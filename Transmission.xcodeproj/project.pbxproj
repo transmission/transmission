@@ -679,6 +679,15 @@
 		45C688F12875B2CA00A2EB25 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoOptionsView.strings; sourceTree = "<group>"; };
 		45C688F22875B2CD00A2EB25 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoOptionsView.strings; sourceTree = "<group>"; };
 		45C688F32875B2CF00A2EB25 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoOptionsView.strings; sourceTree = "<group>"; };
+		45C688F42875B3F000A2EB25 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688F52875B3F400A2EB25 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688F62875B3F600A2EB25 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688F72875B3F800A2EB25 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688F82875B3FB00A2EB25 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688F92875B3FF00A2EB25 /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = pt_PT.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688FA2875B40300A2EB25 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688FB2875B40600A2EB25 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
+		45C688FC2875B40900A2EB25 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/GlobalOptionsPopover.strings; sourceTree = "<group>"; };
 		45F195E828738F3100654B15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		45F195E928738F3100654B15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		45F195EA28738F3200654B15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Creator.xib; sourceTree = "<group>"; };
@@ -884,7 +893,6 @@
 		A263C5681560A4290082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A263C5691560A4310082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/Creator.xib; sourceTree = "<group>"; };
 		A263C56A1560A4370082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A263C5701560A44F0082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A263CFBE10DD67670038DE27 /* InfoTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoTextField.h; sourceTree = "<group>"; };
 		A263CFBF10DD67670038DE27 /* InfoTextField.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoTextField.mm; sourceTree = "<group>"; };
 		A265A32E0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = fr.lproj/Creator.xib; sourceTree = "<group>"; };
@@ -930,13 +938,7 @@
 		A292A6E40DFB45E5004B9C0A /* peer-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-common.h"; sourceTree = "<group>"; };
 		A292A6E50DFB45EC004B9C0A /* webseed.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = webseed.cc; sourceTree = "<group>"; };
 		A292A6E60DFB45EC004B9C0A /* webseed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = webseed.h; sourceTree = "<group>"; };
-		A292C9E01413BA5F00EF710F /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
-		A292C9E2141593DA00EF710F /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
-		A292C9E414163AE500EF710F /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A29304EC15D7465100B1F726 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
-		A29443271419746A0016143A /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = ru.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
-		A294432E141B23CD0016143A /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = pt_PT.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
-		A2963CFD1423F2BB00C497B5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = fr.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2966E8513DAF74C007B52DF /* GlobalOptionsPopoverViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GlobalOptionsPopoverViewController.h; sourceTree = "<group>"; };
 		A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GlobalOptionsPopoverViewController.mm; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PortChecker.h; sourceTree = "<group>"; };
@@ -949,7 +951,6 @@
 		A29E653513F1603100048D71 /* evutil_rand.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = evutil_rand.c; sourceTree = "<group>"; };
 		A29EBE520DC01FC9006CEE80 /* web.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = web.cc; sourceTree = "<group>"; };
 		A29EBE530DC01FC9006CEE80 /* web.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = web.h; sourceTree = "<group>"; };
-		A2A1C81D142EC032008C17BF /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PeerProgressIndicatorCell.mm; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BadgeView.h; sourceTree = "<group>"; };
@@ -962,7 +963,6 @@
 		A2A9D11C187DD75400C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2A9D11D187DD75500C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/Creator.xib; sourceTree = "<group>"; };
 		A2A9D11E187DD75600C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A2A9D124187DD75C00C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PiecesView.mm; sourceTree = "<group>"; };
 		A2AA9BE0132CAC8D00FA131E /* announcer-udp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announcer-udp.cc"; sourceTree = "<group>"; };
@@ -3442,16 +3442,16 @@
 		A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A292C9E01413BA5F00EF710F /* es */,
-				A292C9E2141593DA00EF710F /* de */,
-				A292C9E414163AE500EF710F /* it */,
-				A29443271419746A0016143A /* ru */,
-				A294432E141B23CD0016143A /* pt_PT */,
-				A2963CFD1423F2BB00C497B5 /* fr */,
-				A2A1C81D142EC032008C17BF /* nl */,
-				A263C5701560A44F0082A3D1 /* da */,
-				A2A9D124187DD75C00C52A1F /* tr */,
 				45F195F128738F3500654B15 /* Base */,
+				45C688F42875B3F000A2EB25 /* da */,
+				45C688F52875B3F400A2EB25 /* nl */,
+				45C688F62875B3F600A2EB25 /* fr */,
+				45C688F72875B3F800A2EB25 /* de */,
+				45C688F82875B3FB00A2EB25 /* it */,
+				45C688F92875B3FF00A2EB25 /* pt-PT */,
+				45C688FA2875B40300A2EB25 /* ru */,
+				45C688FB2875B40600A2EB25 /* es */,
+				45C688FC2875B40900A2EB25 /* tr */,
 			);
 			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
