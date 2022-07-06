@@ -652,6 +652,15 @@
 		45C688D62875AE0500A2EB25 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/GroupRules.strings; sourceTree = "<group>"; };
 		45C688D72875AE0800A2EB25 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/GroupRules.strings; sourceTree = "<group>"; };
 		45C688D82875AE0C00A2EB25 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/GroupRules.strings; sourceTree = "<group>"; };
+		45C688D92875B05B00A2EB25 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688DA2875B06000A2EB25 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688DB2875B06200A2EB25 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688DC2875B06400A2EB25 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688DD2875B06700A2EB25 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688DE2875B06900A2EB25 /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = pt_PT.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688DF2875B06D00A2EB25 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688E02875B06F00A2EB25 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
+		45C688E12875B07300A2EB25 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoGeneralView.strings; sourceTree = "<group>"; };
 		45F195E828738F3100654B15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		45F195E928738F3100654B15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		45F195EA28738F3200654B15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Creator.xib; sourceTree = "<group>"; };
@@ -769,16 +778,12 @@
 		A220EC59118C8A060022B4BE /* tr-lpd.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-lpd.cc"; sourceTree = "<group>"; };
 		A220EC5A118C8A060022B4BE /* tr-lpd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-lpd.h"; sourceTree = "<group>"; };
 		A220EE6911A838450022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A220EE6A11A838640022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A220EE6B11A838750022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A220EED211AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A220EED311AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A220EED411AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A220EEDA11AE95CE0022B4BE /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A220EEDB11AE95CE0022B4BE /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A220EEDC11AE95CE0022B4BE /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A220EEEF11B070A50022B4BE /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = ru.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A220EEF011B070A50022B4BE /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = ru.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A220EEF111B070A50022B4BE /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = ru.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A22180960D148A71007D09ED /* GroupsPrefsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupsPrefsController.h; sourceTree = "<group>"; };
 		A22180970D148A71007D09ED /* GroupsPrefsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupsPrefsController.mm; sourceTree = "<group>"; };
@@ -862,7 +867,6 @@
 		A2613F9211B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = pt_PT.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2613F9311B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = pt_PT.lproj/Creator.xib; sourceTree = "<group>"; };
 		A2613F9511B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = pt_PT.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A2613F9611B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = pt_PT.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A2613F9711B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = pt_PT.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A2613F9811B3383200472893 /* pt_PT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_PT; path = pt_PT.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2613F9911B3383200472893 /* pt_PT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_PT; path = pt_PT.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -872,7 +876,6 @@
 		A263C5681560A4290082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A263C5691560A4310082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/Creator.xib; sourceTree = "<group>"; };
 		A263C56A1560A4370082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A263C56D1560A4420082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A263C56E1560A4470082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A263C56F1560A44B0082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A263C5701560A44F0082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
@@ -903,7 +906,6 @@
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A279E3D111C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A279E3D211C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A279E3D311C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentGroup.h; sourceTree = "<group>"; };
 		A27F0F320E19AD9800B2DB97 /* TorrentGroup.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentGroup.mm; sourceTree = "<group>"; };
@@ -956,7 +958,6 @@
 		A2A9D11C187DD75400C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2A9D11D187DD75500C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/Creator.xib; sourceTree = "<group>"; };
 		A2A9D11E187DD75600C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A2A9D121187DD75900C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A2A9D122187DD75A00C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A2A9D123187DD75B00C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A2A9D124187DD75C00C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
@@ -980,7 +981,6 @@
 		A2B5B4E81880665E0071A66A /* ShareTorrentFileHelper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ShareTorrentFileHelper.mm; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2B9F90411BD10BE003FC8CA /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = fr.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A2B9F90511BD10BE003FC8CA /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = fr.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A2B9F90611BD10BE003FC8CA /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = fr.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A2BE9C4E0C1E4ADA002D16E6 /* makemeta.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = makemeta.cc; sourceTree = "<group>"; };
 		A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = makemeta.h; sourceTree = "<group>"; };
@@ -3374,16 +3374,16 @@
 		A209EAEA1142D294002B02D1 /* InfoGeneralView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A220EE6A11A838640022B4BE /* de */,
-				A220EED311AB3F9B0022B4BE /* it */,
-				A220EEDB11AE95CE0022B4BE /* es */,
-				A220EEF011B070A50022B4BE /* ru */,
-				A2613F9611B3383200472893 /* pt_PT */,
-				A2B9F90511BD10BE003FC8CA /* fr */,
-				A279E3D211C3BDC300D48B1F /* nl */,
-				A263C56D1560A4420082A3D1 /* da */,
-				A2A9D121187DD75900C52A1F /* tr */,
 				45F195EE28738F3300654B15 /* Base */,
+				45C688D92875B05B00A2EB25 /* da */,
+				45C688DA2875B06000A2EB25 /* nl */,
+				45C688DB2875B06200A2EB25 /* fr */,
+				45C688DC2875B06400A2EB25 /* de */,
+				45C688DD2875B06700A2EB25 /* it */,
+				45C688DE2875B06900A2EB25 /* pt-PT */,
+				45C688DF2875B06D00A2EB25 /* ru */,
+				45C688E02875B06F00A2EB25 /* es */,
+				45C688E12875B07300A2EB25 /* tr */,
 			);
 			name = InfoGeneralView.xib;
 			sourceTree = "<group>";
