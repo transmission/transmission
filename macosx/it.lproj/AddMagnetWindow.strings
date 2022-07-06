@@ -1,0 +1,54 @@
+
+/* Class = "NSWindow"; title = "Finestra"; ObjectID = "1"; */
+"1.title" = "Finestra";
+
+/* Class = "NSTextFieldCell"; title = "Nome file"; ObjectID = "6"; */
+"6.title" = "Nome file";
+
+/* Class = "NSTextFieldCell"; title = "File"; ObjectID = "13"; */
+"13.title" = "File";
+
+/* Class = "NSTextFieldCell"; title = "Scarica in:"; ObjectID = "15"; */
+"15.title" = "Scarica in:";
+
+/* Class = "NSButtonCell"; title = "Cambia…"; ObjectID = "16"; */
+"16.title" = "Cambia…";
+
+/* Class = "NSButtonCell"; title = "Avvia il trasferimento"; ObjectID = "18"; */
+"18.title" = "Avvia il trasferimento";
+
+/* Class = "NSButtonCell"; title = "Agg."; ObjectID = "20"; */
+"20.title" = "Agg.";
+
+/* Class = "NSButtonCell"; title = "Annulla"; ObjectID = "22"; */
+"22.title" = "Annulla";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "35"; */
+"35.title" = "OtherViews";
+
+/* Class = "NSTextFieldCell"; title = "Gruppo:"; ObjectID = "41"; */
+"41.title" = "Gruppo:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "87"; */
+"87.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Bassa"; ObjectID = "88"; */
+"88.title" = "Bassa";
+
+/* Class = "NSMenuItem"; title = "Normale"; ObjectID = "89"; */
+"89.title" = "Normale";
+
+/* Class = "NSMenuItem"; title = "Alta"; ObjectID = "90"; */
+"90.title" = "Alta";
+
+/* Class = "NSTextFieldCell"; title = "Priorità:"; ObjectID = "91"; */
+"91.title" = "Priorità:";
+
+/* Class = "NSTextFieldCell"; title = "Collegamento magnetico"; ObjectID = "101"; */
+"101.title" = "Collegamento magnetico";
+
+/* Class = "NSBox"; title = "Box"; ObjectID = "102"; */
+"102.title" = "Box";
+
+/* Class = "NSMenuItem"; title = "Nessuno"; ObjectID = "2zq-5y-smI"; */
+"2zq-5y-smI.title" = "Nessuno";
