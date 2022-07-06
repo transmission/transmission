@@ -122,7 +122,8 @@ public:
                 {
                     auto& candidate = candidates[i];
 
-                    if (n_reqs_to_distribute > 0U && (candidate.n_pending + candidate.n_alloced + 1 < n_target) &&
+                    if ((n_reqs_to_distribute > 0U) && (candidate.n_pending + candidate.n_alloced + 1 <= n_target) &&
+                        (!candidate.n_limit || candidate.n_pending + candidate.n_alloced + 1 <= *candidate.n_limit) &&
                         pool_left.hasOpenSlot(std::data(candidate.pools), std::size(candidate.pools)))
                     {
                         --n_reqs_to_distribute;
@@ -176,8 +177,7 @@ private:
         {
             for (auto const* const end = pools + n_pools; pools != end; ++pools)
             {
-                auto& val = blocks_left_[*pools];
-                if (val > 0)
+                if (auto& val = blocks_left_[*pools]; val > 0)
                 {
                     --val;
                 }
@@ -228,9 +228,10 @@ private:
     struct Candidate
     {
         PeerKey peer_key;
-        size_t n_pending;
-        size_t n_alloced;
         std::vector<PoolKey> pools;
+        std::optional<size_t> n_limit = 0;
+        size_t n_pending = 0;
+        size_t n_alloced = 0;
     };
 
     [[nodiscard]] static auto getCandidates(Mediator const& mediator)
@@ -243,7 +244,11 @@ private:
             std::end(peers),
             std::begin(candidates),
             [&mediator](auto& peer) {
-                return Candidate{ peer, mediator.activeReqCount(peer), {}, mediator.pools(peer) };
+                return Candidate{ peer,
+                                  mediator.pools(peer),
+                                  mediator.maxActiveRequests(peer),
+                                  mediator.activeReqCount(peer),
+                                  {} };
             });
 
         return candidates;

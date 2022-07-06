@@ -251,6 +251,28 @@ TEST_F(RequestAllocatorTest, allocatesEvenly2)
     EXPECT_EQ(expected, allocation);
 }
 
+TEST_F(RequestAllocatorTest, reqQAffectsCount)
+{
+    auto mediator = MockMediator();
+    mediator.setPoolLimit(Torrent1Pool, 50);
+    mediator.setPoolLimit(Torrent2Pool, 500);
+    mediator.setPoolLimit(SessionPool, 200);
+    mediator.addPeer(Torrent1PeerA, 10, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent1PeerB, 5, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent2PeerA, 20, Torrent2Pool, SessionPool);
+    mediator.addPeer(Torrent2PeerB, 15, Torrent2Pool, SessionPool);
+
+    mediator.setReqQ(Torrent2PeerB, 40);
+
+    auto allocation = RequestAllocator::allocateBlockReqs(mediator, 1000);
+    std::sort(std::begin(allocation), std::end(allocation));
+    auto const expected = std::vector<std::pair<PeerKey, size_t>>{ std::make_pair(Torrent1PeerA, 15),
+                                                                   std::make_pair(Torrent1PeerB, 20),
+                                                                   std::make_pair(Torrent2PeerA, 90),
+                                                                   std::make_pair(Torrent2PeerB, 25) };
+    EXPECT_EQ(expected, allocation);
+}
+
 TEST_F(RequestAllocatorTest, activeReqsReduceNewReqCount)
 {
     static auto constexpr ActiveReqs = size_t{ 10U };

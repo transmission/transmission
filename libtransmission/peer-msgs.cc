@@ -658,7 +658,7 @@ public:
         }
     }
 
-    [[nodiscard]] virtual std::optional<size_t> maxActiveRequests() const noexcept override
+    [[nodiscard]] std::optional<size_t> maxActiveRequests() const noexcept override
     {
         return reqq;
     }
