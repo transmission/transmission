@@ -1,0 +1,81 @@
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "1"; */
+"1.title" = "Window";
+
+/* Class = "NSTextFieldCell"; title = "Имя файла"; ObjectID = "6"; */
+"6.title" = "Имя файла";
+
+/* Class = "NSTextFieldCell"; title = "информация"; ObjectID = "7"; */
+"7.title" = "информация";
+
+/* Class = "NSTextFieldCell"; title = "File"; ObjectID = "13"; */
+"13.title" = "File";
+
+/* Class = "NSTextFieldCell"; title = "Скачивать в:"; ObjectID = "15"; */
+"15.title" = "Скачивать в:";
+
+/* Class = "NSButtonCell"; title = "Изменить..."; ObjectID = "16"; */
+"16.title" = "Изменить...";
+
+/* Class = "NSButtonCell"; title = "Начать скачивание"; ObjectID = "18"; */
+"18.title" = "Начать скачивание";
+
+/* Class = "NSButtonCell"; title = "Добавить"; ObjectID = "20"; */
+"20.title" = "Добавить";
+
+/* Class = "NSButtonCell"; title = "Отменить"; ObjectID = "22"; */
+"22.title" = "Отменить";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "35"; */
+"35.title" = "OtherViews";
+
+/* Class = "NSTextFieldCell"; title = "Группа:"; ObjectID = "41"; */
+"41.title" = "Группа:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Важн."; ObjectID = "47"; */
+"47.headerCell.title" = "Важн.";
+
+/* Class = "NSTableColumn"; headerCell.title = "Скач."; ObjectID = "48"; */
+"48.headerCell.title" = "Скач.";
+
+/* Class = "NSTableColumn"; headerCell.title = "Имя"; ObjectID = "49"; */
+"49.headerCell.title" = "Имя";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "50"; */
+"50.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "52"; */
+"52.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Удалить торрент-файл"; ObjectID = "59"; */
+"59.title" = "Удалить торрент-файл";
+
+/* Class = "NSButtonCell"; title = "Проверить данные"; ObjectID = "66"; */
+"66.title" = "Проверить данные";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "87"; */
+"87.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Низкий"; ObjectID = "88"; */
+"88.title" = "Низкий";
+
+/* Class = "NSMenuItem"; title = "Нормальный"; ObjectID = "89"; */
+"89.title" = "Нормальный";
+
+/* Class = "NSMenuItem"; title = "Высокий"; ObjectID = "90"; */
+"90.title" = "Высокий";
+
+/* Class = "NSTextFieldCell"; title = "Приоритет:"; ObjectID = "91"; */
+"91.title" = "Приоритет:";
+
+/* Class = "NSBox"; title = "Box"; ObjectID = "100"; */
+"100.title" = "Box";
+
+/* Class = "NSButtonCell"; title = "Все"; ObjectID = "104"; */
+"104.title" = "Все";
+
+/* Class = "NSButtonCell"; title = "Ни одного"; ObjectID = "105"; */
+"105.title" = "Ни одного";
+
+/* Class = "NSSearchFieldCell"; placeholderString = "Фильтр"; ObjectID = "113"; */
+"113.placeholderString" = "Фильтр";
