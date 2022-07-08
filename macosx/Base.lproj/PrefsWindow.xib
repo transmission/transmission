@@ -2424,7 +2424,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button translatesAutoresizingMaskIntoConstraints="NO" id="1747">
+                        <button horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1747">
                             <rect key="frame" x="36" y="139" width="323" height="18"/>
                             <buttonCell key="cell" type="check" title="Only allow the following IP addresses to connect:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1748">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
