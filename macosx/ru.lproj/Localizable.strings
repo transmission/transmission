@@ -1149,3 +1149,6 @@
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Вы заинтересованы в имеющихся у пользователя частях торрента, но он вас блокирует";
 
+/* Preferences window size*/
+"PrefWindowSize" = "606";
+

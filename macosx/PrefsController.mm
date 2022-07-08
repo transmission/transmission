@@ -210,6 +210,7 @@
     self.window.toolbar = toolbar;
 
     [self setPrefView:nil];
+    [self setWindowSize];
 
     //set special-handling of magnet link add window checkbox
     [self updateShowAddMagnetWindowField];
@@ -387,6 +388,14 @@
 {
     NSWindow* window = ((Controller*)NSApp.delegate).prefsController.window;
     completionHandler(window, nil);
+}
+
+- (void) setWindowSize
+{
+    //set window width with localised value
+    NSRect windowRect = self.window.frame;
+    windowRect.size.width = [NSLocalizedString(@"PrefWindowSize", nil) floatValue];
+    [self.window setFrame:windowRect display:YES animate:NO];
 }
 
 //for a beta release, always use the beta appcast
