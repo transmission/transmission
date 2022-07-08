@@ -147,11 +147,11 @@ std::optional<std::string> tr_session::WebMediator::publicAddress() const
 {
     for (auto const type : { TR_AF_INET, TR_AF_INET6 })
     {
-        auto is_default_value = bool{};
-        tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
-        if (addr != nullptr && !is_default_value)
+        auto const [addr, is_default_value] = session_->getPublicAddress(type);
+
+        if (!is_default_value)
         {
-            return addr->readable();
+            return addr.readable();
         }
     }
 
@@ -277,33 +277,12 @@ static void open_incoming_peer_port(tr_session* session)
     }
 }
 
-tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value)
+std::pair<tr_address, bool> tr_session::getPublicAddress(tr_address_type type) const
 {
-    char const* default_value = "";
-    tr_bindinfo const* bindinfo = nullptr;
-
-    switch (tr_af_type)
-    {
-    case TR_AF_INET:
-        bindinfo = session->bind_ipv4;
-        default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
-        break;
-
-    case TR_AF_INET6:
-        bindinfo = session->bind_ipv6;
-        default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
-        break;
-
-    default:
-        break;
-    }
-
-    if (is_default_value != nullptr && bindinfo != nullptr)
-    {
-        *is_default_value = bindinfo->addr.readable() == default_value;
-    }
-
-    return bindinfo != nullptr ? &bindinfo->addr : nullptr;
+    auto const* const bindinfo = type == TR_AF_INET6 ? bind_ipv6 : bind_ipv4;
+    char const* const default_value = type == TR_AF_INET6 ? TR_DEFAULT_BIND_ADDRESS_IPV6 : TR_DEFAULT_BIND_ADDRESS_IPV4;
+    auto const is_default_value = bindinfo->addr.readable() == default_value;
+    return std::make_pair(bindinfo->addr, is_default_value);
 }
 
 /***
