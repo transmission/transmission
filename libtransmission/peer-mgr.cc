@@ -1193,7 +1193,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     }
     else /* we don't have a connection to them yet... */
     {
-        tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket);
+        tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, *addr, port, tr_time(), socket);
         tr_handshake* const handshake = tr_handshakeNew(io, session->encryptionMode, on_handshake_done, manager);
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
@@ -2754,7 +2754,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     tr_peerIo* const io = tr_peerIoNewOutgoing(
         mgr->session,
         &mgr->session->top_bandwidth_,
-        &atom.addr,
+        atom.addr,
         atom.port,
         tr_time(),
         s->tor->infoHash(),
