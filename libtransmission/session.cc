@@ -236,18 +236,15 @@ static void free_incoming_peer_port(tr_session* session)
     session->bind_ipv6 = nullptr;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsession)
+static void accept_incoming_peer(evutil_socket_t listening_sockfd, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    auto clientAddr = tr_address{};
-    auto clientPort = tr_port{};
-    auto const clientSocket = tr_netAccept(session, fd, &clientAddr, &clientPort);
-
-    if (clientSocket != TR_BAD_SOCKET)
+    if (auto const accepted = tr_netAccept(session, listening_sockfd); accepted)
     {
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", clientSocket, clientAddr.readable(clientPort)));
-        tr_peerMgrAddIncoming(session->peerMgr, clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
+        auto const& [sock, addr, port] = *accepted;
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
+        tr_peerMgrAddIncoming(session->peerMgr, addr, port, tr_peer_socket_tcp_create(sock));
     }
 }
 

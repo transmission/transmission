@@ -149,6 +149,7 @@ private:
 struct tr_address
 {
     [[nodiscard]] static std::optional<tr_address> fromString(std::string_view str);
+    [[nodiscard]] static std::optional<std::pair<tr_address, tr_port>> fromSockaddrStorage(sockaddr_storage);
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact4(uint8_t const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
 
@@ -200,8 +201,6 @@ struct tr_address
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
 
-bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
-
 constexpr bool tr_address_is_valid(tr_address const* a)
 {
     return a != nullptr && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
@@ -215,7 +214,7 @@ struct tr_session;
 
 tr_socket_t tr_netBindTCP(tr_address addr, tr_port port, bool suppressMsgs);
 
-tr_socket_t tr_netAccept(tr_session* session, tr_socket_t bound, tr_address* setme_addr, tr_port* setme_port);
+std::optional<std::tuple<tr_socket_t, tr_address, tr_port>> tr_netAccept(tr_session*, tr_socket_t listening_sockfd);
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 

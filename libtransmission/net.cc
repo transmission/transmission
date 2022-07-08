@@ -167,27 +167,27 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 #endif
 }
 
-bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_port, struct sockaddr_storage const* from)
+std::optional<std::pair<tr_address, tr_port>> tr_address::fromSockaddrStorage(sockaddr_storage from)
 {
-    if (from->ss_family == AF_INET)
+    if (from.ss_family == AF_INET)
     {
-        auto const* const sin = (struct sockaddr_in const*)from;
-        setme_addr->type = TR_AF_INET;
-        setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
-        *setme_port = tr_port::fromNetwork(sin->sin_port);
-        return true;
+        auto const* const sin = reinterpret_cast<sockaddr_in const*>(&from);
+        auto tmp = tr_address{};
+        tmp.type = TR_AF_INET;
+        tmp.addr.addr4.s_addr = sin->sin_addr.s_addr;
+        return std::make_pair(tmp, tr_port::fromNetwork(sin->sin_port));
     }
 
-    if (from->ss_family == AF_INET6)
+    if (from.ss_family == AF_INET6)
     {
-        auto const* const sin6 = (struct sockaddr_in6 const*)from;
-        setme_addr->type = TR_AF_INET6;
-        setme_addr->addr.addr6 = sin6->sin6_addr;
-        *setme_port = tr_port::fromNetwork(sin6->sin6_port);
-        return true;
+        auto const* const sin6 = reinterpret_cast<sockaddr_in6 const*>(&from);
+        auto tmp = tr_address{};
+        tmp.type = TR_AF_INET6;
+        tmp.addr.addr6 = sin6->sin6_addr;
+        return std::make_pair(tmp, tr_port::fromNetwork(sin6->sin6_port));
     }
 
-    return false;
+    return {};
 }
 
 static socklen_t setup_sockaddr(tr_address addr, tr_port port, struct sockaddr_storage* sockaddr)
@@ -507,11 +507,9 @@ bool tr_net_hasIPv6(tr_port port)
     return result;
 }
 
-tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_address* addr, tr_port* port)
+std::optional<std::tuple<tr_socket_t, tr_address, tr_port>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(addr != nullptr);
-    TR_ASSERT(port != nullptr);
 
     // accept the incoming connection
     struct sockaddr_storage sock;
@@ -519,20 +517,21 @@ tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_a
     auto const sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
     if (sockfd == TR_BAD_SOCKET)
     {
-        return TR_BAD_SOCKET;
+        return {};
     }
 
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    if (!tr_address_from_sockaddr_storage(addr, port, &sock) || evutil_make_socket_nonblocking(sockfd) == -1 ||
-        !session->incPeerCount())
+    auto const addrport = tr_address::fromSockaddrStorage(sock);
+    if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || !session->incPeerCount())
     {
         tr_netCloseSocket(sockfd);
-        return TR_BAD_SOCKET;
+        return {};
     }
 
-    return sockfd;
+    auto const& [addr, port] = *addrport;
+    return std::make_tuple(sockfd, addr, port);
 }
 
 void tr_netCloseSocket(tr_socket_t sockfd)
