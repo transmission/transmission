@@ -61,34 +61,6 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
-char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port)
-{
-    char addr_buf[INET6_ADDRSTRLEN];
-    tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
-    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("[{:s}]:{:d}"), addr_buf, port.host()).out = '\0';
-    return buf;
-}
-
-char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen)
-{
-    TR_ASSERT(tr_address_is_valid(addr));
-
-    return addr->type == TR_AF_INET ? evutil_inet_ntop(AF_INET, &addr->addr, buf, buflen) :
-                                      evutil_inet_ntop(AF_INET6, &addr->addr, buf, buflen);
-}
-
-/*
- * Non-threadsafe version of tr_address_to_string_with_buf()
- * and uses a static memory area for a buffer.
- * This function is suitable to be called from libTransmission's networking code,
- * which is single-threaded.
- */
-char const* tr_address_to_string(tr_address const* addr)
-{
-    static char buf[INET6_ADDRSTRLEN];
-    return tr_address_to_string_with_buf(addr, buf, sizeof(buf));
-}
-
 bool tr_address_from_string(tr_address* dst, char const* src)
 {
     if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
@@ -397,9 +369,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         ret = tr_peer_socket_tcp_create(s);
     }
 
-    char addrstr[TR_ADDRSTRLEN];
-    tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addrstr));
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr->readable(port)));
 
     return ret;
 }
@@ -884,30 +854,26 @@ std::optional<tr_address> tr_address::fromString(std::string_view address_str)
     return addr;
 }
 
-template<typename OutputIt>
-OutputIt tr_address::readable(OutputIt out) const
+std::string_view tr_address::readable(char* out, size_t outlen, tr_port port) const
 {
-    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-    tr_address_to_string_with_buf(this, std::data(buf), std::size(buf));
-    return fmt::format_to(out, FMT_STRING("{:s}"), std::data(buf));
-}
+    if (std::empty(port))
+    {
+        return type == TR_AF_INET ? evutil_inet_ntop(AF_INET, &addr, out, outlen) :
+                                    evutil_inet_ntop(AF_INET6, &addr, out, outlen);
+    }
 
-template char* tr_address::readable<char*>(char*) const;
-
-std::string tr_address::readable() const
-{
-    auto buf = std::string{};
-    buf.reserve(INET6_ADDRSTRLEN);
-    this->readable(std::back_inserter(buf));
-    return buf;
+    auto addrbuf = std::array<char, INET6_ADDRSTRLEN>{};
+    readable(std::data(addrbuf), std::size(addrbuf));
+    auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), std::data(addrbuf), port.host());
+    return { out, size };
 }
 
 template<typename OutputIt>
 OutputIt tr_address::readable(OutputIt out, tr_port port) const
 {
-    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-    tr_address_to_string_with_buf(this, std::data(buf), std::size(buf));
-    return fmt::format_to(out, FMT_STRING("[{:s}]:{:d}"), std::data(buf), port.host());
+    auto addrbuf = std::array<char, TR_ADDRSTRLEN>{};
+    auto const addr_sv = readable(std::data(addrbuf), std::size(addrbuf), port);
+    return fmt::format_to(out, FMT_STRING("{:s}"), addr_sv);
 }
 
 template char* tr_address::readable<char*>(char*, tr_port) const;

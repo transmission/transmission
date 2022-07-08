@@ -1184,7 +1184,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
 
     if (tr_sessionIsAddressBlocked(session, addr))
     {
-        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", tr_address_to_string(addr)));
+        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr->readable()));
         tr_netClosePeerSocket(session, socket);
     }
     else if (manager->incoming_handshakes.contains(*addr))
@@ -1631,7 +1631,7 @@ namespace peer_stat_helpers
 
     auto const [addr, port] = peer->socketAddress();
 
-    tr_address_to_string_with_buf(&addr, stats.addr, sizeof(stats.addr));
+    addr.readable(stats.addr, sizeof(stats.addr));
     stats.client = peer->client.c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
