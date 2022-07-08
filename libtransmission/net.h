@@ -160,6 +160,16 @@ struct tr_address
     std::string_view readable(char* out, size_t outlen, tr_port port = {}) const;
     [[nodiscard]] std::string readable(tr_port port = {}) const;
 
+    [[nodiscard]] constexpr auto isIPv4() const noexcept
+    {
+        return type == TR_AF_INET;
+    }
+
+    [[nodiscard]] constexpr auto isIPv6() const noexcept
+    {
+        return type == TR_AF_INET6;
+    }
+
     // comparisons
 
     [[nodiscard]] int compare(tr_address const& that) const noexcept;
@@ -189,10 +199,6 @@ struct tr_address
 
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
-
-bool tr_address_from_string(tr_address* setme, char const* string);
-
-bool tr_address_from_string(tr_address* dst, std::string_view src);
 
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
 

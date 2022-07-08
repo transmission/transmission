@@ -934,19 +934,25 @@ static void sessionSetImpl(struct init_data* const data)
 
     free_incoming_peer_port(session);
 
-    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv) || !tr_address_from_string(&b.addr, sv) ||
-        b.addr.type != TR_AF_INET)
+    b.addr = tr_inaddr_any;
+    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv))
     {
-        b.addr = tr_inaddr_any;
+        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv4())
+        {
+            b.addr = *addr;
+        }
     }
 
     b.socket = TR_BAD_SOCKET;
     session->bind_ipv4 = static_cast<struct tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
 
-    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv) || !tr_address_from_string(&b.addr, sv) ||
-        b.addr.type != TR_AF_INET6)
+    b.addr = tr_in6addr_any;
+    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv))
     {
-        b.addr = tr_in6addr_any;
+        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv6())
+        {
+            b.addr = *addr;
+        }
     }
 
     b.socket = TR_BAD_SOCKET;
