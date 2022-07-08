@@ -152,7 +152,7 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact4(uint8_t const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
 
-    [[nodiscard]] bool isValidForPeers(tr_port) const noexcept;
+    [[nodiscard]] bool isValidPeerAddress(tr_port) const noexcept;
 
     // human-readable formatting
     template<typename OutputIt>

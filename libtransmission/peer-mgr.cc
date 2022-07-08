@@ -1225,7 +1225,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && // safeguard against corrupt data
-            !s->manager->session->isAddressBlocked(pex->addr) && pex->addr.isValidForPeers(pex->port))
+            !s->manager->session->isAddressBlocked(pex->addr) && pex->addr.isValidPeerAddress(pex->port))
         {
             ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
             ++n_used;

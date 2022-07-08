@@ -184,7 +184,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             BasicHandler::EndDict(context);
 
-            if (pex_.addr.isValidForPeers(pex_.port))
+            if (pex_.addr.isValidPeerAddress(pex_.port))
             {
                 response_.pex.push_back(pex_);
                 pex_ = {};
