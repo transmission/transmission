@@ -66,7 +66,6 @@ enum tr_address_type
 {
     TR_AF_INET,
     TR_AF_INET6,
-    NUM_TR_AF_INET_TYPES
 };
 
 struct tr_address;

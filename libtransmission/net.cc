@@ -303,7 +303,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         return {};
     }
 
-    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
+    static auto constexpr Domains = std::array<int, 2>{ AF_INET, AF_INET6 };
     auto const s = createSocket(session, Domains[addr->type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
@@ -431,10 +431,10 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
+    static auto constexpr Domains = std::array<int, 2>{ AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
 
-    auto const fd = socket(domains[addr->type], SOCK_STREAM, 0);
+    auto const fd = socket(Domains[addr->type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *errOut = sockerrno;
