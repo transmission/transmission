@@ -107,7 +107,7 @@ struct peer_atom
             return *blocklisted_;
         }
 
-        auto const value = tr_sessionIsAddressBlocked(session, &addr);
+        auto const value = session->isAddressBlocked(addr);
         blocklisted_ = value;
         return value;
     }
@@ -1182,7 +1182,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
 
     tr_session* session = manager->session;
 
-    if (tr_sessionIsAddressBlocked(session, addr))
+    if (session->isAddressBlocked(*addr))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr->readable()));
         tr_netClosePeerSocket(session, socket);
@@ -1224,9 +1224,8 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
 
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
-        if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
-            tr_address_is_valid_for_peers(&pex->addr, pex->port))
+        if (tr_isPex(pex) && // safeguard against corrupt data
+            !s->manager->session->isAddressBlocked(pex->addr) && tr_address_is_valid_for_peers(&pex->addr, pex->port))
         {
             ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
             ++n_used;

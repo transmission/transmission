@@ -60,7 +60,7 @@ protected:
     bool addressIsBlocked(char const* address_str)
     {
         struct tr_address addr = {};
-        return !tr_address_from_string(&addr, address_str) || tr_sessionIsAddressBlocked(session_, &addr);
+        return !tr_address_from_string(&addr, address_str) || session_->isAddressBlocked(addr);
     }
 };
 

@@ -257,6 +257,8 @@ public:
 
     [[nodiscard]] std::pair<tr_address, bool /*is default value*/> getPublicAddress(tr_address_type) const;
 
+    [[nodiscard]] bool isAddressBlocked(tr_address) const noexcept;
+
     [[nodiscard]] constexpr bool incPeerCount() noexcept
     {
         if (this->peerCount >= this->peerLimit)
@@ -470,8 +472,6 @@ private:
 bool tr_sessionAllowsDHT(tr_session const* session);
 
 bool tr_sessionAllowsLPD(tr_session const* session);
-
-bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
 
 struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 

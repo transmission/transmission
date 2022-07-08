@@ -2467,10 +2467,10 @@ size_t tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     return ruleCount;
 }
 
-bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
+[[nodiscard]] bool tr_session::isAddressBlocked(tr_address addr) const noexcept
 {
-    auto const& src = session->blocklists;
-    return std::any_of(std::begin(src), std::end(src), [&addr](auto& blocklist) { return blocklist->hasAddress(*addr); });
+    auto const& src = blocklists;
+    return std::any_of(std::begin(src), std::end(src), [&addr](auto& blocklist) { return blocklist->hasAddress(addr); });
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
