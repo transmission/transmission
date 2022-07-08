@@ -71,8 +71,6 @@ enum tr_address_type
 
 struct tr_address;
 
-[[nodiscard]] int tr_address_compare(tr_address const* a, tr_address const* b) noexcept;
-
 /**
  * Literally just a port number.
  *

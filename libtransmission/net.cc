@@ -122,25 +122,6 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
     return tr_address_from_string(dst, std::data(buf));
 }
 
-/*
- * Compare two tr_address structures.
- * Returns:
- * <0 if a < b
- * >0 if a > b
- * 0  if a == b
- */
-int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
-{
-    // IPv6 addresses are always "greater than" IPv4
-    if (a->type != b->type)
-    {
-        return a->type == TR_AF_INET ? 1 : -1;
-    }
-
-    return a->type == TR_AF_INET ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-                                   memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
-}
-
 /***********************************************************************
  * TCP sockets
  **********************************************************************/
@@ -966,5 +947,12 @@ std::pair<tr_address, uint8_t const*> tr_address::fromCompact6(uint8_t const* co
 
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
-    return tr_address_compare(this, &that);
+    // IPv6 addresses are always "greater than" IPv4
+    if (type != that.type)
+    {
+        return type == TR_AF_INET ? 1 : -1;
+    }
+
+    return type == TR_AF_INET ? memcmp(&addr.addr4, &that.addr.addr4, sizeof(addr.addr4)) :
+                                memcmp(&addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(addr.addr6.s6_addr));
 }
