@@ -255,7 +255,7 @@ static void open_incoming_peer_port(tr_session* session)
 {
     /* bind an ipv4 port to listen for incoming peers... */
     auto* b = session->bind_ipv4;
-    b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
+    b->socket = tr_netBindTCP(b->addr, session->private_peer_port, false);
 
     if (b->socket != TR_BAD_SOCKET)
     {
@@ -267,7 +267,7 @@ static void open_incoming_peer_port(tr_session* session)
     if (tr_net_hasIPv6(session->private_peer_port))
     {
         b = session->bind_ipv6;
-        b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
+        b->socket = tr_netBindTCP(b->addr, session->private_peer_port, false);
 
         if (b->socket != TR_BAD_SOCKET)
         {
