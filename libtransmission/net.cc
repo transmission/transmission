@@ -820,30 +820,29 @@ std::string_view tr_address::readable(char* out, size_t outlen, tr_port port) co
 {
     if (std::empty(port))
     {
-        return type == TR_AF_INET ? evutil_inet_ntop(AF_INET, &addr, out, outlen) :
-                                    evutil_inet_ntop(AF_INET6, &addr, out, outlen);
+        return isIPv4() ? evutil_inet_ntop(AF_INET, &addr, out, outlen) : evutil_inet_ntop(AF_INET6, &addr, out, outlen);
     }
 
-    auto addrbuf = std::array<char, INET6_ADDRSTRLEN>{};
-    readable(std::data(addrbuf), std::size(addrbuf));
-    auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), std::data(addrbuf), port.host());
+    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+    auto const addr_sv = readable(std::data(buf), std::size(buf));
+    auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), addr_sv, port.host());
     return { out, size };
 }
 
 template<typename OutputIt>
 OutputIt tr_address::readable(OutputIt out, tr_port port) const
 {
-    auto addrbuf = std::array<char, TR_ADDRSTRLEN>{};
+    auto addrbuf = std::array<char, TR_ADDRSTRLEN + 16>{};
     auto const addr_sv = readable(std::data(addrbuf), std::size(addrbuf), port);
-    return fmt::format_to(out, FMT_STRING("{:s}"), addr_sv);
+    return std::copy(std::begin(addr_sv), std::end(addr_sv), out);
 }
 
 template char* tr_address::readable<char*>(char*, tr_port) const;
 
-std::string tr_address::readable(tr_port port) const
+[[nodiscard]] std::string tr_address::readable(tr_port port) const
 {
     auto buf = std::string{};
-    buf.reserve(INET6_ADDRSTRLEN + 9);
+    buf.reserve(INET6_ADDRSTRLEN + 16);
     this->readable(std::back_inserter(buf), port);
     return buf;
 }
