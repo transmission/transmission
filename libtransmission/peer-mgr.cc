@@ -107,7 +107,7 @@ struct peer_atom
             return *blocklisted_;
         }
 
-        auto const value = tr_sessionIsAddressBlocked(session, &addr);
+        auto const value = session->isAddressBlocked(addr);
         blocklisted_ = value;
         return value;
     }
@@ -1175,19 +1175,19 @@ static bool on_handshake_done(tr_handshake_result const& result)
     return success;
 }
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket)
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(tr_isSession(manager->session));
     auto const lock = manager->unique_lock();
 
     tr_session* session = manager->session;
 
-    if (tr_sessionIsAddressBlocked(session, addr))
+    if (session->isAddressBlocked(addr))
     {
-        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", tr_address_to_string(addr)));
+        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr.readable()));
         tr_netClosePeerSocket(session, socket);
     }
-    else if (manager->incoming_handshakes.contains(*addr))
+    else if (manager->incoming_handshakes.contains(addr))
     {
         tr_netClosePeerSocket(session, socket);
     }
@@ -1198,7 +1198,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
-        manager->incoming_handshakes.add(*addr, handshake);
+        manager->incoming_handshakes.add(addr, handshake);
     }
 }
 
@@ -1224,9 +1224,8 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
 
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
-        if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
-            tr_address_is_valid_for_peers(&pex->addr, pex->port))
+        if (tr_isPex(pex) && // safeguard against corrupt data
+            !s->manager->session->isAddressBlocked(pex->addr) && pex->addr.isValidPeerAddress(pex->port))
         {
             ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
             ++n_used;
@@ -1631,7 +1630,7 @@ namespace peer_stat_helpers
 
     auto const [addr, port] = peer->socketAddress();
 
-    tr_address_to_string_with_buf(&addr, stats.addr, sizeof(stats.addr));
+    addr.readable(stats.addr, sizeof(stats.addr));
     stats.client = peer->client.c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
@@ -2754,7 +2753,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     tr_peerIo* const io = tr_peerIoNewOutgoing(
         mgr->session,
         &mgr->session->top_bandwidth_,
-        &atom.addr,
+        atom.addr,
         atom.port,
         tr_time(),
         s->tor->infoHash(),

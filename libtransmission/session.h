@@ -255,6 +255,10 @@ public:
         tr_netSetTOS(sock, peer_socket_tos_, type);
     }
 
+    [[nodiscard]] std::pair<tr_address, bool /*is default value*/> getPublicAddress(tr_address_type) const;
+
+    [[nodiscard]] bool isAddressBlocked(tr_address) const noexcept;
+
     [[nodiscard]] constexpr bool incPeerCount() noexcept
     {
         if (this->peerCount >= this->peerLimit)
@@ -468,10 +472,6 @@ private:
 bool tr_sessionAllowsDHT(tr_session const* session);
 
 bool tr_sessionAllowsLPD(tr_session const* session);
-
-bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
-
-struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
 
 struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 

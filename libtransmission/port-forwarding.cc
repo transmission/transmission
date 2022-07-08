@@ -96,12 +96,7 @@ static void natPulse(tr_shared* s, bool do_check)
             fmt::arg("private_port", session->private_peer_port.host())));
     }
 
-    s->upnpStatus = tr_upnpPulse(
-        s->upnp,
-        private_peer_port,
-        is_enabled,
-        do_check,
-        tr_address_to_string(&session->bind_ipv4->addr));
+    s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check, session->bind_ipv4->addr.readable());
 
     auto const new_status = tr_sharedTraversalStatus(s);
 

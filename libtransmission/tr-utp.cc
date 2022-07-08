@@ -76,28 +76,28 @@ static auto constexpr UtpIntervalUs = int{ 500000 };
 
 static void utp_on_accept(tr_session* const session, UTPSocket* const s)
 {
-    struct sockaddr_storage from_storage;
-    auto* const from = (struct sockaddr*)&from_storage;
-    socklen_t fromlen = sizeof(from_storage);
-    tr_address addr;
-    tr_port port;
-
     if (!tr_sessionIsUTPEnabled(session))
     {
         utp_close(s);
         return;
     }
 
+    struct sockaddr_storage from_storage;
+    auto* const from = (struct sockaddr*)&from_storage;
+    socklen_t fromlen = sizeof(from_storage);
+
     utp_getpeername(s, from, &fromlen);
 
-    if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
+    if (auto const addrport = tr_address::fromSockaddrStorage(from_storage); addrport)
+    {
+        auto const& [addr, port] = *addrport;
+        tr_peerMgrAddIncoming(session->peerMgr, addr, port, tr_peer_socket_utp_create(s));
+    }
+    else
     {
         tr_logAddWarn(_("Unknown socket family"));
         utp_close(s);
-        return;
     }
-
-    tr_peerMgrAddIncoming(session->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
 }
 
 static void utp_send_to(

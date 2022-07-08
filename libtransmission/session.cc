@@ -147,11 +147,11 @@ std::optional<std::string> tr_session::WebMediator::publicAddress() const
 {
     for (auto const type : { TR_AF_INET, TR_AF_INET6 })
     {
-        auto is_default_value = bool{};
-        tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
-        if (addr != nullptr && !is_default_value)
+        auto const [addr, is_default_value] = session_->getPublicAddress(type);
+
+        if (!is_default_value)
         {
-            return addr->readable();
+            return addr.readable();
         }
     }
 
@@ -236,21 +236,15 @@ static void free_incoming_peer_port(tr_session* session)
     session->bind_ipv6 = nullptr;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsession)
+static void accept_incoming_peer(evutil_socket_t listening_sockfd, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    auto clientAddr = tr_address{};
-    auto clientPort = tr_port{};
-    auto const clientSocket = tr_netAccept(session, fd, &clientAddr, &clientPort);
-
-    if (clientSocket != TR_BAD_SOCKET)
+    if (auto const accepted = tr_netAccept(session, listening_sockfd); accepted)
     {
-        char addrstr[TR_ADDRSTRLEN];
-        tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", clientSocket, addrstr));
-
-        tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
+        auto const& [sock, addr, port] = *accepted;
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
+        tr_peerMgrAddIncoming(session->peerMgr, addr, port, tr_peer_socket_tcp_create(sock));
     }
 }
 
@@ -258,7 +252,7 @@ static void open_incoming_peer_port(tr_session* session)
 {
     /* bind an ipv4 port to listen for incoming peers... */
     auto* b = session->bind_ipv4;
-    b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
+    b->socket = tr_netBindTCP(b->addr, session->private_peer_port, false);
 
     if (b->socket != TR_BAD_SOCKET)
     {
@@ -270,7 +264,7 @@ static void open_incoming_peer_port(tr_session* session)
     if (tr_net_hasIPv6(session->private_peer_port))
     {
         b = session->bind_ipv6;
-        b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
+        b->socket = tr_netBindTCP(b->addr, session->private_peer_port, false);
 
         if (b->socket != TR_BAD_SOCKET)
         {
@@ -280,33 +274,12 @@ static void open_incoming_peer_port(tr_session* session)
     }
 }
 
-tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value)
+std::pair<tr_address, bool> tr_session::getPublicAddress(tr_address_type type) const
 {
-    char const* default_value = "";
-    tr_bindinfo const* bindinfo = nullptr;
-
-    switch (tr_af_type)
-    {
-    case TR_AF_INET:
-        bindinfo = session->bind_ipv4;
-        default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
-        break;
-
-    case TR_AF_INET6:
-        bindinfo = session->bind_ipv6;
-        default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
-        break;
-
-    default:
-        break;
-    }
-
-    if (is_default_value != nullptr && bindinfo != nullptr)
-    {
-        *is_default_value = bindinfo->addr.readable() == default_value;
-    }
-
-    return bindinfo != nullptr ? &bindinfo->addr : nullptr;
+    auto const* const bindinfo = type == TR_AF_INET6 ? bind_ipv6 : bind_ipv4;
+    char const* const default_value = type == TR_AF_INET6 ? TR_DEFAULT_BIND_ADDRESS_IPV6 : TR_DEFAULT_BIND_ADDRESS_IPV4;
+    auto const is_default_value = bindinfo->addr.readable() == default_value;
+    return std::make_pair(bindinfo->addr, is_default_value);
 }
 
 /***
@@ -464,8 +437,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->bind_ipv4->addr));
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->bind_ipv6->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4->addr.readable());
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6->addr.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
@@ -958,19 +931,25 @@ static void sessionSetImpl(struct init_data* const data)
 
     free_incoming_peer_port(session);
 
-    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv) || !tr_address_from_string(&b.addr, sv) ||
-        b.addr.type != TR_AF_INET)
+    b.addr = tr_inaddr_any;
+    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv))
     {
-        b.addr = tr_inaddr_any;
+        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv4())
+        {
+            b.addr = *addr;
+        }
     }
 
     b.socket = TR_BAD_SOCKET;
     session->bind_ipv4 = static_cast<struct tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
 
-    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv) || !tr_address_from_string(&b.addr, sv) ||
-        b.addr.type != TR_AF_INET6)
+    b.addr = tr_in6addr_any;
+    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv))
     {
-        b.addr = tr_in6addr_any;
+        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv6())
+        {
+            b.addr = *addr;
+        }
     }
 
     b.socket = TR_BAD_SOCKET;
@@ -2491,10 +2470,10 @@ size_t tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     return ruleCount;
 }
 
-bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
+[[nodiscard]] bool tr_session::isAddressBlocked(tr_address addr) const noexcept
 {
-    auto const& src = session->blocklists;
-    return std::any_of(std::begin(src), std::end(src), [&addr](auto& blocklist) { return blocklist->hasAddress(*addr); });
+    auto const& src = blocklists;
+    return std::any_of(std::begin(src), std::end(src), [&addr](auto& blocklist) { return blocklist->hasAddress(addr); });
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
