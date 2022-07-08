@@ -20,7 +20,7 @@
 [submodule "third-party/libutp"]
 	path = third-party/libutp
 	url = https://github.com/transmission/libutp
-	branch = post-3.3-transmission
+	branch = post-3.4-transmission
 [submodule "third-party/miniupnpc"]
 	path = third-party/miniupnpc
 	url = https://github.com/transmission/miniupnpc

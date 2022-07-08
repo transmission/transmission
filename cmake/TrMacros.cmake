@@ -112,6 +112,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                 "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
+                "-DCMAKE_INSTALL_LIBDIR:STRING=lib"
                 ${${ID}_EXT_PROJ_CMAKE_ARGS}
             BUILD_BYPRODUCTS "${${ID}_LIBRARY}"
         )

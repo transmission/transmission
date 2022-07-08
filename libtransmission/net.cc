@@ -431,15 +431,22 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
 {
     auto ret = tr_peer_socket{};
 
-    if (tr_address_is_valid_for_peers(addr, port))
+    if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
-        struct UTPSocket* const socket = UTP_Create(tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
+        auto* const socket = utp_create_socket(session->utp_context);
 
         if (socket != nullptr)
         {
-            ret = tr_peer_socket_utp_create(socket);
+            if (utp_connect(socket, reinterpret_cast<sockaddr*>(&ss), sslen) != -1)
+            {
+                ret = tr_peer_socket_utp_create(socket);
+            }
+            else
+            {
+                utp_close(socket);
+            }
         }
     }
 
@@ -459,7 +466,8 @@ void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
 
 #ifdef WITH_UTP
     case TR_PEER_SOCKET_TYPE_UTP:
-        UTP_Close(socket.handle.utp);
+        utp_set_userdata(socket.handle.utp, nullptr);
+        utp_close(socket.handle.utp);
         break;
 #endif
 

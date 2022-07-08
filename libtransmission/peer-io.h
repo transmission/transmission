@@ -32,6 +32,8 @@
 #include "tr-assert.h"
 
 class tr_peerIo;
+struct tr_bandwidth;
+struct struct_utp_context;
 struct tr_datatype;
 
 /**
@@ -235,6 +237,8 @@ private:
 /**
 ***
 **/
+
+void tr_peerIoUtpInit(struct_utp_context* ctx);
 
 // TODO: 8 constructor args is too many; maybe a builder object?
 tr_peerIo* tr_peerIoNewOutgoing(
