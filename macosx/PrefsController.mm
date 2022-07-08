@@ -209,8 +209,8 @@
     toolbar.selectedItemIdentifier = TOOLBAR_GENERAL;
     self.window.toolbar = toolbar;
 
-    [self setPrefView:nil];
     [self setWindowSize];
+    [self setPrefView:nil];
 
     //set special-handling of magnet link add window checkbox
     [self updateShowAddMagnetWindowField];
@@ -1575,8 +1575,13 @@
 
     view.hidden = YES;
     window.contentView = view;
-    [window setFrame:windowRect display:YES animate:YES];
-    view.hidden = NO;
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
+        context.allowsImplicitAnimation = YES;
+        [window setFrame:windowRect display:YES animate:YES];
+    } completionHandler:^{
+        view.hidden = NO;
+    }];
 
     //set title label
     if (sender)

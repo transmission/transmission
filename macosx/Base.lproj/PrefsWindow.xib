@@ -1743,7 +1743,7 @@
             </constraints>
             <point key="canvasLocation" x="-552" y="156"/>
         </customView>
-        <customView misplaced="YES" id="1361" userLabel="Peers">
+        <customView id="1361" userLabel="Peers">
             <rect key="frame" x="0.0" y="0.0" width="598" height="380"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
