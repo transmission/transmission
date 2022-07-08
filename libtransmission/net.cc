@@ -294,17 +294,15 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
     return sockfd;
 }
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed)
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr, tr_port port, bool client_is_seed)
 {
-    TR_ASSERT(tr_address_is_valid(addr));
-
-    if (!addr->isValidForPeers(port))
+    if (!addr.isValidForPeers(port))
     {
         return {};
     }
 
     static auto constexpr Domains = std::array<int, 2>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(session, Domains[addr->type], SOCK_STREAM);
+    auto const s = createSocket(session, Domains[addr.type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -322,10 +320,10 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     }
 
     struct sockaddr_storage sock;
-    socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
+    socklen_t const addrlen = setup_sockaddr(&addr, port, &sock);
 
     // set source address
-    auto const [source_addr, is_default_addr] = session->getPublicAddress(addr->type);
+    auto const [source_addr, is_default_addr] = session->getPublicAddress(addr.type);
     struct sockaddr_storage source_sock;
     socklen_t const sourcelen = setup_sockaddr(&source_addr, {}, &source_sock);
 
@@ -350,12 +348,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     {
         int const tmperrno = sockerrno;
 
-        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
+        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.type == TR_AF_INET)
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
-                fmt::arg("address", addr->readable()),
+                fmt::arg("address", addr.readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(tmperrno)),
                 fmt::arg("error_code", tmperrno)));
@@ -368,7 +366,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         ret = tr_peer_socket_tcp_create(s);
     }
 
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr->readable(port)));
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.readable(port)));
 
     return ret;
 }

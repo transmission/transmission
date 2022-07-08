@@ -662,7 +662,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
 
     if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
     {
-        socket = tr_netOpenPeerSocket(session, &addr, port, is_seed);
+        socket = tr_netOpenPeerSocket(session, addr, port, is_seed);
         tr_logAddDebug(fmt::format(
             "tr_netOpenPeerSocket returned {}",
             socket.type != TR_PEER_SOCKET_TYPE_NONE ? socket.handle.tcp : TR_BAD_SOCKET));
@@ -909,7 +909,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io_close_socket(io);
 
     auto const [addr, port] = io->socketAddress();
-    io->socket = tr_netOpenPeerSocket(session, &addr, port, io->isSeed());
+    io->socket = tr_netOpenPeerSocket(session, addr, port, io->isSeed());
 
     if (io->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {
