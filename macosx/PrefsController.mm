@@ -1578,10 +1578,9 @@
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
         context.allowsImplicitAnimation = YES;
-        [window setFrame:windowRect display:YES animate:YES];
+        [window setFrame:windowRect display:YES];
     } completionHandler:^{
         view.hidden = NO;
-        [view display];
     }];
 
     //set title label
