@@ -390,7 +390,7 @@
     completionHandler(window, nil);
 }
 
-- (void) setWindowSize
+- (void)setWindowSize
 {
     //set window width with localised value
     NSRect windowRect = self.window.frame;
