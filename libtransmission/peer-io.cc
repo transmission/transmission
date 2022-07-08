@@ -657,7 +657,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
 
     if (utp)
     {
-        socket = tr_netOpenPeerUTPSocket(session, &addr, port, is_seed);
+        socket = tr_netOpenPeerUTPSocket(session, addr, port, is_seed);
     }
 
     if (socket.type == TR_PEER_SOCKET_TYPE_NONE)

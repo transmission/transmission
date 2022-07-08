@@ -223,15 +223,13 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
     return false;
 }
 
-static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct sockaddr_storage* sockaddr)
+static socklen_t setup_sockaddr(tr_address addr, tr_port port, struct sockaddr_storage* sockaddr)
 {
-    TR_ASSERT(tr_address_is_valid(addr));
-
-    if (addr->type == TR_AF_INET)
+    if (addr.type == TR_AF_INET)
     {
         sockaddr_in sock4 = {};
         sock4.sin_family = AF_INET;
-        sock4.sin_addr.s_addr = addr->addr.addr4.s_addr;
+        sock4.sin_addr.s_addr = addr.addr.addr4.s_addr;
         sock4.sin_port = port.network();
         memcpy(sockaddr, &sock4, sizeof(sock4));
         return sizeof(struct sockaddr_in);
@@ -241,7 +239,7 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
     sock6.sin6_family = AF_INET6;
     sock6.sin6_port = port.network();
     sock6.sin6_flowinfo = 0;
-    sock6.sin6_addr = addr->addr.addr6;
+    sock6.sin6_addr = addr.addr.addr6;
     memcpy(sockaddr, &sock6, sizeof(sock6));
     return sizeof(struct sockaddr_in6);
 }
@@ -320,12 +318,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr,
     }
 
     struct sockaddr_storage sock;
-    socklen_t const addrlen = setup_sockaddr(&addr, port, &sock);
+    socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
 
     // set source address
     auto const [source_addr, is_default_addr] = session->getPublicAddress(addr.type);
     struct sockaddr_storage source_sock;
-    socklen_t const sourcelen = setup_sockaddr(&source_addr, {}, &source_sock);
+    socklen_t const sourcelen = setup_sockaddr(source_addr, {}, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
@@ -371,15 +369,11 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr,
     return ret;
 }
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(
-    tr_session* session,
-    tr_address const* addr,
-    tr_port port,
-    bool /*client_is_seed*/)
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address addr, tr_port port, bool /*client_is_seed*/)
 {
     auto ret = tr_peer_socket{};
 
-    if (session->utp_context != nullptr && addr->isValidForPeers(port))
+    if (session->utp_context != nullptr && addr.isValidForPeers(port))
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
@@ -462,7 +456,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    int const addrlen = setup_sockaddr(addr, port, &sock);
+    int const addrlen = setup_sockaddr(*addr, port, &sock);
 
     if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
     {
