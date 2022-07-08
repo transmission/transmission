@@ -247,7 +247,7 @@ static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsess
     if (clientSocket != TR_BAD_SOCKET)
     {
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", clientSocket, clientAddr.readable(clientPort)));
-        tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
+        tr_peerMgrAddIncoming(session->peerMgr, clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
     }
 }
 

@@ -97,7 +97,7 @@ static void utp_on_accept(tr_session* const session, UTPSocket* const s)
         return;
     }
 
-    tr_peerMgrAddIncoming(session->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
+    tr_peerMgrAddIncoming(session->peerMgr, addr, port, tr_peer_socket_utp_create(s));
 }
 
 static void utp_send_to(
