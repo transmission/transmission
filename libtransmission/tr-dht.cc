@@ -203,7 +203,7 @@ static void dht_bootstrap(void* closure)
             addr.type = TR_AF_INET;
             memcpy(&addr.addr.addr4, &cl->nodes[i * 6], 4);
             auto const [port, out] = tr_port::fromCompact(&cl->nodes[i * 6 + 4]);
-            tr_dhtAddNode(cl->session, &addr, port, true);
+            tr_dhtAddNode(cl->session, addr, port, true);
         }
 
         if (i < num6 && !bootstrap_done(cl->session, AF_INET6))
@@ -213,7 +213,7 @@ static void dht_bootstrap(void* closure)
             addr.type = TR_AF_INET6;
             memcpy(&addr.addr.addr6, &cl->nodes6[i * 18], 16);
             auto const [port, out] = tr_port::fromCompact(&cl->nodes6[i * 18 + 16]);
-            tr_dhtAddNode(cl->session, &addr, port, true);
+            tr_dhtAddNode(cl->session, addr, port, true);
         }
 
         /* Our DHT code is able to take up to 9 nodes in a row without
@@ -528,9 +528,9 @@ tr_port tr_dhtPort(tr_session* ss)
     return tr_dhtEnabled(ss) ? ss->udp_port : tr_port{};
 }
 
-bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
+bool tr_dhtAddNode(tr_session* ss, tr_address address, tr_port port, bool bootstrap)
 {
-    int af = address->type == TR_AF_INET ? AF_INET : AF_INET6;
+    int af = address.type == TR_AF_INET ? AF_INET : AF_INET6;
 
     if (!tr_dhtEnabled(ss))
     {
@@ -545,23 +545,23 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         return false;
     }
 
-    if (address->type == TR_AF_INET)
+    if (address.type == TR_AF_INET)
     {
         struct sockaddr_in sin;
         memset(&sin, 0, sizeof(sin));
         sin.sin_family = AF_INET;
-        memcpy(&sin.sin_addr, &address->addr.addr4, 4);
+        memcpy(&sin.sin_addr, &address.addr.addr4, 4);
         sin.sin_port = port.network();
         dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
         return true;
     }
 
-    if (address->type == TR_AF_INET6)
+    if (address.type == TR_AF_INET6)
     {
         struct sockaddr_in6 sin6;
         memset(&sin6, 0, sizeof(sin6));
         sin6.sin6_family = AF_INET6;
-        memcpy(&sin6.sin6_addr, &address->addr.addr6, 16);
+        memcpy(&sin6.sin6_addr, &address.addr.addr6, 16);
         sin6.sin6_port = port.network();
         dht_ping_node((struct sockaddr*)&sin6, sizeof(sin6));
         return true;
