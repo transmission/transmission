@@ -385,7 +385,7 @@
                                                     </menu>
                                                 </popUpButtonCell>
                                             </popUpButton>
-                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="59">
+                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="59">
                                                 <rect key="frame" x="84" y="279" width="103" height="16"/>
                                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Default location:" id="1216">
                                                     <font key="font" metaFont="system"/>
@@ -608,6 +608,7 @@
                                             <constraint firstAttribute="width" priority="750" constant="456" id="5MD-kx-1og"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1339" secondAttribute="trailing" constant="20" symbolic="YES" id="7mT-PQ-YW1"/>
                                             <constraint firstItem="1339" firstAttribute="leading" secondItem="1293" secondAttribute="leading" constant="20" id="7qB-KK-BGx"/>
+                                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="209" secondAttribute="bottom" constant="57" id="89P-iu-qPB"/>
                                             <constraint firstItem="51" firstAttribute="leading" secondItem="59" secondAttribute="trailing" constant="5" id="9cs-sM-t7g"/>
                                             <constraint firstItem="1939" firstAttribute="top" secondItem="115" secondAttribute="bottom" constant="4" id="DPz-89-UIF"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="538" secondAttribute="trailing" constant="20" symbolic="YES" id="Dlu-at-N1m"/>
@@ -783,7 +784,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="268">
-                                                <rect key="frame" x="76" y="242" width="261" height="14"/>
+                                                <rect key="frame" x="96" y="242" width="261" height="14"/>
                                                 <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Ratio is amount uploaded to amount downloaded" id="1235">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1043,7 +1044,7 @@
                                                 </connections>
                                             </button>
                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2122">
-                                                <rect key="frame" x="76" y="182" width="177" height="14"/>
+                                                <rect key="frame" x="96" y="182" width="177" height="14"/>
                                                 <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Applies to newly added transfers" id="2123">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1081,11 +1082,9 @@
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2048" secondAttribute="trailing" constant="20" symbolic="YES" id="M1E-Im-toy"/>
                                             <constraint firstAttribute="bottom" secondItem="2043" secondAttribute="bottom" id="Ntg-kR-Z73"/>
                                             <constraint firstItem="639" firstAttribute="top" secondItem="604" secondAttribute="bottom" constant="4" id="OwP-VL-gX0"/>
-                                            <constraint firstItem="2122" firstAttribute="leading" secondItem="268" secondAttribute="leading" id="P4B-A8-PZt"/>
                                             <constraint firstItem="1298" firstAttribute="leading" secondItem="1301" secondAttribute="trailing" constant="8" symbolic="YES" id="PMy-jP-rEj"/>
                                             <constraint firstItem="2043" firstAttribute="centerY" secondItem="2046" secondAttribute="centerY" id="PSZ-ae-Eqx"/>
                                             <constraint firstItem="2043" firstAttribute="top" secondItem="1299" secondAttribute="bottom" constant="20" id="Qf1-Gf-NrG"/>
-                                            <constraint firstItem="268" firstAttribute="leading" secondItem="264" secondAttribute="leading" id="Qss-zs-sZe"/>
                                             <constraint firstItem="337" firstAttribute="top" secondItem="2122" secondAttribute="bottom" constant="20" id="RNI-7M-7QS"/>
                                             <constraint firstItem="636" firstAttribute="centerY" secondItem="639" secondAttribute="centerY" id="RzR-et-pCg"/>
                                             <constraint firstItem="2046" firstAttribute="width" secondItem="267" secondAttribute="width" id="Ubm-6P-bEl"/>
@@ -1096,6 +1095,7 @@
                                             <constraint firstItem="257" firstAttribute="leading" secondItem="337" secondAttribute="trailing" constant="4" id="XHe-qE-pza"/>
                                             <constraint firstItem="267" firstAttribute="leading" secondItem="4cS-54-dlc" secondAttribute="leading" id="ZXE-R2-LbH"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="265" secondAttribute="trailing" constant="20" symbolic="YES" id="a3K-zJ-Yl9"/>
+                                            <constraint firstItem="268" firstAttribute="leading" secondItem="264" secondAttribute="leading" constant="20" id="aMi-iz-dj7"/>
                                             <constraint firstItem="1299" firstAttribute="top" secondItem="1298" secondAttribute="bottom" constant="9" id="aWw-IV-0Be"/>
                                             <constraint firstItem="1958" firstAttribute="top" secondItem="268" secondAttribute="bottom" constant="8" symbolic="YES" id="cVD-xt-VfW"/>
                                             <constraint firstItem="2046" firstAttribute="trailing" secondItem="267" secondAttribute="trailing" id="caP-di-A7X"/>
@@ -1114,6 +1114,7 @@
                                             <constraint firstItem="1300" firstAttribute="centerY" secondItem="1299" secondAttribute="centerY" id="pg2-8t-utk"/>
                                             <constraint firstItem="263" firstAttribute="centerY" secondItem="337" secondAttribute="centerY" id="pnn-34-PEE"/>
                                             <constraint firstAttribute="width" priority="750" constant="456" id="qLv-Ed-VPc"/>
+                                            <constraint firstItem="2122" firstAttribute="leading" secondItem="268" secondAttribute="leading" id="qe2-1X-osM"/>
                                             <constraint firstItem="1297" firstAttribute="width" secondItem="267" secondAttribute="width" id="qeY-U8-rka"/>
                                             <constraint firstItem="1969" firstAttribute="centerY" secondItem="1958" secondAttribute="centerY" id="qkr-XL-plt"/>
                                             <constraint firstItem="262" firstAttribute="trailing" secondItem="267" secondAttribute="trailing" id="use-zI-GYX"/>
@@ -1174,7 +1175,7 @@
                     <rect key="frame" x="20" y="40" width="522" height="200"/>
                     <subviews>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1834">
-                            <rect key="frame" x="187" y="42" width="227" height="28"/>
+                            <rect key="frame" x="189" y="42" width="225" height="28"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Transfers will be assigned to the first group where all criteria are met" id="1835">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1205,7 +1206,7 @@
                             </connections>
                         </button>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1823">
-                            <rect key="frame" x="187" y="101" width="285" height="14"/>
+                            <rect key="frame" x="189" y="101" width="285" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="The location will only be set when adding the transfer" id="1824">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1367,7 +1368,7 @@
                         <constraint firstItem="1772" firstAttribute="leading" secondItem="1771" secondAttribute="leading" id="ajc-aZ-8Jt"/>
                         <constraint firstItem="1830" firstAttribute="top" secondItem="1823" secondAttribute="bottom" constant="8" symbolic="YES" id="i8b-f2-13U"/>
                         <constraint firstItem="1834" firstAttribute="leading" secondItem="1823" secondAttribute="leading" id="mcL-pK-ejr"/>
-                        <constraint firstItem="1823" firstAttribute="leading" secondItem="1814" secondAttribute="leading" constant="18" id="n09-Oh-jjL"/>
+                        <constraint firstItem="1823" firstAttribute="leading" secondItem="1814" secondAttribute="leading" constant="20" id="n09-Oh-jjL"/>
                         <constraint firstItem="1795" firstAttribute="top" secondItem="1771" secondAttribute="top" id="nl0-tW-40z"/>
                         <constraint firstItem="1800" firstAttribute="leading" secondItem="1771" secondAttribute="trailing" constant="8" symbolic="YES" id="o8H-y4-dHa"/>
                         <constraint firstItem="1772" firstAttribute="top" secondItem="1771" secondAttribute="bottom" constant="11" id="qWX-iU-oKf"/>
@@ -1491,14 +1492,14 @@
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="TortoiseTemplate" id="1279"/>
                         </imageView>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="200">
-                            <rect key="frame" x="172" y="53" width="324" height="28"/>
+                            <rect key="frame" x="192" y="53" width="304" height="28"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="When enabled Speed Limit overrides the global bandwidth limits" id="1278">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="199">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="199">
                             <rect key="frame" x="172" y="114" width="96" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Download rate:" id="1277">
                                 <font key="font" metaFont="system"/>
@@ -1506,7 +1507,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="198">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="198">
                             <rect key="frame" x="172" y="89" width="79" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Upload rate:" id="1276">
                                 <font key="font" metaFont="system"/>
@@ -1696,7 +1697,7 @@
                         <constraint firstItem="199" firstAttribute="top" secondItem="155" secondAttribute="bottom" constant="30" id="CDw-Gi-bcH"/>
                         <constraint firstItem="1907" firstAttribute="leading" secondItem="307" secondAttribute="leading" constant="25" id="Ebi-eC-iqD"/>
                         <constraint firstItem="525" firstAttribute="leading" secondItem="1907" secondAttribute="trailing" constant="12" id="F9u-uv-VMH"/>
-                        <constraint firstItem="200" firstAttribute="leading" secondItem="157" secondAttribute="leading" id="FPH-Ol-fvQ"/>
+                        <constraint firstItem="200" firstAttribute="leading" secondItem="157" secondAttribute="leading" constant="20" id="FPH-Ol-fvQ"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="526" secondAttribute="trailing" constant="20" symbolic="YES" id="Hjj-27-atc"/>
                         <constraint firstItem="196" firstAttribute="trailing" secondItem="163" secondAttribute="trailing" id="IZW-uU-JA8"/>
                         <constraint firstItem="194" firstAttribute="leading" secondItem="158" secondAttribute="leading" id="Kgl-nk-wJU"/>
@@ -1714,6 +1715,7 @@
                         <constraint firstItem="310" firstAttribute="leading" secondItem="525" secondAttribute="trailing" constant="7" id="VTe-SV-9KO"/>
                         <constraint firstItem="195" firstAttribute="centerY" secondItem="198" secondAttribute="centerY" id="YWp-tk-Dwb"/>
                         <constraint firstItem="157" firstAttribute="leading" secondItem="163" secondAttribute="trailing" constant="8" symbolic="YES" id="Z5a-b3-Mvq"/>
+                        <constraint firstItem="190" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="199" secondAttribute="trailing" constant="12" id="aYh-bx-7xI"/>
                         <constraint firstItem="159" firstAttribute="leading" secondItem="158" secondAttribute="leading" id="dgQ-TO-KNu"/>
                         <constraint firstAttribute="bottom" secondItem="526" secondAttribute="bottom" id="eeG-vK-amc"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="200" secondAttribute="trailing" constant="20" symbolic="YES" id="ey8-0B-VKY"/>
@@ -1888,7 +1890,7 @@
                             </textFieldCell>
                         </textField>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="1431">
-                            <rect key="frame" x="106" y="224" width="293" height="45"/>
+                            <rect key="frame" x="106" y="224" width="293" height="31"/>
                             <buttonCell key="cell" type="check" title="Use peer exchange (PEX) for public torrents" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1442">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -1951,7 +1953,7 @@
                             </connections>
                         </textField>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1432">
-                            <rect key="frame" x="106" y="273" width="370" height="14"/>
+                            <rect key="frame" x="126" y="259" width="350" height="28"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="High connection limits might significantly impact system performance" id="1441">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2030,7 +2032,7 @@
                         <constraint firstItem="1985" firstAttribute="top" secondItem="1433" secondAttribute="bottom" constant="5" id="jSQ-v9-oWW"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1741" secondAttribute="trailing" constant="20" symbolic="YES" id="jb3-rn-dHm"/>
                         <constraint firstItem="1427" firstAttribute="leading" secondItem="1426" secondAttribute="trailing" constant="7" id="oA6-7G-FQJ"/>
-                        <constraint firstItem="1432" firstAttribute="leading" secondItem="1425" secondAttribute="leading" id="oPI-0a-X9c"/>
+                        <constraint firstItem="1432" firstAttribute="leading" secondItem="1425" secondAttribute="leading" constant="20" id="oPI-0a-X9c"/>
                         <constraint firstItem="1425" firstAttribute="leading" secondItem="1424" secondAttribute="trailing" constant="8" symbolic="YES" id="oio-4R-VOQ"/>
                         <constraint firstItem="1423" firstAttribute="top" secondItem="1951" secondAttribute="bottom" constant="20" id="p25-TH-H6r"/>
                         <constraint firstItem="1738" firstAttribute="top" secondItem="1436" secondAttribute="bottom" constant="5" id="pDB-c6-B21"/>
@@ -2123,7 +2125,7 @@
                             </textFieldCell>
                         </textField>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="336">
-                            <rect key="frame" x="170" y="36" width="235" height="14"/>
+                            <rect key="frame" x="172" y="36" width="235" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="NAT traversal uses either NAT-PMP or UPnP" id="1248">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2227,7 +2229,7 @@
                         <constraint firstAttribute="width" priority="750" constant="519" id="ShE-6W-wrW"/>
                         <constraint firstItem="664" firstAttribute="centerY" secondItem="665" secondAttribute="centerY" id="T9K-Sv-zrD"/>
                         <constraint firstItem="660" firstAttribute="leading" secondItem="CZ6-Q4-MLF" secondAttribute="leading" constant="20" symbolic="YES" id="VwP-UJ-daQ"/>
-                        <constraint firstItem="336" firstAttribute="leading" secondItem="332" secondAttribute="leading" constant="18" id="XqX-B0-RKz"/>
+                        <constraint firstItem="336" firstAttribute="leading" secondItem="332" secondAttribute="leading" constant="20" id="XqX-B0-RKz"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="664" secondAttribute="trailing" constant="20" symbolic="YES" id="YoK-FL-NEy"/>
                         <constraint firstItem="68" firstAttribute="leading" secondItem="2077" secondAttribute="leading" id="ZUK-cC-Zof"/>
                         <constraint firstItem="357" firstAttribute="centerY" secondItem="2081" secondAttribute="centerY" id="aoG-Gy-P5k"/>
@@ -2277,14 +2279,14 @@
             <point key="canvasLocation" x="-1149" y="500"/>
         </customView>
         <customView id="1481" userLabel="Remote">
-            <rect key="frame" x="0.0" y="0.0" width="506" height="440"/>
+            <rect key="frame" x="0.0" y="0.0" width="508" height="440"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="g2p-4Y-QU9">
-                    <rect key="frame" x="60" y="40" width="386" height="380"/>
+                    <rect key="frame" x="60" y="40" width="388" height="380"/>
                     <subviews>
                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1552">
-                            <rect key="frame" x="131" y="244" width="184" height="21"/>
+                            <rect key="frame" x="133" y="244" width="184" height="21"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1553">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2306,7 +2308,7 @@
                             </connections>
                         </textField>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1541">
-                            <rect key="frame" x="130" y="26" width="193" height="14"/>
+                            <rect key="frame" x="132" y="26" width="193" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="IP addresses may include * wildcard" id="1542">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2314,7 +2316,7 @@
                             </textFieldCell>
                         </textField>
                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1534">
-                            <rect key="frame" x="57" y="23" width="71" height="20"/>
+                            <rect key="frame" x="59" y="23" width="71" height="20"/>
                             <segmentedCell key="cell" state="on" borderStyle="border" alignment="left" style="roundRect" trackingMode="momentary" id="1535">
                                 <font key="font" metaFont="cellTitle"/>
                                 <segments>
@@ -2336,7 +2338,7 @@
                             </connections>
                         </segmentedControl>
                         <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1518">
-                            <rect key="frame" x="58" y="47" width="308" height="88"/>
+                            <rect key="frame" x="60" y="47" width="308" height="88"/>
                             <clipView key="contentView" id="DtM-n3-Fsk">
                                 <rect key="frame" x="1" y="1" width="306" height="86"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2390,7 +2392,7 @@
                             </scroller>
                         </scrollView>
                         <secureTextField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1509">
-                            <rect key="frame" x="131" y="218" width="184" height="21"/>
+                            <rect key="frame" x="133" y="218" width="184" height="21"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="184" id="bne-80-KqO"/>
                             </constraints>
@@ -2417,7 +2419,7 @@
                             </connections>
                         </secureTextField>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1644">
-                            <rect key="frame" x="36" y="348" width="312" height="14"/>
+                            <rect key="frame" x="38" y="348" width="312" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="This enables the web interface and allows remote requests" id="1645">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2425,7 +2427,7 @@
                             </textFieldCell>
                         </textField>
                         <button horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1747">
-                            <rect key="frame" x="36" y="139" width="323" height="18"/>
+                            <rect key="frame" x="38" y="139" width="323" height="18"/>
                             <buttonCell key="cell" type="check" title="Only allow the following IP addresses to connect:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1748">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2437,7 +2439,7 @@
                             </connections>
                         </button>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="1504">
-                            <rect key="frame" x="36" y="269" width="163" height="18"/>
+                            <rect key="frame" x="38" y="269" width="163" height="18"/>
                             <buttonCell key="cell" type="check" title="Require authentication" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1505">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2449,7 +2451,7 @@
                             </connections>
                         </button>
                         <button horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1825">
-                            <rect key="frame" x="36" y="-1" width="259" height="18"/>
+                            <rect key="frame" x="38" y="-1" width="259" height="18"/>
                             <buttonCell key="cell" type="check" title="Display the web interface with Bonjour" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1826">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2472,7 +2474,7 @@
                             </connections>
                         </button>
                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1491">
-                            <rect key="frame" x="134" y="175" width="50" height="21"/>
+                            <rect key="frame" x="136" y="175" width="50" height="21"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="50" id="ujf-b3-hxU"/>
                             </constraints>
@@ -2495,7 +2497,7 @@
                             </connections>
                         </textField>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1556" customClass="ColorTextField">
-                            <rect key="frame" x="55" y="247" width="70" height="16"/>
+                            <rect key="frame" x="57" y="247" width="70" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Username:" usesSingleLineMode="YES" id="1557">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2514,7 +2516,7 @@
                             </connections>
                         </textField>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1554" customClass="ColorTextField">
-                            <rect key="frame" x="55" y="221" width="70" height="16"/>
+                            <rect key="frame" x="57" y="221" width="70" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Password:" usesSingleLineMode="YES" id="1555">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2533,7 +2535,7 @@
                             </connections>
                         </textField>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1492" customClass="ColorTextField">
-                            <rect key="frame" x="36" y="178" width="92" height="16"/>
+                            <rect key="frame" x="38" y="178" width="92" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Listening port:" id="1493">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2544,7 +2546,7 @@
                             </connections>
                         </textField>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
-                            <rect key="frame" x="31" y="301" width="167" height="32"/>
+                            <rect key="frame" x="33" y="301" width="167" height="32"/>
                             <buttonCell key="cell" type="push" title="Launch Web Interface" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2599,11 +2601,11 @@
                         <constraint firstItem="1483" firstAttribute="leading" secondItem="g2p-4Y-QU9" secondAttribute="leading" constant="20" symbolic="YES" id="qHZ-b2-ckO"/>
                         <constraint firstItem="1644" firstAttribute="top" secondItem="1483" secondAttribute="bottom" constant="2" id="sf1-uY-bHw"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1483" secondAttribute="trailing" constant="20" symbolic="YES" id="u9F-4O-ZN2"/>
-                        <constraint firstItem="1644" firstAttribute="leading" secondItem="1483" secondAttribute="leading" constant="18" id="xbZ-rR-97e"/>
+                        <constraint firstItem="1644" firstAttribute="leading" secondItem="1483" secondAttribute="leading" constant="20" id="xbZ-rR-97e"/>
                     </constraints>
                 </customView>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1660">
-                    <rect key="frame" x="463" y="16" width="25" height="25"/>
+                    <rect key="frame" x="465" y="16" width="25" height="25"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="3z3-f2-n3P"/>
                         <constraint firstAttribute="width" constant="20" id="QNy-cj-ZpH"/>
