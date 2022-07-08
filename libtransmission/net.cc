@@ -298,7 +298,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    if (!tr_address_is_valid_for_peers(addr, port))
+    if (!addr->isValidForPeers(port))
     {
         return {};
     }
@@ -381,7 +381,7 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
 {
     auto ret = tr_peer_socket{};
 
-    if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
+    if (session->utp_context != nullptr && addr->isValidForPeers(port))
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
@@ -802,10 +802,10 @@ static bool isMartianAddr(struct tr_address const* a)
     }
 }
 
-bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
+[[nodiscard]] bool tr_address::isValidForPeers(tr_port port) const noexcept
 {
-    return !std::empty(port) && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
-        !isMartianAddr(addr);
+    return !std::empty(port) && tr_address_is_valid(this) && !isIPv6LinkLocalAddress(this) && !isIPv4MappedAddress(this) &&
+        !isMartianAddr(this);
 }
 
 struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)

@@ -152,6 +152,8 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact4(uint8_t const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
 
+    [[nodiscard]] bool isValidForPeers(tr_port) const noexcept;
+
     // human-readable formatting
     template<typename OutputIt>
     OutputIt readable(OutputIt out, tr_port port = {}) const;
@@ -193,8 +195,6 @@ bool tr_address_from_string(tr_address* setme, char const* string);
 bool tr_address_from_string(tr_address* dst, std::string_view src);
 
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
-
-bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
 constexpr bool tr_address_is_valid(tr_address const* a)
 {
