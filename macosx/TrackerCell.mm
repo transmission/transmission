@@ -18,7 +18,7 @@
 #define PADDING_ABOVE_NAME 1.0
 #define PADDING_BETWEEN_LINES 1.0
 #define PADDING_BETWEEN_LINES_ON_SAME_LINE 4.0
-#define COUNT_WIDTH 40.0
+#define COUNT_WIDTH 60.0
 
 @interface TrackerCell ()
 

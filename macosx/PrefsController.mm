@@ -1581,6 +1581,7 @@
         [window setFrame:windowRect display:YES animate:YES];
     } completionHandler:^{
         view.hidden = NO;
+        [view display];
     }];
 
     //set title label
