@@ -21,7 +21,7 @@
             <value key="minSize" type="size" width="350" height="5"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="515" height="248"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Msk-Iv-kCJ">
                         <rect key="frame" x="0.0" y="0.0" width="515" height="248"/>
@@ -48,7 +48,7 @@
                                                         <font key="font" metaFont="system"/>
                                                     </imageCell>
                                                 </tableColumn>
-                                                <tableColumn identifier="Group" editable="NO" width="296" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
+                                                <tableColumn identifier="Group" editable="NO" width="284" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Group">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -69,7 +69,7 @@
                                                         <font key="font" metaFont="system"/>
                                                     </imageCell>
                                                 </tableColumn>
-                                                <tableColumn identifier="DL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3126">
+                                                <tableColumn identifier="DL" editable="NO" width="70" minWidth="70" maxWidth="70" id="3126">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="DL Speed">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -89,7 +89,7 @@
                                                         <font key="font" metaFont="system"/>
                                                     </imageCell>
                                                 </tableColumn>
-                                                <tableColumn identifier="UL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3135">
+                                                <tableColumn identifier="UL" editable="NO" width="70" minWidth="70" maxWidth="70" id="3135">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="UL Speed">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
