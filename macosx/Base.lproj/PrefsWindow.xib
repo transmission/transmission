@@ -141,7 +141,7 @@
                                 <action selector="openNotificationSystemPrefs:" target="-2" id="JoP-u1-8PO"/>
                             </connections>
                         </button>
-                        <button translatesAutoresizingMaskIntoConstraints="NO" id="230">
+                        <button horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="230">
                             <rect key="frame" x="162" y="305" width="292" height="18"/>
                             <buttonCell key="cell" type="check" title="Automatically size window to fit all transfers" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1210">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -160,7 +160,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="147">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="147">
                             <rect key="frame" x="181" y="113" width="251" height="18"/>
                             <buttonCell key="cell" type="check" title="Only when transfers are downloading" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1208">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -171,7 +171,7 @@
                                 <binding destination="365" name="value" keyPath="values.CheckQuitDownloading" id="388"/>
                             </connections>
                         </button>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="146">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="146">
                             <rect key="frame" x="181" y="153" width="251" height="18"/>
                             <buttonCell key="cell" type="check" title="Only when transfers are downloading" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1207">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -182,7 +182,7 @@
                                 <binding destination="365" name="value" keyPath="values.CheckRemoveDownloading" id="387"/>
                             </connections>
                         </button>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="34">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="34">
                             <rect key="frame" x="162" y="249" width="128" height="18"/>
                             <buttonCell key="cell" type="check" title="Total upload rate" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1206">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -193,7 +193,7 @@
                                 <binding destination="365" name="value" keyPath="values.BadgeUploadRate" id="398"/>
                             </connections>
                         </button>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="33">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="33">
                             <rect key="frame" x="162" y="269" width="146" height="18"/>
                             <buttonCell key="cell" type="check" title="Total download rate" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1205">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -228,7 +228,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button translatesAutoresizingMaskIntoConstraints="NO" id="30">
+                        <button horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="30">
                             <rect key="frame" x="162" y="173" width="191" height="18"/>
                             <buttonCell key="cell" type="check" title="Removal of active transfers" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1202">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -238,7 +238,7 @@
                                 <binding destination="365" name="value" keyPath="values.CheckRemove" id="385"/>
                             </connections>
                         </button>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="29">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="29">
                             <rect key="frame" x="162" y="133" width="178" height="18"/>
                             <buttonCell key="cell" type="check" title="Quit with active transfers" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1201">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -328,11 +328,11 @@
             <point key="canvasLocation" x="728" y="892"/>
         </customView>
         <customView id="41" userLabel="Transfers">
-            <rect key="frame" x="0.0" y="0.0" width="606" height="398"/>
+            <rect key="frame" x="0.0" y="0.0" width="606" height="390"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <tabView initialItem="253" translatesAutoresizingMaskIntoConstraints="NO" id="252">
-                    <rect key="frame" x="13" y="10" width="580" height="384"/>
+                    <rect key="frame" x="13" y="10" width="580" height="376"/>
                     <font key="font" metaFont="system"/>
                     <tabViewItems>
                         <tabViewItem label="Adding" identifier="" id="253">
@@ -709,7 +709,7 @@
                                                     <binding destination="365" name="enabled" keyPath="values.Queue" id="1697"/>
                                                 </connections>
                                             </textField>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="264">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="264">
                                                 <rect key="frame" x="76" y="250" width="156" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Stop seeding at ratio:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1232">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -743,7 +743,7 @@
                                                     <outlet property="nextKeyView" destination="257" id="1637"/>
                                                 </connections>
                                             </textField>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1958">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1958">
                                                 <rect key="frame" x="76" y="210" width="217" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Stop seeding when inactive for:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1962">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -791,7 +791,7 @@
                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="337">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="337">
                                                 <rect key="frame" x="76" y="138" width="197" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Download with maximum of:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1236">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -836,7 +836,7 @@
                                                     <binding destination="365" name="enabled" keyPath="values.QueueSeed" id="1698"/>
                                                 </connections>
                                             </textField>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="607">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="607">
                                                 <rect key="frame" x="76" y="118" width="186" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Seeding with maximum of:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1240">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -881,7 +881,7 @@
                                                     <binding destination="365" name="enabled" keyPath="values.CheckStalled" id="1699"/>
                                                 </connections>
                                             </textField>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="639">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="639">
                                                 <rect key="frame" x="76" y="97" width="244" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Transfer is stalled when inactive for:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1243">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -922,7 +922,7 @@
                                                     <outlet property="nextKeyView" destination="1300" id="1641"/>
                                                 </connections>
                                             </popUpButton>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1299">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1299">
                                                 <rect key="frame" x="76" y="37" width="183" height="18"/>
                                                 <buttonCell key="cell" type="check" title="When seeding completes:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1306">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -953,7 +953,7 @@
                                                     <binding destination="365" name="selectedValue" keyPath="values.SeedingSound" previousBinding="1332" id="1333"/>
                                                 </connections>
                                             </popUpButton>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1301">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1301">
                                                 <rect key="frame" x="76" y="59" width="194" height="18"/>
                                                 <buttonCell key="cell" type="check" title="When download completes:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1302">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -974,7 +974,7 @@
                                                     <binding destination="365" name="enabled" keyPath="values.IdleLimitCheck" id="1984"/>
                                                 </connections>
                                             </textField>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="2043">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="2043">
                                                 <rect key="frame" x="76" y="1" width="194" height="18"/>
                                                 <buttonCell key="cell" type="check" title="When download completes:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2044">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1032,7 +1032,7 @@
                                                     <binding destination="365" name="enabled" keyPath="values.DoneScriptEnabled" id="2061"/>
                                                 </connections>
                                             </popUpButton>
-                                            <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="2118">
+                                            <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="2118">
                                                 <rect key="frame" x="76" y="190" width="356" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Remove from the transfer list when seeding completes" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2119">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1390,11 +1390,11 @@
             <point key="canvasLocation" x="-512" y="461"/>
         </customView>
         <customView id="153" userLabel="Bandwidth">
-            <rect key="frame" x="0.0" y="0.0" width="554" height="264"/>
+            <rect key="frame" x="0.0" y="0.0" width="574" height="264"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="a4A-eF-t64">
-                    <rect key="frame" x="20" y="40" width="514" height="204"/>
+                    <rect key="frame" x="20" y="40" width="534" height="204"/>
                     <subviews>
                         <popUpButton horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1907">
                             <rect key="frame" x="196" y="-2" width="110" height="25"/>
@@ -1424,7 +1424,7 @@
                             </connections>
                         </popUpButton>
                         <datePicker verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="526">
-                            <rect key="frame" x="411" y="0.0" width="86" height="28"/>
+                            <rect key="frame" x="424" y="0.0" width="86" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="83" id="Gpc-7F-EcD"/>
                             </constraints>
@@ -1466,7 +1466,7 @@
                             </connections>
                         </datePicker>
                         <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="310" customClass="ColorTextField">
-                            <rect key="frame" x="402" y="4" width="4" height="16"/>
+                            <rect key="frame" x="402" y="4" width="17" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="to" id="1281">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1492,7 +1492,7 @@
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="TortoiseTemplate" id="1279"/>
                         </imageView>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="200">
-                            <rect key="frame" x="192" y="53" width="304" height="28"/>
+                            <rect key="frame" x="192" y="53" width="324" height="28"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="When enabled Speed Limit overrides the global bandwidth limits" id="1278">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1741,7 +1741,7 @@
                 <constraint firstItem="a4A-eF-t64" firstAttribute="centerX" secondItem="153" secondAttribute="centerX" id="ig7-zh-7UR"/>
                 <constraint firstItem="a4A-eF-t64" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="153" secondAttribute="leading" constant="20" symbolic="YES" id="ig9-mv-HpH"/>
             </constraints>
-            <point key="canvasLocation" x="-552" y="156"/>
+            <point key="canvasLocation" x="-542" y="156"/>
         </customView>
         <customView id="1361" userLabel="Peers">
             <rect key="frame" x="0.0" y="0.0" width="598" height="380"/>
@@ -1750,7 +1750,7 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="Uul-ab-ka5">
                     <rect key="frame" x="52" y="40" width="494" height="320"/>
                     <subviews>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1427">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1427">
                             <rect key="frame" x="352" y="301" width="39" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="peers" id="1447">
                                 <font key="font" metaFont="system"/>
@@ -1766,7 +1766,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1925">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1925">
                             <rect key="frame" x="106" y="204" width="338" height="18"/>
                             <buttonCell key="cell" type="check" title="Use distributed hash table (DHT) for public torrents" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1926">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1777,7 +1777,7 @@
                                 <binding destination="365" name="value" keyPath="values.DHTGlobal" id="1927"/>
                             </connections>
                         </button>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1421">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1421">
                             <rect key="frame" x="125" y="128" width="183" height="18"/>
                             <buttonCell key="cell" type="check" title="Ignore unencrypted peers" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1454">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1789,7 +1789,7 @@
                                 <binding destination="365" name="value" keyPath="values.EncryptionRequire" id="1466"/>
                             </connections>
                         </button>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1428">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1428">
                             <rect key="frame" x="417" y="276" width="39" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="peers" id="1446">
                                 <font key="font" metaFont="system"/>
@@ -1805,7 +1805,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1430">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1430">
                             <rect key="frame" x="106" y="276" width="251" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Maximum connections for new transfers:" id="1443">
                                 <font key="font" metaFont="system"/>
@@ -1813,11 +1813,11 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1738">
-                            <rect key="frame" x="125" y="21" width="99" height="14"/>
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1738">
+                            <rect key="frame" x="145" y="21" width="99" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Last updated: N/A" id="1739">
                                 <font key="font" metaFont="smallSystem"/>
-                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
@@ -1829,7 +1829,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1423">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1423">
                             <rect key="frame" x="106" y="148" width="166" height="18"/>
                             <buttonCell key="cell" type="check" title="Prefer encrypted peers" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1452">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1861,7 +1861,7 @@
                                 <outlet property="nextKeyView" destination="1429" id="1455"/>
                             </connections>
                         </textField>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1741">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1741">
                             <rect key="frame" x="125" y="-1" width="199" height="18"/>
                             <buttonCell key="cell" type="check" title="Automatically update weekly" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1742">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1873,7 +1873,7 @@
                                 <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1989"/>
                             </connections>
                         </button>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1425">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1425">
                             <rect key="frame" x="106" y="301" width="186" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Global maximum connections:" id="1450">
                                 <font key="font" metaFont="system"/>
@@ -1881,7 +1881,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1435">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1435">
                             <rect key="frame" x="195" y="42" width="168" height="16"/>
                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="blocklist loaded/not loaded" id="1438">
                                 <font key="font" metaFont="system"/>
@@ -1889,7 +1889,7 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1431">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1431">
                             <rect key="frame" x="106" y="224" width="293" height="18"/>
                             <buttonCell key="cell" type="check" title="Use peer exchange (PEX) for public torrents" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1442">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1911,7 +1911,7 @@
                                 <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1993"/>
                             </connections>
                         </textField>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1951">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1951">
                             <rect key="frame" x="106" y="184" width="287" height="18"/>
                             <buttonCell key="cell" type="check" title="Use local peer discovery for public torrents" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1952">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1952,7 +1952,7 @@
                                 <action selector="setPeersTorrent:" target="-2" id="1457"/>
                             </connections>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1432">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1432">
                             <rect key="frame" x="126" y="246" width="350" height="28"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="High connection limits might significantly impact system performance" id="1441">
                                 <font key="font" metaFont="smallSystem"/>
@@ -1977,7 +1977,7 @@
                                 <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1991"/>
                             </connections>
                         </textField>
-                        <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1433">
+                        <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="1433">
                             <rect key="frame" x="106" y="92" width="282" height="18"/>
                             <buttonCell key="cell" type="check" title="Prevent peers in blocklist from connecting" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1440">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1996,7 +1996,7 @@
                         <constraint firstItem="1421" firstAttribute="top" secondItem="1423" secondAttribute="bottom" constant="4" id="38a-s4-Cqd"/>
                         <constraint firstItem="1426" firstAttribute="centerY" secondItem="1424" secondAttribute="centerY" id="3mp-yH-3WQ"/>
                         <constraint firstItem="1431" firstAttribute="top" secondItem="1432" secondAttribute="bottom" constant="5" id="4fa-M5-fIw"/>
-                        <constraint firstItem="1738" firstAttribute="leading" secondItem="1421" secondAttribute="leading" id="5MP-Hm-9me"/>
+                        <constraint firstItem="1738" firstAttribute="leading" secondItem="1421" secondAttribute="leading" constant="20" id="5MP-Hm-9me"/>
                         <constraint firstItem="1424" firstAttribute="top" secondItem="Uul-ab-ka5" secondAttribute="top" constant="3" id="6sB-hi-YJj"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1738" secondAttribute="trailing" constant="20" symbolic="YES" id="7wC-NP-253"/>
                         <constraint firstAttribute="width" priority="750" constant="494" id="CIt-WZ-AsA"/>

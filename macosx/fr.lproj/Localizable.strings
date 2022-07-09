@@ -1150,5 +1150,5 @@
 "You want to download, but peer does not want to send (interested and choked)" = "Vous voulez télécharger, mais le pair ne veut pas envoyer (intéressé et étranglé)";
 
 /* Preferences window size*/
-"PrefWindowSize" = "606";
+"PrefWindowSize" = "656";
 
