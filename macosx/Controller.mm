@@ -5038,7 +5038,7 @@ static void removeKeRangerRansomware()
 - (void)updateWindowAfterToolbarChange
 {
     //Hacky way of fixing an issue with showing the Toolbar
-    if (!self.isFullScreen && [self.fDefaults boolForKey:@"AutoSize"])
+    if (!self.isFullScreen)
     {
         //macOS Big Sur shows the unified toolbar by default
         //and we only need to "fix" the layout when showing the toolbar
@@ -5058,7 +5058,7 @@ static void removeKeRangerRansomware()
         [self hideToolBarBezels:YES];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self setWindowSizeToFit];
+            [self updateForAutoSize];
             [self hideToolBarBezels:NO];
         });
     }
