@@ -290,13 +290,14 @@ void tr_udpInit(tr_session* ss)
     }
     else
     {
-        auto const [public_addr, is_default] = ss->getPublicAddress(TR_AF_INET);
+        auto is_default = bool{};
+        tr_address const* public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, &is_default);
 
         auto sin = sockaddr_in{};
         sin.sin_family = AF_INET;
-        if (!is_default)
+        if (public_addr != nullptr && !is_default)
         {
-            memcpy(&sin.sin_addr, &public_addr.addr.addr4, sizeof(struct in_addr));
+            memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
         }
 
         sin.sin_port = ss->udp_port.network();
@@ -307,7 +308,7 @@ void tr_udpInit(tr_session* ss)
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", public_addr.readable(ss->udp_port)),
+                fmt::arg("address", public_addr != nullptr ? public_addr->readable(ss->udp_port) : "?"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             tr_netCloseSocket(ss->udp_socket);

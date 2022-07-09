@@ -14,6 +14,7 @@ TEST(PeerMsgs, placeholder)
 #if 0
 
     auto infohash = tr_sha1_digest_t{};
+    struct tr_address addr;
     tr_piece_index_t pieceCount = 1313;
     size_t numwant;
     size_t numgot;
@@ -22,15 +23,15 @@ TEST(PeerMsgs, placeholder)
 
     memset(std::data(infohash), 0xaa, std::size(infohash));
 
-    auto const addr = tr_address::fromString("80.4.4.200");
+    tr_address_from_string(&addr, "80.4.4.200");
 
     numwant = 7;
-    numgot = tr_generateAllowedSet(buf, numwant, pieceCount, infohash, *addr);
+    numgot = tr_generateAllowedSet(buf, numwant, pieceCount, infohash, &addr);
     check_uint(numgot, ==, numwant);
     check_mem(buf, ==, pieces, numgot);
 
     numwant = 9;
-    numgot = tr_generateAllowedSet(buf, numwant, pieceCount, infohash, *addr);
+    numgot = tr_generateAllowedSet(buf, numwant, pieceCount, infohash, &addr);
     check_uint(numgot, ==, numwant);
     check_mem(buf, ==, pieces, numgot);
 

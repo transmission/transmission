@@ -61,6 +61,86 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port)
+{
+    char addr_buf[INET6_ADDRSTRLEN];
+    tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
+    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("[{:s}]:{:d}"), addr_buf, port.host()).out = '\0';
+    return buf;
+}
+
+char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen)
+{
+    TR_ASSERT(tr_address_is_valid(addr));
+
+    return addr->type == TR_AF_INET ? evutil_inet_ntop(AF_INET, &addr->addr, buf, buflen) :
+                                      evutil_inet_ntop(AF_INET6, &addr->addr, buf, buflen);
+}
+
+/*
+ * Non-threadsafe version of tr_address_to_string_with_buf()
+ * and uses a static memory area for a buffer.
+ * This function is suitable to be called from libTransmission's networking code,
+ * which is single-threaded.
+ */
+char const* tr_address_to_string(tr_address const* addr)
+{
+    static char buf[INET6_ADDRSTRLEN];
+    return tr_address_to_string_with_buf(addr, buf, sizeof(buf));
+}
+
+bool tr_address_from_string(tr_address* dst, char const* src)
+{
+    if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
+    {
+        dst->type = TR_AF_INET;
+        return true;
+    }
+
+    if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
+    {
+        dst->type = TR_AF_INET6;
+        return true;
+    }
+
+    return false;
+}
+
+bool tr_address_from_string(tr_address* dst, std::string_view src)
+{
+    // inet_pton() requires zero-terminated strings,
+    // so make a zero-terminated copy here on the stack.
+    auto buf = std::array<char, TR_ADDRSTRLEN>{};
+    if (std::size(src) >= std::size(buf))
+    {
+        // shouldn't ever be that large; malformed address
+        return false;
+    }
+
+    *std::copy(std::begin(src), std::end(src), std::begin(buf)) = '\0';
+
+    return tr_address_from_string(dst, std::data(buf));
+}
+
+/*
+ * Compare two tr_address structures.
+ * Returns:
+ * <0 if a < b
+ * >0 if a > b
+ * 0  if a == b
+ */
+int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
+{
+    // IPv6 addresses are always "greater than" IPv4
+    if (a->type != b->type)
+    {
+        return a->type == TR_AF_INET ? 1 : -1;
+    }
+
+    return a->type == TR_AF_INET ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
+                                   memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
+}
+
 /***********************************************************************
  * TCP sockets
  **********************************************************************/
@@ -167,36 +247,38 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 #endif
 }
 
-std::optional<std::pair<tr_address, tr_port>> tr_address::fromSockaddrStorage(sockaddr_storage from)
+bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_port, struct sockaddr_storage const* from)
 {
-    if (from.ss_family == AF_INET)
+    if (from->ss_family == AF_INET)
     {
-        auto const* const sin = reinterpret_cast<sockaddr_in const*>(&from);
-        auto tmp = tr_address{};
-        tmp.type = TR_AF_INET;
-        tmp.addr.addr4.s_addr = sin->sin_addr.s_addr;
-        return std::make_pair(tmp, tr_port::fromNetwork(sin->sin_port));
+        auto const* const sin = (struct sockaddr_in const*)from;
+        setme_addr->type = TR_AF_INET;
+        setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
+        *setme_port = tr_port::fromNetwork(sin->sin_port);
+        return true;
     }
 
-    if (from.ss_family == AF_INET6)
+    if (from->ss_family == AF_INET6)
     {
-        auto const* const sin6 = reinterpret_cast<sockaddr_in6 const*>(&from);
-        auto tmp = tr_address{};
-        tmp.type = TR_AF_INET6;
-        tmp.addr.addr6 = sin6->sin6_addr;
-        return std::make_pair(tmp, tr_port::fromNetwork(sin6->sin6_port));
+        auto const* const sin6 = (struct sockaddr_in6 const*)from;
+        setme_addr->type = TR_AF_INET6;
+        setme_addr->addr.addr6 = sin6->sin6_addr;
+        *setme_port = tr_port::fromNetwork(sin6->sin6_port);
+        return true;
     }
 
-    return {};
+    return false;
 }
 
-static socklen_t setup_sockaddr(tr_address addr, tr_port port, struct sockaddr_storage* sockaddr)
+static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct sockaddr_storage* sockaddr)
 {
-    if (addr.type == TR_AF_INET)
+    TR_ASSERT(tr_address_is_valid(addr));
+
+    if (addr->type == TR_AF_INET)
     {
         sockaddr_in sock4 = {};
         sock4.sin_family = AF_INET;
-        sock4.sin_addr.s_addr = addr.addr.addr4.s_addr;
+        sock4.sin_addr.s_addr = addr->addr.addr4.s_addr;
         sock4.sin_port = port.network();
         memcpy(sockaddr, &sock4, sizeof(sock4));
         return sizeof(struct sockaddr_in);
@@ -206,7 +288,7 @@ static socklen_t setup_sockaddr(tr_address addr, tr_port port, struct sockaddr_s
     sock6.sin6_family = AF_INET6;
     sock6.sin6_port = port.network();
     sock6.sin6_flowinfo = 0;
-    sock6.sin6_addr = addr.addr.addr6;
+    sock6.sin6_addr = addr->addr.addr6;
     memcpy(sockaddr, &sock6, sizeof(sock6));
     return sizeof(struct sockaddr_in6);
 }
@@ -259,15 +341,17 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
     return sockfd;
 }
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr, tr_port port, bool client_is_seed)
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed)
 {
-    if (!addr.isValidPeerAddress(port))
+    TR_ASSERT(tr_address_is_valid(addr));
+
+    if (!tr_address_is_valid_for_peers(addr, port))
     {
         return {};
     }
 
-    static auto constexpr Domains = std::array<int, 2>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(session, Domains[addr.type], SOCK_STREAM);
+    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
+    auto const s = createSocket(session, Domains[addr->type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -288,7 +372,8 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr,
     socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
 
     // set source address
-    auto const [source_addr, is_default_addr] = session->getPublicAddress(addr.type);
+    tr_address const* const source_addr = tr_sessionGetPublicAddress(session, addr->type, nullptr);
+    TR_ASSERT(source_addr != nullptr);
     struct sockaddr_storage source_sock;
     socklen_t const sourcelen = setup_sockaddr(source_addr, {}, &source_sock);
 
@@ -296,7 +381,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr,
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
-            fmt::arg("address", source_addr.readable()),
+            fmt::arg("address", source_addr->readable()),
             fmt::arg("socket", s),
             fmt::arg("error", tr_net_strerror(sockerrno)),
             fmt::arg("error_code", sockerrno)));
@@ -313,12 +398,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr,
     {
         int const tmperrno = sockerrno;
 
-        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.type == TR_AF_INET)
+        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
-                fmt::arg("address", addr.readable()),
+                fmt::arg("address", addr->readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(tmperrno)),
                 fmt::arg("error_code", tmperrno)));
@@ -331,16 +416,22 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address addr,
         ret = tr_peer_socket_tcp_create(s);
     }
 
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.readable(port)));
+    char addrstr[TR_ADDRSTRLEN];
+    tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addrstr));
 
     return ret;
 }
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address addr, tr_port port, bool /*client_is_seed*/)
+struct tr_peer_socket tr_netOpenPeerUTPSocket(
+    tr_session* session,
+    tr_address const* addr,
+    tr_port port,
+    bool /*client_is_seed*/)
 {
     auto ret = tr_peer_socket{};
 
-    if (session->utp_context != nullptr && addr.isValidPeerAddress(port))
+    if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
@@ -385,12 +476,14 @@ void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
     }
 }
 
-static tr_socket_t tr_netBindTCPImpl(tr_address addr, tr_port port, bool suppressMsgs, int* errOut)
+static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppressMsgs, int* errOut)
 {
-    static auto constexpr Domains = std::array<int, 2>{ AF_INET, AF_INET6 };
+    TR_ASSERT(tr_address_is_valid(addr));
+
+    static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
 
-    auto const fd = socket(Domains[addr.type], SOCK_STREAM, 0);
+    auto const fd = socket(domains[addr->type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *errOut = sockerrno;
@@ -410,7 +503,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address addr, tr_port port, bool suppres
 
 #ifdef IPV6_V6ONLY
 
-    if ((addr.type == TR_AF_INET6) &&
+    if ((addr->type == TR_AF_INET6) &&
         (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
         (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
@@ -433,7 +526,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address addr, tr_port port, bool suppres
                 err == EADDRINUSE ?
                     _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
                     _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.readable()),
+                fmt::arg("address", addr->readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(err)),
                 fmt::arg("error_code", err)));
@@ -446,7 +539,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address addr, tr_port port, bool suppres
 
     if (!suppressMsgs)
     {
-        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr.readable()));
+        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr->readable()));
     }
 
 #ifdef TCP_FASTOPEN
@@ -475,7 +568,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address addr, tr_port port, bool suppres
     return fd;
 }
 
-tr_socket_t tr_netBindTCP(tr_address addr, tr_port port, bool suppressMsgs)
+tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs)
 {
     int unused = 0;
     return tr_netBindTCPImpl(addr, port, suppressMsgs, &unused);
@@ -489,7 +582,7 @@ bool tr_net_hasIPv6(tr_port port)
     if (!alreadyDone)
     {
         int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_in6addr_any, port, true, &err);
+        auto const fd = tr_netBindTCPImpl(&tr_in6addr_any, port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
         {
@@ -507,9 +600,11 @@ bool tr_net_hasIPv6(tr_port port)
     return result;
 }
 
-std::optional<std::tuple<tr_socket_t, tr_address, tr_port>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
+tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_address* addr, tr_port* port)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(addr != nullptr);
+    TR_ASSERT(port != nullptr);
 
     // accept the incoming connection
     struct sockaddr_storage sock;
@@ -517,21 +612,20 @@ std::optional<std::tuple<tr_socket_t, tr_address, tr_port>> tr_netAccept(tr_sess
     auto const sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
     if (sockfd == TR_BAD_SOCKET)
     {
-        return {};
+        return TR_BAD_SOCKET;
     }
 
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    auto const addrport = tr_address::fromSockaddrStorage(sock);
-    if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || !session->incPeerCount())
+    if (!tr_address_from_sockaddr_storage(addr, port, &sock) || evutil_make_socket_nonblocking(sockfd) == -1 ||
+        !session->incPeerCount())
     {
         tr_netCloseSocket(sockfd);
-        return {};
+        return TR_BAD_SOCKET;
     }
 
-    auto const& [addr, port] = *addrport;
-    return std::make_tuple(sockfd, addr, port);
+    return sockfd;
 }
 
 void tr_netCloseSocket(tr_socket_t sockfd)
@@ -706,11 +800,12 @@ unsigned char const* tr_globalIPv6(tr_session const* session)
     /* We have some sort of address, now make sure that we return
        our bound address if non-default. */
 
-    auto const [ipv6_bindaddr, is_default] = session->getPublicAddress(TR_AF_INET6);
-    if (!is_default)
+    bool is_default = false;
+    auto const* ipv6_bindaddr = tr_sessionGetPublicAddress(session, TR_AF_INET6, &is_default);
+    if (ipv6_bindaddr != nullptr && !is_default)
     {
         /* Explicitly bound. Return that address. */
-        memcpy(ipv6, ipv6_bindaddr.addr.addr6.s6_addr, 16);
+        memcpy(ipv6, ipv6_bindaddr->addr.addr6.s6_addr, 16);
     }
 
     return ipv6;
@@ -758,10 +853,10 @@ static bool isMartianAddr(struct tr_address const* a)
     }
 }
 
-[[nodiscard]] bool tr_address::isValidPeerAddress(tr_port port) const noexcept
+bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
-    return !std::empty(port) && tr_address_is_valid(this) && !isIPv6LinkLocalAddress(this) && !isIPv4MappedAddress(this) &&
-        !isMartianAddr(this);
+    return !std::empty(port) && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
+        !isMartianAddr(addr);
 }
 
 struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)
@@ -796,53 +891,50 @@ std::pair<tr_port, uint8_t const*> tr_port::fromCompact(uint8_t const* compact) 
 
 /// tr_address
 
-std::optional<tr_address> tr_address::fromString(std::string_view addrstr)
+std::optional<tr_address> tr_address::fromString(std::string_view address_str)
 {
-    auto const addrstr_sz = tr_strbuf<char, 64>{ addrstr };
     auto addr = tr_address{};
 
-    if (evutil_inet_pton(AF_INET, addrstr_sz, &addr.addr) == 1)
+    if (!tr_address_from_string(&addr, address_str))
     {
-        addr.type = TR_AF_INET;
-        return addr;
+        return {};
     }
 
-    if (evutil_inet_pton(AF_INET6, addrstr_sz, &addr.addr) == 1)
-    {
-        addr.type = TR_AF_INET6;
-        return addr;
-    }
-
-    return {};
+    return addr;
 }
 
-std::string_view tr_address::readable(char* out, size_t outlen, tr_port port) const
+template<typename OutputIt>
+OutputIt tr_address::readable(OutputIt out) const
 {
-    if (std::empty(port))
-    {
-        return isIPv4() ? evutil_inet_ntop(AF_INET, &addr, out, outlen) : evutil_inet_ntop(AF_INET6, &addr, out, outlen);
-    }
-
     auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-    auto const addr_sv = readable(std::data(buf), std::size(buf));
-    auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), addr_sv, port.host());
-    return { out, size };
+    tr_address_to_string_with_buf(this, std::data(buf), std::size(buf));
+    return fmt::format_to(out, FMT_STRING("{:s}"), std::data(buf));
+}
+
+template char* tr_address::readable<char*>(char*) const;
+
+std::string tr_address::readable() const
+{
+    auto buf = std::string{};
+    buf.reserve(INET6_ADDRSTRLEN);
+    this->readable(std::back_inserter(buf));
+    return buf;
 }
 
 template<typename OutputIt>
 OutputIt tr_address::readable(OutputIt out, tr_port port) const
 {
-    auto addrbuf = std::array<char, TR_ADDRSTRLEN + 16>{};
-    auto const addr_sv = readable(std::data(addrbuf), std::size(addrbuf), port);
-    return std::copy(std::begin(addr_sv), std::end(addr_sv), out);
+    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+    tr_address_to_string_with_buf(this, std::data(buf), std::size(buf));
+    return fmt::format_to(out, FMT_STRING("[{:s}]:{:d}"), std::data(buf), port.host());
 }
 
 template char* tr_address::readable<char*>(char*, tr_port) const;
 
-[[nodiscard]] std::string tr_address::readable(tr_port port) const
+std::string tr_address::readable(tr_port port) const
 {
     auto buf = std::string{};
-    buf.reserve(INET6_ADDRSTRLEN + 16);
+    buf.reserve(INET6_ADDRSTRLEN + 9);
     this->readable(std::back_inserter(buf), port);
     return buf;
 }
@@ -874,12 +966,5 @@ std::pair<tr_address, uint8_t const*> tr_address::fromCompact6(uint8_t const* co
 
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
-    // IPv6 addresses are always "greater than" IPv4
-    if (type != that.type)
-    {
-        return type == TR_AF_INET ? 1 : -1;
-    }
-
-    return type == TR_AF_INET ? memcmp(&addr.addr4, &that.addr.addr4, sizeof(addr.addr4)) :
-                                memcmp(&addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(addr.addr6.s6_addr));
+    return tr_address_compare(this, &that);
 }

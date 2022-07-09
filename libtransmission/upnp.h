@@ -18,14 +18,12 @@
 
 #include "net.h" // tr_port
 
-#include <string>
-
 struct tr_upnp;
 
 tr_upnp* tr_upnpInit(void);
 
 void tr_upnpClose(tr_upnp*);
 
-tr_port_forwarding tr_upnpPulse(tr_upnp*, tr_port port, bool isEnabled, bool doPortCheck, std::string addr);
+tr_port_forwarding tr_upnpPulse(tr_upnp*, tr_port port, bool isEnabled, bool doPortCheck, char const*);
 
 /* @} */

@@ -80,7 +80,7 @@ public:
         tr_session* session_in,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
-        tr_address addr,
+        tr_address const& addr,
         tr_port port,
         bool is_seed,
         time_t current_time,
@@ -244,7 +244,7 @@ void tr_peerIoUtpInit(struct_utp_context* ctx);
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address addr,
+    struct tr_address const* addr,
     tr_port port,
     time_t current_time,
     tr_sha1_digest_t const& torrent_hash,
@@ -254,7 +254,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
 tr_peerIo* tr_peerIoNewIncoming(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address addr,
+    struct tr_address const* addr,
     tr_port port,
     time_t current_time,
     struct tr_peer_socket const socket);
