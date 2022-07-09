@@ -240,9 +240,11 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-static auto* discoverThreadfunc(std::string bindaddr)
+static auto* discoverThreadfunc(char* bindaddr)
 {
-    return tr_upnpDiscover(2000, bindaddr.c_str());
+    auto* const ret = tr_upnpDiscover(2000, bindaddr);
+    tr_free(bindaddr);
+    return ret;
 }
 
 template<typename T>
@@ -251,17 +253,17 @@ static bool isFutureReady(std::future<T> const& future)
     return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 }
 
-tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, std::string bindaddr)
+tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, char const* bindaddr)
 {
     if (isEnabled && handle->state == UpnpState::WILL_DISCOVER)
     {
         TR_ASSERT(!handle->discover_future);
 
-        auto task = std::packaged_task<UPNPDev*(std::string)>{ discoverThreadfunc };
+        auto task = std::packaged_task<UPNPDev*(char*)>{ discoverThreadfunc };
         handle->discover_future = task.get_future();
         handle->state = UpnpState::DISCOVERING;
 
-        std::thread(std::move(task), std::move(bindaddr)).detach();
+        std::thread(std::move(task), tr_strdup(bindaddr)).detach();
     }
 
     if (isEnabled && handle->state == UpnpState::DISCOVERING && handle->discover_future &&

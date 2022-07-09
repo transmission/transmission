@@ -184,7 +184,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             BasicHandler::EndDict(context);
 
-            if (pex_.addr.isValidPeerAddress(pex_.port))
+            if (tr_address_is_valid_for_peers(&pex_.addr, pex_.port))
             {
                 response_.pex.push_back(pex_);
                 pex_ = {};
@@ -251,10 +251,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "ip")
             {
-                if (auto const addr = tr_address::fromString(value))
-                {
-                    pex_.addr = *addr;
-                }
+                tr_address_from_string(&pex_.addr, value);
             }
             else if (key == "peer id")
             {

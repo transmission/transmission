@@ -560,7 +560,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
 static tr_peerIo* tr_peerIoNew(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address addr,
+    tr_address const* addr,
     tr_port port,
     time_t current_time,
     tr_sha1_digest_t const* torrent_hash,
@@ -580,11 +580,11 @@ static tr_peerIo* tr_peerIoNew(
 
     if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
-        session->setSocketTOS(socket.handle.tcp, addr.type);
+        session->setSocketTOS(socket.handle.tcp, addr->type);
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, addr, port, is_seed, current_time, parent };
+    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time, parent };
     io->socket = socket;
     io->bandwidth().setPeer(io);
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
@@ -631,12 +631,13 @@ void tr_peerIoUtpInit([[maybe_unused]] struct_utp_context* ctx)
 tr_peerIo* tr_peerIoNewIncoming(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address addr,
+    tr_address const* addr,
     tr_port port,
     time_t current_time,
     struct tr_peer_socket const socket)
 {
     TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_address_is_valid(addr));
 
     return tr_peerIoNew(session, parent, addr, port, current_time, nullptr, true, false, socket);
 }
@@ -644,7 +645,7 @@ tr_peerIo* tr_peerIoNewIncoming(
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address addr,
+    tr_address const* addr,
     tr_port port,
     time_t current_time,
     tr_sha1_digest_t const& torrent_hash,
@@ -652,6 +653,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
     bool utp)
 {
     TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_address_is_valid(addr));
 
     auto socket = tr_peer_socket{};
 
@@ -909,7 +911,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io_close_socket(io);
 
     auto const [addr, port] = io->socketAddress();
-    io->socket = tr_netOpenPeerSocket(session, addr, port, io->isSeed());
+    io->socket = tr_netOpenPeerSocket(session, &addr, port, io->isSeed());
 
     if (io->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {

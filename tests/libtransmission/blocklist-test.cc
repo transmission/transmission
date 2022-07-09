@@ -57,10 +57,10 @@ protected:
 
 #endif
 
-    bool addressIsBlocked(std::string_view address_str)
+    bool addressIsBlocked(char const* address_str)
     {
-        auto const addr = tr_address::fromString(address_str);
-        return addr && session_->isAddressBlocked(*addr);
+        struct tr_address addr = {};
+        return !tr_address_from_string(&addr, address_str) || tr_sessionIsAddressBlocked(session_, &addr);
     }
 };
 
