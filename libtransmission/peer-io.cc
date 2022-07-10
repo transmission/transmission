@@ -1202,6 +1202,8 @@ int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)
 {
     size_t byteCount = 0;
 
+    /* count up how many bytes are used by non-piece-data messages
+       at the front of our outbound queue */
     for (auto const& [n_bytes, is_piece_data] : io->outbuf_info)
     {
         if (is_piece_data)
