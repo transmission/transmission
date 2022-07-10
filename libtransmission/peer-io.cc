@@ -71,89 +71,22 @@ static size_t guessPacketOverhead(size_t d)
     return (unsigned int)(d * (100.0 / assumed_payload_data_rate) - d);
 }
 
-/**
-***
-**/
-
-struct tr_datatype
-{
-    struct tr_datatype* next;
-    size_t length;
-    bool isPieceData;
-};
-
-static struct tr_datatype* datatype_pool = nullptr;
-
-static struct tr_datatype* datatype_new()
-{
-    tr_datatype* ret = nullptr;
-
-    if (datatype_pool == nullptr)
-    {
-        ret = tr_new(struct tr_datatype, 1);
-    }
-    else
-    {
-        ret = datatype_pool;
-        datatype_pool = datatype_pool->next;
-    }
-
-    *ret = {};
-    return ret;
-}
-
-static void datatype_free(struct tr_datatype* datatype)
-{
-    datatype->next = datatype_pool;
-    datatype_pool = datatype;
-}
-
-static void peer_io_pull_datatype(tr_peerIo* io)
-{
-    auto* const tmp = io->outbuf_datatypes;
-
-    if (tmp != nullptr)
-    {
-        io->outbuf_datatypes = tmp->next;
-        datatype_free(tmp);
-    }
-}
-
-static void peer_io_push_datatype(tr_peerIo* io, struct tr_datatype* datatype)
-{
-    tr_datatype* tmp = io->outbuf_datatypes;
-
-    if (tmp != nullptr)
-    {
-        while (tmp->next != nullptr)
-        {
-            tmp = tmp->next;
-        }
-
-        tmp->next = datatype;
-    }
-    else
-    {
-        io->outbuf_datatypes = datatype;
-    }
-}
-
 /***
 ****
 ***/
 
 static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 {
-    while (bytes_transferred != 0 && tr_isPeerIo(io) && io->outbuf_datatypes != nullptr)
+    while (bytes_transferred != 0 && tr_isPeerIo(io) && !std::empty(io->outbuf_info))
     {
-        struct tr_datatype* next = io->outbuf_datatypes;
+        auto& [n_bytes_left, is_piece_data] = io->outbuf_info.front();
 
-        unsigned int const payload = std::min(uint64_t{ next->length }, uint64_t{ bytes_transferred });
+        unsigned int const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
         /* For uTP sockets, the overhead is computed in utp_on_overhead. */
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
-        io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, next->isPieceData, now);
+        io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);
 
         if (overhead > 0)
         {
@@ -162,18 +95,19 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 
         if (io->didWrite != nullptr)
         {
-            io->didWrite(io, payload, next->isPieceData, io->userData);
+            io->didWrite(io, payload, is_piece_data, io->userData);
         }
 
-        if (tr_isPeerIo(io))
+        if (!tr_isPeerIo(io))
         {
-            bytes_transferred -= payload;
-            next->length -= payload;
+            break;
+        }
 
-            if (next->length == 0)
-            {
-                peer_io_pull_datatype(io);
-            }
+        bytes_transferred -= payload;
+        n_bytes_left -= payload;
+        if (n_bytes_left == 0)
+        {
+            io->outbuf_info.pop_front();
         }
     }
 }
@@ -832,11 +766,6 @@ static void io_dtor(tr_peerIo* const io)
     event_disable(io, EV_READ | EV_WRITE);
     io_close_socket(io);
 
-    while (io->outbuf_datatypes != nullptr)
-    {
-        peer_io_pull_datatype(io);
-    }
-
     io->magic_number = ~0;
     delete io;
 }
@@ -1021,14 +950,6 @@ static inline void processBuffer(
     TR_ASSERT(size == 0);
 }
 
-static void addDatatype(tr_peerIo* io, size_t byteCount, bool isPieceData)
-{
-    auto* const d = datatype_new();
-    d->isPieceData = isPieceData;
-    d->length = byteCount;
-    peer_io_push_datatype(io, d);
-}
-
 static inline void maybeEncryptBuffer(tr_peerIo* io, struct evbuffer* buf, size_t offset, size_t size)
 {
     if (io->encryption_type == PEER_ENCRYPTION_RC4)
@@ -1042,7 +963,7 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
     size_t const byteCount = evbuffer_get_length(buf);
     maybeEncryptBuffer(io, buf, 0, byteCount);
     evbuffer_add_buffer(io->outbuf.get(), buf);
-    addDatatype(io, byteCount, isPieceData);
+    io->outbuf_info.emplace_back(byteCount, isPieceData);
 }
 
 void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, bool isPieceData)
@@ -1063,7 +984,7 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     evbuffer_commit_space(io->outbuf.get(), &iovec, 1);
 
-    addDatatype(io, byteCount, isPieceData);
+    io->outbuf_info.emplace_back(byteCount, isPieceData);
 }
 
 /***
@@ -1281,16 +1202,14 @@ int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)
 {
     size_t byteCount = 0;
 
-    /* count up how many bytes are used by non-piece-data messages
-       at the front of our outbound queue */
-    for (struct tr_datatype const* it = io->outbuf_datatypes; it != nullptr; it = it->next)
+    for (auto const& [n_bytes, is_piece_data] : io->outbuf_info)
     {
-        if (it->isPieceData)
+        if (is_piece_data)
         {
             break;
         }
 
-        byteCount += it->length;
+        byteCount += n_bytes;
     }
 
     return tr_peerIoFlush(io, TR_UP, byteCount);

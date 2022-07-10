@@ -16,6 +16,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime>
+#include <deque>
 #include <memory>
 #include <optional>
 #include <string>
@@ -34,7 +35,6 @@
 class tr_peerIo;
 struct tr_bandwidth;
 struct struct_utp_context;
-struct tr_datatype;
 
 /**
  * @addtogroup networked_io Networked IO
@@ -204,7 +204,7 @@ public:
     tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
     tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
 
-    struct tr_datatype* outbuf_datatypes = nullptr;
+    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
 
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
