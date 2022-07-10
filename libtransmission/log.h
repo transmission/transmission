@@ -98,7 +98,7 @@ void tr_logAddMessage(
 #define tr_logAddLevel(level, ...) \
     do \
     { \
-        if (tr_logGetLevel() >= level) \
+        if (tr_logLevelIsActive(level)) \
         { \
             tr_logAddMessage(__FILE__, __LINE__, level, __VA_ARGS__); \
         } \

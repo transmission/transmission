@@ -737,6 +737,8 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
+    fmt::print("{:s}:{:d} readPadA\n", __FILE__, __LINE__);
+
     /* resynchronizing on HASH('req1', S) */
     struct evbuffer_ptr ptr = evbuffer_search(
         inbuf,
@@ -749,6 +751,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_drain(inbuf, ptr.pos);
         tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
         setState(handshake, AWAITING_CRYPTO_PROVIDE);
+        fmt::print("{:s}:{:d} readPadA match\n", __FILE__, __LINE__);
         return READ_NOW;
     }
 
@@ -757,6 +760,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
 
+    fmt::print("{:s}:{:d} readPadA read later\n", __FILE__, __LINE__);
     return READ_LATER;
 }
 
@@ -966,6 +970,7 @@ static ReadState readPayloadStream(tr_handshake* handshake, struct evbuffer* inb
 
 static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 {
+    fmt::print("{:s}:{:d} canRead\n", __FILE__, __LINE__);
     TR_ASSERT(tr_isPeerIo(io));
 
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
@@ -981,6 +986,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
     ReadState ret = READ_NOW;
     while (readyForMore)
     {
+        fmt::print("{:s}:{:d} handshake->state {:d}\n", __FILE__, __LINE__, handshake->state);
         switch (handshake->state)
         {
         case AWAITING_HANDSHAKE:
@@ -1078,6 +1084,7 @@ static ReadState tr_handshakeDone(tr_handshake* handshake, bool isOK)
 {
     tr_logAddTraceHand(handshake, isOK ? "handshakeDone: connected" : "handshakeDone: aborting");
     tr_peerIoSetIOFuncs(handshake->io, nullptr, nullptr, nullptr, nullptr);
+    fmt::print("{:s} handshake done, isOK {}\n", handshake->io->addrStr(), isOK ? "true" : "false");
 
     bool const success = fireDoneFunc(handshake, isOK);
     delete handshake;

@@ -504,7 +504,7 @@ static tr_peerIo* tr_peerIoNew(
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(session->events != nullptr);
-    auto const lock = session->unique_lock();
+    TR_ASSERT(tr_amInEventThread(session));
 
 #ifdef WITH_UTP
     TR_ASSERT(socket.type == TR_PEER_SOCKET_TYPE_TCP || socket.type == TR_PEER_SOCKET_TYPE_UTP);
