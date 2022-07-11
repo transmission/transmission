@@ -63,8 +63,31 @@ static auto constexpr CancelHistorySec = int{ 60 };
 ***
 **/
 
-class tr_handshake_mediator_impl : public tr_handshake_mediator
+class tr_handshake_mediator_impl final : public tr_handshake_mediator
 {
+public:
+    tr_handshake_mediator_impl(tr_session& session)
+        : session_{ session }
+    {
+    }
+
+    virtual ~tr_handshake_mediator_impl() = default;
+
+    std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) override
+    {
+        auto* const tor = session_.torrents().get(info_hash);
+        if (tor == nullptr)
+        {
+            return {};
+        }
+
+        auto info = torrent_info{};
+        info.client_peer_id = tr_torrentGetPeerId(tor);
+        return info;
+    }
+
+private:
+    tr_session& session_;
 };
 
 /**
@@ -1197,7 +1220,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     }
     else /* we don't have a connection to them yet... */
     {
-        auto mediator = std::make_shared<tr_handshake_mediator_impl>();
+        auto mediator = std::make_shared<tr_handshake_mediator_impl>(*session);
         tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket);
         tr_handshake* const handshake = tr_handshakeNew(mediator, io, session->encryptionMode, on_handshake_done, manager);
 
@@ -2774,7 +2797,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     }
     else
     {
-        auto mediator = std::make_shared<tr_handshake_mediator_impl>();
+        auto mediator = std::make_shared<tr_handshake_mediator_impl>(*mgr->session);
         tr_handshake* handshake = tr_handshakeNew(mediator, io, mgr->session->encryptionMode, on_handshake_done, mgr);
 
         TR_ASSERT(io->torrentHash());

@@ -36,6 +36,12 @@ struct tr_handshake_result
 class tr_handshake_mediator
 {
 public:
+    struct torrent_info
+    {
+        tr_peer_id_t client_peer_id;
+    };
+
+    virtual std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) = 0;
 };
 
 /* returns true on success, false on error */

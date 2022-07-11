@@ -190,37 +190,34 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
-    auto const torrent_hash = handshake->crypto->torrentHash();
-    auto* const tor = torrent_hash ? handshake->session->torrents().get(*torrent_hash) : nullptr;
-    bool const success = tor != nullptr;
-
-    if (success)
+    auto const info_hash = handshake->crypto->torrentHash();
+    auto const info = info_hash ? handshake->mediator->torrentInfo(*info_hash) : std::nullopt;
+    if (!info)
     {
-        uint8_t* walk = buf;
-
-        walk = std::copy_n(HANDSHAKE_NAME, HANDSHAKE_NAME_LEN, walk);
-
-        memset(walk, 0, HANDSHAKE_FLAGS_LEN);
-        HANDSHAKE_SET_LTEP(walk);
-        HANDSHAKE_SET_FASTEXT(walk);
-        /* Note that this doesn't depend on whether the torrent is private.
-         * We don't accept DHT peers for a private torrent,
-         * but we participate in the DHT regardless. */
-        if (tr_dhtEnabled(handshake->session))
-        {
-            HANDSHAKE_SET_DHT(walk);
-        }
-        walk += HANDSHAKE_FLAGS_LEN;
-
-        walk = std::copy_n(reinterpret_cast<char const*>(std::data(tor->infoHash())), std::size(tor->infoHash()), walk);
-
-        auto const& peer_id = tr_torrentGetPeerId(tor);
-        std::copy_n(std::data(peer_id), std::size(peer_id), walk);
-
-        TR_ASSERT(walk + std::size(peer_id) - buf == HANDSHAKE_SIZE);
+        return false;
     }
 
-    return success;
+    uint8_t* walk = buf;
+
+    walk = std::copy_n(HANDSHAKE_NAME, HANDSHAKE_NAME_LEN, walk);
+
+    memset(walk, 0, HANDSHAKE_FLAGS_LEN);
+    HANDSHAKE_SET_LTEP(walk);
+    HANDSHAKE_SET_FASTEXT(walk);
+    /* Note that this doesn't depend on whether the torrent is private.
+     * We don't accept DHT peers for a private torrent,
+     * but we participate in the DHT regardless. */
+    if (tr_dhtEnabled(handshake->session))
+    {
+        HANDSHAKE_SET_DHT(walk);
+    }
+    walk += HANDSHAKE_FLAGS_LEN;
+
+    walk = std::copy_n(reinterpret_cast<char const*>(std::data(*info_hash)), std::size(*info_hash), walk);
+    walk = std::copy(std::begin(info->client_peer_id), std::end(info->client_peer_id), walk);
+
+    TR_ASSERT(walk - buf == HANDSHAKE_SIZE);
+    return true;
 }
 
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool isConnected);
@@ -274,7 +271,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
     tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}'", peer_id_sv));
 
-    if (auto* const tor = handshake->session->torrents().get(hash); peer_id == tr_torrentGetPeerId(tor))
+    if (auto const info = handshake->mediator->torrentInfo(hash); info && info->client_peer_id == peer_id)
     {
         tr_logAddTraceHand(handshake, "streuth!  we've connected to ourselves.");
         return HANDSHAKE_PEER_IS_SELF;
@@ -668,7 +665,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (handshake->isIncoming())
     {
-        if (!handshake->session->torrents().contains(hash))
+        if (!handshake->mediator->torrentInfo(hash))
         {
             tr_logAddTraceHand(handshake, "peer is trying to connect to us for a torrent we don't have.");
             return tr_handshakeDone(handshake, false);
@@ -725,8 +722,8 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const hash = handshake->io->torrentHash();
-    auto* const tor = hash ? handshake->session->torrents().get(*hash) : nullptr;
-    bool const connected_to_self = tor != nullptr && peer_id == tr_torrentGetPeerId(tor);
+    auto const info = hash ? handshake->mediator->torrentInfo(*hash) : std::nullopt;
+    auto const connected_to_self = info && info->client_peer_id == peer_id;
 
     return tr_handshakeDone(handshake, !connected_to_self);
 }
