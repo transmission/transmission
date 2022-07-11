@@ -184,7 +184,7 @@ public:
         return crypto.isIncoming();
     }
 
-    constexpr void setTorrentHash(tr_sha1_digest_t hash) noexcept
+    void setTorrentHash(tr_sha1_digest_t hash) noexcept
     {
         crypto.setTorrentHash(hash);
     }
