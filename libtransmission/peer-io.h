@@ -107,11 +107,6 @@ public:
 
     std::string addrStr() const;
 
-    [[nodiscard]] constexpr bool isIncoming() noexcept
-    {
-        return crypto.is_incoming;
-    }
-
     [[nodiscard]] auto getReadBuffer() noexcept
     {
         return inbuf.get();
@@ -183,6 +178,21 @@ public:
     }
 
     tr_crypto crypto;
+
+    [[nodiscard]] constexpr auto isIncoming() noexcept
+    {
+        return crypto.isIncoming();
+    }
+
+    void setTorrentHash(tr_sha1_digest_t hash) noexcept
+    {
+        crypto.setTorrentHash(hash);
+    }
+
+    [[nodiscard]] constexpr auto const& torrentHash() const noexcept
+    {
+        return crypto.torrentHash();
+    }
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
     // like this one isn't being used just for assertions, but also in
@@ -284,10 +294,6 @@ constexpr tr_session* tr_peerIoGetSession(tr_peerIo* io)
 
     return io->session;
 }
-
-std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io);
-
-void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash);
 
 int tr_peerIoReconnect(tr_peerIo* io);
 
