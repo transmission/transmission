@@ -36,7 +36,7 @@ struct tr_crypto
     tr_crypto(tr_crypto const&) = delete;
     tr_crypto(tr_crypto&&) = delete;
 
-    constexpr void setTorrentHash(tr_sha1_digest_t hash) noexcept
+    void setTorrentHash(tr_sha1_digest_t hash) noexcept
     {
         torrent_hash_ = hash;
     }
