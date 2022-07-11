@@ -24,6 +24,7 @@ class tr_peerIo;
 /** @brief opaque struct holding hanshake state information.
            freed when the handshake is completed. */
 struct tr_handshake;
+struct event_base;
 
 struct tr_handshake_result
 {
@@ -49,6 +50,8 @@ public:
     [[nodiscard]] virtual std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const = 0;
 
     [[nodiscard]] virtual std::optional<torrent_info> torrentInfoFromObfuscated(tr_sha1_digest_t const& info_hash) const = 0;
+
+    [[nodiscard]] virtual event_base* eventBase() const = 0;
 
     [[nodiscard]] virtual bool isDHTEnabled() const = 0;
 

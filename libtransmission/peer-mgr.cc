@@ -122,6 +122,11 @@ public:
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
+    [[nodiscard]] event_base* eventBase() const override
+    {
+        return session_.event_base;
+    }
+
 private:
     tr_session& session_;
 };

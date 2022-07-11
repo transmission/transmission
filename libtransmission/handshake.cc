@@ -20,7 +20,6 @@
 #include "handshake.h"
 #include "log.h"
 #include "peer-io.h"
-#include "session.h"
 #include "tr-assert.h"
 #include "utils.h"
 
@@ -131,7 +130,6 @@ struct tr_handshake
     bool haveSentBitTorrentHandshake;
     tr_peerIo* io;
     tr_crypto* crypto;
-    tr_session* session;
     handshake_state_t state;
     tr_encryption_mode encryptionMode;
     uint16_t pad_c_len;
@@ -1196,16 +1194,13 @@ tr_handshake* tr_handshakeNew(
     tr_handshake_done_func done_func,
     void* done_func_user_data)
 {
-    tr_session* session = tr_peerIoGetSession(io);
-
     auto* const handshake = new tr_handshake{ std::move(mediator) };
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto(io);
     handshake->encryptionMode = encryptionMode;
     handshake->done_func = done_func;
     handshake->done_func_user_data = done_func_user_data;
-    handshake->session = session;
-    handshake->timeout_timer = evtimer_new(session->event_base, handshakeTimeout, handshake);
+    handshake->timeout_timer = evtimer_new(handshake->mediator->eventBase(), handshakeTimeout, handshake);
     tr_timerAdd(*handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
