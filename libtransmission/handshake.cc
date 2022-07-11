@@ -1140,15 +1140,15 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 
     if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)
     {
-        /* This peer probably doesn't speak uTP. */
+        // the peer probably doesn't speak uTP.
 
         auto const hash = io->torrentHash();
-        auto* const tor = hash ? handshake->session->torrents().get(*hash) : nullptr;
+        auto const info = hash ? handshake->mediator->torrentInfo(*hash) : std::nullopt;
 
         /* Don't mark a peer as non-uTP unless it's really a connect failure. */
-        if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && tr_isTorrent(tor))
+        if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
         {
-            tr_peerMgrSetUtpFailed(tor, io->address(), true);
+            handshake->mediator->setUTPFailed(*hash, io->address());
         }
 
         if (tr_peerIoReconnect(handshake->io) == 0)

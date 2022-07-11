@@ -14,6 +14,8 @@
 
 #include "transmission.h"
 
+#include "net.h" // tr_address
+
 /** @addtogroup peers Peers
     @{ */
 
@@ -44,6 +46,8 @@ public:
     [[nodiscard]] virtual std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const = 0;
 
     [[nodiscard]] virtual bool isDHTEnabled() const = 0;
+
+    virtual void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address) = 0;
 };
 
 /* returns true on success, false on error */

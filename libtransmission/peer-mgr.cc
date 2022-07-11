@@ -92,6 +92,14 @@ public:
         return tr_dhtEnabled(&session_);
     }
 
+    void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address addr) override
+    {
+        if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
+        {
+            tr_peerMgrSetUtpFailed(tor, addr, true);
+        }
+    }
+
 private:
     tr_session& session_;
 };
