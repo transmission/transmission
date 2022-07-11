@@ -14,14 +14,11 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t
 #include <optional>
+#include <string_view>
+#include <vector>
 
 #include "crypto-utils.h"
 #include "tr-macros.h"
-
-/**
-*** @addtogroup peers
-*** @{
-**/
 
 enum
 {
@@ -34,38 +31,57 @@ struct tr_crypto
     tr_crypto(tr_sha1_digest_t const* torrent_hash = nullptr, bool is_incoming = true);
     ~tr_crypto();
 
-    std::optional<tr_sha1_digest_t> torrent_hash = {};
-    struct arc4_context* dec_key = nullptr;
-    struct arc4_context* enc_key = nullptr;
-    tr_dh_ctx_t dh = {};
-    uint8_t myPublicKey[KEY_LEN] = {};
-    tr_dh_secret_t mySecret = {};
-    bool is_incoming = false;
+    tr_crypto& operator=(tr_crypto const&) = delete;
+    tr_crypto& operator=(tr_crypto&&) = delete;
+    tr_crypto(tr_crypto const&) = delete;
+    tr_crypto(tr_crypto&&) = delete;
+
+    constexpr void setTorrentHash(tr_sha1_digest_t hash) noexcept
+    {
+        torrent_hash_ = hash;
+    }
+
+    [[nodiscard]] constexpr auto const& torrentHash() const noexcept
+    {
+        return torrent_hash_;
+    }
+
+    [[nodiscard]] std::string_view myPublicKey()
+    {
+        ensureKeyExists();
+        return { reinterpret_cast<char const*>(my_public_key_), KEY_LEN };
+    }
+
+    [[nodiscard]] bool computeSecret(void const* peer_public_key, size_t len);
+
+    [[nodiscard]] std::optional<tr_sha1_digest_t> secretKeySha1(
+        void const* prepend,
+        size_t prepend_len,
+        void const* append,
+        size_t append_len) const;
+
+    [[nodiscard]] constexpr auto isIncoming() const noexcept
+    {
+        return is_incoming_;
+    }
+
+    [[nodiscard]] virtual std::vector<uint8_t> pad(size_t maxlen) const;
+
+    void decryptInit();
+    void decrypt(size_t buflen, void const* buf_in, void* buf_out);
+    void encryptInit();
+    void encrypt(size_t buflen, void const* buf_in, void* buf_out);
+
+private:
+    void ensureKeyExists();
+
+    std::optional<tr_sha1_digest_t> torrent_hash_;
+    struct arc4_context* dec_key_ = nullptr;
+    struct arc4_context* enc_key_ = nullptr;
+    tr_dh_ctx_t dh_ = {};
+    tr_dh_secret_t my_secret_ = {};
+    uint8_t my_public_key_[KEY_LEN] = {};
+    bool const is_incoming_;
 };
-
-void tr_cryptoSetTorrentHash(tr_crypto* crypto, tr_sha1_digest_t const& torrent_hash);
-
-std::optional<tr_sha1_digest_t> tr_cryptoGetTorrentHash(tr_crypto const* crypto);
-
-bool tr_cryptoComputeSecret(tr_crypto* crypto, uint8_t const* peerPublicKey);
-
-uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len);
-
-void tr_cryptoDecryptInit(tr_crypto* crypto);
-
-void tr_cryptoDecrypt(tr_crypto* crypto, size_t buflen, void const* buf_in, void* buf_out);
-
-void tr_cryptoEncryptInit(tr_crypto* crypto);
-
-void tr_cryptoEncrypt(tr_crypto* crypto, size_t buflen, void const* buf_in, void* buf_out);
-
-std::optional<tr_sha1_digest_t> tr_cryptoSecretKeySha1(
-    tr_crypto const* crypto,
-    void const* prepend_data,
-    size_t prepend_data_size,
-    void const* append_data,
-    size_t append_data_size);
-
-/* @} */
 
 #endif // TR_ENCRYPTION_H

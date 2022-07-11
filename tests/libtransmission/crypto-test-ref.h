@@ -19,18 +19,6 @@
 #define tr_x509_store_t tr_x509_store_t_
 #define tr_x509_cert_t tr_x509_cert_t_
 #define tr_crypto tr_crypto_
-#define tr_cryptoConstruct tr_cryptoConstruct_
-#define tr_cryptoDestruct tr_cryptoDestruct_
-#define tr_cryptoSetTorrentHash tr_cryptoSetTorrentHash_
-#define tr_cryptoGetTorrentHash tr_cryptoGetTorrentHash_
-#define tr_cryptoHasTorrentHash tr_cryptoHasTorrentHash_
-#define tr_cryptoComputeSecret tr_cryptoComputeSecret_
-#define tr_cryptoGetMyPublicKey tr_cryptoGetMyPublicKey_
-#define tr_cryptoDecryptInit tr_cryptoDecryptInit_
-#define tr_cryptoDecrypt tr_cryptoDecrypt_
-#define tr_cryptoEncryptInit tr_cryptoEncryptInit_
-#define tr_cryptoEncrypt tr_cryptoEncrypt_
-#define tr_cryptoSecretKeySha1 tr_cryptoSecretKeySha1_
 #define tr_sha1 tr_sha1_
 #define tr_sha1_init tr_sha1_init_
 #define tr_sha1_update tr_sha1_update_
@@ -84,18 +72,6 @@
 #undef tr_x509_store_t
 #undef tr_x509_cert_t
 #undef tr_crypto
-#undef tr_cryptoConstruct
-#undef tr_cryptoDestruct
-#undef tr_cryptoSetTorrentHash
-#undef tr_cryptoGetTorrentHash
-#undef tr_cryptoHasTorrentHash
-#undef tr_cryptoComputeSecret
-#undef tr_cryptoGetMyPublicKey
-#undef tr_cryptoDecryptInit
-#undef tr_cryptoDecrypt
-#undef tr_cryptoEncryptInit
-#undef tr_cryptoEncrypt
-#undef tr_cryptoSecretKeySha1
 #undef tr_sha1
 #undef tr_sha1_init
 #undef tr_sha1_update
@@ -142,18 +118,6 @@
 #define tr_x509_store_t_ tr_x509_store_t
 #define tr_x509_cert_t_ tr_x509_cert_t
 #define tr_crypto_ tr_crypto
-#define tr_cryptoConstruct_ tr_cryptoConstruct
-#define tr_cryptoDestruct_ tr_cryptoDestruct
-#define tr_cryptoSetTorrentHash_ tr_cryptoSetTorrentHash
-#define tr_cryptoGetTorrentHash_ tr_cryptoGetTorrentHash
-#define tr_cryptoHasTorrentHash_ tr_cryptoHasTorrentHash
-#define tr_cryptoComputeSecret_ tr_cryptoComputeSecret
-#define tr_cryptoGetMyPublicKey_ tr_cryptoGetMyPublicKey
-#define tr_cryptoDecryptInit_ tr_cryptoDecryptInit
-#define tr_cryptoDecrypt_ tr_cryptoDecrypt
-#define tr_cryptoEncryptInit_ tr_cryptoEncryptInit
-#define tr_cryptoEncrypt_ tr_cryptoEncrypt
-#define tr_cryptoSecretKeySha1_ tr_cryptoSecretKeySha1
 #define tr_sha1_ tr_sha1
 #define tr_sha1_init_ tr_sha1_init
 #define tr_sha1_update_ tr_sha1_update
