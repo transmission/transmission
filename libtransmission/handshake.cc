@@ -24,7 +24,6 @@
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
 #include "utils.h"
 
 using namespace std::literals;
@@ -207,7 +206,7 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
     /* Note that this doesn't depend on whether the torrent is private.
      * We don't accept DHT peers for a private torrent,
      * but we participate in the DHT regardless. */
-    if (tr_dhtEnabled(handshake->session))
+    if (handshake->mediator->isDHTEnabled())
     {
         HANDSHAKE_SET_DHT(walk);
     }

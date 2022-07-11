@@ -45,6 +45,7 @@
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
 #include "tr-assert.h"
+#include "tr-dht.h"
 #include "tr-utp.h"
 #include "utils.h"
 #include "webseed.h"
@@ -73,7 +74,7 @@ public:
 
     virtual ~tr_handshake_mediator_impl() = default;
 
-    std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) override
+    [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
     {
         auto* const tor = session_.torrents().get(info_hash);
         if (tor == nullptr)
@@ -84,6 +85,11 @@ public:
         auto info = torrent_info{};
         info.client_peer_id = tr_torrentGetPeerId(tor);
         return info;
+    }
+
+    [[nodiscard]] bool isDHTEnabled() const override
+    {
+        return tr_dhtEnabled(&session_);
     }
 
 private:

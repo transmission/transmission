@@ -41,7 +41,9 @@ public:
         tr_peer_id_t client_peer_id;
     };
 
-    virtual std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) = 0;
+    [[nodiscard]] virtual std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const = 0;
+
+    [[nodiscard]] virtual bool isDHTEnabled() const = 0;
 };
 
 /* returns true on success, false on error */
