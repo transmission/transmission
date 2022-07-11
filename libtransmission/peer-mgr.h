@@ -110,8 +110,6 @@ tr_peerMgr* tr_peerMgrNew(tr_session* session);
 
 void tr_peerMgrFree(tr_peerMgr* manager);
 
-bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr);
-
 void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed);

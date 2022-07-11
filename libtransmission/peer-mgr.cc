@@ -64,8 +64,26 @@ static auto constexpr CancelHistorySec = int{ 60 };
 ***
 **/
 
+static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr);
+
 class tr_handshake_mediator_impl final : public tr_handshake_mediator
 {
+private:
+    [[nodiscard]] static std::optional<torrent_info> torrentInfo(tr_torrent* tor)
+    {
+        if (tor == nullptr)
+        {
+            return {};
+        }
+
+        auto info = torrent_info{};
+        info.info_hash = tor->infoHash();
+        info.client_peer_id = tr_torrentGetPeerId(tor);
+        info.id = tor->id();
+        info.is_done = tor->isDone();
+        return info;
+    }
+
 public:
     tr_handshake_mediator_impl(tr_session& session)
         : session_{ session }
@@ -76,15 +94,13 @@ public:
 
     [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
     {
-        auto* const tor = session_.torrents().get(info_hash);
-        if (tor == nullptr)
-        {
-            return {};
-        }
+        return torrentInfo(session_.torrents().get(info_hash));
+    }
 
-        auto info = torrent_info{};
-        info.client_peer_id = tr_torrentGetPeerId(tor);
-        return info;
+    [[nodiscard]] std::optional<torrent_info> torrentInfoFromObfuscated(
+        tr_sha1_digest_t const& obfuscated_info_hash) const override
+    {
+        return torrentInfo(tr_torrentFindFromObfuscatedHash(&session_, obfuscated_info_hash));
     }
 
     [[nodiscard]] bool isDHTEnabled() const override
@@ -98,6 +114,12 @@ public:
         {
             tr_peerMgrSetUtpFailed(tor, addr, true);
         }
+    }
+
+    [[nodiscard]] bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const override
+    {
+        auto* const tor = session_.torrents().get(tor_id);
+        return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
 private:
@@ -724,7 +746,7 @@ static void atomSetSeed(tr_swarm* swarm, peer_atom& atom)
     swarm->markAllSeedsFlagDirty();
 }
 
-bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
+static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 {
     if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {

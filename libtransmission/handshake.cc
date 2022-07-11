@@ -20,9 +20,7 @@
 #include "handshake.h"
 #include "log.h"
 #include "peer-io.h"
-#include "peer-mgr.h"
 #include "session.h"
-#include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
 
@@ -831,16 +829,14 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         obfuscated_hash[i] = req2[i] ^ (*req3)[i];
     }
 
-    if (auto const* const tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscated_hash); tor != nullptr)
+    if (auto const info = handshake->mediator->torrentInfoFromObfuscated(obfuscated_hash); info)
     {
-        bool const clientIsSeed = tor->isDone();
-        bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, handshake->io->address());
-        tr_logAddTraceHand(
-            handshake,
-            fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", tor->name()));
-        handshake->io->setTorrentHash(tor->infoHash());
+        bool const client_is_seed = info->is_done;
+        bool const peer_is_seed = handshake->mediator->isPeerKnownSeed(info->id, handshake->io->address());
+        tr_logAddTraceHand(handshake, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
+        handshake->io->setTorrentHash(info->info_hash);
 
-        if (clientIsSeed && peerIsSeed)
+        if (client_is_seed && peer_is_seed)
         {
             tr_logAddTraceHand(handshake, "another seed tried to reconnect to us!");
             return tr_handshakeDone(handshake, false);
