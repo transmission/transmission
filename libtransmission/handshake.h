@@ -10,6 +10,7 @@
 #endif
 
 #include <optional>
+#include <memory>
 
 #include "transmission.h"
 
@@ -32,11 +33,17 @@ struct tr_handshake_result
     std::optional<tr_peer_id_t> peer_id;
 };
 
+class tr_handshake_mediator
+{
+public:
+};
+
 /* returns true on success, false on error */
 using tr_handshake_done_func = bool (*)(tr_handshake_result const& result);
 
 /** @brief create a new handshake */
 tr_handshake* tr_handshakeNew(
+    std::shared_ptr<tr_handshake_mediator> mediator,
     tr_peerIo* io,
     tr_encryption_mode encryption_mode,
     tr_handshake_done_func when_done,

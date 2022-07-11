@@ -108,6 +108,11 @@ enum handshake_state_t
 
 struct tr_handshake
 {
+    tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in)
+        : mediator{ std::move(mediator_in) }
+    {
+    }
+
     ~tr_handshake()
     {
         if (io != nullptr)
@@ -122,6 +127,8 @@ struct tr_handshake
     {
         return io->isIncoming();
     }
+
+    std::shared_ptr<tr_handshake_mediator> const mediator;
 
     bool haveReadAnythingFromPeer;
     bool haveSentBitTorrentHandshake;
@@ -1191,6 +1198,7 @@ static void handshakeTimeout(evutil_socket_t /*s*/, short /*type*/, void* handsh
 }
 
 tr_handshake* tr_handshakeNew(
+    std::shared_ptr<tr_handshake_mediator> mediator,
     tr_peerIo* io,
     tr_encryption_mode encryptionMode,
     tr_handshake_done_func done_func,
@@ -1198,7 +1206,7 @@ tr_handshake* tr_handshakeNew(
 {
     tr_session* session = tr_peerIoGetSession(io);
 
-    auto* const handshake = new tr_handshake{};
+    auto* const handshake = new tr_handshake{ std::move(mediator) };
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto(io);
     handshake->encryptionMode = encryptionMode;
