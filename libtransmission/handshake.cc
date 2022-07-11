@@ -15,8 +15,8 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
+
 #include "clients.h"
-#include "crypto-utils.h"
 #include "handshake.h"
 #include "log.h"
 #include "peer-io.h"
