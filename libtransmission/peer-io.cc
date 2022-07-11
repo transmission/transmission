@@ -861,24 +861,6 @@ int tr_peerIoReconnect(tr_peerIo* io)
 ***
 **/
 
-void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    tr_cryptoSetTorrentHash(&io->crypto, info_hash);
-}
-
-std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    return tr_cryptoGetTorrentHash(&io->crypto);
-}
-
-/**
-***
-**/
-
 static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now)
 {
     /* this is all kind of arbitrary, but what seems to work well is
@@ -922,12 +904,7 @@ void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type)
 ***
 **/
 
-static inline void processBuffer(
-    tr_crypto* crypto,
-    struct evbuffer* buffer,
-    size_t offset,
-    size_t size,
-    void (*callback)(tr_crypto*, size_t, void const*, void*))
+static inline void processBuffer(tr_crypto& crypto, evbuffer* buffer, size_t offset, size_t size)
 {
     struct evbuffer_ptr pos;
     struct evbuffer_iovec iovec;
@@ -941,7 +918,7 @@ static inline void processBuffer(
             break;
         }
 
-        callback(crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base);
+        crypto.encrypt(iovec.iov_len, iovec.iov_base, iovec.iov_base);
 
         TR_ASSERT(size >= iovec.iov_len);
         size -= iovec.iov_len;
@@ -950,18 +927,15 @@ static inline void processBuffer(
     TR_ASSERT(size == 0);
 }
 
-static inline void maybeEncryptBuffer(tr_peerIo* io, struct evbuffer* buf, size_t offset, size_t size)
-{
-    if (io->encryption_type == PEER_ENCRYPTION_RC4)
-    {
-        processBuffer(&io->crypto, buf, offset, size, &tr_cryptoEncrypt);
-    }
-}
-
 void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
 {
     size_t const byteCount = evbuffer_get_length(buf);
-    maybeEncryptBuffer(io, buf, 0, byteCount);
+
+    if (io->encryption_type == PEER_ENCRYPTION_RC4)
+    {
+        processBuffer(io->crypto, buf, 0, byteCount);
+    }
+
     evbuffer_add_buffer(io->outbuf.get(), buf);
     io->outbuf_info.emplace_back(byteCount, isPieceData);
 }
@@ -975,7 +949,7 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     if (io->encryption_type == PEER_ENCRYPTION_RC4)
     {
-        tr_cryptoEncrypt(&io->crypto, iovec.iov_len, bytes, iovec.iov_base);
+        io->crypto.encrypt(iovec.iov_len, bytes, iovec.iov_base);
     }
     else
     {
@@ -1031,7 +1005,7 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
 
     case PEER_ENCRYPTION_RC4:
         evbuffer_remove(inbuf, bytes, byteCount);
-        tr_cryptoDecrypt(&io->crypto, byteCount, bytes, bytes);
+        io->crypto.decrypt(byteCount, bytes, bytes);
         break;
 
     default:

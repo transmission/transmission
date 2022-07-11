@@ -173,7 +173,7 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
-    auto const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
+    auto const torrent_hash = handshake->crypto->torrentHash();
     auto* const tor = torrent_hash ? handshake->session->torrents().get(*torrent_hash) : nullptr;
     bool const success = tor != nullptr;
 
@@ -242,7 +242,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(hash), std::size(hash));
-    if (auto const torrent_hash = tr_peerIoGetTorrentHash(handshake->io); !torrent_hash || *torrent_hash != hash)
+    if (auto const torrent_hash = handshake->io->torrentHash(); !torrent_hash || *torrent_hash != hash)
     {
         tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
         return HANDSHAKE_BAD_TORRENT;
@@ -285,19 +285,16 @@ static void sendYa(tr_handshake* handshake)
 {
     /* add our public key (Ya) */
 
-    int len = 0;
-    uint8_t const* const public_key = tr_cryptoGetMyPublicKey(handshake->crypto, &len);
-    TR_ASSERT(len == KEY_LEN);
-    TR_ASSERT(public_key != nullptr);
+    auto const public_key = handshake->crypto->myPublicKey();
+    TR_ASSERT(std::size(public_key) == KEY_LEN);
 
     char outbuf[KEY_LEN + PadA_MAXLEN];
     char* walk = outbuf;
-    walk = std::copy_n(public_key, len, walk);
+    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
 
-    /* add some bullshit padding */
-    len = tr_rand_int(PadA_MAXLEN);
-    tr_rand_buffer(walk, len);
-    walk += len;
+    // add some random padding
+    auto const pad_a = handshake->crypto->pad(PadA_MAXLEN);
+    walk = std::copy(std::begin(pad_a), std::end(pad_a), walk);
 
     /* send it */
     setReadState(handshake, AWAITING_YB);
@@ -358,7 +355,7 @@ static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_p
 
 static auto computeRequestHash(tr_handshake const* handshake, std::string_view name)
 {
-    return tr_cryptoSecretKeySha1(handshake->crypto, std::data(name), std::size(name), "", 0);
+    return handshake->crypto->secretKeySha1(std::data(name), std::size(name), "", 0);
 }
 
 static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
@@ -398,7 +395,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     /* compute the secret */
     evbuffer_remove(inbuf, yb, KEY_LEN);
 
-    if (!tr_cryptoComputeSecret(handshake->crypto, yb))
+    if (!handshake->crypto->computeSecret(yb, KEY_LEN))
     {
         return tr_handshakeDone(handshake, false);
     }
@@ -420,7 +417,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        auto const hash = tr_cryptoGetTorrentHash(handshake->crypto);
+        auto const hash = handshake->crypto->torrentHash();
         if (!hash)
         {
             tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
@@ -451,7 +448,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         uint8_t vc[VC_LENGTH] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
         tr_peerIoWriteBuf(handshake->io, outbuf, false);
-        tr_cryptoEncryptInit(handshake->crypto);
+        handshake->crypto->encryptInit();
         tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_RC4);
 
         evbuffer_add(outbuf, vc, VC_LENGTH);
@@ -475,7 +472,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* send it */
-    tr_cryptoDecryptInit(handshake->crypto);
+    handshake->crypto->decryptInit();
     setReadState(handshake, AWAITING_VC);
     tr_peerIoWriteBuf(handshake->io, outbuf, false);
 
@@ -502,8 +499,8 @@ static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
         }
 
         memcpy(tmp, evbuffer_pullup(inbuf, key_len), key_len);
-        tr_cryptoDecryptInit(handshake->crypto);
-        tr_cryptoDecrypt(handshake->crypto, key_len, tmp, tmp);
+        handshake->crypto->decryptInit();
+        handshake->crypto->decrypt(key_len, tmp, tmp);
 
         if (memcmp(tmp, key, key_len) == 0)
         {
@@ -614,7 +611,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return READ_NOW;
         }
 
-        tr_cryptoDecrypt(handshake->crypto, 1, &pstrlen, &pstrlen);
+        handshake->crypto->decrypt(1, &pstrlen, &pstrlen);
 
         if (pstrlen != 19)
         {
@@ -660,11 +657,12 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return tr_handshakeDone(handshake, false);
         }
 
-        tr_peerIoSetTorrentHash(handshake->io, hash);
+        handshake->io->setTorrentHash(hash);
     }
     else /* outgoing */
     {
-        auto const torrent_hash = tr_peerIoGetTorrentHash(handshake->io);
+        auto const torrent_hash = handshake->io->torrentHash();
+
         if (!torrent_hash || *torrent_hash != hash)
         {
             tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
@@ -709,7 +707,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}' ... isIncoming is {}", client, handshake->isIncoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
-    auto const hash = tr_peerIoGetTorrentHash(handshake->io);
+    auto const hash = handshake->io->torrentHash();
     auto* const tor = hash ? handshake->session->torrents().get(*hash) : nullptr;
     bool const connected_to_self = tor != nullptr && peer_id == tr_torrentGetPeerId(tor);
 
@@ -729,7 +727,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     uint8_t ya[KEY_LEN];
     evbuffer_remove(inbuf, ya, KEY_LEN);
 
-    if (!tr_cryptoComputeSecret(handshake->crypto, ya))
+    if (!handshake->crypto->computeSecret(ya, KEY_LEN))
     {
         return tr_handshakeDone(handshake, false);
     }
@@ -746,12 +744,10 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
     uint8_t outbuf[KEY_LEN + PadB_MAXLEN];
     uint8_t* walk = outbuf;
-    int len = 0;
-    uint8_t const* const myKey = tr_cryptoGetMyPublicKey(handshake->crypto, &len);
-    walk = std::copy_n(myKey, len, walk);
-    len = tr_rand_int(PadB_MAXLEN);
-    tr_rand_buffer(walk, len);
-    walk += len;
+    auto const public_key = handshake->crypto->myPublicKey();
+    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
+    auto const pad_b = handshake->crypto->pad(PadB_MAXLEN);
+    walk = std::copy(std::begin(pad_b), std::end(pad_b), walk);
 
     setReadState(handshake, AWAITING_PAD_A);
     tr_peerIoWriteBytes(handshake->io, outbuf, walk - outbuf, false);
@@ -829,7 +825,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         tr_logAddTraceHand(
             handshake,
             fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", tor->name()));
-        tr_peerIoSetTorrentHash(handshake->io, tor->infoHash());
+        handshake->io->setTorrentHash(tor->infoHash());
 
         if (clientIsSeed && peerIsSeed)
         {
@@ -845,7 +841,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
 
-    tr_cryptoDecryptInit(handshake->crypto);
+    handshake->crypto->decryptInit();
 
     tr_peerIoReadBytes(handshake->io, inbuf, vc_in, VC_LENGTH);
 
@@ -897,7 +893,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
     **/
 
-    tr_cryptoEncryptInit(handshake->crypto);
+    handshake->crypto->encryptInit();
     evbuffer* const outbuf = evbuffer_new();
 
     {
@@ -1144,7 +1140,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     {
         /* This peer probably doesn't speak uTP. */
 
-        auto const hash = tr_peerIoGetTorrentHash(io);
+        auto const hash = io->torrentHash();
         auto* const tor = hash ? handshake->session->torrents().get(*hash) : nullptr;
 
         /* Don't mark a peer as non-uTP unless it's really a connect failure. */

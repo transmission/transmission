@@ -1084,7 +1084,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
     bool success = false;
     auto* manager = static_cast<tr_peerMgr*>(result.userData);
 
-    auto const hash = tr_peerIoGetTorrentHash(result.io);
+    auto const hash = result.io->torrentHash();
     tr_swarm* const s = hash ? getExistingSwarm(manager, *hash) : nullptr;
 
     auto const [addr, port] = result.io->socketAddress();
@@ -2771,7 +2771,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     {
         tr_handshake* handshake = tr_handshakeNew(io, mgr->session->encryptionMode, on_handshake_done, mgr);
 
-        TR_ASSERT(tr_peerIoGetTorrentHash(io));
+        TR_ASSERT(io->torrentHash());
 
         tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIoNewOutgoing() */
 

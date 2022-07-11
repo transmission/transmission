@@ -37,15 +37,15 @@ TEST(Crypto, torrentHash)
 {
 
     auto a = tr_crypto{};
-    EXPECT_FALSE(tr_cryptoGetTorrentHash(&a));
+    EXPECT_FALSE(a.torrentHash());
 
-    tr_cryptoSetTorrentHash(&a, SomeHash);
-    EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
+    a.setTorrentHash(SomeHash);
+    EXPECT_TRUE(a.torrentHash());
+    EXPECT_EQ(SomeHash, *a.torrentHash());
 
-    a = tr_crypto{ &SomeHash, false };
-    EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
+    auto b = tr_crypto{ &SomeHash, false };
+    EXPECT_TRUE(b.torrentHash());
+    EXPECT_EQ(SomeHash, *b.torrentHash());
 }
 
 TEST(Crypto, encryptDecrypt)
@@ -53,29 +53,30 @@ TEST(Crypto, encryptDecrypt)
     auto a = tr_crypto{ &SomeHash, false };
     auto b = tr_crypto_{ &SomeHash, true };
 
-    auto public_key_length = int{};
-    EXPECT_TRUE(tr_cryptoComputeSecret(&a, tr_cryptoGetMyPublicKey_(&b, &public_key_length)));
-    EXPECT_TRUE(tr_cryptoComputeSecret_(&b, tr_cryptoGetMyPublicKey(&a, &public_key_length)));
+    auto public_key = b.myPublicKey();
+    EXPECT_TRUE(a.computeSecret(std::data(public_key), std::size(public_key)));
+    public_key = a.myPublicKey();
+    EXPECT_TRUE(b.computeSecret(std::data(public_key), std::size(public_key)));
 
-    auto const input1 = std::string{ "test1" };
+    auto constexpr Input1 = "test1"sv;
     auto encrypted1 = std::array<char, 128>{};
     auto decrypted1 = std::array<char, 128>{};
 
-    tr_cryptoEncryptInit(&a);
-    tr_cryptoEncrypt(&a, input1.size(), input1.data(), encrypted1.data());
-    tr_cryptoDecryptInit_(&b);
-    tr_cryptoDecrypt_(&b, input1.size(), encrypted1.data(), decrypted1.data());
-    EXPECT_EQ(input1, std::string(decrypted1.data(), input1.size()));
+    a.encryptInit();
+    a.encrypt(std::size(Input1), std::data(Input1), std::data(encrypted1));
+    b.decryptInit();
+    b.decrypt(std::size(Input1), std::data(encrypted1), std::data(decrypted1));
+    EXPECT_EQ(Input1, std::data(decrypted1));
 
-    auto const input2 = std::string{ "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
+    auto constexpr Input2 = "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)"sv;
     auto encrypted2 = std::array<char, 128>{};
     auto decrypted2 = std::array<char, 128>{};
 
-    tr_cryptoEncryptInit_(&b);
-    tr_cryptoEncrypt_(&b, input2.size(), input2.data(), encrypted2.data());
-    tr_cryptoDecryptInit(&a);
-    tr_cryptoDecrypt(&a, input2.size(), encrypted2.data(), decrypted2.data());
-    EXPECT_EQ(input2, std::string(decrypted2.data(), input2.size()));
+    b.encryptInit();
+    b.encrypt(std::size(Input2), std::data(Input2), std::data(encrypted2));
+    a.decryptInit();
+    a.decrypt(std::size(Input2), std::data(encrypted2), std::data(decrypted2));
+    EXPECT_EQ(Input2, std::data(decrypted2));
 }
 
 TEST(Crypto, sha1)
