@@ -108,6 +108,16 @@ enum handshake_state_t
 
 struct tr_handshake
 {
+    ~tr_handshake()
+    {
+        if (io != nullptr)
+        {
+            tr_peerIoUnref(io); /* balanced by the ref in tr_handshakeNew */
+        }
+
+        event_free(timeout_timer);
+    }
+
     [[nodiscard]] auto constexpr isIncoming() const noexcept
     {
         return io->isIncoming();
@@ -1102,24 +1112,13 @@ static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
     return success;
 }
 
-static void tr_handshakeFree(tr_handshake* handshake)
-{
-    if (handshake->io != nullptr)
-    {
-        tr_peerIoUnref(handshake->io); /* balanced by the ref in tr_handshakeNew */
-    }
-
-    event_free(handshake->timeout_timer);
-    tr_free(handshake);
-}
-
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool isOK)
 {
     tr_logAddTraceHand(handshake, isOK ? "handshakeDone: connected" : "handshakeDone: aborting");
     tr_peerIoSetIOFuncs(handshake->io, nullptr, nullptr, nullptr, nullptr);
 
     bool const success = fireDoneFunc(handshake, isOK);
-    tr_handshakeFree(handshake);
+    delete handshake;
     return success ? READ_LATER : READ_ERR;
 }
 
@@ -1199,7 +1198,7 @@ tr_handshake* tr_handshakeNew(
 {
     tr_session* session = tr_peerIoGetSession(io);
 
-    auto* const handshake = tr_new0(tr_handshake, 1);
+    auto* const handshake = new tr_handshake{};
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto(io);
     handshake->encryptionMode = encryptionMode;
@@ -1209,7 +1208,7 @@ tr_handshake* tr_handshakeNew(
     handshake->timeout_timer = evtimer_new(session->event_base, handshakeTimeout, handshake);
     tr_timerAdd(*handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
 
-    tr_peerIoRef(io); /* balanced by the unref in tr_handshakeFree */
+    tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
     tr_peerIoSetEncryption(io, PEER_ENCRYPTION_NONE);
 
