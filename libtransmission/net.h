@@ -156,15 +156,20 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
 
     // human-readable formatting
-
     template<typename OutputIt>
-    OutputIt readable(OutputIt out) const;
+    OutputIt readable(OutputIt out, tr_port port = {}) const;
+    std::string_view readable(char* out, size_t outlen, tr_port port = {}) const;
+    [[nodiscard]] std::string readable(tr_port port = {}) const;
 
-    template<typename OutputIt>
-    OutputIt readable(OutputIt out, tr_port) const;
+    [[nodiscard]] constexpr auto isIPv4() const noexcept
+    {
+        return type == TR_AF_INET;
+    }
 
-    [[nodiscard]] std::string readable() const;
-    [[nodiscard]] std::string readable(tr_port) const;
+    [[nodiscard]] constexpr auto isIPv6() const noexcept
+    {
+        return type == TR_AF_INET6;
+    }
 
     // comparisons
 
@@ -195,12 +200,6 @@ struct tr_address
 
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
-
-char const* tr_address_to_string(tr_address const* addr);
-
-char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen);
-
-char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port);
 
 bool tr_address_from_string(tr_address* setme, char const* string);
 

@@ -71,89 +71,22 @@ static size_t guessPacketOverhead(size_t d)
     return (unsigned int)(d * (100.0 / assumed_payload_data_rate) - d);
 }
 
-/**
-***
-**/
-
-struct tr_datatype
-{
-    struct tr_datatype* next;
-    size_t length;
-    bool isPieceData;
-};
-
-static struct tr_datatype* datatype_pool = nullptr;
-
-static struct tr_datatype* datatype_new()
-{
-    tr_datatype* ret = nullptr;
-
-    if (datatype_pool == nullptr)
-    {
-        ret = tr_new(struct tr_datatype, 1);
-    }
-    else
-    {
-        ret = datatype_pool;
-        datatype_pool = datatype_pool->next;
-    }
-
-    *ret = {};
-    return ret;
-}
-
-static void datatype_free(struct tr_datatype* datatype)
-{
-    datatype->next = datatype_pool;
-    datatype_pool = datatype;
-}
-
-static void peer_io_pull_datatype(tr_peerIo* io)
-{
-    auto* const tmp = io->outbuf_datatypes;
-
-    if (tmp != nullptr)
-    {
-        io->outbuf_datatypes = tmp->next;
-        datatype_free(tmp);
-    }
-}
-
-static void peer_io_push_datatype(tr_peerIo* io, struct tr_datatype* datatype)
-{
-    tr_datatype* tmp = io->outbuf_datatypes;
-
-    if (tmp != nullptr)
-    {
-        while (tmp->next != nullptr)
-        {
-            tmp = tmp->next;
-        }
-
-        tmp->next = datatype;
-    }
-    else
-    {
-        io->outbuf_datatypes = datatype;
-    }
-}
-
 /***
 ****
 ***/
 
 static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 {
-    while (bytes_transferred != 0 && tr_isPeerIo(io) && io->outbuf_datatypes != nullptr)
+    while (bytes_transferred != 0 && tr_isPeerIo(io) && !std::empty(io->outbuf_info))
     {
-        struct tr_datatype* next = io->outbuf_datatypes;
+        auto& [n_bytes_left, is_piece_data] = io->outbuf_info.front();
 
-        unsigned int const payload = std::min(uint64_t{ next->length }, uint64_t{ bytes_transferred });
+        unsigned int const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
         /* For uTP sockets, the overhead is computed in utp_on_overhead. */
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
-        io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, next->isPieceData, now);
+        io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);
 
         if (overhead > 0)
         {
@@ -162,18 +95,19 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 
         if (io->didWrite != nullptr)
         {
-            io->didWrite(io, payload, next->isPieceData, io->userData);
+            io->didWrite(io, payload, is_piece_data, io->userData);
         }
 
-        if (tr_isPeerIo(io))
+        if (!tr_isPeerIo(io))
         {
-            bytes_transferred -= payload;
-            next->length -= payload;
+            break;
+        }
 
-            if (next->length == 0)
-            {
-                peer_io_pull_datatype(io);
-            }
+        bytes_transferred -= payload;
+        n_bytes_left -= payload;
+        if (n_bytes_left == 0)
+        {
+            io->outbuf_info.pop_front();
         }
     }
 }
@@ -417,12 +351,8 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 #ifdef WITH_UTP
 /* UTP callbacks */
 
-static void utp_on_read(void* vio, unsigned char const* buf, size_t buflen)
+static void utp_on_read(tr_peerIo* const io, uint8_t const* const buf, size_t const buflen)
 {
-    auto* io = static_cast<tr_peerIo*>(vio);
-
-    TR_ASSERT(tr_isPeerIo(io));
-
     if (auto const rc = evbuffer_add(io->inbuf.get(), buf, buflen); rc < 0)
     {
         tr_logAddWarn(_("Couldn't write to peer"));
@@ -434,34 +364,8 @@ static void utp_on_read(void* vio, unsigned char const* buf, size_t buflen)
     canReadWrapper(io);
 }
 
-static void utp_on_write(void* vio, unsigned char* buf, size_t buflen)
+static size_t utp_get_rb_size(tr_peerIo* const io)
 {
-    auto* io = static_cast<tr_peerIo*>(vio);
-
-    TR_ASSERT(tr_isPeerIo(io));
-
-    int rc = evbuffer_remove(io->outbuf.get(), buf, buflen);
-    tr_logAddTraceIo(io, fmt::format("utp_on_write sending {} bytes... evbuffer_remove returned {}", buflen, rc));
-    TR_ASSERT(rc == (int)buflen); /* if this fails, we've corrupted our bookkeeping somewhere */
-
-    if (rc < (long)buflen)
-    {
-        auto const errmsg = fmt::format(
-            _("Couldn't write {expected_size} bytes to peer; wrote {actual_size}"),
-            fmt::arg("expected_size", buflen),
-            fmt::arg("actual_size", rc));
-        tr_logAddWarnIo(io, errmsg);
-    }
-
-    didWriteWrapper(io, buflen);
-}
-
-static size_t utp_get_rb_size(void* vio)
-{
-    auto const* const io = static_cast<tr_peerIo const*>(vio);
-
-    TR_ASSERT(tr_isPeerIo(io));
-
     size_t bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
 
     tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
@@ -478,12 +382,8 @@ static void utp_on_writable(tr_peerIo* io)
     tr_peerIoSetEnabled(io, TR_UP, n != 0 && evbuffer_get_length(io->outbuf.get()) != 0);
 }
 
-static void utp_on_state_change(void* vio, int state)
+static void utp_on_state_change(tr_peerIo* const io, int const state)
 {
-    auto* io = static_cast<tr_peerIo*>(vio);
-
-    TR_ASSERT(tr_isPeerIo(io));
-
     if (state == UTP_STATE_CONNECT)
     {
         tr_logAddTraceIo(io, "utp_on_state_change -- changed to connected");
@@ -508,7 +408,6 @@ static void utp_on_state_change(void* vio, int state)
     else if (state == UTP_STATE_DESTROYING)
     {
         tr_logAddErrorIo(io, "Impossible state UTP_STATE_DESTROYING");
-        return;
     }
     else
     {
@@ -516,12 +415,8 @@ static void utp_on_state_change(void* vio, int state)
     }
 }
 
-static void utp_on_error(void* vio, int errcode)
+static void utp_on_error(tr_peerIo* const io, int const errcode)
 {
-    auto* io = static_cast<tr_peerIo*>(vio);
-
-    TR_ASSERT(tr_isPeerIo(io));
-
     tr_logAddDebugIo(io, fmt::format("utp_on_error -- errcode is {}", errcode));
 
     if (io->gotError != nullptr)
@@ -531,59 +426,68 @@ static void utp_on_error(void* vio, int errcode)
     }
 }
 
-static void utp_on_overhead(void* vio, bool send, size_t count, int /*type*/)
+static void utp_on_overhead(tr_peerIo* const io, bool const send, size_t const count, int /*type*/)
 {
-    auto* io = static_cast<tr_peerIo*>(vio);
-
-    TR_ASSERT(tr_isPeerIo(io));
-
     tr_logAddTraceIo(io, fmt::format("utp_on_overhead -- count is {}", count));
 
     io->bandwidth().notifyBandwidthConsumed(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
 }
 
-static auto utp_function_table = UTPFunctionTable{
-    utp_on_read, utp_on_write, utp_get_rb_size, utp_on_state_change, utp_on_error, utp_on_overhead,
-};
-
-/* Dummy UTP callbacks. */
-/* We switch a UTP socket to use these after the associated peerIo has been
-   destroyed -- see io_dtor. */
-
-static void dummy_read(void* /*closure*/, unsigned char const* /*buf*/, size_t /*buflen*/)
+static uint64 utp_callback(utp_callback_arguments* args)
 {
-    // This cannot happen, as far as I'm aware. */
-    tr_logAddTrace("On_read called on closed socket");
-}
+    auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket));
 
-static void dummy_write(void* /*closure*/, unsigned char* buf, size_t buflen)
-{
-    /* This can very well happen if we've shut down a peer connection that
-       had unflushed buffers.Complain and send zeroes.*/
-    tr_logAddTrace("On_write called on closed socket");
-    memset(buf, 0, buflen);
-}
+    if (io == nullptr)
+    {
+#ifdef TR_UTP_TRACE
 
-static size_t dummy_get_rb_size(void* /*closure*/)
-{
+        if (args->callback_type != UTP_ON_STATE_CHANGE || args->u1.state != UTP_STATE_DESTROYING)
+        {
+            fmt::print(
+                stderr,
+                FMT_STRING("[utp] [{}:{}] [{}] io is null! buf={}, len={}, flags={}, send/error_code/state={}, type={}\n"),
+                fmt::ptr(args->context),
+                fmt::ptr(args->socket),
+                utp_callback_names[args->callback_type],
+                fmt::ptr(args->buf),
+                args->len,
+                args->flags,
+                args->u1.send,
+                args->u2.type);
+        }
+
+#endif
+
+        return 0;
+    }
+
+    TR_ASSERT(tr_isPeerIo(io));
+    TR_ASSERT(io->socket.handle.utp == args->socket);
+
+    switch (args->callback_type)
+    {
+    case UTP_ON_READ:
+        utp_on_read(io, args->buf, args->len);
+        break;
+
+    case UTP_GET_READ_BUFFER_SIZE:
+        return utp_get_rb_size(io);
+
+    case UTP_ON_STATE_CHANGE:
+        utp_on_state_change(io, args->u1.state);
+        break;
+
+    case UTP_ON_ERROR:
+        utp_on_error(io, args->u1.error_code);
+        break;
+
+    case UTP_ON_OVERHEAD_STATISTICS:
+        utp_on_overhead(io, args->u1.send != 0, args->len, args->u2.type);
+        break;
+    }
+
     return 0;
 }
-
-static void dummy_on_state_change(void* /*closure*/, int /*state*/)
-{
-}
-
-static void dummy_on_error(void* /*closure*/, int /*errcode*/)
-{
-}
-
-static void dummy_on_overhead(void* /*closure*/, bool /*send*/, size_t /*count*/, int /*type*/)
-{
-}
-
-static auto dummy_utp_function_table = UTPFunctionTable{
-    dummy_read, dummy_write, dummy_get_rb_size, dummy_on_state_change, dummy_on_error, dummy_on_overhead,
-};
 
 #endif /* #ifdef WITH_UTP */
 
@@ -631,16 +535,7 @@ static tr_peerIo* tr_peerIoNew(
 
     case TR_PEER_SOCKET_TYPE_UTP:
         tr_logAddTraceIo(io, fmt::format("socket (utp) is {}", fmt::ptr(socket.handle.utp)));
-        UTP_SetSockopt(socket.handle.utp, SO_RCVBUF, UtpReadBufferSize);
-        tr_logAddTraceIo(io, "calling UTP_SetCallbacks &utp_function_table");
-        UTP_SetCallbacks(socket.handle.utp, &utp_function_table, io);
-
-        if (!is_incoming)
-        {
-            tr_logAddTraceIo(io, "calling UTP_Connect");
-            UTP_Connect(socket.handle.utp);
-        }
-
+        utp_set_userdata(socket.handle.utp, io);
         break;
 
 #endif
@@ -650,6 +545,21 @@ static tr_peerIo* tr_peerIoNew(
     }
 
     return io;
+}
+
+void tr_peerIoUtpInit([[maybe_unused]] struct_utp_context* ctx)
+{
+#ifdef WITH_UTP
+
+    utp_set_callback(ctx, UTP_ON_READ, &utp_callback);
+    utp_set_callback(ctx, UTP_GET_READ_BUFFER_SIZE, &utp_callback);
+    utp_set_callback(ctx, UTP_ON_STATE_CHANGE, &utp_callback);
+    utp_set_callback(ctx, UTP_ON_ERROR, &utp_callback);
+    utp_set_callback(ctx, UTP_ON_OVERHEAD_STATISTICS, &utp_callback);
+
+    utp_context_set_option(ctx, UTP_RCVBUF, UtpReadBufferSize);
+
+#endif
 }
 
 tr_peerIo* tr_peerIoNewIncoming(
@@ -821,8 +731,8 @@ static void io_close_socket(tr_peerIo* io)
 #ifdef WITH_UTP
 
     case TR_PEER_SOCKET_TYPE_UTP:
-        UTP_SetCallbacks(io->socket.handle.utp, &dummy_utp_function_table, nullptr);
-        UTP_Close(io->socket.handle.utp);
+        utp_set_userdata(io->socket.handle.utp, nullptr);
+        utp_close(io->socket.handle.utp);
         break;
 
 #endif
@@ -855,11 +765,6 @@ static void io_dtor(tr_peerIo* const io)
     tr_logAddTraceIo(io, "in tr_peerIo destructor");
     event_disable(io, EV_READ | EV_WRITE);
     io_close_socket(io);
-
-    while (io->outbuf_datatypes != nullptr)
-    {
-        peer_io_pull_datatype(io);
-    }
 
     io->magic_number = ~0;
     delete io;
@@ -1045,14 +950,6 @@ static inline void processBuffer(
     TR_ASSERT(size == 0);
 }
 
-static void addDatatype(tr_peerIo* io, size_t byteCount, bool isPieceData)
-{
-    auto* const d = datatype_new();
-    d->isPieceData = isPieceData;
-    d->length = byteCount;
-    peer_io_push_datatype(io, d);
-}
-
 static inline void maybeEncryptBuffer(tr_peerIo* io, struct evbuffer* buf, size_t offset, size_t size)
 {
     if (io->encryption_type == PEER_ENCRYPTION_RC4)
@@ -1066,7 +963,7 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
     size_t const byteCount = evbuffer_get_length(buf);
     maybeEncryptBuffer(io, buf, 0, byteCount);
     evbuffer_add_buffer(io->outbuf.get(), buf);
-    addDatatype(io, byteCount, isPieceData);
+    io->outbuf_info.emplace_back(byteCount, isPieceData);
 }
 
 void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, bool isPieceData)
@@ -1087,7 +984,7 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     evbuffer_commit_space(io->outbuf.get(), &iovec, 1);
 
-    addDatatype(io, byteCount, isPieceData);
+    io->outbuf_info.emplace_back(byteCount, isPieceData);
 }
 
 /***
@@ -1190,7 +1087,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
          * if one was not going to be sent. */
         if (evbuffer_get_length(io->inbuf.get()) == 0)
         {
-            UTP_RBDrained(io->socket.handle.utp);
+            utp_read_drained(io->socket.handle.utp);
         }
 
         break;
@@ -1250,8 +1147,14 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     switch (io->socket.type)
     {
     case TR_PEER_SOCKET_TYPE_UTP:
-        UTP_Write(io->socket.handle.utp, howmuch);
-        n = old_len - evbuffer_get_length(io->outbuf.get());
+        n = utp_write(io->socket.handle.utp, evbuffer_pullup(io->outbuf.get(), howmuch), howmuch);
+
+        if (n > 0)
+        {
+            evbuffer_drain(io->outbuf.get(), n);
+            didWriteWrapper(io, n);
+        }
+
         break;
 
     case TR_PEER_SOCKET_TYPE_TCP:
@@ -1301,14 +1204,14 @@ int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)
 
     /* count up how many bytes are used by non-piece-data messages
        at the front of our outbound queue */
-    for (struct tr_datatype const* it = io->outbuf_datatypes; it != nullptr; it = it->next)
+    for (auto const& [n_bytes, is_piece_data] : io->outbuf_info)
     {
-        if (it->isPieceData)
+        if (is_piece_data)
         {
             break;
         }
 
-        byteCount += it->length;
+        byteCount += n_bytes;
     }
 
     return tr_peerIoFlush(io, TR_UP, byteCount);

@@ -20,7 +20,7 @@
 [submodule "third-party/libutp"]
 	path = third-party/libutp
 	url = https://github.com/transmission/libutp
-	branch = post-3.3-transmission
+	branch = post-3.4-transmission
 [submodule "third-party/miniupnpc"]
 	path = third-party/miniupnpc
 	url = https://github.com/transmission/miniupnpc
@@ -43,6 +43,7 @@
 [submodule "third-party/fmt"]
 	path = third-party/fmt
 	url = https://github.com/transmission/fmt.git
+	branch = 9-x-y
 [submodule "third-party/fast_float"]
 	path = third-party/fast_float
 	url = https://github.com/transmission/fast_float

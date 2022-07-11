@@ -16,6 +16,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime>
+#include <deque>
 #include <memory>
 #include <optional>
 #include <string>
@@ -32,7 +33,8 @@
 #include "tr-assert.h"
 
 class tr_peerIo;
-struct tr_datatype;
+struct tr_bandwidth;
+struct struct_utp_context;
 
 /**
  * @addtogroup networked_io Networked IO
@@ -202,7 +204,7 @@ public:
     tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
     tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
 
-    struct tr_datatype* outbuf_datatypes = nullptr;
+    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
 
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
@@ -235,6 +237,8 @@ private:
 /**
 ***
 **/
+
+void tr_peerIoUtpInit(struct_utp_context* ctx);
 
 // TODO: 8 constructor args is too many; maybe a builder object?
 tr_peerIo* tr_peerIoNewOutgoing(

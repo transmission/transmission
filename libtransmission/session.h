@@ -49,12 +49,13 @@ struct evdns_base;
 class tr_bitfield;
 class tr_rpc_server;
 class tr_web;
-struct tr_bandwidth;
+struct BlocklistFile;
+struct struct_utp_context;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
+struct tr_bandwidth;
 struct tr_bindsockets;
-struct BlocklistFile;
 struct tr_fdInfo;
 
 struct tr_bindinfo
@@ -349,6 +350,7 @@ public:
     struct event* udp_event = nullptr;
     struct event* udp6_event = nullptr;
 
+    struct struct_utp_context* utp_context = nullptr;
     struct event* utp_timer = nullptr;
 
     /* The open port on the local machine for incoming peer requests */
