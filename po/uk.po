@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 03:58+0100\n"
+"POT-Creation-Date: 2022-07-12 21:48+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Olexander Movchan, 2022\n"
 "Language-Team: Ukrainian (https://www.transifex.com/transmissionbt/teams/33778/uk/)\n"
@@ -2013,7 +2013,7 @@ msgstr "Не вдалося створити «{path}»: {error} ({error_code})"
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Не вдалося отримати «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/log.cc:299
+#: ../libtransmission/log.cc:296
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "Забагато таких повідомлень! Це повідомлення більше не показуватиметься впродовж цієї сесії."
 
@@ -2037,23 +2037,23 @@ msgstr "Порт {port} вже не переадресовується"
 msgid "Port {port} forwarded successfully"
 msgstr "Порт {port} успішно переадресовано"
 
-#: ../libtransmission/net.cc:306
+#: ../libtransmission/net.cc:278
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr "Не вдалося створити сокет: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:383
+#: ../libtransmission/net.cc:355
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:404
+#: ../libtransmission/net.cc:376
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr "Не вдалося підʼєднати сокет {socket} до {address}:{port}: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:519
+#: ../libtransmission/net.cc:497
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr "Не вдалося привʼязати порт {port} на {address}: {error} ({error_code}) — Чи не запущено вже іншу копію Transmission?"
 
-#: ../libtransmission/net.cc:520
+#: ../libtransmission/net.cc:498
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr "Не вдалося привʼязати порт {port} на {address}: {error} ({error_code})"
 
@@ -2069,15 +2069,11 @@ msgstr "Не вдалося зарезервувати «{path}»: {error} ({err
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Не вдалося обрізати «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:428
+#: ../libtransmission/peer-io.cc:358
 msgid "Couldn't write to peer"
 msgstr "Не вдалося записати до вузла"
 
-#: ../libtransmission/peer-io.cc:450
-msgid "Couldn't write {expected_size} bytes to peer; wrote {actual_size}"
-msgstr "Не вдалося записати {expected_size} Б до вузла; записано {actual_size}"
-
-#: ../libtransmission/peer-io.cc:515
+#: ../libtransmission/peer-io.cc:414
 msgid "Unknown state: {state}"
 msgstr "Невідомий стан: {state}"
 
@@ -2101,7 +2097,7 @@ msgstr "Не переспрямовано"
 msgid "Mapped private port {private_port} to public port {public_port}"
 msgstr "Переадресовано приватний порт {private_port} до публічного порту {public_port}"
 
-#: ../libtransmission/port-forwarding.cc:111
+#: ../libtransmission/port-forwarding.cc:106
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr "Стан змінено з «{old_state}» до «{state}»"
 
@@ -2177,7 +2173,7 @@ msgstr "Не вдалося отримати торент: {error} ({error_code}
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr "Не вдалося відкрити lock-файл сесії «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/session.cc:747
+#: ../libtransmission/session.cc:745
 msgid "Transmission version {version} starting"
 msgstr "Transmission версії {version} запускається"
 
@@ -2189,11 +2185,11 @@ msgstr "Час вимкнення «черепашого» режиму"
 msgid "Time to turn on turtle mode"
 msgstr "Час увімкнення «черепашого» режиму"
 
-#: ../libtransmission/session.cc:1945
+#: ../libtransmission/session.cc:1946
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission версії {version} завершує роботу"
 
-#: ../libtransmission/session.cc:2065
+#: ../libtransmission/session.cc:2066
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "Завантажено {count} торент"
@@ -2209,7 +2205,7 @@ msgstr[1] "Не вдалося розпізнати метадані magnet: «{
 msgstr[2] "Не вдалося розпізнати метадані magnet: «{error}». Перезавантаження {piece_count} частин"
 msgstr[3] "Не вдалося розпізнати метадані magnet: «{error}». Перезавантаження {piece_count} частин"
 
-#: ../libtransmission/torrent-metainfo.cc:786
+#: ../libtransmission/torrent-metainfo.cc:773
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2294,35 +2290,35 @@ msgstr "Не вдалося зарезервувати подію IPv4"
 msgid "Couldn't allocate IPv6 event"
 msgstr "Не вдалося зарезервувати подію IPv6"
 
-#: ../libtransmission/tr-utp.cc:100
+#: ../libtransmission/tr-utp.cc:95
 msgid "Unknown socket family"
 msgstr "Невідоме сімейство сокетів"
 
-#: ../libtransmission/upnp.cc:279
+#: ../libtransmission/upnp.cc:277
 msgid "Found Internet Gateway Device '{url}'"
 msgstr "Знайдено інтернет маршрутизатор «{url}»"
 
-#: ../libtransmission/upnp.cc:280
+#: ../libtransmission/upnp.cc:278
 msgid "Local Address is '{address}'"
 msgstr "Локальна Адреса «{address}»"
 
-#: ../libtransmission/upnp.cc:303
+#: ../libtransmission/upnp.cc:301
 msgid "Port {port} is not forwarded"
 msgstr "Порт {port} не переадресовується"
 
-#: ../libtransmission/upnp.cc:313
+#: ../libtransmission/upnp.cc:311
 msgid "Stopping port forwarding through '{url}', service '{type}'"
 msgstr "Припинення переадресування портів через «{url}», служба «{type}»"
 
-#: ../libtransmission/upnp.cc:345
+#: ../libtransmission/upnp.cc:343
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
 msgstr "Переадресація порту за допомогою «{url}», служба «{type}». (локальна адреса: {address}:{port})"
 
-#: ../libtransmission/upnp.cc:353
+#: ../libtransmission/upnp.cc:351
 msgid "Port {port} is forwarded"
 msgstr "Порт {port} переадресовується"
 
-#: ../libtransmission/upnp.cc:359
+#: ../libtransmission/upnp.cc:357
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr "Якщо ваш маршрутизатор підтримує UPnP, будь ласка, переконайтеся, що UPnP увімкнено!"
 
@@ -2426,3 +2422,6 @@ msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 msgstr[3] "дня"
+
+#~ msgid "Couldn't write {expected_size} bytes to peer; wrote {actual_size}"
+#~ msgstr "Не вдалося записати {expected_size} Б до вузла; записано {actual_size}"
