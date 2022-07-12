@@ -2123,7 +2123,7 @@ msgstr "Migrated torrent tiedosto kohteesta '{old_path}' polkuun '{path}'"
 
 #: ../libtransmission/torrent.cc:127
 msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Ei voitu käyttää metatietoa '{path}' kohteesta '{magnet}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:488
 msgid "Seed ratio reached; pausing torrent"

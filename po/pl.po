@@ -2226,7 +2226,7 @@ msgstr "Przeniesiono plik torrent z „{old_path}” do „{path}”"
 
 #: ../libtransmission/torrent.cc:127
 msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Nie można użyć metainformacji z „{path}” dla „{magnet}”: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:488
 msgid "Seed ratio reached; pausing torrent"

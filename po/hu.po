@@ -346,7 +346,7 @@ msgstr "{current_size} ({percent_done}% kész, {percent_available}% érhető el)
 #: ../gtk/DetailsDialog.cc:947
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% kész, {percent_available}% érhető el, {unverified_size} nem ellenőrzött)"
 
 #: ../gtk/DetailsDialog.cc:980
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
@@ -544,18 +544,18 @@ msgstr "További részletek _megjelenítése"
 #: ../gtk/DetailsDialog.cc:1922
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{markup_begin}{peer_count} partner{markup_end} fogadva {time_span_ago}"
+msgstr[1] "{markup_begin}{peer_count} partner{markup_end} fogadva {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "A partnerlista kérése során {markup_begin}időtúllépés történt{markup_end}; újrapróbálkozás később"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1943
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "„{markup_begin}{error}{markup_end}” hiba fogadva {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1956
 msgid "No updates scheduled"
@@ -563,7 +563,7 @@ msgstr "Nincs ütemezett frissítés"
 
 #: ../gtk/DetailsDialog.cc:1963
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "További partnerek kérése {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for more peers"
@@ -572,12 +572,12 @@ msgstr "További partnerek kérése ütemezve"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1978
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "További partnerek kérve {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:2001
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "A követő  {time_span_ago} ennyi felhasználóról tudott: {markup_begin}{seeder_count} {seeder_or_seeders} és {leecher_count} {leecher_or_leechers}."
 
 #: ../gtk/DetailsDialog.cc:2003
 msgid "seeder"
@@ -594,11 +594,11 @@ msgstr[1] "letöltő"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:2014
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "„{markup_begin}{error}{markup_end}” feldolgozási hiba fogadva {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:2031
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Partnerek számának lekérése {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:2038
 msgid "Queued to ask for peer counts"
@@ -606,7 +606,7 @@ msgstr "Partnerek számának lekérése ütemezve"
 
 #: ../gtk/DetailsDialog.cc:2045
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Partnerek száma lekérve {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2287
 msgid "List contains invalid URLs"
@@ -1708,54 +1708,54 @@ msgstr "TB/s"
 #: ../gtk/Utils.cc:97
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_from_now:L} nap múlva"
+msgstr[1] "{days_from_now:L} nap múlva"
 
 #: ../gtk/Utils.cc:104
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_from_now:L} óra múlva"
+msgstr[1] "{hours_from_now:L} óra múlva"
 
 #: ../gtk/Utils.cc:111
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_from_now:L} perc múlva"
+msgstr[1] "{minutes_from_now:L} perc múlva"
 
 #: ../gtk/Utils.cc:118
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_from_now:L} másodperc múlva"
+msgstr[1] "{seconds_from_now:L} másodperc múlva"
 
 #: ../gtk/Utils.cc:122 ../gtk/Utils.cc:153 ../gtk/Utils.cc:180 ../gtk/Utils.cc:213
 msgid "now"
-msgstr ""
+msgstr "most"
 
 #: ../gtk/Utils.cc:129
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_ago:L} napja"
+msgstr[1] "{days_ago:L} napja"
 
 #: ../gtk/Utils.cc:135
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_ago:L} órája"
+msgstr[1] "{hours_ago:L} órája"
 
 #: ../gtk/Utils.cc:142
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_ago:L} perce"
+msgstr[1] "{minutes_ago:L} perce"
 
 #: ../gtk/Utils.cc:149
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_ago:L} másodperce"
+msgstr[1] "{seconds_ago:L} másodperce"
 
 #: ../gtk/Utils.cc:162
 msgid "{days:L} day"
@@ -1766,44 +1766,44 @@ msgstr[1] "{days:L} nap"
 #: ../gtk/Utils.cc:167
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours:L} óra"
+msgstr[1] "{hours:L} óra"
 
 #: ../gtk/Utils.cc:172
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes:L} perc"
+msgstr[1] "{minutes:L} perc"
 
 #: ../gtk/Utils.cc:177
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds:L} másodperc"
+msgstr[1] "{seconds:L} másodperc"
 
 #: ../gtk/Utils.cc:188
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_left:L} nap van hátra"
+msgstr[1] "{days_left:L} nap van hátra"
 
 #: ../gtk/Utils.cc:195
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_left:L} óra van hátra"
+msgstr[1] "{hours_left:L} óra van hátra"
 
 #: ../gtk/Utils.cc:202
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_left:L} perc van hátra"
+msgstr[1] "{minutes_left:L} perc van hátra"
 
 #: ../gtk/Utils.cc:209
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_left:L} másodperc van hátra"
+msgstr[1] "{seconds_left:L} másodperc van hátra"
 
 #: ../gtk/Utils.cc:249
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -2134,7 +2134,7 @@ msgstr "A torrentfájl átköltöztetve innen: „{old_path}”, ide: „{path}�
 
 #: ../libtransmission/torrent.cc:127
 msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "A(z) „{magnet}” metainformációi nem kérhetők le a(z) „{path}” helyről: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:488
 msgid "Seed ratio reached; pausing torrent"
