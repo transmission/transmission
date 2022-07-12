@@ -79,11 +79,52 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateOptionsNotification:)
                                                name:@"UpdateOptionsNotification"
                                              object:nil];
+
+    [self updateWindowLayout];
 }
 
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)updateWindowLayout
+{
+    CGFloat inset = 12.0, spacing = 8.0, difference = 0;
+
+    NSUserInterfaceLayoutOrientation orientation = self.fStackView.orientation;
+
+    if (self.view.frame.size.width >= (NSWidth(self.fPriorityView.frame) + NSWidth(self.fSeedingView.frame) + (2 * inset + spacing + 1)))
+    {
+        self.fStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+    }
+    else
+    {
+        self.fStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+    }
+
+    if (self.fStackView.orientation != orientation)
+    {
+        if (self.fStackView.orientation == NSUserInterfaceLayoutOrientationHorizontal)
+        {
+            difference -= NSHeight(self.fSeedingView.frame);
+        }
+        else
+        {
+            difference += NSHeight(self.fSeedingView.frame);
+        }
+
+        [self.view setFrameSize:NSMakeSize(NSWidth(self.view.frame), NSHeight(self.view.frame) + difference)];
+
+        NSRect windowRect = self.view.window.frame;
+        windowRect.origin.y -= difference;
+        windowRect.size.height += difference;
+
+        self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
+        self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
+
+        [self.view.window setFrame:windowRect display:YES animate:NO];
+    }
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents

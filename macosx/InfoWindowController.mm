@@ -167,6 +167,11 @@ typedef NS_ENUM(unsigned int, tabTag) {
     }
 }
 
+- (void)windowDidResize:(NSNotification*)notification
+{
+    [self.fOptionsViewController updateWindowLayout];
+}
+
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     if (self.fTorrents && [self.fTorrents isEqualToArray:torrents])
@@ -310,7 +315,15 @@ typedef NS_ENUM(unsigned int, tabTag) {
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
 
-    CGFloat const minWindowWidth = MAX(self.fMinWindowWidth, view.fittingSize.width);
+    CGFloat minWindowWidth = MAX(self.fMinWindowWidth, view.fittingSize.width);
+
+    //special case for options view
+    if ([identifier isEqualToString:TAB_OPTIONS_IDENT])
+    {
+        CGFloat padding = 2 * 12.0;
+        minWindowWidth = MAX(self.fMinWindowWidth, self.fOptionsViewController.fPriorityView.frame.size.width + padding);
+    }
+
     windowRect.size.width = MAX(NSWidth(windowRect), minWindowWidth);
 
     if ([self.fViewController respondsToSelector:@selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
