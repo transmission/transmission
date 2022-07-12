@@ -726,6 +726,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
         return tr_handshakeDone(handshake, false);
     }
     handshake->myReq1 = *req1;
+    fmt::print("{:s}:{:d} got req1\n", __FILE__, __LINE__);
 
     // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
@@ -760,7 +761,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
 
-    fmt::print("{:s}:{:d} readPadA read later\n", __FILE__, __LINE__);
+    fmt::print("{:s}:{:d} readPadA did not find end of pad a; read later\n", __FILE__, __LINE__);
     return READ_LATER;
 }
 

@@ -351,17 +351,18 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 #ifdef WITH_UTP
 /* UTP callbacks */
 
-static void utp_on_read(tr_peerIo* const io, uint8_t const* const buf, size_t const buflen)
+void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
-    if (auto const rc = evbuffer_add(io->inbuf.get(), buf, buflen); rc < 0)
+    fmt::print("{:s}:{:d} peer {} got {}\n", __FILE__, __LINE__, addrStr(), tr_base64_encode(std::string_view{ static_cast<char const*>(data), n_bytes }));
+    if (auto const rc = evbuffer_add(inbuf.get(), data, n_bytes); rc < 0)
     {
         tr_logAddWarn(_("Couldn't write to peer"));
         return;
     }
 
-    tr_logAddTraceIo(io, fmt::format("utp_on_read got {} bytes", buflen));
-    tr_peerIoSetEnabled(io, TR_DOWN, true);
-    canReadWrapper(io);
+    tr_logAddTraceIo(this, fmt::format("readBufferAdd got {} bytes", n_bytes));
+    tr_peerIoSetEnabled(this, TR_DOWN, true);
+    canReadWrapper(this);
 }
 
 static size_t utp_get_rb_size(tr_peerIo* const io)
@@ -467,7 +468,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
     switch (args->callback_type)
     {
     case UTP_ON_READ:
-        utp_on_read(io, args->buf, args->len);
+        io->readBufferAdd(args->buf, args->len);
         break;
 
     case UTP_GET_READ_BUFFER_SIZE:
