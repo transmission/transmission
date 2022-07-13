@@ -17,8 +17,6 @@
 #include <string_view>
 #include <vector>
 
-#include <math/wide_integer/uintwide_t.h>
-
 #include "crypto-utils.h"
 #include "tr-macros.h"
 
@@ -31,11 +29,9 @@ enum
 struct tr_crypto
 {
     static auto constexpr PrivateKeySize = size_t{ 20 };
-    using private_key_t = math::wide_integer::uintwide_t<PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
     using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
 
     static auto constexpr KeySize = size_t{ 96 };
-    using key_t = math::wide_integer::uintwide_t<KeySize * std::numeric_limits<unsigned char>::digits>;
     using key_bigend_t = std::array<std::byte, KeySize>;
 
     tr_crypto(tr_sha1_digest_t const* torrent_hash = nullptr, bool is_incoming = true);

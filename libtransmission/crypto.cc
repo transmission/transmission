@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+#include <math/wide_integer/uintwide_t.h>
+
 #include <arpa/inet.h> // htonl
 
 #include "transmission.h"
@@ -38,8 +40,12 @@ tr_crypto::~tr_crypto()
 
 ///
 
-namespace
+namespace wi
 {
+
+using key_t = math::wide_integer::uintwide_t<tr_crypto::KeySize * std::numeric_limits<unsigned char>::digits>;
+
+using private_key_t = math::wide_integer::uintwide_t<tr_crypto::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
 
 template<typename Integral>
 auto import_bits(std::array<std::byte, Integral::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
@@ -80,6 +86,14 @@ auto export_bits(Integral i)
 
     return ret;
 }
+
+auto WIDE_INTEGER_CONSTEXPR const G = wi::key_t{ "2" };
+auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{ "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563" };
+
+} // namespace wi
+
+namespace
+{
 
 auto constexpr PrimeLen = size_t{ 96 };
 auto constexpr DhPrivkeyLen = size_t{ 20 };
@@ -146,15 +160,12 @@ bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
     auto peer_pub = key_bigend_t{};
     std::copy_n(static_cast<std::byte const*>(peer_public_key), len, std::begin(peer_pub));
     TR_ASSERT(len == std::size(peer_pub));
-    auto WIDE_INTEGER_CONSTEXPR P = key_t{
-        "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563"
-    };
-    auto secret = math::wide_integer::powm(import_bits<key_t>(peer_pub), import_bits<private_key_t>(private_key_), P);
+    auto secret = math::wide_integer::powm(wi::import_bits<wi::key_t>(peer_pub), wi::import_bits<wi::private_key_t>(private_key_), wi::P);
     std::cerr << __FILE__ << ':' << __LINE__ << " wide-integer secret is " << secret << std::endl;
 
-    wi_secret_ = export_bits(secret);
+    wi_secret_ = wi::export_bits(secret);
     std::cerr << __FILE__ << ':' << __LINE__ << " secret bytes from wide-integer: " << std::endl;
-    for (auto const ch : export_bits(secret))
+    for (auto const ch : wi_secret_)
     {
         std::cerr << static_cast<unsigned>(ch) << ' ';
     }
@@ -181,22 +192,18 @@ void tr_crypto::ensureKeyExists()
 
     if (wi_public_key_ == key_bigend_t{})
     {
-        auto const private_key = import_bits<private_key_t>(private_key_);
+        auto const private_key = wi::import_bits<wi::private_key_t>(private_key_);
         std::cerr << __FILE__ << ':' << __LINE__ << " private_key " << private_key << std::endl;
         // yay this is correct ^
 
         // use wide-integer to calculate the public key
-        auto WIDE_INTEGER_CONSTEXPR P = key_t{
-            "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563"
-        };
-        static auto WIDE_INTEGER_CONSTEXPR G = key_t{ "2" };
-        std::cerr << __FILE__ << ':' << __LINE__ << " P " << P << std::endl;
-        std::cerr << __FILE__ << ':' << __LINE__ << " G " << G << std::endl;
-        auto const public_key = math::wide_integer::powm(G, private_key, P);
+        std::cerr << __FILE__ << ':' << __LINE__ << " P " << wi::P << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " G " << wi::G << std::endl;
+        auto const public_key = math::wide_integer::powm(wi::G, private_key, wi::P);
         std::cerr << __FILE__ << ':' << __LINE__ << " public_key " << public_key << std::endl;
         // yay this is correct ^
 
-        wi_public_key_ = export_bits(public_key);
+        wi_public_key_ = wi::export_bits(public_key);
         TR_ASSERT(openssl_public_key_ == wi_public_key_);
 #if 0
         std::cerr << __FILE__ << ':' << __LINE__ << " my_public_key_ from openssl ";
