@@ -156,8 +156,8 @@ bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
     ensureKeyExists();
     my_secret_ = tr_dh_agree(dh_, static_cast<uint8_t const*>(peer_public_key), len);
     auto const tmp = tr_dh_secret_get(my_secret_);
-    TR_ASSERT(std::size(tmp) == std::size(openssl_secret_));
-    std::copy(std::begin(tmp), std::end(tmp), std::begin(openssl_secret_));
+    TR_ASSERT(std::size(tmp) == std::size(secret_));
+    std::copy(std::begin(tmp), std::end(tmp), std::begin(secret_));
 
     auto peer_pub = key_bigend_t{};
     std::copy_n(static_cast<std::byte const*>(peer_public_key), len, std::begin(peer_pub));
@@ -168,13 +168,12 @@ bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
         wi::P);
     std::cerr << __FILE__ << ':' << __LINE__ << " wide-integer secret is " << secret << std::endl;
 
-    wi_secret_ = wi::export_bits(secret);
+    TR_ASSERT(secret_ == wi::export_bits(secret));
     std::cerr << __FILE__ << ':' << __LINE__ << " secret bytes from wide-integer: " << std::endl;
-    for (auto const ch : wi_secret_)
+    for (auto const ch : wi::export_bits(secret))
     {
         std::cerr << static_cast<unsigned>(ch) << ' ';
     }
-    TR_ASSERT(openssl_secret_ == wi_secret_);
 
     return true;
 }
@@ -189,13 +188,7 @@ void tr_crypto::ensureKeyExists()
         auto const tmp = tr_dh_private_key(dh_);
         TR_ASSERT(std::size(tmp) == std::size(openssl_private_key_));
         std::copy(std::begin(tmp), std::end(tmp), std::begin(openssl_private_key_));
-    }
-
-    if (wi_private_key_ == private_key_bigend_t{})
-    {
-        auto const tmp = privateKey();
-        TR_ASSERT(std::size(wi_private_key_) == std::size(tmp));
-        std::copy(std::begin(tmp), std::end(tmp), std::begin(wi_private_key_));
+        wi_private_key_ = openssl_private_key_;
     }
 
     if (wi_public_key_ == key_bigend_t{})

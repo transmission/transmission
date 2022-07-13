@@ -55,7 +55,7 @@ struct tr_crypto
     [[nodiscard]] constexpr auto myPublicKey()
     {
         ensureKeyExists();
-        return openssl_public_key_;
+        return wi_public_key_;
     }
 
     [[nodiscard]] auto publicKey()
@@ -73,12 +73,12 @@ struct tr_crypto
 
     [[nodiscard]] constexpr auto secret() const noexcept
     {
-        return openssl_secret_;
+        return secret_;
     }
 
     [[nodiscard]] constexpr auto privateKey() const noexcept
     {
-        return openssl_private_key_;
+        return wi_private_key_;
     }
 
     [[nodiscard]] std::optional<tr_sha1_digest_t> secretKeySha1(
@@ -101,7 +101,7 @@ struct tr_crypto
 
     private_key_bigend_t wi_private_key_ = {};
     key_bigend_t wi_public_key_ = {};
-    key_bigend_t wi_secret_ = {};
+    key_bigend_t secret_ = {};
 
 private:
     void ensureKeyExists();
@@ -113,7 +113,6 @@ private:
     tr_dh_secret_t my_secret_ = {};
     key_bigend_t openssl_public_key_ = {};
     private_key_bigend_t openssl_private_key_ = {};
-    key_bigend_t openssl_secret_ = {};
     bool const is_incoming_;
 };
 
