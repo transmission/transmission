@@ -241,10 +241,10 @@ std::optional<tr_sha1_digest_t> tr_crypto::secretKeySha1(
         std::string_view{ static_cast<char const*>(append), append_len });
 }
 
-std::vector<uint8_t> tr_crypto::pad(size_t maxlen) const
+std::vector<std::byte> tr_crypto::pad(size_t maxlen) const
 {
     auto const len = tr_rand_int(maxlen);
-    auto ret = std::vector<uint8_t>{};
+    auto ret = std::vector<std::byte>{};
     ret.resize(len);
     tr_rand_buffer(std::data(ret), len);
     return ret;

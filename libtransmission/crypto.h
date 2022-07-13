@@ -19,11 +19,6 @@
 
 #include "tr-macros.h"
 
-enum
-{
-    KEY_LEN = 96
-};
-
 /** @brief Holds state information for encrypted peer communications */
 struct tr_crypto
 {
@@ -80,7 +75,7 @@ struct tr_crypto
         return is_incoming_;
     }
 
-    [[nodiscard]] virtual std::vector<uint8_t> pad(size_t maxlen) const;
+    [[nodiscard]] virtual std::vector<std::byte> pad(size_t maxlen) const;
 
     void decryptInit();
     void decrypt(size_t buflen, void const* buf_in, void* buf_out);

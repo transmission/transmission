@@ -290,23 +290,20 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
 ****
 ***/
 
-/* 1 A->B: Diffie Hellman Ya, PadA */
+// 1 A->B: our public key (Ya) and some padding (PadA)
 static void sendYa(tr_handshake* handshake)
 {
-    /* add our public key (Ya) */
     auto const public_key = handshake->crypto->publicKey();
-
-    char outbuf[KEY_LEN + PadA_MAXLEN];
-    char* walk = outbuf;
-    walk = std::copy_n(reinterpret_cast<char const*>(std::data(public_key)), std::size(public_key), walk);
-
-    // add some random padding
     auto const pad_a = handshake->crypto->pad(PadA_MAXLEN);
-    walk = std::copy(std::begin(pad_a), std::end(pad_a), walk);
 
-    /* send it */
+    auto outbuf = std::array<std::byte, sizeof(decltype(public_key)) + PadA_MAXLEN>{};
+    auto const data = std::data(outbuf);
+    auto walk = data;
+    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
+    walk = std::copy(std::begin(pad_a), std::end(pad_a), walk);
+    tr_peerIoWriteBytes(handshake->io, data, walk - data, false);
+
     setReadState(handshake, AWAITING_YB);
-    tr_peerIoWriteBytes(handshake->io, outbuf, walk - outbuf, false);
 }
 
 static uint32_t getCryptoProvide(tr_handshake const* handshake)
@@ -749,17 +746,18 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     handshake->myReq1 = *req1;
     fmt::print("{:s}:{:d} got req1\n", __FILE__, __LINE__);
 
-    /* send our public key to the peer */
+    // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
-    uint8_t outbuf[std::size(peer_public_key) + PadB_MAXLEN];
-    uint8_t* walk = outbuf;
     auto const public_key = handshake->crypto->publicKey();
-    walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(public_key)), std::size(public_key), walk);
     auto const pad_b = handshake->crypto->pad(PadB_MAXLEN);
+    auto outbuf = std::array<std::byte, std::size(public_key) + PadB_MAXLEN>{};
+    auto const data = std::data(outbuf);
+    auto walk = data;
+    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
     walk = std::copy(std::begin(pad_b), std::end(pad_b), walk);
+    tr_peerIoWriteBytes(handshake->io, data, walk - data, false);
 
     setReadState(handshake, AWAITING_PAD_A);
-    tr_peerIoWriteBytes(handshake->io, outbuf, walk - outbuf, false);
     return READ_NOW;
 }
 

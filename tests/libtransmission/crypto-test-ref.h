@@ -10,8 +10,6 @@
 
 #ifdef CRYPTO_REFERENCE_CHECK
 
-#define KEY_LEN KEY_LEN_
-
 #define tr_sha1_ctx_t tr_sha1_ctx_t_
 #define tr_ssl_ctx_t tr_ssl_ctx_t_
 #define tr_x509_store_t tr_x509_store_t_
@@ -54,8 +52,6 @@
 #include "crypto-utils.cc"
 #include "crypto-utils-openssl.cc"
 
-#undef KEY_LEN_
-
 #undef tr_sha1_ctx_t
 #undef tr_ssl_ctx_t
 #undef tr_x509_store_t
@@ -90,8 +86,6 @@
 #undef tr_sha256_update
 
 #else /* CRYPTO_REFERENCE_CHECK */
-
-#define KEY_LEN_ KEY_LEN
 
 #define tr_sha1_ctx_t_ tr_sha1_ctx_t
 #define tr_ssl_ctx_t_ tr_ssl_ctx_t
