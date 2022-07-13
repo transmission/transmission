@@ -32,8 +32,6 @@ tr_crypto::tr_crypto(tr_sha1_digest_t const* torrent_hash, bool is_incoming)
 
 tr_crypto::~tr_crypto()
 {
-    tr_dh_secret_free(my_secret_);
-    tr_dh_free(dh_);
     tr_free(enc_key_);
     tr_free(dec_key_);
 }
@@ -97,22 +95,6 @@ auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
 namespace
 {
 
-auto constexpr PrimeLen = size_t{ 96 };
-auto constexpr DhPrivkeyLen = size_t{ 20 };
-
-uint8_t constexpr dh_P[PrimeLen] = {
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA, 0xA2, //
-    0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1, //
-    0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74, 0x02, 0x0B, 0xBE, 0xA6, //
-    0x3B, 0x13, 0x9B, 0x22, 0x51, 0x4A, 0x08, 0x79, 0x8E, 0x34, 0x04, 0xDD, //
-    0xEF, 0x95, 0x19, 0xB3, 0xCD, 0x3A, 0x43, 0x1B, 0x30, 0x2B, 0x0A, 0x6D, //
-    0xF2, 0x5F, 0x14, 0x37, 0x4F, 0xE1, 0x35, 0x6D, 0x6D, 0x51, 0xC2, 0x45, //
-    0xE4, 0x85, 0xB5, 0x76, 0x62, 0x5E, 0x7E, 0xC6, 0xF4, 0x4C, 0x42, 0xE9, //
-    0xA6, 0x3A, 0x36, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x05, 0x63, //
-};
-
-uint8_t constexpr dh_G[] = { 2 };
-
 void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, std::string_view key)
 {
     TR_ASSERT(crypto->torrentHash());
@@ -154,41 +136,24 @@ void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_in, voi
 bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
 {
     ensureKeyExists();
-    my_secret_ = tr_dh_agree(dh_, static_cast<uint8_t const*>(peer_public_key), len);
-    auto const tmp = tr_dh_secret_get(my_secret_);
-    TR_ASSERT(std::size(tmp) == std::size(secret_));
-    std::copy(std::begin(tmp), std::end(tmp), std::begin(secret_));
 
     auto peer_pub = key_bigend_t{};
     std::copy_n(static_cast<std::byte const*>(peer_public_key), len, std::begin(peer_pub));
     TR_ASSERT(len == std::size(peer_pub));
-    auto secret = math::wide_integer::powm(
+    auto const secret = math::wide_integer::powm(
         wi::import_bits<wi::key_t>(peer_pub),
         wi::import_bits<wi::private_key_t>(wi_private_key_),
         wi::P);
-    std::cerr << __FILE__ << ':' << __LINE__ << " wide-integer secret is " << secret << std::endl;
+    secret_ = wi::export_bits(secret);
 
-    TR_ASSERT(secret_ == wi::export_bits(secret));
-    std::cerr << __FILE__ << ':' << __LINE__ << " secret bytes from wide-integer: " << std::endl;
-    for (auto const ch : wi::export_bits(secret))
-    {
-        std::cerr << static_cast<unsigned>(ch) << ' ';
-    }
-
-    return true;
+    return true; // FIXME(ckerr) return void
 }
 
 void tr_crypto::ensureKeyExists()
 {
-    if (dh_ == nullptr)
+    if (wi_private_key_ == private_key_bigend_t{})
     {
-        size_t public_key_length = KEY_LEN;
-        dh_ = tr_dh_new(dh_P, sizeof(dh_P), dh_G, sizeof(dh_G));
-        tr_dh_make_key(dh_, DhPrivkeyLen, reinterpret_cast<uint8_t*>(std::data(openssl_public_key_)), &public_key_length);
-        auto const tmp = tr_dh_private_key(dh_);
-        TR_ASSERT(std::size(tmp) == std::size(openssl_private_key_));
-        std::copy(std::begin(tmp), std::end(tmp), std::begin(openssl_private_key_));
-        wi_private_key_ = openssl_private_key_;
+        tr_rand_buffer(std::data(wi_private_key_), std::size(wi_private_key_));
     }
 
     if (wi_public_key_ == key_bigend_t{})
@@ -205,7 +170,7 @@ void tr_crypto::ensureKeyExists()
         // yay this is correct ^
 
         wi_public_key_ = wi::export_bits(public_key);
-        TR_ASSERT(openssl_public_key_ == wi_public_key_);
+        // TR_ASSERT(openssl_public_key_ == wi_public_key_);
 #if 0
         std::cerr << __FILE__ << ':' << __LINE__ << " my_public_key_ from openssl ";
         for (auto* walk = my_public_key_, *end = walk + 96; walk != end; ++walk)
@@ -275,7 +240,10 @@ std::optional<tr_sha1_digest_t> tr_crypto::secretKeySha1(
     void const* append,
     size_t append_len) const
 {
-    return tr_dh_secret_derive(my_secret_, prepend, prepend_len, append, append_len);
+    return tr_sha1(
+        std::string_view{ static_cast<char const*>(prepend), prepend_len },
+        secret_,
+        std::string_view{ static_cast<char const*>(append), append_len });
 }
 
 std::vector<uint8_t> tr_crypto::pad(size_t maxlen) const

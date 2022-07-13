@@ -17,7 +17,6 @@
 #include <string_view>
 #include <vector>
 
-#include "crypto-utils.h"
 #include "tr-macros.h"
 
 enum
@@ -109,10 +108,6 @@ private:
     std::optional<tr_sha1_digest_t> torrent_hash_;
     struct arc4_context* dec_key_ = nullptr;
     struct arc4_context* enc_key_ = nullptr;
-    tr_dh_ctx_t dh_ = {};
-    tr_dh_secret_t my_secret_ = {};
-    key_bigend_t openssl_public_key_ = {};
-    private_key_bigend_t openssl_private_key_ = {};
     bool const is_incoming_;
 };
 
