@@ -21,7 +21,6 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-#define TR_CRYPTO_DH_SECRET_FALLBACK
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
@@ -233,130 +232,6 @@ struct CCBigNumDeleter
 };
 
 using CCBigNumPtr = std::unique_ptr<std::remove_pointer_t<CCBigNumRef>, CCBigNumDeleter>;
-
-struct tr_dh_ctx
-{
-    CCBigNumPtr p;
-    CCBigNumPtr g;
-    CCBigNumPtr private_key;
-};
-
-} // namespace
-
-tr_dh_ctx_t tr_dh_new(
-    uint8_t const* prime_num,
-    size_t prime_num_length,
-    uint8_t const* generator_num,
-    size_t generator_num_length)
-{
-    TR_ASSERT(prime_num != nullptr);
-    TR_ASSERT(generator_num != nullptr);
-
-    auto handle = std::make_unique<tr_dh_ctx>();
-    auto status = CCStatus{};
-
-    handle->p = CCBigNumPtr(CCBigNumFromData(&status, prime_num, prime_num_length));
-    if (!check_pointer(handle->p.get(), &status))
-    {
-        return nullptr;
-    }
-
-    handle->g = CCBigNumPtr(CCBigNumFromData(&status, generator_num, generator_num_length));
-    if (!check_pointer(handle->g.get(), &status))
-    {
-        return nullptr;
-    }
-
-    return handle.release();
-}
-
-void tr_dh_free(tr_dh_ctx_t handle)
-{
-    delete static_cast<tr_dh_ctx*>(handle);
-}
-
-bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
-{
-    TR_ASSERT(raw_handle != nullptr);
-    TR_ASSERT(public_key != nullptr);
-
-    auto& handle = *static_cast<tr_dh_ctx*>(raw_handle);
-    auto status = CCStatus{};
-
-    handle.private_key = CCBigNumPtr(CCBigNumCreateRandom(&status, private_key_length * 8, private_key_length * 8, 0));
-    if (!check_pointer(handle.private_key.get(), &status))
-    {
-        return false;
-    }
-
-    auto const my_public_key = CCBigNumPtr(CCCreateBigNum(&status));
-    if (!check_pointer(my_public_key.get(), &status))
-    {
-        return false;
-    }
-
-    if (!check_result(CCBigNumModExp(my_public_key.get(), handle.g.get(), handle.private_key.get(), handle.p.get())))
-    {
-        return false;
-    }
-
-    auto const my_public_key_length = CCBigNumByteCount(my_public_key.get());
-    CCBigNumToData(&status, my_public_key.get(), public_key);
-    if (!check_result(status))
-    {
-        return false;
-    }
-
-    auto const dh_size = CCBigNumByteCount(handle.p.get());
-    tr_dh_align_key(public_key, my_public_key_length, dh_size);
-
-    if (public_key_length != nullptr)
-    {
-        *public_key_length = dh_size;
-    }
-
-    return true;
-}
-
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
-{
-    TR_ASSERT(raw_handle != nullptr);
-    TR_ASSERT(other_public_key != nullptr);
-
-    auto const& handle = *static_cast<tr_dh_ctx*>(raw_handle);
-    auto status = CCStatus{};
-
-    auto const other_key = CCBigNumPtr(CCBigNumFromData(&status, other_public_key, other_public_key_length));
-    if (!check_pointer(other_key.get(), &status))
-    {
-        return nullptr;
-    }
-
-    auto const my_secret_key = CCBigNumPtr(CCCreateBigNum(&status));
-    if (!check_pointer(my_secret_key.get(), &status))
-    {
-        return nullptr;
-    }
-
-    if (!check_result(CCBigNumModExp(my_secret_key.get(), other_key.get(), handle.private_key.get(), handle.p.get())))
-    {
-        return nullptr;
-    }
-
-    auto const dh_size = CCBigNumByteCount(handle.p.get());
-    auto ret = std::unique_ptr<tr_dh_secret, decltype(&tr_free)>(tr_dh_secret_new(dh_size), &tr_free);
-
-    auto const my_secret_key_length = CCBigNumByteCount(my_secret_key.get());
-    CCBigNumToData(&status, my_secret_key.get(), ret->key);
-    if (!check_result(status))
-    {
-        return nullptr;
-    }
-
-    tr_dh_secret_align(ret.get(), my_secret_key_length);
-
-    return ret.release();
-}
 
 /***
 ****

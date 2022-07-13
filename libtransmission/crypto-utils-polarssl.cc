@@ -31,7 +31,6 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-#define TR_CRYPTO_DH_SECRET_FALLBACK
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
@@ -222,100 +221,6 @@ std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t raw_handle)
 
     tr_free(handle);
     return digest;
-}
-
-/***
-****
-***/
-
-tr_dh_ctx_t tr_dh_new(
-    uint8_t const* prime_num,
-    size_t prime_num_length,
-    uint8_t const* generator_num,
-    size_t generator_num_length)
-{
-    TR_ASSERT(prime_num != nullptr);
-    TR_ASSERT(generator_num != nullptr);
-
-    api_dhm_context* handle = tr_new0(api_dhm_context, 1);
-
-#if API_VERSION_NUMBER >= 0x01030800
-    API(dhm_init)(handle);
-#endif
-
-    if (!check_result(API(mpi_read_binary)(&handle->P, prime_num, prime_num_length)) ||
-        !check_result(API(mpi_read_binary)(&handle->G, generator_num, generator_num_length)))
-    {
-        API(dhm_free)(handle);
-        return nullptr;
-    }
-
-    handle->len = prime_num_length;
-
-    return handle;
-}
-
-void tr_dh_free(tr_dh_ctx_t raw_handle)
-{
-    auto* handle = static_cast<api_dhm_context*>(raw_handle);
-
-    if (handle == nullptr)
-    {
-        return;
-    }
-
-    API(dhm_free)(handle);
-}
-
-bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
-{
-    TR_ASSERT(raw_handle != nullptr);
-    TR_ASSERT(public_key != nullptr);
-
-    auto* handle = static_cast<api_dhm_context*>(raw_handle);
-
-    if (public_key_length != nullptr)
-    {
-        *public_key_length = handle->len;
-    }
-
-    return check_result(API(dhm_make_public)(handle, private_key_length, public_key, handle->len, my_rand, nullptr));
-}
-
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
-{
-    TR_ASSERT(raw_handle != nullptr);
-    TR_ASSERT(other_public_key != nullptr);
-
-    auto* handle = static_cast<api_dhm_context*>(raw_handle);
-
-    if (!check_result(API(dhm_read_public)(handle, other_public_key, other_public_key_length)))
-    {
-        return nullptr;
-    }
-
-    tr_dh_secret* const ret = tr_dh_secret_new(handle->len);
-
-    size_t secret_key_length = handle->len;
-
-#if API_VERSION_NUMBER >= 0x02000000
-
-    if (!check_result(API(dhm_calc_secret)(handle, ret->key, secret_key_length, &secret_key_length, my_rand, nullptr)))
-#elif API_VERSION_NUMBER >= 0x01030000
-
-    if (!check_result(API(dhm_calc_secret)(handle, ret->key, &secret_key_length, my_rand, nullptr)))
-#else
-
-    if (!check_result(API(dhm_calc_secret)(handle, ret->key, &secret_key_length)))
-#endif
-    {
-        tr_dh_secret_free(ret);
-        return nullptr;
-    }
-
-    tr_dh_secret_align(ret, secret_key_length);
-
-    return ret;
 }
 
 /***

@@ -24,10 +24,6 @@
 using tr_sha1_ctx_t = void*;
 /** @brief Opaque SHA256 context type. */
 using tr_sha256_ctx_t = void*;
-/** @brief Opaque DH context type. */
-using tr_dh_ctx_t = void*;
-/** @brief Opaque DH secret key type. */
-using tr_dh_secret_t = void*;
 /** @brief Opaque SSL context type. */
 using tr_ssl_ctx_t = void*;
 /** @brief Opaque X509 certificate store type. */
@@ -110,54 +106,6 @@ std::optional<tr_sha256_digest_t> tr_sha256(T... args)
     tr_sha256_final(ctx);
     return std::nullopt;
 }
-
-/**
- * @brief Allocate and initialize new Diffie-Hellman (DH) key exchange context.
- */
-tr_dh_ctx_t tr_dh_new(
-    uint8_t const* prime_num,
-    size_t prime_num_length,
-    uint8_t const* generator_num,
-    size_t generator_num_length);
-
-std::vector<std::byte> tr_dh_private_key(tr_dh_ctx_t const raw_handle);
-std::vector<std::byte> tr_dh_secret_get(tr_dh_secret_t handle);
-
-/**
- * @brief Free DH key exchange context.
- */
-void tr_dh_free(tr_dh_ctx_t handle);
-
-/**
- * @brief Generate private and public DH keys, export public key.
- */
-bool tr_dh_make_key(tr_dh_ctx_t handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length);
-
-/**
- * @brief Perform DH key exchange, generate secret key.
- */
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, size_t other_public_key_length);
-
-/**
- * @brief Calculate SHA1 hash of DH secret key, prepending and/or appending
- *        given data to the key during calculation.
- */
-std::optional<tr_sha1_digest_t> tr_dh_secret_derive(
-    tr_dh_secret_t handle,
-    void const* prepend_data,
-    size_t prepend_data_size,
-    void const* append_data,
-    size_t append_data_size);
-
-/**
- * @brief Free DH secret key returned by @ref tr_dh_agree.
- */
-void tr_dh_secret_free(tr_dh_secret_t handle);
-
-/**
- * @brief Align DH key (big-endian number) to required length (internal, do not use).
- */
-void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size);
 
 /**
  * @brief Get X509 certificate store from SSL context.
