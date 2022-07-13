@@ -133,20 +133,15 @@ void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_in, voi
 
 ///
 
-bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
+void tr_crypto::setPeerPublicKey(key_bigend_t const& peer_public_key)
 {
     ensureKeyExists();
 
-    auto peer_pub = key_bigend_t{};
-    std::copy_n(static_cast<std::byte const*>(peer_public_key), len, std::begin(peer_pub));
-    TR_ASSERT(len == std::size(peer_pub));
     auto const secret = math::wide_integer::powm(
-        wi::import_bits<wi::key_t>(peer_pub),
+        wi::import_bits<wi::key_t>(peer_public_key),
         wi::import_bits<wi::private_key_t>(private_key_),
         wi::P);
     secret_ = wi::export_bits(secret);
-
-    return true; // FIXME(ckerr) return void
 }
 
 void tr_crypto::ensureKeyExists()

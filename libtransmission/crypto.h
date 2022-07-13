@@ -57,12 +57,7 @@ struct tr_crypto
         return public_key_;
     }
 
-    void setPeerPublicKey(key_bigend_t const& peer_public_key)
-    {
-        (void)computeSecret(std::data(peer_public_key), std::size(peer_public_key));
-    }
-
-    [[nodiscard]] bool computeSecret(void const* peer_public_key, size_t len);
+    void setPeerPublicKey(key_bigend_t const& peer_public_key);
 
     [[nodiscard]] constexpr auto secret() const noexcept
     {

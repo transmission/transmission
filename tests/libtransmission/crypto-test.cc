@@ -70,10 +70,8 @@ TEST(Crypto, encryptDecrypt)
     auto a = tr_crypto{ &SomeHash, false };
     auto b = tr_crypto_{ &SomeHash, true };
 
-    auto public_key = b.myPublicKey();
-    EXPECT_TRUE(a.computeSecret(std::data(public_key), std::size(public_key)));
-    public_key = a.myPublicKey();
-    EXPECT_TRUE(b.computeSecret(std::data(public_key), std::size(public_key)));
+    a.setPeerPublicKey(b.publicKey());
+    b.setPeerPublicKey(a.publicKey());
 
     auto constexpr Input1 = "test1"sv;
     auto encrypted1 = std::array<char, 128>{};
