@@ -120,8 +120,8 @@ tr_dh_ctx_t tr_dh_new(
     uint8_t const* generator_num,
     size_t generator_num_length);
 
-std::vector<char> tr_dh_private_key(tr_dh_ctx_t const raw_handle);
-std::vector<char> tr_dh_secret_get(tr_dh_secret_t handle);
+std::vector<std::byte> tr_dh_private_key(tr_dh_ctx_t const raw_handle);
+std::vector<std::byte> tr_dh_secret_get(tr_dh_secret_t handle);
 
 /**
  * @brief Free DH key exchange context.
@@ -148,8 +148,6 @@ std::optional<tr_sha1_digest_t> tr_dh_secret_derive(
     size_t prepend_data_size,
     void const* append_data,
     size_t append_data_size);
-
-std::vector<char> tr_dh_secret_get(tr_dh_secret_t handle);
 
 /**
  * @brief Free DH secret key returned by @ref tr_dh_agree.

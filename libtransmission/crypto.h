@@ -17,6 +17,8 @@
 #include <string_view>
 #include <vector>
 
+#include <math/wide_integer/uintwide_t.h>
+
 #include "crypto-utils.h"
 #include "tr-macros.h"
 
@@ -28,6 +30,14 @@ enum
 /** @brief Holds state information for encrypted peer communications */
 struct tr_crypto
 {
+    static auto constexpr PrivateKeySize = size_t{ 20 };
+    using private_key_t = math::wide_integer::uintwide_t<PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
+    using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
+
+    static auto constexpr KeySize = size_t{ 96 };
+    using key_t = math::wide_integer::uintwide_t<KeySize * std::numeric_limits<unsigned char>::digits>;
+    using key_bigend_t = std::array<std::byte, KeySize>;
+
     tr_crypto(tr_sha1_digest_t const* torrent_hash = nullptr, bool is_incoming = true);
     ~tr_crypto();
 
@@ -46,20 +56,19 @@ struct tr_crypto
         return torrent_hash_;
     }
 
-    [[nodiscard]] std::string_view myPublicKey()
+    [[nodiscard]] constexpr auto myPublicKey()
     {
         ensureKeyExists();
-        return { reinterpret_cast<char const*>(my_public_key_), KEY_LEN };
+        return openssl_public_key_;
     }
 
-    [[nodiscard]] std::vector<char> publicKey()
+    [[nodiscard]] auto publicKey()
     {
         ensureKeyExists();
-        auto const* begin = reinterpret_cast<char const*>(my_public_key_);
-        return { begin, begin + KEY_LEN };
+        return wi_public_key_;
     }
 
-    void setPeerPublicKey(std::vector<char> const& peer_public_key)
+    void setPeerPublicKey(key_bigend_t const& peer_public_key)
     {
         (void)computeSecret(std::data(peer_public_key), std::size(peer_public_key));
     }
@@ -94,6 +103,10 @@ struct tr_crypto
     void encryptInit();
     void encrypt(size_t buflen, void const* buf_in, void* buf_out);
 
+    private_key_bigend_t private_key_ = {};
+    key_bigend_t wi_public_key_ = {};
+    key_bigend_t wi_secret_ = {};
+
 private:
     void ensureKeyExists();
 
@@ -102,7 +115,7 @@ private:
     struct arc4_context* enc_key_ = nullptr;
     tr_dh_ctx_t dh_ = {};
     tr_dh_secret_t my_secret_ = {};
-    uint8_t my_public_key_[KEY_LEN] = {};
+    key_bigend_t openssl_public_key_ = {};
     bool const is_incoming_;
 };
 

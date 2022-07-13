@@ -300,7 +300,7 @@ static void sendYa(tr_handshake* handshake)
 
     char outbuf[KEY_LEN + PadA_MAXLEN];
     char* walk = outbuf;
-    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
+    walk = std::copy_n(reinterpret_cast<char const*>(std::data(public_key)), std::size(public_key), walk);
 
     // add some random padding
     auto const pad_a = handshake->crypto->pad(PadA_MAXLEN);
@@ -764,7 +764,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     uint8_t outbuf[KEY_LEN + PadB_MAXLEN];
     uint8_t* walk = outbuf;
     auto const public_key = handshake->crypto->myPublicKey();
-    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
+    walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(public_key)), std::size(public_key), walk);
     auto const pad_b = handshake->crypto->pad(PadB_MAXLEN);
     walk = std::copy(std::begin(pad_b), std::end(pad_b), walk);
 

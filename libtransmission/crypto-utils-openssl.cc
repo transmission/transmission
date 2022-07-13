@@ -18,6 +18,8 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
+#include <iostream>
+
 #include <fmt/core.h>
 
 #include "transmission.h"
@@ -319,6 +321,11 @@ tr_dh_ctx_t tr_dh_new(
         handle = nullptr;
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_new prime_num is (dec) " << BN_bn2dec(p) << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_new prime_num is (hex) " << BN_bn2hex(p) << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_new generator is (dec) " << BN_bn2dec(g) << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_new generator is (hex) " << BN_bn2hex(g) << std::endl;
+
     return handle;
 }
 
@@ -351,6 +358,9 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     BIGNUM const* my_public_key = nullptr;
     DH_get0_key(handle, &my_public_key, nullptr);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_make_key public key is (dec) " << BN_bn2dec(my_public_key) << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_make_key public key is (hex) " << BN_bn2hex(my_public_key) << std::endl;
+
     int const my_public_key_length = BN_bn2bin(my_public_key, public_key);
     int const dh_size = DH_size(handle);
 
@@ -364,11 +374,15 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     return true;
 }
 
-std::vector<char> tr_dh_private_key(tr_dh_ctx_t const raw_handle)
+std::vector<std::byte> tr_dh_private_key(tr_dh_ctx_t const raw_handle)
 {
     auto const* const handle = static_cast<DH const*>(raw_handle);
     auto const* priv_key = DH_get0_priv_key(handle);
-    auto ret = std::vector<char>{};
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_make_key private key is (dec) " << BN_bn2dec(priv_key) << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_make_key private key is (hex) " << BN_bn2hex(priv_key) << std::endl;
+
+    auto ret = std::vector<std::byte>{};
     ret.resize(BN_num_bytes(priv_key));
     BN_bn2bin(priv_key, reinterpret_cast<unsigned char*>(std::data(ret)));
     return ret;
@@ -382,6 +396,8 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(other_public_key != nullptr);
 
     BIGNUM* const other_key = BN_bin2bn(other_public_key, other_public_key_length, nullptr);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_agree peer public key is (dec) " << BN_bn2dec(other_key) << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_dh_agree peer public key is (hex) " << BN_bn2hex(other_key) << std::endl;
     if (!check_pointer(other_key))
     {
         return nullptr;
@@ -390,6 +406,12 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     int const dh_size = DH_size(handle);
     tr_dh_secret* ret = tr_dh_secret_new(dh_size);
     int const secret_key_length = DH_compute_key(ret->key, other_key, handle);
+    std::cerr << __FILE__ << ':' << __LINE__ << " secret bytes from openssl: " << std::endl;
+    for (int i = 0; i < secret_key_length; ++i)
+    {
+        std::cerr << static_cast<unsigned>(ret->key[i]) << ' ';
+    }
+    std::cerr << std::endl;
 
     if (check_result_neq(secret_key_length, -1))
     {
@@ -405,10 +427,11 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     return ret;
 }
 
-std::vector<char> tr_dh_secret_get(tr_dh_secret_t handle)
+std::vector<std::byte> tr_dh_secret_get(tr_dh_secret_t handle)
 {
     auto const* secret = static_cast<tr_dh_secret const*>(handle);
-    return { secret->key, secret->key + secret->key_length };
+    auto const* const data = reinterpret_cast<std::byte const*>(secret->key);
+    return { data, data + secret->key_length };
 }
 
 /***
