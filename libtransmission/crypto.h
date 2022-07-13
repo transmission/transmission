@@ -55,16 +55,10 @@ struct tr_crypto
         return torrent_hash_;
     }
 
-    [[nodiscard]] constexpr auto myPublicKey()
-    {
-        ensureKeyExists();
-        return wi_public_key_;
-    }
-
     [[nodiscard]] auto publicKey()
     {
         ensureKeyExists();
-        return wi_public_key_;
+        return public_key_;
     }
 
     void setPeerPublicKey(key_bigend_t const& peer_public_key)
@@ -81,7 +75,7 @@ struct tr_crypto
 
     [[nodiscard]] constexpr auto privateKey() const noexcept
     {
-        return wi_private_key_;
+        return private_key_;
     }
 
     [[nodiscard]] std::optional<tr_sha1_digest_t> secretKeySha1(
@@ -102,10 +96,6 @@ struct tr_crypto
     void encryptInit();
     void encrypt(size_t buflen, void const* buf_in, void* buf_out);
 
-    private_key_bigend_t wi_private_key_ = {};
-    key_bigend_t wi_public_key_ = {};
-    key_bigend_t secret_ = {};
-
 private:
     void ensureKeyExists();
 
@@ -113,6 +103,10 @@ private:
     arc4_context dec_key_;
     arc4_context enc_key_;
     bool const is_incoming_;
+
+    private_key_bigend_t private_key_ = {};
+    key_bigend_t public_key_ = {};
+    key_bigend_t secret_ = {};
 };
 
 #endif // TR_ENCRYPTION_H

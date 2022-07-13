@@ -120,7 +120,7 @@ bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
     TR_ASSERT(len == std::size(peer_pub));
     auto const secret = math::wide_integer::powm(
         wi::import_bits<wi::key_t>(peer_pub),
-        wi::import_bits<wi::private_key_t>(wi_private_key_),
+        wi::import_bits<wi::private_key_t>(private_key_),
         wi::P);
     secret_ = wi::export_bits(secret);
 
@@ -129,14 +129,14 @@ bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
 
 void tr_crypto::ensureKeyExists()
 {
-    if (wi_private_key_ == private_key_bigend_t{})
+    if (private_key_ == private_key_bigend_t{})
     {
-        tr_rand_buffer(std::data(wi_private_key_), std::size(wi_private_key_));
+        tr_rand_buffer(std::data(private_key_), std::size(private_key_));
     }
 
-    if (wi_public_key_ == key_bigend_t{})
+    if (public_key_ == key_bigend_t{})
     {
-        auto const private_key = wi::import_bits<wi::private_key_t>(wi_private_key_);
+        auto const private_key = wi::import_bits<wi::private_key_t>(private_key_);
         std::cerr << __FILE__ << ':' << __LINE__ << " private_key " << private_key << std::endl;
         // yay this is correct ^
 
@@ -147,8 +147,8 @@ void tr_crypto::ensureKeyExists()
         std::cerr << __FILE__ << ':' << __LINE__ << " public_key " << public_key << std::endl;
         // yay this is correct ^
 
-        wi_public_key_ = wi::export_bits(public_key);
-        // TR_ASSERT(openssl_public_key_ == wi_public_key_);
+        public_key_ = wi::export_bits(public_key);
+        // TR_ASSERT(openssl_public_key_ == public_key_);
 #if 0
         std::cerr << __FILE__ << ':' << __LINE__ << " my_public_key_ from openssl ";
         for (auto* walk = my_public_key_, *end = walk + 96; walk != end; ++walk)
