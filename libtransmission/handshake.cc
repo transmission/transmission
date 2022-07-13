@@ -396,6 +396,8 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     tr_logAddTraceHand(handshake, isEncrypted ? "got an encrypted handshake" : "got a plain handshake");
 
+    tr_peerIoSetEncryption(handshake->io, isEncrypted ? PEER_ENCRYPTION_RC4 : PEER_ENCRYPTION_NONE);
+
     if (!isEncrypted)
     {
         setState(handshake, AWAITING_HANDSHAKE);
