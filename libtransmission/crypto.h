@@ -11,18 +11,23 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t
 #include <optional>
 #include <string_view>
 #include <vector>
 
-#include "tr-macros.h"
+#include <arc4.h>
+
+#include "tr-macros.h" // tr_sha1_digest_t
 
 enum
 {
     KEY_LEN = 96
 };
+
+struct arc4_context;
 
 /** @brief Holds state information for encrypted peer communications */
 struct tr_crypto
@@ -34,7 +39,6 @@ struct tr_crypto
     using key_bigend_t = std::array<std::byte, KeySize>;
 
     tr_crypto(tr_sha1_digest_t const* torrent_hash = nullptr, bool is_incoming = true);
-    ~tr_crypto();
 
     tr_crypto& operator=(tr_crypto const&) = delete;
     tr_crypto& operator=(tr_crypto&&) = delete;
@@ -106,8 +110,8 @@ private:
     void ensureKeyExists();
 
     std::optional<tr_sha1_digest_t> torrent_hash_;
-    struct arc4_context* dec_key_ = nullptr;
-    struct arc4_context* enc_key_ = nullptr;
+    arc4_context dec_key_;
+    arc4_context enc_key_;
     bool const is_incoming_;
 };
 
