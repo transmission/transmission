@@ -71,14 +71,14 @@ struct tr_crypto
 
     [[nodiscard]] bool computeSecret(void const* peer_public_key, size_t len);
 
-    [[nodiscard]] auto secret() const noexcept
+    [[nodiscard]] constexpr auto secret() const noexcept
     {
         return openssl_secret_;
     }
 
-    [[nodiscard]] auto privateKey() const noexcept
+    [[nodiscard]] constexpr auto privateKey() const noexcept
     {
-        return tr_dh_private_key(dh_);
+        return openssl_private_key_;
     }
 
     [[nodiscard]] std::optional<tr_sha1_digest_t> secretKeySha1(
@@ -99,7 +99,7 @@ struct tr_crypto
     void encryptInit();
     void encrypt(size_t buflen, void const* buf_in, void* buf_out);
 
-    private_key_bigend_t private_key_ = {};
+    private_key_bigend_t wi_private_key_ = {};
     key_bigend_t wi_public_key_ = {};
     key_bigend_t wi_secret_ = {};
 
@@ -112,6 +112,7 @@ private:
     tr_dh_ctx_t dh_ = {};
     tr_dh_secret_t my_secret_ = {};
     key_bigend_t openssl_public_key_ = {};
+    private_key_bigend_t openssl_private_key_ = {};
     key_bigend_t openssl_secret_ = {};
     bool const is_incoming_;
 };

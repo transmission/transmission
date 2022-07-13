@@ -88,7 +88,9 @@ auto export_bits(Integral i)
 }
 
 auto WIDE_INTEGER_CONSTEXPR const G = wi::key_t{ "2" };
-auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{ "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563" };
+auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
+    "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563"
+};
 
 } // namespace wi
 
@@ -160,7 +162,10 @@ bool tr_crypto::computeSecret(void const* peer_public_key, size_t len)
     auto peer_pub = key_bigend_t{};
     std::copy_n(static_cast<std::byte const*>(peer_public_key), len, std::begin(peer_pub));
     TR_ASSERT(len == std::size(peer_pub));
-    auto secret = math::wide_integer::powm(wi::import_bits<wi::key_t>(peer_pub), wi::import_bits<wi::private_key_t>(private_key_), wi::P);
+    auto secret = math::wide_integer::powm(
+        wi::import_bits<wi::key_t>(peer_pub),
+        wi::import_bits<wi::private_key_t>(wi_private_key_),
+        wi::P);
     std::cerr << __FILE__ << ':' << __LINE__ << " wide-integer secret is " << secret << std::endl;
 
     wi_secret_ = wi::export_bits(secret);
@@ -181,18 +186,21 @@ void tr_crypto::ensureKeyExists()
         size_t public_key_length = KEY_LEN;
         dh_ = tr_dh_new(dh_P, sizeof(dh_P), dh_G, sizeof(dh_G));
         tr_dh_make_key(dh_, DhPrivkeyLen, reinterpret_cast<uint8_t*>(std::data(openssl_public_key_)), &public_key_length);
+        auto const tmp = tr_dh_private_key(dh_);
+        TR_ASSERT(std::size(tmp) == std::size(openssl_private_key_));
+        std::copy(std::begin(tmp), std::end(tmp), std::begin(openssl_private_key_));
     }
 
-    if (private_key_ == private_key_bigend_t{})
+    if (wi_private_key_ == private_key_bigend_t{})
     {
         auto const tmp = privateKey();
-        TR_ASSERT(std::size(private_key_) == std::size(tmp));
-        std::copy(std::begin(tmp), std::end(tmp), std::begin(private_key_));
+        TR_ASSERT(std::size(wi_private_key_) == std::size(tmp));
+        std::copy(std::begin(tmp), std::end(tmp), std::begin(wi_private_key_));
     }
 
     if (wi_public_key_ == key_bigend_t{})
     {
-        auto const private_key = wi::import_bits<wi::private_key_t>(private_key_);
+        auto const private_key = wi::import_bits<wi::private_key_t>(wi_private_key_);
         std::cerr << __FILE__ << ':' << __LINE__ << " private_key " << private_key << std::endl;
         // yay this is correct ^
 
