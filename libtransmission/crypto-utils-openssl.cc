@@ -132,11 +132,13 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
 
     TR_ASSERT(data != nullptr);
 
+    fmt::print("{}:{} adding {} bytes to sha1 digest\n", __FILE__, __LINE__, data_length);
     return check_result(EVP_DigestUpdate(handle, data, data_length));
 }
 
 std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
+    fmt::print("{}:{} tr_sha1_final\n", __FILE__, __LINE__);
     auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
     TR_ASSERT(handle != nullptr);
 
@@ -362,6 +364,16 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     return true;
 }
 
+std::vector<char> tr_dh_private_key(tr_dh_ctx_t const raw_handle)
+{
+    auto const* const handle = static_cast<DH const*>(raw_handle);
+    auto const* priv_key = DH_get0_priv_key(handle);
+    auto ret = std::vector<char>{};
+    ret.resize(BN_num_bytes(priv_key));
+    BN_bn2bin(priv_key, reinterpret_cast<unsigned char*>(std::data(ret)));
+    return ret;
+}
+
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
     auto* handle = static_cast<DH*>(raw_handle);
@@ -391,6 +403,12 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
     BN_free(other_key);
     return ret;
+}
+
+std::vector<char> tr_dh_secret_get(tr_dh_secret_t handle)
+{
+    auto const* secret = static_cast<tr_dh_secret const*>(handle);
+    return { secret->key, secret->key + secret->key_length };
 }
 
 /***

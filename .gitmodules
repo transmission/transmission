@@ -47,3 +47,6 @@
 [submodule "third-party/fast_float"]
 	path = third-party/fast_float
 	url = https://github.com/transmission/fast_float
+[submodule "third-party/wide-integer"]
+	path = third-party/wide-integer
+	url = https://github.com/transmission/wide-integer

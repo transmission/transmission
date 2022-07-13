@@ -22,6 +22,7 @@
 #include "transmission.h"
 
 #include "cache.h"
+#include "crypto-utils.h"
 #include "completion.h"
 #include "file.h"
 #include "log.h"

@@ -153,6 +153,7 @@ find_package(Fmt)
 add_definitions(-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0)
 include_directories(SYSTEM ${LIBFMT_INCLUDE_DIRS})
 
+find_package(WideInteger)
 find_package(FastFloat)
 find_package(UtfCpp)
 find_package(Threads)

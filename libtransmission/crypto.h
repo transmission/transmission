@@ -52,7 +52,29 @@ struct tr_crypto
         return { reinterpret_cast<char const*>(my_public_key_), KEY_LEN };
     }
 
+    [[nodiscard]] std::vector<char> publicKey()
+    {
+        ensureKeyExists();
+        auto const* begin = reinterpret_cast<char const*>(my_public_key_);
+        return { begin, begin + KEY_LEN };
+    }
+
+    void setPeerPublicKey(std::vector<char> const& peer_public_key)
+    {
+        (void)computeSecret(std::data(peer_public_key), std::size(peer_public_key));
+    }
+
     [[nodiscard]] bool computeSecret(void const* peer_public_key, size_t len);
+
+    [[nodiscard]] auto secret() const noexcept
+    {
+        return tr_dh_secret_get(my_secret_);
+    }
+
+    [[nodiscard]] auto privateKey() const noexcept
+    {
+        return tr_dh_private_key(dh_);
+    }
 
     [[nodiscard]] std::optional<tr_sha1_digest_t> secretKeySha1(
         void const* prepend,

@@ -10,6 +10,8 @@
 #include <string_view>
 #include <unordered_set>
 
+#include <iostream>
+
 #include "transmission.h"
 
 #include "crypto.h"
@@ -35,7 +37,6 @@ auto constexpr SomeHash = tr_sha1_digest_t{
 
 TEST(Crypto, torrentHash)
 {
-
     auto a = tr_crypto{};
     EXPECT_FALSE(a.torrentHash());
 
@@ -46,6 +47,22 @@ TEST(Crypto, torrentHash)
     auto b = tr_crypto{ &SomeHash, false };
     EXPECT_TRUE(b.torrentHash());
     EXPECT_EQ(SomeHash, *b.torrentHash());
+}
+
+TEST(Crypto, sharedKey)
+{
+    auto a = tr_crypto{};
+    auto b = tr_crypto{};
+
+    a.setPeerPublicKey(b.publicKey());
+    b.setPeerPublicKey(a.publicKey());
+    EXPECT_EQ(a.secret(), b.secret());
+    EXPECT_EQ(96, std::size(a.secret()));
+    EXPECT_EQ(20, std::size(a.privateKey()));
+
+    auto c = tr_crypto{};
+    c.setPeerPublicKey(b.publicKey());
+    EXPECT_NE(a.secret(), c.secret());
 }
 
 TEST(Crypto, encryptDecrypt)
