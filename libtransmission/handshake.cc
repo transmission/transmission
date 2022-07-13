@@ -365,7 +365,6 @@ static auto computeRequestHash(tr_handshake const* handshake, std::string_view n
 
 static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    fmt::print("{}:{} in readYb\n", __FILE__, __LINE__);
     size_t needlen = HANDSHAKE_NAME_LEN;
 
     if (evbuffer_get_length(inbuf) < needlen)
@@ -373,9 +372,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         return READ_LATER;
     }
 
-    fmt::print("{}:{} have at least {} bytes\n", __FILE__, __LINE__, needlen);
     bool const isEncrypted = memcmp(evbuffer_pullup(inbuf, HANDSHAKE_NAME_LEN), HANDSHAKE_NAME, HANDSHAKE_NAME_LEN) != 0;
-    fmt::print("{}:{} isEncrypted {}\n", __FILE__, __LINE__, isEncrypted);
 
     auto peer_public_key = tr_crypto::key_bigend_t{};
     if (isEncrypted)
@@ -386,7 +383,6 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         {
             return READ_LATER;
         }
-        fmt::print("{}:{} in readYb, have at least {}\n", __FILE__, __LINE__, needlen);
     }
 
     tr_logAddTraceHand(handshake, isEncrypted ? "got an encrypted handshake" : "got a plain handshake");
@@ -409,7 +405,6 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
     evbuffer* const outbuf = evbuffer_new();
 
-    fmt::print("{}:{} sending hash('req', S)\n", __FILE__, __LINE__);
     /* HASH('req1', S) */
     {
         auto const req1 = computeRequestHash(handshake, "req1"sv);
@@ -722,7 +717,6 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    fmt::print("{:s}:{:d} readYa\n", __FILE__, __LINE__);
     auto peer_public_key = tr_crypto::key_bigend_t{};
     tr_logAddTraceHand(
         handshake,
@@ -744,7 +738,6 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
         return tr_handshakeDone(handshake, false);
     }
     handshake->myReq1 = *req1;
-    fmt::print("{:s}:{:d} got req1\n", __FILE__, __LINE__);
 
     // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
@@ -763,8 +756,6 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    fmt::print("{:s}:{:d} readPadA\n", __FILE__, __LINE__);
-
     /* resynchronizing on HASH('req1', S) */
     struct evbuffer_ptr ptr = evbuffer_search(
         inbuf,
@@ -777,7 +768,6 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_drain(inbuf, ptr.pos);
         tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
         setState(handshake, AWAITING_CRYPTO_PROVIDE);
-        fmt::print("{:s}:{:d} readPadA match\n", __FILE__, __LINE__);
         return READ_NOW;
     }
 
@@ -786,7 +776,6 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
 
-    fmt::print("{:s}:{:d} readPadA did not find end of pad a; read later\n", __FILE__, __LINE__);
     return READ_LATER;
 }
 
@@ -1003,7 +992,6 @@ static ReadState readPayloadStream(tr_handshake* handshake, struct evbuffer* inb
 
 static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 {
-    fmt::print("{:s}:{:d} canRead\n", __FILE__, __LINE__);
     TR_ASSERT(tr_isPeerIo(io));
 
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
@@ -1019,7 +1007,6 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
     ReadState ret = READ_NOW;
     while (readyForMore)
     {
-        fmt::print("{:s}:{:d} handshake->state {:d}\n", __FILE__, __LINE__, handshake->state);
         switch (handshake->state)
         {
         case AWAITING_HANDSHAKE:
@@ -1117,7 +1104,6 @@ static ReadState tr_handshakeDone(tr_handshake* handshake, bool isOK)
 {
     tr_logAddTraceHand(handshake, isOK ? "handshakeDone: connected" : "handshakeDone: aborting");
     tr_peerIoSetIOFuncs(handshake->io, nullptr, nullptr, nullptr, nullptr);
-    fmt::print("{:s} handshake done, isOK {}\n", handshake->io->addrStr(), isOK ? "true" : "false");
 
     bool const success = fireDoneFunc(handshake, isOK);
     delete handshake;

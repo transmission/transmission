@@ -7,8 +7,6 @@
 
 #include <arc4.h>
 
-#include <iostream>
-
 #include <math/wide_integer/uintwide_t.h>
 
 #include <arpa/inet.h> // htonl
@@ -17,7 +15,6 @@
 #include "crypto.h"
 #include "crypto-utils.h"
 #include "tr-assert.h"
-#include "utils.h"
 
 ///
 
@@ -28,12 +25,6 @@ tr_crypto::tr_crypto(tr_sha1_digest_t const* torrent_hash, bool is_incoming)
     {
         this->torrent_hash_ = *torrent_hash;
     }
-}
-
-tr_crypto::~tr_crypto()
-{
-    tr_free(enc_key_);
-    tr_free(dec_key_);
 }
 
 ///
@@ -95,13 +86,13 @@ auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
 namespace
 {
 
-void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, std::string_view key)
+void init_rc4(tr_crypto const* crypto, std::shared_ptr<struct arc4_context>& setme, std::string_view key)
 {
     TR_ASSERT(crypto->torrentHash());
 
-    if (*setme == nullptr)
+    if (!setme)
     {
-        *setme = tr_new0(struct arc4_context, 1);
+        setme = std::make_shared<struct arc4_context>();
     }
 
     auto const hash = crypto->torrentHash();
@@ -109,8 +100,8 @@ void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, std::string_
                             std::nullopt;
     if (buf)
     {
-        arc4_init(*setme, std::data(*buf), std::size(*buf));
-        arc4_discard(*setme, 1024);
+        arc4_init(setme.get(), std::data(*buf), std::size(*buf));
+        arc4_discard(setme.get(), 1024);
     }
 }
 
@@ -154,79 +145,28 @@ void tr_crypto::ensureKeyExists()
     if (public_key_ == key_bigend_t{})
     {
         auto const private_key = wi::import_bits<wi::private_key_t>(private_key_);
-        std::cerr << __FILE__ << ':' << __LINE__ << " private_key " << private_key << std::endl;
-        // yay this is correct ^
-
-        // use wide-integer to calculate the public key
-        std::cerr << __FILE__ << ':' << __LINE__ << " P " << wi::P << std::endl;
-        std::cerr << __FILE__ << ':' << __LINE__ << " G " << wi::G << std::endl;
         auto const public_key = math::wide_integer::powm(wi::G, private_key, wi::P);
-        std::cerr << __FILE__ << ':' << __LINE__ << " public_key " << public_key << std::endl;
-        // yay this is correct ^
-
         public_key_ = wi::export_bits(public_key);
-        // TR_ASSERT(openssl_public_key_ == public_key_);
-#if 0
-        std::cerr << __FILE__ << ':' << __LINE__ << " my_public_key_ from openssl ";
-        for (auto* walk = my_public_key_, *end = walk + 96; walk != end; ++walk)
-        {
-            std::cerr << static_cast<unsigned>(*walk) << ' ';
-        }
-        std::cerr << std::endl;
-
-        auto tmp = public_key;
-        for (auto walk = std::rbegin(public_key_), end = std::rend(public_key_); walk != end; ++walk)
-        {
-            *walk = std::byte(static_cast<uint8_t>(tmp & 0xFF));
-            tmp >>= 8;
-        }
-
-        std::cerr << __FILE__ << ':' << __LINE__ << ' ';
-        for (auto walk : public_key_)
-        {
-            std::cerr << static_cast<unsigned>(walk) << ' ';
-        }
-        std::cerr << std::endl;
-#endif
-
-        // auto const public_key_v = std::vector<std::byte>(std::begin(public_key_), std::end(public_key_));
-        // TR_ASSERT(publicKey() == public_key_v);
-        // std::cerr << __FILE__ << ':' << __LINE__ << " yep this is ok" << std::endl;
     }
-
-#if 0
-    auto const
-        static auto constexpr PrivateKeySize = size_t{ 20 };
-    using private_key_t = math::wide_integer::uintwide_t<PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
-    using private_key_bytes_t = std::array<char, PrivateKeySize>;
-
-    static auto constexpr PublicKeySize = size_t{ 96 };
-    using public_key_t = math::wide_integer::uintwide_t<PublicKeySize * std::numeric_limits<unsigned char>::digits>;
-    using public_key_bytes_t = std::array<char, PublicKeySize>;
-
-    private_key_bytes_t private_key_;
-    public_key_bytes_t public_key_;
-    public_key_bytes_t secret_;
-#endif
 }
 void tr_crypto::decryptInit()
 {
-    init_rc4(this, &dec_key_, is_incoming_ ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(this, dec_key_, is_incoming_ ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_crypto::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
-    crypt_rc4(dec_key_, buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
+    crypt_rc4(dec_key_.get(), buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_crypto::encryptInit()
 {
-    init_rc4(this, &enc_key_, is_incoming_ ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(this, enc_key_, is_incoming_ ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_crypto::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
-    crypt_rc4(enc_key_, buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
+    crypt_rc4(enc_key_.get(), buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 std::optional<tr_sha1_digest_t> tr_crypto::secretKeySha1(

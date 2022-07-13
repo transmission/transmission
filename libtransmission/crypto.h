@@ -11,10 +11,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstddef> // size_t
-#include <cstdint> // uint8_t
+#include <cstddef> // size_t, std::byte
 #include <optional>
-#include <string_view>
+#include <memory>
 #include <vector>
 
 #include "tr-macros.h"
@@ -29,7 +28,6 @@ struct tr_crypto
     using key_bigend_t = std::array<std::byte, KeySize>;
 
     tr_crypto(tr_sha1_digest_t const* torrent_hash = nullptr, bool is_incoming = true);
-    ~tr_crypto();
 
     tr_crypto& operator=(tr_crypto const&) = delete;
     tr_crypto& operator=(tr_crypto&&) = delete;
@@ -86,8 +84,8 @@ private:
     void ensureKeyExists();
 
     std::optional<tr_sha1_digest_t> torrent_hash_;
-    struct arc4_context* dec_key_ = nullptr;
-    struct arc4_context* enc_key_ = nullptr;
+    std::shared_ptr<struct arc4_context> dec_key_;
+    std::shared_ptr<struct arc4_context> enc_key_;
     bool const is_incoming_;
 
     private_key_bigend_t private_key_ = {};

@@ -117,13 +117,11 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
 
     TR_ASSERT(data != nullptr);
 
-    fmt::print("{}:{} adding {} bytes to sha1 digest\n", __FILE__, __LINE__, data_length);
     return check_result(EVP_DigestUpdate(handle, data, data_length));
 }
 
 std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
-    fmt::print("{}:{} tr_sha1_final\n", __FILE__, __LINE__);
     auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
     TR_ASSERT(handle != nullptr);
 
