@@ -77,7 +77,7 @@ struct tr_crypto
 
     [[nodiscard]] auto secret() const noexcept
     {
-        return tr_dh_secret_get(my_secret_);
+        return openssl_secret_;
     }
 
     [[nodiscard]] auto privateKey() const noexcept
@@ -116,6 +116,7 @@ private:
     tr_dh_ctx_t dh_ = {};
     tr_dh_secret_t my_secret_ = {};
     key_bigend_t openssl_public_key_ = {};
+    key_bigend_t openssl_secret_ = {};
     bool const is_incoming_;
 };
 
