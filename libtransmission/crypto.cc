@@ -27,17 +27,11 @@ using key_t = math::wide_integer::uintwide_t<
 using private_key_t = math::wide_integer::uintwide_t<
     tr_message_stream_encryption::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
 
-// source: https://stackoverflow.com/a/1001373/6568470
+// source: https://stackoverflow.com/a/1001330/6568470
 // nb: when we bump to std=C++20, use `std::endian`
 bool is_big_endian()
 {
-    union
-    {
-        uint32_t i;
-        char c[4];
-    } bint = { 0x01020304 };
-
-    return bint.c[0] == 1;
+    return htonl(47) == 47;
 }
 
 template<typename Integral>
