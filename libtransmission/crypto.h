@@ -17,6 +17,8 @@
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-assert.h"
 
+struct arc4_context;
+
 // Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption
 {
