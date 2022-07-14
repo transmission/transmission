@@ -410,14 +410,14 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer* const outbuf = evbuffer_new();
 
     /* HASH('req1', S) */
+    if (auto const req1 = tr_sha1("req1"sv, handshake->dh.secret()); req1)
     {
-        auto const req1 = tr_sha1("req1"sv, handshake->dh.secret());
-        if (!req1)
-        {
-            tr_logAddTraceHand(handshake, "error while computing req1 hash after Yb");
-            return tr_handshakeDone(handshake, false);
-        }
         evbuffer_add(outbuf, std::data(*req1), std::size(*req1));
+    }
+    else
+    {
+        tr_logAddTraceHand(handshake, "error while computing req1 hash after Yb");
+        return tr_handshakeDone(handshake, false);
     }
 
     auto const info_hash = handshake->io->torrentHash();
@@ -456,18 +456,15 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer_add_uint16(outbuf, 0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
+    if (uint8_t msg[HANDSHAKE_SIZE]; buildHandshakeMessage(handshake, msg))
     {
-        uint8_t msg[HANDSHAKE_SIZE];
-
-        if (!buildHandshakeMessage(handshake, msg))
-        {
-            return tr_handshakeDone(handshake, false);
-        }
-
         evbuffer_add_uint16(outbuf, sizeof(msg));
         evbuffer_add(outbuf, msg, sizeof(msg));
-
         handshake->haveSentBitTorrentHandshake = true;
+    }
+    else
+    {
+        return tr_handshakeDone(handshake, false);
     }
 
     /* send it */
@@ -916,16 +913,14 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     tr_logAddTraceHand(handshake, "sending handshake");
 
     /* send our handshake */
+    if (uint8_t msg[HANDSHAKE_SIZE]; buildHandshakeMessage(handshake, msg))
     {
-        uint8_t msg[HANDSHAKE_SIZE];
-
-        if (!buildHandshakeMessage(handshake, msg))
-        {
-            return tr_handshakeDone(handshake, false);
-        }
-
         evbuffer_add(outbuf, msg, sizeof(msg));
         handshake->haveSentBitTorrentHandshake = true;
+    }
+    else
+    {
+        return tr_handshakeDone(handshake, false);
     }
 
     /* send it out */
