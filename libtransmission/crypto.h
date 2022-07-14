@@ -12,7 +12,6 @@
 #endif
 
 #include <cstddef> // size_t, std::byte
-#include <optional>
 #include <memory>
 #include <vector>
 
@@ -70,7 +69,6 @@ struct tr_crypto
 private:
     void ensureKeyExists();
 
-    std::optional<tr_sha1_digest_t> torrent_hash_;
     std::shared_ptr<struct arc4_context> dec_key_;
     std::shared_ptr<struct arc4_context> enc_key_;
     bool const is_incoming_;
