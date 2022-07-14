@@ -12,9 +12,7 @@
 #endif
 
 #include <cstddef> // size_t, std::byte
-#include <functional>
 #include <memory>
-#include <vector>
 
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-assert.h"
