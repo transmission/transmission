@@ -18,7 +18,6 @@
 #endif
 
 #include API_HEADER(options.h)
-#include API_HEADER_CRYPT(dh.h)
 #include API_HEADER_CRYPT(error-crypt.h)
 #include API_HEADER_CRYPT(random.h)
 #include API_HEADER_CRYPT(sha.h)

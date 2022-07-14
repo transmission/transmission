@@ -17,7 +17,6 @@
 
 #include API_HEADER(base64.h)
 #include API_HEADER(ctr_drbg.h)
-#include API_HEADER(dhm.h)
 #include API_HEADER(error.h)
 #include API_HEADER(sha1.h)
 #include API_HEADER(sha256.h)
@@ -41,7 +40,6 @@
 using api_ctr_drbg_context = API(ctr_drbg_context);
 using api_sha1_context = API(sha1_context);
 using api_sha256_context = API(sha256_context);
-using api_dhm_context = API(dhm_context);
 
 static void log_polarssl_error(int error_code, char const* file, int line)
 {

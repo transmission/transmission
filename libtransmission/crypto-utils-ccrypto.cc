@@ -6,9 +6,6 @@
 #include <memory>
 #include <type_traits>
 
-#ifdef HAVE_COMMONCRYPTO_COMMONBIGNUM_H
-#include <CommonCrypto/CommonBigNum.h>
-#endif
 #include <CommonCrypto/CommonDigest.h>
 #include <CommonCrypto/CommonRandom.h>
 
@@ -23,29 +20,6 @@
 
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
-
-/***
-****
-***/
-
-#ifndef HAVE_COMMONCRYPTO_COMMONBIGNUM_H
-
-using CCBigNumRef = struct _CCBigNumRef*;
-using CCBigNumConstRef = struct _CCBigNumRef const*;
-using CCStatus = CCCryptorStatus;
-
-extern "C"
-{
-    CCBigNumRef CCBigNumFromData(CCStatus* status, void const* s, size_t len);
-    CCBigNumRef CCCreateBigNum(CCStatus* status);
-    CCBigNumRef CCBigNumCreateRandom(CCStatus* status, int bits, int top, int bottom);
-    void CCBigNumFree(CCBigNumRef bn);
-    CCStatus CCBigNumModExp(CCBigNumRef result, CCBigNumConstRef a, CCBigNumConstRef power, CCBigNumConstRef modulus);
-    uint32_t CCBigNumByteCount(CCBigNumConstRef bn);
-    size_t CCBigNumToData(CCStatus* status, CCBigNumConstRef bn, void* to);
-}
-
-#endif /* !HAVE_COMMONCRYPTO_COMMONBIGNUM_H */
 
 /***
 ****
@@ -212,26 +186,6 @@ std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t raw_handle)
     delete handle;
     return digest;
 }
-
-/***
-****
-***/
-
-namespace
-{
-
-struct CCBigNumDeleter
-{
-    void operator()(CCBigNumRef bn) const noexcept
-    {
-        if (bn != nullptr)
-        {
-            CCBigNumFree(bn);
-        }
-    }
-};
-
-using CCBigNumPtr = std::unique_ptr<std::remove_pointer_t<CCBigNumRef>, CCBigNumDeleter>;
 
 /***
 ****
