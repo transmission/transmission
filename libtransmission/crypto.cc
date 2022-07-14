@@ -10,12 +10,11 @@
 
 #include <math/wide_integer/uintwide_t.h>
 
-#include <arpa/inet.h> // htonl
-
 #include "transmission.h"
+
+#include "crypto-utils.h" // tr_sha1
 #include "crypto.h"
-#include "crypto-utils.h"
-#include "tr-assert.h"
+#include "net.h" // includes the headers for htonl()
 
 using namespace std::literals;
 
