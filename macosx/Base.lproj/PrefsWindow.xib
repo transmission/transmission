@@ -1466,7 +1466,7 @@
                             </connections>
                         </datePicker>
                         <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="310" customClass="ColorTextField">
-                            <rect key="frame" x="402" y="4" width="17" height="16"/>
+                            <rect key="frame" x="402" y="5" width="17" height="16"/>
                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="to" id="1281">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1488,7 +1488,7 @@
                             </connections>
                         </button>
                         <imageView translatesAutoresizingMaskIntoConstraints="NO" id="228">
-                            <rect key="frame" x="29" y="113" width="18" height="18"/>
+                            <rect key="frame" x="29" y="112" width="18" height="18"/>
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="TortoiseTemplate" id="1279"/>
                         </imageView>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="200">
@@ -1689,27 +1689,28 @@
                         <constraint firstItem="196" firstAttribute="leading" secondItem="228" secondAttribute="trailing" constant="5" id="3dL-jk-Que"/>
                         <constraint firstItem="156" firstAttribute="centerY" secondItem="155" secondAttribute="centerY" id="4Cl-qN-h67"/>
                         <constraint firstItem="525" firstAttribute="centerY" secondItem="1907" secondAttribute="centerY" id="4K1-57-qF5"/>
+                        <constraint firstItem="199" firstAttribute="centerY" secondItem="196" secondAttribute="centerY" id="7mo-Zq-APO"/>
                         <constraint firstItem="228" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="a4A-eF-t64" secondAttribute="leading" constant="20" symbolic="YES" id="9Qf-rP-qht"/>
                         <constraint firstItem="157" firstAttribute="centerY" secondItem="163" secondAttribute="centerY" id="9bj-16-n7Q"/>
                         <constraint firstItem="199" firstAttribute="leading" secondItem="157" secondAttribute="leading" id="ApQ-SG-V6h"/>
                         <constraint firstItem="190" firstAttribute="trailing" secondItem="154" secondAttribute="trailing" id="BuK-UU-l9k"/>
-                        <constraint firstItem="199" firstAttribute="centerY" secondItem="228" secondAttribute="centerY" id="BvC-w3-IgD"/>
                         <constraint firstItem="199" firstAttribute="top" secondItem="155" secondAttribute="bottom" constant="30" id="CDw-Gi-bcH"/>
+                        <constraint firstItem="196" firstAttribute="centerY" secondItem="228" secondAttribute="centerY" constant="-1" id="EE7-2m-MFx"/>
                         <constraint firstItem="1907" firstAttribute="leading" secondItem="307" secondAttribute="leading" constant="25" id="Ebi-eC-iqD"/>
                         <constraint firstItem="525" firstAttribute="leading" secondItem="1907" secondAttribute="trailing" constant="12" id="F9u-uv-VMH"/>
                         <constraint firstItem="200" firstAttribute="leading" secondItem="157" secondAttribute="leading" constant="20" id="FPH-Ol-fvQ"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="526" secondAttribute="trailing" constant="20" symbolic="YES" id="Hjj-27-atc"/>
+                        <constraint firstItem="190" firstAttribute="centerY" secondItem="196" secondAttribute="centerY" id="HuN-sa-dlq"/>
                         <constraint firstItem="196" firstAttribute="trailing" secondItem="163" secondAttribute="trailing" id="IZW-uU-JA8"/>
+                        <constraint firstItem="310" firstAttribute="centerY" secondItem="525" secondAttribute="centerY" constant="-1" id="IrK-9T-8Qv"/>
                         <constraint firstItem="194" firstAttribute="leading" secondItem="158" secondAttribute="leading" id="Kgl-nk-wJU"/>
                         <constraint firstItem="159" firstAttribute="centerY" secondItem="155" secondAttribute="centerY" id="MT6-OP-3rB"/>
                         <constraint firstItem="155" firstAttribute="leading" secondItem="157" secondAttribute="leading" id="MsS-pR-ew0"/>
                         <constraint firstItem="526" firstAttribute="centerY" secondItem="1907" secondAttribute="centerY" id="NRB-55-2Fv"/>
                         <constraint firstItem="158" firstAttribute="centerY" secondItem="163" secondAttribute="centerY" id="OT4-00-QLS"/>
-                        <constraint firstItem="194" firstAttribute="centerY" secondItem="228" secondAttribute="centerY" id="Oae-b7-jwA"/>
                         <constraint firstItem="525" firstAttribute="top" secondItem="307" secondAttribute="bottom" constant="6" id="Q3w-qf-DCQ"/>
                         <constraint firstItem="526" firstAttribute="leading" secondItem="310" secondAttribute="trailing" constant="7" id="Q7s-gP-m13"/>
                         <constraint firstItem="156" firstAttribute="trailing" secondItem="154" secondAttribute="trailing" id="SL0-N4-Mm8"/>
-                        <constraint firstItem="310" firstAttribute="centerY" secondItem="1907" secondAttribute="centerY" id="TDP-L6-vVt"/>
                         <constraint firstItem="154" firstAttribute="centerY" secondItem="163" secondAttribute="centerY" id="TFq-HO-rco"/>
                         <constraint firstItem="195" firstAttribute="leading" secondItem="158" secondAttribute="leading" id="UaN-DU-47X"/>
                         <constraint firstItem="310" firstAttribute="leading" secondItem="525" secondAttribute="trailing" constant="7" id="VTe-SV-9KO"/>
@@ -1722,10 +1723,9 @@
                         <constraint firstItem="154" firstAttribute="leading" secondItem="157" secondAttribute="trailing" constant="12" id="fcW-dU-FG0"/>
                         <constraint firstItem="198" firstAttribute="leading" secondItem="157" secondAttribute="leading" id="gFh-76-GuJ"/>
                         <constraint firstItem="200" firstAttribute="top" secondItem="198" secondAttribute="bottom" constant="8" symbolic="YES" id="jJC-Zt-QBL"/>
+                        <constraint firstItem="194" firstAttribute="centerY" secondItem="196" secondAttribute="centerY" id="nRs-hv-2KX"/>
                         <constraint firstItem="196" firstAttribute="leading" secondItem="228" secondAttribute="trailing" constant="5" id="nrz-Af-dC1"/>
-                        <constraint firstItem="190" firstAttribute="centerY" secondItem="228" secondAttribute="centerY" id="qUL-iU-OM7"/>
                         <constraint firstItem="307" firstAttribute="leading" secondItem="157" secondAttribute="leading" id="r0L-jB-5eB"/>
-                        <constraint firstItem="196" firstAttribute="centerY" secondItem="228" secondAttribute="centerY" id="rnv-gX-2v8"/>
                         <constraint firstItem="307" firstAttribute="top" secondItem="200" secondAttribute="bottom" constant="7" id="stc-KL-OlN"/>
                         <constraint firstItem="163" firstAttribute="leading" secondItem="a4A-eF-t64" secondAttribute="leading" constant="20" symbolic="YES" id="v2a-yk-NUx"/>
                         <constraint firstItem="163" firstAttribute="top" secondItem="a4A-eF-t64" secondAttribute="top" constant="3" id="vAT-pn-hBy"/>
@@ -2084,11 +2084,11 @@
             <point key="canvasLocation" x="114" y="1005.5"/>
         </customView>
         <customView id="66" userLabel="Network">
-            <rect key="frame" x="0.0" y="0.0" width="623" height="219"/>
+            <rect key="frame" x="0.0" y="0.0" width="637" height="219"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="CZ6-Q4-MLF">
-                    <rect key="frame" x="52" y="40" width="519" height="159"/>
+                    <rect key="frame" x="40" y="40" width="557" height="159"/>
                     <subviews>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1891">
                             <rect key="frame" x="336" y="69" width="101" height="32"/>
@@ -2116,9 +2116,9 @@
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="357">
-                            <rect key="frame" x="224" y="104" width="77" height="16"/>
-                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Port is open" id="1250">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="357">
+                            <rect key="frame" x="228" y="104" width="77" height="16"/>
+                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Port is open" usesSingleLineMode="YES" id="1250">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2176,7 +2176,7 @@
                             </connections>
                         </button>
                         <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="353">
-                            <rect key="frame" x="210" y="104" width="16" height="16"/>
+                            <rect key="frame" x="209" y="104" width="16" height="16"/>
                         </progressIndicator>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="664">
                             <rect key="frame" x="152" y="-1" width="347" height="18"/>
@@ -2208,14 +2208,15 @@
                             </connections>
                         </button>
                         <imageView translatesAutoresizingMaskIntoConstraints="NO" id="354">
-                            <rect key="frame" x="210" y="104" width="16" height="16"/>
+                            <rect key="frame" x="209" y="104" width="16" height="16"/>
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="NSStatusPartiallyAvailable" id="1249"/>
                         </imageView>
                     </subviews>
                     <constraints>
                         <constraint firstItem="2077" firstAttribute="centerY" secondItem="660" secondAttribute="centerY" id="0uP-eH-lKm"/>
+                        <constraint firstAttribute="width" priority="750" constant="557" id="2Ug-Ph-wa4"/>
                         <constraint firstItem="665" firstAttribute="width" secondItem="660" secondAttribute="width" id="9Hd-Tm-4K7"/>
-                        <constraint firstItem="353" firstAttribute="leading" secondItem="68" secondAttribute="trailing" constant="6" id="DFR-wP-UH7"/>
+                        <constraint firstItem="353" firstAttribute="leading" secondItem="68" secondAttribute="trailing" constant="5" id="DFR-wP-UH7"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="336" secondAttribute="trailing" constant="20" symbolic="YES" id="EqH-JF-Pvs"/>
                         <constraint firstItem="1889" firstAttribute="leading" secondItem="2077" secondAttribute="leading" id="Ero-dE-5SY"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="357" secondAttribute="trailing" constant="20" symbolic="YES" id="FtE-7d-frf"/>
@@ -2226,7 +2227,6 @@
                         <constraint firstItem="664" firstAttribute="top" secondItem="336" secondAttribute="bottom" constant="20" id="Laz-l8-h0f"/>
                         <constraint firstItem="332" firstAttribute="leading" secondItem="2077" secondAttribute="leading" id="NCj-3Q-kBP"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2077" secondAttribute="trailing" constant="20" symbolic="YES" id="NyE-Le-bf4"/>
-                        <constraint firstAttribute="width" priority="750" constant="519" id="ShE-6W-wrW"/>
                         <constraint firstItem="664" firstAttribute="centerY" secondItem="665" secondAttribute="centerY" id="T9K-Sv-zrD"/>
                         <constraint firstItem="660" firstAttribute="leading" secondItem="CZ6-Q4-MLF" secondAttribute="leading" constant="20" symbolic="YES" id="VwP-UJ-daQ"/>
                         <constraint firstItem="336" firstAttribute="leading" secondItem="332" secondAttribute="leading" constant="20" id="XqX-B0-RKz"/>
@@ -2238,7 +2238,7 @@
                         <constraint firstItem="2081" firstAttribute="width" secondItem="660" secondAttribute="width" id="eQ1-4m-W6P"/>
                         <constraint firstItem="336" firstAttribute="top" secondItem="332" secondAttribute="bottom" constant="6" id="euL-bi-l75"/>
                         <constraint firstItem="68" firstAttribute="centerY" secondItem="2081" secondAttribute="centerY" id="gSA-O3-MkQ"/>
-                        <constraint firstItem="357" firstAttribute="leading" secondItem="353" secondAttribute="trailing" id="jNu-gu-4Qf"/>
+                        <constraint firstItem="357" firstAttribute="leading" secondItem="353" secondAttribute="trailing" constant="5" id="jNu-gu-4Qf"/>
                         <constraint firstItem="332" firstAttribute="top" secondItem="1889" secondAttribute="bottom" constant="6" symbolic="YES" id="kCe-Oo-rh0"/>
                         <constraint firstItem="665" firstAttribute="trailing" secondItem="660" secondAttribute="trailing" id="lTB-eG-SOJ"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="332" secondAttribute="trailing" constant="20" symbolic="YES" id="mLX-VC-1Vt"/>
@@ -2252,7 +2252,7 @@
                     </constraints>
                 </customView>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="326">
-                    <rect key="frame" x="580" y="16" width="25" height="25"/>
+                    <rect key="frame" x="594" y="16" width="25" height="25"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="20" id="Y4R-X8-sWg"/>
                         <constraint firstAttribute="height" constant="20" id="rii-Oi-qgd"/>
@@ -2269,6 +2269,7 @@
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="326" secondAttribute="trailing" constant="20" symbolic="YES" id="22D-ju-mP4"/>
                 <constraint firstItem="326" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="CZ6-Q4-MLF" secondAttribute="trailing" id="4kI-MG-l95"/>
+                <constraint firstItem="CZ6-Q4-MLF" firstAttribute="centerX" secondItem="66" secondAttribute="centerX" id="83S-8u-ZlF"/>
                 <constraint firstItem="326" firstAttribute="top" secondItem="CZ6-Q4-MLF" secondAttribute="bottom" id="DrO-z2-ao4"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="CZ6-Q4-MLF" secondAttribute="trailing" constant="20" symbolic="YES" id="Jf6-BA-1xD"/>
                 <constraint firstItem="CZ6-Q4-MLF" firstAttribute="top" secondItem="66" secondAttribute="top" constant="20" symbolic="YES" id="QZb-qV-oZr"/>

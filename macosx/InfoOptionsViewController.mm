@@ -89,17 +89,6 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateOptionsNotification:)
                                                name:@"UpdateOptionsNotification"
                                              object:nil];
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateWindowLayout];
-    });
-}
-
-- (void)viewWillAppear
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateWindowLayout];
-    });
 }
 
 - (void)dealloc

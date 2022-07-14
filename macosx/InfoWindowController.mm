@@ -369,11 +369,21 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
     if (self.fViewController == self.fActivityViewController)
     {
-        [self.fActivityViewController updateWindowLayout];
+        self.fActivityViewController.view.hidden = YES;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.fActivityViewController updateWindowLayout];
+            self.fActivityViewController.view.hidden = NO;
+        });
     }
     else if (self.fViewController == self.fOptionsViewController)
     {
-        [self.fOptionsViewController updateWindowLayout];
+        self.fOptionsViewController.view.hidden = YES;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.fOptionsViewController updateWindowLayout];
+            self.fOptionsViewController.view.hidden = NO;
+        });
     }
     else
     {

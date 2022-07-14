@@ -158,17 +158,6 @@
 #warning after 2.8 just hook this up in the xib
     self.fPiecesView.action = @selector(updatePiecesView:);
     self.fPiecesView.target = self;
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateWindowLayout];
-    });
-}
-
-- (void)viewWillAppear
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateWindowLayout];
-    });
 }
 
 - (void)dealloc
