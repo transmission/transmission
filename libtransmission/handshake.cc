@@ -109,7 +109,7 @@ struct tr_handshake
 {
     tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in)
         : mediator{ std::move(mediator_in) }
-        , dh{ mediator_in->privateKey() }
+        , dh{ mediator->privateKey() }
     {
     }
 
@@ -293,19 +293,22 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
 ****
 ***/
 
-// 1 A->B: our public key (Ya) and some padding (PadA)
-static void sendYa(tr_handshake* handshake)
+template<size_t PadMax>
+static void sendPublicKeyAndPad(tr_handshake* handshake)
 {
     auto const public_key = handshake->dh.publicKey();
-    auto const pad_a = handshake->mediator->pad(PadA_MAXLEN);
-
-    auto outbuf = std::array<std::byte, sizeof(decltype(public_key)) + PadA_MAXLEN>{};
+    auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
     auto const data = std::data(outbuf);
     auto walk = data;
     walk = std::copy(std::begin(public_key), std::end(public_key), walk);
-    walk = std::copy(std::begin(pad_a), std::end(pad_a), walk);
+    walk += handshake->mediator->pad(walk, PadMax);
     tr_peerIoWriteBytes(handshake->io, data, walk - data, false);
+}
 
+// 1 A->B: our public key (Ya) and some padding (PadA)
+static void sendYa(tr_handshake* handshake)
+{
+    sendPublicKeyAndPad<PadA_MAXLEN>(handshake);
     setReadState(handshake, AWAITING_YB);
 }
 
@@ -730,14 +733,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
     // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
-    auto const public_key = handshake->dh.publicKey();
-    auto const pad_b = handshake->mediator->pad(PadB_MAXLEN);
-    auto outbuf = std::array<std::byte, std::size(public_key) + PadB_MAXLEN>{};
-    auto const data = std::data(outbuf);
-    auto walk = data;
-    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
-    walk = std::copy(std::begin(pad_b), std::end(pad_b), walk);
-    tr_peerIoWriteBytes(handshake->io, data, walk - data, false);
+    sendPublicKeyAndPad<PadB_MAXLEN>(handshake);
 
     setReadState(handshake, AWAITING_PAD_A);
     return READ_NOW;

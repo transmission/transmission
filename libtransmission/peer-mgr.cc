@@ -127,13 +127,11 @@ public:
         return session_.event_base;
     }
 
-    [[nodiscard]] std::vector<std::byte> pad(size_t maxlen) const override
+    [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override
     {
         auto const len = tr_rand_int(maxlen);
-        auto ret = std::vector<std::byte>{};
-        ret.resize(len);
-        tr_rand_buffer(std::data(ret), len);
-        return ret;
+        tr_rand_buffer(setme, len);
+        return len;
     }
 
 private:
