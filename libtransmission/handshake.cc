@@ -384,7 +384,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     tr_logAddTraceHand(handshake, isEncrypted ? "got an encrypted handshake" : "got a plain handshake");
 
-    tr_peerIoSetEncryption(handshake->io, isEncrypted ? PEER_ENCRYPTION_RC4 : PEER_ENCRYPTION_NONE);
+    handshake->io->setEncryption(isEncrypted ? PEER_ENCRYPTION_RC4 : PEER_ENCRYPTION_NONE);
 
     if (!isEncrypted)
     {
@@ -447,7 +447,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
         tr_peerIoWriteBuf(handshake->io, outbuf, false);
         handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
-        tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_RC4);
+        handshake->io->setEncryption(PEER_ENCRYPTION_RC4);
 
         evbuffer_add(outbuf, vc, VC_LENGTH);
         evbuffer_add_uint32(outbuf, getCryptoProvide(handshake));
@@ -563,7 +563,7 @@ static ReadState readPadD(tr_handshake* handshake, struct evbuffer* inbuf)
 
     tr_peerIoDrain(handshake->io, inbuf, needlen);
 
-    tr_peerIoSetEncryption(handshake->io, static_cast<tr_encryption_type>(handshake->crypto_select));
+    handshake->io->setEncryption(static_cast<tr_encryption_type>(handshake->crypto_select));
 
     setState(handshake, AWAITING_HANDSHAKE);
     return READ_NOW;
@@ -590,7 +590,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (pstrlen == 19) /* unencrypted */
     {
-        tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_NONE);
+        handshake->io->setEncryption(PEER_ENCRYPTION_NONE);
 
         if (handshake->encryptionMode == TR_ENCRYPTION_REQUIRED)
         {
@@ -600,7 +600,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     }
     else /* encrypted or corrupt */
     {
-        tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_RC4);
+        handshake->io->setEncryption(PEER_ENCRYPTION_RC4);
 
         if (handshake->isIncoming())
         {
@@ -928,7 +928,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     if (crypto_select == CRYPTO_PROVIDE_PLAINTEXT)
     {
         tr_peerIoWriteBuf(handshake->io, outbuf, false);
-        tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_NONE);
+        handshake->io->setEncryption(PEER_ENCRYPTION_NONE);
     }
 
     tr_logAddTraceHand(handshake, "sending handshake");
@@ -1192,7 +1192,7 @@ tr_handshake* tr_handshakeNew(
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
-    tr_peerIoSetEncryption(io, PEER_ENCRYPTION_NONE);
+    handshake->io->setEncryption(PEER_ENCRYPTION_NONE);
 
     if (handshake->isIncoming())
     {

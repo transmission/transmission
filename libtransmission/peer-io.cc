@@ -892,18 +892,6 @@ size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now)
 ***
 **/
 
-void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(encryption_type == PEER_ENCRYPTION_NONE || encryption_type == PEER_ENCRYPTION_RC4);
-
-    io->encryption_type = encryption_type;
-}
-
-/**
-***
-**/
-
 static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset, size_t size)
 {
     struct evbuffer_ptr pos;
@@ -931,7 +919,7 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
 {
     size_t const byteCount = evbuffer_get_length(buf);
 
-    if (io->encryption_type == PEER_ENCRYPTION_RC4)
+    if (io->isEncrypted())
     {
         processBuffer(*io, buf, 0, byteCount);
     }
@@ -949,7 +937,7 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     memcpy(iovec.iov_base, bytes, iovec.iov_len);
 
-    if (io->encryption_type == PEER_ENCRYPTION_RC4)
+    if (io->isEncrypted())
     {
         io->encrypt(iovec.iov_len, iovec.iov_base);
     }
@@ -995,19 +983,11 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(evbuffer_get_length(inbuf) >= byteCount);
 
-    switch (io->encryption_type)
+    evbuffer_remove(inbuf, bytes, byteCount);
+
+    if (io->isEncrypted())
     {
-    case PEER_ENCRYPTION_NONE:
-        evbuffer_remove(inbuf, bytes, byteCount);
-        break;
-
-    case PEER_ENCRYPTION_RC4:
-        evbuffer_remove(inbuf, bytes, byteCount);
         io->decrypt(byteCount, bytes);
-        break;
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled encryption type {:d}"), io->encryption_type));
     }
 }
 

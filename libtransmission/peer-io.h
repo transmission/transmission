@@ -221,9 +221,6 @@ public:
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
 
-    // TODO(ckerr): remove this; filter_ is enough mmm
-    tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
-
     // TODO: use std::shared_ptr instead of manual refcounting?
     int refCount = 1;
 
@@ -258,7 +255,14 @@ public:
 
     [[nodiscard]] constexpr bool isEncrypted() const noexcept
     {
-        return encryption_type == PEER_ENCRYPTION_RC4;
+        return encryption_type_ == PEER_ENCRYPTION_RC4;
+    }
+
+    void setEncryption(tr_encryption_type type)
+    {
+        TR_ASSERT(type == PEER_ENCRYPTION_NONE || type == PEER_ENCRYPTION_RC4);
+
+        encryption_type_ = type;
     }
 
 private:
@@ -280,6 +284,9 @@ private:
 
     tr_address const addr_;
     tr_port const port_;
+
+    // TODO(ckerr): remove this?
+    tr_encryption_type encryption_type_ = PEER_ENCRYPTION_NONE;
 
     bool const is_seed_;
     bool const is_incoming_;
@@ -361,8 +368,6 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 /**
 ***
 **/
-
-void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type);
 
 void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte);
 void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
