@@ -5,12 +5,12 @@
 
 #include <array>
 #include <cstring>
+#include <iostream>
 #include <numeric>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
-
-#include <iostream>
 
 #include "transmission.h"
 
@@ -33,6 +33,19 @@ auto constexpr SomeHash = tr_sha1_digest_t{
     std::byte{ 14 }, std::byte{ 15 }, std::byte{ 16 }, std::byte{ 17 }, std::byte{ 18 }, std::byte{ 19 },
 };
 
+template<size_t N>
+std::string toString(std::array<std::byte, N> const& array)
+{
+    auto ostr = std::ostringstream{};
+    ostr << '[';
+    for (auto const b : array)
+    {
+        ostr << static_cast<unsigned>(b) << ' ';
+    }
+    ostr << ']';
+    return ostr.str();
+}
+
 } // namespace
 
 TEST(Crypto, sharedKey)
@@ -43,12 +56,14 @@ TEST(Crypto, sharedKey)
     a.setPeerPublicKey(b.publicKey());
     b.setPeerPublicKey(a.publicKey());
     EXPECT_EQ(a.secret(), b.secret());
+    EXPECT_EQ(toString(a.secret()), toString(b.secret()));
     EXPECT_EQ(96, std::size(a.secret()));
     EXPECT_EQ(20, std::size(a.privateKey()));
 
     auto c = tr_message_stream_encryption{};
     c.setPeerPublicKey(b.publicKey());
     EXPECT_NE(a.secret(), c.secret());
+    EXPECT_NE(toString(a.secret()), toString(c.secret()));
 }
 
 TEST(Crypto, encryptDecrypt)
