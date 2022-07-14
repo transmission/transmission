@@ -1,0 +1,25 @@
+Name: ubuntu-20.04.3-desktop-amd64.iso
+File: assets/hybrid-single-ubuntu-20.04.3-desktop-amd64.iso.torrent
+
+GENERAL
+
+  Name: ubuntu-20.04.3-desktop-amd64.iso
+  Hash v1: c4b7a178451f4f1a5154ffe1e780b168d6482e98
+  Hash v2: e07f234e9d32eda230d13b7d28bfc07ddd324aa2653c51ed966e9dbadaaa8fa9
+  Created by: Unknown
+  Created on: Unknown
+
+  Piece Count: 11719
+  Piece Size: 256.0 KiB
+  Total Size: 3.07 GB
+  Privacy: Public torrent
+
+TRACKERS
+
+  Tier #1
+  http://example.com/announce
+
+FILES
+
+  ubuntu-20.04.3-desktop-amd64.iso (3.07 GB)
+
