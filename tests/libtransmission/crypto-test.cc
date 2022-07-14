@@ -48,10 +48,10 @@ std::string toString(std::array<std::byte, N> const& array)
 
 } // namespace
 
-TEST(Crypto, sharedKey)
+TEST(Crypto, DH)
 {
-    auto a = tr_message_stream_encryption{};
-    auto b = tr_message_stream_encryption{};
+    auto a = tr_message_stream_encryption::DH{};
+    auto b = tr_message_stream_encryption::DH{};
 
     a.setPeerPublicKey(b.publicKey());
     b.setPeerPublicKey(a.publicKey());
@@ -60,7 +60,7 @@ TEST(Crypto, sharedKey)
     EXPECT_EQ(96, std::size(a.secret()));
     EXPECT_EQ(20, std::size(a.privateKey()));
 
-    auto c = tr_message_stream_encryption{};
+    auto c = tr_message_stream_encryption::DH{};
     c.setPeerPublicKey(b.publicKey());
     EXPECT_NE(a.secret(), c.secret());
     EXPECT_NE(toString(a.secret()), toString(c.secret()));
@@ -68,19 +68,21 @@ TEST(Crypto, sharedKey)
 
 TEST(Crypto, encryptDecrypt)
 {
-    auto a = tr_message_stream_encryption{};
-    auto b = tr_message_stream_encryption_{};
+    auto a_dh = tr_message_stream_encryption::DH{};
+    auto b_dh = tr_message_stream_encryption::DH{};
 
-    a.setPeerPublicKey(b.publicKey());
-    b.setPeerPublicKey(a.publicKey());
+    a_dh.setPeerPublicKey(b_dh.publicKey());
+    b_dh.setPeerPublicKey(a_dh.publicKey());
 
     auto constexpr Input1 = "test1"sv;
     auto encrypted1 = std::array<char, 128>{};
     auto decrypted1 = std::array<char, 128>{};
 
-    a.encryptInit(false, SomeHash);
+    auto a = tr_message_stream_encryption{};
+    a.encryptInit(false, a_dh, SomeHash);
     a.encrypt(std::size(Input1), std::data(Input1), std::data(encrypted1));
-    b.decryptInit(true, SomeHash);
+    auto b = tr_message_stream_encryption_{};
+    b.decryptInit(true, b_dh, SomeHash);
     b.decrypt(std::size(Input1), std::data(encrypted1), std::data(decrypted1));
     EXPECT_EQ(Input1, std::data(decrypted1)) << "Input1 " << Input1 << " decrypted1 " << std::data(decrypted1);
 
@@ -88,9 +90,9 @@ TEST(Crypto, encryptDecrypt)
     auto encrypted2 = std::array<char, 128>{};
     auto decrypted2 = std::array<char, 128>{};
 
-    b.encryptInit(true, SomeHash);
+    b.encryptInit(true, b_dh, SomeHash);
     b.encrypt(std::size(Input2), std::data(Input2), std::data(encrypted2));
-    a.decryptInit(false, SomeHash);
+    a.decryptInit(false, a_dh, SomeHash);
     a.decrypt(std::size(Input2), std::data(encrypted2), std::data(decrypted2));
     EXPECT_EQ(Input2, std::data(decrypted2)) << "Input2 " << Input2 << " decrypted2 " << std::data(decrypted2);
 }

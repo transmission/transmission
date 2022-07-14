@@ -28,10 +28,10 @@ static bool is_big_endian()
 namespace wi
 {
 using key_t = math::wide_integer::uintwide_t<
-    tr_message_stream_encryption::KeySize * std::numeric_limits<unsigned char>::digits>;
+    tr_message_stream_encryption::DH::KeySize * std::numeric_limits<unsigned char>::digits>;
 
 using private_key_t = math::wide_integer::uintwide_t<
-    tr_message_stream_encryption::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
+    tr_message_stream_encryption::DH::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
 
 template<typename UIntWide>
 auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
@@ -111,7 +111,7 @@ void crypt_arc4(struct arc4_context* key, size_t buf_len, void const* buf_in, vo
 
 ///
 
-void tr_message_stream_encryption::setPeerPublicKey(key_bigend_t const& peer_public_key)
+void tr_message_stream_encryption::DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 {
     ensureKeyExists();
 
@@ -122,7 +122,7 @@ void tr_message_stream_encryption::setPeerPublicKey(key_bigend_t const& peer_pub
     secret_ = wi::export_bits(secret);
 }
 
-void tr_message_stream_encryption::ensureKeyExists()
+void tr_message_stream_encryption::DH::ensureKeyExists()
 {
     if (private_key_ == private_key_bigend_t{})
     {
@@ -136,12 +136,12 @@ void tr_message_stream_encryption::ensureKeyExists()
         public_key_ = wi::export_bits(public_key);
     }
 }
-void tr_message_stream_encryption::decryptInit(bool is_incoming, tr_sha1_digest_t const& info_hash)
+void tr_message_stream_encryption::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
 
     dec_key_ = std::make_shared<struct arc4_context>();
-    auto const buf = tr_sha1(key, secret(), info_hash);
+    auto const buf = tr_sha1(key, dh.secret(), info_hash);
     arc4_init(dec_key_.get(), std::data(*buf), std::size(*buf));
     arc4_discard(dec_key_.get(), 1024);
 }
@@ -151,12 +151,12 @@ void tr_message_stream_encryption::decrypt(size_t buf_len, void const* buf_in, v
     crypt_arc4(dec_key_.get(), buf_len, buf_in, buf_out);
 }
 
-void tr_message_stream_encryption::encryptInit(bool is_incoming, tr_sha1_digest_t const& info_hash)
+void tr_message_stream_encryption::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
 
     enc_key_ = std::make_shared<struct arc4_context>();
-    auto const buf = tr_sha1(key, secret(), info_hash);
+    auto const buf = tr_sha1(key, dh.secret(), info_hash);
     arc4_init(enc_key_.get(), std::data(*buf), std::size(*buf));
     arc4_discard(enc_key_.get(), 1024);
 }
