@@ -55,8 +55,8 @@ TEST(Crypto, sharedKey)
 
     a.setPeerPublicKey(b.publicKey());
     b.setPeerPublicKey(a.publicKey());
-    EXPECT_EQ(a.secret(), b.secret());
     EXPECT_EQ(toString(a.secret()), toString(b.secret()));
+    EXPECT_EQ(a.secret(), b.secret());
     EXPECT_EQ(96, std::size(a.secret()));
     EXPECT_EQ(20, std::size(a.privateKey()));
 
@@ -82,7 +82,7 @@ TEST(Crypto, encryptDecrypt)
     a.encrypt(std::size(Input1), std::data(Input1), std::data(encrypted1));
     b.decryptInit(SomeHash);
     b.decrypt(std::size(Input1), std::data(encrypted1), std::data(decrypted1));
-    EXPECT_EQ(Input1, std::data(decrypted1));
+    EXPECT_EQ(Input1, std::data(decrypted1)) << "Input1 " << Input1 << " decrypted1 " << std::data(decrypted1);
 
     auto constexpr Input2 = "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)"sv;
     auto encrypted2 = std::array<char, 128>{};
@@ -92,7 +92,7 @@ TEST(Crypto, encryptDecrypt)
     b.encrypt(std::size(Input2), std::data(Input2), std::data(encrypted2));
     a.decryptInit(SomeHash);
     a.decrypt(std::size(Input2), std::data(encrypted2), std::data(decrypted2));
-    EXPECT_EQ(Input2, std::data(decrypted2));
+    EXPECT_EQ(Input2, std::data(decrypted2)) << "Input2 " << Input2 << " decrypted2 " << std::data(decrypted2);
 }
 
 TEST(Crypto, sha1)
