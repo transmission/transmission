@@ -14,7 +14,6 @@
 #define tr_ssl_ctx_t tr_ssl_ctx_t_
 #define tr_x509_store_t tr_x509_store_t_
 #define tr_x509_cert_t tr_x509_cert_t_
-#define tr_message_stream_encryption tr_message_stream_encryption_
 #define tr_sha1 tr_sha1_
 #define tr_sha1_init tr_sha1_init_
 #define tr_sha1_update tr_sha1_update_
@@ -56,7 +55,6 @@
 #undef tr_ssl_ctx_t
 #undef tr_x509_store_t
 #undef tr_x509_cert_t
-#undef tr_message_stream_encryption
 #undef tr_sha1
 #undef tr_sha1_init
 #undef tr_sha1_update
@@ -91,7 +89,6 @@
 #define tr_ssl_ctx_t_ tr_ssl_ctx_t
 #define tr_x509_store_t_ tr_x509_store_t
 #define tr_x509_cert_t_ tr_x509_cert_t
-#define tr_message_stream_encryption_ tr_message_stream_encryption
 #define tr_sha1_ tr_sha1
 #define tr_sha1_init_ tr_sha1_init
 #define tr_sha1_update_ tr_sha1_update
