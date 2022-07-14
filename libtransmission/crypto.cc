@@ -34,10 +34,10 @@ bool is_big_endian()
     return htonl(47) == 47;
 }
 
-template<typename Integral>
-auto import_bits(std::array<std::byte, Integral::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
+template<typename UIntWide>
+auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
 {
-    auto ret = Integral{};
+    auto ret = UIntWide{};
 
     for (auto const walk : bigend_bin)
     {
@@ -48,10 +48,10 @@ auto import_bits(std::array<std::byte, Integral::my_width2 / std::numeric_limits
     return ret;
 }
 
-template<typename Integral>
-auto export_bits(Integral i)
+template<typename UIntWide>
+auto export_bits(UIntWide i)
 {
-    auto ret = std::array<std::byte, Integral::my_width2 / std::numeric_limits<uint8_t>::digits>{};
+    auto ret = std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits>{};
 
     if (is_big_endian())
     {
