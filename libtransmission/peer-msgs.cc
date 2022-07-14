@@ -383,7 +383,7 @@ public:
 
     [[nodiscard]] bool is_encrypted() const override
     {
-        return tr_peerIoIsEncrypted(io);
+        return io->isEncrypted();
     }
 
     [[nodiscard]] bool is_incoming_connection() const override

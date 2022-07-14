@@ -256,6 +256,11 @@ public:
         filter().encrypt(buflen, buf);
     }
 
+    [[nodiscard]] constexpr bool isEncrypted() const noexcept
+    {
+        return encryption_type == PEER_ENCRYPTION_RC4;
+    }
+
 private:
     tr_bandwidth bandwidth_;
 
@@ -358,11 +363,6 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 **/
 
 void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type);
-
-constexpr bool tr_peerIoIsEncrypted(tr_peerIo const* io)
-{
-    return io != nullptr && io->encryption_type == PEER_ENCRYPTION_RC4;
-}
 
 void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte);
 void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
