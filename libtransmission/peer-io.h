@@ -246,7 +246,7 @@ public:
         filter().encrypt(buflen, buf);
     }
 
-    [[nodiscard]] constexpr bool isEncrypted() const noexcept
+    [[nodiscard]] bool isEncrypted() const noexcept
     {
         return filter_.get() != nullptr;
     }
