@@ -17,9 +17,9 @@
 
 #include "tr-macros.h" // tr_sha1_digest_t
 
-/** @brief Holds state information for encrypted peer communications */
-struct tr_crypto
+class tr_crypto
 {
+public:
     static auto constexpr PrivateKeySize = size_t{ 20 };
     using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
 
