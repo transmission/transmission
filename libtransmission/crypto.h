@@ -26,6 +26,10 @@
 namespace tr_message_stream_encryption
 {
 
+/**
+ * Holds state for the Diffie-Hellman key exchange that takes place
+ * during encrypted peer handshakes
+ */
 class DH
 {
 public:
@@ -44,16 +48,17 @@ public:
     using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
     using key_bigend_t = std::array<std::byte, KeySize>;
 
+    // By default, a private key is randomly generated.
+    // Providing a predefined one is useful for reproducible unit tests.
+    DH(private_key_bigend_t const& private_key = randomPrivateKey());
+
     // Returns our own public key to be shared with a peer.
-    // If one doesn't exist, it is created.
-    [[nodiscard]] auto publicKey()
+    [[nodiscard]] constexpr auto publicKey() const noexcept
     {
-        ensureKeyExists();
         return public_key_;
     }
 
-    // Computes the shared secret from our own privateKey()
-    // and the peer's publicKey().
+    // Compute the shared secret from our private key and the peer's public key.
     void setPeerPublicKey(key_bigend_t const& peer_public_key);
 
     // Returns the shared secret.
@@ -63,25 +68,11 @@ public:
         return secret_;
     }
 
-    [[nodiscard]] auto privateKey() noexcept
-    {
-        ensureKeyExists();
-        return private_key_;
-    }
-
-    // Unused in production. Exists to help make tests reproducible.
-    // Note that the public key is derived from the private key, so
-    // tests must call this *before* ensureKeyExists() is called.
-    void setPrivateKey(private_key_bigend_t const& key)
-    {
-        private_key_ = key;
-    }
+    [[nodiscard]] static private_key_bigend_t randomPrivateKey() noexcept;
 
 private:
-    void ensureKeyExists();
-
-    private_key_bigend_t private_key_ = {};
-    key_bigend_t public_key_ = {};
+    private_key_bigend_t const private_key_;
+    key_bigend_t const public_key_;
     key_bigend_t secret_ = {};
 };
 

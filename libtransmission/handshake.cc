@@ -109,6 +109,7 @@ struct tr_handshake
 {
     tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in)
         : mediator{ std::move(mediator_in) }
+        , dh{ mediator_in->privateKey() }
     {
     }
 

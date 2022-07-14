@@ -93,10 +93,30 @@ auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
 namespace tr_message_stream_encryption
 {
 
+/// DH
+
+[[nodiscard]] DH::private_key_bigend_t DH::randomPrivateKey() noexcept
+{
+    auto key = DH::private_key_bigend_t{};
+    tr_rand_buffer(std::data(key), std::size(key));
+    return key;
+}
+
+auto generatePublicKey(DH::private_key_bigend_t const& private_key)
+{
+    auto const private_key_wi = wi::import_bits<wi::private_key_t>(private_key);
+    auto const public_key_wi = math::wide_integer::powm(wi::G, private_key_wi, wi::P);
+    return wi::export_bits(public_key_wi);
+}
+
+DH::DH(private_key_bigend_t const& private_key)
+    : private_key_{ private_key }
+    , public_key_{ generatePublicKey(private_key_) }
+{
+}
+
 void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 {
-    ensureKeyExists();
-
     auto const secret = math::wide_integer::powm(
         wi::import_bits<wi::key_t>(peer_public_key),
         wi::import_bits<wi::private_key_t>(private_key_),
@@ -104,20 +124,8 @@ void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
     secret_ = wi::export_bits(secret);
 }
 
-void DH::ensureKeyExists()
-{
-    if (private_key_ == private_key_bigend_t{})
-    {
-        tr_rand_buffer(std::data(private_key_), std::size(private_key_));
-    }
+/// Filter
 
-    if (public_key_ == key_bigend_t{})
-    {
-        auto const private_key = wi::import_bits<wi::private_key_t>(private_key_);
-        auto const public_key = math::wide_integer::powm(wi::G, private_key, wi::P);
-        public_key_ = wi::export_bits(public_key);
-    }
-}
 void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
