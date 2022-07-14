@@ -30,8 +30,6 @@
 
 - (IBAction)setPeersConnectLimit:(id)sender;
 
-@property(nonatomic) IBOutlet NSStackView* fStackView;
 @property(nonatomic) IBOutlet NSView* fPriorityView;
-@property(nonatomic) IBOutlet NSView* fSeedingView;
 
 @end

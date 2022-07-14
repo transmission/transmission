@@ -27,13 +27,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" typeSelect="NO" autosaveName="InspectorTableWebSeeds" rowHeight="14" headerView="25" id="22" customClass="WebSeedTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="298" height="47"/>
+                                <rect key="frame" x="0.0" y="0.0" width="299" height="47"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="Address" editable="NO" width="245" minWidth="10" maxWidth="10000" id="27">
+                                    <tableColumn identifier="Address" editable="NO" width="246" minWidth="10" maxWidth="10000" id="27">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Web Seeds">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -70,8 +70,8 @@
                     <constraints>
                         <constraint firstAttribute="height" constant="72" id="4th-jd-ByN"/>
                     </constraints>
-                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="24">
-                        <rect key="frame" x="-5" y="12" width="0.0" height="11"/>
+                    <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="24">
+                        <rect key="frame" x="1" y="57" width="298" height="14"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="23">
@@ -79,7 +79,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <tableHeaderView key="headerView" wantsLayer="YES" id="25">
-                        <rect key="frame" x="0.0" y="0.0" width="298" height="23"/>
+                        <rect key="frame" x="0.0" y="0.0" width="299" height="23"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
                 </scrollView>
@@ -96,7 +96,7 @@
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="IP" editable="NO" width="89" minWidth="10" maxWidth="250" id="11">
+                                    <tableColumn identifier="IP" editable="NO" width="111" minWidth="10" maxWidth="250" id="11">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="IP Address">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -109,7 +109,7 @@
                                         <sortDescriptor key="sortDescriptorPrototype" selector="compareNumeric:" sortKey="IP"/>
                                         <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                     </tableColumn>
-                                    <tableColumn identifier="Client" editable="NO" width="42" minWidth="20" maxWidth="10000" id="12">
+                                    <tableColumn identifier="Client" editable="NO" width="20" minWidth="20" maxWidth="10000" id="12">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Client">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>

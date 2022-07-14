@@ -6,7 +6,7 @@
 
 @class Torrent;
 
-@interface InfoWindowController : NSWindowController<NSWindowDelegate>
+@interface InfoWindowController : NSWindowController
 
 @property(nonatomic, readonly) NSArray<NSURL*>* quickLookURLs;
 @property(nonatomic, readonly) BOOL canQuickLook;

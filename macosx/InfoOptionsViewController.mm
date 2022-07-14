@@ -16,6 +16,9 @@
 
 #define INVALID -99
 
+#define STACKVIEW_INSET 12.0
+#define STACKVIEW_SPACING 8.0
+
 @interface InfoOptionsViewController ()
 
 @property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
@@ -53,6 +56,13 @@
 
 @property(nonatomic, copy) NSString* fInitialString;
 
+@property(nonatomic) IBOutlet NSStackView* fOptionsStackView;
+@property(nonatomic) IBOutlet NSView* fSeedingView;
+@property(nonatomic, readonly) CGFloat currentHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutWidth;
+@property(nonatomic, readonly) CGFloat vertLayoutHeight;
+
 - (void)setupInfo;
 - (void)setGlobalLabels;
 - (void)updateOptionsNotification:(NSNotification*)notification;
@@ -80,7 +90,16 @@
                                                name:@"UpdateOptionsNotification"
                                              object:nil];
 
-    [self updateWindowLayout];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateWindowLayout];
+    });
+}
+
+- (void)viewWillAppear
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateWindowLayout];
+    });
 }
 
 - (void)dealloc
@@ -88,42 +107,55 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
+- (CGFloat)currentHeight
+{
+    return NSHeight(self.view.frame);
+}
+
+- (CGFloat)horizLayoutHeight
+{
+    return NSHeight(self.fPriorityView.frame) + 2 * STACKVIEW_INSET;
+}
+
+- (CGFloat)horizLayoutWidth
+{
+    return NSWidth(self.fPriorityView.frame) + NSWidth(self.fSeedingView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_SPACING;
+}
+
+- (CGFloat)vertLayoutHeight
+{
+    return NSHeight(self.fPriorityView.frame) + NSHeight(self.fSeedingView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_SPACING;
+}
+
 - (void)updateWindowLayout
 {
-    CGFloat inset = 12.0, spacing = 8.0, difference = 0;
+    CGFloat difference = 0;
 
-    NSUserInterfaceLayoutOrientation orientation = self.fStackView.orientation;
-
-    if (self.view.frame.size.width >= (NSWidth(self.fPriorityView.frame) + NSWidth(self.fSeedingView.frame) + (2 * inset + spacing + 1)))
+    if (NSWidth(self.view.window.frame) >= self.horizLayoutWidth + 1)
     {
-        self.fStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+        difference = NSHeight(self.view.frame) - self.horizLayoutHeight;
     }
     else
     {
-        self.fStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+        difference = NSHeight(self.view.frame) - self.vertLayoutHeight;
     }
 
-    if (self.fStackView.orientation != orientation)
+    if (difference != 0)
     {
-        if (self.fStackView.orientation == NSUserInterfaceLayoutOrientationHorizontal)
-        {
-            difference -= NSHeight(self.fSeedingView.frame);
-        }
-        else
-        {
-            difference += NSHeight(self.fSeedingView.frame);
-        }
+        NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
+        windowRect.origin.y += difference;
+        windowRect.size.height -= difference;
 
-        [self.view setFrameSize:NSMakeSize(NSWidth(self.view.frame), NSHeight(self.view.frame) + difference)];
-
-        NSRect windowRect = self.view.window.frame;
-        windowRect.origin.y -= difference;
-        windowRect.size.height += difference;
+        viewRect.size.height -= difference;
+        viewRect.size.width = NSWidth(windowRect);
 
         self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
         self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
 
-        [self.view.window setFrame:windowRect display:YES animate:NO];
+        self.view.frame = viewRect;
+        [self.view.window setFrame:windowRect display:YES animate:YES];
     }
 }
 

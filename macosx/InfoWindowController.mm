@@ -155,6 +155,9 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [nc addObserver:self selector:@selector(resetInfoForTorrent:) name:@"ResetInspector" object:nil];
     [nc addObserver:self selector:@selector(updateInfoStats) name:@"UpdateStats" object:nil];
     [nc addObserver:self selector:@selector(updateOptions) name:@"UpdateOptions" object:nil];
+
+    //add a custom window resize notification heer so we can disable it temporarily in settab:
+    [nc addObserver:self selector:@selector(windowWasResized:) name:NSWindowDidResizeNotification object:self.window];
 }
 
 - (void)dealloc
@@ -167,9 +170,16 @@ typedef NS_ENUM(unsigned int, tabTag) {
     }
 }
 
-- (void)windowDidResize:(NSNotification*)notification
+- (void)windowWasResized:(NSNotification*)notification
 {
-    [self.fOptionsViewController updateWindowLayout];
+    if (self.fViewController == self.fOptionsViewController)
+    {
+        [self.fOptionsViewController updateWindowLayout];
+    }
+    else if (self.fViewController == self.fActivityViewController)
+    {
+        [self.fActivityViewController updateWindowLayout];
+    }
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
@@ -207,6 +217,9 @@ typedef NS_ENUM(unsigned int, tabTag) {
     {
         return;
     }
+
+    //remove window resize notification
+    [NSNotificationCenter.defaultCenter removeObserver:self name:NSWindowDidResizeNotification object:self.window];
 
     //take care of old view
     CGFloat oldHeight = 0;
@@ -310,20 +323,21 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fViewController updateInfo];
 
     NSRect windowRect = window.frame, viewRect = view.frame;
+    CGFloat minWindowWidth = MAX(self.fMinWindowWidth, view.fittingSize.width);
+
+    //special case for Activity and Options views
+    if (self.fViewController == self.fActivityViewController)
+    {
+        minWindowWidth = MAX(self.fMinWindowWidth, self.fActivityViewController.fTransferView.frame.size.width);
+    }
+    else if (self.fViewController == self.fOptionsViewController)
+    {
+        minWindowWidth = MAX(self.fMinWindowWidth, self.fOptionsViewController.fPriorityView.frame.size.width);
+    }
 
     CGFloat const difference = NSHeight(viewRect) - oldHeight;
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
-
-    CGFloat minWindowWidth = MAX(self.fMinWindowWidth, view.fittingSize.width);
-
-    //special case for options view
-    if ([identifier isEqualToString:TAB_OPTIONS_IDENT])
-    {
-        CGFloat padding = 2 * 12.0;
-        minWindowWidth = MAX(self.fMinWindowWidth, self.fOptionsViewController.fPriorityView.frame.size.width + padding);
-    }
-
     windowRect.size.width = MAX(NSWidth(windowRect), minWindowWidth);
 
     if ([self.fViewController respondsToSelector:@selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
@@ -353,7 +367,19 @@ typedef NS_ENUM(unsigned int, tabTag) {
     viewRect.size.width = NSWidth(windowRect);
     view.frame = viewRect;
 
-    [window setFrame:windowRect display:YES animate:oldTabTag != INVALID];
+    if (self.fViewController == self.fActivityViewController)
+    {
+        [self.fActivityViewController updateWindowLayout];
+    }
+    else if (self.fViewController == self.fOptionsViewController)
+    {
+        [self.fOptionsViewController updateWindowLayout];
+    }
+    else
+    {
+        [window setFrame:windowRect display:YES animate:oldTabTag != INVALID];
+    }
+
     [window.contentView addSubview:view];
 
     [window.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[view]-0-|" options:0 metrics:nil
@@ -367,6 +393,13 @@ typedef NS_ENUM(unsigned int, tabTag) {
     {
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
     }
+
+    //add window resize notification
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(windowWasResized:)
+                                                   name:NSWindowDidResizeNotification
+                                                 object:self.window];
+    });
 }
 
 - (void)setNextTab
