@@ -18,6 +18,13 @@
 
 using namespace std::literals;
 
+// source: https://stackoverflow.com/a/1001330/6568470
+// nb: when we bump to std=C++20, use `std::endian`
+static bool is_big_endian()
+{
+    return htonl(47) == 47;
+}
+
 namespace wi
 {
 using key_t = math::wide_integer::uintwide_t<
@@ -25,13 +32,6 @@ using key_t = math::wide_integer::uintwide_t<
 
 using private_key_t = math::wide_integer::uintwide_t<
     tr_message_stream_encryption::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
-
-// source: https://stackoverflow.com/a/1001330/6568470
-// nb: when we bump to std=C++20, use `std::endian`
-bool is_big_endian()
-{
-    return htonl(47) == 47;
-}
 
 template<typename UIntWide>
 auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
