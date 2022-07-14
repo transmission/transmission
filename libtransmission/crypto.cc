@@ -90,25 +90,6 @@ auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
 
 } // namespace wi
 
-namespace
-{
-
-void crypt_arc4(struct arc4_context* key, size_t buf_len, void const* buf_in, void* buf_out)
-{
-    if (key != nullptr)
-    {
-        arc4_process(key, buf_in, buf_out, buf_len);
-        return;
-    }
-
-    if (buf_in != buf_out)
-    {
-        memmove(buf_out, buf_in, buf_len);
-    }
-}
-
-} // namespace
-
 namespace tr_message_stream_encryption
 {
 
@@ -147,9 +128,12 @@ void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     arc4_discard(dec_key_.get(), 1024);
 }
 
-void Filter::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void Filter::decrypt(size_t buf_len, void* buf)
 {
-    crypt_arc4(dec_key_.get(), buf_len, buf_in, buf_out);
+    if (dec_key_)
+    {
+        arc4_process(dec_key_.get(), buf, buf, buf_len);
+    }
 }
 
 void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
@@ -162,9 +146,12 @@ void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     arc4_discard(enc_key_.get(), 1024);
 }
 
-void Filter::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void Filter::encrypt(size_t buf_len, void* buf)
 {
-    crypt_arc4(enc_key_.get(), buf_len, buf_in, buf_out);
+    if (enc_key_)
+    {
+        arc4_process(enc_key_.get(), buf, buf, buf_len);
+    }
 }
 
 } // namespace tr_message_stream_encryption

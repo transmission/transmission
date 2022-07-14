@@ -918,7 +918,7 @@ static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset,
             break;
         }
 
-        io.encrypt(iovec.iov_len, iovec.iov_base, iovec.iov_base);
+        io.encrypt(iovec.iov_len, iovec.iov_base);
 
         TR_ASSERT(size >= iovec.iov_len);
         size -= iovec.iov_len;
@@ -947,13 +947,11 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     iovec.iov_len = byteCount;
 
+    memcpy(iovec.iov_base, bytes, iovec.iov_len);
+
     if (io->encryption_type == PEER_ENCRYPTION_RC4)
     {
-        io->encrypt(iovec.iov_len, bytes, iovec.iov_base);
-    }
-    else
-    {
-        memcpy(iovec.iov_base, bytes, iovec.iov_len);
+        io->encrypt(iovec.iov_len, iovec.iov_base);
     }
 
     evbuffer_commit_space(io->outbuf.get(), &iovec, 1);
@@ -1005,7 +1003,7 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
 
     case PEER_ENCRYPTION_RC4:
         evbuffer_remove(inbuf, bytes, byteCount);
-        io->decrypt(byteCount, bytes, bytes);
+        io->decrypt(byteCount, bytes);
         break;
 
     default:

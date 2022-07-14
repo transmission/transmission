@@ -498,7 +498,7 @@ static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
 
         memcpy(tmp, evbuffer_pullup(inbuf, key_len), key_len);
         handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
-        handshake->io->decrypt(key_len, tmp, tmp);
+        handshake->io->decrypt(key_len, tmp);
 
         if (memcmp(tmp, key, key_len) == 0)
         {
@@ -609,7 +609,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return READ_NOW;
         }
 
-        handshake->io->decrypt(1, &pstrlen, &pstrlen);
+        handshake->io->decrypt(1, &pstrlen);
 
         if (pstrlen != 19)
         {

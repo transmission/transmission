@@ -241,9 +241,9 @@ public:
         filter().decryptInit(is_incoming, dh, info_hash);
     }
 
-    void decrypt(size_t buflen, void const* buf_in, void* buf_out)
+    void decrypt(size_t buflen, void* buf)
     {
-        filter().decrypt(buflen, buf_in, buf_out);
+        filter().decrypt(buflen, buf);
     }
 
     void encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
@@ -251,9 +251,9 @@ public:
         filter().encryptInit(is_incoming, dh, info_hash);
     }
 
-    void encrypt(size_t buflen, void const* buf_in, void* buf_out)
+    void encrypt(size_t buflen, void* buf)
     {
-        filter().encrypt(buflen, buf_in, buf_out);
+        filter().encrypt(buflen, buf);
     }
 
 private:

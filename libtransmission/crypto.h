@@ -90,9 +90,9 @@ class Filter
 {
 public:
     void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void decrypt(size_t buflen, void const* buf_in, void* buf_out);
+    void decrypt(size_t buflen, void* buf);
     void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void encrypt(size_t buflen, void const* buf_in, void* buf_out);
+    void encrypt(size_t buflen, void* buf);
 
 private:
     std::shared_ptr<struct arc4_context> dec_key_;
