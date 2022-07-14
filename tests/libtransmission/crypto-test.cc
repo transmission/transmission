@@ -78,10 +78,10 @@ TEST(Crypto, encryptDecrypt)
     auto encrypted1 = std::array<char, 128>{};
     auto decrypted1 = std::array<char, 128>{};
 
-    auto a = tr_message_stream_encryption{};
+    auto a = tr_message_stream_encryption::Filter{};
     a.encryptInit(false, a_dh, SomeHash);
     a.encrypt(std::size(Input1), std::data(Input1), std::data(encrypted1));
-    auto b = tr_message_stream_encryption_{};
+    auto b = tr_message_stream_encryption_::Filter{};
     b.decryptInit(true, b_dh, SomeHash);
     b.decrypt(std::size(Input1), std::data(encrypted1), std::data(decrypted1));
     EXPECT_EQ(Input1, std::data(decrypted1)) << "Input1 " << Input1 << " decrypted1 " << std::data(decrypted1);

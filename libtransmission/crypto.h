@@ -90,20 +90,23 @@ public:
         key_bigend_t secret_ = {};
     };
 
+    /// arc4 encryption for both incoming and outgoing stream
+    class Filter
+    {
+    public:
+        void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+        void decrypt(size_t buflen, void const* buf_in, void* buf_out);
+        void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+        void encrypt(size_t buflen, void const* buf_in, void* buf_out);
+
+    private:
+        std::shared_ptr<struct arc4_context> dec_key_;
+        std::shared_ptr<struct arc4_context> enc_key_;
+    };
+
     // Generate random padding for MSE's PadA and PadB fields.
     // This is a virtual method so tests can override and inject test data.
     [[nodiscard]] virtual std::vector<std::byte> pad(size_t maxlen) const;
-
-    /// arc4 encryption for both incoming and outgoing stream
-
-    void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void decrypt(size_t buflen, void const* buf_in, void* buf_out);
-    void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void encrypt(size_t buflen, void const* buf_in, void* buf_out);
-
-private:
-    std::shared_ptr<struct arc4_context> dec_key_;
-    std::shared_ptr<struct arc4_context> enc_key_;
 };
 
 #endif // TR_ENCRYPTION_H

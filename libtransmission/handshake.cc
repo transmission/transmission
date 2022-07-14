@@ -448,7 +448,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         uint8_t vc[VC_LENGTH] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
         tr_peerIoWriteBuf(handshake->io, outbuf, false);
-        handshake->mse.encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
+        handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
         tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_RC4);
 
         evbuffer_add(outbuf, vc, VC_LENGTH);
@@ -472,7 +472,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* send it */
-    handshake->mse.decryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
+    handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
     setReadState(handshake, AWAITING_VC);
     tr_peerIoWriteBuf(handshake->io, outbuf, false);
 
@@ -499,8 +499,8 @@ static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
         }
 
         memcpy(tmp, evbuffer_pullup(inbuf, key_len), key_len);
-        handshake->mse.decryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
-        handshake->mse.decrypt(key_len, tmp, tmp);
+        handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
+        handshake->io->decrypt(key_len, tmp, tmp);
 
         if (memcmp(tmp, key, key_len) == 0)
         {
@@ -611,7 +611,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return READ_NOW;
         }
 
-        handshake->mse.decrypt(1, &pstrlen, &pstrlen);
+        handshake->io->decrypt(1, &pstrlen, &pstrlen);
 
         if (pstrlen != 19)
         {
@@ -838,7 +838,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
 
-    handshake->mse.decryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
+    handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
 
     tr_peerIoReadBytes(handshake->io, inbuf, vc_in, VC_LENGTH);
 
@@ -890,7 +890,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
     **/
 
-    handshake->mse.encryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
+    handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
     evbuffer* const outbuf = evbuffer_new();
 
     {

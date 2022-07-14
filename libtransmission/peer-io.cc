@@ -904,7 +904,7 @@ void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type)
 ***
 **/
 
-static inline void processBuffer(tr_message_stream_encryption& mse, evbuffer* buffer, size_t offset, size_t size)
+static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset, size_t size)
 {
     struct evbuffer_ptr pos;
     struct evbuffer_iovec iovec;
@@ -918,7 +918,7 @@ static inline void processBuffer(tr_message_stream_encryption& mse, evbuffer* bu
             break;
         }
 
-        mse.encrypt(iovec.iov_len, iovec.iov_base, iovec.iov_base);
+        io.encrypt(iovec.iov_len, iovec.iov_base, iovec.iov_base);
 
         TR_ASSERT(size >= iovec.iov_len);
         size -= iovec.iov_len;
@@ -933,7 +933,7 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
 
     if (io->encryption_type == PEER_ENCRYPTION_RC4)
     {
-        processBuffer(io->mse(), buf, 0, byteCount);
+        processBuffer(*io, buf, 0, byteCount);
     }
 
     evbuffer_add_buffer(io->outbuf.get(), buf);
@@ -949,7 +949,7 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     if (io->encryption_type == PEER_ENCRYPTION_RC4)
     {
-        io->mse().encrypt(iovec.iov_len, bytes, iovec.iov_base);
+        io->encrypt(iovec.iov_len, bytes, iovec.iov_base);
     }
     else
     {
@@ -1005,7 +1005,7 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
 
     case PEER_ENCRYPTION_RC4:
         evbuffer_remove(inbuf, bytes, byteCount);
-        io->mse().decrypt(byteCount, bytes, bytes);
+        io->decrypt(byteCount, bytes, bytes);
         break;
 
     default:

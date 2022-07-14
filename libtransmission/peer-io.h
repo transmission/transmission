@@ -226,7 +226,7 @@ public:
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
 
-    // TODO(ckerr): this could be narrowed to 1 byte
+    // TODO(ckerr): remove this; filter_ is enough mmm
     tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
 
     // TODO: use std::shared_ptr instead of manual refcounting?
@@ -238,8 +238,42 @@ public:
 
     bool utp_supported_ = false;
 
+    using MSE = tr_message_stream_encryption;
+
+    void decryptInit(bool is_incoming, MSE::DH const& dh, tr_sha1_digest_t const& info_hash)
+    {
+        filter().decryptInit(is_incoming, dh, info_hash);
+    }
+
+    void decrypt(size_t buflen, void const* buf_in, void* buf_out)
+    {
+        filter().decrypt(buflen, buf_in, buf_out);
+    }
+
+    void encryptInit(bool is_incoming, MSE::DH const& dh, tr_sha1_digest_t const& info_hash)
+    {
+        filter().encryptInit(is_incoming, dh, info_hash);
+    }
+
+    void encrypt(size_t buflen, void const* buf_in, void* buf_out)
+    {
+        filter().encrypt(buflen, buf_in, buf_out);
+    }
+
 private:
     tr_bandwidth bandwidth_;
+
+    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
+
+    MSE::Filter& filter()
+    {
+        if (!filter_)
+        {
+            filter_ = std::make_unique<MSE::Filter>();
+        }
+
+        return *filter_;
+    }
 
     tr_message_stream_encryption mse_;
 

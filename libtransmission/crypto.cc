@@ -111,7 +111,9 @@ void crypt_arc4(struct arc4_context* key, size_t buf_len, void const* buf_in, vo
 
 ///
 
-void tr_message_stream_encryption::DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
+using MSE = tr_message_stream_encryption;
+
+void MSE::DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 {
     ensureKeyExists();
 
@@ -122,7 +124,7 @@ void tr_message_stream_encryption::DH::setPeerPublicKey(key_bigend_t const& peer
     secret_ = wi::export_bits(secret);
 }
 
-void tr_message_stream_encryption::DH::ensureKeyExists()
+void MSE::DH::ensureKeyExists()
 {
     if (private_key_ == private_key_bigend_t{})
     {
@@ -136,7 +138,7 @@ void tr_message_stream_encryption::DH::ensureKeyExists()
         public_key_ = wi::export_bits(public_key);
     }
 }
-void tr_message_stream_encryption::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void MSE::Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
 
@@ -146,12 +148,12 @@ void tr_message_stream_encryption::decryptInit(bool is_incoming, DH const& dh, t
     arc4_discard(dec_key_.get(), 1024);
 }
 
-void tr_message_stream_encryption::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void MSE::Filter::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
     crypt_arc4(dec_key_.get(), buf_len, buf_in, buf_out);
 }
 
-void tr_message_stream_encryption::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void MSE::Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
 
@@ -161,7 +163,7 @@ void tr_message_stream_encryption::encryptInit(bool is_incoming, DH const& dh, t
     arc4_discard(enc_key_.get(), 1024);
 }
 
-void tr_message_stream_encryption::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void MSE::Filter::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
     crypt_arc4(enc_key_.get(), buf_len, buf_in, buf_out);
 }
