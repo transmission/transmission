@@ -136,9 +136,9 @@ void tr_message_stream_encryption::ensureKeyExists()
         public_key_ = wi::export_bits(public_key);
     }
 }
-void tr_message_stream_encryption::decryptInit(tr_sha1_digest_t const& info_hash)
+void tr_message_stream_encryption::decryptInit(bool is_incoming, tr_sha1_digest_t const& info_hash)
 {
-    auto const key = isIncoming() ? "keyA"sv : "keyB"sv;
+    auto const key = is_incoming ? "keyA"sv : "keyB"sv;
 
     dec_key_ = std::make_shared<struct arc4_context>();
     auto const buf = tr_sha1(key, secret(), info_hash);
@@ -151,9 +151,9 @@ void tr_message_stream_encryption::decrypt(size_t buf_len, void const* buf_in, v
     crypt_arc4(dec_key_.get(), buf_len, buf_in, buf_out);
 }
 
-void tr_message_stream_encryption::encryptInit(tr_sha1_digest_t const& info_hash)
+void tr_message_stream_encryption::encryptInit(bool is_incoming, tr_sha1_digest_t const& info_hash)
 {
-    auto const key = isIncoming() ? "keyB"sv : "keyA"sv;
+    auto const key = is_incoming ? "keyB"sv : "keyA"sv;
 
     enc_key_ = std::make_shared<struct arc4_context>();
     auto const buf = tr_sha1(key, secret(), info_hash);

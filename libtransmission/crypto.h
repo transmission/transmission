@@ -25,20 +25,11 @@
 class tr_message_stream_encryption
 {
 public:
-    tr_message_stream_encryption(bool is_incoming = true)
-        : is_incoming_{ is_incoming }
-    {
-    }
-
+    tr_message_stream_encryption() = default;
     tr_message_stream_encryption(tr_message_stream_encryption&&) = delete;
     tr_message_stream_encryption(tr_message_stream_encryption const&) = delete;
     tr_message_stream_encryption& operator=(tr_message_stream_encryption&&) = delete;
     tr_message_stream_encryption& operator=(tr_message_stream_encryption const&) = delete;
-
-    [[nodiscard]] constexpr auto isIncoming() const noexcept
-    {
-        return is_incoming_;
-    }
 
     /// DH key exchange
 
@@ -98,9 +89,9 @@ public:
 
     /// arc4 encryption for both incoming and outgoing stream
 
-    void decryptInit(tr_sha1_digest_t const& info_hash);
+    void decryptInit(bool is_incoming, tr_sha1_digest_t const& info_hash);
     void decrypt(size_t buflen, void const* buf_in, void* buf_out);
-    void encryptInit(tr_sha1_digest_t const& info_hash);
+    void encryptInit(bool is_incoming, tr_sha1_digest_t const& info_hash);
     void encrypt(size_t buflen, void const* buf_in, void* buf_out);
 
 private:
@@ -108,7 +99,6 @@ private:
 
     std::shared_ptr<struct arc4_context> dec_key_;
     std::shared_ptr<struct arc4_context> enc_key_;
-    bool const is_incoming_;
 
     private_key_bigend_t private_key_ = {};
     key_bigend_t public_key_ = {};

@@ -88,10 +88,10 @@ public:
         : session{ session_in }
         , time_created{ current_time }
         , bandwidth_{ parent_bandwidth }
-        , mse_{ is_incoming }
         , addr_{ addr }
         , port_{ port }
         , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
     {
         if (torrent_hash != nullptr)
         {
@@ -183,7 +183,7 @@ public:
 
     [[nodiscard]] constexpr auto isIncoming() noexcept
     {
-        return mse_.isIncoming();
+        return is_incoming_;
     }
 
     void setTorrentHash(tr_sha1_digest_t hash) noexcept
@@ -249,6 +249,7 @@ private:
     tr_port const port_;
 
     bool const is_seed_;
+    bool const is_incoming_;
 
     bool dht_supported_ = false;
     bool extended_protocol_supported_ = false;

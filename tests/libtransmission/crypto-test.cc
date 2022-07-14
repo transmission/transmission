@@ -68,8 +68,8 @@ TEST(Crypto, sharedKey)
 
 TEST(Crypto, encryptDecrypt)
 {
-    auto a = tr_message_stream_encryption{ false };
-    auto b = tr_message_stream_encryption_{ true };
+    auto a = tr_message_stream_encryption{};
+    auto b = tr_message_stream_encryption_{};
 
     a.setPeerPublicKey(b.publicKey());
     b.setPeerPublicKey(a.publicKey());
@@ -78,9 +78,9 @@ TEST(Crypto, encryptDecrypt)
     auto encrypted1 = std::array<char, 128>{};
     auto decrypted1 = std::array<char, 128>{};
 
-    a.encryptInit(SomeHash);
+    a.encryptInit(false, SomeHash);
     a.encrypt(std::size(Input1), std::data(Input1), std::data(encrypted1));
-    b.decryptInit(SomeHash);
+    b.decryptInit(true, SomeHash);
     b.decrypt(std::size(Input1), std::data(encrypted1), std::data(decrypted1));
     EXPECT_EQ(Input1, std::data(decrypted1)) << "Input1 " << Input1 << " decrypted1 " << std::data(decrypted1);
 
@@ -88,9 +88,9 @@ TEST(Crypto, encryptDecrypt)
     auto encrypted2 = std::array<char, 128>{};
     auto decrypted2 = std::array<char, 128>{};
 
-    b.encryptInit(SomeHash);
+    b.encryptInit(true, SomeHash);
     b.encrypt(std::size(Input2), std::data(Input2), std::data(encrypted2));
-    a.decryptInit(SomeHash);
+    a.decryptInit(false, SomeHash);
     a.decrypt(std::size(Input2), std::data(encrypted2), std::data(decrypted2));
     EXPECT_EQ(Input2, std::data(decrypted2)) << "Input2 " << Input2 << " decrypted2 " << std::data(decrypted2);
 }
