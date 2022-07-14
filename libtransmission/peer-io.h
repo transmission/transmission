@@ -85,10 +85,10 @@ public:
         bool is_seed,
         time_t current_time,
         tr_bandwidth* parent_bandwidth)
-        : crypto{ is_incoming }
-        , session{ session_in }
+        : session{ session_in }
         , time_created{ current_time }
         , bandwidth_{ parent_bandwidth }
+        , mse_{ is_incoming }
         , addr_{ addr }
         , port_{ port }
         , is_seed_{ is_seed }
@@ -181,11 +181,9 @@ public:
         bandwidth_.setParent(parent);
     }
 
-    tr_crypto crypto;
-
     [[nodiscard]] constexpr auto isIncoming() noexcept
     {
-        return crypto.isIncoming();
+        return mse_.isIncoming();
     }
 
     void setTorrentHash(tr_sha1_digest_t hash) noexcept
@@ -196,6 +194,11 @@ public:
     [[nodiscard]] constexpr auto const& torrentHash() const noexcept
     {
         return torrent_hash_;
+    }
+
+    [[nodiscard]] constexpr auto& mse() noexcept
+    {
+        return mse_;
     }
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
@@ -237,6 +240,8 @@ public:
 
 private:
     tr_bandwidth bandwidth_;
+
+    tr_message_stream_encryption mse_;
 
     std::optional<tr_sha1_digest_t> torrent_hash_;
 
@@ -322,11 +327,6 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 /**
 ***
 **/
-
-constexpr tr_crypto* tr_peerIoGetCrypto(tr_peerIo* io)
-{
-    return &io->crypto;
-}
 
 void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type);
 

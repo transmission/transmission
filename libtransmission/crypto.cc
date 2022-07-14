@@ -21,9 +21,24 @@ using namespace std::literals;
 
 namespace wi
 {
-using key_t = math::wide_integer::uintwide_t<tr_crypto::KeySize * std::numeric_limits<unsigned char>::digits>;
+using key_t = math::wide_integer::uintwide_t<
+    tr_message_stream_encryption::KeySize * std::numeric_limits<unsigned char>::digits>;
 
-using private_key_t = math::wide_integer::uintwide_t<tr_crypto::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
+using private_key_t = math::wide_integer::uintwide_t<
+    tr_message_stream_encryption::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
+
+// source: https://stackoverflow.com/a/1001373/6568470
+// nb: when we bump to std=C++20, use `std::endian`
+bool is_big_endian()
+{
+    union
+    {
+        uint32_t i;
+        char c[4];
+    } bint = { 0x01020304 };
+
+    return bint.c[0] == 1;
+}
 
 template<typename Integral>
 auto import_bits(std::array<std::byte, Integral::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
@@ -42,10 +57,9 @@ auto import_bits(std::array<std::byte, Integral::my_width2 / std::numeric_limits
 template<typename Integral>
 auto export_bits(Integral i)
 {
-    auto const is_big_endian = htonl(47) == 47;
     auto ret = std::array<std::byte, Integral::my_width2 / std::numeric_limits<uint8_t>::digits>{};
 
-    if (is_big_endian)
+    if (is_big_endian())
     {
         for (auto& walk : ret)
         {
@@ -93,7 +107,7 @@ void crypt_arc4(struct arc4_context* key, size_t buf_len, void const* buf_in, vo
 
 ///
 
-void tr_crypto::setPeerPublicKey(key_bigend_t const& peer_public_key)
+void tr_message_stream_encryption::setPeerPublicKey(key_bigend_t const& peer_public_key)
 {
     ensureKeyExists();
 
@@ -104,7 +118,7 @@ void tr_crypto::setPeerPublicKey(key_bigend_t const& peer_public_key)
     secret_ = wi::export_bits(secret);
 }
 
-void tr_crypto::ensureKeyExists()
+void tr_message_stream_encryption::ensureKeyExists()
 {
     if (private_key_ == private_key_bigend_t{})
     {
@@ -118,7 +132,7 @@ void tr_crypto::ensureKeyExists()
         public_key_ = wi::export_bits(public_key);
     }
 }
-void tr_crypto::decryptInit(tr_sha1_digest_t const& info_hash)
+void tr_message_stream_encryption::decryptInit(tr_sha1_digest_t const& info_hash)
 {
     auto const key = isIncoming() ? "keyA"sv : "keyB"sv;
 
@@ -128,12 +142,12 @@ void tr_crypto::decryptInit(tr_sha1_digest_t const& info_hash)
     arc4_discard(dec_key_.get(), 1024);
 }
 
-void tr_crypto::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void tr_message_stream_encryption::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
     crypt_arc4(dec_key_.get(), buf_len, buf_in, buf_out);
 }
 
-void tr_crypto::encryptInit(tr_sha1_digest_t const& info_hash)
+void tr_message_stream_encryption::encryptInit(tr_sha1_digest_t const& info_hash)
 {
     auto const key = isIncoming() ? "keyB"sv : "keyA"sv;
 
@@ -143,12 +157,12 @@ void tr_crypto::encryptInit(tr_sha1_digest_t const& info_hash)
     arc4_discard(enc_key_.get(), 1024);
 }
 
-void tr_crypto::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void tr_message_stream_encryption::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
     crypt_arc4(enc_key_.get(), buf_len, buf_in, buf_out);
 }
 
-std::vector<std::byte> tr_crypto::pad(size_t maxlen) const
+std::vector<std::byte> tr_message_stream_encryption::pad(size_t maxlen) const
 {
     auto const len = tr_rand_int(maxlen);
     auto ret = std::vector<std::byte>{};

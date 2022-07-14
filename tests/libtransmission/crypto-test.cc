@@ -37,8 +37,8 @@ auto constexpr SomeHash = tr_sha1_digest_t{
 
 TEST(Crypto, sharedKey)
 {
-    auto a = tr_crypto{};
-    auto b = tr_crypto{};
+    auto a = tr_message_stream_encryption{};
+    auto b = tr_message_stream_encryption{};
 
     a.setPeerPublicKey(b.publicKey());
     b.setPeerPublicKey(a.publicKey());
@@ -46,15 +46,15 @@ TEST(Crypto, sharedKey)
     EXPECT_EQ(96, std::size(a.secret()));
     EXPECT_EQ(20, std::size(a.privateKey()));
 
-    auto c = tr_crypto{};
+    auto c = tr_message_stream_encryption{};
     c.setPeerPublicKey(b.publicKey());
     EXPECT_NE(a.secret(), c.secret());
 }
 
 TEST(Crypto, encryptDecrypt)
 {
-    auto a = tr_crypto{ false };
-    auto b = tr_crypto_{ true };
+    auto a = tr_message_stream_encryption{ false };
+    auto b = tr_message_stream_encryption_{ true };
 
     a.setPeerPublicKey(b.publicKey());
     b.setPeerPublicKey(a.publicKey());

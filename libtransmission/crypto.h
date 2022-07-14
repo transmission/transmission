@@ -18,9 +18,30 @@
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-assert.h"
 
-class tr_crypto
+/**
+ * Holds state information for message stream encryption.
+ * Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
+ */
+class tr_message_stream_encryption
 {
 public:
+    tr_message_stream_encryption(bool is_incoming = true)
+        : is_incoming_{ is_incoming }
+    {
+    }
+
+    tr_message_stream_encryption(tr_message_stream_encryption&&) = delete;
+    tr_message_stream_encryption(tr_message_stream_encryption const&) = delete;
+    tr_message_stream_encryption& operator=(tr_message_stream_encryption&&) = delete;
+    tr_message_stream_encryption& operator=(tr_message_stream_encryption const&) = delete;
+
+    [[nodiscard]] constexpr auto isIncoming() const noexcept
+    {
+        return is_incoming_;
+    }
+
+    /// DH key exchange
+
     // MSE spec: "Minimum length [for the private key] is 128 bit.
     // Anything beyond 180 bit is not believed to add any further
     // security and only increases the necessary calculation time.
@@ -35,16 +56,6 @@ public:
     // MSE spec: "The entire handshake is in big-endian."
     using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
     using key_bigend_t = std::array<std::byte, KeySize>;
-
-    tr_crypto(bool is_incoming = true)
-        : is_incoming_{ is_incoming }
-    {
-    }
-
-    tr_crypto& operator=(tr_crypto const&) = delete;
-    tr_crypto& operator=(tr_crypto&&) = delete;
-    tr_crypto(tr_crypto const&) = delete;
-    tr_crypto(tr_crypto&&) = delete;
 
     // Returns our own public key to be shared with a peer.
     // If one doesn't exist, it is created.
@@ -71,12 +82,21 @@ public:
         return private_key_;
     }
 
-    [[nodiscard]] constexpr auto isIncoming() const noexcept
+    /// DH Helpers
+
+    // Unused in production. Exists to help make tests reproducible.
+    // Note that the public key is derived from the private key, so
+    // tests must call this *before* ensureKeyExists() is called.
+    void setPrivateKey(private_key_bigend_t const& key)
     {
-        return is_incoming_;
+        private_key_ = key;
     }
 
+    // Generate random padding for MSE's PadA and PadB fields.
+    // This is a virtual method so tests can override and inject test data.
     [[nodiscard]] virtual std::vector<std::byte> pad(size_t maxlen) const;
+
+    /// arc4 encryption for both incoming and outgoing stream
 
     void decryptInit(tr_sha1_digest_t const& info_hash);
     void decrypt(size_t buflen, void const* buf_in, void* buf_out);
