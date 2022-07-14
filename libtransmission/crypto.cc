@@ -38,10 +38,21 @@ auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits
 {
     auto ret = UIntWide{};
 
-    for (auto const walk : bigend_bin)
+    if (is_big_endian())
     {
-        ret <<= 8;
-        ret += static_cast<uint8_t>(walk);
+        for (auto walk = std::rbegin(bigend_bin), end = std::rend(bigend_bin); walk != end; ++walk)
+        {
+            ret <<= 8;
+            ret += static_cast<uint8_t>(*walk);
+        }
+    }
+    else
+    {
+        for (auto const walk : bigend_bin)
+        {
+            ret <<= 8;
+            ret += static_cast<uint8_t>(walk);
+        }
     }
 
     return ret;
