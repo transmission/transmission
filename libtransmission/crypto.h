@@ -17,10 +17,7 @@
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-assert.h"
 
-/**
- * Holds state information for message stream encryption.
- * Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
- */
+// Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption
 {
 

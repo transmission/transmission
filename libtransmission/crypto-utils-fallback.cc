@@ -7,14 +7,10 @@
    implement missing (or duplicate) functionality without exposing internal
    details in header files. */
 
-#include <string_view>
-
 #include "transmission.h"
 
 #include "crypto-utils.h"
-#include "tr-assert.h"
 #include "tr-macros.h"
-#include "utils.h"
 
 /***
 ****
