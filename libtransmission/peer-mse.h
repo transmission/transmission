@@ -50,10 +50,7 @@ public:
     DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept;
 
     // Returns our own public key to be shared with a peer.
-    [[nodiscard]] constexpr auto publicKey() const noexcept
-    {
-        return public_key_;
-    }
+    [[nodiscard]] key_bigend_t publicKey() noexcept;
 
     // Compute the shared secret from our private key and the peer's public key.
     void setPeerPublicKey(key_bigend_t const& peer_public_key);
@@ -69,7 +66,7 @@ public:
 
 private:
     private_key_bigend_t const private_key_;
-    key_bigend_t const public_key_;
+    key_bigend_t public_key_ = {};
     key_bigend_t secret_ = {};
 };
 

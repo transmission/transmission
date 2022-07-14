@@ -111,8 +111,17 @@ namespace tr_message_stream_encryption
 
 DH::DH(private_key_bigend_t const& private_key) noexcept
     : private_key_{ private_key }
-    , public_key_{ generatePublicKey(private_key_) }
 {
+}
+
+DH::key_bigend_t DH::publicKey() noexcept
+{
+    if (public_key_ == key_bigend_t{})
+    {
+        public_key_ = generatePublicKey(private_key_);
+    }
+
+    return public_key_;
 }
 
 void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
