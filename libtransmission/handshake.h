@@ -57,6 +57,8 @@ public:
 
     [[nodiscard]] virtual bool isDHTEnabled() const = 0;
 
+    [[nodiscard]] virtual bool allowsTCP() const = 0;
+
     [[nodiscard]] virtual bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const = 0;
 
     [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;

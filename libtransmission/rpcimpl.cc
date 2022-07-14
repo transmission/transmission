@@ -2184,6 +2184,10 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         tr_variantDictAddBool(d, key, s->allowsPEX());
         break;
 
+    case TR_KEY_tcp_enabled:
+        tr_variantDictAddBool(d, key, s->allowsTCP());
+        break;
+
     case TR_KEY_utp_enabled:
         tr_variantDictAddBool(d, key, s->allowsUTP());
         break;
