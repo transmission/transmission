@@ -38,7 +38,7 @@ public:
     static auto constexpr PrivateKeySize = size_t{ 20 };
 
     // MSE spec: "P, S [the shared secret], Ya and Yb
-    // [the public keys] are 768bits long"
+    // [the public keys] are 768bits long[.]"
     static auto constexpr KeySize = size_t{ 96 };
 
     // big-endian byte arrays holding the keys and shared secret.
@@ -48,7 +48,7 @@ public:
 
     // By default, a private key is randomly generated.
     // Providing a predefined one is useful for reproducible unit tests.
-    DH(private_key_bigend_t const& private_key = randomPrivateKey());
+    DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept;
 
     // Returns our own public key to be shared with a peer.
     [[nodiscard]] constexpr auto publicKey() const noexcept

@@ -22,7 +22,7 @@
 
 class tr_peerIo;
 
-/** @brief opaque struct holding hanshake state information.
+/** @brief opaque struct holding handshake state information.
            freed when the handshake is completed. */
 struct tr_handshake;
 struct event_base;

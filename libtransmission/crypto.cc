@@ -102,14 +102,14 @@ namespace tr_message_stream_encryption
     return key;
 }
 
-auto generatePublicKey(DH::private_key_bigend_t const& private_key)
+[[nodiscard]] auto generatePublicKey(DH::private_key_bigend_t const& private_key) noexcept
 {
     auto const private_key_wi = wi::import_bits<wi::private_key_t>(private_key);
     auto const public_key_wi = math::wide_integer::powm(wi::G, private_key_wi, wi::P);
     return wi::export_bits(public_key_wi);
 }
 
-DH::DH(private_key_bigend_t const& private_key)
+DH::DH(private_key_bigend_t const& private_key) noexcept
     : private_key_{ private_key }
     , public_key_{ generatePublicKey(private_key_) }
 {
