@@ -68,6 +68,9 @@ using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
 
 class tr_peerIo
 {
+    using DH = tr_message_stream_encryption::DH;
+    using Filter = tr_message_stream_encryption::Filter;
+
 public:
     tr_peerIo(
         tr_session* session_in,
@@ -222,9 +225,6 @@ public:
     tr_priority_t priority = TR_PRI_NORMAL;
 
     bool utp_supported_ = false;
-
-    using DH = tr_message_stream_encryption::DH;
-    using Filter = tr_message_stream_encryption::Filter;
 
     void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
