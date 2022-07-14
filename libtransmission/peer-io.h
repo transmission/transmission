@@ -48,13 +48,6 @@ enum ReadState
     READ_ERR
 };
 
-enum tr_encryption_type
-{
-    /* these match the values in MSE's crypto_select */
-    PEER_ENCRYPTION_NONE = (1 << 0),
-    PEER_ENCRYPTION_RC4 = (1 << 1)
-};
-
 using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
 
 using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
@@ -255,14 +248,7 @@ public:
 
     [[nodiscard]] constexpr bool isEncrypted() const noexcept
     {
-        return encryption_type_ == PEER_ENCRYPTION_RC4;
-    }
-
-    void setEncryption(tr_encryption_type type)
-    {
-        TR_ASSERT(type == PEER_ENCRYPTION_NONE || type == PEER_ENCRYPTION_RC4);
-
-        encryption_type_ = type;
+        return filter_.get() != nullptr;
     }
 
 private:
@@ -284,9 +270,6 @@ private:
 
     tr_address const addr_;
     tr_port const port_;
-
-    // TODO(ckerr): remove this?
-    tr_encryption_type encryption_type_ = PEER_ENCRYPTION_NONE;
 
     bool const is_seed_;
     bool const is_incoming_;

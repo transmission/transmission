@@ -384,8 +384,6 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     tr_logAddTraceHand(handshake, isEncrypted ? "got an encrypted handshake" : "got a plain handshake");
 
-    handshake->io->setEncryption(isEncrypted ? PEER_ENCRYPTION_RC4 : PEER_ENCRYPTION_NONE);
-
     if (!isEncrypted)
     {
         setState(handshake, AWAITING_HANDSHAKE);
@@ -447,7 +445,6 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
         tr_peerIoWriteBuf(handshake->io, outbuf, false);
         handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
-        handshake->io->setEncryption(PEER_ENCRYPTION_RC4);
 
         evbuffer_add(outbuf, vc, VC_LENGTH);
         evbuffer_add_uint32(outbuf, getCryptoProvide(handshake));
@@ -563,8 +560,6 @@ static ReadState readPadD(tr_handshake* handshake, struct evbuffer* inbuf)
 
     tr_peerIoDrain(handshake->io, inbuf, needlen);
 
-    handshake->io->setEncryption(static_cast<tr_encryption_type>(handshake->crypto_select));
-
     setState(handshake, AWAITING_HANDSHAKE);
     return READ_NOW;
 }
@@ -590,8 +585,6 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (pstrlen == 19) /* unencrypted */
     {
-        handshake->io->setEncryption(PEER_ENCRYPTION_NONE);
-
         if (handshake->encryptionMode == TR_ENCRYPTION_REQUIRED)
         {
             tr_logAddTraceHand(handshake, "peer is unencrypted, and we're disallowing that");
@@ -600,8 +593,6 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     }
     else /* encrypted or corrupt */
     {
-        handshake->io->setEncryption(PEER_ENCRYPTION_RC4);
-
         if (handshake->isIncoming())
         {
             tr_logAddTraceHand(handshake, "I think peer is sending us an encrypted handshake...");
@@ -928,7 +919,6 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     if (crypto_select == CRYPTO_PROVIDE_PLAINTEXT)
     {
         tr_peerIoWriteBuf(handshake->io, outbuf, false);
-        handshake->io->setEncryption(PEER_ENCRYPTION_NONE);
     }
 
     tr_logAddTraceHand(handshake, "sending handshake");
@@ -1192,7 +1182,6 @@ tr_handshake* tr_handshakeNew(
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
-    handshake->io->setEncryption(PEER_ENCRYPTION_NONE);
 
     if (handshake->isIncoming())
     {
