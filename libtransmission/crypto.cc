@@ -96,8 +96,7 @@ void init_rc4(tr_crypto const* crypto, std::shared_ptr<struct arc4_context>& set
     }
 
     auto const hash = crypto->torrentHash();
-    auto const buf = hash ? crypto->secretKeySha1(std::data(key), std::size(key), std::data(*hash), std::size(*hash)) :
-                            std::nullopt;
+    auto const buf = hash ? tr_sha1(key, crypto->secret(), *hash) : std::nullopt;
     if (buf)
     {
         arc4_init(setme.get(), std::data(*buf), std::size(*buf));
@@ -167,18 +166,6 @@ void tr_crypto::encryptInit()
 void tr_crypto::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
     crypt_rc4(enc_key_.get(), buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
-}
-
-std::optional<tr_sha1_digest_t> tr_crypto::secretKeySha1(
-    void const* prepend,
-    size_t prepend_len,
-    void const* append,
-    size_t append_len) const
-{
-    return tr_sha1(
-        std::string_view{ static_cast<char const*>(prepend), prepend_len },
-        secret_,
-        std::string_view{ static_cast<char const*>(append), append_len });
 }
 
 std::vector<std::byte> tr_crypto::pad(size_t maxlen) const

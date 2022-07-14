@@ -62,12 +62,6 @@ struct tr_crypto
         return private_key_;
     }
 
-    [[nodiscard]] std::optional<tr_sha1_digest_t> secretKeySha1(
-        void const* prepend,
-        size_t prepend_len,
-        void const* append,
-        size_t append_len) const;
-
     [[nodiscard]] constexpr auto isIncoming() const noexcept
     {
         return is_incoming_;

@@ -18,8 +18,6 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
-#include <iostream>
-
 #include <fmt/core.h>
 
 #include "transmission.h"

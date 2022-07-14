@@ -358,11 +358,6 @@ static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_p
     return 0;
 }
 
-static auto computeRequestHash(tr_handshake const* handshake, std::string_view name)
-{
-    return handshake->crypto->secretKeySha1(std::data(name), std::size(name), "", 0);
-}
-
 static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 {
     size_t needlen = HANDSHAKE_NAME_LEN;
@@ -407,7 +402,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* HASH('req1', S) */
     {
-        auto const req1 = computeRequestHash(handshake, "req1"sv);
+        auto const req1 = tr_sha1("req1"sv, handshake->crypto->secret());
         if (!req1)
         {
             tr_logAddTraceHand(handshake, "error while computing req1 hash after Yb");
@@ -426,7 +421,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         }
 
         auto const req2 = tr_sha1("req2"sv, *hash);
-        auto const req3 = computeRequestHash(handshake, "req3"sv);
+        auto const req3 = tr_sha1("req3"sv, handshake->crypto->secret());
         if (!req2 || !req3)
         {
             tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
@@ -731,7 +726,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer_remove(inbuf, std::data(peer_public_key), std::size(peer_public_key));
     handshake->crypto->setPeerPublicKey(peer_public_key);
 
-    auto req1 = computeRequestHash(handshake, "req1"sv);
+    auto req1 = tr_sha1("req1"sv, handshake->crypto->secret());
     if (!req1)
     {
         tr_logAddTraceHand(handshake, "error while computing req1 hash after Ya");
@@ -805,7 +800,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     auto req2 = tr_sha1_digest_t{};
     evbuffer_remove(inbuf, std::data(req2), std::size(req2));
 
-    auto const req3 = computeRequestHash(handshake, "req3"sv);
+    auto const req3 = tr_sha1("req3"sv, handshake->crypto->secret());
     if (!req3)
     {
         tr_logAddTraceHand(handshake, "error while computing req3 hash after req2");
