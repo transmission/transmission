@@ -14,7 +14,7 @@
 
 #include "transmission.h"
 
-#include "crypto.h"
+#include "peer-mse.h"
 #include "crypto-utils.h"
 #include "utils.h"
 

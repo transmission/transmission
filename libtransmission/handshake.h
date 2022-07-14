@@ -15,7 +15,7 @@
 #include "transmission.h"
 
 #include "net.h" // tr_address
-#include "crypto.h" // tr_message_stream_encryption::DH
+#include "peer-mse.h" // tr_message_stream_encryption::DH
 
 /** @addtogroup peers Peers
     @{ */

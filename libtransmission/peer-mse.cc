@@ -13,8 +13,8 @@
 #include "transmission.h"
 
 #include "crypto-utils.h" // tr_sha1
-#include "crypto.h"
 #include "net.h" // includes the headers for htonl()
+#include "peer-mse.h"
 
 using namespace std::literals;
 

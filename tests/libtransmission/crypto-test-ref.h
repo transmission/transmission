@@ -45,9 +45,7 @@
 #undef TR_ENCRYPTION_H
 #undef TR_CRYPTO_UTILS_H
 
-#include "crypto.h"
 #include "crypto-utils.h"
-#include "crypto.cc"
 #include "crypto-utils.cc"
 #include "crypto-utils-openssl.cc"
 

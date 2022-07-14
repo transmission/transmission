@@ -27,8 +27,8 @@
 #include "transmission.h"
 
 #include "bandwidth.h"
-#include "crypto.h"
 #include "net.h" // tr_address
+#include "peer-mse.h"
 #include "peer-socket.h"
 #include "tr-assert.h"
 
