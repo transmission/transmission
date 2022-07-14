@@ -107,9 +107,8 @@ enum handshake_state_t
 
 struct tr_handshake
 {
-    tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in, tr_message_stream_encryption& mse_in)
+    tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in)
         : mediator{ std::move(mediator_in) }
-        , mse{ mse_in }
     {
     }
 
@@ -134,7 +133,6 @@ struct tr_handshake
     bool haveSentBitTorrentHandshake;
     tr_peerIo* io;
     DH dh;
-    tr_message_stream_encryption& mse;
     handshake_state_t state;
     tr_encryption_mode encryptionMode;
     uint16_t pad_c_len;
@@ -298,7 +296,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
 static void sendYa(tr_handshake* handshake)
 {
     auto const public_key = handshake->dh.publicKey();
-    auto const pad_a = handshake->mse.pad(PadA_MAXLEN);
+    auto const pad_a = handshake->mediator->pad(PadA_MAXLEN);
 
     auto outbuf = std::array<std::byte, sizeof(decltype(public_key)) + PadA_MAXLEN>{};
     auto const data = std::data(outbuf);
@@ -741,7 +739,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
     auto const public_key = handshake->dh.publicKey();
-    auto const pad_b = handshake->mse.pad(PadB_MAXLEN);
+    auto const pad_b = handshake->mediator->pad(PadB_MAXLEN);
     auto outbuf = std::array<std::byte, std::size(public_key) + PadB_MAXLEN>{};
     auto const data = std::data(outbuf);
     auto walk = data;
@@ -1184,7 +1182,7 @@ tr_handshake* tr_handshakeNew(
     tr_handshake_done_func done_func,
     void* done_func_user_data)
 {
-    auto* const handshake = new tr_handshake{ std::move(mediator), io->mse() };
+    auto* const handshake = new tr_handshake{ std::move(mediator) };
     handshake->io = io;
     handshake->encryptionMode = encryptionMode;
     handshake->done_func = done_func;

@@ -109,11 +109,10 @@ void crypt_arc4(struct arc4_context* key, size_t buf_len, void const* buf_in, vo
 
 } // namespace
 
-///
+namespace tr_message_stream_encryption
+{
 
-using MSE = tr_message_stream_encryption;
-
-void MSE::DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
+void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 {
     ensureKeyExists();
 
@@ -124,7 +123,7 @@ void MSE::DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
     secret_ = wi::export_bits(secret);
 }
 
-void MSE::DH::ensureKeyExists()
+void DH::ensureKeyExists()
 {
     if (private_key_ == private_key_bigend_t{})
     {
@@ -138,7 +137,7 @@ void MSE::DH::ensureKeyExists()
         public_key_ = wi::export_bits(public_key);
     }
 }
-void MSE::Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
 
@@ -148,12 +147,12 @@ void MSE::Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t c
     arc4_discard(dec_key_.get(), 1024);
 }
 
-void MSE::Filter::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void Filter::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
     crypt_arc4(dec_key_.get(), buf_len, buf_in, buf_out);
 }
 
-void MSE::Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
 
@@ -163,16 +162,9 @@ void MSE::Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t c
     arc4_discard(enc_key_.get(), 1024);
 }
 
-void MSE::Filter::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
+void Filter::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
     crypt_arc4(enc_key_.get(), buf_len, buf_in, buf_out);
 }
 
-std::vector<std::byte> tr_message_stream_encryption::pad(size_t maxlen) const
-{
-    auto const len = tr_rand_int(maxlen);
-    auto ret = std::vector<std::byte>{};
-    ret.resize(len);
-    tr_rand_buffer(std::data(ret), len);
-    return ret;
-}
+} // namespace tr_message_stream_encryption

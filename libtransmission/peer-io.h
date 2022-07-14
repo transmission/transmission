@@ -196,11 +196,6 @@ public:
         return torrent_hash_;
     }
 
-    [[nodiscard]] constexpr auto& mse() noexcept
-    {
-        return mse_;
-    }
-
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
     // like this one isn't being used just for assertions, but also in
     // didWriteWrapper() to see if the tr_peerIo got freed during the
@@ -238,9 +233,10 @@ public:
 
     bool utp_supported_ = false;
 
-    using MSE = tr_message_stream_encryption;
+    using DH = tr_message_stream_encryption::DH;
+    using Filter = tr_message_stream_encryption::Filter;
 
-    void decryptInit(bool is_incoming, MSE::DH const& dh, tr_sha1_digest_t const& info_hash)
+    void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
         filter().decryptInit(is_incoming, dh, info_hash);
     }
@@ -250,7 +246,7 @@ public:
         filter().decrypt(buflen, buf_in, buf_out);
     }
 
-    void encryptInit(bool is_incoming, MSE::DH const& dh, tr_sha1_digest_t const& info_hash)
+    void encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
         filter().encryptInit(is_incoming, dh, info_hash);
     }
@@ -265,17 +261,15 @@ private:
 
     std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
 
-    MSE::Filter& filter()
+    Filter& filter()
     {
         if (!filter_)
         {
-            filter_ = std::make_unique<MSE::Filter>();
+            filter_ = std::make_unique<Filter>();
         }
 
         return *filter_;
     }
-
-    tr_message_stream_encryption mse_;
 
     std::optional<tr_sha1_digest_t> torrent_hash_;
 
