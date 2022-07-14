@@ -81,7 +81,7 @@ TEST(Crypto, encryptDecrypt)
     a.encryptInit(false, a_dh, SomeHash);
     std::copy_n(std::begin(Input1), std::size(Input1), std::begin(encrypted1));
     a.encrypt(std::size(Input1), std::data(encrypted1));
-    auto b = tr_message_stream_encryption_::Filter{};
+    auto b = tr_message_stream_encryption::Filter{};
     b.decryptInit(true, b_dh, SomeHash);
     std::copy_n(std::begin(encrypted1), std::size(Input1), std::begin(decrypted1));
     b.decrypt(std::size(Input1), std::data(decrypted1));
