@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstring> /* memcpy(), memmove(), memset() */
+#include <string_view>
 
 #include <arc4.h>
 
@@ -15,6 +16,8 @@
 #include "crypto.h"
 #include "crypto-utils.h"
 #include "tr-assert.h"
+
+using namespace std::literals;
 
 namespace wi
 {
@@ -72,37 +75,18 @@ auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
 namespace
 {
 
-void init_rc4(
-    tr_crypto const* crypto,
-    std::shared_ptr<struct arc4_context>& setme,
-    std::string_view key,
-    tr_sha1_digest_t const& info_hash)
+void crypt_arc4(struct arc4_context* key, size_t buf_len, void const* buf_in, void* buf_out)
 {
-    if (!setme)
+    if (key != nullptr)
     {
-        setme = std::make_shared<struct arc4_context>();
-    }
-
-    if (auto const buf = tr_sha1(key, crypto->secret(), info_hash); buf)
-    {
-        arc4_init(setme.get(), std::data(*buf), std::size(*buf));
-        arc4_discard(setme.get(), 1024);
-    }
-}
-
-void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_in, void* buf_out)
-{
-    if (key == nullptr)
-    {
-        if (buf_in != buf_out)
-        {
-            memmove(buf_out, buf_in, buf_len);
-        }
-
+        arc4_process(key, buf_in, buf_out, buf_len);
         return;
     }
 
-    arc4_process(key, buf_in, buf_out, buf_len);
+    if (buf_in != buf_out)
+    {
+        memmove(buf_out, buf_in, buf_len);
+    }
 }
 
 } // namespace
@@ -136,22 +120,32 @@ void tr_crypto::ensureKeyExists()
 }
 void tr_crypto::decryptInit(tr_sha1_digest_t const& info_hash)
 {
-    init_rc4(this, dec_key_, is_incoming_ ? "keyA" : "keyB", info_hash); // lgtm[cpp/weak-cryptographic-algorithm]
+    auto const key = isIncoming() ? "keyA"sv : "keyB"sv;
+
+    dec_key_ = std::make_shared<struct arc4_context>();
+    auto const buf = tr_sha1(key, secret(), info_hash);
+    arc4_init(dec_key_.get(), std::data(*buf), std::size(*buf));
+    arc4_discard(dec_key_.get(), 1024);
 }
 
 void tr_crypto::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
-    crypt_rc4(dec_key_.get(), buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
+    crypt_arc4(dec_key_.get(), buf_len, buf_in, buf_out);
 }
 
 void tr_crypto::encryptInit(tr_sha1_digest_t const& info_hash)
 {
-    init_rc4(this, enc_key_, is_incoming_ ? "keyB" : "keyA", info_hash); // lgtm[cpp/weak-cryptographic-algorithm]
+    auto const key = isIncoming() ? "keyB"sv : "keyA"sv;
+
+    enc_key_ = std::make_shared<struct arc4_context>();
+    auto const buf = tr_sha1(key, secret(), info_hash);
+    arc4_init(enc_key_.get(), std::data(*buf), std::size(*buf));
+    arc4_discard(enc_key_.get(), 1024);
 }
 
 void tr_crypto::encrypt(size_t buf_len, void const* buf_in, void* buf_out)
 {
-    crypt_rc4(enc_key_.get(), buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
+    crypt_arc4(enc_key_.get(), buf_len, buf_in, buf_out);
 }
 
 std::vector<std::byte> tr_crypto::pad(size_t maxlen) const
