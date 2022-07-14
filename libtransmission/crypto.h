@@ -16,14 +16,24 @@
 #include <vector>
 
 #include "tr-macros.h" // tr_sha1_digest_t
+#include "tr-assert.h"
 
 class tr_crypto
 {
 public:
+    // MSE spec: "Minimum length [for the private key] is 128 bit.
+    // Anything beyond 180 bit is not believed to add any further
+    // security and only increases the necessary calculation time.
+    // You should use a length of 160bits whenever possible[.]
     static auto constexpr PrivateKeySize = size_t{ 20 };
-    using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
 
+    // MSE spec: "P, S [the shared secret], Ya and Yb
+    // [the public keys] are 768bits long"
     static auto constexpr KeySize = size_t{ 96 };
+
+    // big-endian byte arrays holding the keys and shared secret.
+    // MSE spec: "The entire handshake is in big-endian."
+    using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
     using key_bigend_t = std::array<std::byte, KeySize>;
 
     tr_crypto(bool is_incoming = true)
@@ -36,21 +46,28 @@ public:
     tr_crypto(tr_crypto const&) = delete;
     tr_crypto(tr_crypto&&) = delete;
 
+    // Returns our own public key to be shared with a peer.
+    // If one doesn't exist, it is created.
     [[nodiscard]] auto publicKey()
     {
         ensureKeyExists();
         return public_key_;
     }
 
+    // Computes the shared secret from our own privateKey()
+    // and the peer's publicKey().
     void setPeerPublicKey(key_bigend_t const& peer_public_key);
 
-    [[nodiscard]] constexpr auto secret() const noexcept
+    // Returns the shared secret.
+    [[nodiscard]] auto secret() const noexcept
     {
+        TR_ASSERT(secret_ != key_bigend_t{});
         return secret_;
     }
 
-    [[nodiscard]] constexpr auto privateKey() const noexcept
+    [[nodiscard]] auto privateKey() noexcept
     {
+        ensureKeyExists();
         return private_key_;
     }
 
