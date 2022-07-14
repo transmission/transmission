@@ -85,7 +85,7 @@ public:
         bool is_seed,
         time_t current_time,
         tr_bandwidth* parent_bandwidth)
-        : crypto{ torrent_hash, is_incoming }
+        : crypto{ is_incoming }
         , session{ session_in }
         , time_created{ current_time }
         , bandwidth_{ parent_bandwidth }
@@ -93,6 +93,10 @@ public:
         , port_{ port }
         , is_seed_{ is_seed }
     {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
     }
 
     [[nodiscard]] constexpr tr_address const& address() const noexcept
@@ -186,12 +190,12 @@ public:
 
     void setTorrentHash(tr_sha1_digest_t hash) noexcept
     {
-        crypto.setTorrentHash(hash);
+        torrent_hash_ = hash;
     }
 
     [[nodiscard]] constexpr auto const& torrentHash() const noexcept
     {
-        return crypto.torrentHash();
+        return torrent_hash_;
     }
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
@@ -233,6 +237,8 @@ public:
 
 private:
     tr_bandwidth bandwidth_;
+
+    std::optional<tr_sha1_digest_t> torrent_hash_;
 
     tr_address const addr_;
     tr_port const port_;

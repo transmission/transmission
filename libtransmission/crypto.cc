@@ -16,22 +16,8 @@
 #include "crypto-utils.h"
 #include "tr-assert.h"
 
-///
-
-tr_crypto::tr_crypto(tr_sha1_digest_t const* torrent_hash, bool is_incoming)
-    : is_incoming_{ is_incoming }
-{
-    if (torrent_hash != nullptr)
-    {
-        this->torrent_hash_ = *torrent_hash;
-    }
-}
-
-///
-
 namespace wi
 {
-
 using key_t = math::wide_integer::uintwide_t<tr_crypto::KeySize * std::numeric_limits<unsigned char>::digits>;
 
 using private_key_t = math::wide_integer::uintwide_t<tr_crypto::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
@@ -86,18 +72,18 @@ auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
 namespace
 {
 
-void init_rc4(tr_crypto const* crypto, std::shared_ptr<struct arc4_context>& setme, std::string_view key)
+void init_rc4(
+    tr_crypto const* crypto,
+    std::shared_ptr<struct arc4_context>& setme,
+    std::string_view key,
+    tr_sha1_digest_t const& info_hash)
 {
-    TR_ASSERT(crypto->torrentHash());
-
     if (!setme)
     {
         setme = std::make_shared<struct arc4_context>();
     }
 
-    auto const hash = crypto->torrentHash();
-    auto const buf = hash ? tr_sha1(key, crypto->secret(), *hash) : std::nullopt;
-    if (buf)
+    if (auto const buf = tr_sha1(key, crypto->secret(), info_hash); buf)
     {
         arc4_init(setme.get(), std::data(*buf), std::size(*buf));
         arc4_discard(setme.get(), 1024);
@@ -148,9 +134,9 @@ void tr_crypto::ensureKeyExists()
         public_key_ = wi::export_bits(public_key);
     }
 }
-void tr_crypto::decryptInit()
+void tr_crypto::decryptInit(tr_sha1_digest_t const& info_hash)
 {
-    init_rc4(this, dec_key_, is_incoming_ ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(this, dec_key_, is_incoming_ ? "keyA" : "keyB", info_hash); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_crypto::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
@@ -158,9 +144,9 @@ void tr_crypto::decrypt(size_t buf_len, void const* buf_in, void* buf_out)
     crypt_rc4(dec_key_.get(), buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
-void tr_crypto::encryptInit()
+void tr_crypto::encryptInit(tr_sha1_digest_t const& info_hash)
 {
-    init_rc4(this, enc_key_, is_incoming_ ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(this, enc_key_, is_incoming_ ? "keyB" : "keyA", info_hash); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_crypto::encrypt(size_t buf_len, void const* buf_in, void* buf_out)

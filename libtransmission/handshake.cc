@@ -186,7 +186,7 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
-    auto const info_hash = handshake->crypto->torrentHash();
+    auto const info_hash = handshake->io->torrentHash();
     auto const info = info_hash ? handshake->mediator->torrentInfo(*info_hash) : std::nullopt;
     if (!info)
     {
@@ -411,16 +411,16 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_add(outbuf, std::data(*req1), std::size(*req1));
     }
 
+    auto const info_hash = handshake->io->torrentHash();
+    if (!info_hash)
+    {
+        tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
+        return tr_handshakeDone(handshake, false);
+    }
+
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        auto const hash = handshake->crypto->torrentHash();
-        if (!hash)
-        {
-            tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
-            return tr_handshakeDone(handshake, false);
-        }
-
-        auto const req2 = tr_sha1("req2"sv, *hash);
+        auto const req2 = tr_sha1("req2"sv, *info_hash);
         auto const req3 = tr_sha1("req3"sv, handshake->crypto->secret());
         if (!req2 || !req3)
         {
@@ -444,7 +444,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         uint8_t vc[VC_LENGTH] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
         tr_peerIoWriteBuf(handshake->io, outbuf, false);
-        handshake->crypto->encryptInit();
+        handshake->crypto->encryptInit(*info_hash);
         tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_RC4);
 
         evbuffer_add(outbuf, vc, VC_LENGTH);
@@ -468,7 +468,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* send it */
-    handshake->crypto->decryptInit();
+    handshake->crypto->decryptInit(*info_hash);
     setReadState(handshake, AWAITING_VC);
     tr_peerIoWriteBuf(handshake->io, outbuf, false);
 
@@ -495,7 +495,7 @@ static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
         }
 
         memcpy(tmp, evbuffer_pullup(inbuf, key_len), key_len);
-        handshake->crypto->decryptInit();
+        handshake->crypto->decryptInit(*handshake->io->torrentHash());
         handshake->crypto->decrypt(key_len, tmp, tmp);
 
         if (memcmp(tmp, key, key_len) == 0)
@@ -834,7 +834,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
 
-    handshake->crypto->decryptInit();
+    handshake->crypto->decryptInit(*handshake->io->torrentHash());
 
     tr_peerIoReadBytes(handshake->io, inbuf, vc_in, VC_LENGTH);
 
@@ -886,7 +886,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
     **/
 
-    handshake->crypto->encryptInit();
+    handshake->crypto->encryptInit(*handshake->io->torrentHash());
     evbuffer* const outbuf = evbuffer_new();
 
     {

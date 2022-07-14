@@ -16,7 +16,7 @@
 #include <memory>
 #include <vector>
 
-#include "tr-macros.h"
+#include "tr-macros.h" // tr_sha1_digest_t
 
 /** @brief Holds state information for encrypted peer communications */
 struct tr_crypto
@@ -27,22 +27,15 @@ struct tr_crypto
     static auto constexpr KeySize = size_t{ 96 };
     using key_bigend_t = std::array<std::byte, KeySize>;
 
-    tr_crypto(tr_sha1_digest_t const* torrent_hash = nullptr, bool is_incoming = true);
+    tr_crypto(bool is_incoming = true)
+        : is_incoming_{ is_incoming }
+    {
+    }
 
     tr_crypto& operator=(tr_crypto const&) = delete;
     tr_crypto& operator=(tr_crypto&&) = delete;
     tr_crypto(tr_crypto const&) = delete;
     tr_crypto(tr_crypto&&) = delete;
-
-    void setTorrentHash(tr_sha1_digest_t hash) noexcept
-    {
-        torrent_hash_ = hash;
-    }
-
-    [[nodiscard]] constexpr auto const& torrentHash() const noexcept
-    {
-        return torrent_hash_;
-    }
 
     [[nodiscard]] auto publicKey()
     {
@@ -69,9 +62,9 @@ struct tr_crypto
 
     [[nodiscard]] virtual std::vector<std::byte> pad(size_t maxlen) const;
 
-    void decryptInit();
+    void decryptInit(tr_sha1_digest_t const& info_hash);
     void decrypt(size_t buflen, void const* buf_in, void* buf_out);
-    void encryptInit();
+    void encryptInit(tr_sha1_digest_t const& info_hash);
     void encrypt(size_t buflen, void const* buf_in, void* buf_out);
 
 private:
