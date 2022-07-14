@@ -6,12 +6,10 @@
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
-#include <cstdint> // uint8_t
 #include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include "transmission.h" // tr_sha1_digest_t
 

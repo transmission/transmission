@@ -3,6 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <memory>
+
 #include <arc4.h>
 
 #include <math/wide_integer/uintwide_t.h>
