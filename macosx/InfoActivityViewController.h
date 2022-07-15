@@ -8,6 +8,7 @@
 
 @interface InfoActivityViewController : NSViewController<InfoViewController>
 
+- (NSRect)viewRect;
 - (void)updateWindowLayout;
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;

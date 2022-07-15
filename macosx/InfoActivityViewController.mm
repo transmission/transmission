@@ -185,7 +185,7 @@
     return NSHeight(self.fTransferView.frame) + NSHeight(self.fDatesView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_VERTICAL_SPACING;
 }
 
-- (void)updateWindowLayout
+- (CGFloat)changeInWindowHeight
 {
     CGFloat difference = 0;
 
@@ -206,19 +206,37 @@
         difference = NSHeight(self.view.frame) - self.vertLayoutHeight;
     }
 
+    return difference;
+}
+
+- (NSRect)viewRect
+{
+    CGFloat difference = self.changeInWindowHeight;
+
+    NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
     if (difference != 0)
     {
-        NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
-        windowRect.origin.y += difference;
-        windowRect.size.height -= difference;
-
         viewRect.size.height -= difference;
         viewRect.size.width = NSWidth(windowRect);
+    }
+
+    return viewRect;
+}
+
+- (void)updateWindowLayout
+{
+    CGFloat difference = self.changeInWindowHeight;
+
+    if (difference != 0)
+    {
+        NSRect windowRect = self.view.window.frame;
+        windowRect.origin.y += difference;
+        windowRect.size.height -= difference;
 
         self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
         self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
 
-        self.view.frame = viewRect;
+        self.view.frame = [self viewRect];
         [self.view.window setFrame:windowRect display:YES animate:YES];
     }
 }

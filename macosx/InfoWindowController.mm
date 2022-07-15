@@ -329,10 +329,12 @@ typedef NS_ENUM(unsigned int, tabTag) {
     if (self.fViewController == self.fActivityViewController)
     {
         minWindowWidth = MAX(self.fMinWindowWidth, self.fActivityViewController.fTransferView.frame.size.width);
+        viewRect = [self.fActivityViewController viewRect];
     }
     else if (self.fViewController == self.fOptionsViewController)
     {
         minWindowWidth = MAX(self.fMinWindowWidth, self.fOptionsViewController.fPriorityView.frame.size.width);
+        viewRect = [self.fOptionsViewController viewRect];
     }
 
     CGFloat const difference = NSHeight(viewRect) - oldHeight;
