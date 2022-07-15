@@ -127,6 +127,13 @@ public:
         return session_.event_base;
     }
 
+    [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override
+    {
+        auto const len = tr_rand_int(maxlen);
+        tr_rand_buffer(setme, len);
+        return len;
+    }
+
 private:
     tr_session& session_;
 };

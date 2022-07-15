@@ -28,8 +28,8 @@
 		4D118E1A08CB46B20033958F /* PrefsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D118E1908CB46B20033958F /* PrefsController.mm */; };
 		4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		4D364DA0091FBB2C00377D12 /* TorrentTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D364D9F091FBB2C00377D12 /* TorrentTableView.mm */; };
-		4D36BA6F0CA2F00800A63CA5 /* crypto.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA600CA2F00800A63CA5 /* crypto.cc */; };
-		4D36BA700CA2F00800A63CA5 /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA610CA2F00800A63CA5 /* crypto.h */; };
+		4D36BA6F0CA2F00800A63CA5 /* peer-mse.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA600CA2F00800A63CA5 /* peer-mse.cc */; };
+		4D36BA700CA2F00800A63CA5 /* peer-mse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA610CA2F00800A63CA5 /* peer-mse.h */; };
 		4D36BA720CA2F00800A63CA5 /* handshake.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA630CA2F00800A63CA5 /* handshake.cc */; };
 		4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA640CA2F00800A63CA5 /* handshake.h */; };
 		4D36BA740CA2F00800A63CA5 /* peer-io.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA650CA2F00800A63CA5 /* peer-io.cc */; };
@@ -631,8 +631,8 @@
 		4D18389709DEC0030047D688 /* libtransmission.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtransmission.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D364D9E091FBB2C00377D12 /* TorrentTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentTableView.h; sourceTree = "<group>"; };
 		4D364D9F091FBB2C00377D12 /* TorrentTableView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentTableView.mm; sourceTree = "<group>"; };
-		4D36BA600CA2F00800A63CA5 /* crypto.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crypto.cc; sourceTree = "<group>"; };
-		4D36BA610CA2F00800A63CA5 /* crypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypto.h; sourceTree = "<group>"; };
+		4D36BA600CA2F00800A63CA5 /* peer-mse.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = peer-mse.cc; sourceTree = "<group>"; };
+		4D36BA610CA2F00800A63CA5 /* peer-mse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = peer-mse.h; sourceTree = "<group>"; };
 		4D36BA630CA2F00800A63CA5 /* handshake.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = handshake.cc; sourceTree = "<group>"; };
 		4D36BA640CA2F00800A63CA5 /* handshake.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = handshake.h; sourceTree = "<group>"; };
 		4D36BA650CA2F00800A63CA5 /* peer-io.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-io.cc"; sourceTree = "<group>"; };
@@ -1665,8 +1665,8 @@
 				C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */,
 				C1033E051A3279B800EF44D8 /* crypto-utils.cc */,
 				C1033E061A3279B800EF44D8 /* crypto-utils.h */,
-				4D36BA600CA2F00800A63CA5 /* crypto.cc */,
-				4D36BA610CA2F00800A63CA5 /* crypto.h */,
+				4D36BA600CA2F00800A63CA5 /* peer-mse.cc */,
+				4D36BA610CA2F00800A63CA5 /* peer-mse.h */,
 				4D36BA630CA2F00800A63CA5 /* handshake.cc */,
 				4D36BA640CA2F00800A63CA5 /* handshake.h */,
 				4D36BA650CA2F00800A63CA5 /* peer-io.cc */,
@@ -2188,7 +2188,7 @@
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
 				A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */,
 				A24621410C769D0900088E81 /* trevent.h in Headers */,
-				4D36BA700CA2F00800A63CA5 /* crypto.h in Headers */,
+				4D36BA700CA2F00800A63CA5 /* peer-mse.h in Headers */,
 				C10C644E1D9AF328003C1B4C /* session-id.h in Headers */,
 				4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */,
 				4D36BA750CA2F00800A63CA5 /* peer-io.h in Headers */,
@@ -2938,7 +2938,7 @@
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.cc in Sources */,
 				A24621420C769D0900088E81 /* trevent.cc in Sources */,
 				C11DEA161FCD31C0009E22B9 /* subprocess-posix.cc in Sources */,
-				4D36BA6F0CA2F00800A63CA5 /* crypto.cc in Sources */,
+				4D36BA6F0CA2F00800A63CA5 /* peer-mse.cc in Sources */,
 				4D36BA720CA2F00800A63CA5 /* handshake.cc in Sources */,
 				4D36BA740CA2F00800A63CA5 /* peer-io.cc in Sources */,
 				C1033E071A3279B800EF44D8 /* crypto-utils-fallback.cc in Sources */,
@@ -3592,6 +3592,7 @@
 					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/fast_float/include",
+					"third-party/wide-integer",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
@@ -3602,6 +3603,8 @@
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
+					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
+					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ICONV",
@@ -3833,6 +3836,7 @@
 					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/fast_float/include",
+					"third-party/wide-integer",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
@@ -3843,6 +3847,8 @@
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
+					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
+					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ICONV",
@@ -4148,6 +4154,7 @@
 					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/fast_float/include",
+					"third-party/wide-integer",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
@@ -4158,6 +4165,8 @@
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
+					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
+					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ICONV",

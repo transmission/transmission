@@ -892,19 +892,7 @@ size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now)
 ***
 **/
 
-void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(encryption_type == PEER_ENCRYPTION_NONE || encryption_type == PEER_ENCRYPTION_RC4);
-
-    io->encryption_type = encryption_type;
-}
-
-/**
-***
-**/
-
-static inline void processBuffer(tr_crypto& crypto, evbuffer* buffer, size_t offset, size_t size)
+static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset, size_t size)
 {
     struct evbuffer_ptr pos;
     struct evbuffer_iovec iovec;
@@ -918,7 +906,7 @@ static inline void processBuffer(tr_crypto& crypto, evbuffer* buffer, size_t off
             break;
         }
 
-        crypto.encrypt(iovec.iov_len, iovec.iov_base, iovec.iov_base);
+        io.encrypt(iovec.iov_len, iovec.iov_base);
 
         TR_ASSERT(size >= iovec.iov_len);
         size -= iovec.iov_len;
@@ -931,9 +919,9 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
 {
     size_t const byteCount = evbuffer_get_length(buf);
 
-    if (io->encryption_type == PEER_ENCRYPTION_RC4)
+    if (io->isEncrypted())
     {
-        processBuffer(io->crypto, buf, 0, byteCount);
+        processBuffer(*io, buf, 0, byteCount);
     }
 
     evbuffer_add_buffer(io->outbuf.get(), buf);
@@ -947,13 +935,11 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     iovec.iov_len = byteCount;
 
-    if (io->encryption_type == PEER_ENCRYPTION_RC4)
+    memcpy(iovec.iov_base, bytes, iovec.iov_len);
+
+    if (io->isEncrypted())
     {
-        io->crypto.encrypt(iovec.iov_len, bytes, iovec.iov_base);
-    }
-    else
-    {
-        memcpy(iovec.iov_base, bytes, iovec.iov_len);
+        io->encrypt(iovec.iov_len, iovec.iov_base);
     }
 
     evbuffer_commit_space(io->outbuf.get(), &iovec, 1);
@@ -997,19 +983,11 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(evbuffer_get_length(inbuf) >= byteCount);
 
-    switch (io->encryption_type)
+    evbuffer_remove(inbuf, bytes, byteCount);
+
+    if (io->isEncrypted())
     {
-    case PEER_ENCRYPTION_NONE:
-        evbuffer_remove(inbuf, bytes, byteCount);
-        break;
-
-    case PEER_ENCRYPTION_RC4:
-        evbuffer_remove(inbuf, bytes, byteCount);
-        io->crypto.decrypt(byteCount, bytes, bytes);
-        break;
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled encryption type {:d}"), io->encryption_type));
+        io->decrypt(byteCount, bytes);
     }
 }
 

@@ -52,6 +52,7 @@ target_include_directories(libtransmission-test
 
 target_include_directories(libtransmission-test SYSTEM
     PRIVATE
+        ${WIDE_INTEGER_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS})

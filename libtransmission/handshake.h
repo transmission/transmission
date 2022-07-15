@@ -15,13 +15,14 @@
 #include "transmission.h"
 
 #include "net.h" // tr_address
+#include "peer-mse.h" // tr_message_stream_encryption::DH
 
 /** @addtogroup peers Peers
     @{ */
 
 class tr_peerIo;
 
-/** @brief opaque struct holding hanshake state information.
+/** @brief opaque struct holding handshake state information.
            freed when the handshake is completed. */
 struct tr_handshake;
 struct event_base;
@@ -56,6 +57,13 @@ public:
     [[nodiscard]] virtual bool isDHTEnabled() const = 0;
 
     [[nodiscard]] virtual bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const = 0;
+
+    [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
+
+    [[nodiscard]] virtual tr_message_stream_encryption::DH::private_key_bigend_t privateKey() const
+    {
+        return tr_message_stream_encryption::DH::randomPrivateKey();
+    }
 
     virtual void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address) = 0;
 };

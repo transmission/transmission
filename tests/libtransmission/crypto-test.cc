@@ -5,14 +5,16 @@
 
 #include <array>
 #include <cstring>
+#include <iostream>
 #include <numeric>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
 
 #include "transmission.h"
 
-#include "crypto.h"
+#include "peer-mse.h"
 #include "crypto-utils.h"
 #include "utils.h"
 
@@ -31,52 +33,71 @@ auto constexpr SomeHash = tr_sha1_digest_t{
     std::byte{ 14 }, std::byte{ 15 }, std::byte{ 16 }, std::byte{ 17 }, std::byte{ 18 }, std::byte{ 19 },
 };
 
+template<size_t N>
+std::string toString(std::array<std::byte, N> const& array)
+{
+    auto ostr = std::ostringstream{};
+    ostr << '[';
+    for (auto const b : array)
+    {
+        ostr << static_cast<unsigned>(b) << ' ';
+    }
+    ostr << ']';
+    return ostr.str();
+}
+
 } // namespace
 
-TEST(Crypto, torrentHash)
+TEST(Crypto, DH)
 {
+    auto a = tr_message_stream_encryption::DH{};
+    auto b = tr_message_stream_encryption::DH{};
 
-    auto a = tr_crypto{};
-    EXPECT_FALSE(a.torrentHash());
+    a.setPeerPublicKey(b.publicKey());
+    b.setPeerPublicKey(a.publicKey());
+    EXPECT_EQ(toString(a.secret()), toString(b.secret()));
+    EXPECT_EQ(a.secret(), b.secret());
+    EXPECT_EQ(96, std::size(a.secret()));
 
-    a.setTorrentHash(SomeHash);
-    EXPECT_TRUE(a.torrentHash());
-    EXPECT_EQ(SomeHash, *a.torrentHash());
-
-    auto b = tr_crypto{ &SomeHash, false };
-    EXPECT_TRUE(b.torrentHash());
-    EXPECT_EQ(SomeHash, *b.torrentHash());
+    auto c = tr_message_stream_encryption::DH{};
+    c.setPeerPublicKey(b.publicKey());
+    EXPECT_NE(a.secret(), c.secret());
+    EXPECT_NE(toString(a.secret()), toString(c.secret()));
 }
 
 TEST(Crypto, encryptDecrypt)
 {
-    auto a = tr_crypto{ &SomeHash, false };
-    auto b = tr_crypto_{ &SomeHash, true };
+    auto a_dh = tr_message_stream_encryption::DH{};
+    auto b_dh = tr_message_stream_encryption::DH{};
 
-    auto public_key = b.myPublicKey();
-    EXPECT_TRUE(a.computeSecret(std::data(public_key), std::size(public_key)));
-    public_key = a.myPublicKey();
-    EXPECT_TRUE(b.computeSecret(std::data(public_key), std::size(public_key)));
+    a_dh.setPeerPublicKey(b_dh.publicKey());
+    b_dh.setPeerPublicKey(a_dh.publicKey());
 
     auto constexpr Input1 = "test1"sv;
     auto encrypted1 = std::array<char, 128>{};
     auto decrypted1 = std::array<char, 128>{};
 
-    a.encryptInit();
-    a.encrypt(std::size(Input1), std::data(Input1), std::data(encrypted1));
-    b.decryptInit();
-    b.decrypt(std::size(Input1), std::data(encrypted1), std::data(decrypted1));
-    EXPECT_EQ(Input1, std::data(decrypted1));
+    auto a = tr_message_stream_encryption::Filter{};
+    a.encryptInit(false, a_dh, SomeHash);
+    std::copy_n(std::begin(Input1), std::size(Input1), std::begin(encrypted1));
+    a.encrypt(std::size(Input1), std::data(encrypted1));
+    auto b = tr_message_stream_encryption::Filter{};
+    b.decryptInit(true, b_dh, SomeHash);
+    std::copy_n(std::begin(encrypted1), std::size(Input1), std::begin(decrypted1));
+    b.decrypt(std::size(Input1), std::data(decrypted1));
+    EXPECT_EQ(Input1, std::data(decrypted1)) << "Input1 " << Input1 << " decrypted1 " << std::data(decrypted1);
 
     auto constexpr Input2 = "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)"sv;
     auto encrypted2 = std::array<char, 128>{};
     auto decrypted2 = std::array<char, 128>{};
 
-    b.encryptInit();
-    b.encrypt(std::size(Input2), std::data(Input2), std::data(encrypted2));
-    a.decryptInit();
-    a.decrypt(std::size(Input2), std::data(encrypted2), std::data(decrypted2));
-    EXPECT_EQ(Input2, std::data(decrypted2));
+    b.encryptInit(true, b_dh, SomeHash);
+    std::copy_n(std::begin(Input2), std::size(Input2), std::begin(encrypted2));
+    b.encrypt(std::size(Input2), std::data(encrypted2));
+    a.decryptInit(false, a_dh, SomeHash);
+    std::copy_n(std::begin(encrypted2), std::size(Input2), std::begin(decrypted2));
+    a.decrypt(std::size(Input2), std::data(decrypted2));
+    EXPECT_EQ(Input2, std::data(decrypted2)) << "Input2 " << Input2 << " decrypted2 " << std::data(decrypted2);
 }
 
 TEST(Crypto, sha1)
