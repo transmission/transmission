@@ -271,6 +271,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             file_subpath_.clear();
             file_length_ = 0;
         }
+        if (pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+        {
+            // torrent has a utf8 path, drop the other one due to probable non-utf8 encoding
+            file_subpath_.clear();
+        }
 
         return BasicHandler::StartArray(context);
     }
@@ -351,7 +356,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathStartsWith(InfoKey, FileDurationKey) || //
             pathStartsWith(InfoKey, FileMediaKey) || //
             pathStartsWith(InfoKey, ProfilesKey) || //
-            pathStartsWith(LibtorrentResumeKey))
+            pathStartsWith(LibtorrentResumeKey) || //
+            pathStartsWith(NodesKey))
         {
             // unused by Transmission
         }
@@ -392,7 +398,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (state_ == State::Files)
         {
-            if (curdepth > 1 && key(curdepth - 1) == PathKey)
+            if (curdepth > 1 && (key(curdepth - 1) == PathKey || key(curdepth - 1) == PathUtf8Key))
             {
                 if (!std::empty(file_subpath_))
                 {
@@ -412,8 +418,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 pathIs(InfoKey, FilesKey, ""sv, Md5Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || //
                 pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || // (why a string?)
-                pathIs(InfoKey, FilesKey, ""sv, Sha1Key) || //
-                pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+                pathIs(InfoKey, FilesKey, ""sv, Sha1Key))
             {
                 // unused by Transmission
             }
@@ -430,7 +435,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tr_strvUtf8Clean(value, tm_.creator_);
         }
-        else if (pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || pathIs(PublisherKey) || pathIs(InfoKey, PublisherKey))
+        else if (
+            pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || //
+            pathIs(PublisherKey) || pathIs(InfoKey, PublisherKey) || //
+            pathIs(PublisherUtf8Key) || pathIs(InfoKey, PublisherUtf8Key))
         {
             // “publisher” is rare, but used by BitComet and appears
             // to have the same use as the 'source' key
@@ -481,12 +489,14 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathIs(InfoKey, EntropyKey) || //
             pathIs(InfoKey, Md5sumKey) || //
             pathIs(InfoKey, PublisherUrlKey) || //
+            pathIs(InfoKey, PublisherUrlUtf8Key) || //
             pathIs(InfoKey, Sha1Key) || //
             pathIs(InfoKey, UniqueKey) || //
             pathIs(InfoKey, XCrossSeedKey) || //
             pathIs(LocaleKey) || //
             pathIs(LogCallbackKey) || //
             pathIs(PublisherUrlKey) || //
+            pathIs(PublisherUrlUtf8Key) || //
             pathIs(TitleKey) || //
             pathStartsWith(AzureusPrivatePropertiesKey) || //
             pathStartsWith(AzureusPropertiesKey) || //
@@ -494,7 +504,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathStartsWith(InfoKey, FileDurationKey) || //
             pathStartsWith(InfoKey, ProfilesKey) || //
             pathStartsWith(LibtorrentResumeKey) || //
-            pathStartsWith(MagnetInfoKey))
+            pathStartsWith(MagnetInfoKey) || //
+            pathStartsWith(NodesKey))
         {
             // unused by Transmission
         }
@@ -666,6 +677,7 @@ private:
     static constexpr std::string_view MtimeKey = "mtime"sv;
     static constexpr std::string_view NameKey = "name"sv;
     static constexpr std::string_view NameUtf8Key = "name.utf-8"sv;
+    static constexpr std::string_view NodesKey = "nodes"sv;
     static constexpr std::string_view PathKey = "path"sv;
     static constexpr std::string_view PathUtf8Key = "path.utf-8"sv;
     static constexpr std::string_view PieceLayersKey = "piece layers"sv;
@@ -675,7 +687,9 @@ private:
     static constexpr std::string_view PrivateKey = "private"sv;
     static constexpr std::string_view ProfilesKey = "profiles"sv;
     static constexpr std::string_view PublisherKey = "publisher"sv;
+    static constexpr std::string_view PublisherUtf8Key = "publisher.utf-8"sv;
     static constexpr std::string_view PublisherUrlKey = "publisher-url"sv;
+    static constexpr std::string_view PublisherUrlUtf8Key = "publisher-url.utf-8"sv;
     static constexpr std::string_view Sha1Key = "sha1"sv;
     static constexpr std::string_view SourceKey = "source"sv;
     static constexpr std::string_view TitleKey = "title"sv;
