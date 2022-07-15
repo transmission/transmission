@@ -9,6 +9,10 @@
 #include <cstring>
 #include <string>
 
+// NOCOMMIT
+#include <iostream>
+#include <vector>
+
 #include <event2/event.h>
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
@@ -136,9 +140,19 @@ static void canReadWrapper(tr_peerIo* io)
         {
             size_t piece = 0;
             size_t const oldLen = evbuffer_get_length(io->inbuf.get());
+
+            // this paragraph is temporary code for testing
+            auto const* const pullup = evbuffer_pullup(io->inbuf.get(), oldLen);
+            auto const raw = std::vector<unsigned char>{ pullup, pullup + oldLen };
+
             int const ret = io->canRead(io, io->userData, &piece);
             size_t const used = oldLen - evbuffer_get_length(io->inbuf.get());
             unsigned int const overhead = guessPacketOverhead(used);
+
+            // this paragraph is temporary code for testing
+            auto const sv = std::string_view{ reinterpret_cast<char const*>(std::data(raw)), used };
+            std::cerr << __FILE__ << ':' << __LINE__ << " io " << io << " canRead() just finished. Data consumed: ["
+                      << tr_base64_encode(sv) << ']' << std::endl;
 
             if (piece != 0 || piece != used)
             {
