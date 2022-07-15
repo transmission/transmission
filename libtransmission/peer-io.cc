@@ -18,11 +18,13 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
-#include "session.h"
+
 #include "bandwidth.h"
+#include "crypto-utils.h"
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -114,6 +116,7 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 
 static void canReadWrapper(tr_peerIo* io)
 {
+    fmt::print("{:s}:{:d} peerIo {} canReadWrapper\n", __FILE__, __LINE__, fmt::ptr(io));
     tr_logAddTraceIo(io, "canRead");
 
     tr_peerIoRef(io);
@@ -353,7 +356,12 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 
 void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
-    fmt::print("{:s}:{:d} peer {} got {}\n", __FILE__, __LINE__, addrStr(), tr_base64_encode(std::string_view{ static_cast<char const*>(data), n_bytes }));
+    fmt::print(
+        "{:s}:{:d} peer {} got {}\n",
+        __FILE__,
+        __LINE__,
+        addrStr(),
+        tr_base64_encode(std::string_view{ static_cast<char const*>(data), n_bytes }));
     if (auto const rc = evbuffer_add(inbuf.get(), data, n_bytes); rc < 0)
     {
         tr_logAddWarn(_("Couldn't write to peer"));
@@ -505,7 +513,7 @@ static tr_peerIo* tr_peerIoNew(
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(session->events != nullptr);
-    TR_ASSERT(tr_amInEventThread(session));
+    auto lock = session->unique_lock();
 
 #ifdef WITH_UTP
     TR_ASSERT(socket.type == TR_PEER_SOCKET_TYPE_TCP || socket.type == TR_PEER_SOCKET_TYPE_UTP);

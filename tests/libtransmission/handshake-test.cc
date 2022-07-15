@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cassert>
 #include <cstring>
 #include <string_view>
 
@@ -13,33 +14,39 @@
 
 #include "handshake.h"
 #include "peer-io.h"
+#include "session.h" // tr_peerIdInit()
 
 #include "test-fixtures.h"
 
 using namespace std::literals;
+
+#ifdef _WIN32
+#define LOCAL_SOCKETPAIR_AF AF_INET
+#else
+#define LOCAL_SOCKETPAIR_AF AF_UNIX
+#endif
 
 namespace libtransmission
 {
 namespace test
 {
 
+auto constexpr MaxWaitMsec = int{ 5000 };
+
 using HandshakeTest = SessionTest;
 
 class MediatorMock final : public tr_handshake_mediator
 {
 public:
-    /*
-    struct torrent_info
-    {
-        tr_sha1_digest_t info_hash;
-        tr_peer_id_t client_peer_id;
-        tr_torrent_id_t id;
-        bool is_done;
-    };*/
-
     [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
     {
         fmt::print("{:s}:{:d} torrentInfo info_hash {:s}\n", __FILE__, __LINE__, tr_sha1_to_string(info_hash));
+
+        if (auto const iter = torrents.find(info_hash); iter != std::end(torrents))
+        {
+            return iter->second;
+        }
+
         return {};
     }
 
@@ -67,11 +74,51 @@ public:
         return false;
     }
 
+    [[nodiscard]] size_t pad(void* /*setme*/, size_t /*max_bytes*/) const override
+    {
+        return 0;
+    }
+
+    [[nodiscard]] tr_message_stream_encryption::DH::private_key_bigend_t privateKey() const override
+    {
+        return {};
+    }
+
     void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address addr) override
     {
-        fmt::print("{:s}:{:d} setUTPFailed info_hash {:s} addr {:s}\n", __FILE__, __LINE__, tr_sha1_to_string(info_hash), addr.readable());
+        fmt::print(
+            "{:s}:{:d} setUTPFailed info_hash {:s} addr {:s}\n",
+            __FILE__,
+            __LINE__,
+            tr_sha1_to_string(info_hash),
+            addr.readable());
     }
+
+    std::map<tr_sha1_digest_t, torrent_info> torrents;
 };
+
+template<typename Span>
+void sendToPeer(evutil_socket_t sock, Span const& data)
+{
+    auto const* walk = std::data(data);
+    static_assert(sizeof(*walk) == 1);
+    size_t len = std::size(data);
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " writing " << len << " bytes" << std::endl;
+    while (len > 0)
+    {
+        auto const n = write(sock, walk, len);
+        auto const err = errno;
+        std::cerr << __FILE__ << ':' << __LINE__ << " n " << n << std::endl;
+        if (n < 0)
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_strerror(err);
+        }
+        assert(n >= 0);
+        len -= n;
+        walk += n;
+    }
+}
 
 TEST_F(HandshakeTest, helloWorld)
 {
@@ -88,8 +135,8 @@ TEST_F(HandshakeTest, helloWorld)
 
 TEST_F(HandshakeTest, canCreateHandshake)
 {
-    auto sockpair = std::array<evutil_socket_t, 2>{};
-    evutil_socketpair(AF_INET, SOCK_STREAM, 0, std::data(sockpair));
+    auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
+    evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair));
 
     auto const addr = *tr_address::fromString("127.0.0.1"sv);
     auto const now = tr_time();
@@ -113,40 +160,62 @@ TEST_F(HandshakeTest, canCreateHandshake)
     evutil_closesocket(sockpair[0]);
 }
 
-TEST_F(HandshakeTest, encryptedIncoming)
+TEST_F(HandshakeTest, unencryptedIncomingSuccess)
 {
-    auto sockpair = std::array<evutil_socket_t, 2>{};
-    evutil_socketpair(AF_INET, SOCK_STREAM, 0, std::data(sockpair));
+    auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
+    EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
 
     auto const addr = *tr_address::fromString("127.0.0.1"sv);
     auto const now = tr_time();
     auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
     auto const port = tr_port::fromHost(8080);
 
+    auto mediator = std::make_shared<MediatorMock>();
+    auto const info_hash = *tr_sha1("abcde"sv);
+    auto const tor_id = tr_torrent_id_t{ 8 };
+    auto const is_done = true;
+    auto const info = tr_handshake_mediator::torrent_info{ info_hash, tr_peerIdInit(), tor_id, is_done };
+    mediator->torrents.emplace(info_hash, info);
+
     auto* const incoming_io = tr_peerIoNewIncoming(session_, &session_->top_bandwidth_, &addr, port, now, peer_socket);
     EXPECT_NE(nullptr, incoming_io);
-    auto mediator = std::make_shared<MediatorMock>();
+    auto res = std::optional<tr_handshake_result>{};
     auto* const handshake = tr_handshakeNew(
         mediator,
         incoming_io,
         TR_CLEAR_PREFERRED,
-        [](auto const& /*res*/) { std::cerr << "woot" << std::endl; return true; },
-        nullptr);
+        [](auto const& res)
+        {
+            *static_cast<std::optional<tr_handshake_result>*>(res.userData) = res;
+            return true;
+        },
+        &res);
     EXPECT_NE(nullptr, handshake);
 
     fmt::print("{:s}:{:d} adding payload\n", __FILE__, __LINE__);
-    auto payload = tr_base64_decode("MPJX+PAj4UrFQnlq+LeV7zVNhK5CfLL2X7rDLtdb+elvq8yvkljOQhgQqaoStoV10zaoMsn1ZZSsPjr6ezTFsRN6eRyOASXmwr2w22/a+KVP13hTfehmt6LJVJOSWzCfbbw3qwtZLIE7L+3NCaOUGmE8MqydH/q+lq8wVpOUV6SFLax5KokxDVIjVjVCg6nZgDtO9QdmkYwRRkk5KUS3l8VWlCKgIuHIXi7ghZhU+XIuTlHcWjGulUVXL8HFboiiZMWtN8QR80lhxJTJ");
-    incoming_io->readBufferAdd(std::data(payload), std::size(payload));
+    sendToPeer(sockpair[1], "\023BitTorrent protocol"sv);
+    auto reserved_bytes = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
+    sendToPeer(sockpair[1], reserved_bytes);
+    sendToPeer(sockpair[1], info_hash);
 
-    fmt::print("{:s}:{:d} adding payload\n", __FILE__, __LINE__);
-    payload = tr_base64_decode("ZJkmwyPQjhIa9iT9kzJByUKdmqTu5nF8uPwEvimnLvA6j7gp6uS5oDFyUdYugL3Joo9oJJQoUX4WnsPECNEZHy/ZqzmxYQ1oV3k0bGwzo6DatJu5zw8Ky0aAQMX+o0tDeiKF8ImmBiBaPTJ/VpB0/nOxPkGaOVoEKBgDzcvKpVGDZyA5bpwz8HpgoJ0YYoL+sGj4ULagAkdeO/VLrTvHZfaot5j10Nueadq6j0PYc+1OEXDDpZUB7CTPKj2/RyS6Yrs8bRbG1PUx+WUMhZ02dHEMOspeZ8Apko//6zlZvyx691OeEuoP0P/q+aSWqKJCy7Ln2Ue01dH8/vdiE5HnggpBQ/IPxkrbAgfs/eRFb0DaTCrSMjiPR694mrUdfeG6QAybMNhKSuCRsybKno/fptjp+GYwms1ZkGX1Q194BbAgNosIUBdQi2s5za4XybW4FoVfsH5sagmhiXmCcF7U4eNQeBGWqJoBhKL+Z2g38Re6kwNc1OVimTJIZiFfS1Pjco5rvSTFxLsS6uLQwgzTZCLpZgY04cOSD3J2fg45MoiIHa1vZhWzRA7/dptzp9aswtEuhcXwWEIIgQT9qh8DC2V2LVg=");
-    incoming_io->readBufferAdd(std::data(payload), std::size(payload));
+    auto peer_id = tr_peer_id_t{};
+    tr_rand_buffer(std::data(peer_id), std::size(peer_id));
+    auto const peer_id_prefix = "-UW110Q-"sv;
+    std::copy(std::begin(peer_id_prefix), std::end(peer_id_prefix), std::begin(peer_id));
+    sendToPeer(sockpair[1], peer_id);
 
-    fmt::print("{:s}:{:d} adding payload\n", __FILE__, __LINE__);
-    payload = tr_base64_decode("91JNHv4wpp1RchzFY5i5XQkYlicqdG9qFE+6tA8SAHRRuIM3VhaA66yfE1FrOuX6oVprCzHuRsUIZo1yOfKIxIowo++4yAn4JNxz6s8YMJdTcruywjvNqbwK1pDK3UNCCDl+VSPj7tC64lgD1PcSEcqwEvSQt4P5afkr5ZQRUb6OyYtDGqQvEpbqYmMExEUBjoNUv0CUIOPBOY50qIPKq0zxyj02dPD0W5VVbgGpntnSyGPbczOtKlkQ7wkPjcODyqsVBtyLeMOHtqA1ORGL68AYVYhvMutem4Cmb34zu962h3x8XYkfxHRzHELdUZ6/hMUaXFxIdjJ50QLBgNVIMxj8CxK2WaBqJEiIZp+WHltLVhYWlcHliSAW6J5y3XqXqwXKeGUKgzNEkXfEQzfy");
-    incoming_io->readBufferAdd(std::data(payload), std::size(payload));
+    waitFor([&res]() { return res.has_value(); }, MaxWaitMsec);
+    // tr_wait_msec(1000);
 
-    fmt::print("{:s}:{:d} closing\n", __FILE__, __LINE__);
+    EXPECT_TRUE(res);
+    EXPECT_EQ(handshake, res->handshake);
+    EXPECT_TRUE(res->isConnected);
+    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_EQ(incoming_io, res->io);
+    EXPECT_TRUE(res->peer_id);
+    EXPECT_EQ(peer_id, res->peer_id);
+
+    tr_peerIoUnref(incoming_io);
     evutil_closesocket(sockpair[1]);
     evutil_closesocket(sockpair[0]);
 }

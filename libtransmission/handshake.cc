@@ -135,24 +135,24 @@ struct tr_handshake
 
     std::shared_ptr<tr_handshake_mediator> const mediator;
 
-    bool haveReadAnythingFromPeer;
-    bool haveSentBitTorrentHandshake;
-    tr_peerIo* io;
-    DH dh;
+    bool haveReadAnythingFromPeer = false;
+    bool haveSentBitTorrentHandshake = false;
+    tr_peerIo* io = nullptr;
+    DH dh = {};
     handshake_state_t state;
     tr_encryption_mode encryptionMode;
-    uint16_t pad_c_len;
-    uint16_t pad_d_len;
-    uint16_t ia_len;
-    uint32_t crypto_select;
-    uint32_t crypto_provide;
-    tr_sha1_digest_t myReq1;
-    struct event* timeout_timer;
+    uint16_t pad_c_len = {};
+    uint16_t pad_d_len = {};
+    uint16_t ia_len = {};
+    uint32_t crypto_select = {};
+    uint32_t crypto_provide = {};
+    tr_sha1_digest_t myReq1 = {};
+    struct event* timeout_timer = nullptr;
 
     std::optional<tr_peer_id_t> peer_id;
 
-    tr_handshake_done_func done_func;
-    void* done_func_user_data;
+    tr_handshake_done_func done_func = nullptr;
+    void* done_func_user_data = nullptr;
 };
 
 /**
