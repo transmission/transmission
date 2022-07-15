@@ -626,6 +626,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         0,
         self.fCommentView.string.UTF8String,
         self.fPrivateCheck.state == NSControlStateValueOn,
+        NO,
         self.fSource.stringValue.UTF8String);
     tr_free(trackerInfo);
 

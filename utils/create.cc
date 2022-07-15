@@ -35,7 +35,7 @@ char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>"
 
 uint32_t constexpr KiB = 1024;
 
-auto constexpr Options = std::array<tr_option, 9>{
+auto constexpr Options = std::array<tr_option, 10>{
     { { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
       { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
       { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
@@ -43,6 +43,7 @@ auto constexpr Options = std::array<tr_option, 9>{
       { 'c', "comment", "Add a comment", "c", true, "<comment>" },
       { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
       { 'w', "webseed", "Add a webseed URL", "w", true, "<url>" },
+      { 'x', "anonymize", "Omit \"Creation date\" and \"Created by\" info", nullptr, false, nullptr},
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
@@ -58,6 +59,7 @@ struct app_options
     uint32_t piecesize_kib = 0;
     bool is_private = false;
     bool show_version = false;
+    bool anonymize = false;
 };
 
 int parseCommandLine(app_options& options, int argc, char const* const* argv)
@@ -109,6 +111,10 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
 
         case 'r':
             options.source = optarg;
+            break;
+
+        case 'x':
+            options.anonymize = true;
             break;
 
         case TR_OPT_UNK:
@@ -241,6 +247,7 @@ int tr_main(int argc, char* argv[])
         static_cast<int>(std::size(options.webseeds)),
         options.comment,
         options.is_private,
+        options.anonymize,
         options.source);
 
     uint32_t last = UINT32_MAX;
