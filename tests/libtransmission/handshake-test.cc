@@ -160,24 +160,47 @@ TEST_F(HandshakeTest, canCreateHandshake)
     evutil_closesocket(sockpair[0]);
 }
 
-TEST_F(HandshakeTest, unencryptedIncomingSuccess)
+auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
+auto const default_peer_addr = *tr_address::fromString("127.0.0.1"sv);
+auto const default_peer_port = tr_port::fromHost(8080);
+auto const torrent_we_are_seeding = tr_handshake_mediator::torrent_info{ *tr_sha1("abcde"sv),
+                                                                         tr_peerIdInit(),
+                                                                         tr_torrent_id_t{ 100 },
+                                                                         true };
+
+auto createPeerIo(tr_session* session)
 {
     auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
     EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
-
-    auto const addr = *tr_address::fromString("127.0.0.1"sv);
     auto const now = tr_time();
     auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
-    auto const port = tr_port::fromHost(8080);
+    auto* const incoming_io = tr_peerIoNewIncoming(
+        session,
+        &session->top_bandwidth_,
+        &default_peer_addr,
+        default_peer_port,
+        now,
+        peer_socket);
+    return std::make_pair(incoming_io, sockpair[1]);
+}
 
+auto makeRandomPeerId()
+{
+    auto peer_id = tr_peer_id_t{};
+    tr_rand_buffer(std::data(peer_id), std::size(peer_id));
+    auto const peer_id_prefix = "-UW110Q-"sv;
+    std::copy(std::begin(peer_id_prefix), std::end(peer_id_prefix), std::begin(peer_id));
+    return peer_id;
+}
+
+TEST_F(HandshakeTest, incomingPlaintext)
+{
+    static auto constexpr reserved_bytes = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
+    auto const peer_id = makeRandomPeerId();
     auto mediator = std::make_shared<MediatorMock>();
-    auto const info_hash = *tr_sha1("abcde"sv);
-    auto const tor_id = tr_torrent_id_t{ 8 };
-    auto const is_done = true;
-    auto const info = tr_handshake_mediator::torrent_info{ info_hash, tr_peerIdInit(), tor_id, is_done };
-    mediator->torrents.emplace(info_hash, info);
+    mediator->torrents.emplace(torrent_we_are_seeding.info_hash, torrent_we_are_seeding);
 
-    auto* const incoming_io = tr_peerIoNewIncoming(session_, &session_->top_bandwidth_, &addr, port, now, peer_socket);
+    auto [incoming_io, sock] = createPeerIo(session_);
     EXPECT_NE(nullptr, incoming_io);
     auto res = std::optional<tr_handshake_result>{};
     auto* const handshake = tr_handshakeNew(
@@ -192,21 +215,23 @@ TEST_F(HandshakeTest, unencryptedIncomingSuccess)
         &res);
     EXPECT_NE(nullptr, handshake);
 
-    fmt::print("{:s}:{:d} adding payload\n", __FILE__, __LINE__);
-    sendToPeer(sockpair[1], "\023BitTorrent protocol"sv);
-    auto reserved_bytes = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
-    sendToPeer(sockpair[1], reserved_bytes);
-    sendToPeer(sockpair[1], info_hash);
+    // The simplest handshake there is. "The handshake starts with character
+    // nineteen (decimal) followed by the string 'BitTorrent protocol'.
+    // The leading character is a length prefix[.]. After the fixed headers
+    // come eight reserved bytes, which are all zero in all current
+    // implementations[.] Next comes the 20 byte sha1 hash of the bencoded
+    // form of the info value from the metainfo file[.] After the download
+    // hash comes the 20-byte peer id which is reported in tracker requests
+    // and contained in peer lists in tracker responses.
+    sendToPeer(sock, PlaintextProtocolName);
+    sendToPeer(sock, reserved_bytes);
+    sendToPeer(sock, torrent_we_are_seeding.info_hash);
+    sendToPeer(sock, peer_id);
 
-    auto peer_id = tr_peer_id_t{};
-    tr_rand_buffer(std::data(peer_id), std::size(peer_id));
-    auto const peer_id_prefix = "-UW110Q-"sv;
-    std::copy(std::begin(peer_id_prefix), std::end(peer_id_prefix), std::begin(peer_id));
-    sendToPeer(sockpair[1], peer_id);
-
+    // wait for the "handshake done" callback to be called
     waitFor([&res]() { return res.has_value(); }, MaxWaitMsec);
-    // tr_wait_msec(1000);
 
+    // check the results
     EXPECT_TRUE(res);
     EXPECT_EQ(handshake, res->handshake);
     EXPECT_TRUE(res->isConnected);
@@ -214,10 +239,62 @@ TEST_F(HandshakeTest, unencryptedIncomingSuccess)
     EXPECT_EQ(incoming_io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(peer_id, res->peer_id);
+    EXPECT_TRUE(incoming_io->torrentHash());
+    EXPECT_EQ(torrent_we_are_seeding.info_hash, *incoming_io->torrentHash());
 
     tr_peerIoUnref(incoming_io);
-    evutil_closesocket(sockpair[1]);
-    evutil_closesocket(sockpair[0]);
+    evutil_closesocket(sock);
+}
+
+TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
+{
+    static auto constexpr reserved_bytes = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
+    auto const peer_id = makeRandomPeerId();
+    auto mediator = std::make_shared<MediatorMock>();
+    mediator->torrents.emplace(torrent_we_are_seeding.info_hash, torrent_we_are_seeding);
+
+    auto [incoming_io, sock] = createPeerIo(session_);
+    EXPECT_NE(nullptr, incoming_io);
+    auto res = std::optional<tr_handshake_result>{};
+    auto* const handshake = tr_handshakeNew(
+        mediator,
+        incoming_io,
+        TR_CLEAR_PREFERRED,
+        [](auto const& res)
+        {
+            *static_cast<std::optional<tr_handshake_result>*>(res.userData) = res;
+            return true;
+        },
+        &res);
+    EXPECT_NE(nullptr, handshake);
+
+    // The simplest handshake there is. "The handshake starts with character
+    // nineteen (decimal) followed by the string 'BitTorrent protocol'.
+    // The leading character is a length prefix[.]. After the fixed headers
+    // come eight reserved bytes, which are all zero in all current
+    // implementations[.] Next comes the 20 byte sha1 hash of the bencoded
+    // form of the info value from the metainfo file[.] After the download
+    // hash comes the 20-byte peer id which is reported in tracker requests
+    // and contained in peer lists in tracker responses.
+    sendToPeer(sock, PlaintextProtocolName);
+    sendToPeer(sock, reserved_bytes);
+    sendToPeer(sock, *tr_sha1("some other torrent unknown to us"sv));
+    sendToPeer(sock, peer_id);
+
+    // wait for the "handshake done" callback to be called
+    waitFor([&res]() { return res.has_value(); }, MaxWaitMsec);
+
+    // check the results
+    EXPECT_TRUE(res);
+    EXPECT_EQ(handshake, res->handshake);
+    EXPECT_FALSE(res->isConnected);
+    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_EQ(incoming_io, res->io);
+    EXPECT_FALSE(res->peer_id);
+    EXPECT_FALSE(incoming_io->torrentHash());
+
+    tr_peerIoUnref(incoming_io);
+    evutil_closesocket(sock);
 }
 
 } // namespace test
