@@ -203,7 +203,7 @@
     return NO;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
+- (BOOL)tableView:(NSTableView*)tableView shouldSelectRow:(NSInteger)row
 {
     id node = self.fTrackers[row];
     if ([node isKindOfClass:[TrackerNode class]])
