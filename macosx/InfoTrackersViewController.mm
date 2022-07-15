@@ -200,7 +200,17 @@
 
 - (BOOL)tableView:(NSTableView*)tableView isGroupRow:(NSInteger)row
 {
-    return ![self.fTrackers[row] isKindOfClass:[TrackerNode class]] && tableView.editedRow != row;
+    return NO;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
+{
+    id node = self.fTrackers[row];
+    if ([node isKindOfClass:[TrackerNode class]])
+    {
+        return YES;
+    }
+    return NO;
 }
 
 - (NSString*)tableView:(NSTableView*)tableView
