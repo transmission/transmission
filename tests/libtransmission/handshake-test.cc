@@ -141,12 +141,17 @@ auto const ubuntu_torrent = tr_handshake_mediator::torrent_info{ *tr_sha1_from_s
 
 auto createIncomingIo(tr_session* session)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const now = tr_time();
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
     auto* const
         io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, &default_peer_addr, default_peer_port, now, peer_socket);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return std::make_pair(io, sockpair[1]);
 }
 
@@ -193,26 +198,42 @@ auto runHandshake(
     tr_peerIo* io,
     tr_encryption_mode encryption_mode = TR_CLEAR_PREFERRED)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto result = std::optional<tr_handshake_result>{};
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     static auto const done_callback = [](auto const& resin)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         *static_cast<std::optional<tr_handshake_result>*>(resin.userData) = resin;
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         return true;
     };
 
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_handshakeNew(mediator, io, encryption_mode, done_callback, &result);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
-    waitFor([&result]() { return result.has_value(); }, MaxWaitMsec);
+    waitFor(
+        [&result]()
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+            return result.has_value();
+        },
+        MaxWaitMsec);
 
     return result;
 }
 
 TEST_F(HandshakeTest, incomingPlaintext)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const peer_id = makeRandomPeerId();
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto mediator = std::make_shared<MediatorMock>();
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     mediator->torrents.emplace(torrent_we_are_seeding.info_hash, torrent_we_are_seeding);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // The simplest handshake there is. "The handshake starts with character
     // nineteen (decimal) followed by the string 'BitTorrent protocol'.
@@ -222,26 +243,45 @@ TEST_F(HandshakeTest, incomingPlaintext)
     // form of the info value from the metainfo file[.] After the download
     // hash comes the 20-byte peer id which is reported in tracker requests
     // and contained in peer lists in tracker responses.
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto [io, sock] = createIncomingIo(session_);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     sendToPeer(sock, PlaintextProtocolName);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     sendToPeer(sock, ReservedBytesNoExtensions);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     sendToPeer(sock, torrent_we_are_seeding.info_hash);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     sendToPeer(sock, peer_id);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     auto const res = runHandshake(mediator, io);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // check the results
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(res);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(res->isConnected);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(res->readAnythingFromPeer);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(io, res->io);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(res->peer_id);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(peer_id, res->peer_id);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(io->torrentHash());
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(torrent_we_are_seeding.info_hash, *io->torrentHash());
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_peerIoUnref(io);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     evutil_closesocket(sock);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 }
 
 // The datastream is identical to HandshakeTest.incomingPlaintext,
