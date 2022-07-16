@@ -9,9 +9,6 @@
 #include <cstring>
 #include <string_view>
 
-// NOMERGE
-#include <iostream>
-
 #include <event2/buffer.h>
 #include <event2/event.h>
 
@@ -117,17 +114,8 @@ struct tr_handshake
 {
     tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in)
         : mediator{ std::move(mediator_in) }
-        , private_key_{ mediator->privateKey() }
-        , dh{ private_key_ }
+        , dh{ mediator->privateKey() }
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
-
-        std::cerr << __FILE__ << ':' << __LINE__ << " HERE IS THE CLIENT'S PRIVATE KEY: ";
-        for (auto u8 : private_key_)
-        {
-            std::cerr << static_cast<unsigned>(u8) << ' ';
-        }
-        std::cerr << std::endl;
     }
 
     ~tr_handshake()
@@ -146,7 +134,6 @@ struct tr_handshake
     }
 
     std::shared_ptr<tr_handshake_mediator> const mediator;
-    DH::private_key_bigend_t const private_key_;
 
     bool haveReadAnythingFromPeer = false;
     bool haveSentBitTorrentHandshake = false;
@@ -585,73 +572,57 @@ static ReadState readPadD(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", INCOMING_HANDSHAKE_LEN, evbuffer_get_length(inbuf)));
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (evbuffer_get_length(inbuf) < INCOMING_HANDSHAKE_LEN)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         return READ_LATER;
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->haveReadAnythingFromPeer = true;
 
     uint8_t pstrlen = evbuffer_pullup(inbuf, 1)[0]; /* peek, don't read. We may be handing inbuf to AWAITING_YA */
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (pstrlen == 19) /* unencrypted */
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         if (handshake->encryptionMode == TR_ENCRYPTION_REQUIRED)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_logAddTraceHand(handshake, "peer is unencrypted, and we're disallowing that");
             return tr_handshakeDone(handshake, false);
         }
     }
     else /* encrypted or corrupt */
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         if (handshake->isIncoming())
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_logAddTraceHand(handshake, "I think peer is sending us an encrypted handshake...");
             setState(handshake, AWAITING_YA);
             return READ_NOW;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         handshake->io->decrypt(1, &pstrlen);
 
         if (pstrlen != 19)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_logAddTraceHand(handshake, "I think peer has sent us a corrupt handshake...");
             return tr_handshakeDone(handshake, false);
         }
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     evbuffer_drain(inbuf, 1);
 
     /* pstr (BitTorrent) */
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     TR_ASSERT(pstrlen == 19);
     uint8_t pstr[20];
     tr_peerIoReadBytes(handshake->io, inbuf, pstr, pstrlen);
     pstr[pstrlen] = '\0';
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (strncmp((char const*)pstr, "BitTorrent protocol", 19) != 0)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         return tr_handshakeDone(handshake, false);
     }
 
     /* reserved bytes */
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     tr_peerIoReadBytes(handshake->io, inbuf, reserved, sizeof(reserved));
 
@@ -659,7 +630,6 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     *** Extensions
     **/
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
     handshake->io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
     handshake->io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
@@ -668,29 +638,22 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     auto hash = tr_sha1_digest_t{};
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(hash), std::size(hash));
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (handshake->isIncoming())
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         if (!handshake->mediator->torrentInfo(hash))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_logAddTraceHand(handshake, "peer is trying to connect to us for a torrent we don't have.");
             return tr_handshakeDone(handshake, false);
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         handshake->io->setTorrentHash(hash);
     }
     else /* outgoing */
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         auto const torrent_hash = handshake->io->torrentHash();
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         if (!torrent_hash || *torrent_hash != hash)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
             return tr_handshakeDone(handshake, false);
         }
@@ -700,116 +663,82 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     ***  If it's an incoming message, we need to send a response handshake
     **/
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (!handshake->haveSentBitTorrentHandshake)
     {
         uint8_t msg[HANDSHAKE_SIZE];
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         if (!buildHandshakeMessage(handshake, msg))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             return tr_handshakeDone(handshake, false);
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
         handshake->haveSentBitTorrentHandshake = true;
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     setReadState(handshake, AWAITING_PEER_ID);
     return READ_NOW;
 }
 
 static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     // read the peer_id
     auto peer_id = tr_peer_id_t{};
     if (evbuffer_get_length(inbuf) < std::size(peer_id))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         return READ_LATER;
     }
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(peer_id), std::size(peer_id));
     handshake->peer_id = peer_id;
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     char client[128] = {};
     tr_clientForId(client, sizeof(client), peer_id);
     tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}' ... isIncoming is {}", client, handshake->isIncoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const hash = handshake->io->torrentHash();
     auto const info = hash ? handshake->mediator->torrentInfo(*hash) : std::nullopt;
     auto const connected_to_self = info && info->client_peer_id == peer_id;
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " connected_to_self " << connected_to_self << std::endl;
     return tr_handshakeDone(handshake, !connected_to_self);
 }
 
 static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto peer_public_key = DH::key_bigend_t{};
     tr_logAddTraceHand(
         handshake,
         fmt::format("in readYa... need {}, have {}", std::size(peer_public_key), evbuffer_get_length(inbuf)));
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (evbuffer_get_length(inbuf) < std::size(peer_public_key))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         return READ_LATER;
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     /* read the incoming peer's public key */
     evbuffer_remove(inbuf, std::data(peer_public_key), std::size(peer_public_key));
-    std::cerr << __FILE__ << ':' << __LINE__ << " HERE IS THE PEER'S PUBLIC KEY: ";
-    for (auto u8 : peer_public_key)
-    {
-        std::cerr << static_cast<unsigned>(u8) << ' ';
-    }
-    std::cerr << std::endl;
     handshake->dh.setPeerPublicKey(peer_public_key);
 
-    auto const secret = handshake->dh.secret();
-    std::cerr << __FILE__ << ':' << __LINE__ << " HERE IS THE SHARED SECRET: ";
-    for (auto u8 : secret)
+    if (auto const req1 = tr_sha1("req1"sv, handshake->dh.secret()); req1)
     {
-        std::cerr << static_cast<unsigned>(u8) << ' ';
+        handshake->myReq1 = *req1;
     }
-    std::cerr << std::endl;
-
-    auto sv = std::string_view{ reinterpret_cast<char const*>(std::data(secret)), std::size(secret) };
-    std::cerr << __FILE__ << ':' << __LINE__ << " secret " << tr_base64_encode(sv) << std::endl;
-
-    auto req1 = tr_sha1("req1"sv, handshake->dh.secret());
-    if (!req1)
+    else
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_logAddTraceHand(handshake, "error while computing req1 hash after Ya");
         return tr_handshakeDone(handshake, false);
     }
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sha1('req1', secret): " << tr_sha1_to_string(*req1) << std::endl;
-    handshake->myReq1 = *req1;
 
     // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
     sendPublicKeyAndPad<PadB_MAXLEN>(handshake);
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     setReadState(handshake, AWAITING_PAD_A);
     return READ_NOW;
 }
 
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     /* resynchronizing on HASH('req1', S) */
     struct evbuffer_ptr ptr = evbuffer_search(
         inbuf,
@@ -819,7 +748,6 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (ptr.pos != -1) /* match */
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         evbuffer_drain(inbuf, ptr.pos);
         tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
         setState(handshake, AWAITING_CRYPTO_PROVIDE);
@@ -828,11 +756,9 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (size_t const len = evbuffer_get_length(inbuf); len > SHA_DIGEST_LENGTH)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return READ_LATER;
 }
 
@@ -1057,8 +983,6 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
     ReadState ret = READ_NOW;
     while (readyForMore)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " handshake " << handshake << " io " << io << " state is "
-                  << handshake->state << std::endl;
         switch (handshake->state)
         {
         case AWAITING_HANDSHAKE:
@@ -1237,57 +1161,35 @@ tr_handshake* tr_handshakeNew(
     tr_handshake_done_func done_func,
     void* done_func_user_data)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto* const handshake = new tr_handshake{ std::move(mediator) };
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->io = io;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->encryptionMode = encryptionMode;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->done_func = done_func;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->done_func_user_data = done_func_user_data;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->timeout_timer = evtimer_new(handshake->mediator->eventBase(), handshakeTimeout, handshake);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_timerAdd(*handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     if (handshake->isIncoming())
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
     else if (encryptionMode != TR_CLEAR_PREFERRED)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         sendYa(handshake);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
     else
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         uint8_t msg[HANDSHAKE_SIZE];
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         buildHandshakeMessage(handshake, msg);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         handshake->haveSentBitTorrentHandshake = true;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return handshake;
 }
 
