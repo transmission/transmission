@@ -762,6 +762,15 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer_remove(inbuf, std::data(peer_public_key), std::size(peer_public_key));
     handshake->dh.setPeerPublicKey(peer_public_key);
 
+    auto const secret = handshake->dh.secret();
+    for (auto u8 : secret)
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << static_cast<unsigned>(u8) << std::endl;
+    }
+
+    auto sv = std::string_view{ reinterpret_cast<char const*>(std::data(secret)), std::size(secret) };
+    std::cerr << __FILE__ << ':' << __LINE__ << " secret " << sv << std::endl;
+
     auto req1 = tr_sha1("req1"sv, handshake->dh.secret());
     if (!req1)
     {
@@ -769,7 +778,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
         tr_logAddTraceHand(handshake, "error while computing req1 hash after Ya");
         return tr_handshakeDone(handshake, false);
     }
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sha1('req1', secret): " << tr_sha1_to_string(*req1) << std::endl;
     handshake->myReq1 = *req1;
 
     // send our public key to the peer
