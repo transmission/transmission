@@ -119,7 +119,11 @@ void sendToClient(evutil_socket_t sock, Span const& data)
 
     while (len > 0)
     {
+#if defined(_WIN32)
+        auto const n = send(sock, walk, len, 0);
+#else
         auto const n = write(sock, walk, len);
+#endif
         assert(n >= 0);
         len -= n;
         walk += n;
