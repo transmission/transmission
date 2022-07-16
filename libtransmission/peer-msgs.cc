@@ -227,7 +227,7 @@ using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 #define myLogMacro(msgs, level, text) \
     do \
     { \
-        if (tr_logGetLevel() >= (level)) \
+        if (tr_logLevelIsActive(level)) \
         { \
             tr_logAddMessage( \
                 __FILE__, \
