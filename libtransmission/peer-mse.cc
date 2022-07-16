@@ -40,6 +40,7 @@ template<typename UIntWide>
 auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
 {
     auto ret = UIntWide{};
+    static_assert(sizeof(UIntWide) == sizeof(bigend_bin));
 
     std::cerr << __FILE__ << ':' << __LINE__ << " import_bits, array in: "sv;
     for (auto u8 : bigend_bin)
@@ -52,11 +53,24 @@ auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits
     {
         std::cerr << __FILE__ << ':' << __LINE__ << " is big endian" << std::endl;
 
+        ret = *reinterpret_cast<UIntWide const*>(std::data(bigend_bin));
+        std::cerr << __FILE__ << ':' << __LINE__ << " attempt 1: " << ret << std::endl;
+
+        ret = {};
         for (auto walk = std::rbegin(bigend_bin), end = std::rend(bigend_bin); walk != end; ++walk)
         {
             ret <<= 8;
             ret += static_cast<uint8_t>(*walk);
         }
+        std::cerr << __FILE__ << ':' << __LINE__ << " attempt 2: " << ret << std::endl;
+
+        ret = {};
+        for (auto walk = std::begin(bigend_bin), end = std::end(bigend_bin); walk != end; ++walk)
+        {
+            ret <<= 8;
+            ret += static_cast<uint8_t>(*walk);
+        }
+        std::cerr << __FILE__ << ':' << __LINE__ << " attempt 3: " << ret << std::endl;
     }
     else
     {
