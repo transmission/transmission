@@ -114,16 +114,6 @@ public:
 
     void readBufferAdd(void const* data, size_t n_bytes);
 
-    [[nodiscard]] auto readBufferSize() const noexcept
-    {
-        return evbuffer_get_length(inbuf.get());
-    }
-
-    [[nodiscard]] auto const* peek(size_t n_bytes) const noexcept
-    {
-        return readBufferSize() >= n_bytes ? evbuffer_pullup(inbuf.get(), n_bytes) : nullptr;
-    }
-
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
         return bandwidth_.clamp(dir, 1024) > 0;

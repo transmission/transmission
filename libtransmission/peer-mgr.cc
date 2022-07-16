@@ -19,9 +19,6 @@
 #include <utility>
 #include <vector>
 
-// NOCOMMIT
-#include <iostream>
-
 #include <event2/event.h>
 
 #include <fmt/format.h>
@@ -76,14 +73,11 @@ private:
     {
         if (tor == nullptr)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << "  no such torrent" << std::endl;
             return {};
         }
 
         auto info = torrent_info{};
         info.info_hash = tor->infoHash();
-        std::cerr << __FILE__ << ':' << __LINE__ << " found torrent info_hash " << tr_sha1_to_string(info.info_hash)
-                  << std::endl;
         info.client_peer_id = tr_torrentGetPeerId(tor);
         info.id = tor->id();
         info.is_done = tor->isDone();
@@ -100,15 +94,12 @@ public:
 
     [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " torrentInfo for info_hash " << tr_sha1_to_string(info_hash) << std::endl;
         return torrentInfo(session_.torrents().get(info_hash));
     }
 
     [[nodiscard]] std::optional<torrent_info> torrentInfoFromObfuscated(
         tr_sha1_digest_t const& obfuscated_info_hash) const override
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " torrentInfo for obfuscated info_hash "
-                  << tr_sha1_to_string(obfuscated_info_hash) << std::endl;
         return torrentInfo(tr_torrentFindFromObfuscatedHash(&session_, obfuscated_info_hash));
     }
 
@@ -138,25 +129,9 @@ public:
 
     [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " pad returning 10 spaces" << std::endl;
-#if 0
         auto const len = tr_rand_int(maxlen);
         tr_rand_buffer(setme, len);
-#else
-        TR_ASSERT(maxlen > 10);
-        auto const len = size_t{ 10 };
-        std::fill_n(static_cast<char*>(setme), 10, ' ');
-#endif
         return len;
-    }
-
-    [[nodiscard]] tr_message_stream_encryption::DH::private_key_bigend_t privateKey() const override
-    {
-        auto const str = tr_base64_decode(std::string_view{ "0EYKCwBWQ4Dg9kX3c5xxjVtBDKw=" });
-        auto private_key = tr_message_stream_encryption::DH::private_key_bigend_t{};
-        TR_ASSERT(std::size(str) == std::size(private_key));
-        std::copy_n(reinterpret_cast<std::byte const*>(std::data(str)), std::size(str), std::begin(private_key));
-        return private_key;
     }
 
 private:

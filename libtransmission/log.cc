@@ -68,12 +68,10 @@ tr_sys_file_t tr_logGetFile()
         switch (tr_env_get_int("TR_DEBUG_FD", 0))
         {
         case 1:
-            fmt::print("one\n");
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT);
             break;
 
         case 2:
-            fmt::print("two\n");
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
             break;
 
@@ -85,7 +83,6 @@ tr_sys_file_t tr_logGetFile()
         initialized = true;
     }
 
-    fmt::print("fd {}\n", file);
     return file;
 }
 
@@ -191,8 +188,7 @@ tr_log_level tr_logGetLevel()
 
 bool tr_logLevelIsActive(tr_log_level level)
 {
-    // return log_state.level >= level;
-    return true;
+    return tr_logGetLevel() >= level;
 }
 
 void tr_logSetLevel(tr_log_level level)

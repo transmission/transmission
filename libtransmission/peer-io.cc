@@ -9,10 +9,6 @@
 #include <cstring>
 #include <string>
 
-// NOCOMMIT
-#include <iostream>
-#include <vector>
-
 #include <event2/event.h>
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
@@ -22,13 +18,11 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
-
+#include "session.h"
 #include "bandwidth.h"
-#include "crypto-utils.h"
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
-#include "session.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -120,7 +114,6 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 
 static void canReadWrapper(tr_peerIo* io)
 {
-    fmt::print("{:s}:{:d} peerIo {} canReadWrapper\n", __FILE__, __LINE__, fmt::ptr(io));
     tr_logAddTraceIo(io, "canRead");
 
     tr_peerIoRef(io);
@@ -140,19 +133,9 @@ static void canReadWrapper(tr_peerIo* io)
         {
             size_t piece = 0;
             size_t const oldLen = evbuffer_get_length(io->inbuf.get());
-
-            // this paragraph is temporary code for testing
-            auto const* const pullup = evbuffer_pullup(io->inbuf.get(), oldLen);
-            auto const raw = std::vector<unsigned char>{ pullup, pullup + oldLen };
-
             int const ret = io->canRead(io, io->userData, &piece);
             size_t const used = oldLen - evbuffer_get_length(io->inbuf.get());
             unsigned int const overhead = guessPacketOverhead(used);
-
-            // this paragraph is temporary code for testing
-            auto const sv = std::string_view{ reinterpret_cast<char const*>(std::data(raw)), used };
-            std::cerr << __FILE__ << ':' << __LINE__ << " io " << io << " canRead() just finished. Data consumed: ["
-                      << tr_base64_encode(sv) << ']' << std::endl;
 
             if (piece != 0 || piece != used)
             {
@@ -370,19 +353,12 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 
 void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
-    fmt::print(
-        "{:s}:{:d} peer {} got {}\n",
-        __FILE__,
-        __LINE__,
-        addrStr(),
-        tr_base64_encode(std::string_view{ static_cast<char const*>(data), n_bytes }));
     if (auto const rc = evbuffer_add(inbuf.get(), data, n_bytes); rc < 0)
     {
         tr_logAddWarn(_("Couldn't write to peer"));
         return;
     }
 
-    tr_logAddTraceIo(this, fmt::format("readBufferAdd got {} bytes", n_bytes));
     tr_peerIoSetEnabled(this, TR_DOWN, true);
     canReadWrapper(this);
 }
