@@ -81,7 +81,7 @@ public:
         return false;
     }
 
-    [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override
+    [[nodiscard]] size_t pad(void* setme, [[maybe_unused]] size_t maxlen) const override
     {
         TR_ASSERT(maxlen > 10);
         auto const len = size_t{ 10 };
@@ -120,7 +120,7 @@ void sendToClient(evutil_socket_t sock, Span const& data)
     while (len > 0)
     {
 #if defined(_WIN32)
-        auto const n = send(sock, walk, len, 0);
+        auto const n = send(sock, reinterpret_cast<char const*>(walk), len, 0);
 #else
         auto const n = write(sock, walk, len);
 #endif
