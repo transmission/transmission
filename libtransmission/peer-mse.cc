@@ -13,17 +13,9 @@
 #include "transmission.h"
 
 #include "crypto-utils.h" // tr_sha1
-#include "net.h" // includes the headers for htonl()
 #include "peer-mse.h"
 
 using namespace std::literals;
-
-// source: https://stackoverflow.com/a/1001330/6568470
-// nb: when we bump to std=C++20, use `std::endian`
-static bool is_big_endian()
-{
-    return htonl(47) == 47;
-}
 
 namespace wi
 {
@@ -37,22 +29,12 @@ template<typename UIntWide>
 auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits> const& bigend_bin)
 {
     auto ret = UIntWide{};
+    static_assert(sizeof(UIntWide) == sizeof(bigend_bin));
 
-    if (is_big_endian())
+    for (auto const walk : bigend_bin)
     {
-        for (auto walk = std::rbegin(bigend_bin), end = std::rend(bigend_bin); walk != end; ++walk)
-        {
-            ret <<= 8;
-            ret += static_cast<uint8_t>(*walk);
-        }
-    }
-    else
-    {
-        for (auto const walk : bigend_bin)
-        {
-            ret <<= 8;
-            ret += static_cast<uint8_t>(walk);
-        }
+        ret <<= 8;
+        ret += static_cast<uint8_t>(walk);
     }
 
     return ret;
@@ -63,21 +45,10 @@ auto export_bits(UIntWide i)
 {
     auto ret = std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits>{};
 
-    if (is_big_endian())
+    for (auto walk = std::rbegin(ret), end = std::rend(ret); walk != end; ++walk)
     {
-        for (auto& walk : ret)
-        {
-            walk = std::byte(static_cast<uint8_t>(i & 0xFF));
-            i >>= 8;
-        }
-    }
-    else
-    {
-        for (auto walk = std::rbegin(ret), end = std::rend(ret); walk != end; ++walk)
-        {
-            *walk = std::byte(static_cast<uint8_t>(i & 0xFF));
-            i >>= 8;
-        }
+        *walk = std::byte(static_cast<uint8_t>(i & 0xFF));
+        i >>= 8;
     }
 
     return ret;

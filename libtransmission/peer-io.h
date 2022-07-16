@@ -112,6 +112,8 @@ public:
         return inbuf.get();
     }
 
+    void readBufferAdd(void const* data, size_t n_bytes);
+
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
         return bandwidth_.clamp(dir, 1024) > 0;
@@ -302,6 +304,19 @@ tr_peerIo* tr_peerIoNewIncoming(
     struct tr_address const* addr,
     tr_port port,
     time_t current_time,
+    struct tr_peer_socket const socket);
+
+// this is only public for testing purposes.
+// production code should use tr_peerIoNewOutgoing() or tr_peerIoNewIncoming()
+tr_peerIo* tr_peerIoNew(
+    tr_session* session,
+    tr_bandwidth* parent,
+    tr_address const* addr,
+    tr_port port,
+    time_t current_time,
+    tr_sha1_digest_t const* torrent_hash,
+    bool is_incoming,
+    bool is_seed,
     struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);

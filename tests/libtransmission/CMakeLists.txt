@@ -14,6 +14,7 @@ add_executable(libtransmission-test
     file-piece-map-test.cc
     file-test.cc
     getopt-test.cc
+    handshake-test.cc
     history-test.cc
     json-test.cc
     magnet-metainfo-test.cc

@@ -135,24 +135,24 @@ struct tr_handshake
 
     std::shared_ptr<tr_handshake_mediator> const mediator;
 
-    bool haveReadAnythingFromPeer;
-    bool haveSentBitTorrentHandshake;
-    tr_peerIo* io;
-    DH dh;
+    bool haveReadAnythingFromPeer = false;
+    bool haveSentBitTorrentHandshake = false;
+    tr_peerIo* io = nullptr;
+    DH dh = {};
     handshake_state_t state;
     tr_encryption_mode encryptionMode;
-    uint16_t pad_c_len;
-    uint16_t pad_d_len;
-    uint16_t ia_len;
-    uint32_t crypto_select;
-    uint32_t crypto_provide;
-    tr_sha1_digest_t myReq1;
-    struct event* timeout_timer;
+    uint16_t pad_c_len = {};
+    uint16_t pad_d_len = {};
+    uint16_t ia_len = {};
+    uint32_t crypto_select = {};
+    uint32_t crypto_provide = {};
+    tr_sha1_digest_t myReq1 = {};
+    struct event* timeout_timer = nullptr;
 
     std::optional<tr_peer_id_t> peer_id;
 
-    tr_handshake_done_func done_func;
-    void* done_func_user_data;
+    tr_handshake_done_func done_func = nullptr;
+    void* done_func_user_data = nullptr;
 };
 
 /**
@@ -474,7 +474,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* cleanup */
     evbuffer_free(outbuf);
-    return READ_LATER;
+    return READ_NOW;
 }
 
 // MSE spec: "Since the length of [PadB is] unknown,
@@ -719,13 +719,15 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer_remove(inbuf, std::data(peer_public_key), std::size(peer_public_key));
     handshake->dh.setPeerPublicKey(peer_public_key);
 
-    auto req1 = tr_sha1("req1"sv, handshake->dh.secret());
-    if (!req1)
+    if (auto const req1 = tr_sha1("req1"sv, handshake->dh.secret()); req1)
+    {
+        handshake->myReq1 = *req1;
+    }
+    else
     {
         tr_logAddTraceHand(handshake, "error while computing req1 hash after Ya");
         return tr_handshakeDone(handshake, false);
     }
-    handshake->myReq1 = *req1;
 
     // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
