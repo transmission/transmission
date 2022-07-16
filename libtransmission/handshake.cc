@@ -9,9 +9,6 @@
 #include <cstring>
 #include <string_view>
 
-// NOMERGE
-#include <iostream>
-
 #include <event2/buffer.h>
 #include <event2/event.h>
 
@@ -119,7 +116,6 @@ struct tr_handshake
         : mediator{ std::move(mediator_in) }
         , dh{ mediator->privateKey() }
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
     ~tr_handshake()
@@ -1163,57 +1159,35 @@ tr_handshake* tr_handshakeNew(
     tr_handshake_done_func done_func,
     void* done_func_user_data)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto* const handshake = new tr_handshake{ std::move(mediator) };
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->io = io;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->encryptionMode = encryptionMode;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->done_func = done_func;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->done_func_user_data = done_func_user_data;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     handshake->timeout_timer = evtimer_new(handshake->mediator->eventBase(), handshakeTimeout, handshake);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_timerAdd(*handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     if (handshake->isIncoming())
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
     else if (encryptionMode != TR_CLEAR_PREFERRED)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         sendYa(handshake);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
     else
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         uint8_t msg[HANDSHAKE_SIZE];
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         buildHandshakeMessage(handshake, msg);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         handshake->haveSentBitTorrentHandshake = true;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return handshake;
 }
 
