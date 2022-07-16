@@ -117,9 +117,17 @@ struct tr_handshake
 {
     tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in)
         : mediator{ std::move(mediator_in) }
-        , dh{ mediator->privateKey() }
+        , private_key_{ mediator->privateKey() }
+        , dh{ private_key_ }
     {
         std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+
+        std::cerr << __FILE__ << ':' << __LINE__ << " HERE IS THE CLIENT'S PRIVATE KEY: ";
+        for (auto u8 : private_key_)
+        {
+            std::cerr << static_cast<unsigned>(u8) << ' ';
+        }
+        std::cerr << std::endl;
     }
 
     ~tr_handshake()
@@ -138,6 +146,7 @@ struct tr_handshake
     }
 
     std::shared_ptr<tr_handshake_mediator> const mediator;
+    DH::private_key_bigend_t const private_key_;
 
     bool haveReadAnythingFromPeer = false;
     bool haveSentBitTorrentHandshake = false;
@@ -760,16 +769,24 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     /* read the incoming peer's public key */
     evbuffer_remove(inbuf, std::data(peer_public_key), std::size(peer_public_key));
+    std::cerr << __FILE__ << ':' << __LINE__ << " HERE IS THE PEER'S PUBLIC KEY: ";
+    for (auto u8 : peer_public_key)
+    {
+        std::cerr << static_cast<unsigned>(u8) << ' ';
+    }
+    std::cerr << std::endl;
     handshake->dh.setPeerPublicKey(peer_public_key);
 
     auto const secret = handshake->dh.secret();
+    std::cerr << __FILE__ << ':' << __LINE__ << " HERE IS THE SHARED SECRET: ";
     for (auto u8 : secret)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << static_cast<unsigned>(u8) << std::endl;
+        std::cerr << static_cast<unsigned>(u8) << ' ';
     }
+    std::cerr << std::endl;
 
     auto sv = std::string_view{ reinterpret_cast<char const*>(std::data(secret)), std::size(secret) };
-    std::cerr << __FILE__ << ':' << __LINE__ << " secret " << sv << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " secret " << tr_base64_encode(sv) << std::endl;
 
     auto req1 = tr_sha1("req1"sv, handshake->dh.secret());
     if (!req1)
