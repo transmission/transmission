@@ -783,6 +783,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     /* resynchronizing on HASH('req1', S) */
     struct evbuffer_ptr ptr = evbuffer_search(
         inbuf,
@@ -792,6 +793,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (ptr.pos != -1) /* match */
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         evbuffer_drain(inbuf, ptr.pos);
         tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
         setState(handshake, AWAITING_CRYPTO_PROVIDE);
@@ -800,9 +802,11 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (size_t const len = evbuffer_get_length(inbuf); len > SHA_DIGEST_LENGTH)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return READ_LATER;
 }
 
