@@ -111,7 +111,7 @@ public:
 };
 
 template<typename Span>
-void sendToPeer(evutil_socket_t sock, Span const& data)
+void sendToClient(evutil_socket_t sock, Span const& data)
 {
     auto const* walk = std::data(data);
     static_assert(sizeof(*walk) == 1);
@@ -126,9 +126,9 @@ void sendToPeer(evutil_socket_t sock, Span const& data)
     }
 }
 
-void sendB64ToPeer(evutil_socket_t sock, std::string_view b64)
+void sendB64ToClient(evutil_socket_t sock, std::string_view b64)
 {
-    sendToPeer(sock, tr_base64_decode(b64));
+    sendToClient(sock, tr_base64_decode(b64));
 }
 
 auto constexpr ReservedBytesNoExtensions = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -229,10 +229,10 @@ TEST_F(HandshakeTest, incomingPlaintext)
     // hash comes the 20-byte peer id which is reported in tracker requests
     // and contained in peer lists in tracker responses.
     auto [io, sock] = createIncomingIo(session_);
-    sendToPeer(sock, PlaintextProtocolName);
-    sendToPeer(sock, ReservedBytesNoExtensions);
-    sendToPeer(sock, torrent_we_are_seeding.info_hash);
-    sendToPeer(sock, peer_id);
+    sendToClient(sock, PlaintextProtocolName);
+    sendToClient(sock, ReservedBytesNoExtensions);
+    sendToClient(sock, torrent_we_are_seeding.info_hash);
+    sendToClient(sock, peer_id);
 
     auto const res = runHandshake(mediator, io);
 
@@ -258,10 +258,10 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     mediator->torrents.emplace(torrent_we_are_seeding.info_hash, torrent_we_are_seeding);
 
     auto [io, sock] = createIncomingIo(session_);
-    sendToPeer(sock, PlaintextProtocolName);
-    sendToPeer(sock, ReservedBytesNoExtensions);
-    sendToPeer(sock, *tr_sha1("some other torrent unknown to us"sv));
-    sendToPeer(sock, makeRandomPeerId());
+    sendToClient(sock, PlaintextProtocolName);
+    sendToClient(sock, ReservedBytesNoExtensions);
+    sendToClient(sock, *tr_sha1("some other torrent unknown to us"sv));
+    sendToClient(sock, makeRandomPeerId());
 
     auto const res = runHandshake(mediator, io);
 
@@ -277,23 +277,17 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     evutil_closesocket(sock);
 }
 
-TEST_F(HandshakeTest, outgoingPlaintextWithEncryptedReponse)
+TEST_F(HandshakeTest, outgoingPlaintext)
 {
     auto const peer_id = makeRandomPeerId();
     auto mediator = std::make_shared<MediatorMock>(session_);
     mediator->torrents.emplace(ubuntu_torrent.info_hash, torrent_we_are_seeding);
 
     auto [io, sock] = createOutgoingIo(session_, ubuntu_torrent.info_hash);
-    sendToPeer(sock, PlaintextProtocolName);
-    sendToPeer(sock, ReservedBytesNoExtensions);
-    sendToPeer(sock, ubuntu_torrent.info_hash);
-    sendToPeer(sock, peer_id);
-
-    sendB64ToPeer(
-        sock,
-        "svkySIFcCsrDTeHjPt516UFbsoR+5vfbe5/m6stE7u5JLZ10kJ19NmP64E10qI"
-        "nn78sCrJgjw1yEHHwrzOcKiRlYvcMotzJMe+SjrFUnaw3KBfn2bcKBhxb/sfM9"
-        "J7nJ"sv);
+    sendToClient(sock, PlaintextProtocolName);
+    sendToClient(sock, ReservedBytesNoExtensions);
+    sendToClient(sock, ubuntu_torrent.info_hash);
+    sendToClient(sock, peer_id);
 
     auto const res = runHandshake(mediator, io);
 
@@ -322,12 +316,14 @@ TEST_F(HandshakeTest, incomingEncrypted)
 
     auto [io, sock] = createIncomingIo(session_);
 
-    sendB64ToPeer(
+    // Peer->Client data from a successful encrypted handshake recorded
+    // in the wild for replay here
+    sendB64ToClient(
         sock,
         "svkySIFcCsrDTeHjPt516UFbsoR+5vfbe5/m6stE7u5JLZ10kJ19NmP64E10qI"
         "nn78sCrJgjw1yEHHwrzOcKiRlYvcMotzJMe+SjrFUnaw3KBfn2bcKBhxb/sfM9"
         "J7nJ"sv);
-    sendB64ToPeer(
+    sendB64ToClient(
         sock,
         "ICAgICAgICAgIKdr4jIBZ4xFfO4xNiRV7Gl2azTSuTFuu06NU1WyRPif018JYe"
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
@@ -359,12 +355,14 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
 
     auto [io, sock] = createIncomingIo(session_);
 
-    sendB64ToPeer(
+    // Peer->Client data from a successful encrypted handshake recorded
+    // in the wild for replay here
+    sendB64ToClient(
         sock,
         "svkySIFcCsrDTeHjPt516UFbsoR+5vfbe5/m6stE7u5JLZ10kJ19NmP64E10qI"
         "nn78sCrJgjw1yEHHwrzOcKiRlYvcMotzJMe+SjrFUnaw3KBfn2bcKBhxb/sfM9"
         "J7nJ"sv);
-    sendB64ToPeer(
+    sendB64ToClient(
         sock,
         "ICAgICAgICAgIKdr4jIBZ4xFfO4xNiRV7Gl2azTSuTFuu06NU1WyRPif018JYe"
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
@@ -392,7 +390,9 @@ TEST_F(HandshakeTest, outgoingEncrypted)
 
     auto [io, sock] = createOutgoingIo(session_, ubuntu_torrent.info_hash);
 
-    sendB64ToPeer(
+    // Peer->Client data from a successful encrypted handshake recorded
+    // in the wild for replay here
+    sendB64ToClient(
         sock,
         "Sfgoq/nrQfD4Iwirfk+uhOmQMOC/QwK/vYiOact1NF9TpWXms3cvlKEKxs0VU"
         "mnmytRh9bh4Lcs1bswlC6R05XrJGzLhZqAqcLUUAR1VTLA5oKSjR1038zFbhn"
