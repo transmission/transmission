@@ -38,6 +38,11 @@ using HandshakeTest = SessionTest;
 class MediatorMock final : public tr_handshake_mediator
 {
 public:
+    MediatorMock(tr_session* session)
+        : session_{ session }
+    {
+    }
+
     [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
     {
         if (auto const iter = torrents.find(info_hash); iter != std::end(torrents))
@@ -63,7 +68,7 @@ public:
 
     [[nodiscard]] event_base* eventBase() const override
     {
-        return nullptr;
+        return session_->event_base;
     }
 
     [[nodiscard]] bool isDHTEnabled() const override
@@ -100,6 +105,7 @@ public:
         std::copy_n(reinterpret_cast<std::byte const*>(std::data(str)), std::size(str), std::begin(private_key_));
     }
 
+    tr_session* const session_;
     std::map<tr_sha1_digest_t, torrent_info> torrents;
     tr_message_stream_encryption::DH::private_key_bigend_t private_key_ = {};
 };
@@ -230,7 +236,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const peer_id = makeRandomPeerId();
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
-    auto mediator = std::make_shared<MediatorMock>();
+    auto mediator = std::make_shared<MediatorMock>(session_);
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     mediator->torrents.emplace(torrent_we_are_seeding.info_hash, torrent_we_are_seeding);
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
@@ -288,7 +294,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
 // but this time we don't recognize the infohash sent by the peer.
 TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
 {
-    auto mediator = std::make_shared<MediatorMock>();
+    auto mediator = std::make_shared<MediatorMock>(session_);
     mediator->torrents.emplace(torrent_we_are_seeding.info_hash, torrent_we_are_seeding);
 
     auto [io, sock] = createIncomingIo(session_);
@@ -314,7 +320,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
 TEST_F(HandshakeTest, outgoingPlaintextWithEncryptedReponse)
 {
     auto const peer_id = makeRandomPeerId();
-    auto mediator = std::make_shared<MediatorMock>();
+    auto mediator = std::make_shared<MediatorMock>(session_);
     mediator->torrents.emplace(ubuntu_torrent.info_hash, torrent_we_are_seeding);
 
     auto [io, sock] = createOutgoingIo(session_, ubuntu_torrent.info_hash);
@@ -350,7 +356,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
 {
     static auto constexpr ExpectedPeerId = makePeerId("-TR300Z-w4bd4mkebkbi"sv);
 
-    auto mediator = std::make_shared<MediatorMock>();
+    auto mediator = std::make_shared<MediatorMock>(session_);
     mediator->torrents.emplace(ubuntu_torrent.info_hash, ubuntu_torrent);
     mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
@@ -388,7 +394,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
 // but this time we don't recognize the infohash sent by the peer.
 TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
 {
-    auto mediator = std::make_shared<MediatorMock>();
+    auto mediator = std::make_shared<MediatorMock>(session_);
     mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
     auto [io, sock] = createIncomingIo(session_);
@@ -420,7 +426,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
 {
     static auto constexpr ExpectedPeerId = makePeerId("-qB4250-scysDI_JuVN3"sv);
 
-    auto mediator = std::make_shared<MediatorMock>();
+    auto mediator = std::make_shared<MediatorMock>(session_);
     mediator->torrents.emplace(ubuntu_torrent.info_hash, ubuntu_torrent);
     mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
