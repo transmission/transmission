@@ -6,6 +6,9 @@
 #include <array>
 #include <memory>
 
+// NOMERGE
+#include <iostream>
+
 #include <arc4.h>
 
 #include <math/wide_integer/uintwide_t.h>
@@ -38,8 +41,17 @@ auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits
 {
     auto ret = UIntWide{};
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " import_bits, array in: "sv;
+    for (auto u8 : bigend_bin)
+    {
+        std::cerr << static_cast<unsigned>(u8) << ' ';
+    }
+    std::cerr << std::endl;
+
     if (is_big_endian())
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " is big endian" << std::endl;
+
         for (auto walk = std::rbegin(bigend_bin), end = std::rend(bigend_bin); walk != end; ++walk)
         {
             ret <<= 8;
@@ -48,6 +60,7 @@ auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits
     }
     else
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " is little endian" << std::endl;
         for (auto const walk : bigend_bin)
         {
             ret <<= 8;
@@ -55,16 +68,20 @@ auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits
         }
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " import_bits, number out: "sv << ret << std::endl;
     return ret;
 }
 
 template<typename UIntWide>
 auto export_bits(UIntWide i)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " export_bits, num in: "sv << i << std::endl;
+
     auto ret = std::array<std::byte, UIntWide::my_width2 / std::numeric_limits<uint8_t>::digits>{};
 
     if (is_big_endian())
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " is big endian" << std::endl;
         for (auto& walk : ret)
         {
             walk = std::byte(static_cast<uint8_t>(i & 0xFF));
@@ -73,12 +90,20 @@ auto export_bits(UIntWide i)
     }
     else
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " is little endian" << std::endl;
         for (auto walk = std::rbegin(ret), end = std::rend(ret); walk != end; ++walk)
         {
             *walk = std::byte(static_cast<uint8_t>(i & 0xFF));
             i >>= 8;
         }
     }
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " export_bits, array out: "sv;
+    for (auto u8 : ret)
+    {
+        std::cerr << static_cast<unsigned>(u8) << ' ';
+    }
+    std::cerr << std::endl;
 
     return ret;
 }
