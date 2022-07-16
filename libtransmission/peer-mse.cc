@@ -49,6 +49,7 @@ auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits
     }
     std::cerr << std::endl;
 
+#if 0
     if (is_big_endian())
     {
         std::cerr << __FILE__ << ':' << __LINE__ << " is big endian" << std::endl;
@@ -81,6 +82,14 @@ auto import_bits(std::array<std::byte, UIntWide::my_width2 / std::numeric_limits
             ret += static_cast<uint8_t>(walk);
         }
     }
+#else
+    std::cerr << __FILE__ << ':' << __LINE__ << " is little endian" << std::endl;
+    for (auto const walk : bigend_bin)
+    {
+        ret <<= 8;
+        ret += static_cast<uint8_t>(walk);
+    }
+#endif
 
     std::cerr << __FILE__ << ':' << __LINE__ << " import_bits, number out: "sv << ret << std::endl;
     return ret;
@@ -98,6 +107,7 @@ auto export_bits(UIntWide i)
     {
         std::cerr << __FILE__ << ':' << __LINE__ << " is big endian" << std::endl;
 
+#if 0
         ret = *reinterpret_cast<array_t const*>(&i);
         std::cerr << __FILE__ << ':' << __LINE__ << " attempt 1: ";
         for (auto u8 : ret)
@@ -105,13 +115,14 @@ auto export_bits(UIntWide i)
             std::cerr << static_cast<unsigned>(u8) << ' ';
         }
         std::cerr << std::endl;
-
         ret = {};
+#endif
         for (auto walk = std::rbegin(ret), end = std::rend(ret); walk != end; ++walk)
         {
             *walk = std::byte(static_cast<uint8_t>(i & 0xFF));
             i >>= 8;
         }
+#if 0
         std::cerr << __FILE__ << ':' << __LINE__ << " attempt 2: ";
         for (auto u8 : ret)
         {
@@ -131,6 +142,7 @@ auto export_bits(UIntWide i)
             std::cerr << static_cast<unsigned>(u8) << ' ';
         }
         std::cerr << std::endl;
+#endif
     }
     else
     {
