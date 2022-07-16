@@ -487,7 +487,8 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* cleanup */
     evbuffer_free(outbuf);
-    return READ_LATER;
+    // return READ_LATER;
+    return READ_NOW;
 }
 
 // MSE spec: "Since the length of [PadB is] unknown,

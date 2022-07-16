@@ -152,22 +152,51 @@ auto const default_peer_port = tr_port::fromHost(8080);
 auto const torrent_we_are_seeding = tr_handshake_mediator::torrent_info{ *tr_sha1("abcde"sv),
                                                                          tr_peerIdInit(),
                                                                          tr_torrent_id_t{ 100 },
-                                                                         true };
+                                                                         true /*is_done*/ };
+auto const ubuntu_torrent = tr_handshake_mediator::torrent_info{ *tr_sha1_from_string(
+                                                                     "2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
+                                                                 tr_peerIdInit(),
+                                                                 tr_torrent_id_t{ 101 },
+                                                                 false /*is_done*/ };
 
-auto createPeerIo(tr_session* session)
+auto createIncomingIo(tr_session* session)
 {
     auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
     EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
     auto const now = tr_time();
     auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
-    auto* const incoming_io = tr_peerIoNewIncoming(
+    auto* const
+        io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, &default_peer_addr, default_peer_port, now, peer_socket);
+    return std::make_pair(io, sockpair[1]);
+}
+
+auto createOutgoingIo(tr_session* session, tr_sha1_digest_t const& info_hash)
+{
+    auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
+    EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
+    auto const now = tr_time();
+    auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
+    auto* const io = tr_peerIoNew(
         session,
         &session->top_bandwidth_,
         &default_peer_addr,
         default_peer_port,
         now,
+        &info_hash,
+        false /*is_incoming*/,
+        false /*is_seed*/,
         peer_socket);
-    return std::make_pair(incoming_io, sockpair[1]);
+    return std::make_pair(io, sockpair[1]);
+}
+
+constexpr auto makePeerId(std::string_view sv)
+{
+    auto peer_id = tr_peer_id_t{};
+    for (size_t i = 0, n = std::size(sv); i < n; ++i)
+    {
+        peer_id[i] = sv[i];
+    }
+    return peer_id;
 }
 
 auto makeRandomPeerId()
@@ -213,25 +242,25 @@ TEST_F(HandshakeTest, incomingPlaintext)
     // form of the info value from the metainfo file[.] After the download
     // hash comes the 20-byte peer id which is reported in tracker requests
     // and contained in peer lists in tracker responses.
-    auto [incoming_io, sock] = createPeerIo(session_);
+    auto [io, sock] = createIncomingIo(session_);
     sendToPeer(sock, PlaintextProtocolName);
     sendToPeer(sock, ReservedBytesNoExtensions);
     sendToPeer(sock, torrent_we_are_seeding.info_hash);
     sendToPeer(sock, peer_id);
 
-    auto const res = runHandshake(mediator, incoming_io);
+    auto const res = runHandshake(mediator, io);
 
     // check the results
     EXPECT_TRUE(res);
     EXPECT_TRUE(res->isConnected);
     EXPECT_TRUE(res->readAnythingFromPeer);
-    EXPECT_EQ(incoming_io, res->io);
+    EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(peer_id, res->peer_id);
-    EXPECT_TRUE(incoming_io->torrentHash());
-    EXPECT_EQ(torrent_we_are_seeding.info_hash, *incoming_io->torrentHash());
+    EXPECT_TRUE(io->torrentHash());
+    EXPECT_EQ(torrent_we_are_seeding.info_hash, *io->torrentHash());
 
-    tr_peerIoUnref(incoming_io);
+    tr_peerIoUnref(io);
     evutil_closesocket(sock);
 }
 
@@ -242,39 +271,35 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     auto mediator = std::make_shared<MediatorMock>();
     mediator->torrents.emplace(torrent_we_are_seeding.info_hash, torrent_we_are_seeding);
 
-    auto [incoming_io, sock] = createPeerIo(session_);
+    auto [io, sock] = createIncomingIo(session_);
     sendToPeer(sock, PlaintextProtocolName);
     sendToPeer(sock, ReservedBytesNoExtensions);
     sendToPeer(sock, *tr_sha1("some other torrent unknown to us"sv));
     sendToPeer(sock, makeRandomPeerId());
 
-    auto const res = runHandshake(mediator, incoming_io);
+    auto const res = runHandshake(mediator, io);
 
     // check the results
     EXPECT_TRUE(res);
     EXPECT_FALSE(res->isConnected);
     EXPECT_TRUE(res->readAnythingFromPeer);
-    EXPECT_EQ(incoming_io, res->io);
+    EXPECT_EQ(io, res->io);
     EXPECT_FALSE(res->peer_id);
-    EXPECT_FALSE(incoming_io->torrentHash());
+    EXPECT_FALSE(io->torrentHash());
 
-    tr_peerIoUnref(incoming_io);
+    tr_peerIoUnref(io);
     evutil_closesocket(sock);
 }
 
 TEST_F(HandshakeTest, incomingEncrypted)
 {
-    auto const ubuntu_torrent = tr_handshake_mediator::torrent_info{ *tr_sha1_from_string(
-                                                                         "2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
-                                                                     tr_peerIdInit(),
-                                                                     tr_torrent_id_t{ 100 },
-                                                                     true };
+    static auto constexpr ExpectedPeerId = makePeerId("-TR300Z-w4bd4mkebkbi"sv);
 
     auto mediator = std::make_shared<MediatorMock>();
     mediator->torrents.emplace(ubuntu_torrent.info_hash, ubuntu_torrent);
     mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
-    auto [incoming_io, sock] = createPeerIo(session_);
+    auto [io, sock] = createIncomingIo(session_);
 
     sendB64ToPeer(
         sock,
@@ -287,23 +312,20 @@ TEST_F(HandshakeTest, incomingEncrypted)
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
         "04/1W1A2PHgg+I9puac/i9BsFPcjdQeoVtU73lNCbTDQgTieyjDWmwo="sv);
 
-    auto const res = runHandshake(mediator, incoming_io);
-
-    static auto constexpr ExpectedPeerId = tr_peer_id_t{ '-', 'T', 'R', '3', '0', '0', 'Z', '-', 'w', '4',
-                                                         'b', 'd', '4', 'm', 'k', 'e', 'b', 'k', 'b', 'i' };
+    auto const res = runHandshake(mediator, io);
 
     // check the results
     EXPECT_TRUE(res);
     EXPECT_TRUE(res->isConnected);
     EXPECT_TRUE(res->readAnythingFromPeer);
-    EXPECT_EQ(incoming_io, res->io);
+    EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(ExpectedPeerId, res->peer_id);
-    EXPECT_TRUE(incoming_io->torrentHash());
-    EXPECT_EQ(ubuntu_torrent.info_hash, *incoming_io->torrentHash());
-    EXPECT_EQ(tr_sha1_to_string(ubuntu_torrent.info_hash), tr_sha1_to_string(*incoming_io->torrentHash()));
+    EXPECT_TRUE(io->torrentHash());
+    EXPECT_EQ(ubuntu_torrent.info_hash, *io->torrentHash());
+    EXPECT_EQ(tr_sha1_to_string(ubuntu_torrent.info_hash), tr_sha1_to_string(*io->torrentHash()));
 
-    tr_peerIoUnref(incoming_io);
+    tr_peerIoUnref(io);
     evutil_closesocket(sock);
 }
 
@@ -314,7 +336,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
     auto mediator = std::make_shared<MediatorMock>();
     mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
-    auto [incoming_io, sock] = createPeerIo(session_);
+    auto [io, sock] = createIncomingIo(session_);
 
     sendB64ToPeer(
         sock,
@@ -327,15 +349,58 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
         "04/1W1A2PHgg+I9puac/i9BsFPcjdQeoVtU73lNCbTDQgTieyjDWmwo="sv);
 
-    auto const res = runHandshake(mediator, incoming_io);
+    auto const res = runHandshake(mediator, io);
 
     // check the results
     EXPECT_TRUE(res);
     EXPECT_FALSE(res->isConnected);
     EXPECT_TRUE(res->readAnythingFromPeer);
-    EXPECT_FALSE(incoming_io->torrentHash());
+    EXPECT_FALSE(io->torrentHash());
 
-    tr_peerIoUnref(incoming_io);
+    tr_peerIoUnref(io);
+    evutil_closesocket(sock);
+}
+
+TEST_F(HandshakeTest, outgoingEncrypted)
+{
+    static auto constexpr ExpectedPeerId = makePeerId("-qB4250-scysDI_JuVN3"sv);
+
+    auto mediator = std::make_shared<MediatorMock>();
+    mediator->torrents.emplace(ubuntu_torrent.info_hash, ubuntu_torrent);
+    mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
+
+    auto [io, sock] = createOutgoingIo(session_, ubuntu_torrent.info_hash);
+
+    sendB64ToPeer(
+        sock,
+        "Sfgoq/nrQfD4Iwirfk+uhOmQMOC/QwK/vYiOact1NF9TpWXms3cvlKEKxs0VU"
+        "mnmytRh9bh4Lcs1bswlC6R05XrJGzLhZqAqcLUUAR1VTLA5oKSjR1038zFbhn"
+        "c71jqlpney15ChMTnx02Qt+88l0Z9OWLUUJrUVy+OoIaTMSKDDFVOjuj0y+Ii"
+        "cE0ZnN61e0/R/g+APRK5tegw0SLZ3Nr8+y4Dl77sZyc141PR9xvDj0da1eAvf"
+        "BvXyyDem4vUjqiLUNCEV8KDXEMPCPYAQoDZzLvMyOEtJM/if0o0UN88SWtt1k"
+        "jRD8UNvUlXIfM0YsnJhKA6fJ7/4geK7+Wo2aicfaLFOyG5IEJbTg9OQYbDHFa"
+        "oVzD0xY0Dx+J0loqM+CzrPj8UpeXIcbD7pJrT3XPECbFQ12cCY5LW5RymVIx8"
+        "TP0ajGiTxou1L7DbGD54SYgV/4qFbafRsWp9AO+YDJcouFd/jiVN+r3loxvfT"
+        "0A9H9DRAMR0rZKpQpXZ1ZAhAuAOXGHFIvtw8wd6dPybeu5+LoR2S90/IpwHWI"
+        "jbNbypQZuA9hn4JfFMWPP9TG/E11loB4+MkrP22U72ezjL5ipd74AEEP0/u8w"
+        "Gj1t2kXhND9ONfasA+pY25y8GM04M0B7+0xKmsHP7tntwQLAGZATH83rOxaSO"
+        "3+o/RdiKQJAsGxMIU08scBc5VOmrAmjeYrLNpFnpXVuavH5if7490zMCu3DEn"
+        "G9hpbYbiX95T+EUcRbM6pSCvr3Twq1Q="sv);
+
+    auto const res = runHandshake(mediator, io, TR_ENCRYPTION_PREFERRED);
+
+    // check the results
+    EXPECT_TRUE(res);
+    EXPECT_TRUE(res->isConnected);
+    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_EQ(io, res->io);
+    EXPECT_TRUE(res->peer_id);
+    EXPECT_EQ(ExpectedPeerId, res->peer_id);
+    EXPECT_TRUE(io->torrentHash());
+    EXPECT_EQ(ubuntu_torrent.info_hash, *io->torrentHash());
+    EXPECT_EQ(tr_sha1_to_string(ubuntu_torrent.info_hash), tr_sha1_to_string(*io->torrentHash()));
+
+    tr_peerIoUnref(io);
     evutil_closesocket(sock);
 }
 

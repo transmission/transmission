@@ -514,7 +514,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
 
 #endif /* #ifdef WITH_UTP */
 
-static tr_peerIo* tr_peerIoNew(
+tr_peerIo* tr_peerIoNew(
     tr_session* session,
     tr_bandwidth* parent,
     tr_address const* addr,
