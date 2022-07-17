@@ -84,7 +84,8 @@ static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_
 
 static uint32_t announce_ip(tr_session const* session)
 {
-    if (!session->useAnnounceIP()) {
+    if (!session->useAnnounceIP())
+    {
         return 0;
     }
 
