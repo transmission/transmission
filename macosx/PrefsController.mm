@@ -209,6 +209,7 @@
     toolbar.selectedItemIdentifier = TOOLBAR_GENERAL;
     self.window.toolbar = toolbar;
 
+    [self setWindowSize];
     [self setPrefView:nil];
 
     //set special-handling of magnet link add window checkbox
@@ -387,6 +388,14 @@
 {
     NSWindow* window = ((Controller*)NSApp.delegate).prefsController.window;
     completionHandler(window, nil);
+}
+
+- (void)setWindowSize
+{
+    //set window width with localised value
+    NSRect windowRect = self.window.frame;
+    windowRect.size.width = [NSLocalizedString(@"PrefWindowSize", nil) floatValue];
+    [self.window setFrame:windowRect display:YES animate:NO];
 }
 
 //for a beta release, always use the beta appcast
@@ -1566,8 +1575,13 @@
 
     view.hidden = YES;
     window.contentView = view;
-    [window setFrame:windowRect display:YES animate:YES];
-    view.hidden = NO;
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
+        context.allowsImplicitAnimation = YES;
+        [window setFrame:windowRect display:YES];
+    } completionHandler:^{
+        view.hidden = NO;
+    }];
 
     //set title label
     if (sender)

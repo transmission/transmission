@@ -16,6 +16,9 @@
 
 #define INVALID -99
 
+#define STACKVIEW_INSET 12.0
+#define STACKVIEW_SPACING 8.0
+
 @interface InfoOptionsViewController ()
 
 @property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
@@ -53,6 +56,13 @@
 
 @property(nonatomic, copy) NSString* fInitialString;
 
+@property(nonatomic) IBOutlet NSStackView* fOptionsStackView;
+@property(nonatomic) IBOutlet NSView* fSeedingView;
+@property(nonatomic, readonly) CGFloat currentHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutWidth;
+@property(nonatomic, readonly) CGFloat vertLayoutHeight;
+
 - (void)setupInfo;
 - (void)setGlobalLabels;
 - (void)updateOptionsNotification:(NSNotification*)notification;
@@ -84,6 +94,76 @@
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (CGFloat)currentHeight
+{
+    return NSHeight(self.view.frame);
+}
+
+- (CGFloat)horizLayoutHeight
+{
+    return NSHeight(self.fPriorityView.frame) + 2 * STACKVIEW_INSET;
+}
+
+- (CGFloat)horizLayoutWidth
+{
+    return NSWidth(self.fPriorityView.frame) + NSWidth(self.fSeedingView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_SPACING;
+}
+
+- (CGFloat)vertLayoutHeight
+{
+    return NSHeight(self.fPriorityView.frame) + NSHeight(self.fSeedingView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_SPACING;
+}
+
+- (CGFloat)changeInWindowHeight
+{
+    CGFloat difference = 0;
+
+    if (NSWidth(self.view.window.frame) >= self.horizLayoutWidth + 1)
+    {
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+        difference = NSHeight(self.view.frame) - self.horizLayoutHeight;
+    }
+    else
+    {
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+        difference = NSHeight(self.view.frame) - self.vertLayoutHeight;
+    }
+
+    return difference;
+}
+
+- (NSRect)viewRect
+{
+    CGFloat difference = self.changeInWindowHeight;
+
+    NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
+    if (difference != 0)
+    {
+        viewRect.size.height -= difference;
+        viewRect.size.width = NSWidth(windowRect);
+    }
+
+    return viewRect;
+}
+
+- (void)updateWindowLayout
+{
+    CGFloat difference = self.changeInWindowHeight;
+
+    if (difference != 0)
+    {
+        NSRect windowRect = self.view.window.frame;
+        windowRect.origin.y += difference;
+        windowRect.size.height -= difference;
+
+        self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
+        self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
+
+        self.view.frame = [self viewRect];
+        [self.view.window setFrame:windowRect display:YES animate:YES];
+    }
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents

@@ -1,0 +1,423 @@
+
+/* Class = "NSWindow"; title = "Einstellungen"; ObjectID = "23"; */
+"23.title" = "Einstellungen";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "52"; */
+"52.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Auswählen …"; ObjectID = "53"; */
+"53.title" = "Auswählen …";
+
+/* Class = "NSMenuItem"; title = "Ordner der Torrent-Datei"; ObjectID = "55"; */
+"55.title" = "Ordner der Torrent-Datei";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "217"; */
+"217.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Auswählen …"; ObjectID = "219"; */
+"219.title" = "Auswählen …";
+
+/* Class = "NSTabViewItem"; label = "Hinzufügen"; ObjectID = "253"; */
+"253.label" = "Hinzufügen";
+
+/* Class = "NSTabViewItem"; label = "Verwalten"; ObjectID = "254"; */
+"254.label" = "Verwalten";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "539"; */
+"539.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Auswählen …"; ObjectID = "542"; */
+"542.title" = "Auswählen …";
+
+/* Class = "NSButtonCell"; title = "Beenden während Übertragungen aktiv sind"; ObjectID = "1201"; */
+"1201.title" = "Beenden während Übertragungen aktiv sind";
+
+/* Class = "NSButtonCell"; title = "Entfernen von Übertragungen"; ObjectID = "1202"; */
+"1202.title" = "Entfernen von Übertragungen";
+
+/* Class = "NSTextFieldCell"; title = "Nachfragen vor:"; ObjectID = "1203"; */
+"1203.title" = "Nachfragen vor:";
+
+/* Class = "NSTextFieldCell"; title = "Im Dock anzeigen:"; ObjectID = "1204"; */
+"1204.title" = "Im Dock anzeigen:";
+
+/* Class = "NSButtonCell"; title = "Empfangsgeschwindigkeit"; ObjectID = "1205"; */
+"1205.title" = "Empfangsgeschwindigkeit";
+
+/* Class = "NSButtonCell"; title = "Sendegeschwindigkeit"; ObjectID = "1206"; */
+"1206.title" = "Sendegeschwindigkeit";
+
+/* Class = "NSButtonCell"; title = "Nur wenn noch Daten empfangen werden"; ObjectID = "1207"; */
+"1207.title" = "Nur wenn noch Daten empfangen werden";
+
+/* Class = "NSButtonCell"; title = "Nur wenn noch Daten empfangen werden"; ObjectID = "1208"; */
+"1208.title" = "Nur wenn noch Daten empfangen werden";
+
+/* Class = "NSTextFieldCell"; title = "Fenstergröße:"; ObjectID = "1209"; */
+"1209.title" = "Fenstergröße:";
+
+/* Class = "NSButtonCell"; title = "An die Anzahl der Übertragungen anpassen"; ObjectID = "1210"; */
+"1210.title" = "An die Anzahl der Übertragungen anpassen";
+
+/* Class = "NSButtonCell"; title = "Zurücksetzen"; ObjectID = "1211"; */
+"1211.title" = "Zurücksetzen";
+
+/* Class = "NSTextFieldCell"; title = "Alle Warnungen zurücksetzen:"; ObjectID = "1212"; */
+"1212.title" = "Alle Warnungen zurücksetzen:";
+
+/* Class = "NSButtonCell"; title = "Täglich überprüfen"; ObjectID = "1213"; */
+"1213.title" = "Täglich überprüfen";
+
+/* Class = "NSTextFieldCell"; title = "Aktualisierungen:"; ObjectID = "1214"; */
+"1214.title" = "Aktualisierungen:";
+
+/* Class = "NSTextFieldCell"; title = "Geladene Daten sichern in:"; ObjectID = "1216"; */
+"1216.title" = "Geladene Daten sichern in:";
+
+/* Class = "NSTextFieldCell"; title = "Einstellungen:"; ObjectID = "1217"; */
+"1217.title" = "Einstellungen:";
+
+/* Class = "NSButtonCell"; title = "Torrent-Datei in den Papierkorb legen"; ObjectID = "1218"; */
+"1218.title" = "Torrent-Datei in den Papierkorb legen";
+
+/* Class = "NSButtonCell"; title = "von Torrent-Dateien im Ordner:"; ObjectID = "1219"; */
+"1219.title" = "von Torrent-Dateien im Ordner:";
+
+/* Class = "NSTextFieldCell"; title = "Automatisches Hinzufügen:"; ObjectID = "1226"; */
+"1226.title" = "Automatisches Hinzufügen:";
+
+/* Class = "NSButtonCell"; title = "Unvollständige Übertragungen sichern in:"; ObjectID = "1227"; */
+"1227.title" = "Unvollständige Übertragungen sichern in:";
+
+/* Class = "NSTextFieldCell"; title = "Warteliste:"; ObjectID = "1230"; */
+"1230.title" = "Warteliste:";
+
+/* Class = "NSTextFieldCell"; title = "aktive Empfangsvorgänge"; ObjectID = "1231"; */
+"1231.title" = "aktive Empfangsvorgänge";
+
+/* Class = "NSButtonCell"; title = "ab Erreichen des Verhältnisses:"; ObjectID = "1232"; */
+"1232.title" = "ab Erreichen des Verhältnisses:";
+
+/* Class = "NSTextFieldCell"; title = "Verteilen anhalten:"; ObjectID = "1234"; */
+"1234.title" = "Verteilen anhalten:";
+
+/* Class = "NSTextFieldCell"; title = "Das „Verhältnis“ ist der Quotient der Menge der gesendeten Daten durch die Menge der empfangenen Daten."; ObjectID = "1235"; */
+"1235.title" = "Das „Verhältnis“ ist der Quotient der Menge der gesendeten Daten durch die Menge der empfangenen Daten.";
+
+/* Class = "NSButtonCell"; title = "höchstens"; ObjectID = "1236"; */
+"1236.title" = "höchstens";
+
+/* Class = "NSTextFieldCell"; title = "aktive Verteilungen"; ObjectID = "1239"; */
+"1239.title" = "aktive Verteilungen";
+
+/* Class = "NSButtonCell"; title = "höchstens"; ObjectID = "1240"; */
+"1240.title" = "höchstens";
+
+/* Class = "NSTextFieldCell"; title = "Minuten Inaktivität"; ObjectID = "1242"; */
+"1242.title" = "Minuten Inaktivität";
+
+/* Class = "NSButtonCell"; title = "steckengeblieben nach"; ObjectID = "1243"; */
+"1243.title" = "steckengeblieben nach";
+
+/* Class = "NSButtonCell"; title = "Port automatisch durch den Router weiterleiten"; ObjectID = "1247"; */
+"1247.title" = "Port automatisch durch den Router weiterleiten";
+
+/* Class = "NSTextFieldCell"; title = "Die Port-Weiterleitung nutzt NAT-PMP oder UPnP."; ObjectID = "1248"; */
+"1248.title" = "Die Port-Weiterleitung nutzt NAT-PMP oder UPnP.";
+
+/* Class = "NSTextFieldCell"; title = "Port ist geöffnet."; ObjectID = "1250"; */
+"1250.title" = "Port ist geöffnet.";
+
+/* Class = "NSTextFieldCell"; title = "Kommunikation:"; ObjectID = "1253"; */
+"1253.title" = "Kommunikation:";
+
+/* Class = "NSButtonCell"; title = "Bei aktiven Übertragungen Ruhezustand verhindern"; ObjectID = "1254"; */
+"1254.title" = "Bei aktiven Übertragungen Ruhezustand verhindern";
+
+/* Class = "NSTextFieldCell"; title = "Ruhezustand:"; ObjectID = "1255"; */
+"1255.title" = "Ruhezustand:";
+
+/* Class = "NSButtonCell"; title = "höchstens:"; ObjectID = "1265"; */
+"1265.title" = "höchstens:";
+
+/* Class = "NSButtonCell"; title = "höchstens:"; ObjectID = "1267"; */
+"1267.title" = "höchstens:";
+
+/* Class = "NSTextFieldCell"; title = "KB/s empfangen"; ObjectID = "1268"; */
+"1268.title" = "KB/s empfangen";
+
+/* Class = "NSTextFieldCell"; title = "KB/s senden"; ObjectID = "1269"; */
+"1269.title" = "KB/s senden";
+
+/* Class = "NSTextFieldCell"; title = "Datendurchsatz begrenzen:"; ObjectID = "1270"; */
+"1270.title" = "Datendurchsatz begrenzen:";
+
+/* Class = "NSTextFieldCell"; title = "KB/s empfangen"; ObjectID = "1273"; */
+"1273.title" = "KB/s empfangen";
+
+/* Class = "NSTextFieldCell"; title = "KB/s senden"; ObjectID = "1274"; */
+"1274.title" = "KB/s senden";
+
+/* Class = "NSTextFieldCell"; title = "Begrenzte Übertragungsgeschwindigkeit:"; ObjectID = "1275"; */
+"1275.title" = "Begrenzte Übertragungsgeschwindigkeit:";
+
+/* Class = "NSTextFieldCell"; title = "höchstens:"; ObjectID = "1276"; */
+"1276.title" = "höchstens:";
+
+/* Class = "NSTextFieldCell"; title = "höchstens:"; ObjectID = "1277"; */
+"1277.title" = "höchstens:";
+
+/* Class = "NSTextFieldCell"; title = "Wenn die Begrenzte Übertragungsgeschwindigkeit aktiviert ist, werden diese Einstellungen anstelle der normalen Begrenzung des Datendurchsatzes verwendet."; ObjectID = "1278"; */
+"1278.title" = "Wenn die Begrenzte Übertragungsgeschwindigkeit aktiviert ist, werden diese Einstellungen anstelle der normalen Begrenzung des Datendurchsatzes verwendet.";
+
+/* Class = "NSButtonCell"; title = "automatisch aktivieren"; ObjectID = "1280"; */
+"1280.title" = "automatisch aktivieren";
+
+/* Class = "NSTextFieldCell"; title = "bis"; ObjectID = "1281"; */
+"1281.title" = "bis";
+
+/* Class = "NSButtonCell"; title = "Übertragungseinstellungen beim Öffnen von Torrent-Dateien anzeigen"; ObjectID = "1294"; */
+"1294.title" = "Übertragungseinstellungen beim Öffnen von Torrent-Dateien anzeigen";
+
+/* Class = "NSButtonCell"; title = "vollständig empfangen:"; ObjectID = "1302"; */
+"1302.title" = "vollständig empfangen:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1304"; */
+"1304.title" = "OtherViews";
+
+/* Class = "NSButtonCell"; title = "bis zur Grenze verteilt:"; ObjectID = "1306"; */
+"1306.title" = "bis zur Grenze verteilt:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1308"; */
+"1308.title" = "OtherViews";
+
+/* Class = "NSTextFieldCell"; title = "Ton abspielen:"; ObjectID = "1310"; */
+"1310.title" = "Ton abspielen:";
+
+/* Class = "NSButtonCell"; title = "Übertragungen nach dem Hinzufügen automatisch starten"; ObjectID = "1335"; */
+"1335.title" = "Übertragungen nach dem Hinzufügen automatisch starten";
+
+/* Class = "NSTextFieldCell"; title = "Übertragungseinstellungen:"; ObjectID = "1338"; */
+"1338.title" = "Übertragungseinstellungen:";
+
+/* Class = "NSButtonCell"; title = "Nur wenn die Übertragung mehrere Dateien enthält"; ObjectID = "1340"; */
+"1340.title" = "Nur wenn die Übertragung mehrere Dateien enthält";
+
+/* Class = "NSButtonCell"; title = "Aktualisieren"; ObjectID = "1437"; */
+"1437.title" = "Aktualisieren";
+
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
+"1438.title" = "blocklist loaded/not loaded";
+
+/* Class = "NSTextFieldCell"; title = "Blockliste:"; ObjectID = "1439"; */
+"1439.title" = "Blockliste:";
+
+/* Class = "NSButtonCell"; title = "Teilnehmer aus der Blockliste ignorieren"; ObjectID = "1440"; */
+"1440.title" = "Teilnehmer aus der Blockliste ignorieren";
+
+/* Class = "NSTextFieldCell"; title = "Eine große Anzahl von Verbindungen kann die Geschwindigkeit des Computers negativ beeinflussen."; ObjectID = "1441"; */
+"1441.title" = "Eine große Anzahl von Verbindungen kann die Geschwindigkeit des Computers negativ beeinflussen.";
+
+/* Class = "NSButtonCell"; title = "Teilnehmerdaten für öffentliche Torrents austauschen (PEX)"; ObjectID = "1442"; */
+"1442.title" = "Teilnehmerdaten für öffentliche Torrents austauschen (PEX)";
+
+/* Class = "NSTextFieldCell"; title = "Für neue Übertragungen höchstens"; ObjectID = "1443"; */
+"1443.title" = "Für neue Übertragungen höchstens";
+
+/* Class = "NSTextFieldCell"; title = "Verbindungen"; ObjectID = "1446"; */
+"1446.title" = "Verbindungen";
+
+/* Class = "NSTextFieldCell"; title = "Teilnehmern verbinden"; ObjectID = "1447"; */
+"1447.title" = "Teilnehmern verbinden";
+
+/* Class = "NSTextFieldCell"; title = "Mit insgesamt höchstens"; ObjectID = "1450"; */
+"1450.title" = "Mit insgesamt höchstens";
+
+/* Class = "NSTextFieldCell"; title = "Verbindungen:"; ObjectID = "1451"; */
+"1451.title" = "Verbindungen:";
+
+/* Class = "NSButtonCell"; title = "Teilnehmer mit verschlüsselter Verbindung bevorzugen"; ObjectID = "1452"; */
+"1452.title" = "Teilnehmer mit verschlüsselter Verbindung bevorzugen";
+
+/* Class = "NSTextFieldCell"; title = "Verschlüsselung:"; ObjectID = "1453"; */
+"1453.title" = "Verschlüsselung:";
+
+/* Class = "NSButtonCell"; title = "Teilnehmer ohne verschlüsselte Verbindung ignorieren"; ObjectID = "1454"; */
+"1454.title" = "Teilnehmer ohne verschlüsselte Verbindung ignorieren";
+
+/* Class = "NSButtonCell"; title = "Nur beim manuellen Hinzufügen einer Übertragung"; ObjectID = "1477"; */
+"1477.title" = "Nur beim manuellen Hinzufügen einer Übertragung";
+
+/* Class = "NSTextFieldCell"; title = "Zugriff über Port:"; ObjectID = "1493"; */
+"1493.title" = "Zugriff über Port:";
+
+/* Class = "NSButtonCell"; title = "Entfernten Zugriff ermöglichen"; ObjectID = "1502"; */
+"1502.title" = "Entfernten Zugriff ermöglichen";
+
+/* Class = "NSButtonCell"; title = "Kennwort für den entfernten Zugriff erforderlich "; ObjectID = "1505"; */
+"1505.title" = "Kennwort für den entfernten Zugriff erforderlich ";
+
+/* Class = "NSTableColumn"; headerCell.title = "IP-Adresse"; ObjectID = "1523"; */
+"1523.headerCell.title" = "IP-Adresse";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1526"; */
+"1526.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "IP-Adressen können „*“ als Platzhalter enthalten."; ObjectID = "1542"; */
+"1542.title" = "IP-Adressen können „*“ als Platzhalter enthalten.";
+
+/* Class = "NSTextFieldCell"; title = "Kennwort:"; ObjectID = "1555"; */
+"1555.title" = "Kennwort:";
+
+/* Class = "NSTextFieldCell"; title = "Benutzername:"; ObjectID = "1557"; */
+"1557.title" = "Benutzername:";
+
+/* Class = "NSTextFieldCell"; title = "Hierdurch kann Transmission mit einem Web-Browser bedient werden."; ObjectID = "1645"; */
+"1645.title" = "Hierdurch kann Transmission mit einem Web-Browser bedient werden.";
+
+/* Class = "NSButtonCell"; title = "Im Web-Browser öffnen"; ObjectID = "1718"; */
+"1718.title" = "Im Web-Browser öffnen";
+
+/* Class = "NSTextFieldCell"; title = "Zuletzt aktualisiert: —"; ObjectID = "1739"; */
+"1739.title" = "Zuletzt aktualisiert: —";
+
+/* Class = "NSButtonCell"; title = "Blockliste wöchentlich aktualisieren"; ObjectID = "1742"; */
+"1742.title" = "Blockliste wöchentlich aktualisieren";
+
+/* Class = "NSButtonCell"; title = "Zugriff nur von diesen IP-Adressen zulassen:"; ObjectID = "1748"; */
+"1748.title" = "Zugriff nur von diesen IP-Adressen zulassen:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Farbe"; ObjectID = "1777"; */
+"1777.headerCell.title" = "Farbe";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
+"1779.headerCell.title" = "Name";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1780"; */
+"1780.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "1796"; */
+"1796.title" = "Name:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1810"; */
+"1810.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Auswählen …"; ObjectID = "1813"; */
+"1813.title" = "Auswählen …";
+
+/* Class = "NSButtonCell"; title = "Voreingestellter Ort:"; ObjectID = "1815"; */
+"1815.title" = "Voreingestellter Ort:";
+
+/* Class = "NSTextFieldCell"; title = "Der Speicherort für die empfangenen Daten wird beim Hinzufügen automatisch gesetzt."; ObjectID = "1824"; */
+"1824.title" = "Der Speicherort für die empfangenen Daten wird beim Hinzufügen automatisch gesetzt.";
+
+/* Class = "NSButtonCell"; title = "Webseite im lokalen Netzwerk mit Bonjour ankündigen"; ObjectID = "1826"; */
+"1826.title" = "Webseite im lokalen Netzwerk mit Bonjour ankündigen";
+
+/* Class = "NSButtonCell"; title = "Neue Übertragungen ggf. dieser Gruppe hinzufügen"; ObjectID = "1831"; */
+"1831.title" = "Neue Übertragungen ggf. dieser Gruppe hinzufügen";
+
+/* Class = "NSButtonCell"; title = "Hinzufügebedingungen bearbeiten …"; ObjectID = "1833"; */
+"1833.title" = "Hinzufügebedingungen bearbeiten …";
+
+/* Class = "NSTextFieldCell"; title = "Übertragungen werden der ersten Gruppe hinzugefügt, deren Hinzufügebedingungen sie erfüllen."; ObjectID = "1835"; */
+"1835.title" = "Übertragungen werden der ersten Gruppe hinzugefügt, deren Hinzufügebedingungen sie erfüllen.";
+
+/* Class = "NSButtonCell"; title = "Port zufällig wählen"; ObjectID = "1890"; */
+"1890.title" = "Port zufällig wählen";
+
+/* Class = "NSButtonCell"; title = "Jetzt neu wählen"; ObjectID = "1892"; */
+"1892.title" = "Jetzt neu wählen";
+
+/* Class = "NSButtonCell"; title = "Betaversionen ebenfalls anzeigen"; ObjectID = "1896"; */
+"1896.title" = "Betaversionen ebenfalls anzeigen";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1909"; */
+"1909.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Täglich"; ObjectID = "1910"; */
+"1910.title" = "Täglich";
+
+/* Class = "NSMenuItem"; title = "An Wochentagen"; ObjectID = "1911"; */
+"1911.title" = "An Wochentagen";
+
+/* Class = "NSMenuItem"; title = "An Wochenenden"; ObjectID = "1912"; */
+"1912.title" = "An Wochenenden";
+
+/* Class = "NSMenuItem"; title = "Montags"; ObjectID = "1914"; */
+"1914.title" = "Montags";
+
+/* Class = "NSMenuItem"; title = "Dienstags"; ObjectID = "1915"; */
+"1915.title" = "Dienstags";
+
+/* Class = "NSMenuItem"; title = "Mittwochs"; ObjectID = "1916"; */
+"1916.title" = "Mittwochs";
+
+/* Class = "NSMenuItem"; title = "Donnerstags"; ObjectID = "1917"; */
+"1917.title" = "Donnerstags";
+
+/* Class = "NSMenuItem"; title = "Freitags"; ObjectID = "1918"; */
+"1918.title" = "Freitags";
+
+/* Class = "NSMenuItem"; title = "Samstags"; ObjectID = "1919"; */
+"1919.title" = "Samstags";
+
+/* Class = "NSMenuItem"; title = "Sonntags"; ObjectID = "1920"; */
+"1920.title" = "Sonntags";
+
+/* Class = "NSButtonCell"; title = "Verteilte Hashtabelle verwenden (DHT)"; ObjectID = "1926"; */
+"1926.title" = "Verteilte Hashtabelle verwenden (DHT)";
+
+/* Class = "NSTextFieldCell"; title = "magnet-Links öffnen:"; ObjectID = "1931"; */
+"1931.title" = "magnet-Links öffnen:";
+
+/* Class = "NSButtonCell"; title = "Transmission als Standardprogramm nutzen"; ObjectID = "1933"; */
+"1933.title" = "Transmission als Standardprogramm nutzen";
+
+/* Class = "NSButtonCell"; title = "„.part“ an Dateinamen unvollständer Übertragungen anhängen"; ObjectID = "1940"; */
+"1940.title" = "„.part“ an Dateinamen unvollständer Übertragungen anhängen";
+
+/* Class = "NSButtonCell"; title = "Übertragungseinstellungen beim Öffnen von magnet-Links anzeigen"; ObjectID = "1948"; */
+"1948.title" = "Übertragungseinstellungen beim Öffnen von magnet-Links anzeigen";
+
+/* Class = "NSButtonCell"; title = "auch mit Teilnehmern im lokalen Netzwerk"; ObjectID = "1952"; */
+"1952.title" = "auch mit Teilnehmern im lokalen Netzwerk";
+
+/* Class = "NSButtonCell"; title = "nach"; ObjectID = "1962"; */
+"1962.title" = "nach";
+
+/* Class = "NSTextFieldCell"; title = "Minuten Inaktivität"; ObjectID = "1970"; */
+"1970.title" = "Minuten Inaktivität";
+
+/* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
+"1988.title" = "URL:";
+
+/* Class = "NSButtonCell"; title = "vollständig empfangen:"; ObjectID = "2044"; */
+"2044.title" = "vollständig empfangen:";
+
+/* Class = "NSTextFieldCell"; title = "Skript ausführen:"; ObjectID = "2047"; */
+"2047.title" = "Skript ausführen:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "2050"; */
+"2050.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Auswählen …"; ObjectID = "2053"; */
+"2053.title" = "Auswählen …";
+
+/* Class = "NSButtonCell"; title = "Micro Transport Protocol (µTP) verwenden"; ObjectID = "2078"; */
+"2078.title" = "Micro Transport Protocol (µTP) verwenden";
+
+/* Class = "NSTextFieldCell"; title = "Zugriff über Port:"; ObjectID = "2082"; */
+"2082.title" = "Zugriff über Port:";
+
+/* Class = "NSTextFieldCell"; title = "Benachrichtigungen:"; ObjectID = "2087"; */
+"2087.title" = "Benachrichtigungen:";
+
+/* Class = "NSButtonCell"; title = "In Systemeinstellungen konfigurieren"; ObjectID = "2114"; */
+"2114.title" = "In Systemeinstellungen konfigurieren";
+
+/* Class = "NSButtonCell"; title = "nach automatischem Anhalten aus der Liste entfernen"; ObjectID = "2119"; */
+"2119.title" = "nach automatischem Anhalten aus der Liste entfernen";
+
+/* Class = "NSTextFieldCell"; title = "Für neu hinzugefügte Übertragungen."; ObjectID = "2123"; */
+"2123.title" = "Für neu hinzugefügte Übertragungen.";

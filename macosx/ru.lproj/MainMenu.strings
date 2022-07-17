@@ -1,0 +1,441 @@
+
+/* Class = "NSWindow"; title = "Transmission"; ObjectID = "21"; */
+"21.title" = "Transmission";
+
+/* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
+"29.title" = "MainMenu";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
+"56.title" = "Transmission";
+
+/* Class = "NSMenu"; title = "Transmission"; ObjectID = "57"; */
+"57.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "О программе Transmission"; ObjectID = "58"; */
+"58.title" = "О программе Transmission";
+
+/* Class = "NSMenuItem"; title = "Открыть торрент-файл..."; ObjectID = "72"; */
+"72.title" = "Открыть торрент-файл...";
+
+/* Class = "NSMenuItem"; title = "Закрыть окно"; ObjectID = "73"; */
+"73.title" = "Закрыть окно";
+
+/* Class = "NSMenu"; title = "Файл"; ObjectID = "81"; */
+"81.title" = "Файл";
+
+/* Class = "NSMenuItem"; title = "Файл"; ObjectID = "83"; */
+"83.title" = "Файл";
+
+/* Class = "NSMenuItem"; title = "Справка"; ObjectID = "103"; */
+"103.title" = "Справка";
+
+/* Class = "NSMenu"; title = "Справка"; ObjectID = "106"; */
+"106.title" = "Справка";
+
+/* Class = "NSMenuItem"; title = "Настройки..."; ObjectID = "129"; */
+"129.title" = "Настройки...";
+
+/* Class = "NSMenu"; title = "Службы"; ObjectID = "130"; */
+"130.title" = "Службы";
+
+/* Class = "NSMenuItem"; title = "Службы"; ObjectID = "131"; */
+"131.title" = "Службы";
+
+/* Class = "NSMenuItem"; title = "Скрыть Transmission"; ObjectID = "134"; */
+"134.title" = "Скрыть Transmission";
+
+/* Class = "NSMenuItem"; title = "Завершить Transmission"; ObjectID = "136"; */
+"136.title" = "Завершить Transmission";
+
+/* Class = "NSMenuItem"; title = "Скрыть остальные"; ObjectID = "145"; */
+"145.title" = "Скрыть остальные";
+
+/* Class = "NSMenuItem"; title = "Показать все"; ObjectID = "150"; */
+"150.title" = "Показать все";
+
+/* Class = "NSMenuItem"; title = "Копировать"; ObjectID = "157"; */
+"157.title" = "Копировать";
+
+/* Class = "NSMenuItem"; title = "Вырезать"; ObjectID = "160"; */
+"160.title" = "Вырезать";
+
+/* Class = "NSMenuItem"; title = "Правка"; ObjectID = "163"; */
+"163.title" = "Правка";
+
+/* Class = "NSMenu"; title = "Правка"; ObjectID = "169"; */
+"169.title" = "Правка";
+
+/* Class = "NSMenuItem"; title = "Вставить"; ObjectID = "171"; */
+"171.title" = "Вставить";
+
+/* Class = "NSMenuItem"; title = "Выбрать все"; ObjectID = "172"; */
+"172.title" = "Выбрать все";
+
+/* Class = "NSMenuItem"; title = "Вид"; ObjectID = "301"; */
+"301.title" = "Вид";
+
+/* Class = "NSMenu"; title = "Вид"; ObjectID = "302"; */
+"302.title" = "Вид";
+
+/* Class = "NSMenuItem"; title = "Форумы Transmission"; ObjectID = "418"; */
+"418.title" = "Форумы Transmission";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "456"; */
+"456.title" = "Menu";
+
+/* Class = "NSMenuItem"; title = "Приостановить выбранные"; ObjectID = "457"; */
+"457.title" = "Приостановить выбранные";
+
+/* Class = "NSMenuItem"; title = "Показать Инспектор"; ObjectID = "459"; */
+"459.title" = "Показать Инспектор";
+
+/* Class = "NSMenuItem"; title = "Показать данные в Finder"; ObjectID = "516"; */
+"516.title" = "Показать данные в Finder";
+
+/* Class = "NSMenuItem"; title = "Настроить панель инструментов..."; ObjectID = "545"; */
+"545.title" = "Настроить панель инструментов...";
+
+/* Class = "NSMenuItem"; title = "Скрыть панель статуса"; ObjectID = "547"; */
+"547.title" = "Скрыть панель статуса";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "589"; */
+"589.title" = "Menu";
+
+/* Class = "NSMenuItem"; title = "Показать Инспектор"; ObjectID = "598"; */
+"598.title" = "Показать Инспектор";
+
+/* Class = "NSMenuItem"; title = "Открыть торрент-файл..."; ObjectID = "611"; */
+"611.title" = "Открыть торрент-файл...";
+
+/* Class = "NSMenuItem"; title = "Обновления..."; ObjectID = "975"; */
+"975.title" = "Обновления...";
+
+/* Class = "NSMenuItem"; title = "Возобновить выбранные"; ObjectID = "1028"; */
+"1028.title" = "Возобновить выбранные";
+
+/* Class = "NSMenuItem"; title = "Скрыть панель инструментов"; ObjectID = "1222"; */
+"1222.title" = "Скрыть панель инструментов";
+
+/* Class = "NSMenuItem"; title = "Раздачи"; ObjectID = "1399"; */
+"1399.title" = "Раздачи";
+
+/* Class = "NSMenu"; title = "Раздачи"; ObjectID = "1400"; */
+"1400.title" = "Раздачи";
+
+/* Class = "NSMenuItem"; title = "Приостановить выбранные"; ObjectID = "1403"; */
+"1403.title" = "Приостановить выбранные";
+
+/* Class = "NSMenuItem"; title = "Возобновить выбранные"; ObjectID = "1404"; */
+"1404.title" = "Возобновить выбранные";
+
+/* Class = "NSMenuItem"; title = "Приостановить все"; ObjectID = "1413"; */
+"1413.title" = "Приостановить все";
+
+/* Class = "NSMenuItem"; title = "Возобновить все"; ObjectID = "1414"; */
+"1414.title" = "Возобновить все";
+
+/* Class = "NSMenuItem"; title = "Удалить данные"; ObjectID = "1514"; */
+"1514.title" = "Удалить данные";
+
+/* Class = "NSMenuItem"; title = "Удалить из списка"; ObjectID = "1516"; */
+"1516.title" = "Удалить из списка";
+
+/* Class = "NSMenuItem"; title = "Сохранить торрент-файл как…"; ObjectID = "1533"; */
+"1533.title" = "Сохранить торрент-файл как…";
+
+/* Class = "NSMenuItem"; title = "Показать Инспектор"; ObjectID = "1536"; */
+"1536.title" = "Показать Инспектор";
+
+/* Class = "NSMenuItem"; title = "Показать данные в Finder"; ObjectID = "1539"; */
+"1539.title" = "Показать данные в Finder";
+
+/* Class = "NSMenuItem"; title = "Удалить из списка"; ObjectID = "1550"; */
+"1550.title" = "Удалить из списка";
+
+/* Class = "NSMenuItem"; title = "Удалить данные"; ObjectID = "1551"; */
+"1551.title" = "Удалить данные";
+
+/* Class = "NSMenuItem"; title = "Домашняя страница Transmission"; ObjectID = "1558"; */
+"1558.title" = "Домашняя страница Transmission";
+
+/* Class = "NSMenuItem"; title = "Справка Transmission"; ObjectID = "1561"; */
+"1561.title" = "Справка Transmission";
+
+/* Class = "NSMenuItem"; title = "Ограничение скорости"; ObjectID = "1566"; */
+"1566.title" = "Ограничение скорости";
+
+/* Class = "NSMenuItem"; title = "Компактный список"; ObjectID = "1578"; */
+"1578.title" = "Компактный список";
+
+/* Class = "NSMenuItem"; title = "Скрыть фильтр"; ObjectID = "1620"; */
+"1620.title" = "Скрыть фильтр";
+
+/* Class = "NSMenuItem"; title = "Снять выделение"; ObjectID = "1675"; */
+"1675.title" = "Снять выделение";
+
+/* Class = "NSMenuItem"; title = "Возобновить выбранные немедленно"; ObjectID = "1678"; */
+"1678.title" = "Возобновить выбранные немедленно";
+
+/* Class = "NSMenuItem"; title = "Открыть с дополнительными параметрами…"; ObjectID = "1680"; */
+"1680.title" = "Открыть с дополнительными параметрами…";
+
+/* Class = "NSMenuItem"; title = "Окно"; ObjectID = "1683"; */
+"1683.title" = "Окно";
+
+/* Class = "NSMenu"; title = "Окно"; ObjectID = "1684"; */
+"1684.title" = "Окно";
+
+/* Class = "NSMenuItem"; title = "Убрать в Dock"; ObjectID = "1685"; */
+"1685.title" = "Убрать в Dock";
+
+/* Class = "NSMenuItem"; title = "Все окна - на передний план"; ObjectID = "1687"; */
+"1687.title" = "Все окна - на передний план";
+
+/* Class = "NSMenuItem"; title = "Изменить масштаб"; ObjectID = "1688"; */
+"1688.title" = "Изменить масштаб";
+
+/* Class = "NSMenuItem"; title = "Следующая вкладка инспектора"; ObjectID = "1693"; */
+"1693.title" = "Следующая вкладка инспектора";
+
+/* Class = "NSMenuItem"; title = "Предыдущая вкладка инспектора"; ObjectID = "1694"; */
+"1694.title" = "Предыдущая вкладка инспектора";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "1696"; */
+"1696.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Очистить"; ObjectID = "1766"; */
+"1766.title" = "Очистить";
+
+/* Class = "NSMenuItem"; title = "Журнал сообщений"; ObjectID = "1795"; */
+"1795.title" = "Журнал сообщений";
+
+/* Class = "NSMenuItem"; title = "Следующая кнопка фильтра"; ObjectID = "1797"; */
+"1797.title" = "Следующая кнопка фильтра";
+
+/* Class = "NSMenuItem"; title = "Предыдущая кнопка фильтра"; ObjectID = "1798"; */
+"1798.title" = "Предыдущая кнопка фильтра";
+
+/* Class = "NSMenuItem"; title = "Возобновить все ожидающие"; ObjectID = "1804"; */
+"1804.title" = "Возобновить все ожидающие";
+
+/* Class = "NSMenuItem"; title = "Возобновить все не ожидающие"; ObjectID = "1808"; */
+"1808.title" = "Возобновить все не ожидающие";
+
+/* Class = "NSMenuItem"; title = "Открыть торрент-файл по адресу…"; ObjectID = "1846"; */
+"1846.title" = "Открыть торрент-файл по адресу…";
+
+/* Class = "NSMenuItem"; title = "Открыть торрент-файл по адресу…"; ObjectID = "1858"; */
+"1858.title" = "Открыть торрент-файл по адресу…";
+
+/* Class = "NSMenuItem"; title = "Обновить трекер"; ObjectID = "1860"; */
+"1860.title" = "Обновить трекер";
+
+/* Class = "NSMenuItem"; title = "Перепроверить существующие данные"; ObjectID = "1877"; */
+"1877.title" = "Перепроверить существующие данные";
+
+/* Class = "NSMenuItem"; title = "Переместить данные в…"; ObjectID = "1891"; */
+"1891.title" = "Переместить данные в…";
+
+/* Class = "NSMenuItem"; title = "Сортировать раздачи по"; ObjectID = "1894"; */
+"1894.title" = "Сортировать раздачи по";
+
+/* Class = "NSMenu"; title = "Сортировать раздачи по"; ObjectID = "1895"; */
+"1895.title" = "Сортировать раздачи по";
+
+/* Class = "NSMenuItem"; title = "Прогрессу"; ObjectID = "1896"; */
+"1896.title" = "Прогрессу";
+
+/* Class = "NSMenuItem"; title = "Состоянию"; ObjectID = "1897"; */
+"1897.title" = "Состоянию";
+
+/* Class = "NSMenuItem"; title = "Возрастающей"; ObjectID = "1899"; */
+"1899.title" = "Возрастающей";
+
+/* Class = "NSMenuItem"; title = "Дате добавления"; ObjectID = "1900"; */
+"1900.title" = "Дате добавления";
+
+/* Class = "NSMenuItem"; title = "Порядку в очереди"; ObjectID = "1901"; */
+"1901.title" = "Порядку в очереди";
+
+/* Class = "NSMenuItem"; title = "Имени"; ObjectID = "1902"; */
+"1902.title" = "Имени";
+
+/* Class = "NSMenuItem"; title = "Создать торрент-файл..."; ObjectID = "1921"; */
+"1921.title" = "Создать торрент-файл...";
+
+/* Class = "NSMenuItem"; title = "Создать торрент-файл..."; ObjectID = "1923"; */
+"1923.title" = "Создать торрент-файл...";
+
+/* Class = "NSMenuItem"; title = "Трекеру"; ObjectID = "1933"; */
+"1933.title" = "Трекеру";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
+"1936.title" = "Menu";
+
+/* Class = "NSMenuItem"; title = "Скорость скачивания"; ObjectID = "1944"; */
+"1944.title" = "Скорость скачивания";
+
+/* Class = "NSMenu"; title = "Скорость скачивания"; ObjectID = "1945"; */
+"1945.title" = "Скорость скачивания";
+
+/* Class = "NSMenuItem"; title = "Без ограничений"; ObjectID = "1946"; */
+"1946.title" = "Без ограничений";
+
+/* Class = "NSMenuItem"; title = "Скорость раздачи"; ObjectID = "1950"; */
+"1950.title" = "Скорость раздачи";
+
+/* Class = "NSMenu"; title = "Скорость раздачи"; ObjectID = "1951"; */
+"1951.title" = "Скорость раздачи";
+
+/* Class = "NSMenuItem"; title = "С ограничением (?)"; ObjectID = "1960"; */
+"1960.title" = "С ограничением (?)";
+
+/* Class = "NSMenuItem"; title = "Без ограничений"; ObjectID = "1963"; */
+"1963.title" = "Без ограничений";
+
+/* Class = "NSMenuItem"; title = "С ограничением (?)"; ObjectID = "1964"; */
+"1964.title" = "С ограничением (?)";
+
+/* Class = "NSMenuItem"; title = "Остановить при рейтинге"; ObjectID = "2017"; */
+"2017.title" = "Остановить при рейтинге";
+
+/* Class = "NSMenu"; title = "Остановить при рейтинге"; ObjectID = "2018"; */
+"2018.title" = "Остановить при рейтинге";
+
+/* Class = "NSMenuItem"; title = "Не останавливать"; ObjectID = "2024"; */
+"2024.title" = "Не останавливать";
+
+/* Class = "NSMenuItem"; title = "остановить при рейтинге"; ObjectID = "2025"; */
+"2025.title" = "остановить при рейтинге";
+
+/* Class = "NSMenuItem"; title = "Общие настройки"; ObjectID = "2031"; */
+"2031.title" = "Общие настройки";
+
+/* Class = "NSMenuItem"; title = "Обновить трекер"; ObjectID = "2122"; */
+"2122.title" = "Обновить трекер";
+
+/* Class = "NSMenuItem"; title = "Части"; ObjectID = "2185"; */
+"2185.title" = "Части";
+
+/* Class = "NSMenuItem"; title = "Доступность"; ObjectID = "2279"; */
+"2279.title" = "Доступность";
+
+/* Class = "NSMenuItem"; title = "Статистика"; ObjectID = "2301"; */
+"2301.title" = "Статистика";
+
+/* Class = "NSMenuItem"; title = "Активности"; ObjectID = "2324"; */
+"2324.title" = "Активности";
+
+/* Class = "NSMenuItem"; title = "Группа"; ObjectID = "2839"; */
+"2839.title" = "Группа";
+
+/* Class = "NSMenu"; title = "Группа"; ObjectID = "2840"; */
+"2840.title" = "Группа";
+
+/* Class = "NSMenuItem"; title = "Группа"; ObjectID = "2849"; */
+"2849.title" = "Группа";
+
+/* Class = "NSMenu"; title = "Группа"; ObjectID = "2850"; */
+"2850.title" = "Группа";
+
+/* Class = "NSTextFieldCell"; title = "999 из 999 раздач"; ObjectID = "3049"; */
+"3049.title" = "999 из 999 раздач";
+
+/* Class = "NSMenuItem"; title = "Использовать группы"; ObjectID = "3078"; */
+"3078.title" = "Использовать группы";
+
+/* Class = "NSTableColumn"; headerCell.title = "Цвет"; ObjectID = "3093"; */
+"3093.headerCell.title" = "Цвет";
+
+/* Class = "NSTableColumn"; headerCell.title = "Скорость скачивания"; ObjectID = "3126"; */
+"3126.headerCell.title" = "Скорость скачивания";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3127"; */
+"3127.title" = "Text Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Скорость раздачи"; ObjectID = "3135"; */
+"3135.headerCell.title" = "Скорость раздачи";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3136"; */
+"3136.title" = "Text Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Группа"; ObjectID = "3140"; */
+"3140.headerCell.title" = "Группа";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3145"; */
+"3145.title" = "Text Cell";
+
+/* Class = "NSMenuItem"; title = "Быстрый "; ObjectID = "3166"; */
+"3166.title" = "Быстрый ";
+
+/* Class = "NSMenuItem"; title = "Transmission wiki и разработка"; ObjectID = "3170"; */
+"3170.title" = "Transmission wiki и разработка";
+
+/* Class = "NSMenuItem"; title = "Не превышать общее ограничение скорости"; ObjectID = "3190"; */
+"3190.title" = "Не превышать общее ограничение скорости";
+
+/* Class = "NSMenuItem"; title = "Приоритет"; ObjectID = "3196"; */
+"3196.title" = "Приоритет";
+
+/* Class = "NSMenu"; title = "Приоритет"; ObjectID = "3197"; */
+"3197.title" = "Приоритет";
+
+/* Class = "NSMenuItem"; title = "Высокий"; ObjectID = "3198"; */
+"3198.title" = "Высокий";
+
+/* Class = "NSMenuItem"; title = "Нормальный"; ObjectID = "3199"; */
+"3199.title" = "Нормальный";
+
+/* Class = "NSMenuItem"; title = "Низкий"; ObjectID = "3200"; */
+"3200.title" = "Низкий";
+
+/* Class = "NSMenuItem"; title = "Сохранить торрент-файл как…"; ObjectID = "3207"; */
+"3207.title" = "Сохранить торрент-файл как…";
+
+/* Class = "NSMenuItem"; title = "Переместить данные в…"; ObjectID = "3209"; */
+"3209.title" = "Переместить данные в…";
+
+/* Class = "NSMenuItem"; title = "Сделать пожертвование…"; ObjectID = "3212"; */
+"3212.title" = "Сделать пожертвование…";
+
+/* Class = "NSMenuItem"; title = "Копировать magnet-ссылку"; ObjectID = "3216"; */
+"3216.title" = "Копировать magnet-ссылку";
+
+/* Class = "NSMenuItem"; title = "Копировать magnet-ссылку"; ObjectID = "3218"; */
+"3218.title" = "Копировать magnet-ссылку";
+
+/* Class = "NSMenuItem"; title = "Перепроверить существующие данные"; ObjectID = "3221"; */
+"3221.title" = "Перепроверить существующие данные";
+
+/* Class = "NSMenuItem"; title = "Отменить"; ObjectID = "3321"; */
+"3321.title" = "Отменить";
+
+/* Class = "NSMenuItem"; title = "Повторить"; ObjectID = "3400"; */
+"3400.title" = "Повторить";
+
+/* Class = "NSMenuItem"; title = "Убывающей"; ObjectID = "3405"; */
+"3405.title" = "Убывающей";
+
+/* Class = "NSMenuItem"; title = "Удалить все завершенные из списка"; ObjectID = "3407"; */
+"3407.title" = "Удалить все завершенные из списка";
+
+/* Class = "NSMenuItem"; title = "Размеру"; ObjectID = "3430"; */
+"3430.title" = "Размеру";
+
+/* Class = "NSMenuItem"; title = "Переименовать файл…"; ObjectID = "3445"; */
+"3445.title" = "Переименовать файл…";
+
+/* Class = "NSMenuItem"; title = "Переименовать файл…"; ObjectID = "3448"; */
+"3448.title" = "Переименовать файл…";
+
+/* Class = "NSMenuItem"; title = "Отправить торрент-файл"; ObjectID = "8t6-wh-5UW"; */
+"8t6-wh-5UW.title" = "Отправить торрент-файл";
+
+/* Class = "NSMenu"; title = "Отправить торрент-файл"; ObjectID = "Cay-iU-bH4"; */
+"Cay-iU-bH4.title" = "Отправить торрент-файл";
+
+/* Class = "NSMenu"; title = "Отправить торрент-файл"; ObjectID = "lvU-Va-GzM"; */
+"lvU-Va-GzM.title" = "Отправить торрент-файл";
+
+/* Class = "NSMenuItem"; title = "Отправить торрент-файл"; ObjectID = "s5v-VO-G2y"; */
+"s5v-VO-G2y.title" = "Отправить торрент-файл";

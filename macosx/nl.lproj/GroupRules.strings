@@ -1,0 +1,66 @@
+
+/* Class = "NSWindow"; title = "Venster"; ObjectID = "1"; */
+"1.title" = "Venster";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "11"; */
+"11.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Annuleer"; ObjectID = "12"; */
+"12.title" = "Annuleer";
+
+/* Class = "NSMenuItem"; title = "begint met"; ObjectID = "40"; */
+"40.title" = "begint met";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "42"; */
+"42.title" = "is";
+
+/* Class = "NSMenuItem"; title = "voldoen aan de volgende voorwaarden"; ObjectID = "49"; */
+"49.title" = "voldoen aan de volgende voorwaarden";
+
+/* Class = "NSMenuItem"; title = "Een of meer"; ObjectID = "50"; */
+"50.title" = "Een of meer";
+
+/* Class = "NSMenuItem"; title = "Alle"; ObjectID = "51"; */
+"51.title" = "Alle";
+
+/* Class = "NSMenuItem"; title = "Naam"; ObjectID = "100"; */
+"100.title" = "Naam";
+
+/* Class = "NSMenuItem"; title = "Opmerking"; ObjectID = "102"; */
+"102.title" = "Opmerking";
+
+/* Class = "NSMenuItem"; title = "is gelijk aan"; ObjectID = "118"; */
+"118.title" = "is gelijk aan";
+
+/* Class = "NSMenuItem"; title = "bevat"; ObjectID = "153"; */
+"153.title" = "bevat";
+
+/* Class = "NSMenuItem"; title = "begint met"; ObjectID = "154"; */
+"154.title" = "begint met";
+
+/* Class = "NSMenuItem"; title = "eindigt op"; ObjectID = "155"; */
+"155.title" = "eindigt op";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "156"; */
+"156.title" = "is";
+
+/* Class = "NSMenuItem"; title = "Elk bestand"; ObjectID = "161"; */
+"161.title" = "Elk bestand";
+
+/* Class = "NSMenuItem"; title = "Elke tracker"; ObjectID = "162"; */
+"162.title" = "Elke tracker";
+
+/* Class = "NSMenuItem"; title = "eindigt op"; ObjectID = "163"; */
+"163.title" = "eindigt op";
+
+/* Class = "NSMenuItem"; title = "is niet"; ObjectID = "164"; */
+"164.title" = "is niet";
+
+/* Class = "NSMenuItem"; title = "bevat"; ObjectID = "165"; */
+"165.title" = "bevat";
+
+/* Class = "NSMenuItem"; title = "Geen"; ObjectID = "166"; */
+"166.title" = "Geen";
+
+/* Class = "NSMenuItem"; title = "is gelijk aan"; ObjectID = "167"; */
+"167.title" = "is gelijk aan";
