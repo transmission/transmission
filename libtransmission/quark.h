@@ -40,6 +40,8 @@ enum
     TR_KEY_alt_speed_time_end, /* rpc, settings */
     TR_KEY_alt_speed_up, /* rpc, settings */
     TR_KEY_announce, /* metainfo */
+    TR_KEY_announce_ip, /* metainfo, settings */
+    TR_KEY_announce_ip_enabled, /* metainfo, settings */
     TR_KEY_announce_list, /* metainfo */
     TR_KEY_announceState, /* rpc */
     TR_KEY_anti_brute_force_enabled, /* rpc */
