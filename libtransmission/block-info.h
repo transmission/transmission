@@ -74,6 +74,17 @@ public:
         return { pieceLoc(piece).block, pieceLastLoc(piece).block + 1 };
     }
 
+    [[nodiscard]] tr_byte_span_t byteSpanForPiece(tr_piece_index_t piece) const noexcept
+    {
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        auto const offset = pieceLoc(piece).byte;
+        return { offset, offset + pieceSize(piece) };
+    }
+
     struct Location
     {
         uint64_t byte = 0;

@@ -23,7 +23,6 @@ set(PROJECT_FILES
   crypto-utils-openssl.cc
   crypto-utils-polarssl.cc
   crypto-utils.cc
-  crypto.cc
   error.cc
   file-piece-map.cc
   file-posix.cc
@@ -41,6 +40,7 @@ set(PROJECT_FILES
   peer-mgr-active-requests.cc
   peer-mgr-wishlist.cc
   peer-mgr.cc
+  peer-mse.cc
   peer-msgs.cc
   platform-quota.cc
   platform.cc
@@ -165,7 +165,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     clients.h
     completion.h
     crypto-utils.h
-    crypto.h
     file-piece-map.h
     handshake.h
     history.h
@@ -181,6 +180,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     peer-mgr-active-requests.h
     peer-mgr-wishlist.h
     peer-mgr.h
+    peer-mse.h
     peer-msgs.h
     peer-socket.h
     platform-quota.h
@@ -215,6 +215,8 @@ endif()
 
 add_definitions(
     -D__TRANSMISSION__
+    -DWIDE_INTEGER_DISABLE_FLOAT_INTEROP
+    -DWIDE_INTEGER_DISABLE_IOSTREAM
     "-DPACKAGE_DATA_DIR=\"${CMAKE_INSTALL_FULL_DATAROOTDIR}\""
     ${NATPMP_DEFINITIONS}
     ${MINIUPNPC_DEFINITIONS}
@@ -256,6 +258,7 @@ include_directories(
 
 include_directories(
     SYSTEM
+    ${WIDE_INTEGER_INCLUDE_DIRS}
     ${UTFCPP_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
     ${FAST_FLOAT_INCLUDE_DIRS}

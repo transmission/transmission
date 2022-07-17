@@ -254,7 +254,7 @@ bool tr_torrentUseMetainfoFromFile(
     // tor should keep this metainfo
     tor->setMetainfo(*metainfo);
 
-    if (tor->incompleteMetadata)
+    if (tor->incompleteMetadata != nullptr)
     {
         incompleteMetadataFree(tor->incompleteMetadata);
         tor->incompleteMetadata = nullptr;

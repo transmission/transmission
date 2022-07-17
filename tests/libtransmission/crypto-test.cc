@@ -5,14 +5,16 @@
 
 #include <array>
 #include <cstring>
+#include <iostream>
 #include <numeric>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
 
 #include "transmission.h"
 
-#include "crypto.h"
+#include "peer-mse.h"
 #include "crypto-utils.h"
 #include "utils.h"
 
@@ -31,51 +33,71 @@ auto constexpr SomeHash = tr_sha1_digest_t{
     std::byte{ 14 }, std::byte{ 15 }, std::byte{ 16 }, std::byte{ 17 }, std::byte{ 18 }, std::byte{ 19 },
 };
 
+template<size_t N>
+std::string toString(std::array<std::byte, N> const& array)
+{
+    auto ostr = std::ostringstream{};
+    ostr << '[';
+    for (auto const b : array)
+    {
+        ostr << static_cast<unsigned>(b) << ' ';
+    }
+    ostr << ']';
+    return ostr.str();
+}
+
 } // namespace
 
-TEST(Crypto, torrentHash)
+TEST(Crypto, DH)
 {
+    auto a = tr_message_stream_encryption::DH{};
+    auto b = tr_message_stream_encryption::DH{};
 
-    auto a = tr_crypto{};
-    EXPECT_FALSE(tr_cryptoGetTorrentHash(&a));
+    a.setPeerPublicKey(b.publicKey());
+    b.setPeerPublicKey(a.publicKey());
+    EXPECT_EQ(toString(a.secret()), toString(b.secret()));
+    EXPECT_EQ(a.secret(), b.secret());
+    EXPECT_EQ(96, std::size(a.secret()));
 
-    tr_cryptoSetTorrentHash(&a, SomeHash);
-    EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
-
-    a = tr_crypto{ &SomeHash, false };
-    EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
+    auto c = tr_message_stream_encryption::DH{};
+    c.setPeerPublicKey(b.publicKey());
+    EXPECT_NE(a.secret(), c.secret());
+    EXPECT_NE(toString(a.secret()), toString(c.secret()));
 }
 
 TEST(Crypto, encryptDecrypt)
 {
-    auto a = tr_crypto{ &SomeHash, false };
-    auto b = tr_crypto_{ &SomeHash, true };
+    auto a_dh = tr_message_stream_encryption::DH{};
+    auto b_dh = tr_message_stream_encryption::DH{};
 
-    auto public_key_length = int{};
-    EXPECT_TRUE(tr_cryptoComputeSecret(&a, tr_cryptoGetMyPublicKey_(&b, &public_key_length)));
-    EXPECT_TRUE(tr_cryptoComputeSecret_(&b, tr_cryptoGetMyPublicKey(&a, &public_key_length)));
+    a_dh.setPeerPublicKey(b_dh.publicKey());
+    b_dh.setPeerPublicKey(a_dh.publicKey());
 
-    auto const input1 = std::string{ "test1" };
+    auto constexpr Input1 = "test1"sv;
     auto encrypted1 = std::array<char, 128>{};
     auto decrypted1 = std::array<char, 128>{};
 
-    tr_cryptoEncryptInit(&a);
-    tr_cryptoEncrypt(&a, input1.size(), input1.data(), encrypted1.data());
-    tr_cryptoDecryptInit_(&b);
-    tr_cryptoDecrypt_(&b, input1.size(), encrypted1.data(), decrypted1.data());
-    EXPECT_EQ(input1, std::string(decrypted1.data(), input1.size()));
+    auto a = tr_message_stream_encryption::Filter{};
+    a.encryptInit(false, a_dh, SomeHash);
+    std::copy_n(std::begin(Input1), std::size(Input1), std::begin(encrypted1));
+    a.encrypt(std::size(Input1), std::data(encrypted1));
+    auto b = tr_message_stream_encryption::Filter{};
+    b.decryptInit(true, b_dh, SomeHash);
+    std::copy_n(std::begin(encrypted1), std::size(Input1), std::begin(decrypted1));
+    b.decrypt(std::size(Input1), std::data(decrypted1));
+    EXPECT_EQ(Input1, std::data(decrypted1)) << "Input1 " << Input1 << " decrypted1 " << std::data(decrypted1);
 
-    auto const input2 = std::string{ "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
+    auto constexpr Input2 = "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)"sv;
     auto encrypted2 = std::array<char, 128>{};
     auto decrypted2 = std::array<char, 128>{};
 
-    tr_cryptoEncryptInit_(&b);
-    tr_cryptoEncrypt_(&b, input2.size(), input2.data(), encrypted2.data());
-    tr_cryptoDecryptInit(&a);
-    tr_cryptoDecrypt(&a, input2.size(), encrypted2.data(), decrypted2.data());
-    EXPECT_EQ(input2, std::string(decrypted2.data(), input2.size()));
+    b.encryptInit(true, b_dh, SomeHash);
+    std::copy_n(std::begin(Input2), std::size(Input2), std::begin(encrypted2));
+    b.encrypt(std::size(Input2), std::data(encrypted2));
+    a.decryptInit(false, a_dh, SomeHash);
+    std::copy_n(std::begin(encrypted2), std::size(Input2), std::begin(decrypted2));
+    a.decrypt(std::size(Input2), std::data(decrypted2));
+    EXPECT_EQ(Input2, std::data(decrypted2)) << "Input2 " << Input2 << " decrypted2 " << std::data(decrypted2);
 }
 
 TEST(Crypto, sha1)

@@ -33,25 +33,6 @@ using namespace std::literals;
 ****
 ***/
 
-void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size)
-{
-    TR_ASSERT(key_size <= buffer_size);
-
-    /* DH can generate key sizes that are smaller than the size of
-       key buffer with exponentially decreasing probability, in which case
-       the msb's of key buffer need to be zeroed appropriately. */
-    if (key_size < buffer_size)
-    {
-        size_t const offset = buffer_size - key_size;
-        memmove(key_buffer + offset, key_buffer, key_size);
-        memset(key_buffer, 0, offset);
-    }
-}
-
-/***
-****
-***/
-
 int tr_rand_int(int upper_bound)
 {
     TR_ASSERT(upper_bound > 0);

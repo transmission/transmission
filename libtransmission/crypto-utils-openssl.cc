@@ -8,9 +8,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-#include <openssl/bn.h>
 #include <openssl/crypto.h>
-#include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/opensslv.h>
@@ -21,13 +19,11 @@
 #include <fmt/core.h>
 
 #include "transmission.h"
+
 #include "crypto-utils.h"
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
-
-#define TR_CRYPTO_DH_SECRET_FALLBACK
-#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 /***
 ****
@@ -87,20 +83,6 @@ static bool check_openssl_result(int result, int expected_result, bool expected_
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
 #define check_result_neq(result, x_result) check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
-
-static bool check_openssl_pointer(void const* pointer, char const* file, int line)
-{
-    bool const ret = pointer != nullptr;
-
-    if (!ret)
-    {
-        log_openssl_error(file, line);
-    }
-
-    return ret;
-}
-
-#define check_pointer(pointer) check_openssl_pointer((pointer), __FILE__, __LINE__)
 
 /***
 ****
@@ -231,167 +213,6 @@ static void openssl_evp_cipher_context_free(EVP_CIPHER_CTX* handle)
 #define EVP_CIPHER_CTX_free(x) openssl_evp_cipher_context_free((x))
 
 #endif
-
-/***
-****
-***/
-
-#if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
-
-static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
-{
-    /* If the fields p and g in d are nullptr, the corresponding input
-     * parameters MUST be non-nullptr. q may remain nullptr.
-     */
-    if ((dh->p == nullptr && p == nullptr) || (dh->g == nullptr && g == nullptr))
-    {
-        return 0;
-    }
-
-    if (p != nullptr)
-    {
-        BN_free(dh->p);
-        dh->p = p;
-    }
-
-    if (q != nullptr)
-    {
-        BN_free(dh->q);
-        dh->q = q;
-    }
-
-    if (g != nullptr)
-    {
-        BN_free(dh->g);
-        dh->g = g;
-    }
-
-    if (q != nullptr)
-    {
-        dh->length = BN_num_bits(q);
-    }
-
-    return 1;
-}
-
-static constexpr int DH_set_length(DH* dh, long length)
-{
-    dh->length = length;
-    return 1;
-}
-
-static constexpr void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM const** priv_key)
-{
-    if (pub_key != nullptr)
-    {
-        *pub_key = dh->pub_key;
-    }
-
-    if (priv_key != nullptr)
-    {
-        *priv_key = dh->priv_key;
-    }
-}
-
-#endif
-
-tr_dh_ctx_t tr_dh_new(
-    uint8_t const* prime_num,
-    size_t prime_num_length,
-    uint8_t const* generator_num,
-    size_t generator_num_length)
-{
-    TR_ASSERT(prime_num != nullptr);
-    TR_ASSERT(generator_num != nullptr);
-
-    DH* handle = DH_new();
-
-    BIGNUM* const p = BN_bin2bn(prime_num, prime_num_length, nullptr);
-    BIGNUM* const g = BN_bin2bn(generator_num, generator_num_length, nullptr);
-
-    if (!check_pointer(p) || !check_pointer(g) || DH_set0_pqg(handle, p, nullptr, g) == 0)
-    {
-        BN_free(p);
-        BN_free(g);
-        DH_free(handle);
-        handle = nullptr;
-    }
-
-    return handle;
-}
-
-void tr_dh_free(tr_dh_ctx_t raw_handle)
-{
-    auto* handle = static_cast<DH*>(raw_handle);
-
-    if (handle == nullptr)
-    {
-        return;
-    }
-
-    DH_free(handle);
-}
-
-bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
-{
-    TR_ASSERT(raw_handle != nullptr);
-    TR_ASSERT(public_key != nullptr);
-
-    auto* handle = static_cast<DH*>(raw_handle);
-
-    DH_set_length(handle, private_key_length * 8);
-
-    if (!check_result(DH_generate_key(handle)))
-    {
-        return false;
-    }
-
-    BIGNUM const* my_public_key = nullptr;
-    DH_get0_key(handle, &my_public_key, nullptr);
-
-    int const my_public_key_length = BN_bn2bin(my_public_key, public_key);
-    int const dh_size = DH_size(handle);
-
-    tr_dh_align_key(public_key, my_public_key_length, dh_size);
-
-    if (public_key_length != nullptr)
-    {
-        *public_key_length = dh_size;
-    }
-
-    return true;
-}
-
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
-{
-    auto* handle = static_cast<DH*>(raw_handle);
-
-    TR_ASSERT(handle != nullptr);
-    TR_ASSERT(other_public_key != nullptr);
-
-    BIGNUM* const other_key = BN_bin2bn(other_public_key, other_public_key_length, nullptr);
-    if (!check_pointer(other_key))
-    {
-        return nullptr;
-    }
-
-    int const dh_size = DH_size(handle);
-    tr_dh_secret* ret = tr_dh_secret_new(dh_size);
-    int const secret_key_length = DH_compute_key(ret->key, other_key, handle);
-
-    if (check_result_neq(secret_key_length, -1))
-    {
-        tr_dh_secret_align(ret, secret_key_length);
-    }
-    else
-    {
-        tr_dh_secret_free(ret);
-        ret = nullptr;
-    }
-
-    BN_free(other_key);
-    return ret;
-}
 
 /***
 ****

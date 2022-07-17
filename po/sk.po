@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 03:57+0100\n"
+"POT-Creation-Date: 2022-07-12 21:48+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Julius Dielik, 2021\n"
 "Language-Team: Slovak (https://www.transifex.com/transmissionbt/teams/33778/sk/)\n"
@@ -1991,7 +1991,7 @@ msgstr ""
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:299
+#: ../libtransmission/log.cc:296
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2015,23 +2015,23 @@ msgstr ""
 msgid "Port {port} forwarded successfully"
 msgstr ""
 
-#: ../libtransmission/net.cc:306
+#: ../libtransmission/net.cc:278
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:383
+#: ../libtransmission/net.cc:355
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:404
+#: ../libtransmission/net.cc:376
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:519
+#: ../libtransmission/net.cc:497
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr ""
 
-#: ../libtransmission/net.cc:520
+#: ../libtransmission/net.cc:498
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr ""
 
@@ -2047,15 +2047,11 @@ msgstr ""
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:428
+#: ../libtransmission/peer-io.cc:358
 msgid "Couldn't write to peer"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:450
-msgid "Couldn't write {expected_size} bytes to peer; wrote {actual_size}"
-msgstr ""
-
-#: ../libtransmission/peer-io.cc:515
+#: ../libtransmission/peer-io.cc:414
 msgid "Unknown state: {state}"
 msgstr ""
 
@@ -2079,7 +2075,7 @@ msgstr "Nepresmerovaný"
 msgid "Mapped private port {private_port} to public port {public_port}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding.cc:111
+#: ../libtransmission/port-forwarding.cc:106
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr ""
 
@@ -2155,7 +2151,7 @@ msgstr ""
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/session.cc:747
+#: ../libtransmission/session.cc:745
 msgid "Transmission version {version} starting"
 msgstr ""
 
@@ -2167,11 +2163,11 @@ msgstr ""
 msgid "Time to turn on turtle mode"
 msgstr ""
 
-#: ../libtransmission/session.cc:1945
+#: ../libtransmission/session.cc:1946
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:2065
+#: ../libtransmission/session.cc:2066
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
@@ -2187,7 +2183,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../libtransmission/torrent-metainfo.cc:786
+#: ../libtransmission/torrent-metainfo.cc:773
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2272,35 +2268,35 @@ msgstr ""
 msgid "Couldn't allocate IPv6 event"
 msgstr ""
 
-#: ../libtransmission/tr-utp.cc:100
+#: ../libtransmission/tr-utp.cc:95
 msgid "Unknown socket family"
 msgstr ""
 
-#: ../libtransmission/upnp.cc:279
+#: ../libtransmission/upnp.cc:277
 msgid "Found Internet Gateway Device '{url}'"
 msgstr ""
 
-#: ../libtransmission/upnp.cc:280
+#: ../libtransmission/upnp.cc:278
 msgid "Local Address is '{address}'"
 msgstr ""
 
-#: ../libtransmission/upnp.cc:303
+#: ../libtransmission/upnp.cc:301
 msgid "Port {port} is not forwarded"
 msgstr ""
 
-#: ../libtransmission/upnp.cc:313
+#: ../libtransmission/upnp.cc:311
 msgid "Stopping port forwarding through '{url}', service '{type}'"
 msgstr ""
 
-#: ../libtransmission/upnp.cc:345
+#: ../libtransmission/upnp.cc:343
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
 msgstr ""
 
-#: ../libtransmission/upnp.cc:353
+#: ../libtransmission/upnp.cc:351
 msgid "Port {port} is forwarded"
 msgstr ""
 
-#: ../libtransmission/upnp.cc:359
+#: ../libtransmission/upnp.cc:357
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr ""
 

@@ -45,6 +45,7 @@
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
 #include "tr-assert.h"
+#include "tr-dht.h"
 #include "tr-utp.h"
 #include "utils.h"
 #include "webseed.h"
@@ -62,6 +63,80 @@ static auto constexpr CancelHistorySec = int{ 60 };
 /**
 ***
 **/
+
+static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr);
+
+class tr_handshake_mediator_impl final : public tr_handshake_mediator
+{
+private:
+    [[nodiscard]] static std::optional<torrent_info> torrentInfo(tr_torrent* tor)
+    {
+        if (tor == nullptr)
+        {
+            return {};
+        }
+
+        auto info = torrent_info{};
+        info.info_hash = tor->infoHash();
+        info.client_peer_id = tr_torrentGetPeerId(tor);
+        info.id = tor->id();
+        info.is_done = tor->isDone();
+        return info;
+    }
+
+public:
+    tr_handshake_mediator_impl(tr_session& session)
+        : session_{ session }
+    {
+    }
+
+    virtual ~tr_handshake_mediator_impl() = default;
+
+    [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
+    {
+        return torrentInfo(session_.torrents().get(info_hash));
+    }
+
+    [[nodiscard]] std::optional<torrent_info> torrentInfoFromObfuscated(
+        tr_sha1_digest_t const& obfuscated_info_hash) const override
+    {
+        return torrentInfo(tr_torrentFindFromObfuscatedHash(&session_, obfuscated_info_hash));
+    }
+
+    [[nodiscard]] bool isDHTEnabled() const override
+    {
+        return tr_dhtEnabled(&session_);
+    }
+
+    void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address addr) override
+    {
+        if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
+        {
+            tr_peerMgrSetUtpFailed(tor, addr, true);
+        }
+    }
+
+    [[nodiscard]] bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const override
+    {
+        auto* const tor = session_.torrents().get(tor_id);
+        return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
+    }
+
+    [[nodiscard]] event_base* eventBase() const override
+    {
+        return session_.event_base;
+    }
+
+    [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override
+    {
+        auto const len = tr_rand_int(maxlen);
+        tr_rand_buffer(setme, len);
+        return len;
+    }
+
+private:
+    tr_session& session_;
+};
 
 /**
  * Peer information that should be kept even before we've connected and
@@ -683,7 +758,7 @@ static void atomSetSeed(tr_swarm* swarm, peer_atom& atom)
     swarm->markAllSeedsFlagDirty();
 }
 
-bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
+static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 {
     if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
@@ -1084,7 +1159,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
     bool success = false;
     auto* manager = static_cast<tr_peerMgr*>(result.userData);
 
-    auto const hash = tr_peerIoGetTorrentHash(result.io);
+    auto const hash = result.io->torrentHash();
     tr_swarm* const s = hash ? getExistingSwarm(manager, *hash) : nullptr;
 
     auto const [addr, port] = result.io->socketAddress();
@@ -1184,7 +1259,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
 
     if (tr_sessionIsAddressBlocked(session, addr))
     {
-        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", tr_address_to_string(addr)));
+        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr->readable(port)));
         tr_netClosePeerSocket(session, socket);
     }
     else if (manager->incoming_handshakes.contains(*addr))
@@ -1193,8 +1268,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     }
     else /* we don't have a connection to them yet... */
     {
+        auto mediator = std::make_shared<tr_handshake_mediator_impl>(*session);
         tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket);
-        tr_handshake* const handshake = tr_handshakeNew(io, session->encryptionMode, on_handshake_done, manager);
+        tr_handshake* const handshake = tr_handshakeNew(mediator, io, session->encryptionMode, on_handshake_done, manager);
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
@@ -1631,7 +1707,7 @@ namespace peer_stat_helpers
 
     auto const [addr, port] = peer->socketAddress();
 
-    tr_address_to_string_with_buf(&addr, stats.addr, sizeof(stats.addr));
+    addr.readable(stats.addr, sizeof(stats.addr));
     stats.client = peer->client.c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
@@ -2769,9 +2845,10 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     }
     else
     {
-        tr_handshake* handshake = tr_handshakeNew(io, mgr->session->encryptionMode, on_handshake_done, mgr);
+        auto mediator = std::make_shared<tr_handshake_mediator_impl>(*mgr->session);
+        tr_handshake* handshake = tr_handshakeNew(mediator, io, mgr->session->encryptionMode, on_handshake_done, mgr);
 
-        TR_ASSERT(tr_peerIoGetTorrentHash(io));
+        TR_ASSERT(io->torrentHash());
 
         tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIoNewOutgoing() */
 

@@ -244,6 +244,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             // v2, ignore for today
             tr_logAddInfo("'file tree' is ignored");
+            state_ = State::UsePath;
         }
         else if (state_ == State::Files) // bittorrent v1 format
         {
@@ -253,6 +254,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             }
 
             file_subpath_.clear();
+        }
+        else if (state_ == State::PieceLayers)
+        {
+            state_ = State::UsePath;
         }
 
         return depth() > 0;

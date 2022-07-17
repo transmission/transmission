@@ -16,6 +16,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime>
+#include <deque>
 #include <memory>
 #include <optional>
 #include <string>
@@ -26,13 +27,14 @@
 #include "transmission.h"
 
 #include "bandwidth.h"
-#include "crypto.h"
 #include "net.h" // tr_address
+#include "peer-mse.h"
 #include "peer-socket.h"
 #include "tr-assert.h"
 
 class tr_peerIo;
-struct tr_datatype;
+struct tr_bandwidth;
+struct struct_utp_context;
 
 /**
  * @addtogroup networked_io Networked IO
@@ -44,13 +46,6 @@ enum ReadState
     READ_NOW,
     READ_LATER,
     READ_ERR
-};
-
-enum tr_encryption_type
-{
-    /* these match the values in MSE's crypto_select */
-    PEER_ENCRYPTION_NONE = (1 << 0),
-    PEER_ENCRYPTION_RC4 = (1 << 1)
 };
 
 using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
@@ -73,6 +68,9 @@ using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
 
 class tr_peerIo
 {
+    using DH = tr_message_stream_encryption::DH;
+    using Filter = tr_message_stream_encryption::Filter;
+
 public:
     tr_peerIo(
         tr_session* session_in,
@@ -83,14 +81,18 @@ public:
         bool is_seed,
         time_t current_time,
         tr_bandwidth* parent_bandwidth)
-        : crypto{ torrent_hash, is_incoming }
-        , session{ session_in }
+        : session{ session_in }
         , time_created{ current_time }
         , bandwidth_{ parent_bandwidth }
         , addr_{ addr }
         , port_{ port }
         , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
     {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
     }
 
     [[nodiscard]] constexpr tr_address const& address() const noexcept
@@ -105,15 +107,12 @@ public:
 
     std::string addrStr() const;
 
-    [[nodiscard]] constexpr bool isIncoming() noexcept
-    {
-        return crypto.is_incoming;
-    }
-
     [[nodiscard]] auto getReadBuffer() noexcept
     {
         return inbuf.get();
     }
+
+    void readBufferAdd(void const* data, size_t n_bytes);
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
@@ -180,7 +179,20 @@ public:
         bandwidth_.setParent(parent);
     }
 
-    tr_crypto crypto;
+    [[nodiscard]] constexpr auto isIncoming() noexcept
+    {
+        return is_incoming_;
+    }
+
+    void setTorrentHash(tr_sha1_digest_t hash) noexcept
+    {
+        torrent_hash_ = hash;
+    }
+
+    [[nodiscard]] constexpr auto const& torrentHash() const noexcept
+    {
+        return torrent_hash_;
+    }
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
     // like this one isn't being used just for assertions, but also in
@@ -202,13 +214,10 @@ public:
     tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
     tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
 
-    struct tr_datatype* outbuf_datatypes = nullptr;
+    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
 
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
-
-    // TODO(ckerr): this could be narrowed to 1 byte
-    tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
 
     // TODO: use std::shared_ptr instead of manual refcounting?
     int refCount = 1;
@@ -219,13 +228,53 @@ public:
 
     bool utp_supported_ = false;
 
+    void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+    {
+        filter().decryptInit(is_incoming, dh, info_hash);
+    }
+
+    void decrypt(size_t buflen, void* buf)
+    {
+        filter().decrypt(buflen, buf);
+    }
+
+    void encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+    {
+        filter().encryptInit(is_incoming, dh, info_hash);
+    }
+
+    void encrypt(size_t buflen, void* buf)
+    {
+        filter().encrypt(buflen, buf);
+    }
+
+    [[nodiscard]] bool isEncrypted() const noexcept
+    {
+        return filter_.get() != nullptr;
+    }
+
 private:
     tr_bandwidth bandwidth_;
+
+    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
+
+    Filter& filter()
+    {
+        if (!filter_)
+        {
+            filter_ = std::make_unique<Filter>();
+        }
+
+        return *filter_;
+    }
+
+    std::optional<tr_sha1_digest_t> torrent_hash_;
 
     tr_address const addr_;
     tr_port const port_;
 
     bool const is_seed_;
+    bool const is_incoming_;
 
     bool dht_supported_ = false;
     bool extended_protocol_supported_ = false;
@@ -235,6 +284,8 @@ private:
 /**
 ***
 **/
+
+void tr_peerIoUtpInit(struct_utp_context* ctx);
 
 // TODO: 8 constructor args is too many; maybe a builder object?
 tr_peerIo* tr_peerIoNewOutgoing(
@@ -253,6 +304,19 @@ tr_peerIo* tr_peerIoNewIncoming(
     struct tr_address const* addr,
     tr_port port,
     time_t current_time,
+    struct tr_peer_socket const socket);
+
+// this is only public for testing purposes.
+// production code should use tr_peerIoNewOutgoing() or tr_peerIoNewIncoming()
+tr_peerIo* tr_peerIoNew(
+    tr_session* session,
+    tr_bandwidth* parent,
+    tr_address const* addr,
+    tr_port port,
+    time_t current_time,
+    tr_sha1_digest_t const* torrent_hash,
+    bool is_incoming,
+    bool is_seed,
     struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
@@ -281,10 +345,6 @@ constexpr tr_session* tr_peerIoGetSession(tr_peerIo* io)
     return io->session;
 }
 
-std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io);
-
-void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash);
-
 int tr_peerIoReconnect(tr_peerIo* io);
 
 /**
@@ -306,18 +366,6 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 /**
 ***
 **/
-
-constexpr tr_crypto* tr_peerIoGetCrypto(tr_peerIo* io)
-{
-    return &io->crypto;
-}
-
-void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type);
-
-constexpr bool tr_peerIoIsEncrypted(tr_peerIo const* io)
-{
-    return io != nullptr && io->encryption_type == PEER_ENCRYPTION_RC4;
-}
 
 void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte);
 void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
