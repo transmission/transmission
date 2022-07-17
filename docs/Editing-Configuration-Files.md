@@ -32,6 +32,10 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
 ```
 
 ### Options
+#### IP Announce
+ * **announce-ip:** String (default = "") Alternative IP address to announce to tracker.
+ * **announce-ip-enabled:** Boolean (default = false) When enabled **announce-ip** value is used instead of client's address visible to tracker for announcement requests.
+
 #### Bandwidth
  * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')
    _Note: Clicking the "Turtle" in the GUI when the [scheduler](#Scheduling) is enabled, will only temporarily remove the scheduled limit until the next cycle._
