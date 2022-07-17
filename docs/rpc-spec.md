@@ -12,6 +12,16 @@ If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, i
 
 Lastly, using devtools in the Transmission web client is always an option.
 
+### 1.3 Libraries of ready-made wrappers
+In order not to waste time and effort on parsing RPC calls, we offer the following ready-made wrappers for transmission:
+
+For C#:
+https://www.nuget.org/packages/Transmission.API.RPC
+
+For Python:
+https://github.com/Trim21/transmission-rpc
+
+
 ## 2 Message format
 Messages are formatted as objects. There are two types: requests (described in 2.1) and responses (described in 2.2).
 
