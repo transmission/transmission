@@ -481,23 +481,22 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 // A will be able to resynchronize on ENCRYPT(VC)"
 static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    auto tmp = vc_t{};
+    // compute the `ENCRYPT(VC)` sent by the peer
+    auto needle = VC;
+    auto filter = tr_message_stream_encryption::Filter{};
+    filter.encryptInit(true, handshake->dh, *handshake->io->torrentHash());
+    filter.encrypt(std::size(needle), std::data(needle));
 
-    /* note: this works w/o having to `unwind' the buffer if
-     * we read too much, but it is pretty brute-force.
-     * it would be nice to make this cleaner. */
     for (;;)
     {
-        if (evbuffer_get_length(inbuf) < std::size(tmp))
+        if (evbuffer_get_length(inbuf) < std::size(needle))
         {
             tr_logAddTraceHand(handshake, "not enough bytes... returning read_more");
             return READ_LATER;
         }
 
-        std::copy_n(reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf, std::size(tmp))), std::size(tmp), std::data(tmp));
-        handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *handshake->io->torrentHash());
-        handshake->io->decrypt(std::size(tmp), std::data(tmp));
-        if (tmp == VC)
+        auto const* peek = reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf, std::size(needle)));
+        if (std::equal(std::begin(needle), std::end(needle), peek))
         {
             break;
         }
@@ -505,8 +504,12 @@ static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_drain(inbuf, 1);
     }
 
+    // Consume VC.
+    // We already know it's a match; now we just need to
+    // remove it from the read buffer.
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(needle), std::size(needle));
+
     tr_logAddTraceHand(handshake, "got it!");
-    evbuffer_drain(inbuf, std::size(VC));
     setState(handshake, AWAITING_CRYPTO_SELECT);
     return READ_NOW;
 }
