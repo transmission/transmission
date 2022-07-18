@@ -146,7 +146,6 @@ struct tr_handshake
     uint16_t ia_len = {};
     uint32_t crypto_select = {};
     uint32_t crypto_provide = {};
-    tr_sha1_digest_t myReq1 = {};
     struct event* timeout_timer = nullptr;
 
     std::optional<tr_peer_id_t> peer_id;
@@ -481,13 +480,13 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 // A will be able to resynchronize on ENCRYPT(VC)"
 static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    // compute the `ENCRYPT(VC)` sent by the peer
+    // find the end of PadB by looking for `ENCRYPT(VC)`
     auto needle = VC;
     auto filter = tr_message_stream_encryption::Filter{};
     filter.encryptInit(true, handshake->dh, *handshake->io->torrentHash());
     filter.encrypt(std::size(needle), std::data(needle));
 
-    for (;;)
+    for (size_t i = 0; i < PadB_MAXLEN; ++i)
     {
         if (evbuffer_get_length(inbuf) < std::size(needle))
         {
@@ -498,20 +497,19 @@ static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
         auto const* peek = reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf, std::size(needle)));
         if (std::equal(std::begin(needle), std::end(needle), peek))
         {
-            break;
+            tr_logAddTraceHand(handshake, "got it!");
+            // We already know it's a match; now we just need to
+            // consume it from the read buffer.
+            tr_peerIoReadBytes(handshake->io, inbuf, std::data(needle), std::size(needle));
+            setState(handshake, AWAITING_CRYPTO_SELECT);
+            return READ_NOW;
         }
 
         evbuffer_drain(inbuf, 1);
     }
 
-    // Consume VC.
-    // We already know it's a match; now we just need to
-    // remove it from the read buffer.
-    tr_peerIoReadBytes(handshake->io, inbuf, std::data(needle), std::size(needle));
-
-    tr_logAddTraceHand(handshake, "got it!");
-    setState(handshake, AWAITING_CRYPTO_SELECT);
-    return READ_NOW;
+    tr_logAddTraceHand(handshake, "couldn't find ENCRYPT(VC)");
+    return tr_handshakeDone(handshake, false);
 }
 
 static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbuf)
@@ -722,16 +720,6 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer_remove(inbuf, std::data(peer_public_key), std::size(peer_public_key));
     handshake->dh.setPeerPublicKey(peer_public_key);
 
-    if (auto const req1 = tr_sha1("req1"sv, handshake->dh.secret()); req1)
-    {
-        handshake->myReq1 = *req1;
-    }
-    else
-    {
-        tr_logAddTraceHand(handshake, "error while computing req1 hash after Ya");
-        return tr_handshakeDone(handshake, false);
-    }
-
     // send our public key to the peer
     tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
     sendPublicKeyAndPad<PadB_MAXLEN>(handshake);
@@ -742,27 +730,31 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    /* resynchronizing on HASH('req1', S) */
-    struct evbuffer_ptr ptr = evbuffer_search(
-        inbuf,
-        reinterpret_cast<char const*>(std::data(handshake->myReq1)),
-        std::size(handshake->myReq1),
-        nullptr);
+    // find the end of PadA by looking for HASH('req1', S)
+    auto const needle = *tr_sha1("req1"sv, handshake->dh.secret());
 
-    if (ptr.pos != -1) /* match */
+    for (size_t i = 0; i < PadA_MAXLEN; ++i)
     {
-        evbuffer_drain(inbuf, ptr.pos);
-        tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
-        setState(handshake, AWAITING_CRYPTO_PROVIDE);
-        return READ_NOW;
+        if (evbuffer_get_length(inbuf) < std::size(needle))
+        {
+            tr_logAddTraceHand(handshake, "not enough bytes... returning read_more");
+            return READ_LATER;
+        }
+
+        auto const* peek = reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf, std::size(needle)));
+        if (std::equal(std::begin(needle), std::end(needle), peek))
+        {
+            tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
+            evbuffer_drain(inbuf, std::size(needle));
+            setState(handshake, AWAITING_CRYPTO_PROVIDE);
+            return READ_NOW;
+        }
+
+        evbuffer_drain(inbuf, 1);
     }
 
-    if (size_t const len = evbuffer_get_length(inbuf); len > SHA_DIGEST_LENGTH)
-    {
-        evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
-    }
-
-    return READ_LATER;
+    tr_logAddTraceHand(handshake, "couldn't find HASH('req', S)");
+    return tr_handshakeDone(handshake, false);
 }
 
 static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inbuf)
@@ -771,17 +763,13 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
-    size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req1', s) */
-        SHA_DIGEST_LENGTH + /* HASH('req2', SKEY) xor HASH('req3', S) */
+    size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req2', SKEY) xor HASH('req3', S) */
         std::size(VC) + sizeof(crypto_provide) + sizeof(padc_len);
 
     if (evbuffer_get_length(inbuf) < needlen)
     {
         return READ_LATER;
     }
-
-    /* TODO: confirm they sent HASH('req1',S) here? */
-    evbuffer_drain(inbuf, SHA_DIGEST_LENGTH);
 
     /* This next piece is HASH('req2', SKEY) xor HASH('req3', S) ...
      * we can get the first half of that (the obfuscatedTorrentHash)
