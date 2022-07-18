@@ -271,9 +271,6 @@ public:
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         auto* const tor = getTorrent();
-        TR_ASSERT(tor != nullptr);
-        TR_ASSERT(tor->isRunning);
-        TR_ASSERT(!tor->isDone());
         if (tor == nullptr || !tor->isRunning || tor->isDone())
         {
             return;
