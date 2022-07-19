@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <ctime>
 #include <iterator>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -162,9 +163,9 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     return 0;
 }
 
-[[nodiscard]] auto toString(time_t now)
+[[nodiscard]] auto toString(std::optional<time_t> const& date)
 {
-    return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
+    return date ? fmt::format("{:%a %b %d %T %Y}", fmt::localtime(date.value())) : "Unknown";
 }
 
 bool compareSecondField(std::string_view l, std::string_view r)

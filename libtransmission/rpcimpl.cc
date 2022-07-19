@@ -515,7 +515,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_dateCreated:
-        tr_variantInitInt(initme, tor->dateCreated());
+        tr_variantInitInt(initme, tor->dateCreated().value());
         break;
 
     case TR_KEY_desiredAvailable:

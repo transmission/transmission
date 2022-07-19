@@ -7,6 +7,7 @@
 
 #include <cstdint> // uint32_t, uint64_t
 #include <ctime>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -230,7 +231,7 @@ private:
     std::string creator_;
     std::string source_;
 
-    time_t date_created_ = 0;
+    std::optional<time_t> date_created_ = {};
 
     // Offset + size of the bencoded info dict subset of the bencoded data.
     // Used when loading pieces of it to sent to magnet peers.

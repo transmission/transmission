@@ -92,8 +92,8 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     [htmlString appendFormat:@"<p>%@</p>", fileSizeString];
 
     auto const date_created = metainfo.dateCreated();
-    NSString* dateCreatedString = date_created > 0 ?
-        [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:date_created] dateStyle:NSDateFormatterLongStyle
+    NSString* dateCreatedString = date_created ?
+        [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:date_created.value()] dateStyle:NSDateFormatterLongStyle
                                        timeStyle:NSDateFormatterShortStyle] :
         nil;
     auto const& creator = metainfo.creator();

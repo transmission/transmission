@@ -197,9 +197,9 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
         tr_variantDictAddStr(top, TR_KEY_created_by, val);
     }
 
-    if (auto const val = tm.dateCreated(); val != 0)
+    if (auto const& val = tm.dateCreated())
     {
-        tr_variantDictAddInt(top, TR_KEY_creation_date, val);
+        tr_variantDictAddInt(top, TR_KEY_creation_date, val.value());
     }
 
     if (auto const& announce_list = tm.announceList(); !std::empty(announce_list))

@@ -600,9 +600,9 @@ void gtr_text_buffer_set_text(Glib::RefPtr<Gtk::TextBuffer> const& b, Glib::ustr
     }
 }
 
-[[nodiscard]] std::string get_date_string(time_t t)
+[[nodiscard]] std::string get_date_string(std::optional<time_t> const& t)
 {
-    return t == 0 ? _("N/A") : fmt::format(FMT_STRING("{:%x}"), fmt::localtime(t));
+    return t ? fmt::format(FMT_STRING("{:%x}"), fmt::localtime(t.value())) : _("N/A");
 }
 
 [[nodiscard]] std::string get_date_time_string(time_t t)

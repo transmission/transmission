@@ -20,6 +20,7 @@
 ****
 ***/
 
+#include <optional>
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uintN_t */
@@ -1425,7 +1426,7 @@ struct tr_torrent_view
 
     uint64_t total_size; // total size of the torrent, in bytes
 
-    time_t date_created;
+    std::optional<time_t> date_created;
 
     uint32_t piece_size;
     tr_piece_index_t n_pieces;

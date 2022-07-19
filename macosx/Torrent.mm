@@ -769,7 +769,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 - (NSDate*)dateCreated
 {
     auto const date = tr_torrentView(self.fHandle).date_created;
-    return date > 0 ? [NSDate dateWithTimeIntervalSince1970:date] : nil;
+    return date ? [NSDate dateWithTimeIntervalSince1970:date.value()] : nil;
 }
 
 - (NSInteger)pieceSize
