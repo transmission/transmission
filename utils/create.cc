@@ -43,7 +43,7 @@ auto constexpr Options = std::array<tr_option, 10>{
       { 'c', "comment", "Add a comment", "c", true, "<comment>" },
       { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
       { 'w', "webseed", "Add a webseed URL", "w", true, "<url>" },
-      { 'x', "anonymize", "Omit \"Creation date\" and \"Created by\" info", nullptr, false, nullptr},
+      { 'x', "anonymize", "Omit \"Creation date\" and \"Created by\" info", nullptr, false, nullptr },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
