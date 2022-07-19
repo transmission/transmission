@@ -2343,7 +2343,7 @@
                             <rect key="frame" x="60" y="47" width="308" height="88"/>
                             <clipView key="contentView" id="DtM-n3-Fsk">
                                 <rect key="frame" x="1" y="1" width="306" height="86"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
                                         <rect key="frame" x="0.0" y="0.0" width="306" height="86"/>
