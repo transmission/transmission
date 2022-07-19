@@ -193,6 +193,7 @@ void MakeDialog::makeTorrent()
         0,
         comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
         ui_.privateCheck->isChecked(),
+        false,
         source.isNull() ? nullptr : source.toUtf8().constData());
 
     // pop up the dialog

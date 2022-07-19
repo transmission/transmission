@@ -315,6 +315,7 @@ void MakeDialog::Impl::onResponse(int response)
                 0,
                 useComment ? comment.c_str() : nullptr,
                 isPrivate,
+                false,
                 useSource ? source.c_str() : nullptr);
         }
     }
