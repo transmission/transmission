@@ -287,24 +287,24 @@ public:
         }
     }
 
-    [[nodiscard]] RequestLimit canRequest() const noexcept override
+    [[nodiscard]] std::optional<size_t> maxActiveRequests() const noexcept override
     {
         auto const n_slots = connection_limiter.slotsAvailable();
         if (n_slots == 0)
         {
-            return {};
+            return 0U;
         }
 
         if (auto* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
         {
-            return {};
+            return 0U;
         }
 
         // Prefer to request large, contiguous chunks from webseeds.
         // The actual value of '64' is arbitrary here;
         // we could probably be smarter about this.
         auto constexpr PreferredBlocksPerTask = size_t{ 64 };
-        return { n_slots, n_slots * PreferredBlocksPerTask };
+        return n_slots * PreferredBlocksPerTask;
     }
 
     tr_torrent_id_t const torrent_id;
@@ -452,16 +452,14 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 
 void on_idle(tr_webseed* webseed)
 {
-    auto const [max_spans, max_blocks] = webseed->canRequest();
-    if (max_spans == 0 || max_blocks == 0)
+    auto const max_requests = webseed->maxActiveRequests();
+    if (max_requests && *max_requests == 0U)
     {
         return;
     }
 
-    // Prefer to request large, contiguous chunks from webseeds.
-    // The actual value of '64' is arbitrary here; we could probably
-    // be smarter about this.
-    auto spans = tr_peerMgrGetNextRequests(webseed->getTorrent(), webseed, max_blocks);
+    auto const max_spans = webseed->connection_limiter.slotsAvailable();
+    auto spans = tr_peerMgrGetNextRequests(webseed->getTorrent(), webseed, *max_requests);
     if (std::size(spans) > max_spans)
     {
         spans.resize(max_spans);

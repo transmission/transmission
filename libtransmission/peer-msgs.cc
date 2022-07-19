@@ -659,14 +659,11 @@ public:
         }
     }
 
-    // how many blocks could we request from this peer right now?
-    [[nodiscard]] RequestLimit canRequest() const noexcept override
+    [[nodiscard]] std::optional<size_t> maxActiveRequests() const noexcept override
     {
-        auto const max_blocks = maxAvailableReqs();
-        return RequestLimit{ max_blocks, max_blocks };
+        return reqq;
     }
 
-private:
     [[nodiscard]] size_t maxAvailableReqs() const
     {
         if (torrent->isDone() || !torrent->hasMetainfo() || client_is_choked_ || !client_is_interested_)
@@ -700,6 +697,7 @@ private:
         return std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
 
+private:
     void protocolSendRequest(struct peer_request const& req)
     {
         TR_ASSERT(isValidRequest(req));
@@ -2129,7 +2127,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
 static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 {
-    msgs->desired_request_count = msgs->canRequest().max_blocks;
+    msgs->desired_request_count = msgs->maxAvailableReqs();
 }
 
 static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
