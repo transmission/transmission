@@ -1,0 +1,423 @@
+
+/* Class = "NSWindow"; title = "Préférences"; ObjectID = "23"; */
+"23.title" = "Préférences";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "52"; */
+"52.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Autres..."; ObjectID = "53"; */
+"53.title" = "Autres...";
+
+/* Class = "NSMenuItem"; title = "Même que le fichier torrent"; ObjectID = "55"; */
+"55.title" = "Même que le fichier torrent";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "217"; */
+"217.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Autres..."; ObjectID = "219"; */
+"219.title" = "Autres...";
+
+/* Class = "NSTabViewItem"; label = "Ajout"; ObjectID = "253"; */
+"253.label" = "Ajout";
+
+/* Class = "NSTabViewItem"; label = "Gestion"; ObjectID = "254"; */
+"254.label" = "Gestion";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "539"; */
+"539.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Autres..."; ObjectID = "542"; */
+"542.title" = "Autres...";
+
+/* Class = "NSButtonCell"; title = "Lorsque l'on quitte avec des transferts actifs"; ObjectID = "1201"; */
+"1201.title" = "Lorsque l'on quitte avec des transferts actifs";
+
+/* Class = "NSButtonCell"; title = "Lors de la suppression de transferts actifs"; ObjectID = "1202"; */
+"1202.title" = "Lors de la suppression de transferts actifs";
+
+/* Class = "NSTextFieldCell"; title = "Prévenir l'utilisateur :"; ObjectID = "1203"; */
+"1203.title" = "Prévenir l'utilisateur :";
+
+/* Class = "NSTextFieldCell"; title = "Afficher dans le Dock :"; ObjectID = "1204"; */
+"1204.title" = "Afficher dans le Dock :";
+
+/* Class = "NSButtonCell"; title = "Vitesse de réception totale"; ObjectID = "1205"; */
+"1205.title" = "Vitesse de réception totale";
+
+/* Class = "NSButtonCell"; title = "Vitesse d'envoi totale"; ObjectID = "1206"; */
+"1206.title" = "Vitesse d'envoi totale";
+
+/* Class = "NSButtonCell"; title = "Seulement si des transferts sont incomplets"; ObjectID = "1207"; */
+"1207.title" = "Seulement si des transferts sont incomplets";
+
+/* Class = "NSButtonCell"; title = "Seulement si des transferts sont incomplets"; ObjectID = "1208"; */
+"1208.title" = "Seulement si des transferts sont incomplets";
+
+/* Class = "NSTextFieldCell"; title = "Ajustement automatique :"; ObjectID = "1209"; */
+"1209.title" = "Ajustement automatique :";
+
+/* Class = "NSButtonCell"; title = "Ajuster la taille de la fenêtre aux transferts"; ObjectID = "1210"; */
+"1210.title" = "Ajuster la taille de la fenêtre aux transferts";
+
+/* Class = "NSButtonCell"; title = "Remise à zéro"; ObjectID = "1211"; */
+"1211.title" = "Remise à zéro";
+
+/* Class = "NSTextFieldCell"; title = "Avertissements :"; ObjectID = "1212"; */
+"1212.title" = "Avertissements :";
+
+/* Class = "NSButtonCell"; title = "Vérifier automatiquement tous les jours"; ObjectID = "1213"; */
+"1213.title" = "Vérifier automatiquement tous les jours";
+
+/* Class = "NSTextFieldCell"; title = "Mises à jour :"; ObjectID = "1214"; */
+"1214.title" = "Mises à jour :";
+
+/* Class = "NSTextFieldCell"; title = "Par défaut :"; ObjectID = "1216"; */
+"1216.title" = "Par défaut :";
+
+/* Class = "NSTextFieldCell"; title = "Emplacement :"; ObjectID = "1217"; */
+"1217.title" = "Emplacement :";
+
+/* Class = "NSButtonCell"; title = "Supprimer le fichier torrent original"; ObjectID = "1218"; */
+"1218.title" = "Supprimer le fichier torrent original";
+
+/* Class = "NSButtonCell"; title = "Observer le dossier :"; ObjectID = "1219"; */
+"1219.title" = "Observer le dossier :";
+
+/* Class = "NSTextFieldCell"; title = "Ajout auto :"; ObjectID = "1226"; */
+"1226.title" = "Ajout auto :";
+
+/* Class = "NSButtonCell"; title = "Garder les incomplets à part :"; ObjectID = "1227"; */
+"1227.title" = "Garder les incomplets à part :";
+
+/* Class = "NSTextFieldCell"; title = "File d'attente :"; ObjectID = "1230"; */
+"1230.title" = "File d'attente :";
+
+/* Class = "NSTextFieldCell"; title = "transferts actifs"; ObjectID = "1231"; */
+"1231.title" = "transferts actifs";
+
+/* Class = "NSButtonCell"; title = "Arrêt de l'envoi au ratio :"; ObjectID = "1232"; */
+"1232.title" = "Arrêt de l'envoi au ratio :";
+
+/* Class = "NSTextFieldCell"; title = "Limites :"; ObjectID = "1234"; */
+"1234.title" = "Limites :";
+
+/* Class = "NSTextFieldCell"; title = "Le ratio est la quantité de données envoyées divisée par la quantité de données téléchargées"; ObjectID = "1235"; */
+"1235.title" = "Le ratio est la quantité de données envoyées divisée par la quantité de données téléchargées";
+
+/* Class = "NSButtonCell"; title = "Limiter les téléchargements à"; ObjectID = "1236"; */
+"1236.title" = "Limiter les téléchargements à";
+
+/* Class = "NSTextFieldCell"; title = "transferts actifs"; ObjectID = "1239"; */
+"1239.title" = "transferts actifs";
+
+/* Class = "NSButtonCell"; title = "Limiter les envois à "; ObjectID = "1240"; */
+"1240.title" = "Limiter les envois à ";
+
+/* Class = "NSTextFieldCell"; title = "minutes inactif"; ObjectID = "1242"; */
+"1242.title" = "minutes inactif";
+
+/* Class = "NSButtonCell"; title = "Démarrer un autre transfert après"; ObjectID = "1243"; */
+"1243.title" = "Démarrer un autre transfert après";
+
+/* Class = "NSButtonCell"; title = "Ouvrir le port automatiquement"; ObjectID = "1247"; */
+"1247.title" = "Ouvrir le port automatiquement";
+
+/* Class = "NSTextFieldCell"; title = "La traversée NAT utilise soit NAT-PMP, soit UPnP"; ObjectID = "1248"; */
+"1248.title" = "La traversée NAT utilise soit NAT-PMP, soit UPnP";
+
+/* Class = "NSTextFieldCell"; title = "Vérification..."; ObjectID = "1250"; */
+"1250.title" = "Vérification...";
+
+/* Class = "NSTextFieldCell"; title = "Réseau :"; ObjectID = "1253"; */
+"1253.title" = "Réseau :";
+
+/* Class = "NSButtonCell"; title = "Empêcher la veille si des transferts sont actifs"; ObjectID = "1254"; */
+"1254.title" = "Empêcher la veille si des transferts sont actifs";
+
+/* Class = "NSTextFieldCell"; title = "Veille Système :"; ObjectID = "1255"; */
+"1255.title" = "Veille Système :";
+
+/* Class = "NSButtonCell"; title = "Vitesse d'émission :"; ObjectID = "1265"; */
+"1265.title" = "Vitesse d'émission :";
+
+/* Class = "NSButtonCell"; title = "Vitesse de réception :"; ObjectID = "1267"; */
+"1267.title" = "Vitesse de réception :";
+
+/* Class = "NSTextFieldCell"; title = "Ko/s"; ObjectID = "1268"; */
+"1268.title" = "Ko/s";
+
+/* Class = "NSTextFieldCell"; title = "Ko/s"; ObjectID = "1269"; */
+"1269.title" = "Ko/s";
+
+/* Class = "NSTextFieldCell"; title = "Limites globales :"; ObjectID = "1270"; */
+"1270.title" = "Limites globales :";
+
+/* Class = "NSTextFieldCell"; title = "Ko/s"; ObjectID = "1273"; */
+"1273.title" = "Ko/s";
+
+/* Class = "NSTextFieldCell"; title = "Ko/s"; ObjectID = "1274"; */
+"1274.title" = "Ko/s";
+
+/* Class = "NSTextFieldCell"; title = "Mode tortue :"; ObjectID = "1275"; */
+"1275.title" = "Mode tortue :";
+
+/* Class = "NSTextFieldCell"; title = "Vitesse d'émission :"; ObjectID = "1276"; */
+"1276.title" = "Vitesse d'émission :";
+
+/* Class = "NSTextFieldCell"; title = "Vitesse de réception :"; ObjectID = "1277"; */
+"1277.title" = "Vitesse de réception :";
+
+/* Class = "NSTextFieldCell"; title = "Lorsqu'il est activé, le mode Tortue prime sur les limites globales"; ObjectID = "1278"; */
+"1278.title" = "Lorsqu'il est activé, le mode Tortue prime sur les limites globales";
+
+/* Class = "NSButtonCell"; title = "Activer le mode Tortue automatiquement"; ObjectID = "1280"; */
+"1280.title" = "Activer le mode Tortue automatiquement";
+
+/* Class = "NSTextFieldCell"; title = "à"; ObjectID = "1281"; */
+"1281.title" = "à";
+
+/* Class = "NSButtonCell"; title = "Afficher la fenêtre d'options"; ObjectID = "1294"; */
+"1294.title" = "Afficher la fenêtre d'options";
+
+/* Class = "NSButtonCell"; title = "À la fin d'un téléchargement :"; ObjectID = "1302"; */
+"1302.title" = "À la fin d'un téléchargement :";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1304"; */
+"1304.title" = "OtherViews";
+
+/* Class = "NSButtonCell"; title = "À la fin d'un envoi :"; ObjectID = "1306"; */
+"1306.title" = "À la fin d'un envoi :";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1308"; */
+"1308.title" = "OtherViews";
+
+/* Class = "NSTextFieldCell"; title = "Jouer le son :"; ObjectID = "1310"; */
+"1310.title" = "Jouer le son :";
+
+/* Class = "NSButtonCell"; title = "Démarrer automatiquement après l'ajout"; ObjectID = "1335"; */
+"1335.title" = "Démarrer automatiquement après l'ajout";
+
+/* Class = "NSTextFieldCell"; title = "Fenêtre d'ajout :"; ObjectID = "1338"; */
+"1338.title" = "Fenêtre d'ajout :";
+
+/* Class = "NSButtonCell"; title = "Seulement si il y a plusieurs fichiers"; ObjectID = "1340"; */
+"1340.title" = "Seulement si il y a plusieurs fichiers";
+
+/* Class = "NSButtonCell"; title = "MÀJ"; ObjectID = "1437"; */
+"1437.title" = "MÀJ";
+
+/* Class = "NSTextFieldCell"; title = "liste de blocage chargée/pas chargée"; ObjectID = "1438"; */
+"1438.title" = "liste de blocage chargée/pas chargée";
+
+/* Class = "NSTextFieldCell"; title = "Liste de blocage :"; ObjectID = "1439"; */
+"1439.title" = "Liste de blocage :";
+
+/* Class = "NSButtonCell"; title = "Empêcher la connexion des pairs bloqués"; ObjectID = "1440"; */
+"1440.title" = "Empêcher la connexion des pairs bloqués";
+
+/* Class = "NSTextFieldCell"; title = "Des limites trop hautes peuvent influer sur les performances système"; ObjectID = "1441"; */
+"1441.title" = "Des limites trop hautes peuvent influer sur les performances système";
+
+/* Class = "NSButtonCell"; title = "Utiliser l'échange de pairs (PEX)"; ObjectID = "1442"; */
+"1442.title" = "Utiliser l'échange de pairs (PEX)";
+
+/* Class = "NSTextFieldCell"; title = "Maximum pour chaque transfert :"; ObjectID = "1443"; */
+"1443.title" = "Maximum pour chaque transfert :";
+
+/* Class = "NSTextFieldCell"; title = "pairs"; ObjectID = "1446"; */
+"1446.title" = "pairs";
+
+/* Class = "NSTextFieldCell"; title = "pairs"; ObjectID = "1447"; */
+"1447.title" = "pairs";
+
+/* Class = "NSTextFieldCell"; title = "Maximum global :"; ObjectID = "1450"; */
+"1450.title" = "Maximum global :";
+
+/* Class = "NSTextFieldCell"; title = "Connexions :"; ObjectID = "1451"; */
+"1451.title" = "Connexions :";
+
+/* Class = "NSButtonCell"; title = "Préférer les pairs encryptés"; ObjectID = "1452"; */
+"1452.title" = "Préférer les pairs encryptés";
+
+/* Class = "NSTextFieldCell"; title = "Cryptage :"; ObjectID = "1453"; */
+"1453.title" = "Cryptage :";
+
+/* Class = "NSButtonCell"; title = "Ignorer les pairs non cryptés"; ObjectID = "1454"; */
+"1454.title" = "Ignorer les pairs non cryptés";
+
+/* Class = "NSButtonCell"; title = "À l'ajout manuel uniquement"; ObjectID = "1477"; */
+"1477.title" = "À l'ajout manuel uniquement";
+
+/* Class = "NSTextFieldCell"; title = "Port d'écoute :"; ObjectID = "1493"; */
+"1493.title" = "Port d'écoute :";
+
+/* Class = "NSButtonCell"; title = "Activer l'accès à distance"; ObjectID = "1502"; */
+"1502.title" = "Activer l'accès à distance";
+
+/* Class = "NSButtonCell"; title = "Demander une authentification"; ObjectID = "1505"; */
+"1505.title" = "Demander une authentification";
+
+/* Class = "NSTableColumn"; headerCell.title = "Adresse IP"; ObjectID = "1523"; */
+"1523.headerCell.title" = "Adresse IP";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1526"; */
+"1526.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "L'adresse IP peut contenir le joker *"; ObjectID = "1542"; */
+"1542.title" = "L'adresse IP peut contenir le joker *";
+
+/* Class = "NSTextFieldCell"; title = "Mot de passe :"; ObjectID = "1555"; */
+"1555.title" = "Mot de passe :";
+
+/* Class = "NSTextFieldCell"; title = "Utilisateur :"; ObjectID = "1557"; */
+"1557.title" = "Utilisateur :";
+
+/* Class = "NSTextFieldCell"; title = "Ceci active l'interface web et permet le contrôle à distance"; ObjectID = "1645"; */
+"1645.title" = "Ceci active l'interface web et permet le contrôle à distance";
+
+/* Class = "NSButtonCell"; title = "Ouvrir l'interface web"; ObjectID = "1718"; */
+"1718.title" = "Ouvrir l'interface web";
+
+/* Class = "NSTextFieldCell"; title = "Dernière mise à jour : N/A"; ObjectID = "1739"; */
+"1739.title" = "Dernière mise à jour : N/A";
+
+/* Class = "NSButtonCell"; title = "Mettre à jour automatiquement chaque semaine"; ObjectID = "1742"; */
+"1742.title" = "Mettre à jour automatiquement chaque semaine";
+
+/* Class = "NSButtonCell"; title = "Autoriser seulement les IP suivantes à se connecter :"; ObjectID = "1748"; */
+"1748.title" = "Autoriser seulement les IP suivantes à se connecter :";
+
+/* Class = "NSTableColumn"; headerCell.title = "Couleur"; ObjectID = "1777"; */
+"1777.headerCell.title" = "Couleur";
+
+/* Class = "NSTableColumn"; headerCell.title = "Nom"; ObjectID = "1779"; */
+"1779.headerCell.title" = "Nom";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1780"; */
+"1780.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "Nom du groupe :"; ObjectID = "1796"; */
+"1796.title" = "Nom du groupe :";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1810"; */
+"1810.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Autres..."; ObjectID = "1813"; */
+"1813.title" = "Autres...";
+
+/* Class = "NSButtonCell"; title = "Destination différente :"; ObjectID = "1815"; */
+"1815.title" = "Destination différente :";
+
+/* Class = "NSTextFieldCell"; title = "Cette destination sera choisie uniquement lors de l'ajout du transfert"; ObjectID = "1824"; */
+"1824.title" = "Cette destination sera choisie uniquement lors de l'ajout du transfert";
+
+/* Class = "NSButtonCell"; title = "Utiliser Bonjour pour signaler l'interface web"; ObjectID = "1826"; */
+"1826.title" = "Utiliser Bonjour pour signaler l'interface web";
+
+/* Class = "NSButtonCell"; title = "Assigner un groupe aux nouveaux transferts"; ObjectID = "1831"; */
+"1831.title" = "Assigner un groupe aux nouveaux transferts";
+
+/* Class = "NSButtonCell"; title = "Modifier…"; ObjectID = "1833"; */
+"1833.title" = "Modifier…";
+
+/* Class = "NSTextFieldCell"; title = "Les transferts seront assignés au premier groupe qui satisfera tous les critères"; ObjectID = "1835"; */
+"1835.title" = "Les transferts seront assignés au premier groupe qui satisfera tous les critères";
+
+/* Class = "NSButtonCell"; title = "Port aléatoire au démarrage"; ObjectID = "1890"; */
+"1890.title" = "Port aléatoire au démarrage";
+
+/* Class = "NSButtonCell"; title = "Aléatoire"; ObjectID = "1892"; */
+"1892.title" = "Aléatoire";
+
+/* Class = "NSButtonCell"; title = "Inclure les versions béta"; ObjectID = "1896"; */
+"1896.title" = "Inclure les versions béta";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1909"; */
+"1909.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Tous les jours"; ObjectID = "1910"; */
+"1910.title" = "Tous les jours";
+
+/* Class = "NSMenuItem"; title = "En semaine"; ObjectID = "1911"; */
+"1911.title" = "En semaine";
+
+/* Class = "NSMenuItem"; title = "Le weekend"; ObjectID = "1912"; */
+"1912.title" = "Le weekend";
+
+/* Class = "NSMenuItem"; title = "Lundi"; ObjectID = "1914"; */
+"1914.title" = "Lundi";
+
+/* Class = "NSMenuItem"; title = "Mardi"; ObjectID = "1915"; */
+"1915.title" = "Mardi";
+
+/* Class = "NSMenuItem"; title = "Mercredi"; ObjectID = "1916"; */
+"1916.title" = "Mercredi";
+
+/* Class = "NSMenuItem"; title = "Jeudi"; ObjectID = "1917"; */
+"1917.title" = "Jeudi";
+
+/* Class = "NSMenuItem"; title = "Vendredi"; ObjectID = "1918"; */
+"1918.title" = "Vendredi";
+
+/* Class = "NSMenuItem"; title = "Samedi"; ObjectID = "1919"; */
+"1919.title" = "Samedi";
+
+/* Class = "NSMenuItem"; title = "Dimanche"; ObjectID = "1920"; */
+"1920.title" = "Dimanche";
+
+/* Class = "NSButtonCell"; title = "Utiliser la table de hachage distribuée (DHT)"; ObjectID = "1926"; */
+"1926.title" = "Utiliser la table de hachage distribuée (DHT)";
+
+/* Class = "NSTextFieldCell"; title = "Liens-aimants :"; ObjectID = "1931"; */
+"1931.title" = "Liens-aimants :";
+
+/* Class = "NSButtonCell"; title = "Définir comme application par défaut"; ObjectID = "1933"; */
+"1933.title" = "Définir comme application par défaut";
+
+/* Class = "NSButtonCell"; title = "Ajouter l'extension '.part' aux fichiers incomplets"; ObjectID = "1940"; */
+"1940.title" = "Ajouter l'extension '.part' aux fichiers incomplets";
+
+/* Class = "NSButtonCell"; title = "Afficher la fenêtre lorsqu'un lien aimant est ouvert"; ObjectID = "1948"; */
+"1948.title" = "Afficher la fenêtre lorsqu'un lien aimant est ouvert";
+
+/* Class = "NSButtonCell"; title = "Utiliser la découverte de pairs locale (LPD)"; ObjectID = "1952"; */
+"1952.title" = "Utiliser la découverte de pairs locale (LPD)";
+
+/* Class = "NSButtonCell"; title = "Arrêt de l'envoi si inactif pendant :"; ObjectID = "1962"; */
+"1962.title" = "Arrêt de l'envoi si inactif pendant :";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
+"1970.title" = "minutes";
+
+/* Class = "NSTextFieldCell"; title = "URL : "; ObjectID = "1988"; */
+"1988.title" = "URL : ";
+
+/* Class = "NSButtonCell"; title = "À la fin d'un téléchargement :"; ObjectID = "2044"; */
+"2044.title" = "À la fin d'un téléchargement :";
+
+/* Class = "NSTextFieldCell"; title = "Lancer le script :"; ObjectID = "2047"; */
+"2047.title" = "Lancer le script :";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "2050"; */
+"2050.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Autres..."; ObjectID = "2053"; */
+"2053.title" = "Autres...";
+
+/* Class = "NSButtonCell"; title = "Activer le Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
+"2078.title" = "Activer le Micro Transport Protocol (µTP)";
+
+/* Class = "NSTextFieldCell"; title = "Port d'écoute :"; ObjectID = "2082"; */
+"2082.title" = "Port d'écoute :";
+
+/* Class = "NSTextFieldCell"; title = "Notifications :"; ObjectID = "2087"; */
+"2087.title" = "Notifications :";
+
+/* Class = "NSButtonCell"; title = "Configurer dans les Préférences Système"; ObjectID = "2114"; */
+"2114.title" = "Configurer dans les Préférences Système";
+
+/* Class = "NSButtonCell"; title = "Supprimer un transfert quand l'envoi est terminé"; ObjectID = "2119"; */
+"2119.title" = "Supprimer un transfert quand l'envoi est terminé";
+
+/* Class = "NSTextFieldCell"; title = "S'applique aux nouveaux transferts uniquement"; ObjectID = "2123"; */
+"2123.title" = "S'applique aux nouveaux transferts uniquement";

@@ -8,11 +8,16 @@
 
 @interface InfoActivityViewController : NSViewController<InfoViewController>
 
+- (NSRect)viewRect;
+- (void)updateWindowLayout;
+
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (IBAction)setPiecesView:(id)sender;
 - (IBAction)updatePiecesView:(id)sender;
 - (void)clearView;
+
+@property(nonatomic) IBOutlet NSView* fTransferView;
 
 @end

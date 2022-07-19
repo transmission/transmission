@@ -8,6 +8,9 @@
 
 @interface InfoOptionsViewController : NSViewController<InfoViewController>
 
+- (NSRect)viewRect;
+- (void)updateWindowLayout;
+
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 - (void)updateOptions;
@@ -27,5 +30,7 @@
 - (IBAction)setPriority:(id)sender;
 
 - (IBAction)setPeersConnectLimit:(id)sender;
+
+@property(nonatomic) IBOutlet NSView* fPriorityView;
 
 @end

@@ -1,0 +1,90 @@
+
+/* Class = "NSTextFieldCell"; title = "Téléchargé :"; ObjectID = "30"; */
+"30.title" = "Téléchargé :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Envoyé :"; ObjectID = "32"; */
+"32.title" = "Envoyé :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Ratio :"; ObjectID = "34"; */
+"34.title" = "Ratio :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "35"; */
+"35.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Possédé :"; ObjectID = "36"; */
+"36.title" = "Possédé :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "État :"; ObjectID = "38"; */
+"38.title" = "État :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "39"; */
+"39.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Erreur :"; ObjectID = "41"; */
+"41.title" = "Erreur :";
+
+/* Class = "NSTextFieldCell"; title = "Dates"; ObjectID = "42"; */
+"42.title" = "Dates";
+
+/* Class = "NSTextFieldCell"; title = "Ajouté :"; ObjectID = "43"; */
+"43.title" = "Ajouté :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "44"; */
+"44.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Terminé :"; ObjectID = "46"; */
+"46.title" = "Terminé :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "47"; */
+"47.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Transfert"; ObjectID = "50"; */
+"50.title" = "Transfert";
+
+/* Class = "NSTextFieldCell"; title = "Dern. activité :"; ObjectID = "51"; */
+"51.title" = "Dern. activité :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
+"52.placeholderString" = "N/A";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progres."; ObjectID = "54"; */
+"54.ibShadowedLabels[0]" = "Progres.";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Dispo."; ObjectID = "54"; */
+"54.ibShadowedLabels[1]" = "Dispo.";
+
+/* Class = "NSTextFieldCell"; title = "Progression :"; ObjectID = "55"; */
+"55.title" = "Progression :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "56"; */
+"56.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Échoué :"; ObjectID = "57"; */
+"57.title" = "Échoué :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
+"58.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Temps écoulé"; ObjectID = "85"; */
+"85.title" = "Temps écoulé";
+
+/* Class = "NSTextFieldCell"; title = "Téléch. :"; ObjectID = "86"; */
+"86.title" = "Téléch. :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "87"; */
+"87.placeholderString" = "N/A";
+
+/* Class = "NSTextFieldCell"; title = "Envoi :"; ObjectID = "89"; */
+"89.title" = "Envoi :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "90"; */
+"90.placeholderString" = "N/A";

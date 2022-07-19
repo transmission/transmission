@@ -1,0 +1,54 @@
+
+/* Class = "NSWindow"; title = "Crear torrent"; ObjectID = "5"; */
+"5.title" = "Crear torrent";
+
+/* Class = "NSTextFieldCell"; title = "Nombre de archivo"; ObjectID = "68"; */
+"68.title" = "Nombre de archivo";
+
+/* Class = "NSTextFieldCell"; title = "información de estado"; ObjectID = "69"; */
+"69.title" = "información de estado";
+
+/* Class = "NSTextFieldCell"; title = "Comentarios:"; ObjectID = "70"; */
+"70.title" = "Comentarios:";
+
+/* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
+"71.title" = "Trackers:";
+
+/* Class = "NSButtonCell"; title = "Cambiar..."; ObjectID = "73"; */
+"73.title" = "Cambiar...";
+
+/* Class = "NSTextFieldCell"; title = "Torrent:"; ObjectID = "74"; */
+"74.title" = "Torrent:";
+
+/* Class = "NSTextFieldCell"; title = "File\nFile"; ObjectID = "75"; */
+"75.title" = "File\nFile";
+
+/* Class = "NSButtonCell"; title = "Privado"; ObjectID = "77"; */
+"77.title" = "Privado";
+
+/* Class = "NSButtonCell"; title = "Crear"; ObjectID = "78"; */
+"78.title" = "Crear";
+
+/* Class = "NSButtonCell"; title = "Cancelar"; ObjectID = "79"; */
+"79.title" = "Cancelar";
+
+/* Class = "NSTextFieldCell"; title = "(Información sobre partes)"; ObjectID = "80"; */
+"80.title" = "(Información sobre partes)";
+
+/* Class = "NSButtonCell"; title = "Abrir después de crear"; ObjectID = "81"; */
+"81.title" = "Abrir después de crear";
+
+/* Class = "NSButtonCell"; title = "Cancelar"; ObjectID = "82"; */
+"82.title" = "Cancelar";
+
+/* Class = "NSTextFieldCell"; title = "Creando torrent..."; ObjectID = "83"; */
+"83.title" = "Creando torrent...";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "97"; */
+"97.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "Los trackers se pondrán en un único tier aleatoriamente"; ObjectID = "108"; */
+"108.title" = "Los trackers se pondrán en un único tier aleatoriamente";
+
+/* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
+"f1g-Kk-weU.title" = "Source:";

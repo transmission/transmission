@@ -13,6 +13,10 @@
 #define PIECES_CONTROL_PROGRESS 0
 #define PIECES_CONTROL_AVAILABLE 1
 
+#define STACKVIEW_INSET 12.0
+#define STACKVIEW_HORIZONTAL_SPACING 20.0
+#define STACKVIEW_VERTICAL_SPACING 8.0
+
 @interface InfoActivityViewController ()
 
 @property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
@@ -54,6 +58,13 @@
 @property(nonatomic) IBOutlet NSTextField* fDownloadTimeLabel;
 @property(nonatomic) IBOutlet NSTextField* fSeedTimeLabel;
 @property(nonatomic) IBOutlet NSScrollView* fErrorScrollView;
+
+@property(nonatomic) IBOutlet NSStackView* fActivityStackView;
+@property(nonatomic) IBOutlet NSView* fDatesView;
+@property(nonatomic, readonly) CGFloat currentHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutWidth;
+@property(nonatomic, readonly) CGFloat vertLayoutHeight;
 
 - (void)setupInfo;
 
@@ -152,6 +163,82 @@
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (CGFloat)currentHeight
+{
+    return NSHeight(self.view.frame);
+}
+
+- (CGFloat)horizLayoutHeight
+{
+    return NSHeight(self.fTransferView.frame) + 2 * STACKVIEW_INSET;
+}
+
+- (CGFloat)horizLayoutWidth
+{
+    return NSWidth(self.fTransferView.frame) + NSWidth(self.fDatesView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_HORIZONTAL_SPACING;
+}
+
+- (CGFloat)vertLayoutHeight
+{
+    return NSHeight(self.fTransferView.frame) + NSHeight(self.fDatesView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_VERTICAL_SPACING;
+}
+
+- (CGFloat)changeInWindowHeight
+{
+    CGFloat difference = 0;
+
+    if (NSWidth(self.view.window.frame) >= self.horizLayoutWidth + 1)
+    {
+        self.fActivityStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+
+        //add some padding between views in horizontal layout
+        self.fActivityStackView.spacing = STACKVIEW_HORIZONTAL_SPACING;
+
+        difference = NSHeight(self.view.frame) - self.horizLayoutHeight;
+    }
+    else
+    {
+        self.fActivityStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+        self.fActivityStackView.spacing = STACKVIEW_VERTICAL_SPACING;
+
+        difference = NSHeight(self.view.frame) - self.vertLayoutHeight;
+    }
+
+    return difference;
+}
+
+- (NSRect)viewRect
+{
+    CGFloat difference = self.changeInWindowHeight;
+
+    NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
+    if (difference != 0)
+    {
+        viewRect.size.height -= difference;
+        viewRect.size.width = NSWidth(windowRect);
+    }
+
+    return viewRect;
+}
+
+- (void)updateWindowLayout
+{
+    CGFloat difference = self.changeInWindowHeight;
+
+    if (difference != 0)
+    {
+        NSRect windowRect = self.view.window.frame;
+        windowRect.origin.y += difference;
+        windowRect.size.height -= difference;
+
+        self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
+        self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
+
+        self.view.frame = [self viewRect];
+        [self.view.window setFrame:windowRect display:YES animate:YES];
+    }
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents

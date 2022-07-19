@@ -1,0 +1,90 @@
+
+/* Class = "NSTextFieldCell"; title = "Limiti di distribuzione"; ObjectID = "22"; */
+"22.title" = "Limiti di distribuzione";
+
+/* Class = "NSTextFieldCell"; title = "Banda trasferimento"; ObjectID = "23"; */
+"23.title" = "Banda trasferimento";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
+"26.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
+"29.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Ferma a:"; ObjectID = "30"; */
+"30.title" = "Ferma a:";
+
+/* Class = "NSTextFieldCell"; title = "Avanzate"; ObjectID = "31"; */
+"31.title" = "Avanzate";
+
+/* Class = "NSTextFieldCell"; title = "Connessioni massime:"; ObjectID = "32"; */
+"32.title" = "Connessioni massime:";
+
+/* Class = "NSTextFieldCell"; title = "peer"; ObjectID = "35"; */
+"35.title" = "peer";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "39"; */
+"39.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Non limitata"; ObjectID = "40"; */
+"40.title" = "Non limitata";
+
+/* Class = "NSMenuItem"; title = "Impostazioni generali"; ObjectID = "41"; */
+"41.title" = "Impostazioni generali";
+
+/* Class = "NSMenuItem"; title = "Ferma al rapporto"; ObjectID = "42"; */
+"42.title" = "Ferma al rapporto";
+
+/* Class = "NSButtonCell"; title = "Limita invio:"; ObjectID = "43"; */
+"43.title" = "Limita invio:";
+
+/* Class = "NSButtonCell"; title = "Limita ricezione:"; ObjectID = "44"; */
+"44.title" = "Limita ricezione:";
+
+/* Class = "NSButtonCell"; title = "Non superare i limiti generali di banda"; ObjectID = "45"; */
+"45.title" = "Non superare i limiti generali di banda";
+
+/* Class = "NSTextFieldCell"; title = "Priorità"; ObjectID = "46"; */
+"46.title" = "Priorità";
+
+/* Class = "NSTextFieldCell"; title = "Priorità generale:"; ObjectID = "47"; */
+"47.title" = "Priorità generale:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "49"; */
+"49.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Bassa"; ObjectID = "50"; */
+"50.title" = "Bassa";
+
+/* Class = "NSMenuItem"; title = "Normale"; ObjectID = "51"; */
+"51.title" = "Normale";
+
+/* Class = "NSMenuItem"; title = "Alta"; ObjectID = "52"; */
+"52.title" = "Alta";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "85"; */
+"85.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Ferma se inattiva per"; ObjectID = "86"; */
+"86.title" = "Ferma se inattiva per";
+
+/* Class = "NSMenuItem"; title = "Impostazioni generali"; ObjectID = "87"; */
+"87.title" = "Impostazioni generali";
+
+/* Class = "NSMenuItem"; title = "Non limitata"; ObjectID = "88"; */
+"88.title" = "Non limitata";
+
+/* Class = "NSTextFieldCell"; title = "Inattività:"; ObjectID = "89"; */
+"89.title" = "Inattività:";
+
+/* Class = "NSTextFieldCell"; title = "minuti"; ObjectID = "98"; */
+"98.title" = "minuti";
+
+/* Class = "NSTextFieldCell"; title = "info globali qui"; ObjectID = "108"; */
+"108.title" = "info globali qui";
+
+/* Class = "NSTextFieldCell"; title = "info globali qui"; ObjectID = "110"; */
+"110.title" = "info globali qui";
+
+/* Class = "NSButtonCell"; title = "Rimuovi dalla lista al termine della distribuzione"; ObjectID = "114"; */
+"114.title" = "Rimuovi dalla lista al termine della distribuzione";
