@@ -7,13 +7,13 @@ macOS users may wonder whether there will be AppleScript scripts, the answer is 
 ## How-To
 If you are interested at writing scripts for Transmission, have a look at the following pages:
  * [wiki:man Transmission man pages]
- * [wiki:ConfigFiles Configuration Files]
- * [wiki:EditConfigFiles Editing Configuration Files]
- * [wiki:EnvironmentVariables Environment Variables]
- * [wiki:rpc RPC Protocol Specification]
+ * [Configuration Files](Configuration-Files.md)
+ * [Editing Configuration Files](Editing-Configuration-Files.md)
+ * [Environment Variables](Environment-Variables.md)
+ * [RPC Protocol Specification](rpc-spec.md)
 
 For those who need more information how to use the scripts, have a look at the following links:
- * [https://help.ubuntu.com/community/CronHowto Cron How-To]: Run scripts at a regular interval
+ * [Cron How-To](https://help.ubuntu.com/community/CronHowto ): Run scripts at a regular interval
 
 ## Scripts
 ### Start/Stop
@@ -30,10 +30,10 @@ Transmission can be set to invoke a script when downloads complete. The environm
  * `TR_TORRENT_HASH` - The torrent's info hash
  * `TR_TORRENT_ID`
  * `TR_TORRENT_LABELS` - A comma-delimited list of the torrent's labels
- * `TR_TORRENT_NAME`
+ * `TR_TORRENT_NAME` - Name of torrent (not filename)
  * `TR_TORRENT_TRACKERS` - A comma-delimited list of the torrent's trackers' announce URLs
 
-[https://trac.transmissionbt.com/browser/trunk/extras/send-email-when-torrent-done.sh Here is an example script] that sends an email when a torrent finishes.
+[Here is an example script](https://trac.transmissionbt.com/browser/trunk/extras/send-email-when-torrent-done.sh) that sends an email when a torrent finishes.
 
 ### Obsolete
 Functionality of these scripts has been implemented in libtransmission and is thus available in all clients.
@@ -44,11 +44,11 @@ Functionality of these scripts has been implemented in libtransmission and is th
  * [wiki:Scripts/Scheduler Bandwidth Scheduler]
 
 ## contrib/scripts
-Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [https://github.com/wereHamster/transmission/tree/master/contrib/scripts/ GitHub repository].
+Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [GitHub repository](https://github.com/wereHamster/transmission/tree/master/contrib/scripts/ ).
 
-Falk Husemann (aka hxgn) is maintaining scripts in his [https://falkhusemann.de/category/tcp_ip/transmission-tcp_ip/ blog].
+Falk Husemann (aka hxgn) is maintaining scripts in his [blog](https://falkhusemann.de/category/tcp_ip/transmission-tcp_ip/).
 
-Oguz wrote [https://oguzarduc.blogspot.com/2012/05/transmission-quit-script-in-php.html on his blog] a PHP script to stop Transmission after it finishes downloading and seeding.
+Oguz wrote [on his blog](https://oguzarduc.blogspot.com/2012/05/transmission-quit-script-in-php.html) a PHP script to stop Transmission after it finishes downloading and seeding.
 Scripts which have not yet been ported and may not work with the latest version:
  * https://pastebin.com/QzVxQDtM: Bash - (cron)script to keep a maximum number of torrents running; starting and pausing torrents as necessary
  * https://github.com/jaboto/Transmission-script - (cron)script set network limits according to the number of clients in the network
