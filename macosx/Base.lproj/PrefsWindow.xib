@@ -2309,7 +2309,7 @@
                                 <outlet property="nextKeyView" destination="1509" id="1625"/>
                             </connections>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1541">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1541">
                             <rect key="frame" x="132" y="26" width="193" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="IP addresses may include * wildcard" id="1542">
                                 <font key="font" metaFont="smallSystem"/>
@@ -2343,7 +2343,7 @@
                             <rect key="frame" x="60" y="47" width="308" height="88"/>
                             <clipView key="contentView" id="DtM-n3-Fsk">
                                 <rect key="frame" x="1" y="1" width="306" height="86"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
                                         <rect key="frame" x="0.0" y="0.0" width="306" height="86"/>
