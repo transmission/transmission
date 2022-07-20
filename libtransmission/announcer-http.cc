@@ -124,9 +124,11 @@ static std::string format_ipv6_url_arg(unsigned char const* ipv6_address)
     return arg;
 }
 
-static std::string format_ip_arg(std::string const& ip)
+static std::string format_ip_arg(std::string_view ip)
 {
-    return "&ip="s + ip;
+    auto arg = std::string{ "&ip="sv };
+    arg += ip;
+    return arg;
 }
 
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
