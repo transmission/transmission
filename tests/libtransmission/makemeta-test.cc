@@ -42,6 +42,7 @@ protected:
         size_t const payloadSize,
         char const* comment,
         bool isPrivate,
+        bool anonymize,
         std::string_view source)
     {
 
@@ -69,8 +70,10 @@ protected:
             webseedCount,
             comment,
             isPrivate,
+            anonymize,
             std::string(source).c_str());
         EXPECT_EQ(isPrivate, builder->isPrivate);
+        EXPECT_EQ(anonymize, builder->anonymize);
         EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
         EXPECT_EQ(source, builder->source);
@@ -110,6 +113,7 @@ protected:
         size_t const payload_count,
         char const* comment,
         bool const is_private,
+        bool const anonymize,
         char const* source)
     {
         // create the top temp directory
@@ -158,8 +162,10 @@ protected:
             webseed_count,
             comment,
             is_private,
+            anonymize,
             source);
         EXPECT_EQ(is_private, builder->isPrivate);
+        EXPECT_EQ(anonymize, builder->anonymize);
         EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
         EXPECT_STREQ(source, builder->source);
@@ -197,6 +203,7 @@ protected:
         size_t const max_file_size,
         char const* comment,
         bool const is_private,
+        bool const anonymize,
         char const* source)
     {
         // build random payloads
@@ -223,6 +230,7 @@ protected:
             payload_count,
             comment,
             is_private,
+            anonymize,
             source);
 
         // cleanup
@@ -249,6 +257,7 @@ TEST_F(MakemetaTest, singleFile)
     auto const payload = std::string{ "Hello, World!\n" };
     char const* const comment = "This is the comment";
     bool const is_private = false;
+    bool const anonymize = false;
     auto metainfo = tr_torrent_metainfo{};
     testSingleFileImpl(
         metainfo,
@@ -260,6 +269,7 @@ TEST_F(MakemetaTest, singleFile)
         payload.size(),
         comment,
         is_private,
+        anonymize,
         "TESTME"sv);
 }
 
@@ -273,6 +283,7 @@ TEST_F(MakemetaTest, webseed)
     auto const payload = std::string{ "Hello, World!\n" };
     char const* const comment = "This is the comment";
     bool const is_private = false;
+    bool const anonymize = false;
     auto metainfo = tr_torrent_metainfo{};
     testSingleFileImpl(
         metainfo,
@@ -284,6 +295,7 @@ TEST_F(MakemetaTest, webseed)
         payload.size(),
         comment,
         is_private,
+        anonymize,
         "TESTME"sv);
 }
 
@@ -300,6 +312,7 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
     auto const payload = std::string{ "Hello, World!\n" };
     char const* const comment = "This is the comment";
     bool const is_private = false;
+    bool const anonymize = false;
 
     auto metainfo_foobar = tr_torrent_metainfo{};
     testSingleFileImpl(
@@ -312,6 +325,7 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
         payload.size(),
         comment,
         is_private,
+        anonymize,
         "FOOBAR"sv);
 
     auto metainfo_testme = tr_torrent_metainfo{};
@@ -325,6 +339,7 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
         payload.size(),
         comment,
         is_private,
+        anonymize,
         "TESTME"sv);
 
     EXPECT_NE(metainfo_foobar.infoHash(), metainfo_testme.infoHash());
@@ -345,6 +360,7 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
     ++tracker_count;
     char const* const comment = "This is the comment";
     bool const is_private = false;
+    bool const anonymize = false;
     char const* const source = "TESTME";
 
     for (size_t i = 0; i < 10; ++i)
@@ -358,6 +374,7 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
             DefaultMaxFileSize,
             comment,
             is_private,
+            anonymize,
             source);
     }
 }

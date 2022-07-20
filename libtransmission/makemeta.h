@@ -62,6 +62,7 @@ struct tr_metainfo_builder
     char* outputFile;
     bool isPrivate;
     char* source;
+    bool anonymize;
 
     /**
     ***  These are set inside tr_makeMetaInfo() so the client
@@ -128,4 +129,5 @@ void tr_makeMetaInfo(
     int n_webseeds,
     char const* comment,
     bool is_private,
+    bool anonymize,
     char const* source);

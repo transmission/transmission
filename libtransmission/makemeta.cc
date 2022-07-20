@@ -501,8 +501,11 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
             tr_variantDictAddStr(&top, TR_KEY_comment, builder->comment);
         }
 
-        tr_variantDictAddStrView(&top, TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
-        tr_variantDictAddInt(&top, TR_KEY_creation_date, time(nullptr));
+        if (!builder->anonymize)
+        {
+            tr_variantDictAddStrView(&top, TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
+            tr_variantDictAddInt(&top, TR_KEY_creation_date, time(nullptr));
+        }
         tr_variantDictAddStrView(&top, TR_KEY_encoding, "UTF-8");
         makeInfoDict(tr_variantDictAddDict(&top, TR_KEY_info, 666), builder);
     }
@@ -577,6 +580,7 @@ void tr_makeMetaInfo(
     int webseedCount,
     char const* comment,
     bool isPrivate,
+    bool anonymize,
     char const* source)
 {
     /* free any variables from a previous run */
@@ -613,6 +617,7 @@ void tr_makeMetaInfo(
 
     builder->comment = tr_strdup(comment);
     builder->isPrivate = isPrivate;
+    builder->anonymize = anonymize;
     builder->source = tr_strdup(source);
 
     builder->outputFile = !tr_str_is_empty(outputFile) ? tr_strdup(outputFile) :
