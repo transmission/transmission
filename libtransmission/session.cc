@@ -395,7 +395,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_announce_ip, "");
+    tr_variantDictAddStrView(d, TR_KEY_announce_ip, "");
     tr_variantDictAddBool(d, TR_KEY_announce_ip_enabled, false);
 }
 
