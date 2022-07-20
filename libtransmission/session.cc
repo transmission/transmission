@@ -395,6 +395,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
+    tr_variantDictAddStrView(d, TR_KEY_announce_ip, "");
+    tr_variantDictAddBool(d, TR_KEY_announce_ip_enabled, false);
 }
 
 void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
@@ -468,6 +470,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
+    tr_variantDictAddStr(d, TR_KEY_announce_ip, s->announceIP());
+    tr_variantDictAddBool(d, TR_KEY_announce_ip_enabled, s->useAnnounceIP());
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
         tr_variantDictAddBool(d, enabled_key, s->useScript(script));
@@ -1131,6 +1135,19 @@ static void sessionSetImpl(struct init_data* const data)
     if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
     {
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
+    }
+
+    /*
+     * Announce IP.
+     */
+    if (tr_variantDictFindStrView(settings, TR_KEY_announce_ip, &sv))
+    {
+        session->setAnnounceIP(sv);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_announce_ip_enabled, &boolVal))
+    {
+        session->useAnnounceIP(boolVal);
     }
 
     data->done_cv.notify_one();

@@ -124,6 +124,13 @@ static std::string format_ipv6_url_arg(unsigned char const* ipv6_address)
     return arg;
 }
 
+static std::string format_ip_arg(std::string_view ip)
+{
+    auto arg = std::string{ "&ip="sv };
+    arg += ip;
+    return arg;
+}
+
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
     auto& out = std::cerr;
@@ -437,7 +444,11 @@ void tr_tracker_http_announce(
     static bool const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < CURL_VERSION_BITS(7, 77, 0);
     if (use_curl_workaround)
     {
-        if (ipv6 != nullptr)
+        if (session->useAnnounceIP())
+        {
+            options.url += format_ip_arg(session->announceIP());
+        }
+        else if (ipv6 != nullptr)
         {
             if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
             {
@@ -451,7 +462,16 @@ void tr_tracker_http_announce(
     }
     else
     {
-        if (ipv6 != nullptr)
+        if (session->useAnnounceIP() || ipv6 == nullptr)
+        {
+            if (session->useAnnounceIP())
+            {
+                options.url += format_ip_arg(session->announceIP());
+            }
+            d->requests_sent_count = 1;
+            do_make_request(""sv, std::move(options));
+        }
+        else
         {
             d->requests_sent_count = 2;
 
@@ -470,11 +490,6 @@ void tr_tracker_http_announce(
             }
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
             do_make_request("IPv6"sv, std::move(options));
-        }
-        else
-        {
-            d->requests_sent_count = 1;
-            do_make_request(""sv, std::move(options));
         }
     }
 }

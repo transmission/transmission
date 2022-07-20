@@ -288,6 +288,28 @@ public:
     void closeTorrentFiles(tr_torrent* tor) noexcept;
     void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
 
+    // announce ip
+
+    [[nodiscard]] constexpr auto const& announceIP() const noexcept
+    {
+        return announce_ip_;
+    }
+
+    void setAnnounceIP(std::string_view ip)
+    {
+        announce_ip_ = ip;
+    }
+
+    [[nodiscard]] constexpr auto useAnnounceIP() const noexcept
+    {
+        return announce_ip_enabled_;
+    }
+
+    constexpr void useAnnounceIP(bool enabled) noexcept
+    {
+        announce_ip_enabled_ = enabled;
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -463,6 +485,9 @@ private:
     bool incomplete_dir_enabled_ = false;
 
     tr_open_files open_files_;
+
+    std::string announce_ip_;
+    bool announce_ip_enabled_ = false;
 };
 
 bool tr_sessionAllowsDHT(tr_session const* session);
