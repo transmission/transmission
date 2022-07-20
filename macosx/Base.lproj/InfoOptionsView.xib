@@ -100,7 +100,7 @@
                                         <action selector="setUseSpeedLimit:" target="-2" id="58"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="8">
+                                <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="8">
                                     <rect key="frame" x="-1" y="37" width="105" height="16"/>
                                     <buttonCell key="cell" type="check" title="Limit Upload:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" allowsMixedState="YES" inset="2" id="43">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -216,7 +216,7 @@
                                 <constraint firstItem="5" firstAttribute="top" secondItem="2Ow-Hq-XLB" secondAttribute="top" id="vdH-6J-Md3"/>
                                 <constraint firstItem="6" firstAttribute="top" relation="greaterThanOrEqual" secondItem="8" secondAttribute="bottom" constant="6" symbolic="YES" id="w4o-AO-tgc"/>
                                 <constraint firstItem="5" firstAttribute="leading" secondItem="2Ow-Hq-XLB" secondAttribute="leading" id="whp-KM-xxO"/>
-                                <constraint firstAttribute="trailing" secondItem="6" secondAttribute="trailing" priority="750" constant="12" id="xPc-Ux-J8F"/>
+                                <constraint firstAttribute="trailing" secondItem="6" secondAttribute="trailing" constant="12" id="xPc-Ux-J8F"/>
                                 <constraint firstItem="17" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="7" secondAttribute="trailing" constant="8" symbolic="YES" id="yxI-gP-CbN"/>
                             </constraints>
                         </customView>
@@ -360,7 +360,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="15">
+                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="15">
                                     <rect key="frame" x="-2" y="110" width="56" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Ratio:" id="30">
                                         <font key="font" metaFont="smallSystem"/>
@@ -389,7 +389,7 @@
                                         <outlet property="delegate" destination="-2" id="56"/>
                                     </connections>
                                 </textField>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="79">
+                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="79">
                                     <rect key="frame" x="-2" y="88" width="56" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Inactivity:" id="89">
                                         <font key="font" metaFont="smallSystem"/>
