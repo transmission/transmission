@@ -37,7 +37,7 @@ Please contact us if you are interested in supporting Transmission in any of the
 
   * Code contribution
   * Testing
-  * [Language translations](Translating)
+  * [Language translations](Translating.md)
   * Bug and request management
   * Documentation and Wiki editing
   * [Donations](https://transmissionbt.com/donate/)
