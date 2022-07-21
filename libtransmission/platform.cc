@@ -5,11 +5,10 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring>
+#include <iterator>
 #include <list>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <vector>
 
 #ifdef __HAIKU__
