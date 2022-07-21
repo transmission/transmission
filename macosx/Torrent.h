@@ -50,6 +50,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 - (void)idleLimitHit;
 - (void)ratioLimitHit;
 - (void)metadataRetrieved;
+- (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning;
 
 @property(nonatomic) NSUInteger queuePosition;
 

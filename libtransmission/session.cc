@@ -3009,3 +3009,8 @@ void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func
 {
     session->setMetadataCallback(func, user_data);
 }
+
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func cb, void* user_data)
+{
+    session->setTorrentCompletenessCallback(cb, user_data);
+}

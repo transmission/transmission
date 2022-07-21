@@ -1630,7 +1630,6 @@ void tr_torrentFree(tr_torrent* tor)
 
         auto const lock = tor->unique_lock();
 
-        tr_torrentClearCompletenessCallback(tor);
         tr_runInEventThread(session, closeTorrent, tor);
     }
 }
@@ -1657,7 +1656,6 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
         tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
 
-    tr_torrentClearCompletenessCallback(tor);
     closeTorrent(tor);
 }
 
@@ -1692,29 +1690,6 @@ static char const* getCompletionString(int type)
     default:
         return "Incomplete";
     }
-}
-
-static void fireCompletenessChange(tr_torrent* tor, tr_completeness status, bool wasRunning)
-{
-    TR_ASSERT(status == TR_LEECH || status == TR_SEED || status == TR_PARTIAL_SEED);
-
-    if (tor->completeness_func != nullptr)
-    {
-        (*tor->completeness_func)(tor, status, wasRunning, tor->completeness_func_user_data);
-    }
-}
-
-void tr_torrentSetCompletenessCallback(tr_torrent* tor, tr_torrent_completeness_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->completeness_func = func;
-    tor->completeness_func_user_data = user_data;
-}
-
-void tr_torrentClearCompletenessCallback(tr_torrent* torrent)
-{
-    tr_torrentSetCompletenessCallback(torrent, nullptr, nullptr);
 }
 
 static std::string buildLabelsString(tr_torrent const* tor)
@@ -1843,7 +1818,7 @@ void tr_torrent::recheckCompleteness()
             }
         }
 
-        fireCompletenessChange(this, completeness, wasRunning);
+        this->session->onTorrentCompletenessChanged(this, completeness, wasRunning);
 
         if (this->isDone() && wasLeeching && wasRunning)
         {

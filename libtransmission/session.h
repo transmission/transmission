@@ -370,6 +370,20 @@ public:
         }
     }
 
+    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    {
+        completeness_func_ = cb;
+        completeness_func_user_data_ = user_data;
+    }
+
+    void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness completeness, bool was_running)
+    {
+        if (completeness_func_ != nullptr)
+        {
+            completeness_func_(tor, completeness, was_running, completeness_func_user_data_);
+        }
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -551,6 +565,9 @@ private:
 
     tr_session_metadata_func got_metadata_cb_ = nullptr;
     void* got_metadata_user_data_ = nullptr;
+
+    tr_torrent_completeness_func completeness_func_ = nullptr;
+    void* completeness_func_user_data_ = nullptr;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;

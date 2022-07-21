@@ -660,9 +660,6 @@ public:
      * other peers */
     struct tr_incomplete_metadata* incompleteMetadata = nullptr;
 
-    tr_torrent_completeness_func completeness_func = nullptr;
-    void* completeness_func_user_data = nullptr;
-
     time_t peer_id_creation_time_ = 0;
 
     time_t dhtAnnounceAt = 0;

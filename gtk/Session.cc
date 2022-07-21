@@ -831,7 +831,13 @@ Session::Impl::Impl(Session& core, tr_session* session)
 
     tr_sessionSetMetadataCallback(
         session,
-        [](auto* /*session*/, auto* tor2, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor2); },
+        [](auto* /*session*/, auto* tor, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor); },
+        this);
+
+    tr_sessionSetCompletenessCallback(
+        session,
+        [](auto* tor, auto completeness, bool was_running, gpointer impl)
+        { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor, completeness, was_running); },
         this);
 }
 
@@ -991,12 +997,6 @@ void Session::Impl::add_torrent(tr_torrent* tor, bool do_notify)
         {
             gtr_notify_torrent_added(get_core_ptr(), tr_torrentId(tor));
         }
-
-        tr_torrentSetCompletenessCallback(
-            tor,
-            [](auto* tor2, auto completeness, bool was_running, gpointer impl)
-            { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor2, completeness, was_running); },
-            this);
     }
 }
 

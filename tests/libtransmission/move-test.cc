@@ -74,7 +74,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     {
         *static_cast<tr_completeness*>(vc) = c;
     };
-    tr_torrentSetCompletenessCallback(tor, zeroes_completeness_func, &completeness);
+    tr_sessionSetCompletenessCallback(session_, zeroes_completeness_func, &completeness);
 
     struct TestIncompleteDirData
     {

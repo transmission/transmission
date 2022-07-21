@@ -64,7 +64,6 @@
 - (void)sortFileList:(NSMutableArray<FileListNode*>*)fileNodes;
 
 - (void)startQueue;
-- (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning;
 - (void)ratioLimitHit;
 - (void)idleLimitHit;
 - (void)metadataRetrieved;
@@ -80,13 +79,6 @@
 - (void)setTimeMachineExclude:(BOOL)exclude;
 
 @end
-
-void completenessChangeCallback(tr_torrent* torrent, tr_completeness status, bool wasRunning, void* torrentData)
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [(__bridge Torrent*)torrentData completenessChange:status wasRunning:wasRunning];
-    });
-}
 
 void renameCallback(tr_torrent* torrent, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
 {
@@ -1782,8 +1774,6 @@ bool trashDataFile(char const* filename, tr_error** error)
             return nil;
         }
     }
-
-    tr_torrentSetCompletenessCallback(self.fHandle, completenessChangeCallback, (__bridge void*)(self));
 
     _fResumeOnWake = NO;
 
