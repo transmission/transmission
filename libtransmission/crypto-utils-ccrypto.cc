@@ -93,20 +93,6 @@ bool check_ccrypto_result(CCCryptorStatus result, char const* file, int line)
 
 #define check_result(result) check_ccrypto_result((result), __FILE__, __LINE__)
 
-bool check_ccrypto_pointer(void const* pointer, CCCryptorStatus const* result, char const* file, int line)
-{
-    bool const ret = pointer != nullptr;
-
-    if (!ret)
-    {
-        log_ccrypto_error(*result, file, line);
-    }
-
-    return ret;
-}
-
-#define check_pointer(pointer, result) check_ccrypto_pointer((pointer), (result), __FILE__, __LINE__)
-
 } // namespace
 
 /***
