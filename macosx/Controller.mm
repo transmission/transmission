@@ -363,7 +363,7 @@ void onStartQueue(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
-    auto* torrent = [controller torrentForHash:str];
+    auto* torrent = [controller torrentForHash:hashstr];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [torrent startQueue];
@@ -374,7 +374,7 @@ void onIdleLimitHit(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
-    auto* torrent = [controller torrentForHash:str];
+    auto* torrent = [controller torrentForHash:hashstr];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [torrent idleLimitHit];
@@ -385,7 +385,7 @@ void onRatioLimitHit(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
-    auto* torrent = [controller torrentForHash:str];
+    auto* torrent = [controller torrentForHash:hashstr];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [torrent ratioLimitHit];
@@ -396,7 +396,7 @@ void onMetadataCompleted(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
-    auto* torrent = [controller torrentForHash:str];
+    auto* torrent = [controller torrentForHash:hashstr];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [torrent mmm];
@@ -407,7 +407,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     auto* controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
-    auto* torrent = [controller torrentForHash:str];
+    auto* torrent = [controller torrentForHash:hashstr];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [torrent completenessChange:status wasRunning:wasRunning];
