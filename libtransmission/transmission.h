@@ -1596,10 +1596,6 @@ struct tr_stat
         Range is [0..1] */
     float seedRatioPercentDone;
 
-    /** Speed all data being sent for this torrent.
-        This includes piece data, protocol messages, and TCP overhead */
-    float rawUploadSpeed_KBps;
-
     /** Speed all data being received for this torrent.
         This includes piece data, protocol messages, and TCP overhead */
     float rawDownloadSpeed_KBps;
