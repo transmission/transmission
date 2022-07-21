@@ -1150,4 +1150,4 @@
 "You want to download, but peer does not want to send (interested and choked)" = "You want to download, but peer does not want to send (interested and choked)";
 
 /* Preferences window size*/
-"PrefWindowSize" = "606";
+"PrefWindowSize" = "640";

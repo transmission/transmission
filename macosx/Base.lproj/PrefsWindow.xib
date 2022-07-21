@@ -1294,7 +1294,7 @@
                             <rect key="frame" x="20" y="29" width="143" height="171"/>
                             <clipView key="contentView" id="F5C-Uu-ttQ">
                                 <rect key="frame" x="1" y="1" width="141" height="169"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
                                         <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
@@ -1648,7 +1648,7 @@
                             </connections>
                         </textField>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="155">
-                            <rect key="frame" x="172" y="159" width="101" height="18"/>
+                            <rect key="frame" x="172" y="159" width="118" height="18"/>
                             <buttonCell key="cell" type="check" title="Upload rate:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1265">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -1720,8 +1720,9 @@
                         <constraint firstItem="159" firstAttribute="leading" secondItem="158" secondAttribute="leading" id="dgQ-TO-KNu"/>
                         <constraint firstAttribute="bottom" secondItem="526" secondAttribute="bottom" id="eeG-vK-amc"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="200" secondAttribute="trailing" constant="20" symbolic="YES" id="ey8-0B-VKY"/>
-                        <constraint firstItem="154" firstAttribute="leading" secondItem="157" secondAttribute="trailing" constant="12" id="fcW-dU-FG0"/>
+                        <constraint firstItem="154" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="157" secondAttribute="trailing" constant="12" id="fcW-dU-FG0"/>
                         <constraint firstItem="198" firstAttribute="leading" secondItem="157" secondAttribute="leading" id="gFh-76-GuJ"/>
+                        <constraint firstItem="156" firstAttribute="leading" secondItem="155" secondAttribute="trailing" constant="12" id="iFp-uT-1ce"/>
                         <constraint firstItem="200" firstAttribute="top" secondItem="198" secondAttribute="bottom" constant="8" symbolic="YES" id="jJC-Zt-QBL"/>
                         <constraint firstItem="194" firstAttribute="centerY" secondItem="196" secondAttribute="centerY" id="nRs-hv-2KX"/>
                         <constraint firstItem="196" firstAttribute="leading" secondItem="228" secondAttribute="trailing" constant="5" id="nrz-Af-dC1"/>
@@ -2308,7 +2309,7 @@
                                 <outlet property="nextKeyView" destination="1509" id="1625"/>
                             </connections>
                         </textField>
-                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1541">
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1541">
                             <rect key="frame" x="132" y="26" width="193" height="14"/>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="IP addresses may include * wildcard" id="1542">
                                 <font key="font" metaFont="smallSystem"/>
