@@ -695,11 +695,8 @@ void tr_sessionSetQueueStalledEnabled(tr_session*, bool);
 /** @return true if we're torrents idle for over N minutes will be flagged as 'stalled' */
 bool tr_sessionGetQueueStalledEnabled(tr_session const*);
 
-/**
-**/
-
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
 
 /***
 ****

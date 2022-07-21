@@ -2576,12 +2576,6 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
     }
 }
 
-void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_torrent*, void*), void* user_data)
-{
-    torrent->queue_started_callback = callback;
-    torrent->queue_started_user_data = user_data;
-}
-
 /***
 ****
 ****  RENAME

@@ -310,6 +310,24 @@ public:
         announce_ip_enabled_ = enabled;
     }
 
+    //
+
+    using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
+
+    void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    {
+        queue_start_callback_ = cb;
+        queue_start_user_data_ = user_data;
+    }
+
+    void onQueuedTorrentStarted(tr_torrent* tor)
+    {
+        if (queue_start_callback_ != nullptr)
+        {
+            queue_start_callback_(this, tor, queue_start_user_data_);
+        }
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -488,6 +506,9 @@ private:
 
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
+
+    queue_start_callback_t queue_start_callback_ = nullptr;
+    void* queue_start_user_data_ = nullptr;
 };
 
 bool tr_sessionAllowsDHT(tr_session const* session);

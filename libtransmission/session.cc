@@ -2968,3 +2968,29 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
     this->cache->flushFile(tor, file_num);
     openFiles().closeFile(tor->id(), file_num);
 }
+
+///
+
+void tr_session::initConfigDir(std::string_view config_dir)
+{
+    TR_ASSERT(std::empty(config_dir_));
+
+#if defined(__APPLE__) || defined(_WIN32)
+    auto constexpr ResumeSubdir = "Resume"sv;
+    auto constexpr TorrentSubdir = "Torrents"sv;
+#else
+    auto constexpr ResumeSubdir = "resume"sv;
+    auto constexpr TorrentSubdir = "torrents"sv;
+#endif
+
+    config_dir_ = config_dir;
+    resume_dir_ = tr_strvPath(config_dir, ResumeSubdir);
+    torrent_dir_ = tr_strvPath(config_dir, TorrentSubdir);
+    tr_sys_dir_create(resume_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(torrent_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
+}
+
+void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*), void* user_data)
+{
+    session->setQueueStartCallback(callback, user_data);
+}

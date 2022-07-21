@@ -81,13 +81,6 @@
 
 @end
 
-void startQueueCallback(tr_torrent* torrent, void* torrentData)
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [(__bridge Torrent*)torrentData startQueue];
-    });
-}
-
 void completenessChangeCallback(tr_torrent* torrent, tr_completeness status, bool wasRunning, void* torrentData)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1811,7 +1804,6 @@ bool trashDataFile(char const* filename, tr_error** error)
         }
     }
 
-    tr_torrentSetQueueStartCallback(self.fHandle, startQueueCallback, (__bridge void*)(self));
     tr_torrentSetCompletenessCallback(self.fHandle, completenessChangeCallback, (__bridge void*)(self));
     tr_torrentSetRatioLimitHitCallback(self.fHandle, ratioLimitHitCallback, (__bridge void*)(self));
     tr_torrentSetIdleLimitHitCallback(self.fHandle, idleLimitHitCallback, (__bridge void*)(self));

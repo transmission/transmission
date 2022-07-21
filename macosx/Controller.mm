@@ -359,6 +359,17 @@ static void removeKeRangerRansomware()
     }
 }
 
+void startQueueCallback(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+    auto* torrent = [controller torrentForHash:str];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [torrent startQueue];
+    });
+}
+
 - (instancetype)init
 {
     if ((self = [super init]))

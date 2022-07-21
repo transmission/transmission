@@ -44,6 +44,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 - (void)startTransferNoQueue;
 - (void)startTransfer;
 - (void)stopTransfer;
+- (void)startQueue;
 - (void)sleep;
 - (void)wakeUp;
 
