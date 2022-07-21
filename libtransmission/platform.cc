@@ -256,7 +256,7 @@ bool isWebClientDir(std::string_view path)
 static std::string getPlatformWebClientDir(tr_session const* session)
 {
     // look in the Application Support folder
-    if (auto path = tr_pathbuf{ session->config_dir, "/public_html"sv }; isWebClientDir(path))
+    if (auto path = tr_pathbuf{ session->configDir(), "/public_html"sv }; isWebClientDir(path))
     {
         return std::string{ path };
     }
