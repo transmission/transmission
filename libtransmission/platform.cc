@@ -300,7 +300,7 @@ static std::string getPlatformWebClientDir(tr_session const* session)
     if (auto const path = tr_pathbuf{ std::string_view{ std::data(buf) }, "/Contents/Resources/public_html"sv };
         isWebClientDir(path))
     {
-        return path;
+        return stds::string{ path };
     }
 
     return {};
