@@ -1059,7 +1059,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
     s->errorString = tor->error_string.c_str();
 
-    s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
     s->peersConnected = swarm_stats.peer_count;
     s->peersSendingToUs = swarm_stats.active_peer_count[TR_DOWN];
     s->peersGettingFromUs = swarm_stats.active_peer_count[TR_UP];
@@ -1070,8 +1069,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
-    s->rawUploadSpeed_KBps = tr_toSpeedKBps(tor->bandwidth_.getRawSpeedBytesPerSecond(now, TR_UP));
-    s->rawDownloadSpeed_KBps = tr_toSpeedKBps(tor->bandwidth_.getRawSpeedBytesPerSecond(now, TR_DOWN));
     auto const pieceUploadSpeed_Bps = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_UP);
     s->pieceUploadSpeed_KBps = tr_toSpeedKBps(pieceUploadSpeed_Bps);
     auto const pieceDownloadSpeed_Bps = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_DOWN);

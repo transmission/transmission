@@ -1545,11 +1545,6 @@ struct tr_stat
         are moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
 
-    /** time when one or more of the torrent's trackers will
-        allow you to manually ask for more peers,
-        or 0 if you can't */
-    time_t manualAnnounceTime;
-
     /** When the torrent was first added. */
     time_t addedDate;
 
@@ -1595,14 +1590,6 @@ struct tr_stat
         This is 1 if the ratio is reached or the torrent is set to seed forever.
         Range is [0..1] */
     float seedRatioPercentDone;
-
-    /** Speed all data being sent for this torrent.
-        This includes piece data, protocol messages, and TCP overhead */
-    float rawUploadSpeed_KBps;
-
-    /** Speed all data being received for this torrent.
-        This includes piece data, protocol messages, and TCP overhead */
-    float rawDownloadSpeed_KBps;
 
     /** Speed all piece being sent for this torrent.
         This ONLY counts piece data. */
