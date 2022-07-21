@@ -573,8 +573,6 @@ struct torrent_start_opts
 
 static void torrentStart(tr_torrent* tor, torrent_start_opts opts);
 
-static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
-
 static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->completion = tr_completion{ tor, &tor->blockInfo() };
@@ -602,7 +600,7 @@ void tr_torrent::setMetainfo(tr_torrent_metainfo const& tm)
 
     torrentInitFromInfoDict(this);
     tr_peerMgrOnTorrentGotMetainfo(this);
-    tr_torrentFireMetadataCompleted(this);
+    session->onMetadataCompleted(this);
     this->setDirty();
 }
 
@@ -1862,28 +1860,6 @@ void tr_torrent::recheckCompleteness()
             callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
         }
     }
-}
-
-/***
-****
-***/
-
-static void tr_torrentFireMetadataCompleted(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (tor->metadata_func != nullptr)
-    {
-        (*tor->metadata_func)(tor, tor->metadata_func_user_data);
-    }
-}
-
-void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->metadata_func = func;
-    tor->metadata_func_user_data = user_data;
 }
 
 /**

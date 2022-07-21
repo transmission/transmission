@@ -3004,3 +3004,8 @@ void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limi
 {
     session->setIdleLimitHitCallback(cb, user_data);
 }
+
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func func, void* user_data)
+{
+    session->setMetadataCallback(func, user_data);
+}

@@ -88,13 +88,6 @@ void completenessChangeCallback(tr_torrent* torrent, tr_completeness status, boo
     });
 }
 
-void metadataCallback(tr_torrent* torrent, void* torrentData)
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [(__bridge Torrent*)torrentData metadataRetrieved];
-    });
-}
-
 void renameCallback(tr_torrent* torrent, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
 {
     @autoreleasepool
@@ -1791,7 +1784,6 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     tr_torrentSetCompletenessCallback(self.fHandle, completenessChangeCallback, (__bridge void*)(self));
-    tr_torrentSetMetadataCallback(self.fHandle, metadataCallback, (__bridge void*)(self));
 
     _fResumeOnWake = NO;
 

@@ -356,6 +356,20 @@ public:
         }
     }
 
+    void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    {
+        got_metadata_cb_ = cb;
+        got_metadata_user_data_ = user_data;
+    }
+
+    void onMetadataCompleted(tr_torrent* tor)
+    {
+        if (got_metadata_cb_ != nullptr)
+        {
+            got_metadata_cb_(this, tor, got_metadata_user_data_);
+        }
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -534,6 +548,9 @@ private:
 
     tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
     void* ratio_limit_hit_user_data_ = nullptr;
+
+    tr_session_metadata_func got_metadata_cb_ = nullptr;
+    void* got_metadata_user_data_ = nullptr;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;

@@ -1203,7 +1203,7 @@ void tr_torrentSetCompletenessCallback(tr_torrent* torrent, tr_torrent_completen
 
 void tr_torrentClearCompletenessCallback(tr_torrent* torrent);
 
-using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_metadata_func = void (*)(tr_session* session, tr_torrent* torrent, void* user_data);
 
 /**
  * Register to be notified whenever a torrent changes from
@@ -1211,7 +1211,7 @@ using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
  * This happens when a magnet link finishes downloading
  * metadata from its peers.
  */
-void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func func, void* user_data);
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func func, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's ratio limit

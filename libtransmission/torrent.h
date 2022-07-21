@@ -660,9 +660,6 @@ public:
      * other peers */
     struct tr_incomplete_metadata* incompleteMetadata = nullptr;
 
-    tr_torrent_metadata_func metadata_func = nullptr;
-    void* metadata_func_user_data = nullptr;
-
     tr_torrent_completeness_func completeness_func = nullptr;
     void* completeness_func_user_data = nullptr;
 
