@@ -52,13 +52,13 @@
             <rect key="frame" x="0.0" y="0.0" width="399" height="376"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2aX-cc-oXC">
-                    <rect key="frame" x="12" y="12" width="340" height="352"/>
+                    <rect key="frame" x="12" y="12" width="342" height="352"/>
                     <subviews>
                         <customView horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Vhd-qH-kFK">
-                            <rect key="frame" x="0.0" y="148" width="340" height="204"/>
+                            <rect key="frame" x="0.0" y="148" width="342" height="204"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="28" customClass="InfoTextField">
-                                    <rect key="frame" x="75" y="120" width="23" height="14"/>
+                                    <rect key="frame" x="60" y="113" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="31">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -66,7 +66,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="18">
-                                    <rect key="frame" x="-2" y="56" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="56" width="58" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Error:" id="41">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -74,7 +74,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="26" customClass="InfoTextField">
-                                    <rect key="frame" x="75" y="104" width="23" height="14"/>
+                                    <rect key="frame" x="60" y="90" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="33">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -82,7 +82,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="24" customClass="InfoTextField">
-                                    <rect key="frame" x="75" y="72" width="23" height="14"/>
+                                    <rect key="frame" x="60" y="65" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="35">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -90,7 +90,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="27">
-                                    <rect key="frame" x="-2" y="104" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="90" width="58" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Uploaded:" id="32">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -106,7 +106,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="25">
-                                    <rect key="frame" x="-2" y="72" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="72" width="58" height="0.0"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Ratio:" id="34">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -114,7 +114,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="5">
-                                    <rect key="frame" x="-2" y="88" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="74" width="58" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Failed DL:" id="57">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -122,7 +122,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="4" customClass="InfoTextField">
-                                    <rect key="frame" x="75" y="88" width="23" height="14"/>
+                                    <rect key="frame" x="60" y="74" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="58">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -130,7 +130,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <imageView verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="PiecesView">
-                                    <rect key="frame" x="247" y="95" width="93" height="93"/>
+                                    <rect key="frame" x="249" y="95" width="93" height="93"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="93" id="bsS-qa-kx6"/>
                                         <constraint firstAttribute="width" constant="93" id="euA-Qi-kqQ"/>
@@ -138,7 +138,7 @@
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="axesIndependently" id="40"/>
                                 </imageView>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="29">
-                                    <rect key="frame" x="-2" y="120" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="106" width="58" height="28"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Downloaded:" id="30">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -146,7 +146,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <segmentedControl verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="8">
-                                    <rect key="frame" x="245" y="71" width="97" height="16"/>
+                                    <rect key="frame" x="247" y="64" width="97" height="16"/>
                                     <segmentedCell key="cell" controlSize="mini" borderStyle="border" alignment="left" style="rounded" trackingMode="selectAny" id="54">
                                         <font key="font" metaFont="miniSystem"/>
                                         <segments>
@@ -159,7 +159,7 @@
                                     </connections>
                                 </segmentedControl>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="6" customClass="InfoTextField">
-                                    <rect key="frame" x="75" y="152" width="23" height="14"/>
+                                    <rect key="frame" x="60" y="152" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="56">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -167,24 +167,24 @@
                                     </textFieldCell>
                                 </textField>
                                 <scrollView horizontalHuggingPriority="249" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                                    <rect key="frame" x="77" y="12" width="263" height="58"/>
+                                    <rect key="frame" x="62" y="12" width="280" height="58"/>
                                     <clipView key="contentView" drawsBackground="NO" id="5oS-8e-S2G">
-                                        <rect key="frame" x="1" y="1" width="261" height="56"/>
+                                        <rect key="frame" x="1" y="1" width="278" height="56"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <textView editable="NO" importsGraphics="NO" richText="NO" horizontallyResizable="YES" verticallyResizable="YES" usesFontPanel="YES" usesRuler="YES" linkDetection="YES" spellingCorrection="YES" smartInsertDelete="YES" id="61">
-                                                <rect key="frame" x="0.0" y="0.0" width="261" height="56"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="278" height="56"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <size key="minSize" width="261" height="56"/>
+                                                <size key="minSize" width="278" height="56"/>
                                                 <size key="maxSize" width="517" height="10000000"/>
                                                 <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             </textView>
                                         </subviews>
                                     </clipView>
                                     <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="Rsh-Sr-mv6"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="280" id="Rsh-Sr-mv6"/>
                                         <constraint firstAttribute="height" constant="58" id="WCB-XG-J3d"/>
                                     </constraints>
                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" controlSize="small" horizontal="YES" id="59">
@@ -192,28 +192,28 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                     </scroller>
                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" controlSize="small" horizontal="NO" id="60">
-                                        <rect key="frame" x="248" y="1" width="14" height="56"/>
+                                        <rect key="frame" x="265" y="1" width="14" height="56"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                     </scroller>
                                 </scrollView>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="21">
-                                    <rect key="frame" x="-2" y="168" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="168" width="58" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="State:" id="38">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="22" customClass="InfoTextField">
-                                    <rect key="frame" x="75" y="136" width="23" height="14"/>
-                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="37">
+                                <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="22" customClass="InfoTextField">
+                                    <rect key="frame" x="60" y="136" width="23" height="14"/>
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" usesSingleLineMode="YES" id="37">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="InfoTextField">
-                                    <rect key="frame" x="75" y="168" width="23" height="14"/>
+                                    <rect key="frame" x="60" y="168" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="39">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -221,7 +221,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="7">
-                                    <rect key="frame" x="-2" y="152" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="152" width="58" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Progress:" id="55">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -229,7 +229,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="23">
-                                    <rect key="frame" x="-2" y="136" width="73" height="14"/>
+                                    <rect key="frame" x="-2" y="136" width="58" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Have:" id="36">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
