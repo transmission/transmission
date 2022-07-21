@@ -2990,7 +2990,17 @@ void tr_session::initConfigDir(std::string_view config_dir)
     tr_sys_dir_create(torrent_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
 }
 
-void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*), void* user_data)
+void tr_sessionSetQueueStartCallback(tr_session* session, void (*cb)(tr_session*, tr_torrent*, void*), void* user_data)
 {
-    session->setQueueStartCallback(callback, user_data);
+    session->setQueueStartCallback(cb, user_data);
+}
+
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func cb, void* user_data)
+{
+    session->setRatioLimitHitCallback(cb, user_data);
+}
+
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func cb, void* user_data)
+{
+    session->setIdleLimitHitCallback(cb, user_data);
 }

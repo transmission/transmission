@@ -1182,9 +1182,9 @@ using tr_torrent_completeness_func = void (*)( //
     bool wasRunning,
     void* user_data);
 
-using tr_torrent_ratio_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_ratio_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
 
-using tr_torrent_idle_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_idle_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's "completeness"
@@ -1220,7 +1220,7 @@ void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func fun
  *
  * Has the same restrictions as tr_torrentSetCompletenessCallback
  */
-void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_limit_hit_func func, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_torrent* torrent, tr_session_ratio_limit_hit_func func, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's idle limit
@@ -1229,7 +1229,7 @@ void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_li
  *
  * Has the same restrictions as tr_torrentSetCompletenessCallback
  */
-void tr_torrentSetIdleLimitHitCallback(tr_torrent* torrent, tr_torrent_idle_limit_hit_func func, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_torrent* torrent, tr_session_idle_limit_hit_func func, void* user_data);
 
 /**
  * MANUAL ANNOUNCE

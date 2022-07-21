@@ -48,6 +48,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 - (void)sleep;
 - (void)wakeUp;
 - (void)idleLimitHit;
+- (void)ratioLimitHit;
 
 @property(nonatomic) NSUInteger queuePosition;
 

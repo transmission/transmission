@@ -486,14 +486,8 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     if (tr_torrentIsSeedRatioDone(tor))
     {
         tr_logAddInfoTor(tor, _("Seed ratio reached; pausing torrent"));
-
         tor->isStopping = true;
-
-        /* maybe notify the client */
-        if (tor->ratio_limit_hit_func != nullptr)
-        {
-            (*tor->ratio_limit_hit_func)(tor, tor->ratio_limit_hit_func_user_data);
-        }
+        tor->session->onRatioLimitHit(tor);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
@@ -502,12 +496,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
 
         tor->isStopping = true;
         tor->finishedSeedingByIdle = true;
-
-        /* maybe notify the client */
-        if (tor->idle_limit_hit_func != nullptr)
-        {
-            (*tor->idle_limit_hit_func)(tor, tor->idle_limit_hit_func_user_data);
-        }
+        tor->session->onIdleLimitHit(tor);
     }
 
     if (tor->isStopping)
@@ -1728,22 +1717,6 @@ void tr_torrentSetCompletenessCallback(tr_torrent* tor, tr_torrent_completeness_
 void tr_torrentClearCompletenessCallback(tr_torrent* torrent)
 {
     tr_torrentSetCompletenessCallback(torrent, nullptr, nullptr);
-}
-
-void tr_torrentSetRatioLimitHitCallback(tr_torrent* tor, tr_torrent_ratio_limit_hit_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->ratio_limit_hit_func = func;
-    tor->ratio_limit_hit_func_user_data = user_data;
-}
-
-void tr_torrentSetIdleLimitHitCallback(tr_torrent* tor, tr_torrent_idle_limit_hit_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->idle_limit_hit_func = func;
-    tor->idle_limit_hit_func_user_data = user_data;
 }
 
 static std::string buildLabelsString(tr_torrent const* tor)

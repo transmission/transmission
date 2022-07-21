@@ -88,13 +88,6 @@ void completenessChangeCallback(tr_torrent* torrent, tr_completeness status, boo
     });
 }
 
-void ratioLimitHitCallback(tr_torrent* torrent, void* torrentData)
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [(__bridge Torrent*)torrentData ratioLimitHit];
-    });
-}
-
 void metadataCallback(tr_torrent* torrent, void* torrentData)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1798,7 +1791,6 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     tr_torrentSetCompletenessCallback(self.fHandle, completenessChangeCallback, (__bridge void*)(self));
-    tr_torrentSetRatioLimitHitCallback(self.fHandle, ratioLimitHitCallback, (__bridge void*)(self));
     tr_torrentSetMetadataCallback(self.fHandle, metadataCallback, (__bridge void*)(self));
 
     _fResumeOnWake = NO;

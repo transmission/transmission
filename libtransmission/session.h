@@ -310,7 +310,7 @@ public:
         announce_ip_enabled_ = enabled;
     }
 
-    //
+    // callbacks
 
     using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
 
@@ -325,6 +325,34 @@ public:
         if (queue_start_callback_ != nullptr)
         {
             queue_start_callback_(this, tor, queue_start_user_data_);
+        }
+    }
+
+    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    {
+        idle_limit_hit_callback_ = cb;
+        idle_limit_hit_user_data_ = user_data;
+    }
+
+    void onIdleLimitHit(tr_torrent* tor)
+    {
+        if (idle_limit_hit_callback_ != nullptr)
+        {
+            idle_limit_hit_callback_(this, tor, idle_limit_hit_user_data_);
+        }
+    }
+
+    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    {
+        ratio_limit_hit_cb_ = cb;
+        ratio_limit_hit_user_data_ = user_data;
+    }
+
+    void onRatioLimitHit(tr_torrent* tor)
+    {
+        if (ratio_limit_hit_cb_ != nullptr)
+        {
+            ratio_limit_hit_cb_(this, tor, ratio_limit_hit_user_data_);
         }
     }
 
@@ -498,6 +526,15 @@ private:
     std::string peer_congestion_algorithm_;
     std::optional<tr_address> external_ip_;
 
+    queue_start_callback_t queue_start_callback_ = nullptr;
+    void* queue_start_user_data_ = nullptr;
+
+    tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
+    void* idle_limit_hit_user_data_ = nullptr;
+
+    tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
+    void* ratio_limit_hit_user_data_ = nullptr;
+
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
@@ -506,9 +543,6 @@ private:
 
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
-
-    queue_start_callback_t queue_start_callback_ = nullptr;
-    void* queue_start_user_data_ = nullptr;
 };
 
 bool tr_sessionAllowsDHT(tr_session const* session);
