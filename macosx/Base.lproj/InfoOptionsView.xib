@@ -216,7 +216,7 @@
                                 <constraint firstItem="5" firstAttribute="top" secondItem="2Ow-Hq-XLB" secondAttribute="top" id="vdH-6J-Md3"/>
                                 <constraint firstItem="6" firstAttribute="top" relation="greaterThanOrEqual" secondItem="8" secondAttribute="bottom" constant="6" symbolic="YES" id="w4o-AO-tgc"/>
                                 <constraint firstItem="5" firstAttribute="leading" secondItem="2Ow-Hq-XLB" secondAttribute="leading" id="whp-KM-xxO"/>
-                                <constraint firstAttribute="trailing" secondItem="6" secondAttribute="trailing" constant="12" id="xPc-Ux-J8F"/>
+                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="6" secondAttribute="trailing" constant="12" id="xPc-Ux-J8F"/>
                                 <constraint firstItem="17" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="7" secondAttribute="trailing" constant="8" symbolic="YES" id="yxI-gP-CbN"/>
                             </constraints>
                         </customView>
