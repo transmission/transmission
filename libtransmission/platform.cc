@@ -112,6 +112,18 @@ static char const* getHomeDir()
     return home;
 }
 
+static std::string xdgConfigHome()
+{
+    if (auto* const dir = tr_env_get_string("XDG_CONFIG_HOME", nullptr); dir != nullptr)
+    {
+        auto ret = std::string{ dir };
+        tr_free(dir);
+        return ret;
+    }
+
+    return tr_strvPath(getHomeDir(), ".config"sv);
+}
+
 void tr_setConfigDir(tr_session* session, std::string_view config_dir)
 {
 #if defined(__APPLE__) || defined(_WIN32)
@@ -172,17 +184,7 @@ char const* tr_getDefaultConfigDir(char const* appname)
 
 #else
 
-            char* const xdg_config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
-
-            if (xdg_config_home != nullptr)
-            {
-                s = tr_strvDup(tr_strvPath(xdg_config_home, appname));
-                tr_free(xdg_config_home);
-            }
-            else
-            {
-                s = tr_strvDup(tr_strvPath(getHomeDir(), ".config", appname));
-            }
+            s = tr_strvDup(tr_strvPath(xdgConfigHome(), appname));
 
 #endif
         }
@@ -191,20 +193,11 @@ char const* tr_getDefaultConfigDir(char const* appname)
     return s;
 }
 
-static std::string getUserDirsFilename()
-{
-    char* const config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
-    auto config_file = !tr_str_is_empty(config_home) ? tr_strvPath(config_home, "user-dirs.dirs") :
-                                                       tr_strvPath(getHomeDir(), ".config", "user-dirs.dirs");
-
-    tr_free(config_home);
-    return config_file;
-}
-
 static std::string getXdgEntryFromUserDirs(std::string_view key)
 {
     auto content = std::vector<char>{};
-    if (!tr_loadFile(getUserDirsFilename(), content) && std::empty(content))
+    auto const filename = tr_strvPath(xdgConfigHome(), "user-dirs.dirs"sv);
+    if (!tr_sys_path_exists(filename) || !tr_loadFile(filename, content) || std::empty(content))
     {
         return {};
     }
