@@ -141,11 +141,6 @@ void tr_setConfigDir(tr_session* session, std::string_view config_dir)
     tr_sys_dir_create(session->torrent_dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
 }
 
-char const* tr_sessionGetConfigDir(tr_session const* session)
-{
-    return session->config_dir.c_str();
-}
-
 char const* tr_getTorrentDir(tr_session const* session)
 {
     return session->torrent_dir.c_str();

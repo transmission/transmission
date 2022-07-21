@@ -232,15 +232,6 @@ void tr_sessionReloadBlocklists(tr_session* session);
 void tr_sessionClose(tr_session*);
 
 /**
- * @brief Return the session's configuration directory.
- *
- * This is where transmission stores its torrent files, .resume files,
- * blocklists, etc. It's set in tr_transmissionInit() and is immutable
- * during the session.
- */
-char const* tr_sessionGetConfigDir(tr_session const*);
-
-/**
  * @brief Set the per-session default download folder for new torrents.
  * @see tr_sessionInit()
  * @see tr_sessionGetDownloadDir()
@@ -1156,7 +1147,7 @@ char* tr_torrentGetTrackerList(tr_torrent const* tor);
  * URL per line and a blank line between tiers.
  *
  * This updates both the `torrent' object's tracker list
- * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
+ * and the metainfo file in the session config dir's torrent subdirectory.
  */
 bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
 

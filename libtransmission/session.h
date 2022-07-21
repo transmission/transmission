@@ -396,6 +396,11 @@ public:
         public_peer_port = port;
     }
 
+    constexpr auto const& configDir() const noexcept
+    {
+        return config_dir;
+    }
+
     tr_port randomPortLow;
     tr_port randomPortHigh;
 
