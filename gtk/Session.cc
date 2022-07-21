@@ -84,7 +84,7 @@ private:
 class Session::Impl
 {
 public:
-    Impl(Session& core, tr_session* session);
+    Impl(Session& core, tr_session* session, std::string_view config_dir);
 
     tr_session* close();
 
@@ -153,6 +153,7 @@ private:
 
 private:
     Session& core_;
+    std::string const config_dir_;
 
     Glib::RefPtr<Gio::FileMonitor> monitor_;
     sigc::connection monitor_tag_;
@@ -799,22 +800,23 @@ void Session::Impl::on_pref_changed(tr_quark const key)
 ***
 **/
 
-Glib::RefPtr<Session> Session::create(tr_session* session)
+Glib::RefPtr<Session> Session::create(tr_session* session, std::string_view config_dir)
 {
-    return Glib::make_refptr_for_instance(new Session(session));
+    return Glib::make_refptr_for_instance(new Session(session, config_dir));
 }
 
-Session::Session(tr_session* session)
+Session::Session(tr_session* session, std::string_view config_dir)
     : Glib::ObjectBase(typeid(Session))
-    , impl_(std::make_unique<Impl>(*this, session))
+    , impl_(std::make_unique<Impl>(*this, session, config_dir))
 {
 }
 
 Session::~Session() = default;
 
-Session::Impl::Impl(Session& core, tr_session* session)
-    : core_(core)
-    , session_(session)
+Session::Impl::Impl(Session& core, tr_session* session, std::string_view config_dir)
+    : core_{ core }
+    , config_dir_{ config_dir }
+    , session_{ session }
 {
     raw_model_ = Gtk::ListStore::create(torrent_cols);
     sorted_model_ = Gtk::TreeModelSort::create(raw_model_);
@@ -1011,13 +1013,12 @@ tr_torrent* Session::Impl::create_new_torrent(tr_ctor* ctor)
 
     if (tor != nullptr && do_trash)
     {
-        char const* config = tr_sessionGetConfigDir(session_);
         char const* source = tr_ctorGetSourceFile(ctor);
 
         if (source != nullptr)
         {
             /* #1294: don't delete the .torrent file if it's our internal copy */
-            bool const is_internal = strstr(source, config) == source;
+            bool const is_internal = strstr(source, config_dir_.c_str()) == source;
 
             if (!is_internal)
             {
