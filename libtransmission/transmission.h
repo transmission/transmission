@@ -1545,11 +1545,6 @@ struct tr_stat
         are moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
 
-    /** time when one or more of the torrent's trackers will
-        allow you to manually ask for more peers,
-        or 0 if you can't */
-    time_t manualAnnounceTime;
-
     /** When the torrent was first added. */
     time_t addedDate;
 

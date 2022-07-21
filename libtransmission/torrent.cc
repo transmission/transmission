@@ -1059,7 +1059,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
     s->errorString = tor->error_string.c_str();
 
-    s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
     s->peersConnected = swarm_stats.peer_count;
     s->peersSendingToUs = swarm_stats.active_peer_count[TR_DOWN];
     s->peersGettingFromUs = swarm_stats.active_peer_count[TR_UP];

@@ -20,6 +20,7 @@
 
 #include "transmission.h"
 
+#include "announcer.h"
 #include "completion.h"
 #include "crypto-utils.h"
 #include "error.h"
@@ -617,7 +618,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_manualAnnounceTime:
-        tr_variantInitInt(initme, st->manualAnnounceTime);
+        tr_variantInitInt(initme, tr_announcerNextManualAnnounce(tor));
         break;
 
     case TR_KEY_maxConnectedPeers:
