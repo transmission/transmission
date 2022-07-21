@@ -280,7 +280,7 @@ bool isWebClientDir(std::string_view path)
 
 #ifdef BUILD_MAC_CLIENT
 
-static std::string getPlatformWebClientDir()
+static std::string getPlatformWebClientDir(tr_session const* session)
 {
     // look in the Application Support folder
     if (auto path = tr_pathbuf{ session->config_dir, "/public_html"sv }; isWebClientDir(path))
@@ -308,7 +308,7 @@ static std::string getPlatformWebClientDir()
 
 #elif defined(_WIN32)
 
-static std::string getPlatformWebClientDir()
+static std::string getPlatformWebClientDir([[maybe_unused]] tr_session const* session)
 {
     /* Generally, Web interface should be stored in a Web subdir of
      * calling executable dir. */
@@ -353,7 +353,7 @@ static std::string getPlatformWebClientDir()
 
 #else
 
-static std::string getPlatformWebClientDir()
+static std::string getPlatformWebClientDir([[maybe_unused]] tr_session const* session)
 {
     auto candidates = std::list<std::string>{};
 
@@ -416,7 +416,7 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
         return ret;
     }
 
-    return web_client_dir_helpers::getPlatformWebClientDir();
+    return web_client_dir_helpers::getPlatformWebClientDir(session);
 }
 
 std::string tr_getSessionIdDir()
