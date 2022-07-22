@@ -122,18 +122,6 @@ TEST_F(UtilsTest, trStrvDup)
     tr_free(str);
 }
 
-TEST_F(UtilsTest, trStrvPath)
-{
-    EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("foo", "bar"));
-    EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("", "foo", "bar"));
-
-    EXPECT_EQ("", tr_strvPath(""sv));
-    EXPECT_EQ("foo"sv, tr_strvPath("foo"sv));
-    EXPECT_EQ(
-        "foo" TR_PATH_DELIMITER_STR "bar" TR_PATH_DELIMITER_STR "baz" TR_PATH_DELIMITER_STR "mum"sv,
-        tr_strvPath("foo"sv, "bar", std::string{ "baz" }, "mum"sv));
-}
-
 TEST_F(UtilsTest, trStrvUtf8Clean)
 {
     auto in = "hello world"sv;
