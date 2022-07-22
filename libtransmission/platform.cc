@@ -4,11 +4,11 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cstring>
+#include <array>
+#include <iterator>
 #include <list>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <vector>
 
 #ifdef __HAIKU__
@@ -290,15 +290,16 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     /* Generally, Web interface should be stored in a Web subdir of
      * calling executable dir. */
 
-    static KNOWNFOLDERID const* const known_folder_ids[] = {
+    static auto constexpr KnownFolderIds = std::array<KNOWNFOLDERID const* const, 3>{
         &FOLDERID_LocalAppData,
         &FOLDERID_RoamingAppData,
         &FOLDERID_ProgramData,
     };
 
-    for (size_t i = 0; s == nullptr && i < TR_N_ELEMENTS(known_folder_ids); ++i)
+    for (auto const* const folder_id : KnownFolderIds)
     {
-        auto const dir = win32_get_known_folder(*known_folder_ids[i]);
+        auto const dir = win32_get_known_folder(*folder_id);
+
         if (auto const path = tr_pathbuf{ dir, "/Transmission/Web"sv }; isWebClientDir(path))
         {
             return std::string{ path };
