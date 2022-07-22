@@ -9,41 +9,7 @@
 
 #import "NSStringAdditions.h"
 
-#import <QuickLookUI/QLPreviewingController.h>
-
-#pragma mark - TRError
-
-@interface TRError : NSError
-
-- (instancetype)initWith:(tr_error*)error;
-
-@end
-
-@interface TRError ()
-
-@property NSString* errorMessage;
-
-@end
-
-@implementation TRError
-
-- (instancetype)initWith:(tr_error*)error
-{
-    if (self = [super initWithDomain:@"TransmissionError" code:error->code userInfo:nil])
-    {
-        self.errorMessage = @(error->message);
-    }
-    return self;
-}
-
-- (NSString*)localizedDescription
-{
-    return self.errorMessage;
-}
-
-@end
-
-#pragma mark -
+@import QuickLookUI;
 
 @interface PreviewViewController ()<QLPreviewingController>
 
@@ -67,11 +33,6 @@
     return @"PreviewViewController";
 }
 
-- (void)loadView
-{
-    [super loadView];
-}
-
 #pragma mark - QLPreviewingController
 
 - (void)preparePreviewOfFileAtURL:(NSURL*)url completionHandler:(void (^)(NSError* _Nullable))handler
@@ -84,9 +45,11 @@
         NSError* err = nil;
         if (error != nullptr)
         {
-            err = [[TRError alloc] initWith:error];
+            err = [NSError errorWithDomain:@"TransmissionQuickLookAppexError" code:error->code
+                                  userInfo:@{ NSLocalizedDescriptionKey : @(error->message) }];
         }
         handler(err);
+        return;
     }
 
     NSString* name = @(metainfo.name().c_str());
@@ -136,7 +99,7 @@
         }
         else
         {
-            self.fileIconImage.image = [[NSWorkspace sharedWorkspace] iconForFileType:name.pathExtension];
+            self.fileIconImage.image = [NSWorkspace.sharedWorkspace iconForFileType:name.pathExtension];
         }
     }
 
