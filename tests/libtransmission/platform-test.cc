@@ -47,3 +47,16 @@ TEST_F(PlatformTest, defaultDownloadDir)
     unsetenv("HOME");
 }
 #endif
+
+TEST_F(PlatformTest, defaultConfigDirEnv)
+{
+    setenv("TRANSMISSION_HOME", sandboxDir().c_str(), 1);
+
+    auto actual = std::string{ tr_getDefaultConfigDir("appname") };
+    auto expected = sandboxDir();
+    EXPECT_EQ(expected, actual);
+
+    unsetenv("TRANSMISSION_HOME");
+}
+
+// #if !defined(__APPLE__) && !defined(_WIN32) && !defined(__HAIKU__)
