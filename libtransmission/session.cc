@@ -319,6 +319,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 
 void tr_sessionGetDefaultSettings(tr_variant* d)
 {
+    auto* const download_dir = tr_getDefaultDownloadDir();
     TR_ASSERT(tr_variantIsDict(d));
 
     tr_variantDictReserve(d, 71);
@@ -328,14 +329,14 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
+    tr_variantDictAddStr(d, TR_KEY_download_dir, download_dir);
     tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
     tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, 30);
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_getDefaultDownloadDir());
+    tr_variantDictAddStr(d, TR_KEY_incomplete_dir, download_dir);
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_message_level, TR_LOG_INFO);
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, 5);
@@ -397,6 +398,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
     tr_variantDictAddStrView(d, TR_KEY_announce_ip, "");
     tr_variantDictAddBool(d, TR_KEY_announce_ip_enabled, false);
+
+    tr_free(download_dir);
 }
 
 void tr_sessionGetSettings(tr_session const* s, tr_variant* d)

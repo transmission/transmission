@@ -11,6 +11,8 @@
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "Prefs.h"
@@ -47,7 +49,9 @@ static void tr_prefs_init_defaults(tr_variant* d)
 
     if (dir.empty())
     {
-        dir = tr_getDefaultDownloadDir();
+        auto* const tmp = tr_getDefaultDownloadDir();
+        dir = tmp;
+        tr_free(tmp);
     }
 
     tr_variantDictReserve(d, 31);

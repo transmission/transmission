@@ -111,12 +111,14 @@ char const* tr_getDefaultConfigDir(char const* appname);
 /**
  * @brief returns Transmisson's default download directory.
  *
+ * Use tr_free() to free the string when done.
+ *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
  * -# On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
  * -# Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
  */
-char const* tr_getDefaultDownloadDir(void);
+char* tr_getDefaultDownloadDir();
 
 #define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
 #define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"

@@ -51,65 +51,59 @@ using namespace std::literals;
 
 #ifdef _WIN32
 
-static char* win32_get_known_folder_ex(REFKNOWNFOLDERID folder_id, DWORD flags)
+static std::string win32_get_known_folder_ex(REFKNOWNFOLDERID folder_id, DWORD flags)
 {
-    char* ret = nullptr;
     PWSTR path;
 
     if (SHGetKnownFolderPath(folder_id, flags | KF_FLAG_DONT_UNEXPAND, nullptr, &path) == S_OK)
     {
-        ret = tr_win32_native_to_utf8(path, -1);
+        auto* utf8_cstr = tr_win32_native_to_utf8(path, -1);
+        auto ret = std::string{ utf8_cstr };
+        tr_free(utf8_cstr);
         CoTaskMemFree(path);
+        return ret;
     }
 
-    return ret;
+    return {};
 }
 
-static char* win32_get_known_folder(REFKNOWNFOLDERID folder_id)
+static auto win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 {
     return win32_get_known_folder_ex(folder_id, KF_FLAG_DONT_VERIFY);
 }
 
 #endif
 
-static char const* getHomeDir()
+static std::string getHomeDir()
 {
-    static char const* home = nullptr;
-
-    if (home == nullptr)
+    if (auto* const dir = tr_env_get_string("HOME", nullptr); dir != nullptr)
     {
-        home = tr_env_get_string("HOME", nullptr);
+        auto ret = std::string{ dir };
+        tr_free(dir);
+        return ret;
     }
 
 #ifdef _WIN32
 
-    if (home == nullptr)
+    if (auto dir = win32_get_known_folder(FOLDERID_Profile); !std::empty(dir))
     {
-        home = win32_get_known_folder(FOLDERID_Profile);
+        return dir;
     }
 
 #else
 
-    if (home == nullptr)
+    struct passwd pwent;
+    struct passwd* pw = nullptr;
+    char buf[4096];
+    getpwuid_r(getuid(), &pwent, buf, sizeof buf, &pw);
+    if (pw != nullptr)
     {
-        struct passwd pwent;
-        struct passwd* pw = nullptr;
-        char buf[4096];
-        getpwuid_r(getuid(), &pwent, buf, sizeof buf, &pw);
-        if (pw != nullptr)
-        {
-            home = tr_strdup(pw->pw_dir);
-        }
+        return pw->pw_dir;
     }
 
 #endif
 
-    if (home == nullptr)
-    {
-        home = tr_strdup("");
-    }
-
-    return home;
+    return {};
 }
 
 static std::string xdgConfigHome()
@@ -172,9 +166,8 @@ char const* tr_getDefaultConfigDir(char const* appname)
 
 #elif defined(_WIN32)
 
-            char* appdata = win32_get_known_folder(FOLDERID_LocalAppData);
+            auto const appdata = win32_get_known_folder(FOLDERID_LocalAppData);
             s = tr_strvDup(fmt::format("{:s}/{:s}"sv, appdata, appname));
-            tr_free(appdata);
 
 #elif defined(__HAIKU__)
 
@@ -221,41 +214,31 @@ static std::string getXdgEntryFromUserDirs(std::string_view key)
     auto constexpr Home = "$HOME"sv;
     if (auto const it = std::search(std::begin(val), std::end(val), std::begin(Home), std::end(Home)); it != std::end(val))
     {
-        val.replace(it, it + std::size(Home), std::string_view{ getHomeDir() });
+        val.replace(it, it + std::size(Home), getHomeDir());
     }
 
     return val;
 }
 
-char const* tr_getDefaultDownloadDir()
+char* tr_getDefaultDownloadDir()
 {
-    static char const* user_dir = nullptr;
-
-    if (user_dir == nullptr)
+    if (auto const dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv); !std::empty(dir))
     {
-        if (auto const xdg_user_dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv); !std::empty(xdg_user_dir))
-        {
-            user_dir = tr_strvDup(xdg_user_dir);
-        }
-
-#ifdef _WIN32
-        if (user_dir == nullptr)
-        {
-            user_dir = win32_get_known_folder(FOLDERID_Downloads);
-        }
-#endif
-
-        if (user_dir == nullptr)
-        {
-#ifdef __HAIKU__
-            user_dir = tr_strvDup(fmt::format("{:s}/Desktop"sv, getHomeDir()));
-#else
-            user_dir = tr_strvDup(fmt::format("{:s}/Downloads"sv, getHomeDir()));
-#endif
-        }
+        return tr_strvDup(dir);
     }
 
-    return user_dir;
+#ifdef _WIN32
+    if (auto dir = win32_get_known_folder(FOLDERID_Downloads); !std::empty(dir))
+    {
+        return tr_strvDup(dir);
+    }
+#endif
+
+#ifdef __HAIKU__
+    return tr_strvDup(fmt::format("{:s}/Desktop"sv, getHomeDir()));
+#endif
+
+    return tr_strvDup(fmt::format("{:s}/Downloads"sv, getHomeDir()));
 }
 
 /***
@@ -329,14 +312,11 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 
         for (size_t i = 0; s == nullptr && i < TR_N_ELEMENTS(known_folder_ids); ++i)
         {
-            char* dir = win32_get_known_folder(*known_folder_ids[i]);
-
-            if (auto const path = tr_pathbuf{ std::string_view{ dir }, "/Transmission/Web"sv }; isWebClientDir(path))
+            auto const dir = win32_get_known_folder(*known_folder_ids[i]);
+            if (auto const path = tr_pathbuf{ dir, "/Transmission/Web"sv }; isWebClientDir(path))
             {
                 s = tr_strvDup(path);
             }
-
-            tr_free(dir);
         }
     }
 
@@ -418,9 +398,8 @@ std::string tr_getSessionIdDir()
 
 #else
 
-    char* program_data_dir = win32_get_known_folder_ex(FOLDERID_ProgramData, KF_FLAG_CREATE);
+    auto const program_data_dir = win32_get_known_folder_ex(FOLDERID_ProgramData, KF_FLAG_CREATE);
     auto result = fmt::format("{:s}/Transmission"sv, program_data_dir);
-    tr_free(program_data_dir);
     tr_sys_dir_create(result, 0, 0);
     return result;
 

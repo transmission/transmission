@@ -430,7 +430,7 @@ void Prefs::initDefaults(tr_variant* d) const
     auto constexpr StatsMode = std::string_view{ "total-ratio" };
     auto constexpr WindowLayout = std::string_view{ "menu,toolbar,filter,list,statusbar" };
 
-    auto const download_dir = std::string_view{ tr_getDefaultDownloadDir() };
+    auto* const download_dir = tr_getDefaultDownloadDir();
 
     tr_variantDictReserve(d, 38);
     dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
@@ -460,7 +460,7 @@ void Prefs::initDefaults(tr_variant* d) const
     dictAdd(d, TR_KEY_main_window_x, 50);
     dictAdd(d, TR_KEY_main_window_y, 50);
     dictAdd(d, TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
-    dictAdd(d, TR_KEY_download_dir, download_dir);
+    dictAdd(d, TR_KEY_download_dir, std::string_view{ download_dir });
     dictAdd(d, TR_KEY_filter_mode, FilterMode);
     dictAdd(d, TR_KEY_main_window_layout_order, WindowLayout);
     dictAdd(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath());
@@ -469,8 +469,10 @@ void Prefs::initDefaults(tr_variant* d) const
     dictAdd(d, TR_KEY_remote_session_username, SessionUsername);
     dictAdd(d, TR_KEY_sort_mode, SortMode);
     dictAdd(d, TR_KEY_statusbar_stats, StatsMode);
-    dictAdd(d, TR_KEY_watch_dir, download_dir);
+    dictAdd(d, TR_KEY_watch_dir, std::string_view{ download_dir });
     dictAdd(d, TR_KEY_read_clipboard, false);
+
+    tr_free(download_dir);
 }
 
 /***
