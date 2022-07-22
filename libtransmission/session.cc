@@ -482,6 +482,19 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     }
 }
 
+static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char const* appname)
+{
+    if (!tr_str_is_empty(config_dir))
+    {
+        setme.assign(std::string_view{ config_dir }, "/settings.json"sv);
+        return;
+    }
+
+    auto* const default_config_dir = tr_getDefaultConfigDir(appname);
+    setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
+    tr_free(default_config_dir);
+}
+
 bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* appName)
 {
     TR_ASSERT(tr_variantIsDict(dict));
@@ -494,17 +507,16 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     tr_variantMergeDicts(dict, &oldDict);
     tr_variantFree(&oldDict);
 
-    /* if caller didn't specify a config dir, use the default */
-    if (tr_str_is_empty(config_dir))
-    {
-        config_dir = tr_getDefaultConfigDir(appName);
-    }
-
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
-    auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
     auto success = bool{};
-    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, &error))
+    auto filename = tr_pathbuf{};
+    getSettingsFilename(filename, config_dir, appName);
+    if (!tr_sys_path_exists(filename))
+    {
+        success = true;
+    }
+    else if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -512,8 +524,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     }
     else
     {
-        success = TR_ERROR_IS_ENOENT(error->code);
-        tr_error_free(error);
+        success = false;
     }
 
     /* cleanup */

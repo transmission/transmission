@@ -145,45 +145,38 @@ char const* tr_getTorrentDir(tr_session const* session)
     return session->torrent_dir.c_str();
 }
 
-char const* tr_getDefaultConfigDir(char const* appname)
+char* tr_getDefaultConfigDir(char const* appname)
 {
-    static char const* s = nullptr;
+    if (auto* dir = tr_env_get_string("TRANSMISSION_HOME", nullptr); dir != nullptr)
+    {
+        return dir;
+    }
 
     if (tr_str_is_empty(appname))
     {
         appname = "Transmission";
     }
 
-    if (s == nullptr)
-    {
-        s = tr_env_get_string("TRANSMISSION_HOME", nullptr);
-
-        if (s == nullptr)
-        {
 #ifdef __APPLE__
 
-            s = tr_strvDup(fmt::format("{:s}/Library/Application Support/{:s}"sv, getHomeDir(), appname));
+    return tr_strvDup(fmt::format("{:s}/Library/Application Support/{:s}"sv, getHomeDir(), appname));
 
 #elif defined(_WIN32)
 
-            auto const appdata = win32_get_known_folder(FOLDERID_LocalAppData);
-            s = tr_strvDup(fmt::format("{:s}/{:s}"sv, appdata, appname));
+    auto const appdata = win32_get_known_folder(FOLDERID_LocalAppData);
+    return tr_strvDup(fmt::format("{:s}/{:s}"sv, appdata, appname));
 
 #elif defined(__HAIKU__)
 
-            char buf[PATH_MAX];
-            find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf));
-            s = tr_strvDup(fmt::format("{:s}/{:s}"sv, buf, appname);
+    char buf[PATH_MAX];
+    find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf));
+    return tr_strvDup(fmt::format("{:s}/{:s}"sv, buf, appname);
 
 #else
 
-            s = tr_strvDup(fmt::format("{:s}/{:s}"sv, xdgConfigHome(), appname));
+    return tr_strvDup(fmt::format("{:s}/{:s}"sv, xdgConfigHome(), appname));
 
 #endif
-        }
-    }
-
-    return s;
 }
 
 static std::string getXdgEntryFromUserDirs(std::string_view key)

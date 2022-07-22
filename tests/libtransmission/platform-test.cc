@@ -40,8 +40,8 @@ TEST_F(PlatformTest, defaultDownloadDir)
 {
     setenv("HOME", sandboxDir().c_str(), 1);
 
-    auto actual = makeString(tr_getDefaultDownloadDir());
     auto expected = fmt::format("{:s}/Downloads"sv, sandboxDir());
+    auto actual = makeString(tr_getDefaultDownloadDir());
     EXPECT_EQ(expected, actual);
 
     unsetenv("HOME");
@@ -52,11 +52,36 @@ TEST_F(PlatformTest, defaultConfigDirEnv)
 {
     setenv("TRANSMISSION_HOME", sandboxDir().c_str(), 1);
 
-    auto actual = std::string{ tr_getDefaultConfigDir("appname") };
+    auto actual = makeString(tr_getDefaultConfigDir("appname"));
     auto expected = sandboxDir();
     EXPECT_EQ(expected, actual);
 
     unsetenv("TRANSMISSION_HOME");
 }
 
-// #if !defined(__APPLE__) && !defined(_WIN32) && !defined(__HAIKU__)
+#if !defined(__APPLE__) && !defined(_WIN32) && !defined(__HAIKU__)
+
+TEST_F(PlatformTest, defaultConfigDirXdgConfig)
+{
+    setenv("XDG_CONFIG_HOME", sandboxDir().c_str(), 1);
+
+    auto expected = fmt::format("{:s}/appname", sandboxDir());
+    auto actual = makeString(tr_getDefaultConfigDir("appname"));
+    EXPECT_EQ(expected, actual);
+
+    unsetenv("XDG_CONFIG_HOME");
+}
+
+TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
+{
+    auto const home = tr_pathbuf{ sandboxDir(), "/home/user" };
+    setenv("HOME", home, 1);
+
+    auto expected = fmt::format("{:s}/.config/appname", home.sv());
+    auto actual = makeString(tr_getDefaultConfigDir("appname"));
+    EXPECT_EQ(expected, actual);
+
+    unsetenv("HOME");
+}
+
+#endif

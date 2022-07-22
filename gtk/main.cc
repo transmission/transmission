@@ -94,9 +94,11 @@ int main(int argc, char** argv)
     tr_formatter_speed_init(speed_K, _(speed_K_str), _(speed_M_str), _(speed_G_str), _(speed_T_str));
 
     /* set up the config dir */
-    if (config_dir.empty())
+    if (std::empty(config_dir))
     {
-        config_dir = tr_getDefaultConfigDir(AppConfigDirName);
+        auto* const default_config_dir = tr_getDefaultConfigDir(AppConfigDirName);
+        config_dir = default_config_dir;
+        tr_free(default_config_dir);
     }
 
     gtr_pref_init(config_dir);
