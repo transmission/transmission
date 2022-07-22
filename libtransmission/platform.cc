@@ -121,7 +121,7 @@ static std::string xdgConfigHome()
         return ret;
     }
 
-    return tr_strvPath(getHomeDir(), ".config"sv);
+    return fmt::format("{:s}/.config"sv, getHomeDir());
 }
 
 void tr_setConfigDir(tr_session* session, std::string_view config_dir)
@@ -135,8 +135,8 @@ void tr_setConfigDir(tr_session* session, std::string_view config_dir)
 #endif
 
     session->config_dir = config_dir;
-    session->resume_dir = tr_strvPath(config_dir, ResumeSubdir);
-    session->torrent_dir = tr_strvPath(config_dir, TorrentSubdir);
+    session->resume_dir = fmt::format("{:s}/{:s}"sv, config_dir, ResumeSubdir);
+    session->torrent_dir = fmt::format("{:s}/{:s}"sv, config_dir, TorrentSubdir);
     tr_sys_dir_create(session->resume_dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
     tr_sys_dir_create(session->torrent_dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
 }
@@ -168,23 +168,23 @@ char const* tr_getDefaultConfigDir(char const* appname)
         {
 #ifdef __APPLE__
 
-            s = tr_strvDup(tr_strvPath(getHomeDir(), "Library", "Application Support", appname));
+            s = tr_strvDup(fmt::format("{:s}/Library/Application Support/{:s}"sv, getHomeDir(), appname));
 
 #elif defined(_WIN32)
 
             char* appdata = win32_get_known_folder(FOLDERID_LocalAppData);
-            s = tr_strvDup(tr_strvPath(appdata, appname));
+            s = tr_strvDup(fmt::format("{:s}/{:s}"sv, appdata, appname));
             tr_free(appdata);
 
 #elif defined(__HAIKU__)
 
             char buf[PATH_MAX];
             find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf));
-            s = tr_strvDup(tr_strvPath(buf, appname));
+            s = tr_strvDup(fmt::format("{:s}/{:s}"sv, buf, appname);
 
 #else
 
-            s = tr_strvDup(tr_strvPath(xdgConfigHome(), appname));
+            s = tr_strvDup(fmt::format("{:s}/{:s}"sv, xdgConfigHome(), appname));
 
 #endif
         }
@@ -196,7 +196,7 @@ char const* tr_getDefaultConfigDir(char const* appname)
 static std::string getXdgEntryFromUserDirs(std::string_view key)
 {
     auto content = std::vector<char>{};
-    auto const filename = tr_strvPath(xdgConfigHome(), "user-dirs.dirs"sv);
+    auto const filename = fmt::format("{:s}/{:s}"sv, xdgConfigHome(), "user-dirs.dirs"sv);
     if (!tr_sys_path_exists(filename) || !tr_loadFile(filename, content) || std::empty(content))
     {
         return {};
@@ -248,9 +248,9 @@ char const* tr_getDefaultDownloadDir()
         if (user_dir == nullptr)
         {
 #ifdef __HAIKU__
-            user_dir = tr_strvDup(tr_strvPath(getHomeDir(), "Desktop"));
+            user_dir = tr_strvDup(fmt::format("{:s}/Desktop"sv, getHomeDir()));
 #else
-            user_dir = tr_strvDup(tr_strvPath(getHomeDir(), "Downloads"));
+            user_dir = tr_strvDup(fmt::format("{:s}/Downloads"sv, getHomeDir()));
 #endif
         }
     }
@@ -371,7 +371,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
         }
         else
         {
-            candidates.emplace_back(tr_strvPath(getHomeDir(), ".local"sv, "share"sv));
+            candidates.emplace_back(fmt::format("{:s}/.local/share"sv, getHomeDir()));
         }
         tr_free(tmp);
 
@@ -419,7 +419,7 @@ std::string tr_getSessionIdDir()
 #else
 
     char* program_data_dir = win32_get_known_folder_ex(FOLDERID_ProgramData, KF_FLAG_CREATE);
-    auto const result = tr_strvPath(program_data_dir, "Transmission");
+    auto result = fmt::format("{:s}/Transmission"sv, program_data_dir);
     tr_free(program_data_dir);
     tr_sys_dir_create(result, 0, 0);
     return result;

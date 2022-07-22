@@ -232,27 +232,6 @@ template<typename T>
 ****  std::string_view utils
 ***/
 
-template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
-[[nodiscard]] std::string tr_strvPath(T... args)
-{
-    auto setme = std::string{};
-    auto const n_args = sizeof...(args);
-    auto const n = n_args + (std::size(std::string_view{ args }) + ...);
-    if (setme.capacity() < n)
-    {
-        setme.reserve(n);
-    }
-
-    auto const foo = [&setme](std::string_view a)
-    {
-        setme += a;
-        setme += TR_PATH_DELIMITER;
-    };
-    (foo(args), ...);
-    setme.resize(setme.size() - 1);
-    return setme;
-}
-
 template<typename T>
 [[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
 {
