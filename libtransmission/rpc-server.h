@@ -122,7 +122,6 @@ public:
 
     std::vector<std::string> hostWhitelist;
     std::vector<std::string> whitelist_;
-    std::string const web_client_dir_;
     std::string salted_password_;
     std::string username_;
     std::string whitelist_str_;

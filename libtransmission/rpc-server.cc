@@ -256,7 +256,9 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
 
 static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
 {
-    if (std::empty(server->web_client_dir_))
+    char const* webClientDir = tr_getWebClientDir(server->session);
+
+    if (tr_str_is_empty(webClientDir))
     {
         send_simple_response(
             req,
@@ -285,7 +287,7 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
         }
         else
         {
-            auto const filename = tr_pathbuf{ server->web_client_dir_, '/', tr_str_is_empty(subpath) ? "index.html" : subpath };
+            auto const filename = tr_pathbuf{ webClientDir, "/"sv, tr_str_is_empty(subpath) ? "index.html" : subpath };
             serve_file(req, server, filename.sv());
         }
 
@@ -938,7 +940,6 @@ static void missing_settings_key(tr_quark const q)
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
-    , web_client_dir_{ tr_getWebClientDir(session_in) }
     , bindAddress(std::make_unique<struct tr_rpc_address>())
     , session{ session_in }
 {
@@ -1144,9 +1145,10 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
         }
     }
 
-    if (!std::empty(web_client_dir_))
+    char const* webClientDir = tr_getWebClientDir(this->session);
+    if (!tr_str_is_empty(webClientDir))
     {
-        tr_logAddInfo(fmt::format(_("Serving RPC and Web requests from '{path}'"), fmt::arg("path", web_client_dir_)));
+        tr_logAddInfo(fmt::format(_("Serving RPC and Web requests from '{path}'"), fmt::arg("path", webClientDir)));
     }
 }
 
