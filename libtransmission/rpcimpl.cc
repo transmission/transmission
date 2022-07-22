@@ -1444,7 +1444,7 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
-    auto const filename = tr_pathbuf{ session->config_dir, "/blocklist.tmp"sv };
+    auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
     if (tr_error* error = nullptr; !tr_saveFile(filename, content, &error))
     {
         tr_idle_function_done(
@@ -2171,7 +2171,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_config_dir:
-        tr_variantDictAddStr(d, key, tr_sessionGetConfigDir(s));
+        tr_variantDictAddStr(d, key, s->configDir());
         break;
 
     case TR_KEY_default_trackers:

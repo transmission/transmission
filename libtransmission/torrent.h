@@ -450,17 +450,17 @@ public:
 
     [[nodiscard]] auto torrentFile() const
     {
-        return metainfo_.torrentFile(this->session->torrent_dir);
+        return metainfo_.torrentFile(this->session->torrentDir());
     }
 
     [[nodiscard]] auto magnetFile() const
     {
-        return metainfo_.magnetFile(this->session->torrent_dir);
+        return metainfo_.magnetFile(this->session->torrentDir());
     }
 
     [[nodiscard]] auto resumeFile() const
     {
-        return metainfo_.resumeFile(this->session->resume_dir);
+        return metainfo_.resumeFile(this->session->torrentDir());
     }
 
     [[nodiscard]] auto magnet() const

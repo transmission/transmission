@@ -15,6 +15,7 @@
 
 #include "cache.h" // tr_cacheWriteBlock()
 #include "file.h" // tr_sys_path_*()
+#include "session.h"
 #include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
@@ -156,7 +157,7 @@ using MoveTest = SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
-    auto const target_dir = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/target"sv };
+    auto const target_dir = tr_pathbuf{ session_->configDir(), "/target"sv };
     tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.

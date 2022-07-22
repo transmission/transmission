@@ -655,7 +655,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     auto const wasDirty = tor->isDirty;
 
     auto const migrated = tr_torrent_metainfo::migrateFile(
-        tor->session->resume_dir,
+        tor->session->resumeDir(),
         tor->name(),
         tor->infoHashString(),
         ".resume"sv);

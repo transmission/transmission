@@ -34,14 +34,14 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
 {
     auto top = tr_variant{};
 
-    auto filename = tr_pathbuf{ session->config_dir, "/stats.json"sv };
+    auto filename = tr_pathbuf{ session->configDir(), "/stats.json"sv };
     bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr);
 
     if (!loaded)
     {
         // maybe the user just upgraded from an old version of Transmission
         // that was still using stats.benc
-        filename.assign(session->config_dir, "/stats.benc");
+        filename.assign(session->configDir(), "/stats.benc"sv);
         loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename.sv(), nullptr);
     }
 
@@ -80,7 +80,7 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
 
 static void saveCumulativeStats(tr_session const* session, tr_session_stats const* s)
 {
-    auto const filename = tr_pathbuf{ session->config_dir, "/stats.json"sv };
+    auto const filename = tr_pathbuf{ session->configDir(), "/stats.json"sv };
     auto top = tr_variant{};
     tr_variantInitDict(&top, 5);
     tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, s->downloadedBytes);

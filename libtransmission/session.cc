@@ -46,7 +46,6 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "platform-quota.h" /* tr_device_info_free() */
-#include "platform.h" /* tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
 #include "session-id.h"
@@ -128,7 +127,7 @@ tr_peer_id_t tr_peerIdInit()
 
 std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
-    auto const path = tr_pathbuf{ session_->config_dir, "/cookies.txt" };
+    auto const path = tr_pathbuf{ session_->configDir(), "/cookies.txt"sv };
 
     if (!tr_sys_path_exists(path))
     {
@@ -726,7 +725,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     tr_logSetQueueEnabled(data->messageQueuingEnabled);
 
-    tr_setConfigDir(session, data->config_dir);
+    session->initConfigDir(data->config_dir);
 
     session->peerMgr = tr_peerMgrNew(session);
 
@@ -736,7 +735,7 @@ static void tr_sessionInitImpl(init_data* data)
     ***  Blocklist
     **/
 
-    tr_sys_dir_create(tr_pathbuf{ session->config_dir, "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(tr_pathbuf{ session->configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
     loadBlocklists(session);
 
     TR_ASSERT(tr_isSession(session));
@@ -2036,16 +2035,14 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
     TR_ASSERT(tr_isSession(data->session));
 
     tr_sys_path_info info;
-    char const* const dirname = tr_getTorrentDir(data->session);
-    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname) :
+    auto const& dirname = data->session->torrentDir();
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname.c_str(), 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname.c_str()) :
         TR_BAD_SYS_DIR;
 
     auto torrents = std::list<tr_torrent*>{};
     if (odir != TR_BAD_SYS_DIR)
     {
-        auto const dirname_sv = std::string_view{ dirname };
-
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir)) != nullptr)
         {
@@ -2054,7 +2051,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
                 continue;
             }
 
-            auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
+            auto const path = tr_pathbuf{ dirname, '/', name };
 
             // is a magnet link?
             if (!tr_ctorSetMetainfoFromFile(data->ctor, path.sv(), nullptr))
@@ -2352,7 +2349,7 @@ static void loadBlocklists(tr_session* session)
     auto const isEnabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
-    auto const dirname = tr_pathbuf{ session->config_dir, "/blocklists"sv };
+    auto const dirname = tr_pathbuf{ session->configDir(), "/blocklists"sv };
     auto const odir = tr_sys_dir_open(dirname);
 
     if (odir == TR_BAD_SYS_DIR)
@@ -2492,7 +2489,7 @@ size_t tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     BlocklistFile* b = nullptr;
     if (it == std::end(src))
     {
-        auto path = tr_pathbuf{ session->config_dir, "/blocklists/"sv, name };
+        auto path = tr_pathbuf{ session->configDir(), "/blocklists/"sv, name };
         src.push_back(std::make_unique<BlocklistFile>(path, session->useBlocklist()));
         b = std::rbegin(src)->get();
     }
@@ -2953,4 +2950,25 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
 {
     this->cache->flushFile(tor, file_num);
     openFiles().closeFile(tor->id(), file_num);
+}
+
+///
+
+void tr_session::initConfigDir(std::string_view config_dir)
+{
+    TR_ASSERT(std::empty(config_dir_));
+
+#if defined(__APPLE__) || defined(_WIN32)
+    auto constexpr ResumeSubdir = "Resume"sv;
+    auto constexpr TorrentSubdir = "Torrents"sv;
+#else
+    auto constexpr ResumeSubdir = "resume"sv;
+    auto constexpr TorrentSubdir = "torrents"sv;
+#endif
+
+    config_dir_ = config_dir;
+    resume_dir_ = tr_strvPath(config_dir, ResumeSubdir);
+    torrent_dir_ = tr_strvPath(config_dir, TorrentSubdir);
+    tr_sys_dir_create(resume_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(torrent_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
 }
