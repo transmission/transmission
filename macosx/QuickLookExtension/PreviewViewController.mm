@@ -14,11 +14,11 @@
 @interface PreviewViewController ()<QLPreviewingController>
 
 #pragma mark - IBOutlet
-@property(weak) IBOutlet NSImageView* fileIconImage;
-@property(weak) IBOutlet NSTextField* nameField;
-@property(weak) IBOutlet NSTextField* totalSizeField;
-@property(weak) IBOutlet NSTextField* filesField;
-@property(weak) IBOutlet NSTextField* trackersField;
+@property(nonatomic, weak) IBOutlet NSImageView* fileIconImage;
+@property(nonatomic, weak) IBOutlet NSTextField* nameField;
+@property(nonatomic, weak) IBOutlet NSTextField* totalSizeField;
+@property(nonatomic, weak) IBOutlet NSTextField* filesField;
+@property(nonatomic, weak) IBOutlet NSTextField* trackersField;
 
 @end
 
