@@ -19,6 +19,17 @@ struct tr_session;
  * @{
  */
 
+/**
+ * @brief invoked by tr_sessionInit() to set up the locations of the resume, torrent, and clutch directories.
+ * @see tr_getResumeDir()
+ * @see tr_getTorrentDir()
+ * @see tr_getWebClientDir()
+ */
+void tr_setConfigDir(tr_session* session, std::string_view config_dir);
+
+/** @brief return the directory where torrent files are stored */
+char const* tr_getTorrentDir(tr_session const*);
+
 /** @brief return the directory where the Web Client's web ui files are kept */
 std::string tr_getWebClientDir(tr_session const*);
 
