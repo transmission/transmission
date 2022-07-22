@@ -156,7 +156,7 @@ private:
 private:
     Application& app_;
 
-    std::string const config_dir_;
+    std::string config_dir_;
     bool start_paused_ = false;
     bool is_iconified_ = false;
     bool is_closing_ = false;
@@ -555,7 +555,7 @@ void Application::Impl::on_startup()
 
     gtr_pref_flag_set(TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(session));
     gtr_pref_int_set(TR_KEY_peer_port, tr_sessionGetPeerPort(session));
-    core_ = Session::create(session, config_dir_);
+    core_ = Session::create(session);
 
     /* init the ui manager */
     ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));

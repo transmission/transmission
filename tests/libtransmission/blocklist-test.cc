@@ -18,8 +18,6 @@
 
 #include "test-fixtures.h"
 
-using namespace std::literals;
-
 namespace libtransmission
 {
 
@@ -71,7 +69,7 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
-    auto const path = tr_pathbuf{ session_->configDir(), "/blocklists/level1"sv };
+    auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
@@ -107,7 +105,7 @@ TEST_F(BlocklistTest, parsing)
 TEST_F(BlocklistTest, updating)
 {
     // init the session
-    auto const path = tr_pathbuf{ session_->configDir(), "/blocklists/level1"sv };
+    auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
 
     // no blocklist to start with...
     EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));

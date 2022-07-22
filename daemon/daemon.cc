@@ -672,10 +672,8 @@ struct daemon_data
     bool paused;
 };
 
-static void daemon_reconfigure(void* vdata)
+static void daemon_reconfigure(void* /*arg*/)
 {
-    auto const* const ddata = static_cast<daemon_data const*>(vdata);
-
     if (mySession == nullptr)
     {
         tr_logAddInfo(_("Deferring reload until session is fully started."));
@@ -684,6 +682,7 @@ static void daemon_reconfigure(void* vdata)
     else
     {
         tr_variant settings;
+        char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
         if (logfileName != nullptr)
@@ -691,10 +690,11 @@ static void daemon_reconfigure(void* vdata)
             reopen_log_file(logfileName);
         }
 
-        tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", ddata->configDir)));
+        configDir = tr_sessionGetConfigDir(mySession);
+        tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
         tr_variantInitDict(&settings, 0);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
-        tr_sessionLoadSettings(&settings, ddata->configDir, MyName);
+        tr_sessionLoadSettings(&settings, configDir, MyName);
         tr_sessionSet(mySession, &settings);
         tr_variantFree(&settings);
         tr_sessionReloadBlocklists(mySession);
