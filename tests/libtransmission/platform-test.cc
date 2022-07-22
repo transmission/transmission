@@ -8,12 +8,13 @@
 
 #include "transmission.h"
 
+#include "file.h"
 #include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 
 using namespace std::literals;
-using PlatformTest = ::libtransmission::test::SandboxedTest;
+using PlatformTest = ::libtransmission::test::SessionTest;
 using ::libtransmission::test::makeString;
 
 #ifdef _WIN32
@@ -84,4 +85,38 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
     unsetenv("HOME");
 }
 
+#endif
+
+TEST_F(PlatformTest, webClientDirEnvClutch)
+{
+    setenv("CLUTCH_HOME", sandboxDir().c_str(), 1);
+
+    EXPECT_EQ(sandboxDir(), tr_getWebClientDir(session_));
+
+    unsetenv("CLUTCH_HOME");
+}
+
+TEST_F(PlatformTest, webClientDirEnvTr)
+{
+    setenv("TRANSMISSION_WEB_HOME", sandboxDir().c_str(), 1);
+
+    EXPECT_EQ(sandboxDir(), tr_getWebClientDir(session_));
+
+    unsetenv("TRANSMISSION_WEB_HOME");
+}
+
+#if !defined(BUILD_MAC_CLIENT) && !defined(_WIN32)
+TEST_F(PlatformTest, webClientDirXdgDataHome)
+{
+    setenv("XDG_DATA_HOME", sandboxDir().c_str(), 1);
+
+    auto const expected = tr_pathbuf{ sandboxDir(), "/transmission/public_html"sv };
+    auto const index_html = tr_pathbuf{ expected, "/index.html"sv };
+    EXPECT_TRUE(tr_sys_dir_create(expected, TR_SYS_DIR_CREATE_PARENTS, 0777));
+    EXPECT_TRUE(tr_saveFile(index_html, "<html></html>"sv));
+
+    EXPECT_EQ(expected, tr_getWebClientDir(session_));
+
+    unsetenv("XDG_DATA_HOME");
+}
 #endif
