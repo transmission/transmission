@@ -508,11 +508,11 @@ static void removeKeRangerRansomware()
 
         tr_formatter_mem_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
 
-        char const* configDir = tr_getDefaultConfigDir("Transmission");
-        _fLib = tr_sessionInit(configDir, YES, &settings);
+        char* const default_config_dir = tr_getDefaultConfigDir("Transmission");
+        _fLib = tr_sessionInit(default_config_dir, YES, &settings);
         tr_variantFree(&settings);
-
-        _fConfigDirectory = @(configDir);
+        _fConfigDirectory = @(default_config_dir);
+        tr_free(default_config_dir);
 
         NSApp.delegate = self;
 

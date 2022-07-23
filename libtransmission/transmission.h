@@ -99,6 +99,8 @@ enum tr_encryption_mode
 /**
  * @brief returns Transmission's default configuration file directory.
  *
+ * Use tr_free() to free the string when done.
+ *
  * The default configuration directory is determined this way:
  * -# If the TRANSMISSION_HOME environment variable is set, its value is used.
  * -# On Darwin, "${HOME}/Library/Application Support/${appname}" is used.
@@ -106,17 +108,19 @@ enum tr_encryption_mode
  * -# If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
  * -# ${HOME}/.config/${appname}" is used as a last resort.
  */
-char const* tr_getDefaultConfigDir(char const* appname);
+char* tr_getDefaultConfigDir(char const* appname);
 
 /**
  * @brief returns Transmisson's default download directory.
+ *
+ * Use tr_free() to free the string when done.
  *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
  * -# On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
  * -# Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
  */
-char const* tr_getDefaultDownloadDir(void);
+char* tr_getDefaultDownloadDir();
 
 #define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
 #define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"

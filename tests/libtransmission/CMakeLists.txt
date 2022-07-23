@@ -24,6 +24,7 @@ add_executable(libtransmission-test
     peer-mgr-active-requests-test.cc
     peer-mgr-wishlist-test.cc
     peer-msgs-test.cc
+    platform-test.cc
     quark-test.cc
     remove-test.cc
     rename-test.cc

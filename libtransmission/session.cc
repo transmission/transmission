@@ -319,6 +319,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 
 void tr_sessionGetDefaultSettings(tr_variant* d)
 {
+    auto* const download_dir = tr_getDefaultDownloadDir();
     TR_ASSERT(tr_variantIsDict(d));
 
     tr_variantDictReserve(d, 71);
@@ -328,14 +329,14 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
+    tr_variantDictAddStr(d, TR_KEY_download_dir, download_dir);
     tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
     tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, 30);
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_getDefaultDownloadDir());
+    tr_variantDictAddStr(d, TR_KEY_incomplete_dir, download_dir);
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_message_level, TR_LOG_INFO);
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, 5);
@@ -397,6 +398,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
     tr_variantDictAddStrView(d, TR_KEY_announce_ip, "");
     tr_variantDictAddBool(d, TR_KEY_announce_ip_enabled, false);
+
+    tr_free(download_dir);
 }
 
 void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
@@ -479,6 +482,19 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     }
 }
 
+static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char const* appname)
+{
+    if (!tr_str_is_empty(config_dir))
+    {
+        setme.assign(std::string_view{ config_dir }, "/settings.json"sv);
+        return;
+    }
+
+    auto* const default_config_dir = tr_getDefaultConfigDir(appname);
+    setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
+    tr_free(default_config_dir);
+}
+
 bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* appName)
 {
     TR_ASSERT(tr_variantIsDict(dict));
@@ -491,17 +507,16 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     tr_variantMergeDicts(dict, &oldDict);
     tr_variantFree(&oldDict);
 
-    /* if caller didn't specify a config dir, use the default */
-    if (tr_str_is_empty(config_dir))
-    {
-        config_dir = tr_getDefaultConfigDir(appName);
-    }
-
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
-    auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
     auto success = bool{};
-    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, &error))
+    auto filename = tr_pathbuf{};
+    getSettingsFilename(filename, config_dir, appName);
+    if (!tr_sys_path_exists(filename))
+    {
+        success = true;
+    }
+    else if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -509,8 +524,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     }
     else
     {
-        success = TR_ERROR_IS_ENOENT(error->code);
-        tr_error_free(error);
+        success = false;
     }
 
     /* cleanup */
