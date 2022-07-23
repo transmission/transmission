@@ -828,6 +828,17 @@ Session::Impl::Impl(Session& core, tr_session* session)
     on_pref_changed(TR_KEY_peer_limit_global);
     on_pref_changed(TR_KEY_inhibit_desktop_hibernation);
     signal_prefs_changed.connect([this](auto key) { on_pref_changed(key); });
+
+    tr_sessionSetMetadataCallback(
+        session,
+        [](auto* /*session*/, auto* tor, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor); },
+        this);
+
+    tr_sessionSetCompletenessCallback(
+        session,
+        [](auto* tor, auto completeness, bool was_running, gpointer impl)
+        { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor, completeness, was_running); },
+        this);
 }
 
 tr_session* Session::close()
@@ -986,16 +997,6 @@ void Session::Impl::add_torrent(tr_torrent* tor, bool do_notify)
         {
             gtr_notify_torrent_added(get_core_ptr(), tr_torrentId(tor));
         }
-
-        tr_torrentSetMetadataCallback(
-            tor,
-            [](auto* tor2, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor2); },
-            this);
-        tr_torrentSetCompletenessCallback(
-            tor,
-            [](auto* tor2, auto completeness, bool was_running, gpointer impl)
-            { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor2, completeness, was_running); },
-            this);
     }
 }
 

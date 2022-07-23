@@ -310,6 +310,80 @@ public:
         announce_ip_enabled_ = enabled;
     }
 
+    // callbacks
+
+    using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
+
+    void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    {
+        queue_start_callback_ = cb;
+        queue_start_user_data_ = user_data;
+    }
+
+    void onQueuedTorrentStarted(tr_torrent* tor)
+    {
+        if (queue_start_callback_ != nullptr)
+        {
+            queue_start_callback_(this, tor, queue_start_user_data_);
+        }
+    }
+
+    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    {
+        idle_limit_hit_callback_ = cb;
+        idle_limit_hit_user_data_ = user_data;
+    }
+
+    void onIdleLimitHit(tr_torrent* tor)
+    {
+        if (idle_limit_hit_callback_ != nullptr)
+        {
+            idle_limit_hit_callback_(this, tor, idle_limit_hit_user_data_);
+        }
+    }
+
+    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    {
+        ratio_limit_hit_cb_ = cb;
+        ratio_limit_hit_user_data_ = user_data;
+    }
+
+    void onRatioLimitHit(tr_torrent* tor)
+    {
+        if (ratio_limit_hit_cb_ != nullptr)
+        {
+            ratio_limit_hit_cb_(this, tor, ratio_limit_hit_user_data_);
+        }
+    }
+
+    void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    {
+        got_metadata_cb_ = cb;
+        got_metadata_user_data_ = user_data;
+    }
+
+    void onMetadataCompleted(tr_torrent* tor)
+    {
+        if (got_metadata_cb_ != nullptr)
+        {
+            got_metadata_cb_(this, tor, got_metadata_user_data_);
+        }
+    }
+
+    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    {
+        completeness_func_ = cb;
+        completeness_func_user_data_ = user_data;
+    }
+
+    void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness completeness, bool was_running)
+    {
+        if (completeness_func_ != nullptr)
+        {
+            completeness_func_(tor, completeness, was_running, completeness_func_user_data_);
+        }
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -479,6 +553,21 @@ private:
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
     std::optional<tr_address> external_ip_;
+
+    queue_start_callback_t queue_start_callback_ = nullptr;
+    void* queue_start_user_data_ = nullptr;
+
+    tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
+    void* idle_limit_hit_user_data_ = nullptr;
+
+    tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
+    void* ratio_limit_hit_user_data_ = nullptr;
+
+    tr_session_metadata_func got_metadata_cb_ = nullptr;
+    void* got_metadata_user_data_ = nullptr;
+
+    tr_torrent_completeness_func completeness_func_ = nullptr;
+    void* completeness_func_user_data_ = nullptr;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;

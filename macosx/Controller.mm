@@ -359,6 +359,61 @@ static void removeKeRangerRansomware()
     }
 }
 
+void onStartQueue(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent startQueue];
+    });
+}
+
+void onIdleLimitHit(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent idleLimitHit];
+    });
+}
+
+void onRatioLimitHit(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent ratioLimitHit];
+    });
+}
+
+void onMetadataCompleted(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent metadataRetrieved];
+    });
+}
+
+void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool wasRunning, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent completenessChange:status wasRunning:wasRunning];
+    });
+}
+
 - (instancetype)init
 {
     if ((self = [super init]))
@@ -513,6 +568,12 @@ static void removeKeRangerRansomware()
         tr_variantFree(&settings);
         _fConfigDirectory = @(default_config_dir);
         tr_free(default_config_dir);
+
+        tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
+        tr_sessionSetQueueStartCallback(_fLib, onStartQueue, (__bridge void*)(self));
+        tr_sessionSetRatioLimitHitCallback(_fLib, onRatioLimitHit, (__bridge void*)(self));
+        tr_sessionSetMetadataCallback(_fLib, onMetadataCompleted, (__bridge void*)(self));
+        tr_sessionSetCompletenessCallback(_fLib, onTorrentCompletenessChanged, (__bridge void*)(self));
 
         NSApp.delegate = self;
 

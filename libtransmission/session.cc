@@ -2968,3 +2968,30 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
     this->cache->flushFile(tor, file_num);
     openFiles().closeFile(tor->id(), file_num);
 }
+
+///
+
+void tr_sessionSetQueueStartCallback(tr_session* session, void (*cb)(tr_session*, tr_torrent*, void*), void* user_data)
+{
+    session->setQueueStartCallback(cb, user_data);
+}
+
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func cb, void* user_data)
+{
+    session->setRatioLimitHitCallback(cb, user_data);
+}
+
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func cb, void* user_data)
+{
+    session->setIdleLimitHitCallback(cb, user_data);
+}
+
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func func, void* user_data)
+{
+    session->setMetadataCallback(func, user_data);
+}
+
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func cb, void* user_data)
+{
+    session->setTorrentCompletenessCallback(cb, user_data);
+}

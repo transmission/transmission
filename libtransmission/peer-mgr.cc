@@ -2546,11 +2546,7 @@ void queuePulse(tr_session* session, tr_direction dir)
         for (auto* tor : tr_sessionGetNextQueuedTorrents(session, dir, n))
         {
             tr_torrentStartNow(tor);
-
-            if (tor->queue_started_callback != nullptr)
-            {
-                (*tor->queue_started_callback)(tor, tor->queue_started_user_data);
-            }
+            session->onQueuedTorrentStarted(tor);
         }
     }
 }
