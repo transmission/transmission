@@ -365,10 +365,8 @@ void onStartQueue(tr_session* session, tr_torrent* tor, void* vself)
     auto const hashstr = @(tr_torrentView(tor).hash_string);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (auto* const torrent = [controller torrentForHash:hashstr]; torrent != nullptr)
-        {
-            [torrent startQueue];
-        }
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent startQueue];
     });
 }
 
@@ -378,10 +376,8 @@ void onIdleLimitHit(tr_session* session, tr_torrent* tor, void* vself)
     auto const hashstr = @(tr_torrentView(tor).hash_string);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (auto* const torrent = [controller torrentForHash:hashstr]; torrent != nullptr)
-        {
-            [torrent idleLimitHit];
-        }
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent idleLimitHit];
     });
 }
 
@@ -391,10 +387,8 @@ void onRatioLimitHit(tr_session* session, tr_torrent* tor, void* vself)
     auto const hashstr = @(tr_torrentView(tor).hash_string);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (auto* const torrent = [controller torrentForHash:hashstr]; torrent != nullptr)
-        {
-            [torrent ratioLimitHit];
-        }
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent ratioLimitHit];
     });
 }
 
@@ -404,10 +398,8 @@ void onMetadataCompleted(tr_session* session, tr_torrent* tor, void* vself)
     auto const hashstr = @(tr_torrentView(tor).hash_string);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (auto* const torrent = [controller torrentForHash:hashstr]; torrent != nullptr)
-        {
-            [torrent metadataRetrieved];
-        }
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent metadataRetrieved];
     });
 }
 
@@ -417,10 +409,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     auto const hashstr = @(tr_torrentView(tor).hash_string);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (auto* const torrent = [controller torrentForHash:hashstr]; torrent != nullptr)
-        {
-            [torrent completenessChange:status wasRunning:wasRunning];
-        }
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent completenessChange:status wasRunning:wasRunning];
     });
 }
 
