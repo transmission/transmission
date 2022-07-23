@@ -146,7 +146,7 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 
     // check for a manual bootstrap file.
-    auto in = std::ifstream{ tr_pathbuf{ session->config_dir, "/dht.bootstrap"sv } };
+    auto in = std::ifstream{ tr_pathbuf{ session->configDir(), "/dht.bootstrap"sv } };
     if (!in.is_open())
     {
         return;
@@ -292,7 +292,7 @@ int tr_dhtInit(tr_session* ss)
     }
 
     auto benc = tr_variant{};
-    auto const dat_file = tr_pathbuf{ ss->config_dir, "/dht.dat"sv };
+    auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };
     auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.sv());
 
     bool have_id = false;
@@ -443,7 +443,7 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        auto const dat_file = tr_pathbuf{ ss->config_dir, "/dht.dat" };
+        auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };
         tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.sv());
         tr_variantFree(&benc);
     }

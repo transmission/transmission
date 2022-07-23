@@ -704,7 +704,7 @@ void tr_sessionSetQueueStartCallback(tr_session*, void (*callback)(tr_session*, 
 ***/
 
 /**
- *  Load all the torrents in tr_getTorrentDir().
+ *  Load all the torrents in the session's torrent folder.
  *  This can be used at startup to kickstart all the torrents
  *  from the previous session.
  */

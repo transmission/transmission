@@ -118,33 +118,6 @@ static std::string xdgConfigHome()
     return fmt::format("{:s}/.config"sv, getHomeDir());
 }
 
-void tr_setConfigDir(tr_session* session, std::string_view config_dir)
-{
-#if defined(__APPLE__) || defined(_WIN32)
-    auto constexpr ResumeSubdir = "Resume"sv;
-    auto constexpr TorrentSubdir = "Torrents"sv;
-#else
-    auto constexpr ResumeSubdir = "resume"sv;
-    auto constexpr TorrentSubdir = "torrents"sv;
-#endif
-
-    session->config_dir = config_dir;
-    session->resume_dir = fmt::format("{:s}/{:s}"sv, config_dir, ResumeSubdir);
-    session->torrent_dir = fmt::format("{:s}/{:s}"sv, config_dir, TorrentSubdir);
-    tr_sys_dir_create(session->resume_dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    tr_sys_dir_create(session->torrent_dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
-}
-
-char const* tr_sessionGetConfigDir(tr_session const* session)
-{
-    return session->config_dir.c_str();
-}
-
-char const* tr_getTorrentDir(tr_session const* session)
-{
-    return session->torrent_dir.c_str();
-}
-
 char* tr_getDefaultConfigDir(char const* appname)
 {
     if (auto* dir = tr_env_get_string("TRANSMISSION_HOME", nullptr); dir != nullptr)
@@ -265,7 +238,7 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 #ifdef BUILD_MAC_CLIENT
 
     // look in the Application Support folder
-    if (auto path = tr_pathbuf{ session->config_dir, "/public_html"sv }; isWebClientDir(path))
+    if (auto path = tr_pathbuf{ session->configDir(), "/public_html"sv }; isWebClientDir(path))
     {
         return std::string{ path };
     }
