@@ -118,11 +118,6 @@ static std::string xdgConfigHome()
     return fmt::format("{:s}/.config"sv, getHomeDir());
 }
 
-char const* tr_sessionGetConfigDir(tr_session const* session)
-{
-    return session->configDir().c_str();
-}
-
 char* tr_getDefaultConfigDir(char const* appname)
 {
     if (auto* dir = tr_env_get_string("TRANSMISSION_HOME", nullptr); dir != nullptr)

@@ -246,7 +246,7 @@ TEST_F(RemoveTest, RemovesLeftoverJunk)
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
     // add a junk file *inside of* the torrent's top directory.
-    auto const junk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/", JunkBasename };
+    auto const junk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/"sv, JunkBasename };
     createFileWithContents(junk_file, std::data(Content), std::size(Content));
     expected_tree.emplace(junk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
@@ -295,7 +295,7 @@ TEST_F(RemoveTest, LeavesNonJunkAlone)
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
     // add a non-junk file.
-    auto const nonjunk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/", NonJunkBasename };
+    auto const nonjunk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/"sv, NonJunkBasename };
     createFileWithContents(nonjunk_file, std::data(Content), std::size(Content));
     expected_tree.emplace(nonjunk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));

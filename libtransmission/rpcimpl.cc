@@ -2171,7 +2171,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_config_dir:
-        tr_variantDictAddStr(d, key, tr_sessionGetConfigDir(s));
+        tr_variantDictAddStr(d, key, s->configDir());
         break;
 
     case TR_KEY_default_trackers:

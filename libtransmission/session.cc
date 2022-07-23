@@ -1204,6 +1204,13 @@ char const* tr_sessionGetDownloadDir(tr_session const* session)
     return session->downloadDir().c_str();
 }
 
+char const* tr_sessionGetConfigDir(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return session->configDir().c_str();
+}
+
 /***
 ****
 ***/
