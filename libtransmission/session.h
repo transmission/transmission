@@ -130,7 +130,24 @@ public:
         return is_closing_;
     }
 
-    // download dir
+    // paths
+
+    void initConfigDir(std::string_view config_dir);
+
+    [[nodiscard]] constexpr auto const& configDir() const noexcept
+    {
+        return config_dir_;
+    }
+
+    [[nodiscard]] constexpr auto const& torrentDir() const noexcept
+    {
+        return torrent_dir_;
+    }
+
+    [[nodiscard]] constexpr auto const& resumeDir() const noexcept
+    {
+        return resume_dir_;
+    }
 
     [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
@@ -473,10 +490,6 @@ public:
     tr_port randomPortLow;
     tr_port randomPortHigh;
 
-    std::string config_dir;
-    std::string resume_dir;
-    std::string torrent_dir;
-
     std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr = nullptr;
     struct tr_shared* shared = nullptr;
@@ -547,11 +560,17 @@ private:
     tr_torrents torrents_;
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
-    std::string blocklist_url_;
+
+    std::string config_dir_;
     std::string download_dir_;
-    std::string default_trackers_str_;
     std::string incomplete_dir_;
+    std::string resume_dir_;
+    std::string torrent_dir_;
+
+    std::string blocklist_url_;
+    std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
+
     std::optional<tr_address> external_ip_;
 
     queue_start_callback_t queue_start_callback_ = nullptr;

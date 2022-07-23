@@ -46,7 +46,6 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "platform-quota.h" /* tr_device_info_free() */
-#include "platform.h" /* tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
 #include "session-id.h"
@@ -128,7 +127,7 @@ tr_peer_id_t tr_peerIdInit()
 
 std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
-    auto const path = tr_pathbuf{ session_->config_dir, "/cookies.txt" };
+    auto const path = tr_pathbuf{ session_->configDir(), "/cookies.txt"sv };
 
     if (!tr_sys_path_exists(path))
     {
@@ -740,7 +739,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     tr_logSetQueueEnabled(data->messageQueuingEnabled);
 
-    tr_setConfigDir(session, data->config_dir);
+    session->initConfigDir(data->config_dir);
 
     session->peerMgr = tr_peerMgrNew(session);
 
@@ -750,7 +749,7 @@ static void tr_sessionInitImpl(init_data* data)
     ***  Blocklist
     **/
 
-    tr_sys_dir_create(tr_pathbuf{ session->config_dir, "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(tr_pathbuf{ session->configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
     loadBlocklists(session);
 
     TR_ASSERT(tr_isSession(session));
@@ -2050,16 +2049,14 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
     TR_ASSERT(tr_isSession(data->session));
 
     tr_sys_path_info info;
-    char const* const dirname = tr_getTorrentDir(data->session);
-    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname) :
+    auto const& dirname = data->session->torrentDir();
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname.c_str(), 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname.c_str()) :
         TR_BAD_SYS_DIR;
 
     auto torrents = std::list<tr_torrent*>{};
     if (odir != TR_BAD_SYS_DIR)
     {
-        auto const dirname_sv = std::string_view{ dirname };
-
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir)) != nullptr)
         {
@@ -2068,7 +2065,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
                 continue;
             }
 
-            auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
+            auto const path = tr_pathbuf{ dirname, '/', name };
 
             // is a magnet link?
             if (!tr_ctorSetMetainfoFromFile(data->ctor, path.sv(), nullptr))
@@ -2366,7 +2363,7 @@ static void loadBlocklists(tr_session* session)
     auto const isEnabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
-    auto const dirname = tr_pathbuf{ session->config_dir, "/blocklists"sv };
+    auto const dirname = tr_pathbuf{ session->configDir(), "/blocklists"sv };
     auto const odir = tr_sys_dir_open(dirname);
 
     if (odir == TR_BAD_SYS_DIR)
@@ -2506,7 +2503,7 @@ size_t tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     BlocklistFile* b = nullptr;
     if (it == std::end(src))
     {
-        auto path = tr_pathbuf{ session->config_dir, "/blocklists/"sv, name };
+        auto path = tr_pathbuf{ session->configDir(), "/blocklists/"sv, name };
         src.push_back(std::make_unique<BlocklistFile>(path, session->useBlocklist()));
         b = std::rbegin(src)->get();
     }
@@ -2886,7 +2883,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
-    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
+    auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
     if (!tr_sys_path_exists(filename) || !tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) ||
         !tr_variantIsDict(&groups_dict))
@@ -2949,7 +2946,7 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
         tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
     }
 
-    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
+    auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
     auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
     tr_variantFree(&groups_dict);
     return ret;
@@ -2994,4 +2991,22 @@ void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func
 void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func cb, void* user_data)
 {
     session->setTorrentCompletenessCallback(cb, user_data);
+}
+
+///
+
+void tr_session::initConfigDir(std::string_view config_dir)
+{
+    TR_ASSERT(std::empty(config_dir_));
+    config_dir_ = config_dir;
+
+#if defined(__APPLE__) || defined(_WIN32)
+    resume_dir_ = fmt::format("{:s}/Resume"sv, config_dir);
+    torrent_dir_ = fmt::format("{:s}/Torrents"sv, config_dir);
+#else
+    resume_dir_ = fmt::format("{:s}/resume"sv, config_dir);
+    torrent_dir_ = fmt::format("{:s}/torrents"sv, config_dir);
+#endif
+    tr_sys_dir_create(resume_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(torrent_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
 }
