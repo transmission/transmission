@@ -1050,7 +1050,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Trace" = "";
+"Trace" = "Отслеживающий";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Трекер";
@@ -1129,7 +1129,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warning" = "";
+"Warning" = "Предупреждение";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";
