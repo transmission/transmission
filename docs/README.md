@@ -8,7 +8,7 @@ New to Transmission?
 
 Want to learn more?
   * Visit our [forums](https://forum.transmissionbt.com)
-  * Visit our [IRC](https://en.wikipedia.org/wiki/IRC) channel: [#transmission on Libera.Chat](https://irc.libera.chat/transmission)
+  * Visit our [IRC](https://en.wikipedia.org/wiki/IRC) channel: [#transmission on Libera.Chat](https://web.libera.chat/#transmission)
   * Follow us on [Twitter](https://twitter.com/transmissionbt)
 
 Want to contribute?
