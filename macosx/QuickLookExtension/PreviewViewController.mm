@@ -9,7 +9,7 @@
 
 #import "NSStringAdditions.h"
 
-@import QuickLookUI;
+#import <QuickLookUI/QLPreviewingController.h>
 
 @interface PreviewViewController ()<QLPreviewingController>
 

@@ -2963,6 +2963,7 @@
 			targets = (
 				8D1107260486CEB800E47090 /* Transmission */,
 				A2F35BB815C5A0A100EBF632 /* QuickLookPlugin */,
+				EDEB427B2873B94700A2DD92 /* QuickLookExtension */,
 				4D18389609DEC0030047D688 /* libtransmission */,
 				4DDBB71809E16BAE00284745 /* transmissioncli */,
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
