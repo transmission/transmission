@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+330"/>
+        <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission és un programa de compartició de fitxers.&lt;/b&gt;</translation>
     </message>
@@ -1444,7 +1444,7 @@
         <translation>Torrent nou</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+230"/>
+        <location filename="../MakeDialog.cc" line="+231"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;No s&apos;ha seleccionat l&apos;origen&lt;/i&gt;</translation>
     </message>
@@ -1530,7 +1530,7 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
         <translation>Torrent nou</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-136"/>
+        <location filename="../MakeDialog.cc" line="-137"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>S&apos;està creant «%1»</translation>
     </message>
@@ -2195,12 +2195,12 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-277"/>
+        <location filename="../Application.cc" line="-279"/>
         <source>Invalid option</source>
         <translation>Opció no vàlida</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+307"/>
         <source>Start Now</source>
         <translation type="unfinished"></translation>
     </message>

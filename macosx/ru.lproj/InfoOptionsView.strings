@@ -1,90 +1,75 @@
 
-/* Class = "NSTextFieldCell"; title = "Ограничения раздачи"; ObjectID = "22"; */
+/* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
 "22.title" = "Ограничения раздачи";
 
-/* Class = "NSTextFieldCell"; title = "Ширина канала"; ObjectID = "23"; */
+/* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
 "23.title" = "Ширина канала";
 
-/* Class = "NSTextFieldCell"; title = "КБ/с"; ObjectID = "26"; */
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
 "26.title" = "КБ/с";
 
-/* Class = "NSTextFieldCell"; title = "КБ/с"; ObjectID = "29"; */
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
 "29.title" = "КБ/с";
 
-/* Class = "NSTextFieldCell"; title = "Для рейтинга:"; ObjectID = "30"; */
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
 "30.title" = "Для рейтинга:";
 
-/* Class = "NSTextFieldCell"; title = "Дополнительно"; ObjectID = "31"; */
+/* Class = "NSTextFieldCell"; title = "Advanced"; ObjectID = "31"; */
 "31.title" = "Дополнительно";
 
-/* Class = "NSTextFieldCell"; title = "Максимум подключений:"; ObjectID = "32"; */
+/* Class = "NSTextFieldCell"; title = "Maximum connections:"; ObjectID = "32"; */
 "32.title" = "Максимум подключений:";
 
-/* Class = "NSTextFieldCell"; title = "пользователей"; ObjectID = "35"; */
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "35"; */
 "35.title" = "пользователей";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "39"; */
-"39.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Неограниченно"; ObjectID = "40"; */
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "40"; */
 "40.title" = "Неограниченно";
 
-/* Class = "NSMenuItem"; title = "Общие настройки"; ObjectID = "41"; */
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "41"; */
 "41.title" = "Общие настройки";
 
-/* Class = "NSMenuItem"; title = "Остановить при рейтинге"; ObjectID = "42"; */
+/* Class = "NSMenuItem"; title = "Stop at Ratio"; ObjectID = "42"; */
 "42.title" = "Остановить при рейтинге";
 
-/* Class = "NSButtonCell"; title = "Ограничить скорость раздачи:"; ObjectID = "43"; */
+/* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
 "43.title" = "Ограничить скорость раздачи:";
 
-/* Class = "NSButtonCell"; title = "Ограничить скорость скачивания:"; ObjectID = "44"; */
+/* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
 "44.title" = "Ограничить скорость скачивания:";
 
-/* Class = "NSButtonCell"; title = "Не превышать общее ограничение скорости"; ObjectID = "45"; */
+/* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
 "45.title" = "Не превышать общее ограничение скорости";
 
-/* Class = "NSTextFieldCell"; title = "Приоритет"; ObjectID = "46"; */
+/* Class = "NSTextFieldCell"; title = "Priority"; ObjectID = "46"; */
 "46.title" = "Приоритет";
 
-/* Class = "NSTextFieldCell"; title = "Приоритет всей раздачи:"; ObjectID = "47"; */
+/* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
 "47.title" = "Приоритет всей раздачи:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "49"; */
-"49.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Низкий"; ObjectID = "50"; */
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
 "50.title" = "Низкий";
 
-/* Class = "NSMenuItem"; title = "Нормальный"; ObjectID = "51"; */
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "51"; */
 "51.title" = "Нормальный";
 
-/* Class = "NSMenuItem"; title = "Высокий"; ObjectID = "52"; */
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "52"; */
 "52.title" = "Высокий";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "85"; */
-"85.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Остановить после отсутствия активности в течение"; ObjectID = "86"; */
+/* Class = "NSMenuItem"; title = "Stop When Inactive"; ObjectID = "86"; */
 "86.title" = "Остановить после отсутствия активности в течение";
 
-/* Class = "NSMenuItem"; title = "Общие настройки"; ObjectID = "87"; */
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "87"; */
 "87.title" = "Общие настройки";
 
-/* Class = "NSMenuItem"; title = "Неограниченно"; ObjectID = "88"; */
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "88"; */
 "88.title" = "Неограниченно";
 
-/* Class = "NSTextFieldCell"; title = "Неактивности:"; ObjectID = "89"; */
+/* Class = "NSTextFieldCell"; title = "Inactivity:"; ObjectID = "89"; */
 "89.title" = "Неактивности:";
 
-/* Class = "NSTextFieldCell"; title = "мин"; ObjectID = "98"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
 "98.title" = "мин";
 
-/* Class = "NSTextFieldCell"; title = "global info here"; ObjectID = "108"; */
-"108.title" = "global info here";
-
-/* Class = "NSTextFieldCell"; title = "global info here"; ObjectID = "110"; */
-"110.title" = "global info here";
-
-/* Class = "NSButtonCell"; title = "Удалить из списка раздач после завершения раздачи"; ObjectID = "114"; */
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "114"; */
 "114.title" = "Удалить из списка раздач после завершения раздачи";

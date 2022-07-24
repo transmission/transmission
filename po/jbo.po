@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-12 21:48+0100\n"
+"POT-Creation-Date: 2022-07-24 17:06+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Lojban (https://www.transifex.com/transmissionbt/teams/33778/jbo/)\n"
@@ -29,11 +29,11 @@ msgstr "no la'edi'u"
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:257 ../gtk/MakeDialog.cc:135 ../gtk/Session.cc:1135 ../libtransmission/blocklist.cc:61 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:281 ../libtransmission/blocklist.cc:299 ../libtransmission/inout.cc:165 ../libtransmission/utils.cc:155 ../libtransmission/utils.cc:181 ../libtransmission/utils.cc:193 ../libtransmission/utils.cc:219 ../libtransmission/utils.cc:239 ../libtransmission/utils.cc:251 ../libtransmission/watchdir.cc:195 ../libtransmission/watchdir.cc:228
+#: ../daemon/daemon.cc:257 ../gtk/MakeDialog.cc:135 ../gtk/Session.cc:1136 ../libtransmission/blocklist.cc:61 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:281 ../libtransmission/blocklist.cc:299 ../libtransmission/inout.cc:165 ../libtransmission/utils.cc:155 ../libtransmission/utils.cc:181 ../libtransmission/utils.cc:193 ../libtransmission/utils.cc:219 ../libtransmission/utils.cc:239 ../libtransmission/utils.cc:251 ../libtransmission/watchdir.cc:195 ../libtransmission/watchdir.cc:228
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:283 ../gtk/Session.cc:1187 ../gtk/Utils.cc:255 ../libtransmission/watchdir.cc:332
+#: ../daemon/daemon.cc:283 ../gtk/Session.cc:1188 ../gtk/Utils.cc:255 ../libtransmission/watchdir.cc:332
 msgid "Couldn't add torrent file '{path}'"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgstr ""
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:772 ../gtk/MakeDialog.cc:143 ../gtk/MessageLogWindow.cc:190 ../libtransmission/blocklist.cc:356 ../libtransmission/inout.cc:181 ../libtransmission/rpcimpl.cc:1452 ../libtransmission/torrent.cc:838 ../libtransmission/torrent.cc:2120 ../libtransmission/variant.cc:1137
+#: ../daemon/daemon.cc:772 ../gtk/MakeDialog.cc:143 ../gtk/MessageLogWindow.cc:190 ../libtransmission/blocklist.cc:356 ../libtransmission/inout.cc:181 ../libtransmission/rpcimpl.cc:1453 ../libtransmission/torrent.cc:825 ../libtransmission/torrent.cc:2041 ../libtransmission/variant.cc:1137
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -284,12 +284,12 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:871 ../gtk/MakeDialog.cc:355
+#: ../gtk/DetailsDialog.cc:871 ../gtk/MakeDialog.cc:356
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 
-#: ../gtk/DetailsDialog.cc:886 ../gtk/MakeDialog.cc:361
+#: ../gtk/DetailsDialog.cc:886 ../gtk/MakeDialog.cc:362
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
@@ -585,7 +585,7 @@ msgstr ""
 msgid "Tracker Announce URLs"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2338 ../gtk/MakeDialog.cc:524
+#: ../gtk/DetailsDialog.cc:2338 ../gtk/MakeDialog.cc:525
 msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
@@ -628,7 +628,7 @@ msgid "Show _backup trackers"
 msgstr ""
 
 #. create the dialog
-#: ../gtk/DetailsDialog.cc:2623 ../gtk/MakeDialog.cc:225 ../gtk/MakeDialog.cc:467 ../gtk/PrefsDialog.cc:1176 ../gtk/StatsDialog.cc:143
+#: ../gtk/DetailsDialog.cc:2623 ../gtk/MakeDialog.cc:225 ../gtk/MakeDialog.cc:468 ../gtk/PrefsDialog.cc:1176 ../gtk/StatsDialog.cc:143
 msgid "_Close"
 msgstr ""
 
@@ -644,7 +644,7 @@ msgstr ""
 msgid "File listing not available for combined torrent properties"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2646 ../gtk/MakeDialog.cc:473
+#: ../gtk/DetailsDialog.cc:2646 ../gtk/MakeDialog.cc:474
 msgid "Files"
 msgstr "loi sfaile"
 
@@ -872,7 +872,7 @@ msgstr ""
 msgid "Scanned {file_size}"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:219 ../gtk/MakeDialog.cc:454
+#: ../gtk/MakeDialog.cc:219 ../gtk/MakeDialog.cc:455
 msgid "New Torrent"
 msgstr ""
 
@@ -880,47 +880,47 @@ msgstr ""
 msgid "Creating torrent…"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:349 ../gtk/MakeDialog.cc:499
+#: ../gtk/MakeDialog.cc:350 ../gtk/MakeDialog.cc:500
 msgid "No source selected"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:468
+#: ../gtk/MakeDialog.cc:469
 msgid "_New"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:477
+#: ../gtk/MakeDialog.cc:478
 msgid "Sa_ve to:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:481
+#: ../gtk/MakeDialog.cc:482
 msgid "Source F_older:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:490
+#: ../gtk/MakeDialog.cc:491
 msgid "Source _File:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:506
+#: ../gtk/MakeDialog.cc:507
 msgid "Piece size:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:509
+#: ../gtk/MakeDialog.cc:510
 msgid "Properties"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:529
+#: ../gtk/MakeDialog.cc:530
 msgid "_Trackers:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:531
+#: ../gtk/MakeDialog.cc:532
 msgid "Co_mment:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:538
+#: ../gtk/MakeDialog.cc:539
 msgid "_Source:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:545
+#: ../gtk/MakeDialog.cc:546
 msgid "_Private torrent"
 msgstr ""
 
@@ -1457,21 +1457,21 @@ msgstr ""
 msgid "Local data is _already there"
 msgstr ""
 
-#: ../gtk/Session.cc:1120 ../libtransmission/watchdir-win32.cc:294 ../libtransmission/watchdir-win32.cc:313
+#: ../gtk/Session.cc:1121 ../libtransmission/watchdir-win32.cc:294 ../libtransmission/watchdir-win32.cc:313
 msgid "Couldn't read '{path}'"
 msgstr ""
 
 #. logging
-#: ../gtk/Session.cc:1457
+#: ../gtk/Session.cc:1458
 msgid "Inhibiting desktop hibernation"
 msgstr ""
 
-#: ../gtk/Session.cc:1463 ../gtk/Session.cc:1488
+#: ../gtk/Session.cc:1464 ../gtk/Session.cc:1489
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr ""
 
 #. logging
-#: ../gtk/Session.cc:1484
+#: ../gtk/Session.cc:1485
 msgid "Allowing desktop hibernation"
 msgstr ""
 
@@ -1551,7 +1551,7 @@ msgstr ""
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:192 ../libtransmission/torrent.cc:548
+#: ../gtk/TorrentCellRenderer.cc:192 ../libtransmission/torrent.cc:537
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
@@ -1565,8 +1565,8 @@ msgstr ""
 
 #: ../gtk/TorrentCellRenderer.cc:226
 #, no-c-format
-msgid "Downloading metadata from {active_count} connected peer ({percent_done:d}% done)"
-msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)"
+msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
+msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] ""
 
 #: ../gtk/TorrentCellRenderer.cc:237
@@ -1791,23 +1791,23 @@ msgstr ""
 msgid "Start Transmission Minimized"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:282
+#: ../libtransmission/announcer-http.cc:289
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:584
+#: ../libtransmission/announcer-http.cc:599
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:207 ../libtransmission/announcer-udp.cc:309
+#: ../libtransmission/announcer-udp.cc:225 ../libtransmission/announcer-udp.cc:327
 msgid "Unknown error"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:463
+#: ../libtransmission/announcer-udp.cc:482
 msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:548
+#: ../libtransmission/announcer-udp.cc:567
 msgid "Connection failed"
 msgstr ""
 
@@ -1842,7 +1842,7 @@ msgstr[0] ""
 msgid "Couldn't parse line: '{line}'"
 msgstr ""
 
-#: ../libtransmission/crypto-utils-ccrypto.cc:102 ../libtransmission/crypto-utils-cyassl.cc:70 ../libtransmission/crypto-utils-openssl.cc:67 ../libtransmission/crypto-utils-polarssl.cc:66
+#: ../libtransmission/crypto-utils-ccrypto.cc:75 ../libtransmission/crypto-utils-cyassl.cc:60 ../libtransmission/crypto-utils-openssl.cc:63 ../libtransmission/crypto-utils-polarssl.cc:63
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr ""
 
@@ -1914,7 +1914,7 @@ msgstr ""
 msgid "Couldn't write to peer"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:414
+#: ../libtransmission/peer-io.cc:413
 msgid "Unknown state: {state}"
 msgstr ""
 
@@ -1942,68 +1942,68 @@ msgstr ""
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:626
+#: ../libtransmission/rpc-server.cc:623
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:660
+#: ../libtransmission/rpc-server.cc:657
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:687
+#: ../libtransmission/rpc-server.cc:684
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:763
+#: ../libtransmission/rpc-server.cc:760
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] ""
 
-#: ../libtransmission/rpc-server.cc:774
+#: ../libtransmission/rpc-server.cc:771
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:804
+#: ../libtransmission/rpc-server.cc:801
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:871
+#: ../libtransmission/rpc-server.cc:868
 msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:876
+#: ../libtransmission/rpc-server.cc:873
 msgid "Added '{entry}' to host whitelist"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1120
+#: ../libtransmission/rpc-server.cc:1118
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1135
+#: ../libtransmission/rpc-server.cc:1133
 msgid "Serving RPC and Web requests on {address}"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1140
+#: ../libtransmission/rpc-server.cc:1138
 msgid "Whitelist enabled"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1145
+#: ../libtransmission/rpc-server.cc:1143
 msgid "Password required"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1152
+#: ../libtransmission/rpc-server.cc:1149
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1369
+#: ../libtransmission/rpcimpl.cc:1370
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1409
+#: ../libtransmission/rpcimpl.cc:1410
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1543
+#: ../libtransmission/rpcimpl.cc:1544
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr ""
 
@@ -2011,23 +2011,23 @@ msgstr ""
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/session.cc:745
+#: ../libtransmission/session.cc:762
 msgid "Transmission version {version} starting"
 msgstr ""
 
-#: ../libtransmission/session.cc:1499
+#: ../libtransmission/session.cc:1536
 msgid "Time to turn off turtle mode"
 msgstr ""
 
-#: ../libtransmission/session.cc:1499
+#: ../libtransmission/session.cc:1536
 msgid "Time to turn on turtle mode"
 msgstr ""
 
-#: ../libtransmission/session.cc:1946
+#: ../libtransmission/session.cc:1983
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:2066
+#: ../libtransmission/session.cc:2101
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
@@ -2037,7 +2037,7 @@ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pi
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 
-#: ../libtransmission/torrent-metainfo.cc:773
+#: ../libtransmission/torrent-metainfo.cc:778
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2049,40 +2049,40 @@ msgstr ""
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:501
+#: ../libtransmission/torrent.cc:495
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
 #. lookups by obfuscated hash will fail for this torrent
-#: ../libtransmission/torrent.cc:599
+#: ../libtransmission/torrent.cc:586
 msgid "Couldn't compute obfuscated info hash"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:660
+#: ../libtransmission/torrent.cc:647
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1453
+#: ../libtransmission/torrent.cc:1437
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1573
+#: ../libtransmission/torrent.cc:1557
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1622
+#: ../libtransmission/torrent.cc:1606
 msgid "Removing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1815
+#: ../libtransmission/torrent.cc:1758
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1824
+#: ../libtransmission/torrent.cc:1767
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:2219 ../libtransmission/torrent.cc:2339
+#: ../libtransmission/torrent.cc:2140 ../libtransmission/torrent.cc:2260
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 

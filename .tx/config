@@ -16,6 +16,56 @@ file_filter = macosx/<lang>.lproj/Localizable.strings
 source_lang = en
 type = STRINGS
 
+[transmissionbt.mac-AddMagnetWindow]
+file_filter = macosx/<lang>.lproj/AddMagnetWindow.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-AddWindow]
+file_filter = macosx/<lang>.lproj/AddWindow.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-Creator]
+file_filter = macosx/<lang>.lproj/Creator.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-GlobalOptionsPopover]
+file_filter = macosx/<lang>.lproj/GlobalOptionsPopover.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-GroupRules]
+file_filter = macosx/<lang>.lproj/GroupRules.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-InfoActivityView]
+file_filter = macosx/<lang>.lproj/InfoActivityView.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-InfoGeneralView]
+file_filter = macosx/<lang>.lproj/InfoGeneralView.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-InfoOptionsView]
+file_filter = macosx/<lang>.lproj/InfoOptionsView.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-MainMenu]
+file_filter = macosx/<lang>.lproj/MainMenu.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-PrefsWindow]
+file_filter = macosx/<lang>.lproj/PrefsWindow.strings
+source_lang = en
+type = STRINGS
+
 [transmissionbt.mac-ql]
 file_filter = macosx/QuickLookPlugin/<lang>.lproj/Localizable.strings
 source_lang = en

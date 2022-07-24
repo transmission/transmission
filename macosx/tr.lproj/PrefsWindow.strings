@@ -1,146 +1,137 @@
 
-/* Class = "NSWindow"; title = "Tercihler"; ObjectID = "23"; */
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
 "23.title" = "Tercihler";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "52"; */
-"52.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Diğer..."; ObjectID = "53"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
 "53.title" = "Diğer...";
 
-/* Class = "NSMenuItem"; title = "Torrent ile aynı yer"; ObjectID = "55"; */
+/* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
 "55.title" = "Torrent ile aynı yer";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "217"; */
-"217.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Diğer..."; ObjectID = "219"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
 "219.title" = "Diğer...";
 
-/* Class = "NSTabViewItem"; label = "Ekle"; ObjectID = "253"; */
+/* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
 "253.label" = "Ekle";
 
-/* Class = "NSTabViewItem"; label = "Yönet"; ObjectID = "254"; */
+/* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
 "254.label" = "Yönet";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "539"; */
-"539.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Diğer..."; ObjectID = "542"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
 "542.title" = "Diğer...";
 
-/* Class = "NSButtonCell"; title = "Etkin aktarım sırasında çıkarken"; ObjectID = "1201"; */
+/* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
 "1201.title" = "Etkin aktarım sırasında çıkarken";
 
-/* Class = "NSButtonCell"; title = "Etkin aktarımları kaldırırken"; ObjectID = "1202"; */
+/* Class = "NSButtonCell"; title = "Removal of active transfers"; ObjectID = "1202"; */
 "1202.title" = "Etkin aktarımları kaldırırken";
 
-/* Class = "NSTextFieldCell"; title = "Kullanıcıyı şunlar için uyar:"; ObjectID = "1203"; */
+/* Class = "NSTextFieldCell"; title = "Prompt user for:"; ObjectID = "1203"; */
 "1203.title" = "Kullanıcıyı şunlar için uyar:";
 
-/* Class = "NSTextFieldCell"; title = "Dock simgesinde göster:"; ObjectID = "1204"; */
+/* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
 "1204.title" = "Dock simgesinde göster:";
 
-/* Class = "NSButtonCell"; title = "Toplam indirme oranı"; ObjectID = "1205"; */
+/* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
 "1205.title" = "Toplam indirme oranı";
 
-/* Class = "NSButtonCell"; title = "Toplam gönderme oranı"; ObjectID = "1206"; */
+/* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
 "1206.title" = "Toplam gönderme oranı";
 
-/* Class = "NSButtonCell"; title = "Yalnızca aktarımlar indirilirken"; ObjectID = "1207"; */
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
 "1207.title" = "Yalnızca aktarımlar indirilirken";
 
-/* Class = "NSButtonCell"; title = "Yalnızca aktarımlar indirilirken"; ObjectID = "1208"; */
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1208"; */
 "1208.title" = "Yalnızca aktarımlar indirilirken";
 
-/* Class = "NSTextFieldCell"; title = "Pencere boyutu:"; ObjectID = "1209"; */
+/* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
 "1209.title" = "Pencere boyutu:";
 
-/* Class = "NSButtonCell"; title = "Pencereyi tüm aktarımlar sığacak biçimde ayarla"; ObjectID = "1210"; */
+/* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
 "1210.title" = "Pencereyi tüm aktarımlar sığacak biçimde ayarla";
 
-/* Class = "NSButtonCell"; title = "Sıfırla"; ObjectID = "1211"; */
+/* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
 "1211.title" = "Sıfırla";
 
-/* Class = "NSTextFieldCell"; title = "Tüm uyarıları sıfırla:"; ObjectID = "1212"; */
+/* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
 "1212.title" = "Tüm uyarıları sıfırla:";
 
-/* Class = "NSButtonCell"; title = "Günlük denetle"; ObjectID = "1213"; */
+/* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
 "1213.title" = "Günlük denetle";
 
-/* Class = "NSTextFieldCell"; title = "Güncellemeleri denetle:"; ObjectID = "1214"; */
+/* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
 "1214.title" = "Güncellemeleri denetle:";
 
-/* Class = "NSTextFieldCell"; title = "Öntanımlı konum"; ObjectID = "1216"; */
+/* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
 "1216.title" = "Öntanımlı konum";
 
-/* Class = "NSTextFieldCell"; title = "Ayarlar:"; ObjectID = "1217"; */
+/* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
 "1217.title" = "Ayarlar:";
 
-/* Class = "NSButtonCell"; title = "Kaynak torrent dosyalarını Çöp Sepetine at"; ObjectID = "1218"; */
+/* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
 "1218.title" = "Kaynak torrent dosyalarını Çöp Sepetine at";
 
-/* Class = "NSButtonCell"; title = "Burada torrent varsa ekle:"; ObjectID = "1219"; */
+/* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
 "1219.title" = "Burada torrent varsa ekle:";
 
-/* Class = "NSTextFieldCell"; title = "Otomatik ekle:"; ObjectID = "1226"; */
+/* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
 "1226.title" = "Otomatik ekle:";
 
-/* Class = "NSButtonCell"; title = "Bitmemişleri şurada tut:"; ObjectID = "1227"; */
+/* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
 "1227.title" = "Bitmemişleri şurada tut:";
 
-/* Class = "NSTextFieldCell"; title = "Sıralar:"; ObjectID = "1230"; */
+/* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
 "1230.title" = "Sıralar:";
 
-/* Class = "NSTextFieldCell"; title = "etkin aktarıma izin ver"; ObjectID = "1231"; */
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1231"; */
 "1231.title" = "etkin aktarıma izin ver";
 
-/* Class = "NSButtonCell"; title = "Şu oranda beslemeyi durdur:"; ObjectID = "1232"; */
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
 "1232.title" = "Şu oranda beslemeyi durdur:";
 
-/* Class = "NSTextFieldCell"; title = "Limitler:"; ObjectID = "1234"; */
+/* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
 "1234.title" = "Limitler:";
 
-/* Class = "NSTextFieldCell"; title = "Karşıya yüklemeler ve indirmelerin birbirlerine bölümü oranı verir"; ObjectID = "1235"; */
+/* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
 "1235.title" = "Karşıya yüklemeler ve indirmelerin birbirlerine bölümü oranı verir";
 
-/* Class = "NSButtonCell"; title = "En çok"; ObjectID = "1236"; */
+/* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
 "1236.title" = "En çok";
 
-/* Class = "NSTextFieldCell"; title = "beslemeye izin ver"; ObjectID = "1239"; */
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1239"; */
 "1239.title" = "beslemeye izin ver";
 
-/* Class = "NSButtonCell"; title = "En çok"; ObjectID = "1240"; */
+/* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
 "1240.title" = "En çok";
 
-/* Class = "NSTextFieldCell"; title = "dk."; ObjectID = "1242"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
 "1242.title" = "dk.";
 
-/* Class = "NSButtonCell"; title = "Şu kadar boşta kalırsa aktarımı beklet:"; ObjectID = "1243"; */
+/* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
 "1243.title" = "Şu kadar boşta kalırsa aktarımı beklet:";
 
-/* Class = "NSButtonCell"; title = "Portu otomatik ata"; ObjectID = "1247"; */
+/* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
 "1247.title" = "Portu otomatik ata";
 
 /* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
 "1248.title" = "NAT traversal uses either NAT-PMP or UPnP";
 
-/* Class = "NSTextFieldCell"; title = "Port açık"; ObjectID = "1250"; */
+/* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
 "1250.title" = "Port açık";
 
-/* Class = "NSTextFieldCell"; title = "İletişim:"; ObjectID = "1253"; */
+/* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
 "1253.title" = "İletişim:";
 
-/* Class = "NSButtonCell"; title = "Etkin aktarım varsa bilgisayarı uyanık tut"; ObjectID = "1254"; */
+/* Class = "NSButtonCell"; title = "Prevent computer from sleeping with active transfers"; ObjectID = "1254"; */
 "1254.title" = "Etkin aktarım varsa bilgisayarı uyanık tut";
 
-/* Class = "NSTextFieldCell"; title = "Sistem uykusu:"; ObjectID = "1255"; */
+/* Class = "NSTextFieldCell"; title = "System sleep:"; ObjectID = "1255"; */
 "1255.title" = "Sistem uykusu:";
 
-/* Class = "NSButtonCell"; title = "Gönderme oranı:"; ObjectID = "1265"; */
+/* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
 "1265.title" = "Gönderme oranı:";
 
-/* Class = "NSButtonCell"; title = "İndirme oranı:"; ObjectID = "1267"; */
+/* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
 "1267.title" = "İndirme oranı:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
@@ -149,7 +140,7 @@
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
 "1269.title" = "KB/s";
 
-/* Class = "NSTextFieldCell"; title = "Genel Bant Genişliği:"; ObjectID = "1270"; */
+/* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
 "1270.title" = "Genel Bant Genişliği:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
@@ -158,133 +149,124 @@
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
 "1274.title" = "KB/s";
 
-/* Class = "NSTextFieldCell"; title = "Hız Limiti Kipi:"; ObjectID = "1275"; */
+/* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
 "1275.title" = "Hız Limiti Kipi:";
 
-/* Class = "NSTextFieldCell"; title = "Gönderme oranı:"; ObjectID = "1276"; */
+/* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
 "1276.title" = "Gönderme oranı:";
 
-/* Class = "NSTextFieldCell"; title = "İndirme oranı:"; ObjectID = "1277"; */
+/* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
 "1277.title" = "İndirme oranı:";
 
-/* Class = "NSTextFieldCell"; title = "Hız Limiti Genel Bant Genişliğini etkisiz kılar"; ObjectID = "1278"; */
+/* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
 "1278.title" = "Hız Limiti Genel Bant Genişliğini etkisiz kılar";
 
-/* Class = "NSButtonCell"; title = "Hız Limitini düzenli kıl:"; ObjectID = "1280"; */
+/* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
 "1280.title" = "Hız Limitini düzenli kıl:";
 
-/* Class = "NSTextFieldCell"; title = "arası"; ObjectID = "1281"; */
+/* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
 "1281.title" = "arası";
 
-/* Class = "NSButtonCell"; title = "Bir torrent dosyası açarken pencere görüntüle"; ObjectID = "1294"; */
+/* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
 "1294.title" = "Bir torrent dosyası açarken pencere görüntüle";
 
-/* Class = "NSButtonCell"; title = "İndirme bittiğinde:"; ObjectID = "1302"; */
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
 "1302.title" = "İndirme bittiğinde:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1304"; */
-"1304.title" = "OtherViews";
-
-/* Class = "NSButtonCell"; title = "Besleme bittiğinde:"; ObjectID = "1306"; */
+/* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
 "1306.title" = "Besleme bittiğinde:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1308"; */
-"1308.title" = "OtherViews";
-
-/* Class = "NSTextFieldCell"; title = "Ses çal:"; ObjectID = "1310"; */
+/* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
 "1310.title" = "Ses çal:";
 
-/* Class = "NSButtonCell"; title = "Eklendiği anda aktarımları başlat"; ObjectID = "1335"; */
+/* Class = "NSButtonCell"; title = "Start transfers when added"; ObjectID = "1335"; */
 "1335.title" = "Eklendiği anda aktarımları başlat";
 
-/* Class = "NSTextFieldCell"; title = "Pencere ekle:"; ObjectID = "1338"; */
+/* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
 "1338.title" = "Pencere ekle:";
 
-/* Class = "NSButtonCell"; title = "Yalnızca birden çok dosya var ise"; ObjectID = "1340"; */
+/* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
 "1340.title" = "Yalnızca birden çok dosya var ise";
 
-/* Class = "NSButtonCell"; title = "Güncelle"; ObjectID = "1437"; */
+/* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
 "1437.title" = "Güncelle";
 
-/* Class = "NSTextFieldCell"; title = "engelli dizelgesi yüklü/yüklü değil"; ObjectID = "1438"; */
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
 "1438.title" = "engelli dizelgesi yüklü/yüklü değil";
 
-/* Class = "NSTextFieldCell"; title = "Kara Dizelge:"; ObjectID = "1439"; */
+/* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
 "1439.title" = "Kara Dizelge:";
 
-/* Class = "NSButtonCell"; title = "Engelli kullanıcıların bağlanmasına izin verme"; ObjectID = "1440"; */
+/* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
 "1440.title" = "Engelli kullanıcıların bağlanmasına izin verme";
 
-/* Class = "NSTextFieldCell"; title = "Yüksek bağlantı limitleri sistem başarımını önemli ölçüde etkiler"; ObjectID = "1441"; */
+/* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
 "1441.title" = "Yüksek bağlantı limitleri sistem başarımını önemli ölçüde etkiler";
 
-/* Class = "NSButtonCell"; title = "Genel torrentler için kullanıcı değişimi (PEX) kullan"; ObjectID = "1442"; */
+/* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
 "1442.title" = "Genel torrentler için kullanıcı değişimi (PEX) kullan";
 
-/* Class = "NSTextFieldCell"; title = "Yeni aktarımlar için bağlantı sayısı sınırı:"; ObjectID = "1443"; */
+/* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
 "1443.title" = "Yeni aktarımlar için bağlantı sayısı sınırı:";
 
-/* Class = "NSTextFieldCell"; title = "kullanıcı"; ObjectID = "1446"; */
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1446"; */
 "1446.title" = "kullanıcı";
 
-/* Class = "NSTextFieldCell"; title = "kullanıcı"; ObjectID = "1447"; */
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1447"; */
 "1447.title" = "kullanıcı";
 
-/* Class = "NSTextFieldCell"; title = "Olabilecek en çok bağlantı sayısı:"; ObjectID = "1450"; */
+/* Class = "NSTextFieldCell"; title = "Global maximum connections:"; ObjectID = "1450"; */
 "1450.title" = "Olabilecek en çok bağlantı sayısı:";
 
-/* Class = "NSTextFieldCell"; title = "Bağlantılar:"; ObjectID = "1451"; */
+/* Class = "NSTextFieldCell"; title = "Connections:"; ObjectID = "1451"; */
 "1451.title" = "Bağlantılar:";
 
-/* Class = "NSButtonCell"; title = "Şifreleme kullanan kullanıcıları yeğle"; ObjectID = "1452"; */
+/* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
 "1452.title" = "Şifreleme kullanan kullanıcıları yeğle";
 
-/* Class = "NSTextFieldCell"; title = "Şifreleme:"; ObjectID = "1453"; */
+/* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
 "1453.title" = "Şifreleme:";
 
-/* Class = "NSButtonCell"; title = "Şifrelemesiz kullanıcıları yoksay "; ObjectID = "1454"; */
+/* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
 "1454.title" = "Şifrelemesiz kullanıcıları yoksay ";
 
-/* Class = "NSButtonCell"; title = "Yalnızca el ile eklerken"; ObjectID = "1477"; */
+/* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
 "1477.title" = "Yalnızca el ile eklerken";
 
-/* Class = "NSTextFieldCell"; title = "Dinleme portu:"; ObjectID = "1493"; */
+/* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
 "1493.title" = "Dinleme portu:";
 
-/* Class = "NSButtonCell"; title = "Uzaktan erişimi etkinleştir"; ObjectID = "1502"; */
+/* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
 "1502.title" = "Uzaktan erişimi etkinleştir";
 
-/* Class = "NSButtonCell"; title = "Kimlik denetimi iste"; ObjectID = "1505"; */
+/* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
 "1505.title" = "Kimlik denetimi iste";
 
 /* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
 "1523.headerCell.title" = "IP Address";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1526"; */
-"1526.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "IP adresleri * jokerini içerebilir"; ObjectID = "1542"; */
+/* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
 "1542.title" = "IP adresleri * jokerini içerebilir";
 
-/* Class = "NSTextFieldCell"; title = "Açarsöz:"; ObjectID = "1555"; */
+/* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
 "1555.title" = "Açarsöz:";
 
-/* Class = "NSTextFieldCell"; title = "Kullanıcı adı: "; ObjectID = "1557"; */
+/* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
 "1557.title" = "Kullanıcı adı: ";
 
-/* Class = "NSTextFieldCell"; title = "Web arabirimini etkinleştirir ve uzaktan isteklere izin verir"; ObjectID = "1645"; */
+/* Class = "NSTextFieldCell"; title = "This enables the web interface and allows remote requests"; ObjectID = "1645"; */
 "1645.title" = "Web arabirimini etkinleştirir ve uzaktan isteklere izin verir";
 
-/* Class = "NSButtonCell"; title = "Web Arabirimini Çalıştır"; ObjectID = "1718"; */
+/* Class = "NSButtonCell"; title = "Launch Web Interface"; ObjectID = "1718"; */
 "1718.title" = "Web Arabirimini Çalıştır";
 
-/* Class = "NSTextFieldCell"; title = "Son güncelleme: N/A"; ObjectID = "1739"; */
+/* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
 "1739.title" = "Son güncelleme: N/A";
 
-/* Class = "NSButtonCell"; title = "Haftalık olarak güncelle"; ObjectID = "1742"; */
+/* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
 "1742.title" = "Haftalık olarak güncelle";
 
-/* Class = "NSButtonCell"; title = "Yalnızca aşağıdaki IP adreslerinin bağlanmasına izin ver"; ObjectID = "1748"; */
+/* Class = "NSButtonCell"; title = "Only allow the following IP addresses to connect:"; ObjectID = "1748"; */
 "1748.title" = "Yalnızca aşağıdaki IP adreslerinin bağlanmasına izin ver";
 
 /* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
@@ -293,131 +275,119 @@
 /* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
 "1779.headerCell.title" = "Name";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1780"; */
-"1780.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "Öbek Adı:"; ObjectID = "1796"; */
+/* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
 "1796.title" = "Öbek Adı:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1810"; */
-"1810.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Diğer..."; ObjectID = "1813"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
 "1813.title" = "Diğer...";
 
-/* Class = "NSButtonCell"; title = "Konum belirt:"; ObjectID = "1815"; */
+/* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
 "1815.title" = "Konum belirt:";
 
-/* Class = "NSTextFieldCell"; title = "Konum yalnızca aktarım eklenirken belirlenecektir"; ObjectID = "1824"; */
+/* Class = "NSTextFieldCell"; title = "The location will only be set when adding the transfer"; ObjectID = "1824"; */
 "1824.title" = "Konum yalnızca aktarım eklenirken belirlenecektir";
 
-/* Class = "NSButtonCell"; title = "Web arabirimini Bonjour ile görüntüle"; ObjectID = "1826"; */
+/* Class = "NSButtonCell"; title = "Display the web interface with Bonjour"; ObjectID = "1826"; */
 "1826.title" = "Web arabirimini Bonjour ile görüntüle";
 
-/* Class = "NSButtonCell"; title = "Öbeği yeni aktarımlara şu kriterlere göre ekle:"; ObjectID = "1831"; */
+/* Class = "NSButtonCell"; title = "Assign group to new transfers based on criteria"; ObjectID = "1831"; */
 "1831.title" = "Öbeği yeni aktarımlara şu kriterlere göre ekle:";
 
-/* Class = "NSButtonCell"; title = "Düzenle..."; ObjectID = "1833"; */
+/* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
 "1833.title" = "Düzenle...";
 
-/* Class = "NSTextFieldCell"; title = "Aktarımlar tüm kriterlerin sağlandığı ilk gruba atanacaklardır"; ObjectID = "1835"; */
+/* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
 "1835.title" = "Aktarımlar tüm kriterlerin sağlandığı ilk gruba atanacaklardır";
 
-/* Class = "NSButtonCell"; title = "Başlangıçta portları rastgele dağıt:"; ObjectID = "1890"; */
+/* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
 "1890.title" = "Başlangıçta portları rastgele dağıt:";
 
-/* Class = "NSButtonCell"; title = "Dağıt"; ObjectID = "1892"; */
+/* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
 "1892.title" = "Dağıt";
 
-/* Class = "NSButtonCell"; title = "Deneme sürümlerini içer"; ObjectID = "1896"; */
+/* Class = "NSButtonCell"; title = "Include beta releases"; ObjectID = "1896"; */
 "1896.title" = "Deneme sürümlerini içer";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1909"; */
-"1909.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Her gün"; ObjectID = "1910"; */
+/* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
 "1910.title" = "Her gün";
 
-/* Class = "NSMenuItem"; title = "Haftaiçi"; ObjectID = "1911"; */
+/* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
 "1911.title" = "Haftaiçi";
 
-/* Class = "NSMenuItem"; title = "Haftasonu"; ObjectID = "1912"; */
+/* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
 "1912.title" = "Haftasonu";
 
-/* Class = "NSMenuItem"; title = "Pazartesi"; ObjectID = "1914"; */
+/* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
 "1914.title" = "Pazartesi";
 
-/* Class = "NSMenuItem"; title = "Salı"; ObjectID = "1915"; */
+/* Class = "NSMenuItem"; title = "Tuesday"; ObjectID = "1915"; */
 "1915.title" = "Salı";
 
-/* Class = "NSMenuItem"; title = "Çarşamba"; ObjectID = "1916"; */
+/* Class = "NSMenuItem"; title = "Wednesday"; ObjectID = "1916"; */
 "1916.title" = "Çarşamba";
 
-/* Class = "NSMenuItem"; title = "Perşembe"; ObjectID = "1917"; */
+/* Class = "NSMenuItem"; title = "Thursday"; ObjectID = "1917"; */
 "1917.title" = "Perşembe";
 
-/* Class = "NSMenuItem"; title = "Cuma"; ObjectID = "1918"; */
+/* Class = "NSMenuItem"; title = "Friday"; ObjectID = "1918"; */
 "1918.title" = "Cuma";
 
-/* Class = "NSMenuItem"; title = "Cumartesi"; ObjectID = "1919"; */
+/* Class = "NSMenuItem"; title = "Saturday"; ObjectID = "1919"; */
 "1919.title" = "Cumartesi";
 
-/* Class = "NSMenuItem"; title = "Pazar"; ObjectID = "1920"; */
+/* Class = "NSMenuItem"; title = "Sunday"; ObjectID = "1920"; */
 "1920.title" = "Pazar";
 
-/* Class = "NSButtonCell"; title = "Genel torrentler için komut tablosu (DHT) kullan"; ObjectID = "1926"; */
+/* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
 "1926.title" = "Genel torrentler için komut tablosu (DHT) kullan";
 
-/* Class = "NSTextFieldCell"; title = "Mıknatıs bağlantılar için:"; ObjectID = "1931"; */
+/* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
 "1931.title" = "Mıknatıs bağlantılar için:";
 
-/* Class = "NSButtonCell"; title = "Varsayılan Uygulamayı Belirle"; ObjectID = "1933"; */
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
 "1933.title" = "Varsayılan Uygulamayı Belirle";
 
-/* Class = "NSButtonCell"; title = ".part parçacıklarını bitmemiş dosyalara iliştir"; ObjectID = "1940"; */
+/* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
 "1940.title" = ".part parçacıklarını bitmemiş dosyalara iliştir";
 
-/* Class = "NSButtonCell"; title = "Mıknatıslı bağları açarken pencere görüntüle"; ObjectID = "1948"; */
+/* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
 "1948.title" = "Mıknatıslı bağları açarken pencere görüntüle";
 
-/* Class = "NSButtonCell"; title = "Genel torrentler için yerel kullanıcıları bul"; ObjectID = "1952"; */
+/* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
 "1952.title" = "Genel torrentler için yerel kullanıcıları bul";
 
-/* Class = "NSButtonCell"; title = "Beslemeyi şu kadar boş kalınca durdur:"; ObjectID = "1962"; */
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
 "1962.title" = "Beslemeyi şu kadar boş kalınca durdur:";
 
-/* Class = "NSTextFieldCell"; title = "dk."; ObjectID = "1970"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
 "1970.title" = "dk.";
 
 /* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
 "1988.title" = "URL:";
 
-/* Class = "NSButtonCell"; title = "İndirme bittiğinde çalıştır:"; ObjectID = "2044"; */
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
 "2044.title" = "İndirme bittiğinde çalıştır:";
 
-/* Class = "NSTextFieldCell"; title = "Betikler:"; ObjectID = "2047"; */
+/* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
 "2047.title" = "Betikler:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "2050"; */
-"2050.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Diğer..."; ObjectID = "2053"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
 "2053.title" = "Diğer...";
 
-/* Class = "NSButtonCell"; title = "Mikro İletişim Protokolünü etkinleştir (µTP)"; ObjectID = "2078"; */
+/* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
 "2078.title" = "Mikro İletişim Protokolünü etkinleştir (µTP)";
 
-/* Class = "NSTextFieldCell"; title = "Kişi dinleme portu:"; ObjectID = "2082"; */
+/* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
 "2082.title" = "Kişi dinleme portu:";
 
-/* Class = "NSTextFieldCell"; title = "Bildirimler:"; ObjectID = "2087"; */
+/* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
 "2087.title" = "Bildirimler:";
 
-/* Class = "NSButtonCell"; title = "Sistem Tercihlerinde Yapılandır"; ObjectID = "2114"; */
+/* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
 "2114.title" = "Sistem Tercihlerinde Yapılandır";
 
-/* Class = "NSButtonCell"; title = "Besleme bitince aktarım dizelgesinden kaldır"; ObjectID = "2119"; */
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
 "2119.title" = "Besleme bitince aktarım dizelgesinden kaldır";
 
-/* Class = "NSTextFieldCell"; title = "Yeni eklenen aktarımlar için"; ObjectID = "2123"; */
+/* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
 "2123.title" = "Yeni eklenen aktarımlar için";

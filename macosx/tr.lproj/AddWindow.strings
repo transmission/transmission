@@ -1,81 +1,54 @@
 
-/* Class = "NSWindow"; title = "Window"; ObjectID = "1"; */
-"1.title" = "Window";
-
-/* Class = "NSTextFieldCell"; title = "Dosya Adı"; ObjectID = "6"; */
-"6.title" = "Dosya Adı";
-
-/* Class = "NSTextFieldCell"; title = "Bilgi"; ObjectID = "7"; */
-"7.title" = "Bilgi";
-
-/* Class = "NSTextFieldCell"; title = "Dosya"; ObjectID = "13"; */
-"13.title" = "Dosya";
-
-/* Class = "NSTextFieldCell"; title = "Şuraya indir"; ObjectID = "15"; */
+/* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
 "15.title" = "Şuraya indir";
 
-/* Class = "NSButtonCell"; title = "Değiştir..."; ObjectID = "16"; */
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
 "16.title" = "Değiştir...";
 
-/* Class = "NSButtonCell"; title = "İndirmeyi başlat"; ObjectID = "18"; */
+/* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
 "18.title" = "İndirmeyi başlat";
 
-/* Class = "NSButtonCell"; title = "Ekle"; ObjectID = "20"; */
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
 "20.title" = "Ekle";
 
-/* Class = "NSButtonCell"; title = "Vazgeç"; ObjectID = "22"; */
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "22"; */
 "22.title" = "Vazgeç";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "35"; */
-"35.title" = "OtherViews";
-
-/* Class = "NSTextFieldCell"; title = "Öbek:"; ObjectID = "41"; */
+/* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
 "41.title" = "Öbek:";
 
-/* Class = "NSTableColumn"; headerCell.title = "Важн."; ObjectID = "47"; */
+/* Class = "NSTableColumn"; headerCell.title = "Rank"; ObjectID = "47"; */
 "47.headerCell.title" = "Важн.";
 
-/* Class = "NSTableColumn"; headerCell.title = "Скач."; ObjectID = "48"; */
+/* Class = "NSTableColumn"; headerCell.title = "DL"; ObjectID = "48"; */
 "48.headerCell.title" = "Скач.";
 
-/* Class = "NSTableColumn"; headerCell.title = "Имя"; ObjectID = "49"; */
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "49"; */
 "49.headerCell.title" = "Имя";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "50"; */
-"50.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "52"; */
-"52.title" = "Text Cell";
-
-/* Class = "NSButtonCell"; title = "Torrent dosyasını sil"; ObjectID = "59"; */
+/* Class = "NSButtonCell"; title = "Trash torrent file"; ObjectID = "59"; */
 "59.title" = "Torrent dosyasını sil";
 
-/* Class = "NSButtonCell"; title = "Bilgileri Denetle"; ObjectID = "66"; */
+/* Class = "NSButtonCell"; title = "Verify Local Data"; ObjectID = "66"; */
 "66.title" = "Bilgileri Denetle";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "87"; */
-"87.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Düşük"; ObjectID = "88"; */
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
 "88.title" = "Düşük";
 
-/* Class = "NSMenuItem"; title = "Olağan"; ObjectID = "89"; */
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "89"; */
 "89.title" = "Olağan";
 
-/* Class = "NSMenuItem"; title = "Yüksek"; ObjectID = "90"; */
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "90"; */
 "90.title" = "Yüksek";
 
-/* Class = "NSTextFieldCell"; title = "Öncelik:"; ObjectID = "91"; */
+/* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
 "91.title" = "Öncelik:";
 
-/* Class = "NSBox"; title = "Box"; ObjectID = "100"; */
-"100.title" = "Box";
-
-/* Class = "NSButtonCell"; title = "Tümü"; ObjectID = "104"; */
+/* Class = "NSButtonCell"; title = "All"; ObjectID = "104"; */
 "104.title" = "Tümü";
 
-/* Class = "NSButtonCell"; title = "Hiçbiri"; ObjectID = "105"; */
+/* Class = "NSButtonCell"; title = "None"; ObjectID = "105"; */
 "105.title" = "Hiçbiri";
 
-/* Class = "NSSearchFieldCell"; placeholderString = "Фильтр"; ObjectID = "113"; */
+/* Class = "NSSearchFieldCell"; placeholderString = "Filter"; ObjectID = "113"; */
 "113.placeholderString" = "Фильтр";

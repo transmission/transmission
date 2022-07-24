@@ -1,53 +1,38 @@
 
-/* Class = "NSWindow"; title = "Yeni Torrent"; ObjectID = "5"; */
+/* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
 "5.title" = "Yeni Torrent";
 
-/* Class = "NSTextFieldCell"; title = "Dosya Adı"; ObjectID = "68"; */
-"68.title" = "Dosya Adı";
-
-/* Class = "NSTextFieldCell"; title = "Bilgi"; ObjectID = "69"; */
-"69.title" = "Bilgi";
-
-/* Class = "NSTextFieldCell"; title = "Yorumlar:"; ObjectID = "70"; */
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
 "70.title" = "Yorumlar:";
 
-/* Class = "NSTextFieldCell"; title = "İzleyici:"; ObjectID = "71"; */
+/* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
 "71.title" = "İzleyici:";
 
-/* Class = "NSButtonCell"; title = "Değiştir..."; ObjectID = "73"; */
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
 "73.title" = "Değiştir...";
 
-/* Class = "NSTextFieldCell"; title = "Torrent dosyası:"; ObjectID = "74"; */
+/* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
 "74.title" = "Torrent dosyası:";
 
-/* Class = "NSTextFieldCell"; title = "File\nFile"; ObjectID = "75"; */
-"75.title" = "File\nFile";
-
-/* Class = "NSButtonCell"; title = "Kişisel izleyici"; ObjectID = "77"; */
+/* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
 "77.title" = "Kişisel izleyici";
 
-/* Class = "NSButtonCell"; title = "Oluştur"; ObjectID = "78"; */
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
 "78.title" = "Oluştur";
 
-/* Class = "NSButtonCell"; title = "Vazgeç"; ObjectID = "79"; */
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
 "79.title" = "Vazgeç";
 
-/* Class = "NSTextFieldCell"; title = "parça bilgisi"; ObjectID = "80"; */
-"80.title" = "parça bilgisi";
-
-/* Class = "NSButtonCell"; title = "Oluşturduktan sonra aç"; ObjectID = "81"; */
+/* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
 "81.title" = "Oluşturduktan sonra aç";
 
-/* Class = "NSButtonCell"; title = "Vazgeç"; ObjectID = "82"; */
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
 "82.title" = "Vazgeç";
 
-/* Class = "NSTextFieldCell"; title = "Torrent dosyası oluşturuluyor..."; ObjectID = "83"; */
+/* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
 "83.title" = "Torrent dosyası oluşturuluyor...";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "97"; */
-"97.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "Her izleyici kendi sırasına göre konumlandırılacaktır"; ObjectID = "108"; */
+/* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
 "108.title" = "Her izleyici kendi sırasına göre konumlandırılacaktır";
 
 /* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
