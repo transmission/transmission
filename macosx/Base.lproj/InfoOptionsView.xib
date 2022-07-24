@@ -115,7 +115,7 @@
                                     <popUpButtonCell key="cell" type="roundRect" title="Normal" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="51" id="48">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
-                                        <menu key="menu" title="OtherViews" id="49">
+                                        <menu key="menu" id="49">
                                             <items>
                                                 <menuItem title="High" image="PriorityHighTemplate" id="52"/>
                                                 <menuItem title="Normal" state="on" image="PriorityNormalTemplate" tag="1" id="51"/>
@@ -236,7 +236,7 @@
                                     <popUpButtonCell key="cell" type="roundRect" title="Global Setting" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="87" id="84">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
-                                        <menu key="menu" title="OtherViews" id="85">
+                                        <menu key="menu" id="85">
                                             <items>
                                                 <menuItem title="Global Setting" state="on" id="87"/>
                                                 <menuItem title="Unlimited" id="88"/>
@@ -279,7 +279,7 @@
                                     <popUpButtonCell key="cell" type="roundRect" title="Global Setting" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="41" id="38">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
-                                        <menu key="menu" title="OtherViews" id="39">
+                                        <menu key="menu" id="39">
                                             <items>
                                                 <menuItem title="Global Setting" state="on" id="41"/>
                                                 <menuItem title="Unlimited" id="40"/>
@@ -317,7 +317,7 @@
                                 </textField>
                                 <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="107">
                                     <rect key="frame" x="188" y="88" width="86" height="14"/>
-                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="global info here" id="108">
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" id="108">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" white="0.41999999999999998" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -354,7 +354,7 @@
                                 </textField>
                                 <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="109">
                                     <rect key="frame" x="188" y="110" width="86" height="14"/>
-                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="global info here" id="110">
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" id="110">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" white="0.41999999999999998" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
