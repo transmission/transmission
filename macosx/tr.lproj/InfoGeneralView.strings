@@ -1,48 +1,48 @@
 
-/* Class = "NSTextFieldCell"; title = "Parçalar:"; ObjectID = "21"; */
+/* Class = "NSTextFieldCell"; title = "Pieces:"; ObjectID = "21"; */
 "21.title" = "Parçalar:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
 "22.placeholderString" = "N/A";
 
-/* Class = "NSTextFieldCell"; title = "Güvenlik:"; ObjectID = "24"; */
+/* Class = "NSTextFieldCell"; title = "Secure:"; ObjectID = "24"; */
 "24.title" = "Güvenlik:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "25"; */
 "25.placeholderString" = "N/A";
 
-/* Class = "NSTextFieldCell"; title = "Veri:"; ObjectID = "26"; */
+/* Class = "NSTextFieldCell"; title = "Data File:"; ObjectID = "26"; */
 "26.title" = "Veri:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "27"; */
 "27.placeholderString" = "N/A";
 
-/* Class = "NSTextFieldCell"; title = "Nerede"; ObjectID = "28"; */
+/* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
 "28.title" = "Nerede";
 
 /* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
 "29.title" = "RevealDataFile";
 
-/* Class = "NSTextFieldCell"; title = "Oluşturan:"; ObjectID = "30"; */
+/* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
 "30.title" = "Oluşturan:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
 "31.placeholderString" = "N/A";
 
-/* Class = "NSTextFieldCell"; title = "Oluşturuldu:"; ObjectID = "32"; */
+/* Class = "NSTextFieldCell"; title = "Created On:"; ObjectID = "32"; */
 "32.title" = "Oluşturuldu:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
 "33.placeholderString" = "N/A";
 
-/* Class = "NSTextFieldCell"; title = "Yorumlar:"; ObjectID = "35"; */
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "35"; */
 "35.title" = "Yorumlar:";
 
-/* Class = "NSTextFieldCell"; title = "Sağlama:"; ObjectID = "36"; */
+/* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
 "36.title" = "Sağlama:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
 "37.placeholderString" = "N/A";
 
-/* Class = "NSTextFieldCell"; title = "Torrent Bilgisi"; ObjectID = "41"; */
+/* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
 "41.title" = "Torrent Bilgisi";

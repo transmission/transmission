@@ -1,54 +1,39 @@
 
-/* Class = "NSWindow"; title = "Новый торрент"; ObjectID = "5"; */
+/* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
 "5.title" = "Новый торрент";
 
-/* Class = "NSTextFieldCell"; title = "Имя файла"; ObjectID = "68"; */
-"68.title" = "Имя файла";
-
-/* Class = "NSTextFieldCell"; title = "информация"; ObjectID = "69"; */
-"69.title" = "информация";
-
-/* Class = "NSTextFieldCell"; title = "Комментарии:"; ObjectID = "70"; */
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
 "70.title" = "Комментарии:";
 
-/* Class = "NSTextFieldCell"; title = "Трекер:"; ObjectID = "71"; */
+/* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
 "71.title" = "Трекер:";
 
-/* Class = "NSButtonCell"; title = "Изменить..."; ObjectID = "73"; */
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
 "73.title" = "Изменить...";
 
-/* Class = "NSTextFieldCell"; title = "Торрент-файл:"; ObjectID = "74"; */
+/* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
 "74.title" = "Торрент-файл:";
 
-/* Class = "NSTextFieldCell"; title = "File\nFile"; ObjectID = "75"; */
-"75.title" = "File\nFile";
-
-/* Class = "NSButtonCell"; title = "Частный трекер"; ObjectID = "77"; */
+/* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
 "77.title" = "Частный трекер";
 
-/* Class = "NSButtonCell"; title = "Создать"; ObjectID = "78"; */
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
 "78.title" = "Создать";
 
-/* Class = "NSButtonCell"; title = "Отменить"; ObjectID = "79"; */
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
 "79.title" = "Отменить";
 
-/* Class = "NSTextFieldCell"; title = "информация о частях"; ObjectID = "80"; */
-"80.title" = "информация о частях";
-
-/* Class = "NSButtonCell"; title = "Открыть после создания"; ObjectID = "81"; */
+/* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
 "81.title" = "Открыть после создания";
 
-/* Class = "NSButtonCell"; title = "Отменить"; ObjectID = "82"; */
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
 "82.title" = "Отменить";
 
-/* Class = "NSTextFieldCell"; title = "Создаю торрент-файл…"; ObjectID = "83"; */
+/* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
 "83.title" = "Создаю торрент-файл…";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "97"; */
-"97.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "Трекеры будут объединены в списке общего уровня"; ObjectID = "108"; */
+/* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
 "108.title" = "Трекеры будут объединены в списке общего уровня";
 
-/* Class = "NSTextFieldCell"; title = "Источник:"; ObjectID = "f1g-Kk-weU"; */
+/* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
 "f1g-Kk-weU.title" = "Источник:";

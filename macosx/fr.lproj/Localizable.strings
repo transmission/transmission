@@ -702,6 +702,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "Le port est ouvert";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "656";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Priorité";
@@ -1148,7 +1151,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Vous voulez télécharger, mais le pair ne veut pas envoyer (intéressé et étranglé)";
-
-/* Preferences window size*/
-"PrefWindowSize" = "656";
 

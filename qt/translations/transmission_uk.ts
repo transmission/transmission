@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+330"/>
+        <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission — програма для поширення файлів.&lt;/b&gt;</translation>
     </message>
@@ -1455,7 +1455,7 @@
         <translation>Новий торент</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+230"/>
+        <location filename="../MakeDialog.cc" line="+231"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Не вказано джерела&lt;/i&gt;</translation>
     </message>
@@ -1543,7 +1543,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Новий торент</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-136"/>
+        <location filename="../MakeDialog.cc" line="-137"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>Створюється «%1»</translation>
     </message>
@@ -2212,12 +2212,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-277"/>
+        <location filename="../Application.cc" line="-279"/>
         <source>Invalid option</source>
         <translation>Помилковий параметр</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+307"/>
         <source>Start Now</source>
         <translation>Розпочати зараз</translation>
     </message>

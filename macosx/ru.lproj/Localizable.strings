@@ -702,6 +702,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "Порт открыт";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "640";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Приоритет";
@@ -1148,7 +1151,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Вы заинтересованы в имеющихся у пользователя частях торрента, но он вас блокирует";
-
-/* Preferences window size*/
-"PrefWindowSize" = "640";
 

@@ -1,146 +1,137 @@
 
-/* Class = "NSWindow"; title = "Voorkeuren"; ObjectID = "23"; */
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
 "23.title" = "Voorkeuren";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "52"; */
-"52.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Ander…"; ObjectID = "53"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
 "53.title" = "Ander…";
 
-/* Class = "NSMenuItem"; title = "Hetzelfde als torrent bestand"; ObjectID = "55"; */
+/* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
 "55.title" = "Hetzelfde als torrent bestand";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "217"; */
-"217.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Ander…"; ObjectID = "219"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
 "219.title" = "Ander…";
 
-/* Class = "NSTabViewItem"; label = "Toevoegen"; ObjectID = "253"; */
+/* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
 "253.label" = "Toevoegen";
 
-/* Class = "NSTabViewItem"; label = "Beheer"; ObjectID = "254"; */
+/* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
 "254.label" = "Beheer";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "539"; */
-"539.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Ander…"; ObjectID = "542"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
 "542.title" = "Ander…";
 
-/* Class = "NSButtonCell"; title = "Afsluiten met actieve transfers"; ObjectID = "1201"; */
+/* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
 "1201.title" = "Afsluiten met actieve transfers";
 
-/* Class = "NSButtonCell"; title = "Verwijdering van actieve transfers"; ObjectID = "1202"; */
+/* Class = "NSButtonCell"; title = "Removal of active transfers"; ObjectID = "1202"; */
 "1202.title" = "Verwijdering van actieve transfers";
 
-/* Class = "NSTextFieldCell"; title = "Prompt gebruiker voor:"; ObjectID = "1203"; */
+/* Class = "NSTextFieldCell"; title = "Prompt user for:"; ObjectID = "1203"; */
 "1203.title" = "Prompt gebruiker voor:";
 
-/* Class = "NSTextFieldCell"; title = "Badge Dock-symbool met:"; ObjectID = "1204"; */
+/* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
 "1204.title" = "Badge Dock-symbool met:";
 
-/* Class = "NSButtonCell"; title = "Totale downloadsnelheid"; ObjectID = "1205"; */
+/* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
 "1205.title" = "Totale downloadsnelheid";
 
-/* Class = "NSButtonCell"; title = "Totale uploadsnelheid"; ObjectID = "1206"; */
+/* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
 "1206.title" = "Totale uploadsnelheid";
 
-/* Class = "NSButtonCell"; title = "Enkel bij actieve downloads"; ObjectID = "1207"; */
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
 "1207.title" = "Enkel bij actieve downloads";
 
-/* Class = "NSButtonCell"; title = "Enkel bij actieve downloads"; ObjectID = "1208"; */
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1208"; */
 "1208.title" = "Enkel bij actieve downloads";
 
-/* Class = "NSTextFieldCell"; title = "Venstergrootte:"; ObjectID = "1209"; */
+/* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
 "1209.title" = "Venstergrootte:";
 
-/* Class = "NSButtonCell"; title = "Pas automatisch aan het aantal transfers aan"; ObjectID = "1210"; */
+/* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
 "1210.title" = "Pas automatisch aan het aantal transfers aan";
 
-/* Class = "NSButtonCell"; title = "Herstel"; ObjectID = "1211"; */
+/* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
 "1211.title" = "Herstel";
 
-/* Class = "NSTextFieldCell"; title = "Herstel alle waarschuwingen:"; ObjectID = "1212"; */
+/* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
 "1212.title" = "Herstel alle waarschuwingen:";
 
-/* Class = "NSButtonCell"; title = "Controleer dagelijks op nieuwe versies"; ObjectID = "1213"; */
+/* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
 "1213.title" = "Controleer dagelijks op nieuwe versies";
 
-/* Class = "NSTextFieldCell"; title = "Updates:"; ObjectID = "1214"; */
+/* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
 "1214.title" = "Updates:";
 
-/* Class = "NSTextFieldCell"; title = "Locatie gedownloade bestanden:"; ObjectID = "1216"; */
+/* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
 "1216.title" = "Locatie gedownloade bestanden:";
 
-/* Class = "NSTextFieldCell"; title = "Instellingen:"; ObjectID = "1217"; */
+/* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
 "1217.title" = "Instellingen:";
 
-/* Class = "NSButtonCell"; title = "Verwijder originele torrent bestanden"; ObjectID = "1218"; */
+/* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
 "1218.title" = "Verwijder originele torrent bestanden";
 
-/* Class = "NSButtonCell"; title = "Zoek torrent bestanden in:"; ObjectID = "1219"; */
+/* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
 "1219.title" = "Zoek torrent bestanden in:";
 
-/* Class = "NSTextFieldCell"; title = "Automatisch:"; ObjectID = "1226"; */
+/* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
 "1226.title" = "Automatisch:";
 
-/* Class = "NSButtonCell"; title = "Hou onvolledige bestanden in:"; ObjectID = "1227"; */
+/* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
 "1227.title" = "Hou onvolledige bestanden in:";
 
-/* Class = "NSTextFieldCell"; title = "Wachtrij:"; ObjectID = "1230"; */
+/* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
 "1230.title" = "Wachtrij:";
 
-/* Class = "NSTextFieldCell"; title = "actieve transfers"; ObjectID = "1231"; */
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1231"; */
 "1231.title" = "actieve transfers";
 
-/* Class = "NSButtonCell"; title = "Stop seeden bij ratio:"; ObjectID = "1232"; */
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
 "1232.title" = "Stop seeden bij ratio:";
 
-/* Class = "NSTextFieldCell"; title = "Limieten:"; ObjectID = "1234"; */
+/* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
 "1234.title" = "Limieten:";
 
-/* Class = "NSTextFieldCell"; title = "Ratio is de hoeveelheid geupload over de hoeveelheid gedownload"; ObjectID = "1235"; */
+/* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
 "1235.title" = "Ratio is de hoeveelheid geupload over de hoeveelheid gedownload";
 
-/* Class = "NSButtonCell"; title = "Download met maximum:"; ObjectID = "1236"; */
+/* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
 "1236.title" = "Download met maximum:";
 
-/* Class = "NSTextFieldCell"; title = "actieve transfers"; ObjectID = "1239"; */
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1239"; */
 "1239.title" = "actieve transfers";
 
-/* Class = "NSButtonCell"; title = "Seeden met maximum:"; ObjectID = "1240"; */
+/* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
 "1240.title" = "Seeden met maximum:";
 
-/* Class = "NSTextFieldCell"; title = "minuten"; ObjectID = "1242"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
 "1242.title" = "minuten";
 
-/* Class = "NSButtonCell"; title = "Transfer is passief bij geen activiteit van:"; ObjectID = "1243"; */
+/* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
 "1243.title" = "Transfer is passief bij geen activiteit van:";
 
-/* Class = "NSButtonCell"; title = "Automatische poorttoekenning"; ObjectID = "1247"; */
+/* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
 "1247.title" = "Automatische poorttoekenning";
 
-/* Class = "NSTextFieldCell"; title = "NAT-traversal gebruikt NAT-PMP of UPnP"; ObjectID = "1248"; */
+/* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
 "1248.title" = "NAT-traversal gebruikt NAT-PMP of UPnP";
 
-/* Class = "NSTextFieldCell"; title = "Poort is open"; ObjectID = "1250"; */
+/* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
 "1250.title" = "Poort is open";
 
-/* Class = "NSTextFieldCell"; title = "Peer communicatie:"; ObjectID = "1253"; */
+/* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
 "1253.title" = "Peer communicatie:";
 
-/* Class = "NSButtonCell"; title = "Belet de computer te sluimeren bij actieve transfers"; ObjectID = "1254"; */
+/* Class = "NSButtonCell"; title = "Prevent computer from sleeping with active transfers"; ObjectID = "1254"; */
 "1254.title" = "Belet de computer te sluimeren bij actieve transfers";
 
-/* Class = "NSTextFieldCell"; title = "Systeem:"; ObjectID = "1255"; */
+/* Class = "NSTextFieldCell"; title = "System sleep:"; ObjectID = "1255"; */
 "1255.title" = "Systeem:";
 
-/* Class = "NSButtonCell"; title = "Uploadsnelheid:"; ObjectID = "1265"; */
+/* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
 "1265.title" = "Uploadsnelheid:";
 
-/* Class = "NSButtonCell"; title = "Downloadsnelheid:"; ObjectID = "1267"; */
+/* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
 "1267.title" = "Downloadsnelheid:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
@@ -149,7 +140,7 @@
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
 "1269.title" = "KB/s";
 
-/* Class = "NSTextFieldCell"; title = "Globale bandbreedte:"; ObjectID = "1270"; */
+/* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
 "1270.title" = "Globale bandbreedte:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
@@ -158,70 +149,64 @@
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
 "1274.title" = "KB/s";
 
-/* Class = "NSTextFieldCell"; title = "Snelheidsbeperking:"; ObjectID = "1275"; */
+/* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
 "1275.title" = "Snelheidsbeperking:";
 
-/* Class = "NSTextFieldCell"; title = "Uploadsnelheid:"; ObjectID = "1276"; */
+/* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
 "1276.title" = "Uploadsnelheid:";
 
-/* Class = "NSTextFieldCell"; title = "Downloadsnelheid:"; ObjectID = "1277"; */
+/* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
 "1277.title" = "Downloadsnelheid:";
 
-/* Class = "NSTextFieldCell"; title = "Deze limiet negeert de globale bandbreedtebeperking"; ObjectID = "1278"; */
+/* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
 "1278.title" = "Deze limiet negeert de globale bandbreedtebeperking";
 
-/* Class = "NSButtonCell"; title = "Beperk bandbreedte tussen:"; ObjectID = "1280"; */
+/* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
 "1280.title" = "Beperk bandbreedte tussen:";
 
-/* Class = "NSTextFieldCell"; title = "en"; ObjectID = "1281"; */
+/* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
 "1281.title" = "en";
 
-/* Class = "NSButtonCell"; title = "Toon optiescherm bij toevoegen van torrent bestand"; ObjectID = "1294"; */
+/* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
 "1294.title" = "Toon optiescherm bij toevoegen van torrent bestand";
 
-/* Class = "NSButtonCell"; title = "Na voltooiing download:"; ObjectID = "1302"; */
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
 "1302.title" = "Na voltooiing download:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1304"; */
-"1304.title" = "OtherViews";
-
-/* Class = "NSButtonCell"; title = "Na voltooiing seeden:"; ObjectID = "1306"; */
+/* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
 "1306.title" = "Na voltooiing seeden:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1308"; */
-"1308.title" = "OtherViews";
-
-/* Class = "NSTextFieldCell"; title = "Speel geluid:"; ObjectID = "1310"; */
+/* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
 "1310.title" = "Speel geluid:";
 
-/* Class = "NSButtonCell"; title = "Start transfers bij toevoeging"; ObjectID = "1335"; */
+/* Class = "NSButtonCell"; title = "Start transfers when added"; ObjectID = "1335"; */
 "1335.title" = "Start transfers bij toevoeging";
 
-/* Class = "NSTextFieldCell"; title = "Optiescherm:"; ObjectID = "1338"; */
+/* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
 "1338.title" = "Optiescherm:";
 
-/* Class = "NSButtonCell"; title = "Enkel bij meerdere bestanden"; ObjectID = "1340"; */
+/* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
 "1340.title" = "Enkel bij meerdere bestanden";
 
-/* Class = "NSButtonCell"; title = "Werk bij"; ObjectID = "1437"; */
+/* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
 "1437.title" = "Werk bij";
 
-/* Class = "NSTextFieldCell"; title = "Zwarte lijst geladen/niet geladen"; ObjectID = "1438"; */
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
 "1438.title" = "Zwarte lijst geladen/niet geladen";
 
-/* Class = "NSTextFieldCell"; title = "Zwarte lijst:"; ObjectID = "1439"; */
+/* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
 "1439.title" = "Zwarte lijst:";
 
-/* Class = "NSButtonCell"; title = "Belet deze peers te verbinden"; ObjectID = "1440"; */
+/* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
 "1440.title" = "Belet deze peers te verbinden";
 
-/* Class = "NSTextFieldCell"; title = "Hoge verbindingslimieten kunnen zware impact op systeemprestaties hebben"; ObjectID = "1441"; */
+/* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
 "1441.title" = "Hoge verbindingslimieten kunnen zware impact op systeemprestaties hebben";
 
-/* Class = "NSButtonCell"; title = "Gebruik peer uitwisseling (PEX) bij publieke torrents"; ObjectID = "1442"; */
+/* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
 "1442.title" = "Gebruik peer uitwisseling (PEX) bij publieke torrents";
 
-/* Class = "NSTextFieldCell"; title = "Nieuwe transfers:"; ObjectID = "1443"; */
+/* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
 "1443.title" = "Nieuwe transfers:";
 
 /* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1446"; */
@@ -230,194 +215,179 @@
 /* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1447"; */
 "1447.title" = "peers";
 
-/* Class = "NSTextFieldCell"; title = "Globaal maximum:"; ObjectID = "1450"; */
+/* Class = "NSTextFieldCell"; title = "Global maximum connections:"; ObjectID = "1450"; */
 "1450.title" = "Globaal maximum:";
 
-/* Class = "NSTextFieldCell"; title = "Verbindingen:"; ObjectID = "1451"; */
+/* Class = "NSTextFieldCell"; title = "Connections:"; ObjectID = "1451"; */
 "1451.title" = "Verbindingen:";
 
-/* Class = "NSButtonCell"; title = "Verkies gecodeerde peers"; ObjectID = "1452"; */
+/* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
 "1452.title" = "Verkies gecodeerde peers";
 
-/* Class = "NSTextFieldCell"; title = "Codering:"; ObjectID = "1453"; */
+/* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
 "1453.title" = "Codering:";
 
-/* Class = "NSButtonCell"; title = "Negeer ongecodeerde peers"; ObjectID = "1454"; */
+/* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
 "1454.title" = "Negeer ongecodeerde peers";
 
-/* Class = "NSButtonCell"; title = "Enkel bij handmatig toevoegen"; ObjectID = "1477"; */
+/* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
 "1477.title" = "Enkel bij handmatig toevoegen";
 
-/* Class = "NSTextFieldCell"; title = "Binnenkomende poort:"; ObjectID = "1493"; */
+/* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
 "1493.title" = "Binnenkomende poort:";
 
-/* Class = "NSButtonCell"; title = "Activeer externe toegang"; ObjectID = "1502"; */
+/* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
 "1502.title" = "Activeer externe toegang";
 
-/* Class = "NSButtonCell"; title = "Identiteitscontrole vereist"; ObjectID = "1505"; */
+/* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
 "1505.title" = "Identiteitscontrole vereist";
 
-/* Class = "NSTableColumn"; headerCell.title = "IP-adres"; ObjectID = "1523"; */
+/* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
 "1523.headerCell.title" = "IP-adres";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1526"; */
-"1526.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "IP adressen mogen * (wildcard) bevatten"; ObjectID = "1542"; */
+/* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
 "1542.title" = "IP adressen mogen * (wildcard) bevatten";
 
-/* Class = "NSTextFieldCell"; title = "Wachtwoord:"; ObjectID = "1555"; */
+/* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
 "1555.title" = "Wachtwoord:";
 
-/* Class = "NSTextFieldCell"; title = "Gebruikersnaam:"; ObjectID = "1557"; */
+/* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
 "1557.title" = "Gebruikersnaam:";
 
-/* Class = "NSTextFieldCell"; title = "Dit activeert de web interface en laat externe controle toe"; ObjectID = "1645"; */
+/* Class = "NSTextFieldCell"; title = "This enables the web interface and allows remote requests"; ObjectID = "1645"; */
 "1645.title" = "Dit activeert de web interface en laat externe controle toe";
 
-/* Class = "NSButtonCell"; title = "Start web interface"; ObjectID = "1718"; */
+/* Class = "NSButtonCell"; title = "Launch Web Interface"; ObjectID = "1718"; */
 "1718.title" = "Start web interface";
 
-/* Class = "NSTextFieldCell"; title = "Laatst bijgewerkt: N/B"; ObjectID = "1739"; */
+/* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
 "1739.title" = "Laatst bijgewerkt: N/B";
 
-/* Class = "NSButtonCell"; title = "Werk automatisch wekelijks bij"; ObjectID = "1742"; */
+/* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
 "1742.title" = "Werk automatisch wekelijks bij";
 
-/* Class = "NSButtonCell"; title = "Sta enkel de volgende IP-adressen toe te verbinden:"; ObjectID = "1748"; */
+/* Class = "NSButtonCell"; title = "Only allow the following IP addresses to connect:"; ObjectID = "1748"; */
 "1748.title" = "Sta enkel de volgende IP-adressen toe te verbinden:";
 
-/* Class = "NSTableColumn"; headerCell.title = "Kleur"; ObjectID = "1777"; */
+/* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
 "1777.headerCell.title" = "Kleur";
 
-/* Class = "NSTableColumn"; headerCell.title = "Naam"; ObjectID = "1779"; */
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
 "1779.headerCell.title" = "Naam";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1780"; */
-"1780.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "Groepsnaam:"; ObjectID = "1796"; */
+/* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
 "1796.title" = "Groepsnaam:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1810"; */
-"1810.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Ander…"; ObjectID = "1813"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
 "1813.title" = "Ander…";
 
-/* Class = "NSButtonCell"; title = "Gewijzigde Locatie:"; ObjectID = "1815"; */
+/* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
 "1815.title" = "Gewijzigde Locatie:";
 
-/* Class = "NSTextFieldCell"; title = "De locatie wordt enkel toegekend bij het toevoegen van de transfer."; ObjectID = "1824"; */
+/* Class = "NSTextFieldCell"; title = "The location will only be set when adding the transfer"; ObjectID = "1824"; */
 "1824.title" = "De locatie wordt enkel toegekend bij het toevoegen van de transfer.";
 
-/* Class = "NSButtonCell"; title = "Toon de web interface via Bonjour"; ObjectID = "1826"; */
+/* Class = "NSButtonCell"; title = "Display the web interface with Bonjour"; ObjectID = "1826"; */
 "1826.title" = "Toon de web interface via Bonjour";
 
-/* Class = "NSButtonCell"; title = "Automatisch toevoegen op basis van criteria"; ObjectID = "1831"; */
+/* Class = "NSButtonCell"; title = "Assign group to new transfers based on criteria"; ObjectID = "1831"; */
 "1831.title" = "Automatisch toevoegen op basis van criteria";
 
-/* Class = "NSButtonCell"; title = "Wijzig…"; ObjectID = "1833"; */
+/* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
 "1833.title" = "Wijzig…";
 
-/* Class = "NSTextFieldCell"; title = "Transfers worden toegekend aan de eerste groep dat aan alle voorwaarden voldoet."; ObjectID = "1835"; */
+/* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
 "1835.title" = "Transfers worden toegekend aan de eerste groep dat aan alle voorwaarden voldoet.";
 
-/* Class = "NSButtonCell"; title = "Willekeurige poort bij starten"; ObjectID = "1890"; */
+/* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
 "1890.title" = "Willekeurige poort bij starten";
 
-/* Class = "NSButtonCell"; title = "Genereer"; ObjectID = "1892"; */
+/* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
 "1892.title" = "Genereer";
 
-/* Class = "NSButtonCell"; title = "Update naar beta versies indien mogelijk"; ObjectID = "1896"; */
+/* Class = "NSButtonCell"; title = "Include beta releases"; ObjectID = "1896"; */
 "1896.title" = "Update naar beta versies indien mogelijk";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1909"; */
-"1909.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Elke dag"; ObjectID = "1910"; */
+/* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
 "1910.title" = "Elke dag";
 
-/* Class = "NSMenuItem"; title = "Werkdagen"; ObjectID = "1911"; */
+/* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
 "1911.title" = "Werkdagen";
 
-/* Class = "NSMenuItem"; title = "Weekend"; ObjectID = "1912"; */
+/* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
 "1912.title" = "Weekend";
 
-/* Class = "NSMenuItem"; title = "Op maandag"; ObjectID = "1914"; */
+/* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
 "1914.title" = "Op maandag";
 
-/* Class = "NSMenuItem"; title = "Op dinsdag"; ObjectID = "1915"; */
+/* Class = "NSMenuItem"; title = "Tuesday"; ObjectID = "1915"; */
 "1915.title" = "Op dinsdag";
 
-/* Class = "NSMenuItem"; title = "Op woensdag"; ObjectID = "1916"; */
+/* Class = "NSMenuItem"; title = "Wednesday"; ObjectID = "1916"; */
 "1916.title" = "Op woensdag";
 
-/* Class = "NSMenuItem"; title = "Op donderdag"; ObjectID = "1917"; */
+/* Class = "NSMenuItem"; title = "Thursday"; ObjectID = "1917"; */
 "1917.title" = "Op donderdag";
 
-/* Class = "NSMenuItem"; title = "Op vrijdag"; ObjectID = "1918"; */
+/* Class = "NSMenuItem"; title = "Friday"; ObjectID = "1918"; */
 "1918.title" = "Op vrijdag";
 
-/* Class = "NSMenuItem"; title = "Op zaterdag"; ObjectID = "1919"; */
+/* Class = "NSMenuItem"; title = "Saturday"; ObjectID = "1919"; */
 "1919.title" = "Op zaterdag";
 
-/* Class = "NSMenuItem"; title = "Op zondag"; ObjectID = "1920"; */
+/* Class = "NSMenuItem"; title = "Sunday"; ObjectID = "1920"; */
 "1920.title" = "Op zondag";
 
-/* Class = "NSButtonCell"; title = "Gebruik gedistribueerde hash tabel (DHT) bij publieke torrents"; ObjectID = "1926"; */
+/* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
 "1926.title" = "Gebruik gedistribueerde hash tabel (DHT) bij publieke torrents";
 
-/* Class = "NSTextFieldCell"; title = "Accepteer magnet links:"; ObjectID = "1931"; */
+/* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
 "1931.title" = "Accepteer magnet links:";
 
-/* Class = "NSButtonCell"; title = "Stel in als standaard"; ObjectID = "1933"; */
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
 "1933.title" = "Stel in als standaard";
 
-/* Class = "NSButtonCell"; title = "Voeg \".part\" toe aan onvolledige bestanden"; ObjectID = "1940"; */
+/* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
 "1940.title" = "Voeg \".part\" toe aan onvolledige bestanden";
 
-/* Class = "NSButtonCell"; title = "Toon optiescherm bij toevoegen van magnet link"; ObjectID = "1948"; */
+/* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
 "1948.title" = "Toon optiescherm bij toevoegen van magnet link";
 
-/* Class = "NSButtonCell"; title = "Gebruik lokale peer-ontdekking (LPD) bij publieke torrents"; ObjectID = "1952"; */
+/* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
 "1952.title" = "Gebruik lokale peer-ontdekking (LPD) bij publieke torrents";
 
-/* Class = "NSButtonCell"; title = "Stop seeden bij geen activiteit na:"; ObjectID = "1962"; */
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
 "1962.title" = "Stop seeden bij geen activiteit na:";
 
-/* Class = "NSTextFieldCell"; title = "minuten"; ObjectID = "1970"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
 "1970.title" = "minuten";
 
 /* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
 "1988.title" = "URL:";
 
-/* Class = "NSButtonCell"; title = "Na voltooiing download:"; ObjectID = "2044"; */
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
 "2044.title" = "Na voltooiing download:";
 
-/* Class = "NSTextFieldCell"; title = "Roep script:"; ObjectID = "2047"; */
+/* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
 "2047.title" = "Roep script:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "2050"; */
-"2050.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Ander…"; ObjectID = "2053"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
 "2053.title" = "Ander…";
 
-/* Class = "NSButtonCell"; title = "Gebruik Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
+/* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
 "2078.title" = "Gebruik Micro Transport Protocol (µTP)";
 
-/* Class = "NSTextFieldCell"; title = "Binnenkomende poort:"; ObjectID = "2082"; */
+/* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
 "2082.title" = "Binnenkomende poort:";
 
-/* Class = "NSTextFieldCell"; title = "Meldingen:"; ObjectID = "2087"; */
+/* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
 "2087.title" = "Meldingen:";
 
-/* Class = "NSButtonCell"; title = "Configureer in Systeemvoorkeuren"; ObjectID = "2114"; */
+/* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
 "2114.title" = "Configureer in Systeemvoorkeuren";
 
-/* Class = "NSButtonCell"; title = "Verwijder van transfer lijst als seeden klaar is"; ObjectID = "2119"; */
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
 "2119.title" = "Verwijder van transfer lijst als seeden klaar is";
 
-/* Class = "NSTextFieldCell"; title = "Van toepassing op nieuwe transfers"; ObjectID = "2123"; */
+/* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
 "2123.title" = "Van toepassing op nieuwe transfers";

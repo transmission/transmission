@@ -702,6 +702,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "Port åben";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "640";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Prioritet";
@@ -1148,7 +1151,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Du vil download, men modpart vil ikke sende (interesseret og blokeret)";
-
-/* Preferences window size*/
-"PrefWindowSize" = "640";
 
