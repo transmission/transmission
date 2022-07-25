@@ -60,7 +60,7 @@ protected:
     bool addressIsBlocked(char const* address_str)
     {
         auto const addr = tr_address::fromString(address_str);
-        return !addr || tr_sessionIsAddressBlocked(session_, &addr.value());
+        return !addr || tr_sessionIsAddressBlocked(session_, &*addr);
     }
 };
 
