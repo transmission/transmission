@@ -9,6 +9,7 @@
 #include <array>
 #include <ctime>
 #include <memory>
+#include <utility>
 
 #include <QIcon>
 #include <QLibraryInfo>
