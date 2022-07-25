@@ -327,9 +327,9 @@ foreach(IMG ${${PROJECT_NAME}_LODPI_IMAGES})
 endforeach()
 
 set(${PROJECT_NAME}_LINGUAS
-    Base
     da
     de
+    en
     es
     fr
     it
@@ -361,7 +361,6 @@ set(${PROJECT_NAME}_LANG_XIB_FILES
 set(${PROJECT_NAME}_LANG_STRINGS_FILES
     InfoPlist.strings
     Localizable.strings
-    MainMenu.strings
 )
 
 set(${PROJECT_NAME}_NIB_FILES)
@@ -375,36 +374,27 @@ endforeach()
 set_source_files_properties(${${PROJECT_NAME}_NIB_FILES} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
 
-set(${PROJECT_NAME}_LINGUAS_XIB_FILES)
-set(${PROJECT_NAME}_LINGUAS_NIB_FILES)
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    set(${PROJECT_NAME}_${LANG}_NIB_FILES)
-    foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
-        # Check for existence of xib file, otherwise get .strings file
-        if(EXISTS "${LANG}.lproj/${F}")
-            set(F_XIB "${LANG}.lproj/${F}")
-            get_filename_component(F_BASE "${F}" NAME_WE)
-            set(F_NIB "${PROJECT_BINARY_DIR}/${LANG}.lproj/${F_BASE}.nib")
-            tr_wrap_xib("${F_XIB}" "${F_NIB}")
-            list(APPEND ${PROJECT_NAME}_LINGUAS_XIB_FILES "${F_XIB}")
-            list(APPEND ${PROJECT_NAME}_LINGUAS_NIB_FILES "${F_NIB}")
-            list(APPEND ${PROJECT_NAME}_${LANG}_NIB_FILES "${F_NIB}")
-        elseif(EXISTS "${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F}")
-            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
-        endif()
-    endforeach()
+set(${PROJECT_NAME}_BASE_XIB_FILES)
+set(${PROJECT_NAME}_BASE_NIB_FILES)
+foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
+    set(F_XIB "Base.lproj/${F}")
+    get_filename_component(F_BASE "${F}" NAME_WE)
+    set(F_NIB "${PROJECT_BINARY_DIR}/Base.lproj/${F_BASE}.nib")
+    tr_wrap_xib("${F_XIB}" "${F_NIB}")
+    list(APPEND ${PROJECT_NAME}_BASE_XIB_FILES "${F_XIB}")
+    list(APPEND ${PROJECT_NAME}_BASE_NIB_FILES "${F_NIB}")
+endforeach()
 
+foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
+    if(NOT LANG STREQUAL "en")
+        foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
+            get_filename_component(F_BASE "${F}" NAME_WE)
+            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F_BASE}.strings)
+        endforeach()
+    endif()
     foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
-        # Special case for Base Internationalization.
-        # 'en' is considered as Base/Development locale.
-        if(LANG STREQUAL "Base")
-            if(EXISTS "${PROJECT_NAME}_${LANG}_STRINGS_FILES en.lproj/${F}")
-                list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES en.lproj/${F})
-            endif()
-        elseif(EXISTS "${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F}")
-            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
-        endif()
+        list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
     endforeach()
 endforeach()
 
@@ -424,9 +414,12 @@ add_library(vdkqueue STATIC
     VDKQueue/VDKQueue.h
 )
 
+set_source_files_properties(${${PROJECT_NAME}_BASE_NIB_FILES} PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources/Base.lproj)
+
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
-    set_source_files_properties(${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
+    list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+    set_source_files_properties(${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources/${LANG}.lproj)
 endforeach()
 
@@ -435,8 +428,8 @@ add_executable(${TR_NAME}-mac MACOSX_BUNDLE
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_XIB_FILES}
     ${${PROJECT_NAME}_NIB_FILES}
-    ${${PROJECT_NAME}_LINGUAS_XIB_FILES}
-    ${${PROJECT_NAME}_LINGUAS_NIB_FILES}
+    ${${PROJECT_NAME}_BASE_XIB_FILES}
+    ${${PROJECT_NAME}_BASE_NIB_FILES}
     ${${PROJECT_NAME}_RESOURCES}
 )
 
