@@ -6,7 +6,6 @@
 #include <cerrno>
 #include <csignal> /* sig_atomic_t */
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
-#include <string_view>
 #include <type_traits>
 
 #ifdef _WIN32

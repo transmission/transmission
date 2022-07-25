@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <glibmm/i18n.h>
 

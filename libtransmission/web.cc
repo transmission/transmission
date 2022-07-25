@@ -10,7 +10,6 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <string_view>
 #include <thread>
 
 #ifdef _WIN32

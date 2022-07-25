@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
