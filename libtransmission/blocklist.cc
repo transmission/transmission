@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string_view>
+#include <vector>
 
 #include <fmt/core.h>
 
