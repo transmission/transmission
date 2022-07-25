@@ -59,8 +59,8 @@ protected:
 
     bool addressIsBlocked(char const* address_str)
     {
-        struct tr_address addr = {};
-        return !tr_address_from_string(&addr, address_str) || tr_sessionIsAddressBlocked(session_, &addr);
+        auto const addr = tr_address::fromString(address_str);
+        return !addr || tr_sessionIsAddressBlocked(session_, &*addr);
     }
 };
 

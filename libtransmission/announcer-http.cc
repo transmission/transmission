@@ -258,7 +258,10 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "ip")
             {
-                tr_address_from_string(&pex_.addr, value);
+                if (auto const addr = tr_address::fromString(value); addr)
+                {
+                    pex_.addr = *addr;
+                }
             }
             else if (key == "peer id")
             {

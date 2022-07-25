@@ -530,7 +530,7 @@ tr_port tr_dhtPort(tr_session* ss)
 
 bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
 {
-    int af = address->type == TR_AF_INET ? AF_INET : AF_INET6;
+    int af = address->isIPv4() ? AF_INET : AF_INET6;
 
     if (!tr_dhtEnabled(ss))
     {
@@ -545,7 +545,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         return false;
     }
 
-    if (address->type == TR_AF_INET)
+    if (address->isIPv4())
     {
         struct sockaddr_in sin;
         memset(&sin, 0, sizeof(sin));
@@ -556,7 +556,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         return true;
     }
 
-    if (address->type == TR_AF_INET6)
+    if (address->isIPv6())
     {
         struct sockaddr_in6 sin6;
         memset(&sin6, 0, sizeof(sin6));
