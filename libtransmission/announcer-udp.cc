@@ -92,7 +92,7 @@ static uint32_t announce_ip(tr_session const* session)
     // Since size of IP field is only 4 bytes long we can announce
     // only IPv4 addresses.
     auto const addr = tr_address::fromString(session->announceIP());
-    return addr && addr->type == TR_AF_INET ? addr->addr.addr4.s_addr : 0;
+    return addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
 }
 
 /****

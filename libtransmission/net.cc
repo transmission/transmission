@@ -73,11 +73,11 @@ int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
     // IPv6 addresses are always "greater than" IPv4
     if (a->type != b->type)
     {
-        return a->type == TR_AF_INET ? 1 : -1;
+        return a->isIPv4() ? 1 : -1;
     }
 
-    return a->type == TR_AF_INET ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-                                   memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
+    return a->isIPv4() ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
+                         memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
 }
 
 /***********************************************************************
@@ -213,7 +213,7 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    if (addr->type == TR_AF_INET)
+    if (addr->isIPv4())
     {
         sockaddr_in sock4 = {};
         sock4.sin_family = AF_INET;
@@ -337,7 +337,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     {
         int const tmperrno = sockerrno;
 
-        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
+        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->isIPv4())
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
@@ -440,7 +440,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #ifdef IPV6_V6ONLY
 
-    if ((addr->type == TR_AF_INET6) &&
+    if (addr->isIPv6() &&
         (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
         (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
@@ -755,12 +755,12 @@ unsigned char const* tr_globalIPv6(tr_session const* session)
 
 static bool isIPv4MappedAddress(tr_address const* addr)
 {
-    return addr->type == TR_AF_INET6 && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
+    return addr->isIPv6() && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
 }
 
 static bool isIPv6LinkLocalAddress(tr_address const* addr)
 {
-    return addr->type == TR_AF_INET6 && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
+    return addr->isIPv6() && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
 }
 
 /* isMartianAddr was written by Juliusz Chroboczek,

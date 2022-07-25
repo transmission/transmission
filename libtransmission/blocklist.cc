@@ -112,7 +112,7 @@ bool BlocklistFile::hasAddress(tr_address const& addr)
 {
     TR_ASSERT(tr_address_is_valid(&addr));
 
-    if (!is_enabled_ || addr.type == TR_AF_INET6)
+    if (!is_enabled_ || !addr.isIPv4())
     {
         return false;
     }

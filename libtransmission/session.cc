@@ -977,7 +977,7 @@ static void sessionSetImpl(struct init_data* const data)
 
         if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv))
         {
-            if (auto const addr = tr_address::fromString(sv); addr && addr->type == TR_AF_INET)
+            if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv4())
             {
                 b.addr = *addr;
             }
@@ -991,7 +991,7 @@ static void sessionSetImpl(struct init_data* const data)
 
         if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv))
         {
-            if (auto const addr = tr_address::fromString(sv); addr && addr->type == TR_AF_INET6)
+            if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv6())
             {
                 b.addr = *addr;
             }
