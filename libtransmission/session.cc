@@ -793,7 +793,6 @@ static void sessionSetImpl(struct init_data* const data)
     TR_ASSERT(tr_variantIsDict(settings));
     TR_ASSERT(tr_amInEventThread(session));
 
-    auto b = tr_bindinfo{};
     auto boolVal = bool{};
     auto d = double{};
     auto i = int64_t{};
@@ -973,23 +972,33 @@ static void sessionSetImpl(struct init_data* const data)
 
     free_incoming_peer_port(session);
 
-    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv) || !tr_address_from_string(&b.addr, sv) ||
-        b.addr.type != TR_AF_INET)
     {
-        b.addr = tr_inaddr_any;
+        auto b = tr_bindinfo{ TR_BAD_SOCKET, tr_inaddr_any, nullptr };
+
+        if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv))
+        {
+            if (auto const addr = tr_address::fromString(sv); addr && addr->type == TR_AF_INET)
+            {
+                b.addr = *addr;
+            }
+        }
+
+        session->bind_ipv4 = static_cast<struct tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
     }
 
-    b.socket = TR_BAD_SOCKET;
-    session->bind_ipv4 = static_cast<struct tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
-
-    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv) || !tr_address_from_string(&b.addr, sv) ||
-        b.addr.type != TR_AF_INET6)
     {
-        b.addr = tr_in6addr_any;
-    }
+        auto b = tr_bindinfo{ TR_BAD_SOCKET, tr_in6addr_any, nullptr };
 
-    b.socket = TR_BAD_SOCKET;
-    session->bind_ipv6 = static_cast<tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
+        if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv))
+        {
+            if (auto const addr = tr_address::fromString(sv); addr && addr->type == TR_AF_INET6)
+            {
+                b.addr = *addr;
+            }
+        }
+
+        session->bind_ipv6 = static_cast<tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
+    }
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))

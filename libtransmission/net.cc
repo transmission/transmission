@@ -61,39 +61,6 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
-bool tr_address_from_string(tr_address* dst, char const* src)
-{
-    if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
-    {
-        dst->type = TR_AF_INET;
-        return true;
-    }
-
-    if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
-    {
-        dst->type = TR_AF_INET6;
-        return true;
-    }
-
-    return false;
-}
-
-bool tr_address_from_string(tr_address* dst, std::string_view src)
-{
-    // inet_pton() requires zero-terminated strings,
-    // so make a zero-terminated copy here on the stack.
-    auto buf = std::array<char, TR_ADDRSTRLEN>{};
-    if (std::size(src) >= std::size(buf))
-    {
-        // shouldn't ever be that large; malformed address
-        return false;
-    }
-
-    *std::copy(std::begin(src), std::end(src), std::begin(buf)) = '\0';
-
-    return tr_address_from_string(dst, std::data(buf));
-}
-
 /*
  * Compare two tr_address structures.
  * Returns:
@@ -861,16 +828,25 @@ std::pair<tr_port, uint8_t const*> tr_port::fromCompact(uint8_t const* compact) 
 
 /// tr_address
 
-std::optional<tr_address> tr_address::fromString(std::string_view address_str)
+std::optional<tr_address> tr_address::fromString(std::string_view address_sv)
 {
+    auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
+
     auto addr = tr_address{};
 
-    if (!tr_address_from_string(&addr, address_str))
+    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr) == 1)
     {
-        return {};
+        addr.type = TR_AF_INET;
+        return addr;
     }
 
-    return addr;
+    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr) == 1)
+    {
+        addr.type = TR_AF_INET6;
+        return addr;
+    }
+
+    return {};
 }
 
 std::string_view tr_address::readable(char* out, size_t outlen, tr_port port) const

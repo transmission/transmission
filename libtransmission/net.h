@@ -201,10 +201,6 @@ struct tr_address
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
 
-bool tr_address_from_string(tr_address* setme, char const* string);
-
-bool tr_address_from_string(tr_address* dst, std::string_view src);
-
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
