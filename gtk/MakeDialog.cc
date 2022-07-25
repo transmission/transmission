@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <iostream>
+#include <list>
 #include <memory>
 #include <string>
 

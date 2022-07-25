@@ -7,9 +7,10 @@
 #include <cstddef>
 #include <cstring> // strchr
 #include <functional>
-#include <unordered_map>
+#include <list>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 
 #include <glibmm.h>
