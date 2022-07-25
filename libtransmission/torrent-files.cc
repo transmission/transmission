@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::find()
+#include <functional>
 #include <iterator>
 #include <optional>
 #include <set>

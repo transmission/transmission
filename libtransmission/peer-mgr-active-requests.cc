@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <ctime>
-#include <functional>
 #include <memory>
 #include <numeric>
 #include <utility>
