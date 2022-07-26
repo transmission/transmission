@@ -10,6 +10,7 @@
 #include <cstring>
 #include <deque>
 #include <string_view>
+#include <utility>
 
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>

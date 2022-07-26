@@ -5,6 +5,7 @@
  *
  */
 
+#include <algorithm>
 #include <array>
 #include <map>
 #include <memory>

@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <map>
+#include <vector>
 
 #include <giomm.h>
 #include <glibmm/i18n.h>

@@ -8,6 +8,7 @@
 #include <limits> // std::numeric_limits<size_t>::max()
 #include <numeric> // std::accumulate()
 #include <utility> // std::make_pair()
+#include <vector>
 
 #include <event2/buffer.h>
 

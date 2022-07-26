@@ -11,6 +11,7 @@
 #include <random>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <arc4.h>
 

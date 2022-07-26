@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <string_view>
 
 #include "tr-assert.h"
 

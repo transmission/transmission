@@ -7,6 +7,7 @@
 #include <array>
 #include <cerrno>
 #include <cstdint> // uint8_t, uint64_t
+#include <string_view>
 
 #include <fmt/core.h>
 

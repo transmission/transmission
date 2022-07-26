@@ -6,6 +6,7 @@
 #include <array>
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
+#include <functional>
 #include <limits.h> /* INT_MAX */
 
 #include <giomm.h> /* g_file_trash() */

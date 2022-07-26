@@ -5,7 +5,6 @@
 
 #include <array>
 #include <cassert>
-#include <functional>
 #include <memory>
 #include <utility>
 
