@@ -1269,53 +1269,42 @@ int tr_env_get_int(char const* key, int default_value)
     return default_value;
 }
 
-char* tr_env_get_string(char const* key, char const* default_value)
+std::string tr_env_get_string(std::string_view key, std::string_view default_value)
 {
-    TR_ASSERT(key != nullptr);
-
 #ifdef _WIN32
 
-    wchar_t* wide_key = tr_win32_utf8_to_native(key, -1);
-    char* value = nullptr;
-
-    if (wide_key != nullptr)
+    if (auto* const wide_key = tr_win32_utf8_to_native(std::data(key), std::size(key)); wide_key != nullptr)
     {
-        DWORD const size = GetEnvironmentVariableW(wide_key, nullptr, 0);
-
-        if (size != 0)
+        if (auto const size = GetEnvironmentVariableW(wide_key, nullptr, 0); size != 0)
         {
-            wchar_t* const wide_value = tr_new(wchar_t, size);
+            auto wide_val = std::vector<wchar_t>{};
+            wide_val.resize(size);
 
-            if (GetEnvironmentVariableW(wide_key, wide_value, size) == size - 1)
+            if (GetEnvironmentVariableW(wide_key, std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
             {
-                value = tr_win32_native_to_utf8(wide_value, size);
+                char* const val = tr_win32_native_to_utf8(std::data(wide_val), std::size(wide_val));
+                auto ret = std::string{ val };
+                tr_free(val);
+                tr_free(wide_key);
+                return ret;
             }
-
-            tr_free(wide_value);
         }
 
         tr_free(wide_key);
     }
 
-    if (value == nullptr && default_value != nullptr)
-    {
-        value = tr_strdup(default_value);
-    }
-
-    return value;
-
 #else
 
-    char const* value = getenv(key);
+    auto const szkey = tr_strbuf<char, 256>{ key };
 
-    if (value == nullptr)
+    if (auto const* const value = getenv(szkey); value != nullptr)
     {
-        value = default_value;
+        return value;
     }
 
-    return value != nullptr ? tr_strvDup(value) : nullptr;
-
 #endif
+
+    return std::string{ default_value };
 }
 
 /***

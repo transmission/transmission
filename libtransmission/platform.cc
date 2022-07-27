@@ -76,11 +76,9 @@ static auto win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 
 static std::string getHomeDir()
 {
-    if (auto* const dir = tr_env_get_string("HOME", nullptr); dir != nullptr)
+    if (auto dir = tr_env_get_string("HOME"sv); !std::empty(dir))
     {
-        auto ret = std::string{ dir };
-        tr_free(dir);
-        return ret;
+        return dir;
     }
 
 #ifdef _WIN32
@@ -108,11 +106,9 @@ static std::string getHomeDir()
 
 static std::string xdgConfigHome()
 {
-    if (auto* const dir = tr_env_get_string("XDG_CONFIG_HOME", nullptr); dir != nullptr)
+    if (auto dir = tr_env_get_string("XDG_CONFIG_HOME"sv); !std::empty(dir))
     {
-        auto ret = std::string{ dir };
-        tr_free(dir);
-        return ret;
+        return dir;
     }
 
     return fmt::format("{:s}/.config"sv, getHomeDir());
@@ -120,9 +116,9 @@ static std::string xdgConfigHome()
 
 char* tr_getDefaultConfigDir(char const* appname)
 {
-    if (auto* dir = tr_env_get_string("TRANSMISSION_HOME", nullptr); dir != nullptr)
+    if (auto dir = tr_env_get_string("TRANSMISSION_HOME"sv); !std::empty(dir))
     {
-        return dir;
+        return tr_strvDup(dir);
     }
 
     if (tr_str_is_empty(appname))
@@ -221,18 +217,14 @@ static bool isWebClientDir(std::string_view path)
 
 std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 {
-    if (auto* const dir = tr_env_get_string("CLUTCH_HOME", nullptr); dir != nullptr)
+    if (auto dir = tr_env_get_string("CLUTCH_HOME"sv); !std::empty(dir))
     {
-        auto ret = std::string{ dir };
-        tr_free(dir);
-        return ret;
+        return dir;
     }
 
-    if (auto* const dir = tr_env_get_string("TRANSMISSION_WEB_HOME", nullptr); dir != nullptr)
+    if (auto dir = tr_env_get_string("TRANSMISSION_WEB_HOME"sv); !std::empty(dir))
     {
-        auto ret = std::string{ dir };
-        tr_free(dir);
-        return ret;
+        return dir;
     }
 
 #ifdef BUILD_MAC_CLIENT
@@ -298,23 +290,20 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     auto candidates = std::list<std::string>{};
 
     /* XDG_DATA_HOME should be the first in the list of candidates */
-    char* tmp = tr_env_get_string("XDG_DATA_HOME", nullptr);
-    if (!tr_str_is_empty(tmp))
+    if (auto tmp = tr_env_get_string("XDG_DATA_HOME"sv); !std::empty(tmp))
     {
-        candidates.emplace_back(tmp);
+        candidates.emplace_back(std::move(tmp));
     }
     else
     {
         candidates.emplace_back(fmt::format("{:s}/.local/share"sv, getHomeDir()));
     }
-    tr_free(tmp);
 
     /* XDG_DATA_DIRS are the backup directories */
     {
         char const* const pkg = PACKAGE_DATA_DIR;
-        auto* xdg = tr_env_get_string("XDG_DATA_DIRS", "");
+        auto const xdg = tr_env_get_string("XDG_DATA_DIRS"sv);
         auto const buf = fmt::format(FMT_STRING("{:s}:{:s}:/usr/local/share:/usr/share"), pkg, xdg);
-        tr_free(xdg);
 
         auto sv = std::string_view{ buf };
         auto token = std::string_view{};
