@@ -43,9 +43,8 @@ int main(int argc, char** argv)
     {
         for (int i = 3; i < argc; ++i)
         {
-            char* const value = tr_env_get_string(argv[i], "<null>");
+            auto const value = tr_env_get_string(argv[i], "<null>");
             tr_sys_file_write_line(fd, value);
-            tr_free(value);
         }
     }
     else if (test_action == "--dump-cwd")

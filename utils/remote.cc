@@ -2451,9 +2451,11 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 810: /* authenv */
-                auth = tr_env_get_string("TR_AUTH", nullptr);
-
-                if (auth == nullptr)
+                if (auto const authstr = tr_env_get_string("TR_AUTH"); !std::empty(authstr))
+                {
+                    auth = tr_strvDup(authstr);
+                }
+                else
                 {
                     fprintf(stderr, "The TR_AUTH environment variable is not set\n");
                     exit(0);
