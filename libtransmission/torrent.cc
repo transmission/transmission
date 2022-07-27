@@ -7,7 +7,6 @@
 #include <array>
 #include <cerrno> // EINVAL
 #include <climits> /* INT_MAX */
-#include <cmath>
 #include <csignal> /* signal() */
 #include <ctime>
 #include <map>
@@ -2506,10 +2505,10 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
 ****
 ***/
 
-static bool renameArgsAreValid(char const* oldpath, char const* newname)
+static bool renameArgsAreValid(std::string_view oldpath, std::string_view newname)
 {
-    return !tr_str_is_empty(oldpath) && !tr_str_is_empty(newname) && strcmp(newname, ".") != 0 && strcmp(newname, "..") != 0 &&
-        strchr(newname, TR_PATH_DELIMITER) == nullptr;
+    return !std::empty(oldpath) && !std::empty(newname) && newname != "."sv && newname != ".."sv &&
+        !tr_strvContains(newname, TR_PATH_DELIMITER);
 }
 
 static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
@@ -2530,7 +2529,7 @@ static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldp
     return indices;
 }
 
-static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
+static int renamePath(tr_torrent* tor, std::string_view oldpath, std::string_view newname)
 {
     int err = 0;
 
@@ -2573,13 +2572,17 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
     return err;
 }
 
-static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char const* newname, tr_file_index_t file_index)
+static void renameTorrentFileString(
+    tr_torrent* tor,
+    std::string_view oldpath,
+    std::string_view newname,
+    tr_file_index_t file_index)
 {
     auto name = std::string{};
     auto const subpath = std::string_view{ tor->fileSubpath(file_index) };
-    auto const oldpath_len = strlen(oldpath);
+    auto const oldpath_len = std::size(oldpath);
 
-    if (strchr(oldpath, TR_PATH_DELIMITER) == nullptr)
+    if (!tr_strvContains(oldpath, TR_PATH_DELIMITER))
     {
         if (oldpath_len >= std::size(subpath))
         {
@@ -2615,18 +2618,13 @@ static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char c
     }
 }
 
-struct rename_data
+static void torrentRenamePath(
+    tr_torrent* const tor,
+    std::string oldpath, // NOLINT performance-unnecessary-value-param
+    std::string newname, // NOLINT performance-unnecessary-value-param
+    tr_torrent_rename_done_func callback,
+    void* const callback_user_data)
 {
-    tr_torrent* tor;
-    char* oldpath;
-    char* newname;
-    tr_torrent_rename_done_func callback;
-    void* callback_user_data;
-};
-
-static void torrentRenamePath(struct rename_data* data)
-{
-    auto* const tor = data->tor;
     TR_ASSERT(tr_isTorrent(tor));
 
     /***
@@ -2634,42 +2632,31 @@ static void torrentRenamePath(struct rename_data* data)
     ***/
 
     int error = 0;
-    char const* const oldpath = data->oldpath;
-    char const* const newname = data->newname;
 
     if (!renameArgsAreValid(oldpath, newname))
     {
         error = EINVAL;
     }
-    else
+    else if (auto const file_indices = renameFindAffectedFiles(tor, oldpath); std::empty(file_indices))
     {
-        auto const file_indices = renameFindAffectedFiles(tor, oldpath);
-        if (std::empty(file_indices))
+        error = EINVAL;
+    }
+    else if ((error = renamePath(tor, oldpath, newname)) == 0)
+    {
+        /* update tr_info.files */
+        for (auto const& file_index : file_indices)
         {
-            error = EINVAL;
+            renameTorrentFileString(tor, oldpath, newname, file_index);
         }
-        else
+
+        /* update tr_info.name if user changed the toplevel */
+        if (std::size(file_indices) == tor->fileCount() && !tr_strvContains(oldpath, '/'))
         {
-            error = renamePath(tor, oldpath, newname);
-
-            if (error == 0)
-            {
-                /* update tr_info.files */
-                for (auto const& file_index : file_indices)
-                {
-                    renameTorrentFileString(tor, oldpath, newname, file_index);
-                }
-
-                /* update tr_info.name if user changed the toplevel */
-                if (std::size(file_indices) == tor->fileCount() && strchr(oldpath, '/') == nullptr)
-                {
-                    tor->setName(newname);
-                }
-
-                tor->markEdited();
-                tor->setDirty();
-            }
+            tor->setName(newname);
         }
+
+        tor->markEdited();
+        tor->setDirty();
     }
 
     /***
@@ -2679,15 +2666,10 @@ static void torrentRenamePath(struct rename_data* data)
     tor->markChanged();
 
     /* callback */
-    if (data->callback != nullptr)
+    if (callback != nullptr)
     {
-        (*data->callback)(tor, data->oldpath, data->newname, error, data->callback_user_data);
+        (*callback)(tor, oldpath.c_str(), newname.c_str(), error, callback_user_data);
     }
-
-    /* cleanup */
-    tr_free(data->oldpath);
-    tr_free(data->newname);
-    tr_free(data);
 }
 
 void tr_torrent::renamePath(
@@ -2696,14 +2678,14 @@ void tr_torrent::renamePath(
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
-    auto* const data = tr_new0(struct rename_data, 1);
-    data->tor = this;
-    data->oldpath = tr_strvDup(oldpath);
-    data->newname = tr_strvDup(newname);
-    data->callback = callback;
-    data->callback_user_data = callback_user_data;
-
-    tr_runInEventThread(this->session, torrentRenamePath, data);
+    tr_runInEventThread(
+        this->session,
+        torrentRenamePath,
+        this,
+        std::string{ oldpath },
+        std::string{ newname },
+        callback,
+        callback_user_data);
 }
 
 void tr_torrentRenamePath(
