@@ -8,7 +8,6 @@
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <cstdint>
-#include <cstdlib> /* qsort */
 #include <ctime> // time_t
 #include <deque>
 #include <iterator> // std::back_inserter
@@ -463,7 +462,7 @@ public:
         return is_endgame_;
     }
 
-    void addStrike(tr_peer* peer)
+    void addStrike(tr_peer* peer) const
     {
         tr_logAddTraceSwarm(this, fmt::format("increasing peer {} strike count to {}", peer->readable(), peer->strikes + 1));
 
@@ -1870,23 +1869,31 @@ enum tr_rechoke_state
 
 struct tr_rechoke_info
 {
-    tr_peerMsgs* peer;
-    int salt;
-    int rechoke_state;
-};
-
-[[nodiscard]] constexpr int compare_rechoke_info(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct tr_rechoke_info const*>(va);
-    auto const* const b = static_cast<struct tr_rechoke_info const*>(vb);
-
-    if (a->rechoke_state != b->rechoke_state)
+    tr_rechoke_info(tr_peerMsgs* peer_in, int rechoke_state_in)
+        : peer{ peer_in }
+        , rechoke_state{ rechoke_state_in }
     {
-        return a->rechoke_state - b->rechoke_state;
     }
 
-    return a->salt - b->salt;
-}
+    [[nodiscard]] constexpr auto compare(tr_rechoke_info const& that) const noexcept // <=>
+    {
+        if (this->rechoke_state != that.rechoke_state)
+        {
+            return this->rechoke_state - that.rechoke_state;
+        }
+
+        return this->salt - that.salt;
+    }
+
+    [[nodiscard]] constexpr auto operator<(tr_rechoke_info const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
+
+    tr_peerMsgs* peer;
+    int rechoke_state;
+    int salt = tr_rand_int_weak(INT_MAX);
+};
 
 } // namespace
 
@@ -1900,8 +1907,7 @@ void rechokeDownloads(tr_swarm* s)
     auto const now = tr_time();
 
     uint16_t max_peers = 0;
-    uint16_t rechoke_count = 0;
-    struct tr_rechoke_info* rechoke = nullptr;
+    auto rechoke = std::vector<tr_rechoke_info>{};
 
     /* some cases where this function isn't necessary */
     if (s->tor->isDone() || !s->tor->clientCanDownload())
@@ -1982,6 +1988,8 @@ void rechokeDownloads(tr_swarm* s)
 
     if (peerCount > 0)
     {
+        rechoke.reserve(peerCount);
+
         auto const* const tor = s->tor;
         int const n = tor->pieceCount();
 
@@ -2027,37 +2035,23 @@ void rechokeDownloads(tr_swarm* s)
                     rechoke_state = RECHOKE_STATE_BAD;
                 }
 
-                if (rechoke == nullptr)
-                {
-                    rechoke = tr_new(struct tr_rechoke_info, peerCount);
-                }
-
-                rechoke[rechoke_count].peer = peer;
-                rechoke[rechoke_count].rechoke_state = rechoke_state;
-                rechoke[rechoke_count].salt = tr_rand_int_weak(INT_MAX);
-                rechoke_count++;
+                rechoke.emplace_back(peer, rechoke_state);
             }
         }
 
         tr_free(piece_is_interesting);
     }
 
-    if ((rechoke != nullptr) && (rechoke_count > 0))
-    {
-        qsort(rechoke, rechoke_count, sizeof(struct tr_rechoke_info), compare_rechoke_info);
-    }
+    std::sort(std::begin(rechoke), std::end(rechoke));
 
     /* now that we know which & how many peers to be interested in... update the peer interest */
 
-    s->interested_count = std::min(max_peers, rechoke_count);
+    s->interested_count = std::min(max_peers, static_cast<uint16_t>(std::size(rechoke)));
 
-    for (int i = 0; i < rechoke_count; ++i)
+    for (size_t i = 0, n = std::size(rechoke); i < n; ++i)
     {
         rechoke[i].peer->set_interested(i < s->interested_count);
     }
-
-    /* cleanup */
-    tr_free(rechoke);
 }
 
 } // namespace rechoke_downloads_helpers
@@ -2091,30 +2085,32 @@ struct ChokeData
     int rate;
     int salt;
     tr_peerMsgs* msgs;
+
+    [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
+    {
+        if (this->rate != that.rate) // prefer higher overall speeds
+        {
+            return this->rate > that.rate ? -1 : 1;
+        }
+
+        if (this->wasChoked != that.wasChoked) // prefer unchoked
+        {
+            return this->wasChoked ? 1 : -1;
+        }
+
+        if (this->salt != that.salt) // random order
+        {
+            return this->salt - that.salt;
+        }
+
+        return 0;
+    }
+
+    [[nodiscard]] constexpr auto operator<(ChokeData const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
 };
-
-[[nodiscard]] constexpr int compareChoke(void const* va, void const* vb) noexcept
-{
-    auto const* const a = static_cast<struct ChokeData const*>(va);
-    auto const* const b = static_cast<struct ChokeData const*>(vb);
-
-    if (a->rate != b->rate) // prefer higher overall speeds
-    {
-        return a->rate > b->rate ? -1 : 1;
-    }
-
-    if (a->wasChoked != b->wasChoked) // prefer unchoked
-    {
-        return a->wasChoked ? 1 : -1;
-    }
-
-    if (a->salt != b->salt) // random order
-    {
-        return a->salt - b->salt;
-    }
-
-    return 0;
-}
 
 /* is this a new connection? */
 [[nodiscard]] bool isNew(tr_peerMsgs const* msgs)
@@ -2197,7 +2193,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         }
     }
 
-    qsort(choke, size, sizeof(struct ChokeData), compareChoke);
+    std::sort(choke, choke + size);
 
     /**
      * Reciprocation and number of uploads capping is managed by unchoking
