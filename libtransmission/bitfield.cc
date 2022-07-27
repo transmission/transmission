@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <climits> // SIZE_MAX
 #include <vector>
 
 #include "tr-popcount.h"
