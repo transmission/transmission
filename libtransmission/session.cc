@@ -2341,24 +2341,9 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 ****
 ***/
 
-struct port_forwarding_data
-{
-    bool enabled;
-    struct tr_shared* shared;
-};
-
-static void setPortForwardingEnabled(struct port_forwarding_data* const data)
-{
-    tr_sharedTraversalEnable(data->shared, data->enabled);
-    tr_free(data);
-}
-
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    auto* const d = tr_new0(struct port_forwarding_data, 1);
-    d->shared = session->shared;
-    d->enabled = enabled;
-    tr_runInEventThread(session, setPortForwardingEnabled, d);
+    tr_runInEventThread(session, tr_sharedTraversalEnable, session->shared, enabled);
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
