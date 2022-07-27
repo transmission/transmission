@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
-#include <cstring>
+#include <cstdlib> // bsearch()
 #include <string_view>
 #include <vector>
 

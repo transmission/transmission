@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstddef> /* offsetof */
-#include <cstdlib> /* realloc() */
 #include <errno.h>
 
 #include <process.h> /* _beginthreadex() */
