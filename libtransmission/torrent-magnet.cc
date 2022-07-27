@@ -9,8 +9,7 @@
 #include <deque>
 #include <string>
 #include <string_view>
-
-#include <event2/buffer.h>
+#include <vector>
 
 #include <fmt/core.h>
 
@@ -28,9 +27,6 @@
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
-#include "web-utils.h"
-
-using namespace std::literals;
 
 /***
 ****
@@ -41,7 +37,7 @@ static auto constexpr MinRepeatIntervalSecs = int{ 3 };
 
 struct metadata_node
 {
-    time_t requestedAt;
+    time_t requested_at;
     int piece;
 };
 
@@ -50,9 +46,9 @@ struct tr_incomplete_metadata
     std::vector<char> metadata;
 
     /** sorted from least to most recently requested */
-    std::deque<metadata_node> piecesNeeded;
+    std::deque<metadata_node> pieces_needed;
 
-    int pieceCount = 0;
+    int piece_count = 0;
 };
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
@@ -83,11 +79,11 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    m->pieceCount = n;
+    m->piece_count = n;
     m->metadata.resize(size);
-    m->piecesNeeded.resize(n);
+    m->pieces_needed.resize(n);
 
-    if (std::empty(m->metadata) || std::empty(m->piecesNeeded))
+    if (std::empty(m->metadata) || std::empty(m->pieces_needed))
     {
         delete m;
         return false;
@@ -95,8 +91,8 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 
     for (int i = 0; i < n; ++i)
     {
-        m->piecesNeeded[i].piece = i;
-        m->piecesNeeded[i].requestedAt = 0;
+        m->pieces_needed[i].piece = i;
+        m->pieces_needed[i].requested_at = 0;
     }
 
     tor->incompleteMetadata = m;
@@ -151,7 +147,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
 
 static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)
 {
-    return piece + 1 == m->pieceCount ? // last piece
+    return piece + 1 == m->piece_count ? // last piece
         std::size(m->metadata) - (piece * METADATA_PIECE_SIZE) :
         METADATA_PIECE_SIZE;
 }
@@ -316,12 +312,12 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
     }
     else /* drat. */
     {
-        auto const n_pieces = static_cast<size_t>(m->pieceCount);
-        m->piecesNeeded.resize(n_pieces);
+        auto const n_pieces = static_cast<size_t>(m->piece_count);
+        m->pieces_needed.resize(n_pieces);
         for (size_t i = 0; i < n_pieces; ++i)
         {
-            m->piecesNeeded[i].piece = i;
-            m->piecesNeeded[i].requestedAt = 0;
+            m->pieces_needed[i].piece = i;
+            m->pieces_needed[i].requested_at = 0;
         }
 
         char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
@@ -354,7 +350,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     }
 
     // sanity test: is `piece` in range?
-    if ((piece < 0) || (piece >= m->pieceCount))
+    if ((piece < 0) || (piece >= m->piece_count))
     {
         return;
     }
@@ -366,7 +362,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     }
 
     // do we need this piece?
-    auto& needed = m->piecesNeeded;
+    auto& needed = m->pieces_needed;
     auto const iter = std::find_if(
         std::begin(needed),
         std::end(needed),
@@ -397,12 +393,12 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     bool have_request = false;
     struct tr_incomplete_metadata* m = tor->incompleteMetadata;
 
-    if (m != nullptr && !std::empty(m->piecesNeeded) && m->piecesNeeded[0].requestedAt + MinRepeatIntervalSecs < now)
+    if (m != nullptr && !std::empty(m->pieces_needed) && m->pieces_needed[0].requested_at + MinRepeatIntervalSecs < now)
     {
-        auto req = m->piecesNeeded.front();
-        m->piecesNeeded.pop_front();
-        req.requestedAt = now;
-        m->piecesNeeded.push_back(req);
+        auto req = m->pieces_needed.front();
+        m->pieces_needed.pop_front();
+        req.requested_at = now;
+        m->pieces_needed.push_back(req);
 
         tr_logAddDebugTor(tor, fmt::format("next piece to request: {}", req.piece));
         *setme_piece = req.piece;
@@ -420,7 +416,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
     }
 
     auto const* const m = tor->incompleteMetadata;
-    return m == nullptr || m->pieceCount == 0 ? 0.0 : (m->pieceCount - std::size(m->piecesNeeded)) / (double)m->pieceCount;
+    return m == nullptr || m->piece_count == 0 ? 0.0 : (m->piece_count - std::size(m->pieces_needed)) / (double)m->piece_count;
 }
 
 char* tr_torrentGetMagnetLink(tr_torrent const* tor)
