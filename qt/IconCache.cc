@@ -82,7 +82,7 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
 
     if (!multifile)
     {
-        QMimeDatabase mime_db;
+        QMimeDatabase const mime_db;
         auto const type = mime_db.mimeTypeForName(mime_type_name);
         icon = getThemeIcon(type.iconName());
 
@@ -196,7 +196,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     QIcon& icon = ext_to_icon_[ext];
     if (icon.isNull()) // cache miss
     {
-        QMimeDatabase mime_db;
+        QMimeDatabase const mime_db;
         auto const type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {

@@ -143,7 +143,7 @@ static void verboseLog(std::string_view description, tr_direction direction, std
 
     auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
     out << description << std::endl << "[raw]"sv << direction_sv;
-    for (unsigned char ch : message)
+    for (unsigned char const ch : message)
     {
         if (isprint(ch) != 0)
         {

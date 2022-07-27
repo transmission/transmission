@@ -232,8 +232,8 @@ void MakeDialog::onSourceChanged()
     }
     else
     {
-        QString files = tr("%Ln File(s)", nullptr, builder_->fileCount);
-        QString pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
+        QString const files = tr("%Ln File(s)", nullptr, builder_->fileCount);
+        QString const pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
         text = tr("%1 in %2; %3 @ %4")
                    .arg(Formatter::get().sizeToString(builder_->totalSize))
                    .arg(files)

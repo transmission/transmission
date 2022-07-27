@@ -58,7 +58,7 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
     size_t offset = 0;
     for (size_t i = 0; i < inlen; ++i)
     {
-        int lookup = in[i] - '0';
+        int const lookup = in[i] - '0';
 
         /* Skip chars outside the lookup table */
         if (lookup < 0)

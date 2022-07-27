@@ -307,7 +307,7 @@ static char const* torrentRemove(
     auto delete_flag = bool{ false };
     (void)tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
 
-    tr_rpc_callback_type type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
+    tr_rpc_callback_type const type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
 
     for (auto* tor : getTorrents(session, args_in))
     {

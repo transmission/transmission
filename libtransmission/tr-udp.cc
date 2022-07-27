@@ -92,7 +92,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
 void tr_udpSetSocketBuffers(tr_session* session)
 {
-    bool utp = tr_sessionIsUTPEnabled(session);
+    bool const utp = tr_sessionIsUTPEnabled(session);
 
     if (session->udp_socket != TR_BAD_SOCKET)
     {
@@ -232,7 +232,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     auto* session = static_cast<tr_session*>(vsession);
 
     socklen_t fromlen = sizeof(from);
-    int rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
+    int const rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols. The logic is as follows:

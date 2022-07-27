@@ -24,7 +24,7 @@ void RpcQueue::stepFinished()
     if (future_watcher_.future().isResultReadyAt(0))
     {
         result = future_watcher_.result();
-        RpcResponseFuture future = future_watcher_.future();
+        RpcResponseFuture const future = future_watcher_.future();
 
         // we can't handle network errors, abort queue and pass the error upwards
         if (result.networkError != QNetworkReply::NoError)

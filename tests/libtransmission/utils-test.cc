@@ -258,7 +258,7 @@ TEST_F(UtilsTest, trStrlcpy)
     char const initial_char = '1';
     std::array<char, 100> destination = { initial_char };
 
-    std::vector<std::string> tests{
+    std::vector<std::string> const tests{
         "a",
         "",
         "12345678901234567890",

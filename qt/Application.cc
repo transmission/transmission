@@ -173,7 +173,7 @@ Application::Application(int& argc, char** argv)
 
     // try to delegate the work to an existing copy of Transmission
     // before starting ourselves...
-    InteropHelper interop_client;
+    InteropHelper const interop_client;
 
     if (interop_client.isConnected())
     {
@@ -225,7 +225,7 @@ Application::Application(int& argc, char** argv)
     }
 
     // ensure our config directory exists
-    QDir dir(config_dir);
+    QDir const dir(config_dir);
 
     if (!dir.exists())
     {
@@ -666,6 +666,6 @@ int tr_main(int argc, char** argv)
     Application::setAttribute(Qt::AA_EnableHighDpiScaling);
     Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-    Application app(argc, argv);
+    Application const app(argc, argv);
     return QApplication::exec();
 }

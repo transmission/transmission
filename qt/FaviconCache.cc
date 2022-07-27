@@ -89,7 +89,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
     cache_dir.mkpath(cache_dir.absolutePath());
     for (auto const& sitename : cache_dir.entryList(QDir::Files | QDir::Readable))
     {
-        QPixmap pixmap(cache_dir.absoluteFilePath(sitename));
+        QPixmap const pixmap(cache_dir.absoluteFilePath(sitename));
         if (!pixmap.isNull())
         {
             pixmaps_[sitename] = scale(pixmap);
@@ -200,7 +200,7 @@ void FaviconCache::onRequestFinished(QNetworkReply* reply)
         pixmaps_[sitename] = scale(pixmap);
 
         // save it on disk...
-        QDir cache_dir(getCacheDir());
+        QDir const cache_dir(getCacheDir());
         cache_dir.mkpath(cache_dir.absolutePath());
         QFile file(cache_dir.absoluteFilePath(sitename));
         file.open(QIODevice::WriteOnly);

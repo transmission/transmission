@@ -289,7 +289,7 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
-    bool ret = access(path, F_OK) != -1;
+    bool const ret = access(path, F_OK) != -1;
 
     if (!ret)
     {
@@ -479,7 +479,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 #else /* USE_COPYFILE */
 
     /* Other OSes require us to copy between file descriptors, so open them. */
-    tr_sys_file_t in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+    tr_sys_file_t const in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (in == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open source file: ");
@@ -494,7 +494,11 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         return false;
     }
 
-    tr_sys_file_t out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
+    tr_sys_file_t const out = tr_sys_file_open(
+        dst_path,
+        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+        0666,
+        error);
     if (out == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open destination file: ");
@@ -900,7 +904,7 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool ret = fsync(handle) != -1;
+    bool const ret = fsync(handle) != -1;
 
     if (!ret)
     {
@@ -914,7 +918,7 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool ret = ftruncate(handle, size) != -1;
+    bool const ret = ftruncate(handle, size) != -1;
 
     if (!ret)
     {
@@ -1114,7 +1118,7 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
     TR_ASSERT(address != nullptr);
     TR_ASSERT(size > 0);
 
-    bool ret = munmap((void*)address, size) != -1;
+    bool const ret = munmap((void*)address, size) != -1;
 
     if (!ret)
     {
@@ -1357,7 +1361,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    bool ret = closedir((DIR*)handle) != -1;
+    bool const ret = closedir((DIR*)handle) != -1;
 
     if (!ret)
     {

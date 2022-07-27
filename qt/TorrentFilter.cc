@@ -231,7 +231,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
 bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
-    QModelIndex child_index = sourceModel()->index(source_row, 0, source_parent);
+    QModelIndex const child_index = sourceModel()->index(source_row, 0, source_parent);
     auto const& tor = *child_index.model()->data(child_index, TorrentModel::TorrentRole).value<Torrent const*>();
     bool accepts = true;
 

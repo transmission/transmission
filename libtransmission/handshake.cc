@@ -1087,7 +1087,7 @@ void tr_handshakeAbort(tr_handshake* handshake)
 
 static void gotError(tr_peerIo* io, short what, void* vhandshake)
 {
-    int errcode = errno;
+    int const errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
     if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)

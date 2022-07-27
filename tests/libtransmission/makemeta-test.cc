@@ -207,7 +207,7 @@ protected:
         char const* source)
     {
         // build random payloads
-        size_t payload_count = 1 + tr_rand_int_weak(max_file_count);
+        size_t const payload_count = 1 + tr_rand_int_weak(max_file_count);
         auto** payloads = tr_new0(void*, payload_count);
         auto* payload_sizes = tr_new0(size_t, payload_count);
 

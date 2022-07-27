@@ -49,7 +49,7 @@ public:
 
     QString const& next()
     {
-        int new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
+        int const new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
         token_.truncate(0);
         token_.append(&path_.data()[new_slash_index + 1], slash_index_ - new_slash_index);
         slash_index_ = new_slash_index - 1;
@@ -365,7 +365,7 @@ void FileTreeModel::addFile(
             if (child == nullptr)
             {
                 added = true;
-                QModelIndex parent_index(indexOf(item, 0));
+                QModelIndex const parent_index(indexOf(item, 0));
                 int const n(item->childCount());
 
                 beginInsertRows(parent_index, n, n);

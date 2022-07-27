@@ -118,7 +118,7 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
         }
 
         QString const header_text = model_->headerData(column, Qt::Horizontal).toString();
-        int header_width = Utils::measureHeaderItem(this->header(), header_text);
+        int const header_width = Utils::measureHeaderItem(this->header(), header_text);
 
         int const width = std::max(min_width, std::max(item_width, header_width));
         setColumnWidth(column, width);

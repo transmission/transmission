@@ -133,7 +133,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(info_dict_size > 0);
 
     char* ret = nullptr;
-    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr))
+    if (size_t const o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr))
     {
         size_t const l = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
 
@@ -423,7 +423,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
         int const piece = m->piecesNeeded[0].piece;
         tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount);
 
-        int i = m->piecesNeededCount - 1;
+        int const i = m->piecesNeededCount - 1;
         m->piecesNeeded[i].piece = piece;
         m->piecesNeeded[i].requestedAt = now;
 
