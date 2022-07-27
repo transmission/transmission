@@ -450,44 +450,9 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     TR_ASSERT(dst != nullptr);
     TR_ASSERT(src != nullptr);
 
-#ifdef HAVE_STRLCPY
-
-    return strlcpy(dst, src, siz);
-
-#else
-
-    auto* d = dst;
-    auto const* s = src;
-    size_t n = siz;
-
-    /* Copy as many bytes as will fit */
-    if (n != 0)
-    {
-        while (--n != 0)
-        {
-            if ((*d++ = *s++) == '\0')
-            {
-                break;
-            }
-        }
-    }
-
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0)
-    {
-        if (siz != 0)
-        {
-            *d = '\0'; /* NUL-terminate dst */
-        }
-
-        while (*s++ != '\0')
-        {
-        }
-    }
-
-    return s - (char const*)src - 1; /* count does not include NUL */
-
-#endif
+    auto const res = fmt::format_to_n(dst, siz - 1, FMT_STRING("{:s}"), src);
+    *res.out = '\0';
+    return res.size;
 }
 
 /***
