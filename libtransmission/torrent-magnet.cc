@@ -37,8 +37,8 @@ static auto constexpr MinRepeatIntervalSecs = int{ 3 };
 
 struct metadata_node
 {
-    time_t requested_at;
-    int piece;
+    time_t requested_at = 0U;
+    int piece = 0;
 };
 
 struct tr_incomplete_metadata
@@ -50,6 +50,20 @@ struct tr_incomplete_metadata
 
     int piece_count = 0;
 };
+
+static auto create_all_needed(int n_pieces)
+{
+    auto ret = std::deque<metadata_node>{};
+
+    ret.resize(n_pieces);
+
+    for (int i = 0; i < n_pieces; ++i)
+    {
+        ret[i].piece = i;
+    }
+
+    return ret;
+}
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
@@ -81,18 +95,12 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 
     m->piece_count = n;
     m->metadata.resize(size);
-    m->pieces_needed.resize(n);
+    m->pieces_needed = create_all_needed(n);
 
     if (std::empty(m->metadata) || std::empty(m->pieces_needed))
     {
         delete m;
         return false;
-    }
-
-    for (int i = 0; i < n; ++i)
-    {
-        m->pieces_needed[i].piece = i;
-        m->pieces_needed[i].requested_at = 0;
     }
 
     tor->incompleteMetadata = m;
@@ -312,13 +320,9 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
     }
     else /* drat. */
     {
-        auto const n_pieces = static_cast<size_t>(m->piece_count);
-        m->pieces_needed.resize(n_pieces);
-        for (size_t i = 0; i < n_pieces; ++i)
-        {
-            m->pieces_needed[i].piece = i;
-            m->pieces_needed[i].requested_at = 0;
-        }
+        int const n = m->piece_count;
+
+        m->pieces_needed = create_all_needed(n);
 
         char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
         tr_logAddWarnTor(
@@ -327,9 +331,9 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
                 ngettext(
                     "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece",
                     "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces",
-                    n_pieces),
+                    n),
                 fmt::arg("error", msg),
-                fmt::arg("piece_count", n_pieces)));
+                fmt::arg("piece_count", n)));
         tr_error_clear(&error);
     }
 }
@@ -393,12 +397,13 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     bool have_request = false;
     struct tr_incomplete_metadata* m = tor->incompleteMetadata;
 
-    if (m != nullptr && !std::empty(m->pieces_needed) && m->pieces_needed[0].requested_at + MinRepeatIntervalSecs < now)
+    auto& needed = m->pieces_needed;
+    if (m != nullptr && !std::empty(needed) && needed.front().requested_at + MinRepeatIntervalSecs < now)
     {
-        auto req = m->pieces_needed.front();
-        m->pieces_needed.pop_front();
+        auto req = needed.front();
+        needed.pop_front();
         req.requested_at = now;
-        m->pieces_needed.push_back(req);
+        needed.push_back(req);
 
         tr_logAddDebugTor(tor, fmt::format("next piece to request: {}", req.piece));
         *setme_piece = req.piece;
