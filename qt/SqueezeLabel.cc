@@ -63,7 +63,7 @@ void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
     }
 
     QPainter painter(this);
-    QFontMetrics fm = fontMetrics();
+    QFontMetrics const fm = fontMetrics();
     QStyleOption opt;
     opt.initFrom(this);
     auto const full_text = text();

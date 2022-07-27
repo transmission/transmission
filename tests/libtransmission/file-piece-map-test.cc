@@ -286,7 +286,7 @@ TEST_F(FilePieceMapTest, wanted)
     // set the first file as not wanted.
     // since this begins and ends on a piece boundary,
     // this shouldn't affect any other files' pieces
-    bool wanted = false;
+    bool const wanted = false;
     files_wanted.set(0, wanted);
     expected_files_wanted.set(0, wanted);
     expected_pieces_wanted.setSpan(0, 5, wanted);

@@ -76,8 +76,8 @@ private:
     {
         bool identical = true;
 
-        tr_sys_file_t fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
-        tr_sys_file_t fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+        tr_sys_file_t const fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+        tr_sys_file_t const fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
         EXPECT_NE(fd1, TR_BAD_SYS_FILE);
         EXPECT_NE(fd2, TR_BAD_SYS_FILE);
 

@@ -122,7 +122,7 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 
 static size_t base64_alloc_size(std::string_view input)
 {
-    size_t ret_length = 4 * ((std::size(input) + 2) / 3);
+    size_t ret_length = 4 * ((std::size(input) + 2) / 3); // NOLINT misc-const-correctness
 #ifdef USE_SYSTEM_B64
     // Additional space is needed for newlines if we're using unpatched libb64
     ret_length += ret_length / 72 + 1;

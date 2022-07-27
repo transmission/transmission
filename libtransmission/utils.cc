@@ -1115,7 +1115,7 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
         unit = &u[3];
     }
 
-    double value = double(bytes) / unit->value;
+    double const value = double(bytes) / unit->value;
     auto const* const units = std::data(unit->name);
 
     auto precision = int{};

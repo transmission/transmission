@@ -365,7 +365,7 @@ void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 
 static size_t utp_get_rb_size(tr_peerIo* const io)
 {
-    size_t bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
+    size_t const bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
 
     tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
     return UtpReadBufferSize - bytes;
@@ -833,7 +833,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
 
     tr_session* session = tr_peerIoGetSession(io);
 
-    short int pendingEvents = io->pendingEvents;
+    short int const pendingEvents = io->pendingEvents;
     event_disable(io, EV_READ | EV_WRITE);
 
     io_close_socket(io);

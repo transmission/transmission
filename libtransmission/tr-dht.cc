@@ -343,7 +343,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(myid, 20);
     }
 
-    if (int rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
+    if (int const rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
     {
         tr_free(nodes6);
         tr_free(nodes);
@@ -406,7 +406,7 @@ void tr_dhtUninit(tr_session* ss)
         struct sockaddr_in6 sins6[MaxNodes];
         int num = MaxNodes;
         int num6 = MaxNodes;
-        int n = dht_get_nodes(sins, &num, sins6, &num6);
+        int const n = dht_get_nodes(sins, &num, sins6, &num6);
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num, num6));
 
         tr_variant benc;
@@ -530,7 +530,7 @@ tr_port tr_dhtPort(tr_session* ss)
 
 bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
 {
-    int af = address->isIPv4() ? AF_INET : AF_INET6;
+    int const af = address->isIPv4() ? AF_INET : AF_INET6;
 
     if (!tr_dhtEnabled(ss))
     {
@@ -730,7 +730,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     }
 
     time_t tosleep = 0;
-    int rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
+    int const rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
 
     if (rc < 0)
     {

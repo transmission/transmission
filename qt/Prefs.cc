@@ -38,7 +38,7 @@ namespace
 
 void ensureSoundCommandIsAList(tr_variant* dict)
 {
-    tr_quark key = TR_KEY_torrent_complete_sound_command;
+    tr_quark const key = TR_KEY_torrent_complete_sound_command;
 
     if (tr_variant* list = nullptr; tr_variantDictFindList(dict, key, &list))
     {

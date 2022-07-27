@@ -1155,7 +1155,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
-    bool ok = result.isConnected;
+    bool const ok = result.isConnected;
     bool success = false;
     auto* manager = static_cast<tr_peerMgr*>(result.userData);
 
@@ -1314,7 +1314,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
 
 std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
 {
-    size_t n = compactLen / 6;
+    size_t const n = compactLen / 6;
     auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
@@ -1334,7 +1334,7 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
 
 std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
 {
-    size_t n = compactLen / 18;
+    size_t const n = compactLen / 18;
     auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
