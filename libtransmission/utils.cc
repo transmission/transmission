@@ -1273,7 +1273,7 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 {
 #ifdef _WIN32
 
-    if (auto* const wide_key = tr_win32_utf8_to_native(key, -1); wide_key != nullptr)
+    if (auto* const wide_key = tr_win32_utf8_to_native(std::data(key), std::size(key)); wide_key != nullptr)
     {
         if (auto const size = GetEnvironmentVariableW(wide_key, nullptr, 0); size != 0)
         {
