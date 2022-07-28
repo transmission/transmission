@@ -26,9 +26,9 @@ struct Candidate
     tr_piece_index_t piece;
     size_t n_blocks_missing;
     tr_priority_t priority;
-    uint8_t salt;
+    std::byte salt;
 
-    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, uint8_t salt_in)
+    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, std::byte salt_in)
         : piece{ piece_in }
         , n_blocks_missing{ missing_in }
         , priority{ priority_in }
@@ -87,15 +87,14 @@ std::vector<Candidate> getCandidates(Wishlist::Mediator const& mediator)
     }
 
     // transform them into candidates
+    auto salter = tr_salt_shaker{};
     auto const n = std::size(wanted_pieces);
-    auto saltbuf = std::vector<char>(n);
-    tr_rand_buffer(std::data(saltbuf), n);
     auto candidates = std::vector<Candidate>{};
     candidates.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
         auto const [piece, n_missing] = wanted_pieces[i];
-        candidates.emplace_back(piece, n_missing, mediator.priority(piece), saltbuf[i]);
+        candidates.emplace_back(piece, n_missing, mediator.priority(piece), salter());
     }
 
     return candidates;
