@@ -32,6 +32,7 @@
 #include "net.h" // tr_socket_t
 #include "open-files.h"
 #include "quark.h"
+#include "stats.h"
 #include "torrents.h"
 #include "web.h"
 
@@ -69,32 +70,32 @@ struct tr_bindinfo
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
-    unsigned int speedLimit_Bps[2];
+    unsigned int speedLimit_Bps[2] = {};
 
     /* is turtle mode on right now? */
-    bool isEnabled;
+    bool isEnabled = false;
 
     /* does turtle mode turn itself on and off at given times? */
-    bool isClockEnabled;
+    bool isClockEnabled = false;
 
     /* when clock mode is on, minutes after midnight to turn on turtle mode */
-    int beginMinute;
+    int beginMinute = 0;
 
     /* when clock mode is on, minutes after midnight to turn off turtle mode */
-    int endMinute;
+    int endMinute = 0;
 
     /* only use clock mode on these days of the week */
-    tr_sched_day days;
+    tr_sched_day days = {};
 
     /* called when isEnabled changes */
-    tr_altSpeedFunc callback;
+    tr_altSpeedFunc callback = nullptr;
 
     /* the callback's user_data argument */
-    void* callbackUserData;
+    void* callbackUserData = nullptr;
 
     /* the callback's changedByUser argument.
      * indicates whether the change came from the user or from the clock. */
-    bool changedByUser;
+    bool changedByUser = false;
 
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
@@ -104,13 +105,15 @@ struct tr_turtle_info
     tr_bitfield* minutes = nullptr;
 
     /* recent action that was done by turtle's automatic switch */
-    tr_auto_switch_state_t autoTurtleState;
+    tr_auto_switch_state_t autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 };
 
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
 public:
+    tr_session(std::string_view config_dir);
+
     [[nodiscard]] constexpr auto& torrents()
     {
         return torrents_;
@@ -132,8 +135,6 @@ public:
     }
 
     // paths
-
-    void initConfigDir(std::string_view config_dir);
 
     [[nodiscard]] constexpr auto const& configDir() const noexcept
     {
@@ -402,6 +403,33 @@ public:
         }
     }
 
+    /// stats
+
+    [[nodiscard]] auto& stats() noexcept
+    {
+        return session_stats_;
+    }
+
+    [[nodiscard]] auto const& stats() const noexcept
+    {
+        return session_stats_;
+    }
+
+    void addUploaded(uint32_t n_bytes) noexcept
+    {
+        session_stats_.addUploaded(n_bytes);
+    }
+
+    void addDownloaded(uint32_t n_bytes) noexcept
+    {
+        session_stats_.addDownloaded(n_bytes);
+    }
+
+    void addFileCreated() noexcept
+    {
+        session_stats_.addFileCreated();
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -521,18 +549,16 @@ public:
     WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
-    struct tr_session_id* session_id;
+    struct tr_session_id* session_id = nullptr;
 
-    tr_rpc_func rpc_func;
-    void* rpc_func_user_data;
+    tr_rpc_func rpc_func = nullptr;
+    void* rpc_func_user_data = nullptr;
 
-    struct tr_stats_handle* sessionStats;
+    struct tr_announcer* announcer = nullptr;
+    struct tr_announcer_udp* announcer_udp = nullptr;
 
-    struct tr_announcer* announcer;
-    struct tr_announcer_udp* announcer_udp;
-
-    struct event* nowTimer;
-    struct event* saveTimer;
+    struct event* nowTimer = nullptr;
+    struct event* saveTimer = nullptr;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
@@ -543,8 +569,8 @@ public:
 
     uint16_t idleLimitMinutes;
 
-    struct tr_bindinfo* bind_ipv4;
-    struct tr_bindinfo* bind_ipv6;
+    struct tr_bindinfo* bind_ipv4 = nullptr;
+    struct tr_bindinfo* bind_ipv6 = nullptr;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
@@ -562,15 +588,17 @@ private:
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
-    std::string config_dir_;
+    std::string const config_dir_;
+    std::string const resume_dir_;
+    std::string const torrent_dir_;
     std::string download_dir_;
     std::string incomplete_dir_;
-    std::string resume_dir_;
-    std::string torrent_dir_;
 
     std::string blocklist_url_;
     std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
+
+    tr_stats session_stats_;
 
     std::optional<tr_address> external_ip_;
 

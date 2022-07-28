@@ -18,7 +18,6 @@
 #include "file.h"
 #include "inout.h"
 #include "log.h"
-#include "stats.h" /* tr_statsFileCreated() */
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
@@ -136,7 +135,7 @@ int readOrWriteBytes(
         if (fd && do_write)
         {
             // make a note that we just created a file
-            tr_statsFileCreated(tor->session);
+            tor->session->addFileCreated();
         }
     }
 

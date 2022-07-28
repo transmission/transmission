@@ -41,7 +41,6 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "session.h"
-#include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
@@ -997,7 +996,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tr_announcerAddBytes(tor, TR_ANN_UP, e->length);
             tor->setDateActive(now);
             tor->setDirty();
-            tr_statsAddUploaded(tor->session, e->length);
+            tor->session->addUploaded(e->length);
 
             if (peer->atom != nullptr)
             {
@@ -1015,8 +1014,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tor->downloadedCur += e->length;
             tor->setDateActive(now);
             tor->setDirty();
-
-            tr_statsAddDownloaded(tor->session, e->length);
+            tor->session->addDownloaded(e->length);
 
             if (peer->atom != nullptr)
             {

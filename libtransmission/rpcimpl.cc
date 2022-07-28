@@ -31,7 +31,6 @@
 #include "rpcimpl.h"
 #include "session-id.h"
 #include "session.h"
-#include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -2067,9 +2066,6 @@ static char const* sessionStats(
     tr_variant* args_out,
     tr_rpc_idle_data* /*idle_data*/)
 {
-    auto currentStats = tr_session_stats{};
-    auto cumulativeStats = tr_session_stats{};
-
     auto const& torrents = session->torrents();
     auto const total = std::size(torrents);
     auto const running = std::count_if(
@@ -2077,28 +2073,27 @@ static char const* sessionStats(
         std::end(torrents),
         [](auto const* tor) { return tor->isRunning; });
 
-    tr_sessionGetStats(session, &currentStats);
-    tr_sessionGetCumulativeStats(session, &cumulativeStats);
-
     tr_variantDictAddInt(args_out, TR_KEY_activeTorrentCount, running);
     tr_variantDictAddReal(args_out, TR_KEY_downloadSpeed, tr_sessionGetPieceSpeed_Bps(session, TR_DOWN));
     tr_variantDictAddInt(args_out, TR_KEY_pausedTorrentCount, total - running);
     tr_variantDictAddInt(args_out, TR_KEY_torrentCount, total);
     tr_variantDictAddReal(args_out, TR_KEY_uploadSpeed, tr_sessionGetPieceSpeed_Bps(session, TR_UP));
 
+    auto stats = session->stats().cumulative();
     tr_variant* d = tr_variantDictAddDict(args_out, TR_KEY_cumulative_stats, 5);
-    tr_variantDictAddInt(d, TR_KEY_downloadedBytes, cumulativeStats.downloadedBytes);
-    tr_variantDictAddInt(d, TR_KEY_filesAdded, cumulativeStats.filesAdded);
-    tr_variantDictAddInt(d, TR_KEY_secondsActive, cumulativeStats.secondsActive);
-    tr_variantDictAddInt(d, TR_KEY_sessionCount, cumulativeStats.sessionCount);
-    tr_variantDictAddInt(d, TR_KEY_uploadedBytes, cumulativeStats.uploadedBytes);
+    tr_variantDictAddInt(d, TR_KEY_downloadedBytes, stats.downloadedBytes);
+    tr_variantDictAddInt(d, TR_KEY_filesAdded, stats.filesAdded);
+    tr_variantDictAddInt(d, TR_KEY_secondsActive, stats.secondsActive);
+    tr_variantDictAddInt(d, TR_KEY_sessionCount, stats.sessionCount);
+    tr_variantDictAddInt(d, TR_KEY_uploadedBytes, stats.uploadedBytes);
 
+    stats = session->stats().current();
     d = tr_variantDictAddDict(args_out, TR_KEY_current_stats, 5);
-    tr_variantDictAddInt(d, TR_KEY_downloadedBytes, currentStats.downloadedBytes);
-    tr_variantDictAddInt(d, TR_KEY_filesAdded, currentStats.filesAdded);
-    tr_variantDictAddInt(d, TR_KEY_secondsActive, currentStats.secondsActive);
-    tr_variantDictAddInt(d, TR_KEY_sessionCount, currentStats.sessionCount);
-    tr_variantDictAddInt(d, TR_KEY_uploadedBytes, currentStats.uploadedBytes);
+    tr_variantDictAddInt(d, TR_KEY_downloadedBytes, stats.downloadedBytes);
+    tr_variantDictAddInt(d, TR_KEY_filesAdded, stats.filesAdded);
+    tr_variantDictAddInt(d, TR_KEY_secondsActive, stats.secondsActive);
+    tr_variantDictAddInt(d, TR_KEY_sessionCount, stats.sessionCount);
+    tr_variantDictAddInt(d, TR_KEY_uploadedBytes, stats.uploadedBytes);
 
     return nullptr;
 }
