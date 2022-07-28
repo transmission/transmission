@@ -49,13 +49,13 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Activity">
-            <rect key="frame" x="0.0" y="0.0" width="389" height="376"/>
+            <rect key="frame" x="0.0" y="0.0" width="389" height="358"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2aX-cc-oXC">
-                    <rect key="frame" x="12" y="12" width="357" height="352"/>
+                    <rect key="frame" x="12" y="12" width="357" height="334"/>
                     <subviews>
                         <customView horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Vhd-qH-kFK">
-                            <rect key="frame" x="0.0" y="148" width="357" height="204"/>
+                            <rect key="frame" x="0.0" y="136" width="357" height="198"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="28" customClass="InfoTextField">
                                     <rect key="frame" x="75" y="120" width="23" height="14"/>
@@ -98,7 +98,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                                    <rect key="frame" x="-2" y="190" width="52" height="14"/>
+                                    <rect key="frame" x="-2" y="184" width="52" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Transfer" id="50">
                                         <font key="font" metaFont="smallSystemBold"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -130,7 +130,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <imageView verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="PiecesView">
-                                    <rect key="frame" x="264" y="95" width="93" height="93"/>
+                                    <rect key="frame" x="264" y="89" width="93" height="93"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="93" id="bsS-qa-kx6"/>
                                         <constraint firstAttribute="width" constant="93" id="euA-Qi-kqQ"/>
@@ -283,11 +283,11 @@
                                 <constraint firstItem="7" firstAttribute="top" secondItem="21" secondAttribute="bottom" constant="2" id="ilY-p5-mSk"/>
                                 <constraint firstItem="23" firstAttribute="trailing" secondItem="21" secondAttribute="trailing" id="isL-nM-3an"/>
                                 <constraint firstItem="27" firstAttribute="trailing" secondItem="21" secondAttribute="trailing" id="kB4-js-TsY"/>
-                                <constraint firstItem="21" firstAttribute="top" secondItem="11" secondAttribute="bottom" constant="8" symbolic="YES" id="kfY-4b-78o"/>
+                                <constraint firstItem="21" firstAttribute="top" secondItem="11" secondAttribute="bottom" constant="2" id="kfY-4b-78o"/>
                                 <constraint firstItem="18" firstAttribute="leading" secondItem="Vhd-qH-kFK" secondAttribute="leading" id="lIw-C6-37q"/>
                                 <constraint firstItem="22" firstAttribute="leading" secondItem="20" secondAttribute="leading" id="qEp-oT-lvl"/>
                                 <constraint firstItem="11" firstAttribute="top" secondItem="Vhd-qH-kFK" secondAttribute="top" id="qJC-LH-Ja3"/>
-                                <constraint firstAttribute="height" constant="204" id="qul-ec-RYB"/>
+                                <constraint firstAttribute="height" constant="198" id="qul-ec-RYB"/>
                                 <constraint firstItem="29" firstAttribute="trailing" secondItem="21" secondAttribute="trailing" id="rCV-0c-u3g"/>
                                 <constraint firstItem="29" firstAttribute="top" secondItem="23" secondAttribute="bottom" constant="2" id="rXV-7x-Lp4"/>
                                 <constraint firstItem="20" firstAttribute="leading" secondItem="21" secondAttribute="trailing" constant="8" symbolic="YES" id="t6g-E7-H8Z"/>
@@ -300,10 +300,10 @@
                             </constraints>
                         </customView>
                         <customView horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="WMr-Dh-mdg">
-                            <rect key="frame" x="0.0" y="0.0" width="139" height="140"/>
+                            <rect key="frame" x="0.0" y="0.0" width="139" height="128"/>
                             <subviews>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="10">
-                                    <rect key="frame" x="-2" y="72" width="76" height="14"/>
+                                    <rect key="frame" x="-2" y="66" width="76" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Last Activity:" id="51">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -311,7 +311,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="13" customClass="InfoTextField">
-                                    <rect key="frame" x="78" y="88" width="23" height="14"/>
+                                    <rect key="frame" x="78" y="82" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="47">
                                         <dateFormatter key="formatter" dateStyle="long" timeStyle="short" doesRelativeDateFormatting="YES" id="48"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -344,7 +344,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="InfoTextField">
-                                    <rect key="frame" x="78" y="72" width="23" height="14"/>
+                                    <rect key="frame" x="78" y="66" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="52">
                                         <dateFormatter key="formatter" dateStyle="long" timeStyle="short" doesRelativeDateFormatting="YES" id="53"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -353,7 +353,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="14">
-                                    <rect key="frame" x="-2" y="88" width="76" height="14"/>
+                                    <rect key="frame" x="-2" y="82" width="76" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Completed:" id="46">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -361,7 +361,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="16">
-                                    <rect key="frame" x="-2" y="104" width="76" height="14"/>
+                                    <rect key="frame" x="-2" y="98" width="76" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Added:" id="43">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -369,7 +369,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                                    <rect key="frame" x="-2" y="126" width="37" height="14"/>
+                                    <rect key="frame" x="-2" y="114" width="37" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Dates" id="42">
                                         <font key="font" metaFont="smallSystemBold"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -377,7 +377,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="15" customClass="InfoTextField">
-                                    <rect key="frame" x="78" y="104" width="23" height="14"/>
+                                    <rect key="frame" x="78" y="98" width="23" height="14"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="44">
                                         <dateFormatter key="formatter" dateStyle="long" timeStyle="short" doesRelativeDateFormatting="YES" id="45"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -386,7 +386,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="84">
-                                    <rect key="frame" x="-2" y="38" width="79" height="14"/>
+                                    <rect key="frame" x="-2" y="32" width="79" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Time Elapsed" id="85">
                                         <font key="font" metaFont="smallSystemBold"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -403,7 +403,7 @@
                                 </textField>
                             </subviews>
                             <constraints>
-                                <constraint firstAttribute="height" constant="140" id="0cq-xb-XX1"/>
+                                <constraint firstAttribute="height" constant="128" id="0cq-xb-XX1"/>
                                 <constraint firstItem="16" firstAttribute="leading" secondItem="WMr-Dh-mdg" secondAttribute="leading" id="1J9-Ex-MeX"/>
                                 <constraint firstAttribute="width" priority="750" constant="139" id="5Cn-Uu-9zL"/>
                                 <constraint firstItem="83" firstAttribute="trailing" secondItem="16" secondAttribute="trailing" id="5vW-J5-ACR"/>
@@ -419,13 +419,13 @@
                                 <constraint firstItem="15" firstAttribute="centerY" secondItem="16" secondAttribute="centerY" id="IDq-8e-yQq"/>
                                 <constraint firstItem="15" firstAttribute="leading" secondItem="16" secondAttribute="trailing" constant="8" symbolic="YES" id="KX1-pV-ovD"/>
                                 <constraint firstItem="81" firstAttribute="trailing" secondItem="16" secondAttribute="trailing" id="NZM-WQ-gdt"/>
-                                <constraint firstItem="16" firstAttribute="top" secondItem="17" secondAttribute="bottom" constant="8" symbolic="YES" id="R5d-8B-DmS"/>
+                                <constraint firstItem="16" firstAttribute="top" secondItem="17" secondAttribute="bottom" constant="2" id="R5d-8B-DmS"/>
                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9" secondAttribute="trailing" constant="12" id="RBi-Tl-ZXD"/>
                                 <constraint firstItem="10" firstAttribute="top" secondItem="14" secondAttribute="bottom" constant="2" id="TCV-si-Njm"/>
                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="80" secondAttribute="trailing" constant="12" id="UJm-QD-jfz"/>
                                 <constraint firstItem="82" firstAttribute="leading" secondItem="15" secondAttribute="leading" id="UTr-TC-Noy"/>
                                 <constraint firstItem="84" firstAttribute="leading" secondItem="WMr-Dh-mdg" secondAttribute="leading" id="VKJ-Ud-LTH"/>
-                                <constraint firstItem="83" firstAttribute="top" secondItem="84" secondAttribute="bottom" constant="8" symbolic="YES" id="ZZe-1h-wfg"/>
+                                <constraint firstItem="83" firstAttribute="top" secondItem="84" secondAttribute="bottom" constant="2" id="ZZe-1h-wfg"/>
                                 <constraint firstItem="14" firstAttribute="trailing" secondItem="16" secondAttribute="trailing" id="aR3-Z4-wEJ"/>
                                 <constraint firstItem="83" firstAttribute="width" secondItem="16" secondAttribute="width" id="bHw-lY-ld0"/>
                                 <constraint firstItem="81" firstAttribute="width" secondItem="16" secondAttribute="width" id="buf-vo-5gD"/>
