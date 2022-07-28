@@ -1869,9 +1869,10 @@ enum tr_rechoke_state
 
 struct tr_rechoke_info
 {
-    tr_rechoke_info(tr_peerMsgs* peer_in, int rechoke_state_in)
+    tr_rechoke_info(tr_peerMsgs* peer_in, int rechoke_state_in, uint8_t salt_in)
         : peer{ peer_in }
         , rechoke_state{ rechoke_state_in }
+        , salt{ salt_in }
     {
     }
 
@@ -1882,7 +1883,12 @@ struct tr_rechoke_info
             return this->rechoke_state - that.rechoke_state;
         }
 
-        return this->salt - that.salt;
+        if (this->salt != that.salt)
+        {
+            return this->salt < that.salt ? -1 : 1;
+        }
+
+        return 0;
     }
 
     [[nodiscard]] constexpr auto operator<(tr_rechoke_info const& that) const noexcept
@@ -1892,7 +1898,7 @@ struct tr_rechoke_info
 
     tr_peerMsgs* peer;
     int rechoke_state;
-    int salt = tr_rand_int_weak(INT_MAX);
+    uint8_t salt;
 };
 
 } // namespace
@@ -1908,6 +1914,7 @@ void rechokeDownloads(tr_swarm* s)
 
     uint16_t max_peers = 0;
     auto rechoke = std::vector<tr_rechoke_info>{};
+    auto salter = tr_salt_shaker{};
 
     /* some cases where this function isn't necessary */
     if (s->tor->isDone() || !s->tor->clientCanDownload())
@@ -2035,7 +2042,7 @@ void rechokeDownloads(tr_swarm* s)
                     rechoke_state = RECHOKE_STATE_BAD;
                 }
 
-                rechoke.emplace_back(peer, rechoke_state);
+                rechoke.emplace_back(peer, rechoke_state, salter());
             }
         }
 
@@ -2083,7 +2090,7 @@ struct ChokeData
     bool wasChoked;
     bool isChoked;
     int rate;
-    int salt;
+    uint8_t salt;
     tr_peerMsgs* msgs;
 
     [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
@@ -2100,7 +2107,7 @@ struct ChokeData
 
         if (this->salt != that.salt) // random order
         {
-            return this->salt - that.salt;
+            return this->salt < that.salt ? -1 : 1;
         }
 
         return 0;
@@ -2169,6 +2176,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     int size = 0;
 
     /* sort the peers by preference and rate */
+    auto salter = tr_salt_shaker{};
     for (auto* const peer : peers)
     {
         if (peer->isSeed())
@@ -2188,7 +2196,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             n->isInterested = peer->is_peer_interested();
             n->wasChoked = peer->is_peer_choked();
             n->rate = getRateBps(s->tor, peer, now);
-            n->salt = tr_rand_int_weak(INT_MAX);
+            n->salt = salter();
             n->isChoked = true;
         }
     }
@@ -2753,6 +2761,7 @@ struct peer_candidate
     candidates.reserve(atom_count);
 
     /* populate the candidate array */
+    auto salter = tr_salt_shaker{};
     for (auto* tor : session->torrents())
     {
         if (!tor->swarm->is_running)
@@ -2784,8 +2793,7 @@ struct peer_candidate
         {
             if (isPeerCandidate(tor, atom, now))
             {
-                uint8_t const salt = tr_rand_int_weak(1024);
-                candidates.push_back({ getPeerCandidateScore(tor, atom, salt), tor, &atom });
+                candidates.push_back({ getPeerCandidateScore(tor, atom, salter()), tor, &atom });
             }
         }
     }

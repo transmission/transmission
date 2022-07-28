@@ -6,6 +6,7 @@
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
+#include <array>
 #include <cstddef> // size_t
 #include <optional>
 #include <string>
@@ -189,6 +190,31 @@ std::string tr_sha256_to_string(tr_sha256_digest_t const&);
  * @brief Generate a sha256 digest from a hex string.
  */
 std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
+
+// Convenience utility to efficiently get many random small values.
+// Use this instead of making a lot of calls to tr_rand_int().
+class tr_salt_shaker
+{
+public:
+    [[nodiscard]] auto operator()() noexcept
+    {
+        if (pos == std::size(buf))
+        {
+            pos = 0U;
+        }
+
+        if (pos == 0U)
+        {
+            tr_rand_buffer(std::data(buf), std::size(buf));
+        }
+
+        return buf[pos++];
+    }
+
+private:
+    size_t pos = 0;
+    std::array<uint8_t, 1024U> buf;
+};
 
 /** @} */
 
