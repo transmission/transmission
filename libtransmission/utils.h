@@ -72,12 +72,6 @@ struct tr_error;
  */
 [[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
-/**
- * @brief Loads a file and returns its contents.
- * On failure, NULL is returned and errno is set.
- */
-uint8_t* tr_loadFile(std::string_view filename, size_t* size, struct tr_error** error) TR_GNUC_MALLOC;
-
 bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
 
 bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
