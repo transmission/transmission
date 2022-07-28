@@ -196,7 +196,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
 class tr_salt_shaker
 {
 public:
-    std::byte operator()()
+    [[nodiscard]] auto operator()() noexcept
     {
         if (pos == std::size(buf))
         {
@@ -213,7 +213,7 @@ public:
 
 private:
     size_t pos = 0;
-    std::array<std::byte, 1024U> buf;
+    std::array<uint8_t, 1024U> buf;
 };
 
 /** @} */

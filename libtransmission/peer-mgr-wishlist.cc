@@ -26,9 +26,9 @@ struct Candidate
     tr_piece_index_t piece;
     size_t n_blocks_missing;
     tr_priority_t priority;
-    std::byte salt;
+    uint8_t salt;
 
-    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, std::byte salt_in)
+    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, uint8_t salt_in)
         : piece{ piece_in }
         , n_blocks_missing{ missing_in }
         , priority{ priority_in }

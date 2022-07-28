@@ -1869,7 +1869,7 @@ enum tr_rechoke_state
 
 struct tr_rechoke_info
 {
-    tr_rechoke_info(tr_peerMsgs* peer_in, int rechoke_state_in, std::byte salt_in)
+    tr_rechoke_info(tr_peerMsgs* peer_in, int rechoke_state_in, uint8_t salt_in)
         : peer{ peer_in }
         , rechoke_state{ rechoke_state_in }
         , salt{ salt_in }
@@ -1898,7 +1898,7 @@ struct tr_rechoke_info
 
     tr_peerMsgs* peer;
     int rechoke_state;
-    std::byte salt;
+    uint8_t salt;
 };
 
 } // namespace
@@ -2090,7 +2090,7 @@ struct ChokeData
     bool wasChoked;
     bool isChoked;
     int rate;
-    std::byte salt;
+    uint8_t salt;
     tr_peerMsgs* msgs;
 
     [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
@@ -2673,7 +2673,7 @@ struct peer_candidate
 }
 
 /* smaller value is better */
-[[nodiscard]] uint64_t getPeerCandidateScore(tr_torrent const* tor, peer_atom const& atom, std::byte salt)
+[[nodiscard]] uint64_t getPeerCandidateScore(tr_torrent const* tor, peer_atom const& atom, uint8_t salt)
 {
     auto i = uint64_t{};
     auto score = uint64_t{};
@@ -2726,7 +2726,7 @@ struct peer_candidate
     score = addValToKey(score, 4, atom.fromBest);
 
     /* salt */
-    score = addValToKey(score, 8, static_cast<uint8_t>(salt));
+    score = addValToKey(score, 8, salt);
 
     return score;
 }

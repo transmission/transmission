@@ -479,8 +479,6 @@ static void addPeers(tr_torrent const* tor, tr_variant* list)
 
 static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
 {
-    char* str = nullptr;
-
     switch (key)
     {
     case TR_KEY_activityDate:
