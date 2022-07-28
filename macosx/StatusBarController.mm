@@ -93,15 +93,7 @@ typedef NS_ENUM(unsigned int, statusTag) {
     BOOL total;
     if ((total = [statusLabel isEqualToString:STATUS_RATIO_TOTAL]) || [statusLabel isEqualToString:STATUS_RATIO_SESSION])
     {
-        tr_session_stats stats;
-        if (total)
-        {
-            tr_sessionGetCumulativeStats(self.fLib, &stats);
-        }
-        else
-        {
-            tr_sessionGetStats(self.fLib, &stats);
-        }
+        auto const stats = total ? tr_sessionGetCumulativeStats(self.fLib) : tr_sessionGetStats(self.fLib);
 
         statusString = [NSLocalizedString(@"Ratio", "status bar -> status label")
             stringByAppendingFormat:@": %@", [NSString stringForRatio:stats.ratio]];
@@ -110,15 +102,7 @@ typedef NS_ENUM(unsigned int, statusTag) {
     {
         total = [statusLabel isEqualToString:STATUS_TRANSFER_TOTAL];
 
-        tr_session_stats stats;
-        if (total)
-        {
-            tr_sessionGetCumulativeStats(self.fLib, &stats);
-        }
-        else
-        {
-            tr_sessionGetStats(self.fLib, &stats);
-        }
+        auto const stats = total ? tr_sessionGetCumulativeStats(self.fLib) : tr_sessionGetStats(self.fLib);
 
         statusString = [NSString stringWithFormat:@"%@: %@  %@: %@",
                                                   NSLocalizedString(@"DL", "status bar -> status label"),

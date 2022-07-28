@@ -50,7 +50,6 @@
 #include "rpc-server.h"
 #include "session-id.h"
 #include "session.h"
-#include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
@@ -586,7 +585,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
         tr_torrentSave(tor);
     }
 
-    tr_statsSaveDirty(session);
+    session->stats().saveIfDirty();
 
     tr_timerAdd(*session->saveTimer, SaveIntervalSecs, 0);
 }
@@ -613,7 +612,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     tr_timeUpdate(time(nullptr));
 
     /* initialize the bare skeleton of the session object */
-    auto* session = new tr_session{};
+    auto* const session = new tr_session{ config_dir };
     session->udp_socket = TR_BAD_SOCKET;
     session->udp6_socket = TR_BAD_SOCKET;
     session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
@@ -739,8 +738,6 @@ static void tr_sessionInitImpl(init_data* data)
 
     tr_logSetQueueEnabled(data->messageQueuingEnabled);
 
-    session->initConfigDir(data->config_dir);
-
     session->peerMgr = tr_peerMgrNew(session);
 
     session->shared = tr_sharedInit(session);
@@ -760,8 +757,6 @@ static void tr_sessionInitImpl(init_data* data)
     tr_announcerInit(session);
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
-
-    tr_statsInit(session);
 
     tr_sessionSet(session, &settings);
 
@@ -1957,7 +1952,8 @@ static void sessionCloseImplFinish(tr_session* session)
     tr_tracker_udp_close(session);
     tr_udpUninit(session);
 
-    tr_statsClose(session);
+    session->stats().saveIfDirty();
+
     tr_peerMgrFree(session->peerMgr);
 
     tr_utpClose(session);
@@ -2994,20 +2990,52 @@ void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completen
     session->setTorrentCompletenessCallback(cb, user_data);
 }
 
-///
-
-void tr_session::initConfigDir(std::string_view config_dir)
+tr_session_stats tr_sessionGetStats(tr_session const* session)
 {
-    TR_ASSERT(std::empty(config_dir_));
-    config_dir_ = config_dir;
+    return session->stats().current();
+}
 
+tr_session_stats tr_sessionGetCumulativeStats(tr_session const* session)
+{
+    return session->stats().cumulative();
+}
+
+void tr_sessionClearStats(tr_session* session)
+{
+    session->stats().clear();
+}
+
+namespace
+{
+
+auto makeResumeDir(std::string_view config_dir)
+{
 #if defined(__APPLE__) || defined(_WIN32)
-    resume_dir_ = fmt::format("{:s}/Resume"sv, config_dir);
-    torrent_dir_ = fmt::format("{:s}/Torrents"sv, config_dir);
+    auto dir = fmt::format("{:s}/Resume"sv, config_dir);
 #else
-    resume_dir_ = fmt::format("{:s}/resume"sv, config_dir);
-    torrent_dir_ = fmt::format("{:s}/torrents"sv, config_dir);
+    auto dir = fmt::format("{:s}/resume"sv, config_dir);
 #endif
-    tr_sys_dir_create(resume_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    tr_sys_dir_create(torrent_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
+auto makeTorrentDir(std::string_view config_dir)
+{
+#if defined(__APPLE__) || defined(_WIN32)
+    auto dir = fmt::format("{:s}/Torrents"sv, config_dir);
+#else
+    auto dir = fmt::format("{:s}/torrents"sv, config_dir);
+#endif
+    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
+} // namespace
+
+tr_session::tr_session(std::string_view config_dir)
+    : config_dir_{ config_dir }
+    , resume_dir_{ makeResumeDir(config_dir) }
+    , torrent_dir_{ makeTorrentDir(config_dir) }
+    , session_stats_{ config_dir, time(nullptr) }
+{
 }

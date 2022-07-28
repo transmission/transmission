@@ -71,22 +71,18 @@ auto startedTimesText(uint64_t n)
 
 bool StatsDialog::Impl::updateStats()
 {
-    tr_session_stats one;
-    tr_session_stats all;
+    auto stats = tr_sessionGetStats(core_->get_session());
+    setLabel(one_up_lb_, tr_strlsize(stats.uploadedBytes));
+    setLabel(one_down_lb_, tr_strlsize(stats.downloadedBytes));
+    setLabel(one_time_lb_, tr_format_time(stats.secondsActive));
+    setLabelFromRatio(one_ratio_lb_, stats.ratio);
 
-    tr_sessionGetStats(core_->get_session(), &one);
-    tr_sessionGetCumulativeStats(core_->get_session(), &all);
-
-    setLabel(one_up_lb_, tr_strlsize(one.uploadedBytes));
-    setLabel(one_down_lb_, tr_strlsize(one.downloadedBytes));
-    setLabel(one_time_lb_, tr_format_time(one.secondsActive));
-    setLabelFromRatio(one_ratio_lb_, one.ratio);
-
-    setLabel(all_sessions_lb_, startedTimesText(all.sessionCount));
-    setLabel(all_up_lb_, tr_strlsize(all.uploadedBytes));
-    setLabel(all_down_lb_, tr_strlsize(all.downloadedBytes));
-    setLabel(all_time_lb_, tr_format_time(all.secondsActive));
-    setLabelFromRatio(all_ratio_lb_, all.ratio);
+    stats = tr_sessionGetCumulativeStats(core_->get_session());
+    setLabel(all_sessions_lb_, startedTimesText(stats.sessionCount));
+    setLabel(all_up_lb_, tr_strlsize(stats.uploadedBytes));
+    setLabel(all_down_lb_, tr_strlsize(stats.downloadedBytes));
+    setLabel(all_time_lb_, tr_format_time(stats.secondsActive));
+    setLabelFromRatio(all_ratio_lb_, stats.ratio);
 
     return true;
 }

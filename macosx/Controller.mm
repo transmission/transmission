@@ -864,9 +864,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //shamelessly ask for donations
     if ([self.fDefaults boolForKey:@"WarningDonate"])
     {
-        tr_session_stats stats;
-        tr_sessionGetCumulativeStats(self.fLib, &stats);
-        BOOL const firstLaunch = stats.sessionCount <= 1;
+        BOOL const firstLaunch = tr_sessionGetCumulativeStats(self.fLib).sessionCount <= 1;
 
         NSDate* lastDonateDate = [self.fDefaults objectForKey:@"DonateAskDate"];
         BOOL const timePassed = !lastDonateDate || (-1 * lastDonateDate.timeIntervalSinceNow) >= DONATE_NAG_TIME;

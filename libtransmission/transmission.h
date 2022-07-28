@@ -454,10 +454,10 @@ struct tr_session_stats
 };
 
 /** @brief Get bandwidth use statistics for the current session */
-void tr_sessionGetStats(tr_session const* session, tr_session_stats* setme);
+tr_session_stats tr_sessionGetStats(tr_session const* session);
 
 /** @brief Get cumulative bandwidth statistics for current and past sessions */
-void tr_sessionGetCumulativeStats(tr_session const* session, tr_session_stats* setme);
+tr_session_stats tr_sessionGetCumulativeStats(tr_session const* session);
 
 void tr_sessionClearStats(tr_session* session);
 
