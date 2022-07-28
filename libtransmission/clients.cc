@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
-#include <cstdlib> /* strtol() */
-#include <cstring>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -179,12 +177,11 @@ constexpr std::string_view charint(char ch)
     }
 }
 
-int strint(void const* pch, int span, int base = 0)
+int strint(char const* pch, int span, int base = 10)
 {
-    char tmp[64];
-    memcpy(tmp, pch, span);
-    tmp[span] = '\0';
-    return strtol(tmp, nullptr, base);
+    auto sv = std::string_view{ pch, static_cast<size_t>(span) };
+    auto const num = tr_parseNum<int>(sv, base);
+    return num ? *num : 0;
 }
 
 constexpr std::string_view getMnemonicEnd(uint8_t ch)

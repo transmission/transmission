@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <climits> /* INT_MAX */
 #include <cstddef>
-#include <cstring> // strchr
 #include <list>
 #include <string>
 #include <string_view>

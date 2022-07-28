@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include <csignal>
 #include <cstdint>
+#include <cstdlib> // atoi()
 #include <ctime>
 #include <iterator> // std::back_inserter
 #include <list>

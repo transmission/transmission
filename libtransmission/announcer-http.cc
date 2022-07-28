@@ -4,9 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::copy_n()
-#include <climits> /* USHRT_MAX */
 #include <cstdio> /* fprintf() */
-#include <cstring> /* strchr(), memcmp(), memcpy() */
 #include <iomanip>
 #include <iostream>
 #include <iterator>

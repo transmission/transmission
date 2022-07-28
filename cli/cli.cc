@@ -5,10 +5,10 @@
 #include <array>
 #include <cstdio> /* fprintf () */
 #include <cstdlib> /* atoi () */
-#include <cstring> /* memcmp () */
-#include <signal.h>
 #include <string>
 #include <string_view>
+
+#include <signal.h>
 
 #include <fmt/format.h>
 
