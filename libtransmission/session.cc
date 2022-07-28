@@ -3005,26 +3005,37 @@ void tr_sessionClearStats(tr_session* session)
     session->stats().clear();
 }
 
-///
+namespace
+{
+
+auto makeResumeDir(std::string_view config_dir)
+{
+#if defined(__APPLE__) || defined(_WIN32)
+    auto dir = fmt::format("{:s}/Resume"sv, config_dir);
+#else
+    auto dir = fmt::format("{:s}/resume"sv, config_dir);
+#endif
+    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
+auto makeTorrentDir(std::string_view config_dir)
+{
+#if defined(__APPLE__) || defined(_WIN32)
+    auto dir = fmt::format("{:s}/Torrents"sv, config_dir);
+#else
+    auto dir = fmt::format("{:s}/torrents"sv, config_dir);
+#endif
+    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
+} // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : config_dir_
+    : config_dir_{ config_dir }
+    , resume_dir_{ makeResumeDir(config_dir) }
+    , torrent_dir_{ makeTorrentDir(config_dir) }
+    , session_stats_{ config_dir, time(nullptr) }
 {
-    config_dir
-}
-#if defined(__APPLE__) || defined(_WIN32)
-, resume_dir_{ fmt::format("{:s}/Resume"sv, config_dir) }, torrent_dir_
-{
-    fmt::format("{:s}/Torrents"sv, config_dir)
-}
-#else
-, resume_dir_{ fmt::format("{:s}/resume"sv, config_dir) }, torrent_dir_
-{
-    fmt::format("{:s}/torrents"sv, config_dir)
-}
-#endif
-, session_stats_{ config_dir, time(nullptr) }
-{
-    tr_sys_dir_create(resume_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    tr_sys_dir_create(torrent_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
 }
