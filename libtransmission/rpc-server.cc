@@ -163,8 +163,10 @@ static char const* mimetype_guess(std::string_view path)
     return "application/octet-stream";
 }
 
-static void add_response(struct evhttp_request* req, tr_rpc_server* server, struct evbuffer* out, std::string_view content)
+static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server, std::string_view content)
 {
+    auto* const out = evbuffer_new();
+
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
     bool const do_compress = encoding != nullptr && strstr(encoding, "gzip") != nullptr;
@@ -199,6 +201,8 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
 
         evbuffer_commit_space(out, iovec, 1);
     }
+
+    return out;
 }
 
 static void add_time_header(struct evkeyvalq* headers, char const* key, time_t now)
@@ -216,9 +220,9 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
         return;
     }
 
-    auto contents = std::vector<char>{};
+    auto content = std::vector<char>{};
     tr_error* error = nullptr;
-    if (!tr_loadFile(filename, contents, &error))
+    if (!tr_loadFile(filename, content, &error))
     {
         send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
         tr_error_free(error);
@@ -230,10 +234,9 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
     add_time_header(req->output_headers, "Expires", now + (24 * 60 * 60));
     evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess(filename));
 
-    auto* const out = evbuffer_new();
-    add_response(req, server, out, std::string_view{ std::data(contents), std::size(contents) });
-    evhttp_send_reply(req, HTTP_OK, "OK", out);
-    evbuffer_free(out);
+    auto* const response = make_response(req, server, std::string_view{ std::data(content), std::size(content) });
+    evhttp_send_reply(req, HTTP_OK, "OK", response);
+    evbuffer_free(response);
 }
 
 static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
@@ -281,16 +284,15 @@ struct rpc_response_data
     tr_rpc_server* server;
 };
 
-static void rpc_response_func(tr_session* /*session*/, tr_variant* response, void* user_data)
+static void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data)
 {
     auto* data = static_cast<struct rpc_response_data*>(user_data);
-    struct evbuffer* buf = evbuffer_new();
 
-    add_response(data->req, data->server, buf, tr_variantToStr(response, TR_VARIANT_FMT_JSON_LEAN));
+    auto* const response = make_response(data->req, data->server, tr_variantToStr(content, TR_VARIANT_FMT_JSON_LEAN));
     evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
-    evhttp_send_reply(data->req, HTTP_OK, "OK", buf);
+    evhttp_send_reply(data->req, HTTP_OK, "OK", response);
+    evbuffer_free(response);
 
-    evbuffer_free(buf);
     tr_free(data);
 }
 
