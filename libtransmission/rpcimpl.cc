@@ -626,9 +626,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_magnetLink:
-        str = tr_torrentGetMagnetLink(tor);
-        tr_variantInitStr(initme, str);
-        tr_free(str);
+        tr_variantInitStr(initme, tor->metainfo_.magnet());
         break;
 
     case TR_KEY_metadataPercentComplete:
