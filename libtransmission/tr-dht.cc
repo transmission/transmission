@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2010 Juliusz Chroboczek.
+// This file Copyright © 2009-2022 Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -6,14 +6,14 @@
 #include <cerrno>
 #include <csignal> /* sig_atomic_t */
 #include <cstdio>
-#include <cstdlib> /* atoi() */
-#include <cstring> /* memcpy(), memset(), memchr(), strlen() */
+#include <cstring> /* memcpy(), memset() */
 #include <ctime>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -46,7 +46,6 @@
 #include "tr-dht.h"
 #include "tr-strbuf.h"
 #include "trevent.h"
-#include "utils.h"
 #include "variant.h"
 
 using namespace std::literals;
@@ -56,15 +55,6 @@ static unsigned char myid[20];
 static tr_session* session_ = nullptr;
 
 static void timer_callback(evutil_socket_t s, short type, void* ignore);
-
-struct bootstrap_closure
-{
-    tr_session* session;
-    uint8_t* nodes;
-    uint8_t* nodes6;
-    size_t len;
-    size_t len6;
-};
 
 static bool bootstrap_done(tr_session* session, int af)
 {
@@ -173,47 +163,45 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 }
 
-static void dht_bootstrap(void* closure)
+static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::vector<uint8_t> nodes6)
 {
-    auto* const cl = static_cast<struct bootstrap_closure*>(closure);
-    auto const num = cl->len / 6;
-    auto const num6 = cl->len6 / 18;
-
-    if (session_ != cl->session)
+    if (session_ != session)
     {
         return;
     }
 
-    if (cl->len > 0)
+    auto const num = std::size(nodes) / 6;
+    if (num > 0)
     {
         tr_logAddDebug(fmt::format("Bootstrapping from {} IPv4 nodes", num));
     }
 
-    if (cl->len6 > 0)
+    auto const num6 = std::size(nodes6) / 18;
+    if (num6 > 0)
     {
         tr_logAddDebug(fmt::format("Bootstrapping from {} IPv6 nodes", num6));
     }
 
     for (size_t i = 0; i < std::max(num, num6); ++i)
     {
-        if (i < num && !bootstrap_done(cl->session, AF_INET))
+        if (i < num && !bootstrap_done(session, AF_INET))
         {
             auto addr = tr_address{};
             memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET;
-            memcpy(&addr.addr.addr4, &cl->nodes[i * 6], 4);
-            auto const [port, out] = tr_port::fromCompact(&cl->nodes[i * 6 + 4]);
-            tr_dhtAddNode(cl->session, &addr, port, true);
+            memcpy(&addr.addr.addr4, &nodes[i * 6], 4);
+            auto const [port, out] = tr_port::fromCompact(&nodes[i * 6 + 4]);
+            tr_dhtAddNode(session, &addr, port, true);
         }
 
-        if (i < num6 && !bootstrap_done(cl->session, AF_INET6))
+        if (i < num6 && !bootstrap_done(session, AF_INET6))
         {
             auto addr = tr_address{};
             memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET6;
-            memcpy(&addr.addr.addr6, &cl->nodes6[i * 18], 16);
-            auto const [port, out] = tr_port::fromCompact(&cl->nodes6[i * 18 + 16]);
-            tr_dhtAddNode(cl->session, &addr, port, true);
+            memcpy(&addr.addr.addr6, &nodes6[i * 18], 16);
+            auto const [port, out] = tr_port::fromCompact(&nodes6[i * 18 + 16]);
+            tr_dhtAddNode(session, &addr, port, true);
         }
 
         /* Our DHT code is able to take up to 9 nodes in a row without
@@ -234,12 +222,12 @@ static void dht_bootstrap(void* closure)
         }
     }
 
-    if (!bootstrap_done(cl->session, 0))
+    if (!bootstrap_done(session, 0))
     {
-        dht_boostrap_from_file(cl->session);
+        dht_boostrap_from_file(session);
     }
 
-    if (!bootstrap_done(cl->session, 0))
+    if (!bootstrap_done(session, 0))
     {
         for (int i = 0; i < 6; ++i)
         {
@@ -249,7 +237,7 @@ static void dht_bootstrap(void* closure)
                node, for example because we've just been restarted. */
             nap(40);
 
-            if (bootstrap_done(cl->session, 0))
+            if (bootstrap_done(session, 0))
             {
                 break;
             }
@@ -263,17 +251,6 @@ static void dht_bootstrap(void* closure)
         }
     }
 
-    if (cl->nodes != nullptr)
-    {
-        tr_free(cl->nodes);
-    }
-
-    if (cl->nodes6 != nullptr)
-    {
-        tr_free(cl->nodes6);
-    }
-
-    tr_free(closure);
     tr_logAddTrace("Finished bootstrapping");
 }
 
@@ -296,10 +273,8 @@ int tr_dhtInit(tr_session* ss)
     auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.sv());
 
     bool have_id = false;
-    uint8_t* nodes = nullptr;
-    uint8_t* nodes6 = nullptr;
-    size_t len = 0;
-    size_t len6 = 0;
+    auto nodes = std::vector<uint8_t>{};
+    auto nodes6 = std::vector<uint8_t>{};
     if (ok)
     {
         auto sv = std::string_view{};
@@ -309,23 +284,17 @@ int tr_dhtInit(tr_session* ss)
             std::copy(std::begin(sv), std::end(sv), myid);
         }
 
+        size_t raw_len = 0U;
         uint8_t const* raw = nullptr;
-        if (ss->udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &len) && len % 6 == 0)
+        if (ss->udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
         {
-            nodes = static_cast<uint8_t*>(tr_memdup(raw, len));
-            if (nodes == nullptr)
-            {
-                len = 0;
-            }
+            nodes.assign(raw, raw + raw_len);
         }
 
-        if (ss->udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &len6) && len6 % 18 == 0)
+        if (ss->udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &raw_len) &&
+            raw_len % 18 == 0)
         {
-            nodes6 = static_cast<uint8_t*>(tr_memdup(raw, len6));
-            if (nodes6 == nullptr)
-            {
-                len6 = 0;
-            }
+            nodes6.assign(raw, raw + raw_len);
         }
 
         tr_variantFree(&benc);
@@ -345,9 +314,6 @@ int tr_dhtInit(tr_session* ss)
 
     if (int const rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
     {
-        tr_free(nodes6);
-        tr_free(nodes);
-
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
         session_ = nullptr;
@@ -356,13 +322,7 @@ int tr_dhtInit(tr_session* ss)
 
     session_ = ss;
 
-    auto* const cl = tr_new(struct bootstrap_closure, 1);
-    cl->session = session_;
-    cl->nodes = nodes;
-    cl->nodes6 = nodes6;
-    cl->len = len;
-    cl->len6 = len6;
-    std::thread(dht_bootstrap, cl).detach();
+    std::thread(dht_bootstrap, session_, nodes, nodes6).detach();
 
     dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
     tr_timerAdd(*dht_timer, 0, tr_rand_int_weak(1000000));

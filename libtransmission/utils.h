@@ -169,14 +169,6 @@ void* tr_realloc(void* p, size_t size);
 /** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
 void tr_free(void* p);
 
-/**
- * @brief make a newly-allocated copy of a chunk of memory
- * @param src the memory to copy
- * @param byteCount the number of bytes to copy
- * @return a newly-allocated copy of `src' that can be freed with tr_free()
- */
-[[nodiscard]] void* tr_memdup(void const* src, size_t byteCount);
-
 #define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
 #define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
