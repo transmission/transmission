@@ -10,6 +10,7 @@
 #endif
 
 #include <cstdint> // intX_t, uintX_t
+#include <ctime>
 #include <memory> // std::unique_ptr
 #include <utility> // std::pair
 #include <vector>

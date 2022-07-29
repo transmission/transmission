@@ -99,6 +99,8 @@ enum tr_encryption_mode
 /**
  * @brief returns Transmission's default configuration file directory.
  *
+ * Use tr_free() to free the string when done.
+ *
  * The default configuration directory is determined this way:
  * -# If the TRANSMISSION_HOME environment variable is set, its value is used.
  * -# On Darwin, "${HOME}/Library/Application Support/${appname}" is used.
@@ -106,17 +108,19 @@ enum tr_encryption_mode
  * -# If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
  * -# ${HOME}/.config/${appname}" is used as a last resort.
  */
-char const* tr_getDefaultConfigDir(char const* appname);
+char* tr_getDefaultConfigDir(char const* appname);
 
 /**
  * @brief returns Transmisson's default download directory.
+ *
+ * Use tr_free() to free the string when done.
  *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
  * -# On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
  * -# Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
  */
-char const* tr_getDefaultDownloadDir(void);
+char* tr_getDefaultDownloadDir();
 
 #define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
 #define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
@@ -450,10 +454,10 @@ struct tr_session_stats
 };
 
 /** @brief Get bandwidth use statistics for the current session */
-void tr_sessionGetStats(tr_session const* session, tr_session_stats* setme);
+tr_session_stats tr_sessionGetStats(tr_session const* session);
 
 /** @brief Get cumulative bandwidth statistics for current and past sessions */
-void tr_sessionGetCumulativeStats(tr_session const* session, tr_session_stats* setme);
+tr_session_stats tr_sessionGetCumulativeStats(tr_session const* session);
 
 void tr_sessionClearStats(tr_session* session);
 
@@ -691,11 +695,8 @@ void tr_sessionSetQueueStalledEnabled(tr_session*, bool);
 /** @return true if we're torrents idle for over N minutes will be flagged as 'stalled' */
 bool tr_sessionGetQueueStalledEnabled(tr_session const*);
 
-/**
-**/
-
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_session*, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
 
 /***
 ****
@@ -703,7 +704,7 @@ void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_to
 ***/
 
 /**
- *  Load all the torrents in tr_getTorrentDir().
+ *  Load all the torrents in the session's torrent folder.
  *  This can be used at startup to kickstart all the torrents
  *  from the previous session.
  */
@@ -1181,9 +1182,9 @@ using tr_torrent_completeness_func = void (*)( //
     bool wasRunning,
     void* user_data);
 
-using tr_torrent_ratio_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_ratio_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
 
-using tr_torrent_idle_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_idle_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's "completeness"
@@ -1198,11 +1199,9 @@ using tr_torrent_idle_limit_hit_func = void (*)(tr_torrent* torrent, void* user_
  *
  * @see tr_completeness
  */
-void tr_torrentSetCompletenessCallback(tr_torrent* torrent, tr_torrent_completeness_func func, void* user_data);
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func func, void* user_data);
 
-void tr_torrentClearCompletenessCallback(tr_torrent* torrent);
-
-using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_metadata_func = void (*)(tr_session* session, tr_torrent* torrent, void* user_data);
 
 /**
  * Register to be notified whenever a torrent changes from
@@ -1210,25 +1209,25 @@ using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
  * This happens when a magnet link finishes downloading
  * metadata from its peers.
  */
-void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func func, void* user_data);
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func func, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's ratio limit
  * has been hit. This will be called when the torrent's
  * ul/dl ratio has met or exceeded the designated ratio limit.
  *
- * Has the same restrictions as tr_torrentSetCompletenessCallback
+ * Has the same restrictions as tr_sessionSetCompletenessCallback
  */
-void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_limit_hit_func func, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_session* torrent, tr_session_ratio_limit_hit_func func, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's idle limit
  * has been hit. This will be called when the seeding torrent's
  * idle time has met or exceeded the designated idle limit.
  *
- * Has the same restrictions as tr_torrentSetCompletenessCallback
+ * Has the same restrictions as tr_sessionSetCompletenessCallback
  */
-void tr_torrentSetIdleLimitHitCallback(tr_torrent* torrent, tr_torrent_idle_limit_hit_func func, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_session* torrent, tr_session_idle_limit_hit_func func, void* user_data);
 
 /**
  * MANUAL ANNOUNCE
@@ -1545,11 +1544,6 @@ struct tr_stat
         are moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
 
-    /** time when one or more of the torrent's trackers will
-        allow you to manually ask for more peers,
-        or 0 if you can't */
-    time_t manualAnnounceTime;
-
     /** When the torrent was first added. */
     time_t addedDate;
 
@@ -1595,14 +1589,6 @@ struct tr_stat
         This is 1 if the ratio is reached or the torrent is set to seed forever.
         Range is [0..1] */
     float seedRatioPercentDone;
-
-    /** Speed all data being sent for this torrent.
-        This includes piece data, protocol messages, and TCP overhead */
-    float rawUploadSpeed_KBps;
-
-    /** Speed all data being received for this torrent.
-        This includes piece data, protocol messages, and TCP overhead */
-    float rawDownloadSpeed_KBps;
 
     /** Speed all piece being sent for this torrent.
         This ONLY counts piece data. */

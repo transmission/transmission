@@ -74,7 +74,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     {
         *static_cast<tr_completeness*>(vc) = c;
     };
-    tr_torrentSetCompletenessCallback(tor, zeroes_completeness_func, &completeness);
+    tr_sessionSetCompletenessCallback(session_, zeroes_completeness_func, &completeness);
 
     struct TestIncompleteDirData
     {
@@ -156,7 +156,7 @@ using MoveTest = SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
-    auto const target_dir = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/target"sv };
+    auto const target_dir = tr_pathbuf{ session_->configDir(), "/target"sv };
     tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.

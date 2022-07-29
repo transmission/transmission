@@ -8,7 +8,6 @@
 #include <cinttypes> // PRIu64
 #include <climits> // INT_MAX
 #include <cstdio>
-#include <cstring>
 #include <ctime>
 #include <deque>
 #include <iterator>
@@ -790,7 +789,7 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
          * dump everything leading up to it except "completed" */
         if (e == TR_ANNOUNCE_EVENT_STOPPED)
         {
-            bool has_completed = std::count(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) != 0;
+            bool const has_completed = std::count(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) != 0;
             events.clear();
             if (has_completed)
             {
@@ -1222,7 +1221,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
     time_t const now = tr_time();
 
     tr_torrent* tor = tier->tor;
-    tr_announce_event announce_event = tier_announce_event_pull(tier);
+    tr_announce_event const announce_event = tier_announce_event_pull(tier);
     tr_announce_request* req = announce_request_new(announcer, tor, tier, announce_event);
 
     auto* const data = new announce_data{ tier->id, now, announce_event, announcer->session, tor->isRunning };

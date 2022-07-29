@@ -3,13 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <climits> /* INT_MAX */
 #include <cstddef>
-#include <cstring> // strchr
-#include <functional>
-#include <unordered_map>
+#include <list>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 
 #include <glibmm.h>

@@ -9,11 +9,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint64_t
 #include <string>
-#include <string_view>
 #include <vector>
 
 #ifdef _WIN32

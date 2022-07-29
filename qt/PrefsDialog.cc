@@ -819,7 +819,7 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    key2widget_t::iterator it(widgets_.find(key));
+    key2widget_t::iterator const it(widgets_.find(key));
 
     if (it != widgets_.end())
     {

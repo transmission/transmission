@@ -48,6 +48,7 @@ static auto constexpr INCOMING_HANDSHAKE_LEN = int{ 48 };
 // encryption constants
 static auto constexpr PadA_MAXLEN = int{ 512 };
 static auto constexpr PadB_MAXLEN = int{ 512 };
+static auto constexpr PadC_MAXLEN = int{ 512 };
 static auto constexpr CRYPTO_PROVIDE_PLAINTEXT = int{ 1 };
 static auto constexpr CRYPTO_PROVIDE_CRYPTO = int{ 2 };
 
@@ -823,6 +824,12 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
     tr_peerIoReadUint16(handshake->io, inbuf, &padc_len);
     tr_logAddTraceHand(handshake, fmt::format("padc is {}", padc_len));
+    if (padc_len > PadC_MAXLEN)
+    {
+        tr_logAddTraceHand(handshake, "peer's PadC is too big");
+        return tr_handshakeDone(handshake, false);
+    }
+
     handshake->pad_c_len = padc_len;
     setState(handshake, AWAITING_PAD_C);
     return READ_NOW;
@@ -837,10 +844,9 @@ static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
         return READ_LATER;
     }
 
-    /* read the throwaway padc */
-    auto* const padc = tr_new(char, handshake->pad_c_len);
-    tr_peerIoReadBytes(handshake->io, inbuf, padc, handshake->pad_c_len);
-    tr_free(padc);
+    // read the throwaway padc
+    auto pad_c = std::array<char, PadC_MAXLEN>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(pad_c), handshake->pad_c_len);
 
     /* read ia_len */
     tr_peerIoReadUint16(handshake->io, inbuf, &ia_len);
@@ -1087,7 +1093,7 @@ void tr_handshakeAbort(tr_handshake* handshake)
 
 static void gotError(tr_peerIo* io, short what, void* vhandshake)
 {
-    int errcode = errno;
+    int const errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
     if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)

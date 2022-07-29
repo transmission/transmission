@@ -702,6 +702,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "Порт открыт";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "640";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Приоритет";
@@ -1047,7 +1050,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Trace" = "";
+"Trace" = "Отслеживающий";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Трекер";
@@ -1126,7 +1129,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warning" = "";
+"Warning" = "Предупреждение";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";
@@ -1148,7 +1151,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Вы заинтересованы в имеющихся у пользователя частях торрента, но он вас блокирует";
-
-/* Preferences window size*/
-"PrefWindowSize" = "616";
 

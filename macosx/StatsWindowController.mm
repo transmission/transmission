@@ -182,9 +182,8 @@ tr_session* fLib = NULL;
 
 - (void)updateStats
 {
-    tr_session_stats statsAll, statsSession;
-    tr_sessionGetCumulativeStats(fLib, &statsAll);
-    tr_sessionGetStats(fLib, &statsSession);
+    auto const statsAll = tr_sessionGetCumulativeStats(fLib);
+    auto const statsSession = tr_sessionGetStats(fLib);
 
     NSByteCountFormatter* byteFormatter = [[NSByteCountFormatter alloc] init];
     byteFormatter.allowedUnits = NSByteCountFormatterUseBytes;

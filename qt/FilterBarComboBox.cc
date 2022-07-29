@@ -29,7 +29,7 @@ FilterBarComboBox::FilterBarComboBox(QWidget* parent)
 
 QSize FilterBarComboBox::minimumSizeHint() const
 {
-    QFontMetrics fm(fontMetrics());
+    QFontMetrics const fm(fontMetrics());
     QSize const text_size = fm.size(0, itemText(0));
     QSize const count_size = fm.size(0, itemData(0, CountStringRole).toString());
     return calculateSize(text_size, count_size);
@@ -37,7 +37,7 @@ QSize FilterBarComboBox::minimumSizeHint() const
 
 QSize FilterBarComboBox::sizeHint() const
 {
-    QFontMetrics fm(fontMetrics());
+    QFontMetrics const fm(fontMetrics());
     QSize max_text_size(0, 0);
     QSize max_count_size(0, 0);
 

@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::find_if()
 #include <cerrno> /* errno, EAFNOSUPPORT */
 #include <cstring> /* memset() */
 #include <ctime>
@@ -80,6 +81,19 @@ static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_
 
     tau_sockaddr_setport(ai->ai_addr, port);
     return sendto(sockfd, static_cast<char const*>(buf), buflen, 0, ai->ai_addr, ai->ai_addrlen);
+}
+
+static uint32_t announce_ip(tr_session const* session)
+{
+    if (!session->useAnnounceIP())
+    {
+        return 0;
+    }
+
+    // Since size of IP field is only 4 bytes long we can announce
+    // only IPv4 addresses.
+    auto const addr = tr_address::fromString(session->announceIP());
+    return addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
 }
 
 /****
@@ -351,6 +365,7 @@ static tau_announce_event get_tau_announce_event(tr_announce_event e)
 }
 
 static tau_announce_request make_tau_announce_request(
+    tr_session const* session,
     tr_announce_request const* in,
     tr_announce_response_func callback,
     void* user_data)
@@ -367,7 +382,7 @@ static tau_announce_request make_tau_announce_request(
     evbuffer_add_hton_64(buf, in->leftUntilComplete);
     evbuffer_add_hton_64(buf, in->up);
     evbuffer_add_hton_32(buf, get_tau_announce_event(in->event));
-    evbuffer_add_hton_32(buf, 0);
+    evbuffer_add_hton_32(buf, announce_ip(session));
     evbuffer_add_hton_32(buf, in->key);
     evbuffer_add_hton_32(buf, in->numwant);
     evbuffer_add_hton_16(buf, in->port.host());
@@ -902,7 +917,7 @@ void tr_tracker_udp_announce(
         return;
     }
 
-    tracker->announces.push_back(make_tau_announce_request(request, response_func, user_data));
+    tracker->announces.push_back(make_tau_announce_request(session, request, response_func, user_data));
     tau_tracker_upkeep_ex(tracker, false);
 }
 

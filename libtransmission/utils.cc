@@ -142,70 +142,6 @@ void tr_timerAddMsec(struct event& timer, int msec)
 ***
 **/
 
-uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
-{
-    auto const path = tr_pathbuf{ path_in };
-
-    /* try to stat the file */
-    auto info = tr_sys_path_info{};
-    tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
-    {
-        tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
-        return nullptr;
-    }
-
-    if (info.type != TR_SYS_PATH_IS_FILE)
-    {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
-        tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
-        return nullptr;
-    }
-
-    /* file size should be able to fit into size_t */
-    if constexpr (sizeof(info.size) > sizeof(*size))
-    {
-        TR_ASSERT(info.size <= SIZE_MAX);
-    }
-
-    /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
-    if (fd == TR_BAD_SYS_FILE)
-    {
-        tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
-        return nullptr;
-    }
-
-    auto* buf = static_cast<uint8_t*>(tr_malloc(info.size + 1));
-    if (!tr_sys_file_read(fd, buf, info.size, nullptr, &my_error))
-    {
-        tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_sys_file_close(fd);
-        tr_free(buf);
-        tr_error_propagate(error, &my_error);
-        return nullptr;
-    }
-
-    tr_sys_file_close(fd);
-    buf[info.size] = '\0';
-    *size = info.size;
-    return buf;
-}
-
 bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** error)
 {
     auto const path = tr_pathbuf{ path_in };
@@ -450,44 +386,9 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     TR_ASSERT(dst != nullptr);
     TR_ASSERT(src != nullptr);
 
-#ifdef HAVE_STRLCPY
-
-    return strlcpy(dst, src, siz);
-
-#else
-
-    auto* d = dst;
-    auto const* s = src;
-    size_t n = siz;
-
-    /* Copy as many bytes as will fit */
-    if (n != 0)
-    {
-        while (--n != 0)
-        {
-            if ((*d++ = *s++) == '\0')
-            {
-                break;
-            }
-        }
-    }
-
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0)
-    {
-        if (siz != 0)
-        {
-            *d = '\0'; /* NUL-terminate dst */
-        }
-
-        while (*s++ != '\0')
-        {
-        }
-    }
-
-    return s - (char const*)src - 1; /* count does not include NUL */
-
-#endif
+    auto const res = fmt::format_to_n(dst, siz - 1, FMT_STRING("{:s}"), src);
+    *res.out = '\0';
+    return res.size;
 }
 
 /***
@@ -1115,7 +1016,7 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
         unit = &u[3];
     }
 
-    double value = double(bytes) / unit->value;
+    double const value = double(bytes) / unit->value;
     auto const* const units = std::data(unit->name);
 
     auto precision = int{};
@@ -1269,53 +1170,42 @@ int tr_env_get_int(char const* key, int default_value)
     return default_value;
 }
 
-char* tr_env_get_string(char const* key, char const* default_value)
+std::string tr_env_get_string(std::string_view key, std::string_view default_value)
 {
-    TR_ASSERT(key != nullptr);
-
 #ifdef _WIN32
 
-    wchar_t* wide_key = tr_win32_utf8_to_native(key, -1);
-    char* value = nullptr;
-
-    if (wide_key != nullptr)
+    if (auto* const wide_key = tr_win32_utf8_to_native(std::data(key), std::size(key)); wide_key != nullptr)
     {
-        DWORD const size = GetEnvironmentVariableW(wide_key, nullptr, 0);
-
-        if (size != 0)
+        if (auto const size = GetEnvironmentVariableW(wide_key, nullptr, 0); size != 0)
         {
-            wchar_t* const wide_value = tr_new(wchar_t, size);
+            auto wide_val = std::vector<wchar_t>{};
+            wide_val.resize(size);
 
-            if (GetEnvironmentVariableW(wide_key, wide_value, size) == size - 1)
+            if (GetEnvironmentVariableW(wide_key, std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
             {
-                value = tr_win32_native_to_utf8(wide_value, size);
+                char* const val = tr_win32_native_to_utf8(std::data(wide_val), std::size(wide_val));
+                auto ret = std::string{ val };
+                tr_free(val);
+                tr_free(wide_key);
+                return ret;
             }
-
-            tr_free(wide_value);
         }
 
         tr_free(wide_key);
     }
 
-    if (value == nullptr && default_value != nullptr)
-    {
-        value = tr_strdup(default_value);
-    }
-
-    return value;
-
 #else
 
-    char const* value = getenv(key);
+    auto const szkey = tr_strbuf<char, 256>{ key };
 
-    if (value == nullptr)
+    if (auto const* const value = getenv(szkey); value != nullptr)
     {
-        value = default_value;
+        return value;
     }
 
-    return value != nullptr ? tr_strvDup(value) : nullptr;
-
 #endif
+
+    return std::string{ default_value };
 }
 
 /***

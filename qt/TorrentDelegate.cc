@@ -379,7 +379,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
     if (tor.isReadyToTransfer())
     {
-        QString s = shortTransferString(tor);
+        QString const s = shortTransferString(tor);
 
         if (!s.isEmpty())
         {

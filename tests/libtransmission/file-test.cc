@@ -50,7 +50,7 @@ class FileTest : public SessionTest
 protected:
     auto createTestDir(std::string const& child_name)
     {
-        auto test_dir = tr_pathbuf{ tr_sessionGetConfigDir(session_), '/', child_name };
+        auto test_dir = tr_pathbuf{ session_->configDir(), '/', child_name };
         tr_sys_dir_create(test_dir, 0, 0777);
         return test_dir;
     }
@@ -1024,7 +1024,7 @@ TEST_F(FileTest, pathNativeSeparators)
     for (auto const& test : tests)
     {
         auto buf = std::string(test.input);
-        char* const output = tr_sys_path_native_separators(&buf.front());
+        char* const output = tr_sys_path_native_separators(buf.data());
         EXPECT_EQ(test.expected_output, output);
         EXPECT_EQ(buf.data(), output);
     }

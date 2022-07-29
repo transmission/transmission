@@ -3,9 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <climits> /* USHRT_MAX */
+#include <algorithm> // std::copy_n()
 #include <cstdio> /* fprintf() */
-#include <cstring> /* strchr(), memcmp(), memcpy() */
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -124,6 +123,13 @@ static std::string format_ipv6_url_arg(unsigned char const* ipv6_address)
     return arg;
 }
 
+static std::string format_ip_arg(std::string_view ip)
+{
+    auto arg = std::string{ "&ip="sv };
+    arg += ip;
+    return arg;
+}
+
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
     auto& out = std::cerr;
@@ -135,7 +141,7 @@ static void verboseLog(std::string_view description, tr_direction direction, std
 
     auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
     out << description << std::endl << "[raw]"sv << direction_sv;
-    for (unsigned char ch : message)
+    for (unsigned char const ch : message)
     {
         if (isprint(ch) != 0)
         {
@@ -251,7 +257,10 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "ip")
             {
-                tr_address_from_string(&pex_.addr, value);
+                if (auto const addr = tr_address::fromString(value); addr)
+                {
+                    pex_.addr = *addr;
+                }
             }
             else if (key == "peer id")
             {
@@ -437,7 +446,11 @@ void tr_tracker_http_announce(
     static bool const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < CURL_VERSION_BITS(7, 77, 0);
     if (use_curl_workaround)
     {
-        if (ipv6 != nullptr)
+        if (session->useAnnounceIP())
+        {
+            options.url += format_ip_arg(session->announceIP());
+        }
+        else if (ipv6 != nullptr)
         {
             if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
             {
@@ -451,7 +464,16 @@ void tr_tracker_http_announce(
     }
     else
     {
-        if (ipv6 != nullptr)
+        if (session->useAnnounceIP() || ipv6 == nullptr)
+        {
+            if (session->useAnnounceIP())
+            {
+                options.url += format_ip_arg(session->announceIP());
+            }
+            d->requests_sent_count = 1;
+            do_make_request(""sv, std::move(options));
+        }
+        else
         {
             d->requests_sent_count = 2;
 
@@ -470,11 +492,6 @@ void tr_tracker_http_announce(
             }
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
             do_make_request("IPv6"sv, std::move(options));
-        }
-        else
-        {
-            d->requests_sent_count = 1;
-            do_make_request(""sv, std::move(options));
         }
     }
 }

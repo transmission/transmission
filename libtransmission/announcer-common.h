@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstdint> // uint64_t
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>

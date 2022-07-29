@@ -702,6 +702,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "Kapı açık";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "640";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Öncelik";
@@ -1148,7 +1151,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Siz indirmek istiyorsunuz ancak karşıdaki eş göndermek istemiyor (ilgili ve izinsiz)";
-
-/* Preferences window size*/
-"PrefWindowSize" = "606";
 

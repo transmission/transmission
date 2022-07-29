@@ -72,12 +72,6 @@ struct tr_error;
  */
 [[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
-/**
- * @brief Loads a file and returns its contents.
- * On failure, NULL is returned and errno is set.
- */
-uint8_t* tr_loadFile(std::string_view filename, size_t* size, struct tr_error** error) TR_GNUC_MALLOC;
-
 bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
 
 bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
@@ -231,27 +225,6 @@ template<typename T>
 /***
 ****  std::string_view utils
 ***/
-
-template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
-[[nodiscard]] std::string tr_strvPath(T... args)
-{
-    auto setme = std::string{};
-    auto const n_args = sizeof...(args);
-    auto const n = n_args + (std::size(std::string_view{ args }) + ...);
-    if (setme.capacity() < n)
-    {
-        setme.reserve(n);
-    }
-
-    auto const foo = [&setme](std::string_view a)
-    {
-        setme += a;
-        setme += TR_PATH_DELIMITER;
-    };
-    (foo(args), ...);
-    setme.resize(setme.size() - 1);
-    return setme;
-}
 
 template<typename T>
 [[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
@@ -458,8 +431,8 @@ bool tr_env_key_exists(char const* key);
 /** @brief Get environment variable value as int. */
 int tr_env_get_int(char const* key, int default_value);
 
-/** @brief Get environment variable value as string (should be freed afterwards). */
-char* tr_env_get_string(char const* key, char const* default_value);
+/** @brief Get environment variable value as string. */
+std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});
 
 /***
 ****

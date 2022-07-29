@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::find()
+#include <functional>
 #include <iterator>
 #include <optional>
 #include <set>
@@ -353,7 +355,7 @@ namespace
 
     static auto constexpr ReservedPrefixes = std::array<std::string_view, 22>{
         "AUX."sv,  "CON."sv,  "NUL."sv,  "PRN."sv, //
-        "COM1."sv, "COM2"sv,  "COM3."sv, "COM4."sv, "COM5."sv, "COM6."sv, "COM7."sv, "COM8."sv, "COM9."sv, //
+        "COM1."sv, "COM2."sv, "COM3."sv, "COM4."sv, "COM5."sv, "COM6."sv, "COM7."sv, "COM8."sv, "COM9."sv, //
         "LPT1."sv, "LPT2."sv, "LPT3."sv, "LPT4."sv, "LPT5."sv, "LPT6."sv, "LPT7."sv, "LPT8."sv, "LPT9."sv, //
     };
     return std::any_of(

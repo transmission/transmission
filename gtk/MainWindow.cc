@@ -581,18 +581,17 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
 void MainWindow::Impl::updateStats()
 {
     Glib::ustring buf;
-    tr_session_stats stats;
     auto const* const session = core_->get_session();
 
     /* update the stats */
     if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
     {
-        tr_sessionGetStats(session, &stats);
+        auto const stats = tr_sessionGetStats(session);
         buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
     else if (pch == "session-transfer")
     {
-        tr_sessionGetStats(session, &stats);
+        auto const stats = tr_sessionGetStats(session);
         buf = fmt::format(
             C_("current session totals", "Down: {downloaded_size}, Up: {uploaded_size}"),
             fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
@@ -600,7 +599,7 @@ void MainWindow::Impl::updateStats()
     }
     else if (pch == "total-transfer")
     {
-        tr_sessionGetCumulativeStats(session, &stats);
+        auto const stats = tr_sessionGetCumulativeStats(session);
         buf = fmt::format(
             C_("all-time totals", "Down: {downloaded_size}, Up: {uploaded_size}"),
             fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
@@ -608,7 +607,7 @@ void MainWindow::Impl::updateStats()
     }
     else /* default is total-ratio */
     {
-        tr_sessionGetCumulativeStats(session, &stats);
+        auto const stats = tr_sessionGetCumulativeStats(session);
         buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
 

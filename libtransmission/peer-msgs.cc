@@ -290,7 +290,7 @@ public:
         if (tr_dhtEnabled(torrent->session) && io->supportsDHT())
         {
             /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
-            if (io->address().type == TR_AF_INET || tr_globalIPv6(nullptr) != nullptr)
+            if (io->address().isIPv4() || tr_globalIPv6(nullptr) != nullptr)
             {
                 protocolSendPort(this, tr_dhtPort(torrent->session));
             }
@@ -1005,7 +1005,7 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
 
     size_t setSize = 0;
 
-    if (addr->type == TR_AF_INET)
+    if (addr->isIPv4())
     {
         uint8_t w[SHA_DIGEST_LENGTH + 4];
         uint8_t* walk = w;

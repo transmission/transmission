@@ -679,7 +679,7 @@ void DetailsDialog::refreshUI()
     }
     else
     {
-        int baseline = torrents[0]->getETA();
+        int const baseline = torrents[0]->getETA();
 
         for (Torrent const* const t : torrents)
         {
@@ -830,7 +830,7 @@ void DetailsDialog::refreshUI()
 
     if (!torrents.empty())
     {
-        bool b = torrents[0]->isPrivate();
+        bool const b = torrents[0]->isPrivate();
         string = b ? tr("Private to this tracker -- DHT and PEX disabled") : tr("Public torrent");
 
         for (Torrent const* const t : torrents)
@@ -1021,7 +1021,7 @@ void DetailsDialog::refreshUI()
 
         // myBandwidthPriorityCombo
         uniform = true;
-        int baseline_int = baseline.getBandwidthPriority();
+        int const baseline_int = baseline.getBandwidthPriority();
 
         for (Torrent const* const tor : torrents)
         {
@@ -1032,7 +1032,7 @@ void DetailsDialog::refreshUI()
             }
         }
 
-        int i = uniform ? ui_.bandwidthPriorityCombo->findData(baseline_int) : -1;
+        int const i = uniform ? ui_.bandwidthPriorityCombo->findData(baseline_int) : -1;
 
         setIfIdle(ui_.bandwidthPriorityCombo, i);
 
@@ -1100,7 +1100,7 @@ void DetailsDialog::refreshUI()
     for (Torrent const* const t : torrents)
     {
         QString const id_str(QString::number(t->id()));
-        PeerList peers = t->peers();
+        PeerList const peers = t->peers();
 
         for (Peer const& peer : peers)
         {
@@ -1405,7 +1405,7 @@ void DetailsDialog::onRemoveTrackerClicked()
 {
     // make a map of torrentIds to announce URLs to remove
     QItemSelectionModel* selection_model = ui_.trackersView->selectionModel();
-    QModelIndexList selected_rows = selection_model->selectedRows();
+    QModelIndexList const selected_rows = selection_model->selectedRows();
     QMultiMap<int, int> torrent_id_to_tracker_ids;
 
     for (QModelIndex const& i : selected_rows)
@@ -1456,8 +1456,8 @@ void DetailsDialog::initOptionsTab()
     cr->addLayout(ui_.peerConnectionsSectionLayout);
     cr->update();
 
-    void (QComboBox::*combo_index_changed)(int) = &QComboBox::currentIndexChanged;
-    void (QSpinBox::*spin_value_changed)(int) = &QSpinBox::valueChanged;
+    void (QComboBox::*const combo_index_changed)(int) = &QComboBox::currentIndexChanged;
+    void (QSpinBox::*const spin_value_changed)(int) = &QSpinBox::valueChanged;
     connect(ui_.bandwidthPriorityCombo, combo_index_changed, this, &DetailsDialog::onBandwidthPriorityChanged);
     connect(ui_.idleCombo, combo_index_changed, this, &DetailsDialog::onIdleModeChanged);
     connect(ui_.idleSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);

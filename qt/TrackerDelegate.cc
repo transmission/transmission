@@ -119,7 +119,7 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
     bool const is_item_enabled((option.state & QStyle::State_Enabled) != 0);
     bool const is_item_active((option.state & QStyle::State_Active) != 0);
 
-    QIcon tracker_icon(inf.st.getFavicon());
+    QIcon const tracker_icon(inf.st.getFavicon());
 
     QRect const content_rect(option.rect.adjusted(Margin.width(), Margin.height(), -Margin.width(), -Margin.height()));
     ItemLayout const layout(getText(inf), is_item_selected, option.direction, content_rect.topLeft(), content_rect.width());

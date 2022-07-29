@@ -28,7 +28,6 @@
 
 #include "test-fixtures.h"
 
-using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
 using namespace std::literals;
 
@@ -120,18 +119,6 @@ TEST_F(UtilsTest, trStrvDup)
     EXPECT_NE(nullptr, str);
     EXPECT_EQ(Key, str);
     tr_free(str);
-}
-
-TEST_F(UtilsTest, trStrvPath)
-{
-    EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("foo", "bar"));
-    EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("", "foo", "bar"));
-
-    EXPECT_EQ("", tr_strvPath(""sv));
-    EXPECT_EQ("foo"sv, tr_strvPath("foo"sv));
-    EXPECT_EQ(
-        "foo" TR_PATH_DELIMITER_STR "bar" TR_PATH_DELIMITER_STR "baz" TR_PATH_DELIMITER_STR "mum"sv,
-        tr_strvPath("foo"sv, "bar", std::string{ "baz" }, "mum"sv));
 }
 
 TEST_F(UtilsTest, trStrvUtf8Clean)
@@ -271,7 +258,7 @@ TEST_F(UtilsTest, trStrlcpy)
     char const initial_char = '1';
     std::array<char, 100> destination = { initial_char };
 
-    std::vector<std::string> tests{
+    std::vector<std::string> const tests{
         "a",
         "",
         "12345678901234567890",
@@ -327,27 +314,22 @@ TEST_F(UtilsTest, env)
 
     EXPECT_FALSE(tr_env_key_exists(test_key));
     EXPECT_EQ(123, tr_env_get_int(test_key, 123));
-    EXPECT_EQ(nullptr, tr_env_get_string(test_key, nullptr));
-    auto s = makeString(tr_env_get_string(test_key, "a"));
-    EXPECT_EQ("a", s);
+    EXPECT_EQ(""sv, tr_env_get_string(test_key));
+    EXPECT_EQ("a"sv, tr_env_get_string(test_key, "a"sv));
 
     setenv(test_key, "", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
     EXPECT_EQ(456, tr_env_get_int(test_key, 456));
-    s = makeString(tr_env_get_string(test_key, nullptr));
-    EXPECT_EQ("", s);
-    s = makeString(tr_env_get_string(test_key, "b"));
-    EXPECT_EQ("", s);
+    EXPECT_EQ("", tr_env_get_string(test_key, ""));
+    EXPECT_EQ("", tr_env_get_string(test_key, "b"));
 
     setenv(test_key, "135", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
     EXPECT_EQ(135, tr_env_get_int(test_key, 789));
-    s = makeString(tr_env_get_string(test_key, nullptr));
-    EXPECT_EQ("135", s);
-    s = makeString(tr_env_get_string(test_key, "c"));
-    EXPECT_EQ("135", s);
+    EXPECT_EQ("135", tr_env_get_string(test_key, ""));
+    EXPECT_EQ("135", tr_env_get_string(test_key, "c"));
 }
 
 TEST_F(UtilsTest, mimeTypes)

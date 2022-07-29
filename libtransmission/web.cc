@@ -10,7 +10,6 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <string_view>
 #include <thread>
 
 #ifdef _WIN32
@@ -110,10 +109,9 @@ public:
     {
         std::call_once(curl_init_flag, curlInit);
 
-        if (auto* bundle = tr_env_get_string("CURL_CA_BUNDLE", nullptr); bundle != nullptr)
+        if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
         {
-            curl_ca_bundle = bundle;
-            tr_free(bundle);
+            curl_ca_bundle = std::move(bundle);
         }
 
         shareEverything();

@@ -104,7 +104,7 @@ RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
 
 RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
 {
-    TrVariantPtr json = createVariant();
+    TrVariantPtr const json = createVariant();
     tr_variantInitDict(json.get(), 3);
     dictAdd(json.get(), TR_KEY_method, method);
 
@@ -170,7 +170,7 @@ void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse
 
 RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 {
-    int64_t tag = getNextTag();
+    int64_t const tag = getNextTag();
     dictAdd(json.get(), TR_KEY_tag, tag);
 
     QFutureInterface<RpcResponse> promise;
@@ -211,7 +211,7 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
 
     auto* self = static_cast<RpcClient*>(vself);
 
-    TrVariantPtr json = createVariant();
+    TrVariantPtr const json = createVariant();
     *json = *response;
     variantInit(response, false);
 
@@ -266,7 +266,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         QByteArray const json_data = reply->readAll().trimmed();
         auto const json_sv = std::string_view{ std::data(json_data), size_t(std::size(json_data)) };
 
-        TrVariantPtr json = createVariant();
+        TrVariantPtr const json = createVariant();
         RpcResponse result;
         if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
         {
@@ -280,8 +280,8 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
 void RpcClient::localRequestFinished(TrVariantPtr response)
 {
-    int64_t tag = parseResponseTag(*response);
-    RpcResponse result = parseResponseData(*response);
+    int64_t const tag = parseResponseTag(*response);
+    RpcResponse const result = parseResponseData(*response);
     QFutureInterface<RpcResponse> promise = local_requests_.take(tag);
 
     promise.setProgressRange(0, 1);

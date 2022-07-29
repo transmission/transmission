@@ -359,6 +359,61 @@ static void removeKeRangerRansomware()
     }
 }
 
+void onStartQueue(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent startQueue];
+    });
+}
+
+void onIdleLimitHit(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent idleLimitHit];
+    });
+}
+
+void onRatioLimitHit(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent ratioLimitHit];
+    });
+}
+
+void onMetadataCompleted(tr_session* session, tr_torrent* tor, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent metadataRetrieved];
+    });
+}
+
+void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool wasRunning, void* vself)
+{
+    auto* const controller = (__bridge Controller*)(vself);
+    auto const hashstr = @(tr_torrentView(tor).hash_string);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        auto* const torrent = [controller torrentForHash:hashstr];
+        [torrent completenessChange:status wasRunning:wasRunning];
+    });
+}
+
 - (instancetype)init
 {
     if ((self = [super init]))
@@ -508,11 +563,17 @@ static void removeKeRangerRansomware()
 
         tr_formatter_mem_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
 
-        char const* configDir = tr_getDefaultConfigDir("Transmission");
-        _fLib = tr_sessionInit(configDir, YES, &settings);
+        char* const default_config_dir = tr_getDefaultConfigDir("Transmission");
+        _fLib = tr_sessionInit(default_config_dir, YES, &settings);
         tr_variantFree(&settings);
+        _fConfigDirectory = @(default_config_dir);
+        tr_free(default_config_dir);
 
-        _fConfigDirectory = @(configDir);
+        tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
+        tr_sessionSetQueueStartCallback(_fLib, onStartQueue, (__bridge void*)(self));
+        tr_sessionSetRatioLimitHitCallback(_fLib, onRatioLimitHit, (__bridge void*)(self));
+        tr_sessionSetMetadataCallback(_fLib, onMetadataCompleted, (__bridge void*)(self));
+        tr_sessionSetCompletenessCallback(_fLib, onTorrentCompletenessChanged, (__bridge void*)(self));
 
         NSApp.delegate = self;
 
@@ -803,9 +864,7 @@ static void removeKeRangerRansomware()
     //shamelessly ask for donations
     if ([self.fDefaults boolForKey:@"WarningDonate"])
     {
-        tr_session_stats stats;
-        tr_sessionGetCumulativeStats(self.fLib, &stats);
-        BOOL const firstLaunch = stats.sessionCount <= 1;
+        BOOL const firstLaunch = tr_sessionGetCumulativeStats(self.fLib).sessionCount <= 1;
 
         NSDate* lastDonateDate = [self.fDefaults objectForKey:@"DonateAskDate"];
         BOOL const timePassed = !lastDonateDate || (-1 * lastDonateDate.timeIntervalSinceNow) >= DONATE_NAG_TIME;
@@ -4102,14 +4161,33 @@ static void removeKeRangerRansomware()
     {
         GroupToolbarItem* groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier:ident];
 
-        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
-        segmentedControl.cell = [[ToolbarSegmentedCell alloc] init];
-        groupItem.view = segmentedControl;
-        NSSegmentedCell* segmentedCell = (NSSegmentedCell*)segmentedControl.cell;
-        segmentedControl.segmentStyle = NSSegmentStyleSeparated;
+        NSToolbarItem* itemPause = [self standardToolbarButtonWithIdentifier:TOOLBAR_PAUSE_ALL];
+        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:TOOLBAR_RESUME_ALL];
 
+        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
+        segmentedControl.segmentStyle = NSSegmentStyleTexturedRounded;
+        segmentedControl.trackingMode = NSSegmentSwitchTrackingMomentary;
         segmentedControl.segmentCount = 2;
-        segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
+
+        [segmentedControl setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
+        [segmentedControl setImage:[NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
+                        forSegment:TOOLBAR_PAUSE_TAG];
+        [segmentedControl setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
+                          forSegment:TOOLBAR_PAUSE_TAG];
+
+        [segmentedControl setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
+        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
+                        forSegment:TOOLBAR_RESUME_TAG];
+        [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
+                          forSegment:TOOLBAR_RESUME_TAG];
+
+        groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
+        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
+        groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
+        groupItem.subitems = @[ itemPause, itemResume ];
+        groupItem.view = segmentedControl;
+        groupItem.target = self;
+        groupItem.action = @selector(allToolbarClicked:);
 
         if (@available(macOS 11.0, *))
         {
@@ -4122,31 +4200,10 @@ static void removeKeRangerRansomware()
             groupItem.maxSize = groupSize;
         }
 
-        groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
-        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
-        groupItem.target = self;
-        groupItem.action = @selector(allToolbarClicked:);
-
-        groupItem.identifiers = @[ TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL ];
-
-        [segmentedCell setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage:[NSImage largeSystemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
-                        forSegment:TOOLBAR_PAUSE_TAG];
-        [segmentedCell setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip") forSegment:TOOLBAR_PAUSE_TAG];
-
-        [segmentedCell setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage:[NSImage imageNamed:@"ToolbarResumeAllTemplate"] forSegment:TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage:[NSImage largeSystemSymbol:@"arrow.clockwise.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
-                        forSegment:TOOLBAR_RESUME_TAG];
-        [segmentedCell setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
-                       forSegment:TOOLBAR_RESUME_TAG];
-
         [groupItem createMenu:@[
             NSLocalizedString(@"Pause All", "All toolbar item -> label"),
             NSLocalizedString(@"Resume All", "All toolbar item -> label")
         ]];
-
-        groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
 
         return groupItem;
     }
@@ -4154,13 +4211,34 @@ static void removeKeRangerRansomware()
     {
         GroupToolbarItem* groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier:ident];
 
-        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
-        segmentedControl.cell = [[ToolbarSegmentedCell alloc] init];
-        groupItem.view = segmentedControl;
-        NSSegmentedCell* segmentedCell = (NSSegmentedCell*)segmentedControl.cell;
+        NSToolbarItem* itemPause = [self standardToolbarButtonWithIdentifier:TOOLBAR_PAUSE_SELECTED];
+        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:TOOLBAR_RESUME_SELECTED];
 
+        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
+        segmentedControl.segmentStyle = NSSegmentStyleTexturedRounded;
+        segmentedControl.trackingMode = NSSegmentSwitchTrackingMomentary;
         segmentedControl.segmentCount = 2;
-        segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
+
+        [segmentedControl setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
+        [segmentedControl setImage:[NSImage systemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"]
+                        forSegment:TOOLBAR_PAUSE_TAG];
+        [segmentedControl setToolTip:NSLocalizedString(@"Pause selected transfers", "Selected toolbar item -> tooltip")
+                          forSegment:TOOLBAR_PAUSE_TAG];
+
+        [segmentedControl setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
+        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"]
+                        forSegment:TOOLBAR_RESUME_TAG];
+        [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
+                          forSegment:TOOLBAR_RESUME_TAG];
+
+        groupItem.view = segmentedControl;
+        groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
+        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
+        groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
+        groupItem.subitems = @[ itemPause, itemResume ];
+        groupItem.view = segmentedControl;
+        groupItem.target = self;
+        groupItem.action = @selector(selectedToolbarClicked:);
 
         if (@available(macOS 11.0, *))
         {
@@ -4173,31 +4251,10 @@ static void removeKeRangerRansomware()
             groupItem.maxSize = groupSize;
         }
 
-        groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
-        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
-        groupItem.target = self;
-        groupItem.action = @selector(selectedToolbarClicked:);
-
-        groupItem.identifiers = @[ TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED ];
-
-        [segmentedCell setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage:[NSImage largeSystemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"]
-                        forSegment:TOOLBAR_PAUSE_TAG];
-        [segmentedCell setToolTip:NSLocalizedString(@"Pause selected transfers", "Selected toolbar item -> tooltip")
-                       forSegment:TOOLBAR_PAUSE_TAG];
-
-        [segmentedCell setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"]
-                        forSegment:TOOLBAR_RESUME_TAG];
-        [segmentedCell setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
-                       forSegment:TOOLBAR_RESUME_TAG];
-
         [groupItem createMenu:@[
             NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
             NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label")
         ]];
-
-        groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
 
         return groupItem;
     }
@@ -4255,9 +4312,8 @@ static void removeKeRangerRansomware()
 
 - (void)allToolbarClicked:(id)sender
 {
-    NSInteger tagValue = [sender isKindOfClass:[NSSegmentedControl class]] ?
-        [(NSSegmentedCell*)[sender cell] tagForSegment:[sender selectedSegment]] :
-        ((NSControl*)sender).tag;
+    NSInteger tagValue = [sender isKindOfClass:[NSSegmentedControl class]] ? [(NSSegmentedControl*)sender selectedTag] :
+                                                                             ((NSControl*)sender).tag;
     switch (tagValue)
     {
     case TOOLBAR_PAUSE_TAG:
@@ -4271,9 +4327,8 @@ static void removeKeRangerRansomware()
 
 - (void)selectedToolbarClicked:(id)sender
 {
-    NSInteger tagValue = [sender isKindOfClass:[NSSegmentedControl class]] ?
-        [(NSSegmentedCell*)[sender cell] tagForSegment:[sender selectedSegment]] :
-        ((NSControl*)sender).tag;
+    NSInteger tagValue = [sender isKindOfClass:[NSSegmentedControl class]] ? [(NSSegmentedControl*)sender selectedTag] :
+                                                                             ((NSControl*)sender).tag;
     switch (tagValue)
     {
     case TOOLBAR_PAUSE_TAG:

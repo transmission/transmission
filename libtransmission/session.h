@@ -16,6 +16,7 @@
 #include <cstdint> // uintX_t
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -31,6 +32,7 @@
 #include "net.h" // tr_socket_t
 #include "open-files.h"
 #include "quark.h"
+#include "stats.h"
 #include "torrents.h"
 #include "web.h"
 
@@ -68,32 +70,32 @@ struct tr_bindinfo
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
-    unsigned int speedLimit_Bps[2];
+    unsigned int speedLimit_Bps[2] = {};
 
     /* is turtle mode on right now? */
-    bool isEnabled;
+    bool isEnabled = false;
 
     /* does turtle mode turn itself on and off at given times? */
-    bool isClockEnabled;
+    bool isClockEnabled = false;
 
     /* when clock mode is on, minutes after midnight to turn on turtle mode */
-    int beginMinute;
+    int beginMinute = 0;
 
     /* when clock mode is on, minutes after midnight to turn off turtle mode */
-    int endMinute;
+    int endMinute = 0;
 
     /* only use clock mode on these days of the week */
-    tr_sched_day days;
+    tr_sched_day days = {};
 
     /* called when isEnabled changes */
-    tr_altSpeedFunc callback;
+    tr_altSpeedFunc callback = nullptr;
 
     /* the callback's user_data argument */
-    void* callbackUserData;
+    void* callbackUserData = nullptr;
 
     /* the callback's changedByUser argument.
      * indicates whether the change came from the user or from the clock. */
-    bool changedByUser;
+    bool changedByUser = false;
 
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
@@ -103,13 +105,15 @@ struct tr_turtle_info
     tr_bitfield* minutes = nullptr;
 
     /* recent action that was done by turtle's automatic switch */
-    tr_auto_switch_state_t autoTurtleState;
+    tr_auto_switch_state_t autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 };
 
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
 public:
+    tr_session(std::string_view config_dir);
+
     [[nodiscard]] constexpr auto& torrents()
     {
         return torrents_;
@@ -130,7 +134,22 @@ public:
         return is_closing_;
     }
 
-    // download dir
+    // paths
+
+    [[nodiscard]] constexpr auto const& configDir() const noexcept
+    {
+        return config_dir_;
+    }
+
+    [[nodiscard]] constexpr auto const& torrentDir() const noexcept
+    {
+        return torrent_dir_;
+    }
+
+    [[nodiscard]] constexpr auto const& resumeDir() const noexcept
+    {
+        return resume_dir_;
+    }
 
     [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
@@ -288,6 +307,129 @@ public:
     void closeTorrentFiles(tr_torrent* tor) noexcept;
     void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
 
+    // announce ip
+
+    [[nodiscard]] constexpr auto const& announceIP() const noexcept
+    {
+        return announce_ip_;
+    }
+
+    void setAnnounceIP(std::string_view ip)
+    {
+        announce_ip_ = ip;
+    }
+
+    [[nodiscard]] constexpr auto useAnnounceIP() const noexcept
+    {
+        return announce_ip_enabled_;
+    }
+
+    constexpr void useAnnounceIP(bool enabled) noexcept
+    {
+        announce_ip_enabled_ = enabled;
+    }
+
+    // callbacks
+
+    using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
+
+    void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    {
+        queue_start_callback_ = cb;
+        queue_start_user_data_ = user_data;
+    }
+
+    void onQueuedTorrentStarted(tr_torrent* tor)
+    {
+        if (queue_start_callback_ != nullptr)
+        {
+            queue_start_callback_(this, tor, queue_start_user_data_);
+        }
+    }
+
+    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    {
+        idle_limit_hit_callback_ = cb;
+        idle_limit_hit_user_data_ = user_data;
+    }
+
+    void onIdleLimitHit(tr_torrent* tor)
+    {
+        if (idle_limit_hit_callback_ != nullptr)
+        {
+            idle_limit_hit_callback_(this, tor, idle_limit_hit_user_data_);
+        }
+    }
+
+    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    {
+        ratio_limit_hit_cb_ = cb;
+        ratio_limit_hit_user_data_ = user_data;
+    }
+
+    void onRatioLimitHit(tr_torrent* tor)
+    {
+        if (ratio_limit_hit_cb_ != nullptr)
+        {
+            ratio_limit_hit_cb_(this, tor, ratio_limit_hit_user_data_);
+        }
+    }
+
+    void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    {
+        got_metadata_cb_ = cb;
+        got_metadata_user_data_ = user_data;
+    }
+
+    void onMetadataCompleted(tr_torrent* tor)
+    {
+        if (got_metadata_cb_ != nullptr)
+        {
+            got_metadata_cb_(this, tor, got_metadata_user_data_);
+        }
+    }
+
+    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    {
+        completeness_func_ = cb;
+        completeness_func_user_data_ = user_data;
+    }
+
+    void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness completeness, bool was_running)
+    {
+        if (completeness_func_ != nullptr)
+        {
+            completeness_func_(tor, completeness, was_running, completeness_func_user_data_);
+        }
+    }
+
+    /// stats
+
+    [[nodiscard]] auto& stats() noexcept
+    {
+        return session_stats_;
+    }
+
+    [[nodiscard]] auto const& stats() const noexcept
+    {
+        return session_stats_;
+    }
+
+    void addUploaded(uint32_t n_bytes) noexcept
+    {
+        session_stats_.addUploaded(n_bytes);
+    }
+
+    void addDownloaded(uint32_t n_bytes) noexcept
+    {
+        session_stats_.addDownloaded(n_bytes);
+    }
+
+    void addFileCreated() noexcept
+    {
+        session_stats_.addFileCreated();
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -377,10 +519,6 @@ public:
     tr_port randomPortLow;
     tr_port randomPortHigh;
 
-    std::string config_dir;
-    std::string resume_dir;
-    std::string torrent_dir;
-
     std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr = nullptr;
     struct tr_shared* shared = nullptr;
@@ -411,18 +549,16 @@ public:
     WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
-    struct tr_session_id* session_id;
+    struct tr_session_id* session_id = nullptr;
 
-    tr_rpc_func rpc_func;
-    void* rpc_func_user_data;
+    tr_rpc_func rpc_func = nullptr;
+    void* rpc_func_user_data = nullptr;
 
-    struct tr_stats_handle* sessionStats;
+    struct tr_announcer* announcer = nullptr;
+    struct tr_announcer_udp* announcer_udp = nullptr;
 
-    struct tr_announcer* announcer;
-    struct tr_announcer_udp* announcer_udp;
-
-    struct event* nowTimer;
-    struct event* saveTimer;
+    struct event* nowTimer = nullptr;
+    struct event* saveTimer = nullptr;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
@@ -433,8 +569,8 @@ public:
 
     uint16_t idleLimitMinutes;
 
-    struct tr_bindinfo* bind_ipv4;
-    struct tr_bindinfo* bind_ipv6;
+    struct tr_bindinfo* bind_ipv4 = nullptr;
+    struct tr_bindinfo* bind_ipv6 = nullptr;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
@@ -451,18 +587,44 @@ private:
     tr_torrents torrents_;
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
-    std::string blocklist_url_;
+
+    std::string const config_dir_;
+    std::string const resume_dir_;
+    std::string const torrent_dir_;
     std::string download_dir_;
-    std::string default_trackers_str_;
     std::string incomplete_dir_;
+
+    std::string blocklist_url_;
+    std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
+
+    tr_stats session_stats_;
+
     std::optional<tr_address> external_ip_;
+
+    queue_start_callback_t queue_start_callback_ = nullptr;
+    void* queue_start_user_data_ = nullptr;
+
+    tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
+    void* idle_limit_hit_user_data_ = nullptr;
+
+    tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
+    void* ratio_limit_hit_user_data_ = nullptr;
+
+    tr_session_metadata_func got_metadata_cb_ = nullptr;
+    void* got_metadata_user_data_ = nullptr;
+
+    tr_torrent_completeness_func completeness_func_ = nullptr;
+    void* completeness_func_user_data_ = nullptr;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
 
     tr_open_files open_files_;
+
+    std::string announce_ip_;
+    bool announce_ip_enabled_ = false;
 };
 
 bool tr_sessionAllowsDHT(tr_session const* session);

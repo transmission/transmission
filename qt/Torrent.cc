@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cassert>
 #include <iterator>
 #include <set>
 
@@ -165,7 +164,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
     for (size_t pos = 0; pos < n; ++pos)
     {
-        tr_quark key = keys[pos];
+        tr_quark const key = keys[pos];
         tr_variant const* child = values[pos];
         bool field_changed = false;
 

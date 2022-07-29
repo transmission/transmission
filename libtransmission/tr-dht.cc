@@ -146,7 +146,7 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 
     // check for a manual bootstrap file.
-    auto in = std::ifstream{ tr_pathbuf{ session->config_dir, "/dht.bootstrap"sv } };
+    auto in = std::ifstream{ tr_pathbuf{ session->configDir(), "/dht.bootstrap"sv } };
     if (!in.is_open())
     {
         return;
@@ -292,7 +292,7 @@ int tr_dhtInit(tr_session* ss)
     }
 
     auto benc = tr_variant{};
-    auto const dat_file = tr_pathbuf{ ss->config_dir, "/dht.dat"sv };
+    auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };
     auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.sv());
 
     bool have_id = false;
@@ -343,7 +343,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(myid, 20);
     }
 
-    if (int rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
+    if (int const rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
     {
         tr_free(nodes6);
         tr_free(nodes);
@@ -406,7 +406,7 @@ void tr_dhtUninit(tr_session* ss)
         struct sockaddr_in6 sins6[MaxNodes];
         int num = MaxNodes;
         int num6 = MaxNodes;
-        int n = dht_get_nodes(sins, &num, sins6, &num6);
+        int const n = dht_get_nodes(sins, &num, sins6, &num6);
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num, num6));
 
         tr_variant benc;
@@ -443,7 +443,7 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        auto const dat_file = tr_pathbuf{ ss->config_dir, "/dht.dat" };
+        auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };
         tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.sv());
         tr_variantFree(&benc);
     }
@@ -530,7 +530,7 @@ tr_port tr_dhtPort(tr_session* ss)
 
 bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
 {
-    int af = address->type == TR_AF_INET ? AF_INET : AF_INET6;
+    int const af = address->isIPv4() ? AF_INET : AF_INET6;
 
     if (!tr_dhtEnabled(ss))
     {
@@ -545,7 +545,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         return false;
     }
 
-    if (address->type == TR_AF_INET)
+    if (address->isIPv4())
     {
         struct sockaddr_in sin;
         memset(&sin, 0, sizeof(sin));
@@ -556,7 +556,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         return true;
     }
 
-    if (address->type == TR_AF_INET6)
+    if (address->isIPv6())
     {
         struct sockaddr_in6 sin6;
         memset(&sin6, 0, sizeof(sin6));
@@ -730,7 +730,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     }
 
     time_t tosleep = 0;
-    int rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
+    int const rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
 
     if (rc < 0)
     {

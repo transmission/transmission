@@ -1,426 +1,393 @@
 
-/* Class = "NSWindow"; title = "Настройки"; ObjectID = "23"; */
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
 "23.title" = "Настройки";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "52"; */
-"52.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Выбрать…"; ObjectID = "53"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
 "53.title" = "Выбрать…";
 
-/* Class = "NSMenuItem"; title = "Ту же папку, где торрент-файл"; ObjectID = "55"; */
+/* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
 "55.title" = "Ту же папку, где торрент-файл";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "217"; */
-"217.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Выбрать…"; ObjectID = "219"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
 "219.title" = "Выбрать…";
 
-/* Class = "NSTabViewItem"; label = "Основные"; ObjectID = "253"; */
+/* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
 "253.label" = "Основные";
 
-/* Class = "NSTabViewItem"; label = "Управление"; ObjectID = "254"; */
+/* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
 "254.label" = "Управление";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "539"; */
-"539.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Выбрать…"; ObjectID = "542"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
 "542.title" = "Выбрать…";
 
-/* Class = "NSButtonCell"; title = "Завершении программы во время раздачи"; ObjectID = "1201"; */
+/* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
 "1201.title" = "Завершении программы во время раздачи";
 
-/* Class = "NSButtonCell"; title = "Удалении активных закачек"; ObjectID = "1202"; */
+/* Class = "NSButtonCell"; title = "Removal of active transfers"; ObjectID = "1202"; */
 "1202.title" = "Удалении активных закачек";
 
-/* Class = "NSTextFieldCell"; title = "Предупреждать при:"; ObjectID = "1203"; */
+/* Class = "NSTextFieldCell"; title = "Prompt user for:"; ObjectID = "1203"; */
 "1203.title" = "Предупреждать при:";
 
-/* Class = "NSTextFieldCell"; title = "Показывать в Dock:"; ObjectID = "1204"; */
+/* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
 "1204.title" = "Показывать в Dock:";
 
-/* Class = "NSButtonCell"; title = "Общую скорость скачивания"; ObjectID = "1205"; */
+/* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
 "1205.title" = "Общую скорость скачивания";
 
-/* Class = "NSButtonCell"; title = "Общую скорость раздачи"; ObjectID = "1206"; */
+/* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
 "1206.title" = "Общую скорость раздачи";
 
-/* Class = "NSButtonCell"; title = "Только во время скачивания"; ObjectID = "1207"; */
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
 "1207.title" = "Только во время скачивания";
 
-/* Class = "NSButtonCell"; title = "Только во время скачивания"; ObjectID = "1208"; */
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1208"; */
 "1208.title" = "Только во время скачивания";
 
-/* Class = "NSTextFieldCell"; title = "Размер окна:"; ObjectID = "1209"; */
+/* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
 "1209.title" = "Размер окна:";
 
-/* Class = "NSButtonCell"; title = "Автоматически подстраивать размер окна"; ObjectID = "1210"; */
+/* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
 "1210.title" = "Автоматически подстраивать размер окна";
 
-/* Class = "NSButtonCell"; title = "Сбросить"; ObjectID = "1211"; */
+/* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
 "1211.title" = "Сбросить";
 
-/* Class = "NSTextFieldCell"; title = "Сбросить предупреждения:"; ObjectID = "1212"; */
+/* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
 "1212.title" = "Сбросить предупреждения:";
 
-/* Class = "NSButtonCell"; title = "Проверять наличие обновлений каждый день"; ObjectID = "1213"; */
+/* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
 "1213.title" = "Проверять наличие обновлений каждый день";
 
-/* Class = "NSTextFieldCell"; title = "Обновления программы:"; ObjectID = "1214"; */
+/* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
 "1214.title" = "Обновления программы:";
 
-/* Class = "NSTextFieldCell"; title = "Скачивать в:"; ObjectID = "1216"; */
+/* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
 "1216.title" = "Скачивать в:";
 
-/* Class = "NSTextFieldCell"; title = "Новые раздачи:"; ObjectID = "1217"; */
+/* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
 "1217.title" = "Новые раздачи:";
 
-/* Class = "NSButtonCell"; title = "Удалять торрент-файлы"; ObjectID = "1218"; */
+/* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
 "1218.title" = "Удалять торрент-файлы";
 
-/* Class = "NSButtonCell"; title = "Искать торрент-файлы в:"; ObjectID = "1219"; */
+/* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
 "1219.title" = "Искать торрент-файлы в:";
 
-/* Class = "NSTextFieldCell"; title = "Автоматизация:"; ObjectID = "1226"; */
+/* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
 "1226.title" = "Автоматизация:";
 
-/* Class = "NSButtonCell"; title = "Хранить недокачанные файлы в:"; ObjectID = "1227"; */
+/* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
 "1227.title" = "Хранить недокачанные файлы в:";
 
-/* Class = "NSTextFieldCell"; title = "Очередь:"; ObjectID = "1230"; */
+/* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
 "1230.title" = "Очередь:";
 
-/* Class = "NSTextFieldCell"; title = "раздач"; ObjectID = "1231"; */
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1231"; */
 "1231.title" = "раздач";
 
-/* Class = "NSButtonCell"; title = "Прекратить раздачу при рейтинге:"; ObjectID = "1232"; */
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
 "1232.title" = "Прекратить раздачу при рейтинге:";
 
-/* Class = "NSTextFieldCell"; title = "Ограничения:"; ObjectID = "1234"; */
+/* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
 "1234.title" = "Ограничения:";
 
-/* Class = "NSTextFieldCell"; title = "Рейтинг — отношение розданного к скачанному"; ObjectID = "1235"; */
+/* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
 "1235.title" = "Рейтинг — отношение розданного к скачанному";
 
-/* Class = "NSButtonCell"; title = "Скачивать одновременно не более"; ObjectID = "1236"; */
+/* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
 "1236.title" = "Скачивать одновременно не более";
 
-/* Class = "NSTextFieldCell"; title = "раздач"; ObjectID = "1239"; */
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1239"; */
 "1239.title" = "раздач";
 
-/* Class = "NSButtonCell"; title = "Раздавать одновременно не более"; ObjectID = "1240"; */
+/* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
 "1240.title" = "Раздавать одновременно не более";
 
-/* Class = "NSTextFieldCell"; title = "мин"; ObjectID = "1242"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
 "1242.title" = "мин";
 
-/* Class = "NSButtonCell"; title = "В конец при неактивности в течение"; ObjectID = "1243"; */
+/* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
 "1243.title" = "В конец при неактивности в течение";
 
-/* Class = "NSButtonCell"; title = "Открывать порт автоматически"; ObjectID = "1247"; */
+/* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
 "1247.title" = "Открывать порт автоматически";
 
-/* Class = "NSTextFieldCell"; title = "Используя NAT-T с NAT-PMP или UPnP"; ObjectID = "1248"; */
+/* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
 "1248.title" = "Используя NAT-T с NAT-PMP или UPnP";
 
-/* Class = "NSTextFieldCell"; title = "Проверяю статус порта…"; ObjectID = "1250"; */
+/* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
 "1250.title" = "Проверяю статус порта…";
 
-/* Class = "NSTextFieldCell"; title = "Связь:"; ObjectID = "1253"; */
+/* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
 "1253.title" = "Связь:";
 
-/* Class = "NSButtonCell"; title = "Отключить при наличии активных раздач"; ObjectID = "1254"; */
+/* Class = "NSButtonCell"; title = "Prevent computer from sleeping with active transfers"; ObjectID = "1254"; */
 "1254.title" = "Отключить при наличии активных раздач";
 
-/* Class = "NSTextFieldCell"; title = "Спящий режим:"; ObjectID = "1255"; */
+/* Class = "NSTextFieldCell"; title = "System sleep:"; ObjectID = "1255"; */
 "1255.title" = "Спящий режим:";
 
-/* Class = "NSButtonCell"; title = "Раздачи:"; ObjectID = "1265"; */
+/* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
 "1265.title" = "Раздачи:";
 
-/* Class = "NSButtonCell"; title = "Скачивания:"; ObjectID = "1267"; */
+/* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
 "1267.title" = "Скачивания:";
 
-/* Class = "NSTextFieldCell"; title = "КБ/с"; ObjectID = "1268"; */
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
 "1268.title" = "КБ/с";
 
-/* Class = "NSTextFieldCell"; title = "КБ/с"; ObjectID = "1269"; */
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
 "1269.title" = "КБ/с";
 
-/* Class = "NSTextFieldCell"; title = "Ширина канала:"; ObjectID = "1270"; */
+/* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
 "1270.title" = "Ширина канала:";
 
-/* Class = "NSTextFieldCell"; title = "КБ/с"; ObjectID = "1273"; */
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
 "1273.title" = "КБ/с";
 
-/* Class = "NSTextFieldCell"; title = "КБ/с"; ObjectID = "1274"; */
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
 "1274.title" = "КБ/с";
 
-/* Class = "NSTextFieldCell"; title = "Режим ограничения:"; ObjectID = "1275"; */
+/* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
 "1275.title" = "Режим ограничения:";
 
-/* Class = "NSTextFieldCell"; title = "Раздачи:"; ObjectID = "1276"; */
+/* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
 "1276.title" = "Раздачи:";
 
-/* Class = "NSTextFieldCell"; title = "Максимальная скорость скачивания:"; ObjectID = "1277"; */
+/* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
 "1277.title" = "Максимальная скорость скачивания:";
 
-/* Class = "NSTextFieldCell"; title = "В режиме ограничения скорости настройки общей ширины канала не учитывается"; ObjectID = "1278"; */
+/* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
 "1278.title" = "В режиме ограничения скорости настройки общей ширины канала не учитывается";
 
-/* Class = "NSButtonCell"; title = "Включать по расписанию:"; ObjectID = "1280"; */
+/* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
 "1280.title" = "Включать по расписанию:";
 
-/* Class = "NSTextFieldCell"; title = "до"; ObjectID = "1281"; */
+/* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
 "1281.title" = "до";
 
-/* Class = "NSButtonCell"; title = "Показывать окно опций для новых раздач"; ObjectID = "1294"; */
+/* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
 "1294.title" = "Показывать окно опций для новых раздач";
 
-/* Class = "NSButtonCell"; title = "По завершении скачивания:"; ObjectID = "1302"; */
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
 "1302.title" = "По завершении скачивания:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1304"; */
-"1304.title" = "OtherViews";
-
-/* Class = "NSButtonCell"; title = "После остановки раздачи:"; ObjectID = "1306"; */
+/* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
 "1306.title" = "После остановки раздачи:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1308"; */
-"1308.title" = "OtherViews";
-
-/* Class = "NSTextFieldCell"; title = "Звуки:"; ObjectID = "1310"; */
+/* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
 "1310.title" = "Звуки:";
 
-/* Class = "NSButtonCell"; title = "Начать скачивание после добавления"; ObjectID = "1335"; */
+/* Class = "NSButtonCell"; title = "Start transfers when added"; ObjectID = "1335"; */
 "1335.title" = "Начать скачивание после добавления";
 
-/* Class = "NSTextFieldCell"; title = "При добавлении:"; ObjectID = "1338"; */
+/* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
 "1338.title" = "При добавлении:";
 
-/* Class = "NSButtonCell"; title = "Только при наличии нескольких файлов"; ObjectID = "1340"; */
+/* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
 "1340.title" = "Только при наличии нескольких файлов";
 
-/* Class = "NSButtonCell"; title = "Обновить"; ObjectID = "1437"; */
+/* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
 "1437.title" = "Обновить";
 
-/* Class = "NSTextFieldCell"; title = "черный список скачан/не скачан"; ObjectID = "1438"; */
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
 "1438.title" = "черный список скачан/не скачан";
 
-/* Class = "NSTextFieldCell"; title = "Черный список:"; ObjectID = "1439"; */
+/* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
 "1439.title" = "Черный список:";
 
-/* Class = "NSButtonCell"; title = "Не подключаться к пользователям из черного списка"; ObjectID = "1440"; */
+/* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
 "1440.title" = "Не подключаться к пользователям из черного списка";
 
-/* Class = "NSTextFieldCell"; title = "Некоторые роутеры будут «тормозить» если подключений очень много"; ObjectID = "1441"; */
+/* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
 "1441.title" = "Некоторые роутеры будут «тормозить» если подключений очень много";
 
-/* Class = "NSButtonCell"; title = "Использовать PEX для публичных торрентов"; ObjectID = "1442"; */
+/* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
 "1442.title" = "Использовать PEX для публичных торрентов";
 
-/* Class = "NSTextFieldCell"; title = "Максимум подключений для новых раздач:"; ObjectID = "1443"; */
+/* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
 "1443.title" = "Максимум подключений для новых раздач:";
 
-/* Class = "NSTextFieldCell"; title = "польз."; ObjectID = "1446"; */
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1446"; */
 "1446.title" = "польз.";
 
-/* Class = "NSTextFieldCell"; title = "польз."; ObjectID = "1447"; */
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1447"; */
 "1447.title" = "польз.";
 
-/* Class = "NSTextFieldCell"; title = "Общее максимальное число подключений:"; ObjectID = "1450"; */
+/* Class = "NSTextFieldCell"; title = "Global maximum connections:"; ObjectID = "1450"; */
 "1450.title" = "Общее максимальное число подключений:";
 
-/* Class = "NSTextFieldCell"; title = "Подключения:"; ObjectID = "1451"; */
+/* Class = "NSTextFieldCell"; title = "Connections:"; ObjectID = "1451"; */
 "1451.title" = "Подключения:";
 
-/* Class = "NSButtonCell"; title = "Предпочитать зашифрованных пользователей"; ObjectID = "1452"; */
+/* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
 "1452.title" = "Предпочитать зашифрованных пользователей";
 
-/* Class = "NSTextFieldCell"; title = "Шифрование:"; ObjectID = "1453"; */
+/* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
 "1453.title" = "Шифрование:";
 
-/* Class = "NSButtonCell"; title = "Игнорировать незашифрованных пользователей"; ObjectID = "1454"; */
+/* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
 "1454.title" = "Игнорировать незашифрованных пользователей";
 
-/* Class = "NSButtonCell"; title = "Только если добавлены вручную"; ObjectID = "1477"; */
+/* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
 "1477.title" = "Только если добавлены вручную";
 
-/* Class = "NSTextFieldCell"; title = "Порт:"; ObjectID = "1493"; */
+/* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
 "1493.title" = "Порт:";
 
-/* Class = "NSButtonCell"; title = "Включить удалённый доступ"; ObjectID = "1502"; */
+/* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
 "1502.title" = "Включить удалённый доступ";
 
-/* Class = "NSButtonCell"; title = "Требовать авторизацию"; ObjectID = "1505"; */
+/* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
 "1505.title" = "Требовать авторизацию";
 
-/* Class = "NSTableColumn"; headerCell.title = "IP-адрес"; ObjectID = "1523"; */
+/* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
 "1523.headerCell.title" = "IP-адрес";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1526"; */
-"1526.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "IP-адреса могут содержать символ *"; ObjectID = "1542"; */
+/* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
 "1542.title" = "IP-адреса могут содержать символ *";
 
-/* Class = "NSTextFieldCell"; title = "Пароль:"; ObjectID = "1555"; */
+/* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
 "1555.title" = "Пароль:";
 
-/* Class = "NSTextFieldCell"; title = "Логин:"; ObjectID = "1557"; */
+/* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
 "1557.title" = "Логин:";
 
-/* Class = "NSTextFieldCell"; title = "Управление программой будет доступно через веб-интерфейс"; ObjectID = "1645"; */
+/* Class = "NSTextFieldCell"; title = "This enables the web interface and allows remote requests"; ObjectID = "1645"; */
 "1645.title" = "Управление программой будет доступно через веб-интерфейс";
 
-/* Class = "NSButtonCell"; title = "Открыть веб-интерфейс"; ObjectID = "1718"; */
+/* Class = "NSButtonCell"; title = "Launch Web Interface"; ObjectID = "1718"; */
 "1718.title" = "Открыть веб-интерфейс";
 
-/* Class = "NSTextFieldCell"; title = "Последнее обновление: нет данных"; ObjectID = "1739"; */
+/* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
 "1739.title" = "Последнее обновление: нет данных";
 
-/* Class = "NSButtonCell"; title = "Обновлять список каждую неделю"; ObjectID = "1742"; */
+/* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
 "1742.title" = "Обновлять список каждую неделю";
 
-/* Class = "NSButtonCell"; title = "Позволять подключаться только следующим IP:"; ObjectID = "1748"; */
+/* Class = "NSButtonCell"; title = "Only allow the following IP addresses to connect:"; ObjectID = "1748"; */
 "1748.title" = "Позволять подключаться только следующим IP:";
 
-/* Class = "NSTableColumn"; headerCell.title = "Цвет"; ObjectID = "1777"; */
+/* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
 "1777.headerCell.title" = "Цвет";
 
-/* Class = "NSTableColumn"; headerCell.title = "Имя"; ObjectID = "1779"; */
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
 "1779.headerCell.title" = "Имя";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "1780"; */
-"1780.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "Имя группы:"; ObjectID = "1796"; */
+/* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
 "1796.title" = "Имя группы:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1810"; */
-"1810.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Выбрать…"; ObjectID = "1813"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
 "1813.title" = "Выбрать…";
 
-/* Class = "NSButtonCell"; title = "Местоположение:"; ObjectID = "1815"; */
+/* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
 "1815.title" = "Местоположение:";
 
-/* Class = "NSTextFieldCell"; title = "Будет выбрано при добавлении новых раздач"; ObjectID = "1824"; */
+/* Class = "NSTextFieldCell"; title = "The location will only be set when adding the transfer"; ObjectID = "1824"; */
 "1824.title" = "Будет выбрано при добавлении новых раздач";
 
-/* Class = "NSButtonCell"; title = "Анонсировать веб-интерфейс через Bonjour"; ObjectID = "1826"; */
+/* Class = "NSButtonCell"; title = "Display the web interface with Bonjour"; ObjectID = "1826"; */
 "1826.title" = "Анонсировать веб-интерфейс через Bonjour";
 
-/* Class = "NSButtonCell"; title = "Автоматически добавлять раздачи в группу"; ObjectID = "1831"; */
+/* Class = "NSButtonCell"; title = "Assign group to new transfers based on criteria"; ObjectID = "1831"; */
 "1831.title" = "Автоматически добавлять раздачи в группу";
 
-/* Class = "NSButtonCell"; title = "Правила…"; ObjectID = "1833"; */
+/* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
 "1833.title" = "Правила…";
 
-/* Class = "NSTextFieldCell"; title = "Раздачи будут добавлены в первую \nудовлетворяющую всем правилам группу"; ObjectID = "1835"; */
+/* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
 "1835.title" = "Раздачи будут добавлены в первую \nудовлетворяющую всем правилам группу";
 
-/* Class = "NSButtonCell"; title = "Cлучайный порт при запуске"; ObjectID = "1890"; */
+/* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
 "1890.title" = "Cлучайный порт при запуске";
 
-/* Class = "NSButtonCell"; title = "Случайный порт"; ObjectID = "1892"; */
+/* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
 "1892.title" = "Случайный порт";
 
-/* Class = "NSButtonCell"; title = "Обновляться до бета-версий"; ObjectID = "1896"; */
+/* Class = "NSButtonCell"; title = "Include beta releases"; ObjectID = "1896"; */
 "1896.title" = "Обновляться до бета-версий";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "1909"; */
-"1909.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Каждый день"; ObjectID = "1910"; */
+/* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
 "1910.title" = "Каждый день";
 
-/* Class = "NSMenuItem"; title = "На неделе"; ObjectID = "1911"; */
+/* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
 "1911.title" = "На неделе";
 
-/* Class = "NSMenuItem"; title = "По выходным"; ObjectID = "1912"; */
+/* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
 "1912.title" = "По выходным";
 
-/* Class = "NSMenuItem"; title = "В понедельник"; ObjectID = "1914"; */
+/* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
 "1914.title" = "В понедельник";
 
-/* Class = "NSMenuItem"; title = "Во вторник"; ObjectID = "1915"; */
+/* Class = "NSMenuItem"; title = "Tuesday"; ObjectID = "1915"; */
 "1915.title" = "Во вторник";
 
-/* Class = "NSMenuItem"; title = "В среду"; ObjectID = "1916"; */
+/* Class = "NSMenuItem"; title = "Wednesday"; ObjectID = "1916"; */
 "1916.title" = "В среду";
 
-/* Class = "NSMenuItem"; title = "В четверг"; ObjectID = "1917"; */
+/* Class = "NSMenuItem"; title = "Thursday"; ObjectID = "1917"; */
 "1917.title" = "В четверг";
 
-/* Class = "NSMenuItem"; title = "В пятницу"; ObjectID = "1918"; */
+/* Class = "NSMenuItem"; title = "Friday"; ObjectID = "1918"; */
 "1918.title" = "В пятницу";
 
-/* Class = "NSMenuItem"; title = "В субботу"; ObjectID = "1919"; */
+/* Class = "NSMenuItem"; title = "Saturday"; ObjectID = "1919"; */
 "1919.title" = "В субботу";
 
-/* Class = "NSMenuItem"; title = "В воскресенье"; ObjectID = "1920"; */
+/* Class = "NSMenuItem"; title = "Sunday"; ObjectID = "1920"; */
 "1920.title" = "В воскресенье";
 
-/* Class = "NSButtonCell"; title = "Использовать DHT для публичных торрентов"; ObjectID = "1926"; */
+/* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
 "1926.title" = "Использовать DHT для публичных торрентов";
 
-/* Class = "NSTextFieldCell"; title = "Magnet-ссылки:"; ObjectID = "1931"; */
+/* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
 "1931.title" = "Magnet-ссылки:";
 
-/* Class = "NSButtonCell"; title = "Сделать программой по умолчанию"; ObjectID = "1933"; */
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
 "1933.title" = "Сделать программой по умолчанию";
 
-/* Class = "NSButtonCell"; title = "Добавлять .part к недокачанным файлам"; ObjectID = "1940"; */
+/* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
 "1940.title" = "Добавлять .part к недокачанным файлам";
 
-/* Class = "NSButtonCell"; title = "Показывать окно опций для magnet-ссылок"; ObjectID = "1948"; */
+/* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
 "1948.title" = "Показывать окно опций для magnet-ссылок";
 
-/* Class = "NSButtonCell"; title = "Искать местных пользователей для публичных торрентов"; ObjectID = "1952"; */
+/* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
 "1952.title" = "Искать местных пользователей для публичных торрентов";
 
-/* Class = "NSButtonCell"; title = "После неактивности в течение"; ObjectID = "1962"; */
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
 "1962.title" = "После неактивности в течение";
 
-/* Class = "NSTextFieldCell"; title = "мин"; ObjectID = "1970"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
 "1970.title" = "мин";
 
 /* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
 "1988.title" = "URL:";
 
-/* Class = "NSButtonCell"; title = "По завершении скачивания:"; ObjectID = "2044"; */
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
 "2044.title" = "По завершении скачивания:";
 
-/* Class = "NSTextFieldCell"; title = "Cкрипт:"; ObjectID = "2047"; */
+/* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
 "2047.title" = "Cкрипт:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "2050"; */
-"2050.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Выбрать…"; ObjectID = "2053"; */
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
 "2053.title" = "Выбрать…";
 
-/* Class = "NSButtonCell"; title = "Использовать Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
+/* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
 "2078.title" = "Использовать Micro Transport Protocol (µTP)";
 
-/* Class = "NSTextFieldCell"; title = "Порт:"; ObjectID = "2082"; */
+/* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
 "2082.title" = "Порт:";
 
-/* Class = "NSTextFieldCell"; title = "Оповещения:"; ObjectID = "2087"; */
+/* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
 "2087.title" = "Оповещения:";
 
-/* Class = "NSButtonCell"; title = "Параметры в Системных настройках"; ObjectID = "2114"; */
+/* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
 "2114.title" = "Параметры в Системных настройках";
 
-/* Class = "NSButtonCell"; title = "Удалить из списка раздач по завершении раздачи"; ObjectID = "2119"; */
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
 "2119.title" = "Удалить из списка раздач по завершении раздачи";
 
-/* Class = "NSTextFieldCell"; title = "Применимо к новым раздачам"; ObjectID = "2123"; */
+/* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
 "2123.title" = "Применимо к новым раздачам";
-
-/* Class = "NSTextFieldCell"; title = "c"; ObjectID = "sfg-7Q-XEp"; */
-"sfg-7Q-XEp.title" = "c";

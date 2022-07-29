@@ -170,7 +170,7 @@ TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
     // supplant older ones.
     for (int i = 0; i < LargerThanCacheLimit; ++i)
     {
-        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt", i) };
+        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt"sv, i) };
         EXPECT_TRUE(session_->openFiles().get(TorId, i, true, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
     }
 
@@ -182,7 +182,7 @@ TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
     auto sorted = std::array<bool, LargerThanCacheLimit>{};
     for (int i = 0; i < LargerThanCacheLimit; ++i)
     {
-        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt", i) };
+        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt"sv, i) };
         results[i] = !!session_->openFiles().get(TorId, i, false);
     }
     sorted = results;

@@ -6,7 +6,6 @@ macOS users may wonder whether there will be AppleScript scripts, the answer is 
 
 ## How-To
 If you are interested at writing scripts for Transmission, have a look at the following pages:
- * [wiki:man Transmission man pages]
  * [Configuration Files](Configuration-Files.md)
  * [Editing Configuration Files](Editing-Configuration-Files.md)
  * [Environment Variables](Environment-Variables.md)
@@ -16,9 +15,6 @@ For those who need more information how to use the scripts, have a look at the f
  * [Cron How-To](https://help.ubuntu.com/community/CronHowto ): Run scripts at a regular interval
 
 ## Scripts
-### Start/Stop
- * [wiki:Scripts/initd init.d script] (Debian, Ubuntu and BSD derivatives)
- * [wiki:Scripts/runscript runscript] (Gentoo and other `runscript`-compatible systems)
 
 ### On torrent completion
 Transmission can be set to invoke a script when downloads complete. The environment variables supported are:
@@ -38,10 +34,7 @@ Transmission can be set to invoke a script when downloads complete. The environm
 ### Obsolete
 Functionality of these scripts has been implemented in libtransmission and is thus available in all clients.
 
- * [wiki:Scripts/EmailNotifier Email Notification Script]
- * [wiki:Scripts/BlockListUpdater Block List Updater]
- * [wiki:Scripts/Watchdog Watch Directory Script]
- * [wiki:Scripts/Scheduler Bandwidth Scheduler]
+ * [Email Notification Script](https://github.com/transmission/transmission/blob/main/extras/send-email-when-torrent-done.sh)
 
 ## contrib/scripts
 Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [GitHub repository](https://github.com/wereHamster/transmission/tree/master/contrib/scripts/ ).

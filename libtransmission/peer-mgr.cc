@@ -8,7 +8,6 @@
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <cstdint>
-#include <cstdlib> /* qsort */
 #include <ctime> // time_t
 #include <deque>
 #include <iterator> // std::back_inserter
@@ -42,7 +41,6 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "session.h"
-#include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
@@ -463,7 +461,7 @@ public:
         return is_endgame_;
     }
 
-    void addStrike(tr_peer* peer)
+    void addStrike(tr_peer* peer) const
     {
         tr_logAddTraceSwarm(this, fmt::format("increasing peer {} strike count to {}", peer->readable(), peer->strikes + 1));
 
@@ -998,7 +996,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tr_announcerAddBytes(tor, TR_ANN_UP, e->length);
             tor->setDateActive(now);
             tor->setDirty();
-            tr_statsAddUploaded(tor->session, e->length);
+            tor->session->addUploaded(e->length);
 
             if (peer->atom != nullptr)
             {
@@ -1016,8 +1014,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tor->downloadedCur += e->length;
             tor->setDateActive(now);
             tor->setDirty();
-
-            tr_statsAddDownloaded(tor->session, e->length);
+            tor->session->addDownloaded(e->length);
 
             if (peer->atom != nullptr)
             {
@@ -1155,7 +1152,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
-    bool ok = result.isConnected;
+    bool const ok = result.isConnected;
     bool success = false;
     auto* manager = static_cast<tr_peerMgr*>(result.userData);
 
@@ -1314,7 +1311,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
 
 std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
 {
-    size_t n = compactLen / 6;
+    size_t const n = compactLen / 6;
     auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
@@ -1334,7 +1331,7 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
 
 std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
 {
-    size_t n = compactLen / 18;
+    size_t const n = compactLen / 18;
     auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
@@ -1870,23 +1867,37 @@ enum tr_rechoke_state
 
 struct tr_rechoke_info
 {
-    tr_peerMsgs* peer;
-    int salt;
-    int rechoke_state;
-};
-
-[[nodiscard]] constexpr int compare_rechoke_info(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct tr_rechoke_info const*>(va);
-    auto const* const b = static_cast<struct tr_rechoke_info const*>(vb);
-
-    if (a->rechoke_state != b->rechoke_state)
+    tr_rechoke_info(tr_peerMsgs* peer_in, int rechoke_state_in, uint8_t salt_in)
+        : peer{ peer_in }
+        , rechoke_state{ rechoke_state_in }
+        , salt{ salt_in }
     {
-        return a->rechoke_state - b->rechoke_state;
     }
 
-    return a->salt - b->salt;
-}
+    [[nodiscard]] constexpr auto compare(tr_rechoke_info const& that) const noexcept // <=>
+    {
+        if (this->rechoke_state != that.rechoke_state)
+        {
+            return this->rechoke_state - that.rechoke_state;
+        }
+
+        if (this->salt != that.salt)
+        {
+            return this->salt < that.salt ? -1 : 1;
+        }
+
+        return 0;
+    }
+
+    [[nodiscard]] constexpr auto operator<(tr_rechoke_info const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
+
+    tr_peerMsgs* peer;
+    int rechoke_state;
+    uint8_t salt;
+};
 
 } // namespace
 
@@ -1900,8 +1911,8 @@ void rechokeDownloads(tr_swarm* s)
     auto const now = tr_time();
 
     uint16_t max_peers = 0;
-    uint16_t rechoke_count = 0;
-    struct tr_rechoke_info* rechoke = nullptr;
+    auto rechoke = std::vector<tr_rechoke_info>{};
+    auto salter = tr_salt_shaker{};
 
     /* some cases where this function isn't necessary */
     if (s->tor->isDone() || !s->tor->clientCanDownload())
@@ -1982,6 +1993,8 @@ void rechokeDownloads(tr_swarm* s)
 
     if (peerCount > 0)
     {
+        rechoke.reserve(peerCount);
+
         auto const* const tor = s->tor;
         int const n = tor->pieceCount();
 
@@ -2027,37 +2040,23 @@ void rechokeDownloads(tr_swarm* s)
                     rechoke_state = RECHOKE_STATE_BAD;
                 }
 
-                if (rechoke == nullptr)
-                {
-                    rechoke = tr_new(struct tr_rechoke_info, peerCount);
-                }
-
-                rechoke[rechoke_count].peer = peer;
-                rechoke[rechoke_count].rechoke_state = rechoke_state;
-                rechoke[rechoke_count].salt = tr_rand_int_weak(INT_MAX);
-                rechoke_count++;
+                rechoke.emplace_back(peer, rechoke_state, salter());
             }
         }
 
         tr_free(piece_is_interesting);
     }
 
-    if ((rechoke != nullptr) && (rechoke_count > 0))
-    {
-        qsort(rechoke, rechoke_count, sizeof(struct tr_rechoke_info), compare_rechoke_info);
-    }
+    std::sort(std::begin(rechoke), std::end(rechoke));
 
     /* now that we know which & how many peers to be interested in... update the peer interest */
 
-    s->interested_count = std::min(max_peers, rechoke_count);
+    s->interested_count = std::min(max_peers, static_cast<uint16_t>(std::size(rechoke)));
 
-    for (int i = 0; i < rechoke_count; ++i)
+    for (size_t i = 0, n = std::size(rechoke); i < n; ++i)
     {
         rechoke[i].peer->set_interested(i < s->interested_count);
     }
-
-    /* cleanup */
-    tr_free(rechoke);
 }
 
 } // namespace rechoke_downloads_helpers
@@ -2089,32 +2088,34 @@ struct ChokeData
     bool wasChoked;
     bool isChoked;
     int rate;
-    int salt;
+    uint8_t salt;
     tr_peerMsgs* msgs;
+
+    [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
+    {
+        if (this->rate != that.rate) // prefer higher overall speeds
+        {
+            return this->rate > that.rate ? -1 : 1;
+        }
+
+        if (this->wasChoked != that.wasChoked) // prefer unchoked
+        {
+            return this->wasChoked ? 1 : -1;
+        }
+
+        if (this->salt != that.salt) // random order
+        {
+            return this->salt < that.salt ? -1 : 1;
+        }
+
+        return 0;
+    }
+
+    [[nodiscard]] constexpr auto operator<(ChokeData const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
 };
-
-[[nodiscard]] constexpr int compareChoke(void const* va, void const* vb) noexcept
-{
-    auto const* const a = static_cast<struct ChokeData const*>(va);
-    auto const* const b = static_cast<struct ChokeData const*>(vb);
-
-    if (a->rate != b->rate) // prefer higher overall speeds
-    {
-        return a->rate > b->rate ? -1 : 1;
-    }
-
-    if (a->wasChoked != b->wasChoked) // prefer unchoked
-    {
-        return a->wasChoked ? 1 : -1;
-    }
-
-    if (a->salt != b->salt) // random order
-    {
-        return a->salt - b->salt;
-    }
-
-    return 0;
-}
 
 /* is this a new connection? */
 [[nodiscard]] bool isNew(tr_peerMsgs const* msgs)
@@ -2173,6 +2174,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     int size = 0;
 
     /* sort the peers by preference and rate */
+    auto salter = tr_salt_shaker{};
     for (auto* const peer : peers)
     {
         if (peer->isSeed())
@@ -2192,12 +2194,12 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             n->isInterested = peer->is_peer_interested();
             n->wasChoked = peer->is_peer_choked();
             n->rate = getRateBps(s->tor, peer, now);
-            n->salt = tr_rand_int_weak(INT_MAX);
+            n->salt = salter();
             n->isChoked = true;
         }
     }
 
-    qsort(choke, size, sizeof(struct ChokeData), compareChoke);
+    std::sort(choke, choke + size);
 
     /**
      * Reciprocation and number of uploads capping is managed by unchoking
@@ -2546,11 +2548,7 @@ void queuePulse(tr_session* session, tr_direction dir)
         for (auto* tor : tr_sessionGetNextQueuedTorrents(session, dir, n))
         {
             tr_torrentStartNow(tor);
-
-            if (tor->queue_started_callback != nullptr)
-            {
-                (*tor->queue_started_callback)(tor, tor->queue_started_user_data);
-            }
+            session->onQueuedTorrentStarted(tor);
         }
     }
 }
@@ -2761,6 +2759,7 @@ struct peer_candidate
     candidates.reserve(atom_count);
 
     /* populate the candidate array */
+    auto salter = tr_salt_shaker{};
     for (auto* tor : session->torrents())
     {
         if (!tor->swarm->is_running)
@@ -2792,8 +2791,7 @@ struct peer_candidate
         {
             if (isPeerCandidate(tor, atom, now))
             {
-                uint8_t const salt = tr_rand_int_weak(1024);
-                candidates.push_back({ getPeerCandidateScore(tor, atom, salt), tor, &atom });
+                candidates.push_back({ getPeerCandidateScore(tor, atom, salter()), tor, &atom });
             }
         }
     }

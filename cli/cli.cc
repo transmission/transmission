@@ -5,10 +5,10 @@
 #include <array>
 #include <cstdio> /* fprintf () */
 #include <cstdlib> /* atoi () */
-#include <cstring> /* memcmp () */
-#include <signal.h>
 #include <string>
 #include <string_view>
+
+#include <signal.h>
 
 #include <fmt/format.h>
 
@@ -202,7 +202,6 @@ static char const* getConfigDir(int argc, char const** argv)
 int tr_main(int argc, char* argv[])
 {
     tr_variant settings;
-    char const* configDir;
 
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
@@ -219,7 +218,7 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     tr_variantInitDict(&settings, 0);
-    configDir = getConfigDir(argc, (char const**)argv);
+    char const* const configDir = getConfigDir(argc, (char const**)argv);
     tr_sessionLoadSettings(&settings, configDir, MyConfigName);
 
     /* the command line overrides defaults */

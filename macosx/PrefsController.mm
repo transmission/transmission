@@ -394,7 +394,12 @@
 {
     //set window width with localised value
     NSRect windowRect = self.window.frame;
-    windowRect.size.width = [NSLocalizedString(@"PrefWindowSize", nil) floatValue];
+    NSString* sizeString = NSLocalizedString(@"PrefWindowSize", nil);
+    if ([sizeString isEqualToString:@"PrefWindowSize"])
+    {
+        sizeString = @"640";
+    }
+    windowRect.size.width = [sizeString floatValue];
     [self.window setFrame:windowRect display:YES animate:NO];
 }
 

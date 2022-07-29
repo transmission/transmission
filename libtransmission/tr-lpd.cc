@@ -6,7 +6,6 @@
 #include <cerrno>
 #include <csignal> /* sig_atomic_t */
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
-#include <string_view>
 #include <type_traits>
 
 #ifdef _WIN32
@@ -140,7 +139,7 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 
     int major = -1;
     int minor = -1;
-    size_t len = strlen(s);
+    size_t const len = strlen(s);
 
     /* something might be rotten with this chunk of data */
     if (len == 0 || len > lpd_maxDatagramLength)
@@ -645,7 +644,7 @@ static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*
         char foreignMsg[lpd_maxDatagramLength + 1];
 
         /* process local announcement from foreign peer */
-        int res = recvfrom(
+        int const res = recvfrom(
             lpd_socket,
             foreignMsg,
             lpd_maxDatagramLength,

@@ -7,7 +7,6 @@
 #include <array>
 #include <cctype>
 #include <cstddef>
-#include <cstdlib>
 #include <limits>
 #include <optional>
 #include <string>
@@ -33,8 +32,7 @@ using namespace std::literals;
 
 bool tr_addressIsIP(char const* str)
 {
-    tr_address tmp;
-    return tr_address_from_string(&tmp, str);
+    return str != nullptr && tr_address::fromString(str).has_value();
 }
 
 char const* tr_webGetResponseStr(long code)
@@ -271,15 +269,14 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
-    // psl needs a zero-terminated hostname
-    auto const szhost = tr_urlbuf{ host };
-
     // is it an IP?
-    auto addr = tr_address{};
-    if (tr_address_from_string(&addr, std::data(szhost)))
+    if (auto const addr = tr_address::fromString(host); addr)
     {
         return host;
     }
+
+    // psl needs a zero-terminated hostname
+    auto const szhost = tr_urlbuf{ host };
 
     // is it a registered name?
     if (isAsciiNonUpperCase(host))
