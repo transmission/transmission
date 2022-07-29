@@ -109,11 +109,6 @@ void tr_free(void* p)
     }
 }
 
-void* tr_memdup(void const* src, size_t byteCount)
-{
-    return memcpy(tr_malloc(byteCount), src, byteCount);
-}
-
 /***
 ****
 ***/
