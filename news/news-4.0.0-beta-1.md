@@ -91,7 +91,7 @@ TODO
 ### Mac Client
 
 - The codebase has been rewritten to be universal for Intel and Apple Silicon chips.
-- MacOS Big Sur (macOS 11) offered some standardisation opportunities for the icons in the GUI. 
+- MacOS Big Sur (macOS 11) offered some standardisation opportunities for the icons in the GUI.
 - Here are some of the baseline interface changes that were made for Big Sur, and of course, Monterey (macOS 12).
 
 * Remove deprecated toolbar items
@@ -167,7 +167,7 @@ Maintainer highlights include:
 
 Last but certainly not least, a big **Thank You** to the people who contributed to this release.
 
-### Code Contributions 
+### Code Contributions
 
 #### `libtransmission` code contributions:
 
@@ -206,9 +206,9 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Performance improvements to bitfield.cc ([#2933](https://github.com/transmission/transmission/pull/2933), [#2950](https://github.com/transmission/transmission/pull/2950))
 - [Ivella](https://github.com/lvella) (Lucas Clemente Vella):
   - Implement latest version of BEP-7 for HTTP requests ([#1661](https://github.com/transmission/transmission/pull/1661))
-- [ile6695](https://github.com/ile6695) (Ilkka):
+- [ile6695](https://github.com/ile6695) (Ilkka Kallioniemi):
   - Add more decimals for low wratios ([#2508](https://github.com/transmission/transmission/pull/2508))
-  - Add regression tests for tr_strlcpy
+  - Add regression tests for tr_strlcpy ([#2679](https://github.com/transmission/transmission/pull/2679))
 - [johman10](https://github.com/johman10) (Johan):
   - Add total disk space to free-space RPC request ([#1682](https://github.com/transmission/transmission/pull/1682))
 - [JP-Ellis](https://github.com/JP-Ellis) (JP Ellis):
@@ -433,7 +433,7 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
 - [lajp](https://github.com/lajp) (Luukas Pörtfors):
   - Add renaming support in transmission-remote ([#2905](https://github.com/transmission/transmission/pull/2905))
 - [MatanZ](https://github.com/MatanZ) (Matan Ziv-Av):
-  - Filtering torrents in transmission-remote ([#3125](https://github.com/transmission/transmission/pull/3125)) 
+  - Filtering torrents in transmission-remote ([#3125](https://github.com/transmission/transmission/pull/3125))
   - Allow control of transmission-show output ([#2825](https://github.com/transmission/transmission/pull/2825))
 - [TimoPtr](https://github.com/TimoPtr):
   - Add seeding-done script to transmission-remote ([#2621](https://github.com/transmission/transmission/pull/2621))
