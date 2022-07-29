@@ -223,7 +223,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 96>{
+static auto constexpr Options = std::array<tr_option, 97>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -268,6 +268,7 @@ static auto constexpr Options = std::array<tr_option, 96>{
       { 'l', "list", "List all torrents", "l", false, nullptr },
       { 'L', "labels", "Set the current torrents' labels", "L", true, "<label[,label...]>" },
       { 960, "move", "Move current torrent's data to a new folder", nullptr, true, "<path>" },
+      { 968, "unix-socket", "Use a Unix domain socket", nullptr, true, "<path>" },
       { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, true, "<path>" },
       { 964, "rename", "Rename torrents root folder or a file", nullptr, true, "<name>" },
       { 965, "path", "Provide path for rename functions", nullptr, true, "<path>" },
@@ -402,6 +403,7 @@ static int getOptMode(int val)
     case 'a': /* add torrent */
     case 'b': /* debug */
     case 'n': /* auth */
+    case 968: /* Unix domain socket */
     case 810: /* authenv */
     case 'N': /* netrc */
     case 820: /* UseSSL */
@@ -547,6 +549,7 @@ static bool debug = false;
 static char* auth = nullptr;
 static char* filter = nullptr;
 static char* netrc = nullptr;
+static char* unix_socket_path = nullptr;
 static char* session_id = nullptr;
 static bool UseSSL = false;
 
@@ -2246,6 +2249,8 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
     curl_easy_setopt(curl, CURLOPT_VERBOSE, debug);
     curl_easy_setopt(curl, CURLOPT_ENCODING, ""); /* "" tells curl to fill in the blanks with what it was compiled to support */
 
+    curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, unix_socket_path);
+
     if (netrc != nullptr)
     {
         curl_easy_setopt(curl, CURLOPT_NETRC_FILE, netrc);
@@ -2444,6 +2449,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 'b': /* debug */
                 debug = true;
+                break;
+
+            case 968: /* Unix domain socket */
+                unix_socket_path = tr_strdup(optarg);
                 break;
 
             case 'n': /* auth */
