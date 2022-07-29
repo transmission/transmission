@@ -82,7 +82,7 @@ static bool check_cyassl_result(int result, char const* file, int line)
 ****
 ***/
 
-static RNG* get_rng(void)
+static RNG* get_rng()
 {
     static RNG rng;
     static bool rng_initialized = false;
@@ -106,16 +106,16 @@ static std::mutex rng_mutex_;
 ****
 ***/
 
-tr_sha1_ctx_t tr_sha1_init(void)
+tr_sha1_ctx_t tr_sha1_init()
 {
-    Sha* handle = tr_new(Sha, 1);
+    auto* const handle = new Sha{};
 
     if (check_result(API(InitSha)(handle)))
     {
         return handle;
     }
 
-    tr_free(handle);
+    delete handle;
     return nullptr;
 }
 
@@ -142,8 +142,8 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
     auto digest = tr_sha1_digest_t{};
     auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
     auto const ok = check_result(API(ShaFinal)(handle, digest_as_uchar));
-    tr_free(handle);
 
+    delete handle;
     return ok ? std::make_optional(digest) : std::nullopt;
 }
 
@@ -151,16 +151,16 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 ****
 ***/
 
-tr_sha256_ctx_t tr_sha256_init(void)
+tr_sha256_ctx_t tr_sha256_init()
 {
-    Sha256* handle = tr_new(Sha256, 1);
+    auto* const handle = new Sha256{};
 
     if (check_result(API(InitSha256)(handle)))
     {
         return handle;
     }
 
-    tr_free(handle);
+    delete handle;
     return nullptr;
 }
 
@@ -187,8 +187,8 @@ std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t raw_handle)
     auto digest = tr_sha256_digest_t{};
     auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
     auto const ok = check_result(API(Sha256Final)(handle, digest_as_uchar));
-    tr_free(handle);
 
+    delete handle;
     return ok ? std::make_optional(digest) : std::nullopt;
 }
 

@@ -98,7 +98,7 @@ static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
     return 0;
 }
 
-static api_ctr_drbg_context* get_rng(void)
+static api_ctr_drbg_context* get_rng()
 {
     static api_ctr_drbg_context rng;
     static bool rng_initialized = false;
@@ -129,9 +129,9 @@ static std::recursive_mutex rng_mutex_;
 ****
 ***/
 
-tr_sha1_ctx_t tr_sha1_init(void)
+tr_sha1_ctx_t tr_sha1_init()
 {
-    api_sha1_context* handle = tr_new0(api_sha1_context, 1);
+    auto* const handle = new api_sha1_context{};
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(sha1_init)(handle);
@@ -169,7 +169,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
     API(sha1_free)(handle);
 #endif
 
-    tr_free(handle);
+    delete handle;
     return digest;
 }
 
@@ -177,9 +177,9 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 ****
 ***/
 
-tr_sha256_ctx_t tr_sha256_init(void)
+tr_sha256_ctx_t tr_sha256_init()
 {
-    api_sha256_context* handle = tr_new0(api_sha256_context, 1);
+    auto* const handle = new api_sha256_context{};
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(sha256_init)(handle);
@@ -217,7 +217,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t raw_handle)
     API(sha256_free)(handle);
 #endif
 
-    tr_free(handle);
+    delete handle;
     return digest;
 }
 
