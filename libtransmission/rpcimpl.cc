@@ -2605,29 +2605,3 @@ void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
         }
     }
 }
-
-void tr_rpc_request_exec_uri(
-    tr_session* session,
-    std::string_view request_uri,
-    tr_rpc_response_func callback,
-    void* callback_user_data)
-{
-    auto top = tr_variant{};
-    tr_variantInitDict(&top, 3);
-    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
-
-    if (auto const parsed = tr_urlParse(request_uri); parsed)
-    {
-        for (auto const& [key, val] : tr_url_query_view(parsed->query))
-        {
-            auto is_arg = key != "method"sv && key != "tag"sv;
-            auto* const parent = is_arg ? args : &top;
-            tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key)), val);
-        }
-    }
-
-    tr_rpc_request_exec_json(session, &top, callback, callback_user_data);
-
-    // cleanup
-    tr_variantFree(&top);
-}

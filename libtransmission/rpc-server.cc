@@ -169,7 +169,7 @@ static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server
 
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
-    bool const do_compress = encoding != nullptr && strstr(encoding, "gzip") != nullptr;
+    bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv);
 
     if (!do_compress)
     {
@@ -300,7 +300,7 @@ static void rpc_response_func(tr_session* /*session*/, tr_variant* content, void
     evhttp_send_reply(data->req, HTTP_OK, "OK", response);
     evbuffer_free(response);
 
-    tr_free(data);
+    delete data;
 }
 
 static void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
@@ -308,11 +308,11 @@ static void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* serv
     auto top = tr_variant{};
     auto const have_content = tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json);
 
-    auto* const data = tr_new0(struct rpc_response_data, 1);
-    data->req = req;
-    data->server = server;
-
-    tr_rpc_request_exec_json(server->session, have_content ? &top : nullptr, rpc_response_func, data);
+    tr_rpc_request_exec_json(
+        server->session,
+        have_content ? &top : nullptr,
+        rpc_response_func,
+        new rpc_response_data{ req, server });
 
     if (have_content)
     {
@@ -328,20 +328,6 @@ static void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
                                       evbuffer_get_length(req->input_buffer) };
         handle_rpc_from_json(req, server, json);
         return;
-    }
-
-    if (req->type == EVHTTP_REQ_GET)
-    {
-        char const* q = strchr(req->uri, '?');
-
-        if (q != nullptr)
-        {
-            auto* const data = tr_new0(struct rpc_response_data, 1);
-            data->req = req;
-            data->server = server;
-            tr_rpc_request_exec_uri(server->session, q + 1, rpc_response_func, data);
-            return;
-        }
     }
 
     send_simple_response(req, 405, nullptr);
