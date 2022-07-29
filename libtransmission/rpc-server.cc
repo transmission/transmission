@@ -257,24 +257,31 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
     }
     else
     {
-        // TODO: string_view
-        char* const subpath = tr_strdup(req->uri + std::size(server->url()) + 4);
-        if (char* pch = strchr(subpath, '?'); pch != nullptr)
+        // convert `req->uri` (ex: "/transmission/web/images/favicon.png")
+        // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
+
+        // remove the "/transmission/web/" prefix
+        static auto constexpr Web = "web/"sv;
+        auto subpath = std::string_view{ req->uri }.substr(std::size(server->url()) + std::size(Web));
+
+        // remove any trailing query / fragment
+        subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
+
+        // if the query is empty, use the default
+        static auto constexpr DefaultPage = "index.html"sv;
+        if (std::empty(subpath))
         {
-            *pch = '\0';
+            subpath = DefaultPage;
         }
 
-        if (strstr(subpath, "..") != nullptr)
+        if (tr_strvContains(subpath, ".."sv))
         {
             send_simple_response(req, HTTP_NOTFOUND, "<p>Tsk, tsk.</p>");
         }
         else
         {
-            auto const filename = tr_pathbuf{ server->web_client_dir_, '/', tr_str_is_empty(subpath) ? "index.html" : subpath };
-            serve_file(req, server, filename.sv());
+            serve_file(req, server, tr_pathbuf{ server->web_client_dir_, '/', subpath });
         }
-
-        tr_free(subpath);
     }
 }
 
