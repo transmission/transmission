@@ -186,9 +186,9 @@ std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha1_ctx_t raw_handle)
 
 #if OPENSSL_VERSION_NUMBER < 0x0090802fL
 
-static EVP_CIPHER_CTX* openssl_evp_cipher_context_new(void)
+static EVP_CIPHER_CTX* openssl_evp_cipher_context_new()
 {
-    EVP_CIPHER_CTX* handle = tr_new(EVP_CIPHER_CTX, 1);
+    auto* const handle = new EVP_CIPHER_CTX{};
 
     if (handle != nullptr)
     {
@@ -206,7 +206,7 @@ static void openssl_evp_cipher_context_free(EVP_CIPHER_CTX* handle)
     }
 
     EVP_CIPHER_CTX_cleanup(handle);
-    tr_free(handle);
+    delete handle;
 }
 
 #define EVP_CIPHER_CTX_new() openssl_evp_cipher_context_new()

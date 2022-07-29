@@ -33,7 +33,7 @@ using tr_x509_cert_t = void*;
 /**
  * @brief Allocate and initialize new SHA1 hasher context.
  */
-tr_sha1_ctx_t tr_sha1_init(void);
+tr_sha1_ctx_t tr_sha1_init();
 
 /**
  * @brief Update SHA1 hash.
@@ -71,7 +71,7 @@ std::optional<tr_sha1_digest_t> tr_sha1(T... args)
 /**
  * @brief Allocate and initialize new SHA256 hasher context.
  */
-tr_sha256_ctx_t tr_sha256_init(void);
+tr_sha256_ctx_t tr_sha256_init();
 
 /**
  * @brief Update SHA256 hash.
