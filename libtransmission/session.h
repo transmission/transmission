@@ -62,9 +62,23 @@ struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    tr_socket_t socket = TR_BAD_SOCKET;
-    tr_address addr = {};
-    struct event* ev = nullptr;
+    tr_bindinfo(tr_address addr)
+        : addr_{ std::move(addr) }
+    {
+    }
+
+    void bindAndListenForIncomingPeers(tr_session* session);
+
+    void close();
+
+    [[nodiscard]] auto readable() const
+    {
+        return addr_.readable();
+    }
+
+    tr_address addr_;
+    struct event* ev_ = nullptr;
+    tr_socket_t socket_ = TR_BAD_SOCKET;
 };
 
 struct tr_turtle_info
@@ -569,8 +583,8 @@ public:
 
     uint16_t idleLimitMinutes;
 
-    struct tr_bindinfo* bind_ipv4 = nullptr;
-    struct tr_bindinfo* bind_ipv6 = nullptr;
+    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
+    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
