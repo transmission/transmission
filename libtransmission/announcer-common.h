@@ -127,7 +127,7 @@ enum tr_announce_event
     TR_ANNOUNCE_EVENT_STOPPED,
 };
 
-char const* tr_announce_event_get_string(tr_announce_event);
+std::string_view tr_announce_event_get_string(tr_announce_event);
 
 struct tr_announce_request
 {

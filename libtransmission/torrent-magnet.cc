@@ -255,8 +255,7 @@ bool tr_torrentUseMetainfoFromFile(
 static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
     // test the info_dict checksum
-    auto const sha1 = tr_sha1(m->metadata);
-    if (bool const checksum_passed = sha1 && *sha1 == tor->infoHash(); !checksum_passed)
+    if (tr_sha1::digest(m->metadata) != tor->infoHash())
     {
         return false;
     }

@@ -111,8 +111,8 @@ void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
 
     dec_key_ = std::make_shared<struct arc4_context>();
-    auto const buf = tr_sha1(key, dh.secret(), info_hash);
-    arc4_init(dec_key_.get(), std::data(*buf), std::size(*buf));
+    auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
+    arc4_init(dec_key_.get(), std::data(buf), std::size(buf));
     arc4_discard(dec_key_.get(), 1024);
 }
 
@@ -129,8 +129,8 @@ void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
 
     enc_key_ = std::make_shared<struct arc4_context>();
-    auto const buf = tr_sha1(key, dh.secret(), info_hash);
-    arc4_init(enc_key_.get(), std::data(*buf), std::size(*buf));
+    auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
+    arc4_init(enc_key_.get(), std::data(buf), std::size(buf));
     arc4_discard(enc_key_.get(), 1024);
 }
 

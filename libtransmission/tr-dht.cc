@@ -741,11 +741,8 @@ void dht_hash(void* hash_return, int hash_size, void const* v1, int len1, void c
     auto const sv1 = std::string_view{ static_cast<char const*>(v1), size_t(len1) };
     auto const sv2 = std::string_view{ static_cast<char const*>(v2), size_t(len2) };
     auto const sv3 = std::string_view{ static_cast<char const*>(v3), size_t(len3) };
-    auto const digest = tr_sha1(sv1, sv2, sv3);
-    if (digest)
-    {
-        std::copy_n(std::data(*digest), std::min(size_t(hash_size), std::size(*digest)), setme);
-    }
+    auto const digest = tr_sha1::digest(sv1, sv2, sv3);
+    std::copy_n(std::data(digest), std::min(size_t(hash_size), std::size(digest)), setme);
 }
 
 int dht_random_bytes(void* buf, size_t size)

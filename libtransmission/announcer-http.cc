@@ -44,9 +44,10 @@ using namespace std::literals;
 *****
 ****/
 
-static char const* get_event_string(tr_announce_request const* req)
+static std::string_view get_event_string(tr_announce_request const* req)
 {
-    return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
+    return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused"sv :
+                                                                            tr_announce_event_get_string(req->event);
 }
 
 static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request const* req)
@@ -91,7 +92,7 @@ static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request
         fmt::format_to(out, "&corrupt={}", req->corrupt);
     }
 
-    if (char const* str = get_event_string(req); !tr_str_is_empty(str))
+    if (auto const str = get_event_string(req); !std::empty(str))
     {
         fmt::format_to(out, "&event={}", str);
     }
