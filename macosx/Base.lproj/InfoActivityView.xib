@@ -138,7 +138,7 @@
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="axesIndependently" id="40"/>
                                 </imageView>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="29">
-                                    <rect key="frame" x="-2" y="120" width="14" height="28"/>
+                                    <rect key="frame" x="-2" y="120" width="73" height="14"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Downloaded:" id="30">
                                         <font key="font" metaFont="smallSystemBold"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
