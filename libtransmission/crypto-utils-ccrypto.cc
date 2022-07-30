@@ -128,7 +128,7 @@ public:
     [[nodiscard]] tr_sha1_digest_t final() override
     {
         auto digest = tr_sha1_digest_t{};
-        CC_SHA1_Final(reinterpret_cast<unsigned char*>(std::data(digest)), handle_);
+        CC_SHA1_Final(reinterpret_cast<unsigned char*>(std::data(digest)), &handle_);
         clear();
         return digest;
     }
