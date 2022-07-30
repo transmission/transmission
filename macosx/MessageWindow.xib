@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -22,7 +21,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="320" y="502" width="611" height="328"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="550" height="200"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="611" height="328"/>
@@ -70,7 +69,7 @@
                             <action selector="writeToFile:" target="-2" id="25"/>
                         </connections>
                     </button>
-                    <scrollView fixedFrame="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="30">
+                    <scrollView fixedFrame="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" allowsMagnification="YES" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="30">
                         <rect key="frame" x="-1" y="35" width="613" height="294"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Ncd-0I-lkt">
@@ -97,7 +96,7 @@
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
-                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" alignment="left" title="4/1/76, 11:00 PM" id="62">
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" alignment="left" title="4/01/76, 11:00 PM" id="62">
                                                 <dateFormatter key="formatter" dateStyle="short" timeStyle="short" id="39"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>

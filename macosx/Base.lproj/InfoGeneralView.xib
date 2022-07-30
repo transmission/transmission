@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -32,10 +31,10 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Info">
-            <rect key="frame" x="0.0" y="0.0" width="356" height="228"/>
+            <rect key="frame" x="0.0" y="0.0" width="360" height="230"/>
             <subviews>
                 <scrollView horizontalHuggingPriority="249" horizontalCompressionResistancePriority="249" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4">
-                    <rect key="frame" x="84" y="62" width="260" height="58"/>
+                    <rect key="frame" x="88" y="63" width="260" height="58"/>
                     <clipView key="contentView" drawsBackground="NO" id="4uz-20-4jl">
                         <rect key="frame" x="1" y="1" width="258" height="56"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -65,7 +64,7 @@
                     </scroller>
                 </scrollView>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="InfoTextField">
-                    <rect key="frame" x="82" y="170" width="264" height="14"/>
+                    <rect key="frame" x="86" y="171" width="264" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" placeholderString="N/A" id="37">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -73,23 +72,23 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="6">
-                    <rect key="frame" x="10" y="170" width="68" height="14"/>
+                    <rect key="frame" x="10" y="171" width="72" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Hash:" id="36">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="7">
-                    <rect key="frame" x="10" y="106" width="68" height="14"/>
+                    <rect key="frame" x="10" y="107" width="72" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Comment:" id="35">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="8" customClass="InfoTextField">
-                    <rect key="frame" x="82" y="122" width="264" height="14"/>
+                    <rect key="frame" x="86" y="123" width="264" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="33">
                         <dateFormatter key="formatter" dateStyle="long" timeStyle="short" id="34"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -98,15 +97,15 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="9">
-                    <rect key="frame" x="10" y="122" width="68" height="14"/>
+                    <rect key="frame" x="10" y="123" width="72" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Created On:" id="32">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="10" customClass="InfoTextField">
-                    <rect key="frame" x="82" y="138" width="264" height="14"/>
+                    <rect key="frame" x="86" y="139" width="264" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" placeholderString="N/A" id="31">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -114,29 +113,29 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                    <rect key="frame" x="10" y="138" width="68" height="14"/>
+                    <rect key="frame" x="10" y="139" width="72" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Creator:" id="30">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="12">
-                    <rect key="frame" x="111" y="12" width="14" height="14"/>
+                    <rect key="frame" x="115" y="12" width="14" height="14"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="14" id="50q-rm-IPl"/>
                         <constraint firstAttribute="width" constant="14" id="Zd6-df-Ynq"/>
                     </constraints>
                     <buttonCell key="cell" type="square" title="RevealDataFile" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" alternateImage="RevealOn" imageScaling="proportionallyDown" inset="2" id="29">
                         <behavior key="behavior" lightByContents="YES"/>
-                        <font key="font" metaFont="label"/>
+                        <font key="font" usesAppearanceFont="YES"/>
                     </buttonCell>
                     <connections>
                         <action selector="revealDataFile:" target="-2" id="50"/>
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="14" customClass="InfoTextField">
-                    <rect key="frame" x="82" y="12" width="23" height="14"/>
+                    <rect key="frame" x="86" y="12" width="23" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" sendsActionOnEndEditing="YES" placeholderString="N/A" id="27">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -144,15 +143,15 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="15">
-                    <rect key="frame" x="10" y="12" width="68" height="14"/>
+                    <rect key="frame" x="10" y="12" width="72" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Data File:" id="26">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="16" customClass="InfoTextField">
-                    <rect key="frame" x="82" y="154" width="264" height="14"/>
+                    <rect key="frame" x="86" y="155" width="264" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="25">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -160,23 +159,23 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                    <rect key="frame" x="10" y="154" width="68" height="14"/>
+                    <rect key="frame" x="10" y="155" width="72" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Secure:" id="24">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                    <rect key="frame" x="10" y="202" width="114" height="14"/>
+                    <rect key="frame" x="10" y="203" width="122" height="15"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Torrent Information" id="41">
-                        <font key="font" metaFont="smallSystemBold"/>
+                        <font key="font" metaFont="systemBold" size="12"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="InfoTextField">
-                    <rect key="frame" x="82" y="186" width="264" height="14"/>
+                    <rect key="frame" x="86" y="187" width="264" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="N/A" id="22">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -184,17 +183,17 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="20">
-                    <rect key="frame" x="10" y="186" width="68" height="14"/>
+                    <rect key="frame" x="10" y="187" width="72" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Pieces:" id="21">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="13">
-                    <rect key="frame" x="10" y="28" width="41" height="14"/>
+                    <rect key="frame" x="10" y="28" width="44" height="15"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Where" id="28">
-                        <font key="font" metaFont="smallSystemBold"/>
+                        <font key="font" metaFont="systemBold" size="12"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>

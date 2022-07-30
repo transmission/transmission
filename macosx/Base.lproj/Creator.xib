@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -65,17 +64,17 @@
                         </textFieldCell>
                     </textField>
                     <scrollView horizontalCompressionResistancePriority="249" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                        <rect key="frame" x="101" y="131" width="587" height="54"/>
+                        <rect key="frame" x="106" y="131" width="582" height="54"/>
                         <clipView key="contentView" drawsBackground="NO" id="08t-X6-SLo">
-                            <rect key="frame" x="1" y="1" width="585" height="52"/>
+                            <rect key="frame" x="1" y="1" width="580" height="52"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" continuousSpellChecking="YES" allowsUndo="YES" spellingCorrection="YES" smartInsertDelete="YES" id="12">
-                                    <rect key="frame" x="0.0" y="0.0" width="570" height="52"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="565" height="52"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="585" height="52"/>
+                                    <size key="minSize" width="580" height="52"/>
                                     <size key="maxSize" width="1027" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
@@ -89,22 +88,22 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="84">
-                            <rect key="frame" x="570" y="1" width="16" height="52"/>
+                            <rect key="frame" x="565" y="1" width="16" height="52"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="13">
-                        <rect key="frame" x="18" y="169" width="77" height="16"/>
+                        <rect key="frame" x="18" y="169" width="82" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Comment:" usesSingleLineMode="YES" id="70">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="14">
-                        <rect key="frame" x="18" y="300" width="77" height="16"/>
+                        <rect key="frame" x="18" y="300" width="82" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Trackers:" usesSingleLineMode="YES" id="71">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -123,7 +122,7 @@
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="20">
-                        <rect key="frame" x="121" y="44" width="23" height="28"/>
+                        <rect key="frame" x="126" y="58" width="4" height="14"/>
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="charWrapping" truncatesLastVisibleLine="YES" sendsActionOnEndEditing="YES" id="75">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -131,7 +130,7 @@
                         </textFieldCell>
                     </textField>
                     <imageView translatesAutoresizingMaskIntoConstraints="NO" id="21">
-                        <rect key="frame" x="101" y="56" width="16" height="16"/>
+                        <rect key="frame" x="106" y="56" width="16" height="16"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="16" id="2LL-ew-AZp"/>
                             <constraint firstAttribute="height" constant="16" id="G3i-dS-V5f"/>
@@ -139,7 +138,7 @@
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TransmissionDocument.icns" id="76"/>
                     </imageView>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="22">
-                        <rect key="frame" x="99" y="86" width="68" height="18"/>
+                        <rect key="frame" x="104" y="86" width="68" height="18"/>
                         <buttonCell key="cell" type="check" title="Private" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="77">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -172,7 +171,7 @@ Gw
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="26">
-                        <rect key="frame" x="605" y="87" width="64" height="16"/>
+                        <rect key="frame" x="665" y="87" width="4" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" id="80">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -180,20 +179,20 @@ Gw
                         </textFieldCell>
                     </textField>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="63">
-                        <rect key="frame" x="99" y="19" width="145" height="18"/>
+                        <rect key="frame" x="104" y="19" width="145" height="18"/>
                         <buttonCell key="cell" type="check" title="Open when created" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="81">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
                     <scrollView horizontalCompressionResistancePriority="249" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="89">
-                        <rect key="frame" x="101" y="219" width="587" height="97"/>
+                        <rect key="frame" x="106" y="219" width="582" height="97"/>
                         <clipView key="contentView" id="cIJ-8J-EGs">
-                            <rect key="frame" x="1" y="1" width="585" height="95"/>
+                            <rect key="frame" x="1" y="1" width="580" height="95"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="92">
-                                    <rect key="frame" x="0.0" y="0.0" width="585" height="95"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="580" height="95"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -224,12 +223,12 @@ Gw
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="90">
-                            <rect key="frame" x="570" y="1" width="16" height="95"/>
+                            <rect key="frame" x="565" y="1" width="16" height="95"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="103">
-                        <rect key="frame" x="100" y="192" width="71" height="20"/>
+                        <rect key="frame" x="105" y="192" width="71" height="20"/>
                         <segmentedCell key="cell" state="on" borderStyle="border" alignment="left" style="roundRect" trackingMode="momentary" id="104">
                             <font key="font" metaFont="cellTitle"/>
                             <segments>
@@ -242,7 +241,7 @@ Gw
                         </connections>
                     </segmentedControl>
                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="107">
-                        <rect key="frame" x="176" y="195" width="229" height="14"/>
+                        <rect key="frame" x="181" y="195" width="229" height="14"/>
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Each tracker will be placed into its own tier" id="108">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -250,7 +249,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="R2K-fl-edv">
-                        <rect key="frame" x="101" y="109" width="587" height="22"/>
+                        <rect key="frame" x="106" y="109" width="582" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="sah-qh-fRe"/>
                         </constraints>
@@ -261,9 +260,9 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="faa-JK-W9Q">
-                        <rect key="frame" x="18" y="112" width="77" height="16"/>
+                        <rect key="frame" x="18" y="112" width="82" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Source:" usesSingleLineMode="YES" id="f1g-Kk-weU">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -276,9 +275,9 @@ Gw
                         </connections>
                     </stepper>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="19">
-                        <rect key="frame" x="18" y="56" width="77" height="16"/>
+                        <rect key="frame" x="18" y="56" width="82" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Torrent File:" usesSingleLineMode="YES" id="74">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -393,9 +392,9 @@ Gw
         </customView>
     </objects>
     <resources>
-        <image name="NSAddTemplate" width="14" height="13"/>
+        <image name="NSAddTemplate" width="15" height="13"/>
         <image name="NSApplicationIcon" width="32" height="32"/>
-        <image name="NSRemoveTemplate" width="14" height="4"/>
+        <image name="NSRemoveTemplate" width="15" height="4"/>
         <image name="TransmissionDocument.icns" width="128" height="128"/>
     </resources>
 </document>

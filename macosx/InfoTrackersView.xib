@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -31,7 +30,7 @@
                         <action selector="addRemoveTracker:" target="-2" id="16"/>
                     </connections>
                 </segmentedControl>
-                <scrollView autohidesScrollers="YES" horizontalLineScroll="59" horizontalPageScroll="10" verticalLineScroll="59" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3">
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="59" horizontalPageScroll="10" verticalLineScroll="59" verticalPageScroll="10" hasHorizontalScroller="NO" allowsMagnification="YES" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3">
                     <rect key="frame" x="12" y="36" width="358" height="304"/>
                     <clipView key="contentView" copiesOnScroll="NO" id="sFV-Gc-aEj">
                         <rect key="frame" x="1" y="1" width="356" height="302"/>
@@ -44,7 +43,7 @@
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="Tracker" width="344" minWidth="40" maxWidth="1000" id="9">
+                                    <tableColumn identifier="Tracker" width="315" minWidth="40" maxWidth="1000" id="9">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -90,7 +89,7 @@
         </customView>
     </objects>
     <resources>
-        <image name="NSAddTemplate" width="14" height="13"/>
-        <image name="NSRemoveTemplate" width="14" height="4"/>
+        <image name="NSAddTemplate" width="15" height="13"/>
+        <image name="NSRemoveTemplate" width="15" height="4"/>
     </resources>
 </document>
