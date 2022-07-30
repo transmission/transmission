@@ -628,3 +628,126 @@ void tr_makeMetaInfo(
         thread.detach();
     }
 }
+
+///
+
+
+namespace tr_torrent_maker
+{
+
+static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_files& files)
+{
+    if (std::empty(top) || std::empty(subpath))
+    {
+        return;
+    }
+
+    auto path = tr_pathbuf{ top, '/', subpath };
+    tr_sys_path_native_separators(std::data(path));
+
+    auto info = tr_sys_path_info{};
+    if (tr_error* error = nullptr; !tr_sys_path_get_info(path, 0, &info, &error))
+    {
+        tr_logAddWarn(fmt::format(
+            _("Skipping '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_free(error);
+    }
+
+    switch (info.type)
+    {
+        case TR_SYS_PATH_IS_DIRECTORY:
+            if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
+            {
+                char const* name = nullptr;
+                while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+                {
+                    if (name[0] == '.') // skip dotfiles
+                    {
+                        continue;
+                    }
+
+                    walkTree(top, tr_pathbuf{ subpath, '/', name }, files);
+                }
+
+                tr_sys_dir_close(odir);
+            }
+            break;
+
+        case TR_SYS_PATH_IS_FILE:
+            files.add(subpath, info.size);
+            break;
+
+        default:
+            break;
+    }
+}
+
+Builder::Builder(std::string_view top)
+{
+    top_ = top;
+    walkTree(top, {}, files_);
+    block_info_ = tr_block_info{ files().totalSize(), defaultPieceSize(files_.totalSize()) };
+}
+
+uint32_t Builder::defaultPieceSize(uint64_t totalSize)
+{
+    uint32_t const KiB = 1024;
+    uint32_t const MiB = 1048576;
+    uint32_t const GiB = 1073741824;
+
+    if (totalSize >= 2 * GiB)
+    {
+        return 2 * MiB;
+    }
+
+    if (totalSize >= 1 * GiB)
+    {
+        return 1 * MiB;
+    }
+
+    if (totalSize >= 512 * MiB)
+    {
+        return 512 * KiB;
+    }
+
+    if (totalSize >= 350 * MiB)
+    {
+        return 256 * KiB;
+    }
+
+    if (totalSize >= 150 * MiB)
+    {
+        return 128 * KiB;
+    }
+
+    if (totalSize >= 50 * MiB)
+    {
+        return 64 * KiB;
+    }
+
+    return 32 * KiB; /* less than 50 meg */
+}
+
+bool Builder::isLegalPieceSize(uint32_t x)
+{
+    // It must be a power of two and at least 16KiB
+    static auto constexpr MinSize = uint32_t{ 1024U * 16U };
+    auto const is_power_of_two = !(x == 0) && !(x & (x - 1));
+    return x >= MinSize && is_power_of_two;
+}
+
+bool Builder::setPieceSize(uint32_t piece_size)
+{
+    if (!isLegalPieceSize(piece_size))
+    {
+        return false;
+    }
+
+    block_info_ = tr_block_info{ files().totalSize(), piece_size };
+    return true;
+}
+
+} // namespace tr_torrent_maker

@@ -5,9 +5,102 @@
 
 #pragma once
 
-#include <cstdint> // uint32_t, uint64_t
+#include <string>
 
 #include "transmission.h"
+
+#include "announce-list.h"
+#include "block-info.h"
+#include "torrent-files.h"
+
+namespace tr_torrent_maker
+{
+
+class Builder
+{
+public:
+    Builder(std::string_view top);
+
+    [[nodiscard]] auto const& files() const noexcept
+    {
+        return files_;
+    }
+
+    void setAnnounceList(tr_announce_list&& announce)
+    {
+        announce_ = std::move(announce);
+    }
+
+    [[nodiscard]] auto const& announceList() const noexcept
+    {
+        return announce_;
+    }
+
+    void setComment(std::string_view comment)
+    {
+        comment_ = comment;
+    }
+
+    [[nodiscard]] auto const& comment() const noexcept
+    {
+        return comment_;
+    }
+
+    void setSource(std::string_view source)
+    {
+        source_ = source;
+    }
+
+    [[nodiscard]] auto const& source() const noexcept
+    {
+        return source_;
+    }
+
+    void setPrivate(bool is_private)
+    {
+        is_private_ = is_private;
+    }
+
+    [[nodiscard]] auto const& isPrivate() const noexcept
+    {
+        return is_private_;
+    }
+
+    void setAnonymize(bool anonymize)
+    {
+        anonymize_ = anonymize;
+    }
+
+    [[nodiscard]] auto const& anonymize() const noexcept
+    {
+        return anonymize_;
+    }
+
+    static uint32_t defaultPieceSize(uint64_t total_size);
+
+    // must be a power of two and >= 16 KiB
+    static bool isLegalPieceSize(uint32_t x);
+
+    bool setPieceSize(uint32_t piece_size);
+
+    [[nodiscard]] auto const& blockInfo() const noexcept
+    {
+        return block_info_;
+    }
+
+private:
+    std::string top_;
+    tr_torrent_files files_;
+    tr_announce_list announce_;
+    tr_block_info block_info_;
+
+    std::string comment_;
+    std::string source_;
+    bool is_private_ = false;
+    bool anonymize_ = false;
+};
+
+} // namespace tr_torrent_maker
 
 struct tr_metainfo_builder_file
 {
