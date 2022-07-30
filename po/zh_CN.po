@@ -1598,7 +1598,7 @@ msgstr "{download_speed} ▼  {upload_speed} ▲"
 
 #: ../gtk/TorrentCellRenderer.cc:143
 msgid "Stalled"
-msgstr "已暂停"
+msgstr "已停滞"
 
 #: ../gtk/TorrentCellRenderer.cc:172
 #, no-c-format
