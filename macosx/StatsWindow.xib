@@ -181,7 +181,6 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="30"/>
             </connections>
-            <point key="canvasLocation" x="-56" y="68"/>
         </window>
     </objects>
 </document>
