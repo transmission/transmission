@@ -60,7 +60,7 @@ public:
     {
         for (auto const& [info_hash, info] : torrents)
         {
-            if (obfuscated == *tr_sha1("req2"sv, info.info_hash))
+            if (obfuscated == tr_sha1::digest("req2"sv, info.info_hash))
             {
                 return info;
             }
@@ -142,7 +142,7 @@ auto constexpr ReservedBytesNoExtensions = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0
 auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
 auto const DefaultPeerAddr = *tr_address::fromString("127.0.0.1"sv);
 auto const DefaultPeerPort = tr_port::fromHost(8080);
-auto const TorrentWeAreSeeding = tr_handshake_mediator::torrent_info{ *tr_sha1("abcde"sv),
+auto const TorrentWeAreSeeding = tr_handshake_mediator::torrent_info{ tr_sha1::digest("abcde"sv),
                                                                       tr_peerIdInit(),
                                                                       tr_torrent_id_t{ 100 },
                                                                       true /*is_done*/ };
@@ -267,7 +267,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     auto [io, sock] = createIncomingIo(session_);
     sendToClient(sock, PlaintextProtocolName);
     sendToClient(sock, ReservedBytesNoExtensions);
-    sendToClient(sock, *tr_sha1("some other torrent unknown to us"sv));
+    sendToClient(sock, tr_sha1::digest("some other torrent unknown to us"sv));
     sendToClient(sock, makeRandomPeerId());
 
     auto const res = runHandshake(mediator, io);
