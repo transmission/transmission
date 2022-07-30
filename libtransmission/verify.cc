@@ -14,13 +14,13 @@
 #include <fmt/core.h>
 
 #include "transmission.h"
+
 #include "completion.h"
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_malloc(), tr_free() */
 #include "verify.h"
 
 /***
