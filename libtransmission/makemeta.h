@@ -21,14 +21,38 @@ namespace tr_torrent_maker
 class Builder
 {
 public:
-    Builder(std::string_view top);
+    Builder(std::string_view top_file_or_root_directory);
+
+    /*
+     * Checksums must be generated before calling benc() or save().
+     * Since the process is slow -- it's equivalent to "verify local data" --
+     * client code can either call it in a blocking call, or it can run in a
+     * worker thread.
+     *
+     * If run async, it can be cancelled via `cancelAsyncChecksums()` and
+     * its progress can be polled with `checksumProgress()`. When the task
+     * is done, the future will resolve with an error, or with nullptr if no error.
+     */
 
     bool makeChecksums(tr_error** error = nullptr);
+
     std::future<tr_error*> makeChecksumsAsync();
+
+    [[nodiscard]] double checksumProgress() const noexcept
+    {
+        return checksum_percent_done_; // [0.0 .. 1.0]
+    }
+
+    void cancelAsyncChecksums() noexcept
+    {
+        cancel_ = true;
+    }
 
     std::string benc(tr_error** error = nullptr) const;
 
     bool save(std::string_view filename, tr_error** error = nullptr) const;
+
+    ///
 
     [[nodiscard]] auto const& files() const noexcept
     {
@@ -85,6 +109,7 @@ public:
         return is_private_;
     }
 
+    // whether or not to include User-Agent and creation time
     void setAnonymize(bool anonymize)
     {
         anonymize_ = anonymize;
@@ -119,8 +144,11 @@ private:
 
     std::string comment_;
     std::string source_;
+
+    double checksum_percent_done_ = {};
     bool is_private_ = false;
     bool anonymize_ = false;
+    bool cancel_ = false;
 };
 
 } // namespace tr_torrent_maker

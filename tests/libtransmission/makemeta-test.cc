@@ -38,7 +38,10 @@ protected:
     static auto constexpr DefaultMaxFileCount = size_t{ 16 };
     static auto constexpr DefaultMaxFileSize = size_t{ 1024 };
 
-    auto makeRandomFiles(std::string_view top, size_t n_files = tr_rand_int_weak(DefaultMaxFileCount), size_t max_size = DefaultMaxFileSize)
+    auto makeRandomFiles(
+        std::string_view top,
+        size_t n_files = tr_rand_int_weak(DefaultMaxFileCount),
+        size_t max_size = DefaultMaxFileSize)
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
 
@@ -52,7 +55,7 @@ protected:
             createTmpfileWithContents(std::data(filename), std::data(payload), std::size(payload));
             tr_sys_path_native_separators(std::data(filename));
 
-            files.emplace_back(std::make_pair(std::string{filename.sv()}, payload));
+            files.emplace_back(std::make_pair(std::string{ filename.sv() }, payload));
         }
 
         return files;
@@ -421,7 +424,11 @@ TEST_F(MakemetaTest, rewrite)
     tr_error* error = nullptr;
     EXPECT_TRUE(builder.makeChecksums(&error));
     EXPECT_EQ(nullptr, error) << *error;
-    auto const total_size = std::accumulate(std::begin(files), std::end(files), uint64_t{}, [](auto sum, auto const& item){ return sum + std::size(item.second); });
+    auto const total_size = std::accumulate(
+        std::begin(files),
+        std::end(files),
+        uint64_t{},
+        [](auto sum, auto const& item) { return sum + std::size(item.second); });
     EXPECT_EQ(total_size, builder.blockInfo().totalSize());
     EXPECT_NE(total_size, 0U);
     builder.setComment(Comment);
@@ -444,7 +451,6 @@ TEST_F(MakemetaTest, rewrite)
     EXPECT_EQ(builder.files().fileCount(), metainfo.fileCount());
     EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
 }
-
 
 } // namespace test
 

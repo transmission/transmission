@@ -631,7 +631,6 @@ void tr_makeMetaInfo(
 
 ///
 
-
 namespace tr_torrent_maker
 {
 
@@ -662,42 +661,42 @@ static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_
 
     switch (info.type)
     {
-        case TR_SYS_PATH_IS_DIRECTORY:
-            if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
+    case TR_SYS_PATH_IS_DIRECTORY:
+        if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
+        {
+            char const* name = nullptr;
+            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
             {
-                char const* name = nullptr;
-                while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+                if (name[0] == '.') // skip dotfiles
                 {
-                    if (name[0] == '.') // skip dotfiles
-                    {
-                        continue;
-                    }
-
-                    if (!std::empty(subpath))
-                    {
-                        walkTree(top, tr_pathbuf{ subpath, '/', name }, files);
-                    }
-                    else
-                    {
-                        walkTree(top, name, files);
-                    }
+                    continue;
                 }
 
-                tr_sys_dir_close(odir);
+                if (!std::empty(subpath))
+                {
+                    walkTree(top, tr_pathbuf{ subpath, '/', name }, files);
+                }
+                else
+                {
+                    walkTree(top, name, files);
+                }
             }
-            break;
 
-        case TR_SYS_PATH_IS_FILE:
-            files.add(subpath, info.size);
-            break;
+            tr_sys_dir_close(odir);
+        }
+        break;
 
-        default:
-            break;
+    case TR_SYS_PATH_IS_FILE:
+        files.add(subpath, info.size);
+        break;
+
+    default:
+        break;
     }
 }
 
-Builder::Builder(std::string_view top):
-    top_{ top }
+Builder::Builder(std::string_view top)
+    : top_{ top }
 {
     walkTree(top, {}, files_);
     block_info_ = tr_block_info{ files().totalSize(), defaultPieceSize(files_.totalSize()) };
@@ -763,6 +762,9 @@ bool Builder::setPieceSize(uint32_t piece_size)
 
 bool Builder::makeChecksums(tr_error** error)
 {
+    checksum_percent_done_ = 0;
+    cancel_ = false;
+
     auto const& files = this->files();
     auto const& block_info = this->blockInfo();
 
@@ -782,14 +784,20 @@ bool Builder::makeChecksums(tr_error** error)
 
     auto buf = std::vector<char>(block_info.pieceSize());
 
-    auto fd = tr_sys_file_open(tr_pathbuf{ top_, '/', files.path(file_index)}, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+    auto fd = tr_sys_file_open(
+        tr_pathbuf{ top_, '/', files.path(file_index) },
+        TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL,
+        0,
+        error);
     if (fd == TR_BAD_SYS_FILE)
     {
         return false;
     }
 
-    while (total_remain > 0U)
+    while (!cancel_ && (total_remain > 0U))
     {
+        checksum_percent_done_ = static_cast<double>(piece_index) / block_info.pieceCount();
+
         TR_ASSERT(piece_index < block_info.pieceCount());
 
         uint32_t const piece_size = block_info.pieceSize(piece_index);
@@ -815,7 +823,11 @@ bool Builder::makeChecksums(tr_error** error)
 
                 if (++file_index < files.fileCount())
                 {
-                    fd = tr_sys_file_open(tr_pathbuf{ top_, '/', files.path(file_index) }, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+                    fd = tr_sys_file_open(
+                        tr_pathbuf{ top_, '/', files.path(file_index) },
+                        TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL,
+                        0,
+                        error);
                     if (fd == TR_BAD_SYS_FILE)
                     {
                         return false;
@@ -829,46 +841,39 @@ bool Builder::makeChecksums(tr_error** error)
         auto const digest = *tr_sha1(buf);
         walk = std::copy(std::begin(digest), std::end(digest), walk);
 
-#if 0
-        if (abort_flag_)
-        {
-            tr_error_set(&error, ECANCELED, tr_strerror(ECANCELED));
-            promise.set_value(error);
-            return;
-        }
-#endif
-
         total_remain -= piece_size;
         ++piece_index;
     }
 
-#if 0
-    TR_ASSERT(b->abortFlag || size_t(walk - std::data(ret)) == std::size(ret));
-    TR_ASSERT(b->abortFlag || !totalRemain);
-#else
-    TR_ASSERT(size_t(walk - std::data(hashes)) == std::size(hashes));
-    TR_ASSERT(total_remain == 0U);
-#endif
+    TR_ASSERT(cancel_ || size_t(walk - std::data(hashes)) == std::size(hashes));
+    TR_ASSERT(cancel_ || total_remain == 0U);
 
     if (fd != TR_BAD_SYS_FILE)
     {
         tr_sys_file_close(fd);
     }
 
+    if (cancel_)
+    {
+        tr_error_set(error, ECANCELED, tr_strerror(ECANCELED));
+        return false;
+    }
+
     piece_hashes_ = std::move(hashes);
     return true;
-    // promise.set_value(nullptr);
 }
 
 std::future<tr_error*> Builder::makeChecksumsAsync()
 {
     auto promise = std::promise<tr_error*>{};
     auto future = promise.get_future();
-    std::thread work_thread([this, promise = std::move(promise)]() mutable {
+    std::thread work_thread(
+        [this, promise = std::move(promise)]() mutable
+        {
             tr_error* error = nullptr;
             makeChecksums(&error);
             promise.set_value(error);
-            });
+        });
     return future;
 }
 
@@ -993,6 +998,5 @@ bool Builder::save(std::string_view filename, tr_error** error) const
 {
     return tr_saveFile(filename, benc(), error);
 }
-
 
 } // namespace tr_torrent_maker
