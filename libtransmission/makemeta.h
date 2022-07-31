@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include <future>
 #include <string>
+#include <vector>
 
 #include "transmission.h"
 
@@ -20,6 +22,13 @@ class Builder
 {
 public:
     Builder(std::string_view top);
+
+    bool makeChecksums(tr_error** error = nullptr);
+    std::future<tr_error*> makeChecksumsAsync();
+
+    std::string benc(tr_error** error = nullptr) const;
+
+    bool save(std::string_view filename, tr_error** error = nullptr);
 
     [[nodiscard]] auto const& files() const noexcept
     {
@@ -89,10 +98,14 @@ public:
     }
 
 private:
+    void makeChecksumsImpl(std::promise<tr_error*> promise);
+
     std::string top_;
     tr_torrent_files files_;
     tr_announce_list announce_;
     tr_block_info block_info_;
+    std::vector<std::byte> piece_hashes_;
+
 
     std::string comment_;
     std::string source_;

@@ -7,7 +7,10 @@
 #include <cstdlib> // mktemp()
 #include <cstring> // strlen()
 #include <string>
+#include <numeric>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -32,6 +35,30 @@ namespace test
 class MakemetaTest : public SandboxedTest
 {
 protected:
+    static auto constexpr DefaultMaxFileCount = size_t{ 16 };
+    static auto constexpr DefaultMaxFileSize = size_t{ 1024 };
+
+    auto makeRandomFiles(std::string_view top, size_t n_files = tr_rand_int_weak(DefaultMaxFileCount), size_t max_size = DefaultMaxFileSize)
+    {
+        auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
+
+        for (size_t i = 0; i < n_files; ++i)
+        {
+            auto payload = std::vector<std::byte>{};
+            payload.resize(tr_rand_int_weak(max_size));
+            tr_rand_buffer(std::data(payload), std::size(payload));
+
+            auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };
+            createTmpfileWithContents(std::data(filename), std::data(payload), std::size(payload));
+            tr_sys_path_native_separators(std::data(filename));
+            std::cerr << __FILE__ << ':' << __LINE__ << " creating file [" << filename << ']' << std::endl;
+
+            files.emplace_back(std::make_pair(std::string{filename.sv()}, payload));
+        }
+
+        return files;
+    }
+
     void testSingleFileImpl(
         tr_torrent_metainfo& metainfo,
         tr_tracker_info const* trackers,
@@ -347,9 +374,6 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
 
 TEST_F(MakemetaTest, singleDirectoryRandomPayload)
 {
-    auto constexpr DefaultMaxFileCount = size_t{ 16 };
-    auto constexpr DefaultMaxFileSize = size_t{ 1024 };
-
     auto trackers = std::array<tr_tracker_info, 16>{};
     auto tracker_count = int{};
     trackers[tracker_count].tier = tracker_count;
@@ -378,6 +402,49 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
             source);
     }
 }
+
+TEST_F(MakemetaTest, rewrite)
+{
+    static auto constexpr Comment = "This is the comment"sv;
+    static auto constexpr Source = "This is the source"sv;
+    using tr_torrent_maker::Builder;
+
+    // create the top temp directory
+    auto top = tr_pathbuf{ sandboxDir(), '/', "folder.XXXXXX"sv };
+    tr_sys_path_native_separators(std::data(top));
+    tr_sys_dir_create_temp(std::data(top));
+
+    // build the payload files that go into the top temp directory
+    auto const files = makeRandomFiles(top);
+
+    // make the builder
+    auto builder = Builder{ top };
+    tr_error* error = nullptr;
+    EXPECT_TRUE(builder.makeChecksums(&error));
+    EXPECT_EQ(nullptr, error) << *error;
+    auto const total_size = std::accumulate(std::begin(files), std::end(files), uint64_t{}, [](auto sum, auto const& item){ return sum + std::size(item.second); });
+    EXPECT_EQ(total_size, builder.blockInfo().totalSize());
+    EXPECT_NE(total_size, 0U);
+    builder.setComment(Comment);
+    builder.setSource(Source);
+    auto const benc = builder.benc();
+
+    // now let's check our work: parse the metainfo
+    auto metainfo = tr_torrent_metainfo{};
+    EXPECT_TRUE(metainfo.parseBenc(benc));
+
+    // quick check of some of the parsed metainfo
+    EXPECT_EQ(total_size, metainfo.totalSize());
+    EXPECT_EQ(Comment, metainfo.comment());
+    EXPECT_EQ(Source, metainfo.source());
+#if 0
+    EXPECT_EQ(tr_sys_path_basename(top), metainfo.name());
+    EXPECT_EQ(payload_count, metainfo.fileCount());
+    EXPECT_EQ(is_private, metainfo.isPrivate());
+    EXPECT_EQ(size_t(tracker_count), std::size(metainfo.announceList()));
+#endif
+}
+
 
 } // namespace test
 

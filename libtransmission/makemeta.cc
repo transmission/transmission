@@ -13,6 +13,8 @@
 #include <thread>
 #include <vector>
 
+#include <iostream> // NOCOMMIT(ckerr)
+
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include <fmt/format.h>
@@ -637,13 +639,19 @@ namespace tr_torrent_maker
 
 static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_files& files)
 {
-    if (std::empty(top) || std::empty(subpath))
+    std::cerr << __FILE__ << ':' << __LINE__ << " top [" << top << "] subpath [" << subpath << ']' << std::endl;
+    if (std::empty(top) && std::empty(subpath))
     {
         return;
     }
 
-    auto path = tr_pathbuf{ top, '/', subpath };
+    auto path = tr_pathbuf{ top };
+    if (!std::empty(subpath))
+    {
+        path.append('/', subpath);
+    }
     tr_sys_path_native_separators(std::data(path));
+    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
 
     auto info = tr_sys_path_info{};
     if (tr_error* error = nullptr; !tr_sys_path_get_info(path, 0, &info, &error))
@@ -669,7 +677,14 @@ static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_
                         continue;
                     }
 
-                    walkTree(top, tr_pathbuf{ subpath, '/', name }, files);
+                    if (!std::empty(subpath))
+                    {
+                        walkTree(top, tr_pathbuf{ subpath, '/', name }, files);
+                    }
+                    else
+                    {
+                        walkTree(top, name, files);
+                    }
                 }
 
                 tr_sys_dir_close(odir);
@@ -685,9 +700,9 @@ static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_
     }
 }
 
-Builder::Builder(std::string_view top)
+Builder::Builder(std::string_view top):
+    top_{ top }
 {
-    top_ = top;
     walkTree(top, {}, files_);
     block_info_ = tr_block_info{ files().totalSize(), defaultPieceSize(files_.totalSize()) };
 }
@@ -735,7 +750,7 @@ bool Builder::isLegalPieceSize(uint32_t x)
 {
     // It must be a power of two and at least 16KiB
     static auto constexpr MinSize = uint32_t{ 1024U * 16U };
-    auto const is_power_of_two = !(x == 0) && !(x & (x - 1));
+    auto const is_power_of_two = (x & (x - 1)) == 0;
     return x >= MinSize && is_power_of_two;
 }
 
@@ -749,5 +764,131 @@ bool Builder::setPieceSize(uint32_t piece_size)
     block_info_ = tr_block_info{ files().totalSize(), piece_size };
     return true;
 }
+
+bool Builder::makeChecksums(tr_error** error)
+{
+    auto const& files = this->files();
+    auto const& block_info = this->blockInfo();
+
+    if (files.totalSize() == 0U)
+    {
+        tr_error_set(error, ENOENT, tr_strerror(ENOENT));
+        return false;
+    }
+
+    auto hashes = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * block_info.pieceCount());
+    auto* walk = std::data(hashes);
+
+    auto file_index = tr_file_index_t{ 0U };
+    auto piece_index = tr_piece_index_t{ 0U };
+    auto total_remain = files.totalSize();
+    auto off = uint64_t{ 0U };
+
+    auto buf = std::vector<char>(block_info.pieceSize());
+
+    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_pathbuf{ top_, '/', files.path(file_index)} << std::endl;
+    auto fd = tr_sys_file_open(tr_pathbuf{ top_, '/', files.path(file_index)}, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+    if (fd == TR_BAD_SYS_FILE)
+    {
+        return false;
+    }
+
+    while (total_remain > 0U)
+    {
+        TR_ASSERT(piece_index < block_info.pieceCount());
+
+        uint32_t const piece_size = block_info.pieceSize(piece_index);
+        buf.resize(piece_size);
+        auto* bufptr = std::data(buf);
+
+        auto left_in_piece = piece_size;
+        while (left_in_piece > 0U)
+        {
+            auto const n_this_pass = std::min(files.fileSize(file_index) - off, uint64_t{ left_in_piece });
+            auto n_read = uint64_t{};
+
+            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, error);
+            bufptr += n_read;
+            off += n_read;
+            left_in_piece -= n_read;
+
+            if (off == files.fileSize(file_index))
+            {
+                off = 0;
+                tr_sys_file_close(fd);
+                fd = TR_BAD_SYS_FILE;
+
+                if (++file_index < files.fileCount())
+                {
+                    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_pathbuf{ top_, '/', files.path(file_index)} << std::endl;
+                    fd = tr_sys_file_open(tr_pathbuf{ top_, '/', files.path(file_index) }, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+                    if (fd == TR_BAD_SYS_FILE)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        TR_ASSERT(bufptr - std::data(buf) == (int)piece_size);
+        TR_ASSERT(left_in_piece == 0);
+        auto const digest = *tr_sha1(buf);
+        walk = std::copy(std::begin(digest), std::end(digest), walk);
+
+#if 0
+        if (abort_flag_)
+        {
+            tr_error_set(&error, ECANCELED, tr_strerror(ECANCELED));
+            promise.set_value(error);
+            return;
+        }
+#endif
+
+        total_remain -= piece_size;
+        ++piece_index;
+    }
+
+#if 0
+    TR_ASSERT(b->abortFlag || size_t(walk - std::data(ret)) == std::size(ret));
+    TR_ASSERT(b->abortFlag || !totalRemain);
+#else
+    TR_ASSERT(size_t(walk - std::data(hashes)) == std::size(hashes));
+    TR_ASSERT(total_remain == 0U);
+#endif
+
+    if (fd != TR_BAD_SYS_FILE)
+    {
+        tr_sys_file_close(fd);
+    }
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " hash size is " << std::size(hashes) << std::endl;
+    piece_hashes_ = std::move(hashes);
+    return true;
+    // promise.set_value(nullptr);
+}
+
+std::future<tr_error*> Builder::makeChecksumsAsync()
+{
+    auto promise = std::promise<tr_error*>{};
+    auto future = promise.get_future();
+    std::thread work_thread([this, promise = std::move(promise)]() mutable {
+            tr_error* error = nullptr;
+            makeChecksums(&error);
+            promise.set_value(error);
+            });
+    return future;
+}
+
+std::string Builder::benc(tr_error** error) const
+{
+    return "";
+    // TODO
+}
+
+bool Builder::save(std::string_view filename, tr_error** error)
+{
+    return tr_saveFile(filename, benc(), error);
+}
+
 
 } // namespace tr_torrent_maker
