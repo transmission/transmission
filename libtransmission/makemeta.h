@@ -133,7 +133,7 @@ public:
         return block_info_;
     }
 
-    [[nodiscard]] auto top() const noexcept
+    [[nodiscard]] auto const& top() const noexcept
     {
         return top_;
     }
