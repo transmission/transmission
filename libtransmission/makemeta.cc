@@ -13,8 +13,6 @@
 #include <thread>
 #include <vector>
 
-#include <iostream> // NOCOMMIT(ckerr)
-
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include <fmt/format.h>
@@ -639,7 +637,6 @@ namespace tr_torrent_maker
 
 static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_files& files)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " top [" << top << "] subpath [" << subpath << ']' << std::endl;
     if (std::empty(top) && std::empty(subpath))
     {
         return;
@@ -651,7 +648,6 @@ static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_
         path.append('/', subpath);
     }
     tr_sys_path_native_separators(std::data(path));
-    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
 
     auto info = tr_sys_path_info{};
     if (tr_error* error = nullptr; !tr_sys_path_get_info(path, 0, &info, &error))
@@ -786,7 +782,6 @@ bool Builder::makeChecksums(tr_error** error)
 
     auto buf = std::vector<char>(block_info.pieceSize());
 
-    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_pathbuf{ top_, '/', files.path(file_index)} << std::endl;
     auto fd = tr_sys_file_open(tr_pathbuf{ top_, '/', files.path(file_index)}, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (fd == TR_BAD_SYS_FILE)
     {
@@ -820,7 +815,6 @@ bool Builder::makeChecksums(tr_error** error)
 
                 if (++file_index < files.fileCount())
                 {
-                    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_pathbuf{ top_, '/', files.path(file_index)} << std::endl;
                     fd = tr_sys_file_open(tr_pathbuf{ top_, '/', files.path(file_index) }, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
                     if (fd == TR_BAD_SYS_FILE)
                     {
@@ -861,7 +855,6 @@ bool Builder::makeChecksums(tr_error** error)
         tr_sys_file_close(fd);
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " hash size is " << std::size(hashes) << std::endl;
     piece_hashes_ = std::move(hashes);
     return true;
     // promise.set_value(nullptr);
@@ -881,11 +874,122 @@ std::future<tr_error*> Builder::makeChecksumsAsync()
 
 std::string Builder::benc(tr_error** error) const
 {
-    return "";
-    // TODO
+    auto const anonymize = this->anonymize();
+    auto const& block_info = this->blockInfo();
+    auto const& comment = this->comment();
+    auto const& files = this->files();
+    auto const& source = this->source();
+    auto const& webseeds = this->webseeds();
+
+    if (block_info.totalSize() == 0)
+    {
+        tr_error_set(error, ENOENT, tr_strerror(ENOENT));
+        return {};
+    }
+
+    auto top = tr_variant{};
+    tr_variantInitDict(&top, 8);
+
+    // add the announce-list trackers
+    if (!std::empty(announceList()))
+    {
+        auto* const announce_list = tr_variantDictAddList(&top, TR_KEY_announce_list, 0);
+        tr_variant* tier_list = nullptr;
+        auto prev_tier = std::optional<tr_tracker_tier_t>{};
+        for (auto const& tracker : announceList())
+        {
+            if (!prev_tier || *prev_tier != tracker.tier)
+            {
+                tier_list = nullptr;
+            }
+
+            if (tier_list == nullptr)
+            {
+                prev_tier = tracker.tier;
+                tr_variantListAddList(announce_list, 0);
+            }
+
+            tr_variantListAddStr(tier_list, tracker.announce);
+        }
+    }
+
+    // add the webseeds
+    if (!std::empty(webseeds))
+    {
+        auto* const url_list = tr_variantDictAddList(&top, TR_KEY_url_list, std::size(webseeds));
+
+        for (auto const& webseed : webseeds)
+        {
+            tr_variantListAddStr(url_list, webseed);
+        }
+    }
+
+    // add the comment
+    if (!std::empty(comment))
+    {
+        tr_variantDictAddStr(&top, TR_KEY_comment, comment);
+    }
+
+    // maybe add some optional metainfo
+    if (!anonymize)
+    {
+        tr_variantDictAddStrView(&top, TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
+        tr_variantDictAddInt(&top, TR_KEY_creation_date, time(nullptr));
+    }
+
+    tr_variantDictAddStrView(&top, TR_KEY_encoding, "UTF-8");
+
+    if (is_private_)
+    {
+        tr_variantDictAddInt(&top, TR_KEY_private, 1);
+    }
+
+    if (!std::empty(source))
+    {
+        tr_variantDictAddStr(&top, TR_KEY_source, source_);
+    }
+
+    auto* const info_dict = tr_variantDictAddDict(&top, TR_KEY_info, 5);
+
+    // "There is also a key `length` or a key `files`, but not both or neither.
+    // If length is present then the download represents a single file,
+    // otherwise it represents a set of files which go in a directory structure."
+    if (files.fileCount() == 1U)
+    {
+        tr_variantDictAddInt(info_dict, TR_KEY_length, files.fileSize(0));
+    }
+    else
+    {
+        auto const n_files = files.fileCount();
+        auto* const file_list = tr_variantDictAddList(info_dict, TR_KEY_files, n_files);
+
+        for (tr_file_index_t i = 0; i < n_files; ++i)
+        {
+            auto* file_dict = tr_variantListAddDict(file_list, 2);
+            tr_variantDictAddInt(file_dict, TR_KEY_length, files.fileSize(i));
+            auto subpath = std::string_view{ files.path(i) };
+            auto* path_list = tr_variantDictAddList(file_dict, TR_KEY_path, 0);
+            auto token = std::string_view{};
+            while (tr_strvSep(&subpath, &token, '/'))
+            {
+                tr_variantListAddStr(path_list, token);
+            }
+        }
+    }
+
+    if (auto const base = tr_sys_path_basename(top_); !std::empty(base))
+    {
+        tr_variantDictAddStr(info_dict, TR_KEY_name, base);
+    }
+
+    tr_variantDictAddInt(info_dict, TR_KEY_piece_length, block_info.pieceSize());
+    tr_variantDictAddRaw(info_dict, TR_KEY_pieces, std::data(piece_hashes_), std::size(piece_hashes_));
+    auto ret = tr_variantToStr(&top, TR_VARIANT_FMT_BENC);
+    tr_variantFree(&top);
+    return ret;
 }
 
-bool Builder::save(std::string_view filename, tr_error** error)
+bool Builder::save(std::string_view filename, tr_error** error) const
 {
     return tr_saveFile(filename, benc(), error);
 }

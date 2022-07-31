@@ -28,7 +28,7 @@ public:
 
     std::string benc(tr_error** error = nullptr) const;
 
-    bool save(std::string_view filename, tr_error** error = nullptr);
+    bool save(std::string_view filename, tr_error** error = nullptr) const;
 
     [[nodiscard]] auto const& files() const noexcept
     {
@@ -43,6 +43,16 @@ public:
     [[nodiscard]] auto const& announceList() const noexcept
     {
         return announce_;
+    }
+
+    void setWebseeds(std::vector<std::string>&& webseeds)
+    {
+        webseeds_ = std::move(webseeds);
+    }
+
+    [[nodiscard]] auto const& webseeds() const noexcept
+    {
+        return webseeds_;
     }
 
     void setComment(std::string_view comment)
@@ -105,7 +115,7 @@ private:
     tr_announce_list announce_;
     tr_block_info block_info_;
     std::vector<std::byte> piece_hashes_;
-
+    std::vector<std::string> webseeds_;
 
     std::string comment_;
     std::string source_;

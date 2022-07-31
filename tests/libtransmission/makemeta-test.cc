@@ -51,7 +51,6 @@ protected:
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };
             createTmpfileWithContents(std::data(filename), std::data(payload), std::size(payload));
             tr_sys_path_native_separators(std::data(filename));
-            std::cerr << __FILE__ << ':' << __LINE__ << " creating file [" << filename << ']' << std::endl;
 
             files.emplace_back(std::make_pair(std::string{filename.sv()}, payload));
         }
@@ -427,6 +426,8 @@ TEST_F(MakemetaTest, rewrite)
     EXPECT_NE(total_size, 0U);
     builder.setComment(Comment);
     builder.setSource(Source);
+    auto const is_private = true;
+    builder.setPrivate(is_private);
     auto const benc = builder.benc();
 
     // now let's check our work: parse the metainfo
@@ -437,12 +438,11 @@ TEST_F(MakemetaTest, rewrite)
     EXPECT_EQ(total_size, metainfo.totalSize());
     EXPECT_EQ(Comment, metainfo.comment());
     EXPECT_EQ(Source, metainfo.source());
-#if 0
     EXPECT_EQ(tr_sys_path_basename(top), metainfo.name());
-    EXPECT_EQ(payload_count, metainfo.fileCount());
     EXPECT_EQ(is_private, metainfo.isPrivate());
-    EXPECT_EQ(size_t(tracker_count), std::size(metainfo.announceList()));
-#endif
+    EXPECT_EQ(builder.isPrivate(), metainfo.isPrivate());
+    EXPECT_EQ(builder.files().fileCount(), metainfo.fileCount());
+    EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
 }
 
 
