@@ -19,19 +19,11 @@
 #define tr_rand_int_weak tr_rand_int_weak_
 #define tr_salt_shaker tr_salt_shaker_
 #define tr_sha1 tr_sha1_
-#define tr_sha1_ctx_t tr_sha1_ctx_t_
-#define tr_sha1_final tr_sha1_final_
 #define tr_sha1_from_string tr_sha1_from_string_
-#define tr_sha1_init tr_sha1_init_
 #define tr_sha1_to_string tr_sha1_to_string_
-#define tr_sha1_update tr_sha1_update_
 #define tr_sha256 tr_sha256_
-#define tr_sha256_ctx_t tr_sha256_ctx_t_
-#define tr_sha256_final tr_sha256_final_
 #define tr_sha256_from_string tr_sha256_from_string_
-#define tr_sha256_init tr_sha256_init_
 #define tr_sha256_to_string tr_sha256_to_string_
-#define tr_sha256_update tr_sha256_update_
 #define tr_ssha1 tr_ssha1_
 #define tr_ssha1_matches tr_ssha1_matches_
 #define tr_ssha1_test tr_ssha1_test_
@@ -59,19 +51,11 @@
 #undef tr_rand_int_weak
 #undef tr_salt_shaker
 #undef tr_sha1
-#undef tr_sha1_ctx_t
-#undef tr_sha1_final
 #undef tr_sha1_from_string
-#undef tr_sha1_init
 #undef tr_sha1_to_string
-#undef tr_sha1_update
 #undef tr_sha256
-#undef tr_sha256_ctx_t
-#undef tr_sha256_final
 #undef tr_sha256_from_string
-#undef tr_sha256_init
 #undef tr_sha256_to_string
-#undef tr_sha256_update
 #undef tr_ssha1
 #undef tr_ssha1_matches
 #undef tr_ssha1_test

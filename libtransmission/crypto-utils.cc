@@ -74,11 +74,11 @@ std::string tr_salt(std::string_view plaintext, std::string_view salt)
     static_assert(DigestStringSize == 40);
 
     // build a sha1 digest of the original content and the salt
-    auto const digest = tr_sha1(plaintext, salt);
+    auto const digest = tr_sha1::digest(plaintext, salt);
 
     // convert it to a string. string holds three parts:
     // DigestPrefix, stringified digest of plaintext + salt, and the salt.
-    return fmt::format(FMT_STRING("{:s}{:s}{:s}"), SaltedPrefix, (digest ? tr_sha1_to_string(*digest) : ""sv), salt);
+    return fmt::format(FMT_STRING("{:s}{:s}{:s}"), SaltedPrefix, tr_sha1_to_string(digest), salt);
 }
 
 } // namespace

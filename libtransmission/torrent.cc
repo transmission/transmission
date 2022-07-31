@@ -456,7 +456,7 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
         difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
 }
 
-static void torrentCallScript(tr_torrent const* tor, char const* script);
+static void torrentCallScript(tr_torrent const* tor, std::string const& script);
 
 static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 {
@@ -464,7 +464,7 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 
     if (tr_sessionIsScriptEnabled(session, type))
     {
-        torrentCallScript(tor, tr_sessionGetScript(session, type));
+        torrentCallScript(tor, session->script(type));
     }
 }
 
@@ -575,17 +575,7 @@ static void torrentStart(tr_torrent* tor, torrent_start_opts opts);
 static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->completion = tr_completion{ tor, &tor->blockInfo() };
-    if (auto const obfuscated = tr_sha1("req2"sv, tor->infoHash()); obfuscated)
-    {
-        tor->obfuscated_hash = *obfuscated;
-    }
-    else
-    {
-        // lookups by obfuscated hash will fail for this torrent
-        tr_logAddErrorTor(tor, _("Couldn't compute obfuscated info hash"));
-        tor->obfuscated_hash = tr_sha1_digest_t{};
-    }
-
+    tor->obfuscated_hash = tr_sha1::digest("req2"sv, tor->infoHash());
     tor->fpm_.reset(tor->metainfo_);
     tor->file_mtimes_.resize(tor->fileCount());
     tor->file_priorities_.reset(&tor->fpm_);
@@ -1725,9 +1715,9 @@ static std::string buildTrackersString(tr_torrent const* tor)
     return buf.str();
 }
 
-static void torrentCallScript(tr_torrent const* tor, char const* script)
+static void torrentCallScript(tr_torrent const* tor, std::string const& script)
 {
-    if (tr_str_is_empty(script))
+    if (std::empty(script))
     {
         return;
     }
@@ -1735,7 +1725,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     auto torrent_dir = tr_pathbuf{ tor->currentDir() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
-    auto const cmd = std::array<char const*, 2>{ script, nullptr };
+    auto const cmd = std::array<char const*, 2>{ script.c_str(), nullptr };
 
     auto const id_str = std::to_string(tr_torrentId(tor));
     auto const labels_str = buildLabelsString(tor);
