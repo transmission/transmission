@@ -7,21 +7,21 @@
 
 #include <future>
 #include <string>
+#include <utility>
+#include <optional>
 #include <vector>
 
 #include "transmission.h"
 
 #include "announce-list.h"
 #include "block-info.h"
+#include "file.h"
 #include "torrent-files.h"
 
-namespace tr_torrent_maker
-{
-
-class Builder
+class tr_metainfo_builder
 {
 public:
-    Builder(std::string_view top_file_or_root_directory);
+    tr_metainfo_builder(std::string_view top_file_or_root_directory);
 
     /*
      * Checksums must be generated before calling benc() or save().
@@ -38,9 +38,16 @@ public:
 
     std::future<tr_error*> makeChecksumsAsync();
 
-    [[nodiscard]] double checksumProgress() const noexcept
+    // returns thet status of a `makeChecksumsAsync()` call:
+    // the current and total number of pieces if active, or nullopt if done
+    [[nodiscard]] std::optional<std::pair<tr_piece_index_t, tr_piece_index_t>> checksumStatus() const noexcept
     {
-        return checksum_percent_done_; // [0.0 .. 1.0]
+        if (checksum_piece_)
+        {
+            return std::make_pair(*checksum_piece_, block_info_.pieceCount());
+        }
+
+        return std::nullopt;
     }
 
     void cancelAsyncChecksums() noexcept
@@ -132,6 +139,11 @@ public:
         return block_info_;
     }
 
+    [[nodiscard]] auto name() const noexcept
+    {
+        return tr_sys_path_basename(top_);
+    }
+
 private:
     void makeChecksumsImpl(std::promise<tr_error*> promise);
 
@@ -145,14 +157,14 @@ private:
     std::string comment_;
     std::string source_;
 
-    double checksum_percent_done_ = {};
+    std::optional<tr_piece_index_t> checksum_piece_;
+
     bool is_private_ = false;
     bool anonymize_ = false;
     bool cancel_ = false;
 };
 
-} // namespace tr_torrent_maker
-
+#if 0
 struct tr_metainfo_builder_file
 {
     char* filename;
@@ -275,3 +287,4 @@ void tr_makeMetaInfo(
     bool is_private,
     bool anonymize,
     char const* source);
+#endif

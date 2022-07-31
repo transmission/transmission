@@ -37,6 +37,7 @@ using namespace std::literals;
 *****
 ****/
 
+#if 0
 struct FileList
 {
     uint64_t size;
@@ -628,11 +629,9 @@ void tr_makeMetaInfo(
         thread.detach();
     }
 }
+#endif
 
 ///
-
-namespace tr_torrent_maker
-{
 
 static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_files& files)
 {
@@ -695,14 +694,14 @@ static void walkTree(std::string_view top, std::string_view subpath, tr_torrent_
     }
 }
 
-Builder::Builder(std::string_view top)
+tr_metainfo_builder::tr_metainfo_builder(std::string_view top)
     : top_{ top }
 {
     walkTree(top, {}, files_);
     block_info_ = tr_block_info{ files().totalSize(), defaultPieceSize(files_.totalSize()) };
 }
 
-uint32_t Builder::defaultPieceSize(uint64_t totalSize)
+uint32_t tr_metainfo_builder::defaultPieceSize(uint64_t totalSize)
 {
     uint32_t const KiB = 1024;
     uint32_t const MiB = 1048576;
@@ -741,7 +740,7 @@ uint32_t Builder::defaultPieceSize(uint64_t totalSize)
     return 32 * KiB; /* less than 50 meg */
 }
 
-bool Builder::isLegalPieceSize(uint32_t x)
+bool tr_metainfo_builder::isLegalPieceSize(uint32_t x)
 {
     // It must be a power of two and at least 16KiB
     static auto constexpr MinSize = uint32_t{ 1024U * 16U };
@@ -749,7 +748,7 @@ bool Builder::isLegalPieceSize(uint32_t x)
     return x >= MinSize && is_power_of_two;
 }
 
-bool Builder::setPieceSize(uint32_t piece_size)
+bool tr_metainfo_builder::setPieceSize(uint32_t piece_size)
 {
     if (!isLegalPieceSize(piece_size))
     {
@@ -760,9 +759,9 @@ bool Builder::setPieceSize(uint32_t piece_size)
     return true;
 }
 
-bool Builder::makeChecksums(tr_error** error)
+bool tr_metainfo_builder::makeChecksums(tr_error** error)
 {
-    checksum_percent_done_ = 0;
+    checksum_piece_ = 0;
     cancel_ = false;
 
     auto const& files = this->files();
@@ -771,6 +770,7 @@ bool Builder::makeChecksums(tr_error** error)
     if (files.totalSize() == 0U)
     {
         tr_error_set(error, ENOENT, tr_strerror(ENOENT));
+        checksum_piece_.reset();
         return false;
     }
 
@@ -791,12 +791,13 @@ bool Builder::makeChecksums(tr_error** error)
         error);
     if (fd == TR_BAD_SYS_FILE)
     {
+        checksum_piece_.reset();
         return false;
     }
 
     while (!cancel_ && (total_remain > 0U))
     {
-        checksum_percent_done_ = static_cast<double>(piece_index) / block_info.pieceCount();
+        checksum_piece_ = piece_index;
 
         TR_ASSERT(piece_index < block_info.pieceCount());
 
@@ -830,6 +831,7 @@ bool Builder::makeChecksums(tr_error** error)
                         error);
                     if (fd == TR_BAD_SYS_FILE)
                     {
+                        checksum_piece_.reset();
                         return false;
                     }
                 }
@@ -856,14 +858,16 @@ bool Builder::makeChecksums(tr_error** error)
     if (cancel_)
     {
         tr_error_set(error, ECANCELED, tr_strerror(ECANCELED));
+        checksum_piece_.reset();
         return false;
     }
 
     piece_hashes_ = std::move(hashes);
+    checksum_piece_.reset();
     return true;
 }
 
-std::future<tr_error*> Builder::makeChecksumsAsync()
+std::future<tr_error*> tr_metainfo_builder::makeChecksumsAsync()
 {
     auto promise = std::promise<tr_error*>{};
     auto future = promise.get_future();
@@ -874,10 +878,11 @@ std::future<tr_error*> Builder::makeChecksumsAsync()
             makeChecksums(&error);
             promise.set_value(error);
         });
+    work_thread.detach();
     return future;
 }
 
-std::string Builder::benc(tr_error** error) const
+std::string tr_metainfo_builder::benc(tr_error** error) const
 {
     auto const anonymize = this->anonymize();
     auto const& block_info = this->blockInfo();
@@ -911,7 +916,7 @@ std::string Builder::benc(tr_error** error) const
             if (tier_list == nullptr)
             {
                 prev_tier = tracker.tier;
-                tr_variantListAddList(announce_list, 0);
+                tier_list = tr_variantListAddList(announce_list, 0);
             }
 
             tr_variantListAddStr(tier_list, tracker.announce);
@@ -994,9 +999,7 @@ std::string Builder::benc(tr_error** error) const
     return ret;
 }
 
-bool Builder::save(std::string_view filename, tr_error** error) const
+bool tr_metainfo_builder::save(std::string_view filename, tr_error** error) const
 {
     return tr_saveFile(filename, benc(), error);
 }
-
-} // namespace tr_torrent_maker
