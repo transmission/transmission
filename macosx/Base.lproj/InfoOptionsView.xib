@@ -273,7 +273,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="9">
-                                    <rect key="frame" x="60" y="101" width="122" height="17"/>
+                                    <rect key="frame" x="60" y="101" width="122" height="20"/>
                                     <popUpButtonCell key="cell" type="roundRect" title="Global Setting" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="41" id="38">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -440,6 +440,7 @@
                                 <constraint firstItem="79" firstAttribute="top" secondItem="15" secondAttribute="bottom" constant="8" symbolic="YES" id="jg3-Ef-mfx"/>
                                 <constraint firstItem="80" firstAttribute="leading" secondItem="79" secondAttribute="trailing" constant="8" symbolic="YES" id="lnQ-HZ-qhn"/>
                                 <constraint firstItem="12" firstAttribute="leading" secondItem="13" secondAttribute="trailing" constant="8" symbolic="YES" id="ndk-VM-Qct"/>
+                                <constraint firstItem="80" firstAttribute="height" secondItem="9" secondAttribute="height" id="oUs-2W-qCi"/>
                                 <constraint firstItem="11" firstAttribute="baseline" secondItem="12" secondAttribute="baseline" id="omh-OH-8EQ"/>
                                 <constraint firstItem="113" firstAttribute="top" secondItem="79" secondAttribute="bottom" constant="8" symbolic="YES" id="pJS-3O-ASV"/>
                                 <constraint firstItem="80" firstAttribute="top" secondItem="9" secondAttribute="bottom" constant="3" id="pWd-3W-OAA"/>
