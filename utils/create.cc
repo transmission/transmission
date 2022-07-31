@@ -273,7 +273,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (tr_error * error = nullptr; !builder.save(options.outfile, &error))
+    if (tr_error* error = nullptr; !builder.save(options.outfile, &error))
     {
         fmt::print("ERROR: could not save \"{:s}\": {:s} {:d}\n", options.outfile, error->message, error->code);
         tr_error_free(error);
