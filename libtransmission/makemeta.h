@@ -8,7 +8,6 @@
 #include <future>
 #include <string>
 #include <utility>
-#include <optional>
 #include <vector>
 
 #include "transmission.h"
@@ -40,14 +39,9 @@ public:
 
     // returns thet status of a `makeChecksumsAsync()` call:
     // the current and total number of pieces if active, or nullopt if done
-    [[nodiscard]] std::optional<std::pair<tr_piece_index_t, tr_piece_index_t>> checksumStatus() const noexcept
+    [[nodiscard]] std::pair<tr_piece_index_t, tr_piece_index_t> checksumStatus() const noexcept
     {
-        if (checksum_piece_)
-        {
-            return std::make_pair(*checksum_piece_, block_info_.pieceCount());
-        }
-
-        return std::nullopt;
+        return std::make_pair(checksum_piece_, block_info_.pieceCount());
     }
 
     void cancelAsyncChecksums() noexcept
@@ -139,6 +133,11 @@ public:
         return block_info_;
     }
 
+    [[nodiscard]] auto top() const noexcept
+    {
+        return top_;
+    }
+
     [[nodiscard]] auto name() const noexcept
     {
         return tr_sys_path_basename(top_);
@@ -157,7 +156,7 @@ private:
     std::string comment_;
     std::string source_;
 
-    std::optional<tr_piece_index_t> checksum_piece_;
+    tr_piece_index_t checksum_piece_ = 0;
 
     bool is_private_ = false;
     bool anonymize_ = false;

@@ -254,7 +254,7 @@ int tr_main(int argc, char* argv[])
     auto last = std::optional<tr_piece_index_t>{};
     while (future.wait_for(std::chrono::milliseconds(500)) != std::future_status::ready)
     {
-        auto const [current, total] = *builder.checksumStatus();
+        auto const [current, total] = builder.checksumStatus();
 
         if (!last || current != *last)
         {

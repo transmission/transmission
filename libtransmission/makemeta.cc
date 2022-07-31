@@ -770,7 +770,6 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
     if (files.totalSize() == 0U)
     {
         tr_error_set(error, ENOENT, tr_strerror(ENOENT));
-        checksum_piece_.reset();
         return false;
     }
 
@@ -791,7 +790,6 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
         error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        checksum_piece_.reset();
         return false;
     }
 
@@ -831,7 +829,6 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
                         error);
                     if (fd == TR_BAD_SYS_FILE)
                     {
-                        checksum_piece_.reset();
                         return false;
                     }
                 }
@@ -858,12 +855,10 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
     if (cancel_)
     {
         tr_error_set(error, ECANCELED, tr_strerror(ECANCELED));
-        checksum_piece_.reset();
         return false;
     }
 
     piece_hashes_ = std::move(hashes);
-    checksum_piece_.reset();
     return true;
 }
 
