@@ -86,7 +86,7 @@ protected:
         return builder;
     }
 
-    static void builderCheck(tr_metainfo_builder const& builder)
+    static auto testBuilder(tr_metainfo_builder const& builder)
     {
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
@@ -102,8 +102,75 @@ protected:
         EXPECT_EQ(builder.comment(), metainfo.comment());
         EXPECT_EQ(builder.isPrivate(), metainfo.isPrivate());
         EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
+        return metainfo;
     }
 };
+
+TEST_F(MakemetaTest, comment)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+
+    static auto constexpr Comment = "This is the comment"sv;
+    builder.setComment(Comment);
+
+    EXPECT_EQ(Comment, testBuilder(builder).comment());
+}
+
+TEST_F(MakemetaTest, source)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+
+    static auto constexpr Source = "This is the source"sv;
+    builder.setSource(Source);
+
+    EXPECT_EQ(Source, testBuilder(builder).source());
+}
+
+TEST_F(MakemetaTest, isPrivate)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+
+    for (bool const is_private : { true, false })
+    {
+        auto builder = tr_metainfo_builder{ filename };
+        builder.setPrivate(is_private);
+        EXPECT_EQ(is_private, testBuilder(builder).isPrivate());
+    }
+}
+
+TEST_F(MakemetaTest, pieceSize)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+
+    for (uint32_t const piece_size : { 16384, 32768 })
+    {
+        auto builder = tr_metainfo_builder{ filename };
+        builder.setPieceSize(piece_size);
+        EXPECT_EQ(piece_size, testBuilder(builder).blockInfo().pieceSize());
+    }
+}
+
+TEST_F(MakemetaTest, nameIsRootSingleFile)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+    EXPECT_EQ(tr_sys_path_basename(filename), testBuilder(builder).name());
+}
+
+TEST_F(MakemetaTest, nameIsRootMultifile)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 10);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+    EXPECT_EQ(tr_sys_path_basename(filename), testBuilder(builder).name());
+}
 
 TEST_F(MakemetaTest, singleFile)
 {
@@ -128,7 +195,7 @@ TEST_F(MakemetaTest, singleFile)
     tr_error* error = nullptr;
     EXPECT_TRUE(builder.makeChecksums(&error)) << *error;
 
-    builderCheck(builder);
+    testBuilder(builder);
 }
 
 // webseeds.emplace_back("https://www.example.com/linux.iso");
@@ -166,7 +233,7 @@ TEST_F(MakemetaTest, rewrite)
     builder.setPrivate(is_private);
     auto const benc = builder.benc();
 
-    builderCheck(builder);
+    testBuilder(builder);
 }
 
 } // namespace test
