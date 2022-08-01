@@ -95,6 +95,7 @@ protected:
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
         EXPECT_EQ(builder.blockInfo().totalSize(), metainfo.totalSize());
+        EXPECT_EQ(builder.blockInfo().pieceSize(), metainfo.pieceSize());
         EXPECT_EQ(builder.files().totalSize(), metainfo.files().totalSize());
         EXPECT_EQ(builder.files().fileCount(), metainfo.files().fileCount());
         for (size_t i = 0, n = std::min(builder.files().fileCount(), metainfo.files().fileCount()); i < n; ++i)
