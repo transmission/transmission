@@ -3,11 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cstdlib> // mktemp()
 #include <cstring> // strlen()
-#include <string>
 #include <numeric>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -40,7 +41,7 @@ protected:
 
     auto makeRandomFiles(
         std::string_view top,
-        size_t n_files = tr_rand_int_weak(DefaultMaxFileCount),
+        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int_weak(DefaultMaxFileCount))),
         size_t max_size = DefaultMaxFileSize)
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
@@ -48,7 +49,12 @@ protected:
         for (size_t i = 0; i < n_files; ++i)
         {
             auto payload = std::vector<std::byte>{};
-            payload.resize(tr_rand_int_weak(max_size));
+            // TODO(5.0.0): zero-sized files are disabled in these test
+            // because tr_torrent_metainfo discards them, throwing off the
+            // builder-to-metainfo comparisons here. tr_torrent_metainfo
+            // will behave when BEP52 support is added in Transmission 5.
+            static auto constexpr MinFileSize = size_t{ 1U };
+            payload.resize(std::max(MinFileSize, static_cast<size_t>(tr_rand_int_weak(max_size))));
             tr_rand_buffer(std::data(payload), std::size(payload));
 
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };
@@ -60,13 +66,49 @@ protected:
 
         return files;
     }
+
+    static tr_metainfo_builder makeBuilder(std::string_view top, tr_torrent_metainfo const& metainfo, bool anonymize = false)
+    {
+        auto builder = tr_metainfo_builder{ top };
+        builder.setAnnounceList(tr_announce_list{ metainfo.announceList() });
+        builder.setAnonymize(anonymize);
+        builder.setComment(metainfo.comment());
+        builder.setPrivate(metainfo.isPrivate());
+        builder.setSource(metainfo.source());
+
+        auto webseeds = std::vector<std::string>{};
+        for (size_t i = 0, n = metainfo.webseedCount(); i < n; ++i)
+        {
+            webseeds.emplace_back(metainfo.webseed(i));
+        }
+        builder.setWebseeds(std::move(webseeds));
+
+        return builder;
+    }
+
+    static void builderCheck(tr_metainfo_builder const& builder)
+    {
+        auto metainfo = tr_torrent_metainfo{};
+        EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
+        EXPECT_EQ(builder.blockInfo().totalSize(), metainfo.totalSize());
+        EXPECT_EQ(builder.files().totalSize(), metainfo.files().totalSize());
+        EXPECT_EQ(builder.files().fileCount(), metainfo.files().fileCount());
+        for (size_t i = 0, n = std::min(builder.files().fileCount(), metainfo.files().fileCount()); i < n; ++i)
+        {
+            EXPECT_EQ(builder.files().fileSize(i), metainfo.files().fileSize(i));
+            EXPECT_EQ(builder.files().path(i), metainfo.files().path(i));
+        }
+        EXPECT_EQ(builder.name(), metainfo.name());
+        EXPECT_EQ(builder.comment(), metainfo.comment());
+        EXPECT_EQ(builder.isPrivate(), metainfo.isPrivate());
+        EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
+    }
 };
 
 TEST_F(MakemetaTest, singleFile)
 {
     auto const files = makeRandomFiles(sandboxDir(), 1);
     auto const [filename, payload] = files.front();
-
     auto builder = tr_metainfo_builder{ filename };
 
     auto trackers = tr_announce_list{};
@@ -86,19 +128,7 @@ TEST_F(MakemetaTest, singleFile)
     tr_error* error = nullptr;
     EXPECT_TRUE(builder.makeChecksums(&error)) << *error;
 
-    // now let's check our work: parse the  torrent file
-    auto metainfo = tr_torrent_metainfo{};
-    EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
-
-    // quick check of some of the parsed metainfo
-    EXPECT_EQ(builder.blockInfo().totalSize(), metainfo.totalSize());
-    EXPECT_EQ(builder.name(), metainfo.name());
-    EXPECT_EQ(builder.comment(), metainfo.comment());
-    EXPECT_EQ(builder.isPrivate(), metainfo.isPrivate());
-    EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
-    EXPECT_EQ(2U, std::size(metainfo.announceList()));
-    EXPECT_EQ(std::size(payload), metainfo.totalSize());
-    EXPECT_EQ(tr_sys_path_basename(filename), metainfo.fileSubpath(0));
+    builderCheck(builder);
 }
 
 // webseeds.emplace_back("https://www.example.com/linux.iso");
@@ -136,19 +166,7 @@ TEST_F(MakemetaTest, rewrite)
     builder.setPrivate(is_private);
     auto const benc = builder.benc();
 
-    // now let's check our work: parse the metainfo
-    auto metainfo = tr_torrent_metainfo{};
-    EXPECT_TRUE(metainfo.parseBenc(benc));
-
-    // quick check of some of the parsed metainfo
-    EXPECT_EQ(total_size, metainfo.totalSize());
-    EXPECT_EQ(Comment, metainfo.comment());
-    EXPECT_EQ(Source, metainfo.source());
-    EXPECT_EQ(tr_sys_path_basename(top), metainfo.name());
-    EXPECT_EQ(is_private, metainfo.isPrivate());
-    EXPECT_EQ(builder.isPrivate(), metainfo.isPrivate());
-    EXPECT_EQ(builder.files().fileCount(), metainfo.fileCount());
-    EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
+    builderCheck(builder);
 }
 
 } // namespace test
