@@ -5,9 +5,12 @@
 
 #pragma once
 
+#include <algorithm> // std::move
+#include <cstddef> // std::byte
 #include <future>
 #include <string>
-#include <utility>
+#include <string_view>
+#include <utility> // std::pair
 #include <vector>
 
 #include "transmission.h"
@@ -158,8 +161,6 @@ public:
     }
 
 private:
-    void makeChecksumsImpl(std::promise<tr_error*> promise);
-
     std::string top_;
     tr_torrent_files files_;
     tr_announce_list announce_;
