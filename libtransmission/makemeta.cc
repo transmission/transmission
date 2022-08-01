@@ -301,21 +301,6 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
     return true;
 }
 
-std::future<tr_error*> tr_metainfo_builder::makeChecksumsAsync()
-{
-    auto promise = std::promise<tr_error*>{};
-    auto future = promise.get_future();
-    std::thread work_thread(
-        [this, promise = std::move(promise)]() mutable
-        {
-            tr_error* error = nullptr;
-            makeChecksums(&error);
-            promise.set_value(error);
-        });
-    work_thread.detach();
-    return future;
-}
-
 std::string tr_metainfo_builder::benc(tr_error** error) const
 {
     auto const anonymize = this->anonymize();

@@ -34,10 +34,22 @@ public:
      */
     bool makeChecksums(tr_error** error = nullptr);
 
-    std::future<tr_error*> makeChecksumsAsync();
+    // Convenience function for running `makeChecksums()` asynchronously.
+    // See also checksumStatus() and cancelAsyncChecksums()
+    std::future<tr_error*> makeChecksumsAsync()
+    {
+        return std::async(
+            std::launch::async,
+            [this]()
+            {
+                tr_error* error = nullptr;
+                makeChecksums(&error);
+                return error;
+            });
+    }
 
-    // returns thet status of a `makeChecksumsAsync()` call:
-    // the current and total number of pieces if active, or nullopt if done
+    // Returns the status of a `makeChecksumsAsync()` call:
+    // The current piece being tested and the total number of pieces in the torrent.
     [[nodiscard]] std::pair<tr_piece_index_t, tr_piece_index_t> checksumStatus() const noexcept
     {
         return std::make_pair(checksum_piece_, block_info_.pieceCount());
