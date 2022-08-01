@@ -357,7 +357,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (IBAction)cancelCreateProgress:(id)sender
 {
-    self.fBuilder->cancelAsyncChecksums();
+    self.fBuilder->cancelChecksums();
     [self.fTimer fire];
 }
 
@@ -625,7 +625,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     self.fBuilder->setPrivate(self.fPrivateCheck.state == NSControlStateValueOn);
     self.fBuilder->setSource(self.fSource.stringValue.UTF8String);
 
-    self.fFuture = self.fBuilder->makeChecksumsAsync();
+    self.fFuture = self.fBuilder->makeChecksums();
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkProgress) userInfo:nil
                                                   repeats:YES];
 }

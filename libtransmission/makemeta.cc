@@ -195,7 +195,7 @@ bool tr_metainfo_builder::setPieceSize(uint32_t piece_size)
     return true;
 }
 
-bool tr_metainfo_builder::makeChecksums(tr_error** error)
+bool tr_metainfo_builder::blockingMakeChecksums(tr_error** error)
 {
     checksum_piece_ = 0;
     cancel_ = false;
@@ -301,6 +301,8 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
 
 std::string tr_metainfo_builder::benc(tr_error** error) const
 {
+    TR_ASSERT_MSG(!std::empty(piece_hashes_), "did you forget to call makeChecksums() first?");
+
     auto const anonymize = this->anonymize();
     auto const& comment = this->comment();
     auto const& source = this->source();

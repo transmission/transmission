@@ -218,7 +218,7 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
     switch (response)
     {
     case Gtk::RESPONSE_CANCEL:
-        builder_.cancelAsyncChecksums();
+        builder_.cancelChecksums();
         hide();
         break;
 
@@ -322,7 +322,7 @@ void MakeDialog::Impl::onResponse(int response)
             builder_->setPrivate(private_check_->get_active());
 
             // build the .torrent
-            makeProgressDialog(target, builder_->makeChecksumsAsync());
+            makeProgressDialog(target, builder_->makeChecksums());
         }
     }
     else if (response == Gtk::RESPONSE_CLOSE)

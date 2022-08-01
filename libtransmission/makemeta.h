@@ -25,40 +25,32 @@ class tr_metainfo_builder
 public:
     tr_metainfo_builder(std::string_view single_file_or_parent_directory);
 
-    /*
-     * Checksums must be generated before calling benc() or save().
-     * Since the process is slow -- it's equivalent to "verify local data" --
-     * client code can either call it in a blocking call, or it can run in a
-     * worker thread.
-     *
-     * If run async, it can be cancelled via `cancelAsyncChecksums()` and
-     * its progress can be polled with `checksumProgress()`. When the task
-     * is done, the future will resolve with an error, or with nullptr if no error.
-     */
-    bool makeChecksums(tr_error** error = nullptr);
-
-    // Convenience function for running `makeChecksums()` asynchronously.
-    // See also checksumStatus() and cancelAsyncChecksums()
-    std::future<tr_error*> makeChecksumsAsync()
+    // Generate piece checksums asynchronously.
+    // - This must be done before calling `benc()` or `save()`.
+    // - Runs in a worker thread because it can be time-consuming.
+    // - Can be cancelled with `cancelChecksums()` and polled with `checksumStatus()`
+    // - Resolves with a `tr_error*` which is set on failure or nullptr on success.
+    std::future<tr_error*> makeChecksums()
     {
         return std::async(
             std::launch::async,
             [this]()
             {
                 tr_error* error = nullptr;
-                makeChecksums(&error);
+                blockingMakeChecksums(&error);
                 return error;
             });
     }
 
-    // Returns the status of a `makeChecksumsAsync()` call:
+    // Returns the status of a `makeChecksums()` call:
     // The current piece being tested and the total number of pieces in the torrent.
     [[nodiscard]] constexpr std::pair<tr_piece_index_t, tr_piece_index_t> checksumStatus() const noexcept
     {
         return std::make_pair(checksum_piece_, block_info_.pieceCount());
     }
 
-    constexpr void cancelAsyncChecksums() noexcept
+    // Tell the `makeChecksums()` worker thread to cleanly exit ASAP.
+    constexpr void cancelChecksums() noexcept
     {
         cancel_ = true;
     }
@@ -181,6 +173,8 @@ public:
     }
 
 private:
+    bool blockingMakeChecksums(tr_error** error = nullptr);
+
     std::string top_;
     tr_torrent_files files_;
     tr_announce_list announce_;

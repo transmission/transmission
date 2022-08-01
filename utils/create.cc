@@ -248,7 +248,7 @@ int tr_main(int argc, char* argv[])
     builder.setWebseeds(std::move(options.webseeds));
     builder.setAnnounceList(std::move(options.trackers));
 
-    auto future = builder.makeChecksumsAsync();
+    auto future = builder.makeChecksums();
     auto last = std::optional<tr_piece_index_t>{};
     while (future.wait_for(std::chrono::milliseconds(500)) != std::future_status::ready)
     {

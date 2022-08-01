@@ -88,7 +88,7 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
         break;
 
     case QDialogButtonBox::Abort:
-        builder_.cancelAsyncChecksums();
+        builder_.cancelChecksums();
         break;
 
     default: // QDialogButtonBox::Ok:
@@ -193,7 +193,7 @@ void MakeDialog::makeTorrent()
     builder_->setPrivate(ui_.privateCheck->isChecked());
 
     // pop up the dialog
-    auto* dialog = new MakeProgressDialog(session_, *builder_, builder_->makeChecksumsAsync(), outfile, this);
+    auto* dialog = new MakeProgressDialog(session_, *builder_, builder_->makeChecksums(), outfile, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }

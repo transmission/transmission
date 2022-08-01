@@ -89,8 +89,8 @@ protected:
 
     static auto testBuilder(tr_metainfo_builder& builder)
     {
-        tr_error* error = nullptr;
-        EXPECT_TRUE(builder.makeChecksums(&error)) << *error;
+        tr_error* error = builder.makeChecksums().get();
+        EXPECT_EQ(error, nullptr) << *error;
 
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
