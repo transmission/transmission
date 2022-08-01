@@ -41,7 +41,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 ### 1. Main Screen ###
 ![image](https://user-images.githubusercontent.com/76732207/181889508-c926e97c-f51a-4562-bf8b-75e4be672786.png)
 
-| Number On Picture | Discription                 |
+| Number On Picture | Description                 |
 | ----------------- | --------------------------- |
 | 1                 | Torrent name                |
 | 2                 | Torrent management panel    |
@@ -51,7 +51,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 ### 2. Torrent management panel ###
 ![image](https://user-images.githubusercontent.com/76732207/181903463-f3752531-6a5e-41e8-bea0-fdcd4fabed94.png)
 
-| Number On Picture | Discription                       |
+| Number On Picture | Description                       |
 | ----------------- | --------------------------------- |
 | 1                 | Open Torrent                      |
 | 2                 | Remove selected torrents          |
@@ -64,7 +64,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 #### 2.1 Adding torrent ####
 ![image](https://user-images.githubusercontent.com/76732207/181906789-b56f8e8c-c362-407b-bbd7-d6df83c54f08.png)
 
-| Number On Picture | Discription                                       |
+| Number On Picture | Description                                       |
 | ----------------- | ------------------------------------------------- |
 | 1                 | Button to select a torrent file to upload         |
 | 2                 | Or enter an URL to torrent                        |
@@ -76,7 +76,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 ### 3. Display filters panel ###
 ![image](https://user-images.githubusercontent.com/76732207/181907925-34f5b8fe-8a6d-48e2-80e3-df25bf36423c.png)
 
-| Number On Picture | Discription                                           |
+| Number On Picture | Description                                           |
 | ----------------- | ----------------------------------------------------- |
 | 1                 | Filter torrents by status                             |
 | 2                 | Filter torrents by source                             |
@@ -85,6 +85,17 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 5                 | Downloading speed                                     |
 | 6                 | Uploading speed                                       |
 
+### 4. List of added torrents ###
+![image](https://user-images.githubusercontent.com/76732207/181936421-a6d36ca0-e214-4f37-9368-1404cbeb125c.png)
 
+| Number On Picture | Description                                                                     |
+| ----------------- | ------------------------------------------------------------------------------- |
+| 1                 | Name of torrent file                                                            | 
+| 2                 | In current case: the torrent is downloading from 0 peers of 0 possible          |
+| 3                 | Download and upload speeds of current torrent                                   |
+| 4                 | In current case: the torrent is downloaded on 0 bytes of 3.65GB. This is 0.00 % |
+| 5                 | The remaining time until the torrent is fully downloaded                        |
+| 6                 | Progress bar showing the current progress in downloading the torrent            |
+| 7                 | Pause selected torrent                                                          |
 
 
