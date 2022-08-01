@@ -92,6 +92,11 @@ public:
         return files().path(i);
     }
 
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const noexcept
+    {
+        return files().fileSize(i);
+    }
+
     void setAnnounceList(tr_announce_list&& announce)
     {
         announce_ = std::move(announce);

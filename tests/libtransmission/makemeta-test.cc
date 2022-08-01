@@ -94,14 +94,14 @@ protected:
 
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
-        EXPECT_EQ(builder.blockInfo().totalSize(), metainfo.totalSize());
-        EXPECT_EQ(builder.blockInfo().pieceSize(), metainfo.pieceSize());
-        EXPECT_EQ(builder.files().totalSize(), metainfo.files().totalSize());
-        EXPECT_EQ(builder.files().fileCount(), metainfo.files().fileCount());
-        for (size_t i = 0, n = std::min(builder.files().fileCount(), metainfo.files().fileCount()); i < n; ++i)
+        EXPECT_EQ(builder.fileCount(), metainfo.fileCount());
+        EXPECT_EQ(builder.pieceSize(), metainfo.pieceSize());
+        EXPECT_EQ(builder.totalSize(), metainfo.totalSize());
+        EXPECT_EQ(builder.totalSize(), metainfo.totalSize());
+        for (size_t i = 0, n = std::min(builder.fileCount(), metainfo.fileCount()); i < n; ++i)
         {
-            EXPECT_EQ(builder.files().fileSize(i), metainfo.files().fileSize(i));
-            EXPECT_EQ(builder.files().path(i), metainfo.files().path(i));
+            EXPECT_EQ(builder.fileSize(i), metainfo.files().fileSize(i));
+            EXPECT_EQ(builder.path(i), metainfo.files().path(i));
         }
         EXPECT_EQ(builder.name(), metainfo.name());
         EXPECT_EQ(builder.comment(), metainfo.comment());
@@ -157,7 +157,7 @@ TEST_F(MakemetaTest, pieceSize)
     {
         auto builder = tr_metainfo_builder{ filename };
         builder.setPieceSize(piece_size);
-        EXPECT_EQ(piece_size, testBuilder(builder).blockInfo().pieceSize());
+        EXPECT_EQ(piece_size, testBuilder(builder).pieceSize());
     }
 }
 

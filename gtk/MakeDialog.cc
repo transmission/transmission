@@ -185,7 +185,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
         /* how much data we've scanned through to generate checksums */
         str = fmt::format(
             _("Scanned {file_size}"),
-            fmt::arg("file_size", tr_strlsize(static_cast<uint64_t>(piece_index) * builder_.blockInfo().pieceSize())));
+            fmt::arg("file_size", tr_strlsize(static_cast<uint64_t>(piece_index) * builder_.pieceSize())));
     }
 
     progress_bar_->set_fraction(percent_done);
@@ -358,21 +358,18 @@ void MakeDialog::Impl::updatePiecesLabel()
     }
     else
     {
-        auto const n_files = builder_->files().fileCount();
-        auto const& block_info = builder_->blockInfo();
-
         gstr += fmt::format(
-            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", n_files),
-            fmt::arg("total_size", tr_strlsize(block_info.totalSize())),
-            fmt::arg("file_count", n_files));
+            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", builder_->fileCount()),
+            fmt::arg("total_size", tr_strlsize(builder_->totalSize())),
+            fmt::arg("file_count", builder_->fileCount()));
         gstr += ' ';
         gstr += fmt::format(
             ngettext(
                 "({piece_count} BitTorrent piece @ {piece_size})",
                 "({piece_count} BitTorrent pieces @ {piece_size})",
-                block_info.pieceCount()),
-            fmt::arg("piece_count", block_info.pieceCount()),
-            fmt::arg("piece_size", tr_formatter_mem_B(block_info.pieceSize())));
+                builder_->pieceCount()),
+            fmt::arg("piece_count", builder_->pieceCount()),
+            fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize())));
     }
 
     gstr += "</i>";
@@ -382,7 +379,7 @@ void MakeDialog::Impl::updatePiecesLabel()
 void MakeDialog::Impl::configurePieceSizeScale()
 {
     // the below lower & upper bounds would allow piece size selection between approx 1KiB - 16MiB
-    auto adjustment = Gtk::Adjustment::create(log2(builder_->blockInfo().pieceSize()), 10, 24, 1.0, 1.0);
+    auto adjustment = Gtk::Adjustment::create(log2(builder_->pieceSize()), 10, 24, 1.0, 1.0);
     piece_size_scale_->set_adjustment(adjustment);
     piece_size_scale_->set_visible(true);
 }

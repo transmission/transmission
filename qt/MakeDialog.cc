@@ -228,15 +228,13 @@ void MakeDialog::onSourceChanged()
     }
     else
     {
-        auto const& block_info = builder_->blockInfo();
-
-        auto const files = tr("%Ln File(s)", nullptr, builder_->files().fileCount());
-        auto const pieces = tr("%Ln Piece(s)", nullptr, block_info.pieceCount());
+        auto const files = tr("%Ln File(s)", nullptr, builder_->fileCount());
+        auto const pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount());
         text = tr("%1 in %2; %3 @ %4")
-                   .arg(Formatter::get().sizeToString(block_info.totalSize()))
+                   .arg(Formatter::get().sizeToString(builder_->totalSize()))
                    .arg(files)
                    .arg(pieces)
-                   .arg(Formatter::get().sizeToString(static_cast<uint64_t>(block_info.pieceSize())));
+                   .arg(Formatter::get().sizeToString(static_cast<uint64_t>(builder_->pieceSize())));
     }
 
     ui_.sourceSizeLabel->setText(text);

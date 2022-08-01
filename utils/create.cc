@@ -199,9 +199,7 @@ int tr_main(int argc, char* argv[])
     fmt::print("Creating torrent \"{:s}\"\n", options.outfile);
 
     auto builder = tr_metainfo_builder(options.infile);
-    auto const& block_info = builder.blockInfo();
-    auto const& files = builder.files();
-    auto const n_files = files.fileCount();
+    auto const n_files = builder.fileCount();
     if (n_files == 0U)
     {
         fprintf(stderr, "ERROR: Cannot find specified input file or directory.\n");
@@ -210,8 +208,8 @@ int tr_main(int argc, char* argv[])
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
-        auto const& path = files.path(i);
-        if (!files.isSubpathPortable(path))
+        auto const& path = builder.path(i);
+        if (!tr_torrent_files::isSubpathPortable(path))
         {
             fmt::print(stderr, "WARNING\n");
             fmt::print(stderr, "filename \"{:s}\" may not be portable on all systems.\n", path);
@@ -226,14 +224,14 @@ int tr_main(int argc, char* argv[])
     }
 
     fmt::print(
-        ngettext("{:d} files, {:s}\n", "{:d} file, {:s}\n", files.fileCount()),
-        files.fileCount(),
-        tr_formatter_size_B(files.totalSize()));
+        ngettext("{:d} files, {:s}\n", "{:d} file, {:s}\n", builder.fileCount()),
+        builder.fileCount(),
+        tr_formatter_size_B(builder.totalSize()));
 
     fmt::print(
-        ngettext("{:d} pieces, {:s} each\n", "{:d} piece, {:s}\n", block_info.pieceCount()),
-        block_info.pieceCount(),
-        tr_formatter_size_B(block_info.pieceSize()));
+        ngettext("{:d} pieces, {:s} each\n", "{:d} piece, {:s}\n", builder.pieceCount()),
+        builder.pieceCount(),
+        tr_formatter_size_B(builder.pieceSize()));
 
     if (!std::empty(options.comment))
     {
