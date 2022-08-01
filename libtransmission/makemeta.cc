@@ -4,11 +4,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <optional>
+#include <set>
 #include <string_view>
 #include <thread>
 #include <vector>
-
-#include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include <fmt/format.h>
 
@@ -30,7 +29,29 @@ using namespace std::literals;
 namespace
 {
 
-void walkTree(std::string_view const top, std::string_view const subpath, tr_torrent_files& files)
+namespace find_files_helpers
+{
+
+struct TorrentFile
+{
+    TorrentFile(std::string_view subpath, size_t size)
+        : subpath_{ subpath }
+        , lowercase_{ tr_strlower(subpath) }
+        , size_{ size }
+    {
+    }
+
+    [[nodiscard]] auto operator<(TorrentFile const& that) const noexcept
+    {
+        return lowercase_ < that.lowercase_;
+    }
+
+    std::string subpath_;
+    std::string lowercase_;
+    uint64_t size_ = 0;
+};
+
+void walkTree(std::string_view const top, std::string_view const subpath, std::set<TorrentFile>& files)
 {
     TR_ASSERT(!std::empty(top));
     TR_ASSERT(!std::empty(subpath));
@@ -82,7 +103,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, tr_tor
         break;
 
     case TR_SYS_PATH_IS_FILE:
-        files.add(subpath, info.size);
+        files.emplace(subpath, info.size);
         break;
 
     default:
@@ -90,14 +111,28 @@ void walkTree(std::string_view const top, std::string_view const subpath, tr_tor
     }
 }
 
+} // namespace find_files_helpers
+
+tr_torrent_files findFiles(std::string_view const top, std::string_view const subpath)
+{
+    using namespace find_files_helpers;
+
+    auto tmp = std::set<TorrentFile>{};
+    walkTree(top, subpath, tmp);
+    auto files = tr_torrent_files{};
+    for (auto const& file : tmp)
+    {
+        files.add(file.subpath_, file.size_);
+    }
+    return files;
+}
+
 } // namespace
 
 tr_metainfo_builder::tr_metainfo_builder(std::string_view filename)
     : top_{ filename }
 {
-    auto const dir = tr_sys_path_dirname(filename);
-    auto const base = tr_sys_path_basename(filename);
-    walkTree(dir, base, files_);
+    files_ = findFiles(tr_sys_path_dirname(filename), tr_sys_path_basename(filename));
     block_info_ = tr_block_info{ files().totalSize(), defaultPieceSize(files_.totalSize()) };
 }
 
@@ -359,11 +394,12 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     }
 
     auto* const info_dict = tr_variantDictAddDict(&top, TR_KEY_info, 5);
+    auto const base = tr_sys_path_basename(top_);
 
     // "There is also a key `length` or a key `files`, but not both or neither.
     // If length is present then the download represents a single file,
     // otherwise it represents a set of files which go in a directory structure."
-    if (files.fileCount() == 1U)
+    if (files.fileCount() == 1U && !tr_strvContains(files.path(0), '/'))
     {
         tr_variantDictAddInt(info_dict, TR_KEY_length, files.fileSize(0));
     }
@@ -374,10 +410,16 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
-            auto* file_dict = tr_variantListAddDict(file_list, 2);
+            auto* const file_dict = tr_variantListAddDict(file_list, 2);
             tr_variantDictAddInt(file_dict, TR_KEY_length, files.fileSize(i));
+
             auto subpath = std::string_view{ files.path(i) };
-            auto* path_list = tr_variantDictAddList(file_dict, TR_KEY_path, 0);
+            if (!std::empty(base))
+            {
+                subpath.remove_prefix(std::size(base) + std::size("/"sv));
+            }
+
+            auto* const path_list = tr_variantDictAddList(file_dict, TR_KEY_path, 0);
             auto token = std::string_view{};
             while (tr_strvSep(&subpath, &token, '/'))
             {
@@ -386,7 +428,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
         }
     }
 
-    if (auto const base = tr_sys_path_basename(top_); !std::empty(base))
+    if (!std::empty(base))
     {
         tr_variantDictAddStr(info_dict, TR_KEY_name, base);
     }
