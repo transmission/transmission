@@ -84,7 +84,7 @@ public:
         return files_.fileSize(i);
     }
 
-    void setAnnounceList(tr_announce_list&& announce)
+    void setAnnounceList(tr_announce_list announce)
     {
         announce_ = std::move(announce);
     }
@@ -94,7 +94,7 @@ public:
         return announce_;
     }
 
-    void setWebseeds(std::vector<std::string>&& webseeds)
+    void setWebseeds(std::vector<std::string> webseeds)
     {
         webseeds_ = std::move(webseeds);
     }
