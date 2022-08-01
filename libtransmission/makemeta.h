@@ -72,29 +72,24 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr auto const& files() const noexcept
-    {
-        return files_;
-    }
-
     [[nodiscard]] auto fileCount() const noexcept
     {
-        return files().fileCount();
+        return files_.fileCount();
     }
 
     [[nodiscard]] constexpr auto totalSize() const noexcept
     {
-        return files().totalSize();
+        return files_.totalSize();
     }
 
     [[nodiscard]] auto const& path(tr_file_index_t i) const noexcept
     {
-        return files().path(i);
+        return files_.path(i);
     }
 
     [[nodiscard]] auto fileSize(tr_file_index_t i) const noexcept
     {
-        return files().fileSize(i);
+        return files_.fileSize(i);
     }
 
     void setAnnounceList(tr_announce_list&& announce)
@@ -165,19 +160,14 @@ public:
 
     bool setPieceSize(uint32_t piece_size);
 
-    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
-    {
-        return block_info_;
-    }
-
     [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
-        return blockInfo().pieceCount();
+        return block_info_.pieceCount();
     }
 
     [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
-        return blockInfo().pieceSize();
+        return block_info_.pieceSize();
     }
 
     [[nodiscard]] constexpr auto const& top() const noexcept

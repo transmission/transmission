@@ -134,7 +134,7 @@ tr_metainfo_builder::tr_metainfo_builder(std::string_view filename)
     : top_{ filename }
 {
     files_ = findFiles(tr_sys_path_dirname(filename), tr_sys_path_basename(filename));
-    block_info_ = tr_block_info{ files().totalSize(), defaultPieceSize(files_.totalSize()) };
+    block_info_ = tr_block_info{ files_.totalSize(), defaultPieceSize(files_.totalSize()) };
 }
 
 uint32_t tr_metainfo_builder::defaultPieceSize(uint64_t totalSize)
@@ -191,7 +191,7 @@ bool tr_metainfo_builder::setPieceSize(uint32_t piece_size)
         return false;
     }
 
-    block_info_ = tr_block_info{ files().totalSize(), piece_size };
+    block_info_ = tr_block_info{ files_.totalSize(), piece_size };
     return true;
 }
 
@@ -200,29 +200,26 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
     checksum_piece_ = 0;
     cancel_ = false;
 
-    auto const& files = this->files();
-    auto const& block_info = this->blockInfo();
-
-    if (files.totalSize() == 0U)
+    if (totalSize() == 0U)
     {
         tr_error_set(error, ENOENT, tr_strerror(ENOENT));
         return false;
     }
 
-    auto hashes = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * block_info.pieceCount());
+    auto hashes = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * pieceCount());
     auto* walk = std::data(hashes);
     auto sha = tr_sha1::create();
 
     auto file_index = tr_file_index_t{ 0U };
     auto piece_index = tr_piece_index_t{ 0U };
-    auto total_remain = files.totalSize();
+    auto total_remain = totalSize();
     auto off = uint64_t{ 0U };
 
-    auto buf = std::vector<char>(block_info.pieceSize());
+    auto buf = std::vector<char>(pieceSize());
 
     auto const parent = tr_sys_path_dirname(top_);
     auto fd = tr_sys_file_open(
-        tr_pathbuf{ parent, '/', files.path(file_index) },
+        tr_pathbuf{ parent, '/', path(file_index) },
         TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL,
         0,
         error);
@@ -235,16 +232,16 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
     {
         checksum_piece_ = piece_index;
 
-        TR_ASSERT(piece_index < block_info.pieceCount());
+        TR_ASSERT(piece_index < pieceCount());
 
-        uint32_t const piece_size = block_info.pieceSize(piece_index);
+        uint32_t const piece_size = block_info_.pieceSize(piece_index);
         buf.resize(piece_size);
         auto* bufptr = std::data(buf);
 
         auto left_in_piece = piece_size;
         while (left_in_piece > 0U)
         {
-            auto const n_this_pass = std::min(files.fileSize(file_index) - off, uint64_t{ left_in_piece });
+            auto const n_this_pass = std::min(fileSize(file_index) - off, uint64_t{ left_in_piece });
             auto n_read = uint64_t{};
 
             (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, error);
@@ -252,16 +249,16 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
             off += n_read;
             left_in_piece -= n_read;
 
-            if (off == files.fileSize(file_index))
+            if (off == fileSize(file_index))
             {
                 off = 0;
                 tr_sys_file_close(fd);
                 fd = TR_BAD_SYS_FILE;
 
-                if (++file_index < files.fileCount())
+                if (++file_index < fileCount())
                 {
                     fd = tr_sys_file_open(
-                        tr_pathbuf{ parent, '/', files.path(file_index) },
+                        tr_pathbuf{ parent, '/', path(file_index) },
                         TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL,
                         0,
                         error);
@@ -305,13 +302,11 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
 std::string tr_metainfo_builder::benc(tr_error** error) const
 {
     auto const anonymize = this->anonymize();
-    auto const& block_info = this->blockInfo();
     auto const& comment = this->comment();
-    auto const& files = this->files();
     auto const& source = this->source();
     auto const& webseeds = this->webseeds();
 
-    if (block_info.totalSize() == 0)
+    if (totalSize() == 0)
     {
         tr_error_set(error, ENOENT, tr_strerror(ENOENT));
         return {};
@@ -385,21 +380,21 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     // "There is also a key `length` or a key `files`, but not both or neither.
     // If length is present then the download represents a single file,
     // otherwise it represents a set of files which go in a directory structure."
-    if (files.fileCount() == 1U && !tr_strvContains(files.path(0), '/'))
+    if (fileCount() == 1U && !tr_strvContains(path(0), '/'))
     {
-        tr_variantDictAddInt(info_dict, TR_KEY_length, files.fileSize(0));
+        tr_variantDictAddInt(info_dict, TR_KEY_length, fileSize(0));
     }
     else
     {
-        auto const n_files = files.fileCount();
+        auto const n_files = fileCount();
         auto* const file_list = tr_variantDictAddList(info_dict, TR_KEY_files, n_files);
 
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
             auto* const file_dict = tr_variantListAddDict(file_list, 2);
-            tr_variantDictAddInt(file_dict, TR_KEY_length, files.fileSize(i));
+            tr_variantDictAddInt(file_dict, TR_KEY_length, fileSize(i));
 
-            auto subpath = std::string_view{ files.path(i) };
+            auto subpath = std::string_view{ path(i) };
             if (!std::empty(base))
             {
                 subpath.remove_prefix(std::size(base) + std::size("/"sv));
@@ -419,7 +414,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
         tr_variantDictAddStr(info_dict, TR_KEY_name, base);
     }
 
-    tr_variantDictAddInt(info_dict, TR_KEY_piece_length, block_info.pieceSize());
+    tr_variantDictAddInt(info_dict, TR_KEY_piece_length, pieceSize());
     tr_variantDictAddRaw(info_dict, TR_KEY_pieces, std::data(piece_hashes_), std::size(piece_hashes_));
     auto ret = tr_variantToStr(&top, TR_VARIANT_FMT_BENC);
     tr_variantFree(&top);
