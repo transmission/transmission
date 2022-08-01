@@ -58,7 +58,7 @@ TEST(Crypto, DH)
     b.setPeerPublicKey(a.publicKey());
     EXPECT_EQ(toString(a.secret()), toString(b.secret()));
     EXPECT_EQ(a.secret(), b.secret());
-    EXPECT_EQ(96, std::size(a.secret()));
+    EXPECT_EQ(96U, std::size(a.secret()));
 
     auto c = tr_message_stream_encryption::DH{};
     c.setPeerPublicKey(b.publicKey());
