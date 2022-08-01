@@ -30,20 +30,18 @@ using namespace std::literals;
 namespace
 {
 
-void walkTree(std::string_view top, std::string_view subpath, tr_torrent_files& files)
+void walkTree(std::string_view const top, std::string_view const subpath, tr_torrent_files& files)
 {
-    if (std::empty(top) && std::empty(subpath))
+    TR_ASSERT(!std::empty(top));
+    TR_ASSERT(!std::empty(subpath));
+
+    if (std::empty(top) || std::empty(subpath))
     {
         return;
     }
 
-    auto path = tr_pathbuf{ top };
-    if (!std::empty(subpath))
-    {
-        path.append('/', subpath);
-    }
+    auto path = tr_pathbuf{ top, '/', subpath };
     tr_sys_path_native_separators(std::data(path));
-
     auto info = tr_sys_path_info{};
     if (tr_error* error = nullptr; !tr_sys_path_get_info(path, 0, &info, &error))
     {
@@ -53,6 +51,7 @@ void walkTree(std::string_view top, std::string_view subpath, tr_torrent_files& 
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
+        return;
     }
 
     switch (info.type)
@@ -93,10 +92,12 @@ void walkTree(std::string_view top, std::string_view subpath, tr_torrent_files& 
 
 } // namespace
 
-tr_metainfo_builder::tr_metainfo_builder(std::string_view top)
-    : top_{ top }
+tr_metainfo_builder::tr_metainfo_builder(std::string_view filename)
+    : top_{ filename }
 {
-    walkTree(top, {}, files_);
+    auto const dir = tr_sys_path_dirname(filename);
+    auto const base = tr_sys_path_basename(filename);
+    walkTree(dir, base, files_);
     block_info_ = tr_block_info{ files().totalSize(), defaultPieceSize(files_.totalSize()) };
 }
 
@@ -183,8 +184,9 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
 
     auto buf = std::vector<char>(block_info.pieceSize());
 
+    auto const parent = tr_sys_path_dirname(top_);
     auto fd = tr_sys_file_open(
-        tr_pathbuf{ top_, '/', files.path(file_index) },
+        tr_pathbuf{ parent, '/', files.path(file_index) },
         TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL,
         0,
         error);
@@ -223,7 +225,7 @@ bool tr_metainfo_builder::makeChecksums(tr_error** error)
                 if (++file_index < files.fileCount())
                 {
                     fd = tr_sys_file_open(
-                        tr_pathbuf{ top_, '/', files.path(file_index) },
+                        tr_pathbuf{ parent, '/', files.path(file_index) },
                         TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL,
                         0,
                         error);
