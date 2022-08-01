@@ -62,7 +62,7 @@ protected:
             createTmpfileWithContents(std::data(filename), std::data(payload), std::size(payload));
             tr_sys_path_native_separators(std::data(filename));
 
-            files.emplace_back(std::make_pair(std::string{ filename.sv() }, payload));
+            files.emplace_back(std::string{ filename.sv() }, payload);
         }
 
         return files;
