@@ -6,8 +6,10 @@
 #include <mutex>
 
 #if defined(CYASSL_IS_WOLFSSL)
+// NOLINTBEGIN bugprone-macro-parentheses
 #define API_HEADER(x) <wolfssl/x>
 #define API_HEADER_CRYPT(x) API_HEADER(wolfcrypt/x)
+// NOLINTEND
 #define API(x) wc_##x
 #define API_VERSION_HEX LIBWOLFSSL_VERSION_HEX
 #else
@@ -31,6 +33,12 @@
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+#if LIBWOLFSSL_VERSION_HEX >= 0x04000000 // 4.0.0
+using TR_WC_RNG = WC_RNG;
+#else
+using TR_WC_RNG = RNG;
+#endif
 
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
@@ -82,9 +90,9 @@ static bool check_cyassl_result(int result, char const* file, int line)
 ****
 ***/
 
-static RNG* get_rng(void)
+static TR_WC_RNG* get_rng()
 {
-    static RNG rng;
+    static TR_WC_RNG rng;
     static bool rng_initialized = false;
 
     if (!rng_initialized)
@@ -106,90 +114,89 @@ static std::mutex rng_mutex_;
 ****
 ***/
 
-tr_sha1_ctx_t tr_sha1_init(void)
+namespace
 {
-    Sha* handle = tr_new(Sha, 1);
 
-    if (check_result(API(InitSha)(handle)))
+class Sha1Impl final : public tr_sha1
+{
+public:
+    Sha1Impl()
     {
-        return handle;
+        clear();
     }
 
-    tr_free(handle);
-    return nullptr;
-}
+    ~Sha1Impl() override = default;
 
-bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
-{
-    auto* handle = static_cast<Sha*>(raw_handle);
-    TR_ASSERT(handle != nullptr);
-
-    if (data_length == 0)
+    void clear() override
     {
-        return true;
+        API(InitSha)(&handle_);
     }
 
-    TR_ASSERT(data != nullptr);
-
-    return check_result(API(ShaUpdate)(handle, static_cast<byte const*>(data), data_length));
-}
-
-std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
-{
-    auto* handle = static_cast<Sha*>(raw_handle);
-    TR_ASSERT(handle != nullptr);
-
-    auto digest = tr_sha1_digest_t{};
-    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-    auto const ok = check_result(API(ShaFinal)(handle, digest_as_uchar));
-    tr_free(handle);
-
-    return ok ? std::make_optional(digest) : std::nullopt;
-}
-
-/***
-****
-***/
-
-tr_sha256_ctx_t tr_sha256_init(void)
-{
-    Sha256* handle = tr_new(Sha256, 1);
-
-    if (check_result(API(InitSha256)(handle)))
+    void add(void const* data, size_t data_length) override
     {
-        return handle;
+        if (data_length > 0U)
+        {
+            API(ShaUpdate)(&handle_, static_cast<byte const*>(data), data_length);
+        }
     }
 
-    tr_free(handle);
-    return nullptr;
-}
-
-bool tr_sha256_update(tr_sha256_ctx_t raw_handle, void const* data, size_t data_length)
-{
-    auto* handle = static_cast<Sha256*>(raw_handle);
-    TR_ASSERT(handle != nullptr);
-
-    if (data_length == 0)
+    [[nodiscard]] tr_sha1_digest_t final() override
     {
-        return true;
+        auto digest = tr_sha1_digest_t{};
+        API(ShaFinal)(&handle_, reinterpret_cast<byte*>(std::data(digest)));
+        clear();
+        return digest;
     }
 
-    TR_ASSERT(data != nullptr);
+private:
+    API(Sha) handle_ = {};
+};
 
-    return check_result(API(Sha256Update)(handle, static_cast<byte const*>(data), data_length));
+class Sha256Impl final : public tr_sha256
+{
+public:
+    Sha256Impl()
+    {
+        clear();
+    }
+
+    ~Sha256Impl() override = default;
+
+    void clear() override
+    {
+        API(InitSha256)(&handle_);
+    }
+
+    void add(void const* data, size_t data_length) override
+    {
+        if (data_length > 0U)
+        {
+            API(Sha256Update)(&handle_, static_cast<byte const*>(data), data_length);
+        }
+    }
+
+    [[nodiscard]] tr_sha256_digest_t final() override
+    {
+        auto digest = tr_sha256_digest_t{};
+        API(Sha256Final)(&handle_, reinterpret_cast<byte*>(std::data(digest)));
+        clear();
+        return digest;
+    }
+
+private:
+    API(Sha256) handle_ = {};
+};
+
+} // namespace
+
+std::unique_ptr<tr_sha1> tr_sha1::create()
+{
+    return std::make_unique<Sha1Impl>();
 }
 
-std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t raw_handle)
+std::unique_ptr<tr_sha256> tr_sha256::create()
 {
-    auto* handle = static_cast<Sha256*>(raw_handle);
-    TR_ASSERT(handle != nullptr);
-
-    auto digest = tr_sha256_digest_t{};
-    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-    auto const ok = check_result(API(Sha256Final)(handle, digest_as_uchar));
-    tr_free(handle);
-
-    return ok ? std::make_optional(digest) : std::nullopt;
+    return std::make_unique<Sha256Impl>();
 }
 
 /***

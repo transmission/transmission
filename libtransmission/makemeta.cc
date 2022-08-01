@@ -321,16 +321,8 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 
         TR_ASSERT(bufptr - std::data(buf) == (int)this_piece_size);
         TR_ASSERT(leftInPiece == 0);
-        auto const digest = tr_sha1(buf);
-        if (!digest)
-        {
-            b->my_errno = EIO;
-            *fmt::format_to_n(b->errfile, sizeof(b->errfile) - 1, "error hashing piece {:d}", b->pieceIndex).out = '\0';
-            b->result = TrMakemetaResult::ERR_IO_READ;
-            break;
-        }
-
-        walk = std::copy(std::begin(*digest), std::end(*digest), walk);
+        auto const digest = tr_sha1::digest(buf);
+        walk = std::copy(std::begin(digest), std::end(digest), walk);
 
         if (b->abortFlag)
         {

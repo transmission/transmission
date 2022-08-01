@@ -410,15 +410,8 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer* const outbuf = evbuffer_new();
 
     /* HASH('req1', S) */
-    if (auto const req1 = tr_sha1("req1"sv, handshake->dh.secret()); req1)
-    {
-        evbuffer_add(outbuf, std::data(*req1), std::size(*req1));
-    }
-    else
-    {
-        tr_logAddTraceHand(handshake, "error while computing req1 hash after Yb");
-        return tr_handshakeDone(handshake, false);
-    }
+    auto const req1 = tr_sha1::digest("req1"sv, handshake->dh.secret());
+    evbuffer_add(outbuf, std::data(req1), std::size(req1));
 
     auto const info_hash = handshake->io->torrentHash();
     if (!info_hash)
@@ -429,18 +422,12 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        auto const req2 = tr_sha1("req2"sv, *info_hash);
-        auto const req3 = tr_sha1("req3"sv, handshake->dh.secret());
-        if (!req2 || !req3)
-        {
-            tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
-            return tr_handshakeDone(handshake, false);
-        }
-
+        auto const req2 = tr_sha1::digest("req2"sv, *info_hash);
+        auto const req3 = tr_sha1::digest("req3"sv, handshake->dh.secret());
         auto buf = tr_sha1_digest_t{};
         for (size_t i = 0, n = std::size(buf); i < n; ++i)
         {
-            buf[i] = (*req2)[i] ^ (*req3)[i];
+            buf[i] = req2[i] ^ req3[i];
         }
 
         evbuffer_add(outbuf, std::data(buf), std::size(buf));
@@ -732,7 +719,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
     // find the end of PadA by looking for HASH('req1', S)
-    auto const needle = *tr_sha1("req1"sv, handshake->dh.secret());
+    auto const needle = tr_sha1::digest("req1"sv, handshake->dh.secret());
 
     for (size_t i = 0; i < PadA_MAXLEN; ++i)
     {
@@ -779,17 +766,11 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     auto req2 = tr_sha1_digest_t{};
     evbuffer_remove(inbuf, std::data(req2), std::size(req2));
 
-    auto const req3 = tr_sha1("req3"sv, handshake->dh.secret());
-    if (!req3)
-    {
-        tr_logAddTraceHand(handshake, "error while computing req3 hash after req2");
-        return tr_handshakeDone(handshake, false);
-    }
-
+    auto const req3 = tr_sha1::digest("req3"sv, handshake->dh.secret());
     auto obfuscated_hash = tr_sha1_digest_t{};
     for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
     {
-        obfuscated_hash[i] = req2[i] ^ (*req3)[i];
+        obfuscated_hash[i] = req2[i] ^ req3[i];
     }
 
     if (auto const info = handshake->mediator->torrentInfoFromObfuscated(obfuscated_hash); info)

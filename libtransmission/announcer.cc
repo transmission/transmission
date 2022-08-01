@@ -70,21 +70,21 @@ static auto constexpr TrMultiscrapeStep = int{ 5 };
 ****
 ***/
 
-char const* tr_announce_event_get_string(tr_announce_event e)
+std::string_view tr_announce_event_get_string(tr_announce_event e)
 {
     switch (e)
     {
     case TR_ANNOUNCE_EVENT_COMPLETED:
-        return "completed";
+        return "completed"sv;
 
     case TR_ANNOUNCE_EVENT_STARTED:
-        return "started";
+        return "started"sv;
 
     case TR_ANNOUNCE_EVENT_STOPPED:
-        return "stopped";
+        return "stopped"sv;
 
     default:
-        return "";
+        return ""sv;
     }
 }
 

@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstddef> // size_t
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -19,92 +20,50 @@
 *** @{
 **/
 
-/** @brief Opaque SHA1 context type. */
-using tr_sha1_ctx_t = void*;
-/** @brief Opaque SHA256 context type. */
-using tr_sha256_ctx_t = void*;
+class tr_sha1
+{
+public:
+    static std::unique_ptr<tr_sha1> create();
+    virtual ~tr_sha1() = default;
+
+    virtual void clear() = 0;
+    virtual void add(void const* data, size_t data_length) = 0;
+    [[nodiscard]] virtual tr_sha1_digest_t final() = 0;
+
+    template<typename... T>
+    [[nodiscard]] static tr_sha1_digest_t digest(T... args)
+    {
+        auto context = tr_sha1::create();
+        (context->add(std::data(args), std::size(args)), ...);
+        return context->final();
+    }
+};
+
+class tr_sha256
+{
+public:
+    static std::unique_ptr<tr_sha256> create();
+    virtual ~tr_sha256() = default;
+
+    virtual void clear() = 0;
+    virtual void add(void const* data, size_t data_length) = 0;
+    [[nodiscard]] virtual tr_sha256_digest_t final() = 0;
+
+    template<typename... T>
+    [[nodiscard]] static tr_sha256_digest_t digest(T... args)
+    {
+        auto context = tr_sha256::create();
+        (context->add(std::data(args), std::size(args)), ...);
+        return context->final();
+    }
+};
+
 /** @brief Opaque SSL context type. */
 using tr_ssl_ctx_t = void*;
 /** @brief Opaque X509 certificate store type. */
 using tr_x509_store_t = void*;
 /** @brief Opaque X509 certificate type. */
 using tr_x509_cert_t = void*;
-
-/**
- * @brief Allocate and initialize new SHA1 hasher context.
- */
-tr_sha1_ctx_t tr_sha1_init(void);
-
-/**
- * @brief Update SHA1 hash.
- */
-bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length);
-
-/**
- * @brief Finalize and export SHA1 hash, free hasher context.
- */
-std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t handle);
-
-/**
- * @brief Generate a SHA1 hash from one or more chunks of memory.
- */
-template<typename... T>
-std::optional<tr_sha1_digest_t> tr_sha1(T... args)
-{
-    auto ctx = tr_sha1_init();
-    if (ctx == nullptr)
-    {
-        return std::nullopt;
-    }
-
-    if ((tr_sha1_update(ctx, std::data(args), std::size(args)) && ...))
-    {
-        return tr_sha1_final(ctx);
-    }
-
-    // one of the update() calls failed so we will return nullopt,
-    // but we need to call final() first to ensure ctx is released
-    tr_sha1_final(ctx);
-    return std::nullopt;
-}
-
-/**
- * @brief Allocate and initialize new SHA256 hasher context.
- */
-tr_sha256_ctx_t tr_sha256_init(void);
-
-/**
- * @brief Update SHA256 hash.
- */
-bool tr_sha256_update(tr_sha256_ctx_t handle, void const* data, size_t data_length);
-
-/**
- * @brief Finalize and export SHA256 hash, free hasher context.
- */
-std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t handle);
-
-/**
- * @brief generate a SHA256 hash from some memory
- */
-template<typename... T>
-std::optional<tr_sha256_digest_t> tr_sha256(T... args)
-{
-    auto ctx = tr_sha256_init();
-    if (ctx == nullptr)
-    {
-        return std::nullopt;
-    }
-
-    if ((tr_sha256_update(ctx, std::data(args), std::size(args)) && ...))
-    {
-        return tr_sha256_final(ctx);
-    }
-
-    // one of the update() calls failed so we will return nullopt,
-    // but we need to call final() first to ensure ctx is released
-    tr_sha256_final(ctx);
-    return std::nullopt;
-}
 
 /**
  * @brief Get X509 certificate store from SSL context.

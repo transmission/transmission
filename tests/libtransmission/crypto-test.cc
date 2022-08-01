@@ -103,42 +103,35 @@ TEST(Crypto, encryptDecrypt)
 
 TEST(Crypto, sha1)
 {
-    auto hash1 = tr_sha1("test"sv);
-    EXPECT_TRUE(hash1);
+    auto hash1 = tr_sha1::digest("test"sv);
     EXPECT_EQ(
         0,
         memcmp(
-            std::data(*hash1),
+            std::data(hash1),
             "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3",
-            std::size(*hash1)));
+            std::size(hash1)));
 
-    auto hash2 = tr_sha1("test"sv);
-    EXPECT_TRUE(hash1);
-    EXPECT_EQ(*hash1, *hash2);
+    auto hash2 = tr_sha1::digest("test"sv);
+    EXPECT_EQ(hash1, hash2);
 
-    hash1 = tr_sha1("1"sv, "22"sv, "333"sv);
-    hash2 = tr_sha1("1"sv, "22"sv, "333"sv);
-    EXPECT_TRUE(hash1);
-    EXPECT_TRUE(hash2);
-    EXPECT_EQ(*hash1, *hash2);
+    hash1 = tr_sha1::digest("1"sv, "22"sv, "333"sv);
+    hash2 = tr_sha1::digest("1"sv, "22"sv, "333"sv);
+    EXPECT_EQ(hash1, hash2);
     EXPECT_EQ(
         0,
         memcmp(
-            std::data(*hash1),
+            std::data(hash1),
             "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed",
-            std::size(*hash1)));
+            std::size(hash1)));
 
-    auto const hash3 = tr_sha1("test"sv);
-    EXPECT_TRUE(hash3);
-    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash3));
+    auto const hash3 = tr_sha1::digest("test"sv);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(hash3));
 
-    auto const hash4 = tr_sha1("te"sv, "st"sv);
-    EXPECT_TRUE(hash4);
-    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash4));
+    auto const hash4 = tr_sha1::digest("te"sv, "st"sv);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(hash4));
 
-    auto const hash5 = tr_sha1("t"sv, "e"sv, std::string{ "s" }, std::array<char, 1>{ { 't' } });
-    EXPECT_TRUE(hash5);
-    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash5));
+    auto const hash5 = tr_sha1::digest("t"sv, "e"sv, std::string{ "s" }, std::array<char, 1>{ { 't' } });
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(hash5));
 }
 
 TEST(Crypto, ssha1)
