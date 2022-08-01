@@ -25,6 +25,11 @@ class tr_metainfo_builder
 public:
     tr_metainfo_builder(std::string_view single_file_or_parent_directory);
 
+    tr_metainfo_builder(tr_metainfo_builder&&) = delete;
+    tr_metainfo_builder(tr_metainfo_builder const&) = delete;
+    tr_metainfo_builder& operator=(tr_metainfo_builder&&) = delete;
+    tr_metainfo_builder& operator=(tr_metainfo_builder const&) = delete;
+
     // Generate piece checksums asynchronously.
     // - This must be done before calling `benc()` or `save()`.
     // - Runs in a worker thread because it can be time-consuming.

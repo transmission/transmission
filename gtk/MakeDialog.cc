@@ -390,7 +390,7 @@ void MakeDialog::Impl::setFilename(std::string_view filename)
 
     if (!filename.empty())
     {
-        builder_ = tr_metainfo_builder{ filename };
+        builder_.emplace(filename);
         configurePieceSizeScale();
     }
 

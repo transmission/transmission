@@ -68,25 +68,6 @@ protected:
         return files;
     }
 
-    static tr_metainfo_builder makeBuilder(std::string_view top, tr_torrent_metainfo const& metainfo, bool anonymize = false)
-    {
-        auto builder = tr_metainfo_builder{ top };
-        builder.setAnnounceList(tr_announce_list{ metainfo.announceList() });
-        builder.setAnonymize(anonymize);
-        builder.setComment(metainfo.comment());
-        builder.setPrivate(metainfo.isPrivate());
-        builder.setSource(metainfo.source());
-
-        auto webseeds = std::vector<std::string>{};
-        for (size_t i = 0, n = metainfo.webseedCount(); i < n; ++i)
-        {
-            webseeds.emplace_back(metainfo.webseed(i));
-        }
-        builder.setWebseeds(std::move(webseeds));
-
-        return builder;
-    }
-
     static auto testBuilder(tr_metainfo_builder& builder)
     {
         tr_error* error = builder.makeChecksums().get();
