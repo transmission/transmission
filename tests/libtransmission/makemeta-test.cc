@@ -20,6 +20,7 @@
 #include "crypto-utils.h"
 #include "file.h"
 #include "makemeta.h"
+#include "session.h" // TR_NAME
 #include "torrent-metainfo.h"
 #include "utils.h"
 
@@ -179,6 +180,32 @@ TEST_F(MakemetaTest, nameIsRootSingleFile)
     auto const [filename, payload] = files.front();
     auto builder = tr_metainfo_builder{ filename };
     EXPECT_EQ(tr_sys_path_basename(filename), testBuilder(builder).name());
+}
+
+TEST_F(MakemetaTest, anonymizeTrue)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+
+    auto builder = tr_metainfo_builder{ filename };
+    builder.setAnonymize(true);
+    auto const metainfo = testBuilder(builder);
+    EXPECT_EQ(""sv, metainfo.creator());
+    EXPECT_EQ(time_t{}, metainfo.dateCreated());
+}
+
+TEST_F(MakemetaTest, anonymizeFalse)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+
+    auto builder = tr_metainfo_builder{ filename };
+    builder.setAnonymize(false);
+    auto const metainfo = testBuilder(builder);
+    EXPECT_TRUE(tr_strvContains(metainfo.creator(), TR_NAME)) << metainfo.creator();
+    auto const now = time(nullptr);
+    EXPECT_LE(metainfo.dateCreated(), now);
+    EXPECT_LE(now - 60, metainfo.dateCreated());
 }
 
 TEST_F(MakemetaTest, nameIsRootMultifile)
