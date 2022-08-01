@@ -77,6 +77,21 @@ public:
         return files_;
     }
 
+    [[nodiscard]] auto fileCount() const noexcept
+    {
+        return files().fileCount();
+    }
+
+    [[nodiscard]] auto totalSize() const noexcept
+    {
+        return files().totalSize();
+    }
+
+    [[nodiscard]] auto const& path(tr_file_index_t i) const noexcept
+    {
+        return files().path(i);
+    }
+
     void setAnnounceList(tr_announce_list&& announce)
     {
         announce_ = std::move(announce);
@@ -148,6 +163,16 @@ public:
     [[nodiscard]] auto const& blockInfo() const noexcept
     {
         return block_info_;
+    }
+
+    [[nodiscard]] auto pieceCount() const noexcept
+    {
+        return blockInfo().pieceCount();
+    }
+
+    [[nodiscard]] auto pieceSize() const noexcept
+    {
+        return blockInfo().pieceSize();
     }
 
     [[nodiscard]] auto const& top() const noexcept
