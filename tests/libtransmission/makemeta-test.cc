@@ -212,40 +212,6 @@ TEST_F(MakemetaTest, singleFile)
     testBuilder(builder);
 }
 
-TEST_F(MakemetaTest, rewrite)
-{
-    static auto constexpr Comment = "This is the comment"sv;
-    static auto constexpr Source = "This is the source"sv;
-
-    // create the top temp directory
-    auto top = tr_pathbuf{ sandboxDir(), '/', "folder.XXXXXX"sv };
-    tr_sys_path_native_separators(std::data(top));
-    tr_sys_dir_create_temp(std::data(top));
-
-    // build the payload files that go into the top temp directory
-    auto const files = makeRandomFiles(top);
-
-    // make the builder
-    auto builder = tr_metainfo_builder{ top };
-    tr_error* error = nullptr;
-    EXPECT_TRUE(builder.makeChecksums(&error));
-    EXPECT_EQ(nullptr, error) << *error;
-    auto const total_size = std::accumulate(
-        std::begin(files),
-        std::end(files),
-        uint64_t{},
-        [](auto sum, auto const& item) { return sum + std::size(item.second); });
-    EXPECT_EQ(total_size, builder.blockInfo().totalSize());
-    EXPECT_NE(total_size, 0U);
-    builder.setComment(Comment);
-    builder.setSource(Source);
-    auto const is_private = true;
-    builder.setPrivate(is_private);
-    auto const benc = builder.benc();
-
-    testBuilder(builder);
-}
-
 } // namespace test
 
 } // namespace libtransmission
