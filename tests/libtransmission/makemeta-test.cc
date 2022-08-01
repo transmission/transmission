@@ -86,8 +86,11 @@ protected:
         return builder;
     }
 
-    static auto testBuilder(tr_metainfo_builder const& builder)
+    static auto testBuilder(tr_metainfo_builder& builder)
     {
+        tr_error* error = nullptr;
+        EXPECT_TRUE(builder.makeChecksums(&error)) << *error;
+
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
         EXPECT_EQ(builder.blockInfo().totalSize(), metainfo.totalSize());
@@ -156,6 +159,20 @@ TEST_F(MakemetaTest, pieceSize)
     }
 }
 
+TEST_F(MakemetaTest, webseeds)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+
+    static auto constexpr Webseed = "https://www.example.com/linux.iso"sv;
+    builder.setWebseeds(std::vector<std::string>{ std::string{ Webseed } });
+
+    auto const metainfo = testBuilder(builder);
+    EXPECT_EQ(1U, metainfo.webseedCount());
+    EXPECT_EQ(Webseed, metainfo.webseed(0));
+}
+
 TEST_F(MakemetaTest, nameIsRootSingleFile)
 {
     auto const files = makeRandomFiles(sandboxDir(), 1);
@@ -192,15 +209,8 @@ TEST_F(MakemetaTest, singleFile)
     static auto constexpr Anonymize = false;
     builder.setAnonymize(Anonymize);
 
-    tr_error* error = nullptr;
-    EXPECT_TRUE(builder.makeChecksums(&error)) << *error;
-
     testBuilder(builder);
 }
-
-// webseeds.emplace_back("https://www.example.com/linux.iso");
-
-// "FOOBAR"sv);
 
 TEST_F(MakemetaTest, rewrite)
 {
