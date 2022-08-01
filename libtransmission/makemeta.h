@@ -20,7 +20,7 @@
 class tr_metainfo_builder
 {
 public:
-    tr_metainfo_builder(std::string_view top_file_or_root_directory);
+    tr_metainfo_builder(std::string_view single_file_or_parent_directory);
 
     /*
      * Checksums must be generated before calling benc() or save().
@@ -32,7 +32,6 @@ public:
      * its progress can be polled with `checksumProgress()`. When the task
      * is done, the future will resolve with an error, or with nullptr if no error.
      */
-
     bool makeChecksums(tr_error** error = nullptr);
 
     std::future<tr_error*> makeChecksumsAsync();
@@ -51,7 +50,10 @@ public:
 
     std::string benc(tr_error** error = nullptr) const;
 
-    bool save(std::string_view filename, tr_error** error = nullptr) const;
+    bool save(std::string_view filename, tr_error** error = nullptr) const
+    {
+        return tr_saveFile(filename, benc(error), error);
+    }
 
     ///
 

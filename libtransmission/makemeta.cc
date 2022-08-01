@@ -439,8 +439,3 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     tr_variantFree(&top);
     return ret;
 }
-
-bool tr_metainfo_builder::save(std::string_view filename, tr_error** error) const
-{
-    return tr_saveFile(filename, benc(), error);
-}
