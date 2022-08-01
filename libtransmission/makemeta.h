@@ -53,12 +53,12 @@ public:
 
     // Returns the status of a `makeChecksumsAsync()` call:
     // The current piece being tested and the total number of pieces in the torrent.
-    [[nodiscard]] std::pair<tr_piece_index_t, tr_piece_index_t> checksumStatus() const noexcept
+    [[nodiscard]] constexpr std::pair<tr_piece_index_t, tr_piece_index_t> checksumStatus() const noexcept
     {
         return std::make_pair(checksum_piece_, block_info_.pieceCount());
     }
 
-    void cancelAsyncChecksums() noexcept
+    constexpr void cancelAsyncChecksums() noexcept
     {
         cancel_ = true;
     }
@@ -72,7 +72,7 @@ public:
 
     ///
 
-    [[nodiscard]] auto const& files() const noexcept
+    [[nodiscard]] constexpr auto const& files() const noexcept
     {
         return files_;
     }
@@ -82,7 +82,7 @@ public:
         return files().fileCount();
     }
 
-    [[nodiscard]] auto totalSize() const noexcept
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
         return files().totalSize();
     }
@@ -102,7 +102,7 @@ public:
         announce_ = std::move(announce);
     }
 
-    [[nodiscard]] auto const& announceList() const noexcept
+    [[nodiscard]] constexpr auto const& announceList() const noexcept
     {
         return announce_;
     }
@@ -112,7 +112,7 @@ public:
         webseeds_ = std::move(webseeds);
     }
 
-    [[nodiscard]] auto const& webseeds() const noexcept
+    [[nodiscard]] constexpr auto const& webseeds() const noexcept
     {
         return webseeds_;
     }
@@ -122,7 +122,7 @@ public:
         comment_ = comment;
     }
 
-    [[nodiscard]] auto const& comment() const noexcept
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
         return comment_;
     }
@@ -137,23 +137,23 @@ public:
         return source_;
     }
 
-    void setPrivate(bool is_private)
+    constexpr void setPrivate(bool is_private) noexcept
     {
         is_private_ = is_private;
     }
 
-    [[nodiscard]] auto const& isPrivate() const noexcept
+    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
     {
         return is_private_;
     }
 
     // whether or not to include User-Agent and creation time
-    void setAnonymize(bool anonymize)
+    constexpr void setAnonymize(bool anonymize)
     {
         anonymize_ = anonymize;
     }
 
-    [[nodiscard]] auto const& anonymize() const noexcept
+    [[nodiscard]] constexpr auto const& anonymize() const noexcept
     {
         return anonymize_;
     }
@@ -165,22 +165,22 @@ public:
 
     bool setPieceSize(uint32_t piece_size);
 
-    [[nodiscard]] auto const& blockInfo() const noexcept
+    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
     {
         return block_info_;
     }
 
-    [[nodiscard]] auto pieceCount() const noexcept
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
         return blockInfo().pieceCount();
     }
 
-    [[nodiscard]] auto pieceSize() const noexcept
+    [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
         return blockInfo().pieceSize();
     }
 
-    [[nodiscard]] auto const& top() const noexcept
+    [[nodiscard]] constexpr auto const& top() const noexcept
     {
         return top_;
     }
