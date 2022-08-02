@@ -2047,9 +2047,8 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     tr_sys_path_info info;
     auto const& dirname = data->session->torrentDir();
-    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname.c_str(), 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname.c_str()) :
-        TR_BAD_SYS_DIR;
+    tr_sys_dir_t odir = tr_sys_path_get_info(dirname.c_str(), 0, &info) && info.isFolder() ? tr_sys_dir_open(dirname.c_str()) :
+                                                                                             TR_BAD_SYS_DIR;
 
     auto torrents = std::list<tr_torrent*>{};
     if (odir != TR_BAD_SYS_DIR)

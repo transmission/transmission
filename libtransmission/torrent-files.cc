@@ -30,7 +30,7 @@ using file_func_t = std::function<void(char const* filename)>;
 bool isDirectory(char const* path)
 {
     auto info = tr_sys_path_info{};
-    return tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY);
+    return tr_sys_path_get_info(path, 0, &info) && info.isFolder();
 }
 
 bool isEmptyDirectory(char const* path)

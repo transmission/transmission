@@ -117,8 +117,18 @@ enum tr_sys_path_type_t
 struct tr_sys_path_info
 {
     tr_sys_path_type_t type = {};
-    uint64_t size = 0;
-    time_t last_modified_at = 0;
+    uint64_t size = {};
+    time_t last_modified_at = {};
+
+    [[nodiscard]] constexpr auto isFile() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_FILE;
+    }
+
+    [[nodiscard]] constexpr auto isFolder() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_DIRECTORY;
+    }
 };
 
 /**

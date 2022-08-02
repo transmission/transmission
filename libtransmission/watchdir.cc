@@ -267,7 +267,7 @@ private:
 
         auto path_info = tr_sys_path_info{};
         tr_error* error = nullptr;
-        bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
+        bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && path_info.isFile();
 
         if (error != nullptr)
         {
