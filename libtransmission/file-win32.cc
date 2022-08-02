@@ -105,7 +105,7 @@ static constexpr auto stat_to_sys_path_info(DWORD attributes, DWORD size_low, DW
     info.size <<= 32;
     info.size |= size_low;
 
-    info.last_modified_at = filetime_to_unix_time(&mtime);
+    info.last_modified_at = filetime_to_unix_time(mtime);
 
     return info;
 }
