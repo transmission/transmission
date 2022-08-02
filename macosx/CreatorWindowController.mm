@@ -603,8 +603,6 @@ NSMutableSet* creatorWindowControllerSet = nil;
     for (NSUInteger i = 0; i < self.fTrackers.count; ++i)
     {
         trackers.add((char*)(self.fTrackers[i]).UTF8String, trackers.nextTier());
-        // trackerInfo[i].announce = (char*)(self.fTrackers[i]).UTF8String;
-        // trackerInfo[i].tier = i;
     }
     self.fBuilder->setAnnounceList(std::move(trackers));
 
