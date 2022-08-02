@@ -2257,13 +2257,13 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     }
 }
 
-static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t pieceIndex)
+static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t piece_index)
 {
-    tr_peerMgrPieceCompleted(tor, pieceIndex);
+    tr_peerMgrPieceCompleted(tor, piece_index);
 
     // if this piece completes any file, invoke the fileCompleted func for it
-    auto const [begin, end] = tor->fpm_.fileSpan(pieceIndex);
-    for (tr_file_index_t file = begin; file < end; ++file)
+    auto const span = tor->fpm_.fileSpan(piece_index);
+    for (auto file = span.begin; file < span.end; ++file)
     {
         if (tor->completion.hasBlocks(tr_torGetFileBlockSpan(tor, file)))
         {
