@@ -8,9 +8,9 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
+#include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -167,9 +167,12 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ * @return info on success, or nullopt with `error` set accordingly.
  */
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr);
+[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_path_get_info(
+    std::string_view path,
+    int flags = 0,
+    tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -383,9 +386,9 @@ bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error = nullptr);
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ * @return info on success, or nullopt with `error` set accordingly.
  */
-bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct tr_error** error = nullptr);
+[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `lseek()`.

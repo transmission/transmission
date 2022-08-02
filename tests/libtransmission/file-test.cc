@@ -107,7 +107,6 @@ protected:
 
         while (*p != '\0')
         {
-            tr_sys_path_info info;
             char const* slash_pos = strchr(p, '/');
 
 #ifdef _WIN32
@@ -127,9 +126,8 @@ protected:
             }
 
             auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
-
-            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info) ||
-                (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
+            auto const info = tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW);
+            if (!info || (!info->isFile() && !info->isFolder()))
             {
                 return false;
             }
@@ -226,14 +224,14 @@ protected:
 TEST_F(FileTest, getInfo)
 {
     auto const test_dir = createTestDir(currentTestName());
-    tr_sys_path_info info;
 
     auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
     auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
     // Can't get info of non-existent file/directory
     tr_error* err = nullptr;
-    EXPECT_FALSE(tr_sys_path_get_info(path1, 0, &info, &err));
+    auto info = tr_sys_path_get_info(path1, 0, &err);
+    EXPECT_FALSE(info);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
@@ -241,23 +239,23 @@ TEST_F(FileTest, getInfo)
     createFileWithContents(path1, "test");
 
     // Good file info
-    clearPathInfo(&info);
-    EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+    info = tr_sys_path_get_info(path1, 0, &err);
     EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
-    EXPECT_EQ(4, info.size);
-    EXPECT_GE(info.last_modified_at, t - 1);
-    EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
+    EXPECT_EQ(4, info->size);
+    EXPECT_GE(info->last_modified_at, t - 1);
+    EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
 
     // Good file info (by handle)
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0);
-    clearPathInfo(&info);
-    EXPECT_TRUE(tr_sys_file_get_info(fd, &info, &err));
+    info = tr_sys_file_get_info(fd, &err);
+    EXPECT_TRUE(info);
     EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
-    EXPECT_EQ(4, info.size);
-    EXPECT_GE(info.last_modified_at, t - 1);
-    EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
+    EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
+    EXPECT_EQ(4, info->size);
+    EXPECT_GE(info->last_modified_at, t - 1);
+    EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
     tr_sys_file_close(fd);
 
     tr_sys_path_remove(path1);
@@ -265,19 +263,20 @@ TEST_F(FileTest, getInfo)
     // Good directory info
     t = time(nullptr);
     tr_sys_dir_create(path1, 0, 0777);
-    clearPathInfo(&info);
-    EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+    info = tr_sys_path_get_info(path1, 0, &err);
+    EXPECT_TRUE(info);
     EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
-    EXPECT_NE(uint64_t(-1), info.size);
-    EXPECT_GE(info.last_modified_at, t - 1);
-    EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
+    EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info->type);
+    EXPECT_NE(uint64_t(-1), info->size);
+    EXPECT_GE(info->last_modified_at, t - 1);
+    EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
     tr_sys_path_remove(path1);
 
     if (createSymlink(path1, path2, false))
     {
         // Can't get info of non-existent file/directory
-        EXPECT_FALSE(tr_sys_path_get_info(path1, 0, &info, &err));
+        info = tr_sys_path_get_info(path1, 0, &err);
+        EXPECT_FALSE(info);
         EXPECT_NE(nullptr, err);
         tr_error_clear(&err);
 
@@ -285,23 +284,23 @@ TEST_F(FileTest, getInfo)
         createFileWithContents(path2, "test");
 
         // Good file info
-        clearPathInfo(&info);
-        EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+        info = tr_sys_path_get_info(path1, 0, &err);
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
-        EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
-        EXPECT_EQ(4, info.size);
-        EXPECT_GE(info.last_modified_at, t - 1);
-        EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
+        EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
+        EXPECT_EQ(4, info->size);
+        EXPECT_GE(info->last_modified_at, t - 1);
+        EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
 
         // Good file info (by handle)
         fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0);
-        clearPathInfo(&info);
-        EXPECT_TRUE(tr_sys_file_get_info(fd, &info, &err));
+        info = tr_sys_file_get_info(fd, &err);
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
-        EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
-        EXPECT_EQ(4, info.size);
-        EXPECT_GE(info.last_modified_at, t - 1);
-        EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
+        EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
+        EXPECT_EQ(4, info->size);
+        EXPECT_GE(info->last_modified_at, t - 1);
+        EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
         tr_sys_file_close(fd);
 
         tr_sys_path_remove(path2);
@@ -311,13 +310,13 @@ TEST_F(FileTest, getInfo)
         t = time(nullptr);
         tr_sys_dir_create(path2, 0, 0777);
         EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
-        clearPathInfo(&info);
-        EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+        info = tr_sys_path_get_info(path1, 0, &err);
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
-        EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
-        EXPECT_NE(uint64_t(-1), info.size);
-        EXPECT_GE(info.last_modified_at, t - 1);
-        EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
+        EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info->type);
+        EXPECT_NE(uint64_t(-1), info->size);
+        EXPECT_GE(info->last_modified_at, t - 1);
+        EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
 
         tr_sys_path_remove(path2);
         tr_sys_path_remove(path1);
@@ -1088,13 +1087,14 @@ TEST_F(FileTest, fileOpen)
     EXPECT_EQ(TR_BAD_SYS_FILE, fd);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
-    tr_sys_path_info info;
-    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
-    EXPECT_EQ(4, info.size);
+    auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(4, info->size);
 
     /* Pointer is at the end of file */
-    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
-    EXPECT_EQ(4, info.size);
+    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(4, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
@@ -1105,16 +1105,19 @@ TEST_F(FileTest, fileOpen)
     tr_sys_file_close(fd);
 
     /* File gets truncated */
-    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
-    EXPECT_EQ(5, info.size);
+    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(5, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
-    tr_sys_file_get_info(fd, &info);
-    EXPECT_EQ(0, info.size);
+    info = tr_sys_file_get_info(fd);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(0, info->size);
     tr_sys_file_close(fd);
-    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
-    EXPECT_EQ(0, info.size);
+    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(0, info->size);
 
     /* TODO: symlink and hardlink tests */
 
@@ -1214,27 +1217,30 @@ TEST_F(FileTest, fileTruncate)
     tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_truncate(fd, 10, &err));
     EXPECT_EQ(nullptr, err) << *err;
-    tr_sys_path_info info;
-    tr_sys_file_get_info(fd, &info);
-    EXPECT_EQ(10, info.size);
+    auto info = tr_sys_file_get_info(fd);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(10, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 20, &err));
     EXPECT_EQ(nullptr, err) << *err;
-    tr_sys_file_get_info(fd, &info);
-    EXPECT_EQ(20, info.size);
+    info = tr_sys_file_get_info(fd);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(20, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 0, &err));
     EXPECT_EQ(nullptr, err) << *err;
-    tr_sys_file_get_info(fd, &info);
-    EXPECT_EQ(0, info.size);
+    info = tr_sys_file_get_info(fd);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(0, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 50, &err));
     EXPECT_EQ(nullptr, err) << *err;
 
     tr_sys_file_close(fd);
 
-    tr_sys_path_get_info(path1, 0, &info);
-    EXPECT_EQ(50, info.size);
+    info = tr_sys_path_get_info(path1);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(50, info->size);
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
@@ -1243,8 +1249,9 @@ TEST_F(FileTest, fileTruncate)
 
     tr_sys_file_close(fd);
 
-    tr_sys_path_get_info(path1, 0, &info);
-    EXPECT_EQ(25, info.size);
+    info = tr_sys_path_get_info(path1);
+    EXPECT_TRUE(info);
+    EXPECT_EQ(25, info->size);
 
     tr_sys_path_remove(path1);
 }
@@ -1261,9 +1268,9 @@ TEST_F(FileTest, filePreallocate)
     if (tr_sys_file_preallocate(fd, prealloc_size, 0, &err))
     {
         EXPECT_EQ(nullptr, err) << *err;
-        tr_sys_path_info info;
-        tr_sys_file_get_info(fd, &info);
-        EXPECT_EQ(prealloc_size, info.size);
+        auto info = tr_sys_file_get_info(fd);
+        EXPECT_TRUE(info);
+        EXPECT_EQ(prealloc_size, info->size);
     }
     else
     {
@@ -1282,9 +1289,9 @@ TEST_F(FileTest, filePreallocate)
     if (tr_sys_file_preallocate(fd, prealloc_size, TR_SYS_FILE_PREALLOC_SPARSE, &err))
     {
         EXPECT_EQ(nullptr, err) << *err;
-        tr_sys_path_info info;
-        tr_sys_file_get_info(fd, &info);
-        EXPECT_EQ(prealloc_size, info.size);
+        auto info = tr_sys_file_get_info(fd);
+        EXPECT_TRUE(info);
+        EXPECT_EQ(prealloc_size, info->size);
     }
     else
     {

@@ -303,33 +303,28 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     return ret;
 }
 
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, tr_error** error)
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-    TR_ASSERT(info != nullptr);
+    struct stat sb = {};
 
-    bool ret = false;
-    struct stat sb;
-
+    bool ok = false;
+    auto const szpath = tr_pathbuf{ path };
     if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
     {
-        ret = stat(path, &sb) != -1;
+        ok = stat(szpath, &sb) != -1;
     }
     else
     {
-        ret = lstat(path, &sb) != -1;
+        ok = lstat(szpath, &sb) != -1;
     }
 
-    if (ret)
+    if (ok)
     {
-        *info = stat_to_sys_path_info(sb);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return stat_to_sys_path_info(sb);
     }
 
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
 bool tr_sys_path_is_relative(std::string_view path)
@@ -490,8 +485,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         return false;
     }
 
-    tr_sys_path_info info;
-    if (!tr_sys_file_get_info(in, &info, error))
+    auto const info = tr_sys_file_get_info(in, error);
+    if (!info)
     {
         tr_error_prefix(error, "Unable to get information on source file: ");
         tr_sys_file_close(in);
@@ -510,7 +505,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         return false;
     }
 
-    uint64_t file_size = info.size;
+    uint64_t file_size = info->size;
 
 #if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
 
@@ -711,24 +706,19 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error** error)
+std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(info != nullptr);
 
     struct stat sb;
-    bool const ret = fstat(handle, &sb) != -1;
 
-    if (ret)
+    if (fstat(handle, &sb) != -1)
     {
-        *info = stat_to_sys_path_info(sb);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return stat_to_sys_path_info(sb);
     }
 
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)

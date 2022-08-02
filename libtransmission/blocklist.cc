@@ -42,13 +42,13 @@ void BlocklistFile::load()
 {
     close();
 
-    auto info = tr_sys_path_info{};
-    if (!tr_sys_path_get_info(getFilename(), 0, &info))
+    auto const info = tr_sys_path_get_info(getFilename());
+    if (!info)
     {
         return;
     }
 
-    auto const byteCount = info.size;
+    auto const byteCount = info->size;
     if (byteCount == 0)
     {
         return;
