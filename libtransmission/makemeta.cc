@@ -54,8 +54,9 @@ static struct FileList* getFiles(std::string_view dir, std::string_view base, st
     auto buf = tr_pathbuf{ dir, '/', base };
     tr_sys_path_native_separators(std::data(buf));
 
-    tr_sys_path_info info;
-    if (tr_error* error = nullptr; !tr_sys_path_get_info(buf, 0, &info, &error))
+    tr_error* error = nullptr;
+    auto const info = tr_sys_path_get_info(buf, 0, &error);
+    if (!info)
     {
         tr_logAddWarn(fmt::format(
             _("Skipping '{path}': {error} ({error_code})"),
@@ -66,27 +67,36 @@ static struct FileList* getFiles(std::string_view dir, std::string_view base, st
         return list;
     }
 
-    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str()) : TR_BAD_SYS_DIR;
-        odir != TR_BAD_SYS_DIR)
+    switch (info->type)
     {
-        char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+    case TR_SYS_PATH_IS_DIRECTORY:
+        if (auto const odir = tr_sys_dir_open(buf.c_str()); odir != TR_BAD_SYS_DIR)
         {
-            if (name[0] != '.') /* skip dotfiles */
+            char const* name = nullptr;
+            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
             {
-                list = getFiles(buf.c_str(), name, list);
+                if (name[0] != '.') /* skip dotfiles */
+                {
+                    list = getFiles(buf.c_str(), name, list);
+                }
             }
-        }
 
-        tr_sys_dir_close(odir);
-    }
-    else if (info.type == TR_SYS_PATH_IS_FILE)
-    {
-        auto* const node = tr_new0(FileList, 1);
-        node->size = info.size;
-        node->filename = tr_strvDup(buf);
-        node->next = list;
-        list = node;
+            tr_sys_dir_close(odir);
+        }
+        break;
+
+    case TR_SYS_PATH_IS_FILE:
+        {
+            auto* const node = tr_new0(FileList, 1);
+            node->size = info->size;
+            node->filename = tr_strvDup(buf);
+            node->next = list;
+            list = node;
+        }
+        break;
+
+    default:
+        break;
     }
 
     return list;
@@ -145,10 +155,8 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     ret->top = real_top;
 
-    {
-        tr_sys_path_info info;
-        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY;
-    }
+    auto const info = tr_sys_path_get_info(ret->top);
+    ret->isFolder = info && info->isFolder();
 
     /* build a list of files containing top file and,
        if it's a directory, all of its children */

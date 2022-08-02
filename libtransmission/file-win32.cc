@@ -72,48 +72,42 @@ static void set_system_error_if_file_found(tr_error** error, DWORD code)
     }
 }
 
-static time_t filetime_to_unix_time(FILETIME const* t)
+static constexpr time_t filetime_to_unix_time(FILETIME const& t)
 {
-    TR_ASSERT(t != nullptr);
-
     uint64_t tmp = 0;
-    tmp |= t->dwHighDateTime;
+    tmp |= t.dwHighDateTime;
     tmp <<= 32;
-    tmp |= t->dwLowDateTime;
+    tmp |= t.dwLowDateTime;
     tmp /= 10; /* to microseconds */
     tmp -= DELTA_EPOCH_IN_MICROSECS;
 
     return tmp / 1000000UL;
 }
 
-static void stat_to_sys_path_info(
-    DWORD attributes,
-    DWORD size_low,
-    DWORD size_high,
-    FILETIME const* mtime,
-    tr_sys_path_info* info)
+static constexpr auto stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_high, FILETIME const& mtime)
 {
-    TR_ASSERT(mtime != nullptr);
-    TR_ASSERT(info != nullptr);
+    auto info = tr_sys_path_info{};
 
     if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
     {
-        info->type = TR_SYS_PATH_IS_DIRECTORY;
+        info.type = TR_SYS_PATH_IS_DIRECTORY;
     }
     else if ((attributes & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL)) == 0)
     {
-        info->type = TR_SYS_PATH_IS_FILE;
+        info.type = TR_SYS_PATH_IS_FILE;
     }
     else
     {
-        info->type = TR_SYS_PATH_IS_OTHER;
+        info.type = TR_SYS_PATH_IS_OTHER;
     }
 
-    info->size = size_high;
-    info->size <<= 32;
-    info->size |= size_low;
+    info.size = size_high;
+    info.size <<= 32;
+    info.size |= size_low;
 
-    info->last_modified_at = filetime_to_unix_time(mtime);
+    info.last_modified_at = filetime_to_unix_time(mtime);
+
+    return info;
 }
 
 static constexpr bool is_slash(char c)
@@ -233,6 +227,18 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
 static wchar_t* path_to_native_path(char const* path)
 {
     return path_to_native_path_ex(path, 0, nullptr);
+}
+
+static std::wstring path_to_native_path_wstr(std::string_view path)
+{
+    if (auto* const rawptr = path_to_native_path(tr_pathbuf{ path }); rawptr != nullptr)
+    {
+        auto ret = std::wstring{ rawptr };
+        tr_free(rawptr);
+        return ret;
+    }
+
+    return {};
 }
 
 static char* native_path_to_path(wchar_t const* wide_path)
@@ -423,67 +429,35 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     return ret;
 }
 
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, tr_error** error)
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-    TR_ASSERT(info != nullptr);
-
-    bool ret = false;
-    wchar_t* wide_path = path_to_native_path(path);
-
-    if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
+    if (auto const wide_path = path_to_native_path_wstr(path); std::empty(wide_path))
     {
-        HANDLE handle = INVALID_HANDLE_VALUE;
-
-        if (wide_path != nullptr)
-        {
-            handle = CreateFileW(wide_path, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-        }
-
-        if (handle != INVALID_HANDLE_VALUE)
-        {
-            tr_error* my_error = nullptr;
-            ret = tr_sys_file_get_info(handle, info, &my_error);
-
-            if (!ret)
-            {
-                tr_error_propagate(error, &my_error);
-            }
-
-            CloseHandle(handle);
-        }
-        else
-        {
-            set_system_error(error, GetLastError());
-        }
+        // do nothing
     }
-    else
+    else if ((flags & TR_SYS_PATH_NO_FOLLOW) != 0)
     {
-        WIN32_FILE_ATTRIBUTE_DATA attributes;
-
-        if (wide_path != nullptr)
+        auto attributes = WIN32_FILE_ATTRIBUTE_DATA{};
+        if (GetFileAttributesExW(wide_path.c_str(), GetFileExInfoStandard, &attributes))
         {
-            ret = GetFileAttributesExW(wide_path, GetFileExInfoStandard, &attributes);
-        }
-
-        if (ret)
-        {
-            stat_to_sys_path_info(
+            return stat_to_sys_path_info(
                 attributes.dwFileAttributes,
                 attributes.nFileSizeLow,
                 attributes.nFileSizeHigh,
-                &attributes.ftLastWriteTime,
-                info);
-        }
-        else
-        {
-            set_system_error(error, GetLastError());
+                attributes.ftLastWriteTime);
         }
     }
+    else if (auto const
+                 handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+             handle != INVALID_HANDLE_VALUE)
+    {
+        auto ret = tr_sys_file_get_info(handle, error);
+        CloseHandle(handle);
+        return ret;
+    }
 
-    tr_free(wide_path);
-
-    return ret;
+    set_system_error(error, GetLastError());
+    return {};
 }
 
 bool tr_sys_path_is_relative(std::string_view path)
@@ -1071,29 +1045,22 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error** error)
+std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(info != nullptr);
 
-    BY_HANDLE_FILE_INFORMATION attributes;
-    bool ret = GetFileInformationByHandle(handle, &attributes);
-
-    if (ret)
+    auto attributes = BY_HANDLE_FILE_INFORMATION{};
+    if (GetFileInformationByHandle(handle, &attributes))
     {
-        stat_to_sys_path_info(
+        return stat_to_sys_path_info(
             attributes.dwFileAttributes,
             attributes.nFileSizeLow,
             attributes.nFileSizeHigh,
-            &attributes.ftLastWriteTime,
-            info);
-    }
-    else
-    {
-        set_system_error(error, GetLastError());
+            attributes.ftLastWriteTime);
     }
 
-    return ret;
+    set_system_error(error, GetLastError());
+    return {};
 }
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)

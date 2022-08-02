@@ -167,11 +167,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         }
     }
 
-    auto info = tr_sys_path_info{};
-    bool const already_existed = tr_sys_path_get_info(filename, 0, &info) && info.type == TR_SYS_PATH_IS_FILE;
+    auto const info = tr_sys_path_get_info(filename);
+    bool const already_existed = info && info->isFile();
 
     // we need write permissions to resize the file
-    bool const resize_needed = already_existed && (file_size < info.size);
+    bool const resize_needed = already_existed && (file_size < info->size);
     writable |= resize_needed;
 
     // open the file
