@@ -99,7 +99,8 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
         }
 
         /* Consume entire name into buffer */
-        if ((nread = bufferevent_read(event, name, ev.len)) == (size_t)-1)
+        nread = bufferevent_read(event, name, ev.len);
+        if (nread == static_cast<size_t>(-1))
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
