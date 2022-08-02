@@ -1291,10 +1291,10 @@ uint16_t tr_sessionGetPeerPort(tr_session const* session)
 
 uint16_t tr_sessionSetPeerPortRandom(tr_session* session)
 {
-    TR_ASSERT(tr_isSession(session));
+    tr_port p = getRandomPort(session);
+    tr_sessionSetPeerPort(session, p.host());
 
-    session->setPeerPort(getRandomPort(session));
-    return session->private_peer_port.host();
+    return p.host();
 }
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
