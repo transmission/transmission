@@ -177,9 +177,9 @@ void tr_completion::setHasAll() noexcept
 
 void tr_completion::addPiece(tr_piece_index_t piece)
 {
-    auto const [begin, end] = block_info_->blockSpanForPiece(piece);
+    auto const span = block_info_->blockSpanForPiece(piece);
 
-    for (tr_block_index_t block = begin; block < end; ++block)
+    for (tr_block_index_t block = span.begin; block < span.end; ++block)
     {
         addBlock(block);
     }

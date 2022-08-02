@@ -68,7 +68,7 @@ public:
     {
         if (!isInitialized())
         {
-            return {};
+            return { 0U, 0U };
         }
 
         return { pieceLoc(piece).block, pieceLastLoc(piece).block + 1 };
@@ -78,7 +78,7 @@ public:
     {
         if (!isInitialized())
         {
-            return {};
+            return { 0U, 0U };
         }
 
         auto const offset = pieceLoc(piece).byte;
