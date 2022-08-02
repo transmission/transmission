@@ -147,8 +147,6 @@ public:
         return date_created_;
     }
 
-    [[nodiscard]] std::string benc() const;
-
     [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {
         return info_dict_size_;

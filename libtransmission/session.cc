@@ -2379,7 +2379,7 @@ static void loadBlocklists(tr_session* session)
                 }
             }
             else if (auto const pathinfo = tr_sys_path_get_info(path);
-                     path && pathinfo->last_modified_at >= bininfo->last_modified_at)
+                     pathinfo && pathinfo->last_modified_at >= bininfo->last_modified_at)
             {
                 // update it
                 auto const old = tr_pathbuf{ binname, ".old"sv };
