@@ -815,28 +815,27 @@ RpcResponseFuture Session::exec(std::string_view method, tr_variant* args)
 
 void Session::updateStats(tr_variant* d, tr_session_stats* stats)
 {
-    auto value = dictFind<uint64_t>(d, TR_KEY_uploadedBytes);
-    if (value)
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_uploadedBytes); value)
     {
         stats->uploadedBytes = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_downloadedBytes)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_downloadedBytes); value)
     {
         stats->downloadedBytes = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_filesAdded)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_filesAdded); value)
     {
         stats->filesAdded = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_sessionCount)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_sessionCount); value)
     {
         stats->sessionCount = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_secondsActive)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_secondsActive); value)
     {
         stats->secondsActive = *value;
     }
