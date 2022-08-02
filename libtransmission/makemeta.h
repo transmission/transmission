@@ -60,53 +60,26 @@ public:
         cancel_ = true;
     }
 
+    // generate the metainfo
     std::string benc(tr_error** error = nullptr) const;
 
+    // generate the metainfo and save it to a torrent file
     bool save(std::string_view filename, tr_error** error = nullptr) const
     {
         return tr_saveFile(filename, benc(error), error);
     }
 
-    ///
-
-    [[nodiscard]] auto fileCount() const noexcept
-    {
-        return files_.fileCount();
-    }
-
-    [[nodiscard]] constexpr auto totalSize() const noexcept
-    {
-        return files_.totalSize();
-    }
-
-    [[nodiscard]] auto const& path(tr_file_index_t i) const noexcept
-    {
-        return files_.path(i);
-    }
-
-    [[nodiscard]] auto fileSize(tr_file_index_t i) const noexcept
-    {
-        return files_.fileSize(i);
-    }
+    /// setters
 
     void setAnnounceList(tr_announce_list announce)
     {
         announce_ = std::move(announce);
     }
 
-    [[nodiscard]] constexpr auto const& announceList() const noexcept
+    // whether or not to include User-Agent and creation time
+    constexpr void setAnonymize(bool anonymize) noexcept
     {
-        return announce_;
-    }
-
-    void setWebseeds(std::vector<std::string> webseeds)
-    {
-        webseeds_ = std::move(webseeds);
-    }
-
-    [[nodiscard]] constexpr auto const& webseeds() const noexcept
-    {
-        return webseeds_;
+        anonymize_ = anonymize;
     }
 
     void setComment(std::string_view comment)
@@ -114,9 +87,11 @@ public:
         comment_ = comment;
     }
 
-    [[nodiscard]] constexpr auto const& comment() const noexcept
+    bool setPieceSize(uint32_t piece_size) noexcept;
+
+    constexpr void setPrivate(bool is_private) noexcept
     {
-        return comment_;
+        is_private_ = is_private;
     }
 
     void setSource(std::string_view source)
@@ -124,25 +99,16 @@ public:
         source_ = source;
     }
 
-    [[nodiscard]] auto const& source() const noexcept
+    void setWebseeds(std::vector<std::string> webseeds)
     {
-        return source_;
+        webseeds_ = std::move(webseeds);
     }
 
-    constexpr void setPrivate(bool is_private) noexcept
-    {
-        is_private_ = is_private;
-    }
+    /// getters
 
-    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
+    [[nodiscard]] constexpr auto const& announceList() const noexcept
     {
-        return is_private_;
-    }
-
-    // whether or not to include User-Agent and creation time
-    constexpr void setAnonymize(bool anonymize)
-    {
-        anonymize_ = anonymize;
+        return announce_;
     }
 
     [[nodiscard]] constexpr auto const& anonymize() const noexcept
@@ -150,16 +116,34 @@ public:
         return anonymize_;
     }
 
-    static uint32_t defaultPieceSize(uint64_t total_size);
-
-    // must be a power of two and >= 16 KiB
-    static bool isLegalPieceSize(uint32_t x);
-
-    bool setPieceSize(uint32_t piece_size);
-
-    [[nodiscard]] constexpr auto pieceCount() const noexcept
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
-        return block_info_.pieceCount();
+        return comment_;
+    }
+
+    [[nodiscard]] auto fileCount() const noexcept
+    {
+        return files_.fileCount();
+    }
+
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const noexcept
+    {
+        return files_.fileSize(i);
+    }
+
+    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
+    {
+        return is_private_;
+    }
+
+    [[nodiscard]] auto name() const noexcept
+    {
+        return tr_sys_path_basename(top_);
+    }
+
+    [[nodiscard]] auto const& path(tr_file_index_t i) const noexcept
+    {
+        return files_.path(i);
     }
 
     [[nodiscard]] constexpr auto pieceSize() const noexcept
@@ -167,15 +151,37 @@ public:
         return block_info_.pieceSize();
     }
 
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
+    {
+        return block_info_.pieceCount();
+    }
+
+    [[nodiscard]] constexpr auto const& source() const noexcept
+    {
+        return source_;
+    }
+
     [[nodiscard]] constexpr auto const& top() const noexcept
     {
         return top_;
     }
 
-    [[nodiscard]] auto name() const noexcept
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
-        return tr_sys_path_basename(top_);
+        return files_.totalSize();
     }
+
+    [[nodiscard]] constexpr auto const& webseeds() const noexcept
+    {
+        return webseeds_;
+    }
+
+    ///
+
+    [[nodiscard]] static uint32_t defaultPieceSize(uint64_t total_size);
+
+    // must be a power of two and >= 16 KiB
+    [[nodiscard]] static bool isLegalPieceSize(uint32_t x);
 
 private:
     bool blockingMakeChecksums(tr_error** error = nullptr);

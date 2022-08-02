@@ -190,7 +190,7 @@ bool tr_metainfo_builder::isLegalPieceSize(uint32_t x)
     return x >= MinSize && is_power_of_two;
 }
 
-bool tr_metainfo_builder::setPieceSize(uint32_t piece_size)
+bool tr_metainfo_builder::setPieceSize(uint32_t piece_size) noexcept
 {
     if (!isLegalPieceSize(piece_size))
     {
