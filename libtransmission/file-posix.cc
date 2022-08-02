@@ -539,11 +539,11 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
 
     static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
-    auto* buf = static_cast<char*>(tr_malloc(buflen));
+    auto* buf = static_cast<char*>(tr_malloc(Buflen));
 
     while (file_size > 0U)
     {
-        uint64_t const chunk_size = std::min(file_size, uint64_t{ buflen });
+        uint64_t const chunk_size = std::min(file_size, uint64_t{ Buflen });
         uint64_t bytes_read;
         uint64_t bytes_written;
 
