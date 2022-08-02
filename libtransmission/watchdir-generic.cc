@@ -73,10 +73,8 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 {
     auto* backend = new tr_watchdir_generic{};
     backend->base.free_func = &tr_watchdir_generic_free;
-
-    if ((backend
-             ->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event, handle)) ==
-        nullptr)
+    backend->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event, handle);
+    if (backend->event == nullptr)
     {
         auto const error_code = errno;
         tr_logAddError(fmt::format(

@@ -240,7 +240,7 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-static auto* discoverThreadfunc(std::string bindaddr)
+static auto* discoverThreadfunc(std::string bindaddr) // NOLINT performance-unnecessary-value-param
 {
     return tr_upnpDiscover(2000, bindaddr.c_str());
 }
