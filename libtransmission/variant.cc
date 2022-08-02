@@ -822,26 +822,32 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
         if (!node.is_visited)
         {
             v = &node.v;
+
             node.is_visited = true;
         }
-        else if ((v = node.nextChild()) != nullptr)
+        else
         {
-            if (tr_variantIsDict(&node.v))
-            {
-                auto tmp = tr_variant{};
-                tr_variantInitQuark(&tmp, v->key);
-                walkFuncs->stringFunc(&tmp, user_data);
-            }
-        }
-        else // finished with this node
-        {
-            if (tr_variantIsContainer(&node.v))
-            {
-                walkFuncs->containerEndFunc(&node.v, user_data);
-            }
+            v = node.nextChild();
 
-            stack.pop();
-            continue;
+            if (v != nullptr)
+            {
+                if (tr_variantIsDict(&node.v))
+                {
+                    auto tmp = tr_variant{};
+                    tr_variantInitQuark(&tmp, v->key);
+                    walkFuncs->stringFunc(&tmp, user_data);
+                }
+            }
+            else // finished with this node
+            {
+                if (tr_variantIsContainer(&node.v))
+                {
+                    walkFuncs->containerEndFunc(&node.v, user_data);
+                }
+
+                stack.pop();
+                continue;
+            }
         }
 
         if (v != nullptr)
