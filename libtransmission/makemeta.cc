@@ -81,9 +81,15 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     case TR_SYS_PATH_IS_DIRECTORY:
         if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
         {
-            char const* name = nullptr;
-            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+            for (;;)
             {
+                char const* const name = tr_sys_dir_read_name(odir);
+
+                if (name == nullptr)
+                {
+                    break;
+                }
+
                 if (name[0] == '.') // skip dotfiles
                 {
                     continue;
