@@ -117,23 +117,27 @@ static void set_system_error_if_file_found(tr_error** error, int code)
     }
 }
 
-static void stat_to_sys_path_info(struct stat const* sb, tr_sys_path_info* info)
+static auto stat_to_sys_path_info(struct stat const& sb)
 {
-    if (S_ISREG(sb->st_mode))
+    auto info = tr_sys_path_info{};
+
+    if (S_ISREG(sb.st_mode))
     {
-        info->type = TR_SYS_PATH_IS_FILE;
+        info.type = TR_SYS_PATH_IS_FILE;
     }
-    else if (S_ISDIR(sb->st_mode))
+    else if (S_ISDIR(sb.st_mode))
     {
-        info->type = TR_SYS_PATH_IS_DIRECTORY;
+        info.type = TR_SYS_PATH_IS_DIRECTORY;
     }
     else
     {
-        info->type = TR_SYS_PATH_IS_OTHER;
+        info.type = TR_SYS_PATH_IS_OTHER;
     }
 
-    info->size = (uint64_t)sb->st_size;
-    info->last_modified_at = sb->st_mtime;
+    info.size = static_cast<uint64_t>(sb.st_size);
+    info.last_modified_at = sb.st_mtime;
+
+    return info;
 }
 
 static void set_file_for_single_pass(tr_sys_file_t handle)
@@ -318,7 +322,7 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
 
     if (ret)
     {
-        stat_to_sys_path_info(&sb, info);
+        *info = stat_to_sys_path_info(sb);
     }
     else
     {
@@ -717,7 +721,7 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
 
     if (ret)
     {
-        stat_to_sys_path_info(&sb, info);
+        *info = stat_to_sys_path_info(sb);
     }
     else
     {
