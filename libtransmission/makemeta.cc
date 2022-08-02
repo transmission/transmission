@@ -64,8 +64,9 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
 
     auto path = tr_pathbuf{ top, '/', subpath };
     tr_sys_path_native_separators(std::data(path));
-    auto info = tr_sys_path_info{};
-    if (tr_error* error = nullptr; !tr_sys_path_get_info(path, 0, &info, &error))
+    tr_error* error = nullptr;
+    auto const info = tr_sys_path_get_info(path, 0, &error);
+    if (!info)
     {
         tr_logAddWarn(fmt::format(
             _("Skipping '{path}': {error} ({error_code})"),
@@ -76,7 +77,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
         return;
     }
 
-    switch (info.type)
+    switch (info->type)
     {
     case TR_SYS_PATH_IS_DIRECTORY:
         if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
@@ -110,7 +111,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
         break;
 
     case TR_SYS_PATH_IS_FILE:
-        files.emplace(subpath, info.size);
+        files.emplace(subpath, info->size);
         break;
 
     default:

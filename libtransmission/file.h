@@ -8,9 +8,9 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
+#include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -117,8 +117,18 @@ enum tr_sys_path_type_t
 struct tr_sys_path_info
 {
     tr_sys_path_type_t type = {};
-    uint64_t size = 0;
-    time_t last_modified_at = 0;
+    uint64_t size = {};
+    time_t last_modified_at = {};
+
+    [[nodiscard]] constexpr auto isFile() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_FILE;
+    }
+
+    [[nodiscard]] constexpr auto isFolder() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_DIRECTORY;
+    }
 };
 
 /**
@@ -153,13 +163,15 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  *
  * @param[in]  path  Path to file or directory.
  * @param[in]  flags Combination of @ref tr_sys_path_get_info_flags_t values.
- * @param[out] info  Result buffer.
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ * @return info on success, or nullopt with `error` set accordingly.
  */
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr);
+[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_path_get_info(
+    std::string_view path,
+    int flags = 0,
+    tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -369,13 +381,12 @@ bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error = nullptr);
  * @brief Portability wrapper for `fstat()`.
  *
  * @param[in]  handle Valid file descriptor.
- * @param[out] info   Result buffer.
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ * @return info on success, or nullopt with `error` set accordingly.
  */
-bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct tr_error** error = nullptr);
+[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `lseek()`.

@@ -81,14 +81,14 @@ private:
         EXPECT_NE(fd1, TR_BAD_SYS_FILE);
         EXPECT_NE(fd2, TR_BAD_SYS_FILE);
 
-        tr_sys_path_info info1;
-        tr_sys_path_info info2;
-        tr_sys_file_get_info(fd1, &info1);
-        tr_sys_file_get_info(fd2, &info2);
-        EXPECT_EQ(info1.size, info2.size);
+        auto const info1 = tr_sys_file_get_info(fd1);
+        auto const info2 = tr_sys_file_get_info(fd2);
+        EXPECT_TRUE(info1);
+        EXPECT_TRUE(info2);
+        EXPECT_EQ(info1->size, info2->size);
 
-        uint64_t bytes_left1 = info1.size;
-        uint64_t bytes_left2 = info2.size;
+        auto bytes_left1 = info1->size;
+        auto bytes_left2 = info2->size;
 
         size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
         auto* readbuf1 = static_cast<char*>(tr_malloc(buflen));

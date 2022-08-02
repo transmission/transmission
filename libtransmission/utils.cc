@@ -142,9 +142,9 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
     auto const path = tr_pathbuf{ path_in };
 
     /* try to stat the file */
-    auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
+    auto const info = tr_sys_path_get_info(path, 0, &my_error);
+    if (!info)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -155,7 +155,7 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
         return false;
     }
 
-    if (info.type != TR_SYS_PATH_IS_FILE)
+    if (!info->isFile())
     {
         tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
@@ -175,8 +175,8 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
         return false;
     }
 
-    setme.resize(info.size);
-    if (!tr_sys_file_read(fd, std::data(setme), info.size, nullptr, &my_error))
+    setme.resize(info->size);
+    if (!tr_sys_file_read(fd, std::data(setme), info->size, nullptr, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -851,13 +851,13 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
     auto const newpath = tr_pathbuf{ newpath_in };
 
     // make sure the old file exists
-    auto info = tr_sys_path_info{};
-    if (!tr_sys_path_get_info(oldpath, 0, &info, error))
+    auto const info = tr_sys_path_get_info(oldpath, 0, error);
+    if (!info)
     {
         tr_error_prefix(error, "Unable to get information on old file: ");
         return false;
     }
-    if (info.type != TR_SYS_PATH_IS_FILE)
+    if (!info->isFile())
     {
         tr_error_set(error, TR_ERROR_EINVAL, "Old path does not point to a file."sv);
         return false;
