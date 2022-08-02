@@ -163,7 +163,6 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  *
  * @param[in]  path  Path to file or directory.
  * @param[in]  flags Combination of @ref tr_sys_path_get_info_flags_t values.
- * @param[out] info  Result buffer.
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
@@ -382,7 +381,6 @@ bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error = nullptr);
  * @brief Portability wrapper for `fstat()`.
  *
  * @param[in]  handle Valid file descriptor.
- * @param[out] info   Result buffer.
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *

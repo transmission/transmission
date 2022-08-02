@@ -49,10 +49,15 @@ static void depthFirstWalk(char const* path, file_func_t func)
     {
         if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
-            char const* name;
-            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+            for (;;)
             {
-                if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+                char const* const name = tr_sys_dir_read_name(odir);
+                if (name == nullptr)
+                {
+                    break;
+                }
+
+                if ("."sv != name && ".."sv != name)
                 {
                     auto const child = fmt::format("{:s}/{:s}"sv, path, name);
                     depthFirstWalk(child.c_str(), func);

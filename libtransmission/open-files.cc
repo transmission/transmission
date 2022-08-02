@@ -167,7 +167,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         }
     }
 
-    auto info = tr_sys_path_get_info(filename);
+    auto const info = tr_sys_path_get_info(filename);
     bool const already_existed = info && info->isFile();
 
     // we need write permissions to resize the file

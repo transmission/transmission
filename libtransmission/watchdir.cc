@@ -264,6 +264,7 @@ private:
     static bool is_regular_file(std::string_view dir, std::string_view name)
     {
         auto const path = tr_pathbuf{ dir, '/', name };
+
         tr_error* error = nullptr;
         auto const info = tr_sys_path_get_info(path, 0, &error);
         if (error != nullptr)

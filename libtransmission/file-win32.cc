@@ -231,9 +231,10 @@ static wchar_t* path_to_native_path(char const* path)
 
 static std::wstring path_to_native_path_wstr(std::string_view path)
 {
-    if (auto* rawptr = path_to_native_path(tr_pathbuf{ path }); rawptr != nullptr)
+    if (auto* const rawptr = path_to_native_path(tr_pathbuf{ path }); rawptr != nullptr)
     {
-        auto ret = std::wstring{ rawptr } tr_free(rawptr);
+        auto ret = std::wstring{ rawptr };
+        tr_free(rawptr);
         return ret;
     }
 
@@ -430,26 +431,13 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 
 std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
 {
-    auto const wide_path = path_to_native_path_wstr(path);
-    if (std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path_wstr(path); std::empty(wide_path))
     {
         // do nothing
     }
-    else if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
-    {
-        if (auto const
-                handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-            handle != INVALID_HANDLE_VALUE)
-        {
-            auto ret = tr_sys_file_get_info(handle, error);
-            CloseHandle(handle);
-            return ret;
-        }
-    }
-    else
+    else if ((flags & TR_SYS_PATH_NO_FOLLOW) != 0)
     {
         auto attributes = WIN32_FILE_ATTRIBUTE_DATA{};
-
         if (GetFileAttributesExW(wide_path.c_str(), GetFileExInfoStandard, &attributes))
         {
             return stat_to_sys_path_info(
@@ -458,6 +446,14 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
                 attributes.nFileSizeHigh,
                 attributes.ftLastWriteTime);
         }
+    }
+    else if (auto const
+                 handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+             handle != INVALID_HANDLE_VALUE)
+    {
+        auto ret = tr_sys_file_get_info(handle, error);
+        CloseHandle(handle);
+        return ret;
     }
 
     set_system_error(error, GetLastError());
@@ -1064,7 +1060,7 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_er
     }
 
     set_system_error(error, GetLastError());
-    return ret;
+    return {};
 }
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)

@@ -55,7 +55,7 @@ static struct FileList* getFiles(std::string_view dir, std::string_view base, st
     tr_sys_path_native_separators(std::data(buf));
 
     tr_error* error = nullptr;
-    auto info = tr_sys_path_get_info(buf, 0, &error);
+    auto const info = tr_sys_path_get_info(buf, 0, &error);
     if (!info)
     {
         tr_logAddWarn(fmt::format(

@@ -240,10 +240,10 @@ TEST_F(FileTest, getInfo)
 
     // Good file info
     info = tr_sys_path_get_info(path1, 0, &err);
-    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_TRUE(info);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
-    EXPECT_EQ(4, info->size);
+    EXPECT_EQ(4U, info->size);
     EXPECT_GE(info->last_modified_at, t - 1);
     EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
 
@@ -1089,12 +1089,12 @@ TEST_F(FileTest, fileOpen)
     tr_error_clear(&err);
     auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info);
-    EXPECT_EQ(4, info->size);
+    EXPECT_EQ(4U, info->size);
 
     /* Pointer is at the end of file */
     info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info);
-    EXPECT_EQ(4, info->size);
+    EXPECT_EQ(4U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
@@ -1107,17 +1107,17 @@ TEST_F(FileTest, fileOpen)
     /* File gets truncated */
     info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info);
-    EXPECT_EQ(5, info->size);
+    EXPECT_EQ(5U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_file_get_info(fd);
     EXPECT_TRUE(info);
-    EXPECT_EQ(0, info->size);
+    EXPECT_EQ(0U, info->size);
     tr_sys_file_close(fd);
     info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info);
-    EXPECT_EQ(0, info->size);
+    EXPECT_EQ(0U, info->size);
 
     /* TODO: symlink and hardlink tests */
 
@@ -1219,19 +1219,19 @@ TEST_F(FileTest, fileTruncate)
     EXPECT_EQ(nullptr, err) << *err;
     auto info = tr_sys_file_get_info(fd);
     EXPECT_TRUE(info);
-    EXPECT_EQ(10, info->size);
+    EXPECT_EQ(10U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 20, &err));
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_file_get_info(fd);
     EXPECT_TRUE(info);
-    EXPECT_EQ(20, info->size);
+    EXPECT_EQ(20U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 0, &err));
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_file_get_info(fd);
     EXPECT_TRUE(info);
-    EXPECT_EQ(0, info->size);
+    EXPECT_EQ(0U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 50, &err));
     EXPECT_EQ(nullptr, err) << *err;
@@ -1240,7 +1240,7 @@ TEST_F(FileTest, fileTruncate)
 
     info = tr_sys_path_get_info(path1);
     EXPECT_TRUE(info);
-    EXPECT_EQ(50, info->size);
+    EXPECT_EQ(50U, info->size);
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
@@ -1251,7 +1251,7 @@ TEST_F(FileTest, fileTruncate)
 
     info = tr_sys_path_get_info(path1);
     EXPECT_TRUE(info);
-    EXPECT_EQ(25, info->size);
+    EXPECT_EQ(25U, info->size);
 
     tr_sys_path_remove(path1);
 }

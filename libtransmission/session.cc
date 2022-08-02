@@ -2340,7 +2340,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 static void loadBlocklists(tr_session* session)
 {
     auto loadme = std::unordered_set<std::string>{};
-    auto const isEnabled = session->useBlocklist();
+    auto const is_enabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
     auto const dirname = tr_pathbuf{ session->configDir(), "/blocklists"sv };
@@ -2371,8 +2371,8 @@ static void loadBlocklists(tr_session* session)
 
             if (auto const bininfo = tr_sys_path_get_info(binname); !bininfo)
             {
-                // doesn't exit; create it
-                BlocklistFile b(binname, isEnabled);
+                // create it
+                auto b = BlocklistFile{ binname, is_enabled };
                 if (auto const n = b.setContent(path); n > 0)
                 {
                     load = binname;
@@ -2381,12 +2381,12 @@ static void loadBlocklists(tr_session* session)
             else if (auto const pathinfo = tr_sys_path_get_info(path);
                      path && pathinfo->last_modified_at >= bininfo->last_modified_at)
             {
-                // source file is more recent; update bin
+                // update it
                 auto const old = tr_pathbuf{ binname, ".old"sv };
                 tr_sys_path_remove(old);
                 tr_sys_path_rename(binname, old);
 
-                BlocklistFile b(binname, isEnabled);
+                BlocklistFile b(binname, is_enabled);
 
                 if (b.setContent(path) > 0)
                 {
@@ -2411,7 +2411,7 @@ static void loadBlocklists(tr_session* session)
         std::begin(loadme),
         std::end(loadme),
         std::back_inserter(session->blocklists),
-        [&isEnabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), isEnabled); });
+        [&is_enabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), is_enabled); });
 
     /* cleanup */
     tr_sys_dir_close(odir);

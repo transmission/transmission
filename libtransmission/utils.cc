@@ -857,7 +857,6 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
         tr_error_prefix(error, "Unable to get information on old file: ");
         return false;
     }
-
     if (!info->isFile())
     {
         tr_error_set(error, TR_ERROR_EINVAL, "Old path does not point to a file."sv);

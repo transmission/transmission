@@ -117,7 +117,7 @@ static void set_system_error_if_file_found(tr_error** error, int code)
     }
 }
 
-static auto stat_to_sys_path_info(struct stat const& sb)
+static constexpr auto stat_to_sys_path_info(struct stat const& sb)
 {
     auto info = tr_sys_path_info{};
 
@@ -309,6 +309,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
 
     bool ok = false;
     auto const szpath = tr_pathbuf{ path };
+
     if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
     {
         ok = stat(szpath, &sb) != -1;
@@ -509,7 +510,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
 #if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
 
-    while (file_size > 0)
+    while (file_size > 0U)
     {
         size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
         ssize_t const copied =
@@ -537,10 +538,10 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     /* Fallback to user-space copy. */
 
-    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
+    static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
     auto* buf = static_cast<char*>(tr_malloc(buflen));
 
-    while (file_size > 0)
+    while (file_size > 0U)
     {
         uint64_t const chunk_size = std::min(file_size, uint64_t{ buflen });
         uint64_t bytes_read;
