@@ -2631,22 +2631,27 @@ static void torrentRenamePath(
     {
         error = EINVAL;
     }
-    else if ((error = renamePath(tor, oldpath, newname)) == 0)
+    else
     {
-        /* update tr_info.files */
-        for (auto const& file_index : file_indices)
-        {
-            renameTorrentFileString(tor, oldpath, newname, file_index);
-        }
+        error = renamePath(tor, oldpath, newname);
 
-        /* update tr_info.name if user changed the toplevel */
-        if (std::size(file_indices) == tor->fileCount() && !tr_strvContains(oldpath, '/'))
+        if (error == 0)
         {
-            tor->setName(newname);
-        }
+            /* update tr_info.files */
+            for (auto const& file_index : file_indices)
+            {
+                renameTorrentFileString(tor, oldpath, newname, file_index);
+            }
 
-        tor->markEdited();
-        tor->setDirty();
+            /* update tr_info.name if user changed the toplevel */
+            if (std::size(file_indices) == tor->fileCount() && !tr_strvContains(oldpath, '/'))
+            {
+                tor->setName(newname);
+            }
+
+            tor->markEdited();
+            tor->setDirty();
+        }
     }
 
     /***
