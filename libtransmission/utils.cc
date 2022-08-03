@@ -194,7 +194,9 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
 
 bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_error** error)
 {
+    fmt::print("{}:{} filename_in {}\n", __FILE__, __LINE__, filename_in);
     auto const filename = tr_pathbuf{ filename_in };
+    fmt::print("{}:{} filename {}\n", __FILE__, __LINE__, filename.sv());
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
     if (char* const real_filename = tr_sys_path_resolve(filename.c_str()); real_filename != nullptr)
@@ -212,31 +214,42 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
     // Write it to a temp file first.
     // This is a safeguard against edge cases, e.g. disk full, crash while writing, etc.
     auto tmp = tr_pathbuf{ filename.sv(), ".tmp.XXXXXX"sv };
+    fmt::print("{}:{} tmp {}\n", __FILE__, __LINE__, tmp.sv());
     auto const fd = tr_sys_file_open_temp(std::data(tmp), error);
+    fmt::print("{}:{} tmp {}\n", __FILE__, __LINE__, tmp.sv());
     if (fd == TR_BAD_SYS_FILE)
     {
+        fmt::print("{}:{} bad file\n", __FILE__, __LINE__);
         return false;
     }
+    fmt::print("{}:{}\n", __FILE__, __LINE__);
 
     // Save the contents. This might take >1 pass.
     auto ok = bool{ true };
     while (!std::empty(contents))
     {
+        fmt::print("{}:{}\n", __FILE__, __LINE__);
         auto n_written = uint64_t{};
+        fmt::print("{}:{}\n", __FILE__, __LINE__);
         if (!tr_sys_file_write(fd, std::data(contents), std::size(contents), &n_written, error))
         {
+            fmt::print("{}:{}\n", __FILE__, __LINE__);
             ok = false;
             break;
         }
+        fmt::print("{}:{}\n", __FILE__, __LINE__);
         contents.remove_prefix(n_written);
     }
 
     // If we saved it to disk successfully, move it from '.tmp' to the correct filename
+    fmt::print("{}:{}\n", __FILE__, __LINE__);
     if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, filename, error))
     {
+        fmt::print("{}:{}\n", __FILE__, __LINE__);
         return false;
     }
 
+    fmt::print("{}:{}\n", __FILE__, __LINE__);
     tr_logAddTrace(fmt::format("Saved '{}'", filename));
     return true;
 }
