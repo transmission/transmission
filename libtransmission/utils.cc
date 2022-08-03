@@ -1191,22 +1191,18 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 {
 #ifdef _WIN32
 
-    if (auto* const wide_key = tr_win32_utf8_to_native(std::data(key), std::size(key)); wide_key != nullptr)
+    if (auto const wide_key = tr_win32_utf8_to_native(key); !std::empty(wide_key))
     {
-        if (auto const size = GetEnvironmentVariableW(wide_key, nullptr, 0); size != 0)
+        if (auto const size = GetEnvironmentVariableW(wide_key.c_str(), nullptr, 0); size != 0)
         {
             auto wide_val = std::vector<wchar_t>{};
             wide_val.resize(size);
 
-            if (GetEnvironmentVariableW(wide_key, std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
+            if (GetEnvironmentVariableW(wide_key.c_str(), std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
             {
-                auto ret = tr_win32_native_to_utf8({ std::data(wide_val), std::size(wide_val) });
-                tr_free(wide_key);
-                return ret;
+                return tr_win32_native_to_utf8({ std::data(wide_val), std::size(wide_val) });
             }
         }
-
-        tr_free(wide_key);
     }
 
 #else
