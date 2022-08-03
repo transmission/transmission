@@ -551,7 +551,7 @@ public:
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
-        [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
+        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
@@ -679,6 +679,6 @@ unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
 
-std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted);
+std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t num_wanted);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);

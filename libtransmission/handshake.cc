@@ -141,7 +141,7 @@ struct tr_handshake
     tr_peerIo* io = nullptr;
     DH dh = {};
     handshake_state_t state;
-    tr_encryption_mode encryptionMode;
+    tr_encryption_mode encryption_mode;
     uint16_t pad_c_len = {};
     uint16_t pad_d_len = {};
     uint16_t ia_len = {};
@@ -224,7 +224,7 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
     return true;
 }
 
-static ReadState tr_handshakeDone(tr_handshake* handshake, bool isConnected);
+static ReadState tr_handshakeDone(tr_handshake* handshake, bool is_connected);
 
 enum handshake_parse_err_t
 {
@@ -321,7 +321,7 @@ static uint32_t getCryptoProvide(tr_handshake const* handshake)
 {
     uint32_t provide = 0;
 
-    switch (handshake->encryptionMode)
+    switch (handshake->encryption_mode)
     {
     case TR_ENCRYPTION_REQUIRED:
     case TR_ENCRYPTION_PREFERRED:
@@ -341,7 +341,7 @@ static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_p
     uint32_t choices[2];
     int nChoices = 0;
 
-    switch (handshake->encryptionMode)
+    switch (handshake->encryption_mode)
     {
     case TR_ENCRYPTION_REQUIRED:
         choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
@@ -574,7 +574,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (pstrlen == 19) /* unencrypted */
     {
-        if (handshake->encryptionMode == TR_ENCRYPTION_REQUIRED)
+        if (handshake->encryption_mode == TR_ENCRYPTION_REQUIRED)
         {
             tr_logAddTraceHand(handshake, "peer is unencrypted, and we're disallowing that");
             return tr_handshakeDone(handshake, false);
@@ -1054,12 +1054,12 @@ static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
     return success;
 }
 
-static ReadState tr_handshakeDone(tr_handshake* handshake, bool isOK)
+static ReadState tr_handshakeDone(tr_handshake* handshake, bool is_connected)
 {
-    tr_logAddTraceHand(handshake, isOK ? "handshakeDone: connected" : "handshakeDone: aborting");
+    tr_logAddTraceHand(handshake, is_connected ? "handshakeDone: connected" : "handshakeDone: aborting");
     tr_peerIoSetIOFuncs(handshake->io, nullptr, nullptr, nullptr, nullptr);
 
-    bool const success = fireDoneFunc(handshake, isOK);
+    bool const success = fireDoneFunc(handshake, is_connected);
     delete handshake;
     return success ? READ_LATER : READ_ERR;
 }
@@ -1104,7 +1104,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
     if ((handshake->state == AWAITING_YB || handshake->state == AWAITING_VC) &&
-        handshake->encryptionMode != TR_ENCRYPTION_REQUIRED && tr_peerIoReconnect(handshake->io) == 0)
+        handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && tr_peerIoReconnect(handshake->io) == 0)
     {
         uint8_t msg[HANDSHAKE_SIZE];
 
@@ -1135,13 +1135,13 @@ static void handshakeTimeout(evutil_socket_t /*s*/, short /*type*/, void* handsh
 tr_handshake* tr_handshakeNew(
     std::shared_ptr<tr_handshake_mediator> mediator,
     tr_peerIo* io,
-    tr_encryption_mode encryptionMode,
+    tr_encryption_mode encryption_mode,
     tr_handshake_done_func done_func,
     void* done_func_user_data)
 {
     auto* const handshake = new tr_handshake{ std::move(mediator) };
     handshake->io = io;
-    handshake->encryptionMode = encryptionMode;
+    handshake->encryption_mode = encryption_mode;
     handshake->done_func = done_func;
     handshake->done_func_user_data = done_func_user_data;
     handshake->timeout_timer = evtimer_new(handshake->mediator->eventBase(), handshakeTimeout, handshake);
@@ -1154,7 +1154,7 @@ tr_handshake* tr_handshakeNew(
     {
         setReadState(handshake, AWAITING_HANDSHAKE);
     }
-    else if (encryptionMode != TR_CLEAR_PREFERRED)
+    else if (encryption_mode != TR_CLEAR_PREFERRED)
     {
         sendYa(handshake);
     }

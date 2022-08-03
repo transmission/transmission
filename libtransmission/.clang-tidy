@@ -29,7 +29,6 @@ Checks: >
   readability-*,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
-  -readability-inconsistent-declaration-parameter-name,
   -readability-magic-numbers,
   -readability-qualified-auto,
   -readability-redundant-access-specifiers,

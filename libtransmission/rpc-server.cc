@@ -852,10 +852,10 @@ static auto parseWhitelist(std::string_view whitelist)
     return list;
 }
 
-void tr_rpc_server::setWhitelist(std::string_view sv)
+void tr_rpc_server::setWhitelist(std::string_view whitelist)
 {
-    this->whitelist_str_ = sv;
-    this->whitelist_ = parseWhitelist(sv);
+    this->whitelist_str_ = whitelist;
+    this->whitelist_ = parseWhitelist(whitelist);
 }
 
 /****

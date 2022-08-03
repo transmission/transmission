@@ -151,7 +151,7 @@ void tr_variantInitStrView(tr_variant* initme, std::string_view);
 void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
 
-bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** raw_setme, size_t* len_setme);
+bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
 
 /***
 ****  Real Numbers
@@ -186,7 +186,7 @@ constexpr bool tr_variantIsInt(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
 
-void tr_variantInitInt(tr_variant* variant, int64_t value);
+void tr_variantInitInt(tr_variant* initme, int64_t value);
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 
 /***
@@ -198,17 +198,17 @@ constexpr bool tr_variantIsList(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_LIST;
 }
 
-void tr_variantInitList(tr_variant* list, size_t reserve_count);
+void tr_variantInitList(tr_variant* initme, size_t reserve_count);
 void tr_variantListReserve(tr_variant* list, size_t reserve_count);
 
 tr_variant* tr_variantListAdd(tr_variant* list);
-tr_variant* tr_variantListAddBool(tr_variant* list, bool addme);
-tr_variant* tr_variantListAddInt(tr_variant* list, int64_t addme);
-tr_variant* tr_variantListAddReal(tr_variant* list, double addme);
-tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view);
-tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view);
-tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const addme);
-tr_variant* tr_variantListAddRaw(tr_variant* list, void const* addme_value, size_t addme_len);
+tr_variant* tr_variantListAddBool(tr_variant* list, bool value);
+tr_variant* tr_variantListAddInt(tr_variant* list, int64_t value);
+tr_variant* tr_variantListAddReal(tr_variant* list, double value);
+tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view value);
+tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view value);
+tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const value);
+tr_variant* tr_variantListAddRaw(tr_variant* list, void const* value, size_t value_len);
 tr_variant* tr_variantListAddList(tr_variant* list, size_t reserve_count);
 tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count);
 tr_variant* tr_variantListChild(tr_variant* list, size_t pos);

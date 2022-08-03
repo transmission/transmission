@@ -104,7 +104,7 @@ public:
     }
 
     bool add(std::string_view announce_url_sv, tr_tracker_tier_t tier);
-    void add(tr_announce_list const& that);
+    void add(tr_announce_list const& src);
     bool remove(std::string_view announce_url);
     bool remove(tr_tracker_id_t id);
     bool replace(tr_tracker_id_t id, std::string_view announce_url_sv);

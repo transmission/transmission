@@ -43,7 +43,7 @@ public:
     void setHasNone() noexcept;
 
     // set one or more bits
-    void set(size_t bit, bool value = true);
+    void set(size_t nth, bool value = true);
     void setSpan(size_t begin, size_t end, bool value = true);
     void unset(size_t bit)
     {
@@ -53,12 +53,12 @@ public:
     {
         setSpan(begin, end, false);
     }
-    void setFromBools(bool const* bytes, size_t n);
+    void setFromBools(bool const* flags, size_t n);
 
     // "raw" here is in BEP0003 format: "The first byte of the bitfield
     // corresponds to indices 0 - 7 from high bit to low bit, respectively.
     // The next one 8-15, etc. Spare bits at the end are set to zero."
-    void setRaw(uint8_t const* bits, size_t byte_count);
+    void setRaw(uint8_t const* raw, size_t byte_count);
     [[nodiscard]] std::vector<uint8_t> raw() const;
 
     [[nodiscard]] constexpr bool hasAll() const noexcept

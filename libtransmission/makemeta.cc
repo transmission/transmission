@@ -137,50 +137,11 @@ tr_torrent_files findFiles(std::string_view const top, std::string_view const su
 
 } // namespace
 
-tr_metainfo_builder::tr_metainfo_builder(std::string_view filename)
-    : top_{ filename }
+tr_metainfo_builder::tr_metainfo_builder(std::string_view single_file_or_parent_directory)
+    : top_{ single_file_or_parent_directory }
 {
-    files_ = findFiles(tr_sys_path_dirname(filename), tr_sys_path_basename(filename));
+    files_ = findFiles(tr_sys_path_dirname(top_), tr_sys_path_basename(top_));
     block_info_ = tr_block_info{ files_.totalSize(), defaultPieceSize(files_.totalSize()) };
-}
-
-uint32_t tr_metainfo_builder::defaultPieceSize(uint64_t totalSize)
-{
-    uint32_t const KiB = 1024;
-    uint32_t const MiB = 1048576;
-    uint32_t const GiB = 1073741824;
-
-    if (totalSize >= 2 * GiB)
-    {
-        return 2 * MiB;
-    }
-
-    if (totalSize >= 1 * GiB)
-    {
-        return 1 * MiB;
-    }
-
-    if (totalSize >= 512 * MiB)
-    {
-        return 512 * KiB;
-    }
-
-    if (totalSize >= 350 * MiB)
-    {
-        return 256 * KiB;
-    }
-
-    if (totalSize >= 150 * MiB)
-    {
-        return 128 * KiB;
-    }
-
-    if (totalSize >= 50 * MiB)
-    {
-        return 64 * KiB;
-    }
-
-    return 32 * KiB; /* less than 50 meg */
 }
 
 bool tr_metainfo_builder::isLegalPieceSize(uint32_t x)
