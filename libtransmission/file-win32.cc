@@ -142,7 +142,7 @@ static bool is_valid_path(std::string_view path)
     return path.find_first_of("<>:\"|?*"sv) == path.npos;
 }
 
-static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* setme_real_result_size)
+static wchar_t* path_to_native_path(char const* path)
 {
     if (path == nullptr)
     {
@@ -163,7 +163,7 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
     /* TODO (?): TR_ASSERT(!is_relative); */
 
     int real_result_size = 0;
-    wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, extra_chars_after, &real_result_size);
+    wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, 0, &real_result_size);
 
     if (wide_path == nullptr)
     {
@@ -211,17 +211,7 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
         real_result_size -= last_conseq_sep - first_conseq_sep;
     }
 
-    if (setme_real_result_size != nullptr)
-    {
-        *setme_real_result_size = real_result_size;
-    }
-
     return wide_path;
-}
-
-static wchar_t* path_to_native_path(char const* path)
-{
-    return path_to_native_path_ex(path, 0, nullptr);
 }
 
 static std::wstring path_to_native_path_wstr(std::string_view path)
