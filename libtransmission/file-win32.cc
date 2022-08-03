@@ -1352,18 +1352,14 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 char* tr_sys_dir_get_current(tr_error** error)
 {
     char* ret = nullptr;
-    wchar_t* wide_ret = nullptr;
-    DWORD size;
 
-    size = GetCurrentDirectoryW(0, nullptr);
-
-    if (size != 0)
+    if (auto const size = GetCurrentDirectoryW(0, nullptr); size != 0)
     {
-        wide_ret = tr_new(wchar_t, size);
-
-        if (GetCurrentDirectoryW(size, wide_ret) != 0)
+        auto wide_ret = std::wstring{};
+        wide_ret.resize(size);
+        if (GetCurrentDirectoryW(std::size(wide_ret), std::data(wide_ret)) != 0)
         {
-            ret = tr_win32_native_to_utf8(wide_ret, size);
+            ret = tr_win32_native_to_utf8(std::data(wide_ret), std::size(wide_ret));
         }
     }
 
@@ -1371,8 +1367,6 @@ char* tr_sys_dir_get_current(tr_error** error)
     {
         set_system_error(error, GetLastError());
     }
-
-    tr_free(wide_ret);
 
     return ret;
 }
