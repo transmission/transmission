@@ -438,19 +438,16 @@ static struct tr_disk_space getDiskSpace(char const* path)
 
     struct tr_disk_space ret = { -1, -1 };
 
-    wchar_t* const wide_path = tr_win32_utf8_to_native(path, -1);
-    if (wide_path != nullptr)
+    if (auto const wide_path = tr_win32_utf8_to_native(path); !std::empty(wide_path))
     {
         ULARGE_INTEGER freeBytesAvailable;
         ULARGE_INTEGER totalBytesAvailable;
 
-        if (GetDiskFreeSpaceExW(wide_path, &freeBytesAvailable, &totalBytesAvailable, nullptr))
+        if (GetDiskFreeSpaceExW(wide_path.c_str(), &freeBytesAvailable, &totalBytesAvailable, nullptr))
         {
             ret.free = freeBytesAvailable.QuadPart;
             ret.total = totalBytesAvailable.QuadPart;
         }
-
-        tr_free(wide_path);
     }
 
     return ret;
