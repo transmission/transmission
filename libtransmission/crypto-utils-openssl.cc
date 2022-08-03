@@ -123,7 +123,7 @@ public:
         unsigned int hash_length = 0;
         auto digest = DigestType{};
         auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-        bool const ok = check_result(EVP_DigestFinal_ex(handle_.get(), digest_as_uchar, &hash_length));
+        [[maybe_unused]] bool const ok = check_result(EVP_DigestFinal_ex(handle_.get(), digest_as_uchar, &hash_length));
         TR_ASSERT(!ok || hash_length == std::size(digest));
 
         clear();

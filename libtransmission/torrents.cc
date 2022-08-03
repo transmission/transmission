@@ -85,7 +85,7 @@ tr_torrent_id_t tr_torrents::add(tr_torrent* tor)
     return id;
 }
 
-void tr_torrents::remove(tr_torrent const* tor, time_t timestamp)
+void tr_torrents::remove(tr_torrent const* tor, time_t current_time)
 {
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(get(tor->id()) == tor);
@@ -93,7 +93,7 @@ void tr_torrents::remove(tr_torrent const* tor, time_t timestamp)
     by_id_[tor->id()] = nullptr;
     auto const [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{});
     by_hash_.erase(begin, end);
-    removed_.emplace_back(tor->id(), timestamp);
+    removed_.emplace_back(tor->id(), current_time);
 }
 
 std::vector<tr_torrent_id_t> tr_torrents::removedSince(time_t timestamp) const

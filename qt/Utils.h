@@ -63,7 +63,7 @@ public:
     {
         if (dialog.isNull())
         {
-            dialog = new DialogT(std::forward<ArgsT>(args)...);
+            dialog = new DialogT(std::forward<ArgsT>(args)...); // NOLINT clang-analyzer-cplusplus.NewDelete
             dialog->setAttribute(Qt::WA_DeleteOnClose);
             dialog->show();
         }

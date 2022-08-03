@@ -32,7 +32,7 @@ public:
         tr_file_index_t file_num,
         bool writable,
         std::string_view filename,
-        tr_preallocation_mode mode,
+        tr_preallocation_mode allocation,
         uint64_t file_size);
 
     void closeAll();

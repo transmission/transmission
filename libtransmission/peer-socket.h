@@ -37,8 +37,8 @@ struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle);
 struct tr_session;
 struct tr_address;
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
 
 void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket);

@@ -811,12 +811,12 @@ std::string tr_peerIo::addrStr() const
     return tr_isPeerIo(this) ? this->addr_.readable(this->port_) : "error";
 }
 
-void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* userData)
+void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
 {
     io->canRead = readcb;
     io->didWrite = writecb;
     io->gotError = errcb;
-    io->userData = userData;
+    io->userData = user_data;
 }
 
 void tr_peerIoClear(tr_peerIo* io)
@@ -927,14 +927,14 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
     io->outbuf_info.emplace_back(byteCount, isPieceData);
 }
 
-void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, bool isPieceData)
+void tr_peerIoWriteBytes(tr_peerIo* io, void const* writeme, size_t writeme_len, bool is_piece_data)
 {
     struct evbuffer_iovec iovec;
-    evbuffer_reserve_space(io->outbuf.get(), byteCount, &iovec, 1);
+    evbuffer_reserve_space(io->outbuf.get(), writeme_len, &iovec, 1);
 
-    iovec.iov_len = byteCount;
+    iovec.iov_len = writeme_len;
 
-    memcpy(iovec.iov_base, bytes, iovec.iov_len);
+    memcpy(iovec.iov_base, writeme, iovec.iov_len);
 
     if (io->isEncrypted())
     {
@@ -943,7 +943,7 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 
     evbuffer_commit_space(io->outbuf.get(), &iovec, 1);
 
-    io->outbuf_info.emplace_back(byteCount, isPieceData);
+    io->outbuf_info.emplace_back(writeme_len, is_piece_data);
 }
 
 /***

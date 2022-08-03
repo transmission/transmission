@@ -126,10 +126,10 @@ void tr_timerAdd(struct event& timer, int seconds, int microseconds)
     evtimer_add(&timer, &tv);
 }
 
-void tr_timerAddMsec(struct event& timer, int msec)
+void tr_timerAddMsec(struct event& timer, int milliseconds)
 {
-    int const seconds = msec / 1000;
-    int const usec = (msec % 1000) * 1000;
+    int const seconds = milliseconds / 1000;
+    int const usec = (milliseconds % 1000) * 1000;
     tr_timerAdd(timer, seconds, usec);
 }
 
@@ -137,50 +137,50 @@ void tr_timerAddMsec(struct event& timer, int msec)
 ***
 **/
 
-bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** error)
+bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
-    auto const path = tr_pathbuf{ path_in };
+    auto const szfilename = tr_pathbuf{ filename };
 
     /* try to stat the file */
-    auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
+    auto const info = tr_sys_path_get_info(szfilename, 0, &my_error);
+    if (!info)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return false;
     }
 
-    if (info.type != TR_SYS_PATH_IS_FILE)
+    if (!info->isFile())
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return false;
     }
 
-    setme.resize(info.size);
-    if (!tr_sys_file_read(fd, std::data(setme), info.size, nullptr, &my_error))
+    contents.resize(info->size);
+    if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd);
@@ -241,15 +241,15 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
     return true;
 }
 
-tr_disk_space tr_dirSpace(std::string_view dir)
+tr_disk_space tr_dirSpace(std::string_view directory)
 {
-    if (std::empty(dir))
+    if (std::empty(directory))
     {
         errno = EINVAL;
         return { -1, -1 };
     }
 
-    return tr_device_info_get_disk_space(tr_device_info_create(dir));
+    return tr_device_info_get_disk_space(tr_device_info_create(directory));
 }
 
 /****
@@ -283,16 +283,14 @@ bool tr_wildmat(std::string_view text, std::string_view pattern)
     return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) != 0;
 }
 
-char const* tr_strerror(int i)
+char const* tr_strerror(int errnum)
 {
-    char const* ret = strerror(i);
-
-    if (ret == nullptr)
+    if (char const* const ret = strerror(errnum); ret != nullptr)
     {
-        ret = "Unknown Error";
+        return ret;
     }
 
-    return ret;
+    return "Unknown Error";
 }
 
 /****
@@ -348,17 +346,17 @@ uint64_t tr_time_msec()
     return uint64_t(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
 }
 
-void tr_wait_msec(long int msec)
+void tr_wait_msec(long int delay_milliseconds)
 {
 #ifdef _WIN32
 
-    Sleep((DWORD)msec);
+    Sleep((DWORD)delay_milliseconds);
 
 #else
 
     struct timespec ts;
-    ts.tv_sec = msec / 1000;
-    ts.tv_nsec = (msec % 1000) * 1000000;
+    ts.tv_sec = delay_milliseconds / 1000;
+    ts.tv_nsec = (delay_milliseconds % 1000) * 1000000;
     nanosleep(&ts, nullptr);
 
 #endif
@@ -795,7 +793,7 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
 ****
 ***/
 
-double tr_truncd(double x, int precision)
+double tr_truncd(double x, int decimal_places)
 {
     auto buf = std::array<char, 128>{};
     auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
@@ -803,7 +801,7 @@ double tr_truncd(double x, int precision)
 
     if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
     {
-        pt[precision != 0 ? precision + 1 : 0] = '\0';
+        pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
     return atof(std::data(buf));
@@ -851,13 +849,13 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
     auto const newpath = tr_pathbuf{ newpath_in };
 
     // make sure the old file exists
-    auto info = tr_sys_path_info{};
-    if (!tr_sys_path_get_info(oldpath, 0, &info, error))
+    auto const info = tr_sys_path_get_info(oldpath, 0, error);
+    if (!info)
     {
         tr_error_prefix(error, "Unable to get information on old file: ");
         return false;
     }
-    if (info.type != TR_SYS_PATH_IS_FILE)
+    if (!info->isFile())
     {
         tr_error_set(error, TR_ERROR_EINVAL, "Old path does not point to a file."sv);
         return false;

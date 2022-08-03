@@ -38,7 +38,7 @@ enum
  * @brief similar to getopt()
  * @return TR_GETOPT_DONE, TR_GETOPT_ERR, TR_GETOPT_UNK, or the matching tr_option's `val' field
  */
-int tr_getopt(char const* summary, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg);
+int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg);
 
 /** @brief prints the `Usage' help section to stdout */
 void tr_getopt_usage(char const* appName, char const* description, tr_option const* opts);

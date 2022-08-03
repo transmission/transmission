@@ -1180,21 +1180,21 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 ****
 ***/
 
-tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t i)
+tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto const& subpath = tor->fileSubpath(i);
-    auto const priority = tor->file_priorities_.filePriority(i);
-    auto const wanted = tor->files_wanted_.fileWanted(i);
-    auto const length = tor->fileSize(i);
+    auto const& subpath = tor->fileSubpath(file);
+    auto const priority = tor->file_priorities_.filePriority(file);
+    auto const wanted = tor->files_wanted_.fileWanted(file);
+    auto const length = tor->fileSize(file);
 
     if (tor->completeness == TR_SEED || length == 0)
     {
         return { subpath.c_str(), length, length, 1.0, priority, wanted };
     }
 
-    auto const have = tor->completion.countHasBytesInSpan(tor->fpm_.byteSpan(i));
+    auto const have = tor->completion.countHasBytesInSpan(tor->fpm_.byteSpan(file));
     return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
 }
 
@@ -1205,9 +1205,9 @@ size_t tr_torrentFileCount(tr_torrent const* torrent)
     return torrent->fileCount();
 }
 
-tr_webseed_view tr_torrentWebseed(tr_torrent const* tor, size_t i)
+tr_webseed_view tr_torrentWebseed(tr_torrent const* tor, size_t nth)
 {
-    return tr_peerMgrWebseed(tor, i);
+    return tr_peerMgrWebseed(tor, nth);
 }
 
 size_t tr_torrentWebseedCount(tr_torrent const* tor)
@@ -1861,21 +1861,21 @@ void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 ****
 ***/
 
-void tr_torrent::setBandwidthGroup(std::string_view bandwidth_group) noexcept
+void tr_torrent::setBandwidthGroup(std::string_view group_name) noexcept
 {
-    bandwidth_group = tr_strvStrip(bandwidth_group);
+    group_name = tr_strvStrip(group_name);
 
     auto const lock = this->unique_lock();
 
-    if (std::empty(bandwidth_group))
+    if (std::empty(group_name))
     {
         this->bandwidth_group_ = tr_interned_string{};
         this->bandwidth_.setParent(&this->session->top_bandwidth_);
     }
     else
     {
-        this->bandwidth_group_ = bandwidth_group;
-        this->bandwidth_.setParent(&this->session->getBandwidthGroup(bandwidth_group));
+        this->bandwidth_group_ = group_name;
+        this->bandwidth_.setParent(&this->session->getBandwidthGroup(group_name));
     }
 
     this->setDirty();
@@ -1968,9 +1968,9 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 }
 
 // TODO(ckerr) migrate to fpm?
-tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t i)
+tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file)
 {
-    auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(i);
+    auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(file);
 
     auto const begin_block = tor->byteLoc(begin_byte).block;
     if (begin_byte >= end_byte) // 0-byte file
@@ -2154,7 +2154,7 @@ static void setLocationInEventThread(
 }
 
 void tr_torrent::setLocation(
-    std::string_view path,
+    std::string_view location,
     bool move_from_old_path,
     double volatile* setme_progress,
     int volatile* setme_state)
@@ -2168,7 +2168,7 @@ void tr_torrent::setLocation(
         this->session,
         setLocationInEventThread,
         this,
-        std::string{ path },
+        std::string{ location },
         move_from_old_path,
         setme_progress,
         setme_state);
@@ -2176,15 +2176,15 @@ void tr_torrent::setLocation(
 
 void tr_torrentSetLocation(
     tr_torrent* tor,
-    char const* path,
+    char const* location,
     bool move_from_old_path,
     double volatile* setme_progress,
     int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(!tr_str_is_empty(path));
+    TR_ASSERT(!tr_str_is_empty(location));
 
-    tor->setLocation(path, move_from_old_path, setme_progress, setme_state);
+    tor->setLocation(location, move_from_old_path, setme_progress, setme_state);
 }
 
 ///
@@ -2257,13 +2257,13 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     }
 }
 
-static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t pieceIndex)
+static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t piece_index)
 {
-    tr_peerMgrPieceCompleted(tor, pieceIndex);
+    tr_peerMgrPieceCompleted(tor, piece_index);
 
     // if this piece completes any file, invoke the fileCompleted func for it
-    auto const [begin, end] = tor->fpm_.fileSpan(pieceIndex);
-    for (tr_file_index_t file = begin; file < end; ++file)
+    auto const span = tor->fpm_.fileSpan(piece_index);
+    for (auto file = span.begin; file < span.end; ++file)
     {
         if (tor->completion.hasBlocks(tr_torGetFileBlockSpan(tor, file)))
         {
@@ -2391,27 +2391,27 @@ int tr_torrentGetQueuePosition(tr_torrent const* tor)
     return tor->queuePosition;
 }
 
-void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
+void tr_torrentSetQueuePosition(tr_torrent* tor, int queue_position)
 {
     int back = -1;
     int const old_pos = tor->queuePosition;
 
-    if (pos < 0)
+    if (queue_position < 0)
     {
-        pos = 0;
+        queue_position = 0;
     }
 
     tor->queuePosition = -1;
 
     for (auto* const walk : tor->session->torrents())
     {
-        if ((old_pos < pos) && (old_pos <= walk->queuePosition) && (walk->queuePosition <= pos))
+        if ((old_pos < queue_position) && (old_pos <= walk->queuePosition) && (walk->queuePosition <= queue_position))
         {
             walk->queuePosition--;
             walk->markChanged();
         }
 
-        if ((old_pos > pos) && (pos <= walk->queuePosition) && (walk->queuePosition < old_pos))
+        if ((old_pos > queue_position) && (queue_position <= walk->queuePosition) && (walk->queuePosition < old_pos))
         {
             walk->queuePosition++;
             walk->markChanged();
@@ -2423,7 +2423,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
         }
     }
 
-    tor->queuePosition = std::min(pos, back + 1);
+    tor->queuePosition = std::min(queue_position, back + 1);
     tor->markChanged();
 
     TR_ASSERT(queueIsSequenced(tor->session));
@@ -2437,9 +2437,9 @@ struct CompareTorrentByQueuePosition
     }
 };
 
-void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t n)
+void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition{});
     for (auto* tor : torrents)
     {
@@ -2447,9 +2447,9 @@ void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t n)
     }
 }
 
-void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t n)
+void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
     for (auto* tor : torrents)
     {
@@ -2457,9 +2457,9 @@ void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t n)
     }
 }
 
-void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t n)
+void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition{});
     for (auto* tor : torrents)
     {
@@ -2467,9 +2467,9 @@ void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t n)
     }
 }
 
-void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t n)
+void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
     for (auto* tor : torrents)
     {
@@ -2631,22 +2631,27 @@ static void torrentRenamePath(
     {
         error = EINVAL;
     }
-    else if ((error = renamePath(tor, oldpath, newname)) == 0)
+    else
     {
-        /* update tr_info.files */
-        for (auto const& file_index : file_indices)
-        {
-            renameTorrentFileString(tor, oldpath, newname, file_index);
-        }
+        error = renamePath(tor, oldpath, newname);
 
-        /* update tr_info.name if user changed the toplevel */
-        if (std::size(file_indices) == tor->fileCount() && !tr_strvContains(oldpath, '/'))
+        if (error == 0)
         {
-            tor->setName(newname);
-        }
+            /* update tr_info.files */
+            for (auto const& file_index : file_indices)
+            {
+                renameTorrentFileString(tor, oldpath, newname, file_index);
+            }
 
-        tor->markEdited();
-        tor->setDirty();
+            /* update tr_info.name if user changed the toplevel */
+            if (std::size(file_indices) == tor->fileCount() && !tr_strvContains(oldpath, '/'))
+            {
+                tor->setName(newname);
+            }
+
+            tor->markEdited();
+            tor->setDirty();
+        }
     }
 
     /***
