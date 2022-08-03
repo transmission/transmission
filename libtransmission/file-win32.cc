@@ -474,14 +474,14 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
         goto fail;
     }
 
-    handle1 = CreateFileW(wide_path1, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+    handle1 = CreateFileW(wide_path1.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
     if (handle1 == INVALID_HANDLE_VALUE)
     {
         goto fail;
     }
 
-    handle2 = CreateFileW(wide_path2, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+    handle2 = CreateFileW(wide_path2.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
     if (handle2 == INVALID_HANDLE_VALUE)
     {
@@ -800,7 +800,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     auto cancel = BOOL{ FALSE };
     DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
-    if (CopyFileExW(wide_src_path, wide_dst_path, nullptr, nullptr, &cancel, flags) == 0)
+    if (CopyFileExW(wide_src_path.c_str(), wide_dst_path.c_str(), nullptr, nullptr, &cancel, flags) == 0)
     {
         set_system_error(error, GetLastError());
         return false;
@@ -1440,13 +1440,11 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     if (auto const utf8 = tr_win32_native_to_utf8(handle->find_data.cFileName); !std::empty(utf8))
     {
         handle->utf8_name = utf8;
-    }
-    else
-    {
-        set_system_error(error, GetLastError());
+        return handle->utf8_name.c_str();
     }
 
-    return ret;
+    set_system_error(error, GetLastError());
+    return nullptr;
 }
 
 bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
