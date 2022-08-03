@@ -88,6 +88,11 @@ public:
     {
     }
 
+    tr_handshake_mediator_impl(tr_handshake_mediator_impl&&) = delete;
+    tr_handshake_mediator_impl(tr_handshake_mediator_impl const&) = delete;
+    tr_handshake_mediator_impl& operator=(tr_handshake_mediator_impl&&) = delete;
+    tr_handshake_mediator_impl& operator=(tr_handshake_mediator_impl const&) = delete;
+
     virtual ~tr_handshake_mediator_impl() = default;
 
     [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
@@ -578,6 +583,11 @@ struct tr_peerMgr
         tr_timerAddMsec(*refill_upkeep_timer_, RefillUpkeepPeriodMsec);
     }
 
+    tr_peerMgr(tr_peerMgr&&) = delete;
+    tr_peerMgr(tr_peerMgr const&) = delete;
+    tr_peerMgr& operator=(tr_peerMgr&&) = delete;
+    tr_peerMgr& operator=(tr_peerMgr const&) = delete;
+
     [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
@@ -823,6 +833,11 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
             , peer_{ peer_in }
         {
         }
+
+        MediatorImpl(MediatorImpl&&) = delete;
+        MediatorImpl(MediatorImpl const&) = delete;
+        MediatorImpl& operator=(MediatorImpl&&) = delete;
+        MediatorImpl& operator=(MediatorImpl const&) = delete;
 
         ~MediatorImpl() override = default;
 

@@ -1296,9 +1296,8 @@ uint16_t tr_sessionGetPeerPort(tr_session const* session)
 
 uint16_t tr_sessionSetPeerPortRandom(tr_session* session)
 {
-    tr_port p = getRandomPort(session);
+    tr_port const p = getRandomPort(session);
     tr_sessionSetPeerPort(session, p.host());
-
     return p.host();
 }
 
