@@ -119,6 +119,11 @@ struct tr_handshake
     {
     }
 
+    tr_handshake(tr_handshake&&) = delete;
+    tr_handshake(tr_handshake const&) = delete;
+    tr_handshake& operator=(tr_handshake&&) = delete;
+    tr_handshake& operator=(tr_handshake const&) = delete;
+
     ~tr_handshake()
     {
         if (io != nullptr)

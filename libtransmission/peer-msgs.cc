@@ -300,6 +300,11 @@ public:
         updateDesiredRequestCount(this);
     }
 
+    tr_peerMsgsImpl(tr_peerMsgsImpl&&) = delete;
+    tr_peerMsgsImpl(tr_peerMsgsImpl const&) = delete;
+    tr_peerMsgsImpl& operator=(tr_peerMsgsImpl&&) = delete;
+    tr_peerMsgsImpl& operator=(tr_peerMsgsImpl const&) = delete;
+
     ~tr_peerMsgsImpl() override
     {
         set_active(TR_UP, false);

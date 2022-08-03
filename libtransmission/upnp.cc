@@ -66,6 +66,12 @@ tr_port_forwarding portFwdState(UpnpState upnp_state, bool is_mapped)
 
 struct tr_upnp
 {
+    tr_upnp() = default;
+    tr_upnp(tr_upnp&&) = delete;
+    tr_upnp(tr_upnp const&) = delete;
+    tr_upnp& operator=(tr_upnp&&) = delete;
+    tr_upnp& operator=(tr_upnp const&) = delete;
+
     ~tr_upnp()
     {
         TR_ASSERT(!isMapped);
