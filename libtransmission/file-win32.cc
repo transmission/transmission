@@ -33,10 +33,10 @@ using namespace std::literals;
 
 struct tr_sys_dir_win32
 {
-    wchar_t* pattern;
-    HANDLE find_handle;
-    WIN32_FIND_DATAW find_data;
-    char* utf8_name;
+    std::wstring pattern;
+    HANDLE find_handle = INVALID_HANDLE_VALUE;
+    WIN32_FIND_DATAW find_data = {};
+    std::string utf8_name;
 };
 
 static wchar_t const native_local_path_prefix[] = { '\\', '\\', '?', '\\' };
@@ -1398,36 +1398,23 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
 tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
+    TR_ASSERT(path != nullptr);
+
 #ifndef __clang__
     /* Clang gives "static_assert expression is not an integral constant expression" error */
     static_assert(TR_BAD_SYS_DIR == nullptr, "values should match");
 #endif
 
-    TR_ASSERT(path != nullptr);
-
-    tr_sys_dir_t ret = tr_new(struct tr_sys_dir_win32, 1);
-
-    int pattern_size;
-    ret->pattern = path_to_native_path_ex(path, 2, &pattern_size);
-
-    if (ret->pattern != nullptr)
-    {
-        ret->pattern[pattern_size + 0] = L'\\';
-        ret->pattern[pattern_size + 1] = L'*';
-
-        ret->find_handle = INVALID_HANDLE_VALUE;
-        ret->utf8_name = nullptr;
-    }
-    else
+    auto pattern = path_to_native_path_wstr(path);
+    if (std::empty(pattern))
     {
         set_system_error(error, GetLastError());
-
-        tr_free(ret->pattern);
-        tr_free(ret);
-
-        ret = nullptr;
+        return nullptr;
     }
 
+    auto* const ret = new tr_sys_dir_win32{};
+    ret->pattern = pattern;
+    ret->pattern.append(L"\\*");
     return ret;
 }
 
@@ -1439,7 +1426,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
 
     if (handle->find_handle == INVALID_HANDLE_VALUE)
     {
-        handle->find_handle = FindFirstFileW(handle->pattern, &handle->find_data);
+        handle->find_handle = FindFirstFileW(handle->pattern.c_str(), &handle->find_data);
 
         if (handle->find_handle == INVALID_HANDLE_VALUE)
         {
@@ -1460,12 +1447,9 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
         return nullptr;
     }
 
-    char* ret = tr_win32_native_to_utf8(handle->find_data.cFileName, -1);
-
-    if (ret != nullptr)
+    if (auto const utf8 = tr_win32_native_to_utf8(handle->find_data.cFileName); !std::empty(utf8))
     {
-        tr_free(handle->utf8_name);
-        handle->utf8_name = ret;
+        handle->utf8_name = utf8;
     }
     else
     {
@@ -1486,9 +1470,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
         set_system_error(error, GetLastError());
     }
 
-    tr_free(handle->utf8_name);
-    tr_free(handle->pattern);
-    tr_free(handle);
+    delete handle;
 
     return ret;
 }
