@@ -1943,7 +1943,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_port, &i))
     {
-        session->setPeerPort(tr_port::fromHost(i));
+        tr_sessionSetPeerPort(session, i);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_port_forwarding_enabled, &boolVal))
