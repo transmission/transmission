@@ -260,17 +260,14 @@ static char* native_path_to_path(wchar_t const* wide_path)
     return path;
 }
 
-static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
+static tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
-    wchar_t* wide_path = path_to_native_path(path);
 
-    if (wide_path != nullptr)
+    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
         ret = CreateFileW(
-            wide_path,
+            wide_path.c_str(),
             access,
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
             nullptr,
@@ -284,27 +281,23 @@ static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition
         set_system_error(error, GetLastError());
     }
 
-    tr_free(wide_path);
-
     return ret;
 }
 
-static bool create_dir(char const* path, int flags, int /*permissions*/, bool okay_if_exists, tr_error** error)
+static bool create_dir(std::string_view path, int flags, int /*permissions*/, bool okay_if_exists, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
     bool ret;
     DWORD error_code = ERROR_SUCCESS;
-    wchar_t* wide_path = path_to_native_path(path);
+    auto const wide_path = path_to_native_path_wstr(path);
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
-        error_code = SHCreateDirectoryExW(nullptr, wide_path, nullptr);
+        error_code = SHCreateDirectoryExW(nullptr, wide_path.c_str(), nullptr);
         ret = error_code == ERROR_SUCCESS;
     }
     else
     {
-        ret = CreateDirectoryW(wide_path, nullptr);
+        ret = CreateDirectoryW(wide_path.c_str(), nullptr);
 
         if (!ret)
         {
@@ -314,7 +307,7 @@ static bool create_dir(char const* path, int flags, int /*permissions*/, bool ok
 
     if (!ret && error_code == ERROR_ALREADY_EXISTS && okay_if_exists)
     {
-        DWORD const attributes = GetFileAttributesW(wide_path);
+        DWORD const attributes = GetFileAttributesW(wide_path.c_str());
 
         if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
         {
@@ -326,8 +319,6 @@ static bool create_dir(char const* path, int flags, int /*permissions*/, bool ok
     {
         set_system_error(error, error_code);
     }
-
-    tr_free(wide_path);
 
     return ret;
 }
@@ -389,17 +380,16 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 
     bool ret = false;
     HANDLE handle = INVALID_HANDLE_VALUE;
-    wchar_t* wide_path = path_to_native_path(path);
 
-    if (wide_path != nullptr)
+    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
-        DWORD attributes = GetFileAttributesW(wide_path);
+        DWORD attributes = GetFileAttributesW(wide_path.c_str());
 
         if (attributes != INVALID_FILE_ATTRIBUTES)
         {
             if ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
             {
-                handle = CreateFileW(wide_path, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+                handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
                 ret = handle != INVALID_HANDLE_VALUE;
             }
             else
@@ -418,8 +408,6 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     {
         CloseHandle(handle);
     }
-
-    tr_free(wide_path);
 
     return ret;
 }
@@ -484,22 +472,14 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     TR_ASSERT(path2 != nullptr);
 
     bool ret = false;
-    wchar_t* wide_path1 = nullptr;
-    wchar_t* wide_path2 = nullptr;
     HANDLE handle1 = INVALID_HANDLE_VALUE;
     HANDLE handle2 = INVALID_HANDLE_VALUE;
     BY_HANDLE_FILE_INFORMATION fi1, fi2;
 
-    wide_path1 = path_to_native_path(path1);
+    auto const wide_path1 = path_to_native_path_wstr(path1);
+    auto const wide_path2 = path_to_native_path_wstr(path2);
 
-    if (wide_path1 == nullptr)
-    {
-        goto fail;
-    }
-
-    wide_path2 = path_to_native_path(path2);
-
-    if (wide_path2 == nullptr)
+    if (std::empty(wide_path1) || std::empty(wide_path2))
     {
         goto fail;
     }
@@ -537,9 +517,6 @@ cleanup:
     CloseHandle(handle2);
     CloseHandle(handle1);
 
-    tr_free(wide_path2);
-    tr_free(wide_path1);
-
     return ret;
 }
 
@@ -548,20 +525,18 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     TR_ASSERT(path != nullptr);
 
     char* ret = nullptr;
-    wchar_t* wide_path;
     wchar_t* wide_ret = nullptr;
     HANDLE handle = INVALID_HANDLE_VALUE;
     DWORD wide_ret_size;
 
-    wide_path = path_to_native_path(path);
-
-    if (wide_path == nullptr)
+    auto const wide_path = path_to_native_path_wstr(path);
+    if (std::empty(wide_path))
     {
         goto fail;
     }
 
     handle = CreateFileW(
-        wide_path,
+        wide_path.c_str(),
         FILE_READ_EA,
         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
         nullptr,
@@ -605,7 +580,6 @@ fail:
 
 cleanup:
     tr_free(wide_ret);
-    tr_free(wide_path);
 
     if (handle != INVALID_HANDLE_VALUE)
     {
@@ -786,15 +760,15 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     TR_ASSERT(dst_path != nullptr);
 
     bool ret = false;
-    wchar_t* wide_src_path = path_to_native_path(src_path);
-    wchar_t* wide_dst_path = path_to_native_path(dst_path);
+    auto const wide_src_path = path_to_native_path_wstr(src_path);
+    auto const wide_dst_path = path_to_native_path_wstr(dst_path);
 
-    if (wide_src_path != nullptr && wide_dst_path != nullptr)
+    if (std::empty(wide_src_path) && std::empty(wide_dst_path))
     {
         DWORD flags = MOVEFILE_REPLACE_EXISTING;
         DWORD attributes;
 
-        attributes = GetFileAttributesW(wide_src_path);
+        attributes = GetFileAttributesW(wide_src_path.c_str());
 
         if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
         {
@@ -802,7 +776,7 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
         }
         else
         {
-            attributes = GetFileAttributesW(wide_dst_path);
+            attributes = GetFileAttributesW(wide_dst_path.c_str());
 
             if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
             {
@@ -810,16 +784,13 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
             }
         }
 
-        ret = MoveFileExW(wide_src_path, wide_dst_path, flags);
+        ret = MoveFileExW(wide_src_path.c_str(), wide_dst_path.c_str(), flags);
     }
 
     if (!ret)
     {
         set_system_error(error, GetLastError());
     }
-
-    tr_free(wide_dst_path);
-    tr_free(wide_src_path);
 
     return ret;
 }
@@ -829,15 +800,12 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     TR_ASSERT(src_path != nullptr);
     TR_ASSERT(dst_path != nullptr);
 
-    bool ret = false;
-
-    wchar_t* wide_src_path = path_to_native_path(src_path);
-    wchar_t* wide_dst_path = path_to_native_path(dst_path);
-
-    if (wide_src_path == nullptr || wide_dst_path == nullptr)
+    auto const wide_src_path = path_to_native_path_wstr(src_path);
+    auto const wide_dst_path = path_to_native_path_wstr(dst_path);
+    if (std::empty(wide_src_path) || std::empty(wide_dst_path))
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
-        goto out;
+        return false;
     }
 
     auto cancel = BOOL{ FALSE };
@@ -845,18 +813,10 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (CopyFileExW(wide_src_path, wide_dst_path, nullptr, nullptr, &cancel, flags) == 0)
     {
         set_system_error(error, GetLastError());
-        goto out;
-    }
-    else
-    {
-        ret = true;
+        return false;
     }
 
-out:
-    tr_free(wide_src_path);
-    tr_free(wide_dst_path);
-
-    return ret;
+    return true;
 }
 
 bool tr_sys_path_remove(char const* path, tr_error** error)
@@ -864,21 +824,20 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
     TR_ASSERT(path != nullptr);
 
     bool ret = false;
-    wchar_t* wide_path = path_to_native_path(path);
 
-    if (wide_path != nullptr)
+    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
-        DWORD const attributes = GetFileAttributesW(wide_path);
+        DWORD const attributes = GetFileAttributesW(wide_path.c_str());
 
         if (attributes != INVALID_FILE_ATTRIBUTES)
         {
             if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
             {
-                ret = RemoveDirectoryW(wide_path);
+                ret = RemoveDirectoryW(wide_path.c_str());
             }
             else
             {
-                ret = DeleteFileW(wide_path);
+                ret = DeleteFileW(wide_path.c_str());
             }
         }
     }
@@ -887,8 +846,6 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
     {
         set_system_error(error, GetLastError());
     }
-
-    tr_free(wide_path);
 
     return ret;
 }
