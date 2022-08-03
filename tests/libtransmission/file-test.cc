@@ -79,7 +79,7 @@ protected:
 
         auto const wide_src_path = tr_win32_utf8_to_native(src_path);
         auto const wide_dst_path = tr_win32_utf8_to_native(dst_path);
-        return CreateHardLinkW(wide_dst_path, wide_src_path, nullptr);
+        return CreateHardLinkW(wide_dst_path.c_str(), wide_src_path.c_str(), nullptr);
 
 #endif
     }
