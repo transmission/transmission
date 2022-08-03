@@ -519,6 +519,30 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 
 #ifdef _WIN32
 
+std::string tr_win32_native_to_utf8(std::wstring_view native)
+{
+    if (auto* const tmp = tr_win32_native_to_utf8(std::data(native), std::size(native)); tmp != nullptr)
+    {
+        auto ret = std::string{ tmp };
+        tr_free(tmp);
+        return ret;
+    }
+
+    return {};
+}
+
+std::wstring tr_win32_utf8_to_native(std::string_view utf8)
+{
+    if (auto* const tmp = tr_win32_utf8_to_native(std::data(utf8), std::size(utf8)); tmp != nullptr)
+    {
+        auto ret = std::wstring{ tmp };
+        tr_free(tmp);
+        return ret;
+    }
+
+    return {};
+}
+
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 {
     return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, nullptr);

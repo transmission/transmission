@@ -119,6 +119,9 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end);
 
 #ifdef _WIN32
 
+std::string tr_win32_native_to_utf8(std::wstring_view);
+std::wstring tr_win32_utf8_to_native(std::string_view);
+
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);
 char* tr_win32_native_to_utf8_ex(
     wchar_t const* text,
