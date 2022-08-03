@@ -1200,9 +1200,7 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
             if (GetEnvironmentVariableW(wide_key, std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
             {
-                char* const val = tr_win32_native_to_utf8(std::data(wide_val), std::size(wide_val));
-                auto ret = std::string{ val };
-                tr_free(val);
+                auto ret = tr_win32_native_to_utf8({ std::data(wide_val), std::size(wide_val) });
                 tr_free(wide_key);
                 return ret;
             }
