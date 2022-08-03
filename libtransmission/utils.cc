@@ -643,14 +643,10 @@ fail:
     return nullptr;
 }
 
-char* tr_win32_format_message(uint32_t code)
+std::string tr_win32_format_message(uint32_t code)
 {
     wchar_t* wide_text = nullptr;
-    DWORD wide_size;
-    char* text = nullptr;
-    size_t text_size;
-
-    wide_size = FormatMessageW(
+    auto const wide_size = FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         nullptr,
         code,
@@ -661,25 +657,22 @@ char* tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return tr_strvDup(fmt::format(FMT_STRING("Unknown error ({:#08x})"), code));
+        return fmt::format(FMT_STRING("Unknown error ({:#08x})"), code);
     }
+
+    auto text = std::string{};
 
     if (wide_size != 0 && wide_text != nullptr)
     {
-        text = tr_win32_native_to_utf8(wide_text, wide_size);
+        text = tr_win32_native_to_utf8({ wide_text, wide_size });
     }
 
     LocalFree(wide_text);
 
-    if (text != nullptr)
+    // Most (all?) messages contain "\r\n" in the end, chop it
+    while (!std::empty(text) && isspace(text.back()))
     {
-        /* Most (all?) messages contain "\r\n" in the end, chop it */
-        text_size = strlen(text);
-
-        while (text_size > 0 && isspace((uint8_t)text[text_size - 1]))
-        {
-            text[--text_size] = '\0';
-        }
+        text.resize(text.size() - 1);
     }
 
     return text;

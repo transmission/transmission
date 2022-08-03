@@ -44,19 +44,14 @@ static wchar_t const native_unc_path_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N
 
 static void set_system_error(tr_error** error, DWORD code)
 {
-    char* message;
-
     if (error == nullptr)
     {
         return;
     }
 
-    message = tr_win32_format_message(code);
-
-    if (message != nullptr)
+    if (auto const message = tr_win32_format_message(code); !std::empty(message))
     {
         tr_error_set(error, code, message);
-        tr_free(message);
     }
     else
     {
