@@ -139,6 +139,11 @@ public:
         curl_thread = std::make_unique<std::thread>(curlThreadFunc, this);
     }
 
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
+
     ~Impl()
     {
         run_mode = RunMode::CloseNow;

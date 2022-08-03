@@ -43,7 +43,9 @@ auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
 class tr_watchdir_retry
 {
 public:
+    tr_watchdir_retry(tr_watchdir_retry&&) = delete;
     tr_watchdir_retry(tr_watchdir_retry const&) = delete;
+    tr_watchdir_retry& operator=(tr_watchdir_retry&&) = delete;
     tr_watchdir_retry& operator=(tr_watchdir_retry const&) = delete;
 
     tr_watchdir_retry(tr_watchdir_t handle_in, struct event_base* base, std::string_view name_in)
@@ -139,6 +141,11 @@ public:
         }
     }
 
+    tr_watchdir(tr_watchdir&&) = delete;
+    tr_watchdir(tr_watchdir const&) = delete;
+    tr_watchdir& operator=(tr_watchdir&&) = delete;
+    tr_watchdir& operator=(tr_watchdir const&) = delete;
+
     ~tr_watchdir()
     {
         if (backend_ != nullptr)
@@ -146,9 +153,6 @@ public:
             backend_->free_func(backend_);
         }
     }
-
-    tr_watchdir(tr_watchdir const&) = delete;
-    tr_watchdir& operator=(tr_watchdir const&) = delete;
 
     [[nodiscard]] constexpr auto const& path() const noexcept
     {

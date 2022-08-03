@@ -169,6 +169,11 @@ public:
         startTimer();
     }
 
+    tr_webseed(tr_webseed&&) = delete;
+    tr_webseed(tr_webseed const&) = delete;
+    tr_webseed& operator=(tr_webseed&&) = delete;
+    tr_webseed& operator=(tr_webseed const&) = delete;
+
     ~tr_webseed() override
     {
         // flag all the pending tasks as dead

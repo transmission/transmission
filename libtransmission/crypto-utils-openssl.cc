@@ -146,7 +146,12 @@ private:
 class Sha1Impl final : public tr_sha1
 {
 public:
+    Sha1Impl() = default;
+    Sha1Impl(Sha1Impl&&) = delete;
+    Sha1Impl(Sha1Impl const&) = delete;
     ~Sha1Impl() override = default;
+    Sha1Impl& operator=(Sha1Impl&&) = delete;
+    Sha1Impl& operator=(Sha1Impl const&) = delete;
 
     void clear() override
     {
@@ -170,7 +175,12 @@ private:
 class Sha256Impl final : public tr_sha256
 {
 public:
+    Sha256Impl() = default;
+    Sha256Impl(Sha256Impl&&) = delete;
+    Sha256Impl(Sha256Impl const&) = delete;
     ~Sha256Impl() override = default;
+    Sha256Impl& operator=(Sha256Impl&&) = delete;
+    Sha256Impl& operator=(Sha256Impl const&) = delete;
 
     void clear() override
     {

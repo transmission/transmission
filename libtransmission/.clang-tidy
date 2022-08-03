@@ -18,6 +18,7 @@ Checks: >
   cppcoreguidelines-init-variables,
   cppcoreguidelines-prefer-member-initializer,
   cppcoreguidelines-slicing,
+  cppcoreguidelines-special-member-functions,
   cppcoreguidelines-virtual-class-destructor,
   misc-*,
   -misc-no-recursion,

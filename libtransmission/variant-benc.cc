@@ -144,6 +144,11 @@ struct MyHandler : public transmission::benc::Handler
     {
     }
 
+    MyHandler(MyHandler&&) = delete;
+    MyHandler(MyHandler const&) = delete;
+    MyHandler& operator=(MyHandler&&) = delete;
+    MyHandler& operator=(MyHandler const&) = delete;
+
     ~MyHandler() override = default;
 
     bool Int64(int64_t value, Context const& /*context*/) final
