@@ -110,14 +110,14 @@ public:
     }
 
     bool move(
-        std::string_view old_top_in,
-        std::string_view top_in,
+        std::string_view old_parent_in,
+        std::string_view parent_in,
         double volatile* setme_progress,
-        std::string_view log_name = "",
+        std::string_view parent_name = "",
         tr_error** error = nullptr) const;
 
     using FileFunc = std::function<void(char const* filename)>;
-    void remove(std::string_view top_in, std::string_view tmpdir_prefix, FileFunc const& func) const;
+    void remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func) const;
 
     struct FoundFile : public tr_sys_path_info
     {

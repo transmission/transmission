@@ -105,9 +105,9 @@ struct tr_completion
 
     void amountDone(float* tab, size_t n_tabs) const;
 
-    void addBlock(tr_block_index_t i);
-    void addPiece(tr_piece_index_t i);
-    void removePiece(tr_piece_index_t i);
+    void addBlock(tr_block_index_t block);
+    void addPiece(tr_piece_index_t piece);
+    void removePiece(tr_piece_index_t piece);
 
     void setHasPiece(tr_piece_index_t i, bool has)
     {

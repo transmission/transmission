@@ -30,9 +30,9 @@ using namespace std::literals;
 ****
 ***/
 
-bool tr_addressIsIP(char const* str)
+bool tr_addressIsIP(char const* address)
 {
-    return str != nullptr && tr_address::fromString(str).has_value();
+    return address != nullptr && tr_address::fromString(address).has_value();
 }
 
 char const* tr_webGetResponseStr(long code)
