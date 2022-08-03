@@ -753,7 +753,7 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     auto const wide_src_path = path_to_native_path_wstr(src_path);
     auto const wide_dst_path = path_to_native_path_wstr(dst_path);
 
-    if (!std::empty(wide_src_path) && std::empty(!wide_dst_path))
+    if (!std::empty(wide_src_path) && !std::empty(wide_dst_path))
     {
         DWORD flags = MOVEFILE_REPLACE_EXISTING;
         DWORD attributes;
