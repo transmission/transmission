@@ -207,12 +207,10 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 
         if (ev->Action == FILE_ACTION_ADDED || ev->Action == FILE_ACTION_MODIFIED || ev->Action == FILE_ACTION_RENAMED_NEW_NAME)
         {
-            char* name = tr_win32_native_to_utf8(ev->FileName, ev->FileNameLength / sizeof(WCHAR));
-
-            if (name != nullptr)
+            if (auto const name = tr_win32_native_to_utf8({ ev->FileName, ev->FileNameLength / sizeof(WCHAR) });
+                !std::empty(name))
             {
-                tr_watchdir_process(handle, name);
-                tr_free(name);
+                tr_watchdir_process(handle, name.c_str());
             }
         }
     }
