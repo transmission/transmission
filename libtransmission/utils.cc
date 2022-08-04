@@ -515,8 +515,8 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 std::string tr_win32_native_to_utf8(std::wstring_view wide)
 {
     auto utf8 = std::string{};
-    utf8.resize(std::mbstowcs(nullptr, std::data(wide), std::size(wide)));
-    auto const len = mbstowcs(std::data(utf8), std::data(wide), std::size(wide));
+    utf8.resize(std::wcstombs(nullptr, std::data(wide), std::size(wide)));
+    auto const len = std::wcstombs(std::data(utf8), std::data(wide), std::size(wide));
     TR_ASSERT(len == std::size(wide));
     return utf8;
 }
@@ -525,7 +525,7 @@ std::wstring tr_win32_utf8_to_native(std::string_view utf8)
 {
     auto wide = std::wstring{};
     wide.resize(std::mbstowcs(nullptr, std::data(utf8), std::size(utf8)));
-    auto const len = mbstowcs(std::data(wide), std::data(utf8), std::size(utf8));
+    auto const len = std::mbstowcs(std::data(wide), std::data(utf8), std::size(utf8));
     TR_ASSERT(len == std::size(wide));
     return wide;
 }
