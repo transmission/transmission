@@ -342,8 +342,10 @@ TEST_F(AnnounceListTest, save)
     auto original_content = std::vector<char>{};
     auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
     tr_error* error = nullptr;
+    std::cerr << __FILE__ << ':' << __LINE__ << " OriginalFile [" << OriginalFile << ']' << std::endl;
     EXPECT_TRUE(tr_loadFile(OriginalFile, original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
+    std::cerr << __FILE__ << ':' << __LINE__ << " test_file.sv() [" << test_file.sv() << ']' << std::endl;
     EXPECT_TRUE(tr_saveFile(test_file.sv(), original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
 
@@ -354,13 +356,17 @@ TEST_F(AnnounceListTest, save)
     EXPECT_TRUE(announce_list.add(Urls[2], Tiers[2]));
 
     // try saving to a nonexistent torrent file
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(announce_list.save("/this/path/does/not/exist", &error));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
     tr_error_clear(&error);
 
     // now save to a real torrent file
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(announce_list.save(std::string{ test_file.sv() }, &error));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(nullptr, error) << *error;
 
     // load the original

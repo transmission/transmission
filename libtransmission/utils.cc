@@ -18,6 +18,8 @@
 #include <string_view>
 #include <vector>
 
+#include <iostream> // NOMERGE(ckerr)
+
 #ifdef _WIN32
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
 
@@ -194,6 +196,8 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
 
 bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " filename [" << filename << ']' << std::endl;
+
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
     if (auto const realname = tr_sys_path_resolve(filename); !std::empty(realname) && realname != filename)
@@ -203,7 +207,9 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
 
     // Write it to a temp file first.
     // This is a safeguard against edge cases, e.g. disk full, crash while writing, etc.
+    std::cerr << __FILE__ << ':' << __LINE__ << " filename [" << filename << ']' << std::endl;
     auto tmp = tr_pathbuf{ filename, ".tmp.XXXXXX"sv };
+    std::cerr << __FILE__ << ':' << __LINE__ << " tmp [" << tmp.sv() << ']' << std::endl;
     auto const fd = tr_sys_file_open_temp(std::data(tmp), error);
     if (fd == TR_BAD_SYS_FILE)
     {

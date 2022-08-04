@@ -952,6 +952,7 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
 
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " path_template [" << path_template << ']' << std::endl;
     create_temp_path(path_template, file_open_temp_callback, &ret, error);
 
     return ret;
@@ -1359,6 +1360,7 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
     bool ret = false;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " path_template [" << path_template << ']' << std::endl;
     create_temp_path(path_template, dir_create_temp_callback, &ret, error);
 
     return ret;
