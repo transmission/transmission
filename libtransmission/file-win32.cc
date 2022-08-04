@@ -233,18 +233,18 @@ static std::wstring path_to_native_path_wstr(std::string_view path)
 
 static std::string native_path_to_path(std::wstring_view wide_path)
 {
-    fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+    fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
     if (std::empty(wide_path))
     {
-        fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+        fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
         return {};
     }
 
     if (tr_strvStartsWith(wide_path, NativeUncPathPrefix))
     {
-        fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+        fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
         wide_path.remove_prefix(std::size(NativeUncPathPrefix));
-        fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+        fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
         auto path = tr_win32_native_to_utf8(wide_path);
         fmt::print(stderr, "{}:{} path [{}]\n", __FILE__, __LINE__, path);
         path.insert(0, "\\\\"sv);
@@ -254,13 +254,13 @@ static std::string native_path_to_path(std::wstring_view wide_path)
 
     if (tr_strvStartsWith(wide_path, NativeLocalPathPrefix))
     {
-        fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+        fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
         wide_path.remove_prefix(std::size(NativeLocalPathPrefix));
-        fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+        fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
         return tr_win32_native_to_utf8(wide_path);
     }
 
-    fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+    fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
     return tr_win32_native_to_utf8(wide_path);
 }
 
@@ -540,7 +540,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 
     if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
-        fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+        fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
         if (auto const handle = CreateFileW(
                 wide_path.c_str(),
                 FILE_READ_EA,
@@ -551,7 +551,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
                 nullptr);
             handle != INVALID_HANDLE_VALUE)
         {
-            fmt::print(stderr, "{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
+            fmt::print(stderr, L"{}:{} wide_path [{}]\n", __FILE__, __LINE__, wide_path);
             if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
             {
                 fmt::print(stderr, "{}:{} wide_ret_size [{}]\n", __FILE__, __LINE__, wide_ret_size);
