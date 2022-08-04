@@ -9,6 +9,8 @@
 #include <ctype.h> /* isalpha() */
 #include <string_view>
 
+#include <iostream> // NOMERGE(ckerr)
+
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
@@ -325,8 +327,11 @@ static void create_temp_path(
     TR_ASSERT(path_template != nullptr);
     TR_ASSERT(callback != nullptr);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " path_template [" << path_template << ']' << std::endl;
     char* path = tr_strdup(path_template);
+    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
     size_t path_size = strlen(path);
+    std::cerr << __FILE__ << ':' << __LINE__ << " path_size [" << path_size << ']' << std::endl;
 
     TR_ASSERT(path_size > 0);
 
@@ -335,14 +340,19 @@ static void create_temp_path(
     for (int attempt = 0; attempt < 100; ++attempt)
     {
         size_t i = path_size;
+        std::cerr << __FILE__ << ':' << __LINE__ << " i [" << i << ']' << std::endl;
 
         while (i > 0 && path_template[i - 1] == 'X')
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " i [" << i << ']' << std::endl;
             int const c = tr_rand_int(26 + 26 + 10);
             path[i - 1] = c < 26 ? c + 'A' : (c < 26 + 26 ? (c - 26) + 'a' : (c - 26 - 26) + '0');
             --i;
         }
 
+        std::cerr << __FILE__ << ':' << __LINE__ << " path_size [" << path_size << ']' << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " i [" << i << ']' << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
         TR_ASSERT(path_size >= i + 6);
 
         tr_error_clear(&my_error);
