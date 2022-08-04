@@ -48,7 +48,7 @@
         statusParagraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
         _fStatusAttributes = [[NSMutableDictionary alloc]
-            initWithObjectsAndKeys:[NSFont messageFontOfSize:9.0], NSFontAttributeName, statusParagraphStyle, NSParagraphStyleAttributeName, nil];
+            initWithObjectsAndKeys:[NSFont messageFontOfSize:10.0], NSFontAttributeName, statusParagraphStyle, NSParagraphStyleAttributeName, nil];
     }
     return self;
 }
