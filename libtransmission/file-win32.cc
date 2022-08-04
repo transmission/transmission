@@ -517,7 +517,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
     auto ret = std::string{};
 
-    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
         if (auto const handle = CreateFileW(
                 wide_path.c_str(),
