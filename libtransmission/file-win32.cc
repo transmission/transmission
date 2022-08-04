@@ -231,7 +231,7 @@ static std::wstring path_to_native_path_wstr(std::string_view path)
 
 static std::string native_path_to_path(std::wstring_view wide_path)
 {
-    if (std::empty(path))
+    if (std::empty(wide_path))
     {
         return {};
     }
