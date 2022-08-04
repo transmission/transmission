@@ -538,10 +538,10 @@ char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 
     if (text_size < 0)
     {
-        return tr_win32_native_to_utf8(text);
+        return tr_strvDup(tr_win32_native_to_utf8(text));
     }
 
-    return tr_win32_native_to_utf8({ text, static_cast<size_t>(text_size) });
+    return tr_strvDup(tr_win32_native_to_utf8({ text, static_cast<size_t>(text_size) }));
 }
 
 std::wstring tr_win32_utf8_to_native(std::string_view utf8)
