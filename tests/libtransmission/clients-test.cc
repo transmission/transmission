@@ -8,8 +8,9 @@
 #include <string_view>
 
 #include "transmission.h"
+
+#include "crypto-utils.h" // tr_rand_buffer()
 #include "clients.h"
-#include "crypto-utils.h"
 
 #include "gtest/gtest.h"
 

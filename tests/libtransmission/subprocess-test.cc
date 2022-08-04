@@ -8,14 +8,12 @@
 #include "file.h"
 #include "platform.h"
 #include "subprocess.h"
-#include "utils.h"
 
 #include "gtest/internal/gtest-port.h" // GetArgvs()
 
 #include "test-fixtures.h"
 
 #include <array>
-#include <cstdlib>
 #include <map>
 #include <string>
 #include <string_view>

@@ -11,10 +11,6 @@
 #include <QNetworkRequest>
 #include <QStandardPaths>
 
-#include <libtransmission/transmission.h>
-
-#include <libtransmission/web-utils.h> // tr_urlParse()
-
 #include "FaviconCache.h"
 
 /***

@@ -22,7 +22,6 @@
 #include "makemeta.h"
 #include "session.h" // TR_NAME
 #include "torrent-metainfo.h"
-#include "utils.h"
 
 #include "test-fixtures.h"
 

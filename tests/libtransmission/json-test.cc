@@ -11,7 +11,6 @@
 #include <string_view>
 
 #include "transmission.h"
-#include "utils.h" // tr_free()
 #include "variant.h"
 #include "variant-common.h"
 

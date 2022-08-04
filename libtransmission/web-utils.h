@@ -13,7 +13,6 @@
 
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-strbuf.h" // tr_urlbuf
-#include "utils.h"
 
 struct evbuffer;
 
@@ -101,7 +100,8 @@ void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
 
     for (auto const& ch : in)
     {
-        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
+        if (UnescapedChars.find(ch) != std::string_view::npos ||
+            (ReservedChars.find(ch) != std::string_view::npos && !escape_reserved))
         {
             out = ch;
         }

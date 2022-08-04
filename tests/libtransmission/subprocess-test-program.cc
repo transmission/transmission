@@ -6,7 +6,7 @@
 #include "transmission.h"
 #include "file.h"
 #include "subprocess.h"
-#include "utils.h"
+#include "utils.h" // tr_env_get_string()
 
 #include <string>
 
