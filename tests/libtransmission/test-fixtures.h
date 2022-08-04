@@ -128,11 +128,9 @@ protected:
 
         tr_error* error = nullptr;
 
-        if (auto* path = tr_sys_dir_get_current(&error); path != nullptr)
+        if (auto path = tr_sys_dir_get_current(&error); !std::empty(path))
         {
-            auto ret = std::string{ path };
-            tr_free(path);
-            return ret;
+            return path;
         }
 
         std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;

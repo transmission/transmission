@@ -129,12 +129,11 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
 std::string tr_getcwd()
 {
     tr_error* error = nullptr;
-    if (char* const cur = tr_sys_dir_get_current(&error); cur != nullptr)
+    if (auto cur = tr_sys_dir_get_current(&error); !std::empty(cur))
     {
-        auto path = std::string{ cur };
-        tr_free(cur);
-        return path;
+        return cur;
     }
+
     fprintf(stderr, "getcwd error: \"%s\"", error->message);
     tr_error_free(error);
     return "";

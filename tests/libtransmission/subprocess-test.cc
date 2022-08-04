@@ -56,8 +56,8 @@ protected:
 
     [[nodiscard]] static std::string nativeCwd()
     {
-        auto path = makeString(tr_sys_dir_get_current(nullptr));
-        tr_sys_path_native_separators(&path.front());
+        auto path = tr_sys_dir_get_current();
+        tr_sys_path_native_separators(path.data());
         return path;
     }
 

@@ -1339,26 +1339,20 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
     return ret;
 }
 
-char* tr_sys_dir_get_current(tr_error** error)
+std::string tr_sys_dir_get_current(tr_error** error)
 {
-    char* ret = nullptr;
-
     if (auto const size = GetCurrentDirectoryW(0, nullptr); size != 0)
     {
         auto wide_ret = std::wstring{};
         wide_ret.resize(size);
         if (GetCurrentDirectoryW(std::size(wide_ret), std::data(wide_ret)) != 0)
         {
-            ret = tr_win32_native_to_utf8(std::data(wide_ret), std::size(wide_ret));
+            return tr_win32_native_to_utf8(wide_ret);
         }
     }
 
-    if (ret == nullptr)
-    {
-        set_system_error(error, GetLastError());
-    }
-
-    return ret;
+    set_system_error(error, GetLastError());
+    return {};
 }
 
 bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
