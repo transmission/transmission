@@ -11,8 +11,8 @@
 #include "transmission.h"
 
 #include "block-info.h"
+#include "crypto-utils.h" // tr_rand_buffer()
 #include "completion.h"
-#include "crypto-utils.h"
 
 #include "gtest/gtest.h"
 

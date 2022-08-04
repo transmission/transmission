@@ -25,8 +25,9 @@
 #include <QDBusReply>
 #endif
 
-#include <libtransmission/tr-getopt.h>
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 

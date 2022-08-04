@@ -9,7 +9,7 @@
 #include <QPushButton>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* mime64 */
+
 #include <libtransmission/variant.h>
 #include <libtransmission/torrent-metainfo.h>
 

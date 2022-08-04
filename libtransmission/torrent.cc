@@ -49,7 +49,6 @@
 #include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
-#include "variant.h"
 #include "verify.h"
 #include "version.h"
 #include "web-utils.h"

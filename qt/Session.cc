@@ -23,8 +23,9 @@
 #include <QTextStream>
 #include <QtDebug>
 
-#include <libtransmission/session-id.h>
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/session-id.h>
 #include <libtransmission/utils.h> // tr_free
 #include <libtransmission/variant.h>
 

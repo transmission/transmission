@@ -6,7 +6,6 @@
 #include "transmission.h"
 #include "session.h"
 #include "session-id.h"
-#include "utils.h"
 #include "version.h"
 
 #include "test-fixtures.h"

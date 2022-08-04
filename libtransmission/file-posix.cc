@@ -539,7 +539,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
 
     static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
-    auto* buf = static_cast<char*>(tr_malloc(Buflen));
+    auto buf = std::vector<char>{};
+    buf.resize(Buflen);
 
     while (file_size > 0U)
     {
@@ -547,12 +548,12 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         uint64_t bytes_read;
         uint64_t bytes_written;
 
-        if (!tr_sys_file_read(in, buf, chunk_size, &bytes_read, error))
+        if (!tr_sys_file_read(in, std::data(buf), chunk_size, &bytes_read, error))
         {
             break;
         }
 
-        if (!tr_sys_file_write(out, buf, bytes_read, &bytes_written, error))
+        if (!tr_sys_file_write(out, std::data(buf), bytes_read, &bytes_written, error))
         {
             break;
         }
@@ -561,9 +562,6 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         TR_ASSERT(bytes_written <= file_size);
         file_size -= bytes_written;
     }
-
-    /* cleanup */
-    tr_free(buf);
 
 #endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 

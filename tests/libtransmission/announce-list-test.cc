@@ -15,7 +15,6 @@
 #include "error.h"
 #include "torrent-metainfo.h"
 #include "tr-strbuf.h"
-#include "utils.h"
 #include "variant.h"
 
 #include "test-fixtures.h"

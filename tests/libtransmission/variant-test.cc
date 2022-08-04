@@ -8,9 +8,8 @@
 #include "transmission.h"
 
 #include "benc.h"
-#include "crypto-utils.h"
+#include "crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
 #include "error.h"
-#include "utils.h" /* tr_free */
 #include "variant-common.h"
 #include "variant.h"
 

@@ -92,3 +92,15 @@ void tr_stats::clear()
     ret.ratio = tr_getRatio(ret.uploadedBytes, ret.downloadedBytes);
     return ret;
 }
+
+tr_session_stats tr_stats::add(tr_session_stats const& a, tr_session_stats const& b)
+{
+    auto ret = tr_session_stats{};
+    ret.uploadedBytes = a.uploadedBytes + b.uploadedBytes;
+    ret.downloadedBytes = a.downloadedBytes + b.downloadedBytes;
+    ret.filesAdded = a.filesAdded + b.filesAdded;
+    ret.sessionCount = a.sessionCount + b.sessionCount;
+    ret.secondsActive = a.secondsActive + b.secondsActive;
+    ret.ratio = tr_getRatio(ret.uploadedBytes, ret.downloadedBytes);
+    return ret;
+}

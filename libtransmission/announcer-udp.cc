@@ -33,6 +33,7 @@
 #include "tr-assert.h"
 #include "tr-udp.h"
 #include "utils.h"
+#include "web-utils.h"
 
 #define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())

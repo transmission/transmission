@@ -12,10 +12,6 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/web-utils.h>
-
 #include "FaviconCache.h" /* gtr_get_favicon() */
 #include "FilterBar.h"
 #include "HigWorkarea.h" /* GUI_PAD */
