@@ -513,70 +513,44 @@ cleanup:
     return ret;
 }
 
-std::string tr_sys_path_resolve(char const* path, tr_error** error)
+std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
     auto ret = std::string{};
-    wchar_t* wide_ret = nullptr;
-    HANDLE handle = INVALID_HANDLE_VALUE;
-    DWORD wide_ret_size;
 
-    auto const wide_path = path_to_native_path_wstr(path);
-    if (std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
     {
-        goto fail;
+        if (auto const handle = CreateFileW(
+                wide_path.c_str(),
+                FILE_READ_EA,
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                nullptr,
+                OPEN_EXISTING,
+                FILE_FLAG_BACKUP_SEMANTICS,
+                nullptr);
+            handle != INVALID_HANDLE_VALUE)
+        {
+            if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
+            {
+                auto wide_ret = std::wstring{};
+                wide_ret.resize(wide_ret_size);
+                if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
+                {
+                    TR_ASSERT(tr_strvStartsWith(wide_ret, NativeLocalPathPrefix));
+                    ret = native_path_to_path(wide_ret);
+                }
+            }
+
+            CloseHandle(handle);
+        }
     }
-
-    handle = CreateFileW(
-        wide_path.c_str(),
-        FILE_READ_EA,
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS,
-        nullptr);
-
-    if (handle == INVALID_HANDLE_VALUE)
-    {
-        goto fail;
-    }
-
-    wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0);
-
-    if (wide_ret_size == 0)
-    {
-        goto fail;
-    }
-
-    wide_ret = tr_new(wchar_t, wide_ret_size);
-
-    if (GetFinalPathNameByHandleW(handle, wide_ret, wide_ret_size, 0) != wide_ret_size - 1)
-    {
-        goto fail;
-    }
-
-    TR_ASSERT(wcsncmp(wide_ret, L"\\\\?\\", 4) == 0);
-
-    ret = native_path_to_path(wide_ret);
 
     if (!std::empty(ret))
     {
-        goto cleanup;
+        return ret;
     }
 
-fail:
     set_system_error(error, GetLastError());
-
-cleanup:
-    tr_free(wide_ret);
-
-    if (handle != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(handle);
-    }
-
-    return ret;
+    return {};
 }
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
