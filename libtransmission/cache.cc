@@ -127,7 +127,7 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 ****
 ***/
 
-void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& data)
+void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme)
 {
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
@@ -139,7 +139,7 @@ void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
 
     iter->time_added = tr_time();
 
-    iter->buf = std::move(data);
+    iter->buf = std::move(writeme);
 
     ++cache_writes_;
     cache_write_bytes_ += std::size(*iter->buf);
@@ -205,11 +205,11 @@ int Cache::flushSpan(CIter const begin, CIter const end)
     return {};
 }
 
-int Cache::flushFile(tr_torrent* torrent, tr_file_index_t i)
+int Cache::flushFile(tr_torrent* torrent, tr_file_index_t file)
 {
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
-    auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, i);
+    auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
 
     return flushSpan(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), compare),

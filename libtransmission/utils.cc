@@ -126,10 +126,10 @@ void tr_timerAdd(struct event& timer, int seconds, int microseconds)
     evtimer_add(&timer, &tv);
 }
 
-void tr_timerAddMsec(struct event& timer, int msec)
+void tr_timerAddMsec(struct event& timer, int milliseconds)
 {
-    int const seconds = msec / 1000;
-    int const usec = (msec % 1000) * 1000;
+    int const seconds = milliseconds / 1000;
+    int const usec = (milliseconds % 1000) * 1000;
     tr_timerAdd(timer, seconds, usec);
 }
 
@@ -137,18 +137,18 @@ void tr_timerAddMsec(struct event& timer, int msec)
 ***
 **/
 
-bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** error)
+bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
-    auto const path = tr_pathbuf{ path_in };
+    auto const szfilename = tr_pathbuf{ filename };
 
     /* try to stat the file */
     tr_error* my_error = nullptr;
-    auto const info = tr_sys_path_get_info(path, 0, &my_error);
+    auto const info = tr_sys_path_get_info(szfilename, 0, &my_error);
     if (!info)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -157,30 +157,30 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
 
     if (!info->isFile())
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return false;
     }
 
-    setme.resize(info->size);
-    if (!tr_sys_file_read(fd, std::data(setme), info->size, nullptr, &my_error))
+    contents.resize(info->size);
+    if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd);
@@ -241,15 +241,15 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
     return true;
 }
 
-tr_disk_space tr_dirSpace(std::string_view dir)
+tr_disk_space tr_dirSpace(std::string_view directory)
 {
-    if (std::empty(dir))
+    if (std::empty(directory))
     {
         errno = EINVAL;
         return { -1, -1 };
     }
 
-    return tr_device_info_get_disk_space(tr_device_info_create(dir));
+    return tr_device_info_get_disk_space(tr_device_info_create(directory));
 }
 
 /****
@@ -283,16 +283,14 @@ bool tr_wildmat(std::string_view text, std::string_view pattern)
     return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) != 0;
 }
 
-char const* tr_strerror(int i)
+char const* tr_strerror(int errnum)
 {
-    char const* ret = strerror(i);
-
-    if (ret == nullptr)
+    if (char const* const ret = strerror(errnum); ret != nullptr)
     {
-        ret = "Unknown Error";
+        return ret;
     }
 
-    return ret;
+    return "Unknown Error";
 }
 
 /****
@@ -348,17 +346,17 @@ uint64_t tr_time_msec()
     return uint64_t(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
 }
 
-void tr_wait_msec(long int msec)
+void tr_wait_msec(long int delay_milliseconds)
 {
 #ifdef _WIN32
 
-    Sleep((DWORD)msec);
+    Sleep((DWORD)delay_milliseconds);
 
 #else
 
     struct timespec ts;
-    ts.tv_sec = msec / 1000;
-    ts.tv_nsec = (msec % 1000) * 1000000;
+    ts.tv_sec = delay_milliseconds / 1000;
+    ts.tv_nsec = (delay_milliseconds % 1000) * 1000000;
     nanosleep(&ts, nullptr);
 
 #endif
@@ -521,6 +519,30 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 
 #ifdef _WIN32
 
+std::string tr_win32_native_to_utf8(std::wstring_view native)
+{
+    if (auto* const tmp = tr_win32_native_to_utf8(std::data(native), std::size(native)); tmp != nullptr)
+    {
+        auto ret = std::string{ tmp };
+        tr_free(tmp);
+        return ret;
+    }
+
+    return {};
+}
+
+std::wstring tr_win32_utf8_to_native(std::string_view utf8)
+{
+    if (auto* const tmp = tr_win32_utf8_to_native(std::data(utf8), std::size(utf8)); tmp != nullptr)
+    {
+        auto ret = std::wstring{ tmp };
+        tr_free(tmp);
+        return ret;
+    }
+
+    return {};
+}
+
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 {
     return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, nullptr);
@@ -621,14 +643,10 @@ fail:
     return nullptr;
 }
 
-char* tr_win32_format_message(uint32_t code)
+std::string tr_win32_format_message(uint32_t code)
 {
     wchar_t* wide_text = nullptr;
-    DWORD wide_size;
-    char* text = nullptr;
-    size_t text_size;
-
-    wide_size = FormatMessageW(
+    auto const wide_size = FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         nullptr,
         code,
@@ -639,25 +657,22 @@ char* tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return tr_strvDup(fmt::format(FMT_STRING("Unknown error ({:#08x})"), code));
+        return fmt::format(FMT_STRING("Unknown error ({:#08x})"), code);
     }
+
+    auto text = std::string{};
 
     if (wide_size != 0 && wide_text != nullptr)
     {
-        text = tr_win32_native_to_utf8(wide_text, wide_size);
+        text = tr_win32_native_to_utf8({ wide_text, wide_size });
     }
 
     LocalFree(wide_text);
 
-    if (text != nullptr)
+    // Most (all?) messages contain "\r\n" in the end, chop it
+    while (!std::empty(text) && isspace(text.back()))
     {
-        /* Most (all?) messages contain "\r\n" in the end, chop it */
-        text_size = strlen(text);
-
-        while (text_size > 0 && isspace((uint8_t)text[text_size - 1]))
-        {
-            text[--text_size] = '\0';
-        }
+        text.resize(text.size() - 1);
     }
 
     return text;
@@ -795,7 +810,7 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
 ****
 ***/
 
-double tr_truncd(double x, int precision)
+double tr_truncd(double x, int decimal_places)
 {
     auto buf = std::array<char, 128>{};
     auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
@@ -803,7 +818,7 @@ double tr_truncd(double x, int precision)
 
     if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
     {
-        pt[precision != 0 ? precision + 1 : 0] = '\0';
+        pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
     return atof(std::data(buf));
@@ -1169,24 +1184,18 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 {
 #ifdef _WIN32
 
-    if (auto* const wide_key = tr_win32_utf8_to_native(std::data(key), std::size(key)); wide_key != nullptr)
+    if (auto const wide_key = tr_win32_utf8_to_native(key); !std::empty(wide_key))
     {
-        if (auto const size = GetEnvironmentVariableW(wide_key, nullptr, 0); size != 0)
+        if (auto const size = GetEnvironmentVariableW(wide_key.c_str(), nullptr, 0); size != 0)
         {
             auto wide_val = std::vector<wchar_t>{};
             wide_val.resize(size);
 
-            if (GetEnvironmentVariableW(wide_key, std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
+            if (GetEnvironmentVariableW(wide_key.c_str(), std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
             {
-                char* const val = tr_win32_native_to_utf8(std::data(wide_val), std::size(wide_val));
-                auto ret = std::string{ val };
-                tr_free(val);
-                tr_free(wide_key);
-                return ret;
+                return tr_win32_native_to_utf8({ std::data(wide_val), std::size(wide_val) });
             }
         }
-
-        tr_free(wide_key);
     }
 
 #else

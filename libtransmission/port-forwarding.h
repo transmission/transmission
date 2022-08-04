@@ -21,7 +21,7 @@ void tr_sharedClose(tr_session*);
 
 void tr_sharedPortChanged(tr_session*);
 
-void tr_sharedTraversalEnable(tr_shared*, bool isEnabled);
+void tr_sharedTraversalEnable(tr_shared*, bool is_enabled);
 
 tr_port tr_sharedGetPeerPort(tr_shared const* s);
 

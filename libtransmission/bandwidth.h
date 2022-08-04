@@ -117,7 +117,7 @@ public:
      */
     void allocate(tr_direction dir, unsigned int period_msec);
 
-    void setParent(tr_bandwidth* newParent);
+    void setParent(tr_bandwidth* new_parent);
 
     [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {

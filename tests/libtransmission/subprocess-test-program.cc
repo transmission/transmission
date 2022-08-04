@@ -49,9 +49,8 @@ int main(int argc, char** argv)
     }
     else if (test_action == "--dump-cwd")
     {
-        char* const value = tr_sys_dir_get_current(nullptr);
-        tr_sys_file_write_line(fd, value != nullptr ? value : "<null>");
-        tr_free(value);
+        auto const value = tr_sys_dir_get_current(nullptr);
+        tr_sys_file_write_line(fd, !std::empty(value) ? value : "<null>");
     }
     else
     {

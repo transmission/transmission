@@ -300,6 +300,11 @@ public:
         updateDesiredRequestCount(this);
     }
 
+    tr_peerMsgsImpl(tr_peerMsgsImpl&&) = delete;
+    tr_peerMsgsImpl(tr_peerMsgsImpl const&) = delete;
+    tr_peerMsgsImpl& operator=(tr_peerMsgsImpl&&) = delete;
+    tr_peerMsgsImpl& operator=(tr_peerMsgsImpl const&) = delete;
+
     ~tr_peerMsgsImpl() override
     {
         set_active(TR_UP, false);
@@ -864,9 +869,9 @@ private:
     mutable std::optional<float> percent_done_;
 };
 
-tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
+tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data)
 {
-    return new tr_peerMsgsImpl(torrent, atom, io, callback, callbackData);
+    return new tr_peerMsgsImpl(torrent, atom, io, callback, callback_data);
 }
 
 /**

@@ -218,15 +218,15 @@ tr_log_message* tr_logGetQueue()
     return ret;
 }
 
-void tr_logFreeQueue(tr_log_message* list)
+void tr_logFreeQueue(tr_log_message* freeme)
 {
-    while (list != nullptr)
+    while (freeme != nullptr)
     {
-        tr_log_message* next = list->next;
-        tr_free(list->message);
-        tr_free(list->name);
-        tr_free(list);
-        list = next;
+        auto* const next = freeme->next;
+        tr_free(freeme->message);
+        tr_free(freeme->name);
+        tr_free(freeme);
+        freeme = next;
     }
 }
 

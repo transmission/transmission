@@ -34,7 +34,7 @@ public:
     // If you're looping through several files, passing in a non-nullptr
     // `buffer` can reduce the number of memory allocations needed to
     // load multiple files.
-    bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* buffer = nullptr, tr_error** error = nullptr);
+    bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error** error = nullptr);
 
     // FILES
 

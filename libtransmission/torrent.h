@@ -60,7 +60,7 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDi
 ***
 **/
 
-void tr_torrentChangeMyPort(tr_torrent* session);
+void tr_torrentChangeMyPort(tr_torrent* tor);
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
 
@@ -98,7 +98,7 @@ public:
 
     void setLocation(
         std::string_view location,
-        bool move_from_current_location,
+        bool move_from_old_path,
         double volatile* setme_progress,
         int volatile* setme_state);
 
@@ -770,7 +770,7 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error = nullptr);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 

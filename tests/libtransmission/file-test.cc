@@ -62,15 +62,9 @@ protected:
         return symlink(src_path, dst_path) != -1;
 
 #else
-        wchar_t* wide_src_path = tr_win32_utf8_to_native(src_path, -1);
-        wchar_t* wide_dst_path = tr_win32_utf8_to_native(dst_path, -1);
-
-        auto const ret = CreateSymbolicLinkW(wide_dst_path, wide_src_path, dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
-
-        tr_free(wide_dst_path);
-        tr_free(wide_src_path);
-
-        return ret;
+        auto const wide_src_path = tr_win32_utf8_to_native(src_path);
+        auto const wide_dst_path = tr_win32_utf8_to_native(dst_path);
+        return CreateSymbolicLinkW(wide_dst_path.c_str(), wide_src_path.c_str(), dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
 
 #endif
     }
@@ -83,15 +77,9 @@ protected:
 
 #else
 
-        wchar_t* wide_src_path = tr_win32_utf8_to_native(src_path, -1);
-        wchar_t* wide_dst_path = tr_win32_utf8_to_native(dst_path, -1);
-
-        auto const ret = CreateHardLinkW(wide_dst_path, wide_src_path, nullptr);
-
-        tr_free(wide_dst_path);
-        tr_free(wide_src_path);
-
-        return ret;
+        auto const wide_src_path = tr_win32_utf8_to_native(src_path);
+        auto const wide_dst_path = tr_win32_utf8_to_native(dst_path);
+        return CreateHardLinkW(wide_dst_path.c_str(), wide_src_path.c_str(), nullptr);
 
 #endif
     }

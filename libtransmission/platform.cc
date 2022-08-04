@@ -53,13 +53,9 @@ using namespace std::literals;
 
 static std::string win32_get_known_folder_ex(REFKNOWNFOLDERID folder_id, DWORD flags)
 {
-    PWSTR path;
-
-    if (SHGetKnownFolderPath(folder_id, flags | KF_FLAG_DONT_UNEXPAND, nullptr, &path) == S_OK)
+    if (PWSTR path; SHGetKnownFolderPath(folder_id, flags | KF_FLAG_DONT_UNEXPAND, nullptr, &path) == S_OK)
     {
-        auto* utf8_cstr = tr_win32_native_to_utf8(path, -1);
-        auto ret = std::string{ utf8_cstr };
-        tr_free(utf8_cstr);
+        auto ret = tr_win32_native_to_utf8(path);
         CoTaskMemFree(path);
         return ret;
     }
@@ -274,16 +270,14 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     /* check calling module place */
     wchar_t wide_module_path[MAX_PATH];
     GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
-    char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
+    auto const module_path = tr_win32_native_to_utf8(wide_module_path);
     if (auto const dir = tr_sys_path_dirname(module_path); !std::empty(dir))
     {
         if (auto const path = tr_pathbuf{ dir, "/Web"sv }; isWebClientDir(path))
         {
-            tr_free(module_path);
             return std::string{ path };
         }
     }
-    tr_free(module_path);
 
 #else // everyone else, follow the XDG spec
 

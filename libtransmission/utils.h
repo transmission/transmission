@@ -86,7 +86,7 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-tr_disk_space tr_dirSpace(std::string_view path);
+tr_disk_space tr_dirSpace(std::string_view directory);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
@@ -115,9 +115,12 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv);
 
-bool tr_utf8_validate(std::string_view sv, char const** endptr);
+bool tr_utf8_validate(std::string_view sv, char const** good_end);
 
 #ifdef _WIN32
+
+std::string tr_win32_native_to_utf8(std::wstring_view);
+std::wstring tr_win32_utf8_to_native(std::string_view);
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);
 char* tr_win32_native_to_utf8_ex(
@@ -133,7 +136,7 @@ wchar_t* tr_win32_utf8_to_native_ex(
     int extra_chars_before,
     int extra_chars_after,
     int* real_result_size);
-char* tr_win32_format_message(uint32_t code);
+std::string tr_win32_format_message(uint32_t code);
 
 void tr_win32_make_args_utf8(int* argc, char*** argv);
 
@@ -263,7 +266,7 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
     return true;
 }
 
-[[nodiscard]] std::string_view tr_strvStrip(std::string_view sv);
+[[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
 
 [[nodiscard]] char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
 

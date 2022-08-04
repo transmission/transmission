@@ -153,15 +153,15 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor);
 // return the number of connected peers that have `piece`, or -1 if we already have it
 int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece);
 
-void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int tabCount);
+void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs);
 
 uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor);
 
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor);
 
-void tr_peerMgrOnBlocklistChanged(tr_peerMgr* manager);
+void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr);
 
-struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount);
+struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count);
 
 tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 
