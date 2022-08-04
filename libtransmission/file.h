@@ -235,12 +235,10 @@ bool tr_sys_path_is_same(T const& path1, U const& path2, struct tr_error** error
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return Pointer to newly allocated buffer containing full path (with symbolic
- *         links, `.` and `..` resolved) on success (use @ref tr_free to free it
- *         when no longer needed), `nullptr` otherwise (with `error` set
- *         accordingly).
+ * @return Full path with symbolic links, `.` and `..` resolved on success,
+ *         or an empty string otherwise (with `error` set accordingly).
  */
-char* tr_sys_path_resolve(char const* path, struct tr_error** error = nullptr);
+std::string tr_sys_path_resolve(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `basename()`.

@@ -39,6 +39,9 @@ struct tr_sys_dir_win32
     std::string utf8_name;
 };
 
+static auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
+static auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
+
 static wchar_t const native_local_path_prefix[] = { '\\', '\\', '?', '\\' };
 static wchar_t const native_unc_path_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
 
@@ -226,28 +229,28 @@ static std::wstring path_to_native_path_wstr(std::string_view path)
     return {};
 }
 
-static char* native_path_to_path(wchar_t const* wide_path)
+static std::string native_path_to_path(std::wstring_view wide_path)
 {
-    if (wide_path == nullptr)
+    if (std::empty(path))
     {
-        return nullptr;
+        return {};
     }
 
-    bool const is_unc = wcsncmp(wide_path, native_unc_path_prefix, TR_N_ELEMENTS(native_unc_path_prefix)) == 0;
-    bool const is_local = !is_unc && wcsncmp(wide_path, native_local_path_prefix, TR_N_ELEMENTS(native_local_path_prefix)) == 0;
-
-    size_t const skip_chars = is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) :
-                                       (is_local ? TR_N_ELEMENTS(native_local_path_prefix) : 0);
-
-    char* const path = tr_win32_native_to_utf8_ex(wide_path + skip_chars, -1, is_unc ? 2 : 0, 0, nullptr);
-
-    if (is_unc && path != nullptr)
+    if (tr_strvStartsWith(wide_path, NativeUncPathPrefix))
     {
-        path[0] = '\\';
-        path[1] = '\\';
+        wide_path.remove_prefix(std::size(NativeUncPathPrefix));
+        auto path = tr_win32_native_to_utf8(wide_path);
+        path.insert(0, L"\\\\");
+        return path;
     }
 
-    return path;
+    if (tr_strvStartsWith(wide_path, NativeLocalPathPrefix))
+    {
+        wide_path.remove_prefix(std::size(NativeLocalPathPrefix));
+        return tr_win32_native_to_utf8(wide_path);
+    }
+
+    return tr_win32_native_to_utf8(wide_path);
 }
 
 static tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
@@ -510,11 +513,11 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_resolve(char const* path, tr_error** error)
+std::string tr_sys_path_resolve(char const* path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
-    char* ret = nullptr;
+    auto ret = std::string{};
     wchar_t* wide_ret = nullptr;
     HANDLE handle = INVALID_HANDLE_VALUE;
     DWORD wide_ret_size;
@@ -557,16 +560,13 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
     ret = native_path_to_path(wide_ret);
 
-    if (ret != nullptr)
+    if (!std::empty(ret))
     {
         goto cleanup;
     }
 
 fail:
     set_system_error(error, GetLastError());
-
-    tr_free(ret);
-    ret = nullptr;
 
 cleanup:
     tr_free(wide_ret);

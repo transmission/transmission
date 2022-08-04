@@ -192,26 +192,18 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
     return true;
 }
 
-bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_error** error)
+bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error)
 {
-    auto const filename = tr_pathbuf{ filename_in };
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
-    if (char* const real_filename = tr_sys_path_resolve(filename.c_str()); real_filename != nullptr)
+    if (auto const realname = tr_sys_path_resolve(filename); !std::empty(realname) && realname != filename)
     {
-        if (filename_in != real_filename)
-        {
-            auto const saved = tr_saveFile(real_filename, contents, error);
-            tr_free(real_filename);
-            return saved;
-        }
-
-        tr_free(real_filename);
+        return tr_saveFile(realname, contents, error);
     }
 
     // Write it to a temp file first.
     // This is a safeguard against edge cases, e.g. disk full, crash while writing, etc.
-    auto tmp = tr_pathbuf{ filename.sv(), ".tmp.XXXXXX"sv };
+    auto tmp = tr_pathbuf{ filename, ".tmp.XXXXXX"sv };
     auto const fd = tr_sys_file_open_temp(std::data(tmp), error);
     if (fd == TR_BAD_SYS_FILE)
     {
@@ -232,7 +224,8 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
     }
 
     // If we saved it to disk successfully, move it from '.tmp' to the correct filename
-    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, filename, error))
+    auto const szfilename = tr_pathbuf{ filename };
+    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, szfilename, error))
     {
         return false;
     }
@@ -519,36 +512,25 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 
 #ifdef _WIN32
 
-std::string tr_win32_native_to_utf8(std::wstring_view native)
+std::string tr_win32_native_to_utf8(std::wstring_view wide)
 {
-    if (auto* const tmp = tr_win32_native_to_utf8(std::data(native), std::size(native)); tmp != nullptr)
-    {
-        auto ret = std::string{ tmp };
-        tr_free(tmp);
-        return ret;
-    }
-
-    return {};
+    auto utf8 = std::string{};
+    utf8.resize(std::mbstowcs(nullptr, std::data(wide), std::size(wide)));
+    auto const len = mbstowcs(std::data(utf8), std::data(wide), std::size(wide));
+    TR_ASSERT(len == std::size(wide));
+    return utf8;
 }
 
 std::wstring tr_win32_utf8_to_native(std::string_view utf8)
 {
-    if (auto* const tmp = tr_win32_utf8_to_native(std::data(utf8), std::size(utf8)); tmp != nullptr)
-    {
-        auto ret = std::wstring{ tmp };
-        tr_free(tmp);
-        return ret;
-    }
-
-    return {};
+    auto wide = std::wstring{};
+    wide.resize(std::mbstowcs(nullptr, std::data(utf8), std::size(utf8)));
+    auto const len = mbstowcs(std::data(wide), std::data(utf8), std::size(utf8));
+    TR_ASSERT(len == std::size(wide));
+    return wide;
 }
 
-char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
-{
-    return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, nullptr);
-}
-
-char* tr_win32_native_to_utf8_ex(
+static char* tr_win32_native_to_utf8_ex(
     wchar_t const* text,
     int text_size,
     int extra_chars_before,
@@ -591,6 +573,11 @@ fail:
     tr_free(ret);
 
     return nullptr;
+}
+
+char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
+{
+    return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, nullptr);
 }
 
 wchar_t* tr_win32_utf8_to_native(char const* text, int text_size)
