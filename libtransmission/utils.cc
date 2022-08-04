@@ -517,7 +517,7 @@ std::string tr_win32_native_to_utf8(std::wstring_view wide)
     auto utf8 = std::string{};
     utf8.resize(std::wcstombs(nullptr, std::data(wide), std::size(wide)));
     auto const len = std::wcstombs(std::data(utf8), std::data(wide), std::size(wide));
-    TR_ASSERT(len == std::size(wide));
+    TR_ASSERT(len == std::size(utf8));
     return utf8;
 }
 
