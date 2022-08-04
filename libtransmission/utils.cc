@@ -515,8 +515,16 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 std::string tr_win32_native_to_utf8(std::wstring_view wide)
 {
     auto utf8 = std::string{};
-    utf8.resize(std::wcstombs(nullptr, std::data(wide), std::size(wide)));
-    auto const len = std::wcstombs(std::data(utf8), std::data(wide), std::size(wide));
+    utf8.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(wide), std::size(wide), nullptr, 0, nullptr, nullptr));
+    auto const len = WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        std::data(wide),
+        std::size(wide),
+        std::data(utf8),
+        std::size(utf8),
+        nullptr,
+        nullptr);
     TR_ASSERT(len == std::size(utf8));
     return utf8;
 }
@@ -524,8 +532,8 @@ std::string tr_win32_native_to_utf8(std::wstring_view wide)
 std::wstring tr_win32_utf8_to_native(std::string_view utf8)
 {
     auto wide = std::wstring{};
-    wide.resize(std::mbstowcs(nullptr, std::data(utf8), std::size(utf8)));
-    auto const len = std::mbstowcs(std::data(wide), std::data(utf8), std::size(utf8));
+    wide.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), nullptr, 0);
+    auto const len = MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), std::data(wide), std::size(wide));
     TR_ASSERT(len == std::size(wide));
     return wide;
 }
