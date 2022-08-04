@@ -1207,42 +1207,26 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     return ret;
 }
 
-char* tr_sys_dir_get_current(tr_error** error)
+std::string tr_sys_dir_get_current(tr_error** error)
 {
-    char* ret = getcwd(nullptr, 0);
+    auto buf = std::vector<char>{};
+    buf.resize(PATH_MAX);
 
-    if (ret == nullptr && (errno == EINVAL || errno == ERANGE))
+    for (;;)
     {
-        size_t size = PATH_MAX;
-        char* tmp = nullptr;
-
-        do
+        if (char* ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
         {
-            tmp = tr_renew(char, tmp, size);
-
-            if (tmp == nullptr)
-            {
-                break;
-            }
-
-            ret = getcwd(tmp, size);
-            size += 2048;
-        } while (ret == nullptr && errno == ERANGE);
-
-        if (ret == nullptr)
-        {
-            int const err = errno;
-            tr_free(tmp);
-            errno = err;
+            return ret;
         }
-    }
 
-    if (ret == nullptr)
-    {
-        set_system_error(error, errno);
-    }
+        if (errno != ERANGE)
+        {
+            set_system_error(error, errno);
+            return {};
+        }
 
-    return ret;
+        buf.resize(std::size(buf) * 2);
+    }
 }
 
 bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)

@@ -644,7 +644,7 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, struc
  *         directory (use @ref tr_free to free it when no longer needed) on
  *         success, `nullptr` otherwise (with `error` set accordingly).
  */
-char* tr_sys_dir_get_current(struct tr_error** error = nullptr);
+std::string tr_sys_dir_get_current(struct tr_error** error = nullptr);
 
 /**
  * @brief Like `mkdir()`, but makes parent directories if needed.
