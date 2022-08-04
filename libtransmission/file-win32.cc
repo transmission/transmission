@@ -240,7 +240,7 @@ static std::string native_path_to_path(std::wstring_view wide_path)
     {
         wide_path.remove_prefix(std::size(NativeUncPathPrefix));
         auto path = tr_win32_native_to_utf8(wide_path);
-        path.insert(0, L"\\\\");
+        path.insert(0, "\\\\"sv);
         return path;
     }
 
