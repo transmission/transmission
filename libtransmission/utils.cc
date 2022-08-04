@@ -531,13 +531,23 @@ std::string tr_win32_native_to_utf8(std::wstring_view wide)
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 {
-    return tr_strvDup(tr_win32_native_to_utf8({ text, text_size });
+    if (text == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (text_size < 0)
+    {
+        return tr_win32_native_to_utf8(text);
+    }
+
+    return tr_win32_native_to_utf8({ text, static_cast<size_t>(text_size) });
 }
 
 std::wstring tr_win32_utf8_to_native(std::string_view utf8)
 {
     auto wide = std::wstring{};
-    wide.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), nullptr, 0);
+    wide.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), nullptr, 0));
     auto const len = MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), std::data(wide), std::size(wide));
     TR_ASSERT(len == std::size(wide));
     return wide;
