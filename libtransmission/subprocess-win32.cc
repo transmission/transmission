@@ -9,9 +9,11 @@
 #include <cstring>
 #include <cwchar>
 #include <map>
+#include <iterator>
 #include <string_view>
 
 #include <fmt/format.h>
+#include <fmt/xchar.h> // for wchar_t support
 
 #include <windows.h>
 
@@ -23,13 +25,16 @@
 
 using namespace std::literals;
 
-enum tr_app_type
+namespace
 {
-    TR_APP_TYPE_EXE,
-    TR_APP_TYPE_BATCH
+
+enum class tr_app_type
+{
+    EXE,
+    BATCH
 };
 
-static void set_system_error(tr_error** error, DWORD code, std::string_view what)
+void set_system_error(tr_error** error, DWORD code, std::string_view what)
 {
     if (error == nullptr)
     {
@@ -46,206 +51,97 @@ static void set_system_error(tr_error** error, DWORD code, std::string_view what
     }
 }
 
-static void append_to_env_block(wchar_t** env_block, size_t* env_block_len, wchar_t const* part, size_t part_len)
+// "The sort is case-insensitive, Unicode order, without regard to locale" © MSDN
+class WStrICompare
 {
-    *env_block = tr_renew(wchar_t, *env_block, *env_block_len + part_len + 1);
-    wmemcpy(*env_block + *env_block_len, part, part_len);
-    *env_block_len += part_len;
-}
-
-static bool parse_env_block_part(wchar_t const* part, size_t* full_len, size_t* name_len)
-{
-    TR_ASSERT(part != nullptr);
-
-    auto const* const equals_pos = wcschr(part, L'=');
-
-    if (equals_pos == nullptr)
+public:
+    [[nodiscard]] auto compare(std::wstring_view a, std::wstring_view b) const noexcept // <=>
     {
-        /* Invalid part */
-        return false;
-    }
+        int diff = wcsnicmp(std::data(a), std::data(b), std::min(std::size(a), std::size(b)));
 
-    ptrdiff_t const my_name_len = equals_pos - part;
-
-    if (my_name_len > SIZE_MAX)
-    {
-        /* Invalid part */
-        return false;
-    }
-
-    if (full_len != nullptr)
-    {
-        /* Includes terminating '\0' */
-        *full_len = wcslen(part) + 1;
-    }
-
-    if (name_len != nullptr)
-    {
-        *name_len = (size_t)my_name_len;
-    }
-
-    return true;
-}
-
-static int compare_wide_strings_ci(wchar_t const* lhs, size_t lhs_len, wchar_t const* rhs, size_t rhs_len)
-{
-    int diff = wcsnicmp(lhs, rhs, std::min(lhs_len, rhs_len));
-
-    if (diff == 0)
-    {
-        diff = lhs_len < rhs_len ? -1 : (lhs_len > rhs_len ? 1 : 0);
-    }
-
-    return diff;
-}
-
-static int compare_env_part_names(void const* vlhs, void const* vrhs)
-{
-    int ret = 0;
-    auto const* const* const lhs = reinterpret_cast<wchar_t const* const*>(vlhs);
-    auto const* const* const rhs = reinterpret_cast<wchar_t const* const*>(vrhs);
-
-    size_t lhs_part_len;
-    size_t lhs_name_len;
-
-    if (parse_env_block_part(*lhs, &lhs_part_len, &lhs_name_len))
-    {
-        size_t rhs_part_len;
-        size_t rhs_name_len;
-
-        if (parse_env_block_part(*rhs, &rhs_part_len, &rhs_name_len))
+        if (diff == 0)
         {
-            ret = compare_wide_strings_ci(*lhs, lhs_name_len, *rhs, rhs_name_len);
+            diff = std::size(a) < std::size(b) ? -1 : (std::size(a) > std::size(b) ? 1 : 0);
         }
+
+        return diff;
     }
+
+    [[nodiscard]] auto operator()(std::wstring_view a, std::wstring_view b) const noexcept // <
+    {
+        return compare(a, b) < 0;
+    }
+};
+
+using SortedWideEnv = std::map<std::wstring, std::wstring, WStrICompare>;
+
+/*
+ * Var1=Value1\0
+ * Var2=Value2\0
+ * Var3=Value3\0
+ * ...
+ * VarN=ValueN\0\0
+ */
+auto to_env_string(SortedWideEnv const& wide_env)
+{
+    auto ret = std::vector<wchar_t>{};
+
+    for (auto const& [key, val] : wide_env)
+    {
+        fmt::format_to(std::back_inserter(ret), FMT_STRING(L"{:s}={:s}"), key, val);
+        ret.insert(std::end(ret), L'\0');
+    }
+
+    ret.insert(std::end(ret), L'\0');
 
     return ret;
 }
 
-static wchar_t** to_wide_env(std::map<std::string_view, std::string_view> const& env)
+/*
+ * Var1=Value1\0
+ * Var2=Value2\0
+ * Var3=Value3\0
+ * ...
+ * VarN=ValueN\0\0
+ */
+auto parse_env_string(wchar_t const* env)
 {
-    auto const part_count = std::size(env);
-    wchar_t** const wide_env = tr_new(wchar_t*, part_count + 1);
+    auto sorted = SortedWideEnv{};
 
-    int i = 0;
-    for (auto const& [key, val] : env)
+    for (;;)
     {
-        auto const line = fmt::format(FMT_STRING("{:s}={:s}"), key, val);
-        wide_env[i++] = tr_win32_utf8_to_native(std::data(line), std::size(line));
-    }
-    wide_env[i] = nullptr;
-    TR_ASSERT(i == part_count);
-
-    /* "The sort is case-insensitive, Unicode order, without regard to locale" © MSDN */
-    qsort(wide_env, part_count, sizeof(wchar_t*), &compare_env_part_names);
-
-    return wide_env;
-}
-
-static void tr_free_ptrv(void* const* p)
-{
-    if (p == nullptr)
-    {
-        return;
-    }
-
-    while (*p != nullptr)
-    {
-        tr_free(*p);
-        ++p;
-    }
-}
-
-static bool create_env_block(std::map<std::string_view, std::string_view> const& env, wchar_t** env_block, tr_error** error)
-{
-    wchar_t** wide_env = to_wide_env(env);
-
-    if (wide_env == nullptr)
-    {
-        *env_block = nullptr;
-        return true;
-    }
-
-    wchar_t* const old_env_block = GetEnvironmentStringsW();
-
-    if (old_env_block == nullptr)
-    {
-        set_system_error(error, GetLastError(), "Call to GetEnvironmentStrings()");
-        return false;
-    }
-
-    *env_block = nullptr;
-
-    wchar_t const* old_part = old_env_block;
-    size_t env_block_len = 0;
-
-    for (size_t i = 0; wide_env[i] != nullptr; ++i)
-    {
-        wchar_t const* const part = wide_env[i];
-
-        size_t part_len;
-        size_t name_len;
-
-        if (!parse_env_block_part(part, &part_len, &name_len))
+        auto const line = std::wstring_view{ env };
+        if (std::empty(line))
         {
-            continue;
+            break;
         }
 
-        while (*old_part != L'\0')
+        if (auto const pos = line.find(L'='); pos != std::string_view::npos)
         {
-            size_t old_part_len;
-            size_t old_name_len;
-
-            if (!parse_env_block_part(old_part, &old_part_len, &old_name_len))
-            {
-                continue;
-            }
-
-            int const name_diff = compare_wide_strings_ci(old_part, old_name_len, part, name_len);
-
-            if (name_diff < 0)
-            {
-                append_to_env_block(env_block, &env_block_len, old_part, old_part_len);
-            }
-
-            if (name_diff <= 0)
-            {
-                old_part += old_part_len;
-            }
-
-            if (name_diff >= 0)
-            {
-                break;
-            }
+            sorted.insert_or_assign(std::wstring{ line.substr(0, pos) }, std::wstring{ line.substr(pos + 1) });
         }
 
-        append_to_env_block(env_block, &env_block_len, part, part_len);
+        env += std::size(line) + 1 /*'\0'*/;
     }
 
-    while (*old_part != L'\0')
-    {
-        size_t old_part_len;
-
-        if (!parse_env_block_part(old_part, &old_part_len, nullptr))
-        {
-            continue;
-        }
-
-        append_to_env_block(env_block, &env_block_len, old_part, old_part_len);
-        old_part += old_part_len;
-    }
-
-    (*env_block)[env_block_len] = '\0';
-
-    FreeEnvironmentStringsW(old_env_block);
-
-    tr_free_ptrv((void* const*)wide_env);
-    tr_free(wide_env);
-
-    return true;
+    return sorted;
 }
 
-static void append_argument(char** arguments, char const* argument)
+auto get_current_env()
+{
+    auto env = SortedWideEnv{};
+
+    if (auto* pwch = GetEnvironmentStringsW(); pwch != nullptr)
+    {
+        env = parse_env_string(pwch);
+
+        FreeEnvironmentStringsW(pwch);
+    }
+
+    return env;
+}
+
+void append_argument(char** arguments, char const* argument)
 {
     size_t arguments_len = *arguments != nullptr ? strlen(*arguments) : 0u;
     size_t const argument_len = strlen(argument);
@@ -304,7 +200,7 @@ static void append_argument(char** arguments, char const* argument)
     *(dst++) = '\0';
 }
 
-static bool contains_batch_metachars(char const* text)
+bool contains_batch_metachars(char const* text)
 {
     /* First part - chars explicitly documented by `cmd.exe /?` as "special" */
     return strpbrk(
@@ -313,26 +209,28 @@ static bool contains_batch_metachars(char const* text)
                "%!^\"") != nullptr;
 }
 
-static enum tr_app_type get_app_type(char const* app)
+auto get_app_type(char const* app)
 {
-    if (tr_str_has_suffix(app, ".cmd") || tr_str_has_suffix(app, ".bat"))
+    auto const lower = tr_strlower(app);
+
+    if (tr_strvEndsWith(lower, ".cmd") || tr_strvEndsWith(lower, ".bat"))
     {
-        return TR_APP_TYPE_BATCH;
+        return tr_app_type::BATCH;
     }
 
     /* TODO: Support other types? */
 
-    return TR_APP_TYPE_EXE;
+    return tr_app_type::EXE;
 }
 
-static void append_app_launcher_arguments(enum tr_app_type app_type, char** args)
+void append_app_launcher_arguments(tr_app_type app_type, char** args)
 {
     switch (app_type)
     {
-    case TR_APP_TYPE_EXE:
+    case tr_app_type::EXE:
         break;
 
-    case TR_APP_TYPE_BATCH:
+    case tr_app_type::BATCH:
         append_argument(args, "cmd.exe");
         append_argument(args, "/d");
         append_argument(args, "/e:off");
@@ -342,64 +240,65 @@ static void append_app_launcher_arguments(enum tr_app_type app_type, char** args
         break;
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported application type {:d}"), app_type));
+        TR_ASSERT_MSG(false, "unsupported application type");
         break;
     }
 }
 
-static bool construct_cmd_line(char const* const* cmd, wchar_t** cmd_line)
+std::wstring construct_cmd_line(char const* const* cmd)
 {
-    enum tr_app_type const app_type = get_app_type(cmd[0]);
+    auto const app_type = get_app_type(cmd[0]);
 
     char* args = nullptr;
-    size_t arg_count = 0;
-    bool ret = false;
 
     append_app_launcher_arguments(app_type, &args);
 
     for (size_t i = 0; cmd[i] != nullptr; ++i)
     {
-        if (app_type == TR_APP_TYPE_BATCH && i > 0 && contains_batch_metachars(cmd[i]))
+        if (app_type == tr_app_type::BATCH && i > 0 && contains_batch_metachars(cmd[i]))
         {
             /* FIXME: My attempts to escape them one or another way didn't lead to anything good so far */
-            goto cleanup;
+            tr_free(args);
+            args = nullptr;
+            break;
         }
 
         append_argument(&args, cmd[i]);
-        ++arg_count;
     }
 
-    *cmd_line = args != nullptr ? tr_win32_utf8_to_native(args, -1) : nullptr;
+    if (args != nullptr)
+    {
+        auto cmd_line = tr_win32_utf8_to_native(args);
+        tr_free(args);
+        return cmd_line;
+    }
 
-    ret = true;
-
-cleanup:
-    tr_free(args);
-    return ret;
+    return {};
 }
+
+} // namespace
 
 bool tr_spawn_async(
     char const* const* cmd,
     std::map<std::string_view, std::string_view> const& env,
-    char const* work_dir,
+    std::string_view work_dir,
     tr_error** error)
 {
-    wchar_t* env_block = nullptr;
-
-    if (!create_env_block(env, &env_block, error))
+    // full_env = current_env + env;
+    auto full_env = get_current_env();
+    for (auto const& [key, val] : env)
     {
-        return false;
+        full_env.insert_or_assign(tr_win32_utf8_to_native(key), tr_win32_utf8_to_native(val));
     }
 
-    wchar_t* cmd_line;
-
-    if (!construct_cmd_line(cmd, &cmd_line))
+    auto cmd_line = construct_cmd_line(cmd);
+    if (std::empty(cmd_line))
     {
         set_system_error(error, ERROR_INVALID_PARAMETER, "Constructing command line");
         return false;
     }
 
-    wchar_t* current_dir = work_dir != nullptr ? tr_win32_utf8_to_native(work_dir, -1) : nullptr;
+    auto const current_dir = tr_win32_utf8_to_native(work_dir);
 
     auto si = STARTUPINFOW{};
     si.cb = sizeof(si);
@@ -410,13 +309,13 @@ bool tr_spawn_async(
 
     bool const ret = CreateProcessW(
         nullptr,
-        cmd_line,
+        std::data(cmd_line),
         nullptr,
         nullptr,
         FALSE,
         NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE,
-        env_block,
-        current_dir,
+        std::empty(full_env) ? nullptr : to_env_string(full_env).data(),
+        std::empty(current_dir) ? nullptr : current_dir.c_str(),
         &si,
         &pi);
 
@@ -429,10 +328,6 @@ bool tr_spawn_async(
     {
         set_system_error(error, GetLastError(), "Call to CreateProcess()");
     }
-
-    tr_free(current_dir);
-    tr_free(cmd_line);
-    tr_free(env_block);
 
     return ret;
 }
