@@ -1193,7 +1193,7 @@ std::string tr_sys_dir_get_current(tr_error** error)
 
     for (;;)
     {
-        if (char* ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
+        if (char* const ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
         {
             return ret;
         }
