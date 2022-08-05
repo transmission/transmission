@@ -1174,12 +1174,10 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::stri
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
 
-    auto buf = std::vector<char>{};
-    if (!tr_loadFile(filename, buf, error))
+    if (auto buf = std::vector<char>{}; tr_loadFile(filename, buf, error))
     {
-        return false;
+        return tr_variantFromBuf(setme, opts, buf, nullptr, error);
     }
 
-    auto const sv = std::string_view{ std::data(buf), std::size(buf) };
-    return tr_variantFromBuf(setme, opts, sv, nullptr, error);
+    return false;
 }

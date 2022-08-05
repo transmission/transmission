@@ -130,6 +130,22 @@ bool tr_variantFromBuf(
     char const** setme_end = nullptr,
     tr_error** error = nullptr);
 
+template<typename T>
+bool tr_variantFromBuf(
+    tr_variant* setme,
+    int variant_parse_opts,
+    T const& buf,
+    char const** setme_end = nullptr,
+    tr_error** error = nullptr)
+{
+    return tr_variantFromBuf(
+        setme,
+        variant_parse_opts,
+        std::string_view{ std::data(buf), static_cast<size_t>(std::size(buf)) },
+        setme_end,
+        error);
+}
+
 constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
     return b != nullptr && b->type == type;

@@ -1346,14 +1346,15 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     int64_t msg_type = -1;
     int64_t piece = -1;
     int64_t total_size = 0;
-    auto* const tmp = tr_new(char, msglen);
 
-    tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-    char const* const msg_end = (char const*)tmp + msglen;
+    auto tmp = std::vector<char>{};
+    tmp.resize(msglen);
+    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+    char const* const msg_end = std::data(tmp) + std::size(tmp);
 
     auto dict = tr_variant{};
     char const* benc_end = nullptr;
-    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }, &benc_end))
+    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp, &benc_end))
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
@@ -1408,8 +1409,6 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
             tr_variantFree(&v);
         }
     }
-
-    tr_free(tmp);
 }
 
 static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
@@ -1420,10 +1419,11 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
         return;
     }
 
-    auto* tmp = tr_new(char, msglen);
-    tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
+    auto tmp = std::vector<char>{};
+    tmp.resize(msglen);
+    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
 
-    if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }))
+    if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp))
     {
         uint8_t const* added = nullptr;
         auto added_len = size_t{};
@@ -1459,8 +1459,6 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
 
         tr_variantFree(&val);
     }
-
-    tr_free(tmp);
 }
 
 static void sendPex(tr_peerMsgsImpl* msgs);
