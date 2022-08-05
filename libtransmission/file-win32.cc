@@ -559,7 +559,8 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
                 wide_ret.resize(wide_ret_size);
                 if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
                 {
-                    wide_ret.resize(std::size(wide_ret) - 1); // remove excess '\0'
+                    // `wide_ret_size` includes the terminating '\0'; remove it from `wide_ret`
+                    wide_ret.resize(std::size(wide_ret) - 1);
                     std::wcerr << __LINE__ << L" [" << wide_ret << L']' << std::endl;
                     TR_ASSERT(tr_strvStartsWith(wide_ret, NativeLocalPathPrefix));
                     ret = native_path_to_path(wide_ret);
@@ -1349,6 +1350,8 @@ std::string tr_sys_dir_get_current(tr_error** error)
         wide_ret.resize(size);
         if (GetCurrentDirectoryW(std::size(wide_ret), std::data(wide_ret)) != 0)
         {
+            // `size` includes the terminating '\0'; remove it from `wide_ret`
+            wide_ret.resize(std::size(wide_ret) - 1);
             return tr_win32_native_to_utf8(wide_ret);
         }
     }
