@@ -166,7 +166,7 @@ auto path_to_fixed_native_path(std::string_view path)
     {
         return a == b && a == L'\\';
     };
-    auto tmp = wide_path;
+    auto const tmp = wide_path;
     wide_path.clear();
     std::unique_copy(std::begin(tmp), std::end(tmp), std::back_inserter(wide_path), Equal);
 
@@ -177,7 +177,7 @@ auto path_to_fixed_native_path(std::string_view path)
 } // namespace
 
 /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
-   (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx) for more info */
+   https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx for more info */
 static auto path_to_native_path(std::string_view path)
 {
     using namespace path_to_native_path_helpers;

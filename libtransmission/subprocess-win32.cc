@@ -268,7 +268,9 @@ std::wstring construct_cmd_line(char const* const* cmd)
 
     if (args != nullptr)
     {
-        return tr_win32_utf8_to_native(args);
+        auto cmd_line = tr_win32_utf8_to_native(args);
+        tr_free(args);
+        return cmd_line;
     }
 
     return {};
