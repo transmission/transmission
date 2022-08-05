@@ -1092,7 +1092,7 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
     TR_ASSERT(address != nullptr);
     TR_ASSERT(size > 0);
 
-    bool const ret = munmap((void*)address, size) != -1;
+    bool const ret = munmap(const_cast<void*>(address), size) != -1;
 
     if (!ret)
     {
