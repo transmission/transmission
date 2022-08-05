@@ -294,7 +294,7 @@ std::string_view tr_strvStrip(std::string_view str)
 {
     auto constexpr test = [](auto ch)
     {
-        return isspace(ch);
+        return isspace(static_cast<unsigned char>(ch));
     };
 
     auto const it = std::find_if_not(std::begin(str), std::end(str), test);
