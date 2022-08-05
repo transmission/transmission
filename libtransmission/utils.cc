@@ -18,8 +18,6 @@
 #include <string_view>
 #include <vector>
 
-#include <iostream> // NOMERGE(ckerr)
-
 #ifdef _WIN32
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
 
@@ -516,7 +514,6 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 
 std::string tr_win32_native_to_utf8(std::wstring_view wide)
 {
-    std::wcerr << __LINE__ << L": wide [" << wide << L']' << std::endl;
     auto utf8 = std::string{};
     utf8.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(wide), std::size(wide), nullptr, 0, nullptr, nullptr));
     auto const len = WideCharToMultiByte(
@@ -529,10 +526,6 @@ std::string tr_win32_native_to_utf8(std::wstring_view wide)
         nullptr,
         nullptr);
     TR_ASSERT(len == std::size(utf8));
-    std::cerr << __FILE__ << ':' << __LINE__ << " len [" << len << ']' << std::endl;
-    std::cerr << __FILE__ << ':' << __LINE__ << " utf8 [" << utf8 << ']' << std::endl;
-    TR_ASSERT(utf8.back() == '\0');
-    utf8.resize(std::size(utf8) - 1);
     return utf8;
 }
 
