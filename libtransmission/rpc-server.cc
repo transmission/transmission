@@ -220,8 +220,8 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
     }
 
     auto content = std::vector<char>{};
-    tr_error* error = nullptr;
-    if (!tr_loadFile(filename, content, &error))
+
+    if (tr_error* error = nullptr; !tr_loadFile(filename, content, &error))
     {
         send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
         tr_error_free(error);
