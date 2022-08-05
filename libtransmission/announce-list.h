@@ -15,9 +15,9 @@
 
 #include "quark.h"
 #include "interned-string.h"
-#include "web-utils.h"
 
 struct tr_error;
+struct tr_url_parsed_t;
 
 class tr_announce_list
 {

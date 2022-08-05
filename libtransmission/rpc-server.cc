@@ -46,6 +46,7 @@
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
+#include "web-utils.h"
 #include "web.h"
 
 using namespace std::literals;

@@ -17,7 +17,6 @@
 #endif
 
 #include "tr-macros.h"
-#include "tr-strbuf.h"
 
 struct tr_error;
 

@@ -15,6 +15,7 @@
 #include "torrent-metainfo.h"
 #include "utils.h"
 #include "variant.h"
+#include "web-utils.h"
 
 using namespace std::literals;
 
