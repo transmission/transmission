@@ -521,7 +521,7 @@ std::string tr_win32_native_to_utf8(std::wstring_view in)
     return out;
 }
 
-char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
+static char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 {
     if (text == nullptr)
     {
@@ -543,56 +543,6 @@ std::wstring tr_win32_utf8_to_native(std::string_view in)
     auto len = MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out));
     TR_ASSERT(len == std::size(out));
     return out;
-}
-
-wchar_t* tr_win32_utf8_to_native(char const* text, int text_size)
-{
-    return tr_win32_utf8_to_native_ex(text, text_size, 0, 0, nullptr);
-}
-
-wchar_t* tr_win32_utf8_to_native_ex(
-    char const* text,
-    int text_size,
-    int extra_chars_before,
-    int extra_chars_after,
-    int* real_result_size)
-{
-    wchar_t* ret = nullptr;
-    int size;
-
-    if (text_size == -1)
-    {
-        text_size = strlen(text);
-    }
-
-    size = MultiByteToWideChar(CP_UTF8, 0, text, text_size, nullptr, 0);
-
-    if (size == 0)
-    {
-        goto fail;
-    }
-
-    ret = tr_new(wchar_t, size + extra_chars_before + extra_chars_after + 1);
-    size = MultiByteToWideChar(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size);
-
-    if (size == 0)
-    {
-        goto fail;
-    }
-
-    ret[size + extra_chars_before + extra_chars_after] = L'\0';
-
-    if (real_result_size != nullptr)
-    {
-        *real_result_size = size;
-    }
-
-    return ret;
-
-fail:
-    tr_free(ret);
-
-    return nullptr;
 }
 
 std::string tr_win32_format_message(uint32_t code)
@@ -630,7 +580,7 @@ std::string tr_win32_format_message(uint32_t code)
     return text;
 }
 
-void tr_win32_make_args_utf8(int* argc, char*** argv)
+static void tr_win32_make_args_utf8(int* argc, char*** argv)
 {
     int my_argc;
     wchar_t** my_wide_argv;

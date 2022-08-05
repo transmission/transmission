@@ -87,7 +87,7 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
     auto args = std::array<char const*, 2>{ missing_exe_path.data(), nullptr };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
+    auto const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_FALSE(ret);
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
@@ -116,7 +116,7 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
                                                   nullptr };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
+    bool const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_TRUE(ret) << args[0] << ' ' << args[1];
     EXPECT_EQ(nullptr, error) << *error;
 
@@ -197,7 +197,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     setenv("ZOO", "tar", 1 /*true*/); // overridden
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), env, nullptr, &error);
+    bool const ret = tr_spawn_async(std::data(args), env, {}, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
@@ -245,7 +245,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), {}, test_dir.c_str(), &error);
+    bool const ret = tr_spawn_async(std::data(args), {}, test_dir, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
@@ -273,7 +273,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
+    auto const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
