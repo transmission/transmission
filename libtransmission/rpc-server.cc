@@ -169,9 +169,8 @@ static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server
 
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
-    bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv);
 
-    if (!do_compress)
+    if (bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv); !do_compress)
     {
         evbuffer_add(out, std::data(content), std::size(content));
     }
