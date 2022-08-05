@@ -233,34 +233,34 @@ static std::wstring path_to_native_path_wstr(std::string_view path)
 
 static std::string native_path_to_path(std::wstring_view wide_path)
 {
-    fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+    std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
     if (std::empty(wide_path))
     {
-        fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         return {};
     }
 
     if (tr_strvStartsWith(wide_path, NativeUncPathPrefix))
     {
-        fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         wide_path.remove_prefix(std::size(NativeUncPathPrefix));
-        fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         auto path = tr_win32_native_to_utf8(wide_path);
-        fmt::print(stderr, ":{} path [{}]\n", __LINE__, path);
+        std::cerr << __LINE__ << " [" << path << ']' << std::endl;
         path.insert(0, "\\\\"sv);
-        fmt::print(stderr, ":{} path [{}]\n", __LINE__, path);
+        std::cerr << __LINE__ << " [" << path << ']' << std::endl;
         return path;
     }
 
     if (tr_strvStartsWith(wide_path, NativeLocalPathPrefix))
     {
-        fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         wide_path.remove_prefix(std::size(NativeLocalPathPrefix));
-        fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         return tr_win32_native_to_utf8(wide_path);
     }
 
-    fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+    std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
     return tr_win32_native_to_utf8(wide_path);
 }
 
@@ -540,7 +540,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 
     if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
-        fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         if (auto const handle = CreateFileW(
                 wide_path.c_str(),
                 FILE_READ_EA,
@@ -551,18 +551,18 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
                 nullptr);
             handle != INVALID_HANDLE_VALUE)
         {
-            fmt::print(stderr, L":{} wide_path [{}]\n", __LINE__, wide_path);
+            std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
             if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
             {
-                fmt::print(stderr, ":{} wide_ret_size [{}]\n", __LINE__, wide_ret_size);
+                std::wcerr << __LINE__ << L" [" << wide_ret_size << L']' << std::endl;
                 auto wide_ret = std::wstring{};
                 wide_ret.resize(wide_ret_size);
                 if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
                 {
-                    fmt::print(stderr, ":{} wide_ret [{}]\n", __LINE__, wide_ret);
+                    std::wcerr << __LINE__ << L" [" << wide_ret << L']' << std::endl;
                     TR_ASSERT(tr_strvStartsWith(wide_ret, NativeLocalPathPrefix));
                     ret = native_path_to_path(wide_ret);
-                    fmt::print(stderr, ":{} ret [{}]\n", __LINE__, ret);
+                    std::cerr << __LINE__ << " [" << ret << ']' << std::endl;
                 }
             }
 
