@@ -18,8 +18,6 @@
 #include <string_view>
 #include <vector>
 
-#include <iostream> // NOCOMMIT(ckerr)
-
 #ifdef _WIN32
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
 
@@ -548,15 +546,10 @@ char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 
 std::wstring tr_win32_utf8_to_native(std::string_view utf8)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " utf8 [" << utf8 << ']' << std::endl;
     auto wide = std::wstring{};
     wide.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), nullptr, 0));
     auto const len = MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), std::data(wide), std::size(wide));
-    std::cerr << __FILE__ << ':' << __LINE__ << " len [" << len << ']' << std::endl;
-    std::wcerr << __LINE__ << L" [" << wide << L']' << std::endl;
     TR_ASSERT(len == std::size(wide));
-    TR_ASSERT(wide.back() == L'\0');
-    wide.resize(std::size(wide) - 1);
     return wide;
 }
 
