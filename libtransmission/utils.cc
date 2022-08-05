@@ -512,21 +512,13 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 
 #ifdef _WIN32
 
-std::string tr_win32_native_to_utf8(std::wstring_view wide)
+std::string tr_win32_native_to_utf8(std::wstring_view in)
 {
-    auto utf8 = std::string{};
-    utf8.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(wide), std::size(wide), nullptr, 0, nullptr, nullptr));
-    auto const len = WideCharToMultiByte(
-        CP_UTF8,
-        0,
-        std::data(wide),
-        std::size(wide),
-        std::data(utf8),
-        std::size(utf8),
-        nullptr,
-        nullptr);
-    TR_ASSERT(len == std::size(utf8));
-    return utf8;
+    auto out = std::string{};
+    out.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0, nullptr, nullptr));
+    auto len = WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out), nullptr, nullptr);
+    TR_ASSERT(len == std::size(out));
+    return out;
 }
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
@@ -544,13 +536,13 @@ char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
     return tr_strvDup(tr_win32_native_to_utf8({ text, static_cast<size_t>(text_size) }));
 }
 
-std::wstring tr_win32_utf8_to_native(std::string_view utf8)
+std::wstring tr_win32_utf8_to_native(std::string_view in)
 {
-    auto wide = std::wstring{};
-    wide.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), nullptr, 0));
-    auto const len = MultiByteToWideChar(CP_UTF8, 0, std::data(utf8), std::size(utf8), std::data(wide), std::size(wide));
-    TR_ASSERT(len == std::size(wide));
-    return wide;
+    auto out = std::wstring{};
+    out.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0));
+    auto len = MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out));
+    TR_ASSERT(len == std::size(out));
+    return out;
 }
 
 wchar_t* tr_win32_utf8_to_native(char const* text, int text_size)
