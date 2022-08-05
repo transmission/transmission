@@ -9,8 +9,6 @@
 #include <ctype.h> /* isalpha() */
 #include <string_view>
 
-#include <iostream> // NOMERGE(ckerr)
-
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
@@ -233,34 +231,25 @@ static std::wstring path_to_native_path_wstr(std::string_view path)
 
 static std::string native_path_to_path(std::wstring_view wide_path)
 {
-    std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
     if (std::empty(wide_path))
     {
-        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         return {};
     }
 
     if (tr_strvStartsWith(wide_path, NativeUncPathPrefix))
     {
-        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         wide_path.remove_prefix(std::size(NativeUncPathPrefix));
-        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         auto path = tr_win32_native_to_utf8(wide_path);
-        std::cerr << __LINE__ << " [" << path << ']' << std::endl;
         path.insert(0, "\\\\"sv);
-        std::cerr << __LINE__ << " [" << path << ']' << std::endl;
         return path;
     }
 
     if (tr_strvStartsWith(wide_path, NativeLocalPathPrefix))
     {
-        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         wide_path.remove_prefix(std::size(NativeLocalPathPrefix));
-        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         return tr_win32_native_to_utf8(wide_path);
     }
 
-    std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
     return tr_win32_native_to_utf8(wide_path);
 }
 
@@ -336,11 +325,8 @@ static void create_temp_path(
     TR_ASSERT(path_template != nullptr);
     TR_ASSERT(callback != nullptr);
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " path_template [" << path_template << ']' << std::endl;
     char* path = tr_strdup(path_template);
-    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
     size_t path_size = strlen(path);
-    std::cerr << __FILE__ << ':' << __LINE__ << " path_size [" << path_size << ']' << std::endl;
 
     TR_ASSERT(path_size > 0);
 
@@ -349,19 +335,14 @@ static void create_temp_path(
     for (int attempt = 0; attempt < 100; ++attempt)
     {
         size_t i = path_size;
-        std::cerr << __FILE__ << ':' << __LINE__ << " i [" << i << ']' << std::endl;
 
         while (i > 0 && path_template[i - 1] == 'X')
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " i [" << i << ']' << std::endl;
             int const c = tr_rand_int(26 + 26 + 10);
             path[i - 1] = c < 26 ? c + 'A' : (c < 26 + 26 ? (c - 26) + 'a' : (c - 26 - 26) + '0');
             --i;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " path_size [" << path_size << ']' << std::endl;
-        std::cerr << __FILE__ << ':' << __LINE__ << " i [" << i << ']' << std::endl;
-        std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
         TR_ASSERT(path_size >= i + 6);
 
         tr_error_clear(&my_error);
@@ -536,11 +517,8 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
     auto ret = std::string{};
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
-
     if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
-        std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
         if (auto const handle = CreateFileW(
                 wide_path.c_str(),
                 FILE_READ_EA,
@@ -551,20 +529,16 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
                 nullptr);
             handle != INVALID_HANDLE_VALUE)
         {
-            std::wcerr << __LINE__ << L" [" << wide_path << L']' << std::endl;
             if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
             {
-                std::wcerr << __LINE__ << L" [" << wide_ret_size << L']' << std::endl;
                 auto wide_ret = std::wstring{};
                 wide_ret.resize(wide_ret_size);
                 if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
                 {
                     // `wide_ret_size` includes the terminating '\0'; remove it from `wide_ret`
                     wide_ret.resize(std::size(wide_ret) - 1);
-                    std::wcerr << __LINE__ << L" [" << wide_ret << L']' << std::endl;
                     TR_ASSERT(tr_strvStartsWith(wide_ret, NativeLocalPathPrefix));
                     ret = native_path_to_path(wide_ret);
-                    std::cerr << __LINE__ << " [" << ret << ']' << std::endl;
                 }
             }
 
@@ -970,7 +944,6 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
 
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " path_template [" << path_template << ']' << std::endl;
     create_temp_path(path_template, file_open_temp_callback, &ret, error);
 
     return ret;
@@ -1380,7 +1353,6 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
     bool ret = false;
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " path_template [" << path_template << ']' << std::endl;
     create_temp_path(path_template, dir_create_temp_callback, &ret, error);
 
     return ret;
