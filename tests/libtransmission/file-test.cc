@@ -635,18 +635,18 @@ TEST_F(FileTest, pathResolve)
 
     if (createSymlink(path2, path1, false))
     {
-        auto tmp = makeString(tr_sys_path_resolve(path2, &err));
+        auto resolved = tr_sys_path_resolve(path2, &err);
         EXPECT_EQ(nullptr, err) << *err;
-        EXPECT_TRUE(pathContainsNoSymlinks(tmp.c_str()));
+        EXPECT_TRUE(pathContainsNoSymlinks(resolved.c_str()));
 
         tr_sys_path_remove(path2);
         tr_sys_path_remove(path1);
 
         tr_sys_dir_create(path1, 0, 0755);
         EXPECT_TRUE(createSymlink(path2, path1, true)); /* Win32: directory and file symlinks differ :( */
-        tmp = makeString(tr_sys_path_resolve(path2, &err));
+        resolved = tr_sys_path_resolve(path2, &err);
         EXPECT_EQ(nullptr, err) << *err;
-        EXPECT_TRUE(pathContainsNoSymlinks(tmp.c_str()));
+        EXPECT_TRUE(pathContainsNoSymlinks(resolved.c_str()));
     }
     else
     {
@@ -658,23 +658,25 @@ TEST_F(FileTest, pathResolve)
 
 #ifdef _WIN32
 
+    auto resolved = tr_sys_path_resolve("\\\\127.0.0.1\\NonExistent"sv, &err);
+    EXPECT_EQ(""sv, resolved);
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    resolved = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\NonExistent"sv, &err);
+    EXPECT_EQ(""sv, resolved);
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    for (auto const& input : { "\\\\127.0.0.1\\ADMIN$\\System32"sv,
+                               "\\\\127.0.0.1\\ADMIN$\\\\System32"sv,
+                               "\\\\127.0.0.1\\\\ADMIN$\\System32"sv,
+                               "\\\\127.0.0.1\\\\ADMIN$\\\\System32"sv,
+                               "\\\\127.0.0.1\\ADMIN$/System32"sv })
     {
-        char* tmp;
-
-        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\NonExistent", &err);
-        EXPECT_EQ(nullptr, tmp);
-        EXPECT_NE(nullptr, err);
-        tr_error_clear(&err);
-
-        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\NonExistent", &err);
-        EXPECT_EQ(nullptr, tmp);
-        EXPECT_NE(nullptr, err);
-        tr_error_clear(&err);
-
-        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\System32", &err);
-        EXPECT_STREQ("\\\\127.0.0.1\\ADMIN$\\System32", tmp);
+        resolved = tr_sys_path_resolve(input, &err);
+        EXPECT_EQ("\\\\127.0.0.1\\ADMIN$\\System32"sv, resolved);
         EXPECT_EQ(nullptr, err) << *err;
-        tr_free(tmp);
     }
 
 #endif

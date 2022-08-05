@@ -354,42 +354,25 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_resolve(char const* path, tr_error** error)
+std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
+    auto const szpath = tr_pathbuf{ path };
+    auto buf = std::array<char, PATH_MAX>{};
 
-    char* ret = nullptr;
-
-#if defined(HAVE_CANONICALIZE_FILE_NAME)
-
-    ret = canonicalize_file_name(path);
-
-#endif
-
-    if (ret == nullptr)
+    if (auto* const ret = realpath(szpath, std::data(buf)); ret != nullptr)
     {
-        char tmp[PATH_MAX];
-        ret = realpath(path, tmp);
-
-        if (ret != nullptr)
-        {
-            ret = tr_strdup(ret);
-        }
+        return ret;
     }
 
-    if (ret == nullptr)
-    {
-        set_system_error(error, errno);
-    }
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
     auto tmp = tr_pathbuf{ path };
 
-    if (char const* ret = basename(std::data(tmp)); ret != nullptr)
+    if (char const* const ret = basename(std::data(tmp)); ret != nullptr)
     {
         return ret;
     }

@@ -101,7 +101,7 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
     // get the string length
     auto svtmp = benc->substr(0, colon_pos);
-    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(ch) != 0; }))
+    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(static_cast<unsigned char>(ch)) != 0; }))
     {
         return {};
     }

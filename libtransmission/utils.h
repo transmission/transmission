@@ -123,12 +123,6 @@ std::string tr_win32_native_to_utf8(std::wstring_view);
 std::wstring tr_win32_utf8_to_native(std::string_view);
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);
-char* tr_win32_native_to_utf8_ex(
-    wchar_t const* text,
-    int text_size,
-    int extra_chars_before,
-    int extra_chars_after,
-    int* real_result_size);
 wchar_t* tr_win32_utf8_to_native(char const* text, int text_size);
 wchar_t* tr_win32_utf8_to_native_ex(
     char const* text,
@@ -233,6 +227,11 @@ template<typename T>
 }
 
 [[nodiscard]] constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
+}
+
+[[nodiscard]] constexpr bool tr_strvStartsWith(std::wstring_view sv, std::wstring_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
 }

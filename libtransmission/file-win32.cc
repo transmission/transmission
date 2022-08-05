@@ -39,6 +39,9 @@ struct tr_sys_dir_win32
     std::string utf8_name;
 };
 
+static auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
+static auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
+
 static wchar_t const native_local_path_prefix[] = { '\\', '\\', '?', '\\' };
 static wchar_t const native_unc_path_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
 
@@ -226,28 +229,28 @@ static std::wstring path_to_native_path_wstr(std::string_view path)
     return {};
 }
 
-static char* native_path_to_path(wchar_t const* wide_path)
+static std::string native_path_to_path(std::wstring_view wide_path)
 {
-    if (wide_path == nullptr)
+    if (std::empty(wide_path))
     {
-        return nullptr;
+        return {};
     }
 
-    bool const is_unc = wcsncmp(wide_path, native_unc_path_prefix, TR_N_ELEMENTS(native_unc_path_prefix)) == 0;
-    bool const is_local = !is_unc && wcsncmp(wide_path, native_local_path_prefix, TR_N_ELEMENTS(native_local_path_prefix)) == 0;
-
-    size_t const skip_chars = is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) :
-                                       (is_local ? TR_N_ELEMENTS(native_local_path_prefix) : 0);
-
-    char* const path = tr_win32_native_to_utf8_ex(wide_path + skip_chars, -1, is_unc ? 2 : 0, 0, nullptr);
-
-    if (is_unc && path != nullptr)
+    if (tr_strvStartsWith(wide_path, NativeUncPathPrefix))
     {
-        path[0] = '\\';
-        path[1] = '\\';
+        wide_path.remove_prefix(std::size(NativeUncPathPrefix));
+        auto path = tr_win32_native_to_utf8(wide_path);
+        path.insert(0, "\\\\"sv);
+        return path;
     }
 
-    return path;
+    if (tr_strvStartsWith(wide_path, NativeLocalPathPrefix))
+    {
+        wide_path.remove_prefix(std::size(NativeLocalPathPrefix));
+        return tr_win32_native_to_utf8(wide_path);
+    }
+
+    return tr_win32_native_to_utf8(wide_path);
 }
 
 static tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
@@ -510,73 +513,46 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_resolve(char const* path, tr_error** error)
+std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
+    auto ret = std::string{};
 
-    char* ret = nullptr;
-    wchar_t* wide_ret = nullptr;
-    HANDLE handle = INVALID_HANDLE_VALUE;
-    DWORD wide_ret_size;
-
-    auto const wide_path = path_to_native_path_wstr(path);
-    if (std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
     {
-        goto fail;
+        if (auto const handle = CreateFileW(
+                wide_path.c_str(),
+                FILE_READ_EA,
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                nullptr,
+                OPEN_EXISTING,
+                FILE_FLAG_BACKUP_SEMANTICS,
+                nullptr);
+            handle != INVALID_HANDLE_VALUE)
+        {
+            if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
+            {
+                auto wide_ret = std::wstring{};
+                wide_ret.resize(wide_ret_size);
+                if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
+                {
+                    // `wide_ret_size` includes the terminating '\0'; remove it from `wide_ret`
+                    wide_ret.resize(std::size(wide_ret) - 1);
+                    TR_ASSERT(tr_strvStartsWith(wide_ret, NativeLocalPathPrefix));
+                    ret = native_path_to_path(wide_ret);
+                }
+            }
+
+            CloseHandle(handle);
+        }
     }
 
-    handle = CreateFileW(
-        wide_path.c_str(),
-        FILE_READ_EA,
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS,
-        nullptr);
-
-    if (handle == INVALID_HANDLE_VALUE)
+    if (!std::empty(ret))
     {
-        goto fail;
+        return ret;
     }
 
-    wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0);
-
-    if (wide_ret_size == 0)
-    {
-        goto fail;
-    }
-
-    wide_ret = tr_new(wchar_t, wide_ret_size);
-
-    if (GetFinalPathNameByHandleW(handle, wide_ret, wide_ret_size, 0) != wide_ret_size - 1)
-    {
-        goto fail;
-    }
-
-    TR_ASSERT(wcsncmp(wide_ret, L"\\\\?\\", 4) == 0);
-
-    ret = native_path_to_path(wide_ret);
-
-    if (ret != nullptr)
-    {
-        goto cleanup;
-    }
-
-fail:
     set_system_error(error, GetLastError());
-
-    tr_free(ret);
-    ret = nullptr;
-
-cleanup:
-    tr_free(wide_ret);
-
-    if (handle != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(handle);
-    }
-
-    return ret;
+    return {};
 }
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
@@ -1347,6 +1323,8 @@ std::string tr_sys_dir_get_current(tr_error** error)
         wide_ret.resize(size);
         if (GetCurrentDirectoryW(std::size(wide_ret), std::data(wide_ret)) != 0)
         {
+            // `size` includes the terminating '\0'; remove it from `wide_ret`
+            wide_ret.resize(std::size(wide_ret) - 1);
             return tr_win32_native_to_utf8(wide_ret);
         }
     }
