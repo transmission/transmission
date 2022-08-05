@@ -1148,9 +1148,8 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
     {
         if (auto const size = GetEnvironmentVariableW(wide_key.c_str(), nullptr, 0); size != 0)
         {
-            auto wide_val = std::vector<wchar_t>{};
+            auto wide_val = std::wstring{};
             wide_val.resize(size);
-
             if (GetEnvironmentVariableW(wide_key.c_str(), std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
             {
                 TR_ASSERT(wide_val.back() == L'\0');
