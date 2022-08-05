@@ -24,7 +24,7 @@
 class tr_metainfo_builder
 {
 public:
-    tr_metainfo_builder(std::string_view single_file_or_parent_directory);
+    explicit tr_metainfo_builder(std::string_view single_file_or_parent_directory);
 
     tr_metainfo_builder(tr_metainfo_builder&&) = delete;
     tr_metainfo_builder(tr_metainfo_builder const&) = delete;
