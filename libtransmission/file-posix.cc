@@ -692,9 +692,7 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_er
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    struct stat sb;
-
-    if (fstat(handle, &sb) != -1)
+    if (struct stat sb; fstat(handle, &sb) != -1)
     {
         return stat_to_sys_path_info(sb);
     }
