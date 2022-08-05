@@ -263,12 +263,10 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        QByteArray const json_data = reply->readAll().trimmed();
-        auto const json_sv = std::string_view{ std::data(json_data), size_t(std::size(json_data)) };
-
-        TrVariantPtr const json = createVariant();
+        auto const json_data = reply->readAll().trimmed();
+        auto const json = createVariant();
         RpcResponse result;
-        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
+        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_data))
         {
             result = parseResponseData(*json);
         }
