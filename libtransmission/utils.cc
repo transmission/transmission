@@ -18,6 +18,8 @@
 #include <string_view>
 #include <vector>
 
+#include <iostream> // NOCOMMIT(ckerr)
+
 #ifdef _WIN32
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
 
