@@ -155,11 +155,17 @@ auto path_to_fixed_native_path(std::string_view path)
     auto wide_path = tr_win32_utf8_to_native(path);
 
     // convert '/' to '\'
-    static auto constexpr Convert = [](wchar_t wch){ return wch == L'/' ? L'\\' : wch; };
+    static auto constexpr Convert = [](wchar_t wch)
+    {
+        return wch == L'/' ? L'\\' : wch;
+    };
     std::transform(std::begin(wide_path), std::end(wide_path), std::begin(wide_path), Convert);
 
     // squash multiple consecutive separators into one to avoid ERROR_INVALID_NAME
-    static auto constexpr Equal = [](wchar_t a, wchar_t b){ return a == b && a == L'\\'; };
+    static auto constexpr Equal = [](wchar_t a, wchar_t b)
+    {
+        return a == b && a == L'\\';
+    };
     auto tmp = wide_path;
     wide_path.clear();
     std::unique_copy(std::begin(tmp), std::end(tmp), std::back_inserter(wide_path), Equal);

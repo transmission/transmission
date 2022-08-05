@@ -67,7 +67,8 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
     }
 
     // leading zeroes are not allowed
-    if ((walk[0] == '0' && (isdigit(static_cast<unsigned char>(walk[1])) != 0)) || (walk[0] == '-' && walk[1] == '0' && (isdigit(static_cast<unsigned char>(walk[2])) != 0)))
+    if ((walk[0] == '0' && (isdigit(static_cast<unsigned char>(walk[1])) != 0)) ||
+        (walk[0] == '-' && walk[1] == '0' && (isdigit(static_cast<unsigned char>(walk[2])) != 0)))
     {
         return {};
     }
