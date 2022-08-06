@@ -111,7 +111,7 @@ static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 
 static char const* get_current_session_id(tr_rpc_server* server)
 {
-    return tr_session_id_get_current(server->session->session_id);
+    return server->session->session_id.c_str();
 }
 
 /**

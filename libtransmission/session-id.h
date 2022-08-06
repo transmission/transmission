@@ -5,41 +5,55 @@
 
 #pragma once
 
-using tr_session_id_t = struct tr_session_id*;
+#include <array>
+#include <cstddef> // for size_t
+#include <ctime> // for time_t
+#include <string_view>
 
-/**
- * Create new session identifier object.
- *
- * @return New session identifier object.
- */
-tr_session_id_t tr_session_id_new(void);
+#include "file.h" // tr_sys_file_t
 
-/**
- * Free session identifier object.
- *
- * @param[in] session_id Session identifier object.
- */
-void tr_session_id_free(tr_session_id_t session_id);
+class tr_session_id
+{
+public:
+    using current_time_func_t = time_t (*)();
 
-/**
- * Get current session identifier as string.
- *
- * @param[in] session_id Session identifier object.
- *
- * @return String representation of current session identifier.
- */
-char const* tr_session_id_get_current(tr_session_id_t session_id);
+    tr_session_id(current_time_func_t get_current_time)
+        : get_current_time_{ get_current_time }
+    {
+    }
 
-/**
- * Check if session ID corresponds to session running on the same machine as
- * the caller.
- *
- * This is useful for various behavior alterations, such as transforming
- * relative paths to absolute before passing through RPC, or presenting
- * different UI for local and remote sessions.
- *
- * @param[in] session_id String representation of session identifier object.
- *
- * @return `True` if session is valid and local, `false` otherwise.
- */
-bool tr_session_id_is_local(char const* session_id);
+    tr_session_id(tr_session_id&&) = delete;
+    tr_session_id(tr_session_id const&) = delete;
+    tr_session_id& operator=(tr_session_id&&) = delete;
+    tr_session_id& operator=(tr_session_id const&) = delete;
+    ~tr_session_id();
+
+    /**
+     * Check if session ID corresponds to session running on the same machine as
+     * the caller.
+     *
+     * This is useful for various behavior alterations, such as transforming
+     * relative paths to absolute before passing through RPC, or presenting
+     * different UI for local and remote sessions.
+     */
+    [[nodiscard]] static bool isLocal(std::string_view) noexcept;
+
+    // current session identifier
+    [[nodiscard]] std::string_view sv() const noexcept;
+    [[nodiscard]] char const* c_str() const noexcept;
+
+private:
+    static auto constexpr SessionIdSize = size_t{ 48 };
+    static auto constexpr SessionIdDurationSec = time_t{ 60 * 60 }; /* expire in an hour */
+
+    using session_id_t = std::array<char, SessionIdSize + 1>; // +1 for '\0';
+    static session_id_t make_session_id();
+
+    current_time_func_t const get_current_time_;
+
+    mutable session_id_t current_value_;
+    mutable session_id_t previous_value_;
+    mutable tr_sys_file_t current_lock_file_ = TR_BAD_SYS_FILE;
+    mutable tr_sys_file_t previous_lock_file_ = TR_BAD_SYS_FILE;
+    mutable time_t expires_at_ = 0;
+};

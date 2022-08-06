@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "Session.h"
-
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -28,6 +26,8 @@
 #include <libtransmission/session-id.h>
 #include <libtransmission/utils.h> // tr_free
 #include <libtransmission/variant.h>
+
+#include "Session.h"
 
 #include "AddData.h"
 #include "CustomVariantType.h"
@@ -969,7 +969,7 @@ void Session::updateInfo(tr_variant* d)
     if (auto const str = dictFind<QString>(d, TR_KEY_session_id); str)
     {
         session_id_ = *str;
-        is_definitely_local_session_ = tr_session_id_is_local(session_id_.toUtf8().constData());
+        is_definitely_local_session_ = tr_session_id::isLocal(session_id_.toUtf8().constData());
     }
     else
     {

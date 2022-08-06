@@ -23,6 +23,7 @@
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"
+#include "Filters.h"
 #include "Prefs.h"
 #include "VariantHelpers.h"
 
