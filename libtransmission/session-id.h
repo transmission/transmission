@@ -28,10 +28,18 @@ public:
     tr_session_id& operator=(tr_session_id const&) = delete;
     ~tr_session_id();
 
+    /**
+     * Check if session ID corresponds to session running on the same machine as
+     * the caller.
+     *
+     * This is useful for various behavior alterations, such as transforming
+     * relative paths to absolute before passing through RPC, or presenting
+     * different UI for local and remote sessions.
+     */
     [[nodiscard]] static bool isLocal(std::string_view) noexcept;
 
+    // current session identifier
     [[nodiscard]] std::string_view sv() const noexcept;
-
     [[nodiscard]] char const* c_str() const noexcept;
 
 private:
