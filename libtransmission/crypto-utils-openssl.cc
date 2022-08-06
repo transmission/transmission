@@ -96,18 +96,18 @@ class ShaHelper
 public:
     using EvpFunc = decltype((EVP_sha1));
 
-    ShaHelper(EvpFunc evp_func)
+    explicit ShaHelper(EvpFunc evp_func)
         : evp_func_{ evp_func }
     {
         clear();
     }
 
-    void clear()
+    void clear() const
     {
         EVP_DigestInit_ex(handle_.get(), evp_func_(), nullptr);
     }
 
-    void update(void const* data, size_t data_length)
+    void update(void const* data, size_t data_length) const
     {
         if (data_length != 0U)
         {

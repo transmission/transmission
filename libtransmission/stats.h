@@ -15,8 +15,6 @@
 
 #include "transmission.h" // for tr_session_stats
 
-#include "utils.h" // for tr_getRatio()
-
 // per-session data structure for bandwidth use statistics
 class tr_stats
 {
@@ -71,17 +69,7 @@ public:
     }
 
 private:
-    static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b)
-    {
-        auto ret = tr_session_stats{};
-        ret.uploadedBytes = a.uploadedBytes + b.uploadedBytes;
-        ret.downloadedBytes = a.downloadedBytes + b.downloadedBytes;
-        ret.filesAdded = a.filesAdded + b.filesAdded;
-        ret.sessionCount = a.sessionCount + b.sessionCount;
-        ret.secondsActive = a.secondsActive + b.secondsActive;
-        ret.ratio = tr_getRatio(ret.uploadedBytes, ret.downloadedBytes);
-        return ret;
-    }
+    static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b);
 
     void save() const;
 

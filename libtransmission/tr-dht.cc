@@ -47,6 +47,7 @@
 #include "tr-strbuf.h"
 #include "trevent.h"
 #include "variant.h"
+#include "utils.h" // tr_time(), _()
 
 using namespace std::literals;
 

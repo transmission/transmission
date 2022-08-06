@@ -5,7 +5,6 @@
 
 #include "transmission.h"
 #include "peer-msgs.h"
-#include "utils.h"
 
 #include "gtest/gtest.h"
 

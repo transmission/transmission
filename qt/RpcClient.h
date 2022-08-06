@@ -22,7 +22,6 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/quark.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 class QNetworkAccessManager;
@@ -97,5 +96,5 @@ private:
     QNetworkAccessManager* nam_ = {};
     QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     int64_t next_tag_ = {};
-    bool const verbose_ = tr_env_key_exists("TR_RPC_VERBOSE");
+    bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
 };

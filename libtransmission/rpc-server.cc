@@ -169,9 +169,8 @@ static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server
 
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
-    bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv);
 
-    if (!do_compress)
+    if (bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv); !do_compress)
     {
         evbuffer_add(out, std::data(content), std::size(content));
     }
@@ -221,8 +220,8 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
     }
 
     auto content = std::vector<char>{};
-    tr_error* error = nullptr;
-    if (!tr_loadFile(filename, content, &error))
+
+    if (tr_error* error = nullptr; !tr_loadFile(filename, content, &error))
     {
         send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
         tr_error_free(error);

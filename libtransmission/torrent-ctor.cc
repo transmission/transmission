@@ -19,7 +19,6 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 
 using namespace std::literals;
 

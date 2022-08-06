@@ -12,7 +12,6 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_new0, tr_strdup */
 #include <libtransmission/variant.h>
 
 #include "Application.h"
