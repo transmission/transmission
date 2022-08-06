@@ -99,7 +99,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 7                 | Pause selected torrent                                                          |
 
 ### Torrent inspector ###
-
+![image](resources/WI-torrent-inspector.png)
 
 | Number On Picture | Description                                                                                                                                |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
