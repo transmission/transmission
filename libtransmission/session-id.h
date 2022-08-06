@@ -10,25 +10,22 @@
 #include <ctime> // for time_t
 #include <string_view>
 
-#include "transmission.h"
-
 #include "file.h" // tr_sys_file_t
-#include "tr-strbuf.h" // for tr_pathbuf
 
 class tr_session_id
 {
 public:
-    using current_time_func_t = time_t(*)();
+    using current_time_func_t = time_t (*)();
 
-    tr_session_id(current_time_func_t time_func)
-        : time_func_{ time_func }
+    tr_session_id(current_time_func_t get_current_time)
+        : get_current_time_{ get_current_time }
     {
     }
 
     tr_session_id(tr_session_id&&) = delete;
     tr_session_id(tr_session_id const&) = delete;
-    tr_session_id& operator= (tr_session_id&&) = delete;
-    tr_session_id& operator= (tr_session_id const&) = delete;
+    tr_session_id& operator=(tr_session_id&&) = delete;
+    tr_session_id& operator=(tr_session_id const&) = delete;
     ~tr_session_id();
 
     [[nodiscard]] static bool isLocal(std::string_view) noexcept;
@@ -41,14 +38,10 @@ private:
     static auto constexpr SessionIdSize = size_t{ 48 };
     static auto constexpr SessionIdDurationSec = time_t{ 60 * 60 }; /* expire in an hour */
 
-    static void get_lockfile_path(std::string_view session_id, tr_pathbuf&);
-    static tr_sys_file_t create_lockfile(std::string_view session_id);
-    static void destroy_lockfile(tr_sys_file_t lockfile_fd, std::string_view session_id);
-
     using session_id_t = std::array<char, SessionIdSize + 1>; // +1 for '\0';
     static session_id_t make_session_id();
 
-    current_time_func_t const time_func_;
+    current_time_func_t const get_current_time_;
 
     mutable session_id_t current_value_;
     mutable session_id_t previous_value_;
