@@ -255,5 +255,12 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
 }
 
+// Test for https://github.com/transmission/transmission/issues/3591
+TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
+{
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+}
+
 } // namespace test
 } // namespace libtransmission
