@@ -11,10 +11,10 @@
 #include <cstdint>
 #include <cstdlib> // atoi()
 #include <ctime>
-#include <iterator> // std::back_inserter
+#include <iterator> // for std::back_inserter
 #include <list>
 #include <memory>
-#include <numeric> // std::accumulate()
+#include <numeric> // for std::accumulate()
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -45,7 +45,6 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform-quota.h" /* tr_device_info_free() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
 #include "session-id.h"

@@ -692,9 +692,7 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_er
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    struct stat sb;
-
-    if (fstat(handle, &sb) != -1)
+    if (struct stat sb; fstat(handle, &sb) != -1)
     {
         return stat_to_sys_path_info(sb);
     }
@@ -1094,7 +1092,7 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
     TR_ASSERT(address != nullptr);
     TR_ASSERT(size > 0);
 
-    bool const ret = munmap((void*)address, size) != -1;
+    bool const ret = munmap(const_cast<void*>(address), size) != -1;
 
     if (!ret)
     {
@@ -1195,7 +1193,7 @@ std::string tr_sys_dir_get_current(tr_error** error)
 
     for (;;)
     {
-        if (char* ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
+        if (char* const ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
         {
             return ret;
         }

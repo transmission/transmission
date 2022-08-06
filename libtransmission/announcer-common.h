@@ -21,7 +21,8 @@
 #include "interned-string.h"
 #include "net.h"
 #include "peer-mgr.h" // tr_pex
-#include "web-utils.h"
+
+struct tr_url_parsed_t;
 
 /***
 ****  SCRAPE

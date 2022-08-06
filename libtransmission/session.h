@@ -62,7 +62,7 @@ struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    tr_bindinfo(tr_address addr)
+    explicit tr_bindinfo(tr_address addr)
         : addr_{ std::move(addr) }
     {
     }

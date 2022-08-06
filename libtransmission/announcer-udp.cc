@@ -3,9 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::find_if()
-#include <cerrno> /* errno, EAFNOSUPPORT */
-#include <cstring> /* memset() */
+#include <algorithm> // for std::find_if()
+#include <cerrno> // for errno, EAFNOSUPPORT
+#include <cstring> // for memset()
 #include <ctime>
 #include <list>
 #include <memory>
