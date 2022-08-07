@@ -25,8 +25,7 @@
 #include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "utils.h"
-#include "watchdir-common.h"
-#include "watchdir.h"
+#include "watchdir-base.h"
 
 class tr_watchdir_inotify : public tr_watchdir_base
 {

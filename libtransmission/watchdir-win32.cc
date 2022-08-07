@@ -24,8 +24,7 @@
 #include "net.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "watchdir.h"
-#include "watchdir-common.h"
+#include "watchdir-base.h"
 
 namespace
 {

@@ -15,8 +15,7 @@
 #include "log.h"
 #include "tr-strbuf.h"
 #include "utils.h" // for _()
-#include "watchdir-common.h"
-#include "watchdir.h"
+#include "watchdir-base.h"
 
 namespace
 {

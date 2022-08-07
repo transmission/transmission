@@ -9,8 +9,7 @@
 
 #include "transmission.h"
 
-#include "watchdir.h"
-#include "watchdir-common.h"
+#include "watchdir-base.h"
 #include "utils.h" // for tr_timerAddMsec()
 
 class tr_watchdir_generic final : public tr_watchdir_base

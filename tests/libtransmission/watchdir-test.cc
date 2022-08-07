@@ -14,7 +14,7 @@
 #include "file.h"
 #include "net.h"
 #include "watchdir.h"
-#include "watchdir-common.h"
+#include "watchdir-base.h"
 
 #include "test-fixtures.h"
 
