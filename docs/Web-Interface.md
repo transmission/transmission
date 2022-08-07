@@ -121,7 +121,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 16                | Comment on the torrent, usually a link to the site from where it was downloaded   
 
 #### 5.1 Torrent inspector peers tab ####
-
+![image](resources/WI-torrent-inspector-peers-tab.png)
 
 | Number On Picture | Description                                                     |
 | ----------------- | --------------------------------------------------------------- |
@@ -133,8 +133,3 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 6                 | Сolumn showing the IP address of the peer                       |
 | 7                 | Column showing the Bittorrent client of the feast               |
   
-
-
-
-
-
