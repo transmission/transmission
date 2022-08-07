@@ -16,7 +16,7 @@
 #include <set>
 #include <string>
 
-#include <event.h>
+#include <event2/event.h>
 
 #include "watchdir.h"
 
