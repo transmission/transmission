@@ -26,25 +26,161 @@
 #include "watchdir.h"
 #include "watchdir-common.h"
 
-/***
-****
-***/
-
-struct tr_watchdir_win32
+class tr_watchdir_win32 final : public tr_watchdir_base
 {
-    tr_watchdir_backend base;
+public:
+    tr_watchdir_win32(std::string_view dirname, Callback callback, event_base* event_base, TimeFunc time_func)
+        : tr_watchdir_base{ dirname, std::move(callback), event_base, time_func }
+    {
+        init();
+        scan();
+    }
 
-    HANDLE fd;
-    OVERLAPPED overlapped;
-    DWORD buffer[8 * 1024 / sizeof(DWORD)];
-    evutil_socket_t notify_pipe[2];
-    struct bufferevent* event;
-    HANDLE thread;
+    tr_watchdir_win32(tr_watchdir_win32&&) = delete;
+    tr_watchdir_win32(tr_watchdir_win32 const&) = delete;
+    tr_watchdir_win32& operator=(tr_watchdir_win32&&) = delete;
+    tr_watchdir_win32& operator=(tr_watchdir_win32 const&) = delete;
+
+    ~tr_watchdir_win32() override
+    {
+        if (fd_ != INVALID_HANDLE_VALUE)
+        {
+            CancelIoEx(fd_, &overlapped_);
+        }
+
+        if (thread_ != nullptr)
+        {
+            WaitForSingleObject(thread_, INFINITE);
+            CloseHandle(thread_);
+        }
+
+        if (event_ != nullptr)
+        {
+            bufferevent_free(event_);
+        }
+
+        if (notify_pipe[0] _ != TR_BAD_SOCKET)
+        {
+            evutil_closesocket(notify_pipe[0] _);
+        }
+
+        if (notify_pipe[1] _ != TR_BAD_SOCKET)
+        {
+            evutil_closesocket(notify_pipe[1] _);
+        }
+
+        if (fd_ != INVALID_HANDLE_VALUE)
+        {
+            CloseHandle(fd_);
+        }
+    }
+
+private:
+    void init()
+    {
+        auto const path = dirname();
+        auto const wide_path = tr_win32_utf8_to_native(path);
+        if (!std::empty(wide_path))
+        {
+            tr_logAddError(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));
+            return;
+        }
+
+        if ((fd_ = CreateFileW(
+                 wide_path.c_str(),
+                 FILE_LIST_DIRECTORY,
+                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                 nullptr,
+                 OPEN_EXISTING,
+                 FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+                 nullptr)) == INVALID_HANDLE_VALUE)
+        {
+            tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
+            return;
+        }
+
+        overlapped_.Pointer = handle;
+
+        if (!ReadDirectoryChangesW(
+                backend->fd,
+                backend->buffer,
+                sizeof(backend->buffer),
+                FALSE,
+                WIN32_WATCH_MASK,
+                nullptr,
+                &backend->overlapped,
+                nullptr))
+        {
+            tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
+            return;
+        }
+
+        if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, notify_pipe_) == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't create pipe: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        auto* const event = bufferevent_socket_new(eventBase(), notify_pipe_[0], 0);
+        if (event == nullptr)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't create event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+        event_.reset(event);
+
+        bufferevent_setwatermark(event_.get(), EV_READ, sizeof(FILE_NOTIFY_INFORMATION), 0);
+        bufferevent_setcb(event_.get(), &tr_watchdir_win32_on_event, nullptr, nullptr, handle);
+        bufferevent_enable(event_.get(), EV_READ);
+
+        thread_ = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32_thread, handle, 0, nullptr);
+        if (thread == nullptr)
+        {
+            tr_logAddError(_("Couldn't create thread"));
+            return;
+        }
+
+        /* Perform an initial scan on the directory */
+        if (event_base_once(eventBase(), -1, EV_TIMEOUT, &tr_watchdir_win32::onFirstScan, this, nullptr) == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't scan '{path}': {error} ({error_code})"),
+                fmt::arg("path", path),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+        }
+    }
+
+    static void onFirstScan(evutil_socket_t /*unused*/, short /*unused*/, void* vself)
+    {
+        static_cast<tr_watchdir_win32*>(vself)->scan();
+    }
+
+    HANDLE fd_ = INVALID_HANDLE_VALUE;
+    OVERLAPPED overlapped_;
+    DWORD buffer_[8 * 1024 / sizeof(DWORD)];
+    std::array<evutil_socket_t, 2> notify_pipe_ = { TR_BAD_SOCKET, TR_BAD_SOCKET };
+    struct bufferevent* event_ = nullptr;
+    HANDLE thread_ = nullptr;
 };
 
-#define BACKEND_UPCAST(b) ((tr_watchdir_win32*)(b))
-
-#define WIN32_WATCH_MASK (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE)
+std::unique_ptr<tr_watchdir> tr_watchdir::create(
+    std::string_view dirname,
+    Callback callback,
+    event_base* event_base,
+    TimeFunc time_func)
+{
+    return std::make_unique<tr_watchdir_win32>(dirname, std::move(callback), event_base, time_func);
+}
 
 /***
 ****
@@ -133,13 +269,6 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
     return 0;
 }
 
-static void tr_watchdir_win32_on_first_scan(evutil_socket_t /*fd*/, short /*type*/, void* context)
-{
-    auto const handle = static_cast<tr_watchdir_t>(context);
-
-    tr_watchdir_scan(handle, nullptr);
-}
-
 static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 {
     auto const handle = static_cast<tr_watchdir_t>(context);
@@ -216,148 +345,4 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
     }
 
     tr_free(buffer);
-}
-
-static void tr_watchdir_win32_free(tr_watchdir_backend* backend_base)
-{
-    tr_watchdir_win32* const backend = BACKEND_UPCAST(backend_base);
-
-    if (backend == nullptr)
-    {
-        return;
-    }
-
-    TR_ASSERT(backend->base.free_func == &tr_watchdir_win32_free);
-
-    if (backend->fd != INVALID_HANDLE_VALUE)
-    {
-        CancelIoEx(backend->fd, &backend->overlapped);
-    }
-
-    if (backend->thread != nullptr)
-    {
-        WaitForSingleObject(backend->thread, INFINITE);
-        CloseHandle(backend->thread);
-    }
-
-    if (backend->event != nullptr)
-    {
-        bufferevent_free(backend->event);
-    }
-
-    if (backend->notify_pipe[0] != TR_BAD_SOCKET)
-    {
-        evutil_closesocket(backend->notify_pipe[0]);
-    }
-
-    if (backend->notify_pipe[1] != TR_BAD_SOCKET)
-    {
-        evutil_closesocket(backend->notify_pipe[1]);
-    }
-
-    if (backend->fd != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(backend->fd);
-    }
-
-    tr_free(backend);
-}
-
-tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
-{
-    char const* const path = tr_watchdir_get_path(handle);
-
-    auto* const backend = tr_new0(tr_watchdir_win32, 1);
-    backend->base.free_func = &tr_watchdir_win32_free;
-    backend->fd = INVALID_HANDLE_VALUE;
-    backend->notify_pipe[0] = backend->notify_pipe[1] = TR_BAD_SOCKET;
-
-    auto const wide_path = tr_win32_utf8_to_native(path);
-    if (!std::empty(wide_path))
-    {
-        tr_logAddError(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));
-        goto fail;
-    }
-
-    if ((backend->fd = CreateFileW(
-             wide_path.c_str(),
-             FILE_LIST_DIRECTORY,
-             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-             nullptr,
-             OPEN_EXISTING,
-             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-             nullptr)) == INVALID_HANDLE_VALUE)
-    {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
-        goto fail;
-    }
-
-    backend->overlapped.Pointer = handle;
-
-    if (!ReadDirectoryChangesW(
-            backend->fd,
-            backend->buffer,
-            sizeof(backend->buffer),
-            FALSE,
-            WIN32_WATCH_MASK,
-            nullptr,
-            &backend->overlapped,
-            nullptr))
-    {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
-        goto fail;
-    }
-
-    if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, backend->notify_pipe) == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't create pipe: {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto fail;
-    }
-
-    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->notify_pipe[0], 0)) == nullptr)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't create event: {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto fail;
-    }
-
-    bufferevent_setwatermark(backend->event, EV_READ, sizeof(FILE_NOTIFY_INFORMATION), 0);
-    bufferevent_setcb(backend->event, &tr_watchdir_win32_on_event, nullptr, nullptr, handle);
-    bufferevent_enable(backend->event, EV_READ);
-
-    if ((backend->thread = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32_thread, handle, 0, nullptr)) == nullptr)
-    {
-        tr_logAddError(_("Couldn't create thread"));
-        goto fail;
-    }
-
-    /* Perform an initial scan on the directory */
-    if (event_base_once(
-            tr_watchdir_get_event_base(handle),
-            -1,
-            EV_TIMEOUT,
-            &tr_watchdir_win32_on_first_scan,
-            handle,
-            nullptr) == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't scan '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-    }
-
-    return BACKEND_DOWNCAST(backend);
-
-fail:
-    tr_watchdir_win32_free(BACKEND_DOWNCAST(backend));
-    return nullptr;
 }
