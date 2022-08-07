@@ -144,16 +144,3 @@ void tr_watchdir_base::scan()
 
     tr_sys_dir_close(dir);
 }
-
-#if !defined(WITH_INOTIFY) && !defined(WITH_KQUEUE) && !defined(_WIN32)
-// no native impl, so use generic
-std::unique_ptr<tr_watchdir> tr_watchdir::create(
-    std::string_view dirname,
-    Callback callback,
-    event_base* event_base,
-    TimeFunc current_time_func)
-{
-#warning tr_watchdir::create creates generic
-    return tr_watchdir_base::createGeneric(dirname, std::move(callback), event_base, current_time_func);
-}
-#endif

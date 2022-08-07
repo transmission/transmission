@@ -53,3 +53,16 @@ std::unique_ptr<tr_watchdir> tr_watchdir::createGeneric(
 {
     return std::make_unique<tr_watchdir_generic>(dirname, std::move(callback), event_base, time_func, rescan_interval_msec);
 }
+
+#if !defined(WITH_INOTIFY) && !defined(WITH_KQUEUE) && !defined(_WIN32)
+// no native impl, so use generic
+std::unique_ptr<tr_watchdir> tr_watchdir::create(
+    std::string_view dirname,
+    Callback callback,
+    event_base* event_base,
+    TimeFunc current_time_func)
+{
+#warning tr_watchdir::create creates generic
+    return std::make_unique<tr_watchdir_generic>(dirname, std::move(callback), event_base, time_func);
+}
+#endif
