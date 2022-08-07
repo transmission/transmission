@@ -3,10 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstddef> /* offsetof */
-#include <errno.h>
+#include <array>
+#include <cerrno>
+#include <cstddef> // for offsetof
 
-#include <process.h> /* _beginthreadex() */
+#include <process.h> // for _beginthreadex()
 
 #include <windows.h>
 
@@ -105,14 +106,14 @@ public:
             bufferevent_free(event_);
         }
 
-        if (notify_pipe[0] _ != TR_BAD_SOCKET)
+        if (notify_pipe_[0] != TR_BAD_SOCKET)
         {
-            evutil_closesocket(notify_pipe[0] _);
+            evutil_closesocket(notify_pipe_[0]);
         }
 
-        if (notify_pipe[1] _ != TR_BAD_SOCKET)
+        if (notify_pipe_[1] != TR_BAD_SOCKET)
         {
-            evutil_closesocket(notify_pipe[1] _);
+            evutil_closesocket(notify_pipe_[1]);
         }
 
         if (fd_ != INVALID_HANDLE_VALUE)
@@ -122,11 +123,16 @@ public:
     }
 
 private:
+    static auto constexpr Win32WatchMask =
+        (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE);
+
     void init()
     {
+        tr_net_init();
+
         auto const path = dirname();
         auto const wide_path = tr_win32_utf8_to_native(path);
-        if (!std::empty(wide_path))
+        if (std::empty(wide_path))
         {
             tr_logAddError(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));
             return;
@@ -145,15 +151,15 @@ private:
             return;
         }
 
-        overlapped_.Pointer = handle;
+        overlapped_.Pointer = this;
 
-        if (!ReadDirectoryChangesW(fd_, buffer_, sizeof(buffer_), FALSE, WIN32_WATCH_MASK, nullptr, &overlapped_, nullptr))
+        if (!ReadDirectoryChangesW(fd_, buffer_, sizeof(buffer_), false, Win32WatchMask, nullptr, &overlapped_, nullptr))
         {
             tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
             return;
         }
 
-        if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, notify_pipe_) == -1)
+        if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, std::data(notify_pipe_)) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -163,8 +169,8 @@ private:
             return;
         }
 
-        auto* const event = bufferevent_socket_new(eventBase(), notify_pipe_[0], 0);
-        if (event == nullptr)
+        event_ = bufferevent_socket_new(eventBase(), notify_pipe_[0], 0);
+        if (event_ == nullptr)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -173,14 +179,13 @@ private:
                 fmt::arg("error_code", error_code)));
             return;
         }
-        event_.reset(event);
 
-        bufferevent_setwatermark(event_.get(), EV_READ, sizeof(FILE_NOTIFY_INFORMATION), 0);
-        bufferevent_setcb(event_.get(), &tr_watchdir_win32::onBufferEvent, nullptr, nullptr, this);
-        bufferevent_enable(event_.get(), EV_READ);
+        bufferevent_setwatermark(event_, EV_READ, sizeof(FILE_NOTIFY_INFORMATION), 0);
+        bufferevent_setcb(event_, &tr_watchdir_win32::onBufferEvent, nullptr, nullptr, this);
+        bufferevent_enable(event_, EV_READ);
 
-        thread_ = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32::threadfunc, this, 0, nullptr);
-        if (thread == nullptr)
+        thread_ = (HANDLE)_beginthreadex(nullptr, 0, tr_watchdir_win32::staticThreadFunc, this, 0, nullptr);
+        if (thread_ == nullptr)
         {
             tr_logAddError(_("Couldn't create thread"));
             return;
@@ -198,9 +203,13 @@ private:
         }
     }
 
-    unsigned int __stdcall threadfunc(void* vself)
+    static unsigned int __stdcall staticThreadFunc(void* vself)
     {
-        auto* self = static_cast<tr_watchdir_win32*>(vself);
+        return static_cast<tr_watchdir_win32*>(vself)->threadFunc();
+    }
+
+    unsigned int threadFunc()
+    {
         DWORD bytes_transferred;
 
         while (tr_get_overlapped_result_ex(fd_, &overlapped_, &bytes_transferred, INFINITE, FALSE))
@@ -216,7 +225,7 @@ private:
 
             send(notify_pipe_[1], (char const*)buffer_, bytes_transferred, 0);
 
-            if (!ReadDirectoryChangesW(fd_, buffer_, sizeof(buffer_), FALSE, WIN32_WATCH_MASK, nullptr, &overlapped_, nullptr))
+            if (!ReadDirectoryChangesW(fd_, buffer_, sizeof(buffer_), FALSE, Win32WatchMask, nullptr, &overlapped_, nullptr))
             {
                 tr_logAddError(_("Couldn't read directory changes"));
                 return 0;
@@ -243,7 +252,6 @@ private:
 
     void processBufferEvent(struct bufferevent* event)
     {
-        size_t nread;
         size_t name_size = MAX_PATH * sizeof(WCHAR);
 
         auto buffer = std::vector<char>{};
@@ -328,11 +336,11 @@ private:
     }
 
     HANDLE fd_ = INVALID_HANDLE_VALUE;
-    OVERLAPPED overlapped_;
+    OVERLAPPED overlapped_ = {};
     DWORD buffer_[8 * 1024 / sizeof(DWORD)];
-    std::array<evutil_socket_t, 2> notify_pipe_ = { TR_BAD_SOCKET, TR_BAD_SOCKET };
+    std::array<evutil_socket_t, 2> notify_pipe_{ static_cast<evutil_socket_t>(-1), static_cast<evutil_socket_t>(-1) };
     struct bufferevent* event_ = nullptr;
-    HANDLE thread_ = nullptr;
+    HANDLE thread_ = {};
 };
 
 std::unique_ptr<tr_watchdir> tr_watchdir::create(
