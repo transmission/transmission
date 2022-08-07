@@ -26,6 +26,52 @@
 #include "watchdir.h"
 #include "watchdir-common.h"
 
+namespace
+{
+
+BOOL tr_get_overlapped_result_ex(
+    HANDLE handle,
+    LPOVERLAPPED overlapped,
+    LPDWORD bytes_transferred,
+    DWORD timeout,
+    BOOL alertable)
+{
+    using impl_t = BOOL(WINAPI*)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
+
+    static impl_t real_impl = nullptr;
+    static bool is_real_impl_valid = false;
+
+    if (!is_real_impl_valid)
+    {
+        real_impl = (impl_t)GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetOverlappedResultEx");
+        is_real_impl_valid = true;
+    }
+
+    if (real_impl != nullptr)
+    {
+        return (*real_impl)(handle, overlapped, bytes_transferred, timeout, alertable);
+    }
+
+    DWORD const wait_result = WaitForSingleObjectEx(handle, timeout, alertable);
+
+    if (wait_result == WAIT_FAILED)
+    {
+        return FALSE;
+    }
+
+    if (wait_result == WAIT_IO_COMPLETION || wait_result == WAIT_TIMEOUT)
+    {
+        SetLastError(wait_result);
+        return FALSE;
+    }
+
+    TR_ASSERT(wait_result == WAIT_OBJECT_0);
+
+    return GetOverlappedResult(handle, overlapped, bytes_transferred, FALSE);
+}
+
+} // namespace
+
 class tr_watchdir_win32 final : public tr_watchdir_base
 {
 public:
@@ -101,15 +147,7 @@ private:
 
         overlapped_.Pointer = handle;
 
-        if (!ReadDirectoryChangesW(
-                backend->fd,
-                backend->buffer,
-                sizeof(backend->buffer),
-                FALSE,
-                WIN32_WATCH_MASK,
-                nullptr,
-                &backend->overlapped,
-                nullptr))
+        if (!ReadDirectoryChangesW(fd_, buffer_, sizeof(buffer_), FALSE, WIN32_WATCH_MASK, nullptr, &overlapped_, nullptr))
         {
             tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
             return;
@@ -138,10 +176,10 @@ private:
         event_.reset(event);
 
         bufferevent_setwatermark(event_.get(), EV_READ, sizeof(FILE_NOTIFY_INFORMATION), 0);
-        bufferevent_setcb(event_.get(), &tr_watchdir_win32_on_event, nullptr, nullptr, handle);
+        bufferevent_setcb(event_.get(), &tr_watchdir_win32::onBufferEvent, nullptr, nullptr, this);
         bufferevent_enable(event_.get(), EV_READ);
 
-        thread_ = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32_thread, handle, 0, nullptr);
+        thread_ = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32::threadfunc, this, 0, nullptr);
         if (thread == nullptr)
         {
             tr_logAddError(_("Couldn't create thread"));
@@ -160,9 +198,133 @@ private:
         }
     }
 
+    unsigned int __stdcall threadfunc(void* vself)
+    {
+        auto* self = static_cast<tr_watchdir_win32*>(vself);
+        DWORD bytes_transferred;
+
+        while (tr_get_overlapped_result_ex(fd_, &overlapped_, &bytes_transferred, INFINITE, FALSE))
+        {
+            PFILE_NOTIFY_INFORMATION info = (PFILE_NOTIFY_INFORMATION)buffer_;
+
+            while (info->NextEntryOffset != 0)
+            {
+                *((BYTE**)&info) += info->NextEntryOffset;
+            }
+
+            info->NextEntryOffset = bytes_transferred - ((BYTE*)info - (BYTE*)buffer_);
+
+            send(notify_pipe_[1], (char const*)buffer_, bytes_transferred, 0);
+
+            if (!ReadDirectoryChangesW(fd_, buffer_, sizeof(buffer_), FALSE, WIN32_WATCH_MASK, nullptr, &overlapped_, nullptr))
+            {
+                tr_logAddError(_("Couldn't read directory changes"));
+                return 0;
+            }
+        }
+
+        if (GetLastError() != ERROR_OPERATION_ABORTED)
+        {
+            tr_logAddError(_("Couldn't wait for directory changes"));
+        }
+
+        return 0;
+    }
+
     static void onFirstScan(evutil_socket_t /*unused*/, short /*unused*/, void* vself)
     {
         static_cast<tr_watchdir_win32*>(vself)->scan();
+    }
+
+    static void onBufferEvent(struct bufferevent* event, void* vself)
+    {
+        static_cast<tr_watchdir_win32*>(vself)->processBufferEvent(event);
+    }
+
+    void processBufferEvent(struct bufferevent* event)
+    {
+        size_t nread;
+        size_t name_size = MAX_PATH * sizeof(WCHAR);
+
+        auto buffer = std::vector<char>{};
+        buffer.resize(sizeof(FILE_NOTIFY_INFORMATION) + name_size);
+        PFILE_NOTIFY_INFORMATION ev = (PFILE_NOTIFY_INFORMATION)std::data(buffer);
+
+        size_t const header_size = offsetof(FILE_NOTIFY_INFORMATION, FileName);
+
+        // Read the size of the struct excluding name into buf.
+        // Guaranteed to have at least sizeof(*ev) available
+        for (;;)
+        {
+            auto nread = bufferevent_read(event, ev, header_size);
+            if (nread == 0)
+            {
+                break;
+            }
+
+            if (nread == (size_t)-1)
+            {
+                auto const error_code = errno;
+                tr_logAddError(fmt::format(
+                    _("Couldn't read event: {error} ({error_code})"),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
+                break;
+            }
+
+            if (nread != header_size)
+            {
+                tr_logAddError(fmt::format(
+                    _("Couldn't read event: expected {expected_size}, got {actual_size}"),
+                    fmt::arg("expected_size", header_size),
+                    fmt::arg("actual_size", nread)));
+                break;
+            }
+
+            size_t const nleft = ev->NextEntryOffset - nread;
+
+            TR_ASSERT(ev->FileNameLength % sizeof(WCHAR) == 0);
+            TR_ASSERT(ev->FileNameLength > 0);
+            TR_ASSERT(ev->FileNameLength <= nleft);
+
+            if (nleft > name_size)
+            {
+                name_size = nleft;
+                buffer.resize(sizeof(FILE_NOTIFY_INFORMATION) + name_size);
+                ev = (PFILE_NOTIFY_INFORMATION)std::data(buffer);
+            }
+
+            // consume entire name into buffer
+            nread = bufferevent_read(event, &buffer[header_size], nleft);
+            if (nread == (size_t)-1)
+            {
+                auto const error_code = errno;
+                tr_logAddError(fmt::format(
+                    _("Couldn't read filename: {error} ({error_code})"),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
+                break;
+            }
+
+            if (nread != nleft)
+            {
+                tr_logAddError(fmt::format(
+                    _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
+                    fmt::arg("expected_size", nleft),
+                    fmt::arg("actual_size", nread)));
+                break;
+            }
+
+            if (ev->Action == FILE_ACTION_ADDED || ev->Action == FILE_ACTION_MODIFIED ||
+                ev->Action == FILE_ACTION_RENAMED_NEW_NAME)
+            {
+                if (auto const name = tr_win32_native_to_utf8({ ev->FileName, ev->FileNameLength / sizeof(WCHAR) });
+                    !std::empty(name))
+                {
+                    processFile(name);
+                }
+            }
+        }
     }
 
     HANDLE fd_ = INVALID_HANDLE_VALUE;
@@ -180,169 +342,4 @@ std::unique_ptr<tr_watchdir> tr_watchdir::create(
     TimeFunc time_func)
 {
     return std::make_unique<tr_watchdir_win32>(dirname, std::move(callback), event_base, time_func);
-}
-
-/***
-****
-***/
-
-static BOOL tr_get_overlapped_result_ex(
-    HANDLE handle,
-    LPOVERLAPPED overlapped,
-    LPDWORD bytes_transferred,
-    DWORD timeout,
-    BOOL alertable)
-{
-    using impl_t = BOOL(WINAPI*)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
-
-    static impl_t real_impl = nullptr;
-    static bool is_real_impl_valid = false;
-
-    if (!is_real_impl_valid)
-    {
-        real_impl = (impl_t)GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetOverlappedResultEx");
-        is_real_impl_valid = true;
-    }
-
-    if (real_impl != nullptr)
-    {
-        return (*real_impl)(handle, overlapped, bytes_transferred, timeout, alertable);
-    }
-
-    DWORD const wait_result = WaitForSingleObjectEx(handle, timeout, alertable);
-
-    if (wait_result == WAIT_FAILED)
-    {
-        return FALSE;
-    }
-
-    if (wait_result == WAIT_IO_COMPLETION || wait_result == WAIT_TIMEOUT)
-    {
-        SetLastError(wait_result);
-        return FALSE;
-    }
-
-    TR_ASSERT(wait_result == WAIT_OBJECT_0);
-
-    return GetOverlappedResult(handle, overlapped, bytes_transferred, FALSE);
-}
-
-static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
-{
-    auto const handle = static_cast<tr_watchdir_t>(context);
-    tr_watchdir_win32* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
-    DWORD bytes_transferred;
-
-    while (tr_get_overlapped_result_ex(backend->fd, &backend->overlapped, &bytes_transferred, INFINITE, FALSE))
-    {
-        PFILE_NOTIFY_INFORMATION info = (PFILE_NOTIFY_INFORMATION)backend->buffer;
-
-        while (info->NextEntryOffset != 0)
-        {
-            *((BYTE**)&info) += info->NextEntryOffset;
-        }
-
-        info->NextEntryOffset = bytes_transferred - ((BYTE*)info - (BYTE*)backend->buffer);
-
-        send(backend->notify_pipe[1], (char const*)backend->buffer, bytes_transferred, 0);
-
-        if (!ReadDirectoryChangesW(
-                backend->fd,
-                backend->buffer,
-                sizeof(backend->buffer),
-                FALSE,
-                WIN32_WATCH_MASK,
-                nullptr,
-                &backend->overlapped,
-                nullptr))
-        {
-            tr_logAddError(_("Couldn't read directory changes"));
-            return 0;
-        }
-    }
-
-    if (GetLastError() != ERROR_OPERATION_ABORTED)
-    {
-        tr_logAddError(_("Couldn't wait for directory changes"));
-    }
-
-    return 0;
-}
-
-static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
-{
-    auto const handle = static_cast<tr_watchdir_t>(context);
-    size_t nread;
-    size_t name_size = MAX_PATH * sizeof(WCHAR);
-    auto* buffer = static_cast<char*>(tr_malloc(sizeof(FILE_NOTIFY_INFORMATION) + name_size));
-    PFILE_NOTIFY_INFORMATION ev = (PFILE_NOTIFY_INFORMATION)buffer;
-    size_t const header_size = offsetof(FILE_NOTIFY_INFORMATION, FileName);
-
-    /* Read the size of the struct excluding name into buf. Guaranteed to have at
-       least sizeof(*ev) available */
-    while ((nread = bufferevent_read(event, ev, header_size)) != 0)
-    {
-        if (nread == (size_t)-1)
-        {
-            auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't read event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
-            break;
-        }
-
-        if (nread != header_size)
-        {
-            tr_logAddError(fmt::format(
-                _("Couldn't read event: expected {expected_size}, got {actual_size}"),
-                fmt::arg("expected_size", header_size),
-                fmt::arg("actual_size", nread)));
-            break;
-        }
-
-        size_t const nleft = ev->NextEntryOffset - nread;
-
-        TR_ASSERT(ev->FileNameLength % sizeof(WCHAR) == 0);
-        TR_ASSERT(ev->FileNameLength > 0);
-        TR_ASSERT(ev->FileNameLength <= nleft);
-
-        if (nleft > name_size)
-        {
-            name_size = nleft;
-            buffer = static_cast<char*>(tr_realloc(buffer, sizeof(FILE_NOTIFY_INFORMATION) + name_size));
-            ev = (PFILE_NOTIFY_INFORMATION)buffer;
-        }
-
-        /* Consume entire name into buffer */
-        if ((nread = bufferevent_read(event, buffer + header_size, nleft)) == (size_t)-1)
-        {
-            auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't read filename: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
-            break;
-        }
-
-        if (nread != nleft)
-        {
-            tr_logAddError(fmt::format(
-                _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
-                fmt::arg("expected_size", nleft),
-                fmt::arg("actual_size", nread)));
-            break;
-        }
-
-        if (ev->Action == FILE_ACTION_ADDED || ev->Action == FILE_ACTION_MODIFIED || ev->Action == FILE_ACTION_RENAMED_NEW_NAME)
-        {
-            if (auto const name = tr_win32_native_to_utf8({ ev->FileName, ev->FileNameLength / sizeof(WCHAR) });
-                !std::empty(name))
-            {
-                tr_watchdir_process(handle, name.c_str());
-            }
-        }
-    }
-
-    tr_free(buffer);
 }
