@@ -154,6 +154,7 @@ std::unique_ptr<tr_watchdir> tr_watchdir::create(
     event_base* event_base,
     TimeFunc current_time_func)
 {
-    return tr_watchdir_base::createGeneric(dirname, callback, event_base, current_time_func);
+#warning tr_watchdir::create creates generic
+    return tr_watchdir_base::createGeneric(dirname, std::move(callback), event_base, current_time_func);
 }
 #endif
