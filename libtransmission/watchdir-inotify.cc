@@ -6,6 +6,8 @@
 #include <cerrno>
 #include <climits> /* NAME_MAX */
 
+#include <iostream> // NOCOMMIT
+
 #include <unistd.h> /* close() */
 
 #include <sys/inotify.h>
@@ -18,204 +20,173 @@
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
+
 #include "log.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
-#include "watchdir.h"
 #include "watchdir-common.h"
+#include "watchdir.h"
 
-/***
-****
-***/
-
-struct tr_watchdir_inotify
+class tr_watchdir_inotify : public tr_watchdir_base
 {
-    tr_watchdir_backend base;
+private:
+    static auto constexpr InotifyWatchMask = uint32_t{ IN_CLOSE_WRITE | IN_MOVED_TO | IN_CREATE };
 
-    int infd;
-    int inwd;
-    struct bufferevent* event;
+public:
+    tr_watchdir_inotify(std::string_view dirname, Callback callback, event_base* event_base, TimeFunc time_func)
+        : tr_watchdir_base{ dirname, std::move(callback), event_base, time_func }
+    {
+        init();
+        scan();
+    }
+
+    tr_watchdir_inotify(tr_watchdir_inotify&&) = delete;
+    tr_watchdir_inotify(tr_watchdir_inotify const&) = delete;
+    tr_watchdir_inotify& operator=(tr_watchdir_inotify&&) = delete;
+    tr_watchdir_inotify& operator=(tr_watchdir_inotify const&) = delete;
+
+    ~tr_watchdir_inotify() override
+    {
+        if (event_ != nullptr)
+        {
+            bufferevent_disable(event_, EV_READ);
+            bufferevent_free(event_);
+        }
+
+        if (infd_ != -1)
+        {
+            if (inwd_ != -1)
+            {
+                inotify_rm_watch(infd_, inwd_);
+            }
+
+            close(infd_);
+        }
+    }
+
+private:
+    void init()
+    {
+        infd_ = inotify_init();
+        if (infd_ == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't watch '{path}': {error} ({error_code})"),
+                fmt::arg("path", dirname()),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        inwd_ = inotify_add_watch(infd_, tr_pathbuf{ dirname() }, InotifyWatchMask | IN_ONLYDIR);
+        if (inwd_ == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't watch '{path}': {error} ({error_code})"),
+                fmt::arg("path", dirname()),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        event_ = bufferevent_socket_new(eventBase(), infd_, 0);
+        if (event_ == nullptr)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't watch '{path}': {error} ({error_code})"),
+                fmt::arg("path", dirname()),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        // guarantees at least the sizeof an inotify event will be available in the event buffer
+        bufferevent_setwatermark(event_, EV_READ, sizeof(struct inotify_event), 0);
+        bufferevent_setcb(event_, onInotifyEvent, nullptr, nullptr, this);
+        bufferevent_enable(event_, EV_READ);
+    }
+
+    static void onInotifyEvent(struct bufferevent* event, void* vself)
+    {
+        static_cast<tr_watchdir_inotify*>(vself)->handleInotifyEvent(event);
+    }
+
+    void handleInotifyEvent(struct bufferevent* event)
+    {
+        struct inotify_event ev;
+        auto name = std::string{};
+
+        // Read the size of the struct excluding name into buf.
+        // Guaranteed to have at least sizeof(ev) available.
+        auto nread = size_t{};
+        while ((nread = bufferevent_read(event, &ev, sizeof(ev))) != 0)
+        {
+            if (nread == (size_t)-1)
+            {
+                auto const error_code = errno;
+                tr_logAddError(fmt::format(
+                    _("Couldn't read event: {error} ({error_code})"),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
+                break;
+            }
+
+            if (nread != sizeof(ev))
+            {
+                tr_logAddError(fmt::format(
+                    _("Couldn't read event: expected {expected_size}, got {actual_size}"),
+                    fmt::arg("expected_size", sizeof(ev)),
+                    fmt::arg("actual_size", nread)));
+                break;
+            }
+
+            TR_ASSERT(ev.wd == inwd_);
+            TR_ASSERT((ev.mask & InotifyWatchMask) != 0);
+            TR_ASSERT(ev.len > 0);
+
+            // consume entire name into buffer
+            name.resize(ev.len);
+            nread = bufferevent_read(event, std::data(name), ev.len);
+            if (nread == static_cast<size_t>(-1))
+            {
+                auto const error_code = errno;
+                tr_logAddError(fmt::format(
+                    _("Couldn't read filename: {error} ({error_code})"),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
+                break;
+            }
+
+            if (nread != ev.len)
+            {
+                tr_logAddError(fmt::format(
+                    _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
+                    fmt::arg("expected_size", sizeof(ev)),
+                    fmt::arg("actual_size", nread)));
+                break;
+            }
+
+            // NB: `name` may have extra trailing zeroes from inotify;
+            // pass the c_str() so that processFile gets the right strlen
+            processFile(name.c_str());
+        }
+    }
+
+private:
+    int infd_ = -1;
+    int inwd_ = -1;
+    struct bufferevent* event_ = nullptr;
 };
 
-#define BACKEND_UPCAST(b) ((tr_watchdir_inotify*)(b))
-
-#define INOTIFY_WATCH_MASK (IN_CLOSE_WRITE | IN_MOVED_TO | IN_CREATE)
-
-/***
-****
-***/
-
-static void tr_watchdir_inotify_on_first_scan(evutil_socket_t /*fd*/, short /*type*/, void* context)
+std::unique_ptr<tr_watchdir> tr_watchdir::create(
+    std::string_view dirname,
+    Callback callback,
+    event_base* event_base,
+    TimeFunc time_func)
 {
-    auto const handle = static_cast<tr_watchdir_t>(context);
-
-    tr_watchdir_scan(handle, nullptr);
-}
-
-static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* context)
-{
-    TR_ASSERT(context != nullptr);
-
-    auto const handle = static_cast<tr_watchdir_t>(context);
-#ifdef TR_ENABLE_ASSERTS
-    tr_watchdir_inotify const* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
-#endif
-    struct inotify_event ev;
-    auto name = std::string{};
-
-    /* Read the size of the struct excluding name into buf. Guaranteed to have at
-       least sizeof(ev) available */
-    auto nread = size_t{};
-    while ((nread = bufferevent_read(event, &ev, sizeof(ev))) != 0)
-    {
-        if (nread == (size_t)-1)
-        {
-            auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't read event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
-            break;
-        }
-
-        if (nread != sizeof(ev))
-        {
-            tr_logAddError(fmt::format(
-                _("Couldn't read event: expected {expected_size}, got {actual_size}"),
-                fmt::arg("expected_size", sizeof(ev)),
-                fmt::arg("actual_size", nread)));
-            break;
-        }
-
-        TR_ASSERT(ev.wd == backend->inwd);
-        TR_ASSERT((ev.mask & INOTIFY_WATCH_MASK) != 0);
-        TR_ASSERT(ev.len > 0);
-
-        /* Consume entire name into buffer */
-        name.resize(ev.len);
-        nread = bufferevent_read(event, std::data(name), ev.len);
-        if (nread == static_cast<size_t>(-1))
-        {
-            auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't read filename: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
-            break;
-        }
-
-        if (nread != ev.len)
-        {
-            tr_logAddError(fmt::format(
-                _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
-                fmt::arg("expected_size", sizeof(ev)),
-                fmt::arg("actual_size", nread)));
-            break;
-        }
-
-        tr_watchdir_process(handle, name.c_str());
-    }
-}
-
-static void tr_watchdir_inotify_free(tr_watchdir_backend* backend_base)
-{
-    auto* const backend = BACKEND_UPCAST(backend_base);
-
-    if (backend == nullptr)
-    {
-        return;
-    }
-
-    TR_ASSERT(backend->base.free_func == &tr_watchdir_inotify_free);
-
-    if (backend->event != nullptr)
-    {
-        bufferevent_disable(backend->event, EV_READ);
-        bufferevent_free(backend->event);
-    }
-
-    if (backend->infd != -1)
-    {
-        if (backend->inwd != -1)
-        {
-            inotify_rm_watch(backend->infd, backend->inwd);
-        }
-
-        close(backend->infd);
-    }
-
-    tr_free(backend);
-}
-
-tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
-{
-    char const* const path = tr_watchdir_get_path(handle);
-
-    auto* const backend = tr_new0(tr_watchdir_inotify, 1);
-    backend->base.free_func = &tr_watchdir_inotify_free;
-
-    backend->infd = inotify_init();
-    if (backend->infd == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't watch '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto FAIL;
-    }
-
-    backend->inwd = inotify_add_watch(backend->infd, path, INOTIFY_WATCH_MASK | IN_ONLYDIR);
-    if (backend->inwd == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't watch '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto FAIL;
-    }
-
-    backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0);
-    if (backend->event == nullptr)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't watch '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto FAIL;
-    }
-
-    /* Guarantees at least the sizeof an inotify event will be available in the
-       event buffer */
-    bufferevent_setwatermark(backend->event, EV_READ, sizeof(struct inotify_event), 0);
-    bufferevent_setcb(backend->event, &tr_watchdir_inotify_on_event, nullptr, nullptr, handle);
-    bufferevent_enable(backend->event, EV_READ);
-
-    /* Perform an initial scan on the directory */
-    if (event_base_once(
-            tr_watchdir_get_event_base(handle),
-            -1,
-            EV_TIMEOUT,
-            &tr_watchdir_inotify_on_first_scan,
-            handle,
-            nullptr) == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddWarn(fmt::format(
-            _("Couldn't scan '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-    }
-
-    return BACKEND_DOWNCAST(backend);
-
-FAIL:
-    tr_watchdir_inotify_free(BACKEND_DOWNCAST(backend));
-    return nullptr;
+    return std::make_unique<tr_watchdir_inotify>(dirname, std::move(callback), event_base, time_func);
 }

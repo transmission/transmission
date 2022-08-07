@@ -5,30 +5,44 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
 #include <string_view>
 
 struct event_base;
 
-using tr_watchdir_t = struct tr_watchdir*;
-
-enum tr_watchdir_status
+class tr_watchdir
 {
-    TR_WATCHDIR_ACCEPT,
-    TR_WATCHDIR_IGNORE,
-    TR_WATCHDIR_RETRY
+public:
+    tr_watchdir() = default;
+    virtual ~tr_watchdir() = default;
+    tr_watchdir(tr_watchdir&&) = delete;
+    tr_watchdir(tr_watchdir const&) = delete;
+    tr_watchdir& operator=(tr_watchdir&&) = delete;
+    tr_watchdir& operator=(tr_watchdir const&) = delete;
+
+    [[nodiscard]] virtual std::string_view dirname() const noexcept = 0;
+
+    enum class Action
+    {
+        Done,
+        Retry
+    };
+
+    using Callback = std::function<Action(std::string_view dirname, std::string_view basename)>;
+
+    using TimeFunc = time_t (*)();
+
+    static std::unique_ptr<tr_watchdir> create(
+        std::string_view dirname,
+        Callback callback,
+        event_base* event_base,
+        TimeFunc current_time_func);
+
+    static std::unique_ptr<tr_watchdir> createGeneric(
+        std::string_view dirname,
+        Callback callback,
+        event_base* event_base,
+        TimeFunc current_time_func,
+        size_t rescan_interval_msec = 10000);
 };
-
-using tr_watchdir_cb = tr_watchdir_status (*)(tr_watchdir_t handle, char const* name, void* user_data);
-
-/* ... */
-
-tr_watchdir_t tr_watchdir_new(
-    std::string_view path,
-    tr_watchdir_cb callback,
-    void* callback_user_data,
-    struct event_base* event_base,
-    bool force_generic);
-
-void tr_watchdir_free(tr_watchdir_t handle);
-
-char const* tr_watchdir_get_path(tr_watchdir_t handle);

@@ -5,12 +5,16 @@
 
 #include <memory>
 #include <string>
+#include <vector>
+
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 
 #include "file.h"
 #include "net.h"
 #include "watchdir.h"
+#include "watchdir-common.h"
 
 #include "test-fixtures.h"
 
@@ -20,17 +24,42 @@
 ****
 ***/
 
-extern struct timeval tr_watchdir_generic_interval;
-extern size_t tr_watchdir_retry_limit;
-extern struct timeval tr_watchdir_retry_start_interval;
-extern struct timeval tr_watchdir_retry_max_interval;
+// extern struct timeval tr_watchdir_generic_interval;
+// extern size_t tr_watchdir_retry_limit;
+// extern struct timeval tr_watchdir_retry_start_interval;
+// extern struct timeval tr_watchdir_retry_max_interval;
 
 namespace
 {
 
-auto constexpr FiftyMsec = timeval{ 0, 50000 };
-auto constexpr OneHundredMsec = timeval{ 0, 100000 };
-auto constexpr TwoHundredMsec = timeval{ 0, 200000 };
+auto constexpr GenericRescanIntervalMsec = size_t{ 100U };
+auto constexpr ProcessEventsTimeoutMsec = size_t{ 200U };
+// ensure that ProcessEvents hits at least one timeout in watchdir-generic
+static_assert(ProcessEventsTimeoutMsec > GenericRescanIntervalMsec);
+// auto constexpr FiftyMsec = timeval{ 0, 50000 };
+// auto constexpr OneHundredMsec = timeval{ 0, 100000 };
+// auto constexpr TwoHundredMsec = timeval{ 0, 200000 };
+
+namespace current_time_mock
+{
+namespace
+{
+auto value = time_t{};
+}
+
+time_t get()
+{
+    return value;
+}
+
+#if 0
+void set(time_t now)
+{
+    value = now;
+}
+#endif
+
+} // namespace current_time_mock
 
 } // namespace
 
@@ -52,15 +81,13 @@ class WatchDirTest
 {
 private:
     std::shared_ptr<struct event_base> ev_base_;
+    size_t retry_multiplier_msec_ = 100U;
 
 protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
-
-        // speed up generic implementation
-        tr_watchdir_generic_interval = OneHundredMsec;
     }
 
     void TearDown() override
@@ -70,28 +97,30 @@ protected:
         SandboxedTest::TearDown();
     }
 
-    auto createWatchDir(std::string const& path, tr_watchdir_cb cb, void* cb_data)
+    auto createWatchDir(std::string_view path, tr_watchdir::Callback callback)
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
-        return tr_watchdir_new(path.c_str(), cb, cb_data, ev_base_.get(), force_generic);
+        auto watchdir = force_generic ? tr_watchdir::createGeneric(
+                                            path,
+                                            std::move(callback),
+                                            ev_base_.get(),
+                                            current_time_mock::get,
+                                            GenericRescanIntervalMsec) :
+                                        tr_watchdir::create(path, std::move(callback), ev_base_.get(), current_time_mock::get);
+        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierSecs(retry_multiplier_msec_);
+        return watchdir;
     }
 
-    std::string createFile(std::string const& parent_dir, std::string const& name)
+    void createFile(std::string_view dirname, std::string_view basename, std::string_view contents = ""sv)
     {
-        auto path = parent_dir;
-        path += TR_PATH_DELIMITER;
-        path += name;
-
-        createFileWithContents(path, "");
-
-        return path;
+        createFileWithContents(tr_pathbuf{ dirname, '/', basename }, contents);
     }
 
-    static std::string createDir(std::string const& parent_dir, std::string const& name)
+    static std::string createDir(std::string_view dirname, std::string_view basename)
     {
-        auto path = parent_dir;
+        auto path = std::string{ dirname };
         path += TR_PATH_DELIMITER;
-        path += name;
+        path += basename;
 
         tr_sys_dir_create(path, 0, 0700);
 
@@ -100,22 +129,26 @@ protected:
 
     void processEvents()
     {
-        event_base_loopexit(ev_base_.get(), &TwoHundredMsec);
+        // should be larger than mmm
+        static auto constexpr Interval = timeval{ ProcessEventsTimeoutMsec / 1000, (ProcessEventsTimeoutMsec % 1000) * 1000 };
+        event_base_loopexit(ev_base_.get(), &Interval);
         event_base_dispatch(ev_base_.get());
     }
 
+#if 0
     struct CallbackData
     {
-        explicit CallbackData(tr_watchdir_status status = TR_WATCHDIR_ACCEPT)
-            : result{ status }
+        using Action = tr_watchdir::Action;
+
+        explicit CallbackData(Action action = Action::Done)
+            : action_{ action }
         {
         }
-        tr_watchdir_status result{};
 
-        tr_watchdir_t wd = {};
-        std::string name = {};
+        Action action_;
+        std::string name_;
     };
-
+jjjjjjjjjjjjjjjjjj
     static tr_watchdir_status callback(tr_watchdir_t wd, char const* name, void* vdata) noexcept
     {
         auto* data = static_cast<CallbackData*>(vdata);
@@ -129,19 +162,22 @@ protected:
 
         return result;
     }
+#endif
 };
 
 TEST_P(WatchDirTest, construct)
 {
     auto const path = sandboxDir();
 
-    auto wd = createWatchDir(path, &callback, nullptr);
-    EXPECT_NE(nullptr, wd);
-    EXPECT_TRUE(tr_sys_path_is_same(path.c_str(), tr_watchdir_get_path(wd)));
+    auto callback = [](std::string_view /*dirname*/, std::string_view /*basename*/)
+    {
+        return tr_watchdir::Action::Done;
+    };
+    auto watchdir = createWatchDir(path, callback);
+    EXPECT_TRUE(watchdir);
+    EXPECT_EQ(path, watchdir->dirname());
 
     processEvents();
-
-    tr_watchdir_free(wd);
 }
 
 TEST_P(WatchDirTest, initialScan)
@@ -151,74 +187,84 @@ TEST_P(WatchDirTest, initialScan)
     // setup: start with an empty directory.
     // this block confirms that it's empty
     {
-        auto wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-        auto wd = createWatchDir(path, &callback, &wd_data);
-        EXPECT_NE(nullptr, wd);
-
+        auto called = bool{ false };
+        auto callback = [&called](std::string_view /*dirname*/, std::string_view /*basename*/)
+        {
+            called = true;
+            return tr_watchdir::Action::Done;
+        };
+        auto watchdir = createWatchDir(path, callback);
+        EXPECT_TRUE(watchdir);
         processEvents();
-        EXPECT_EQ(nullptr, wd_data.wd);
-        EXPECT_EQ("", wd_data.name);
-
-        tr_watchdir_free(wd);
+        EXPECT_FALSE(called);
     }
 
     // add a file
-    auto const base_name = std::string{ "test.txt" };
+    auto const base_name = "test.txt"sv;
     createFile(path, base_name);
 
     // confirm that a wd will pick up the file that
     // was created before the wd was instantiated
     {
-        auto wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-        auto wd = createWatchDir(path, &callback, &wd_data);
-        EXPECT_NE(nullptr, wd);
-
+        auto names = std::set<std::string>{};
+        auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
+        {
+            names.insert(std::string{ basename });
+            return tr_watchdir::Action::Done;
+        };
+        auto watchdir = createWatchDir(path, callback);
+        EXPECT_TRUE(watchdir);
         processEvents();
-        EXPECT_EQ(wd, wd_data.wd);
-        EXPECT_EQ(base_name, wd_data.name);
-
-        tr_watchdir_free(wd);
+        EXPECT_EQ(1U, std::size(names));
+        EXPECT_EQ(base_name, *names.begin());
     }
 }
 
 TEST_P(WatchDirTest, watch)
 {
-    auto const path = sandboxDir();
+    auto const dirname = sandboxDir();
 
     // create a new watchdir and confirm it's empty
-    auto wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto wd = createWatchDir(path, &callback, &wd_data);
-    EXPECT_NE(nullptr, wd);
+    auto names = std::vector<std::string>{};
+    auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
+    {
+        names.emplace_back(std::string{ basename });
+        return tr_watchdir::Action::Done;
+    };
+    auto watchdir = createWatchDir(dirname, callback);
     processEvents();
-    EXPECT_EQ(nullptr, wd_data.wd);
-    EXPECT_EQ("", wd_data.name);
+    EXPECT_TRUE(watchdir);
+    EXPECT_TRUE(std::empty(names));
 
     // test that a new file in an empty directory shows up
-    auto const file1 = std::string{ "test1" };
-    createFile(path, file1);
+    auto const file1 = "test1"sv;
+    createFile(dirname, file1);
     processEvents();
-    EXPECT_EQ(wd, wd_data.wd);
-    EXPECT_EQ(file1, wd_data.name);
+    EXPECT_EQ(1U, std::size(names));
+    if (!std::empty(names))
+    {
+        EXPECT_EQ(file1, names.front());
+    }
 
     // test that a new file in a nonempty directory shows up
-    wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file2 = std::string{ "test2" };
-    createFile(path, file2);
+    names.clear();
+    auto const file2 = "test2"sv;
+    createFile(dirname, file2);
     processEvents();
-    EXPECT_EQ(wd, wd_data.wd);
-    EXPECT_EQ(file2, wd_data.name);
+    EXPECT_EQ(1U, std::size(names));
+    if (!std::empty(names))
+    {
+        EXPECT_EQ(file2, names.front());
+    }
 
     // test that folders don't trigger the callback
-    wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    createDir(path, "test3");
+    names.clear();
+    createDir(dirname, "test3"sv);
     processEvents();
-    EXPECT_EQ(nullptr, wd_data.wd);
-    EXPECT_EQ("", wd_data.name);
-
-    // cleanup
-    tr_watchdir_free(wd);
+    EXPECT_TRUE(std::empty(names));
 }
 
+#if 0
 TEST_P(WatchDirTest, watchTwoDirs)
 {
     auto top = sandboxDir();
@@ -360,6 +406,7 @@ TEST_P(WatchDirTest, retry)
 
     tr_watchdir_free(wd);
 }
+#endif
 
 INSTANTIATE_TEST_SUITE_P( //
     WatchDir,
