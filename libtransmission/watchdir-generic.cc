@@ -42,7 +42,7 @@ private:
     }
 
     size_t const rescan_interval_msec_;
-    WrappedTimer const rescan_timer_{ evtimer_new(eventBase(), onRescanTimer, this) };
+    WrappedEvent const rescan_timer_{ evtimer_new(eventBase(), onRescanTimer, this) };
 };
 
 std::unique_ptr<tr_watchdir> tr_watchdir::createGeneric(

@@ -76,16 +76,16 @@ protected:
         return &*event_base_;
     }
 
-    struct FreeTimer
+    struct FreeEvent
     {
         void operator()(event* ev)
         {
-            evtimer_del(ev);
+            event_del(ev);
             event_free(ev);
         }
     };
 
-    using WrappedTimer = std::unique_ptr<struct event, FreeTimer>;
+    using WrappedEvent = std::unique_ptr<struct event, FreeEvent>;
 
 private:
     struct Pending
@@ -143,7 +143,7 @@ private:
     Callback const callback_;
     event_base* const event_base_;
     TimeFunc const current_time_func_;
-    WrappedTimer const retry_timer_{ evtimer_new(event_base_, onRetryTimer, this) };
+    WrappedEvent const retry_timer_{ evtimer_new(event_base_, onRetryTimer, this) };
 
     std::map<std::string, Pending, std::less<>> pending_;
     std::set<std::string, std::less<>> handled_;

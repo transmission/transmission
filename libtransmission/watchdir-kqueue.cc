@@ -30,158 +30,141 @@
 #include "watchdir.h"
 #include "watchdir-common.h"
 
-/***
-****
-***/
-
-struct tr_watchdir_kqueue
+class tr_watchdir_kqueue final : public tr_watchdir_base
 {
-    tr_watchdir_backend base;
+public:
+    tr_watchdir_kqueue(std::string_view dirname, Callback callback, event_base* event_base, TimeFunc time_func)
+        : tr_watchdir_base{ dirname, std::move(callback), event_base, time_func }
+    {
+        init();
+        scan();
+    }
 
-    int kq;
-    int dirfd;
-    struct event* event;
-    std::unordered_set<std::string> dir_entries;
+    tr_watchdir_kqueue(tr_watchdir_kqueue&&) = delete;
+    tr_watchdir_kqueue(tr_watchdir_kqueue const&) = delete;
+    tr_watchdir_kqueue& operator=(tr_watchdir_kqueue&&) = delete;
+    tr_watchdir_kqueue& operator=(tr_watchdir_kqueue const&) = delete;
+
+    ~tr_watchdir_kqueue() override
+    {
+        event_.reset();
+
+        if (kq_ != -1)
+        {
+            close(kq_);
+        }
+
+        if (dirfd != -1)
+        {
+            close(dirfd);
+        }
+    }
+
+private:
+    void init()
+    {
+        kq_ = kqueue();
+        if (kq_ == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't watch '{path}': {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        // open fd for watching
+        dirfd_ = open(path, O_RDONLY | O_EVTONLY);
+        if (dirfd_ == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't watch '{path}': {error} ({error_code})"),
+                fmt::arg("path", path),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        // register kevent filter with kqueue descriptor
+        struct kevent ke;
+        EV_SET(&ke, dirfd_, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, NULL);
+        if (kevent(kq_, &ke, 1, nullptr, 0, nullptr) == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't watch '{path}': {error} ({error_code})"),
+                fmt::arg("path", path),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        // create libevent task for event descriptor
+        auto* const event = event_new(
+            tr_watchdir_get_event_base(handle),
+            kq_,
+            EV_READ | EV_ET | EV_PERSIST,
+            &onKqueueEvent,
+            this);
+        if (event == nullptr)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't create event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+        event_.reset(event);
+
+        if (event_add(backend->event, nullptr) == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't add event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        // trigger one event for the initial scan
+        event_active(event_, EV_READ, 0);
+    }
+
+    static void onKqueueEvent(evutil_socket_t /*fd*/, short /*type*/, void* vself)
+    {
+        static_cast<tr_watchdir_kqueue*>(vself)->handleKqueueEvent();
+    }
+
+    void handleKqueueEvent()
+    {
+        struct kevent ke;
+        auto ts = timespec{};
+        if (kevent(kq_, nullptr, 0, &ke, 1, &ts) == -1)
+        {
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't read event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+            return;
+        }
+
+        scan();
+    }
+
+    int kq = -1;
+    int dirfd = -1;
+    WrappedEvent event_;
 };
 
-#define BACKEND_UPCAST(b) (reinterpret_cast<tr_watchdir_kqueue*>(b))
-
-#define KQUEUE_WATCH_MASK (NOTE_WRITE | NOTE_EXTEND)
-
-/***
-****
-***/
-
-static void tr_watchdir_kqueue_on_event(evutil_socket_t /*fd*/, short /*type*/, void* context)
+std::unique_ptr<tr_watchdir> tr_watchdir::create(
+    std::string_view dirname,
+    Callback callback,
+    event_base* event_base,
+    TimeFunc time_func)
 {
-    auto const handle = static_cast<tr_watchdir_t>(context);
-    auto* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
-
-    struct kevent ke;
-    auto ts = timespec{};
-    if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't read event: {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        return;
-    }
-
-    /* Read directory with generic scan */
-    tr_watchdir_scan(handle, &backend->dir_entries);
-}
-
-static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
-{
-    tr_watchdir_kqueue* const backend = BACKEND_UPCAST(backend_base);
-
-    if (backend == nullptr)
-    {
-        return;
-    }
-
-    TR_ASSERT(backend->base.free_func == &tr_watchdir_kqueue_free);
-
-    if (backend->event != nullptr)
-    {
-        event_del(backend->event);
-        event_free(backend->event);
-    }
-
-    if (backend->kq != -1)
-    {
-        close(backend->kq);
-    }
-
-    if (backend->dirfd != -1)
-    {
-        close(backend->dirfd);
-    }
-
-    delete backend;
-}
-
-tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
-{
-    char const* const path = tr_watchdir_get_path(handle);
-    struct kevent ke;
-
-    auto* backend = new tr_watchdir_kqueue{};
-    backend->base.free_func = &tr_watchdir_kqueue_free;
-    backend->dirfd = -1;
-
-    backend->kq = kqueue();
-    if (backend->kq == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't watch '{path}': {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto fail;
-    }
-
-    /* Open fd for watching */
-    backend->dirfd = open(path, O_RDONLY | O_EVTONLY);
-    if (backend->dirfd == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't watch '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto fail;
-    }
-
-    /* Register kevent filter with kqueue descriptor */
-    EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, NULL);
-
-    if (kevent(backend->kq, &ke, 1, nullptr, 0, nullptr) == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't watch '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto fail;
-    }
-
-    /* Create libevent task for event descriptor */
-    if ((backend->event = event_new(
-             tr_watchdir_get_event_base(handle),
-             backend->kq,
-             EV_READ | EV_ET | EV_PERSIST,
-             &tr_watchdir_kqueue_on_event,
-             handle)) == nullptr)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't create event: {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto fail;
-    }
-
-    if (event_add(backend->event, nullptr) == -1)
-    {
-        auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            _("Couldn't add event: {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-        goto fail;
-    }
-
-    /* Trigger one event for the initial scan */
-    event_active(backend->event, EV_READ, 0);
-
-    return BACKEND_DOWNCAST(backend);
-
-fail:
-    tr_watchdir_kqueue_free(BACKEND_DOWNCAST(backend));
-    return nullptr;
+    return std::make_unique<tr_watchdir_kqueue>(dirname, std::move(callback), event_base, time_func);
 }
