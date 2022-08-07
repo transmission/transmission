@@ -63,6 +63,11 @@ std::unique_ptr<tr_watchdir> tr_watchdir::create(
     TimeFunc time_func)
 {
 #warning tr_watchdir::create creates generic
-    return std::make_unique<tr_watchdir_generic>(dirname, std::move(callback), event_base, time_func);
+    return std::make_unique<tr_watchdir_generic>(
+        dirname,
+        std::move(callback),
+        event_base,
+        time_func,
+        DefaultGenericRescanIntevalMsec);
 }
 #endif

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef> // for size_t
 #include <functional>
 #include <memory>
 #include <string_view>
@@ -44,5 +45,8 @@ public:
         Callback callback,
         event_base* event_base,
         TimeFunc current_time_func,
-        size_t rescan_interval_msec = 10000);
+        size_t rescan_interval_msec = DefaultGenericRescanIntevalMsec);
+
+private:
+    static constexpr size_t DefaultGenericRescanIntevalMsec = 10000;
 };
