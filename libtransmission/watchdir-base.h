@@ -148,5 +148,5 @@ private:
     std::map<std::string, Pending, std::less<>> pending_;
     std::set<std::string, std::less<>> handled_;
     size_t retry_limit_ = 3U;
-    size_t retry_multiplier_msec_ = 5000;
+    size_t retry_multiplier_msec_ = 5000U;
 };
