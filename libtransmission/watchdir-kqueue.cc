@@ -3,12 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cerrno> /* errno */
+#include <cerrno> // for errno
 #include <string>
 #include <unordered_set>
 
-#include <fcntl.h> /* open() */
-#include <unistd.h> /* close() */
+#include <fcntl.h> // for open()
+#include <unistd.h> // for close()
 
 #include <sys/types.h>
 #include <sys/event.h>
@@ -26,9 +26,10 @@
 
 #include "log.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
-#include "watchdir.h"
 #include "watchdir-common.h"
+#include "watchdir.h"
 
 class tr_watchdir_kqueue final : public tr_watchdir_base
 {
@@ -54,9 +55,9 @@ public:
             close(kq_);
         }
 
-        if (dirfd != -1)
+        if (dirfd_ != -1)
         {
-            close(dirfd);
+            close(dirfd_);
         }
     }
 
@@ -75,13 +76,14 @@ private:
         }
 
         // open fd for watching
-        dirfd_ = open(path, O_RDONLY | O_EVTONLY);
+        auto const szdirname = tr_pathbuf{ dirname() };
+        dirfd_ = open(szdirname, O_RDONLY | O_EVTONLY);
         if (dirfd_ == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
                 _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
+                fmt::arg("path", dirname()),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             return;
@@ -89,25 +91,21 @@ private:
 
         // register kevent filter with kqueue descriptor
         struct kevent ke;
-        EV_SET(&ke, dirfd_, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, NULL);
+        static auto constexpr KqueueWatchMask = (NOTE_WRITE | NOTE_EXTEND);
+        EV_SET(&ke, dirfd_, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KqueueWatchMask, 0, NULL);
         if (kevent(kq_, &ke, 1, nullptr, 0, nullptr) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
                 _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
+                fmt::arg("path", dirname()),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             return;
         }
 
         // create libevent task for event descriptor
-        auto* const event = event_new(
-            tr_watchdir_get_event_base(handle),
-            kq_,
-            EV_READ | EV_ET | EV_PERSIST,
-            &onKqueueEvent,
-            this);
+        auto* const event = event_new(eventBase(), kq_, EV_READ | EV_ET | EV_PERSIST, &onKqueueEvent, this);
         if (event == nullptr)
         {
             auto const error_code = errno;
@@ -119,7 +117,7 @@ private:
         }
         event_.reset(event);
 
-        if (event_add(backend->event, nullptr) == -1)
+        if (event_add(event_.get(), nullptr) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -130,7 +128,7 @@ private:
         }
 
         // trigger one event for the initial scan
-        event_active(event_, EV_READ, 0);
+        event_active(event_.get(), EV_READ, 0);
     }
 
     static void onKqueueEvent(evutil_socket_t /*fd*/, short /*type*/, void* vself)
@@ -155,8 +153,8 @@ private:
         scan();
     }
 
-    int kq = -1;
-    int dirfd = -1;
+    int kq_ = -1;
+    int dirfd_ = -1;
     WrappedEvent event_;
 };
 
