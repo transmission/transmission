@@ -122,7 +122,8 @@ protected:
 
     void processEvents()
     {
-        auto const interval = timeval{ process_events_timeout_msec / 1000U, (process_events_timeout_msec % 1000U) * 1000U };
+        auto const interval = timeval{ process_events_timeout_msec / 1000U,
+                                       static_cast<long>((process_events_timeout_msec % 1000U) * 1000U) };
         event_base_loopexit(ev_base_.get(), &interval);
         event_base_dispatch(ev_base_.get());
     }
