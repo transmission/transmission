@@ -1143,7 +1143,7 @@ tr_handshake* tr_handshakeNew(
     handshake->done_func = done_func;
     handshake->done_func_user_data = done_func_user_data;
     handshake->timeout_timer = handshake->mediator->createTimer();
-    handshake->timeout_timer->setCallback([handshake](){ tr_handshakeAbort(handshake); });
+    handshake->timeout_timer->setCallback([handshake]() { tr_handshakeAbort(handshake); });
     handshake->timeout_timer->startSingleShot(HandshakeTimeoutSec);
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
