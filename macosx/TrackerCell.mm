@@ -66,7 +66,7 @@ NSMutableSet* fTrackerIconLoading;
             initWithObjectsAndKeys:[NSFont messageFontOfSize:12.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
 
         _fStatusAttributes = [[NSMutableDictionary alloc]
-            initWithObjectsAndKeys:[NSFont messageFontOfSize:10.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
+            initWithObjectsAndKeys:[NSFont messageFontOfSize:9.5], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
     }
     return self;
 }
