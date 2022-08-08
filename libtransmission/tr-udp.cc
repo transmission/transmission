@@ -316,7 +316,7 @@ void tr_udpInit(tr_session* ss)
         }
         else
         {
-            ss->udp_event = event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
+            ss->udp_event = event_new(ss->eventBase(), ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
 
             if (ss->udp_event == nullptr)
             {
@@ -334,7 +334,7 @@ void tr_udpInit(tr_session* ss)
 
     if (ss->udp6_socket != TR_BAD_SOCKET)
     {
-        ss->udp6_event = event_new(ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST, event_callback, ss);
+        ss->udp6_event = event_new(ss->eventBase(), ss->udp6_socket, EV_READ | EV_PERSIST, event_callback, ss);
 
         if (ss->udp6_event == nullptr)
         {

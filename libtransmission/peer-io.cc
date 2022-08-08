@@ -526,8 +526,8 @@ tr_peerIo* tr_peerIoNew(
     {
     case TR_PEER_SOCKET_TYPE_TCP:
         tr_logAddTraceIo(io, fmt::format("socket (tcp) is {}", socket.handle.tcp));
-        io->event_read = event_new(session->event_base, socket.handle.tcp, EV_READ, event_read_cb, io);
-        io->event_write = event_new(session->event_base, socket.handle.tcp, EV_WRITE, event_write_cb, io);
+        io->event_read = event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, io);
+        io->event_write = event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, io);
         break;
 
 #ifdef WITH_UTP
@@ -846,8 +846,8 @@ int tr_peerIoReconnect(tr_peerIo* io)
         return -1;
     }
 
-    io->event_read = event_new(session->event_base, io->socket.handle.tcp, EV_READ, event_read_cb, io);
-    io->event_write = event_new(session->event_base, io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
+    io->event_read = event_new(session->eventBase(), io->socket.handle.tcp, EV_READ, event_read_cb, io);
+    io->event_write = event_new(session->eventBase(), io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
 
     event_enable(io, pendingEvents);
     io->session->setSocketTOS(io->socket.handle.tcp, addr.type);

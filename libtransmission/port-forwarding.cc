@@ -220,7 +220,7 @@ void tr_sharedClose(tr_session* session)
 
 static void start_timer(tr_shared* s)
 {
-    s->timer = evtimer_new(s->session->event_base, onTimer, s);
+    s->timer = evtimer_new(s->session->eventBase(), onTimer, s);
     set_evtimer_from_status(s);
 }
 

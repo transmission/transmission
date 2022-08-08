@@ -270,7 +270,7 @@ public:
     {
         if (torrent->allowsPex())
         {
-            pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
+            pex_timer.reset(evtimer_new(torrent->session->eventBase(), pexPulse, this));
             tr_timerAdd(*pex_timer, PexIntervalSecs, 0);
         }
 

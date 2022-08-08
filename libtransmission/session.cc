@@ -49,6 +49,7 @@
 #include "rpc-server.h"
 #include "session-id.h"
 #include "session.h"
+#include "timer-ev.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
@@ -75,7 +76,7 @@ static auto constexpr DefaultCacheSizeMB = int{ 4 };
 static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr DefaultUmask = int{ 022 };
-static auto constexpr SaveIntervalSecs = int{ 360 };
+static auto constexpr SaveIntervalSecs = 360s;
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir);
@@ -246,7 +247,7 @@ void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
         tr_logAddInfo(fmt::format(
             _("Listening to incoming peer connections on {hostport}"),
             fmt::arg("hostport", addr_.readable(session->private_peer_port))));
-        ev_ = event_new(session->event_base, socket_, EV_READ | EV_PERSIST, accept_incoming_peer, session);
+        ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, accept_incoming_peer, session);
         event_add(ev_, nullptr);
     }
 }
@@ -569,7 +570,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
  * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
-static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
+static void onSaveTimer(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -579,8 +580,6 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     }
 
     session->stats().saveIfDirty();
-
-    tr_timerAdd(*session->saveTimer, SaveIntervalSecs, 0);
 }
 
 /***
@@ -646,23 +645,16 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
+static void onNowTimer(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(session->nowTimer != nullptr);
+    TR_ASSERT(session->now_timer_);
 
-    time_t const now = time(nullptr);
-
-    /**
-    ***  tr_session things to do once per second
-    **/
-
-    tr_timeUpdate(now);
-
+    // tr_session upkeep tasks to perform once per second
+    tr_timeUpdate(time(nullptr));
     tr_dhtUpkeep(session);
-
     if (session->turtle.isClockEnabled)
     {
         turtleCheckClock(session, &session->turtle);
@@ -686,17 +678,17 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
         }
     }
 
-    /**
-    ***  Set the timer
-    **/
-
-    /* schedule the next timer for right after the next second begins */
+    // set the timer to kick again right after the next second
     auto const tv = tr_gettimeofday();
     int constexpr Min = 100;
     int constexpr Max = 999999;
-    int const usec = std::clamp(int(1000000 - tv.tv_usec), Min, Max);
-
-    tr_timerAdd(*session->nowTimer, 0, usec);
+    auto const next_second_occurs_in_usec = std::chrono::microseconds{ std::clamp(int(1000000 - tv.tv_usec), Min, Max) };
+    auto next_second_occurs_in_msec = std::chrono::duration_cast<std::chrono::milliseconds>(next_second_occurs_in_usec);
+    if (next_second_occurs_in_msec < 100ms)
+    {
+        next_second_occurs_in_msec += 1s;
+    }
+    session->now_timer_->setInterval(next_second_occurs_in_msec);
 }
 
 static void loadBlocklists(tr_session* session);
@@ -719,9 +711,9 @@ static void tr_sessionInitImpl(init_data* data)
     tr_sessionGetDefaultSettings(&settings);
     tr_variantMergeDicts(&settings, clientSettings);
 
-    TR_ASSERT(session->event_base != nullptr);
-    session->nowTimer = evtimer_new(session->event_base, onNowTimer, session);
-    onNowTimer(0, 0, session);
+    session->now_timer_ = session->timerMaker().create();
+    session->now_timer_->setCallback(onNowTimer, session);
+    session->now_timer_->startRepeating(1s);
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
@@ -743,8 +735,9 @@ static void tr_sessionInitImpl(init_data* data)
 
     TR_ASSERT(tr_isSession(session));
 
-    session->saveTimer = evtimer_new(session->event_base, onSaveTimer, session);
-    tr_timerAdd(*session->saveTimer, SaveIntervalSecs, 0);
+    session->save_timer_ = session->timerMaker().create();
+    session->save_timer_->setCallback(onSaveTimer, session);
+    session->save_timer_->startRepeating(SaveIntervalSecs);
 
     tr_announcerInit(session);
 
@@ -1847,7 +1840,7 @@ std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
 
 static void closeBlocklists(tr_session* /*session*/);
 
-static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession);
+static void sessionCloseImplWaitForIdleUdp(void* vsession);
 
 static void sessionCloseImplStart(tr_session* session)
 {
@@ -1860,11 +1853,8 @@ static void sessionCloseImplStart(tr_session* session)
 
     tr_dhtUninit(session);
 
-    event_free(session->saveTimer);
-    session->saveTimer = nullptr;
-
-    event_free(session->nowTimer);
-    session->nowTimer = nullptr;
+    session->save_timer_.reset();
+    session->now_timer_.reset();
 
     tr_verifyClose(session);
     tr_sharedClose(session);
@@ -1905,14 +1895,15 @@ static void sessionCloseImplStart(tr_session* session)
     session->cache.reset();
 
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
-    TR_ASSERT(session->saveTimer == nullptr);
-    session->saveTimer = evtimer_new(session->event_base, sessionCloseImplWaitForIdleUdp, session);
-    tr_timerAdd(*session->saveTimer, 0, 0);
+    TR_ASSERT(!session->save_timer_);
+    session->save_timer_ = session->timerMaker().create();
+    session->save_timer_->setCallback(sessionCloseImplWaitForIdleUdp, session);
+    session->save_timer_->start(1ms);
 }
 
 static void sessionCloseImplFinish(tr_session* session);
 
-static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
+static void sessionCloseImplWaitForIdleUdp(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -1923,7 +1914,7 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*
     if (!tr_tracker_udp_is_idle(session))
     {
         tr_tracker_udp_upkeep(session);
-        tr_timerAdd(*session->saveTimer, 0, 100000);
+        session->save_timer_->start(100ms);
         return;
     }
 
@@ -1932,8 +1923,7 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*
 
 static void sessionCloseImplFinish(tr_session* session)
 {
-    event_free(session->saveTimer);
-    session->saveTimer = nullptr;
+    session->save_timer_.reset();
 
     /* we had to wait until UDP trackers were closed before closing these: */
     tr_tracker_udp_close(session);
@@ -2017,7 +2007,7 @@ void tr_sessionClose(tr_session* session)
         {
             tr_logAddTrace("calling event_loopbreak()");
             forced = true;
-            event_base_loopbreak(session->event_base);
+            event_base_loopbreak(session->eventBase());
         }
 
         if (deadlineReached(deadline + 3))
@@ -3021,4 +3011,23 @@ tr_session::tr_session(std::string_view config_dir)
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , session_stats_{ config_dir, time(nullptr) }
 {
+}
+
+void tr_session::setEventBase(event_base* base)
+{
+    TR_ASSERT(event_base_ == nullptr);
+    event_base_ = base;
+    timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(base);
+}
+
+void tr_session::clearEventBase()
+{
+    timer_maker_.reset();
+    event_base_ = nullptr;
+}
+
+[[nodiscard]] libtransmission::TimerMaker& tr_session::timerMaker() noexcept
+{
+    TR_ASSERT(timer_maker_);
+    return *timer_maker_;
 }
