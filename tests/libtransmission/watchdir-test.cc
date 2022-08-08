@@ -31,9 +31,8 @@ auto constexpr GenericRescanIntervalMsec = size_t{ 100U };
 
 // should be at least 2x the watchdir-generic size to ensure that
 // we have time to pump all events at least once in processEvents()
-auto constexpr DefaultProcessEventsTimeoutMsec = time_t{ 200U };
-static_assert(DefaultProcessEventsTimeoutMsec > GenericRescanIntervalMsec);
-auto process_events_timeout_msec = DefaultProcessEventsTimeoutMsec;
+auto constexpr ProcessEventsTimeoutMsec = size_t{ 300U };
+static_assert(ProcessEventsTimeoutMsec > GenericRescanIntervalMsec);
 
 namespace current_time_mock
 {
@@ -83,7 +82,6 @@ protected:
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
         tr_watchdir::setGenericRescanIntervalMsec(GenericRescanIntervalMsec);
-        process_events_timeout_msec = DefaultProcessEventsTimeoutMsec;
         retry_multiplier_msec_ = 100U;
     }
 
@@ -122,8 +120,7 @@ protected:
 
     void processEvents()
     {
-        auto const interval = timeval{ process_events_timeout_msec / 1000U,
-                                       static_cast<long>((process_events_timeout_msec % 1000U) * 1000U) };
+        auto const interval = timeval{ ProcessEventsTimeoutMsec / 1000U, (ProcessEventsTimeoutMsec % 1000) * 1000 };
         event_base_loopexit(ev_base_.get(), &interval);
         event_base_dispatch(ev_base_.get());
     }
