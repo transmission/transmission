@@ -120,7 +120,7 @@ protected:
 
     void processEvents(size_t msec = ProcessEventsTimeoutMsec)
     {
-        auto const interval = timeval{ static_cast<time_t>(msec / 1000U), static_cast<long>((msec % 1000) * 1000) };
+        auto const interval = timeval{ static_cast<time_t>(msec / 1000U), static_cast<int>((msec % 1000) * 1000) };
         event_base_loopexit(ev_base_.get(), &interval);
         event_base_dispatch(ev_base_.get());
     }
