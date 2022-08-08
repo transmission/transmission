@@ -76,7 +76,6 @@ class WatchDirTest
 {
 private:
     std::shared_ptr<struct event_base> ev_base_;
-    size_t retry_multiplier_msec_ = 100U;
 
 protected:
     void SetUp() override
@@ -85,6 +84,7 @@ protected:
         ev_base_.reset(event_base_new(), event_base_free);
         tr_watchdir::setGenericRescanIntervalMsec(GenericRescanIntervalMsec);
         process_events_timeout_msec = DefaultProcessEventsTimeoutMsec;
+        retry_multiplier_msec_ = 100U;
     }
 
     void TearDown() override
@@ -126,6 +126,8 @@ protected:
         event_base_loopexit(ev_base_.get(), &interval);
         event_base_dispatch(ev_base_.get());
     }
+
+    size_t retry_multiplier_msec_ = 100U;
 };
 
 TEST_P(WatchDirTest, construct)
@@ -241,6 +243,7 @@ TEST_P(WatchDirTest, retry)
         names.emplace_back(std::string{ basename });
         return tr_watchdir::Action::Retry;
     };
+    retry_multiplier_msec_ = 50U;
     auto watchdir = createWatchDir(path, callback);
 
     processEvents();
