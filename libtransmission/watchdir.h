@@ -45,8 +45,19 @@ public:
         Callback callback,
         event_base* event_base,
         TimeFunc current_time_func,
-        size_t rescan_interval_msec = DefaultGenericRescanIntevalMsec);
+        size_t rescan_interval_msec = generic_rescan_interval_msec_);
+
+    [[nodiscard]] static auto genericRescanIntervalMsec() noexcept
+    {
+        return generic_rescan_interval_msec_;
+    }
+
+    static void setGenericRescanIntervalMsec(size_t msec) noexcept
+    {
+        generic_rescan_interval_msec_ = msec;
+    }
 
 private:
     static constexpr size_t DefaultGenericRescanIntevalMsec = 10000;
+    static size_t generic_rescan_interval_msec_;
 };

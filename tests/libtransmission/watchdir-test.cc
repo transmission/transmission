@@ -100,13 +100,10 @@ protected:
     auto createWatchDir(std::string_view path, tr_watchdir::Callback callback)
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
-        auto watchdir = force_generic ? tr_watchdir::createGeneric(
-                                            path,
-                                            std::move(callback),
-                                            ev_base_.get(),
-                                            current_time_mock::get,
-                                            GenericRescanIntervalMsec) :
-                                        tr_watchdir::create(path, std::move(callback), ev_base_.get(), current_time_mock::get);
+        tr_watchdir::setGenericRescanIntervalMsec(GenericRescanIntervalMsec);
+        auto watchdir = force_generic ?
+            tr_watchdir::createGeneric(path, std::move(callback), ev_base_.get(), current_time_mock::get) :
+            tr_watchdir::create(path, std::move(callback), ev_base_.get(), current_time_mock::get);
         dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierSecs(retry_multiplier_msec_);
         return watchdir;
     }

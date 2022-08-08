@@ -20,6 +20,7 @@
 
 #include "watchdir.h"
 
+// base class for concrete tr_watchdirs
 class tr_watchdir_base : public tr_watchdir
 {
 public:
@@ -121,7 +122,6 @@ private:
     {
         static_cast<tr_watchdir_base*>(vself)->retry();
     }
-
     void retry()
     {
         auto const now = current_time_func_();

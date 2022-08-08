@@ -57,6 +57,8 @@ namespace
 
 } // namespace
 
+size_t tr_watchdir::generic_rescan_interval_msec_ = tr_watchdir::DefaultGenericRescanIntevalMsec;
+
 void tr_watchdir_base::updateRetryTimer()
 {
     evtimer_del(retry_timer_.get());
