@@ -14,6 +14,9 @@
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
+		E975121263DD973CAF4AEBA0 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA1 /* timer.h */; };
+		E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA3 /* timer-ev.h */; };
+		E975121263DD973CAF4AEBA4 /* timer-ev.cc in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA5 /* timer-ev.cc */; };
 		2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB1 /* torrents.cc */; };
 		2B9BA6C508B488FE586A0AB2 /* torrents.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB3 /* torrents.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
@@ -607,6 +610,9 @@
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
 		2856E0656A49F2665D69E761 /* benc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = benc.h; sourceTree = "<group>"; };
+		E975121263DD973CAF4AEBA1 /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
+		E975121263DD973CAF4AEBA3 /* timer-ev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer-ev.h; sourceTree = "<group>"; };
+		E975121263DD973CAF4AEBA5 /* timer-ev.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer-ev.cc; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1621,6 +1627,9 @@
 				C17740D4273A002C00E455D2 /* web-utils.h */,
 				CAB35C62252F6F5E00552A55 /* mime-types.h */,
 				2856E0656A49F2665D69E761 /* benc.h */,
+				E975121263DD973CAF4AEBA1 /* timer.h */
+				E975121263DD973CAF4AEBA3 /* timer-ev.h */
+				E975121263DD973CAF4AEBA5 /* timer-ev.cc */
 				C1077A4A183EB29600634C22 /* error.cc */,
 				C1077A4B183EB29600634C22 /* error.h */,
 				C1077A4C183EB29600634C22 /* file-posix.cc */,
@@ -2223,6 +2232,8 @@
 				A23547E311CD0B090046EAE6 /* cache.h in Headers */,
 				CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */,
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
+				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
+				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
 				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
@@ -2987,6 +2998,7 @@
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
 				A23FAE54178BC2950053DC5B /* platform-quota.cc in Sources */,
 				62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */,
+				E975121263DD973CAF4AEBA4 /* timer-ev.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
