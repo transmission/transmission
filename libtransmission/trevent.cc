@@ -10,6 +10,8 @@
 #include <shared_mutex>
 #include <thread>
 
+#include <iostream> // NOMERGE(ckerr)
+
 #include <csignal>
 
 #ifdef _WIN32
@@ -138,6 +140,12 @@ void tr_evthread_init()
 
 struct tr_event_handle
 {
+    tr_event_handle(tr_session* session_in)
+        : session{ session_in }
+    {
+    }
+
+    tr_session* const session;
     using callback = std::function<void(void)>;
 
     using work_queue_t = std::list<callback>;
@@ -146,24 +154,25 @@ struct tr_event_handle
     std::mutex work_queue_mutex;
     event* work_queue_event = nullptr;
 
-    event_base* base = nullptr;
-    tr_session* session = nullptr;
     std::thread::id thread_id;
 };
 
 static void onWorkAvailable(evutil_socket_t /*fd*/, short /*flags*/, void* vsession)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " onWorkAvailable" << std::endl;
     // invariant
     auto* const session = static_cast<tr_session*>(vsession);
     TR_ASSERT(tr_amInEventThread(session));
 
     // steal the work queue
     auto* events = session->events;
+    std::cerr << __FILE__ << ':' << __LINE__ << " waiting on work_queue lock" << std::endl;
     auto work_queue_lock = std::unique_lock(events->work_queue_mutex);
     auto work_queue = tr_event_handle::work_queue_t{};
     std::swap(work_queue, events->work_queue);
     work_queue_lock.unlock();
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " doing the work" << std::endl;
     // process the work queue
     for (auto const& func : work_queue)
     {
@@ -178,16 +187,15 @@ static void libeventThreadFunc(tr_event_handle* events)
     (void)signal(SIGPIPE, SIG_IGN);
 #endif
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " in libtransmission thread" << std::endl;
     tr_evthread_init();
 
     // create the libevent base
-    auto* const base = event_base_new();
+    auto* const base = events->session->eventBase();
     auto* const dns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
 
     // initialize the session struct's event fields
-    events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
-    events->session->event_base = base;
     events->session->evdns_base = dns_base;
     events->session->events = events;
 
@@ -195,8 +203,10 @@ static void libeventThreadFunc(tr_event_handle* events)
     // that this thread is ready for business
     events->work_queue_cv.notify_one();
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " in libtransmission thread; event loop starting" << std::endl;
     // loop until `tr_eventClose()` kills the loop
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
+    std::cerr << __FILE__ << ':' << __LINE__ << " in libtransmission thread; event loop done" << std::endl;
 
     // shut down the thread
     if (dns_base != nullptr)
@@ -204,8 +214,6 @@ static void libeventThreadFunc(tr_event_handle* events)
         evdns_base_free(dns_base, 0);
     }
     event_free(events->work_queue_event);
-    event_base_free(base);
-    events->session->event_base = nullptr;
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
@@ -216,8 +224,7 @@ void tr_eventInit(tr_session* session)
 {
     session->events = nullptr;
 
-    auto* const events = new tr_event_handle();
-    events->session = session;
+    auto* const events = new tr_event_handle{ session };
 
     auto lock = std::unique_lock(events->work_queue_mutex);
     auto thread = std::thread(libeventThreadFunc, events);
@@ -237,7 +244,7 @@ void tr_eventClose(tr_session* session)
         return;
     }
 
-    event_base_loopexit(events->base, nullptr);
+    event_base_loopexit(session->eventBase(), nullptr);
 
     tr_logAddTrace("closing trevent pipe");
 }
@@ -270,10 +277,14 @@ void tr_runInEventThread(tr_session* session, std::function<void(void)>&& func)
     }
     else
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " waiting for work_queue_mutex before adding to event queue" << std::endl;
         auto lock = std::unique_lock(events->work_queue_mutex);
+        std::cerr << __FILE__ << ':' << __LINE__ << " adding to event queue" << std::endl;
         events->work_queue.emplace_back(std::move(func));
+        std::cerr << __FILE__ << ':' << __LINE__ << " unlock" << std::endl;
         lock.unlock();
 
+        std::cerr << __FILE__ << ':' << __LINE__ << " poking work_queue_event" << std::endl;
         event_active(events->work_queue_event, 0, {});
     }
 }

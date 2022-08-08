@@ -71,7 +71,7 @@ public:
 
     [[nodiscard]] event_base* eventBase() const override
     {
-        return session_->event_base;
+        return session_->eventBase();
     }
 
     [[nodiscard]] bool isDHTEnabled() const override

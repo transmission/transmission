@@ -54,6 +54,7 @@ set(PROJECT_FILES
   stats.cc
   subprocess-posix.cc
   subprocess-win32.cc
+  timer.cc
   torrent-ctor.cc
   torrent-files.cc
   torrent-magnet.cc
@@ -140,6 +141,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     quark.h
     rpcimpl.h
     session-id.h
+    timer.h
     tr-assert.h
     tr-getopt.h
     tr-macros.h

@@ -164,7 +164,7 @@ struct tr_announcer
 {
     explicit tr_announcer(tr_session* session_in)
         : session{ session_in }
-        , upkeep_timer{ evtimer_new(session_in->event_base, onUpkeepTimer, this) }
+        , upkeep_timer{ evtimer_new(session_in->eventBase(), onUpkeepTimer, this) }
     {
         scheduleNextUpdate();
     }

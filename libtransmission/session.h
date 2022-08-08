@@ -34,6 +34,7 @@
 #include "quark.h"
 #include "session-id.h"
 #include "stats.h"
+#include "timer.h"
 #include "torrents.h"
 #include "web.h"
 
@@ -128,6 +129,17 @@ struct tr_session
 {
 public:
     tr_session(std::string_view config_dir);
+    ~tr_session();
+
+    [[nodiscard]] constexpr auto* eventBase() noexcept
+    {
+        return event_base_;
+    }
+
+    [[nodiscard]] constexpr libtransmission::TimerMaker& timerMaker() noexcept
+    {
+        return timer_maker_;
+    }
 
     [[nodiscard]] constexpr auto& torrents()
     {
@@ -489,7 +501,6 @@ public:
 
     tr_preallocation_mode preallocationMode;
 
-    struct event_base* event_base = nullptr;
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
@@ -572,8 +583,8 @@ public:
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
-    struct event* nowTimer = nullptr;
-    struct event* saveTimer = nullptr;
+    std::unique_ptr<libtransmission::Timer> now_timer_;
+    std::unique_ptr<libtransmission::Timer> save_timer_;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
@@ -598,6 +609,9 @@ public:
 
 private:
     static std::recursive_mutex session_mutex_;
+
+    struct event_base* const event_base_;
+    libtransmission::EvTimerMaker timer_maker_;
 
     tr_torrents torrents_;
 
