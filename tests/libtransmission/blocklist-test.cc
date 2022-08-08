@@ -14,7 +14,6 @@
 #include "peer-socket.h"
 #include "session.h" // tr_sessionIsAddressBlocked()
 #include "tr-strbuf.h"
-#include "utils.h"
 
 #include "test-fixtures.h"
 

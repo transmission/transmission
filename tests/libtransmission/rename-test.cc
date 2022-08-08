@@ -5,13 +5,11 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h"
 #include "file.h"
 #include "resume.h"
 #include "torrent.h" // tr_isTorrent()
 #include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "utils.h"
 #include "variant.h"
 
 #include "test-fixtures.h"

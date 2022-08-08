@@ -43,7 +43,9 @@ auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
 class tr_watchdir_retry
 {
 public:
+    tr_watchdir_retry(tr_watchdir_retry&&) = delete;
     tr_watchdir_retry(tr_watchdir_retry const&) = delete;
+    tr_watchdir_retry& operator=(tr_watchdir_retry&&) = delete;
     tr_watchdir_retry& operator=(tr_watchdir_retry const&) = delete;
 
     tr_watchdir_retry(tr_watchdir_t handle_in, struct event_base* base, std::string_view name_in)
@@ -139,6 +141,11 @@ public:
         }
     }
 
+    tr_watchdir(tr_watchdir&&) = delete;
+    tr_watchdir(tr_watchdir const&) = delete;
+    tr_watchdir& operator=(tr_watchdir&&) = delete;
+    tr_watchdir& operator=(tr_watchdir const&) = delete;
+
     ~tr_watchdir()
     {
         if (backend_ != nullptr)
@@ -146,9 +153,6 @@ public:
             backend_->free_func(backend_);
         }
     }
-
-    tr_watchdir(tr_watchdir const&) = delete;
-    tr_watchdir& operator=(tr_watchdir const&) = delete;
 
     [[nodiscard]] constexpr auto const& path() const noexcept
     {
@@ -265,10 +269,8 @@ private:
     {
         auto const path = tr_pathbuf{ dir, '/', name };
 
-        auto path_info = tr_sys_path_info{};
         tr_error* error = nullptr;
-        bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
-
+        auto const info = tr_sys_path_get_info(path, 0, &error);
         if (error != nullptr)
         {
             if (!TR_ERROR_IS_ENOENT(error->code))
@@ -283,7 +285,7 @@ private:
             tr_error_free(error);
         }
 
-        return ret;
+        return info && info->isFile();
     }
 
     static constexpr std::string_view statusToString(tr_watchdir_status status)

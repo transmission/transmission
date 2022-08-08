@@ -27,15 +27,15 @@ namespace
 
 using file_func_t = std::function<void(char const* filename)>;
 
-bool isDirectory(char const* path)
+bool isFolder(std::string_view path)
 {
-    auto info = tr_sys_path_info{};
-    return tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY);
+    auto const info = tr_sys_path_get_info(path);
+    return info && info->isFolder();
 }
 
-bool isEmptyDirectory(char const* path)
+bool isEmptyFolder(char const* path)
 {
-    if (!isDirectory(path))
+    if (!isFolder(path))
     {
         return false;
     }
@@ -60,7 +60,7 @@ bool isEmptyDirectory(char const* path)
 
 void depthFirstWalk(char const* path, file_func_t const& func, std::optional<int> max_depth = {})
 {
-    if (isDirectory(path) && (!max_depth || *max_depth > 0))
+    if (isFolder(path) && (!max_depth || *max_depth > 0))
     {
         if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
@@ -114,7 +114,6 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     size_t n_paths) const
 {
     auto filename = tr_pathbuf{};
-    auto file_info = tr_sys_path_info{};
     auto const& subpath = path(file_index);
 
     for (size_t path_idx = 0; path_idx < n_paths; ++path_idx)
@@ -122,15 +121,15 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
         auto const base = search_paths[path_idx];
 
         filename.assign(base, '/', subpath);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
+        if (auto const info = tr_sys_path_get_info(filename); info)
         {
-            return FoundFile{ file_info, std::move(filename), std::size(base) };
+            return FoundFile{ *info, std::move(filename), std::size(base) };
         }
 
-        filename.assign(filename, base, '/', subpath, PartialFileSuffix);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
+        filename.assign(base, '/', subpath, PartialFileSuffix);
+        if (auto const info = tr_sys_path_get_info(filename); info)
         {
-            return FoundFile{ file_info, std::move(filename), std::size(base) };
+            return FoundFile{ *info, std::move(filename), std::size(base) };
         }
     }
 
@@ -220,7 +219,7 @@ bool tr_torrent_files::move(
     {
         auto const remove_empty_directories = [](char const* filename)
         {
-            if (isEmptyDirectory(filename))
+            if (isEmptyFolder(filename))
             {
                 tr_sys_path_remove(filename, nullptr);
             }
@@ -304,7 +303,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     // Remove the first two categories and leave the third alone.
     auto const remove_junk = [](char const* filename)
     {
-        if (isEmptyDirectory(filename) || isJunkFile(filename))
+        if (isEmptyFolder(filename) || isJunkFile(filename))
         {
             tr_sys_path_remove(filename);
         }

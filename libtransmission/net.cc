@@ -335,9 +335,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 #endif
         sockerrno != EINPROGRESS)
     {
-        int const tmperrno = sockerrno;
-
-        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->isIPv4())
+        if (auto const tmperrno = sockerrno; (tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->isIPv4())
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),

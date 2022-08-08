@@ -5,7 +5,6 @@
 
 #include "transmission.h"
 #include "rpcimpl.h"
-#include "utils.h"
 #include "variant.h"
 
 #include "test-fixtures.h"

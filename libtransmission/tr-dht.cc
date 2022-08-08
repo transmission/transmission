@@ -47,6 +47,7 @@
 #include "tr-strbuf.h"
 #include "trevent.h"
 #include "variant.h"
+#include "utils.h" // tr_time(), _()
 
 using namespace std::literals;
 
@@ -54,7 +55,7 @@ static struct event* dht_timer = nullptr;
 static unsigned char myid[20];
 static tr_session* session_ = nullptr;
 
-static void timer_callback(evutil_socket_t s, short type, void* ignore);
+static void timer_callback(evutil_socket_t s, short type, void* session);
 
 static bool bootstrap_done(tr_session* session, int af)
 {
@@ -453,16 +454,16 @@ static void getstatus(getstatus_closure* const closure)
     }
 }
 
-int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
+int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
 {
     auto closure = getstatus_closure{ af, -1, -1 };
 
     if (!tr_dhtEnabled(session) || (af == AF_INET && session->udp_socket == TR_BAD_SOCKET) ||
         (af == AF_INET6 && session->udp6_socket == TR_BAD_SOCKET))
     {
-        if (nodes_return != nullptr)
+        if (setme_node_count != nullptr)
         {
-            *nodes_return = 0;
+            *setme_node_count = 0;
         }
 
         return TR_DHT_STOPPED;
@@ -475,9 +476,9 @@ int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
         tr_wait_msec(50 /*msec*/);
     }
 
-    if (nodes_return != nullptr)
+    if (setme_node_count != nullptr)
     {
-        *nodes_return = closure.count;
+        *setme_node_count = closure.count;
     }
 
     return closure.status;

@@ -169,6 +169,11 @@ struct tr_announcer
         scheduleNextUpdate();
     }
 
+    tr_announcer(tr_announcer&&) = delete;
+    tr_announcer(tr_announcer const&) = delete;
+    tr_announcer& operator=(tr_announcer&&) = delete;
+    tr_announcer& operator=(tr_announcer const&) = delete;
+
     ~tr_announcer()
     {
         event_free(upkeep_timer);

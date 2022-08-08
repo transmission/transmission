@@ -207,12 +207,10 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 
         if (ev->Action == FILE_ACTION_ADDED || ev->Action == FILE_ACTION_MODIFIED || ev->Action == FILE_ACTION_RENAMED_NEW_NAME)
         {
-            char* name = tr_win32_native_to_utf8(ev->FileName, ev->FileNameLength / sizeof(WCHAR));
-
-            if (name != nullptr)
+            if (auto const name = tr_win32_native_to_utf8({ ev->FileName, ev->FileNameLength / sizeof(WCHAR) });
+                !std::empty(name))
             {
-                tr_watchdir_process(handle, name);
-                tr_free(name);
+                tr_watchdir_process(handle, name.c_str());
             }
         }
     }
@@ -274,15 +272,15 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     backend->fd = INVALID_HANDLE_VALUE;
     backend->notify_pipe[0] = backend->notify_pipe[1] = TR_BAD_SOCKET;
 
-    wchar_t* wide_path = tr_win32_utf8_to_native(path, -1);
-    if (wide_path == nullptr)
+    auto const wide_path = tr_win32_utf8_to_native(path);
+    if (!std::empty(wide_path))
     {
         tr_logAddError(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));
         goto fail;
     }
 
     if ((backend->fd = CreateFileW(
-             wide_path,
+             wide_path.c_str(),
              FILE_LIST_DIRECTORY,
              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
              nullptr,
@@ -293,9 +291,6 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
         tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
         goto fail;
     }
-
-    tr_free(wide_path);
-    wide_path = nullptr;
 
     backend->overlapped.Pointer = handle;
 
@@ -364,6 +359,5 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 
 fail:
     tr_watchdir_win32_free(BACKEND_DOWNCAST(backend));
-    tr_free(wide_path);
     return nullptr;
 }

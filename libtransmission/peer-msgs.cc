@@ -300,6 +300,11 @@ public:
         updateDesiredRequestCount(this);
     }
 
+    tr_peerMsgsImpl(tr_peerMsgsImpl&&) = delete;
+    tr_peerMsgsImpl(tr_peerMsgsImpl const&) = delete;
+    tr_peerMsgsImpl& operator=(tr_peerMsgsImpl&&) = delete;
+    tr_peerMsgsImpl& operator=(tr_peerMsgsImpl const&) = delete;
+
     ~tr_peerMsgsImpl() override
     {
         set_active(TR_UP, false);
@@ -864,9 +869,9 @@ private:
     mutable std::optional<float> percent_done_;
 };
 
-tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
+tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data)
 {
-    return new tr_peerMsgsImpl(torrent, atom, io, callback, callbackData);
+    return new tr_peerMsgsImpl(torrent, atom, io, callback, callback_data);
 }
 
 /**
@@ -1341,14 +1346,15 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     int64_t msg_type = -1;
     int64_t piece = -1;
     int64_t total_size = 0;
-    auto* const tmp = tr_new(char, msglen);
 
-    tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-    char const* const msg_end = (char const*)tmp + msglen;
+    auto tmp = std::vector<char>{};
+    tmp.resize(msglen);
+    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+    char const* const msg_end = std::data(tmp) + std::size(tmp);
 
     auto dict = tr_variant{};
     char const* benc_end = nullptr;
-    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }, &benc_end))
+    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp, &benc_end))
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
@@ -1403,8 +1409,6 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
             tr_variantFree(&v);
         }
     }
-
-    tr_free(tmp);
 }
 
 static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
@@ -1415,10 +1419,11 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
         return;
     }
 
-    auto* tmp = tr_new(char, msglen);
-    tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
+    auto tmp = std::vector<char>{};
+    tmp.resize(msglen);
+    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
 
-    if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }))
+    if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp))
     {
         uint8_t const* added = nullptr;
         auto added_len = size_t{};
@@ -1454,8 +1459,6 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
 
         tr_variantFree(&val);
     }
-
-    tr_free(tmp);
 }
 
 static void sendPex(tr_peerMsgsImpl* msgs);
@@ -2505,8 +2508,6 @@ static void sendPex(tr_peerMsgsImpl* msgs)
         return;
     }
 
-    uint8_t* tmp = nullptr;
-    uint8_t* walk = nullptr;
     evbuffer* const out = msgs->outMessages;
 
     // update msgs
@@ -2517,10 +2518,14 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     auto val = tr_variant{};
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
+    auto tmpbuf = std::vector<uint8_t>{};
+
     if (!std::empty(added))
     {
         // "added"
-        tmp = walk = tr_new(uint8_t, std::size(added) * 6U);
+        tmpbuf.resize(std::size(added) * 6U);
+        auto* begin = std::data(tmpbuf);
+        auto* walk = begin;
         for (auto const& p : added)
         {
             memcpy(walk, &p.addr.addr, 4U);
@@ -2529,27 +2534,29 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             walk += 2U;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added) * 6U);
-        tr_variantDictAddRaw(&val, TR_KEY_added, tmp, walk - tmp);
-        tr_free(tmp);
+        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added) * 6U);
+        tr_variantDictAddRaw(&val, TR_KEY_added, begin, walk - begin);
 
         // "added.f"
         // unset each holepunch flag because we don't support it.
-        tmp = walk = tr_new(uint8_t, std::size(added));
+        tmpbuf.resize(std::size(added));
+        begin = std::data(tmpbuf);
+        walk = begin;
         for (auto const& p : added)
         {
             *walk++ = p.flags & ~ADDED_F_HOLEPUNCH;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added));
-        tr_variantDictAddRaw(&val, TR_KEY_added_f, tmp, walk - tmp);
-        tr_free(tmp);
+        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added));
+        tr_variantDictAddRaw(&val, TR_KEY_added_f, begin, walk - begin);
     }
 
     if (!std::empty(dropped))
     {
         // "dropped"
-        tmp = walk = tr_new(uint8_t, std::size(dropped) * 6U);
+        tmpbuf.resize(std::size(dropped) * 6U);
+        auto* begin = std::data(tmpbuf);
+        auto* walk = begin;
         for (auto const& p : dropped)
         {
             memcpy(walk, &p.addr.addr, 4U);
@@ -2558,15 +2565,16 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             walk += 2U;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(dropped) * 6U);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped, tmp, walk - tmp);
-        tr_free(tmp);
+        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(dropped) * 6U);
+        tr_variantDictAddRaw(&val, TR_KEY_dropped, begin, walk - begin);
     }
 
     if (!std::empty(added6))
     {
         // "added6"
-        tmp = walk = tr_new(uint8_t, std::size(added6) * 18U);
+        tmpbuf.resize(std::size(added6) * 18U);
+        auto* begin = std::data(tmpbuf);
+        auto* walk = begin;
         for (auto const& p : added6)
         {
             memcpy(walk, &p.addr.addr.addr6.s6_addr, 16U);
@@ -2575,27 +2583,29 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             walk += 2U;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added6) * 18U);
-        tr_variantDictAddRaw(&val, TR_KEY_added6, tmp, walk - tmp);
-        tr_free(tmp);
+        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added6) * 18U);
+        tr_variantDictAddRaw(&val, TR_KEY_added6, begin, walk - begin);
 
         // "added6.f"
         // unset each holepunch flag because we don't support it.
-        tmp = walk = tr_new(uint8_t, std::size(added6));
+        tmpbuf.resize(std::size(added6));
+        begin = std::data(tmpbuf);
+        walk = begin;
         for (auto const& p : added6)
         {
             *walk++ = p.flags & ~ADDED_F_HOLEPUNCH;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added6));
-        tr_variantDictAddRaw(&val, TR_KEY_added6_f, tmp, walk - tmp);
-        tr_free(tmp);
+        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added6));
+        tr_variantDictAddRaw(&val, TR_KEY_added6_f, begin, walk - begin);
     }
 
     if (!std::empty(dropped6))
     {
         // "dropped6"
-        tmp = walk = tr_new(uint8_t, std::size(dropped6) * 18U);
+        tmpbuf.resize(std::size(dropped6) * 18U);
+        auto* const begin = std::data(tmpbuf);
+        auto* walk = begin;
         for (auto const& p : dropped6)
         {
             memcpy(walk, &p.addr.addr.addr6.s6_addr, 16U);
@@ -2604,9 +2614,8 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             walk += 2U;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(dropped6) * 18U);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped6, tmp, walk - tmp);
-        tr_free(tmp);
+        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(dropped6) * 18U);
+        tr_variantDictAddRaw(&val, TR_KEY_dropped6, begin, walk - begin);
     }
 
     /* write the pex message */

@@ -224,9 +224,9 @@ static void start_timer(tr_shared* s)
     set_evtimer_from_status(s);
 }
 
-void tr_sharedTraversalEnable(tr_shared* s, bool enable)
+void tr_sharedTraversalEnable(tr_shared* s, bool is_enable)
 {
-    if (enable)
+    if (is_enable)
     {
         s->isEnabled = true;
         start_timer(s);

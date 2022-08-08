@@ -11,7 +11,6 @@
 
 #include "torrent.h"
 #include "torrents.h"
-#include "utils.h"
 
 #include "gtest/gtest.h"
 

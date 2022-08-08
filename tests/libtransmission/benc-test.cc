@@ -8,7 +8,6 @@
 #include "transmission.h"
 
 #include "benc.h"
-#include "utils.h"
 
 #include "gtest/gtest.h"
 

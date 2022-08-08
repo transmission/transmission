@@ -669,12 +669,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     tr_error* error = nullptr;
     auto top = tr_variant{};
     if (!tr_loadFile(filename, buf, &error) ||
-        !tr_variantFromBuf(
-            &top,
-            TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
-            { std::data(buf), std::size(buf) },
-            nullptr,
-            &error))
+        !tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, &error))
     {
         tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, error->message));
         tr_error_clear(&error);

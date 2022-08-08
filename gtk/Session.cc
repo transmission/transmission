@@ -25,7 +25,8 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-assert.h>
-#include <libtransmission/utils.h> /* tr_free */
+#include <libtransmission/utils.h> // tr_free(), tr_time()
+#include <libtransmission/web-utils.h> // tr_urlIsValid()
 #include <libtransmission/variant.h>
 
 #include "Actions.h"
@@ -45,11 +46,11 @@ using TrVariantPtr = std::shared_ptr<tr_variant>;
 TrVariantPtr create_variant(tr_variant&& other)
 {
     auto result = TrVariantPtr(
-        tr_new0(tr_variant, 1),
+        new tr_variant{},
         [](tr_variant* ptr)
         {
             tr_variantFree(ptr);
-            tr_free(ptr);
+            delete ptr;
         });
     *result = std::move(other);
     tr_variantInitBool(&other, false);

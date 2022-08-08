@@ -20,7 +20,6 @@
 #include "magnet-metainfo.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 #include "web-utils.h"
 
 using namespace std::literals;

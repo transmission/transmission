@@ -359,7 +359,7 @@ void tr_peerIoClear(tr_peerIo* io);
 ***
 **/
 
-void tr_peerIoWriteBytes(tr_peerIo* io, void const* writeme, size_t writemeLen, bool isPieceData);
+void tr_peerIoWriteBytes(tr_peerIo* io, void const* writeme, size_t writeme_len, bool is_piece_data);
 
 void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 
@@ -367,7 +367,7 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 ***
 **/
 
-void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte);
+void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme);
 void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
 void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t hl);
 void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t hll);

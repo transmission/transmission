@@ -8,9 +8,8 @@
 #include "transmission.h"
 
 #include "benc.h"
-#include "crypto-utils.h"
+#include "crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
 #include "error.h"
-#include "utils.h" /* tr_free */
 #include "variant-common.h"
 #include "variant.h"
 
@@ -546,17 +545,16 @@ TEST_F(VariantTest, variantFromBufFuzz)
     {
         buf.resize(tr_rand_int(4096));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const sv = std::string_view{ std::data(buf), std::size(buf) };
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
         if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
         {
             tr_variantFree(&top);
         }
 
         if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
         {
             tr_variantFree(&top);
         }

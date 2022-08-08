@@ -91,6 +91,10 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
     window.becomesKeyOnlyIfNeeded = YES;
 
+    //disable green maximise window button
+    //https://github.com/transmission/transmission/issues/3486
+    [[window standardWindowButton:NSWindowZoomButton] setEnabled:NO];
+
     //set tab tooltips
     [self.fTabs.cell setToolTip:NSLocalizedString(@"General Info", "Inspector -> tab") forSegment:TAB_GENERAL_TAG];
     [self.fTabs.cell setToolTip:NSLocalizedString(@"Activity", "Inspector -> tab") forSegment:TAB_ACTIVITY_TAG];

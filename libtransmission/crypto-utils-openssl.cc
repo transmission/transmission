@@ -96,18 +96,18 @@ class ShaHelper
 public:
     using EvpFunc = decltype((EVP_sha1));
 
-    ShaHelper(EvpFunc evp_func)
+    explicit ShaHelper(EvpFunc evp_func)
         : evp_func_{ evp_func }
     {
         clear();
     }
 
-    void clear()
+    void clear() const
     {
         EVP_DigestInit_ex(handle_.get(), evp_func_(), nullptr);
     }
 
-    void update(void const* data, size_t data_length)
+    void update(void const* data, size_t data_length) const
     {
         if (data_length != 0U)
         {
@@ -123,7 +123,7 @@ public:
         unsigned int hash_length = 0;
         auto digest = DigestType{};
         auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-        bool const ok = check_result(EVP_DigestFinal_ex(handle_.get(), digest_as_uchar, &hash_length));
+        [[maybe_unused]] bool const ok = check_result(EVP_DigestFinal_ex(handle_.get(), digest_as_uchar, &hash_length));
         TR_ASSERT(!ok || hash_length == std::size(digest));
 
         clear();
@@ -146,7 +146,12 @@ private:
 class Sha1Impl final : public tr_sha1
 {
 public:
+    Sha1Impl() = default;
+    Sha1Impl(Sha1Impl&&) = delete;
+    Sha1Impl(Sha1Impl const&) = delete;
     ~Sha1Impl() override = default;
+    Sha1Impl& operator=(Sha1Impl&&) = delete;
+    Sha1Impl& operator=(Sha1Impl const&) = delete;
 
     void clear() override
     {
@@ -170,7 +175,12 @@ private:
 class Sha256Impl final : public tr_sha256
 {
 public:
+    Sha256Impl() = default;
+    Sha256Impl(Sha256Impl&&) = delete;
+    Sha256Impl(Sha256Impl const&) = delete;
     ~Sha256Impl() override = default;
+    Sha256Impl& operator=(Sha256Impl&&) = delete;
+    Sha256Impl& operator=(Sha256Impl const&) = delete;
 
     void clear() override
     {

@@ -11,7 +11,6 @@
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "bitfield.h"
-#include "utils.h" /* tr_free */
 
 #include "gtest/gtest.h"
 

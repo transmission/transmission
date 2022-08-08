@@ -566,7 +566,6 @@ endforeach()
 
 set(NEEDED_FUNCTIONS
     _configthreadlocale
-    canonicalize_file_name
     copy_file_range
     copyfile
     daemon

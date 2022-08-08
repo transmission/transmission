@@ -88,6 +88,11 @@ public:
     {
     }
 
+    tr_handshake_mediator_impl(tr_handshake_mediator_impl&&) = delete;
+    tr_handshake_mediator_impl(tr_handshake_mediator_impl const&) = delete;
+    tr_handshake_mediator_impl& operator=(tr_handshake_mediator_impl&&) = delete;
+    tr_handshake_mediator_impl& operator=(tr_handshake_mediator_impl const&) = delete;
+
     virtual ~tr_handshake_mediator_impl() = default;
 
     [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
@@ -578,6 +583,11 @@ struct tr_peerMgr
         tr_timerAddMsec(*refill_upkeep_timer_, RefillUpkeepPeriodMsec);
     }
 
+    tr_peerMgr(tr_peerMgr&&) = delete;
+    tr_peerMgr(tr_peerMgr const&) = delete;
+    tr_peerMgr& operator=(tr_peerMgr&&) = delete;
+    tr_peerMgr& operator=(tr_peerMgr const&) = delete;
+
     [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
@@ -823,6 +833,11 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
             , peer_{ peer_in }
         {
         }
+
+        MediatorImpl(MediatorImpl&&) = delete;
+        MediatorImpl(MediatorImpl const&) = delete;
+        MediatorImpl& operator=(MediatorImpl&&) = delete;
+        MediatorImpl& operator=(MediatorImpl const&) = delete;
 
         ~MediatorImpl() override = default;
 
@@ -1440,14 +1455,14 @@ struct CompareAtomsByUsefulness
 
 } // namespace get_peers_helpers
 
-std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_t list_mode, size_t max_count)
+std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_type, uint8_t list_mode, size_t max_peer_count)
 {
     using namespace get_peers_helpers;
 
     TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
 
-    TR_ASSERT(af == TR_AF_INET || af == TR_AF_INET6);
+    TR_ASSERT(address_type == TR_AF_INET || address_type == TR_AF_INET6);
     TR_ASSERT(list_mode == TR_PEERS_CONNECTED || list_mode == TR_PEERS_INTERESTING);
 
     tr_swarm const* s = tor->swarm;
@@ -1483,7 +1498,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_
     ***  add the first N of them into our return list
     **/
 
-    auto const n = std::min(std::size(atoms), max_count);
+    auto const n = std::min(std::size(atoms), max_peer_count);
     auto pex = std::vector<tr_pex>{};
     pex.reserve(n);
 
@@ -1491,7 +1506,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_
     {
         auto const* const atom = atoms[i];
 
-        if (atom->addr.type == af)
+        if (atom->addr.type == address_type)
         {
             TR_ASSERT(tr_address_is_valid(&atom->addr));
             pex.emplace_back(atom->addr, atom->port, atom->flags);

@@ -45,15 +45,19 @@ using file_func_t = std::function<void(char const* filename)>;
 
 static void depthFirstWalk(char const* path, file_func_t func)
 {
-    auto info = tr_sys_path_info{};
-    if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+    if (auto const info = tr_sys_path_get_info(path); info && info->isFolder())
     {
         if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
-            char const* name;
-            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+            for (;;)
             {
-                if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+                char const* const name = tr_sys_dir_read_name(odir);
+                if (name == nullptr)
+                {
+                    break;
+                }
+
+                if ("."sv != name && ".."sv != name)
                 {
                     auto const child = fmt::format("{:s}/{:s}"sv, path, name);
                     depthFirstWalk(child.c_str(), func);
@@ -124,11 +128,9 @@ protected:
 
         tr_error* error = nullptr;
 
-        if (auto* path = tr_sys_dir_get_current(&error); path != nullptr)
+        if (auto path = tr_sys_dir_get_current(&error); !std::empty(path))
         {
-            auto ret = std::string{ path };
-            tr_free(path);
-            return ret;
+            return path;
         }
 
         std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
@@ -194,7 +196,7 @@ protected:
         errno = tmperr;
     }
 
-    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len)
+    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error** error = nullptr)
     {
         uint64_t n_left = data_len;
         auto const* left = static_cast<uint8_t const*>(data);
@@ -202,11 +204,12 @@ protected:
         while (n_left > 0)
         {
             uint64_t n = {};
-            tr_error* error = nullptr;
-            if (!tr_sys_file_write(fd, left, n_left, &n, &error))
+            tr_error* local_error = nullptr;
+            if (!tr_sys_file_write(fd, left, n_left, &n, error))
             {
-                fprintf(stderr, "Error writing file: '%s'\n", error->message);
-                tr_error_free(error);
+                fprintf(stderr, "Error writing file: '%s'\n", local_error->message);
+                tr_error_propagate(error, &local_error);
+                tr_error_free(local_error);
                 break;
             }
 
@@ -221,10 +224,21 @@ protected:
 
         buildParentDir(tmpl);
 
-        // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(tmpl);
-        blockingFileWrite(fd, payload, n);
-        tr_sys_file_close(fd);
+        tr_error* error = nullptr;
+        auto const fd = tr_sys_file_open_temp(tmpl, &error);
+        blockingFileWrite(fd, payload, n, &error);
+        tr_sys_file_flush(fd, &error);
+        tr_sys_file_flush(fd, &error);
+        tr_sys_file_close(fd, &error);
+        if (error != nullptr)
+        {
+            fmt::print(
+                "Couldn't create '{path}': {error} ({error_code})\n",
+                fmt::arg("path", tmpl),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code));
+            tr_error_free(error);
+        }
         sync();
 
         errno = tmperr;

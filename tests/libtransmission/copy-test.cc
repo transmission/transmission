@@ -9,6 +9,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <vector>
 
 #include "transmission.h"
 #include "error.h"
@@ -30,10 +31,10 @@ protected:
         auto const path1 = tr_pathbuf{ sandboxDir(), '/', filename1 };
 
         /* Create a file. */
-        auto* file_content = static_cast<char*>(tr_malloc(file_length));
-        tr_rand_buffer(file_content, file_length);
-        createFileWithContents(path1, file_content, file_length);
-        tr_free(file_content);
+        auto contents = std::vector<char>{};
+        contents.resize(file_length);
+        tr_rand_buffer(std::data(contents), std::size(contents));
+        createFileWithContents(path1, std::data(contents), std::size(contents));
 
         auto const path2 = tr_pathbuf{ sandboxDir(), '/', filename2 };
 
@@ -72,52 +73,11 @@ private:
         return bytes_remaining;
     }
 
-    static bool filesAreIdentical(char const* fn1, char const* fn2)
+    static bool filesAreIdentical(std::string_view filename1, std::string_view filename2)
     {
-        bool identical = true;
-
-        tr_sys_file_t const fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
-        tr_sys_file_t const fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
-        EXPECT_NE(fd1, TR_BAD_SYS_FILE);
-        EXPECT_NE(fd2, TR_BAD_SYS_FILE);
-
-        tr_sys_path_info info1;
-        tr_sys_path_info info2;
-        tr_sys_file_get_info(fd1, &info1);
-        tr_sys_file_get_info(fd2, &info2);
-        EXPECT_EQ(info1.size, info2.size);
-
-        uint64_t bytes_left1 = info1.size;
-        uint64_t bytes_left2 = info2.size;
-
-        size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
-        auto* readbuf1 = static_cast<char*>(tr_malloc(buflen));
-        auto* readbuf2 = static_cast<char*>(tr_malloc(buflen));
-
-        while (bytes_left1 > 0 || bytes_left2 > 0)
-        {
-            bytes_left1 = fillBufferFromFd(fd1, bytes_left1, readbuf1, buflen);
-            bytes_left2 = fillBufferFromFd(fd2, bytes_left2, readbuf2, buflen);
-
-            if (bytes_left1 != bytes_left2)
-            {
-                identical = false;
-                break;
-            }
-
-            if (memcmp(readbuf1, readbuf2, buflen) != 0)
-            {
-                identical = false;
-                break;
-            }
-        }
-
-        tr_free(readbuf1);
-        tr_free(readbuf2);
-        tr_sys_file_close(fd1);
-        tr_sys_file_close(fd2);
-
-        return identical;
+        auto contents1 = std::vector<char>{};
+        auto contents2 = std::vector<char>{};
+        return tr_loadFile(filename1, contents1) && tr_loadFile(filename2, contents2) && contents1 == contents2;
     }
 };
 

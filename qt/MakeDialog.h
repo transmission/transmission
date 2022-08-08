@@ -5,21 +5,16 @@
 
 #pragma once
 
-#include <memory>
+#include <optional>
 
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/makemeta.h>
 
 #include "BaseDialog.h"
 #include "ui_MakeDialog.h"
 
 class QAbstractButton;
-
 class Session;
-
-extern "C"
-{
-    struct tr_metainfo_builder;
-}
 
 class MakeDialog : public BaseDialog
 {
@@ -45,5 +40,5 @@ private:
 
     Ui::MakeDialog ui_ = {};
 
-    std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> builder_;
+    std::optional<tr_metainfo_builder> builder_;
 };

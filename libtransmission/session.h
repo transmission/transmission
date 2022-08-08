@@ -32,6 +32,7 @@
 #include "net.h" // tr_socket_t
 #include "open-files.h"
 #include "quark.h"
+#include "session-id.h"
 #include "stats.h"
 #include "torrents.h"
 #include "web.h"
@@ -62,7 +63,7 @@ struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    tr_bindinfo(tr_address addr)
+    explicit tr_bindinfo(tr_address addr)
         : addr_{ std::move(addr) }
     {
     }
@@ -551,7 +552,7 @@ public:
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
-        [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
+        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
@@ -563,7 +564,7 @@ public:
     WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
-    struct tr_session_id* session_id = nullptr;
+    tr_session_id session_id;
 
     tr_rpc_func rpc_func = nullptr;
     void* rpc_func_user_data = nullptr;
@@ -679,6 +680,6 @@ unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
 
-std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted);
+std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t num_wanted);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);

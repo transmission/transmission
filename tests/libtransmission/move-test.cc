@@ -16,7 +16,6 @@
 #include "cache.h" // tr_cacheWriteBlock()
 #include "file.h" // tr_sys_path_*()
 #include "tr-strbuf.h"
-#include "utils.h"
 #include "variant.h"
 
 #include "test-fixtures.h"

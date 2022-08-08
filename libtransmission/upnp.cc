@@ -66,6 +66,12 @@ tr_port_forwarding portFwdState(UpnpState upnp_state, bool is_mapped)
 
 struct tr_upnp
 {
+    tr_upnp() = default;
+    tr_upnp(tr_upnp&&) = delete;
+    tr_upnp(tr_upnp const&) = delete;
+    tr_upnp& operator=(tr_upnp&&) = delete;
+    tr_upnp& operator=(tr_upnp const&) = delete;
+
     ~tr_upnp()
     {
         TR_ASSERT(!isMapped);
@@ -240,7 +246,7 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-static auto* discoverThreadfunc(std::string bindaddr)
+static auto* discoverThreadfunc(std::string bindaddr) // NOLINT performance-unnecessary-value-param
 {
     return tr_upnpDiscover(2000, bindaddr.c_str());
 }

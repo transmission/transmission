@@ -17,6 +17,7 @@
 #include <QStyleOptionProgressBar>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/utils.h>
 
 #include "Torrent.h"

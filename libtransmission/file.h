@@ -8,16 +8,15 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
+#include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 #include "tr-macros.h"
-#include "tr-strbuf.h"
 
 struct tr_error;
 
@@ -117,8 +116,18 @@ enum tr_sys_path_type_t
 struct tr_sys_path_info
 {
     tr_sys_path_type_t type = {};
-    uint64_t size = 0;
-    time_t last_modified_at = 0;
+    uint64_t size = {};
+    time_t last_modified_at = {};
+
+    [[nodiscard]] constexpr auto isFile() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_FILE;
+    }
+
+    [[nodiscard]] constexpr auto isFolder() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_DIRECTORY;
+    }
 };
 
 /**
@@ -153,13 +162,15 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  *
  * @param[in]  path  Path to file or directory.
  * @param[in]  flags Combination of @ref tr_sys_path_get_info_flags_t values.
- * @param[out] info  Result buffer.
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ * @return info on success, or nullopt with `error` set accordingly.
  */
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr);
+[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_path_get_info(
+    std::string_view path,
+    int flags = 0,
+    tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -223,12 +234,10 @@ bool tr_sys_path_is_same(T const& path1, U const& path2, struct tr_error** error
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return Pointer to newly allocated buffer containing full path (with symbolic
- *         links, `.` and `..` resolved) on success (use @ref tr_free to free it
- *         when no longer needed), `nullptr` otherwise (with `error` set
- *         accordingly).
+ * @return Full path with symbolic links, `.` and `..` resolved on success,
+ *         or an empty string otherwise (with `error` set accordingly).
  */
-char* tr_sys_path_resolve(char const* path, struct tr_error** error = nullptr);
+std::string tr_sys_path_resolve(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `basename()`.
@@ -237,10 +246,8 @@ char* tr_sys_path_resolve(char const* path, struct tr_error** error = nullptr);
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return Pointer to newly allocated buffer containing base name (last path
- *         component; parent path removed) on success (use @ref tr_free to free
- *         it when no longer needed), `nullptr` otherwise (with `error` set
- *         accordingly).
+ * @return base name (last path component; parent path removed) on success,
+ *         or empty string otherwise (with `error` set accordingly).
  */
 std::string tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
 
@@ -249,10 +256,8 @@ std::string tr_sys_path_basename(std::string_view path, struct tr_error** error 
  *
  * @param[in]  path  Path to file or directory.
  *
- * @return Pointer to newly allocated buffer containing directory (parent path;
- *         last path component removed) on success (use @ref tr_free to free it
- *         when no longer needed), `nullptr` otherwise (with `error` set
- *         accordingly).
+ * @return parent path substring of `path` (last path component removed) on
+ *         success, or empty string otherwise with `error` set accordingly).
  */
 std::string_view tr_sys_path_dirname(std::string_view path);
 
@@ -369,13 +374,12 @@ bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error = nullptr);
  * @brief Portability wrapper for `fstat()`.
  *
  * @param[in]  handle Valid file descriptor.
- * @param[out] info   Result buffer.
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ * @return info on success, or nullopt with `error` set accordingly.
  */
-bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct tr_error** error = nullptr);
+[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `lseek()`.
@@ -629,11 +633,10 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, struc
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you are
  *                   not interested in error details.
  *
- * @return Pointer to newly allocated buffer containing path to current
- *         directory (use @ref tr_free to free it when no longer needed) on
- *         success, `nullptr` otherwise (with `error` set accordingly).
+ * @return current directory on success, or an empty string otherwise
+ *         (with `error` set accordingly).
  */
-char* tr_sys_dir_get_current(struct tr_error** error = nullptr);
+std::string tr_sys_dir_get_current(struct tr_error** error = nullptr);
 
 /**
  * @brief Like `mkdir()`, but makes parent directories if needed.
@@ -689,11 +692,11 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, struct tr_error** error = nullptr
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *
- * @return Pointer to next directory entry name (stored internally, DO NOT pass
- *         it to @ref tr_free) on success, `nullptr` otherwise (with `error` set
- *         accordingly). Note that `nullptr` will also be returned in case of end
- *         of directory; if you need to distinguish the two, check if `error`
- *         is `nullptr` afterwards.
+ * @return Pointer to next directory entry name (stored internally, DO NOT free
+ *         it) on success, `nullptr` otherwise (with `error` set accordingly).
+ *         Note that `nullptr` will also be returned in case of end of directory.
+ *         If you need to distinguish the two, check if `error` is `nullptr`
+ *         afterwards.
  */
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error = nullptr);
 

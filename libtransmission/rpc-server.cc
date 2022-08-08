@@ -111,7 +111,7 @@ static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 
 static char const* get_current_session_id(tr_rpc_server* server)
 {
-    return tr_session_id_get_current(server->session->session_id);
+    return server->session->session_id.c_str();
 }
 
 /**
@@ -169,9 +169,8 @@ static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server
 
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
-    bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv);
 
-    if (!do_compress)
+    if (bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv); !do_compress)
     {
         evbuffer_add(out, std::data(content), std::size(content));
     }
@@ -221,8 +220,8 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
     }
 
     auto content = std::vector<char>{};
-    tr_error* error = nullptr;
-    if (!tr_loadFile(filename, content, &error))
+
+    if (tr_error* error = nullptr; !tr_loadFile(filename, content, &error))
     {
         send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
         tr_error_free(error);
@@ -852,10 +851,10 @@ static auto parseWhitelist(std::string_view whitelist)
     return list;
 }
 
-void tr_rpc_server::setWhitelist(std::string_view sv)
+void tr_rpc_server::setWhitelist(std::string_view whitelist)
 {
-    this->whitelist_str_ = sv;
-    this->whitelist_ = parseWhitelist(sv);
+    this->whitelist_str_ = whitelist;
+    this->whitelist_ = parseWhitelist(whitelist);
 }
 
 /****
