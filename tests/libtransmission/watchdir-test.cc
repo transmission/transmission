@@ -28,6 +28,7 @@ namespace
 {
 
 auto constexpr GenericRescanIntervalMsec = size_t{ 100U };
+auto constexpr RetryMultiplierMsec = size_t{ 100U };
 
 // should be at least 2x the watchdir-generic size to ensure that
 // we have time to pump all events at least once in processEvents()
@@ -82,7 +83,6 @@ protected:
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
         tr_watchdir::setGenericRescanIntervalMsec(GenericRescanIntervalMsec);
-        retry_multiplier_msec_ = 100U;
     }
 
     void TearDown() override
@@ -98,7 +98,7 @@ protected:
         auto watchdir = force_generic ?
             tr_watchdir::createGeneric(path, std::move(callback), ev_base_.get(), current_time_mock::get) :
             tr_watchdir::create(path, std::move(callback), ev_base_.get(), current_time_mock::get);
-        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierMsec(retry_multiplier_msec_);
+        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierMsec(RetryMultiplierMsec);
         return watchdir;
     }
 
@@ -118,14 +118,12 @@ protected:
         return path;
     }
 
-    void processEvents()
+    void processEvents(size_t msec = ProcessEventsTimeoutMsec)
     {
-        auto const interval = timeval{ ProcessEventsTimeoutMsec / 1000U, (ProcessEventsTimeoutMsec % 1000) * 1000 };
+        auto const interval = timeval{ static_cast<time_t>(msec / 1000U), static_cast<long>((msec % 1000) * 1000) };
         event_base_loopexit(ev_base_.get(), &interval);
         event_base_dispatch(ev_base_.get());
     }
-
-    size_t retry_multiplier_msec_ = 100U;
 };
 
 TEST_P(WatchDirTest, construct)
@@ -214,6 +212,7 @@ TEST_P(WatchDirTest, watch)
     auto const file2 = "test2"sv;
     createFile(dirname, file2);
     processEvents();
+    processEvents();
     EXPECT_EQ(1U, std::size(names));
     if (!std::empty(names))
     {
@@ -241,7 +240,6 @@ TEST_P(WatchDirTest, retry)
         names.emplace_back(std::string{ basename });
         return tr_watchdir::Action::Retry;
     };
-    retry_multiplier_msec_ = 50U;
     auto watchdir = createWatchDir(path, callback);
 
     processEvents();
@@ -249,7 +247,7 @@ TEST_P(WatchDirTest, retry)
 
     auto const test_file = "test.txt"sv;
     createFile(path, test_file);
-    processEvents();
+    processEvents(ProcessEventsTimeoutMsec * 3);
     EXPECT_LE(2, std::size(names));
     for (auto const& name : names)
     {
