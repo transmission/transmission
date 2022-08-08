@@ -129,16 +129,19 @@ struct tr_session
 {
 public:
     tr_session(std::string_view config_dir);
-    ~tr_session();
 
     [[nodiscard]] constexpr auto* eventBase() noexcept
     {
         return event_base_;
     }
 
+    void setEventBase(event_base* base);
+    void clearEventBase();
+
     [[nodiscard]] constexpr libtransmission::TimerMaker& timerMaker() noexcept
     {
-        return timer_maker_;
+        TR_ASSERT(timer_maker_);
+        return *timer_maker_;
     }
 
     [[nodiscard]] constexpr auto& torrents()
@@ -610,8 +613,8 @@ public:
 private:
     static std::recursive_mutex session_mutex_;
 
-    struct event_base* const event_base_;
-    libtransmission::EvTimerMaker timer_maker_;
+    struct event_base* event_base_ = nullptr;
+    std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
 
     tr_torrents torrents_;
 

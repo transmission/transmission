@@ -20,8 +20,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include <iostream> // NOMERGE(ckerr)
-
 #ifndef _WIN32
 #include <sys/types.h> /* umask() */
 #include <sys/stat.h> /* umask() */
@@ -51,6 +49,7 @@
 #include "rpc-server.h"
 #include "session-id.h"
 #include "session.h"
+#include "timer-ev.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
@@ -77,7 +76,7 @@ static auto constexpr DefaultCacheSizeMB = int{ 4 };
 static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr DefaultUmask = int{ 022 };
-static auto constexpr SaveIntervalSecs = int{ 360 };
+static auto constexpr SaveIntervalSecs = 360s;
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir);
@@ -630,21 +629,15 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     data.clientSettings = clientSettings;
 
     // run it in the libtransmission thread
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (tr_amInEventThread(session))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_sessionInitImpl(&data);
     }
     else
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         auto lock = session->unique_lock();
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_runInEventThread(session, tr_sessionInitImpl, &data);
-        std::cerr << __FILE__ << ':' << __LINE__ << " waiting for data.done_cv" << std::endl;
         data.done_cv.wait(lock); // wait for the session to be ready
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
     return session;
@@ -655,7 +648,6 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 static void onNowTimer(void* vsession)
 {
     auto const tmp = tr_gettimeofday();
-    std::cerr << __FILE__ << ':' << __LINE__ << " onNowTimer sec " << tmp.tv_sec << " usec " << tmp.tv_usec << std::endl;
 
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -693,15 +685,19 @@ static void onNowTimer(void* vsession)
     auto const tv = tr_gettimeofday();
     int constexpr Min = 100;
     int constexpr Max = 999999;
-    auto next_second_occurs_in_usec = std::chrono::microseconds{ std::clamp(int(1000000 - tv.tv_usec), Min, Max) };
-    session->now_timer_->start(std::chrono::duration_cast<std::chrono::milliseconds>(next_second_occurs_in_usec));
+    auto const next_second_occurs_in_usec = std::chrono::microseconds{ std::clamp(int(1000000 - tv.tv_usec), Min, Max) };
+    auto next_second_occurs_in_msec = std::chrono::duration_cast<std::chrono::milliseconds>(next_second_occurs_in_usec);
+    if (next_second_occurs_in_msec < 100ms)
+    {
+        next_second_occurs_in_msec += 1s;
+    }
+    session->now_timer_->setInterval(next_second_occurs_in_msec);
 }
 
 static void loadBlocklists(tr_session* session);
 
 static void tr_sessionInitImpl(init_data* data)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
     auto lock = session->unique_lock();
@@ -720,7 +716,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     session->now_timer_ = session->timerMaker().create();
     session->now_timer_->setCallback(onNowTimer, session);
-    session->now_timer_->start(0ms);
+    session->now_timer_->startRepeating(1s);
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
@@ -744,8 +740,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     session->save_timer_ = session->timerMaker().create();
     session->save_timer_->setCallback(onSaveTimer, session);
-    session->save_timer_->setRepeating(true);
-    session->save_timer_->start(std::chrono::seconds{SaveIntervalSecs});
+    session->save_timer_->startRepeating(SaveIntervalSecs);
 
     tr_announcerInit(session);
 
@@ -766,7 +761,6 @@ static void tr_sessionInitImpl(init_data* data)
 
     /* cleanup */
     tr_variantFree(&settings);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     data->done_cv.notify_one();
 }
 
@@ -3015,8 +3009,6 @@ auto makeTorrentDir(std::string_view config_dir)
 
 tr_session::tr_session(std::string_view config_dir)
     : session_id{ tr_time }
-    , event_base_{ event_base_new() }
-    , timer_maker_{ event_base_ }
     , config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
@@ -3024,7 +3016,15 @@ tr_session::tr_session(std::string_view config_dir)
 {
 }
 
-tr_session::~tr_session()
+void tr_session::setEventBase(event_base* base)
 {
-    event_base_free(event_base_);
+    TR_ASSERT(event_base_ == nullptr);
+    event_base_ = base;
+    timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(base);
+}
+
+void tr_session::clearEventBase()
+{
+    timer_maker_.reset();
+    event_base_ = nullptr;
 }
