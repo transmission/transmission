@@ -647,16 +647,13 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
 static void onNowTimer(void* vsession)
 {
-    auto const tmp = tr_gettimeofday();
-
     auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(session->now_timer_);
 
     // tr_session upkeep tasks to perform once per second
-    auto const now = time(nullptr);
-    tr_timeUpdate(now);
+    tr_timeUpdate(time(nullptr));
     tr_dhtUpkeep(session);
     if (session->turtle.isClockEnabled)
     {

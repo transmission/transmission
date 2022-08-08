@@ -69,9 +69,9 @@ public:
         return {};
     }
 
-    [[nodiscard]] event_base* eventBase() const override
+    [[nodiscard]] std::unique_ptr<libtransmission::Timer> createTimer() override
     {
-        return session_->eventBase();
+        return session_->timerMaker().create();
     }
 
     [[nodiscard]] bool isDHTEnabled() const override
