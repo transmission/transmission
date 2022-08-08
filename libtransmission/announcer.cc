@@ -18,8 +18,6 @@
 #include <string_view>
 #include <vector>
 
-#include <event2/buffer.h>
-
 #include <fmt/core.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE

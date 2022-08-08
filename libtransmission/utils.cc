@@ -36,7 +36,6 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
-#include <event2/buffer.h>
 #include <event2/event.h>
 
 #include <fmt/format.h>

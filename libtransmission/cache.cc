@@ -10,8 +10,6 @@
 #include <utility> // std::make_pair()
 #include <vector>
 
-#include <event2/buffer.h>
-
 #include <fmt/core.h>
 
 #include "transmission.h"
