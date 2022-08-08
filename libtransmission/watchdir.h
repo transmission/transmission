@@ -34,6 +34,16 @@ public:
 
     using TimeFunc = time_t (*)();
 
+    [[nodiscard]] static size_t genericRescanIntervalMsec() noexcept
+    {
+        return generic_rescan_interval_msec_;
+    }
+
+    static void setGenericRescanIntervalMsec(size_t msec) noexcept
+    {
+        generic_rescan_interval_msec_ = msec;
+    }
+
     static std::unique_ptr<tr_watchdir> create(
         std::string_view dirname,
         Callback callback,
@@ -45,17 +55,7 @@ public:
         Callback callback,
         event_base* event_base,
         TimeFunc current_time_func,
-        size_t rescan_interval_msec = generic_rescan_interval_msec_);
-
-    [[nodiscard]] static auto genericRescanIntervalMsec() noexcept
-    {
-        return generic_rescan_interval_msec_;
-    }
-
-    static void setGenericRescanIntervalMsec(size_t msec) noexcept
-    {
-        generic_rescan_interval_msec_ = msec;
-    }
+        size_t rescan_interval_msec = genericRescanIntervalMsec());
 
 private:
     static constexpr size_t DefaultGenericRescanIntevalMsec = 10000;

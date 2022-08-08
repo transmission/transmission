@@ -24,11 +24,6 @@
 ****
 ***/
 
-// extern struct timeval tr_watchdir_generic_interval;
-// extern size_t tr_watchdir_retry_limit;
-// extern struct timeval tr_watchdir_retry_start_interval;
-// extern struct timeval tr_watchdir_retry_max_interval;
-
 namespace
 {
 
@@ -37,8 +32,6 @@ auto constexpr ProcessEventsTimeoutMsec = size_t{ 200U };
 // ensure that ProcessEvents hits at least one timeout in watchdir-generic
 static_assert(ProcessEventsTimeoutMsec > GenericRescanIntervalMsec);
 // auto constexpr FiftyMsec = timeval{ 0, 50000 };
-// auto constexpr OneHundredMsec = timeval{ 0, 100000 };
-// auto constexpr TwoHundredMsec = timeval{ 0, 200000 };
 
 namespace current_time_mock
 {
@@ -131,35 +124,6 @@ protected:
         event_base_loopexit(ev_base_.get(), &Interval);
         event_base_dispatch(ev_base_.get());
     }
-
-#if 0
-    struct CallbackData
-    {
-        using Action = tr_watchdir::Action;
-
-        explicit CallbackData(Action action = Action::Done)
-            : action_{ action }
-        {
-        }
-
-        Action action_;
-        std::string name_;
-    };
-jjjjjjjjjjjjjjjjjj
-    static tr_watchdir_status callback(tr_watchdir_t wd, char const* name, void* vdata) noexcept
-    {
-        auto* data = static_cast<CallbackData*>(vdata);
-        auto const result = data->result;
-
-        if (result != TR_WATCHDIR_RETRY)
-        {
-            data->wd = wd;
-            data->name = name;
-        }
-
-        return result;
-    }
-#endif
 };
 
 TEST_P(WatchDirTest, construct)
