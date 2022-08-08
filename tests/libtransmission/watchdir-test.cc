@@ -28,10 +28,12 @@ namespace
 {
 
 auto constexpr GenericRescanIntervalMsec = size_t{ 100U };
-auto constexpr ProcessEventsTimeoutMsec = size_t{ 200U };
-// ensure that ProcessEvents hits at least one timeout in watchdir-generic
-static_assert(ProcessEventsTimeoutMsec > GenericRescanIntervalMsec);
-// auto constexpr FiftyMsec = timeval{ 0, 50000 };
+
+// should be at least 2x the watchdir-generic size to ensure that
+// we have time to pump all events at least once in processEvents()
+auto constexpr DefaultProcessEventsTimeoutMsec = time_t{ 200U };
+static_assert(DefaultProcessEventsTimeoutMsec > GenericRescanIntervalMsec);
+auto process_events_timeout_msec = DefaultProcessEventsTimeoutMsec;
 
 namespace current_time_mock
 {
@@ -81,6 +83,8 @@ protected:
     {
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
+        tr_watchdir::setGenericRescanIntervalMsec(GenericRescanIntervalMsec);
+        process_events_timeout_msec = DefaultProcessEventsTimeoutMsec;
     }
 
     void TearDown() override
@@ -93,11 +97,10 @@ protected:
     auto createWatchDir(std::string_view path, tr_watchdir::Callback callback)
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
-        tr_watchdir::setGenericRescanIntervalMsec(GenericRescanIntervalMsec);
         auto watchdir = force_generic ?
             tr_watchdir::createGeneric(path, std::move(callback), ev_base_.get(), current_time_mock::get) :
             tr_watchdir::create(path, std::move(callback), ev_base_.get(), current_time_mock::get);
-        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierSecs(retry_multiplier_msec_);
+        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierMsec(retry_multiplier_msec_);
         return watchdir;
     }
 
@@ -119,9 +122,8 @@ protected:
 
     void processEvents()
     {
-        // should be larger than mmm
-        static auto constexpr Interval = timeval{ ProcessEventsTimeoutMsec / 1000, (ProcessEventsTimeoutMsec % 1000) * 1000 };
-        event_base_loopexit(ev_base_.get(), &Interval);
+        auto const interval = timeval{ process_events_timeout_msec / 1000U, (process_events_timeout_msec % 1000U) * 1000U };
+        event_base_loopexit(ev_base_.get(), &interval);
         event_base_dispatch(ev_base_.get());
     }
 };
@@ -225,149 +227,34 @@ TEST_P(WatchDirTest, watch)
     EXPECT_TRUE(std::empty(names));
 }
 
-#if 0
-TEST_P(WatchDirTest, watchTwoDirs)
-{
-    auto top = sandboxDir();
-
-    // create two empty directories and watch them
-    auto wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const dir1 = createDir(top, "a");
-    auto wd1 = createWatchDir(dir1, &callback, &wd1_data);
-    EXPECT_NE(wd1, nullptr);
-    auto wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const dir2 = createDir(top, "b");
-    auto wd2 = createWatchDir(dir2, &callback, &wd2_data);
-    EXPECT_NE(wd2, nullptr);
-
-    processEvents();
-    EXPECT_EQ(nullptr, wd1_data.wd);
-    EXPECT_EQ("", wd1_data.name);
-    EXPECT_EQ(nullptr, wd2_data.wd);
-    EXPECT_EQ("", wd2_data.name);
-
-    // add a file into directory 1 and confirm it triggers
-    // a callback with the right wd
-    auto const file1 = std::string{ "test.txt" };
-    createFile(dir1, file1);
-    processEvents();
-    EXPECT_EQ(wd1, wd1_data.wd);
-    EXPECT_EQ(file1, wd1_data.name);
-    EXPECT_EQ(nullptr, wd2_data.wd);
-    EXPECT_EQ("", wd2_data.name);
-
-    // add a file into directory 2 and confirm it triggers
-    // a callback with the right wd
-    wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file2 = std::string{ "test2.txt" };
-    createFile(dir2, file2);
-    processEvents();
-    EXPECT_EQ(nullptr, wd1_data.wd);
-    EXPECT_EQ("", wd1_data.name);
-    EXPECT_EQ(wd2, wd2_data.wd);
-    EXPECT_EQ(file2, wd2_data.name);
-
-    // TODO(ckerr): watchdir.c seems to treat IGNORE and ACCEPT identically
-    // so I'm not sure what's intended or what this is supposed to
-    // be testing.
-    wd1_data = CallbackData(TR_WATCHDIR_IGNORE);
-    wd2_data = CallbackData(TR_WATCHDIR_IGNORE);
-    auto const file3 = std::string{ "test3.txt" };
-    auto const file4 = std::string{ "test4.txt" };
-    createFile(dir1, file3);
-    createFile(dir2, file4);
-    processEvents();
-    EXPECT_EQ(wd1, wd1_data.wd);
-    EXPECT_EQ(file3, wd1_data.name);
-    EXPECT_EQ(wd2, wd2_data.wd);
-    EXPECT_EQ(file4, wd2_data.name);
-
-    // confirm that callbacks don't get confused
-    // when there's a new file in directory 'a'
-    // and a new directory in directory 'b'
-    wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file5 = std::string{ "test5.txt" };
-    createFile(dir1, file5);
-    createDir(dir2, file5);
-    processEvents();
-    EXPECT_EQ(wd1, wd1_data.wd);
-    EXPECT_EQ(file5, wd1_data.name);
-    EXPECT_EQ(nullptr, wd2_data.wd);
-    EXPECT_EQ("", wd2_data.name);
-
-    // reverse the order of the previous test:
-    // confirm that callbacks don't get confused
-    // when there's a new file in directory 'b'
-    // and a new directory in directory 'a'
-    wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file6 = std::string{ "test6.txt" };
-    createDir(dir1, file6);
-    createFile(dir2, file6);
-    processEvents();
-    EXPECT_EQ(nullptr, wd1_data.wd);
-    EXPECT_EQ("", wd1_data.name);
-    EXPECT_EQ(wd2, wd2_data.wd);
-    EXPECT_EQ(file6, wd2_data.name);
-
-    // confirm that creating new directories in BOTH
-    // watchdirs still triggers no callbacks
-    wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file7 = std::string{ "test7.txt" };
-    auto const file8 = std::string{ "test8.txt" };
-    createDir(dir1, file7);
-    createDir(dir2, file8);
-    processEvents();
-    EXPECT_EQ(nullptr, wd1_data.wd);
-    EXPECT_EQ("", wd1_data.name);
-    EXPECT_EQ(nullptr, wd2_data.wd);
-    EXPECT_EQ("", wd2_data.name);
-
-    // cleanup
-    tr_watchdir_free(wd2);
-    tr_watchdir_free(wd1);
-}
-
 TEST_P(WatchDirTest, retry)
 {
     auto const path = sandboxDir();
 
-    // tune retry logic
-    tr_watchdir_retry_limit = 10;
-    tr_watchdir_retry_start_interval = FiftyMsec;
-    tr_watchdir_retry_max_interval = tr_watchdir_retry_start_interval;
-
     // test setup:
     // Start watching the test directory.
-    // Create a file and return 'retry' back to the watchdir code
-    // from our callback. This should cause the wd to wait a bit
-    // and try again.
-    auto wd_data = CallbackData(TR_WATCHDIR_RETRY);
-    auto wd = createWatchDir(path, &callback, &wd_data);
-    EXPECT_NE(nullptr, wd);
-    processEvents();
-    EXPECT_EQ(nullptr, wd_data.wd);
-    EXPECT_EQ("", wd_data.name);
+    // Create a file and return 'retry' back to the watchdir code from our callback.
+    // This should cause the wd to wait a bit and try again.
+    auto names = std::vector<std::string>{};
+    auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
+    {
+        names.emplace_back(std::string{ basename });
+        return tr_watchdir::Action::Retry;
+    };
+    auto watchdir = createWatchDir(path, callback);
 
-    auto const test_file = std::string{ "test" };
+    processEvents();
+    EXPECT_EQ(0U, std::size(names));
+
+    auto const test_file = "test.txt"sv;
     createFile(path, test_file);
     processEvents();
-    EXPECT_EQ(nullptr, wd_data.wd);
-    EXPECT_EQ("", wd_data.name);
-
-    // confirm that wd retries.
-    // return 'accept' in the callback so it won't keep retrying.
-    wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    processEvents();
-    EXPECT_EQ(wd, wd_data.wd);
-    EXPECT_EQ(test_file, wd_data.name);
-
-    tr_watchdir_free(wd);
+    EXPECT_LE(2, std::size(names));
+    for (auto const& name : names)
+    {
+        EXPECT_EQ(test_file, name);
+    }
 }
-#endif
 
 INSTANTIATE_TEST_SUITE_P( //
     WatchDir,

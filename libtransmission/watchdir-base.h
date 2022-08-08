@@ -58,7 +58,7 @@ public:
         return retry_multiplier_msec_;
     }
 
-    void setRetryMultiplierSecs(size_t retry_multiplier_msec) noexcept
+    void setRetryMultiplierMsec(size_t retry_multiplier_msec) noexcept
     {
         retry_multiplier_msec_ = retry_multiplier_msec;
 
