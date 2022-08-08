@@ -23,14 +23,12 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "completion.h"
-#include "file.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
 #include "log.h"
 #include "session.h"
 #include "torrent-metainfo.h"
 #include "tr-macros.h"
-#include "tr-strbuf.h"
 
 class tr_swarm;
 struct tr_error;

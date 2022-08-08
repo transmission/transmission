@@ -10,7 +10,6 @@
 
 #include "file.h"
 #include "net.h"
-#include "utils.h"
 #include "watchdir.h"
 
 #include "test-fixtures.h"

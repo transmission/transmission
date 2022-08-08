@@ -98,4 +98,28 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 6                 | Progress bar showing the current progress in downloading the torrent            |
 | 7                 | Pause selected torrent                                                          |
 
+### Torrent inspector ###
+![image](resources/WI-torrent-inspector.png)
+
+| Number On Picture | Description                                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1                 | Name of torrent                                                                                                                            | 
+| 2                 | In current case: Transmission have 3.65 GB of file data from the total volume of downloaded files, which is 100%                           |
+| 3                 | In current case: the file is available (written to disk) at 100%                                                                           |
+| 4                 | In current case: other peers have downloaded 111.2MB from you                                                                              |
+| 5                 | In current case: in total, Transmission downloaded 3.68 GB (in this case 2.35MB were corrupted, so Transmission had to re-download another 2.35MB)                                                                                                                                                          |
+| 6                 | The current state of the torrent                                                                                                           |
+| 7                 | In current case: 4 days have passed since the torrent download was started                                                                 |
+| 8                 | The remaining time until the torrent is fully downloaded                                                                                   |
+| 9                 | In current case: The last torrent activity (download or upload) was 1 hour 53 minutes ago                                                  |
+| 10                | If an error occurs, its details will be displayed in this field                                                                            |
+| 11                | In current case: The total size of the torrent is 3.65 GB, which is 13,943 pieces of 256KB                                                 |
+| 12                | The path to the folder where the torrent is being downloaded                                                                               |
+| 13                | Torrent hash                                                                                                                               |
+| 14                | Private or public torrent                                                                                                                  |
+| 15                | A field indicating which program created the torrent and at what time                                                                      |
+| 16                | Comment on the torrent, usually a link to the site from where it was downloaded                                                            |
+
+
+
 

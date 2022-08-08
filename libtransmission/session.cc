@@ -11,10 +11,10 @@
 #include <cstdint>
 #include <cstdlib> // atoi()
 #include <ctime>
-#include <iterator> // std::back_inserter
+#include <iterator> // for std::back_inserter
 #include <list>
 #include <memory>
-#include <numeric> // std::accumulate()
+#include <numeric> // for std::accumulate()
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -45,7 +45,6 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform-quota.h" /* tr_device_info_free() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
 #include "session-id.h"
@@ -611,7 +610,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     session->udp6_socket = TR_BAD_SOCKET;
     session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
-    session->session_id = tr_session_id_new();
     bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
@@ -2031,7 +2029,6 @@ void tr_sessionClose(tr_session* session)
 
     /* free the session memory */
     delete session->turtle.minutes;
-    tr_session_id_free(session->session_id);
 
     delete session;
 }
@@ -3018,7 +3015,8 @@ auto makeTorrentDir(std::string_view config_dir)
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : config_dir_{ config_dir }
+    : session_id{ tr_time }
+    , config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , session_stats_{ config_dir, time(nullptr) }

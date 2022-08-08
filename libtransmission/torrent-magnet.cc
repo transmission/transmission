@@ -262,12 +262,7 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
 
     // checksum passed; now try to parse it as benc
     auto info_dict_v = tr_variant{};
-    if (!tr_variantFromBuf(
-            &info_dict_v,
-            TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
-            { std::data(m->metadata), std::size(m->metadata) },
-            nullptr,
-            error))
+    if (!tr_variantFromBuf(&info_dict_v, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, m->metadata, nullptr, error))
     {
         return false;
     }

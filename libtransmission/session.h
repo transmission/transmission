@@ -32,6 +32,7 @@
 #include "net.h" // tr_socket_t
 #include "open-files.h"
 #include "quark.h"
+#include "session-id.h"
 #include "stats.h"
 #include "torrents.h"
 #include "web.h"
@@ -62,7 +63,7 @@ struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    tr_bindinfo(tr_address addr)
+    explicit tr_bindinfo(tr_address addr)
         : addr_{ std::move(addr) }
     {
     }
@@ -563,7 +564,7 @@ public:
     WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
-    struct tr_session_id* session_id = nullptr;
+    tr_session_id session_id;
 
     tr_rpc_func rpc_func = nullptr;
     void* rpc_func_user_data = nullptr;

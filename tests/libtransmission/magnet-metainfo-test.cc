@@ -10,9 +10,8 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h"
 #include "magnet-metainfo.h"
-#include "utils.h"
+#include "crypto-utils.h" // tr_rand_buffer()
 
 using namespace std::literals;
 

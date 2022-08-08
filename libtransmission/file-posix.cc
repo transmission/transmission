@@ -354,42 +354,25 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_resolve(char const* path, tr_error** error)
+std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
+    auto const szpath = tr_pathbuf{ path };
+    auto buf = std::array<char, PATH_MAX>{};
 
-    char* ret = nullptr;
-
-#if defined(HAVE_CANONICALIZE_FILE_NAME)
-
-    ret = canonicalize_file_name(path);
-
-#endif
-
-    if (ret == nullptr)
+    if (auto* const ret = realpath(szpath, std::data(buf)); ret != nullptr)
     {
-        char tmp[PATH_MAX];
-        ret = realpath(path, tmp);
-
-        if (ret != nullptr)
-        {
-            ret = tr_strdup(ret);
-        }
+        return ret;
     }
 
-    if (ret == nullptr)
-    {
-        set_system_error(error, errno);
-    }
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
     auto tmp = tr_pathbuf{ path };
 
-    if (char const* ret = basename(std::data(tmp)); ret != nullptr)
+    if (char const* const ret = basename(std::data(tmp)); ret != nullptr)
     {
         return ret;
     }
@@ -539,7 +522,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
 
     static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
-    auto* buf = static_cast<char*>(tr_malloc(Buflen));
+    auto buf = std::vector<char>{};
+    buf.resize(Buflen);
 
     while (file_size > 0U)
     {
@@ -547,12 +531,12 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         uint64_t bytes_read;
         uint64_t bytes_written;
 
-        if (!tr_sys_file_read(in, buf, chunk_size, &bytes_read, error))
+        if (!tr_sys_file_read(in, std::data(buf), chunk_size, &bytes_read, error))
         {
             break;
         }
 
-        if (!tr_sys_file_write(out, buf, bytes_read, &bytes_written, error))
+        if (!tr_sys_file_write(out, std::data(buf), bytes_read, &bytes_written, error))
         {
             break;
         }
@@ -561,9 +545,6 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         TR_ASSERT(bytes_written <= file_size);
         file_size -= bytes_written;
     }
-
-    /* cleanup */
-    tr_free(buf);
 
 #endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 
@@ -711,9 +692,7 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_er
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    struct stat sb;
-
-    if (fstat(handle, &sb) != -1)
+    if (struct stat sb; fstat(handle, &sb) != -1)
     {
         return stat_to_sys_path_info(sb);
     }
@@ -1113,7 +1092,7 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
     TR_ASSERT(address != nullptr);
     TR_ASSERT(size > 0);
 
-    bool const ret = munmap((void*)address, size) != -1;
+    bool const ret = munmap(const_cast<void*>(address), size) != -1;
 
     if (!ret)
     {
@@ -1214,7 +1193,7 @@ std::string tr_sys_dir_get_current(tr_error** error)
 
     for (;;)
     {
-        if (char* ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
+        if (char* const ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
         {
             return ret;
         }

@@ -5,8 +5,8 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring>
-#include <ctype.h> /* isalpha() */
+#include <cctype> // for isalpha()
+#include <string>
 #include <string_view>
 
 #include <shlobj.h> /* SHCreateDirectoryEx() */
@@ -38,6 +38,9 @@ struct tr_sys_dir_win32
     WIN32_FIND_DATAW find_data = {};
     std::string utf8_name;
 };
+
+static auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
+static auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
 
 static wchar_t const native_local_path_prefix[] = { '\\', '\\', '?', '\\' };
 static wchar_t const native_unc_path_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
@@ -142,119 +145,92 @@ static bool is_valid_path(std::string_view path)
     return path.find_first_of("<>:\"|?*"sv) == path.npos;
 }
 
-static wchar_t* path_to_native_path(char const* path)
+namespace
 {
-    if (path == nullptr)
+namespace path_to_native_path_helpers
+{
+
+auto path_to_fixed_native_path(std::string_view path)
+{
+    auto wide_path = tr_win32_utf8_to_native(path);
+
+    // convert '/' to '\'
+    static auto constexpr Convert = [](wchar_t wch)
     {
-        return nullptr;
-    }
+        return wch == L'/' ? L'\\' : wch;
+    };
+    std::transform(std::begin(wide_path), std::end(wide_path), std::begin(wide_path), Convert);
 
-    /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
-       (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx) for more info */
-
-    bool const is_relative = tr_sys_path_is_relative(path);
-    bool const is_unc = is_unc_path(path);
-
-    /* `-2` for UNC since we overwrite existing prefix slashes */
-    int const extra_chars_before = is_relative ?
-        0 :
-        (is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) - 2 : TR_N_ELEMENTS(native_local_path_prefix));
-
-    /* TODO (?): TR_ASSERT(!is_relative); */
-
-    int real_result_size = 0;
-    wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, 0, &real_result_size);
-
-    if (wide_path == nullptr)
+    // squash multiple consecutive separators into one to avoid ERROR_INVALID_NAME
+    static auto constexpr Equal = [](wchar_t a, wchar_t b)
     {
-        return nullptr;
-    }
-
-    real_result_size += extra_chars_before;
-
-    /* Relative paths cannot be used with "\\?\" prefixes. This also means that relative paths are
-       limited to ~260 chars... but we should rarely work with relative paths in the first place */
-    if (!is_relative)
-    {
-        if (is_unc)
-        {
-            /* UNC path: "\\server\share" -> "\\?\UNC\server\share" */
-            memcpy(wide_path, native_unc_path_prefix, sizeof(native_unc_path_prefix));
-        }
-        else
-        {
-            /* Local path: "C:" -> "\\?\C:" */
-            memcpy(wide_path, native_local_path_prefix, sizeof(native_local_path_prefix));
-        }
-    }
-
-    /* Automatic '/' to '\' conversion is disabled for "\\?\"-prefixed paths */
-    wchar_t* p = wide_path + extra_chars_before;
-
-    while ((p = wcschr(p, L'/')) != nullptr)
-    {
-        *p++ = L'\\';
-    }
-
-    /* Squash multiple consecutive path separators into one to avoid ERROR_INVALID_NAME */
-    wchar_t* first_conseq_sep = wide_path + extra_chars_before;
-
-    while ((first_conseq_sep = std::wcsstr(first_conseq_sep, L"\\\\")) != nullptr)
-    {
-        wchar_t const* last_conseq_sep = first_conseq_sep + 1;
-        while (*(last_conseq_sep + 1) == L'\\')
-        {
-            ++last_conseq_sep;
-        }
-
-        std::copy_n(last_conseq_sep, real_result_size - (last_conseq_sep - wide_path) + 1, first_conseq_sep);
-        real_result_size -= last_conseq_sep - first_conseq_sep;
-    }
+        return a == b && a == L'\\';
+    };
+    auto const tmp = wide_path;
+    wide_path.clear();
+    std::unique_copy(std::begin(tmp), std::end(tmp), std::back_inserter(wide_path), Equal);
 
     return wide_path;
 }
 
-static std::wstring path_to_native_path_wstr(std::string_view path)
+} // namespace path_to_native_path_helpers
+} // namespace
+
+/* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
+   https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx for more info */
+static auto path_to_native_path(std::string_view path)
 {
-    if (auto* const rawptr = path_to_native_path(tr_pathbuf{ path }); rawptr != nullptr)
+    using namespace path_to_native_path_helpers;
+
+    if (is_unc_path(path))
     {
-        auto ret = std::wstring{ rawptr };
-        tr_free(rawptr);
-        return ret;
+        // UNC path: "\\server\share" -> "\\?\UNC\server\share"
+        path.remove_prefix(2); // remove path's UNC prefix slashes
+        auto wide_path = path_to_fixed_native_path(path);
+        wide_path.insert(0, NativeUncPathPrefix);
+        return wide_path;
     }
 
-    return {};
+    if (!tr_sys_path_is_relative(path))
+    {
+        // local path: "C:" -> "\\?\C:"
+        auto wide_path = path_to_fixed_native_path(path);
+        wide_path.insert(0, NativeLocalPathPrefix);
+        return wide_path;
+    }
+
+    return path_to_fixed_native_path(path);
 }
 
-static char* native_path_to_path(wchar_t const* wide_path)
+static std::string native_path_to_path(std::wstring_view wide_path)
 {
-    if (wide_path == nullptr)
+    if (std::empty(wide_path))
     {
-        return nullptr;
+        return {};
     }
 
-    bool const is_unc = wcsncmp(wide_path, native_unc_path_prefix, TR_N_ELEMENTS(native_unc_path_prefix)) == 0;
-    bool const is_local = !is_unc && wcsncmp(wide_path, native_local_path_prefix, TR_N_ELEMENTS(native_local_path_prefix)) == 0;
-
-    size_t const skip_chars = is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) :
-                                       (is_local ? TR_N_ELEMENTS(native_local_path_prefix) : 0);
-
-    char* const path = tr_win32_native_to_utf8_ex(wide_path + skip_chars, -1, is_unc ? 2 : 0, 0, nullptr);
-
-    if (is_unc && path != nullptr)
+    if (tr_strvStartsWith(wide_path, NativeUncPathPrefix))
     {
-        path[0] = '\\';
-        path[1] = '\\';
+        wide_path.remove_prefix(std::size(NativeUncPathPrefix));
+        auto path = tr_win32_native_to_utf8(wide_path);
+        path.insert(0, "\\\\"sv);
+        return path;
     }
 
-    return path;
+    if (tr_strvStartsWith(wide_path, NativeLocalPathPrefix))
+    {
+        wide_path.remove_prefix(std::size(NativeLocalPathPrefix));
+        return tr_win32_native_to_utf8(wide_path);
+    }
+
+    return tr_win32_native_to_utf8(wide_path);
 }
 
 static tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
 {
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
-    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
     {
         ret = CreateFileW(
             wide_path.c_str(),
@@ -278,7 +254,7 @@ static bool create_dir(std::string_view path, int flags, int /*permissions*/, bo
 {
     bool ret;
     DWORD error_code = ERROR_SUCCESS;
-    auto const wide_path = path_to_native_path_wstr(path);
+    auto const wide_path = path_to_native_path(path);
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
@@ -371,7 +347,7 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     bool ret = false;
     HANDLE handle = INVALID_HANDLE_VALUE;
 
-    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
     {
         DWORD attributes = GetFileAttributesW(wide_path.c_str());
 
@@ -404,7 +380,7 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 
 std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
 {
-    if (auto const wide_path = path_to_native_path_wstr(path); std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path(path); std::empty(wide_path))
     {
         // do nothing
     }
@@ -466,8 +442,8 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     HANDLE handle2 = INVALID_HANDLE_VALUE;
     BY_HANDLE_FILE_INFORMATION fi1, fi2;
 
-    auto const wide_path1 = path_to_native_path_wstr(path1);
-    auto const wide_path2 = path_to_native_path_wstr(path2);
+    auto const wide_path1 = path_to_native_path(path1);
+    auto const wide_path2 = path_to_native_path(path2);
 
     if (std::empty(wide_path1) || std::empty(wide_path2))
     {
@@ -510,73 +486,46 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_resolve(char const* path, tr_error** error)
+std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
+    auto ret = std::string{};
 
-    char* ret = nullptr;
-    wchar_t* wide_ret = nullptr;
-    HANDLE handle = INVALID_HANDLE_VALUE;
-    DWORD wide_ret_size;
-
-    auto const wide_path = path_to_native_path_wstr(path);
-    if (std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
     {
-        goto fail;
+        if (auto const handle = CreateFileW(
+                wide_path.c_str(),
+                FILE_READ_EA,
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                nullptr,
+                OPEN_EXISTING,
+                FILE_FLAG_BACKUP_SEMANTICS,
+                nullptr);
+            handle != INVALID_HANDLE_VALUE)
+        {
+            if (auto const wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0); wide_ret_size != 0)
+            {
+                auto wide_ret = std::wstring{};
+                wide_ret.resize(wide_ret_size);
+                if (GetFinalPathNameByHandleW(handle, std::data(wide_ret), wide_ret_size, 0) == wide_ret_size - 1)
+                {
+                    // `wide_ret_size` includes the terminating '\0'; remove it from `wide_ret`
+                    wide_ret.resize(std::size(wide_ret) - 1);
+                    TR_ASSERT(tr_strvStartsWith(wide_ret, NativeLocalPathPrefix));
+                    ret = native_path_to_path(wide_ret);
+                }
+            }
+
+            CloseHandle(handle);
+        }
     }
 
-    handle = CreateFileW(
-        wide_path.c_str(),
-        FILE_READ_EA,
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS,
-        nullptr);
-
-    if (handle == INVALID_HANDLE_VALUE)
+    if (!std::empty(ret))
     {
-        goto fail;
+        return ret;
     }
 
-    wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0);
-
-    if (wide_ret_size == 0)
-    {
-        goto fail;
-    }
-
-    wide_ret = tr_new(wchar_t, wide_ret_size);
-
-    if (GetFinalPathNameByHandleW(handle, wide_ret, wide_ret_size, 0) != wide_ret_size - 1)
-    {
-        goto fail;
-    }
-
-    TR_ASSERT(wcsncmp(wide_ret, L"\\\\?\\", 4) == 0);
-
-    ret = native_path_to_path(wide_ret);
-
-    if (ret != nullptr)
-    {
-        goto cleanup;
-    }
-
-fail:
     set_system_error(error, GetLastError());
-
-    tr_free(ret);
-    ret = nullptr;
-
-cleanup:
-    tr_free(wide_ret);
-
-    if (handle != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(handle);
-    }
-
-    return ret;
+    return {};
 }
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
@@ -750,8 +699,8 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     TR_ASSERT(dst_path != nullptr);
 
     bool ret = false;
-    auto const wide_src_path = path_to_native_path_wstr(src_path);
-    auto const wide_dst_path = path_to_native_path_wstr(dst_path);
+    auto const wide_src_path = path_to_native_path(src_path);
+    auto const wide_dst_path = path_to_native_path(dst_path);
 
     if (!std::empty(wide_src_path) && !std::empty(wide_dst_path))
     {
@@ -790,8 +739,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     TR_ASSERT(src_path != nullptr);
     TR_ASSERT(dst_path != nullptr);
 
-    auto const wide_src_path = path_to_native_path_wstr(src_path);
-    auto const wide_dst_path = path_to_native_path_wstr(dst_path);
+    auto const wide_src_path = path_to_native_path(src_path);
+    auto const wide_dst_path = path_to_native_path(dst_path);
     if (std::empty(wide_src_path) || std::empty(wide_dst_path))
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
@@ -815,7 +764,7 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
 
     bool ret = false;
 
-    if (auto const wide_path = path_to_native_path_wstr(path); !std::empty(wide_path))
+    if (auto const wide_path = path_to_native_path(path); !std::empty(wide_path))
     {
         DWORD const attributes = GetFileAttributesW(wide_path.c_str());
 
@@ -1347,6 +1296,8 @@ std::string tr_sys_dir_get_current(tr_error** error)
         wide_ret.resize(size);
         if (GetCurrentDirectoryW(std::size(wide_ret), std::data(wide_ret)) != 0)
         {
+            // `size` includes the terminating '\0'; remove it from `wide_ret`
+            wide_ret.resize(std::size(wide_ret) - 1);
             return tr_win32_native_to_utf8(wide_ret);
         }
     }
@@ -1389,7 +1340,7 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
     static_assert(TR_BAD_SYS_DIR == nullptr, "values should match");
 #endif
 
-    auto pattern = path_to_native_path_wstr(path);
+    auto pattern = path_to_native_path(path);
     if (std::empty(pattern))
     {
         set_system_error(error, GetLastError());

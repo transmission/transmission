@@ -19,11 +19,12 @@
 #include "block-info.h"
 #include "file.h"
 #include "torrent-files.h"
+#include "utils.h" // tr_saveFile()
 
 class tr_metainfo_builder
 {
 public:
-    tr_metainfo_builder(std::string_view single_file_or_parent_directory);
+    explicit tr_metainfo_builder(std::string_view single_file_or_parent_directory);
 
     tr_metainfo_builder(tr_metainfo_builder&&) = delete;
     tr_metainfo_builder(tr_metainfo_builder const&) = delete;

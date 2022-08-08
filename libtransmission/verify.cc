@@ -21,6 +21,7 @@
 #include "log.h"
 #include "torrent.h"
 #include "tr-assert.h"
+#include "utils.h" // tr_time(), tr_wait_msec()
 #include "verify.h"
 
 /***

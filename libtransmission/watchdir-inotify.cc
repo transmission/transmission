@@ -61,8 +61,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
     tr_watchdir_inotify const* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 #endif
     struct inotify_event ev;
-    size_t name_size = NAME_MAX + 1;
-    auto* name = tr_new(char, name_size);
+    auto name = std::string{};
 
     /* Read the size of the struct excluding name into buf. Guaranteed to have at
        least sizeof(ev) available */
@@ -92,14 +91,9 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
         TR_ASSERT((ev.mask & INOTIFY_WATCH_MASK) != 0);
         TR_ASSERT(ev.len > 0);
 
-        if (ev.len > name_size)
-        {
-            name_size = ev.len;
-            name = tr_renew(char, name, name_size);
-        }
-
         /* Consume entire name into buffer */
-        nread = bufferevent_read(event, name, ev.len);
+        name.resize(ev.len);
+        nread = bufferevent_read(event, std::data(name), ev.len);
         if (nread == static_cast<size_t>(-1))
         {
             auto const error_code = errno;
@@ -119,10 +113,8 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
             break;
         }
 
-        tr_watchdir_process(handle, name);
+        tr_watchdir_process(handle, name.c_str());
     }
-
-    tr_free(name);
 }
 
 static void tr_watchdir_inotify_free(tr_watchdir_backend* backend_base)

@@ -12,7 +12,6 @@
 #include "transmission.h"
 
 #include "announcer-common.h"
-#include "crypto-utils.h"
 #include "net.h"
 
 #include "test-fixtures.h"

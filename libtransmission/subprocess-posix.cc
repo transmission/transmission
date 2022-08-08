@@ -16,10 +16,12 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
+
 #include "error.h"
 #include "subprocess.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 using namespace std::literals;
@@ -50,7 +52,7 @@ static void set_system_error(tr_error** error, int code, std::string_view what)
 static bool tr_spawn_async_in_child(
     char const* const* cmd,
     std::map<std::string_view, std::string_view> const& env,
-    char const* work_dir,
+    std::string_view work_dir,
     int pipe_fd)
 {
     auto key_sz = std::string{};
@@ -67,7 +69,7 @@ static bool tr_spawn_async_in_child(
         }
     }
 
-    if (work_dir != nullptr && chdir(work_dir) == -1)
+    if (!std::empty(work_dir) && chdir(tr_pathbuf{ work_dir }) == -1)
     {
         goto FAIL;
     }
@@ -120,7 +122,7 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
 bool tr_spawn_async(
     char const* const* cmd,
     std::map<std::string_view, std::string_view> const& env,
-    char const* work_dir,
+    std::string_view work_dir,
     tr_error** error)
 {
     static bool sigchld_handler_set = false;
