@@ -3025,3 +3025,9 @@ void tr_session::clearEventBase()
     timer_maker_.reset();
     event_base_ = nullptr;
 }
+
+[[nodiscard]] libtransmission::TimerMaker& tr_session::timerMaker() noexcept
+{
+    TR_ASSERT(timer_maker_);
+    return *timer_maker_;
+}

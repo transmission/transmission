@@ -138,10 +138,7 @@ public:
     void setEventBase(event_base* base);
     void clearEventBase();
 
-    [[nodiscard]] constexpr auto& timerMaker() noexcept
-    {
-        return *timer_maker_;
-    }
+    [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept;
 
     [[nodiscard]] constexpr auto& torrents()
     {
