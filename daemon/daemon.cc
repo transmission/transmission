@@ -61,6 +61,7 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 #endif
 
 using namespace std::literals;
+using libtransmission::Watchdir;
 
 /***
 ****
@@ -235,7 +236,7 @@ static auto onFileAdded(tr_session* session, std::string_view dirname, std::stri
 
     if (!is_torrent && !is_magnet)
     {
-        return tr_watchdir::Action::Done;
+        return Watchdir::Action::Done;
     }
 
     auto const filename = tr_pathbuf{ dirname, '/', basename };
@@ -278,7 +279,7 @@ static auto onFileAdded(tr_session* session, std::string_view dirname, std::stri
     if (retry)
     {
         tr_ctorFree(ctor);
-        return tr_watchdir::Action::Retry;
+        return Watchdir::Action::Retry;
     }
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
@@ -313,7 +314,7 @@ static auto onFileAdded(tr_session* session, std::string_view dirname, std::stri
     }
 
     tr_ctorFree(ctor);
-    return tr_watchdir::Action::Done;
+    return Watchdir::Action::Done;
 }
 
 static char const* levelName(tr_log_level level)
@@ -715,7 +716,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
-    auto watchdir = std::unique_ptr<tr_watchdir>{};
+    auto watchdir = std::unique_ptr<Watchdir>{};
 
     auto* arg = static_cast<daemon_data*>(varg);
     tr_variant* const settings = &arg->settings;
@@ -811,8 +812,8 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             };
 
             auto timer_maker = libtransmission::EvTimerMaker{ ev_base };
-            watchdir = force_generic ? tr_watchdir::createGeneric(dir, handler, timer_maker) :
-                                       tr_watchdir::create(dir, handler, timer_maker, ev_base);
+            watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
+                                       Watchdir::create(dir, handler, timer_maker, ev_base);
         }
     }
 
