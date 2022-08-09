@@ -30,29 +30,32 @@
 #include "utils.h"
 #include "watchdir-base.h"
 
-class tr_watchdir_kqueue final : public tr_watchdir_base
+namespace libtransmission
+{
+namespace
+{
+class KQueueWatchdir final : public impl::BaseWatchdir
 {
 public:
-    tr_watchdir_kqueue(
-        std::string_view dirname,
-        Callback callback,
-        libtransmission::TimerMaker& timer_maker,
-        event_base* evbase)
-        : tr_watchdir_base{ dirname, std::move(callback), timer_maker }
+    KQueueWatchdir(std::string_view dirname, Callback callback, libtransmission::TimerMaker& timer_maker, event_base* evbase)
+        : BaseWatchdir{ dirname, std::move(callback), timer_maker }
     {
         init(evbase);
         scan();
     }
 
-    tr_watchdir_kqueue(tr_watchdir_kqueue&&) = delete;
-    tr_watchdir_kqueue(tr_watchdir_kqueue const&) = delete;
-    tr_watchdir_kqueue& operator=(tr_watchdir_kqueue&&) = delete;
-    tr_watchdir_kqueue& operator=(tr_watchdir_kqueue const&) = delete;
+    KQueueWatchdir(KQueueWatchdir&&) = delete;
+    KQueueWatchdir(KQueueWatchdir const&) = delete;
+    KQueueWatchdir& operator=(KQueueWatchdir&&) = delete;
+    KQueueWatchdir& operator=(KQueueWatchdir const&) = delete;
 
-    ~tr_watchdir_kqueue() override
+    ~KQueueWatchdir() override
     {
-        event_del(event_);
-        event_free(event_);
+        if (event_ != nullptr)
+        {
+            event_del(event_);
+            event_free(event_);
+        }
 
         if (kq_ != -1)
         {
@@ -133,7 +136,7 @@ private:
 
     static void onKqueueEvent(evutil_socket_t /*fd*/, short /*type*/, void* vself)
     {
-        static_cast<tr_watchdir_kqueue*>(vself)->handleKqueueEvent();
+        static_cast<KQueueWatchdir*>(vself)->handleKqueueEvent();
     }
 
     void handleKqueueEvent()
@@ -158,11 +161,15 @@ private:
     struct event* event_ = nullptr;
 };
 
-std::unique_ptr<tr_watchdir> tr_watchdir::create(
+} // namespace
+
+std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
-    libtransmission::TimerMaker& timer_maker,
+    TimerMaker& timer_maker,
     event_base* evbase)
 {
-    return std::make_unique<tr_watchdir_kqueue>(dirname, std::move(callback), timer_maker, evbase);
+    return std::make_unique<KQueueWatchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
+
+} // namespace libtransmission

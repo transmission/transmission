@@ -8,17 +8,20 @@
 #include "transmission.h"
 
 #include "watchdir-base.h"
-#include "utils.h" // for tr_timerAddMsec()
 
-class tr_watchdir_generic final : public tr_watchdir_base
+namespace libtransmission
+{
+namespace
+{
+class GenericWatchdir final : public impl::BaseWatchdir
 {
 public:
-    tr_watchdir_generic(
+    GenericWatchdir(
         std::string_view dirname,
         Callback callback,
         libtransmission::TimerMaker& timer_maker,
         std::chrono::milliseconds rescan_interval)
-        : tr_watchdir_base{ dirname, std::move(callback), timer_maker }
+        : BaseWatchdir{ dirname, std::move(callback), timer_maker }
         , rescan_timer_{ timer_maker.create() }
     {
         rescan_timer_->setCallback([this]() { scan(); });
@@ -27,25 +30,29 @@ public:
     }
 
 private:
-    std::unique_ptr<libtransmission::Timer> rescan_timer_;
+    std::unique_ptr<Timer> rescan_timer_;
 };
 
-std::unique_ptr<tr_watchdir> tr_watchdir::createGeneric(
+} // namespace
+
+std::unique_ptr<Watchdir> Watchdir::createGeneric(
     std::string_view dirname,
     Callback callback,
     libtransmission::TimerMaker& timer_maker,
     std::chrono::milliseconds rescan_interval)
 {
-    return std::make_unique<tr_watchdir_generic>(dirname, std::move(callback), timer_maker, rescan_interval);
+    return std::make_unique<GenericWatchdir>(dirname, std::move(callback), timer_maker, rescan_interval);
 }
 
 #if !defined(WITH_INOTIFY) && !defined(WITH_KQUEUE) && !defined(_WIN32)
 // no native impl, so use generic
-std::unique_ptr<tr_watchdir> tr_watchdir::create(
+std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
     libtransmission::TimerMaker& timer_maker)
 {
-    return std::make_unique<tr_watchdir_generic>(dirname, std::move(callback), timer_maker, genericRescanIntervalMsec());
+    return std::make_unique<WatchdirGeneric>(dirname, std::move(callback), timer_maker, genericRescanIntervalMsec());
 }
 #endif
+
+} // namespace libtransmission

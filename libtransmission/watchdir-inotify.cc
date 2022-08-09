@@ -27,29 +27,29 @@
 #include "utils.h"
 #include "watchdir-base.h"
 
-class tr_watchdir_inotify : public tr_watchdir_base
+namespace libtransmission
+{
+namespace
+{
+class INotifyWatchdir final : public impl::BaseWatchdir
 {
 private:
     static auto constexpr InotifyWatchMask = uint32_t{ IN_CLOSE_WRITE | IN_MOVED_TO | IN_CREATE };
 
 public:
-    tr_watchdir_inotify(
-        std::string_view dirname,
-        Callback callback,
-        libtransmission::TimerMaker& timer_maker,
-        event_base* evbase)
-        : tr_watchdir_base{ dirname, std::move(callback), timer_maker }
+    INotifyWatchdir(std::string_view dirname, Callback callback, TimerMaker& timer_maker, event_base* evbase)
+        : BaseWatchdir{ dirname, std::move(callback), timer_maker }
     {
         init(evbase);
         scan();
     }
 
-    tr_watchdir_inotify(tr_watchdir_inotify&&) = delete;
-    tr_watchdir_inotify(tr_watchdir_inotify const&) = delete;
-    tr_watchdir_inotify& operator=(tr_watchdir_inotify&&) = delete;
-    tr_watchdir_inotify& operator=(tr_watchdir_inotify const&) = delete;
+    INotifyWatchdir(INotifyWatchdir&&) = delete;
+    INotifyWatchdir(INotifyWatchdir const&) = delete;
+    INotifyWatchdir& operator=(INotifyWatchdir&&) = delete;
+    INotifyWatchdir& operator=(INotifyWatchdir const&) = delete;
 
-    ~tr_watchdir_inotify() override
+    ~INotifyWatchdir() override
     {
         if (event_ != nullptr)
         {
@@ -115,7 +115,7 @@ private:
 
     static void onInotifyEvent(struct bufferevent* event, void* vself)
     {
-        static_cast<tr_watchdir_inotify*>(vself)->handleInotifyEvent(event);
+        static_cast<INotifyWatchdir*>(vself)->handleInotifyEvent(event);
     }
 
     void handleInotifyEvent(struct bufferevent* event)
@@ -185,11 +185,15 @@ private:
     struct bufferevent* event_ = nullptr;
 };
 
-std::unique_ptr<tr_watchdir> tr_watchdir::create(
+} // namespace
+
+std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
     libtransmission::TimerMaker& timer_maker,
     event_base* evbase)
 {
-    return std::make_unique<tr_watchdir_inotify>(dirname, std::move(callback), timer_maker, evbase);
+    return std::make_unique<INotifyWatchdir>(dirname, std::move(callback), timer_maker, evbase);
 }
+
+} // namespace libtransmission

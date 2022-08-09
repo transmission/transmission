@@ -20,17 +20,19 @@
 
 using namespace std::literals;
 
+namespace libtransmission
+{
 namespace
 {
 
-[[nodiscard]] constexpr std::string_view actionToString(tr_watchdir::Action action)
+[[nodiscard]] constexpr std::string_view actionToString(Watchdir::Action action)
 {
     switch (action)
     {
-    case tr_watchdir::Action::Retry:
+    case Watchdir::Action::Retry:
         return "retry";
 
-    case tr_watchdir::Action::Done:
+    case Watchdir::Action::Done:
         return "done";
     }
 
@@ -63,9 +65,12 @@ namespace
 
 } // namespace
 
-std::chrono::milliseconds tr_watchdir::generic_rescan_interval_ = tr_watchdir::DefaultGenericRescanInterval;
+std::chrono::milliseconds Watchdir::generic_rescan_interval_ = Watchdir::DefaultGenericRescanInterval;
 
-void tr_watchdir_base::processFile(std::string_view basename)
+namespace impl
+{
+
+void BaseWatchdir::processFile(std::string_view basename)
 {
     if (!isRegularFile(dirname_, basename) || handled_.count(basename) != 0)
     {
@@ -99,7 +104,7 @@ void tr_watchdir_base::processFile(std::string_view basename)
     }
 }
 
-void tr_watchdir_base::scan()
+void BaseWatchdir::scan()
 {
     auto new_dir_entries = std::set<std::string>{};
 
@@ -144,3 +149,6 @@ void tr_watchdir_base::scan()
 
     tr_sys_dir_close(dir);
 }
+
+} // namespace impl
+} // namespace libtransmission

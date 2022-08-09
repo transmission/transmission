@@ -16,15 +16,18 @@ extern "C"
     struct event_base;
 }
 
-class tr_watchdir
+namespace libtransmission
+{
+
+class Watchdir
 {
 public:
-    tr_watchdir() = default;
-    virtual ~tr_watchdir() = default;
-    tr_watchdir(tr_watchdir&&) = delete;
-    tr_watchdir(tr_watchdir const&) = delete;
-    tr_watchdir& operator=(tr_watchdir&&) = delete;
-    tr_watchdir& operator=(tr_watchdir const&) = delete;
+    Watchdir() = default;
+    virtual ~Watchdir() = default;
+    Watchdir(Watchdir&&) = delete;
+    Watchdir(Watchdir const&) = delete;
+    Watchdir& operator=(Watchdir&&) = delete;
+    Watchdir& operator=(Watchdir const&) = delete;
 
     [[nodiscard]] virtual std::string_view dirname() const noexcept = 0;
 
@@ -46,13 +49,13 @@ public:
         generic_rescan_interval_ = interval;
     }
 
-    static std::unique_ptr<tr_watchdir> create(
+    static std::unique_ptr<Watchdir> create(
         std::string_view dirname,
         Callback callback,
         libtransmission::TimerMaker& timer_maker,
         struct event_base* evbase);
 
-    static std::unique_ptr<tr_watchdir> createGeneric(
+    static std::unique_ptr<Watchdir> createGeneric(
         std::string_view dirname,
         Callback callback,
         libtransmission::TimerMaker& timer_maker,
@@ -62,3 +65,5 @@ private:
     static constexpr std::chrono::milliseconds DefaultGenericRescanInterval{ 1000 };
     static std::chrono::milliseconds generic_rescan_interval_;
 };
+
+} // namespace libtransmission

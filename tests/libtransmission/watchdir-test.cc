@@ -62,7 +62,7 @@ protected:
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
         timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
-        tr_watchdir::setGenericRescanInterval(GenericRescanInterval);
+        Watchdir::setGenericRescanInterval(GenericRescanInterval);
     }
 
     void TearDown() override
@@ -72,13 +72,13 @@ protected:
         SandboxedTest::TearDown();
     }
 
-    auto createWatchDir(std::string_view path, tr_watchdir::Callback callback)
+    auto createWatchDir(std::string_view path, Watchdir::Callback callback)
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
         auto watchdir = force_generic ?
-            tr_watchdir::createGeneric(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
-            tr_watchdir::create(path, std::move(callback), *timer_maker_, ev_base_.get());
-        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierInterval(RetryMultiplier);
+            Watchdir::createGeneric(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
+            Watchdir::create(path, std::move(callback), *timer_maker_, ev_base_.get());
+        dynamic_cast<impl::BaseWatchdir*>(watchdir.get())->setRetryMultiplierInterval(RetryMultiplier);
         return watchdir;
     }
 
@@ -119,7 +119,7 @@ TEST_P(WatchDirTest, construct)
 
     auto callback = [](std::string_view /*dirname*/, std::string_view /*basename*/)
     {
-        return tr_watchdir::Action::Done;
+        return Watchdir::Action::Done;
     };
     auto watchdir = createWatchDir(path, callback);
     EXPECT_TRUE(watchdir);
@@ -139,7 +139,7 @@ TEST_P(WatchDirTest, initialScan)
         auto callback = [&called](std::string_view /*dirname*/, std::string_view /*basename*/)
         {
             called = true;
-            return tr_watchdir::Action::Done;
+            return Watchdir::Action::Done;
         };
         auto watchdir = createWatchDir(path, callback);
         EXPECT_TRUE(watchdir);
@@ -158,7 +158,7 @@ TEST_P(WatchDirTest, initialScan)
         auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
         {
             names.insert(std::string{ basename });
-            return tr_watchdir::Action::Done;
+            return Watchdir::Action::Done;
         };
         auto watchdir = createWatchDir(path, callback);
         EXPECT_TRUE(watchdir);
@@ -177,7 +177,7 @@ TEST_P(WatchDirTest, watch)
     auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
     {
         names.emplace_back(std::string{ basename });
-        return tr_watchdir::Action::Done;
+        return Watchdir::Action::Done;
     };
     auto watchdir = createWatchDir(dirname, callback);
     processEvents();
@@ -225,7 +225,7 @@ TEST_P(WatchDirTest, retry)
     auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
     {
         names.emplace_back(std::string{ basename });
-        return tr_watchdir::Action::Retry;
+        return Watchdir::Action::Retry;
     };
     auto watchdir = createWatchDir(path, callback);
 

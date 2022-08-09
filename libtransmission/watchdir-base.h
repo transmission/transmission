@@ -5,10 +5,6 @@
 
 #pragma once
 
-#ifndef LIBTRANSMISSION_WATCHDIR_MODULE
-#error only the libtransmission watchdir module should #include this header.
-#endif
-
 #include <algorithm>
 #include <chrono>
 #include <map>
@@ -20,11 +16,15 @@
 #include "timer.h"
 #include "watchdir.h"
 
+namespace libtransmission
+{
+namespace impl
+{
 // base class for concrete tr_watchdirs
-class tr_watchdir_base : public tr_watchdir
+class BaseWatchdir : public Watchdir
 {
 public:
-    tr_watchdir_base(std::string_view dirname, Callback callback, libtransmission::TimerMaker& timer_maker)
+    BaseWatchdir(std::string_view dirname, Callback callback, TimerMaker& timer_maker)
         : dirname_{ dirname }
         , callback_{ std::move(callback) }
         , retry_timer_{ timer_maker.create() }
@@ -32,11 +32,11 @@ public:
         retry_timer_->setCallback([this]() { onRetryTimer(); });
     }
 
-    virtual ~tr_watchdir_base() override = default;
-    tr_watchdir_base(tr_watchdir_base&&) = delete;
-    tr_watchdir_base(tr_watchdir_base const&) = delete;
-    tr_watchdir_base& operator=(tr_watchdir_base&&) = delete;
-    tr_watchdir_base& operator=(tr_watchdir_base const&) = delete;
+    virtual ~BaseWatchdir() override = default;
+    BaseWatchdir(BaseWatchdir&&) = delete;
+    BaseWatchdir(BaseWatchdir const&) = delete;
+    BaseWatchdir& operator=(BaseWatchdir&&) = delete;
+    BaseWatchdir& operator=(BaseWatchdir const&) = delete;
 
     [[nodiscard]] std::string_view dirname() const noexcept override
     {
@@ -133,10 +133,13 @@ private:
 
     std::string const dirname_;
     Callback const callback_;
-    std::unique_ptr<libtransmission::Timer> const retry_timer_;
+    std::unique_ptr<Timer> const retry_timer_;
 
     std::map<std::string, Pending, std::less<>> pending_;
     std::set<std::string, std::less<>> handled_;
     std::chrono::milliseconds retry_multiplier_interval_ = std::chrono::milliseconds{ 5000 };
     size_t retry_limit_ = 3U;
 };
+
+} // namespace impl
+} // namespace libtransmission

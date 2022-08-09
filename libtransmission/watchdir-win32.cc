@@ -26,6 +26,8 @@
 #include "utils.h"
 #include "watchdir-base.h"
 
+namespace libtransmission
+{
 namespace
 {
 
@@ -70,28 +72,26 @@ BOOL tr_get_overlapped_result_ex(
     return GetOverlappedResult(handle, overlapped, bytes_transferred, FALSE);
 }
 
-} // namespace
-
-class tr_watchdir_win32 final : public tr_watchdir_base
+class Win32Watchdir final : public impl::BaseWatchdir
 {
 public:
-    tr_watchdir_win32(
+    Win32Watchdir(
         std::string_view dirname,
         Callback callback,
         libtransmission::TimerMaker& timer_maker,
         struct event_base* event_base)
-        : tr_watchdir_base{ dirname, std::move(callback), timer_maker }
+        : BaseWatchdir{ dirname, std::move(callback), timer_maker }
     {
         init(event_base);
         scan();
     }
 
-    tr_watchdir_win32(tr_watchdir_win32&&) = delete;
-    tr_watchdir_win32(tr_watchdir_win32 const&) = delete;
-    tr_watchdir_win32& operator=(tr_watchdir_win32&&) = delete;
-    tr_watchdir_win32& operator=(tr_watchdir_win32 const&) = delete;
+    Win32Watchdir(Win32Watchdir&&) = delete;
+    Win32Watchdir(Win32Watchdir const&) = delete;
+    Win32Watchdir& operator=(Win32Watchdir&&) = delete;
+    Win32Watchdir& operator=(Win32Watchdir const&) = delete;
 
-    ~tr_watchdir_win32() override
+    ~Win32Watchdir() override
     {
         if (fd_ != INVALID_HANDLE_VALUE)
         {
@@ -184,25 +184,14 @@ private:
         }
 
         bufferevent_setwatermark(event_, EV_READ, sizeof(FILE_NOTIFY_INFORMATION), 0);
-        bufferevent_setcb(event_, &tr_watchdir_win32::onBufferEvent, nullptr, nullptr, this);
+        bufferevent_setcb(event_, &Win32Watchdir::onBufferEvent, nullptr, nullptr, this);
         bufferevent_enable(event_, EV_READ);
 
-        thread_ = (HANDLE)_beginthreadex(nullptr, 0, tr_watchdir_win32::staticThreadFunc, this, 0, nullptr);
+        thread_ = (HANDLE)_beginthreadex(nullptr, 0, Win32Watchdir::staticThreadFunc, this, 0, nullptr);
         if (thread_ == nullptr)
         {
             tr_logAddError(_("Couldn't create thread"));
             return;
-        }
-
-        /* Perform an initial scan on the directory */
-        if (event_base_once(event_base, -1, EV_TIMEOUT, &tr_watchdir_win32::onFirstScan, this, nullptr) == -1)
-        {
-            auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                _("Couldn't scan '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
         }
     }
 
@@ -346,11 +335,15 @@ private:
     HANDLE thread_ = {};
 };
 
-std::unique_ptr<tr_watchdir> tr_watchdir::create(
+} // namespace
+
+std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
-    libtransmission::TimerMaker& timer_maker,
+    TimerMaker& timer_maker,
     struct event_base* event_base)
 {
-    return std::make_unique<tr_watchdir_win32>(dirname, std::move(callback), timer_maker, event_base);
+    return std::make_unique<Win32Watchdir>(dirname, std::move(callback), timer_maker, event_base);
 }
+
+} // namespace libtransmission
