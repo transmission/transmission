@@ -36,7 +36,7 @@ public:
 
     using Callback = std::function<Action(std::string_view dirname, std::string_view basename)>;
 
-    [[nodiscard]] constexpr static auto genericRescanInterval() noexcept
+    [[nodiscard]] static auto genericRescanInterval() noexcept
     {
         return generic_rescan_interval_;
     }
