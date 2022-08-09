@@ -129,9 +129,6 @@ private:
                 fmt::arg("error_code", error_code)));
             return;
         }
-
-        // trigger one event for the initial scan
-        // event_active(event_, EV_READ, 0);
     }
 
     static void onKqueueEvent(evutil_socket_t /*fd*/, short /*type*/, void* vself)
