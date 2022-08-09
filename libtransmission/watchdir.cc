@@ -14,8 +14,11 @@
 #include "file.h"
 #include "log.h"
 #include "tr-strbuf.h"
+#include "tr-assert.h"
 #include "utils.h" // for _()
 #include "watchdir-base.h"
+
+using namespace std::literals;
 
 namespace
 {
@@ -30,6 +33,9 @@ namespace
     case tr_watchdir::Action::Done:
         return "done";
     }
+
+    TR_ASSERT(false);
+    return "???";
 }
 
 [[nodiscard]] bool isRegularFile(std::string_view dir, std::string_view name)
@@ -57,20 +63,7 @@ namespace
 
 } // namespace
 
-size_t tr_watchdir::generic_rescan_interval_msec_ = tr_watchdir::DefaultGenericRescanIntevalMsec;
-
-void tr_watchdir_base::updateRetryTimer()
-{
-    evtimer_del(retry_timer_.get());
-
-    if (auto const kick_at = nextKickTime(); kick_at)
-    {
-        auto const now = current_time_func_();
-        auto const sec = static_cast<int>(*kick_at > now ? *kick_at - now : 1);
-        auto const usec = 0;
-        tr_timerAdd(*retry_timer_, sec, usec);
-    }
-}
+std::chrono::milliseconds tr_watchdir::generic_rescan_interval_ = tr_watchdir::DefaultGenericRescanInterval;
 
 void tr_watchdir_base::processFile(std::string_view basename)
 {
@@ -80,7 +73,6 @@ void tr_watchdir_base::processFile(std::string_view basename)
     }
 
     auto const action = callback_(dirname_, basename);
-    auto const now = current_time_func_();
     tr_logAddDebug(fmt::format("Callback decided to {:s} file '{:s}'", actionToString(action), basename));
     if (action == Action::Retry)
     {
@@ -88,11 +80,12 @@ void tr_watchdir_base::processFile(std::string_view basename)
 
         auto& info = iter->second;
         ++info.strikes;
-        info.last_kick_at = now;
+        info.last_kick_at = std::chrono::steady_clock::now();
 
         if (info.strikes < retry_limit_)
         {
             setNextKickTime(info);
+            restartTimerIfPending();
         }
         else
         {
@@ -123,10 +116,15 @@ void tr_watchdir_base::scan()
         return;
     }
 
-    char const* name = nullptr;
-    while ((name = tr_sys_dir_read_name(dir, &error)) != nullptr)
+    for (;;)
     {
-        if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+        char const* const name = tr_sys_dir_read_name(dir, &error);
+        if (name == nullptr)
+        {
+            break;
+        }
+
+        if ("."sv == name || ".."sv == name)
         {
             continue;
         }

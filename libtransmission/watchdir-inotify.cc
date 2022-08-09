@@ -33,10 +33,14 @@ private:
     static auto constexpr InotifyWatchMask = uint32_t{ IN_CLOSE_WRITE | IN_MOVED_TO | IN_CREATE };
 
 public:
-    tr_watchdir_inotify(std::string_view dirname, Callback callback, event_base* event_base, TimeFunc time_func)
-        : tr_watchdir_base{ dirname, std::move(callback), event_base, time_func }
+    tr_watchdir_inotify(
+        std::string_view dirname,
+        Callback callback,
+        libtransmission::TimerMaker& timer_maker,
+        event_base* evbase)
+        : tr_watchdir_base{ dirname, std::move(callback), timer_maker }
     {
-        init();
+        init(evbase);
         scan();
     }
 
@@ -65,7 +69,7 @@ public:
     }
 
 private:
-    void init()
+    void init(struct event_base* evbase)
     {
         infd_ = inotify_init();
         if (infd_ == -1)
@@ -91,7 +95,7 @@ private:
             return;
         }
 
-        event_ = bufferevent_socket_new(eventBase(), infd_, 0);
+        event_ = bufferevent_socket_new(evbase, infd_, 0);
         if (event_ == nullptr)
         {
             auto const error_code = errno;
@@ -184,8 +188,8 @@ private:
 std::unique_ptr<tr_watchdir> tr_watchdir::create(
     std::string_view dirname,
     Callback callback,
-    event_base* event_base,
-    TimeFunc time_func)
+    libtransmission::TimerMaker& timer_maker,
+    event_base* evbase)
 {
-    return std::make_unique<tr_watchdir_inotify>(dirname, std::move(callback), event_base, time_func);
+    return std::make_unique<tr_watchdir_inotify>(dirname, std::move(callback), timer_maker, evbase);
 }

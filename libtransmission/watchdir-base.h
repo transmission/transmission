@@ -9,27 +9,27 @@
 #error only the libtransmission watchdir module should #include this header.
 #endif
 
-#include <ctime>
+#include <algorithm>
+#include <chrono>
 #include <map>
 #include <memory>
 #include <optional>
 #include <set>
 #include <string>
 
-#include <event2/event.h>
-
+#include "timer.h"
 #include "watchdir.h"
 
 // base class for concrete tr_watchdirs
 class tr_watchdir_base : public tr_watchdir
 {
 public:
-    tr_watchdir_base(std::string_view dirname, Callback callback, event_base* event_base, TimeFunc current_time_func)
+    tr_watchdir_base(std::string_view dirname, Callback callback, libtransmission::TimerMaker& timer_maker)
         : dirname_{ dirname }
         , callback_{ std::move(callback) }
-        , event_base_{ event_base }
-        , current_time_func_{ current_time_func }
+        , retry_timer_{ timer_maker.create() }
     {
+        retry_timer_->setCallback([this]() { onRetryTimer(); });
     }
 
     virtual ~tr_watchdir_base() override = default;
@@ -53,14 +53,14 @@ public:
         retry_limit_ = retry_limit;
     }
 
-    [[nodiscard]] constexpr auto retryMultiplierMsec() const noexcept
+    [[nodiscard]] constexpr auto retryMultiplierInterval() const noexcept
     {
-        return retry_multiplier_msec_;
+        return retry_multiplier_interval_;
     }
 
-    void setRetryMultiplierMsec(size_t retry_multiplier_msec) noexcept
+    void setRetryMultiplierInterval(std::chrono::milliseconds interval) noexcept
     {
-        retry_multiplier_msec_ = retry_multiplier_msec;
+        retry_multiplier_interval_ = interval;
 
         for (auto& [basename, info] : pending_)
         {
@@ -72,38 +72,24 @@ protected:
     void scan();
     void processFile(std::string_view basename);
 
-    [[nodiscard]] constexpr event_base* eventBase() noexcept
-    {
-        return &*event_base_;
-    }
-
-    struct FreeEvent
-    {
-        void operator()(event* ev)
-        {
-            event_del(ev);
-            event_free(ev);
-        }
-    };
-
-    using WrappedEvent = std::unique_ptr<struct event, FreeEvent>;
-
 private:
+    using Timestamp = std::chrono::time_point<std::chrono::steady_clock>;
+
     struct Pending
     {
         size_t strikes = 0U;
-        time_t last_kick_at = 0U;
-        time_t next_kick_at = 0U;
+        Timestamp last_kick_at;
+        Timestamp next_kick_at;
     };
 
-    void setNextKickTime(Pending& info)
+    void setNextKickTime(Pending& item)
     {
-        info.next_kick_at = info.last_kick_at + (static_cast<size_t>(info.strikes * retry_multiplier_msec_)) / 1000U;
+        item.next_kick_at = item.last_kick_at + item.strikes * retry_multiplier_interval_;
     }
 
     [[nodiscard]] auto nextKickTime() const
     {
-        auto next_time = std::optional<time_t>{};
+        auto next_time = std::optional<Timestamp>{};
 
         for (auto const& [name, info] : pending_)
         {
@@ -116,15 +102,21 @@ private:
         return next_time;
     }
 
-    void updateRetryTimer();
-
-    static void onRetryTimer(evutil_socket_t /*unused*/, short /*unused*/, void* vself)
+    void restartTimerIfPending()
     {
-        static_cast<tr_watchdir_base*>(vself)->retry();
+        if (auto next_kick_time = nextKickTime(); next_kick_time)
+        {
+            using namespace std::chrono;
+            auto const now = steady_clock::now();
+            auto duration = duration_cast<milliseconds>(*next_kick_time - now);
+            retry_timer_->startSingleShot(duration);
+        }
     }
-    void retry()
+
+    void onRetryTimer()
     {
-        auto const now = current_time_func_();
+        using namespace std::chrono;
+        auto const now = steady_clock::now();
 
         auto tmp = decltype(pending_){};
         std::swap(tmp, pending_);
@@ -136,17 +128,15 @@ private:
             }
         }
 
-        updateRetryTimer();
+        restartTimerIfPending();
     }
 
     std::string const dirname_;
     Callback const callback_;
-    event_base* const event_base_;
-    TimeFunc const current_time_func_;
-    WrappedEvent const retry_timer_{ evtimer_new(event_base_, onRetryTimer, this) };
+    std::unique_ptr<libtransmission::Timer> const retry_timer_;
 
     std::map<std::string, Pending, std::less<>> pending_;
     std::set<std::string, std::less<>> handled_;
+    std::chrono::milliseconds retry_multiplier_interval_ = std::chrono::milliseconds{ 5000 };
     size_t retry_limit_ = 3U;
-    size_t retry_multiplier_msec_ = 5000U;
 };

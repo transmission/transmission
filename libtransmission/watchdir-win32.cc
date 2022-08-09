@@ -75,10 +75,14 @@ BOOL tr_get_overlapped_result_ex(
 class tr_watchdir_win32 final : public tr_watchdir_base
 {
 public:
-    tr_watchdir_win32(std::string_view dirname, Callback callback, event_base* event_base, TimeFunc time_func)
-        : tr_watchdir_base{ dirname, std::move(callback), event_base, time_func }
+    tr_watchdir_win32(
+        std::string_view dirname,
+        Callback callback,
+        libtransmission::TimerMaker& timer_maker,
+        struct event_base* event_base)
+        : tr_watchdir_base{ dirname, std::move(callback), timer_maker }
     {
-        init();
+        init(event_base);
         scan();
     }
 
@@ -125,7 +129,7 @@ private:
     static auto constexpr Win32WatchMask =
         (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE);
 
-    void init()
+    void init(struct event_base* event_base)
     {
         tr_net_init();
 
@@ -168,7 +172,7 @@ private:
             return;
         }
 
-        event_ = bufferevent_socket_new(eventBase(), notify_pipe_[0], 0);
+        event_ = bufferevent_socket_new(event_base, notify_pipe_[0], 0);
         if (event_ == nullptr)
         {
             auto const error_code = errno;
@@ -191,7 +195,7 @@ private:
         }
 
         /* Perform an initial scan on the directory */
-        if (event_base_once(eventBase(), -1, EV_TIMEOUT, &tr_watchdir_win32::onFirstScan, this, nullptr) == -1)
+        if (event_base_once(event_base, -1, EV_TIMEOUT, &tr_watchdir_win32::onFirstScan, this, nullptr) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -345,8 +349,8 @@ private:
 std::unique_ptr<tr_watchdir> tr_watchdir::create(
     std::string_view dirname,
     Callback callback,
-    event_base* event_base,
-    TimeFunc time_func)
+    libtransmission::TimerMaker& timer_maker,
+    struct event_base* event_base)
 {
-    return std::make_unique<tr_watchdir_win32>(dirname, std::move(callback), event_base, time_func);
+    return std::make_unique<tr_watchdir_win32>(dirname, std::move(callback), timer_maker, event_base);
 }

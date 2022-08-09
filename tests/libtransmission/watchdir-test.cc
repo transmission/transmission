@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,48 +16,25 @@
 #include "net.h"
 #include "watchdir.h"
 #include "watchdir-base.h"
+#include "timer-ev.h"
 
 #include "test-fixtures.h"
 
 #include <event2/event.h>
 
+using namespace std::literals;
+
 /***
 ****
 ***/
 
-namespace
-{
-
-auto constexpr GenericRescanIntervalMsec = size_t{ 100U };
-auto constexpr RetryMultiplierMsec = size_t{ 100U };
+static auto constexpr GenericRescanInterval = 100ms;
+static auto constexpr RetryMultiplier = 100ms;
 
 // should be at least 2x the watchdir-generic size to ensure that
 // we have time to pump all events at least once in processEvents()
-auto constexpr ProcessEventsTimeoutMsec = size_t{ 300U };
-static_assert(ProcessEventsTimeoutMsec > GenericRescanIntervalMsec);
-
-namespace current_time_mock
-{
-namespace
-{
-auto value = time_t{};
-}
-
-time_t get()
-{
-    return value;
-}
-
-#if 0
-void set(time_t now)
-{
-    value = now;
-}
-#endif
-
-} // namespace current_time_mock
-
-} // namespace
+static auto constexpr ProcessEventsTimeout = 300ms;
+static_assert(ProcessEventsTimeout > GenericRescanInterval);
 
 namespace libtransmission
 {
@@ -76,13 +54,15 @@ class WatchDirTest
 {
 private:
     std::shared_ptr<struct event_base> ev_base_;
+    std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
 
 protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
-        tr_watchdir::setGenericRescanIntervalMsec(GenericRescanIntervalMsec);
+        timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
+        tr_watchdir::setGenericRescanInterval(GenericRescanInterval);
     }
 
     void TearDown() override
@@ -96,9 +76,9 @@ protected:
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
         auto watchdir = force_generic ?
-            tr_watchdir::createGeneric(path, std::move(callback), ev_base_.get(), current_time_mock::get) :
-            tr_watchdir::create(path, std::move(callback), ev_base_.get(), current_time_mock::get);
-        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierMsec(RetryMultiplierMsec);
+            tr_watchdir::createGeneric(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
+            tr_watchdir::create(path, std::move(callback), *timer_maker_, ev_base_.get());
+        dynamic_cast<tr_watchdir_base*>(watchdir.get())->setRetryMultiplierInterval(RetryMultiplier);
         return watchdir;
     }
 
@@ -118,10 +98,17 @@ protected:
         return path;
     }
 
-    void processEvents(size_t msec = ProcessEventsTimeoutMsec)
+    void processEvents(std::chrono::milliseconds wait_interval = ProcessEventsTimeout)
     {
-        auto const interval = timeval{ static_cast<time_t>(msec / 1000U), static_cast<int>((msec % 1000) * 1000) };
-        event_base_loopexit(ev_base_.get(), &interval);
+        auto tv = timeval{};
+        auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(wait_interval);
+        tv.tv_sec = static_cast<decltype(tv.tv_sec)>(seconds.count());
+
+        wait_interval -= seconds;
+        auto const usec = std::chrono::duration_cast<std::chrono::microseconds>(wait_interval);
+        tv.tv_usec = static_cast<decltype(tv.tv_usec)>(usec.count());
+
+        event_base_loopexit(ev_base_.get(), &tv);
         event_base_dispatch(ev_base_.get());
     }
 };
@@ -247,7 +234,7 @@ TEST_P(WatchDirTest, retry)
 
     auto const test_file = "test.txt"sv;
     createFile(path, test_file);
-    processEvents(ProcessEventsTimeoutMsec * 3);
+    processEvents(ProcessEventsTimeout * 3);
     EXPECT_LE(2, std::size(names));
     for (auto const& name : names)
     {

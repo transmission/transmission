@@ -10,7 +10,12 @@
 #include <memory>
 #include <string_view>
 
-struct event_base;
+#include "timer.h"
+
+extern "C"
+{
+    struct event_base;
+}
 
 class tr_watchdir
 {
@@ -32,32 +37,29 @@ public:
 
     using Callback = std::function<Action(std::string_view dirname, std::string_view basename)>;
 
-    using TimeFunc = time_t (*)();
-
-    [[nodiscard]] static size_t genericRescanIntervalMsec() noexcept
+    [[nodiscard]] constexpr static auto genericRescanInterval() noexcept
     {
-        return generic_rescan_interval_msec_;
+        return generic_rescan_interval_;
     }
 
-    static void setGenericRescanIntervalMsec(size_t msec) noexcept
+    static void setGenericRescanInterval(std::chrono::milliseconds interval) noexcept
     {
-        generic_rescan_interval_msec_ = msec;
+        generic_rescan_interval_ = interval;
     }
 
     static std::unique_ptr<tr_watchdir> create(
         std::string_view dirname,
         Callback callback,
-        event_base* event_base,
-        TimeFunc current_time_func);
+        libtransmission::TimerMaker& timer_maker,
+        struct event_base* evbase);
 
     static std::unique_ptr<tr_watchdir> createGeneric(
         std::string_view dirname,
         Callback callback,
-        event_base* event_base,
-        TimeFunc current_time_func,
-        size_t rescan_interval_msec = genericRescanIntervalMsec());
+        libtransmission::TimerMaker& timer_maker,
+        std::chrono::milliseconds rescan_interval);
 
 private:
-    static constexpr size_t DefaultGenericRescanIntevalMsec = 10000;
-    static size_t generic_rescan_interval_msec_;
+    static constexpr std::chrono::milliseconds DefaultGenericRescanInterval{ 1000 };
+    static std::chrono::milliseconds generic_rescan_interval_;
 };
