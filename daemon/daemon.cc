@@ -31,6 +31,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
+#include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
@@ -809,8 +810,9 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
                 return onFileAdded(session, dirname, basename);
             };
 
-            watchdir = force_generic ? tr_watchdir::createGeneric(dir, handler, ev_base, tr_time) :
-                                       tr_watchdir::create(dir, handler, ev_base, tr_time);
+            auto timer_maker = libtransmission::EvTimerMaker{ ev_base };
+            watchdir = force_generic ? tr_watchdir::createGeneric(dir, handler, timer_maker) :
+                                       tr_watchdir::create(dir, handler, timer_maker, ev_base);
         }
     }
 
