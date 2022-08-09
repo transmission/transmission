@@ -83,19 +83,25 @@ void BaseWatchdir::processFile(std::string_view basename)
     {
         auto const [iter, added] = pending_.try_emplace(std::string{ basename }, Pending{});
 
+        auto const now = std::chrono::steady_clock::now();
         auto& info = iter->second;
         ++info.strikes;
-        info.last_kick_at = std::chrono::steady_clock::now();
+        info.last_kick_at = now;
 
-        if (info.strikes < retry_limit_)
+        if (info.first_kick_at == Timestamp{})
         {
-            setNextKickTime(info);
-            restartTimerIfPending();
+            info.first_kick_at = now;
         }
-        else
+
+        if (now - info.first_kick_at > timeoutDuration())
         {
             tr_logAddWarn(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", basename)));
             pending_.erase(iter);
+        }
+        else
+        {
+            setNextKickTime(info);
+            restartTimerIfPending();
         }
     }
     else if (action == Action::Done)

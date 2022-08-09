@@ -29,7 +29,7 @@ using namespace std::literals;
 ***/
 
 static auto constexpr GenericRescanInterval = 100ms;
-static auto constexpr RetryMultiplier = 100ms;
+static auto constexpr RetryDuration = 100ms;
 
 // should be at least 2x the watchdir-generic size to ensure that
 // we have time to pump all events at least once in processEvents()
@@ -78,7 +78,7 @@ protected:
         auto watchdir = force_generic ?
             Watchdir::createGeneric(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
             Watchdir::create(path, std::move(callback), *timer_maker_, ev_base_.get());
-        dynamic_cast<impl::BaseWatchdir*>(watchdir.get())->setRetryMultiplierInterval(RetryMultiplier);
+        dynamic_cast<impl::BaseWatchdir*>(watchdir.get())->setRetryDuration(RetryDuration);
         return watchdir;
     }
 

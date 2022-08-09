@@ -43,24 +43,24 @@ public:
         return dirname_;
     }
 
-    [[nodiscard]] constexpr auto retryLimit() const noexcept
+    [[nodiscard]] constexpr auto timeoutDuration() const noexcept
     {
-        return retry_limit_;
+        return timeout_duration_;
     }
 
-    constexpr void setRetryLimit(size_t retry_limit) noexcept
+    constexpr void setTimeoutDuration(std::chrono::seconds timeout_duration) noexcept
     {
-        retry_limit_ = retry_limit;
+        timeout_duration_ = timeout_duration;
     }
 
-    [[nodiscard]] constexpr auto retryMultiplierInterval() const noexcept
+    [[nodiscard]] constexpr auto retryDuration() const noexcept
     {
-        return retry_multiplier_interval_;
+        return retry_duration_;
     }
 
-    void setRetryMultiplierInterval(std::chrono::milliseconds interval) noexcept
+    void setRetryDuration(std::chrono::milliseconds retry_duration) noexcept
     {
-        retry_multiplier_interval_ = interval;
+        retry_duration_ = retry_duration;
 
         for (auto& [basename, info] : pending_)
         {
@@ -78,13 +78,14 @@ private:
     struct Pending
     {
         size_t strikes = 0U;
-        Timestamp last_kick_at;
-        Timestamp next_kick_at;
+        Timestamp first_kick_at = {};
+        Timestamp last_kick_at = {};
+        Timestamp next_kick_at = {};
     };
 
     void setNextKickTime(Pending& item)
     {
-        item.next_kick_at = item.last_kick_at + item.strikes * retry_multiplier_interval_;
+        item.next_kick_at = item.last_kick_at + retry_duration_;
     }
 
     [[nodiscard]] auto nextKickTime() const
@@ -137,8 +138,8 @@ private:
 
     std::map<std::string, Pending, std::less<>> pending_;
     std::set<std::string, std::less<>> handled_;
-    std::chrono::milliseconds retry_multiplier_interval_ = std::chrono::milliseconds{ 5000 };
-    size_t retry_limit_ = 3U;
+    std::chrono::milliseconds retry_duration_ = std::chrono::seconds{ 5 };
+    std::chrono::seconds timeout_duration_ = std::chrono::seconds{ 15 };
 };
 
 } // namespace impl
