@@ -49,9 +49,10 @@ std::unique_ptr<Watchdir> Watchdir::createGeneric(
 std::unique_ptr<Watchdir> Watchdir::create(
     std::string_view dirname,
     Callback callback,
-    libtransmission::TimerMaker& timer_maker)
+    libtransmission::TimerMaker& timer_maker,
+    struct event_base* /*evbase*/)
 {
-    return std::make_unique<WatchdirGeneric>(dirname, std::move(callback), timer_maker, genericRescanIntervalMsec());
+    return std::make_unique<GenericWatchdir>(dirname, std::move(callback), timer_maker, genericRescanIntervalMsec());
 }
 #endif
 
