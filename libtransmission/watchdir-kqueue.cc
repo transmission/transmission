@@ -33,10 +33,14 @@
 class tr_watchdir_kqueue final : public tr_watchdir_base
 {
 public:
-    tr_watchdir_kqueue(std::string_view dirname, Callback callback, event_base* event_base, TimeFunc time_func)
-        : tr_watchdir_base{ dirname, std::move(callback), event_base, time_func }
+    tr_watchdir_kqueue(
+        std::string_view dirname,
+        Callback callback,
+        libtransmission::TimerMaker& timer_maker,
+        event_base* evbase)
+        : tr_watchdir_base{ dirname, std::move(callback), timer_maker }
     {
-        init();
+        init(evbase);
         scan();
     }
 
@@ -47,7 +51,8 @@ public:
 
     ~tr_watchdir_kqueue() override
     {
-        event_.reset();
+        event_del(event_);
+        event_free(event_);
 
         if (kq_ != -1)
         {
@@ -61,7 +66,7 @@ public:
     }
 
 private:
-    void init()
+    void init(struct event_base* evbase)
     {
         kq_ = kqueue();
         if (kq_ == -1)
@@ -104,8 +109,8 @@ private:
         }
 
         // create libevent task for event descriptor
-        auto* const event = event_new(eventBase(), kq_, EV_READ | EV_ET | EV_PERSIST, &onKqueueEvent, this);
-        if (event == nullptr)
+        event_ = event_new(evbase, kq_, EV_READ | EV_ET | EV_PERSIST, &onKqueueEvent, this);
+        if (event_ == nullptr)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -114,9 +119,8 @@ private:
                 fmt::arg("error_code", error_code)));
             return;
         }
-        event_.reset(event);
 
-        if (event_add(event_.get(), nullptr) == -1)
+        if (event_add(event_, nullptr) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -127,7 +131,7 @@ private:
         }
 
         // trigger one event for the initial scan
-        event_active(event_.get(), EV_READ, 0);
+        // event_active(event_, EV_READ, 0);
     }
 
     static void onKqueueEvent(evutil_socket_t /*fd*/, short /*type*/, void* vself)
@@ -154,14 +158,14 @@ private:
 
     int kq_ = -1;
     int dirfd_ = -1;
-    WrappedEvent event_;
+    struct event* event_ = nullptr;
 };
 
 std::unique_ptr<tr_watchdir> tr_watchdir::create(
     std::string_view dirname,
     Callback callback,
-    event_base* event_base,
-    TimeFunc time_func)
+    libtransmission::TimerMaker& timer_maker,
+    event_base* evbase)
 {
-    return std::make_unique<tr_watchdir_kqueue>(dirname, std::move(callback), event_base, time_func);
+    return std::make_unique<tr_watchdir_kqueue>(dirname, std::move(callback), timer_maker, evbase);
 }

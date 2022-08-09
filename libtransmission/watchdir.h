@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <cstddef> // for size_t
 #include <functional>
 #include <memory>
 #include <string_view>
