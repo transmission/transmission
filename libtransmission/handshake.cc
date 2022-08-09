@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstring>
 #include <string_view>
 
 #include <event2/buffer.h>
-#include <event2/event.h>
 
 #include <fmt/format.h>
 
@@ -59,7 +59,7 @@ using vc_t = std::array<std::byte, 8>;
 static auto constexpr VC = vc_t{};
 
 // how long to wait before giving up on a handshake
-static auto constexpr HANDSHAKE_TIMEOUT_SEC = int{ 30 };
+static auto constexpr HandshakeTimeoutSec = 30s;
 
 #ifdef ENABLE_LTEP
 #define HANDSHAKE_HAS_LTEP(bits) (((bits)[5] & 0x10) != 0)
@@ -130,8 +130,6 @@ struct tr_handshake
         {
             tr_peerIoUnref(io); /* balanced by the ref in tr_handshakeNew */
         }
-
-        event_free(timeout_timer);
     }
 
     [[nodiscard]] auto constexpr isIncoming() const noexcept
@@ -152,7 +150,7 @@ struct tr_handshake
     uint16_t ia_len = {};
     uint32_t crypto_select = {};
     uint32_t crypto_provide = {};
-    struct event* timeout_timer = nullptr;
+    std::unique_ptr<libtransmission::Timer> timeout_timer;
 
     std::optional<tr_peer_id_t> peer_id;
 
@@ -1132,11 +1130,6 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-static void handshakeTimeout(evutil_socket_t /*s*/, short /*type*/, void* handshake)
-{
-    tr_handshakeAbort(static_cast<tr_handshake*>(handshake));
-}
-
 tr_handshake* tr_handshakeNew(
     std::shared_ptr<tr_handshake_mediator> mediator,
     tr_peerIo* io,
@@ -1149,8 +1142,9 @@ tr_handshake* tr_handshakeNew(
     handshake->encryption_mode = encryption_mode;
     handshake->done_func = done_func;
     handshake->done_func_user_data = done_func_user_data;
-    handshake->timeout_timer = evtimer_new(handshake->mediator->eventBase(), handshakeTimeout, handshake);
-    tr_timerAdd(*handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
+    handshake->timeout_timer = handshake->mediator->createTimer();
+    handshake->timeout_timer->setCallback([handshake]() { tr_handshakeAbort(handshake); });
+    handshake->timeout_timer->startSingleShot(HandshakeTimeoutSec);
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);

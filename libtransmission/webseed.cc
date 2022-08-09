@@ -164,7 +164,7 @@ public:
         , callback{ callback_in }
         , callback_data{ callback_data_in }
         , bandwidth_(&tor->bandwidth_)
-        , pulse_timer(evtimer_new(session->event_base, &tr_webseed::onTimer, this), event_free)
+        , pulse_timer(evtimer_new(session->eventBase(), &tr_webseed::onTimer, this), event_free)
     {
         startTimer();
     }

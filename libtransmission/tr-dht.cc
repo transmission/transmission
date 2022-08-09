@@ -325,7 +325,7 @@ int tr_dhtInit(tr_session* ss)
 
     std::thread(dht_bootstrap, session_, nodes, nodes6).detach();
 
-    dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
+    dht_timer = evtimer_new(session_->eventBase(), timer_callback, session_);
     tr_timerAdd(*dht_timer, 0, tr_rand_int_weak(1000000));
 
     tr_logAddDebug("DHT initialized");

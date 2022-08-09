@@ -242,7 +242,7 @@
 		A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.mm */; };
 		A2E384DD130DFB3A001F501B /* utp_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E384D5130DFB3A001F501B /* utp_utils.cpp */; };
 		A2E384DE130DFB3A001F501B /* utp_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D6130DFB3A001F501B /* utp_utils.h */; };
-		A2E384E0130DFB3A001F501B /* utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D8130DFB3A001F501B /* utp.h */; };
+		A2E384E0130DFB3A001F501B /* include/libutp/utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D8130DFB3A001F501B /* include/libutp/utp.h */; };
 		A2E57ABB1310822C00A7DAB1 /* StatusBarController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2E57ABA1310822C00A7DAB1 /* StatusBarController.mm */; };
 		A2E57AC61310831400A7DAB1 /* StatusBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E57AC51310831400A7DAB1 /* StatusBar.xib */; };
 		A2E57B9C13109DC200A7DAB1 /* FilterBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E57B9B13109DC200A7DAB1 /* FilterBar.xib */; };
@@ -432,6 +432,9 @@
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */ = {isa = PBXBuildFile; fileRef = E71A5564279C2DD600EBFA1E /* tr-assert.mm */; };
+		E975121263DD973CAF4AEBA0 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA1 /* timer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA3 /* timer-ev.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		E975121263DD973CAF4AEBA4 /* timer-ev.cc in Sources */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA5 /* timer-ev.cc */; };
 		ED20B87C28589274005FA6BE /* common_defs.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87B28589274005FA6BE /* common_defs.h */; };
 		ED20B87F285892C5005FA6BE /* crc32_multipliers.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87D285892C5005FA6BE /* crc32_multipliers.h */; };
 		ED20B880285892C5005FA6BE /* crc32_tables.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87E285892C5005FA6BE /* crc32_tables.h */; };
@@ -731,8 +734,8 @@
 		4D18389709DEC0030047D688 /* libtransmission.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtransmission.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D364D9E091FBB2C00377D12 /* TorrentTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentTableView.h; sourceTree = "<group>"; };
 		4D364D9F091FBB2C00377D12 /* TorrentTableView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentTableView.mm; sourceTree = "<group>"; };
-		4D36BA600CA2F00800A63CA5 /* peer-mse.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = peer-mse.cc; sourceTree = "<group>"; };
-		4D36BA610CA2F00800A63CA5 /* peer-mse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = peer-mse.h; sourceTree = "<group>"; };
+		4D36BA600CA2F00800A63CA5 /* peer-mse.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-mse.cc"; sourceTree = "<group>"; };
+		4D36BA610CA2F00800A63CA5 /* peer-mse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-mse.h"; sourceTree = "<group>"; };
 		4D36BA630CA2F00800A63CA5 /* handshake.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = handshake.cc; sourceTree = "<group>"; };
 		4D36BA640CA2F00800A63CA5 /* handshake.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = handshake.h; sourceTree = "<group>"; };
 		4D36BA650CA2F00800A63CA5 /* peer-io.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-io.cc"; sourceTree = "<group>"; };
@@ -1003,7 +1006,7 @@
 		A2DF37050C220D03006523C1 /* CreatorWindowController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CreatorWindowController.mm; sourceTree = "<group>"; };
 		A2E384D5130DFB3A001F501B /* utp_utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utp_utils.cpp; sourceTree = "<group>"; };
 		A2E384D6130DFB3A001F501B /* utp_utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utp_utils.h; sourceTree = "<group>"; };
-		A2E384D8130DFB3A001F501B /* utp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = include/libutp/utp.h; sourceTree = "<group>"; };
+		A2E384D8130DFB3A001F501B /* include/libutp/utp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = include/libutp/utp.h; sourceTree = "<group>"; };
 		A2E38544130DFEE3001F501B /* libutp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libutp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2E57AB91310822C00A7DAB1 /* StatusBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusBarController.h; sourceTree = "<group>"; };
 		A2E57ABA1310822C00A7DAB1 /* StatusBarController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = StatusBarController.mm; sourceTree = "<group>"; };
@@ -1111,17 +1114,17 @@
 		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-assert.h"; sourceTree = "<group>"; };
 		C1425B341EE9C5EA001DB85F /* tr-macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-macros.h"; sourceTree = "<group>"; };
 		C1425B351EE9C5EA001DB85F /* peer-socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-socket.h"; sourceTree = "<group>"; };
-		C16089E41F092A1E00CEFC36 /* utp_api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utp_api.cpp; path = "utp_api.cpp"; sourceTree = "<group>"; };
-		C16089E51F092A1E00CEFC36 /* utp_callbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utp_callbacks.cpp; path = "utp_callbacks.cpp"; sourceTree = "<group>"; };
-		C16089E61F092A1E00CEFC36 /* utp_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_callbacks.h; path = "utp_callbacks.h"; sourceTree = "<group>"; };
-		C16089E71F092A1E00CEFC36 /* utp_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utp_hash.cpp; path = "utp_hash.cpp"; sourceTree = "<group>"; };
-		C16089E81F092A1E00CEFC36 /* utp_hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_hash.h; path = "utp_hash.h"; sourceTree = "<group>"; };
-		C16089E91F092A1E00CEFC36 /* utp_internal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utp_internal.cpp; path = "utp_internal.cpp"; sourceTree = "<group>"; };
-		C16089EA1F092A1E00CEFC36 /* utp_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_internal.h; path = "utp_internal.h"; sourceTree = "<group>"; };
-		C16089EB1F092A1E00CEFC36 /* utp_packedsockaddr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utp_packedsockaddr.cpp; path = "utp_packedsockaddr.cpp"; sourceTree = "<group>"; };
-		C16089EC1F092A1E00CEFC36 /* utp_packedsockaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_packedsockaddr.h; path = "utp_packedsockaddr.h"; sourceTree = "<group>"; };
-		C16089ED1F092A1E00CEFC36 /* utp_templates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_templates.h; path = "utp_templates.h"; sourceTree = "<group>"; };
-		C16089EE1F092A1E00CEFC36 /* utp_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_types.h; path = "include/libutp/utp_types.h"; sourceTree = "<group>"; };
+		C16089E41F092A1E00CEFC36 /* utp_api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utp_api.cpp; sourceTree = "<group>"; };
+		C16089E51F092A1E00CEFC36 /* utp_callbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utp_callbacks.cpp; sourceTree = "<group>"; };
+		C16089E61F092A1E00CEFC36 /* utp_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utp_callbacks.h; sourceTree = "<group>"; };
+		C16089E71F092A1E00CEFC36 /* utp_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utp_hash.cpp; sourceTree = "<group>"; };
+		C16089E81F092A1E00CEFC36 /* utp_hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utp_hash.h; sourceTree = "<group>"; };
+		C16089E91F092A1E00CEFC36 /* utp_internal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utp_internal.cpp; sourceTree = "<group>"; };
+		C16089EA1F092A1E00CEFC36 /* utp_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utp_internal.h; sourceTree = "<group>"; };
+		C16089EB1F092A1E00CEFC36 /* utp_packedsockaddr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utp_packedsockaddr.cpp; sourceTree = "<group>"; };
+		C16089EC1F092A1E00CEFC36 /* utp_packedsockaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utp_packedsockaddr.h; sourceTree = "<group>"; };
+		C16089ED1F092A1E00CEFC36 /* utp_templates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utp_templates.h; sourceTree = "<group>"; };
+		C16089EE1F092A1E00CEFC36 /* utp_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_types.h; path = include/libutp/utp_types.h; sourceTree = "<group>"; };
 		C1639A6F1A55F4D600E42033 /* libb64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libb64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1639A761A55F56600E42033 /* cdecode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cdecode.c; path = src/cdecode.c; sourceTree = "<group>"; };
 		C1639A771A55F56600E42033 /* cencode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cencode.c; path = src/cencode.c; sourceTree = "<group>"; };
@@ -1195,6 +1198,9 @@
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = "<group>"; };
 		E71A5564279C2DD600EBFA1E /* tr-assert.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "tr-assert.mm"; sourceTree = "<group>"; };
+		E975121263DD973CAF4AEBA1 /* timer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = timer.h; sourceTree = "<group>"; };
+		E975121263DD973CAF4AEBA3 /* timer-ev.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "timer-ev.h"; sourceTree = "<group>"; };
+		E975121263DD973CAF4AEBA5 /* timer-ev.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = "timer-ev.cc"; sourceTree = "<group>"; };
 		ED20B87B28589274005FA6BE /* common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common_defs.h; sourceTree = "<group>"; };
 		ED20B87D285892C5005FA6BE /* crc32_multipliers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_multipliers.h; path = lib/crc32_multipliers.h; sourceTree = "<group>"; };
 		ED20B87E285892C5005FA6BE /* crc32_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_tables.h; path = lib/crc32_tables.h; sourceTree = "<group>"; };
@@ -1614,149 +1620,152 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				66F977825E65AD498C028BB1 /* announce-list.cc */,
+				66F977825E65AD498C028BB3 /* announce-list.h */,
+				A23F299F132A447400E9A83B /* announcer-common.h */,
+				A23F29A0132A447400E9A83B /* announcer-http.cc */,
+				A2AA9BE0132CAC8D00FA131E /* announcer-udp.cc */,
+				A25964A4106D73A800453B31 /* announcer.cc */,
+				A25964A5106D73A800453B31 /* announcer.h */,
+				A21FBBAA0EDA78C300BC3C51 /* bandwidth.cc */,
+				A21FBBA90EDA78C300BC3C51 /* bandwidth.h */,
+				2856E0656A49F2665D69E761 /* benc.h */,
+				0A6169A50FE5C9A200C66CE6 /* bitfield.cc */,
+				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
 				A54D44C6A7AAF131D9AE29F5 /* block-info.cc */,
 				6A044CBD8C049AFCBD4DB411 /* block-info.h */,
-				E23B55A5FC3B557F7746D511 /* interned-string.h */,
-				C17740D3273A002C00E455D2 /* web-utils.cc */,
-				C17740D4273A002C00E455D2 /* web-utils.h */,
-				CAB35C62252F6F5E00552A55 /* mime-types.h */,
-				2856E0656A49F2665D69E761 /* benc.h */,
+				A2D3078E0D9EC45F0051FD27 /* blocklist.cc */,
+				A2D307930D9EC4860051FD27 /* blocklist.h */,
+				A23547E011CD0B090046EAE6 /* cache.cc */,
+				A23547E111CD0B090046EAE6 /* cache.h */,
+				BEFC1E1F0C07861A00B0BB3C /* clients.cc */,
+				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
+				BEFC1E1D0C07861A00B0BB3C /* completion.cc */,
+				BEFC1E1C0C07861A00B0BB3C /* completion.h */,
+				C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */,
+				C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */,
+				C1033E051A3279B800EF44D8 /* crypto-utils.cc */,
+				C1033E061A3279B800EF44D8 /* crypto-utils.h */,
 				C1077A4A183EB29600634C22 /* error.cc */,
 				C1077A4B183EB29600634C22 /* error.h */,
+				1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */,
+				1BB44E07B1B52E28291B4E31 /* file-piece-map.h */,
 				C1077A4C183EB29600634C22 /* file-posix.cc */,
 				C1305EB8186A134000F03351 /* file.cc */,
 				C1077A4D183EB29600634C22 /* file.h */,
-				C11DEA141FCD31C0009E22B9 /* subprocess-posix.cc */,
-				C11DEA151FCD31C0009E22B9 /* subprocess.h */,
-				4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */,
-				4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */,
-				0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */,
-				0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */,
-				4D8017E810BBC073008A4AF2 /* torrent-magnet.cc */,
-				4D8017E910BBC073008A4AF2 /* torrent-magnet.h */,
-				0A6169A50FE5C9A200C66CE6 /* bitfield.cc */,
-				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
-				1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */,
-				1BB44E07B1B52E28291B4E31 /* file-piece-map.h */,
-				E71A5564279C2DD600EBFA1E /* tr-assert.mm */,
-				C1425B321EE9C5EA001DB85F /* tr-assert.cc */,
-				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
-				A22CFCA60FC24ED80009BD3E /* tr-dht.cc */,
-				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
-				C1425B341EE9C5EA001DB85F /* tr-macros.h */,
-				888A256631B3DE536FEB8B01 /* tr-strbuf.h */,
-				C1425B351EE9C5EA001DB85F /* peer-socket.h */,
-				A284214212DA663E00FBDDBB /* tr-udp.cc */,
-				A284214312DA663E00FBDDBB /* tr-udp.h */,
-				A2679292130E00A000CB7464 /* tr-utp.cc */,
-				A2679293130E00A000CB7464 /* tr-utp.h */,
-				A220EC59118C8A060022B4BE /* tr-lpd.cc */,
-				A220EC5A118C8A060022B4BE /* tr-lpd.h */,
-				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.cc */,
-				A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */,
-				A2AAB6580DE0CF6200E04DDA /* rpc-server.cc */,
-				A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */,
-				A29DF8B60DB2544C00D04E5A /* resume.cc */,
-				A29DF8B70DB2544C00D04E5A /* resume.h */,
-				A29DF8B80DB2544C00D04E5A /* torrent.h */,
-				2B9BA6C508B488FE586A0AB3 /* torrents.h */,
-				A47A7C87B8B57BE50DF0D413 /* torrent-files.h */,
-				C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */,
-				C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */,
-				C1033E051A3279B800EF44D8 /* crypto-utils.cc */,
-				C1033E061A3279B800EF44D8 /* crypto-utils.h */,
-				4D36BA600CA2F00800A63CA5 /* peer-mse.cc */,
-				4D36BA610CA2F00800A63CA5 /* peer-mse.h */,
 				4D36BA630CA2F00800A63CA5 /* handshake.cc */,
 				4D36BA640CA2F00800A63CA5 /* handshake.h */,
+				A209EE5B1144B51E002B02D1 /* history.h */,
+				BEFC1E160C07861A00B0BB3C /* inout.cc */,
+				BEFC1E150C07861A00B0BB3C /* inout.h */,
+				E23B55A5FC3B557F7746D511 /* interned-string.h */,
+				A2A7B328164F87D400B98C65 /* jsonsl.c */,
+				A2A7B329164F87D400B98C65 /* jsonsl.h */,
+				A2AF23C616B44FA0003BC59E /* log.cc */,
+				A2AF23C716B44FA0003BC59E /* log.h */,
+				4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */,
+				4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */,
+				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.cc */,
+				A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */,
+				CAB35C62252F6F5E00552A55 /* mime-types.h */,
+				A2EE726E14DCCC950093C99A /* natpmp_local.h */,
+				BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */,
+				BEFC1E0D0C07861A00B0BB3C /* net.cc */,
+				BEFC1E0C0C07861A00B0BB3C /* net.h */,
+				BEFC1E1A0C07861A00B0BB3C /* open-files.cc */,
+				BEFC1E190C07861A00B0BB3C /* open-files.h */,
+				A292A6E40DFB45E5004B9C0A /* peer-common.h */,
 				4D36BA650CA2F00800A63CA5 /* peer-io.cc */,
 				4D36BA660CA2F00800A63CA5 /* peer-io.h */,
-				4D36BA680CA2F00800A63CA5 /* peer-mgr.cc */,
-				4D36BA690CA2F00800A63CA5 /* peer-mgr.h */,
 				ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */,
 				ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */,
 				ED8A163E2735A8AA000D61F9 /* peer-mgr-wishlist.cc */,
 				ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */,
+				4D36BA680CA2F00800A63CA5 /* peer-mgr.cc */,
+				4D36BA690CA2F00800A63CA5 /* peer-mgr.h */,
+				4D36BA600CA2F00800A63CA5 /* peer-mse.cc */,
+				4D36BA610CA2F00800A63CA5 /* peer-mse.h */,
 				4D36BA6A0CA2F00800A63CA5 /* peer-msgs.cc */,
 				4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */,
-				A292A6E40DFB45E5004B9C0A /* peer-common.h */,
-				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
-				A292A6E60DFB45EC004B9C0A /* webseed.h */,
-				A24621350C769CF400088E81 /* trevent.h */,
-				A24621360C769CF400088E81 /* trevent.cc */,
-				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.cc */,
-				A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */,
-				BEFC1DF00C07861A00B0BB3C /* version.h */,
-				BEFC1DF10C07861A00B0BB3C /* utils.h */,
-				BEFC1DF20C07861A00B0BB3C /* utils.cc */,
-				BEFC1DF30C07861A00B0BB3C /* upnp.h */,
-				BEFC1DF40C07861A00B0BB3C /* upnp.cc */,
-				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
-				BEFC1DF60C07861A00B0BB3C /* session.cc */,
-				BEFC1E140C07861A00B0BB3C /* session.h */,
+				C1425B351EE9C5EA001DB85F /* peer-socket.h */,
+				A23FAE52178BC2950053DC5B /* platform-quota.cc */,
+				A23FAE53178BC2950053DC5B /* platform-quota.h */,
+				BEFC1E030C07861A00B0BB3C /* platform.cc */,
+				BEFC1E020C07861A00B0BB3C /* platform.h */,
+				BEFC1DFD0C07861A00B0BB3C /* port-forwarding.cc */,
+				BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */,
+				A2EA522F1686AC0D00180493 /* quark.cc */,
+				A2EA52301686AC0D00180493 /* quark.h */,
+				A29DF8B60DB2544C00D04E5A /* resume.cc */,
+				A29DF8B70DB2544C00D04E5A /* resume.h */,
+				A2AAB6580DE0CF6200E04DDA /* rpc-server.cc */,
+				A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */,
+				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.cc */,
+				A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */,
 				C10C644B1D9AF328003C1B4C /* session-id.cc */,
 				C10C644C1D9AF328003C1B4C /* session-id.h */,
-				A20152790D1C26EB0081714F /* torrent-ctor.cc */,
-				A23F299F132A447400E9A83B /* announcer-common.h */,
-				66F977825E65AD498C028BB1 /* announce-list.cc */,
-				66F977825E65AD498C028BB3 /* announce-list.h */,
-				A25964A4106D73A800453B31 /* announcer.cc */,
-				A25964A5106D73A800453B31 /* announcer.h */,
-				A23F29A0132A447400E9A83B /* announcer-http.cc */,
-				A2AA9BE0132CAC8D00FA131E /* announcer-udp.cc */,
-				BEFC1DF90C07861A00B0BB3C /* torrent.cc */,
-				2B9BA6C508B488FE586A0AB1 /* torrents.cc */,
-				A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */,
-				BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */,
-				BEFC1DFD0C07861A00B0BB3C /* port-forwarding.cc */,
-				A21FBBA90EDA78C300BC3C51 /* bandwidth.h */,
-				A21FBBAA0EDA78C300BC3C51 /* bandwidth.cc */,
-				A209EE5B1144B51E002B02D1 /* history.h */,
-				A23547E011CD0B090046EAE6 /* cache.cc */,
-				A23547E111CD0B090046EAE6 /* cache.h */,
-				BEFC1E020C07861A00B0BB3C /* platform.h */,
-				BEFC1E030C07861A00B0BB3C /* platform.cc */,
-				A23FAE53178BC2950053DC5B /* platform-quota.h */,
-				A23FAE52178BC2950053DC5B /* platform-quota.cc */,
-				BEFC1E0C0C07861A00B0BB3C /* net.h */,
-				BEFC1E0D0C07861A00B0BB3C /* net.cc */,
-				A2EE726E14DCCC950093C99A /* natpmp_local.h */,
-				BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */,
-				BEFC1E150C07861A00B0BB3C /* inout.h */,
-				BEFC1E160C07861A00B0BB3C /* inout.cc */,
-				BEFC1E190C07861A00B0BB3C /* open-files.h */,
-				BEFC1E1A0C07861A00B0BB3C /* open-files.cc */,
-				BEFC1E1C0C07861A00B0BB3C /* completion.h */,
-				BEFC1E1D0C07861A00B0BB3C /* completion.cc */,
-				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
-				BEFC1E1F0C07861A00B0BB3C /* clients.cc */,
-				A25D2CBA0CF4C7190096A262 /* stats.h */,
+				BEFC1DF60C07861A00B0BB3C /* session.cc */,
+				BEFC1E140C07861A00B0BB3C /* session.h */,
 				A25D2CBB0CF4C7190096A262 /* stats.cc */,
-				A2D22A110D65EED100007D5F /* verify.h */,
-				A2D22A100D65EED100007D5F /* verify.cc */,
-				A2D307930D9EC4860051FD27 /* blocklist.h */,
-				A2D3078E0D9EC45F0051FD27 /* blocklist.cc */,
-				A29EBE530DC01FC9006CEE80 /* web.h */,
-				A29EBE520DC01FC9006CEE80 /* web.cc */,
-				A25E03E00E4015380086C225 /* tr-getopt.h */,
+				A25D2CBA0CF4C7190096A262 /* stats.h */,
+				C11DEA141FCD31C0009E22B9 /* subprocess-posix.cc */,
+				C11DEA151FCD31C0009E22B9 /* subprocess.h */,
+				E975121263DD973CAF4AEBA5 /* timer-ev.cc */,
+				E975121263DD973CAF4AEBA3 /* timer-ev.h */,
+				E975121263DD973CAF4AEBA1 /* timer.h */,
+				A20152790D1C26EB0081714F /* torrent-ctor.cc */,
+				A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */,
+				A47A7C87B8B57BE50DF0D413 /* torrent-files.h */,
+				4D8017E810BBC073008A4AF2 /* torrent-magnet.cc */,
+				4D8017E910BBC073008A4AF2 /* torrent-magnet.h */,
+				0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */,
+				0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */,
+				BEFC1DF90C07861A00B0BB3C /* torrent.cc */,
+				A29DF8B80DB2544C00D04E5A /* torrent.h */,
+				2B9BA6C508B488FE586A0AB1 /* torrents.cc */,
+				2B9BA6C508B488FE586A0AB3 /* torrents.h */,
+				C1425B321EE9C5EA001DB85F /* tr-assert.cc */,
+				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
+				E71A5564279C2DD600EBFA1E /* tr-assert.mm */,
+				A22CFCA60FC24ED80009BD3E /* tr-dht.cc */,
+				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				A25E03E10E4015380086C225 /* tr-getopt.cc */,
-				A2A7B329164F87D400B98C65 /* jsonsl.h */,
-				A2A7B328164F87D400B98C65 /* jsonsl.c */,
+				A25E03E00E4015380086C225 /* tr-getopt.h */,
+				A220EC59118C8A060022B4BE /* tr-lpd.cc */,
+				A220EC5A118C8A060022B4BE /* tr-lpd.h */,
+				C1425B341EE9C5EA001DB85F /* tr-macros.h */,
+				888A256631B3DE536FEB8B01 /* tr-strbuf.h */,
+				A284214212DA663E00FBDDBB /* tr-udp.cc */,
+				A284214312DA663E00FBDDBB /* tr-udp.h */,
+				A2679292130E00A000CB7464 /* tr-utp.cc */,
+				A2679293130E00A000CB7464 /* tr-utp.h */,
+				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
+				A24621360C769CF400088E81 /* trevent.cc */,
+				A24621350C769CF400088E81 /* trevent.h */,
+				BEFC1DF40C07861A00B0BB3C /* upnp.cc */,
+				BEFC1DF30C07861A00B0BB3C /* upnp.h */,
+				BEFC1DF20C07861A00B0BB3C /* utils.cc */,
+				BEFC1DF10C07861A00B0BB3C /* utils.h */,
 				A25BFD63167BED3B0039D1AA /* variant-benc.cc */,
 				A25BFD64167BED3B0039D1AA /* variant-common.h */,
 				A25BFD65167BED3B0039D1AA /* variant-json.cc */,
 				A25BFD67167BED3B0039D1AA /* variant.cc */,
 				A25BFD68167BED3B0039D1AA /* variant.h */,
-				A2EA522F1686AC0D00180493 /* quark.cc */,
-				A2EA52301686AC0D00180493 /* quark.h */,
-				A2AF23C616B44FA0003BC59E /* log.cc */,
-				A2AF23C716B44FA0003BC59E /* log.h */,
-				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
-				C1FEE5751C3223CC00D62832 /* watchdir.cc */,
-				C1FEE5761C3223CC00D62832 /* watchdir.h */,
+				A2D22A100D65EED100007D5F /* verify.cc */,
+				A2D22A110D65EED100007D5F /* verify.h */,
+				BEFC1DF00C07861A00B0BB3C /* version.h */,
+				C1FEE5721C3223CC00D62832 /* watchdir-common.h */,
 				C1FEE5731C3223CC00D62832 /* watchdir-generic.cc */,
 				C1FEE5741C3223CC00D62832 /* watchdir-kqueue.cc */,
-				C1FEE5721C3223CC00D62832 /* watchdir-common.h */,
+				C1FEE5751C3223CC00D62832 /* watchdir.cc */,
+				C1FEE5761C3223CC00D62832 /* watchdir.h */,
+				C17740D3273A002C00E455D2 /* web-utils.cc */,
+				C17740D4273A002C00E455D2 /* web-utils.h */,
+				A29EBE520DC01FC9006CEE80 /* web.cc */,
+				A29EBE530DC01FC9006CEE80 /* web.h */,
+				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
+				A292A6E60DFB45EC004B9C0A /* webseed.h */,
+				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
 			);
 			path = libtransmission;
 			sourceTree = "<group>";
@@ -1853,7 +1862,7 @@
 				C16089EE1F092A1E00CEFC36 /* utp_types.h */,
 				A2E384D5130DFB3A001F501B /* utp_utils.cpp */,
 				A2E384D6130DFB3A001F501B /* utp_utils.h */,
-				A2E384D8130DFB3A001F501B /* utp.h */,
+				A2E384D8130DFB3A001F501B /* include/libutp/utp.h */,
 			);
 			name = libutp;
 			path = "third-party/libutp";
@@ -2223,6 +2232,8 @@
 				A23547E311CD0B090046EAE6 /* cache.h in Headers */,
 				CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */,
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
+				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
+				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
 				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
@@ -2257,7 +2268,7 @@
 				C16089F81F092A1E00CEFC36 /* utp_templates.h in Headers */,
 				A2E384DE130DFB3A001F501B /* utp_utils.h in Headers */,
 				C16089F71F092A1E00CEFC36 /* utp_packedsockaddr.h in Headers */,
-				A2E384E0130DFB3A001F501B /* utp.h in Headers */,
+				A2E384E0130DFB3A001F501B /* include/libutp/utp.h in Headers */,
 				C16089F91F092A1E00CEFC36 /* utp_types.h in Headers */,
 				C16089F11F092A1E00CEFC36 /* utp_callbacks.h in Headers */,
 			);
@@ -2987,6 +2998,7 @@
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
 				A23FAE54178BC2950053DC5B /* platform-quota.cc in Sources */,
 				62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */,
+				E975121263DD973CAF4AEBA4 /* timer-ev.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

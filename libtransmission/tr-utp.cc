@@ -228,7 +228,7 @@ bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const
 {
     if (!ss->isClosed && ss->utp_timer == nullptr)
     {
-        ss->utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
+        ss->utp_timer = evtimer_new(ss->eventBase(), timer_callback, ss);
 
         if (ss->utp_timer == nullptr)
         {
