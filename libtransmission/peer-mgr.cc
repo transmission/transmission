@@ -125,9 +125,9 @@ public:
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
-    [[nodiscard]] event_base* eventBase() const override
+    [[nodiscard]] std::unique_ptr<libtransmission::Timer> createTimer() override
     {
-        return session_.event_base;
+        return session_.timerMaker().create();
     }
 
     [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override
@@ -574,9 +574,9 @@ struct tr_peerMgr
 {
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
-        , bandwidth_timer_{ evtimer_new(session->event_base, bandwidthPulseMarshall, this) }
-        , rechoke_timer_{ evtimer_new(session->event_base, rechokePulseMarshall, this) }
-        , refill_upkeep_timer_{ evtimer_new(session->event_base, refillUpkeepMarshall, this) }
+        , bandwidth_timer_{ evtimer_new(session->eventBase(), bandwidthPulseMarshall, this) }
+        , rechoke_timer_{ evtimer_new(session->eventBase(), rechokePulseMarshall, this) }
+        , refill_upkeep_timer_{ evtimer_new(session->eventBase(), refillUpkeepMarshall, this) }
     {
         tr_timerAddMsec(*bandwidth_timer_, BandwidthPeriodMsec);
         tr_timerAddMsec(*rechoke_timer_, RechokePeriodMsec);

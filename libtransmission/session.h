@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -32,7 +32,9 @@
 #include "net.h" // tr_socket_t
 #include "open-files.h"
 #include "quark.h"
+#include "session-id.h"
 #include "stats.h"
+#include "timer.h"
 #include "torrents.h"
 #include "web.h"
 
@@ -127,6 +129,16 @@ struct tr_session
 {
 public:
     tr_session(std::string_view config_dir);
+
+    [[nodiscard]] constexpr auto* eventBase() noexcept
+    {
+        return event_base_;
+    }
+
+    void setEventBase(event_base* base);
+    void clearEventBase();
+
+    [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept;
 
     [[nodiscard]] constexpr auto& torrents()
     {
@@ -488,7 +500,6 @@ public:
 
     tr_preallocation_mode preallocationMode;
 
-    struct event_base* event_base = nullptr;
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
@@ -563,7 +574,7 @@ public:
     WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
-    struct tr_session_id* session_id = nullptr;
+    tr_session_id session_id;
 
     tr_rpc_func rpc_func = nullptr;
     void* rpc_func_user_data = nullptr;
@@ -571,8 +582,8 @@ public:
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
-    struct event* nowTimer = nullptr;
-    struct event* saveTimer = nullptr;
+    std::unique_ptr<libtransmission::Timer> now_timer_;
+    std::unique_ptr<libtransmission::Timer> save_timer_;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
@@ -597,6 +608,9 @@ public:
 
 private:
     static std::recursive_mutex session_mutex_;
+
+    struct event_base* event_base_ = nullptr;
+    std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
 
     tr_torrents torrents_;
 

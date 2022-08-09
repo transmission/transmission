@@ -187,7 +187,7 @@ static void libeventThreadFunc(tr_event_handle* events)
     // initialize the session struct's event fields
     events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
-    events->session->event_base = base;
+    events->session->setEventBase(base);
     events->session->evdns_base = dns_base;
     events->session->events = events;
 
@@ -205,7 +205,7 @@ static void libeventThreadFunc(tr_event_handle* events)
     }
     event_free(events->work_queue_event);
     event_base_free(base);
-    events->session->event_base = nullptr;
+    events->session->clearEventBase();
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;

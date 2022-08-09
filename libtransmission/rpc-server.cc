@@ -111,7 +111,7 @@ static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 
 static char const* get_current_session_id(tr_rpc_server* server)
 {
-    return tr_session_id_get_current(server->session->session_id);
+    return server->session->session_id.c_str();
 }
 
 /**
@@ -676,7 +676,7 @@ static int rpc_server_start_retry(tr_rpc_server* server)
 
     if (server->start_retry_timer == nullptr)
     {
-        server->start_retry_timer = evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
+        server->start_retry_timer = evtimer_new(server->session->eventBase(), rpc_server_on_start_retry, server);
     }
 
     tr_timerAdd(*server->start_retry_timer, retry_delay, 0);
@@ -703,7 +703,7 @@ static void startServer(tr_rpc_server* server)
         return;
     }
 
-    struct event_base* base = server->session->event_base;
+    struct event_base* base = server->session->eventBase();
     struct evhttp* httpd = evhttp_new(base);
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);

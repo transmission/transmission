@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -16,6 +16,7 @@
 
 #include "net.h" // tr_address
 #include "peer-mse.h" // tr_message_stream_encryption::DH
+#include "timer.h"
 
 /** @addtogroup peers Peers
     @{ */
@@ -52,7 +53,7 @@ public:
 
     [[nodiscard]] virtual std::optional<torrent_info> torrentInfoFromObfuscated(tr_sha1_digest_t const& info_hash) const = 0;
 
-    [[nodiscard]] virtual event_base* eventBase() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<libtransmission::Timer> createTimer() = 0;
 
     [[nodiscard]] virtual bool isDHTEnabled() const = 0;
 

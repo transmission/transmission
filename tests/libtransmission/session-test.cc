@@ -1,5 +1,5 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -14,6 +14,7 @@
 #include <array>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <string_view>
 
@@ -211,6 +212,25 @@ TEST_F(SessionTest, peerId)
     }
 }
 
+namespace current_time_mock
+{
+namespace
+{
+auto value = time_t{};
+}
+
+time_t get()
+{
+    return value;
+}
+
+void set(time_t now)
+{
+    value = now;
+}
+
+} // namespace current_time_mock
+
 TEST_F(SessionTest, sessionId)
 {
 #ifdef __sun
@@ -218,75 +238,54 @@ TEST_F(SessionTest, sessionId)
     GTEST_SKIP();
 #endif
 
-    EXPECT_FALSE(tr_session_id_is_local(nullptr));
-    EXPECT_FALSE(tr_session_id_is_local(""));
-    EXPECT_FALSE(tr_session_id_is_local("test"));
+    EXPECT_FALSE(tr_session_id::isLocal(""));
+    EXPECT_FALSE(tr_session_id::isLocal("test"));
 
-    auto session_id = tr_session_id_new();
-    EXPECT_NE(nullptr, session_id);
+    current_time_mock::set(0U);
+    auto session_id = std::make_unique<tr_session_id>(current_time_mock::get);
 
-    tr_timeUpdate(0);
+    EXPECT_NE(""sv, session_id->sv());
+    EXPECT_EQ(session_id->sv(), session_id->c_str()) << session_id->sv() << ", " << session_id->c_str();
+    EXPECT_EQ(48U, strlen(session_id->c_str()));
+    auto session_id_str_1 = std::string{ session_id->sv() };
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
 
-    auto const* session_id_str_1 = tr_session_id_get_current(session_id);
-    EXPECT_NE(nullptr, session_id_str_1);
-    EXPECT_EQ(48U, strlen(session_id_str_1));
-    session_id_str_1 = tr_strdup(session_id_str_1);
+    current_time_mock::set(current_time_mock::get() + (3600U - 1U));
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    auto session_id_str_2 = std::string{ session_id->sv() };
+    EXPECT_EQ(session_id_str_1, session_id_str_2);
 
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_1));
+    current_time_mock::set(3600U);
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    session_id_str_2 = std::string{ session_id->sv() };
+    EXPECT_NE(session_id_str_1, session_id_str_2);
+    EXPECT_EQ(session_id_str_2, session_id->c_str());
+    EXPECT_EQ(48U, strlen(session_id->c_str()));
 
-    tr_timeUpdate(60 * 60 - 1);
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    current_time_mock::set(3600U * 2U);
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
 
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_1));
+    auto const session_id_str_3 = std::string{ session_id->sv() };
+    EXPECT_EQ(48U, std::size(session_id_str_3));
+    EXPECT_NE(session_id_str_2, session_id_str_3);
+    EXPECT_NE(session_id_str_1, session_id_str_3);
 
-    auto const* session_id_str_2 = tr_session_id_get_current(session_id);
-    EXPECT_NE(nullptr, session_id_str_2);
-    EXPECT_EQ(48U, strlen(session_id_str_2));
-    EXPECT_STREQ(session_id_str_1, session_id_str_2);
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_3));
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
+    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
 
-    tr_timeUpdate(60 * 60);
+    current_time_mock::set(60U * 60U * 10U);
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_3));
+    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
+    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
 
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_1));
-
-    session_id_str_2 = tr_session_id_get_current(session_id);
-    EXPECT_NE(nullptr, session_id_str_2);
-    EXPECT_EQ(48U, strlen(session_id_str_2));
-    EXPECT_STRNE(session_id_str_1, session_id_str_2);
-    session_id_str_2 = tr_strdup(session_id_str_2);
-
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_2));
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_1));
-
-    tr_timeUpdate(60 * 60 * 2);
-
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_2));
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_1));
-
-    auto const* session_id_str_3 = tr_session_id_get_current(session_id);
-    EXPECT_NE(nullptr, session_id_str_3);
-    EXPECT_EQ(48U, strlen(session_id_str_3));
-    EXPECT_STRNE(session_id_str_2, session_id_str_3);
-    EXPECT_STRNE(session_id_str_1, session_id_str_3);
-    session_id_str_3 = tr_strdup(session_id_str_3);
-
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_3));
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_2));
-    EXPECT_FALSE(tr_session_id_is_local(session_id_str_1));
-
-    tr_timeUpdate(60 * 60 * 10);
-
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_3));
-    EXPECT_TRUE(tr_session_id_is_local(session_id_str_2));
-    EXPECT_FALSE(tr_session_id_is_local(session_id_str_1));
-
-    tr_session_id_free(session_id);
-
-    EXPECT_FALSE(tr_session_id_is_local(session_id_str_3));
-    EXPECT_FALSE(tr_session_id_is_local(session_id_str_2));
-    EXPECT_FALSE(tr_session_id_is_local(session_id_str_1));
-
-    tr_free(const_cast<char*>(session_id_str_3));
-    tr_free(const_cast<char*>(session_id_str_2));
-    tr_free(const_cast<char*>(session_id_str_1));
+    session_id.reset();
+    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_3));
+    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_2));
+    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
 }
 
 } // namespace test
