@@ -114,7 +114,7 @@ static void natPulse(tr_shared* s, bool do_check)
     }
 }
 
-static void set_evtimer_from_status(tr_shared* s)
+static void restartTimer(tr_shared* s)
 {
     auto& timer = s->timer;
     if (!timer)
@@ -163,7 +163,7 @@ static void onTimer(void* vshared)
     s->doPortCheck = false;
 
     /* set up the timer for the next pulse */
-    set_evtimer_from_status(s);
+    restartTimer(s);
 }
 
 /***
@@ -209,7 +209,7 @@ void tr_sharedClose(tr_session* session)
 static void start_timer(tr_shared* s)
 {
     s->timer = s->session->timerMaker().create(onTimer, s);
-    set_evtimer_from_status(s);
+    restartTimer(s);
 }
 
 void tr_sharedTraversalEnable(tr_shared* s, bool is_enable)
