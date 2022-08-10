@@ -98,13 +98,13 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 6                 | Progress bar showing the current progress in downloading the torrent            |
 | 7                 | Pause selected torrent                                                          |
 
-### Torrent inspector ###
+### 5. Torrent inspector ###
 ![image](resources/WI-torrent-inspector.png)
 
 | Number On Picture | Description                                                                                                                                |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1                 | Name of torrent                                                                                                                            | 
-| 2                 | In current case: Transmission have 3.65 GB of file data from the total volume of downloaded files, which is 100%                           |
+| 2                 | In current case: Transmission has 3.65 GB of file data from the total volume of downloaded files, which is 100%                           |
 | 3                 | In current case: the file is available (written to disk) at 100%                                                                           |
 | 4                 | In current case: other peers have downloaded 111.2MB from you                                                                              |
 | 5                 | In current case: in total, Transmission downloaded 3.68 GB (in this case 2.35MB were corrupted, so Transmission had to re-download another 2.35MB)                                                                                                                                                          |
@@ -118,8 +118,18 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 13                | Torrent hash                                                                                                                               |
 | 14                | Private or public torrent                                                                                                                  |
 | 15                | A field indicating which program created the torrent and at what time                                                                      |
-| 16                | Comment on the torrent, usually a link to the site from where it was downloaded                                                            |
+| 16                | Comment on the torrent, usually a link to the site from where it was downloaded   
 
+#### 5.1 Torrent inspector peers tab ####
+![image](resources/WI-torrent-inspector-peers-tab.png)
 
-
-
+| Number On Picture | Description                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| 1                 | Name of torrent                                                 | 
+| 2                 | Upload speed column                                             |
+| 3                 | Download speed column                                           |
+| 4                 | A column showing how many percent of the file data the peer has |
+| 5                 | Peer status column(see [Peer status text](Peer-Status-Text.md)) |
+| 6                 | Сolumn showing the IP address of the peer                       |
+| 7                 | Column showing the Bittorrent client of the feast               |
+  
