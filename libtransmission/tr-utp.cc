@@ -3,8 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstdint>
-
-#include <event2/event.h>
+#include <chrono>
 
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -22,6 +21,8 @@
 #include "session.h"
 #include "tr-utp.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 #ifndef WITH_UTP
 
@@ -72,7 +73,7 @@ void tr_utpClose(tr_session* /*session*/)
 #else
 
 /* Greg says 50ms works for them. */
-static auto constexpr UtpIntervalUs = int{ 500000 };
+static auto constexpr UtpInterval = 50ms;
 
 static void utp_on_accept(tr_session* const session, UTPSocket* const s)
 {
@@ -155,15 +156,17 @@ static uint64 utp_callback(utp_callback_arguments* args)
     return 0;
 }
 
-static void reset_timer(tr_session* ss)
+static void reset_timer(tr_session* session)
 {
-    int sec = 0;
-    int usec = 0;
+    auto interval = std::chrono::milliseconds{};
+    auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
 
-    if (tr_sessionIsUTPEnabled(ss))
+    if (tr_sessionIsUTPEnabled(session))
     {
-        sec = 0;
-        usec = UtpIntervalUs / 2 + tr_rand_int_weak(UtpIntervalUs);
+        static auto constexpr MinInterval = UtpInterval * 0.5;
+        static auto constexpr MaxInterval = UtpInterval * 1.5;
+        auto const target = MinInterval + random_percent * (MaxInterval - MinInterval);
+        interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
     else
     {
@@ -172,14 +175,16 @@ static void reset_timer(tr_session* ss)
            gracefully and so on.  However, since we're not particularly
            interested in that happening in a timely manner, we might as
            well use a large timeout. */
-        sec = 2;
-        usec = tr_rand_int_weak(1000000);
+        static auto constexpr MinInterval = 2s;
+        static auto constexpr MaxInterval = 3s;
+        auto const target = MinInterval + random_percent * (MaxInterval - MinInterval);
+        interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
 
-    tr_timerAdd(*ss->utp_timer, sec, usec);
+    session->utp_timer->startSingleShot(interval);
 }
 
-static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession)
+static void timer_callback(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -226,15 +231,9 @@ void tr_utpInit(tr_session* session)
 
 bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosed && ss->utp_timer == nullptr)
+    if (!ss->isClosed && !ss->utp_timer)
     {
-        ss->utp_timer = evtimer_new(ss->eventBase(), timer_callback, ss);
-
-        if (ss->utp_timer == nullptr)
-        {
-            return false;
-        }
-
+        ss->utp_timer = ss->timerMaker().create(timer_callback, ss);
         reset_timer(ss);
     }
 
@@ -248,11 +247,7 @@ bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const
 
 void tr_utpClose(tr_session* session)
 {
-    if (session->utp_timer != nullptr)
-    {
-        evtimer_del(session->utp_timer);
-        session->utp_timer = nullptr;
-    }
+    session->utp_timer.reset();
 
     if (session->utp_context != nullptr)
     {
