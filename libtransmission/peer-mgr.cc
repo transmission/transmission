@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cerrno> /* error codes ERANGE, ... */
+#include <chrono>
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <cstdint>
@@ -17,8 +18,6 @@
 #include <tuple> // std::tie
 #include <utility>
 #include <vector>
-
-#include <event2/event.h>
 
 #include <fmt/format.h>
 
@@ -47,6 +46,8 @@
 #include "tr-utp.h"
 #include "utils.h"
 #include "webseed.h"
+
+using namespace std::literals;
 
 // use for bitwise operations w/peer_atom.flags2
 static auto constexpr MyflagBanned = int{ 1 };
@@ -560,27 +561,17 @@ private:
     bool is_endgame_ = false;
 };
 
-struct EventDeleter
-{
-    void operator()(struct event* ev) const
-    {
-        event_free(ev);
-    }
-};
-
-using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
-
 struct tr_peerMgr
 {
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
-        , bandwidth_timer_{ evtimer_new(session->eventBase(), bandwidthPulseMarshall, this) }
-        , rechoke_timer_{ evtimer_new(session->eventBase(), rechokePulseMarshall, this) }
-        , refill_upkeep_timer_{ evtimer_new(session->eventBase(), refillUpkeepMarshall, this) }
+        , bandwidth_timer_{ session->timerMaker().create([this]() { bandwidthPulse(); }) }
+        , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
+        , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
     {
-        tr_timerAddMsec(*bandwidth_timer_, BandwidthPeriodMsec);
-        tr_timerAddMsec(*rechoke_timer_, RechokePeriodMsec);
-        tr_timerAddMsec(*refill_upkeep_timer_, RefillUpkeepPeriodMsec);
+        bandwidth_timer_->startRepeating(BandwidthPeriod);
+        rechoke_timer_->startSingleShot(RechokePeriod);
+        refill_upkeep_timer_->startRepeating(RefillUpkeepPeriod);
     }
 
     tr_peerMgr(tr_peerMgr&&) = delete;
@@ -601,7 +592,7 @@ struct tr_peerMgr
 
     void rechokeSoon() noexcept
     {
-        tr_timerAddMsec(*rechoke_timer_, 100);
+        rechoke_timer_->startSingleShot(100ms);
     }
 
     void bandwidthPulse();
@@ -614,34 +605,19 @@ struct tr_peerMgr
     Handshakes incoming_handshakes;
 
 private:
-    static void bandwidthPulseMarshall(evutil_socket_t, short /*reason*/, void* vmgr)
+    void rechokePulseMarshall()
     {
-        auto* const self = static_cast<tr_peerMgr*>(vmgr);
-        self->bandwidthPulse();
-        tr_timerAddMsec(*self->bandwidth_timer_, BandwidthPeriodMsec);
+        rechokePulse();
+        rechoke_timer_->startSingleShot(RechokePeriod);
     }
 
-    static void rechokePulseMarshall(evutil_socket_t, short /*reason*/, void* vmgr)
-    {
-        auto* const self = static_cast<tr_peerMgr*>(vmgr);
-        self->rechokePulse();
-        tr_timerAddMsec(*self->rechoke_timer_, RechokePeriodMsec);
-    }
+    std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
+    std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
+    std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
 
-    static void refillUpkeepMarshall(evutil_socket_t, short /*reason*/, void* vmgr)
-    {
-        auto* const self = static_cast<tr_peerMgr*>(vmgr);
-        self->refillUpkeep();
-        tr_timerAddMsec(*self->refill_upkeep_timer_, RefillUpkeepPeriodMsec);
-    }
-
-    UniqueTimer const bandwidth_timer_;
-    UniqueTimer const rechoke_timer_;
-    UniqueTimer const refill_upkeep_timer_;
-
-    static auto constexpr BandwidthPeriodMsec = int{ 500 };
-    static auto constexpr RechokePeriodMsec = int{ 10 * 1000 };
-    static auto constexpr RefillUpkeepPeriodMsec = int{ 10 * 1000 };
+    static auto constexpr BandwidthPeriod = 500ms;
+    static auto constexpr RechokePeriod = 10s;
+    static auto constexpr RefillUpkeepPeriod = 10s;
 
     // how frequently to decide which peers live and die
     static auto constexpr ReconnectPeriodMsec = int{ 500 };
@@ -2579,8 +2555,9 @@ void tr_peerMgr::bandwidthPulse()
     pumpAllPeers(this);
 
     /* allocate bandwidth to the peers */
-    session->top_bandwidth_.allocate(TR_UP, BandwidthPeriodMsec);
-    session->top_bandwidth_.allocate(TR_DOWN, BandwidthPeriodMsec);
+    auto const msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
+    session->top_bandwidth_.allocate(TR_UP, msec);
+    session->top_bandwidth_.allocate(TR_DOWN, msec);
 
     /* torrent upkeep */
     for (auto* const tor : session->torrents())

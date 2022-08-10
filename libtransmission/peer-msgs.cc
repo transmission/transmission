@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <chrono>
 #include <cstring>
@@ -16,7 +17,6 @@
 
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
-#include <event2/event.h>
 
 #include <fmt/format.h>
 
@@ -203,7 +203,6 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
 static void peerPulse(void* vmsgs);
-static void pexPulse(evutil_socket_t fd, short what, void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
 static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
@@ -212,17 +211,6 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b);
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
 static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
-//zzz
-
-struct EventDeleter
-{
-    void operator()(struct event* ev) const
-    {
-        event_free(ev);
-    }
-};
-
-using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 
 #define myLogMacro(msgs, level, text) \
     do \
@@ -271,7 +259,7 @@ public:
         if (torrent->allowsPex())
         {
             pex_timer_ = torrent->session->timerMaker().create([this]() { sendPex(); });
-            pex_timer_->startRepeating(PexInterval);
+            pex_timer_->startRepeating(SendPexInterval);
         }
 
         if (io->supportsUTP())
@@ -863,15 +851,15 @@ public:
     tr_bitfield have_;
 
 private:
-    bool is_active_[2] = { false, false };
+    std::array<bool, 2> is_active_ = { false, false };
 
     tr_peer_callback const callback_;
     void* const callbackData_;
 
     mutable std::optional<float> percent_done_;
 
-    // seconds between sendPex() calls
-    static auto constexpr PexInterval = 90s;
+    // seconds between periodic sendPex() calls
+    static auto constexpr SendPexInterval = 90s;
 };
 
 tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data)
@@ -1465,8 +1453,6 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
         tr_variantFree(&val);
     }
 }
-
-static void sendPex(tr_peerMsgsImpl* msgs);
 
 static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
