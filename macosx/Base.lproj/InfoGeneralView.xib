@@ -75,7 +75,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="6">
                     <rect key="frame" x="10" y="170" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Hash:" id="36">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -83,7 +83,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="7">
                     <rect key="frame" x="10" y="106" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Comment:" id="35">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -100,7 +100,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="9">
                     <rect key="frame" x="10" y="122" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Created On:" id="32">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -116,7 +116,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="11">
                     <rect key="frame" x="10" y="138" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Creator:" id="30">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -146,7 +146,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="15">
                     <rect key="frame" x="10" y="12" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Data File:" id="26">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -162,7 +162,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="17">
                     <rect key="frame" x="10" y="154" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Secure:" id="24">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -170,7 +170,7 @@
                 <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="3">
                     <rect key="frame" x="10" y="202" width="114" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Torrent Information" id="41">
-                        <font key="font" metaFont="smallSystemBold"/>
+                        <font key="font" metaFont="systemBold" size="12"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -186,7 +186,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="20">
                     <rect key="frame" x="10" y="186" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Pieces:" id="21">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -194,7 +194,7 @@
                 <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="13">
                     <rect key="frame" x="10" y="28" width="41" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Where" id="28">
-                        <font key="font" metaFont="smallSystemBold"/>
+                        <font key="font" metaFont="systemBold" size="12"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
