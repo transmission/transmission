@@ -14,7 +14,6 @@
 #include "file.h"
 #include "log.h"
 #include "tr-strbuf.h"
-#include "tr-assert.h"
 #include "utils.h" // for _()
 #include "watchdir-base.h"
 
@@ -36,7 +35,6 @@ namespace
         return "done";
     }
 
-    TR_ASSERT(false);
     return "???";
 }
 
