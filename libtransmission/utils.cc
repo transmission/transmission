@@ -36,8 +36,6 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
-#include <event2/event.h>
-
 #include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
@@ -273,8 +271,7 @@ std::string_view tr_strvStrip(std::string_view str)
 
 uint64_t tr_time_msec()
 {
-    auto const tv = tr_gettimeofday();
-    return uint64_t(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
+    return std::chrono::system_clock::now().time_since_epoch() / 1ms;
 }
 
 void tr_wait_msec(long int delay_milliseconds)
