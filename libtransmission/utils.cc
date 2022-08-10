@@ -108,30 +108,6 @@ void tr_free(void* p)
     }
 }
 
-/***
-****
-***/
-
-void tr_timerAdd(struct event& timer, int seconds, int microseconds)
-{
-    auto tv = timeval{};
-    tv.tv_sec = seconds;
-    tv.tv_usec = microseconds;
-
-    TR_ASSERT(tv.tv_sec >= 0);
-    TR_ASSERT(tv.tv_usec >= 0);
-    TR_ASSERT(tv.tv_usec < 1000000);
-
-    evtimer_add(&timer, &tv);
-}
-
-void tr_timerAddMsec(struct event& timer, int milliseconds)
-{
-    int const seconds = milliseconds / 1000;
-    int const usec = (milliseconds % 1000) * 1000;
-    tr_timerAdd(timer, seconds, usec);
-}
-
 /**
 ***
 **/

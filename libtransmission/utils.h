@@ -88,21 +88,6 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
  */
 tr_disk_space tr_dirSpace(std::string_view directory);
 
-/**
- * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
- * @param timer         the timer to set
- * @param seconds       seconds to wait
- * @param microseconds  microseconds to wait
- */
-void tr_timerAdd(struct event& timer, int seconds, int microseconds);
-
-/**
- * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of milliseconds
- * @param timer         the timer to set
- * @param milliseconds  milliseconds to wait
- */
-void tr_timerAddMsec(struct event& timer, int milliseconds);
-
 /** @brief return the current date in milliseconds */
 uint64_t tr_time_msec();
 
