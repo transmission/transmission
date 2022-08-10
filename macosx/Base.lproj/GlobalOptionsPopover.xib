@@ -25,7 +25,7 @@
                     <rect key="frame" x="11" y="99" width="105" height="16"/>
                     <buttonCell key="cell" type="check" title="Limit Download:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="44">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                         <connections>
                             <binding destination="119" name="value" keyPath="values.CheckDownload" id="145"/>
                         </connections>
@@ -39,7 +39,7 @@
                     <rect key="frame" x="11" y="77" width="105" height="16"/>
                     <buttonCell key="cell" type="check" title="Limit Upload:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="43">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                     </buttonCell>
                     <connections>
                         <action selector="setUpSpeedSetting:" target="-2" id="153"/>
@@ -123,7 +123,7 @@
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="20">
                     <rect key="frame" x="10" y="122" width="114" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Transfer Bandwidth" id="23">
-                        <font key="font" metaFont="smallSystemBold"/>
+                        <font key="font" metaFont="systemBold" size="12"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -131,7 +131,7 @@
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="21">
                     <rect key="frame" x="10" y="56" width="87" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Seeding Limits" id="22">
-                        <font key="font" metaFont="smallSystemBold"/>
+                        <font key="font" metaFont="systemBold" size="12"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -182,7 +182,7 @@
                     <rect key="frame" x="11" y="143" width="142" height="16"/>
                     <buttonCell key="cell" type="check" title="Status of selected files" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="114">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="12"/>
                     </buttonCell>
                     <connections>
                         <action selector="updatedDisplayString:" target="-2" id="192"/>
@@ -214,7 +214,7 @@
                     <rect key="frame" x="11" y="33" width="134" height="16"/>
                     <buttonCell key="cell" type="check" title="Stop seeding at ratio:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="116">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                     </buttonCell>
                     <connections>
                         <action selector="setRatioStopSetting:" target="-2" id="188"/>
@@ -225,7 +225,7 @@
                     <rect key="frame" x="11" y="11" width="187" height="16"/>
                     <buttonCell key="cell" type="check" title="Stop seeding when inactive for:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="118">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="systemBold" size="11"/>
                     </buttonCell>
                     <connections>
                         <action selector="setIdleStopSetting:" target="-2" id="189"/>
