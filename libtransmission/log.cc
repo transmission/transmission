@@ -12,8 +12,6 @@
 #include <string_view>
 #include <utility>
 
-#include <event2/buffer.h>
-
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 

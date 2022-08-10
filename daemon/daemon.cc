@@ -31,6 +31,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
+#include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
@@ -60,6 +61,7 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 #endif
 
 using namespace std::literals;
+using libtransmission::Watchdir;
 
 /***
 ****
@@ -226,28 +228,30 @@ static char const* getConfigDir(int argc, char const* const* argv)
     return configDir;
 }
 
-static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
+static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
 {
-    auto const* session = static_cast<tr_session const*>(vsession);
+    auto const lowercase = tr_strlower(basename);
+    auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
+    auto const is_magnet = tr_strvEndsWith(lowercase, ".magnet"sv);
 
-    if (!tr_str_has_suffix(name, ".torrent") && !tr_str_has_suffix(name, ".magnet"))
+    if (!is_torrent && !is_magnet)
     {
-        return TR_WATCHDIR_IGNORE;
+        return Watchdir::Action::Done;
     }
 
-    auto const filename = tr_pathbuf{ tr_watchdir_get_path(dir), '/', name };
+    auto const filename = tr_pathbuf{ dirname, '/', basename };
     tr_ctor* const ctor = tr_ctorNew(session);
 
     bool retry = false;
 
-    if (tr_str_has_suffix(name, ".torrent"))
+    if (is_torrent)
     {
         if (!tr_ctorSetMetainfoFromFile(ctor, filename, nullptr))
         {
             retry = true;
         }
     }
-    else // ".magnet" suffix
+    else // is_magnet
     {
         auto content = std::vector<char>{};
         tr_error* error = nullptr;
@@ -255,7 +259,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),
-                fmt::arg("path", name),
+                fmt::arg("path", basename),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
             tr_error_free(error);
@@ -275,12 +279,12 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
     if (retry)
     {
         tr_ctorFree(ctor);
-        return TR_WATCHDIR_RETRY;
+        return Watchdir::Action::Retry;
     }
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
     {
-        tr_logAddError(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", name)));
+        tr_logAddError(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", basename)));
     }
     else
     {
@@ -291,13 +295,13 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         {
             tr_error* error = nullptr;
 
-            tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", name)));
+            tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", basename)));
 
             if (!tr_sys_path_remove(filename, &error))
             {
                 tr_logAddError(fmt::format(
                     _("Couldn't remove '{path}': {error} ({error_code})"),
-                    fmt::arg("path", name),
+                    fmt::arg("path", basename),
                     fmt::arg("error", error->message),
                     fmt::arg("error_code", error->code)));
                 tr_error_free(error);
@@ -310,7 +314,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
     }
 
     tr_ctorFree(ctor);
-    return TR_WATCHDIR_ACCEPT;
+    return Watchdir::Action::Done;
 }
 
 static char const* levelName(tr_log_level level)
@@ -712,7 +716,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
-    tr_watchdir_t watchdir = nullptr;
+    auto watchdir = std::unique_ptr<Watchdir>{};
 
     auto* arg = static_cast<daemon_data*>(varg);
     tr_variant* const settings = &arg->settings;
@@ -802,11 +806,14 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             tr_logAddInfo(fmt::format(_("Watching '{path}' for new torrent files"), fmt::arg("path", dir)));
 
-            watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
-            if (watchdir == nullptr)
+            auto handler = [session](std::string_view dirname, std::string_view basename)
             {
-                goto CLEANUP;
-            }
+                return onFileAdded(session, dirname, basename);
+            };
+
+            auto timer_maker = libtransmission::EvTimerMaker{ ev_base };
+            watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
+                                       Watchdir::create(dir, handler, timer_maker, ev_base);
         }
     }
 
@@ -877,7 +884,7 @@ CLEANUP:
     sd_notify(0, "STATUS=Closing transmission session...\n");
     printf("Closing transmission session...");
 
-    tr_watchdir_free(watchdir);
+    watchdir.reset();
 
     if (status_ev != nullptr)
     {

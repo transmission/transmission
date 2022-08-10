@@ -181,9 +181,6 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
     @param errnum the error number to describe */
 [[nodiscard]] char const* tr_strerror(int errnum);
 
-/** @brief Returns true if the string ends with the specified case-insensitive suffix */
-[[nodiscard]] bool tr_str_has_suffix(char const* str, char const* suffix);
-
 template<typename T>
 [[nodiscard]] std::string tr_strlower(T in)
 {

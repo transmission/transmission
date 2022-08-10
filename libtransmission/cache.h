@@ -20,7 +20,6 @@
 #include "block-info.h"
 
 class tr_torrents;
-struct evbuffer;
 struct tr_torrent;
 
 class Cache

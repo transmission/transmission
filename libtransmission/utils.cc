@@ -36,7 +36,6 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
-#include <event2/buffer.h>
 #include <event2/event.h>
 
 #include <fmt/format.h>
@@ -304,29 +303,6 @@ std::string_view tr_strvStrip(std::string_view str)
     str.remove_suffix(std::distance(std::rbegin(str), rit));
 
     return str;
-}
-
-bool tr_str_has_suffix(char const* str, char const* suffix)
-{
-    if (str == nullptr)
-    {
-        return false;
-    }
-
-    if (suffix == nullptr)
-    {
-        return true;
-    }
-
-    auto const str_len = strlen(str);
-    auto const suffix_len = strlen(suffix);
-
-    if (str_len < suffix_len)
-    {
-        return false;
-    }
-
-    return evutil_ascii_strncasecmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
 }
 
 /****

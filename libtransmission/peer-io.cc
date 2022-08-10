@@ -540,7 +540,7 @@ tr_peerIo* tr_peerIoNew(
 #endif
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported peer socket type {:d}"), socket.type));
+        TR_ASSERT_MSG(false, fmt::format("unsupported peer socket type {:d}", socket.type));
     }
 
     return io;
