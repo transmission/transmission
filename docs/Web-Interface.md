@@ -134,6 +134,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 7                 | Column showing the Bittorrent client of the feast               |
 
 #### 5.1 Torrent inspector trackers tab ####
+![image](resources/WI-torrent-inspector-trackers-tab.png)
 
 | Number On Picture | Description                                                                       |
 | ----------------- | --------------------------------------------------------------------------------- |
