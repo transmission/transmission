@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <chrono>
 #include <csignal> /* sig_atomic_t */
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
 #include <type_traits>
@@ -49,9 +50,9 @@ static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
 static void event_callback(evutil_socket_t, short /*type*/, void* /*unused*/);
 
-static auto constexpr UpkeepIntervalSecs = int{ 5 };
+static auto constexpr UpkeepInterval = 5s;
 
-static struct event* upkeep_timer = nullptr;
+static std::unique_ptr<libtransmission::Timer> upkeep_timer;
 
 static tr_socket_t lpd_socket; /**<separate multicast receive socket */
 static tr_socket_t lpd_socket2; /**<and multicast send socket */
@@ -229,7 +230,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 /**
 * @} */
 
-static void on_upkeep_timer(evutil_socket_t, short /*unused*/, void* /*unused*/);
+static void on_upkeep_timer();
 
 /**
 * @brief Initializes Local Peer Discovery for this node
@@ -357,8 +358,8 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     lpd_event = event_new(ss->eventBase(), lpd_socket, EV_READ | EV_PERSIST, event_callback, nullptr);
     event_add(lpd_event, nullptr);
 
-    upkeep_timer = evtimer_new(ss->eventBase(), on_upkeep_timer, ss);
-    tr_timerAdd(*upkeep_timer, UpkeepIntervalSecs, 0);
+    upkeep_timer = ss->timerMaker().create([]() { on_upkeep_timer(); });
+    upkeep_timer->startRepeating(UpkeepInterval);
 
     tr_logAddDebug("Local Peer Discovery initialised");
 
@@ -393,8 +394,7 @@ void tr_lpdUninit(tr_session* ss)
     event_free(lpd_event);
     lpd_event = nullptr;
 
-    evtimer_del(upkeep_timer);
-    upkeep_timer = nullptr;
+    upkeep_timer.reset();
 
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket(lpd_socket);
@@ -616,11 +616,11 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
     return announcesSent;
 }
 
-static void on_upkeep_timer(evutil_socket_t /*s*/, short /*type*/, void* /*user_data*/)
+static void on_upkeep_timer()
 {
     time_t const now = tr_time();
-    tr_lpdAnnounceMore(now, UpkeepIntervalSecs);
-    tr_timerAdd(*upkeep_timer, UpkeepIntervalSecs, 0);
+    auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
+    tr_lpdAnnounceMore(now, seconds);
 }
 
 /**
