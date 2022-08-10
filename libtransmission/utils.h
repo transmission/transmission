@@ -285,9 +285,6 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
 
-/** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
-struct timeval tr_gettimeofday();
-
 /**
  * @brief move a file
  * @return `True` on success, `false` otherwise (with `error` set accordingly).

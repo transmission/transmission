@@ -755,10 +755,19 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 
+/***
+****
+***/
+
 extern "C" int dht_gettimeofday(struct timeval* tv, [[maybe_unused]] timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
-    *tv = tr_gettimeofday();
+
+    auto const d = std::chrono::system_clock::now().time_since_epoch();
+    auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
+    tv->tv_sec = s.count();
+    tv->tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
+
     return 0;
 }
 

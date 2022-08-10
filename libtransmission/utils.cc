@@ -64,20 +64,6 @@ time_t __tr_current_time = 0;
 ****
 ***/
 
-struct timeval tr_gettimeofday()
-{
-    auto const d = std::chrono::system_clock::now().time_since_epoch();
-    auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
-    auto ret = timeval{};
-    ret.tv_sec = s.count();
-    ret.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
-    return ret;
-}
-
-/***
-****
-***/
-
 void* tr_malloc(size_t size)
 {
     return size != 0 ? malloc(size) : nullptr;
