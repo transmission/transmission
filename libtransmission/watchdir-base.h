@@ -16,9 +16,7 @@
 #include "timer.h"
 #include "watchdir.h"
 
-namespace libtransmission
-{
-namespace impl
+namespace libtransmission::impl
 {
 // base class for concrete tr_watchdirs
 class BaseWatchdir : public Watchdir
@@ -32,7 +30,7 @@ public:
         retry_timer_->setCallback([this]() { onRetryTimer(); });
     }
 
-    virtual ~BaseWatchdir() override = default;
+    ~BaseWatchdir() override = default;
     BaseWatchdir(BaseWatchdir&&) = delete;
     BaseWatchdir(BaseWatchdir const&) = delete;
     BaseWatchdir& operator=(BaseWatchdir&&) = delete;
@@ -127,6 +125,10 @@ private:
             {
                 processFile(basename);
             }
+            else
+            {
+                pending_.emplace(basename, info);
+            }
         }
 
         restartTimerIfPending();
@@ -142,5 +144,4 @@ private:
     std::chrono::seconds timeout_duration_ = std::chrono::seconds{ 15 };
 };
 
-} // namespace impl
-} // namespace libtransmission
+} // namespace libtransmission::impl

@@ -25,9 +25,8 @@
 #include "transmission.h"
 
 #include "log.h"
-#include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "utils.h"
+#include "utils.h" // for _()
 #include "watchdir-base.h"
 
 namespace libtransmission
