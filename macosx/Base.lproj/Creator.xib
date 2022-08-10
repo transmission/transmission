@@ -96,7 +96,7 @@
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="13">
                         <rect key="frame" x="18" y="169" width="77" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Comment:" usesSingleLineMode="YES" id="70">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -104,7 +104,7 @@
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="14">
                         <rect key="frame" x="18" y="300" width="77" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Trackers:" usesSingleLineMode="YES" id="71">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -263,7 +263,7 @@ Gw
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="faa-JK-W9Q">
                         <rect key="frame" x="18" y="112" width="77" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Source:" usesSingleLineMode="YES" id="f1g-Kk-weU">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -278,7 +278,7 @@ Gw
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="19">
                         <rect key="frame" x="18" y="56" width="77" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Torrent File:" usesSingleLineMode="YES" id="74">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
