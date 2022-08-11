@@ -181,7 +181,7 @@ jobs:
         run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install gtkmm3
+        run: brew install gtkmm3 libjpeg
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install qt@5
