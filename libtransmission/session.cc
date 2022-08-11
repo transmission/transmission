@@ -3000,32 +3000,21 @@ auto makeTorrentDir(std::string_view config_dir)
     return dir;
 }
 
+auto makeEventBase()
+{
+    tr_evthread_init();
+    return std::shared_ptr<event_base>{ event_base_new(), event_base_free };
+}
+
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
     : session_id{ tr_time }
+    , event_base_{ makeEventBase() }
+    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , session_stats_{ config_dir, time(nullptr) }
 {
-}
-
-void tr_session::setEventBase(event_base* base)
-{
-    TR_ASSERT(event_base_ == nullptr);
-    event_base_ = base;
-    timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(base);
-}
-
-void tr_session::clearEventBase()
-{
-    timer_maker_.reset();
-    event_base_ = nullptr;
-}
-
-[[nodiscard]] libtransmission::TimerMaker& tr_session::timerMaker() noexcept
-{
-    TR_ASSERT(timer_maker_);
-    return *timer_maker_;
 }

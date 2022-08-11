@@ -128,17 +128,17 @@ struct tr_turtle_info
 struct tr_session
 {
 public:
-    tr_session(std::string_view config_dir);
+    explicit tr_session(std::string_view config_dir);
 
-    [[nodiscard]] constexpr auto* eventBase() noexcept
+    [[nodiscard]] event_base* eventBase() noexcept
     {
-        return event_base_;
+        return event_base_.get();
     }
 
-    void setEventBase(event_base* base);
-    void clearEventBase();
-
-    [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept;
+    [[nodiscard]] auto& timerMaker() noexcept
+    {
+        return *timer_maker_;
+    }
 
     [[nodiscard]] constexpr auto& torrents()
     {
@@ -609,8 +609,8 @@ public:
 private:
     static std::recursive_mutex session_mutex_;
 
-    struct event_base* event_base_ = nullptr;
-    std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
+    std::shared_ptr<event_base> const event_base_;
+    std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
     tr_torrents torrents_;
 

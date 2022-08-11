@@ -238,7 +238,7 @@ TEST_P(WatchDirTest, retry)
     auto const test_file = "test.txt"sv;
     createFile(path, test_file);
     processEvents(ThreeRetries);
-    EXPECT_LE(2, std::size(names));
+    EXPECT_LE(2U, std::size(names));
     for (auto const& name : names)
     {
         EXPECT_EQ(test_file, name);
