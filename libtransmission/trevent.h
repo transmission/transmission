@@ -17,6 +17,8 @@
 
 struct tr_session;
 
+void tr_evthread_init();
+
 void tr_eventInit(tr_session* session);
 
 void tr_eventClose(tr_session* session);

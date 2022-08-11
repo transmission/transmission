@@ -35,7 +35,7 @@
 
 namespace
 {
-namespace impl
+namespace tr_evthread_init_helpers
 {
 void* lock_alloc(unsigned /*locktype*/)
 {
@@ -109,28 +109,33 @@ unsigned long thread_current_id()
     return std::hash<std::thread::id>()(std::this_thread::get_id());
 }
 
-} // namespace impl
+auto evthread_flag = std::once_flag{};
 
-void tr_evthread_init()
+void initEvthreadsOnce()
 {
-    // evthread_enable_lock_debugging();
-
-    evthread_lock_callbacks constexpr lock_cbs{ EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE,
-                                                impl::lock_alloc,          impl::lock_free,
-                                                impl::lock_lock,           impl::lock_unlock };
+    evthread_lock_callbacks constexpr lock_cbs{
+        EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
+    };
     evthread_set_lock_callbacks(&lock_cbs);
 
     evthread_condition_callbacks constexpr cond_cbs{ EVTHREAD_CONDITION_API_VERSION,
-                                                     impl::cond_alloc,
-                                                     impl::cond_free,
-                                                     impl::cond_signal,
-                                                     impl::cond_wait };
+                                                     cond_alloc,
+                                                     cond_free,
+                                                     cond_signal,
+                                                     cond_wait };
     evthread_set_condition_callbacks(&cond_cbs);
 
-    evthread_set_id_callback(impl::thread_current_id);
+    evthread_set_id_callback(thread_current_id);
 }
 
+} // namespace tr_evthread_init_helpers
 } // namespace
+
+void tr_evthread_init()
+{
+    using namespace tr_evthread_init_helpers;
+    std::call_once(evthread_flag, initEvthreadsOnce);
+}
 
 /***
 ****
