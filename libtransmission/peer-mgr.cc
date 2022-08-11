@@ -1826,7 +1826,7 @@ namespace
 /* does this peer have any pieces that we want? */
 [[nodiscard]] bool isPeerInteresting(
     tr_torrent* const tor,
-    bool const* const piece_is_interesting,
+    std::vector<bool> const& piece_is_interesting,
     tr_peerMsgs const* const peer)
 {
     /* these cases should have already been handled by the calling code... */
@@ -1990,7 +1990,8 @@ void rechokeDownloads(tr_swarm* s)
         int const n = tor->pieceCount();
 
         /* build a bitfield of interesting pieces... */
-        auto* const piece_is_interesting = tr_new(bool, n);
+        auto piece_is_interesting = std::vector<bool>{};
+        piece_is_interesting.resize(n);
 
         for (int i = 0; i < n; ++i)
         {
@@ -2034,8 +2035,6 @@ void rechokeDownloads(tr_swarm* s)
                 rechoke.emplace_back(peer, rechoke_state, salter());
             }
         }
-
-        tr_free(piece_is_interesting);
     }
 
     std::sort(std::begin(rechoke), std::end(rechoke));
