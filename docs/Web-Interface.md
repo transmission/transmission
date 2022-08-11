@@ -132,4 +132,18 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 5                 | Peer status column(see [Peer status text](Peer-Status-Text.md)) |
 | 6                 | Сolumn showing the IP address of the peer                       |
 | 7                 | Column showing the Bittorrent client of the feast               |
+
+#### 5.1 Torrent inspector trackers tab ####
+![image](resources/WI-torrent-inspector-trackers-tab.png)
+
+| Number On Picture | Description                                                                       |
+| ----------------- | --------------------------------------------------------------------------------- |
+| 1                 | URL of tracker                                                                    | 
+| 2                 | Date and time of the last Transmission announcement about yourself on the tracker |
+| 3                 | Time until the next announcement about yourself                                   |
+| 4                 | The time of the last receive of the list of tracker members                       |
+| 5                 | The number of seeders - those who distribute the file                             |
+| 6                 | Number of leechers - those who want to download file                              |
+| 7                 | Number of current downloads                                                       |
+
   
