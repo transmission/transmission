@@ -151,7 +151,6 @@ struct tr_event_handle
     std::mutex work_queue_mutex;
     event* work_queue_event = nullptr;
 
-    event_base* base = nullptr;
     tr_session* session = nullptr;
     std::thread::id thread_id;
 };
@@ -186,13 +185,11 @@ static void libeventThreadFunc(tr_event_handle* events)
     tr_evthread_init();
 
     // create the libevent base
-    auto* const base = event_base_new();
+    auto* base = events->session->eventBase();
     auto* const dns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
 
     // initialize the session struct's event fields
-    events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
-    events->session->setEventBase(base);
     events->session->evdns_base = dns_base;
     events->session->events = events;
 
@@ -209,8 +206,6 @@ static void libeventThreadFunc(tr_event_handle* events)
         evdns_base_free(dns_base, 0);
     }
     event_free(events->work_queue_event);
-    event_base_free(base);
-    events->session->clearEventBase();
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
@@ -242,7 +237,7 @@ void tr_eventClose(tr_session* session)
         return;
     }
 
-    event_base_loopexit(events->base, nullptr);
+    event_base_loopexit(session->eventBase(), nullptr);
 
     tr_logAddTrace("closing trevent pipe");
 }
