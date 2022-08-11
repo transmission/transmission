@@ -254,7 +254,7 @@
     {
         NSString* name = !std::empty(currentMessage->name) ? @(currentMessage->name.c_str()) : NSProcessInfo.processInfo.processName;
 
-        NSString* file = [(@(currentMessage->file)).lastPathComponent stringByAppendingFormat:@":%d", currentMessage->line];
+        NSString* file = [(@(currentMessage->file.c_str())).lastPathComponent stringByAppendingFormat:@":%d", currentMessage->line];
 
         NSDictionary* message = @{
             @"Message" : @(currentMessage->message.c_str()),
