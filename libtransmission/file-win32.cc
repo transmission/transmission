@@ -21,6 +21,7 @@
 #include "file.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
+#include "utils.h"
 
 using namespace std::literals;
 
