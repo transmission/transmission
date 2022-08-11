@@ -147,7 +147,7 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 7                 | Number of current downloads                                                       |
 
 #### 5.1 Torrent inspector files tab ####
-
+![image](resources/WI-torrent-inspector-files-tab.png)
 
 | Number On Picture | Description                                                                                           |
 | ----------------- | ----------------------------------------------------------------------------------------------------- |
