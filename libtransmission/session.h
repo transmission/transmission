@@ -135,7 +135,7 @@ public:
         return event_base_.get();
     }
 
-    [[nodiscard]] constexpr auto& timerMaker() noexcept
+    [[nodiscard]] auto& timerMaker() noexcept
     {
         return *timer_maker_;
     }
