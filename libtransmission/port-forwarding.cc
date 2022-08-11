@@ -39,7 +39,7 @@ struct tr_shared
     tr_port_forwarding upnpStatus = TR_PORT_UNMAPPED;
 
     tr_upnp* upnp = nullptr;
-    tr_natpmp* natpmp = nullptr;
+    std::unique_ptr<tr_natpmp> natpmp;
 
     std::unique_ptr<libtransmission::Timer> timer;
 };
@@ -75,9 +75,9 @@ static void natPulse(tr_shared* s, bool do_check)
     tr_port const private_peer_port = session.private_peer_port;
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
-    if (s->natpmp == nullptr)
+    if (!s->natpmp)
     {
-        s->natpmp = tr_natpmpInit();
+        s->natpmp = std::make_unique<tr_natpmp>();
     }
 
     if (s->upnp == nullptr)
@@ -89,7 +89,7 @@ static void natPulse(tr_shared* s, bool do_check)
 
     auto public_peer_port = tr_port{};
     auto received_private_port = tr_port{};
-    s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled, &public_peer_port, &received_private_port);
+    s->natpmpStatus = s->natpmp->pulse(private_peer_port, is_enabled, &public_peer_port, &received_private_port);
 
     if (s->natpmpStatus == TR_PORT_MAPPED)
     {
@@ -129,9 +129,9 @@ static void restartTimer(tr_shared* s)
         // if we're mapped, everything is fine... check back at `renew_time`
         // to renew the port forwarding if it's expired
         s->doPortCheck = true;
-        if (auto const now = tr_time(); s->natpmp->renew_time > now)
+        if (auto const now = tr_time(); s->natpmp->renewTime() > now)
         {
-            timer->startSingleShot(std::chrono::seconds{ s->natpmp->renew_time - now });
+            timer->startSingleShot(std::chrono::seconds{ s->natpmp->renewTime() - now });
         }
         else // ???
         {
@@ -185,8 +185,7 @@ static void stop_forwarding(tr_shared* s)
     tr_logAddTrace("stopped");
     natPulse(s, false);
 
-    tr_natpmpClose(s->natpmp);
-    s->natpmp = nullptr;
+    s->natpmp.reset();
     s->natpmpStatus = TR_PORT_UNMAPPED;
 
     tr_upnpClose(s->upnp);
