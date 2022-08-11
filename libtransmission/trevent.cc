@@ -113,6 +113,8 @@ auto evthread_flag = std::once_flag{};
 
 void initEvthreadsOnce()
 {
+    tr_net_init();
+
     evthread_lock_callbacks constexpr lock_cbs{
         EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
     };
