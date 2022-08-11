@@ -24,12 +24,12 @@ using namespace std::literals;
 
 struct tr_shared
 {
-    tr_shared(tr_session* session_in)
+    tr_shared(tr_session& session_in)
         : session{ session_in }
     {
     }
 
-    tr_session* const session = nullptr;
+    tr_session& session;
 
     bool isEnabled = false;
     bool isShuttingDown = false;
@@ -71,8 +71,8 @@ static char const* getNatStateStr(int state)
 
 static void natPulse(tr_shared* s, bool do_check)
 {
-    auto* session = s->session;
-    tr_port const private_peer_port = session->private_peer_port;
+    auto& session = s->session;
+    tr_port const private_peer_port = session.private_peer_port;
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
     if (s->natpmp == nullptr)
@@ -93,15 +93,15 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (s->natpmpStatus == TR_PORT_MAPPED)
     {
-        session->public_peer_port = public_peer_port;
-        session->private_peer_port = received_private_port;
+        session.public_peer_port = public_peer_port;
+        session.private_peer_port = received_private_port;
         tr_logAddInfo(fmt::format(
             _("Mapped private port {private_port} to public port {public_port}"),
-            fmt::arg("public_port", session->public_peer_port.host()),
-            fmt::arg("private_port", session->private_peer_port.host())));
+            fmt::arg("public_port", session.public_peer_port.host()),
+            fmt::arg("private_port", session.private_peer_port.host())));
     }
 
-    s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check, session->bind_ipv4.readable());
+    s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
 
     auto const new_status = tr_sharedTraversalStatus(s);
 
@@ -170,7 +170,7 @@ static void onTimer(void* vshared)
 ****
 ***/
 
-tr_shared* tr_sharedInit(tr_session* session)
+tr_shared* tr_sharedInit(tr_session& session)
 {
     return new tr_shared{ session };
 }
@@ -196,19 +196,19 @@ static void stop_forwarding(tr_shared* s)
     stop_timer(s);
 }
 
-void tr_sharedClose(tr_session* session)
+void tr_sharedClose(tr_session& session)
 {
-    tr_shared* shared = session->shared;
+    tr_shared* shared = session.shared;
 
     shared->isShuttingDown = true;
     stop_forwarding(shared);
-    shared->session->shared = nullptr;
+    shared->session.shared = nullptr;
     delete shared;
 }
 
 static void start_timer(tr_shared* s)
 {
-    s->timer = s->session->timerMaker().create(onTimer, s);
+    s->timer = s->session.timerMaker().create(onTimer, s);
     restartTimer(s);
 }
 
@@ -226,9 +226,9 @@ void tr_sharedTraversalEnable(tr_shared* s, bool is_enable)
     }
 }
 
-void tr_sharedPortChanged(tr_session* session)
+void tr_sharedPortChanged(tr_session& session)
 {
-    tr_shared* s = session->shared;
+    auto* const s = session.shared;
 
     if (s->isEnabled)
     {
