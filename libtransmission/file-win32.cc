@@ -20,7 +20,7 @@
 #include "error.h"
 #include "file.h"
 #include "tr-assert.h"
-#include "tr-pathbuf.h"
+#include "tr-strbuf.h"
 
 using namespace std::literals;
 
