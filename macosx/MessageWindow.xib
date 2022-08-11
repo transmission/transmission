@@ -22,15 +22,14 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="320" y="502" width="611" height="328"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="550" height="200"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="611" height="328"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="13">
-                        <rect key="frame" x="509" y="6" width="82" height="25"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
+                        <rect key="frame" x="544" y="3" width="48" height="23"/>
                         <buttonCell key="cell" type="roundTextured" title="Clear" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="59">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -39,9 +38,8 @@
                             <action selector="clearLog:" target="-2" id="14"/>
                         </connections>
                     </button>
-                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="15">
-                        <rect key="frame" x="20" y="5" width="101" height="25"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="15">
+                        <rect key="frame" x="17" y="1" width="95" height="25"/>
                         <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" imagePosition="left" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" id="60">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
@@ -59,9 +57,8 @@
                             <action selector="changeLevel:" target="-2" id="21"/>
                         </connections>
                     </popUpButton>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="24">
-                        <rect key="frame" x="129" y="6" width="82" height="25"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="24">
+                        <rect key="frame" x="115" y="3" width="56" height="23"/>
                         <buttonCell key="cell" type="roundTextured" title="Save…" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="61">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -70,15 +67,14 @@
                             <action selector="writeToFile:" target="-2" id="25"/>
                         </connections>
                     </button>
-                    <scrollView fixedFrame="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="30">
-                        <rect key="frame" x="-1" y="35" width="613" height="294"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <scrollView horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="30">
+                        <rect key="frame" x="-1" y="30" width="613" height="299"/>
                         <clipView key="contentView" id="Ncd-0I-lkt">
-                            <rect key="frame" x="1" y="1" width="611" height="292"/>
+                            <rect key="frame" x="1" y="1" width="611" height="297"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" autosaveName="LogTableView" rowHeight="14" headerView="66" id="31">
-                                    <rect key="frame" x="0.0" y="0.0" width="611" height="269"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="611" height="274"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -97,7 +93,7 @@
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
-                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" alignment="left" title="4/1/76, 11:00 PM" id="62">
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" alignment="left" title="4/1/1976, 11:00 pm" id="62">
                                                 <dateFormatter key="formatter" dateStyle="short" timeStyle="short" id="39"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -145,7 +141,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="64">
-                            <rect key="frame" x="596" y="24" width="16" height="269"/>
+                            <rect key="frame" x="596" y="24" width="16" height="274"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" wantsLayer="YES" id="66">
@@ -153,9 +149,11 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
-                    <searchField wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="72">
-                        <rect key="frame" x="351" y="8" width="150" height="22"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    <searchField wantsLayer="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="72">
+                        <rect key="frame" x="353" y="4" width="184" height="22"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="184" id="DIT-6d-IWt"/>
+                        </constraints>
                         <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter" bezelStyle="round" id="73">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -166,6 +164,21 @@
                         </connections>
                     </searchField>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="72" firstAttribute="centerY" secondItem="15" secondAttribute="centerY" id="0XN-t8-46e"/>
+                    <constraint firstItem="24" firstAttribute="leading" secondItem="15" secondAttribute="trailing" constant="8" symbolic="YES" id="4l6-Fu-ZcX"/>
+                    <constraint firstItem="13" firstAttribute="leading" secondItem="72" secondAttribute="trailing" constant="8" symbolic="YES" id="6bb-cd-9n7"/>
+                    <constraint firstAttribute="trailing" secondItem="30" secondAttribute="trailing" constant="-1" id="Aa9-Tl-L7z"/>
+                    <constraint firstAttribute="trailing" secondItem="13" secondAttribute="trailing" constant="20" symbolic="YES" id="DOO-Vg-foL"/>
+                    <constraint firstItem="24" firstAttribute="centerY" secondItem="15" secondAttribute="centerY" id="Dpi-HF-bee"/>
+                    <constraint firstItem="30" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="-1" id="Iso-0q-OyD"/>
+                    <constraint firstItem="30" firstAttribute="top" secondItem="6" secondAttribute="top" constant="-1" id="Tke-P9-2Q1"/>
+                    <constraint firstItem="13" firstAttribute="centerY" secondItem="15" secondAttribute="centerY" id="VVk-HR-ne1"/>
+                    <constraint firstItem="13" firstAttribute="top" secondItem="30" secondAttribute="bottom" constant="5" id="WiJ-cK-XNo"/>
+                    <constraint firstAttribute="bottom" secondItem="13" secondAttribute="bottom" constant="5" id="YaQ-Y1-LK1"/>
+                    <constraint firstItem="72" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="24" secondAttribute="trailing" constant="8" symbolic="YES" id="rFi-Db-Cio"/>
+                    <constraint firstItem="15" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="20" symbolic="YES" id="ufa-KH-Hrp"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="67"/>

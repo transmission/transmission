@@ -10,8 +10,6 @@
 #include <string_view>
 #include <vector>
 
-#include <event2/buffer.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
