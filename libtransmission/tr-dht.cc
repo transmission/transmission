@@ -21,7 +21,7 @@
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
 #else
-#include <sys/time.h>
+#include <sys/time.h> // for `struct timezone`
 #include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netdb.h>
@@ -759,7 +759,7 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 ****
 ***/
 
-extern "C" int dht_gettimeofday(struct timeval* tv, [[maybe_unused]] timezone* tz)
+extern "C" int dht_gettimeofday(struct timeval* tv, [[maybe_unused]] struct timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
 
