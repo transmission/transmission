@@ -20,7 +20,6 @@
 #include "error.h"
 #include "file.h"
 #include "tr-assert.h"
-#include "tr-strbuf.h"
 #include "utils.h"
 
 using namespace std::literals;
@@ -300,7 +299,7 @@ static void create_temp_path(
     TR_ASSERT(path_template != nullptr);
     TR_ASSERT(callback != nullptr);
 
-    char* path = tr_pathbuf{ path_template };
+    auto path = std::string{ path_template };
     auto path_size = std::size(path);
 
     TR_ASSERT(path_size > 0);
@@ -322,7 +321,7 @@ static void create_temp_path(
 
         tr_error_clear(&my_error);
 
-        (*callback)(path, callback_param, &my_error);
+        (*callback)(path.c_str(), callback_param, &my_error);
 
         if (my_error == nullptr)
         {
@@ -336,7 +335,7 @@ static void create_temp_path(
     }
     else
     {
-        memcpy(path_template, path, path_size);
+        std::copy_n(std::begin(path), path_size, path_template);
     }
 }
 
