@@ -15,11 +15,12 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_rand_int() */
 #include "error.h"
 #include "file.h"
 #include "tr-assert.h"
-#include "utils.h"
+#include "tr-pathbuf.h"
 
 using namespace std::literals;
 
@@ -298,8 +299,8 @@ static void create_temp_path(
     TR_ASSERT(path_template != nullptr);
     TR_ASSERT(callback != nullptr);
 
-    char* path = tr_strdup(path_template);
-    size_t path_size = strlen(path);
+    char* path = tr_pathbuf{ path_template };
+    auto path_size = std::size(path);
 
     TR_ASSERT(path_size > 0);
 
@@ -336,8 +337,6 @@ static void create_temp_path(
     {
         memcpy(path_template, path, path_size);
     }
-
-    tr_free(path);
 }
 
 bool tr_sys_path_exists(char const* path, tr_error** error)
