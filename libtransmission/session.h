@@ -518,7 +518,7 @@ public:
     struct event* udp6_event = nullptr;
 
     struct struct_utp_context* utp_context = nullptr;
-    struct event* utp_timer = nullptr;
+    std::unique_ptr<libtransmission::Timer> utp_timer;
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;

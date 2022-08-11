@@ -4,10 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-
-#include <sys/types.h>
-
-#include <event2/event.h>
+#include <chrono>
 
 #include <fmt/core.h>
 
@@ -21,22 +18,30 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "upnp.h"
-#include "utils.h"
+#include "utils.h" // for _()
+
+using namespace std::literals;
 
 struct tr_shared
 {
-    bool isEnabled;
-    bool isShuttingDown;
-    bool doPortCheck;
+    tr_shared(tr_session* session_in)
+        : session{ session_in }
+    {
+    }
 
-    tr_port_forwarding natpmpStatus;
-    tr_port_forwarding upnpStatus;
+    tr_session* const session = nullptr;
 
-    tr_upnp* upnp;
-    tr_natpmp* natpmp;
-    tr_session* session;
+    bool isEnabled = false;
+    bool isShuttingDown = false;
+    bool doPortCheck = false;
 
-    struct event* timer;
+    tr_port_forwarding natpmpStatus = TR_PORT_UNMAPPED;
+    tr_port_forwarding upnpStatus = TR_PORT_UNMAPPED;
+
+    tr_upnp* upnp = nullptr;
+    tr_natpmp* natpmp = nullptr;
+
+    std::unique_ptr<libtransmission::Timer> timer;
 };
 
 /***
@@ -109,51 +114,56 @@ static void natPulse(tr_shared* s, bool do_check)
     }
 }
 
-static void set_evtimer_from_status(tr_shared* s)
+static void restartTimer(tr_shared* s)
 {
-    int sec = 0;
-    int msec = 0;
+    auto& timer = s->timer;
+    if (!timer)
+    {
+        return;
+    }
 
-    /* when to wake up again */
+    // when to wake up again
     switch (tr_sharedTraversalStatus(s))
     {
     case TR_PORT_MAPPED:
-        /* if we're mapped, everything is fine... check back at renew_time
-         * to renew the port forwarding if it's expired */
+        // if we're mapped, everything is fine... check back at `renew_time`
+        // to renew the port forwarding if it's expired
         s->doPortCheck = true;
-        sec = std::max(0, int(s->natpmp->renew_time - tr_time()));
+        if (auto const now = tr_time(); s->natpmp->renew_time > now)
+        {
+            timer->startSingleShot(std::chrono::seconds{ s->natpmp->renew_time - now });
+        }
+        else // ???
+        {
+            timer->startSingleShot(1min);
+        }
         break;
 
     case TR_PORT_ERROR:
-        /* some kind of an error. wait 60 seconds and retry */
-        sec = 60;
+        // some kind of an error. wait a minute and retry
+        timer->startSingleShot(1min);
         break;
 
     default:
-        /* in progress. pulse frequently. */
-        msec = 333000;
+        // in progress. pulse frequently.
+        timer->startSingleShot(333ms);
         break;
-    }
-
-    if (s->timer != nullptr)
-    {
-        tr_timerAdd(*s->timer, sec, msec);
     }
 }
 
-static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vshared)
+static void onTimer(void* vshared)
 {
     auto* s = static_cast<tr_shared*>(vshared);
 
     TR_ASSERT(s != nullptr);
-    TR_ASSERT(s->timer != nullptr);
+    TR_ASSERT(s->timer);
 
     /* do something */
     natPulse(s, s->doPortCheck);
     s->doPortCheck = false;
 
     /* set up the timer for the next pulse */
-    set_evtimer_from_status(s);
+    restartTimer(s);
 }
 
 /***
@@ -162,34 +172,12 @@ static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vshared)
 
 tr_shared* tr_sharedInit(tr_session* session)
 {
-    auto* const s = tr_new0(tr_shared, 1);
-
-    s->session = session;
-    s->isEnabled = false;
-    s->upnpStatus = TR_PORT_UNMAPPED;
-    s->natpmpStatus = TR_PORT_UNMAPPED;
-
-#if 0
-
-    if (isEnabled)
-    {
-        s->timer = tr_new0(struct event, 1);
-        evtimer_set(s->timer, onTimer, s);
-        tr_timerAdd(s->timer, 0, 333000);
-    }
-
-#endif
-
-    return s;
+    return new tr_shared{ session };
 }
 
 static void stop_timer(tr_shared* s)
 {
-    if (s->timer != nullptr)
-    {
-        event_free(s->timer);
-        s->timer = nullptr;
-    }
+    s->timer.reset();
 }
 
 static void stop_forwarding(tr_shared* s)
@@ -210,18 +198,18 @@ static void stop_forwarding(tr_shared* s)
 
 void tr_sharedClose(tr_session* session)
 {
-    tr_shared* s = session->shared;
+    tr_shared* shared = session->shared;
 
-    s->isShuttingDown = true;
-    stop_forwarding(s);
-    s->session->shared = nullptr;
-    tr_free(s);
+    shared->isShuttingDown = true;
+    stop_forwarding(shared);
+    shared->session->shared = nullptr;
+    delete shared;
 }
 
 static void start_timer(tr_shared* s)
 {
-    s->timer = evtimer_new(s->session->eventBase(), onTimer, s);
-    set_evtimer_from_status(s);
+    s->timer = s->session->timerMaker().create(onTimer, s);
+    restartTimer(s);
 }
 
 void tr_sharedTraversalEnable(tr_shared* s, bool is_enable)

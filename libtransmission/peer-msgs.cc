@@ -4,7 +4,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstring>
 #include <ctime>
 #include <iterator>
@@ -15,7 +17,6 @@
 
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
-#include <event2/event.h>
 
 #include <fmt/format.h>
 
@@ -42,6 +43,8 @@
 #ifndef EBADMSG
 #define EBADMSG EINVAL
 #endif
+
+using namespace std::literals;
 
 /**
 ***
@@ -112,9 +115,6 @@ auto constexpr Data = int{ 1 };
 auto constexpr Reject = int{ 2 };
 
 } // namespace MetadataMsgType
-
-// seconds between sendPex() calls
-static auto constexpr PexIntervalSecs = int{ 90 };
 
 static auto constexpr MinChokePeriodSec = int{ 10 };
 
@@ -203,7 +203,6 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
 static void peerPulse(void* vmsgs);
-static void pexPulse(evutil_socket_t fd, short what, void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
 static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
@@ -212,17 +211,6 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b);
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
 static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
-//zzz
-
-struct EventDeleter
-{
-    void operator()(struct event* ev) const
-    {
-        event_free(ev);
-    }
-};
-
-using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 
 #define myLogMacro(msgs, level, text) \
     do \
@@ -270,8 +258,8 @@ public:
     {
         if (torrent->allowsPex())
         {
-            pex_timer.reset(evtimer_new(torrent->session->eventBase(), pexPulse, this));
-            tr_timerAdd(*pex_timer, PexIntervalSecs, 0);
+            pex_timer_ = torrent->session->timerMaker().create([this]() { sendPex(); });
+            pex_timer_->startRepeating(SendPexInterval);
         }
 
         if (io->supportsUTP())
@@ -671,6 +659,8 @@ public:
         return RequestLimit{ max_blocks, max_blocks };
     }
 
+    void sendPex();
+
 private:
     [[nodiscard]] size_t maxAvailableReqs() const
     {
@@ -856,17 +846,20 @@ public:
        supplied a reqq argument, it's stored here. */
     std::optional<size_t> reqq;
 
-    UniqueTimer pex_timer;
+    std::unique_ptr<libtransmission::Timer> pex_timer_;
 
     tr_bitfield have_;
 
 private:
-    bool is_active_[2] = { false, false };
+    std::array<bool, 2> is_active_ = { false, false };
 
     tr_peer_callback const callback_;
     void* const callbackData_;
 
     mutable std::optional<float> percent_done_;
+
+    // seconds between periodic sendPex() calls
+    static auto constexpr SendPexInterval = 90s;
 };
 
 tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data)
@@ -1461,8 +1454,6 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
     }
 }
 
-static void sendPex(tr_peerMsgsImpl* msgs);
-
 static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
     TR_ASSERT(msglen > 0);
@@ -1479,7 +1470,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
         if (msgs->io->supportsLTEP())
         {
             sendLtepHandshake(msgs);
-            sendPex(msgs);
+            msgs->sendPex();
         }
     }
     else if (ltep_msgid == UT_PEX_ID)
@@ -2453,31 +2444,31 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
     }
 }
 
-static void sendPex(tr_peerMsgsImpl* msgs)
+void tr_peerMsgsImpl::sendPex()
 {
     // only send pex if both the torrent and peer support it
-    if (!msgs->peerSupportsPex || !msgs->torrent->allowsPex())
+    if (!this->peerSupportsPex || !this->torrent->allowsPex())
     {
         return;
     }
 
-    auto& old = msgs->pex;
-    auto pex = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
+    auto& old4 = this->pex;
+    auto new4 = tr_peerMgrGetPeers(this->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
     auto added = std::vector<tr_pex>{};
-    added.reserve(std::size(pex));
-    std::set_difference(std::begin(pex), std::end(pex), std::begin(old), std::end(old), std::back_inserter(added));
+    added.reserve(std::size(new4));
+    std::set_difference(std::begin(new4), std::end(new4), std::begin(old4), std::end(old4), std::back_inserter(added));
     auto dropped = std::vector<tr_pex>{};
-    dropped.reserve(std::size(old));
-    std::set_difference(std::begin(old), std::end(old), std::begin(pex), std::end(pex), std::back_inserter(dropped));
+    dropped.reserve(std::size(old4));
+    std::set_difference(std::begin(old4), std::end(old4), std::begin(new4), std::end(new4), std::back_inserter(dropped));
 
-    auto& old6 = msgs->pex6;
-    auto pex6 = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
+    auto& old6 = this->pex6;
+    auto new6 = tr_peerMgrGetPeers(this->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
     auto added6 = std::vector<tr_pex>{};
-    added6.reserve(std::size(pex6));
-    std::set_difference(std::begin(pex6), std::end(pex6), std::begin(old6), std::end(old6), std::back_inserter(added6));
+    added6.reserve(std::size(new6));
+    std::set_difference(std::begin(new6), std::end(new6), std::begin(old6), std::end(old6), std::back_inserter(added6));
     auto dropped6 = std::vector<tr_pex>{};
     dropped6.reserve(std::size(old6));
-    std::set_difference(std::begin(old6), std::end(old6), std::begin(pex6), std::end(pex6), std::back_inserter(dropped6));
+    std::set_difference(std::begin(old6), std::end(old6), std::begin(new6), std::end(new6), std::back_inserter(dropped6));
 
     // Some peers give us error messages if we send
     // more than this many peers in a single pex message.
@@ -2490,13 +2481,13 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     dropped6.resize(std::min(std::size(dropped6), MaxPexDropped));
 
     logtrace(
-        msgs,
+        this,
         fmt::format(
             FMT_STRING("pex: old peer count {:d}+{:d}, new peer count {:d}+{:d}, added {:d}+{:d}, dropped {:d}+{:d}"),
-            std::size(old),
+            std::size(old4),
             std::size(old6),
-            std::size(pex),
-            std::size(pex6),
+            std::size(new4),
+            std::size(new6),
             std::size(added),
             std::size(added6),
             std::size(dropped),
@@ -2508,11 +2499,11 @@ static void sendPex(tr_peerMsgsImpl* msgs)
         return;
     }
 
-    evbuffer* const out = msgs->outMessages;
+    evbuffer* const out = this->outMessages;
 
     // update msgs
-    std::swap(old, pex);
-    std::swap(old6, pex6);
+    std::swap(old4, new4);
+    std::swap(old6, new6);
 
     // build the pex payload
     auto val = tr_variant{};
@@ -2622,22 +2613,12 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     auto* const payload = tr_variantToBuf(&val, TR_VARIANT_FMT_BENC);
     evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
     evbuffer_add_uint8(out, BtPeerMsgs::Ltep);
-    evbuffer_add_uint8(out, msgs->ut_pex_id);
+    evbuffer_add_uint8(out, this->ut_pex_id);
     evbuffer_add_buffer(out, payload);
-    msgs->pokeBatchPeriod(HighPriorityIntervalSecs);
-    logtrace(msgs, fmt::format(FMT_STRING("sending a pex message; outMessage size is now {:d}"), evbuffer_get_length(out)));
-    msgs->dbgOutMessageLen();
+    this->pokeBatchPeriod(HighPriorityIntervalSecs);
+    logtrace(this, fmt::format(FMT_STRING("sending a pex message; outMessage size is now {:d}"), evbuffer_get_length(out)));
+    this->dbgOutMessageLen();
 
     evbuffer_free(payload);
     tr_variantFree(&val);
-}
-
-static void pexPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmsgs)
-{
-    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-
-    sendPex(msgs);
-
-    TR_ASSERT(msgs->pex_timer);
-    tr_timerAdd(*msgs->pex_timer, PexIntervalSecs, 0);
 }

@@ -678,17 +678,15 @@ static void onNowTimer(void* vsession)
         }
     }
 
-    // set the timer to kick again right after the next second
-    auto const tv = tr_gettimeofday();
-    int constexpr Min = 100;
-    int constexpr Max = 999999;
-    auto const next_second_occurs_in_usec = std::chrono::microseconds{ std::clamp(int(1000000 - tv.tv_usec), Min, Max) };
-    auto next_second_occurs_in_msec = std::chrono::duration_cast<std::chrono::milliseconds>(next_second_occurs_in_usec);
-    if (next_second_occurs_in_msec < 100ms)
+    // set the timer to kick again right after (10ms after) the next second
+    auto const now = std::chrono::system_clock::now();
+    auto const target_time = std::chrono::time_point_cast<std::chrono::seconds>(now) + 1s + 10ms;
+    auto target_interval = target_time - now;
+    if (target_interval < 100ms)
     {
-        next_second_occurs_in_msec += 1s;
+        target_interval += 1s;
     }
-    session->now_timer_->setInterval(next_second_occurs_in_msec);
+    session->now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
 
 static void loadBlocklists(tr_session* session);
