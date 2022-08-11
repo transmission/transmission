@@ -1795,7 +1795,7 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count)
     TR_ASSERT(tor->swarm->manager != nullptr);
 
     auto const n = tor->swarm->peerCount();
-    auto* const ret = tr_new0(tr_peer_stat, n);
+    auto* const ret = new tr_peer_stat[n];
 
     auto const now = tr_time();
     auto const now_msec = tr_time_msec();
