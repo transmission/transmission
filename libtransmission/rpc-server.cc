@@ -109,9 +109,9 @@ static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 ****
 ***/
 
-static char const* get_current_session_id(tr_rpc_server* server)
+static std::string_view get_current_session_id(tr_rpc_server* server)
 {
-    return server->session->session_id.c_str();
+    return server->session->sessionId();
 }
 
 /**
@@ -398,9 +398,9 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
 
 static bool test_session_id(tr_rpc_server* server, evhttp_request const* req)
 {
-    char const* ours = get_current_session_id(server);
+    auto const ours = get_current_session_id(server);
     char const* theirs = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
-    bool const success = theirs != nullptr && strcmp(theirs, ours) == 0;
+    bool const success = theirs != nullptr && ours == theirs;
     return success;
 }
 
@@ -518,7 +518,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 #ifdef REQUIRE_SESSION_ID
         else if (!test_session_id(server, req))
         {
-            char const* sessionId = get_current_session_id(server);
+            auto const session_id = get_current_session_id(server);
             auto const tmp = fmt::format(
                 FMT_STRING("<p>Your request had an invalid session-id header.</p>"
                            "<p>To fix this, follow these steps:"
@@ -531,8 +531,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
                            "attacks.</p>"
                            "<p><code>{:s}: {:s}</code></p>"),
                 TR_RPC_SESSION_ID_HEADER,
-                sessionId);
-            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
+                session_id);
+            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, tr_strbuf<char, 64>{session_id});
             evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
             send_simple_response(req, 409, tmp.c_str());
         }

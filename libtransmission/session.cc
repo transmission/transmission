@@ -2934,7 +2934,7 @@ auto makeEventBase()
 tr_session::tr_session(std::string_view config_dir)
     : magicNumber{ SESSION_MAGIC_NUMBER }
     , cache{ std::make_unique<Cache>(torrents(), 1024 * 1024 * 2) }
-    , session_id{ tr_time }
+    , session_id_{ tr_time }
     , event_base_{ makeEventBase() }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , config_dir_{ config_dir }

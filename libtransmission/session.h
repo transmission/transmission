@@ -130,6 +130,11 @@ struct tr_session
 public:
     explicit tr_session(std::string_view config_dir);
 
+    [[nodiscard]] std::string_view sessionId() const noexcept
+    {
+        return session_id_.sv();
+    }
+
     [[nodiscard]] auto& web() noexcept
     {
         return *web_;
@@ -585,8 +590,6 @@ public:
 
     std::unique_ptr<Cache> cache;
 
-    tr_session_id session_id;
-
     tr_rpc_func rpc_func = nullptr;
     void* rpc_func_user_data = nullptr;
 
@@ -646,6 +649,8 @@ private:
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    tr_session_id session_id_;
 
     class WebMediator final : public tr_web::Mediator
     {
