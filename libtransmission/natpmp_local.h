@@ -56,7 +56,7 @@ private:
 
     void setCommandTime();
 
-    natpmp_t natpmp_;
+    natpmp_t natpmp_ = {};
 
     tr_port public_port_ = {};
     tr_port private_port_ = {};
