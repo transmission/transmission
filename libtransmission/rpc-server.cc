@@ -532,7 +532,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
                            "<p><code>{:s}: {:s}</code></p>"),
                 TR_RPC_SESSION_ID_HEADER,
                 session_id);
-            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, tr_strbuf<char, 64>{session_id});
+            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, tr_strbuf<char, 64>{ session_id });
             evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
             send_simple_response(req, 409, tmp.c_str());
         }

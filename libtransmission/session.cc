@@ -1202,13 +1202,15 @@ void tr_session::setPeerPort(tr_port public_port, tr_port private_port)
     private_peer_port_ = public_port;
     public_peer_port_ = private_port;
 
-    tr_runInEventThread(this, [this]()
-    {
-        close_incoming_peer_port(this);
-        open_incoming_peer_port(this);
-        tr_sharedPortChanged(*this);
-        std::for_each(std::begin(torrents()), std::end(torrents()), [](auto* tor){ tr_torrentChangeMyPort(tor); });
-    });
+    tr_runInEventThread(
+        this,
+        [this]()
+        {
+            close_incoming_peer_port(this);
+            open_incoming_peer_port(this);
+            tr_sharedPortChanged(*this);
+            std::for_each(std::begin(torrents()), std::end(torrents()), [](auto* tor) { tr_torrentChangeMyPort(tor); });
+        });
 }
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
