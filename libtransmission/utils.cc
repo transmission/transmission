@@ -113,8 +113,7 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
         tr_error_propagate(error, &my_error);
         return false;
     }
-
-    if (!info->isFile())
+    if (!info || !info->isFile())
     {
         tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
