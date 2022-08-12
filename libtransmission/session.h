@@ -619,16 +619,8 @@ public:
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
-    std::unique_ptr<tr_rpc_server> rpc_server_;
-
-    tr_announce_list default_trackers_;
-
-    // One of <netinet/ip.h>'s IPTOS_ values.
-    // See tr_netTos*() in libtransmission/net.h for more info
-    // Only session.cc should use this.
-    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
-
 private:
+    friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
     friend bool tr_sessionGetDeleteSource(tr_session const* session);
     friend bool tr_sessionGetPaused(tr_session const* session);
     friend bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
@@ -636,12 +628,23 @@ private:
     friend bool tr_sessionIsIdleLimited(tr_session const* session);
     friend bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
     friend bool tr_sessionIsPexEnabled(tr_session const* session);
+    friend bool tr_sessionIsRPCEnabled(tr_session const* session);
+    friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
+    friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
     friend bool tr_sessionIsRatioLimited(tr_session const* session);
     friend bool tr_sessionIsUTPEnabled(tr_session const* session);
+    friend char const* tr_sessionGetRPCPassword(tr_session const* session);
+    friend char const* tr_sessionGetRPCUrl(tr_session const* session);
+    friend char const* tr_sessionGetRPCUsername(tr_session const* session);
+    friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
@@ -650,8 +653,23 @@ private:
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetRPCPassword(tr_session* session, char const* password);
+    friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetRPCPort(tr_session* session, uint16_t hport);
+    friend void tr_sessionSetRPCUrl(tr_session* session, char const* url);
+    friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    std::unique_ptr<tr_rpc_server> rpc_server_;
+
+    tr_announce_list default_trackers_;
+
+    // One of <netinet/ip.h>'s IPTOS_ values.
+    // See tr_netTos*() in libtransmission/net.h for more info
+    // Only session.cc should use this.
+    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
     struct init_data;
     void initImpl(struct init_data&);
