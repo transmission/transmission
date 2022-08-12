@@ -130,6 +130,11 @@ struct tr_session
 public:
     explicit tr_session(std::string_view config_dir);
 
+    [[nodiscard]] auto& web() noexcept
+    {
+        return *web_;
+    }
+
     [[nodiscard]] constexpr auto isClosing() const noexcept
     {
         return is_closing_;
@@ -580,30 +585,6 @@ public:
 
     std::unique_ptr<Cache> cache;
 
-    class WebMediator final : public tr_web::Mediator
-    {
-    public:
-        explicit WebMediator(tr_session* session)
-            : session_{ session }
-        {
-        }
-        ~WebMediator() override = default;
-
-        [[nodiscard]] std::optional<std::string> cookieFile() const override;
-        [[nodiscard]] std::optional<std::string> publicAddress() const override;
-        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
-        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
-        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
-        // runs the tr_web::fetch response callback in the libtransmission thread
-        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
-
-    private:
-        tr_session* const session_;
-    };
-
-    WebMediator web_mediator{ this };
-    std::unique_ptr<tr_web> web;
-
     tr_session_id session_id;
 
     tr_rpc_func rpc_func = nullptr;
@@ -642,6 +623,7 @@ private:
     friend uint16_t tr_sessionGetIdleLimit(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend void tr_sessionClose(tr_session* session);
+    friend void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
@@ -664,6 +646,30 @@ private:
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    class WebMediator final : public tr_web::Mediator
+    {
+    public:
+        explicit WebMediator(tr_session* session)
+            : session_{ session }
+        {
+        }
+        ~WebMediator() override = default;
+
+        [[nodiscard]] std::optional<std::string> cookieFile() const override;
+        [[nodiscard]] std::optional<std::string> publicAddress() const override;
+        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
+        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
+        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
+        // runs the tr_web::fetch response callback in the libtransmission thread
+        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
+
+    private:
+        tr_session* const session_;
+    };
+
+    WebMediator web_mediator_{ this };
+    std::unique_ptr<tr_web> web_;
 
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 

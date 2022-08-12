@@ -433,7 +433,7 @@ void tr_tracker_http_announce(
     auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& opt)
     {
         tr_logAddTrace(fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, opt.url), request->log_name);
-        session->web->fetch(std::move(opt));
+        session->web().fetch(std::move(opt));
     };
 
     auto ipv6 = tr_globalIPv6(session);
@@ -692,5 +692,5 @@ void tr_tracker_http_scrape(
     options.timeout_secs = 30L;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
-    session->web->fetch(std::move(options));
+    session->web().fetch(std::move(options));
 }
