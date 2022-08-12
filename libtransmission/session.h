@@ -629,7 +629,6 @@ private:
     friend bool tr_sessionIsPexEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
-    friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
     friend bool tr_sessionIsRatioLimited(tr_session const* session);
     friend bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir);
     friend bool tr_sessionIsUTPEnabled(tr_session const* session);
