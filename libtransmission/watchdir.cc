@@ -3,387 +3,156 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstring> // strcmp()
-#include <map>
-#include <memory>
-#include <string>
-#include <string_view>
-#include <unordered_set>
-
-#include <event2/event.h>
-#include <event2/util.h>
-
-#include <fmt/core.h>
-
 #define LIBTRANSMISSION_WATCHDIR_MODULE
+
+#include <set>
 
 #include "transmission.h"
 
-#include "error.h"
 #include "error-types.h"
+#include "error.h"
 #include "file.h"
 #include "log.h"
-#include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "utils.h"
-#include "watchdir.h"
-#include "watchdir-common.h"
+#include "utils.h" // for _()
+#include "watchdir-base.h"
 
 using namespace std::literals;
 
-/***
-****
-***/
-
-/* Non-static and mutable for unit tests */
-auto tr_watchdir_retry_limit = size_t{ 3 };
-auto tr_watchdir_retry_start_interval = timeval{ 1, 0 };
-auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
-
-class tr_watchdir_retry
+namespace libtransmission
 {
-public:
-    tr_watchdir_retry(tr_watchdir_retry&&) = delete;
-    tr_watchdir_retry(tr_watchdir_retry const&) = delete;
-    tr_watchdir_retry& operator=(tr_watchdir_retry&&) = delete;
-    tr_watchdir_retry& operator=(tr_watchdir_retry const&) = delete;
-
-    tr_watchdir_retry(tr_watchdir_t handle_in, struct event_base* base, std::string_view name_in)
-        : handle_{ handle_in }
-        , name_{ name_in }
-        , timer_{ evtimer_new(base, onRetryTimer, this) }
-    {
-        restart();
-    }
-
-    ~tr_watchdir_retry()
-    {
-        evtimer_del(timer_);
-        event_free(timer_);
-    }
-
-    void restart()
-    {
-        evtimer_del(timer_);
-
-        counter_ = 0U;
-        interval_ = tr_watchdir_retry_start_interval;
-
-        evtimer_add(timer_, &interval_);
-    }
-
-    bool bump()
-    {
-        evtimer_del(timer_);
-
-        if (++counter_ >= tr_watchdir_retry_limit)
-        {
-            return false;
-        }
-
-        // keep doubling the interval, but clamp at max_interval
-        evutil_timeradd(&interval_, &interval_, &interval_);
-        if (evutil_timercmp(&interval_, &tr_watchdir_retry_max_interval, >))
-        {
-            interval_ = tr_watchdir_retry_max_interval;
-        }
-
-        evtimer_add(timer_, &interval_);
-        return true;
-    }
-
-    [[nodiscard]] auto const& name() const noexcept
-    {
-        return name_;
-    }
-
-private:
-    static void onRetryTimer(evutil_socket_t /*fd*/, short /*type*/, void* self);
-
-    tr_watchdir_t handle_ = nullptr;
-    std::string name_;
-    size_t counter_ = 0U;
-    struct event* const timer_;
-    struct timeval interval_ = tr_watchdir_retry_start_interval;
-};
-
-// TODO: notify / kqueue / win32 / generic should subclass from tr_watchdir
-
-struct tr_watchdir
+namespace
 {
-public:
-    tr_watchdir(
-        std::string_view path,
-        event_base* event_base,
-        tr_watchdir_cb callback,
-        void* callback_user_data,
-        bool force_generic = false)
-        : path_{ path }
-        , event_base_{ event_base }
-        , callback_{ callback }
-        , callback_user_data_{ callback_user_data }
-    {
-        // TODO: backends should be subclasses
-        if (!force_generic && (backend_ == nullptr))
-        {
-#if defined(WITH_INOTIFY)
-            backend_ = tr_watchdir_inotify_new(this);
-#elif defined(WITH_KQUEUE)
-            backend_ = tr_watchdir_kqueue_new(this);
-#elif defined(_WIN32)
-            backend_ = tr_watchdir_win32_new(this);
-#endif
-        }
 
-        if (backend_ == nullptr)
-        {
-            backend_ = tr_watchdir_generic_new(this);
-        }
+[[nodiscard]] constexpr std::string_view actionToString(Watchdir::Action action)
+{
+    switch (action)
+    {
+    case Watchdir::Action::Retry:
+        return "retry";
+
+    case Watchdir::Action::Done:
+        return "done";
     }
 
-    tr_watchdir(tr_watchdir&&) = delete;
-    tr_watchdir(tr_watchdir const&) = delete;
-    tr_watchdir& operator=(tr_watchdir&&) = delete;
-    tr_watchdir& operator=(tr_watchdir const&) = delete;
+    return "???";
+}
 
-    ~tr_watchdir()
+[[nodiscard]] bool isRegularFile(std::string_view dir, std::string_view name)
+{
+    auto const path = tr_pathbuf{ dir, '/', name };
+
+    tr_error* error = nullptr;
+    auto const info = tr_sys_path_get_info(path, 0, &error);
+    if (error != nullptr)
     {
-        if (backend_ != nullptr)
-        {
-            backend_->free_func(backend_);
-        }
-    }
-
-    [[nodiscard]] constexpr auto const& path() const noexcept
-    {
-        return path_;
-    }
-
-    [[nodiscard]] constexpr auto* backend() noexcept
-    {
-        return backend_;
-    }
-
-    [[nodiscard]] constexpr auto* eventBase() noexcept
-    {
-        return event_base_;
-    }
-
-    tr_watchdir_status invoke(char const* name)
-    {
-        /* File may be gone while we're retrying */
-        if (!is_regular_file(path(), name))
-        {
-            return TR_WATCHDIR_IGNORE;
-        }
-
-        auto const ret = (*callback_)(this, name, callback_user_data_);
-        TR_ASSERT(ret == TR_WATCHDIR_ACCEPT || ret == TR_WATCHDIR_IGNORE || ret == TR_WATCHDIR_RETRY);
-        tr_logAddDebug(fmt::format("Callback decided to {:s} file '{:s}'", statusToString(ret), name));
-        return ret;
-    }
-
-    void erase(std::string_view name)
-    {
-        active_retries_.erase(std::string{ name });
-    }
-
-    void scan(std::unordered_set<std::string>* dir_entries)
-    {
-        auto new_dir_entries = std::unordered_set<std::string>{};
-        tr_error* error = nullptr;
-
-        auto const dir = tr_sys_dir_open(path().c_str(), &error);
-        if (dir == TR_BAD_SYS_DIR)
+        if (!TR_ERROR_IS_ENOENT(error->code))
         {
             tr_logAddWarn(fmt::format(
-                _("Couldn't read '{path}': {error} ({error_code})"),
-                fmt::arg("path", path()),
+                _("Skipping '{path}': {error} ({error_code})"),
+                fmt::arg("path", path),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
-            tr_error_free(error);
-            return;
         }
 
-        char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(dir, &error)) != nullptr)
-        {
-            if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
-            {
-                continue;
-            }
-
-            if (dir_entries != nullptr)
-            {
-                auto const namestr = std::string(name);
-                new_dir_entries.insert(namestr);
-
-                if (dir_entries->count(namestr) != 0)
-                {
-                    continue;
-                }
-            }
-
-            process(name);
-        }
-
-        if (error != nullptr)
-        {
-            tr_logAddWarn(fmt::format(
-                _("Couldn't read '{path}': {error} ({error_code})"),
-                fmt::arg("path", path()),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
-        }
-
-        tr_sys_dir_close(dir);
-
-        if (dir_entries != nullptr)
-        {
-            *dir_entries = new_dir_entries;
-        }
+        tr_error_free(error);
     }
 
-    void process(char const* name_cstr)
+    return info && info->isFile();
+}
+
+} // namespace
+
+std::chrono::milliseconds Watchdir::generic_rescan_interval_ = Watchdir::DefaultGenericRescanInterval;
+
+namespace impl
+{
+
+void BaseWatchdir::processFile(std::string_view basename)
+{
+    if (!isRegularFile(dirname_, basename) || handled_.count(basename) != 0)
     {
-        auto& retries = active_retries_;
-        auto name = std::string{ name_cstr };
-        auto it = retries.find(name);
-        if (it != std::end(retries)) // if we already have it, restart it
-        {
-            it->second->restart();
-            return;
-        }
-
-        if (invoke(name_cstr) != TR_WATCHDIR_RETRY)
-        {
-            return;
-        }
-
-        retries.try_emplace(name, std::make_unique<tr_watchdir_retry>(this, event_base_, name));
+        return;
     }
 
-private:
-    static bool is_regular_file(std::string_view dir, std::string_view name)
+    auto const action = callback_(dirname_, basename);
+    tr_logAddDebug(fmt::format("Callback decided to {:s} file '{:s}'", actionToString(action), basename));
+    if (action == Action::Retry)
     {
-        auto const path = tr_pathbuf{ dir, '/', name };
+        auto const [iter, added] = pending_.try_emplace(std::string{ basename }, Pending{});
 
-        tr_error* error = nullptr;
-        auto const info = tr_sys_path_get_info(path, 0, &error);
-        if (error != nullptr)
+        auto const now = std::chrono::steady_clock::now();
+        auto& info = iter->second;
+        ++info.strikes;
+        info.last_kick_at = now;
+
+        if (info.first_kick_at == Timestamp{})
         {
-            if (!TR_ERROR_IS_ENOENT(error->code))
-            {
-                tr_logAddWarn(fmt::format(
-                    _("Skipping '{path}': {error} ({error_code})"),
-                    fmt::arg("path", path),
-                    fmt::arg("error", error->message),
-                    fmt::arg("error_code", error->code)));
-            }
-
-            tr_error_free(error);
+            info.first_kick_at = now;
         }
 
-        return info && info->isFile();
+        if (now - info.first_kick_at > timeoutDuration())
+        {
+            tr_logAddWarn(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", basename)));
+            pending_.erase(iter);
+        }
+        else
+        {
+            setNextKickTime(info);
+            restartTimerIfPending();
+        }
     }
-
-    static constexpr std::string_view statusToString(tr_watchdir_status status)
+    else if (action == Action::Done)
     {
-        switch (status)
-        {
-        case TR_WATCHDIR_ACCEPT:
-            return "accept"sv;
-
-        case TR_WATCHDIR_IGNORE:
-            return "ignore"sv;
-
-        case TR_WATCHDIR_RETRY:
-            return "retry"sv;
-
-        default:
-            return "???"sv;
-        }
+        handled_.insert(std::string{ basename });
     }
+}
 
-    std::string const path_;
-    struct event_base* const event_base_;
-    tr_watchdir_backend* backend_ = nullptr;
-    tr_watchdir_cb const callback_;
-    void* const callback_user_data_;
-    std::map<std::string /*name*/, std::unique_ptr<tr_watchdir_retry>> active_retries_;
-};
-
-/***
-****
-***/
-
-void tr_watchdir_retry::onRetryTimer(evutil_socket_t /*fd*/, short /*type*/, void* vself)
+void BaseWatchdir::scan()
 {
-    TR_ASSERT(vself != nullptr);
+    auto new_dir_entries = std::set<std::string>{};
 
-    auto* const retry = static_cast<tr_watchdir_retry*>(vself);
-    auto const handle = retry->handle_;
-
-    if (handle->invoke(retry->name_.c_str()) == TR_WATCHDIR_RETRY)
+    tr_error* error = nullptr;
+    auto const dir = tr_sys_dir_open(dirname_.c_str(), &error);
+    if (dir == TR_BAD_SYS_DIR)
     {
-        if (retry->bump())
-        {
-            return;
-        }
-
-        tr_logAddWarn(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", retry->name())));
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", dirname()),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_free(error);
+        return;
     }
 
-    handle->erase(retry->name());
+    for (;;)
+    {
+        char const* const name = tr_sys_dir_read_name(dir, &error);
+        if (name == nullptr)
+        {
+            break;
+        }
+
+        if ("."sv == name || ".."sv == name)
+        {
+            continue;
+        }
+
+        processFile(name);
+    }
+
+    if (error != nullptr)
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", dirname()),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_free(error);
+    }
+
+    tr_sys_dir_close(dir);
 }
 
-/***
-****
-***/
-
-tr_watchdir_t tr_watchdir_new(
-    std::string_view path,
-    tr_watchdir_cb callback,
-    void* callback_user_data,
-    struct event_base* event_base,
-    bool force_generic)
-{
-    return new tr_watchdir{ path, event_base, callback, callback_user_data, force_generic };
-}
-
-void tr_watchdir_free(tr_watchdir_t handle)
-{
-    delete handle;
-}
-
-char const* tr_watchdir_get_path(tr_watchdir_t handle)
-{
-    TR_ASSERT(handle != nullptr);
-
-    return handle->path().c_str();
-}
-
-tr_watchdir_backend* tr_watchdir_get_backend(tr_watchdir_t handle)
-{
-    TR_ASSERT(handle != nullptr);
-
-    return handle->backend();
-}
-
-struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle)
-{
-    TR_ASSERT(handle != nullptr);
-
-    return handle->eventBase();
-}
-
-void tr_watchdir_process(tr_watchdir_t handle, char const* name)
-{
-    handle->process(name);
-}
-
-void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir_entries)
-{
-    handle->scan(dir_entries);
-}
+} // namespace impl
+} // namespace libtransmission

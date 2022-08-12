@@ -35,7 +35,7 @@
 
 namespace
 {
-namespace impl
+namespace tr_evthread_init_helpers
 {
 void* lock_alloc(unsigned /*locktype*/)
 {
@@ -109,28 +109,35 @@ unsigned long thread_current_id()
     return std::hash<std::thread::id>()(std::this_thread::get_id());
 }
 
-} // namespace impl
+auto evthread_flag = std::once_flag{};
 
-void tr_evthread_init()
+void initEvthreadsOnce()
 {
-    // evthread_enable_lock_debugging();
+    tr_net_init();
 
-    evthread_lock_callbacks constexpr lock_cbs{ EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE,
-                                                impl::lock_alloc,          impl::lock_free,
-                                                impl::lock_lock,           impl::lock_unlock };
+    evthread_lock_callbacks constexpr lock_cbs{
+        EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
+    };
     evthread_set_lock_callbacks(&lock_cbs);
 
     evthread_condition_callbacks constexpr cond_cbs{ EVTHREAD_CONDITION_API_VERSION,
-                                                     impl::cond_alloc,
-                                                     impl::cond_free,
-                                                     impl::cond_signal,
-                                                     impl::cond_wait };
+                                                     cond_alloc,
+                                                     cond_free,
+                                                     cond_signal,
+                                                     cond_wait };
     evthread_set_condition_callbacks(&cond_cbs);
 
-    evthread_set_id_callback(impl::thread_current_id);
+    evthread_set_id_callback(thread_current_id);
 }
 
+} // namespace tr_evthread_init_helpers
 } // namespace
+
+void tr_evthread_init()
+{
+    using namespace tr_evthread_init_helpers;
+    std::call_once(evthread_flag, initEvthreadsOnce);
+}
 
 /***
 ****
@@ -146,7 +153,6 @@ struct tr_event_handle
     std::mutex work_queue_mutex;
     event* work_queue_event = nullptr;
 
-    event_base* base = nullptr;
     tr_session* session = nullptr;
     std::thread::id thread_id;
 };
@@ -181,13 +187,11 @@ static void libeventThreadFunc(tr_event_handle* events)
     tr_evthread_init();
 
     // create the libevent base
-    auto* const base = event_base_new();
+    auto* base = events->session->eventBase();
     auto* const dns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
 
     // initialize the session struct's event fields
-    events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
-    events->session->setEventBase(base);
     events->session->evdns_base = dns_base;
     events->session->events = events;
 
@@ -204,8 +208,6 @@ static void libeventThreadFunc(tr_event_handle* events)
         evdns_base_free(dns_base, 0);
     }
     event_free(events->work_queue_event);
-    event_base_free(base);
-    events->session->clearEventBase();
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
@@ -237,7 +239,7 @@ void tr_eventClose(tr_session* session)
         return;
     }
 
-    event_base_loopexit(events->base, nullptr);
+    event_base_loopexit(session->eventBase(), nullptr);
 
     tr_logAddTrace("closing trevent pipe");
 }

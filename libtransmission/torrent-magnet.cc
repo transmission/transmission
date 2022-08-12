@@ -107,50 +107,45 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     return true;
 }
 
-void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
+std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
-    TR_ASSERT(len != nullptr);
 
     if (!tor->hasMetainfo())
     {
-        return nullptr;
+        return {};
     }
 
     auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
     if (fd == TR_BAD_SYS_FILE)
     {
-        return nullptr;
+        return {};
     }
 
     auto const info_dict_size = tor->infoDictSize();
     TR_ASSERT(info_dict_size > 0);
 
-    char* ret = nullptr;
     if (size_t const o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr))
     {
-        size_t const l = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
+        size_t const piece_len = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
 
-        if (0 < l && l <= METADATA_PIECE_SIZE)
+        if (piece_len <= METADATA_PIECE_SIZE)
         {
-            auto* buf = tr_new(char, l);
+            auto buf = std::vector<std::byte>{};
+            buf.resize(piece_len);
 
-            if (auto n = uint64_t{}; tr_sys_file_read(fd, buf, l, &n) && n == l)
+            if (auto n_read = uint64_t{};
+                tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_read) && n_read == std::size(buf))
             {
-                *len = l;
-                ret = buf;
-                buf = nullptr;
+                tr_sys_file_close(fd);
+                return buf;
             }
-
-            tr_free(buf);
         }
     }
 
     tr_sys_file_close(fd);
-
-    TR_ASSERT(ret == nullptr || *len > 0);
-    return ret;
+    return {};
 }
 
 static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)

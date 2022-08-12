@@ -88,21 +88,6 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
  */
 tr_disk_space tr_dirSpace(std::string_view directory);
 
-/**
- * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
- * @param timer         the timer to set
- * @param seconds       seconds to wait
- * @param microseconds  microseconds to wait
- */
-void tr_timerAdd(struct event& timer, int seconds, int microseconds);
-
-/**
- * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of milliseconds
- * @param timer         the timer to set
- * @param milliseconds  milliseconds to wait
- */
-void tr_timerAddMsec(struct event& timer, int milliseconds);
-
 /** @brief return the current date in milliseconds */
 uint64_t tr_time_msec();
 
@@ -180,9 +165,6 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 /** @brief Convenience wrapper around strerorr() guaranteed to not return nullptr
     @param errnum the error number to describe */
 [[nodiscard]] char const* tr_strerror(int errnum);
-
-/** @brief Returns true if the string ends with the specified case-insensitive suffix */
-[[nodiscard]] bool tr_str_has_suffix(char const* str, char const* suffix);
 
 template<typename T>
 [[nodiscard]] std::string tr_strlower(T in)
@@ -302,9 +284,6 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
  * @param infinity the string representation of "infinity"
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
-
-/** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
-struct timeval tr_gettimeofday();
 
 /**
  * @brief move a file

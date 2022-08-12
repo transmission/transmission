@@ -15,11 +15,11 @@ struct tr_bindsockets;
 struct tr_session;
 struct tr_shared;
 
-tr_shared* tr_sharedInit(tr_session*);
+tr_shared* tr_sharedInit(tr_session&);
 
-void tr_sharedClose(tr_session*);
+void tr_sharedClose(tr_session&);
 
-void tr_sharedPortChanged(tr_session*);
+void tr_sharedPortChanged(tr_session&);
 
 void tr_sharedTraversalEnable(tr_shared*, bool is_enabled);
 

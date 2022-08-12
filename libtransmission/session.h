@@ -128,17 +128,17 @@ struct tr_turtle_info
 struct tr_session
 {
 public:
-    tr_session(std::string_view config_dir);
+    explicit tr_session(std::string_view config_dir);
 
-    [[nodiscard]] constexpr auto* eventBase() noexcept
+    [[nodiscard]] event_base* eventBase() noexcept
     {
-        return event_base_;
+        return event_base_.get();
     }
 
-    void setEventBase(event_base* base);
-    void clearEventBase();
-
-    [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept;
+    [[nodiscard]] auto& timerMaker() noexcept
+    {
+        return *timer_maker_;
+    }
 
     [[nodiscard]] constexpr auto& torrents()
     {
@@ -507,7 +507,7 @@ public:
     uint16_t peerLimit = 200;
     uint16_t peerLimitPerTorrent = 50;
 
-    int uploadSlotsPerTorrent = 0;
+    uint16_t upload_slots_per_torrent = 0;
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
@@ -518,7 +518,7 @@ public:
     struct event* udp6_event = nullptr;
 
     struct struct_utp_context* utp_context = nullptr;
-    struct event* utp_timer = nullptr;
+    std::unique_ptr<libtransmission::Timer> utp_timer;
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
@@ -609,8 +609,8 @@ public:
 private:
     static std::recursive_mutex session_mutex_;
 
-    struct event_base* event_base_ = nullptr;
-    std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
+    std::shared_ptr<event_base> const event_base_;
+    std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
     tr_torrents torrents_;
 

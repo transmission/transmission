@@ -252,12 +252,13 @@
 
     for (tr_log_message* currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
-        NSString* name = currentMessage->name != NULL ? @(currentMessage->name) : NSProcessInfo.processInfo.processName;
+        NSString* name = !std::empty(currentMessage->name) ? @(currentMessage->name.c_str()) : NSProcessInfo.processInfo.processName;
 
-        NSString* file = [(@(currentMessage->file)).lastPathComponent stringByAppendingFormat:@":%d", currentMessage->line];
+        auto const file_string = std::string{ currentMessage->file };
+        NSString* file = [(@(file_string.c_str())).lastPathComponent stringByAppendingFormat:@":%d", currentMessage->line];
 
         NSDictionary* message = @{
-            @"Message" : @(currentMessage->message),
+            @"Message" : @(currentMessage->message.c_str()),
             @"Date" : [NSDate dateWithTimeIntervalSince1970:currentMessage->when],
             @"Index" : @(currentIndex++), //more accurate when sorting by date
             @"Level" : @(currentMessage->level),
