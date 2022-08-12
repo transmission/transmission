@@ -241,7 +241,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     while (bytes_left != 0)
     {
         size_t const len = std::min(bytes_left, std::size(buffer));
-        if (auto const success = tor->session->cache->readBlock(tor, loc, len, std::data(buffer)) == 0; !success)
+        if (auto const success = tor->session->cache().readBlock(tor, loc, len, std::data(buffer)) == 0; !success)
         {
             return {};
         }

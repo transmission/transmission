@@ -224,7 +224,7 @@ FAIL:
 
 static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
 {
-    TR_ASSERT(tr_isSession(static_cast<tr_session*>(vsession)));
+    TR_ASSERT(vsession != nullptr);
     TR_ASSERT(type == EV_READ);
 
     unsigned char buf[4096];

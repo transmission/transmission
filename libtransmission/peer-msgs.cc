@@ -1558,7 +1558,7 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
     {
         if (auto& req = requests[i]; !req.prefetched)
         {
-            msgs->session->cache->prefetchBlock(msgs->torrent, msgs->torrent->pieceLoc(req.index, req.offset), req.length);
+            msgs->session->cache().prefetchBlock(msgs->torrent, msgs->torrent->pieceLoc(req.index, req.offset), req.length);
             req.prefetched = true;
         }
     }
@@ -2046,7 +2046,7 @@ static int clientGotBlock(
         return 0;
     }
 
-    msgs->session->cache->writeBlock(tor->id(), block, block_data);
+    msgs->session->cache().writeBlock(tor->id(), block, block_data);
     msgs->blame.set(loc.piece);
     msgs->publishGotBlock(block);
     return 0;
@@ -2299,7 +2299,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer_add_uint32(out, req.offset);
 
             evbuffer_reserve_space(out, req.length, iovec, 1);
-            bool err = msgs->session->cache->readBlock(
+            bool err = msgs->session->cache().readBlock(
                            msgs->torrent,
                            msgs->torrent->pieceLoc(req.index, req.offset),
                            req.length,

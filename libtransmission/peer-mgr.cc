@@ -1240,7 +1240,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket)
 {
-    TR_ASSERT(tr_isSession(manager->session));
+    TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
 
     tr_session* session = manager->session;
@@ -1257,7 +1257,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     else /* we don't have a connection to them yet... */
     {
         auto mediator = std::make_shared<tr_handshake_mediator_impl>(*session);
-        tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket);
+        tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->topBandwidth(), addr, port, tr_time(), socket);
         tr_handshake* const handshake = tr_handshakeNew(mediator, io, session->encryptionMode, on_handshake_done, manager);
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
@@ -2537,7 +2537,7 @@ void pumpAllPeers(tr_peerMgr* mgr)
 
 void queuePulse(tr_session* session, tr_direction dir)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
     if (tr_sessionGetQueueEnabled(session, dir))
@@ -2564,8 +2564,8 @@ void tr_peerMgr::bandwidthPulse()
 
     /* allocate bandwidth to the peers */
     auto const msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
-    session->top_bandwidth_.allocate(TR_UP, msec);
-    session->top_bandwidth_.allocate(TR_DOWN, msec);
+    session->topBandwidth().allocate(TR_UP, msec);
+    session->topBandwidth().allocate(TR_DOWN, msec);
 
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
@@ -2827,7 +2827,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 
     tr_peerIo* const io = tr_peerIoNewOutgoing(
         mgr->session,
-        &mgr->session->top_bandwidth_,
+        &mgr->session->topBandwidth(),
         &atom.addr,
         atom.port,
         tr_time(),

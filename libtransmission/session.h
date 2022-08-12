@@ -130,6 +130,16 @@ struct tr_session
 public:
     explicit tr_session(std::string_view config_dir);
 
+    [[nodiscard]] auto& topBandwidth() noexcept
+    {
+        return top_bandwidth_;
+    }
+
+    [[nodiscard]] auto const& topBandwidth() const noexcept
+    {
+        return top_bandwidth_;
+    }
+
     [[nodiscard]] std::string_view sessionId() const noexcept
     {
         return session_id_.sv();
@@ -138,6 +148,16 @@ public:
     [[nodiscard]] auto& web() noexcept
     {
         return *web_;
+    }
+
+    [[nodiscard]] auto const& cache() const noexcept
+    {
+        return *cache_;
+    }
+
+    [[nodiscard]] auto& cache() noexcept
+    {
+        return *cache_;
     }
 
     [[nodiscard]] constexpr auto isClosing() const noexcept
@@ -534,8 +554,6 @@ public:
 
     struct tr_turtle_info turtle;
 
-    int magicNumber = 0;
-
     tr_encryption_mode encryptionMode;
 
     tr_preallocation_mode preallocationMode;
@@ -588,16 +606,11 @@ public:
     struct tr_peerMgr* peerMgr = nullptr;
     struct tr_shared* shared = nullptr;
 
-    std::unique_ptr<Cache> cache;
-
     tr_rpc_func rpc_func = nullptr;
     void* rpc_func_user_data = nullptr;
 
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
-
-    // monitors the "global pool" speeds
-    tr_bandwidth top_bandwidth_;
 
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
@@ -649,6 +662,11 @@ private:
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    std::unique_ptr<Cache> cache_;
+
+    // monitors the "global pool" speeds
+    tr_bandwidth top_bandwidth_;
 
     tr_session_id session_id_;
 
@@ -780,16 +798,6 @@ struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 int tr_sessionCountTorrents(tr_session const* session);
 
 std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
-
-enum
-{
-    SESSION_MAGIC_NUMBER = 3845,
-};
-
-constexpr bool tr_isSession(tr_session const* session)
-{
-    return session != nullptr && session->magicNumber == SESSION_MAGIC_NUMBER;
-}
 
 constexpr bool tr_isPriority(tr_priority_t p)
 {

@@ -707,7 +707,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         tor->incomplete_dir = dir;
     }
-    tor->bandwidth_.setParent(&session->top_bandwidth_);
+    tor->bandwidth_.setParent(&session->topBandwidth());
     tor->bandwidth_.setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
@@ -864,7 +864,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
 
     // is the metainfo valid?
     auto metainfo = tr_ctorStealMetainfo(ctor);
@@ -1614,7 +1614,7 @@ void tr_torrentFree(tr_torrent* tor)
     {
         tr_session* session = tor->session;
 
-        TR_ASSERT(tr_isSession(session));
+        TR_ASSERT(session != nullptr);
 
         auto const lock = tor->unique_lock();
 
@@ -1869,7 +1869,7 @@ void tr_torrent::setBandwidthGroup(std::string_view group_name) noexcept
     if (std::empty(group_name))
     {
         this->bandwidth_group_ = tr_interned_string{};
-        this->bandwidth_.setParent(&this->session->top_bandwidth_);
+        this->bandwidth_.setParent(&this->session->topBandwidth());
     }
     else
     {

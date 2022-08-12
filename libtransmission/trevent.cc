@@ -231,7 +231,7 @@ void tr_eventInit(tr_session* session)
 
 void tr_eventClose(tr_session* session)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
 
     auto* events = session->events;
     if (events == nullptr)
@@ -250,7 +250,7 @@ void tr_eventClose(tr_session* session)
 
 bool tr_amInEventThread(tr_session const* session)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
     TR_ASSERT(session->events != nullptr);
 
     return std::this_thread::get_id() == session->events->thread_id;
@@ -262,7 +262,7 @@ bool tr_amInEventThread(tr_session const* session)
 
 void tr_runInEventThread(tr_session* session, std::function<void(void)>&& func)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
     auto* events = session->events;
     TR_ASSERT(events != nullptr);
 
