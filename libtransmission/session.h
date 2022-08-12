@@ -582,9 +582,6 @@ public:
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
-    std::unique_ptr<libtransmission::Timer> now_timer_;
-    std::unique_ptr<libtransmission::Timer> save_timer_;
-
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
 
@@ -607,10 +604,21 @@ public:
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
 private:
+    friend void tr_sessionClose(tr_session* session);
+
+    void closeImplStart();
+    void closeImplWaitForIdleUdp();
+    void closeImplFinish();
+
     static std::recursive_mutex session_mutex_;
 
     std::shared_ptr<event_base> const event_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
+
+    void onNowTimer();
+    std::unique_ptr<libtransmission::Timer> now_timer_;
+
+    std::unique_ptr<libtransmission::Timer> save_timer_;
 
     tr_torrents torrents_;
 
