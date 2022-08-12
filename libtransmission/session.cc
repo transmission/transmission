@@ -82,10 +82,10 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir);
 static auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 
-static tr_port getRandomPort(tr_session const* s)
+tr_port tr_session::randomPort() const
 {
-    auto const lower = std::min(s->randomPortLow.host(), s->randomPortHigh.host());
-    auto const upper = std::max(s->randomPortLow.host(), s->randomPortHigh.host());
+    auto const lower = std::min(random_port_low_.host(), random_port_high_.host());
+    auto const upper = std::max(random_port_low_.host(), random_port_high_.host());
     auto const range = upper - lower;
     return tr_port::fromHost(lower + tr_rand_int_weak(range + 1));
 }
@@ -240,13 +240,13 @@ static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsess
 
 void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
 {
-    socket_ = tr_netBindTCP(&addr_, session->private_peer_port, false);
+    socket_ = tr_netBindTCP(&addr_, session->privatePeerPort(), false);
 
     if (socket_ != TR_BAD_SOCKET)
     {
         tr_logAddInfo(fmt::format(
             _("Listening to incoming peer connections on {hostport}"),
-            fmt::arg("hostport", addr_.readable(session->private_peer_port))));
+            fmt::arg("hostport", addr_.readable(session->privatePeerPort()))));
         ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, accept_incoming_peer, session);
         event_add(ev_, nullptr);
     }
@@ -262,7 +262,7 @@ static void open_incoming_peer_port(tr_session* session)
 {
     session->bind_ipv4.bindAndListenForIncomingPeers(session);
 
-    if (tr_net_hasIPv6(session->private_peer_port))
+    if (tr_net_hasIPv6(session->privatePeerPort()))
     {
         session->bind_ipv6.bindAndListenForIncomingPeers(session);
     }
@@ -419,10 +419,10 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_message_level, tr_logGetLevel());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent);
-    tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
+    tr_variantDictAddInt(d, TR_KEY_peer_port, s->publicPeerPort().host());
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->is_port_random_);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow.host());
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh.host());
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->random_port_high_.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->is_pex_enabled_);
@@ -671,7 +671,6 @@ void tr_session::initImpl(init_data& data)
     data.done_cv.notify_one();
 }
 
-static void setPeerPort(tr_session* session, tr_port port);
 static void turtleBootstrap(tr_session* session, struct tr_turtle_info& turtle);
 
 void tr_session::setImpl(struct init_data& data)
@@ -885,12 +884,12 @@ void tr_session::setImpl(struct init_data& data)
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
     {
-        randomPortLow.setHost(i);
+        random_port_low_.setHost(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_high, &i))
     {
-        randomPortHigh.setHost(i);
+        random_port_high_.setHost(i);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &boolVal))
@@ -899,14 +898,14 @@ void tr_session::setImpl(struct init_data& data)
     }
 
     {
-        auto peer_port = this->private_peer_port;
+        auto peer_port = this->private_peer_port_;
 
         if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
         {
             peer_port.setHost(static_cast<uint16_t>(port));
         }
 
-        ::setPeerPort(this, boolVal ? getRandomPort(this) : peer_port);
+        setPeerPort(boolVal ? randomPort() : peer_port);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &boolVal))
@@ -1198,44 +1197,36 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 ****  Peer Port
 ***/
 
-static void peerPortChanged(tr_session* const session)
+void tr_session::setPeerPort(tr_port public_port, tr_port private_port)
 {
-    TR_ASSERT(session != nullptr);
+    private_peer_port_ = public_port;
+    public_peer_port_ = private_port;
 
-    close_incoming_peer_port(session);
-    open_incoming_peer_port(session);
-    tr_sharedPortChanged(*session);
-
-    for (auto* const tor : session->torrents())
+    tr_runInEventThread(this, [this]()
     {
-        tr_torrentChangeMyPort(tor);
-    }
-}
-
-static void setPeerPort(tr_session* session, tr_port port)
-{
-    session->private_peer_port = port;
-    session->public_peer_port = port;
-
-    tr_runInEventThread(session, peerPortChanged, session);
+        close_incoming_peer_port(this);
+        open_incoming_peer_port(this);
+        tr_sharedPortChanged(*this);
+        std::for_each(std::begin(torrents()), std::end(torrents()), [](auto* tor){ tr_torrentChangeMyPort(tor); });
+    });
 }
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
-    if (auto const port = tr_port::fromHost(hport); session != nullptr && session->private_peer_port != port)
+    if (auto const port = tr_port::fromHost(hport); session != nullptr && session->private_peer_port_ != port)
     {
-        setPeerPort(session, port);
+        session->setPeerPort(port);
     }
 }
 
 uint16_t tr_sessionGetPeerPort(tr_session const* session)
 {
-    return session != nullptr ? session->public_peer_port.host() : 0U;
+    return session != nullptr ? session->public_peer_port_.host() : 0U;
 }
 
 uint16_t tr_sessionSetPeerPortRandom(tr_session* session)
 {
-    tr_port const p = getRandomPort(session);
+    auto const p = session->randomPort();
     tr_sessionSetPeerPort(session, p.host());
     return p.host();
 }

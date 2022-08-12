@@ -1178,7 +1178,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // port number of the other side. Note that there is no need for the
     // receiving side of the connection to send this extension message,
     // since its port number is already known.
-    tr_variantDictAddInt(&val, TR_KEY_p, msgs->session->peerPort().host());
+    tr_variantDictAddInt(&val, TR_KEY_p, msgs->session->publicPeerPort().host());
 
     // http://bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this

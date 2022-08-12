@@ -578,29 +578,22 @@ public:
     struct struct_utp_context* utp_context = nullptr;
     std::unique_ptr<libtransmission::Timer> utp_timer;
 
-    /* The open port on the local machine for incoming peer requests */
-    tr_port private_peer_port;
+    void setPeerPort(tr_port public_port, tr_port private_port);
 
-    /**
-     * The open port on the public device for incoming peer requests.
-     * This is usually the same as private_peer_port but can differ
-     * if the public device is a router and it decides to use a different
-     * port than the one requested by Transmission.
-     */
-    tr_port public_peer_port;
-
-    [[nodiscard]] constexpr auto peerPort() const noexcept
+    void setPeerPort(tr_port port)
     {
-        return public_peer_port;
+        setPeerPort(port, port);
     }
 
-    constexpr auto setPeerPort(tr_port port) noexcept
+    [[nodiscard]] constexpr auto publicPeerPort() const noexcept
     {
-        public_peer_port = port;
+        return public_peer_port_;
     }
 
-    tr_port randomPortLow;
-    tr_port randomPortHigh;
+    [[nodiscard]] constexpr auto privatePeerPort() const noexcept
+    {
+        return private_peer_port_;
+    }
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr = nullptr;
@@ -637,7 +630,9 @@ private:
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionGetIdleLimit(tr_session const* session);
+    friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
+    friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
@@ -651,6 +646,7 @@ private:
     friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
+    friend void tr_sessionSetPeerPort(tr_session* session, uint16_t hport);
     friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
@@ -662,6 +658,21 @@ private:
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    [[nodiscard]] tr_port randomPort() const;
+    tr_port random_port_low_;
+    tr_port random_port_high_;
+
+    /* The open port on the local machine for incoming peer requests */
+    tr_port private_peer_port_;
+
+    /**
+     * The open port on the public device for incoming peer requests.
+     * This is usually the same as private_peer_port but can differ
+     * if the public device is a router and it decides to use a different
+     * port than the one requested by Transmission.
+     */
+    tr_port public_peer_port_;
 
     std::unique_ptr<Cache> cache_;
 

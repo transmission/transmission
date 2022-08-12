@@ -72,7 +72,7 @@ static char const* getNatStateStr(int state)
 static void natPulse(tr_shared* s, bool do_check)
 {
     auto& session = s->session;
-    tr_port const private_peer_port = session.private_peer_port;
+    auto const private_peer_port = session.privatePeerPort();
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
     if (!s->natpmp)
@@ -93,12 +93,11 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (s->natpmpStatus == TR_PORT_MAPPED)
     {
-        session.public_peer_port = public_peer_port;
-        session.private_peer_port = received_private_port;
+        session.setPeerPort(public_peer_port, received_private_port);
         tr_logAddInfo(fmt::format(
             _("Mapped private port {private_port} to public port {public_port}"),
-            fmt::arg("public_port", session.public_peer_port.host()),
-            fmt::arg("private_port", session.private_peer_port.host())));
+            fmt::arg("public_port", session.publicPeerPort().host()),
+            fmt::arg("private_port", session.privatePeerPort().host())));
     }
 
     s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());

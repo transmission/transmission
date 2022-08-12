@@ -276,7 +276,7 @@ void tr_udpInit(tr_session* ss)
     TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
     TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
 
-    ss->udp_port = ss->peerPort();
+    ss->udp_port = ss->publicPeerPort();
     if (std::empty(ss->udp_port))
     {
         return;

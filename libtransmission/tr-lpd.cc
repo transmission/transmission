@@ -262,7 +262,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     TR_ASSERT(lpd_announceInterval > 0);
     TR_ASSERT(lpd_announceScope > 0);
 
-    lpd_port = ss->peerPort();
+    lpd_port = ss->publicPeerPort();
     if (std::empty(lpd_port))
     {
         return -1;
