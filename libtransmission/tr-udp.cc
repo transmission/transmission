@@ -346,7 +346,7 @@ void tr_udpInit(tr_session* ss)
 
     tr_udpSetSocketTOS(ss);
 
-    if (ss->isDHTEnabled)
+    if (ss->isDHTEnabled())
     {
         tr_dhtInit(ss);
     }

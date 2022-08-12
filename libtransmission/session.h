@@ -130,6 +130,51 @@ struct tr_session
 public:
     explicit tr_session(std::string_view config_dir);
 
+    [[nodiscard]] constexpr auto isClosing() const noexcept
+    {
+        return is_closing_;
+    }
+
+    [[nodiscard]] constexpr auto isClosed() const noexcept
+    {
+        return is_session_closed_;
+    }
+
+    [[nodiscard]] constexpr auto isDHTEnabled() const noexcept
+    {
+        return is_dht_enabled_;
+    }
+
+    [[nodiscard]] constexpr auto isLPDEnabled() const noexcept
+    {
+        return is_lpd_enabled_;
+    }
+
+    [[nodiscard]] constexpr auto isPexEnabled() const noexcept
+    {
+        return is_pex_enabled_;
+    }
+
+    [[nodiscard]] constexpr auto isPrefetchEnabled() const noexcept
+    {
+        return is_prefetch_enabled_;
+    }
+
+    [[nodiscard]] constexpr auto isUTPEnabled() const noexcept
+    {
+        return is_utp_enabled_;
+    }
+
+    [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
+    {
+        return is_incomplete_file_naming_enabled_;
+    }
+
+    [[nodiscard]] constexpr auto shouldScrapePausedTorrents() const noexcept
+    {
+        return should_scrape_paused_torrents_;
+    }
+
     [[nodiscard]] event_base* eventBase() noexcept
     {
         return event_base_.get();
@@ -153,11 +198,6 @@ public:
     [[nodiscard]] auto unique_lock() const
     {
         return std::unique_lock(session_mutex_);
-    }
-
-    [[nodiscard]] constexpr auto isClosing() const noexcept
-    {
-        return is_closing_;
     }
 
     // paths
@@ -465,21 +505,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isPortRandom = false;
-    bool isPexEnabled = false;
-    bool isDHTEnabled = false;
-    bool isUTPEnabled = false;
-    bool isLPDEnabled = false;
-    bool isPrefetchEnabled = false;
-    bool is_closing_ = false;
-    bool isClosed = false;
-    bool isRatioLimited = false;
-    bool isIdleLimited = false;
-    bool isIncompleteFileNamingEnabled = false;
-    bool pauseAddedTorrent = false;
-    bool deleteSourceTorrent = false;
-    bool scrapePausedTorrents = false;
-
     uint8_t peer_id_ttl_hours = 0;
 
     bool stalledEnabled = false;
@@ -604,11 +629,46 @@ public:
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
 private:
+    friend bool tr_sessionGetDeleteSource(tr_session const* session);
+    friend bool tr_sessionGetPaused(tr_session const* session);
+    friend bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
+    friend bool tr_sessionIsDHTEnabled(tr_session const* session);
+    friend bool tr_sessionIsIdleLimited(tr_session const* session);
+    friend bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
+    friend bool tr_sessionIsPexEnabled(tr_session const* session);
+    friend bool tr_sessionIsRatioLimited(tr_session const* session);
+    friend bool tr_sessionIsUTPEnabled(tr_session const* session);
     friend void tr_sessionClose(tr_session* session);
+    friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
+    friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
+    friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
+    friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b);
+    friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
+    friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
+    friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
+    friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    bool delete_source_torrent_ = false;
+    bool is_closing_ = false;
+    bool is_dht_enabled_ = false;
+    bool is_idle_limited_ = false;
+    bool is_incomplete_file_naming_enabled_ = false;
+    bool is_lpd_enabled_ = false;
+    bool is_pex_enabled_ = false;
+    bool is_port_random_ = false;
+    bool is_prefetch_enabled_ = false;
+    bool is_ratio_limited_ = false;
+    bool is_session_closed_ = false;
+    bool is_utp_enabled_ = false;
+    bool pause_added_torrent_ = false;
+    bool should_scrape_paused_torrents_ = false;
 
     static std::recursive_mutex session_mutex_;
 

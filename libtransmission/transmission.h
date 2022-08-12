@@ -584,13 +584,13 @@ bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction 
 
 double tr_sessionGetRawSpeed_KBps(tr_session const*, tr_direction);
 
-void tr_sessionSetRatioLimited(tr_session*, bool isLimited);
+void tr_sessionSetRatioLimited(tr_session*, bool is_limited);
 bool tr_sessionIsRatioLimited(tr_session const*);
 
 void tr_sessionSetRatioLimit(tr_session*, double desiredRatio);
 double tr_sessionGetRatioLimit(tr_session const*);
 
-void tr_sessionSetIdleLimited(tr_session*, bool isLimited);
+void tr_sessionSetIdleLimited(tr_session*, bool is_limited);
 bool tr_sessionIsIdleLimited(tr_session const*);
 
 void tr_sessionSetIdleLimit(tr_session*, uint16_t idleMinutes);
@@ -602,10 +602,10 @@ uint16_t tr_sessionGetPeerLimit(tr_session const*);
 void tr_sessionSetPeerLimitPerTorrent(tr_session*, uint16_t max_peers);
 uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const*);
 
-void tr_sessionSetPaused(tr_session*, bool isPaused);
+void tr_sessionSetPaused(tr_session*, bool is_paused);
 bool tr_sessionGetPaused(tr_session const*);
 
-void tr_sessionSetDeleteSource(tr_session*, bool deleteSource);
+void tr_sessionSetDeleteSource(tr_session*, bool delete_source);
 bool tr_sessionGetDeleteSource(tr_session const*);
 
 tr_priority_t tr_torrentGetPriority(tr_torrent const*);

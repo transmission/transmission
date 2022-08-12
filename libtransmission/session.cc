@@ -402,9 +402,9 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
-    tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->isDHTEnabled);
-    tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
-    tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
+    tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->is_dht_enabled_);
+    tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->is_utp_enabled_);
+    tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->is_lpd_enabled_);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
@@ -420,20 +420,20 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent);
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
-    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
+    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->is_port_random_);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow.host());
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
-    tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
+    tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->is_pex_enabled_);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode);
-    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
+    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->is_prefetch_enabled_);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, tr_sessionGetQueueStalledEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, tr_sessionGetQueueStalledMinutes(s));
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio);
-    tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
+    tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->is_ratio_limited_);
     tr_variantDictAddBool(d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
@@ -445,7 +445,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
-    tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
+    tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->shouldScrapePausedTorrents());
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
@@ -715,7 +715,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     session->web = tr_web::create(session->web_mediator);
 
-    if (session->isLPDEnabled)
+    if (session->isLPDEnabled())
     {
         tr_lpdInit(session, &session->bind_ipv4.addr_);
     }
@@ -883,7 +883,7 @@ static void sessionSetImpl(struct init_data* const data)
     /* files and directories */
     if (tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &boolVal))
     {
-        session->isPrefetchEnabled = boolVal;
+        session->is_prefetch_enabled_ = boolVal;
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
@@ -1084,7 +1084,7 @@ static void sessionSetImpl(struct init_data* const data)
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
     {
-        session->scrapePausedTorrents = boolVal;
+        session->should_scrape_paused_torrents_ = boolVal;
     }
 
     /**
@@ -1170,14 +1170,14 @@ void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isIncompleteFileNamingEnabled = b;
+    session->is_incomplete_file_naming_enabled_ = b;
 }
 
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isIncompleteFileNamingEnabled;
+    return session->is_incomplete_file_naming_enabled_;
 }
 
 /***
@@ -1262,14 +1262,14 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isPortRandom = random;
+    session->is_port_random_ = random;
 }
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isPortRandom;
+    return session->is_port_random_;
 }
 
 tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
@@ -1283,11 +1283,11 @@ tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetRatioLimited(tr_session* session, bool isLimited)
+void tr_sessionSetRatioLimited(tr_session* session, bool is_limited)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isRatioLimited = isLimited;
+    session->is_ratio_limited_ = is_limited;
 }
 
 void tr_sessionSetRatioLimit(tr_session* session, double desiredRatio)
@@ -1301,7 +1301,7 @@ bool tr_sessionIsRatioLimited(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isRatioLimited;
+    return session->is_ratio_limited_;
 }
 
 double tr_sessionGetRatioLimit(tr_session const* session)
@@ -1315,11 +1315,11 @@ double tr_sessionGetRatioLimit(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetIdleLimited(tr_session* session, bool isLimited)
+void tr_sessionSetIdleLimited(tr_session* session, bool is_limited)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isIdleLimited = isLimited;
+    session->is_idle_limited_ = is_limited;
 }
 
 void tr_sessionSetIdleLimit(tr_session* session, uint16_t idleMinutes)
@@ -1333,7 +1333,7 @@ bool tr_sessionIsIdleLimited(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isIdleLimited;
+    return session->is_idle_limited_;
 }
 
 uint16_t tr_sessionGetIdleLimit(tr_session const* session)
@@ -1353,7 +1353,7 @@ static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction 
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme_Bps)
 {
-    bool isLimited = true;
+    bool is_limited = true;
 
     if (!tr_isSession(session))
     {
@@ -1370,10 +1370,10 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
     }
     else
     {
-        isLimited = false;
+        is_limited = false;
     }
 
-    return isLimited;
+    return is_limited;
 }
 
 bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme_KBps)
@@ -1742,32 +1742,32 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetPaused(tr_session* session, bool isPaused)
+void tr_sessionSetPaused(tr_session* session, bool is_paused)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->pauseAddedTorrent = isPaused;
+    session->pause_added_torrent_ = is_paused;
 }
 
 bool tr_sessionGetPaused(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->pauseAddedTorrent;
+    return session->pause_added_torrent_;
 }
 
-void tr_sessionSetDeleteSource(tr_session* session, bool deleteSource)
+void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->deleteSourceTorrent = deleteSource;
+    session->delete_source_torrent_ = delete_source;
 }
 
 bool tr_sessionGetDeleteSource(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->deleteSourceTorrent;
+    return session->delete_source_torrent_;
 }
 
 /***
@@ -1810,7 +1810,7 @@ void tr_session::closeImplStart()
 {
     is_closing_ = true;
 
-    if (isLPDEnabled)
+    if (isLPDEnabled())
     {
         tr_lpdUninit(this);
     }
@@ -1891,7 +1891,7 @@ void tr_session::closeImplFinish()
     tr_utpClose(this);
     closeBlocklists(this);
     openFiles().closeAll();
-    isClosed = true;
+    is_session_closed_ = true;
 }
 
 static bool deadlineReached(time_t const deadline)
@@ -1913,7 +1913,7 @@ void tr_sessionClose(tr_session* session)
     /* close the session */
     tr_runInEventThread(session, [session]() { session->closeImplStart(); });
 
-    while (!session->isClosed && !deadlineReached(deadline))
+    while (!session->isClosed() && !deadlineReached(deadline))
     {
         tr_logAddTrace("waiting for the libtransmission thread to finish");
         tr_wait_msec(10);
@@ -2061,14 +2061,14 @@ void tr_sessionSetPexEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isPexEnabled = enabled;
+    session->is_pex_enabled_ = enabled;
 }
 
 bool tr_sessionIsPexEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isPexEnabled;
+    return session->is_pex_enabled_;
 }
 
 bool tr_sessionAllowsDHT(tr_session const* session)
@@ -2080,26 +2080,24 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isDHTEnabled;
-}
-
-static void toggleDHTImpl(tr_session* const session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    tr_udpUninit(session);
-    session->isDHTEnabled = !session->isDHTEnabled;
-    tr_udpInit(session);
+    return session->is_dht_enabled_;
 }
 
 void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (enabled != session->isDHTEnabled)
+    if (enabled == session->isDHTEnabled())
     {
-        tr_runInEventThread(session, toggleDHTImpl, session);
+        return;
     }
+
+    tr_runInEventThread(session, [session, enabled]()
+    {
+        tr_udpUninit(session);
+        session->is_dht_enabled_ = enabled;
+        tr_udpInit(session);
+    });
 }
 
 /***
@@ -2111,72 +2109,63 @@ bool tr_sessionIsUTPEnabled(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
 #ifdef WITH_UTP
-    return session->isUTPEnabled;
+    return session->isUTPEnabled();
 #else
     return false;
 #endif
-}
-
-static void toggle_utp(tr_session* const session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    session->isUTPEnabled = !session->isUTPEnabled;
-
-    tr_udpSetSocketBuffers(session);
-
-    tr_udpSetSocketTOS(session);
-
-    /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
-       explanation. */
 }
 
 void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (enabled != session->isUTPEnabled)
+    if (enabled == session->isUTPEnabled())
     {
-        tr_runInEventThread(session, toggle_utp, session);
+        return;
     }
+
+    tr_runInEventThread(session, [session, enabled]()
+    {
+        session->is_utp_enabled_ = enabled;
+        tr_udpSetSocketBuffers(session);
+        tr_udpSetSocketTOS(session);
+        // But don't call tr_utpClose --
+        // see reset_timer in tr-utp.c for an explanation.
+    });
 }
 
 /***
 ****
 ***/
 
-static void toggleLPDImpl(tr_session* const session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    if (session->isLPDEnabled)
-    {
-        tr_lpdUninit(session);
-    }
-
-    session->isLPDEnabled = !session->isLPDEnabled;
-
-    if (session->isLPDEnabled)
-    {
-        tr_lpdInit(session, &session->bind_ipv4.addr_);
-    }
-}
-
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (enabled != session->isLPDEnabled)
+    if (enabled == session->isLPDEnabled())
     {
-        tr_runInEventThread(session, toggleLPDImpl, session);
+        return;
     }
+
+    tr_runInEventThread(session, [session, enabled]()
+    {
+        if (session->isLPDEnabled())
+        {
+            tr_lpdUninit(session);
+        }
+        session->is_lpd_enabled_ = enabled;
+        if (enabled)
+        {
+            tr_lpdInit(session, &session->bind_ipv4.addr_);
+        }
+    });
 }
 
 bool tr_sessionIsLPDEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isLPDEnabled;
+    return session->isLPDEnabled();
 }
 
 bool tr_sessionAllowsLPD(tr_session const* session)

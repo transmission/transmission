@@ -475,7 +475,7 @@ private:
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
     {
         // Maybe don't scrape paused torrents
-        if (!tier->isRunning && !session->scrapePausedTorrents)
+        if (!tier->isRunning && !session->shouldScrapePausedTorrents())
         {
             return 0;
         }
@@ -1595,7 +1595,7 @@ void tr_announcer::upkeep()
 {
     auto const lock = session->unique_lock();
 
-    bool const is_closing = session->isClosed;
+    bool const is_closing = session->isClosed();
     time_t const now = tr_time();
 
     /* maybe send out some "stopped" messages for closed torrents */

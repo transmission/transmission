@@ -1547,7 +1547,7 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
 
 static void prefetchPieces(tr_peerMsgsImpl* msgs)
 {
-    if (!msgs->session->isPrefetchEnabled)
+    if (!msgs->session->isPrefetchEnabled())
     {
         return;
     }
