@@ -146,4 +146,15 @@ If the web browser and the Transmission daemon are on the machine you can use ht
 | 6                 | Number of leechers - those who want to download file                              |
 | 7                 | Number of current downloads                                                       |
 
+#### 5.1 Torrent inspector files tab ####
+![image](resources/WI-torrent-inspector-files-tab.png)
+
+| Number On Picture | Description                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------- |
+| 1                 | The name of the file marked for download                                                              | 
+| 2                 | This checkbox controls the file upload. If you uncheck it, the file will not load                     |
+| 3                 | In current case: the torrent is downloaded on 2.58GB of 3.65GB. This is 70.6%                         |
+| 4                 | With this button you can change downloading priority of this file to low                              |
+| 5                 | With this button you can change downloading priority of this file to medium. This priority is default |
+| 6                 | With this button you can change downloading priority of this file to high                             |
   
