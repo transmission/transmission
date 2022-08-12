@@ -159,7 +159,7 @@ auto createIncomingIo(tr_session* session)
     auto const now = tr_time();
     auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
     auto* const
-        io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, &DefaultPeerAddr, DefaultPeerPort, now, peer_socket);
+        io = tr_peerIoNewIncoming(session, &session->topBandwidth(), &DefaultPeerAddr, DefaultPeerPort, now, peer_socket);
     return std::make_pair(io, sockpair[1]);
 }
 
@@ -171,7 +171,7 @@ auto createOutgoingIo(tr_session* session, tr_sha1_digest_t const& info_hash)
     auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
     auto* const io = tr_peerIoNew(
         session,
-        &session->top_bandwidth_,
+        &session->topBandwidth(),
         &DefaultPeerAddr,
         DefaultPeerPort,
         now,
