@@ -245,6 +245,11 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
+    [[nodiscard]] constexpr auto uploadSlotsPerTorrent() const noexcept
+    {
+        return upload_slots_per_torrent;
+    }
+
     // paths
 
     [[nodiscard]] constexpr auto const& configDir() const noexcept
@@ -385,22 +390,32 @@ public:
         tr_netSetTOS(sock, peer_socket_tos_, type);
     }
 
+    [[nodiscard]] constexpr auto peerLimit() const noexcept
+    {
+        return peer_limit_;
+    }
+
+    [[nodiscard]] constexpr auto peerLimitPerTorrent() const noexcept
+    {
+        return peer_limit_per_torrent_;
+    }
+
     [[nodiscard]] constexpr bool incPeerCount() noexcept
     {
-        if (this->peerCount >= this->peerLimit)
+        if (peer_count_ >= peer_limit_)
         {
             return false;
         }
 
-        ++this->peerCount;
+        ++peer_count_;
         return true;
     }
 
     constexpr void decPeerCount() noexcept
     {
-        if (this->peerCount > 0)
+        if (peer_count_ > 0)
         {
-            --this->peerCount;
+            --peer_count_;
         }
     }
 
@@ -558,12 +573,6 @@ public:
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
-    uint16_t peerCount = 0;
-    uint16_t peerLimit = 200;
-    uint16_t peerLimitPerTorrent = 50;
-
-    uint16_t upload_slots_per_torrent = 0;
-
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
     tr_socket_t udp_socket = TR_BAD_SOCKET;
@@ -608,11 +617,6 @@ public:
     struct tr_turtle_info turtle;
 
 private:
-    friend void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int KBps);
-    friend unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* session, tr_direction dir);
-    friend unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
-    friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool is_limited);
-    friend bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
     friend bool tr_sessionGetDeleteSource(tr_session const* session);
     friend bool tr_sessionGetPaused(tr_session const* session);
@@ -627,6 +631,7 @@ private:
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
     friend bool tr_sessionIsRatioLimited(tr_session const* session);
+    friend bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir);
     friend bool tr_sessionIsUTPEnabled(tr_session const* session);
     friend char const* tr_sessionGetRPCPassword(tr_session const* session);
     friend char const* tr_sessionGetRPCUrl(tr_session const* session);
@@ -641,9 +646,12 @@ private:
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
+    friend unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* session, tr_direction dir);
+    friend unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
+    friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool is_limited);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
@@ -655,6 +663,8 @@ private:
     friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
+    friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
+    friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
     friend void tr_sessionSetPeerPort(tr_session* session, uint16_t hport);
     friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
@@ -670,7 +680,13 @@ private:
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
+    friend void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int KBps);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    uint16_t peer_count_ = 0U;
+    uint16_t peer_limit_ = 200U;
+    uint16_t peer_limit_per_torrent_ = 50U;
+    uint16_t upload_slots_per_torrent = 0U;
 
     uint8_t peer_id_ttl_hours_ = 0;
 

@@ -2220,7 +2220,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 
     for (auto& item : choked)
     {
-        if (unchoked_interested >= session->upload_slots_per_torrent)
+        if (unchoked_interested >= session->uploadSlotsPerTorrent())
         {
             break;
         }

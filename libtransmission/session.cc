@@ -417,8 +417,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir(s));
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, tr_sessionIsIncompleteDirEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_message_level, tr_logGetLevel());
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit);
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent);
+    tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit());
+    tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->publicPeerPort().host());
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->is_port_random_);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
@@ -458,7 +458,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
-    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->upload_slots_per_torrent);
+    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
@@ -915,7 +915,7 @@ void tr_session::setImpl(struct init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_global, &i))
     {
-        this->peerLimit = i;
+        this->peer_limit_ = i;
     }
 
     /**
@@ -1679,28 +1679,28 @@ void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers)
 {
     TR_ASSERT(session != nullptr);
 
-    session->peerLimit = max_global_peers;
+    session->peer_limit_ = max_global_peers;
 }
 
 uint16_t tr_sessionGetPeerLimit(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->peerLimit;
+    return session->peerLimit();
 }
 
 void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers)
 {
     TR_ASSERT(session != nullptr);
 
-    session->peerLimitPerTorrent = max_peers;
+    session->peer_limit_per_torrent_ = max_peers;
 }
 
 uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->peerLimitPerTorrent;
+    return session->peerLimitPerTorrent();
 }
 
 /***
