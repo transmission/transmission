@@ -208,13 +208,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
             auto const it = level_names_.find(node->level);
             auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
 
-            fprintf(
-                fp,
-                "%s\t%s\t%s\t%s\n",
-                date.c_str(),
-                level_str,
-                node->name != nullptr ? node->name : "",
-                node->message != nullptr ? node->message : "");
+            fprintf(fp, "%s\t%s\t%s\t%s\n", date.c_str(), level_str, node->name.c_str(), node->message.c_str());
         }
 
         fclose(fp);
@@ -356,7 +350,7 @@ tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_me
 
     for (i = head; i != nullptr && i->next != nullptr; i = i->next)
     {
-        char const* name = i->name != nullptr ? i->name : default_name.c_str();
+        char const* name = !std::empty(i->name) ? i->name.c_str() : default_name.c_str();
 
         auto const row = *store->prepend();
         row[message_log_cols.tr_msg] = i;
@@ -369,9 +363,9 @@ tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_me
         {
             auto gstr = gtr_sprintf("%s:%d %s", i->file, i->line, i->message);
 
-            if (i->name != nullptr)
+            if (!std::empty(i->name))
             {
-                gstr += gtr_sprintf(" (%s)", i->name);
+                gstr += gtr_sprintf(" (%s)", i->name.c_str());
             }
 
             g_warning("%s", gstr.c_str());

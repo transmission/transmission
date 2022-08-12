@@ -458,7 +458,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
-    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
+    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->upload_slots_per_torrent);
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
@@ -678,17 +678,15 @@ static void onNowTimer(void* vsession)
         }
     }
 
-    // set the timer to kick again right after the next second
-    auto const tv = tr_gettimeofday();
-    int constexpr Min = 100;
-    int constexpr Max = 999999;
-    auto const next_second_occurs_in_usec = std::chrono::microseconds{ std::clamp(int(1000000 - tv.tv_usec), Min, Max) };
-    auto next_second_occurs_in_msec = std::chrono::duration_cast<std::chrono::milliseconds>(next_second_occurs_in_usec);
-    if (next_second_occurs_in_msec < 100ms)
+    // set the timer to kick again right after (10ms after) the next second
+    auto const now = std::chrono::system_clock::now();
+    auto const target_time = std::chrono::time_point_cast<std::chrono::seconds>(now) + 1s + 10ms;
+    auto target_interval = target_time - now;
+    if (target_interval < 100ms)
     {
-        next_second_occurs_in_msec += 1s;
+        target_interval += 1s;
     }
-    session->now_timer_->setInterval(next_second_occurs_in_msec);
+    session->now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
 
 static void loadBlocklists(tr_session* session);
@@ -724,7 +722,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     session->peerMgr = tr_peerMgrNew(session);
 
-    session->shared = tr_sharedInit(session);
+    session->shared = tr_sharedInit(*session);
 
     /**
     ***  Blocklist
@@ -1018,7 +1016,7 @@ static void sessionSetImpl(struct init_data* const data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_upload_slots_per_torrent, &i))
     {
-        session->uploadSlotsPerTorrent = i;
+        session->upload_slots_per_torrent = i;
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
@@ -1256,7 +1254,7 @@ static void peerPortChanged(tr_session* const session)
 
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
-    tr_sharedPortChanged(session);
+    tr_sharedPortChanged(*session);
 
     for (auto* const tor : session->torrents())
     {
@@ -1857,7 +1855,7 @@ static void sessionCloseImplStart(tr_session* session)
     session->now_timer_.reset();
 
     tr_verifyClose(session);
-    tr_sharedClose(session);
+    tr_sharedClose(*session);
 
     close_incoming_peer_port(session);
     session->rpc_server_.reset();
@@ -3002,32 +3000,21 @@ auto makeTorrentDir(std::string_view config_dir)
     return dir;
 }
 
+auto makeEventBase()
+{
+    tr_evthread_init();
+    return std::shared_ptr<event_base>{ event_base_new(), event_base_free };
+}
+
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
     : session_id{ tr_time }
+    , event_base_{ makeEventBase() }
+    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , session_stats_{ config_dir, time(nullptr) }
 {
-}
-
-void tr_session::setEventBase(event_base* base)
-{
-    TR_ASSERT(event_base_ == nullptr);
-    event_base_ = base;
-    timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(base);
-}
-
-void tr_session::clearEventBase()
-{
-    timer_maker_.reset();
-    event_base_ = nullptr;
-}
-
-[[nodiscard]] libtransmission::TimerMaker& tr_session::timerMaker() noexcept
-{
-    TR_ASSERT(timer_maker_);
-    return *timer_maker_;
 }

@@ -256,6 +256,8 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
+        tr_sys_file_flush(fd);
+        tr_sys_file_flush(fd);
         tr_sys_file_close(fd);
         sync();
 

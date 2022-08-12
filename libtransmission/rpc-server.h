@@ -17,6 +17,7 @@
 #include "transmission.h"
 
 #include "net.h"
+#include "timer.h"
 
 struct event;
 struct evhttp;
@@ -130,7 +131,7 @@ public:
 
     std::unique_ptr<struct tr_rpc_address> bindAddress;
 
-    struct event* start_retry_timer = nullptr;
+    std::unique_ptr<libtransmission::Timer> start_retry_timer;
     struct evhttp* httpd = nullptr;
     tr_session* const session;
 

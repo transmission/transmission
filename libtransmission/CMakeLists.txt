@@ -208,7 +208,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     variant-common.h
     verify.h
     version.h
-    watchdir-common.h
+    watchdir-base.h
     webseed.h
 )
 

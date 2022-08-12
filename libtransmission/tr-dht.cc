@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <chrono>
 #include <csignal> /* sig_atomic_t */
 #include <cstdio>
 #include <cstring> /* memcpy(), memset() */
@@ -20,7 +21,7 @@
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
 #else
-#include <sys/time.h>
+#include <sys/time.h> // for `struct timezone`
 #include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netdb.h>
@@ -28,8 +29,6 @@
 #endif
 
 #include <dht/dht.h>
-
-#include <event2/event.h>
 
 #include <fmt/format.h>
 
@@ -51,11 +50,9 @@
 
 using namespace std::literals;
 
-static struct event* dht_timer = nullptr;
+static std::unique_ptr<libtransmission::Timer> dht_timer;
 static unsigned char myid[20];
 static tr_session* session_ = nullptr;
-
-static void timer_callback(evutil_socket_t s, short type, void* session);
 
 static bool bootstrap_done(tr_session* session, int af)
 {
@@ -325,8 +322,12 @@ int tr_dhtInit(tr_session* ss)
 
     std::thread(dht_bootstrap, session_, nodes, nodes6).detach();
 
-    dht_timer = evtimer_new(session_->eventBase(), timer_callback, session_);
-    tr_timerAdd(*dht_timer, 0, tr_rand_int_weak(1000000));
+    dht_timer = session_->timerMaker().create([]() { tr_dhtCallback(nullptr, 0, nullptr, 0, session_); });
+    auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
+    static auto constexpr MinInterval = 10ms;
+    static auto constexpr MaxInterval = 1s;
+    auto interval = MinInterval + random_percent * (MaxInterval - MinInterval);
+    dht_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
 
     tr_logAddDebug("DHT initialized");
 
@@ -342,11 +343,7 @@ void tr_dhtUninit(tr_session* ss)
 
     tr_logAddTrace("Uninitializing DHT");
 
-    if (dht_timer != nullptr)
-    {
-        event_free(dht_timer);
-        dht_timer = nullptr;
-    }
+    dht_timer.reset();
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
@@ -715,12 +712,11 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
 
     /* Being slightly late is fine,
        and has the added benefit of adding some jitter. */
-    tr_timerAdd(*dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
-}
-
-static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* session)
-{
-    tr_dhtCallback(nullptr, 0, nullptr, 0, session);
+    auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
+    auto const min_interval = std::chrono::seconds{ tosleep };
+    auto const max_interval = std::chrono::seconds{ tosleep + 1 };
+    auto const interval = min_interval + random_percent * (max_interval - min_interval);
+    dht_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
 }
 
 /* This function should return true when a node is blacklisted.  We do
@@ -759,10 +755,19 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 
-extern "C" int dht_gettimeofday(struct timeval* tv, [[maybe_unused]] timezone* tz)
+/***
+****
+***/
+
+extern "C" int dht_gettimeofday(struct timeval* tv, [[maybe_unused]] struct timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
-    *tv = tr_gettimeofday();
+
+    auto const d = std::chrono::system_clock::now().time_since_epoch();
+    auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
+    tv->tv_sec = s.count();
+    tv->tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
+
     return 0;
 }
 

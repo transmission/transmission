@@ -5,30 +5,65 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
 #include <string_view>
 
-struct event_base;
+#include "timer.h"
 
-using tr_watchdir_t = struct tr_watchdir*;
-
-enum tr_watchdir_status
+extern "C"
 {
-    TR_WATCHDIR_ACCEPT,
-    TR_WATCHDIR_IGNORE,
-    TR_WATCHDIR_RETRY
+    struct event_base;
+}
+
+namespace libtransmission
+{
+
+class Watchdir
+{
+public:
+    Watchdir() = default;
+    virtual ~Watchdir() = default;
+    Watchdir(Watchdir&&) = delete;
+    Watchdir(Watchdir const&) = delete;
+    Watchdir& operator=(Watchdir&&) = delete;
+    Watchdir& operator=(Watchdir const&) = delete;
+
+    [[nodiscard]] virtual std::string_view dirname() const noexcept = 0;
+
+    enum class Action
+    {
+        Done,
+        Retry
+    };
+
+    using Callback = std::function<Action(std::string_view dirname, std::string_view basename)>;
+
+    [[nodiscard]] static auto genericRescanInterval() noexcept
+    {
+        return generic_rescan_interval_;
+    }
+
+    static void setGenericRescanInterval(std::chrono::milliseconds interval) noexcept
+    {
+        generic_rescan_interval_ = interval;
+    }
+
+    static std::unique_ptr<Watchdir> create(
+        std::string_view dirname,
+        Callback callback,
+        libtransmission::TimerMaker& timer_maker,
+        struct event_base* evbase);
+
+    static std::unique_ptr<Watchdir> createGeneric(
+        std::string_view dirname,
+        Callback callback,
+        libtransmission::TimerMaker& timer_maker,
+        std::chrono::milliseconds rescan_interval = generic_rescan_interval_);
+
+private:
+    static constexpr std::chrono::milliseconds DefaultGenericRescanInterval{ 1000 };
+    static std::chrono::milliseconds generic_rescan_interval_;
 };
 
-using tr_watchdir_cb = tr_watchdir_status (*)(tr_watchdir_t handle, char const* name, void* user_data);
-
-/* ... */
-
-tr_watchdir_t tr_watchdir_new(
-    std::string_view path,
-    tr_watchdir_cb callback,
-    void* callback_user_data,
-    struct event_base* event_base,
-    bool force_generic);
-
-void tr_watchdir_free(tr_watchdir_t handle);
-
-char const* tr_watchdir_get_path(tr_watchdir_t handle);
+} // namespace libtransmission

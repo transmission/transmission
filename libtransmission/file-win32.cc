@@ -15,6 +15,7 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_rand_int() */
 #include "error.h"
 #include "file.h"
@@ -298,8 +299,8 @@ static void create_temp_path(
     TR_ASSERT(path_template != nullptr);
     TR_ASSERT(callback != nullptr);
 
-    char* path = tr_strdup(path_template);
-    size_t path_size = strlen(path);
+    auto path = std::string{ path_template };
+    auto path_size = std::size(path);
 
     TR_ASSERT(path_size > 0);
 
@@ -320,7 +321,7 @@ static void create_temp_path(
 
         tr_error_clear(&my_error);
 
-        (*callback)(path, callback_param, &my_error);
+        (*callback)(path.c_str(), callback_param, &my_error);
 
         if (my_error == nullptr)
         {
@@ -334,10 +335,8 @@ static void create_temp_path(
     }
     else
     {
-        memcpy(path_template, path, path_size);
+        std::copy_n(std::begin(path), path_size, path_template);
     }
-
-    tr_free(path);
 }
 
 bool tr_sys_path_exists(char const* path, tr_error** error)

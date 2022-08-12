@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstring> /* memcpy */
 #include <ctime>
 #include <string>
@@ -19,7 +20,6 @@
 #endif
 
 #include <event2/buffer.h>
-#include <event2/event.h>
 #include <event2/http.h>
 #include <event2/http_struct.h> /* TODO: eventually remove this */
 #include <event2/listener.h>
@@ -549,9 +549,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
 }
 
 static auto constexpr ServerStartRetryCount = int{ 10 };
-static auto constexpr ServerStartRetryDelayIncrement = int{ 5 };
-static auto constexpr ServerStartRetryDelayStep = int{ 3 };
-static auto constexpr ServerStartRetryMaxDelay = int{ 60 };
+static auto constexpr ServerStartRetryDelayIncrement = 5s;
+static auto constexpr ServerStartRetryMaxDelay = 60s;
 
 static char const* tr_rpc_address_to_string(tr_rpc_address const& addr, char* buf, size_t buflen)
 {
@@ -664,35 +663,22 @@ static bool bindUnixSocket(
 
 static void startServer(tr_rpc_server* server);
 
-static void rpc_server_on_start_retry(evutil_socket_t /*fd*/, short /*type*/, void* context)
+static auto rpc_server_start_retry(tr_rpc_server* server)
 {
-    startServer(static_cast<tr_rpc_server*>(context));
-}
-
-static int rpc_server_start_retry(tr_rpc_server* server)
-{
-    int retry_delay = (server->start_retry_counter / ServerStartRetryDelayStep + 1) * ServerStartRetryDelayIncrement;
-    retry_delay = std::min(retry_delay, int{ ServerStartRetryMaxDelay });
-
-    if (server->start_retry_timer == nullptr)
+    if (!server->start_retry_timer)
     {
-        server->start_retry_timer = evtimer_new(server->session->eventBase(), rpc_server_on_start_retry, server);
+        server->start_retry_timer = server->session->timerMaker().create([server]() { startServer(server); });
     }
 
-    tr_timerAdd(*server->start_retry_timer, retry_delay, 0);
     ++server->start_retry_counter;
-
-    return retry_delay;
+    auto const interval = std::min(ServerStartRetryDelayIncrement * server->start_retry_counter, ServerStartRetryMaxDelay);
+    server->start_retry_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    return interval;
 }
 
 static void rpc_server_start_retry_cancel(tr_rpc_server* server)
 {
-    if (server->start_retry_timer != nullptr)
-    {
-        event_free(server->start_retry_timer);
-        server->start_retry_timer = nullptr;
-    }
-
+    server->start_retry_timer.reset();
     server->start_retry_counter = 0;
 }
 
@@ -723,9 +709,9 @@ static void startServer(tr_rpc_server* server)
 
         if (server->start_retry_counter < ServerStartRetryCount)
         {
-            int const retry_delay = rpc_server_start_retry(server);
-
-            tr_logAddDebug(fmt::format("Couldn't bind to {}, retrying in {} seconds", addr_port_str, retry_delay));
+            auto const retry_delay = rpc_server_start_retry(server);
+            auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(retry_delay).count();
+            tr_logAddDebug(fmt::format("Couldn't bind to {}, retrying in {} seconds", addr_port_str, seconds));
             return;
         }
 
