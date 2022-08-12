@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <ctime>
 #include <optional>
+#include <string>
 #include <string_view>
 
 ///
@@ -50,17 +51,17 @@ struct tr_log_message
     tr_log_level level;
 
     // location in the source code
-    char const* file;
-    int line;
+    std::string_view file;
+    size_t line;
 
     // when the message was generated
     time_t when;
 
     // torrent name or code module name associated with the message
-    char* name;
+    std::string name;
 
     // the message
-    char* message;
+    std::string message;
 
     // linked list of messages
     struct tr_log_message* next;

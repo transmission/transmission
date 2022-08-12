@@ -36,8 +36,6 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
-#include <event2/event.h>
-
 #include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
@@ -59,20 +57,6 @@
 using namespace std::literals;
 
 time_t __tr_current_time = 0;
-
-/***
-****
-***/
-
-struct timeval tr_gettimeofday()
-{
-    auto const d = std::chrono::system_clock::now().time_since_epoch();
-    auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
-    auto ret = timeval{};
-    ret.tv_sec = s.count();
-    ret.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
-    return ret;
-}
 
 /***
 ****
@@ -106,30 +90,6 @@ void tr_free(void* p)
     {
         free(p);
     }
-}
-
-/***
-****
-***/
-
-void tr_timerAdd(struct event& timer, int seconds, int microseconds)
-{
-    auto tv = timeval{};
-    tv.tv_sec = seconds;
-    tv.tv_usec = microseconds;
-
-    TR_ASSERT(tv.tv_sec >= 0);
-    TR_ASSERT(tv.tv_usec >= 0);
-    TR_ASSERT(tv.tv_usec < 1000000);
-
-    evtimer_add(&timer, &tv);
-}
-
-void tr_timerAddMsec(struct event& timer, int milliseconds)
-{
-    int const seconds = milliseconds / 1000;
-    int const usec = (milliseconds % 1000) * 1000;
-    tr_timerAdd(timer, seconds, usec);
 }
 
 /**
@@ -311,8 +271,7 @@ std::string_view tr_strvStrip(std::string_view str)
 
 uint64_t tr_time_msec()
 {
-    auto const tv = tr_gettimeofday();
-    return uint64_t(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
+    return std::chrono::system_clock::now().time_since_epoch() / 1ms;
 }
 
 void tr_wait_msec(long int delay_milliseconds)

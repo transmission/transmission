@@ -396,8 +396,7 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     for (tr_log_message const* l = list; l != nullptr; l = l->next)
     {
-        auto const name = std::string_view{ l->name != nullptr ? l->name : "" };
-        printMessage(file, l->level, name, l->message, l->file, l->line);
+        printMessage(file, l->level, l->name, l->message, l->file, l->line);
     }
 
     if (file != TR_BAD_SYS_FILE)

@@ -1264,7 +1264,7 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
 
 void tr_torrentPeersFree(tr_peer_stat* peers, int /*peerCount*/)
 {
-    tr_free(peers);
+    delete[] peers;
 }
 
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
