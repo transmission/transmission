@@ -565,64 +565,524 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 ****
 ***/
 
-struct init_data
+struct tr_session::init_data
 {
-    bool messageQueuingEnabled;
-    tr_session* session;
-    char const* config_dir;
-    tr_variant* clientSettings;
+    init_data() = default;
+    ~init_data() = default;
+    init_data(init_data&&) = delete;
+    init_data(init_data const&) = delete;
+    init_data& operator=(init_data&&) = delete;
+    init_data& operator=(init_data const&) = delete;
+
+    bool message_queuing_enabled = false;
+    tr_variant* client_settings = nullptr;
     std::condition_variable_any done_cv;
 };
 
-static void tr_sessionInitImpl(init_data* data);
-
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* clientSettings)
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings)
 {
-    TR_ASSERT(tr_variantIsDict(clientSettings));
+    TR_ASSERT(tr_variantIsDict(client_settings));
 
     tr_timeUpdate(time(nullptr));
 
     /* initialize the bare skeleton of the session object */
     auto* const session = new tr_session{ config_dir };
-    session->udp_socket = TR_BAD_SOCKET;
-    session->udp6_socket = TR_BAD_SOCKET;
-    session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
-    session->magicNumber = SESSION_MAGIC_NUMBER;
     bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
-    if (auto i = int64_t{}; tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
+    if (auto i = int64_t{}; tr_variantDictFindInt(client_settings, TR_KEY_message_level, &i))
     {
         tr_logSetLevel(tr_log_level(i));
     }
 
     /* start the libtransmission thread */
-    tr_net_init(); /* must go before tr_eventInit */
     tr_eventInit(session);
     TR_ASSERT(session->events != nullptr);
 
-    auto data = init_data{};
-    data.session = session;
-    data.config_dir = config_dir;
-    data.messageQueuingEnabled = message_queueing_enabled;
-    data.clientSettings = clientSettings;
+    auto data = tr_session::init_data{};
+    data.message_queuing_enabled = message_queueing_enabled;
+    data.client_settings = client_settings;
 
     // run it in the libtransmission thread
     if (tr_amInEventThread(session))
     {
-        tr_sessionInitImpl(&data);
+        session->initImpl(data);
     }
     else
     {
         auto lock = session->unique_lock();
-        tr_runInEventThread(session, tr_sessionInitImpl, &data);
+        tr_runInEventThread(session, [&session, &data]() { session->initImpl(data); });
         data.done_cv.wait(lock); // wait for the session to be ready
     }
 
     return session;
 }
 
-static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
+static void loadBlocklists(tr_session* session);
+
+void tr_session::initImpl(init_data& data)
+{
+    auto lock = unique_lock();
+    TR_ASSERT(tr_amInEventThread(this));
+
+    auto const* const client_settings = data.client_settings;
+    TR_ASSERT(tr_variantIsDict(client_settings));
+
+    tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
+
+    auto settings = tr_variant{};
+    tr_variantInitDict(&settings, 0);
+    tr_sessionGetDefaultSettings(&settings);
+    tr_variantMergeDicts(&settings, client_settings);
+
+#ifndef _WIN32
+    /* Don't exit when writing on a broken socket */
+    (void)signal(SIGPIPE, SIG_IGN);
+#endif
+
+    tr_logSetQueueEnabled(data.message_queuing_enabled);
+
+    this->peerMgr = tr_peerMgrNew(this);
+
+    this->shared = tr_sharedInit(*this);
+
+    tr_sys_dir_create(tr_pathbuf{ this->configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    loadBlocklists(this);
+
+    TR_ASSERT(tr_isSession(this));
+
+    tr_announcerInit(this);
+
+    tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
+
+    tr_sessionSet(this, &settings);
+
+    tr_udpInit(this);
+
+    this->web = tr_web::create(this->web_mediator);
+
+    if (this->isLPDEnabled())
+    {
+        tr_lpdInit(this, &bind_ipv4.addr_);
+    }
+
+    tr_utpInit(this);
+
+    /* cleanup */
+    tr_variantFree(&settings);
+    data.done_cv.notify_one();
+}
+
+static void setPeerPort(tr_session* session, tr_port port);
+static void turtleBootstrap(tr_session* session, struct tr_turtle_info& turtle);
+
+void tr_session::setImpl(struct init_data& data)
+{
+    tr_variant* const settings = data.client_settings;
+    TR_ASSERT(tr_variantIsDict(settings));
+    TR_ASSERT(tr_amInEventThread(this));
+
+    auto boolVal = bool{};
+    auto d = double{};
+    auto i = int64_t{};
+    auto sv = std::string_view{};
+
+    if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
+    {
+        tr_logSetLevel(tr_log_level(i));
+    }
+
+#ifndef _WIN32
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
+    {
+        /* Read a umask as a string representing an octal number. */
+        umask = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
+        ::umask(umask);
+    }
+    else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
+    {
+        /* Or as a base 10 integer to remain compatible with the old settings format. */
+        umask = (mode_t)i;
+        ::umask(umask);
+    }
+
+#endif
+
+    /* misc features */
+    if (tr_variantDictFindInt(settings, TR_KEY_cache_size_mb, &i))
+    {
+        tr_sessionSetCacheLimit_MB(this, i);
+    }
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_default_trackers, &sv))
+    {
+        setDefaultTrackers(sv);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
+    {
+        tr_sessionSetPeerLimitPerTorrent(this, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_pex_enabled, &boolVal))
+    {
+        tr_sessionSetPexEnabled(this, boolVal);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &boolVal))
+    {
+        tr_sessionSetDHTEnabled(this, boolVal);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_utp_enabled, &boolVal))
+    {
+        tr_sessionSetUTPEnabled(this, boolVal);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_lpd_enabled, &boolVal))
+    {
+        tr_sessionSetLPDEnabled(this, boolVal);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_encryption, &i))
+    {
+        tr_sessionSetEncryption(this, tr_encryption_mode(i));
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_socket_tos, &i))
+    {
+        peer_socket_tos_ = i;
+    }
+    else if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
+    {
+        if (auto ip_tos = tr_netTosFromName(sv); ip_tos)
+        {
+            peer_socket_tos_ = *ip_tos;
+        }
+    }
+
+    sv = ""sv;
+    (void)tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
+    setPeerCongestionAlgorithm(sv);
+
+    if (tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &boolVal))
+    {
+        useBlocklist(boolVal);
+    }
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_blocklist_url, &sv))
+    {
+        setBlocklistUrl(sv);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &boolVal))
+    {
+        tr_sessionSetPaused(this, !boolVal);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_trash_original_torrent_files, &boolVal))
+    {
+        tr_sessionSetDeleteSource(this, boolVal);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
+    {
+        peer_id_ttl_hours = i;
+    }
+
+    /* torrent queues */
+    if (tr_variantDictFindInt(settings, TR_KEY_queue_stalled_minutes, &i))
+    {
+        tr_sessionSetQueueStalledMinutes(this, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_queue_stalled_enabled, &boolVal))
+    {
+        tr_sessionSetQueueStalledEnabled(this, boolVal);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_download_queue_size, &i))
+    {
+        tr_sessionSetQueueSize(this, TR_DOWN, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_download_queue_enabled, &boolVal))
+    {
+        tr_sessionSetQueueEnabled(this, TR_DOWN, boolVal);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_seed_queue_size, &i))
+    {
+        tr_sessionSetQueueSize(this, TR_UP, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_seed_queue_enabled, &boolVal))
+    {
+        tr_sessionSetQueueEnabled(this, TR_UP, boolVal);
+    }
+
+    /* files and directories */
+    if (tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &boolVal))
+    {
+        is_prefetch_enabled_ = boolVal;
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
+    {
+        preallocationMode = tr_preallocation_mode(i);
+    }
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))
+    {
+        setDownloadDir(sv);
+    }
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_incomplete_dir, &sv))
+    {
+        setIncompleteDir(sv);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &boolVal))
+    {
+        useIncompleteDir(boolVal);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &boolVal))
+    {
+        tr_sessionSetIncompleteFileNamingEnabled(this, boolVal);
+    }
+
+    /* rpc server */
+    rpc_server_ = std::make_unique<tr_rpc_server>(this, settings);
+
+    /* public addresses */
+
+    close_incoming_peer_port(this);
+
+    auto address = tr_inaddr_any;
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv))
+    {
+        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv4())
+        {
+            address = *addr;
+        }
+    }
+
+    bind_ipv4 = tr_bindinfo{ address };
+
+    address = tr_in6addr_any;
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv))
+    {
+        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv6())
+        {
+            address = *addr;
+        }
+    }
+
+    bind_ipv6 = tr_bindinfo{ address };
+
+    /* incoming peer port */
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
+    {
+        randomPortLow.setHost(i);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_high, &i))
+    {
+        randomPortHigh.setHost(i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &boolVal))
+    {
+        tr_sessionSetPeerPortRandomOnStart(this, boolVal);
+    }
+
+    {
+        auto peer_port = this->private_peer_port;
+
+        if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
+        {
+            peer_port.setHost(static_cast<uint16_t>(port));
+        }
+
+        ::setPeerPort(this, boolVal ? getRandomPort(this) : peer_port);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &boolVal))
+    {
+        tr_sessionSetPortForwardingEnabled(this, boolVal);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_global, &i))
+    {
+        this->peerLimit = i;
+    }
+
+    /**
+    **/
+
+    if (tr_variantDictFindInt(settings, TR_KEY_upload_slots_per_torrent, &i))
+    {
+        this->upload_slots_per_torrent = i;
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
+    {
+        tr_sessionSetSpeedLimit_KBps(this, TR_UP, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_speed_limit_up_enabled, &boolVal))
+    {
+        tr_sessionLimitSpeed(this, TR_UP, boolVal);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_down, &i))
+    {
+        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_speed_limit_down_enabled, &boolVal))
+    {
+        tr_sessionLimitSpeed(this, TR_DOWN, boolVal);
+    }
+
+    if (tr_variantDictFindReal(settings, TR_KEY_ratio_limit, &d))
+    {
+        tr_sessionSetRatioLimit(this, d);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_ratio_limit_enabled, &boolVal))
+    {
+        tr_sessionSetRatioLimited(this, boolVal);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_idle_seeding_limit, &i))
+    {
+        tr_sessionSetIdleLimit(this, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_idle_seeding_limit_enabled, &boolVal))
+    {
+        tr_sessionSetIdleLimited(this, boolVal);
+    }
+
+    /**
+    ***  Turtle Mode
+    **/
+
+    /* update the turtle mode's fields */
+    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_up, &i))
+    {
+        turtle.speedLimit_Bps[TR_UP] = tr_toSpeedBytes(i);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_down, &i))
+    {
+        turtle.speedLimit_Bps[TR_DOWN] = tr_toSpeedBytes(i);
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_begin, &i))
+    {
+        turtle.beginMinute = i;
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_end, &i))
+    {
+        turtle.endMinute = i;
+    }
+
+    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_day, &i))
+    {
+        turtle.days = tr_sched_day(i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_alt_speed_time_enabled, &boolVal))
+    {
+        turtle.isClockEnabled = boolVal;
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_alt_speed_enabled, &boolVal))
+    {
+        turtle.isEnabled = boolVal;
+    }
+
+    turtleBootstrap(this, turtle);
+
+    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
+    {
+        if (auto enabled = bool{}; tr_variantDictFindBool(settings, enabled_key, &enabled))
+        {
+            this->useScript(script, enabled);
+        }
+
+        if (auto file = std::string_view{}; tr_variantDictFindStrView(settings, script_key, &file))
+        {
+            this->setScript(script, file);
+        }
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
+    {
+        this->should_scrape_paused_torrents_ = boolVal;
+    }
+
+    /**
+    ***  BruteForce
+    **/
+
+    if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
+    {
+        tr_sessionSetAntiBruteForceThreshold(this, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
+    {
+        tr_sessionSetAntiBruteForceEnabled(this, boolVal);
+    }
+
+    /*
+     * Announce IP.
+     */
+    if (tr_variantDictFindStrView(settings, TR_KEY_announce_ip, &sv))
+    {
+        this->setAnnounceIP(sv);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_announce_ip_enabled, &boolVal))
+    {
+        this->useAnnounceIP(boolVal);
+    }
+
+    data.done_cv.notify_one();
+}
+
+void tr_sessionSet(tr_session* session, tr_variant* settings)
+{
+    auto data = tr_session::init_data{};
+    data.client_settings = settings;
+
+    // run it in the libtransmission thread
+
+    if (tr_amInEventThread(session))
+    {
+        session->setImpl(data);
+    }
+    else
+    {
+        auto lock = session->unique_lock();
+        tr_runInEventThread(session, [&session, &data]() { session->setImpl(data); });
+        data.done_cv.wait(lock);
+    }
+}
+
+/***
+****
+***/
+
+static void turtleCheckClock(tr_session* s, struct tr_turtle_info& t);
 
 void tr_session::onNowTimer()
 {
@@ -633,7 +1093,7 @@ void tr_session::onNowTimer()
     tr_dhtUpkeep(this);
     if (turtle.isClockEnabled)
     {
-        turtleCheckClock(this, &this->turtle);
+        turtleCheckClock(this, this->turtle);
     }
 
     // TODO: this seems a little silly. Why do we increment this
@@ -664,482 +1124,6 @@ void tr_session::onNowTimer()
     }
     now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
-
-static void loadBlocklists(tr_session* session);
-
-static void tr_sessionInitImpl(init_data* data)
-{
-    tr_variant const* const clientSettings = data->clientSettings;
-    tr_session* session = data->session;
-    auto lock = session->unique_lock();
-
-    TR_ASSERT(tr_amInEventThread(session));
-    TR_ASSERT(tr_variantIsDict(clientSettings));
-
-    tr_logAddTrace(
-        fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&session->top_bandwidth_)));
-
-    tr_variant settings;
-
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
-    tr_variantMergeDicts(&settings, clientSettings);
-
-#ifndef _WIN32
-    /* Don't exit when writing on a broken socket */
-    (void)signal(SIGPIPE, SIG_IGN);
-#endif
-
-    tr_logSetQueueEnabled(data->messageQueuingEnabled);
-
-    session->peerMgr = tr_peerMgrNew(session);
-
-    session->shared = tr_sharedInit(*session);
-
-    /**
-    ***  Blocklist
-    **/
-
-    tr_sys_dir_create(tr_pathbuf{ session->configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    loadBlocklists(session);
-
-    TR_ASSERT(tr_isSession(session));
-
-    tr_announcerInit(session);
-
-    tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
-
-    tr_sessionSet(session, &settings);
-
-    tr_udpInit(session);
-
-    session->web = tr_web::create(session->web_mediator);
-
-    if (session->isLPDEnabled())
-    {
-        tr_lpdInit(session, &session->bind_ipv4.addr_);
-    }
-
-    tr_utpInit(session);
-
-    /* cleanup */
-    tr_variantFree(&settings);
-    data->done_cv.notify_one();
-}
-
-static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
-static void setPeerPort(tr_session* session, tr_port port);
-
-static void sessionSetImpl(struct init_data* const data)
-{
-    tr_session* const session = data->session;
-    tr_variant* const settings = data->clientSettings;
-
-    TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(tr_variantIsDict(settings));
-    TR_ASSERT(tr_amInEventThread(session));
-
-    auto boolVal = bool{};
-    auto d = double{};
-    auto i = int64_t{};
-    auto sv = std::string_view{};
-    tr_turtle_info* const turtle = &session->turtle;
-
-    if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
-    {
-        tr_logSetLevel(tr_log_level(i));
-    }
-
-#ifndef _WIN32
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
-    {
-        /* Read a umask as a string representing an octal number. */
-        session->umask = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
-        umask(session->umask);
-    }
-    else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
-    {
-        /* Or as a base 10 integer to remain compatible with the old settings format. */
-        session->umask = (mode_t)i;
-        umask(session->umask);
-    }
-
-#endif
-
-    /* misc features */
-    if (tr_variantDictFindInt(settings, TR_KEY_cache_size_mb, &i))
-    {
-        tr_sessionSetCacheLimit_MB(session, i);
-    }
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_default_trackers, &sv))
-    {
-        session->setDefaultTrackers(sv);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
-    {
-        tr_sessionSetPeerLimitPerTorrent(session, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_pex_enabled, &boolVal))
-    {
-        tr_sessionSetPexEnabled(session, boolVal);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &boolVal))
-    {
-        tr_sessionSetDHTEnabled(session, boolVal);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_utp_enabled, &boolVal))
-    {
-        tr_sessionSetUTPEnabled(session, boolVal);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_lpd_enabled, &boolVal))
-    {
-        tr_sessionSetLPDEnabled(session, boolVal);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_encryption, &i))
-    {
-        tr_sessionSetEncryption(session, tr_encryption_mode(i));
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_socket_tos, &i))
-    {
-        session->peer_socket_tos_ = i;
-    }
-    else if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
-    {
-        if (auto ip_tos = tr_netTosFromName(sv); ip_tos)
-        {
-            session->peer_socket_tos_ = *ip_tos;
-        }
-    }
-
-    sv = ""sv;
-    (void)tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
-    session->setPeerCongestionAlgorithm(sv);
-
-    if (tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &boolVal))
-    {
-        session->useBlocklist(boolVal);
-    }
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_blocklist_url, &sv))
-    {
-        session->setBlocklistUrl(sv);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &boolVal))
-    {
-        tr_sessionSetPaused(session, !boolVal);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_trash_original_torrent_files, &boolVal))
-    {
-        tr_sessionSetDeleteSource(session, boolVal);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
-    {
-        session->peer_id_ttl_hours = i;
-    }
-
-    /* torrent queues */
-    if (tr_variantDictFindInt(settings, TR_KEY_queue_stalled_minutes, &i))
-    {
-        tr_sessionSetQueueStalledMinutes(session, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_queue_stalled_enabled, &boolVal))
-    {
-        tr_sessionSetQueueStalledEnabled(session, boolVal);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_download_queue_size, &i))
-    {
-        tr_sessionSetQueueSize(session, TR_DOWN, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_download_queue_enabled, &boolVal))
-    {
-        tr_sessionSetQueueEnabled(session, TR_DOWN, boolVal);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_seed_queue_size, &i))
-    {
-        tr_sessionSetQueueSize(session, TR_UP, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_seed_queue_enabled, &boolVal))
-    {
-        tr_sessionSetQueueEnabled(session, TR_UP, boolVal);
-    }
-
-    /* files and directories */
-    if (tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &boolVal))
-    {
-        session->is_prefetch_enabled_ = boolVal;
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
-    {
-        session->preallocationMode = tr_preallocation_mode(i);
-    }
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))
-    {
-        session->setDownloadDir(sv);
-    }
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_incomplete_dir, &sv))
-    {
-        session->setIncompleteDir(sv);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &boolVal))
-    {
-        session->useIncompleteDir(boolVal);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &boolVal))
-    {
-        tr_sessionSetIncompleteFileNamingEnabled(session, boolVal);
-    }
-
-    /* rpc server */
-    session->rpc_server_ = std::make_unique<tr_rpc_server>(session, settings);
-
-    /* public addresses */
-
-    close_incoming_peer_port(session);
-
-    auto address = tr_inaddr_any;
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv))
-    {
-        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv4())
-        {
-            address = *addr;
-        }
-    }
-
-    session->bind_ipv4 = tr_bindinfo{ address };
-
-    address = tr_in6addr_any;
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv))
-    {
-        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv6())
-        {
-            address = *addr;
-        }
-    }
-
-    session->bind_ipv6 = tr_bindinfo{ address };
-
-    /* incoming peer port */
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
-    {
-        session->randomPortLow.setHost(i);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_high, &i))
-    {
-        session->randomPortHigh.setHost(i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &boolVal))
-    {
-        tr_sessionSetPeerPortRandomOnStart(session, boolVal);
-    }
-
-    {
-        auto peer_port = session->private_peer_port;
-
-        if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
-        {
-            peer_port.setHost(static_cast<uint16_t>(port));
-        }
-
-        setPeerPort(session, boolVal ? getRandomPort(session) : peer_port);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &boolVal))
-    {
-        tr_sessionSetPortForwardingEnabled(session, boolVal);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_global, &i))
-    {
-        session->peerLimit = i;
-    }
-
-    /**
-    **/
-
-    if (tr_variantDictFindInt(settings, TR_KEY_upload_slots_per_torrent, &i))
-    {
-        session->upload_slots_per_torrent = i;
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
-    {
-        tr_sessionSetSpeedLimit_KBps(session, TR_UP, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_speed_limit_up_enabled, &boolVal))
-    {
-        tr_sessionLimitSpeed(session, TR_UP, boolVal);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_down, &i))
-    {
-        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_speed_limit_down_enabled, &boolVal))
-    {
-        tr_sessionLimitSpeed(session, TR_DOWN, boolVal);
-    }
-
-    if (tr_variantDictFindReal(settings, TR_KEY_ratio_limit, &d))
-    {
-        tr_sessionSetRatioLimit(session, d);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_ratio_limit_enabled, &boolVal))
-    {
-        tr_sessionSetRatioLimited(session, boolVal);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_idle_seeding_limit, &i))
-    {
-        tr_sessionSetIdleLimit(session, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_idle_seeding_limit_enabled, &boolVal))
-    {
-        tr_sessionSetIdleLimited(session, boolVal);
-    }
-
-    /**
-    ***  Turtle Mode
-    **/
-
-    /* update the turtle mode's fields */
-    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_up, &i))
-    {
-        turtle->speedLimit_Bps[TR_UP] = tr_toSpeedBytes(i);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_down, &i))
-    {
-        turtle->speedLimit_Bps[TR_DOWN] = tr_toSpeedBytes(i);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_begin, &i))
-    {
-        turtle->beginMinute = i;
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_end, &i))
-    {
-        turtle->endMinute = i;
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_day, &i))
-    {
-        turtle->days = tr_sched_day(i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_alt_speed_time_enabled, &boolVal))
-    {
-        turtle->isClockEnabled = boolVal;
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_alt_speed_enabled, &boolVal))
-    {
-        turtle->isEnabled = boolVal;
-    }
-
-    turtleBootstrap(session, turtle);
-
-    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
-    {
-        if (auto enabled = bool{}; tr_variantDictFindBool(settings, enabled_key, &enabled))
-        {
-            session->useScript(script, enabled);
-        }
-
-        if (auto file = std::string_view{}; tr_variantDictFindStrView(settings, script_key, &file))
-        {
-            session->setScript(script, file);
-        }
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
-    {
-        session->should_scrape_paused_torrents_ = boolVal;
-    }
-
-    /**
-    ***  BruteForce
-    **/
-
-    if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
-    {
-        tr_sessionSetAntiBruteForceThreshold(session, i);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
-    {
-        tr_sessionSetAntiBruteForceEnabled(session, boolVal);
-    }
-
-    /*
-     * Announce IP.
-     */
-    if (tr_variantDictFindStrView(settings, TR_KEY_announce_ip, &sv))
-    {
-        session->setAnnounceIP(sv);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_announce_ip_enabled, &boolVal))
-    {
-        session->useAnnounceIP(boolVal);
-    }
-
-    data->done_cv.notify_one();
-}
-
-void tr_sessionSet(tr_session* session, tr_variant* settings)
-{
-    auto data = init_data{};
-    data.session = session;
-    data.clientSettings = settings;
-
-    // run it in the libtransmission thread
-
-    if (tr_amInEventThread(session))
-    {
-        sessionSetImpl(&data);
-    }
-    else
-    {
-        auto lock = session->unique_lock();
-        tr_runInEventThread(session, sessionSetImpl, &data);
-        data.done_cv.wait(lock);
-    }
-}
-
-/***
-****
-***/
 
 void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
@@ -1398,16 +1382,16 @@ static auto constexpr MinutesPerHour = int{ 60 };
 static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
 static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
 
-static void turtleUpdateTable(struct tr_turtle_info* t)
+static void turtleUpdateTable(struct tr_turtle_info& turtle)
 {
-    t->minutes->setHasNone();
+    turtle.minutes->setHasNone();
 
     for (int day = 0; day < 7; ++day)
     {
-        if ((t->days & (1 << day)) != 0)
+        if ((turtle.days & (1 << day)) != 0)
         {
-            time_t const begin = t->beginMinute;
-            time_t end = t->endMinute;
+            time_t const begin = turtle.beginMinute;
+            time_t end = turtle.endMinute;
 
             if (end <= begin)
             {
@@ -1416,7 +1400,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             for (time_t i = begin; i < end; ++i)
             {
-                t->minutes->set((i + day * MinutesPerDay) % MinutesPerWeek);
+                turtle.minutes->set((i + day * MinutesPerDay) % MinutesPerWeek);
             }
         }
     }
@@ -1437,15 +1421,14 @@ static void altSpeedToggled(tr_session* const session)
     }
 }
 
-static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, bool byUser)
+static void useAltSpeed(tr_session* s, tr_turtle_info& turtle, bool enabled, bool byUser)
 {
     TR_ASSERT(tr_isSession(s));
-    TR_ASSERT(t != nullptr);
 
-    if (t->isEnabled != enabled)
+    if (turtle.isEnabled != enabled)
     {
-        t->isEnabled = enabled;
-        t->changedByUser = byUser;
+        turtle.isEnabled = enabled;
+        turtle.changedByUser = byUser;
         tr_runInEventThread(s, altSpeedToggled, s);
     }
 }
@@ -1453,7 +1436,7 @@ static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, b
 /**
  * @return whether turtle should be on/off according to the scheduler
  */
-static bool getInTurtleTime(struct tr_turtle_info const* t)
+static bool getInTurtleTime(struct tr_turtle_info const& turtle)
 {
     auto const now = tr_time();
     struct tm const tm = fmt::localtime(now);
@@ -1465,7 +1448,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
         minute_of_the_week = MinutesPerWeek - 1;
     }
 
-    return t->minutes->test(minute_of_the_week);
+    return turtle.minutes->test(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1473,38 +1456,38 @@ static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
     return enabled ? TR_AUTO_SWITCH_ON : TR_AUTO_SWITCH_OFF;
 }
 
-static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
+static void turtleCheckClock(tr_session* s, tr_turtle_info& turtle)
 {
-    TR_ASSERT(t->isClockEnabled);
+    TR_ASSERT(turtle.isClockEnabled);
 
-    bool const enabled = getInTurtleTime(t);
+    bool const enabled = getInTurtleTime(turtle);
     tr_auto_switch_state_t const newAutoTurtleState = autoSwitchState(enabled);
-    bool const alreadySwitched = t->autoTurtleState == newAutoTurtleState;
+    bool const alreadySwitched = turtle.autoTurtleState == newAutoTurtleState;
 
     if (!alreadySwitched)
     {
         tr_logAddInfo(enabled ? _("Time to turn on turtle mode") : _("Time to turn off turtle mode"));
-        t->autoTurtleState = newAutoTurtleState;
-        useAltSpeed(s, t, enabled, false);
+        turtle.autoTurtleState = newAutoTurtleState;
+        useAltSpeed(s, turtle, enabled, false);
     }
 }
 
 /* Called after the turtle's fields are loaded from an outside source.
  * It initializes the implementation fields
  * and turns on turtle mode if the clock settings say to. */
-static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
+static void turtleBootstrap(tr_session* session, tr_turtle_info& turtle)
 {
-    turtle->changedByUser = false;
-    turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
+    turtle.changedByUser = false;
+    turtle.autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    turtle->minutes = new tr_bitfield(MinutesPerWeek);
+    turtle.minutes = new tr_bitfield(MinutesPerWeek);
 
     turtleUpdateTable(turtle);
 
-    if (turtle->isClockEnabled)
+    if (turtle.isClockEnabled)
     {
-        turtle->isEnabled = getInTurtleTime(turtle);
-        turtle->autoTurtleState = autoSwitchState(turtle->isEnabled);
+        turtle.isEnabled = getInTurtleTime(turtle);
+        turtle.autoTurtleState = autoSwitchState(turtle.isEnabled);
     }
 
     altSpeedToggled(session);
@@ -1592,32 +1575,30 @@ unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
     return tr_toSpeedKBps(tr_sessionGetAltSpeed_Bps(s, d));
 }
 
-static void userPokedTheClock(tr_session* s, struct tr_turtle_info* t)
+static void userPokedTheClock(tr_session* session, tr_turtle_info& turtle)
 {
     tr_logAddTrace("Refreshing the turtle mode clock due to user changes");
 
-    t->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
+    turtle.autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    turtleUpdateTable(t);
+    turtleUpdateTable(turtle);
 
-    if (t->isClockEnabled)
+    if (turtle.isClockEnabled)
     {
-        bool const enabled = getInTurtleTime(t);
-        useAltSpeed(s, t, enabled, true);
-        t->autoTurtleState = autoSwitchState(enabled);
+        bool const enabled = getInTurtleTime(turtle);
+        useAltSpeed(session, turtle, enabled, true);
+        turtle.autoTurtleState = autoSwitchState(enabled);
     }
 }
 
-void tr_sessionUseAltSpeedTime(tr_session* s, bool b)
+void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled)
 {
-    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isSession(session));
 
-    struct tr_turtle_info* t = &s->turtle;
-
-    if (t->isClockEnabled != b)
+    if (auto& turtle = session->turtle; turtle.isClockEnabled != enabled)
     {
-        t->isClockEnabled = b;
-        userPokedTheClock(s, t);
+        turtle.isClockEnabled = enabled;
+        userPokedTheClock(session, turtle);
     }
 }
 
@@ -1628,16 +1609,16 @@ bool tr_sessionUsesAltSpeedTime(tr_session const* s)
     return s->turtle.isClockEnabled;
 }
 
-void tr_sessionSetAltSpeedBegin(tr_session* s, int minutes_since_midnight)
+void tr_sessionSetAltSpeedBegin(tr_session* session, int minutes_since_midnight)
 {
-    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isSession(session));
     TR_ASSERT(minutes_since_midnight >= 0);
     TR_ASSERT(minutes_since_midnight < 60 * 24);
 
-    if (s->turtle.beginMinute != minutes_since_midnight)
+    if (auto& turtle = session->turtle; turtle.beginMinute != minutes_since_midnight)
     {
-        s->turtle.beginMinute = minutes_since_midnight;
-        userPokedTheClock(s, &s->turtle);
+        turtle.beginMinute = minutes_since_midnight;
+        userPokedTheClock(session, turtle);
     }
 }
 
@@ -1648,16 +1629,16 @@ int tr_sessionGetAltSpeedBegin(tr_session const* s)
     return s->turtle.beginMinute;
 }
 
-void tr_sessionSetAltSpeedEnd(tr_session* s, int minutes_since_midnight)
+void tr_sessionSetAltSpeedEnd(tr_session* session, int minutes_since_midnight)
 {
-    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isSession(session));
     TR_ASSERT(minutes_since_midnight >= 0);
     TR_ASSERT(minutes_since_midnight < 60 * 24);
 
-    if (s->turtle.endMinute != minutes_since_midnight)
+    if (auto& turtle = session->turtle; turtle.endMinute != minutes_since_midnight)
     {
-        s->turtle.endMinute = minutes_since_midnight;
-        userPokedTheClock(s, &s->turtle);
+        turtle.endMinute = minutes_since_midnight;
+        userPokedTheClock(session, turtle);
     }
 }
 
@@ -1668,14 +1649,14 @@ int tr_sessionGetAltSpeedEnd(tr_session const* s)
     return s->turtle.endMinute;
 }
 
-void tr_sessionSetAltSpeedDay(tr_session* s, tr_sched_day days)
+void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day days)
 {
-    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isSession(session));
 
-    if (s->turtle.days != days)
+    if (auto& turtle = session->turtle; turtle.days != days)
     {
-        s->turtle.days = days;
-        userPokedTheClock(s, &s->turtle);
+        turtle.days = days;
+        userPokedTheClock(session, turtle);
     }
 }
 
@@ -1688,7 +1669,7 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* s)
 
 void tr_sessionUseAltSpeed(tr_session* session, bool enabled)
 {
-    useAltSpeed(session, &session->turtle, enabled, true);
+    useAltSpeed(session, session->turtle, enabled, true);
 }
 
 bool tr_sessionUsesAltSpeed(tr_session const* s)
@@ -2092,12 +2073,14 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         return;
     }
 
-    tr_runInEventThread(session, [session, enabled]()
-    {
-        tr_udpUninit(session);
-        session->is_dht_enabled_ = enabled;
-        tr_udpInit(session);
-    });
+    tr_runInEventThread(
+        session,
+        [session, enabled]()
+        {
+            tr_udpUninit(session);
+            session->is_dht_enabled_ = enabled;
+            tr_udpInit(session);
+        });
 }
 
 /***
@@ -2124,14 +2107,16 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
         return;
     }
 
-    tr_runInEventThread(session, [session, enabled]()
-    {
-        session->is_utp_enabled_ = enabled;
-        tr_udpSetSocketBuffers(session);
-        tr_udpSetSocketTOS(session);
-        // But don't call tr_utpClose --
-        // see reset_timer in tr-utp.c for an explanation.
-    });
+    tr_runInEventThread(
+        session,
+        [session, enabled]()
+        {
+            session->is_utp_enabled_ = enabled;
+            tr_udpSetSocketBuffers(session);
+            tr_udpSetSocketTOS(session);
+            // But don't call tr_utpClose --
+            // see reset_timer in tr-utp.c for an explanation.
+        });
 }
 
 /***
@@ -2147,18 +2132,20 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
         return;
     }
 
-    tr_runInEventThread(session, [session, enabled]()
-    {
-        if (session->isLPDEnabled())
+    tr_runInEventThread(
+        session,
+        [session, enabled]()
         {
-            tr_lpdUninit(session);
-        }
-        session->is_lpd_enabled_ = enabled;
-        if (enabled)
-        {
-            tr_lpdInit(session, &session->bind_ipv4.addr_);
-        }
-    });
+            if (session->isLPDEnabled())
+            {
+                tr_lpdUninit(session);
+            }
+            session->is_lpd_enabled_ = enabled;
+            if (enabled)
+            {
+                tr_lpdInit(session, &session->bind_ipv4.addr_);
+            }
+        });
 }
 
 bool tr_sessionIsLPDEnabled(tr_session const* session)
@@ -2945,7 +2932,9 @@ auto makeEventBase()
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : session_id{ tr_time }
+    : magicNumber{ SESSION_MAGIC_NUMBER }
+    , cache{ std::make_unique<Cache>(torrents(), 1024 * 1024 * 2) }
+    , session_id{ tr_time }
     , event_base_{ makeEventBase() }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , config_dir_{ config_dir }
@@ -2962,11 +2951,7 @@ tr_session::tr_session(std::string_view config_dir)
     save_timer_ = timerMaker().create(
         [this]()
         {
-            for (auto* const tor : torrents())
-            {
-                tr_torrentSave(tor);
-            }
-
+            std::for_each(std::begin(torrents()), std::end(torrents()), [](auto* tor) { tr_torrentSave(tor); });
             stats().saveIfDirty();
         });
     save_timer_->startRepeating(SaveIntervalSecs);

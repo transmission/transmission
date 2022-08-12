@@ -638,8 +638,10 @@ private:
     friend bool tr_sessionIsPexEnabled(tr_session const* session);
     friend bool tr_sessionIsRatioLimited(tr_session const* session);
     friend bool tr_sessionIsUTPEnabled(tr_session const* session);
+    friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
+    friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
@@ -650,6 +652,10 @@ private:
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    struct init_data;
+    void initImpl(struct init_data&);
+    void setImpl(struct init_data&);
 
     void closeImplStart();
     void closeImplWaitForIdleUdp();
