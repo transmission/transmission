@@ -127,15 +127,13 @@ protected:
         }
 
         tr_error* error = nullptr;
-
-        if (auto path = tr_sys_dir_get_current(&error); !std::empty(path))
+        auto path = tr_sys_dir_get_current(&error);
+        if (error != nullptr)
         {
-            return path;
+            std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
+            tr_error_free(error);
         }
-
-        std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
-        tr_error_free(error);
-        return {};
+        return path;
     }
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
