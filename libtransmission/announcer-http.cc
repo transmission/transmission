@@ -82,7 +82,7 @@ static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request
         fmt::arg("numwant", req->numwant),
         fmt::arg("key", req->key));
 
-    if (session->encryptionMode == TR_ENCRYPTION_REQUIRED)
+    if (session->encryptionMode() == TR_ENCRYPTION_REQUIRED)
     {
         fmt::format_to(out, "&requirecrypto=1");
     }

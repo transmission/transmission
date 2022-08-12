@@ -170,7 +170,7 @@ static void tr_torrentUnsetPeerId(tr_torrent* tor)
 static int peerIdTTL(tr_torrent const* tor)
 {
     auto const ctime = tor->peer_id_creation_time_;
-    return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peer_id_ttl_hours * 3600, tr_time());
+    return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peerIdTtlHours() * 3600, tr_time());
 }
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)

@@ -1258,7 +1258,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     {
         auto mediator = std::make_shared<tr_handshake_mediator_impl>(*session);
         tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->topBandwidth(), addr, port, tr_time(), socket);
-        tr_handshake* const handshake = tr_handshakeNew(mediator, io, session->encryptionMode, on_handshake_done, manager);
+        tr_handshake* const handshake = tr_handshakeNew(mediator, io, session->encryptionMode(), on_handshake_done, manager);
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
@@ -2844,7 +2844,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     else
     {
         auto mediator = std::make_shared<tr_handshake_mediator_impl>(*mgr->session);
-        tr_handshake* handshake = tr_handshakeNew(mediator, io, mgr->session->encryptionMode, on_handshake_done, mgr);
+        tr_handshake* handshake = tr_handshakeNew(mediator, io, mgr->session->encryptionMode(), on_handshake_done, mgr);
 
         TR_ASSERT(io->torrentHash());
 

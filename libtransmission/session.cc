@@ -192,7 +192,7 @@ tr_encryption_mode tr_sessionGetEncryption(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->encryptionMode;
+    return session->encryptionMode();
 }
 
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
@@ -200,7 +200,7 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED || mode == TR_CLEAR_PREFERRED);
 
-    session->encryptionMode = mode;
+    session->encryption_mode_ = mode;
 }
 
 /***
@@ -411,7 +411,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited(s, TR_DOWN));
-    tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode);
+    tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
     tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, tr_sessionGetIdleLimit(s));
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, tr_sessionIsIdleLimited(s));
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir(s));
@@ -427,9 +427,9 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->is_pex_enabled_);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
-    tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode);
+    tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->is_prefetch_enabled_);
-    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
+    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTtlHours());
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, tr_sessionGetQueueStalledEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, tr_sessionGetQueueStalledMinutes(s));
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desired_ratio_);
@@ -785,7 +785,7 @@ void tr_session::setImpl(struct init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
     {
-        peer_id_ttl_hours = i;
+        peer_id_ttl_hours_ = i;
     }
 
     /* torrent queues */
@@ -827,7 +827,7 @@ void tr_session::setImpl(struct init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
     {
-        preallocationMode = tr_preallocation_mode(i);
+        preallocation_mode_ = tr_preallocation_mode(i);
     }
 
     if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))
@@ -1486,42 +1486,37 @@ static void turtleBootstrap(tr_session* session, tr_turtle_info& turtle)
 ****  Primary session speed limits
 ***/
 
-static void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned int Bps)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int KBps)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    s->speedLimit_Bps[d] = Bps;
+    session->speedLimit_Bps[dir] = tr_toSpeedBytes(KBps);
 
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* s, tr_direction d, unsigned int KBps)
+unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* session, tr_direction dir)
 {
-    tr_sessionSetSpeedLimit_Bps(s, d, tr_toSpeedBytes(KBps));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
+
+    return session->speedLimit_Bps[dir];
 }
 
-unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* s, tr_direction d)
+unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
-
-    return s->speedLimit_Bps[d];
+    return tr_toSpeedKBps(tr_sessionGetSpeedLimit_Bps(session, dir));
 }
 
-unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
+void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool is_limited)
 {
-    return tr_toSpeedKBps(tr_sessionGetSpeedLimit_Bps(s, d));
-}
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
-{
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    session->speedLimitEnabled[dir] = is_limited;
 
-    s->speedLimitEnabled[d] = b;
-
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
 bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
@@ -1536,32 +1531,32 @@ bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned int Bps)
+static void tr_sessionSetAltSpeed_Bps(tr_session* session, tr_direction dir, unsigned int Bps)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    s->turtle.speedLimit_Bps[d] = Bps;
+    session->turtle.speedLimit_Bps[dir] = Bps;
 
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
-void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int KBps)
+void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, unsigned int KBps)
 {
-    tr_sessionSetAltSpeed_Bps(s, d, tr_toSpeedBytes(KBps));
+    tr_sessionSetAltSpeed_Bps(session, dir, tr_toSpeedBytes(KBps));
 }
 
-static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
+static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    return s->turtle.speedLimit_Bps[d];
+    return session->turtle.speedLimit_Bps[dir];
 }
 
-unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
+unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    return tr_toSpeedKBps(tr_sessionGetAltSpeed_Bps(s, d));
+    return tr_toSpeedKBps(tr_sessionGetAltSpeed_Bps(session, dir));
 }
 
 static void userPokedTheClock(tr_session* session, tr_turtle_info& turtle)

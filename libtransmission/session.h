@@ -205,6 +205,21 @@ public:
         return should_scrape_paused_torrents_;
     }
 
+    [[nodiscard]] constexpr auto encryptionMode() const noexcept
+    {
+        return encryption_mode_;
+    }
+
+    [[nodiscard]] constexpr auto preallocationMode() const noexcept
+    {
+        return preallocation_mode_;
+    }
+
+    [[nodiscard]] constexpr auto peerIdTtlHours() const noexcept
+    {
+        return peer_id_ttl_hours_;
+    }
+
     [[nodiscard]] event_base* eventBase() noexcept
     {
         return event_base_.get();
@@ -540,24 +555,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    uint8_t peer_id_ttl_hours = 0;
-
-    bool stalledEnabled = false;
-    bool queueEnabled[2] = { false, false };
-    int queueSize[2] = { 0, 0 };
-    int queueStalledMinutes = 0;
-
-    int umask = 0;
-
-    unsigned int speedLimit_Bps[2] = { 0, 0 };
-    bool speedLimitEnabled[2] = { false, false };
-
-    struct tr_turtle_info turtle;
-
-    tr_encryption_mode encryptionMode;
-
-    tr_preallocation_mode preallocationMode;
-
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
@@ -608,11 +605,20 @@ public:
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
+    struct tr_turtle_info turtle;
+
 private:
+    friend void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int KBps);
+    friend unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* session, tr_direction dir);
+    friend unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
+    friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool is_limited);
+    friend bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
     friend bool tr_sessionGetDeleteSource(tr_session const* session);
     friend bool tr_sessionGetPaused(tr_session const* session);
     friend bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
+    friend bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir);
+    friend bool tr_sessionGetQueueStalledEnabled(tr_session const* session);
     friend bool tr_sessionIsDHTEnabled(tr_session const* session);
     friend bool tr_sessionIsIdleLimited(tr_session const* session);
     friend bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
@@ -628,6 +634,8 @@ private:
     friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
     friend double tr_sessionGetRatioLimit(tr_session const* session);
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
+    friend int tr_sessionGetQueueSize(tr_session const* session, tr_direction dir);
+    friend int tr_sessionGetQueueStalledMinutes(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionGetIdleLimit(tr_session const* session);
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
@@ -641,6 +649,7 @@ private:
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
+    friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
     friend void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes);
     friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b);
@@ -649,6 +658,10 @@ private:
     friend void tr_sessionSetPeerPort(tr_session* session, uint16_t hport);
     friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
+    friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
+    friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetRPCPassword(tr_session* session, char const* password);
     friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
@@ -658,6 +671,22 @@ private:
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    uint8_t peer_id_ttl_hours_ = 0;
+
+    bool stalledEnabled = false;
+    bool queueEnabled[2] = { false, false };
+    int queueSize[2] = { 0, 0 };
+    int queueStalledMinutes = 0;
+
+    int umask = 0;
+
+    unsigned int speedLimit_Bps[2] = { 0, 0 };
+    bool speedLimitEnabled[2] = { false, false };
+
+    tr_encryption_mode encryption_mode_;
+
+    tr_preallocation_mode preallocation_mode_;
 
     [[nodiscard]] tr_port randomPort() const;
     tr_port random_port_low_;
