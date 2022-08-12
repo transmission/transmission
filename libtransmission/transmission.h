@@ -587,13 +587,13 @@ double tr_sessionGetRawSpeed_KBps(tr_session const*, tr_direction);
 void tr_sessionSetRatioLimited(tr_session*, bool is_limited);
 bool tr_sessionIsRatioLimited(tr_session const*);
 
-void tr_sessionSetRatioLimit(tr_session*, double desiredRatio);
+void tr_sessionSetRatioLimit(tr_session*, double desired_ratio);
 double tr_sessionGetRatioLimit(tr_session const*);
 
 void tr_sessionSetIdleLimited(tr_session*, bool is_limited);
 bool tr_sessionIsIdleLimited(tr_session const*);
 
-void tr_sessionSetIdleLimit(tr_session*, uint16_t idleMinutes);
+void tr_sessionSetIdleLimit(tr_session*, uint16_t idle_minutes);
 uint16_t tr_sessionGetIdleLimit(tr_session const*);
 
 void tr_sessionSetPeerLimit(tr_session*, uint16_t max_global_peers);

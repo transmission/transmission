@@ -363,6 +363,11 @@ public:
 
     [[nodiscard]] tr_bandwidth& getBandwidthGroup(std::string_view name);
 
+    [[nodiscard]] constexpr auto& bandwidthGroups() const noexcept
+    {
+        return bandwidth_groups_;
+    }
+
     //
 
     [[nodiscard]] constexpr auto& openFiles() noexcept
@@ -610,12 +615,6 @@ public:
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
 
-    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
-    float desiredRatio;
-
-    uint16_t idleLimitMinutes;
-
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
@@ -637,8 +636,10 @@ private:
     friend char const* tr_sessionGetRPCUrl(tr_session const* session);
     friend char const* tr_sessionGetRPCUsername(tr_session const* session);
     friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend double tr_sessionGetRatioLimit(tr_session const* session);
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionGetIdleLimit(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
@@ -647,6 +648,7 @@ private:
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
+    friend void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes);
     friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
@@ -659,8 +661,15 @@ private:
     friend void tr_sessionSetRPCPort(tr_session* session, uint16_t hport);
     friend void tr_sessionSetRPCUrl(tr_session* session, char const* url);
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
+    friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
+
+    float desired_ratio_;
+
+    uint16_t idle_limit_minutes_;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
