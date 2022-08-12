@@ -565,27 +565,6 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 ****
 ***/
 
-/**
- * Periodically save the .resume files of any torrents whose
- * status has recently changed. This prevents loss of metadata
- * in the case of a crash, unclean shutdown, clumsy user, etc.
- */
-static void onSaveTimer(void* vsession)
-{
-    auto* session = static_cast<tr_session*>(vsession);
-
-    for (auto* const tor : session->torrents())
-    {
-        tr_torrentSave(tor);
-    }
-
-    session->stats().saveIfDirty();
-}
-
-/***
-****
-***/
-
 struct init_data
 {
     bool messageQueuingEnabled;
@@ -645,25 +624,22 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer(void* vsession)
+void tr_session::onNowTimer()
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
-    TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(session->now_timer_);
+    TR_ASSERT(now_timer_);
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
-    tr_dhtUpkeep(session);
-    if (session->turtle.isClockEnabled)
+    tr_dhtUpkeep(this);
+    if (turtle.isClockEnabled)
     {
-        turtleCheckClock(session, &session->turtle);
+        turtleCheckClock(this, &this->turtle);
     }
 
     // TODO: this seems a little silly. Why do we increment this
     // every second instead of computing the value as needed by
     // subtracting the current time from a start time?
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents())
     {
         if (tor->isRunning)
         {
@@ -686,7 +662,7 @@ static void onNowTimer(void* vsession)
     {
         target_interval += 1s;
     }
-    session->now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
+    now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
 
 static void loadBlocklists(tr_session* session);
@@ -709,10 +685,6 @@ static void tr_sessionInitImpl(init_data* data)
     tr_sessionGetDefaultSettings(&settings);
     tr_variantMergeDicts(&settings, clientSettings);
 
-    session->now_timer_ = session->timerMaker().create();
-    session->now_timer_->setCallback(onNowTimer, session);
-    session->now_timer_->startRepeating(1s);
-
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
     (void)signal(SIGPIPE, SIG_IGN);
@@ -732,10 +704,6 @@ static void tr_sessionInitImpl(init_data* data)
     loadBlocklists(session);
 
     TR_ASSERT(tr_isSession(session));
-
-    session->save_timer_ = session->timerMaker().create();
-    session->save_timer_->setCallback(onSaveTimer, session);
-    session->save_timer_->startRepeating(SaveIntervalSecs);
 
     tr_announcerInit(session);
 
@@ -1838,32 +1806,30 @@ std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
 
 static void closeBlocklists(tr_session* /*session*/);
 
-static void sessionCloseImplWaitForIdleUdp(void* vsession);
-
-static void sessionCloseImplStart(tr_session* session)
+void tr_session::closeImplStart()
 {
-    session->is_closing_ = true;
+    is_closing_ = true;
 
-    if (session->isLPDEnabled)
+    if (isLPDEnabled)
     {
-        tr_lpdUninit(session);
+        tr_lpdUninit(this);
     }
 
-    tr_dhtUninit(session);
+    tr_dhtUninit(this);
 
-    session->save_timer_.reset();
-    session->now_timer_.reset();
+    save_timer_.reset();
+    now_timer_.reset();
 
-    tr_verifyClose(session);
-    tr_sharedClose(*session);
+    tr_verifyClose(this);
+    tr_sharedClose(*this);
 
-    close_incoming_peer_port(session);
-    session->rpc_server_.reset();
+    close_incoming_peer_port(this);
+    this->rpc_server_.reset();
 
     /* Close the torrents. Get the most active ones first so that
      * if we can't get them all closed in a reasonable amount of time,
      * at least we get the most important ones first. */
-    auto torrents = tr_sessionGetTorrents(session);
+    auto torrents = tr_sessionGetTorrents(this);
     std::sort(
         std::begin(torrents),
         std::end(torrents),
@@ -1884,67 +1850,48 @@ static void sessionCloseImplStart(tr_session* session)
     /* Close the announcer *after* closing the torrents
        so that all the &event=stopped messages will be
        queued to be sent by tr_announcerClose() */
-    tr_announcerClose(session);
+    tr_announcerClose(this);
 
     /* and this goes *after* announcer close so that
        it won't be idle until the announce events are sent... */
-    session->web->closeSoon();
+    this->web->closeSoon();
 
-    session->cache.reset();
+    this->cache.reset();
 
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
-    TR_ASSERT(!session->save_timer_);
-    session->save_timer_ = session->timerMaker().create();
-    session->save_timer_->setCallback(sessionCloseImplWaitForIdleUdp, session);
-    session->save_timer_->start(1ms);
+    TR_ASSERT(!save_timer_);
+    save_timer_ = timerMaker().create([this]() { closeImplWaitForIdleUdp(); });
+    save_timer_->start(1ms);
 }
 
-static void sessionCloseImplFinish(tr_session* session);
-
-static void sessionCloseImplWaitForIdleUdp(void* vsession)
+void tr_session::closeImplWaitForIdleUdp()
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
-    TR_ASSERT(tr_isSession(session));
-
     /* gotta keep udp running long enough to send out all
        the &event=stopped UDP tracker messages */
-    if (!tr_tracker_udp_is_idle(session))
+    if (!tr_tracker_udp_is_idle(this))
     {
-        tr_tracker_udp_upkeep(session);
-        session->save_timer_->start(100ms);
+        tr_tracker_udp_upkeep(this);
+        save_timer_->start(100ms);
         return;
     }
 
-    sessionCloseImplFinish(session);
+    closeImplFinish();
 }
 
-static void sessionCloseImplFinish(tr_session* session)
+void tr_session::closeImplFinish()
 {
-    session->save_timer_.reset();
+    save_timer_.reset();
 
     /* we had to wait until UDP trackers were closed before closing these: */
-    tr_tracker_udp_close(session);
-    tr_udpUninit(session);
+    tr_tracker_udp_close(this);
+    tr_udpUninit(this);
 
-    session->stats().saveIfDirty();
-
-    tr_peerMgrFree(session->peerMgr);
-
-    tr_utpClose(session);
-
-    closeBlocklists(session);
-
-    session->openFiles().closeAll();
-
-    session->isClosed = true;
-}
-
-static void sessionCloseImpl(tr_session* const session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    sessionCloseImplStart(session);
+    stats().saveIfDirty();
+    tr_peerMgrFree(peerMgr);
+    tr_utpClose(this);
+    closeBlocklists(this);
+    openFiles().closeAll();
+    isClosed = true;
 }
 
 static bool deadlineReached(time_t const deadline)
@@ -1964,7 +1911,7 @@ void tr_sessionClose(tr_session* session)
     tr_logAddDebug(fmt::format("now is {}, deadline is {}", time(nullptr), deadline));
 
     /* close the session */
-    tr_runInEventThread(session, sessionCloseImpl, session);
+    tr_runInEventThread(session, [session]() { session->closeImplStart(); });
 
     while (!session->isClosed && !deadlineReached(deadline))
     {
@@ -3017,4 +2964,21 @@ tr_session::tr_session(std::string_view config_dir)
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , session_stats_{ config_dir, time(nullptr) }
 {
+    now_timer_ = timerMaker().create([this]() { onNowTimer(); });
+    now_timer_->startRepeating(1s);
+
+    // Periodically save the .resume files of any torrents whose
+    // status has recently changed. This prevents loss of metadata
+    // in the case of a crash, unclean shutdown, clumsy user, etc.
+    save_timer_ = timerMaker().create(
+        [this]()
+        {
+            for (auto* const tor : torrents())
+            {
+                tr_torrentSave(tor);
+            }
+
+            stats().saveIfDirty();
+        });
+    save_timer_->startRepeating(SaveIntervalSecs);
 }
