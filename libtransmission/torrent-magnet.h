@@ -9,9 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // int64_t
 #include <cstddef> // size_t
+#include <cstdint> // int64_t
 #include <ctime> // time_t
+#include <optional>
+#include <vector>
 
 #include "transmission.h"
 
@@ -21,7 +23,7 @@ struct tr_torrent_metainfo;
 // defined by BEP #9
 inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
 
-void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len);
+std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece);
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len);
 

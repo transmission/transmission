@@ -59,7 +59,7 @@
 #include "log.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "utils.h"
+#include "utils.h" // for _(), tr_strerror()
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -192,10 +192,10 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 static bool create_path(char const* path_in, int permissions, tr_error** error)
 {
     /* make a temporary copy of path */
-    char* const path = tr_strdup(path_in);
+    auto path = tr_pathbuf{ path_in };
 
     /* walk past the root */
-    char* p = path;
+    char* p = std::data(path);
 
     while (*p == TR_PATH_DELIMITER)
     {
@@ -283,7 +283,6 @@ CLEANUP:
 
     TR_ASSERT(my_error == nullptr);
 
-    tr_free(path);
     return ret;
 }
 

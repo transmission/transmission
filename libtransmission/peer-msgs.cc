@@ -2225,9 +2225,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     {
         auto ok = bool{ false };
 
-        auto dataLen = size_t{};
-
-        if (auto* data = static_cast<char*>(tr_torrentGetMetadataPiece(msgs->torrent, piece, &dataLen)); data != nullptr)
+        if (auto const piece_data = tr_torrentGetMetadataPiece(msgs->torrent, piece); piece_data)
         {
             auto* const out = msgs->outMessages;
 
@@ -2240,17 +2238,16 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
-            evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload) + dataLen);
+            evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload) + std::size(*piece_data));
             evbuffer_add_uint8(out, BtPeerMsgs::Ltep);
             evbuffer_add_uint8(out, msgs->ut_metadata_id);
             evbuffer_add_buffer(out, payload);
-            evbuffer_add(out, data, dataLen);
+            evbuffer_add(out, std::data(*piece_data), std::size(*piece_data));
             msgs->pokeBatchPeriod(HighPriorityIntervalSecs);
             msgs->dbgOutMessageLen();
 
             evbuffer_free(payload);
             tr_variantFree(&tmp);
-            tr_free(data);
 
             ok = true;
         }

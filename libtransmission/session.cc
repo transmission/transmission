@@ -458,7 +458,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
-    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
+    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->upload_slots_per_torrent);
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
@@ -722,7 +722,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     session->peerMgr = tr_peerMgrNew(session);
 
-    session->shared = tr_sharedInit(session);
+    session->shared = tr_sharedInit(*session);
 
     /**
     ***  Blocklist
@@ -1016,7 +1016,7 @@ static void sessionSetImpl(struct init_data* const data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_upload_slots_per_torrent, &i))
     {
-        session->uploadSlotsPerTorrent = i;
+        session->upload_slots_per_torrent = i;
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
@@ -1254,7 +1254,7 @@ static void peerPortChanged(tr_session* const session)
 
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
-    tr_sharedPortChanged(session);
+    tr_sharedPortChanged(*session);
 
     for (auto* const tor : session->torrents())
     {
@@ -1855,7 +1855,7 @@ static void sessionCloseImplStart(tr_session* session)
     session->now_timer_.reset();
 
     tr_verifyClose(session);
-    tr_sharedClose(session);
+    tr_sharedClose(*session);
 
     close_incoming_peer_port(session);
     session->rpc_server_.reset();

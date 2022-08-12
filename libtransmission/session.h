@@ -507,7 +507,7 @@ public:
     uint16_t peerLimit = 200;
     uint16_t peerLimitPerTorrent = 50;
 
-    int uploadSlotsPerTorrent = 0;
+    uint16_t upload_slots_per_torrent = 0;
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
