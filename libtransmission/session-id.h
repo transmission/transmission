@@ -17,7 +17,7 @@ class tr_session_id
 public:
     using current_time_func_t = time_t (*)();
 
-    tr_session_id(current_time_func_t get_current_time)
+    explicit tr_session_id(current_time_func_t get_current_time)
         : get_current_time_{ get_current_time }
     {
     }
