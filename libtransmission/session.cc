@@ -192,7 +192,7 @@ tr_encryption_mode tr_sessionGetEncryption(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->encryptionMode;
+    return session->encryptionMode();
 }
 
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
@@ -200,7 +200,7 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED || mode == TR_CLEAR_PREFERRED);
 
-    session->encryptionMode = mode;
+    session->encryption_mode_ = mode;
 }
 
 /***
@@ -411,7 +411,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, s->queueEnabled(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited(s, TR_DOWN));
-    tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode);
+    tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
     tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, tr_sessionGetIdleLimit(s));
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, tr_sessionIsIdleLimited(s));
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir(s));
@@ -427,7 +427,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
-    tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode);
+    tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
@@ -876,7 +876,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
     {
-        this->preallocationMode = tr_preallocation_mode(i);
+        this->preallocation_mode_ = tr_preallocation_mode(i);
     }
 
     if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))

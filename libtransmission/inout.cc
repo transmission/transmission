@@ -130,7 +130,7 @@ int readOrWriteBytes(
     {
         // open (and maybe create) the file
         auto const prealloc = (!do_write || !tor->fileIsWanted(file_index)) ? TR_PREALLOCATE_NONE :
-                                                                              tor->session->preallocationMode;
+                                                                              tor->session->preallocationMode();
         fd = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
         if (fd && do_write)
         {

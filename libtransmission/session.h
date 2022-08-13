@@ -484,10 +484,6 @@ public:
 
     int magicNumber = 0;
 
-    tr_encryption_mode encryptionMode;
-
-    tr_preallocation_mode preallocationMode;
-
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
@@ -626,11 +622,22 @@ public:
         return is_closed_;
     }
 
+    [[nodiscard]] auto constexpr encryptionMode() const noexcept
+    {
+        return encryption_mode_;
+    }
+
+    [[nodiscard]] auto constexpr preallocationMode() const noexcept
+    {
+        return preallocation_mode_;
+    }
+
 private:
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
@@ -644,6 +651,10 @@ private:
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
+
+    tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
 
     bool is_closing_ = false;
     bool is_closed_ = false;
