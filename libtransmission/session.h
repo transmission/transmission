@@ -571,7 +571,6 @@ public:
         tr_session* const session_;
     };
 
-    WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
     tr_session_id session_id;
@@ -604,13 +603,20 @@ public:
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
 private:
+    friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionClose(tr_session* session);
 
+    struct init_data;
+    void initImpl(init_data&);
+    void setImpl(init_data&);
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
 
     static std::recursive_mutex session_mutex_;
+
+    WebMediator web_mediator_{ this };
 
     std::shared_ptr<event_base> const event_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
