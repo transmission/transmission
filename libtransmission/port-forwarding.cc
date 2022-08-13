@@ -24,7 +24,7 @@ using namespace std::literals;
 
 struct tr_shared
 {
-    tr_shared(tr_session& session_in)
+    explicit tr_shared(tr_session& session_in)
         : session{ session_in }
     {
     }

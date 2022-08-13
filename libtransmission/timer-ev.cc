@@ -19,7 +19,7 @@ namespace libtransmission
 class EvTimer final : public Timer
 {
 public:
-    EvTimer(struct event_base* base)
+    explicit EvTimer(struct event_base* base)
         : base_{ base }
     {
         setRepeating(is_repeating_);
