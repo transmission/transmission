@@ -46,7 +46,7 @@ private:
     static auto constexpr SessionIdSize = size_t{ 48 };
     static auto constexpr SessionIdDurationSec = time_t{ 60 * 60 }; /* expire in an hour */
 
-    using session_id_t = std::array<char, SessionIdSize + 1>; // +1 for '\0';
+    using session_id_t = std::array<char, SessionIdSize + 1>; // add one for '\0'
     static session_id_t make_session_id();
 
     current_time_func_t const get_current_time_;
