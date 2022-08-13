@@ -106,7 +106,7 @@ private:
         static_cast<EvTimer*>(vself)->handleTimer();
     }
 
-    void handleTimer()
+    void handleTimer() const
     {
         TR_ASSERT(callback_);
         callback_();
