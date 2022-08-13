@@ -407,8 +407,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
-    tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
-    tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
+    tr_variantDictAddInt(d, TR_KEY_download_queue_size, s->queueSize(TR_DOWN));
+    tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, s->queueEnabled(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode);
@@ -430,8 +430,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode);
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
-    tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, tr_sessionGetQueueStalledEnabled(s));
-    tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, tr_sessionGetQueueStalledMinutes(s));
+    tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
+    tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio);
     tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
     tr_variantDictAddBool(d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled(s));
@@ -446,8 +446,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
-    tr_variantDictAddInt(d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize(s, TR_UP));
-    tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled(s, TR_UP));
+    tr_variantDictAddInt(d, TR_KEY_seed_queue_size, s->queueSize(TR_UP));
+    tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, s->queueEnabled(TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_up, tr_sessionGetAltSpeed_KBps(s, TR_UP));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_down, tr_sessionGetAltSpeed_KBps(s, TR_DOWN));
@@ -2621,7 +2621,7 @@ void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simul
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(dir));
 
-    session->queueSize[dir] = max_simultaneous_seed_torrents;
+    session->queue_size_[dir] = max_simultaneous_seed_torrents;
 }
 
 int tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
@@ -2629,7 +2629,7 @@ int tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(dir));
 
-    return session->queueSize[dir];
+    return session->queueSize(dir);
 }
 
 void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents)
@@ -2637,7 +2637,7 @@ void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_li
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(dir));
 
-    session->queueEnabled[dir] = do_limit_simultaneous_seed_torrents;
+    session->queue_enabled_[dir] = do_limit_simultaneous_seed_torrents;
 }
 
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
@@ -2645,7 +2645,7 @@ bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(dir));
 
-    return session->queueEnabled[dir];
+    return session->queueEnabled(dir);
 }
 
 void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes)
@@ -2653,28 +2653,28 @@ void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(minutes > 0);
 
-    session->queueStalledMinutes = minutes;
+    session->queue_stalled_minutes_ = minutes;
 }
 
 void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->stalledEnabled = is_enabled;
+    session->queue_stalled_enabled_ = is_enabled;
 }
 
 bool tr_sessionGetQueueStalledEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->stalledEnabled;
+    return session->queueStalledEnabled();
 }
 
 int tr_sessionGetQueueStalledMinutes(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->queueStalledMinutes;
+    return session->queueStalledMinutes();
 }
 
 void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests)
@@ -2739,18 +2739,18 @@ std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 {
-    int const max = tr_sessionGetQueueSize(session, dir);
+    auto const max = session->queueSize(dir);
     tr_torrent_activity const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 
-    if (!tr_sessionGetQueueEnabled(session, dir))
+    if (!session->queueEnabled(dir))
     {
         return INT_MAX;
     }
 
     /* count how many torrents are active */
     int active_count = 0;
-    bool const stalled_enabled = tr_sessionGetQueueStalledEnabled(session);
-    int const stalled_if_idle_for_n_seconds = tr_sessionGetQueueStalledMinutes(session) * 60;
+    bool const stalled_enabled = session->queueStalledEnabled();
+    int const stalled_if_idle_for_n_seconds = session->queueStalledMinutes() * 60;
     time_t const now = tr_time();
     for (auto const* const tor : session->torrents())
     {

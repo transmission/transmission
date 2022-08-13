@@ -2178,11 +2178,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_queue_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionGetQueueEnabled(s, TR_DOWN));
+        tr_variantDictAddBool(d, key, s->queueEnabled(TR_DOWN));
         break;
 
     case TR_KEY_download_queue_size:
-        tr_variantDictAddInt(d, key, tr_sessionGetQueueSize(s, TR_DOWN));
+        tr_variantDictAddInt(d, key, s->queueSize(TR_DOWN));
         break;
 
     case TR_KEY_peer_limit_global:
@@ -2262,11 +2262,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_seed_queue_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionGetQueueEnabled(s, TR_UP));
+        tr_variantDictAddBool(d, key, s->queueEnabled(TR_UP));
         break;
 
     case TR_KEY_seed_queue_size:
-        tr_variantDictAddInt(d, key, tr_sessionGetQueueSize(s, TR_UP));
+        tr_variantDictAddInt(d, key, s->queueSize(TR_UP));
         break;
 
     case TR_KEY_start_added_torrents:
@@ -2318,11 +2318,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_queue_stalled_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionGetQueueStalledEnabled(s));
+        tr_variantDictAddBool(d, key, s->queueStalledEnabled());
         break;
 
     case TR_KEY_queue_stalled_minutes:
-        tr_variantDictAddInt(d, key, tr_sessionGetQueueStalledMinutes(s));
+        tr_variantDictAddInt(d, key, s->queueStalledMinutes());
         break;
 
     case TR_KEY_anti_brute_force_enabled:
