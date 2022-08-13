@@ -155,11 +155,6 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
-    [[nodiscard]] constexpr auto isClosing() const noexcept
-    {
-        return is_closing_;
-    }
-
     // paths
 
     [[nodiscard]] constexpr auto const& configDir() const noexcept
@@ -471,8 +466,6 @@ public:
     bool isUTPEnabled = false;
     bool isLPDEnabled = false;
     bool isPrefetchEnabled = false;
-    bool is_closing_ = false;
-    bool isClosed = false;
     bool isRatioLimited = false;
     bool isIdleLimited = false;
     bool isIncompleteFileNamingEnabled = false;
@@ -623,6 +616,16 @@ public:
         return peer_limit_per_torrent_;
     }
 
+    [[nodiscard]] auto constexpr isClosing() const noexcept
+    {
+        return is_closing_;
+    }
+
+    [[nodiscard]] auto constexpr isClosed() const noexcept
+    {
+        return is_closed_;
+    }
+
 private:
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend void tr_sessionClose(tr_session* session);
@@ -641,6 +644,9 @@ private:
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    bool is_closing_ = false;
+    bool is_closed_ = false;
 
     uint16_t peer_count_ = 0;
     uint16_t peer_limit_ = 200;

@@ -1878,7 +1878,7 @@ void tr_session::closeImplFinish()
     tr_utpClose(this);
     closeBlocklists(this);
     openFiles().closeAll();
-    isClosed = true;
+    is_closed_ = true;
 }
 
 static bool deadlineReached(time_t const deadline)
@@ -1900,7 +1900,7 @@ void tr_sessionClose(tr_session* session)
     /* close the session */
     tr_runInEventThread(session, [session]() { session->closeImplStart(); });
 
-    while (!session->isClosed && !deadlineReached(deadline))
+    while (!session->isClosed() && !deadlineReached(deadline))
     {
         tr_logAddTrace("waiting for the libtransmission thread to finish");
         tr_wait_msec(10);

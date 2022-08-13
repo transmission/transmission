@@ -1595,7 +1595,7 @@ void tr_announcer::upkeep()
 {
     auto const lock = session->unique_lock();
 
-    bool const is_closing = session->isClosed;
+    bool const is_closing = session->isClosed();
     time_t const now = tr_time();
 
     /* maybe send out some "stopped" messages for closed torrents */

@@ -231,7 +231,7 @@ void tr_utpInit(tr_session* session)
 
 bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosed && !ss->utp_timer)
+    if (!ss->isClosed() && !ss->utp_timer)
     {
         ss->utp_timer = ss->timerMaker().create(timer_callback, ss);
         reset_timer(ss);
