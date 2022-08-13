@@ -66,7 +66,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     tr_sys_path_native_separators(std::data(path));
     tr_error* error = nullptr;
     auto const info = tr_sys_path_get_info(path, 0, &error);
-    if (!info)
+    if (error != nullptr)
     {
         tr_logAddWarn(fmt::format(
             _("Skipping '{path}': {error} ({error_code})"),
@@ -74,6 +74,9 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
+    }
+    if (!info)
+    {
         return;
     }
 
