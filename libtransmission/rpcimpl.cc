@@ -2186,11 +2186,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_peer_limit_global:
-        tr_variantDictAddInt(d, key, tr_sessionGetPeerLimit(s));
+        tr_variantDictAddInt(d, key, s->peerLimit());
         break;
 
     case TR_KEY_peer_limit_per_torrent:
-        tr_variantDictAddInt(d, key, tr_sessionGetPeerLimitPerTorrent(s));
+        tr_variantDictAddInt(d, key, s->peerLimitPerTorrent());
         break;
 
     case TR_KEY_incomplete_dir:

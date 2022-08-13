@@ -2458,7 +2458,7 @@ void enforceSessionPeerLimit(tr_session* session)
         std::end(torrents),
         size_t{},
         [](size_t sum, tr_torrent const* tor) { return sum + tor->swarm->peerCount(); });
-    size_t const max = tr_sessionGetPeerLimit(session);
+    size_t const max = session->peerLimit();
     if (n_peers <= max)
     {
         return;
@@ -2738,7 +2738,7 @@ struct peer_candidate
     auto const now_msec = tr_time_msec();
 
     // leave 5% of connection slots for incoming connections -- ticket #2609
-    auto const max_candidates = static_cast<size_t>(tr_sessionGetPeerLimit(session) * 0.95);
+    auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95);
 
     /* count how many peers and atoms we've got */
     auto atom_count = size_t{};

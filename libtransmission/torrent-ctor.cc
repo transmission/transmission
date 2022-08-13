@@ -353,7 +353,7 @@ tr_ctor* tr_ctorNew(tr_session const* session)
 
     tr_ctorSetDeleteSource(ctor, tr_sessionGetDeleteSource(session));
     tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
-    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
+    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent());
     tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
 
     return ctor;

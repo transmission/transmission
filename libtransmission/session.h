@@ -302,20 +302,20 @@ public:
 
     [[nodiscard]] constexpr bool incPeerCount() noexcept
     {
-        if (this->peerCount >= this->peerLimit)
+        if (this->peer_count_ >= this->peer_limit_)
         {
             return false;
         }
 
-        ++this->peerCount;
+        ++this->peer_count_;
         return true;
     }
 
     constexpr void decPeerCount() noexcept
     {
-        if (this->peerCount > 0)
+        if (this->peer_count_ > 0)
         {
-            --this->peerCount;
+            --this->peer_count_;
         }
     }
 
@@ -498,10 +498,6 @@ public:
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
-    uint16_t peerCount = 0;
-    uint16_t peerLimit = 200;
-    uint16_t peerLimitPerTorrent = 50;
-
     uint16_t upload_slots_per_torrent = 0;
 
     /* The UDP sockets used for the DHT and uTP. */
@@ -617,10 +613,23 @@ public:
         return queue_stalled_minutes_;
     }
 
+    [[nodiscard]] auto constexpr peerLimit() const noexcept
+    {
+        return peer_limit_;
+    }
+
+    [[nodiscard]] auto constexpr peerLimitPerTorrent() const noexcept
+    {
+        return peer_limit_per_torrent_;
+    }
+
 private:
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend void tr_sessionClose(tr_session* session);
+    friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
+    friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
@@ -632,6 +641,10 @@ private:
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    uint16_t peer_count_ = 0;
+    uint16_t peer_limit_ = 200;
+    uint16_t peer_limit_per_torrent_ = 50;
 
     std::array<bool, 2> queue_enabled_ = { false, false };
     std::array<int, 2> queue_size_ = { 0, 0 };
