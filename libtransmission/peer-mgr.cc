@@ -2540,7 +2540,7 @@ void queuePulse(tr_session* session, tr_direction dir)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tr_sessionGetQueueEnabled(session, dir))
+    if (session->queueEnabled(dir))
     {
         auto const n = tr_sessionCountQueueFreeSlots(session, dir);
 

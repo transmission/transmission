@@ -482,11 +482,6 @@ public:
 
     uint8_t peer_id_ttl_hours = 0;
 
-    bool stalledEnabled = false;
-    bool queueEnabled[2] = { false, false };
-    int queueSize[2] = { 0, 0 };
-    int queueStalledMinutes = 0;
-
     int umask = 0;
 
     unsigned int speedLimit_Bps[2] = { 0, 0 };
@@ -602,10 +597,34 @@ public:
     // Only session.cc should use this.
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
+    [[nodiscard]] auto constexpr queueEnabled(tr_direction dir) const noexcept
+    {
+        return queue_enabled_[dir];
+    }
+
+    [[nodiscard]] auto constexpr queueSize(tr_direction dir) const noexcept
+    {
+        return queue_size_[dir];
+    }
+
+    [[nodiscard]] auto constexpr queueStalledEnabled() const noexcept
+    {
+        return queue_stalled_enabled_;
+    }
+
+    [[nodiscard]] auto constexpr queueStalledMinutes() const noexcept
+    {
+        return queue_stalled_minutes_;
+    }
+
 private:
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
-    friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionClose(tr_session* session);
+    friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
+    friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
+    friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
 
     struct init_data;
     void initImpl(init_data&);
@@ -613,6 +632,11 @@ private:
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    std::array<bool, 2> queue_enabled_ = { false, false };
+    std::array<int, 2> queue_size_ = { 0, 0 };
+    int queue_stalled_minutes_ = 0;
+    bool queue_stalled_enabled_ = false;
 
     static std::recursive_mutex session_mutex_;
 
