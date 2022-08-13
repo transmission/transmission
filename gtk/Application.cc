@@ -630,13 +630,9 @@ namespace
 
 std::string get_application_id(std::string const& config_dir)
 {
-    struct stat sb;
-    ::stat(config_dir.c_str(), &sb);
-
-    std::ostringstream id;
-    id << "com.transmissionbt.transmission_" << sb.st_dev << '_' << sb.st_ino;
-
-    return id.str();
+    struct stat sb = {};
+    (void)::stat(config_dir.c_str(), &sb);
+    return fmt::format("com.transmissionbt.transmission_{}_{}", sb.st_dev, sb.st_ino);
 }
 
 } // namespace
