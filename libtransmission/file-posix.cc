@@ -358,7 +358,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
     auto const szpath = tr_pathbuf{ path };
     auto buf = std::array<char, PATH_MAX>{};
 
-    if (auto* const ret = realpath(szpath, std::data(buf)); ret != nullptr)
+    if (auto const* const ret = realpath(szpath, std::data(buf)); ret != nullptr)
     {
         return ret;
     }
@@ -1192,7 +1192,7 @@ std::string tr_sys_dir_get_current(tr_error** error)
 
     for (;;)
     {
-        if (char* const ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
+        if (char const* const ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
         {
             return ret;
         }
