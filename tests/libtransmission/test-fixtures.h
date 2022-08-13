@@ -203,7 +203,7 @@ protected:
         {
             uint64_t n = {};
             tr_error* local_error = nullptr;
-            if (!tr_sys_file_write(fd, left, n_left, &n, error))
+            if (!tr_sys_file_write(fd, left, n_left, &n, &local_error))
             {
                 fprintf(stderr, "Error writing file: '%s'\n", local_error->message);
                 tr_error_propagate(error, &local_error);
