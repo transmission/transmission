@@ -113,9 +113,10 @@ enum handshake_state_t
 
 struct tr_handshake
 {
-    tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in)
+    tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in, tr_encryption_mode encryption_mode_in)
         : mediator{ std::move(mediator_in) }
         , dh{ mediator->privateKey() }
+        , encryption_mode{ encryption_mode_in }
     {
     }
 
@@ -143,7 +144,7 @@ struct tr_handshake
     bool haveSentBitTorrentHandshake = false;
     tr_peerIo* io = nullptr;
     DH dh = {};
-    handshake_state_t state;
+    handshake_state_t state = AWAITING_HANDSHAKE;
     tr_encryption_mode encryption_mode;
     uint16_t pad_c_len = {};
     uint16_t pad_d_len = {};
@@ -1137,9 +1138,8 @@ tr_handshake* tr_handshakeNew(
     tr_handshake_done_func done_func,
     void* done_func_user_data)
 {
-    auto* const handshake = new tr_handshake{ std::move(mediator) };
+    auto* const handshake = new tr_handshake{ std::move(mediator), encryption_mode };
     handshake->io = io;
-    handshake->encryption_mode = encryption_mode;
     handshake->done_func = done_func;
     handshake->done_func_user_data = done_func_user_data;
     handshake->timeout_timer = handshake->mediator->createTimer();

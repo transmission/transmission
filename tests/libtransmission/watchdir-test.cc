@@ -78,7 +78,12 @@ protected:
         auto watchdir = force_generic ?
             Watchdir::createGeneric(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
             Watchdir::create(path, std::move(callback), *timer_maker_, ev_base_.get());
-        dynamic_cast<impl::BaseWatchdir*>(watchdir.get())->setRetryDuration(RetryDuration);
+
+        if (auto* const base_watchdir = dynamic_cast<impl::BaseWatchdir*>(watchdir.get()); base_watchdir != nullptr)
+        {
+            base_watchdir->setRetryDuration(RetryDuration);
+        }
+
         return watchdir;
     }
 
@@ -230,7 +235,9 @@ TEST_P(WatchDirTest, retry)
     auto watchdir = createWatchDir(path, callback);
     auto constexpr FastRetryWaitTime = 20ms;
     auto constexpr ThreeRetries = FastRetryWaitTime * 4;
-    dynamic_cast<impl::BaseWatchdir*>(watchdir.get())->setRetryDuration(FastRetryWaitTime);
+    auto* const base_watchdir = dynamic_cast<impl::BaseWatchdir*>(watchdir.get());
+    ASSERT_TRUE(base_watchdir != nullptr);
+    base_watchdir->setRetryDuration(FastRetryWaitTime);
 
     processEvents(ThreeRetries);
     EXPECT_EQ(0U, std::size(names));

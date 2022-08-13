@@ -86,7 +86,7 @@ struct tr_bindinfo
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
-    unsigned int speedLimit_Bps[2] = {};
+    std::array<unsigned int, 2> speedLimit_Bps = {};
 
     /* is turtle mode on right now? */
     bool isEnabled = false;

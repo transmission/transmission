@@ -90,18 +90,15 @@ tr_bandwidth::tr_bandwidth(tr_bandwidth* parent)
 ****
 ***/
 
-static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me)
+static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me) noexcept
 {
-    auto it = std::find(std::begin(v), std::end(v), remove_me);
-    if (it == std::end(v))
-    {
-        return;
-    }
-
     // the list isn't sorted -- so instead of erase()ing `it`,
     // do the cheaper option of overwriting it with the final item
-    *it = v.back();
-    v.resize(v.size() - 1);
+    if (auto it = std::find(std::begin(v), std::end(v), remove_me); it != std::end(v))
+    {
+        *it = v.back();
+        v.resize(v.size() - 1);
+    }
 }
 
 void tr_bandwidth::setParent(tr_bandwidth* new_parent)

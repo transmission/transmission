@@ -103,7 +103,7 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
     /* try to stat the file */
     tr_error* my_error = nullptr;
     auto const info = tr_sys_path_get_info(szfilename, 0, &my_error);
-    if (!info)
+    if (my_error != nullptr)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -114,7 +114,7 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
         return false;
     }
 
-    if (!info->isFile())
+    if (!info || !info->isFile())
     {
         tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);

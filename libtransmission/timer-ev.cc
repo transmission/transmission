@@ -19,7 +19,7 @@ namespace libtransmission
 class EvTimer final : public Timer
 {
 public:
-    EvTimer(struct event_base* base)
+    explicit EvTimer(struct event_base* base)
         : base_{ base }
     {
         setRepeating(is_repeating_);
@@ -106,7 +106,7 @@ private:
         static_cast<EvTimer*>(vself)->handleTimer();
     }
 
-    void handleTimer()
+    void handleTimer() const
     {
         TR_ASSERT(callback_);
         callback_();

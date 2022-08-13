@@ -20,6 +20,7 @@ Checks: >
   cppcoreguidelines-slicing,
   cppcoreguidelines-special-member-functions,
   cppcoreguidelines-virtual-class-destructor,
+  google-explicit-constructor,
   misc-*,
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
