@@ -385,7 +385,7 @@ TEST_F(AnnounceListTest, save)
         std::end(modified_tm.announceList())));
 
     // cleanup
-    std::remove(test_file.c_str());
+    (void)std::remove(test_file.c_str());
 }
 
 TEST_F(AnnounceListTest, SingleAnnounce)
