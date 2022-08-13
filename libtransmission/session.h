@@ -521,9 +521,6 @@ public:
         public_peer_port = port;
     }
 
-    tr_port randomPortLow;
-    tr_port randomPortHigh;
-
     std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr = nullptr;
     struct tr_shared* shared = nullptr;
@@ -550,6 +547,9 @@ public:
     private:
         tr_session* const session_;
     };
+
+    tr_port random_port_low_;
+    tr_port random_port_high_;
 
     std::unique_ptr<tr_web> web;
 
@@ -633,7 +633,10 @@ public:
     }
 
 private:
+    [[nodiscard]] tr_port randomPort() const;
+
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
