@@ -2674,7 +2674,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
 {
     if (!queueEnabled(dir))
     {
-        std::numeric_limits<size_t>::max();
+        return std::numeric_limits<size_t>::max();
     }
 
     auto const max = queueSize(dir);
