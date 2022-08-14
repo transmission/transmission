@@ -658,6 +658,8 @@ public:
 
     [[nodiscard]] size_t countQueueFreeSlots(tr_direction dir) const noexcept;
 
+    [[nodiscard]] std::vector<tr_torrent*> getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const;
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -793,5 +795,3 @@ unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
-
-std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t num_wanted);

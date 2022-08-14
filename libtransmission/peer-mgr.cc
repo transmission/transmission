@@ -2546,7 +2546,7 @@ void queuePulse(tr_session* session, tr_direction dir)
     }
 
     auto const n = session->countQueueFreeSlots(dir);
-    for (auto* tor : tr_sessionGetNextQueuedTorrents(session, dir, n))
+    for (auto* tor : session->getNextQueuedTorrents(dir, n))
     {
         tr_torrentStartNow(tor);
         session->onQueuedTorrentStarted(tor);

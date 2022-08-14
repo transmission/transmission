@@ -2695,17 +2695,16 @@ bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
     return session->rpc_server_->isAntiBruteForceEnabled();
 }
 
-std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted)
+std::vector<tr_torrent*> tr_session::getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const
 {
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(direction));
+    TR_ASSERT(tr_isDirection(dir));
 
     // build an array of the candidates
     auto candidates = std::vector<tr_torrent*>{};
-    candidates.reserve(tr_sessionCountTorrents(session));
-    for (auto* const tor : session->torrents())
+    candidates.reserve(std::size(torrents()));
+    for (auto* const tor : torrents())
     {
-        if (tor->isQueued() && (direction == tor->queueDirection()))
+        if (tor->isQueued() && (dir == tor->queueDirection()))
         {
             candidates.push_back(tor);
         }
