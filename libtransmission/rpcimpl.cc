@@ -2240,7 +2240,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_idle_seeding_limit_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsIdleLimited(s));
+        tr_variantDictAddBool(d, key, s->isIdleLimited());
         break;
 
     case TR_KEY_seed_queue_enabled:

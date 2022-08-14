@@ -428,7 +428,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
         break;
 
     case TR_IDLELIMIT_GLOBAL:
-        isLimited = tr_sessionIsIdleLimited(tor->session);
+        isLimited = tor->session->isIdleLimited();
 
         if (isLimited && idleMinutes != nullptr)
         {

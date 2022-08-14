@@ -1287,11 +1287,11 @@ double tr_sessionGetRatioLimit(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetIdleLimited(tr_session* session, bool isLimited)
+void tr_sessionSetIdleLimited(tr_session* session, bool is_limited)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isIdleLimited = isLimited;
+    session->is_idle_limited_ = is_limited;
 }
 
 void tr_sessionSetIdleLimit(tr_session* session, uint16_t idleMinutes)
@@ -1305,7 +1305,7 @@ bool tr_sessionIsIdleLimited(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isIdleLimited;
+    return session->isIdleLimited();
 }
 
 uint16_t tr_sessionGetIdleLimit(tr_session const* session)

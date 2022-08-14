@@ -463,7 +463,6 @@ public:
     bool isUTPEnabled = false;
     bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
-    bool isIdleLimited = false;
 
     uint8_t peer_id_ttl_hours = 0;
 
@@ -644,6 +643,11 @@ public:
         return is_pex_enabled_;
     }
 
+    [[nodiscard]] auto constexpr isIdleLimited() const noexcept
+    {
+        return is_idle_limited_;
+    }
+
     [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
     {
         return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
@@ -713,6 +717,7 @@ private:
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
@@ -730,6 +735,8 @@ private:
     bool is_pex_enabled_ = false;
     bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;
+
+    bool is_idle_limited_ = false;
 
     struct init_data;
     void initImpl(init_data&);
