@@ -2057,35 +2057,30 @@ bool tr_sessionIsPexEnabled(tr_session const* session)
     return session->isPexEnabled;
 }
 
-bool tr_sessionAllowsDHT(tr_session const* session)
-{
-    return tr_sessionIsDHTEnabled(session);
-}
-
 bool tr_sessionIsDHTEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isDHTEnabled;
-}
-
-static void toggleDHTImpl(tr_session* const session)
-{
-    TR_ASSERT(session != nullptr);
-
-    tr_udpUninit(session);
-    session->isDHTEnabled = !session->isDHTEnabled;
-    tr_udpInit(session);
+    return session->allowsDHT();
 }
 
 void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled != session->isDHTEnabled)
+    if (enabled == session->allowsDHT())
     {
-        tr_runInEventThread(session, toggleDHTImpl, session);
+        return;
     }
+
+    tr_runInEventThread(
+        session,
+        [session, enabled]()
+        {
+            tr_udpUninit(session);
+            session->is_dht_enabled_ = enabled;
+            tr_udpInit(session);
+        });
 }
 
 /***

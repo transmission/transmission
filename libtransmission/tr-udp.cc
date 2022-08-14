@@ -245,7 +245,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     {
         if (buf[0] == 'd')
         {
-            if (tr_sessionAllowsDHT(session))
+            if (session->allowsDHT())
             {
                 buf[rc] = '\0'; /* required by the DHT code */
                 tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, vsession);

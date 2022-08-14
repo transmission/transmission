@@ -523,7 +523,7 @@ public:
 
     [[nodiscard]] auto allowsDht() const
     {
-        return this->isPublic() && tr_sessionAllowsDHT(this->session);
+        return this->isPublic() && this->session->allowsDHT();
     }
 
     [[nodiscard]] auto allowsLpd() const // local peer discovery

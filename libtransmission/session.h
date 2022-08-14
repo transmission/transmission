@@ -462,7 +462,6 @@ public:
 
     bool isPortRandom = false;
     bool isPexEnabled = false;
-    bool isDHTEnabled = false;
     bool isUTPEnabled = false;
     bool isLPDEnabled = false;
     bool isPrefetchEnabled = false;
@@ -636,6 +635,11 @@ public:
         return should_pause_added_torrents_;
     }
 
+    [[nodiscard]] auto constexpr allowsDHT() const noexcept
+    {
+        return is_dht_enabled_;
+    }
+
     /*module_visible*/
 
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
@@ -658,6 +662,7 @@ private:
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
@@ -668,6 +673,8 @@ private:
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+
+    bool is_dht_enabled_ = false;
 
     struct init_data;
     void initImpl(init_data&);
@@ -756,8 +763,6 @@ private:
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
 };
-
-bool tr_sessionAllowsDHT(tr_session const* session);
 
 bool tr_sessionAllowsLPD(tr_session const* session);
 
