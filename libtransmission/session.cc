@@ -1338,7 +1338,7 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
     }
     else if (tr_sessionIsSpeedLimited(session, dir))
     {
-        *setme_Bps = tr_sessionGetSpeedLimit_Bps(session, dir);
+        *setme_Bps = session->speedLimitBps(dir);
     }
     else
     {
@@ -1493,17 +1493,9 @@ void tr_sessionSetSpeedLimit_KBps(tr_session* s, tr_direction d, unsigned int KB
     tr_sessionSetSpeedLimit_Bps(s, d, tr_toSpeedBytes(KBps));
 }
 
-unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* s, tr_direction d)
-{
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
-
-    return s->speedLimit_Bps[d];
-}
-
 unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
 {
-    return tr_toSpeedKBps(tr_sessionGetSpeedLimit_Bps(s, d));
+    return tr_toSpeedKBps(s->speedLimitBps(d));
 }
 
 void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
