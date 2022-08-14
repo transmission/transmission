@@ -354,7 +354,7 @@ public:
 
     using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
 
-    void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    constexpr void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
     {
         queue_start_callback_ = cb;
         queue_start_user_data_ = user_data;
@@ -368,7 +368,7 @@ public:
         }
     }
 
-    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    constexpr void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
     {
         idle_limit_hit_callback_ = cb;
         idle_limit_hit_user_data_ = user_data;
@@ -382,7 +382,7 @@ public:
         }
     }
 
-    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    constexpr void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
     {
         ratio_limit_hit_cb_ = cb;
         ratio_limit_hit_user_data_ = user_data;
@@ -396,7 +396,7 @@ public:
         }
     }
 
-    void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    constexpr void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
     {
         got_metadata_cb_ = cb;
         got_metadata_user_data_ = user_data;
@@ -410,7 +410,7 @@ public:
         }
     }
 
-    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    constexpr void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
     {
         completeness_func_ = cb;
         completeness_func_user_data_ = user_data;
