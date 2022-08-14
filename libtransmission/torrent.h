@@ -528,7 +528,7 @@ public:
 
     [[nodiscard]] auto allowsLpd() const // local peer discovery
     {
-        return this->isPublic() && tr_sessionAllowsLPD(this->session);
+        return this->isPublic() && this->session->allowsLPD();
     }
 
     [[nodiscard]] bool isPieceTransferAllowed(tr_direction direction) const;

@@ -463,7 +463,6 @@ public:
     bool isPortRandom = false;
     bool isPexEnabled = false;
     bool isUTPEnabled = false;
-    bool isLPDEnabled = false;
     bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
     bool isIdleLimited = false;
@@ -640,6 +639,11 @@ public:
         return is_dht_enabled_;
     }
 
+    [[nodiscard]] auto constexpr allowsLPD() const noexcept
+    {
+        return is_lpd_enabled_;
+    }
+
     /*module_visible*/
 
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
@@ -665,6 +669,7 @@ private:
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
@@ -675,6 +680,7 @@ private:
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
 
     bool is_dht_enabled_ = false;
+    bool is_lpd_enabled_ = false;
 
     struct init_data;
     void initImpl(init_data&);
@@ -763,8 +769,6 @@ private:
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
 };
-
-bool tr_sessionAllowsLPD(tr_session const* session);
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
 

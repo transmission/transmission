@@ -402,9 +402,9 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
-    tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->isDHTEnabled);
+    tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->allowsDHT());
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
-    tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
+    tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, s->queueSize(TR_DOWN));
@@ -705,7 +705,7 @@ void tr_session::initImpl(init_data& data)
 
     this->web = tr_web::create(this->web_mediator_);
 
-    if (this->isLPDEnabled)
+    if (this->allowsLPD())
     {
         tr_lpdInit(this, &this->bind_ipv4.addr_);
     }
@@ -1796,7 +1796,7 @@ void tr_session::closeImplStart()
 {
     is_closing_ = true;
 
-    if (isLPDEnabled)
+    if (this->allowsLPD())
     {
         tr_lpdUninit(this);
     }
@@ -2126,43 +2126,38 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 ****
 ***/
 
-static void toggleLPDImpl(tr_session* const session)
-{
-    TR_ASSERT(session != nullptr);
-
-    if (session->isLPDEnabled)
-    {
-        tr_lpdUninit(session);
-    }
-
-    session->isLPDEnabled = !session->isLPDEnabled;
-
-    if (session->isLPDEnabled)
-    {
-        tr_lpdInit(session, &session->bind_ipv4.addr_);
-    }
-}
-
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled != session->isLPDEnabled)
+    if (enabled == session->allowsLPD())
     {
-        tr_runInEventThread(session, toggleLPDImpl, session);
+        return;
     }
+
+    tr_runInEventThread(
+        session,
+        [session, enabled]()
+        {
+            if (session->allowsLPD())
+            {
+                tr_lpdUninit(session);
+            }
+
+            session->is_lpd_enabled_ = enabled;
+
+            if (session->allowsLPD())
+            {
+                tr_lpdInit(session, &session->bind_ipv4.addr_);
+            }
+        });
 }
 
 bool tr_sessionIsLPDEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isLPDEnabled;
-}
-
-bool tr_sessionAllowsLPD(tr_session const* session)
-{
-    return tr_sessionIsLPDEnabled(session);
+    return session->allowsLPD();
 }
 
 /***
