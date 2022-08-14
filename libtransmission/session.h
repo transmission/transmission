@@ -543,15 +543,9 @@ public:
         tr_session* const session_;
     };
 
-    tr_port random_port_low_;
-    tr_port random_port_high_;
-
     std::unique_ptr<tr_web> web;
 
     tr_session_id session_id;
-
-    tr_rpc_func rpc_func = nullptr;
-    void* rpc_func_user_data = nullptr;
 
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
@@ -642,6 +636,16 @@ public:
         return should_pause_added_torrents_;
     }
 
+    auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
+    {
+        if (rpc_func_ != nullptr)
+        {
+            return (*rpc_func_)(this, type, tor, rpc_func_user_data_);
+        }
+
+        return TR_RPC_OK;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -659,6 +663,7 @@ private:
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
+    friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
 
     struct init_data;
     void initImpl(init_data&);
@@ -666,6 +671,12 @@ private:
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    tr_port random_port_low_;
+    tr_port random_port_high_;
+
+    tr_rpc_func rpc_func_ = nullptr;
+    void* rpc_func_user_data_ = nullptr;
 
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
