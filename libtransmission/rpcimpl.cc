@@ -2228,7 +2228,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_seedRatioLimit:
-        tr_variantDictAddReal(d, key, tr_sessionGetRatioLimit(s));
+        tr_variantDictAddReal(d, key, s->desiredRatio());
         break;
 
     case TR_KEY_seedRatioLimited:

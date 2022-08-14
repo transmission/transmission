@@ -551,8 +551,6 @@ public:
 
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
-    float desiredRatio;
-
     uint16_t idleLimitMinutes;
 
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
@@ -695,6 +693,11 @@ public:
         return is_port_random_;
     }
 
+    [[nodiscard]] constexpr auto desiredRatio() const noexcept
+    {
+        return desired_ratio_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -717,6 +720,7 @@ private:
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+    friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
 
     bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;
@@ -733,6 +737,8 @@ private:
 
     tr_rpc_func rpc_func_ = nullptr;
     void* rpc_func_user_data_ = nullptr;
+
+    float desired_ratio_ = 2.0F;
 
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
