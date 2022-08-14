@@ -1323,39 +1323,32 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 
 static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d);
 
-bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme_Bps)
+std::optional<unsigned int> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
 {
-    bool isLimited = true;
-
-    if (session == nullptr)
+    if (tr_sessionUsesAltSpeed(this))
     {
-        return false;
+        return tr_sessionGetAltSpeed_Bps(this, dir);
     }
 
-    if (tr_sessionUsesAltSpeed(session))
+    if (tr_sessionIsSpeedLimited(this, dir))
     {
-        *setme_Bps = tr_sessionGetAltSpeed_Bps(session, dir);
-    }
-    else if (tr_sessionIsSpeedLimited(session, dir))
-    {
-        *setme_Bps = session->speedLimitBps(dir);
-    }
-    else
-    {
-        isLimited = false;
+        return speedLimitBps(dir);
     }
 
-    return isLimited;
+    return {};
 }
 
 static void updateBandwidth(tr_session* session, tr_direction dir)
 {
-    unsigned int limit_Bps = 0;
-    bool const isLimited = tr_sessionGetActiveSpeedLimit_Bps(session, dir, &limit_Bps);
-    bool const zeroCase = isLimited && limit_Bps == 0;
-
-    session->top_bandwidth_.setLimited(dir, isLimited && !zeroCase);
-    session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, limit_Bps);
+    if (auto const limit_Bps = session->activeSpeedLimitBps(dir); limit_Bps)
+    {
+        session->top_bandwidth_.setLimited(dir, *limit_Bps > 0U);
+        session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, *limit_Bps);
+    }
+    else
+    {
+        session->top_bandwidth_.setLimited(dir, false);
+    }
 }
 
 static auto constexpr MinutesPerHour = int{ 60 };

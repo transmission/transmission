@@ -685,6 +685,8 @@ public:
         return top_bandwidth_.getPieceSpeedBytesPerSecond(0, dir);
     }
 
+    [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -801,9 +803,3 @@ constexpr bool tr_isPriority(tr_priority_t p)
 {
     return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
 }
-
-/***
-****
-***/
-
-bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);

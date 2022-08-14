@@ -138,23 +138,20 @@ bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
 {
     TR_ASSERT(tr_isDirection(direction));
 
-    bool allowed = true;
-
     if (tr_torrentUsesSpeedLimit(this, direction) && this->speedLimitBps(direction) <= 0)
     {
-        allowed = false;
+        return false;
     }
 
     if (tr_torrentUsesSessionLimits(this))
     {
-        unsigned int limit = 0;
-        if (tr_sessionGetActiveSpeedLimit_Bps(this->session, direction, &limit) && (limit <= 0))
+        if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
         {
-            allowed = false;
+            return false;
         }
     }
 
-    return allowed;
+    return true;
 }
 
 /***

@@ -679,11 +679,12 @@ private:
         }
 
         // honor the session limits, if enabled
-        auto irate_Bps = unsigned{};
-        if (tr_torrentUsesSessionLimits(torrent) &&
-            tr_sessionGetActiveSpeedLimit_Bps(torrent->session, TR_PEER_TO_CLIENT, &irate_Bps))
+        if (tr_torrentUsesSessionLimits(torrent))
         {
-            rate_Bps = std::min(rate_Bps, irate_Bps);
+            if (auto const irate_Bps = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT); irate_Bps)
+            {
+                rate_Bps = std::min(rate_Bps, *irate_Bps);
+            }
         }
 
         // use this desired rate to figure out how
