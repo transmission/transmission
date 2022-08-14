@@ -576,8 +576,6 @@ using tr_altSpeedFunc = void (*)(tr_session*, bool active, bool userDriven, void
 
 void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
 
-bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme);
-
 /***
 ****
 ***/

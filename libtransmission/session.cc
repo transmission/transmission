@@ -1348,14 +1348,6 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
     return isLimited;
 }
 
-bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme_KBps)
-{
-    unsigned int Bps = 0;
-    bool const is_active = tr_sessionGetActiveSpeedLimit_Bps(session, dir, &Bps);
-    *setme_KBps = tr_toSpeedKBps(Bps);
-    return is_active;
-}
-
 static void updateBandwidth(tr_session* session, tr_direction dir)
 {
     unsigned int limit_Bps = 0;
