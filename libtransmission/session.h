@@ -667,6 +667,14 @@ public:
 
     [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
 
+    struct PublicAddressResult
+    {
+        tr_address address;
+        bool is_default_value;
+    };
+
+    [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -778,8 +786,6 @@ private:
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
 };
-
-struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
 
 struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 
