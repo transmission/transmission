@@ -680,6 +680,11 @@ public:
         return speedLimit_Bps[dir];
     }
 
+    [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
+    {
+        return top_bandwidth_.getPieceSpeedBytesPerSecond(0, dir);
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -802,7 +807,5 @@ constexpr bool tr_isPriority(tr_priority_t p)
 /***
 ****
 ***/
-
-unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
