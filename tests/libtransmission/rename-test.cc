@@ -39,7 +39,7 @@ protected:
         tr_torrentRemove(tor, false, nullptr);
         auto const test = [this, expected_torrent_count]()
         {
-            return tr_sessionCountTorrents(session_) == expected_torrent_count;
+            return std::size(session_->torrents()) == expected_torrent_count;
         };
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }

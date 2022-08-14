@@ -1761,11 +1761,6 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-int tr_sessionCountTorrents(tr_session const* session)
-{
-    return session != nullptr ? std::size(session->torrents()) : 0;
-}
-
 static void closeBlocklists(tr_session* /*session*/);
 
 void tr_session::closeImplStart()

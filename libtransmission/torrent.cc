@@ -688,7 +688,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     auto const lock = tor->unique_lock();
 
-    tor->queuePosition = tr_sessionCountTorrents(session);
+    tor->queuePosition = std::size(session->torrents());
 
     torrentInitFromInfoDict(tor);
 
