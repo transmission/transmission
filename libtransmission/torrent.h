@@ -755,7 +755,7 @@ private:
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
-    return tor != nullptr && tr_isSession(tor->session);
+    return tor != nullptr && tor->session != nullptr;
 }
 
 /**

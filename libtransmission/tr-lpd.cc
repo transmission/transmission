@@ -553,7 +553,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
 {
     int announcesSent = 0;
 
-    if (!tr_isSession(session))
+    if (session == nullptr)
     {
         return -1;
     }
@@ -629,7 +629,7 @@ static void on_upkeep_timer()
 * @see DoS */
 static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
 
     /* do not allow announces to be processed if LPD is disabled */
     if (!tr_sessionAllowsLPD(session))

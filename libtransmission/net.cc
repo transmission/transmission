@@ -234,7 +234,7 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
 
 static tr_socket_t createSocket(tr_session* session, int domain, int type)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
 
     auto const sockfd = socket(domain, type, 0);
     if (sockfd == TR_BAD_SOCKET)
@@ -537,7 +537,7 @@ bool tr_net_hasIPv6(tr_port port)
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_address* addr, tr_port* port)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
     TR_ASSERT(addr != nullptr);
     TR_ASSERT(port != nullptr);
 

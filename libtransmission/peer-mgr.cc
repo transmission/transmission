@@ -1240,7 +1240,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket)
 {
-    TR_ASSERT(tr_isSession(manager->session));
+    TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
 
     tr_session* session = manager->session;
@@ -2537,7 +2537,7 @@ void pumpAllPeers(tr_peerMgr* mgr)
 
 void queuePulse(tr_session* session, tr_direction dir)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
     if (session->queueEnabled(dir))

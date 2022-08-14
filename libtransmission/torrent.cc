@@ -864,7 +864,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
 
     // is the metainfo valid?
     auto metainfo = tr_ctorStealMetainfo(ctor);
@@ -1614,7 +1614,7 @@ void tr_torrentFree(tr_torrent* tor)
     {
         tr_session* session = tor->session;
 
-        TR_ASSERT(tr_isSession(session));
+        TR_ASSERT(session != nullptr);
 
         auto const lock = tor->unique_lock();
 
