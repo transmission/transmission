@@ -665,6 +665,8 @@ public:
 
     [[nodiscard]] std::vector<tr_torrent*> getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const;
 
+    [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -776,8 +778,6 @@ private:
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
 };
-
-bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
 
 struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
 
