@@ -466,7 +466,6 @@ public:
     bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
     bool isIdleLimited = false;
-    bool isIncompleteFileNamingEnabled = false;
 
     uint8_t peer_id_ttl_hours = 0;
 
@@ -687,6 +686,11 @@ public:
 
     [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
 
+    [[nodiscard]] auto isIncompleteFileNamingEnabled() const noexcept
+    {
+        return is_incomplete_file_naming_enabled_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -698,6 +702,7 @@ private:
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
@@ -727,6 +732,7 @@ private:
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
     bool should_scrape_paused_torrents_ = false;
+    bool is_incomplete_file_naming_enabled_ = false;
 
     tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
 

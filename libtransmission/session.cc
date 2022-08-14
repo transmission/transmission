@@ -420,7 +420,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio);
     tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
-    tr_variantDictAddBool(d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled(s));
+    tr_variantDictAddBool(d, TR_KEY_rename_partial_files, s->isIncompleteFileNamingEnabled());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
@@ -1138,18 +1138,18 @@ char const* tr_sessionGetConfigDir(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b)
+void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isIncompleteFileNamingEnabled = b;
+    session->is_incomplete_file_naming_enabled_ = enabled;
 }
 
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isIncompleteFileNamingEnabled;
+    return session->isIncompleteFileNamingEnabled();
 }
 
 /***

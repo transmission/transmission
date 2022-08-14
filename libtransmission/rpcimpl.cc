@@ -2212,7 +2212,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_rename_partial_files:
-        tr_variantDictAddBool(d, key, tr_sessionIsIncompleteFileNamingEnabled(s));
+        tr_variantDictAddBool(d, key, s->isIncompleteFileNamingEnabled());
         break;
 
     case TR_KEY_rpc_version:
