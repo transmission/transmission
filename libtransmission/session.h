@@ -636,6 +636,8 @@ public:
         return should_pause_added_torrents_;
     }
 
+    /*module_visible*/
+
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
     {
         if (rpc_func_ != nullptr)
@@ -645,6 +647,8 @@ public:
 
         return TR_RPC_OK;
     }
+
+    [[nodiscard]] size_t countQueueFreeSlots(tr_direction dir) const noexcept;
 
 private:
     [[nodiscard]] tr_port randomPort() const;
@@ -782,5 +786,3 @@ unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
 
 std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t num_wanted);
-
-int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);

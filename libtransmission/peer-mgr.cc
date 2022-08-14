@@ -2540,15 +2540,16 @@ void queuePulse(tr_session* session, tr_direction dir)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    if (session->queueEnabled(dir))
+    if (!session->queueEnabled(dir))
     {
-        auto const n = tr_sessionCountQueueFreeSlots(session, dir);
+        return;
+    }
 
-        for (auto* tor : tr_sessionGetNextQueuedTorrents(session, dir, n))
-        {
-            tr_torrentStartNow(tor);
-            session->onQueuedTorrentStarted(tor);
-        }
+    auto const n = session->countQueueFreeSlots(dir);
+    for (auto* tor : tr_sessionGetNextQueuedTorrents(session, dir, n))
+    {
+        tr_torrentStartNow(tor);
+        session->onQueuedTorrentStarted(tor);
     }
 }
 

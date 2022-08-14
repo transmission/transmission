@@ -2736,22 +2736,22 @@ std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr
     return candidates;
 }
 
-int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
+size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
 {
-    auto const max = session->queueSize(dir);
-    tr_torrent_activity const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
-
-    if (!session->queueEnabled(dir))
+    if (!queueEnabled(dir))
     {
-        return INT_MAX;
+        std::numeric_limits<size_t>::max();
     }
+
+    auto const max = queueSize(dir);
+    auto const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 
     /* count how many torrents are active */
     int active_count = 0;
-    bool const stalled_enabled = session->queueStalledEnabled();
-    int const stalled_if_idle_for_n_seconds = session->queueStalledMinutes() * 60;
+    bool const stalled_enabled = queueStalledEnabled();
+    int const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
     time_t const now = tr_time();
-    for (auto const* const tor : session->torrents())
+    for (auto const* const tor : torrents())
     {
         /* is it the right activity? */
         if (activity != tr_torrentGetActivity(tor))

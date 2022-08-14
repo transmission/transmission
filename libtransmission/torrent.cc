@@ -1369,11 +1369,11 @@ static void torrentStartImpl(tr_torrent* const tor)
     tr_peerMgrStartTorrent(tor);
 }
 
-static bool torrentShouldQueue(tr_torrent const* tor)
+static bool torrentShouldQueue(tr_torrent const* const tor)
 {
     tr_direction const dir = tor->queueDirection();
 
-    return tr_sessionCountQueueFreeSlots(tor->session, dir) == 0;
+    return tor->session->countQueueFreeSlots(dir) == 0;
 }
 
 static void torrentStart(tr_torrent* tor, torrent_start_opts opts)
