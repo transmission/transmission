@@ -238,7 +238,7 @@ bool tr_torrentUseMetainfoFromFile(
     }
     tor->isStopping = true;
     tor->magnetVerify = true;
-    if (tr_sessionGetPaused(tor->session))
+    if (tor->session->shouldPauseAddedTorrents())
     {
         tor->startAfterVerify = false;
     }
@@ -301,7 +301,7 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
         tor->incompleteMetadata = nullptr;
         tor->isStopping = true;
         tor->magnetVerify = true;
-        if (tr_sessionGetPaused(tor->session))
+        if (tor->session->shouldPauseAddedTorrents())
         {
             tor->startAfterVerify = false;
         }

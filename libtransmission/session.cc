@@ -82,10 +82,10 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir);
 static auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 
-static tr_port getRandomPort(tr_session const* s)
+tr_port tr_session::randomPort() const
 {
-    auto const lower = std::min(s->randomPortLow.host(), s->randomPortHigh.host());
-    auto const upper = std::max(s->randomPortLow.host(), s->randomPortHigh.host());
+    auto const lower = std::min(random_port_low_.host(), random_port_high_.host());
+    auto const upper = std::max(random_port_low_.host(), random_port_high_.host());
     auto const range = upper - lower;
     return tr_port::fromHost(lower + tr_rand_int_weak(range + 1));
 }
@@ -192,7 +192,7 @@ tr_encryption_mode tr_sessionGetEncryption(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->encryptionMode;
+    return session->encryptionMode();
 }
 
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
@@ -200,7 +200,7 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED || mode == TR_CLEAR_PREFERRED);
 
-    session->encryptionMode = mode;
+    session->encryption_mode_ = mode;
 }
 
 /***
@@ -411,7 +411,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, s->queueEnabled(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited(s, TR_DOWN));
-    tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode);
+    tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
     tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, tr_sessionGetIdleLimit(s));
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, tr_sessionIsIdleLimited(s));
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir(s));
@@ -421,13 +421,13 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow.host());
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh.host());
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->random_port_high_.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
-    tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode);
+    tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
@@ -445,7 +445,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
-    tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
+    tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->shouldScrapePausedTorrents());
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, s->queueSize(TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, s->queueEnabled(TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
@@ -461,7 +461,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->upload_slots_per_torrent);
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
-    tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
+    tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !s->shouldPauseAddedTorrents());
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
@@ -876,7 +876,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
     {
-        this->preallocationMode = tr_preallocation_mode(i);
+        this->preallocation_mode_ = tr_preallocation_mode(i);
     }
 
     if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))
@@ -933,12 +933,12 @@ void tr_session::setImpl(init_data& data)
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
     {
-        this->randomPortLow.setHost(i);
+        this->random_port_low_.setHost(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_high, &i))
     {
-        this->randomPortHigh.setHost(i);
+        this->random_port_high_.setHost(i);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &boolVal))
@@ -954,7 +954,7 @@ void tr_session::setImpl(init_data& data)
             peer_port.setHost(static_cast<uint16_t>(port));
         }
 
-        ::setPeerPort(this, boolVal ? getRandomPort(this) : peer_port);
+        ::setPeerPort(this, boolVal ? randomPort() : peer_port);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &boolVal))
@@ -1072,7 +1072,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
     {
-        this->scrapePausedTorrents = boolVal;
+        this->should_scrape_paused_torrents_ = boolVal;
     }
 
     /**
@@ -1240,7 +1240,7 @@ uint16_t tr_sessionGetPeerPort(tr_session const* session)
 
 uint16_t tr_sessionSetPeerPortRandom(tr_session* session)
 {
-    tr_port const p = getRandomPort(session);
+    auto const p = session->randomPort();
     tr_sessionSetPeerPort(session, p.host());
     return p.host();
 }
@@ -1729,32 +1729,32 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetPaused(tr_session* session, bool isPaused)
+void tr_sessionSetPaused(tr_session* session, bool is_paused)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->pauseAddedTorrent = isPaused;
+    session->should_pause_added_torrents_ = is_paused;
 }
 
 bool tr_sessionGetPaused(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->pauseAddedTorrent;
+    return session->shouldPauseAddedTorrents();
 }
 
-void tr_sessionSetDeleteSource(tr_session* session, bool deleteSource)
+void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->deleteSourceTorrent = deleteSource;
+    session->should_delete_source_torrents_ = delete_source;
 }
 
 bool tr_sessionGetDeleteSource(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->deleteSourceTorrent;
+    return session->shouldDeleteSource();
 }
 
 /***
@@ -1878,7 +1878,7 @@ void tr_session::closeImplFinish()
     tr_utpClose(this);
     closeBlocklists(this);
     openFiles().closeAll();
-    isClosed = true;
+    is_closed_ = true;
 }
 
 static bool deadlineReached(time_t const deadline)
@@ -1900,7 +1900,7 @@ void tr_sessionClose(tr_session* session)
     /* close the session */
     tr_runInEventThread(session, [session]() { session->closeImplStart(); });
 
-    while (!session->isClosed && !deadlineReached(deadline))
+    while (!session->isClosed() && !deadlineReached(deadline))
     {
         tr_logAddTrace("waiting for the libtransmission thread to finish");
         tr_wait_msec(10);

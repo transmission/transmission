@@ -1156,7 +1156,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     auto val = tr_variant{};
     tr_variantInitDict(&val, 8);
-    tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode != TR_CLEAR_PREFERRED);
+    tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode() != TR_CLEAR_PREFERRED);
 
     if (ipv6 != nullptr)
     {

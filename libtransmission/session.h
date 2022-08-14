@@ -155,11 +155,6 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
-    [[nodiscard]] constexpr auto isClosing() const noexcept
-    {
-        return is_closing_;
-    }
-
     // paths
 
     [[nodiscard]] constexpr auto const& configDir() const noexcept
@@ -471,14 +466,9 @@ public:
     bool isUTPEnabled = false;
     bool isLPDEnabled = false;
     bool isPrefetchEnabled = false;
-    bool is_closing_ = false;
-    bool isClosed = false;
     bool isRatioLimited = false;
     bool isIdleLimited = false;
     bool isIncompleteFileNamingEnabled = false;
-    bool pauseAddedTorrent = false;
-    bool deleteSourceTorrent = false;
-    bool scrapePausedTorrents = false;
 
     uint8_t peer_id_ttl_hours = 0;
 
@@ -490,10 +480,6 @@ public:
     struct tr_turtle_info turtle;
 
     int magicNumber = 0;
-
-    tr_encryption_mode encryptionMode;
-
-    tr_preallocation_mode preallocationMode;
 
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
@@ -532,9 +518,6 @@ public:
         public_peer_port = port;
     }
 
-    tr_port randomPortLow;
-    tr_port randomPortHigh;
-
     std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr = nullptr;
     struct tr_shared* shared = nullptr;
@@ -561,6 +544,9 @@ public:
     private:
         tr_session* const session_;
     };
+
+    tr_port random_port_low_;
+    tr_port random_port_high_;
 
     std::unique_ptr<tr_web> web;
 
@@ -623,11 +609,52 @@ public:
         return peer_limit_per_torrent_;
     }
 
+    [[nodiscard]] auto constexpr isClosing() const noexcept
+    {
+        return is_closing_;
+    }
+
+    [[nodiscard]] auto constexpr isClosed() const noexcept
+    {
+        return is_closed_;
+    }
+
+    [[nodiscard]] auto constexpr encryptionMode() const noexcept
+    {
+        return encryption_mode_;
+    }
+
+    [[nodiscard]] auto constexpr preallocationMode() const noexcept
+    {
+        return preallocation_mode_;
+    }
+
+    [[nodiscard]] auto constexpr shouldScrapePausedTorrents() const noexcept
+    {
+        return should_scrape_paused_torrents_;
+    }
+
+    [[nodiscard]] auto constexpr shouldPauseAddedTorrents() const noexcept
+    {
+        return should_pause_added_torrents_;
+    }
+
+    [[nodiscard]] auto constexpr shouldDeleteSource() const noexcept
+    {
+        return should_pause_added_torrents_;
+    }
+
 private:
+    [[nodiscard]] tr_port randomPort() const;
+
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
+    friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
@@ -641,6 +668,17 @@ private:
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    bool should_pause_added_torrents_ = false;
+    bool should_delete_source_torrents_ = false;
+    bool should_scrape_paused_torrents_ = false;
+
+    tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
+
+    tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
+
+    bool is_closing_ = false;
+    bool is_closed_ = false;
 
     uint16_t peer_count_ = 0;
     uint16_t peer_limit_ = 200;
