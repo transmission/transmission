@@ -2501,8 +2501,8 @@ void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_func = func;
-    session->rpc_func_user_data = user_data;
+    session->rpc_func_ = func;
+    session->rpc_func_user_data_ = user_data;
 }
 
 void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)

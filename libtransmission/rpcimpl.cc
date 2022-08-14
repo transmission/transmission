@@ -58,22 +58,6 @@ enum class TrFormat
 ****
 ***/
 
-static tr_rpc_callback_status notify(tr_session* session, tr_rpc_callback_type type, tr_torrent* tor)
-{
-    tr_rpc_callback_status status = TR_RPC_OK;
-
-    if (session->rpc_func != nullptr)
-    {
-        status = (*session->rpc_func)(session, type, tor, session->rpc_func_user_data);
-    }
-
-    return status;
-}
-
-/***
-****
-***/
-
 /* For functions that can't be immediately executed, like torrentAdd,
  * this is the callback data used to pass a response to the caller
  * when the task is complete */
@@ -177,10 +161,10 @@ static void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*>
 {
     for (auto* tor : torrents)
     {
-        notify(session, TR_RPC_TORRENT_CHANGED, tor);
+        session->rpcNotify(TR_RPC_TORRENT_CHANGED, tor);
     }
 
-    notify(session, TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED, nullptr);
+    session->rpcNotify(TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED);
 }
 
 static char const* queueMoveTop(
@@ -252,7 +236,7 @@ static char const* torrentStart(
         if (!tor->isRunning)
         {
             tr_torrentStart(tor);
-            notify(session, TR_RPC_TORRENT_STARTED, tor);
+            session->rpcNotify(TR_RPC_TORRENT_STARTED, tor);
         }
     }
 
@@ -272,7 +256,7 @@ static char const* torrentStartNow(
         if (!tor->isRunning)
         {
             tr_torrentStartNow(tor);
-            notify(session, TR_RPC_TORRENT_STARTED, tor);
+            session->rpcNotify(TR_RPC_TORRENT_STARTED, tor);
         }
     }
 
@@ -290,7 +274,7 @@ static char const* torrentStop(
         if (tor->isRunning || tor->isQueued() || tor->verifyState() != TR_VERIFY_NONE)
         {
             tor->isStopping = true;
-            notify(session, TR_RPC_TORRENT_STOPPED, tor);
+            session->rpcNotify(TR_RPC_TORRENT_STOPPED, tor);
         }
     }
 
@@ -310,9 +294,7 @@ static char const* torrentRemove(
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        tr_rpc_callback_status const status = notify(session, type, tor);
-
-        if ((status & TR_RPC_NOREMOVE) == 0)
+        if (auto const status = session->rpcNotify(type, tor); (status & TR_RPC_NOREMOVE) == 0)
         {
             tr_torrentRemove(tor, delete_flag, nullptr);
         }
@@ -332,7 +314,7 @@ static char const* torrentReannounce(
         if (tr_torrentCanManualUpdate(tor))
         {
             tr_torrentManualUpdate(tor);
-            notify(session, TR_RPC_TORRENT_CHANGED, tor);
+            session->rpcNotify(TR_RPC_TORRENT_CHANGED, tor);
         }
     }
 
@@ -348,7 +330,7 @@ static char const* torrentVerify(
     for (auto* tor : getTorrents(session, args_in))
     {
         tr_torrentVerify(tor);
-        notify(session, TR_RPC_TORRENT_CHANGED, tor);
+        session->rpcNotify(TR_RPC_TORRENT_CHANGED, tor);
     }
 
     return nullptr;
@@ -1271,7 +1253,7 @@ static char const* torrentSet(
             }
         }
 
-        notify(session, TR_RPC_TORRENT_CHANGED, tor);
+        session->rpcNotify(TR_RPC_TORRENT_CHANGED, tor);
     }
 
     return errmsg;
@@ -1301,7 +1283,7 @@ static char const* torrentSetLocation(
     for (auto* tor : getTorrents(session, args_in))
     {
         tor->setLocation(location, move, nullptr, nullptr);
-        notify(session, TR_RPC_TORRENT_MOVED, tor);
+        session->rpcNotify(TR_RPC_TORRENT_MOVED, tor);
     }
 
     return nullptr;
@@ -1499,7 +1481,7 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
         return;
     }
 
-    notify(data->session, TR_RPC_TORRENT_ADDED, tor);
+    data->session->rpcNotify(TR_RPC_TORRENT_ADDED, tor);
     addTorrentInfo(
         tor,
         TrFormat::Object,
@@ -2055,7 +2037,7 @@ static char const* sessionSet(
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
 
-    notify(session, TR_RPC_SESSION_CHANGED, nullptr);
+    session->rpcNotify(TR_RPC_SESSION_CHANGED, nullptr);
 
     return nullptr;
 }
@@ -2425,7 +2407,7 @@ static char const* sessionClose(
     tr_variant* /*args_out*/,
     tr_rpc_idle_data* /*idle_data*/)
 {
-    notify(session, TR_RPC_SESSION_CLOSE, nullptr);
+    session->rpcNotify(TR_RPC_SESSION_CLOSE, nullptr);
     return nullptr;
 }
 
