@@ -2353,7 +2353,7 @@ void tr_torrent::refreshCurrentDir()
 
 static bool queueIsSequenced(tr_session* session)
 {
-    auto torrents = tr_sessionGetTorrents(session);
+    auto torrents = session->getAllTorrents();
     std::sort(
         std::begin(torrents),
         std::end(torrents),

@@ -644,6 +644,11 @@ public:
         return is_lpd_enabled_;
     }
 
+    [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
+    {
+        return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
+    }
+
     /*module_visible*/
 
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
@@ -779,8 +784,6 @@ struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, i
 struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 
 int tr_sessionCountTorrents(tr_session const* session);
-
-std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
 
 constexpr bool tr_isPriority(tr_priority_t p)
 {

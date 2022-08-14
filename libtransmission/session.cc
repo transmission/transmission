@@ -1780,16 +1780,6 @@ int tr_sessionCountTorrents(tr_session const* session)
     return session != nullptr ? std::size(session->torrents()) : 0;
 }
 
-std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    auto const n = std::size(session->torrents());
-    auto torrents = std::vector<tr_torrent*>{ n };
-    std::copy(std::begin(session->torrents()), std::end(session->torrents()), std::begin(torrents));
-    return torrents;
-}
-
 static void closeBlocklists(tr_session* /*session*/);
 
 void tr_session::closeImplStart()
@@ -1815,7 +1805,7 @@ void tr_session::closeImplStart()
     /* Close the torrents. Get the most active ones first so that
      * if we can't get them all closed in a reasonable amount of time,
      * at least we get the most important ones first. */
-    auto torrents = tr_sessionGetTorrents(this);
+    auto torrents = getAllTorrents();
     std::sort(
         std::begin(torrents),
         std::end(torrents),
