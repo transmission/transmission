@@ -460,7 +460,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isPexEnabled = false;
     bool isUTPEnabled = false;
     bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
@@ -640,6 +639,11 @@ public:
         return is_lpd_enabled_;
     }
 
+    [[nodiscard]] auto constexpr allowsPEX() const noexcept
+    {
+        return is_pex_enabled_;
+    }
+
     [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
     {
         return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
@@ -715,6 +719,7 @@ private:
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
     friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
+    friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
@@ -722,6 +727,7 @@ private:
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
 
+    bool is_pex_enabled_ = false;
     bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;
 

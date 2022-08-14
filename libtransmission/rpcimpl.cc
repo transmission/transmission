@@ -2184,7 +2184,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_pex_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsPexEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsPEX());
         break;
 
     case TR_KEY_utp_enabled:
@@ -2192,11 +2192,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_dht_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsDHTEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsDHT());
         break;
 
     case TR_KEY_lpd_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsLPDEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsLPD());
         break;
 
     case TR_KEY_peer_port:

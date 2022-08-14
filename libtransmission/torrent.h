@@ -518,7 +518,7 @@ public:
 
     [[nodiscard]] auto allowsPex() const noexcept
     {
-        return this->isPublic() && this->session->isPexEnabled;
+        return this->isPublic() && this->session->allowsPEX();
     }
 
     [[nodiscard]] auto allowsDht() const

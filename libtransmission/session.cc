@@ -411,7 +411,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->random_port_high_.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
-    tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
+    tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
@@ -1990,14 +1990,14 @@ void tr_sessionSetPexEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isPexEnabled = enabled;
+    session->is_pex_enabled_ = enabled;
 }
 
 bool tr_sessionIsPexEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isPexEnabled;
+    return session->allowsPEX();
 }
 
 bool tr_sessionIsDHTEnabled(tr_session const* session)
