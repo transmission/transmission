@@ -406,7 +406,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
-    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
+    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom());
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->random_port_high_.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
@@ -1234,14 +1234,14 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isPortRandom = random;
+    session->is_port_random_ = random;
 }
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isPortRandom;
+    return session->isPortRandom();
 }
 
 tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)

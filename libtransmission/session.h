@@ -460,7 +460,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isPortRandom = false;
     bool isPexEnabled = false;
     bool isUTPEnabled = false;
     bool isPrefetchEnabled = false;
@@ -691,6 +690,11 @@ public:
         return is_incomplete_file_naming_enabled_;
     }
 
+    [[nodiscard]] constexpr auto isPortRandom() const noexcept
+    {
+        return is_port_random_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -707,6 +711,7 @@ private:
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
+    friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
@@ -740,6 +745,7 @@ private:
 
     bool is_closing_ = false;
     bool is_closed_ = false;
+    bool is_port_random_ = false;
 
     uint16_t peer_count_ = 0;
     uint16_t peer_limit_ = 200;

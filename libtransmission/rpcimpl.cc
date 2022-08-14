@@ -2204,7 +2204,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_peer_port_random_on_start:
-        tr_variantDictAddBool(d, key, tr_sessionGetPeerPortRandomOnStart(s));
+        tr_variantDictAddBool(d, key, s->isPortRandom());
         break;
 
     case TR_KEY_port_forwarding_enabled:
