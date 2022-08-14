@@ -12,7 +12,7 @@
 #include "file.h"
 #include "net.h"
 #include "peer-socket.h"
-#include "session.h" // tr_sessionIsAddressBlocked()
+#include "session.h" // tr_session.tr_session.addressIsBlocked()
 #include "tr-strbuf.h"
 
 #include "test-fixtures.h"
@@ -59,7 +59,7 @@ protected:
     bool addressIsBlocked(char const* address_str)
     {
         auto const addr = tr_address::fromString(address_str);
-        return !addr || tr_sessionIsAddressBlocked(session_, &*addr);
+        return !addr || session_->addressIsBlocked(*addr);
     }
 };
 

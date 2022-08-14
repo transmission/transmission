@@ -679,11 +679,12 @@ private:
         }
 
         // honor the session limits, if enabled
-        auto irate_Bps = unsigned{};
-        if (tr_torrentUsesSessionLimits(torrent) &&
-            tr_sessionGetActiveSpeedLimit_Bps(torrent->session, TR_PEER_TO_CLIENT, &irate_Bps))
+        if (tr_torrentUsesSessionLimits(torrent))
         {
-            rate_Bps = std::min(rate_Bps, irate_Bps);
+            if (auto const irate_Bps = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT); irate_Bps)
+            {
+                rate_Bps = std::min(rate_Bps, *irate_Bps);
+            }
         }
 
         // use this desired rate to figure out how
@@ -2128,8 +2129,12 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 
 static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 {
-    auto piece = int{};
-    if (msgs->peerSupportsMetadataXfer && tr_torrentGetNextMetadataRequest(msgs->torrent, now, &piece))
+    if (!msgs->peerSupportsMetadataXfer)
+    {
+        return;
+    }
+
+    if (auto const piece = tr_torrentGetNextMetadataRequest(msgs->torrent, now); piece)
     {
         evbuffer* const out = msgs->outMessages;
 
@@ -2137,10 +2142,10 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         auto tmp = tr_variant{};
         tr_variantInitDict(&tmp, 3);
         tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Request);
-        tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
+        tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
         auto* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
-        logtrace(msgs, fmt::format(FMT_STRING("requesting metadata piece #{:d}"), piece));
+        logtrace(msgs, fmt::format(FMT_STRING("requesting metadata piece #{:d}"), *piece));
 
         /* write it out as a LTEP message to our outMessages buffer */
         evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));

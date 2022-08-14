@@ -311,16 +311,15 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
 
     // set source address
-    tr_address const* const source_addr = tr_sessionGetPublicAddress(session, addr->type, nullptr);
-    TR_ASSERT(source_addr != nullptr);
+    auto const [source_addr, is_default_addr] = session->publicAddress(addr->type);
     struct sockaddr_storage source_sock;
-    socklen_t const sourcelen = setup_sockaddr(source_addr, {}, &source_sock);
+    socklen_t const sourcelen = setup_sockaddr(&source_addr, {}, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
-            fmt::arg("address", source_addr->readable()),
+            fmt::arg("address", source_addr.readable()),
             fmt::arg("socket", s),
             fmt::arg("error", tr_net_strerror(sockerrno)),
             fmt::arg("error_code", sockerrno)));
@@ -735,12 +734,11 @@ unsigned char const* tr_globalIPv6(tr_session const* session)
     /* We have some sort of address, now make sure that we return
        our bound address if non-default. */
 
-    bool is_default = false;
-    auto const* ipv6_bindaddr = tr_sessionGetPublicAddress(session, TR_AF_INET6, &is_default);
-    if (ipv6_bindaddr != nullptr && !is_default)
+    auto const [ipv6_bindaddr, is_default] = session->publicAddress(TR_AF_INET6);
+    if (!is_default)
     {
         /* Explicitly bound. Return that address. */
-        memcpy(ipv6, ipv6_bindaddr->addr.addr6.s6_addr, 16);
+        memcpy(ipv6, ipv6_bindaddr.addr.addr6.s6_addr, 16);
     }
 
     return ipv6;

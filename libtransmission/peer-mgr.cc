@@ -186,7 +186,7 @@ struct peer_atom
             return *blocklisted_;
         }
 
-        auto const value = tr_sessionIsAddressBlocked(session, &addr);
+        auto const value = session->addressIsBlocked(addr);
         blocklisted_ = value;
         return value;
     }
@@ -1245,7 +1245,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
 
     tr_session* session = manager->session;
 
-    if (tr_sessionIsAddressBlocked(session, addr))
+    if (session->addressIsBlocked(*addr))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr->readable(port)));
         tr_netClosePeerSocket(session, socket);
@@ -1289,8 +1289,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
-            tr_address_is_valid_for_peers(&pex->addr, pex->port))
+            !s->manager->session->addressIsBlocked(pex->addr) && tr_address_is_valid_for_peers(&pex->addr, pex->port))
         {
             ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
             ++n_used;
@@ -2540,15 +2539,16 @@ void queuePulse(tr_session* session, tr_direction dir)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    if (session->queueEnabled(dir))
+    if (!session->queueEnabled(dir))
     {
-        auto const n = tr_sessionCountQueueFreeSlots(session, dir);
+        return;
+    }
 
-        for (auto* tor : tr_sessionGetNextQueuedTorrents(session, dir, n))
-        {
-            tr_torrentStartNow(tor);
-            session->onQueuedTorrentStarted(tor);
-        }
+    auto const n = session->countQueueFreeSlots(dir);
+    for (auto* tor : session->getNextQueuedTorrents(dir, n))
+    {
+        tr_torrentStartNow(tor);
+        session->onQueuedTorrentStarted(tor);
     }
 }
 

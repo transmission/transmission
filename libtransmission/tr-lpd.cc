@@ -558,7 +558,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         return -1;
     }
 
-    if (tr_sessionAllowsLPD(session))
+    if (session->allowsLPD())
     {
         for (auto* const tor : session->torrents())
         {
@@ -632,7 +632,7 @@ static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*
     TR_ASSERT(session != nullptr);
 
     /* do not allow announces to be processed if LPD is disabled */
-    if (!tr_sessionAllowsLPD(session))
+    if (!session->allowsLPD())
     {
         return;
     }

@@ -462,9 +462,7 @@ public:
 
     bool isPortRandom = false;
     bool isPexEnabled = false;
-    bool isDHTEnabled = false;
     bool isUTPEnabled = false;
-    bool isLPDEnabled = false;
     bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
     bool isIdleLimited = false;
@@ -636,6 +634,23 @@ public:
         return should_pause_added_torrents_;
     }
 
+    [[nodiscard]] auto constexpr allowsDHT() const noexcept
+    {
+        return is_dht_enabled_;
+    }
+
+    [[nodiscard]] auto constexpr allowsLPD() const noexcept
+    {
+        return is_lpd_enabled_;
+    }
+
+    [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
+    {
+        return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
+    }
+
+    /*module_visible*/
+
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
     {
         if (rpc_func_ != nullptr)
@@ -646,6 +661,32 @@ public:
         return TR_RPC_OK;
     }
 
+    [[nodiscard]] size_t countQueueFreeSlots(tr_direction dir) const noexcept;
+
+    [[nodiscard]] std::vector<tr_torrent*> getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const;
+
+    [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
+
+    struct PublicAddressResult
+    {
+        tr_address address;
+        bool is_default_value;
+    };
+
+    [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
+
+    [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const noexcept
+    {
+        return speedLimit_Bps[dir];
+    }
+
+    [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
+    {
+        return top_bandwidth_.getPieceSpeedBytesPerSecond(0, dir);
+    }
+
+    [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -654,8 +695,10 @@ private:
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
@@ -664,6 +707,9 @@ private:
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+
+    bool is_dht_enabled_ = false;
+    bool is_lpd_enabled_ = false;
 
     struct init_data;
     void initImpl(init_data&);
@@ -753,34 +799,7 @@ private:
     bool announce_ip_enabled_ = false;
 };
 
-bool tr_sessionAllowsDHT(tr_session const* session);
-
-bool tr_sessionAllowsLPD(tr_session const* session);
-
-bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
-
-struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
-
-struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
-
-int tr_sessionCountTorrents(tr_session const* session);
-
-std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
-
 constexpr bool tr_isPriority(tr_priority_t p)
 {
     return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
 }
-
-/***
-****
-***/
-
-unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
-unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
-
-bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
-
-std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t num_wanted);
-
-int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);

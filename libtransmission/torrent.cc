@@ -138,23 +138,20 @@ bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
 {
     TR_ASSERT(tr_isDirection(direction));
 
-    bool allowed = true;
-
     if (tr_torrentUsesSpeedLimit(this, direction) && this->speedLimitBps(direction) <= 0)
     {
-        allowed = false;
+        return false;
     }
 
     if (tr_torrentUsesSessionLimits(this))
     {
-        unsigned int limit = 0;
-        if (tr_sessionGetActiveSpeedLimit_Bps(this->session, direction, &limit) && (limit <= 0))
+        if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
         {
-            allowed = false;
+            return false;
         }
     }
 
-    return allowed;
+    return true;
 }
 
 /***
@@ -688,7 +685,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     auto const lock = tor->unique_lock();
 
-    tor->queuePosition = tr_sessionCountTorrents(session);
+    tor->queuePosition = std::size(session->torrents());
 
     torrentInitFromInfoDict(tor);
 
@@ -758,9 +755,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
         tr_torrentUseSpeedLimit(tor, TR_UP, false);
-        tor->setSpeedLimitBps(TR_UP, tr_sessionGetSpeedLimit_Bps(tor->session, TR_UP));
+        tor->setSpeedLimitBps(TR_UP, tor->session->speedLimitBps(TR_UP));
         tr_torrentUseSpeedLimit(tor, TR_DOWN, false);
-        tor->setSpeedLimitBps(TR_DOWN, tr_sessionGetSpeedLimit_Bps(tor->session, TR_DOWN));
+        tor->setSpeedLimitBps(TR_DOWN, tor->session->speedLimitBps(TR_DOWN));
         tr_torrentUseSessionLimits(tor, true);
     }
 
@@ -1369,11 +1366,11 @@ static void torrentStartImpl(tr_torrent* const tor)
     tr_peerMgrStartTorrent(tor);
 }
 
-static bool torrentShouldQueue(tr_torrent const* tor)
+static bool torrentShouldQueue(tr_torrent const* const tor)
 {
     tr_direction const dir = tor->queueDirection();
 
-    return tr_sessionCountQueueFreeSlots(tor->session, dir) == 0;
+    return tor->session->countQueueFreeSlots(dir) == 0;
 }
 
 static void torrentStart(tr_torrent* tor, torrent_start_opts opts)
@@ -2353,7 +2350,7 @@ void tr_torrent::refreshCurrentDir()
 
 static bool queueIsSequenced(tr_session* session)
 {
-    auto torrents = tr_sessionGetTorrents(session);
+    auto torrents = session->getAllTorrents();
     std::sort(
         std::begin(torrents),
         std::end(torrents),
