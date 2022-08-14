@@ -313,7 +313,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     // set source address
     auto const [source_addr, is_default_addr] = session->publicAddress(addr->type);
     struct sockaddr_storage source_sock;
-    socklen_t const sourcelen = setup_sockaddr(*source_addr, {}, &source_sock);
+    socklen_t const sourcelen = setup_sockaddr(&source_addr, {}, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
