@@ -27,7 +27,7 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len);
 
-bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme);
+std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now);
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t metadata_size);
 

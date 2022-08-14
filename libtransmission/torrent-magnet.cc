@@ -379,27 +379,28 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     }
 }
 
-bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_piece)
+std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    bool have_request = false;
     struct tr_incomplete_metadata* m = tor->incompleteMetadata;
-
-    auto& needed = m->pieces_needed;
-    if (m != nullptr && !std::empty(needed) && needed.front().requested_at + MinRepeatIntervalSecs < now)
+    if (m == nullptr)
     {
-        auto req = needed.front();
-        needed.pop_front();
-        req.requested_at = now;
-        needed.push_back(req);
-
-        tr_logAddDebugTor(tor, fmt::format("next piece to request: {}", req.piece));
-        *setme_piece = req.piece;
-        have_request = true;
+        return {};
     }
 
-    return have_request;
+    auto& needed = m->pieces_needed;
+    if (std::empty(needed) || needed.front().requested_at + MinRepeatIntervalSecs >= now)
+    {
+        return {};
+    }
+
+    auto req = needed.front();
+    needed.pop_front();
+    req.requested_at = now;
+    needed.push_back(req);
+    tr_logAddDebugTor(tor, fmt::format("next piece to request: {}", req.piece));
+    return req.piece;
 }
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
