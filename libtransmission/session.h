@@ -469,9 +469,6 @@ public:
     bool isRatioLimited = false;
     bool isIdleLimited = false;
     bool isIncompleteFileNamingEnabled = false;
-    bool pauseAddedTorrent = false;
-    bool deleteSourceTorrent = false;
-    bool scrapePausedTorrents = false;
 
     uint8_t peer_id_ttl_hours = 0;
 
@@ -632,6 +629,21 @@ public:
         return preallocation_mode_;
     }
 
+    [[nodiscard]] auto constexpr shouldScrapePausedTorrents() const noexcept
+    {
+        return should_scrape_paused_torrents_;
+    }
+
+    [[nodiscard]] auto constexpr shouldPauseAddedTorrents() const noexcept
+    {
+        return should_pause_added_torrents_;
+    }
+
+    [[nodiscard]] auto constexpr shouldDeleteSource() const noexcept
+    {
+        return should_pause_added_torrents_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -640,7 +652,9 @@ private:
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
@@ -654,6 +668,10 @@ private:
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
+
+    bool should_pause_added_torrents_ = false;
+    bool should_delete_source_torrents_ = false;
+    bool should_scrape_paused_torrents_ = false;
 
     tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
 

@@ -475,7 +475,7 @@ private:
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
     {
         // Maybe don't scrape paused torrents
-        if (!tier->isRunning && !session->scrapePausedTorrents)
+        if (!tier->isRunning && !session->shouldScrapePausedTorrents())
         {
             return 0;
         }

@@ -2270,11 +2270,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_start_added_torrents:
-        tr_variantDictAddBool(d, key, !tr_sessionGetPaused(s));
+        tr_variantDictAddBool(d, key, !s->shouldPauseAddedTorrents());
         break;
 
     case TR_KEY_trash_original_torrent_files:
-        tr_variantDictAddBool(d, key, tr_sessionGetDeleteSource(s));
+        tr_variantDictAddBool(d, key, s->shouldDeleteSource());
         break;
 
     case TR_KEY_speed_limit_up:

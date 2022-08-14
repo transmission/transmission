@@ -445,7 +445,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
-    tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
+    tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->shouldScrapePausedTorrents());
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, s->queueSize(TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, s->queueEnabled(TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
@@ -461,7 +461,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->upload_slots_per_torrent);
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
-    tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
+    tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !s->shouldPauseAddedTorrents());
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
@@ -1072,7 +1072,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
     {
-        this->scrapePausedTorrents = boolVal;
+        this->should_scrape_paused_torrents_ = boolVal;
     }
 
     /**
@@ -1729,32 +1729,32 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetPaused(tr_session* session, bool isPaused)
+void tr_sessionSetPaused(tr_session* session, bool is_paused)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->pauseAddedTorrent = isPaused;
+    session->should_pause_added_torrents_ = is_paused;
 }
 
 bool tr_sessionGetPaused(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->pauseAddedTorrent;
+    return session->shouldPauseAddedTorrents();
 }
 
-void tr_sessionSetDeleteSource(tr_session* session, bool deleteSource)
+void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->deleteSourceTorrent = deleteSource;
+    session->should_delete_source_torrents_ = delete_source;
 }
 
 bool tr_sessionGetDeleteSource(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->deleteSourceTorrent;
+    return session->shouldDeleteSource();
 }
 
 /***
