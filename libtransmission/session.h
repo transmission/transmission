@@ -479,8 +479,6 @@ public:
 
     struct tr_turtle_info turtle;
 
-    int magicNumber = 0;
-
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
@@ -757,16 +755,6 @@ struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 int tr_sessionCountTorrents(tr_session const* session);
 
 std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
-
-enum
-{
-    SESSION_MAGIC_NUMBER = 3845,
-};
-
-constexpr bool tr_isSession(tr_session const* session)
-{
-    return session != nullptr && session->magicNumber == SESSION_MAGIC_NUMBER;
-}
 
 constexpr bool tr_isPriority(tr_priority_t p)
 {

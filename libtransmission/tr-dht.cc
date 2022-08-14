@@ -680,7 +680,7 @@ void tr_dhtUpkeep(tr_session* session)
 
 void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen, void* sv)
 {
-    TR_ASSERT(tr_isSession(static_cast<tr_session*>(sv)));
+    TR_ASSERT(sv != nullptr);
 
     if (sv != session_)
     {

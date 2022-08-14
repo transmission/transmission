@@ -198,7 +198,7 @@ static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_int
 
 void tr_announcerInit(tr_session* session)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
 
     auto* a = new tr_announcer{ session };
 
