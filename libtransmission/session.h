@@ -135,6 +135,11 @@ public:
         return event_base_.get();
     }
 
+    [[nodiscard]] evdns_base* evdnsBase() noexcept
+    {
+        return evdns_base_.get();
+    }
+
     [[nodiscard]] auto& timerMaker() noexcept
     {
         return *timer_maker_;
@@ -462,7 +467,6 @@ public:
 
     struct tr_turtle_info turtle;
 
-    struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
     /* The UDP sockets used for the DHT and uTP. */
@@ -817,6 +821,7 @@ private:
     WebMediator web_mediator_{ this };
 
     std::shared_ptr<event_base> const event_base_;
+    std::shared_ptr<evdns_base> const evdns_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
     void onNowTimer();

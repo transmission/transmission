@@ -25,6 +25,7 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
+#include <event2/dns.h>
 #include <event2/event.h>
 
 #include <fmt/chrono.h>
@@ -2877,6 +2878,12 @@ auto makeEventBase()
 tr_session::tr_session(std::string_view config_dir)
     : session_id{ tr_time }
     , event_base_{ makeEventBase() }
+    , evdns_base_{ evdns_base_new(eventBase(), EVDNS_BASE_INITIALIZE_NAMESERVERS),
+                   [](evdns_base* dns)
+                   {
+                       // if zero, active requests will be aborted
+                       evdns_base_free(dns, 0);
+                   } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }

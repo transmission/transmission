@@ -652,7 +652,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         hints.ai_protocol = IPPROTO_UDP;
         logtrace(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
-            tracker->session->evdns_base,
+            tracker->session->evdnsBase(),
             tr_strlower(tracker->host.sv()).c_str(),
             nullptr,
             &hints,
