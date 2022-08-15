@@ -2328,7 +2328,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_session_id:
-        tr_variantDictAddStr(d, key, s->session_id.sv());
+        tr_variantDictAddStr(d, key, s->sessionId());
         break;
     }
 }

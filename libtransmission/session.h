@@ -130,6 +130,11 @@ struct tr_session
 public:
     explicit tr_session(std::string_view config_dir);
 
+    [[nodiscard]] std::string_view sessionId() const noexcept
+    {
+        return session_id_.sv();
+    }
+
     [[nodiscard]] event_base* eventBase() noexcept
     {
         return event_base_.get();
@@ -508,8 +513,6 @@ public:
 
     std::unique_ptr<tr_web> web;
 
-    tr_session_id session_id;
-
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
@@ -743,6 +746,8 @@ private:
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
 
     tr_announce_list default_trackers_;
+
+    tr_session_id session_id_;
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };

@@ -2872,7 +2872,7 @@ auto makeEventBase()
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : session_id{ tr_time }
+    : session_id_{ tr_time }
     , event_base_{ makeEventBase() }
     , evdns_base_{ evdns_base_new(eventBase(), EVDNS_BASE_INITIALIZE_NAMESERVERS),
                    [](evdns_base* dns)
