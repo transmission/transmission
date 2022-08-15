@@ -460,7 +460,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
 
     uint8_t peer_id_ttl_hours = 0;
@@ -641,6 +640,11 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
+    [[nodiscard]] auto constexpr allowsPrefetch() const noexcept
+    {
+        return is_prefetch_enabled_;
+    }
+
     [[nodiscard]] auto constexpr isIdleLimited() const noexcept
     {
         return is_idle_limited_;
@@ -747,6 +751,7 @@ private:
     bool is_lpd_enabled_ = false;
 
     bool is_idle_limited_ = false;
+    bool is_prefetch_enabled_ = false;
 
     struct init_data;
     void initImpl(init_data&);

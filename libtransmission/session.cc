@@ -414,7 +414,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
-    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
+    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
@@ -856,7 +856,7 @@ void tr_session::setImpl(init_data& data)
     /* files and directories */
     if (tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &boolVal))
     {
-        this->isPrefetchEnabled = boolVal;
+        this->is_prefetch_enabled_ = boolVal;
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
