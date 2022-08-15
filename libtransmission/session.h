@@ -469,8 +469,6 @@ public:
     struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
 
-    uint16_t upload_slots_per_torrent = 0;
-
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
     tr_socket_t udp_socket = TR_BAD_SOCKET;
@@ -584,6 +582,11 @@ public:
     [[nodiscard]] auto constexpr peerLimitPerTorrent() const noexcept
     {
         return peer_limit_per_torrent_;
+    }
+
+    [[nodiscards]] auto constexpr uploadSlotsPerTorrent() const noexcept
+    {
+        return upload_slots_per_torrent_;
     }
 
     [[nodiscard]] auto constexpr isClosing() const noexcept
@@ -772,6 +775,8 @@ private:
     void* rpc_func_user_data_ = nullptr;
 
     float desired_ratio_ = 2.0F;
+
+    uint16_t upload_slots_per_torrent_ = 8;
 
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
