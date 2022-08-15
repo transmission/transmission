@@ -2184,7 +2184,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_pex_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsPexEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsPEX());
         break;
 
     case TR_KEY_utp_enabled:
@@ -2192,11 +2192,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_dht_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsDHTEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsDHT());
         break;
 
     case TR_KEY_lpd_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsLPDEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsLPD());
         break;
 
     case TR_KEY_peer_port:
@@ -2204,7 +2204,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_peer_port_random_on_start:
-        tr_variantDictAddBool(d, key, tr_sessionGetPeerPortRandomOnStart(s));
+        tr_variantDictAddBool(d, key, s->isPortRandom());
         break;
 
     case TR_KEY_port_forwarding_enabled:
@@ -2212,7 +2212,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_rename_partial_files:
-        tr_variantDictAddBool(d, key, tr_sessionIsIncompleteFileNamingEnabled(s));
+        tr_variantDictAddBool(d, key, s->isIncompleteFileNamingEnabled());
         break;
 
     case TR_KEY_rpc_version:
@@ -2228,7 +2228,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_seedRatioLimit:
-        tr_variantDictAddReal(d, key, tr_sessionGetRatioLimit(s));
+        tr_variantDictAddReal(d, key, s->desiredRatio());
         break;
 
     case TR_KEY_seedRatioLimited:
@@ -2240,7 +2240,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_idle_seeding_limit_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsIdleLimited(s));
+        tr_variantDictAddBool(d, key, s->isIdleLimited());
         break;
 
     case TR_KEY_seed_queue_enabled:

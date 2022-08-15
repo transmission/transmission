@@ -309,7 +309,7 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);
  *
  * @see tr_sessionIsIncompleteFileNamingEnabled()
  */
-void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool);
+void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
 
 /** @brief return true if files will end in ".part" until they're complete */
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
@@ -585,10 +585,10 @@ double tr_sessionGetRawSpeed_KBps(tr_session const*, tr_direction);
 void tr_sessionSetRatioLimited(tr_session*, bool isLimited);
 bool tr_sessionIsRatioLimited(tr_session const*);
 
-void tr_sessionSetRatioLimit(tr_session*, double desiredRatio);
+void tr_sessionSetRatioLimit(tr_session*, double desired_ratio);
 double tr_sessionGetRatioLimit(tr_session const*);
 
-void tr_sessionSetIdleLimited(tr_session*, bool isLimited);
+void tr_sessionSetIdleLimited(tr_session*, bool is_limited);
 bool tr_sessionIsIdleLimited(tr_session const*);
 
 void tr_sessionSetIdleLimit(tr_session*, uint16_t idleMinutes);

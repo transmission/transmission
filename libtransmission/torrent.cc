@@ -319,7 +319,7 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
 
         if (isLimited && ratio != nullptr)
         {
-            *ratio = tr_sessionGetRatioLimit(tor->session);
+            *ratio = tor->session->desiredRatio();
         }
 
         break;
@@ -428,7 +428,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
         break;
 
     case TR_IDLELIMIT_GLOBAL:
-        isLimited = tr_sessionIsIdleLimited(tor->session);
+        isLimited = tor->session->isIdleLimited();
 
         if (isLimited && idleMinutes != nullptr)
         {
@@ -764,7 +764,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if ((loaded & tr_resume::Ratiolimit) == 0)
     {
         tr_torrentSetRatioMode(tor, TR_RATIOLIMIT_GLOBAL);
-        tr_torrentSetRatioLimit(tor, tr_sessionGetRatioLimit(tor->session));
+        tr_torrentSetRatioLimit(tor, tor->session->desiredRatio());
     }
 
     if ((loaded & tr_resume::Idlelimit) == 0)

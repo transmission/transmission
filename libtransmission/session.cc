@@ -406,21 +406,21 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
-    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
+    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom());
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->random_port_high_.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
-    tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
+    tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
-    tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio);
+    tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio());
     tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
-    tr_variantDictAddBool(d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled(s));
+    tr_variantDictAddBool(d, TR_KEY_rename_partial_files, s->isIncompleteFileNamingEnabled());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
@@ -1138,18 +1138,18 @@ char const* tr_sessionGetConfigDir(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b)
+void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isIncompleteFileNamingEnabled = b;
+    session->is_incomplete_file_naming_enabled_ = enabled;
 }
 
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isIncompleteFileNamingEnabled;
+    return session->isIncompleteFileNamingEnabled();
 }
 
 /***
@@ -1234,14 +1234,14 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isPortRandom = random;
+    session->is_port_random_ = random;
 }
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isPortRandom;
+    return session->isPortRandom();
 }
 
 tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
@@ -1262,11 +1262,11 @@ void tr_sessionSetRatioLimited(tr_session* session, bool isLimited)
     session->isRatioLimited = isLimited;
 }
 
-void tr_sessionSetRatioLimit(tr_session* session, double desiredRatio)
+void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio)
 {
     TR_ASSERT(session != nullptr);
 
-    session->desiredRatio = desiredRatio;
+    session->desired_ratio_ = desired_ratio;
 }
 
 bool tr_sessionIsRatioLimited(tr_session const* session)
@@ -1280,18 +1280,18 @@ double tr_sessionGetRatioLimit(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->desiredRatio;
+    return session->desiredRatio();
 }
 
 /***
 ****
 ***/
 
-void tr_sessionSetIdleLimited(tr_session* session, bool isLimited)
+void tr_sessionSetIdleLimited(tr_session* session, bool is_limited)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isIdleLimited = isLimited;
+    session->is_idle_limited_ = is_limited;
 }
 
 void tr_sessionSetIdleLimit(tr_session* session, uint16_t idleMinutes)
@@ -1305,7 +1305,7 @@ bool tr_sessionIsIdleLimited(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isIdleLimited;
+    return session->isIdleLimited();
 }
 
 uint16_t tr_sessionGetIdleLimit(tr_session const* session)
@@ -1990,14 +1990,14 @@ void tr_sessionSetPexEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isPexEnabled = enabled;
+    session->is_pex_enabled_ = enabled;
 }
 
 bool tr_sessionIsPexEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isPexEnabled;
+    return session->allowsPEX();
 }
 
 bool tr_sessionIsDHTEnabled(tr_session const* session)

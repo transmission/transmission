@@ -354,7 +354,7 @@ public:
 
     using queue_start_callback_t = void (*)(tr_session*, tr_torrent*, void* user_data);
 
-    void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
+    constexpr void setQueueStartCallback(queue_start_callback_t cb, void* user_data)
     {
         queue_start_callback_ = cb;
         queue_start_user_data_ = user_data;
@@ -368,7 +368,7 @@ public:
         }
     }
 
-    void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
+    constexpr void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
     {
         idle_limit_hit_callback_ = cb;
         idle_limit_hit_user_data_ = user_data;
@@ -382,7 +382,7 @@ public:
         }
     }
 
-    void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
+    constexpr void setRatioLimitHitCallback(tr_session_ratio_limit_hit_func cb, void* user_data)
     {
         ratio_limit_hit_cb_ = cb;
         ratio_limit_hit_user_data_ = user_data;
@@ -396,7 +396,7 @@ public:
         }
     }
 
-    void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
+    constexpr void setMetadataCallback(tr_session_metadata_func cb, void* user_data)
     {
         got_metadata_cb_ = cb;
         got_metadata_user_data_ = user_data;
@@ -410,7 +410,7 @@ public:
         }
     }
 
-    void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
+    constexpr void setTorrentCompletenessCallback(tr_torrent_completeness_func cb, void* user_data)
     {
         completeness_func_ = cb;
         completeness_func_user_data_ = user_data;
@@ -460,13 +460,9 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isPortRandom = false;
-    bool isPexEnabled = false;
     bool isUTPEnabled = false;
     bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
-    bool isIdleLimited = false;
-    bool isIncompleteFileNamingEnabled = false;
 
     uint8_t peer_id_ttl_hours = 0;
 
@@ -552,8 +548,6 @@ public:
     tr_bandwidth top_bandwidth_;
 
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
-    float desiredRatio;
 
     uint16_t idleLimitMinutes;
 
@@ -644,6 +638,16 @@ public:
         return is_lpd_enabled_;
     }
 
+    [[nodiscard]] auto constexpr allowsPEX() const noexcept
+    {
+        return is_pex_enabled_;
+    }
+
+    [[nodiscard]] auto constexpr isIdleLimited() const noexcept
+    {
+        return is_idle_limited_;
+    }
+
     [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
     {
         return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
@@ -687,6 +691,21 @@ public:
 
     [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
 
+    [[nodiscard]] auto isIncompleteFileNamingEnabled() const noexcept
+    {
+        return is_incomplete_file_naming_enabled_;
+    }
+
+    [[nodiscard]] constexpr auto isPortRandom() const noexcept
+    {
+        return is_port_random_;
+    }
+
+    [[nodiscard]] constexpr auto desiredRatio() const noexcept
+    {
+        return desired_ratio_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -698,18 +717,26 @@ private:
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
+    friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
+    friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
+    friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+    friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
 
+    bool is_pex_enabled_ = false;
     bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;
+
+    bool is_idle_limited_ = false;
 
     struct init_data;
     void initImpl(init_data&);
@@ -724,9 +751,12 @@ private:
     tr_rpc_func rpc_func_ = nullptr;
     void* rpc_func_user_data_ = nullptr;
 
+    float desired_ratio_ = 2.0F;
+
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
     bool should_scrape_paused_torrents_ = false;
+    bool is_incomplete_file_naming_enabled_ = false;
 
     tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
 
@@ -734,6 +764,7 @@ private:
 
     bool is_closing_ = false;
     bool is_closed_ = false;
+    bool is_port_random_ = false;
 
     uint16_t peer_count_ = 0;
     uint16_t peer_limit_ = 200;

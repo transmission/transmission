@@ -88,7 +88,7 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
     // We didn't find the file that we want to write to.
     // Let's figure out where it goes so that we can create it.
     auto const base = tor->currentDir();
-    auto const suffix = tor->session->isIncompleteFileNamingEnabled ? tr_torrent_files::PartialFileSuffix : ""sv;
+    auto const suffix = tor->session->isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
     setme.assign(base, '/', tor->fileSubpath(file_index), suffix);
     return true;
 }
