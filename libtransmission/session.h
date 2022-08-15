@@ -499,7 +499,6 @@ public:
         public_peer_port = port;
     }
 
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr = nullptr;
     struct tr_shared* shared = nullptr;
 
@@ -725,11 +724,17 @@ public:
 private:
     [[nodiscard]] tr_port randomPort() const;
 
+    void loadBlocklists();
+
+    friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
+    friend bool tr_blocklistExists(tr_session const* session);
+    friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
+    friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
@@ -751,6 +756,8 @@ private:
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
