@@ -15,8 +15,6 @@
 
 #include "tr-macros.h" // tr_sha1_digest_t
 
-struct evbuffer;
-
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
 
