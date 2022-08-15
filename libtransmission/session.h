@@ -27,6 +27,7 @@
 
 #include "announce-list.h"
 #include "bandwidth.h"
+#include "bitfield.h"
 #include "cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
@@ -50,17 +51,12 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 struct evdns_base;
 
-class tr_bitfield;
 class tr_rpc_server;
 class tr_web;
 struct BlocklistFile;
 struct struct_utp_context;
-struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
-struct tr_bandwidth;
-struct tr_bindsockets;
-struct tr_fdInfo;
 
 struct tr_bindinfo
 {
@@ -116,9 +112,7 @@ struct tr_turtle_info
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
      * limits on or off at that given minute in the week. */
-    // Changed to non-owning pointer temporarily till tr_turtle_info becomes C++-constructible and destructible
-    // TODO: remove * and own the value
-    tr_bitfield* minutes = nullptr;
+    tr_bitfield minutes{ 10080 };
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState = TR_AUTO_SWITCH_UNUSED;
@@ -524,8 +518,6 @@ public:
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
-    std::unique_ptr<tr_rpc_server> rpc_server_;
-
     [[nodiscard]] auto constexpr queueEnabled(tr_direction dir) const noexcept
     {
         return queue_enabled_[dir];
@@ -706,16 +698,34 @@ private:
 
     void loadBlocklists();
 
+    struct init_data;
+    void initImpl(init_data&);
+    void setImpl(init_data&);
+    void closeImplStart();
+    void closeImplWaitForIdleUdp();
+    void closeImplFinish();
+
     friend bool tr_blocklistExists(tr_session const* session);
+    friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
+    friend bool tr_sessionIsRPCEnabled(tr_session const* session);
+    friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
+    friend char const* tr_sessionGetRPCPassword(tr_session const* session);
+    friend char const* tr_sessionGetRPCUrl(tr_session const* session);
+    friend char const* tr_sessionGetRPCUsername(tr_session const* session);
+    friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -733,12 +743,22 @@ private:
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+    friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetRPCPassword(tr_session* session, char const* password);
+    friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetRPCPort(tr_session* session, uint16_t hport);
+    friend void tr_sessionSetRPCUrl(tr_session* session, char const* url);
+    friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
+    static std::recursive_mutex session_mutex_;
+
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+
+    std::unique_ptr<tr_rpc_server> rpc_server_;
 
     tr_announce_list default_trackers_;
 
@@ -747,11 +767,41 @@ private:
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
+    std::array<bool, 2> queue_enabled_ = { false, false };
+    std::array<int, 2> queue_size_ = { 0, 0 };
+
+    tr_rpc_func rpc_func_ = nullptr;
+    void* rpc_func_user_data_ = nullptr;
+
+    float desired_ratio_ = 2.0F;
+
     int umask_ = 022;
 
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
+
+    int queue_stalled_minutes_ = 0;
+
+    tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
+
+    tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
+
+    tr_port random_port_low_;
+    tr_port random_port_high_;
+
+    uint16_t peer_count_ = 0;
+    uint16_t peer_limit_ = 200;
+    uint16_t peer_limit_per_torrent_ = 50;
+
+    uint16_t idle_limit_minutes_;
+
+    uint16_t upload_slots_per_torrent_ = 8;
+
+    uint8_t peer_id_ttl_hours_ = 6;
+
+    bool is_closing_ = false;
+    bool is_closed_ = false;
 
     bool is_utp_enabled_ = false;
     bool is_pex_enabled_ = false;
@@ -761,51 +811,14 @@ private:
     bool is_idle_limited_ = false;
     bool is_prefetch_enabled_ = false;
     bool is_ratio_limited_ = false;
+    bool queue_stalled_enabled_ = false;
 
-    uint8_t peer_id_ttl_hours_ = 6;
-
-    struct init_data;
-    void initImpl(init_data&);
-    void setImpl(init_data&);
-    void closeImplStart();
-    void closeImplWaitForIdleUdp();
-    void closeImplFinish();
-
-    tr_port random_port_low_;
-    tr_port random_port_high_;
-
-    tr_rpc_func rpc_func_ = nullptr;
-    void* rpc_func_user_data_ = nullptr;
-
-    float desired_ratio_ = 2.0F;
-
-    uint16_t upload_slots_per_torrent_ = 8;
+    bool is_port_random_ = false;
 
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
-
-    tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
-
-    tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
-
-    bool is_closing_ = false;
-    bool is_closed_ = false;
-    bool is_port_random_ = false;
-
-    uint16_t peer_count_ = 0;
-    uint16_t peer_limit_ = 200;
-    uint16_t peer_limit_per_torrent_ = 50;
-
-    uint16_t idle_limit_minutes_;
-
-    std::array<bool, 2> queue_enabled_ = { false, false };
-    std::array<int, 2> queue_size_ = { 0, 0 };
-    int queue_stalled_minutes_ = 0;
-    bool queue_stalled_enabled_ = false;
-
-    static std::recursive_mutex session_mutex_;
 
     class WebMediator final : public tr_web::Mediator
     {

@@ -19,7 +19,6 @@
 #include "net.h"
 #include "timer.h"
 
-struct event;
 struct evhttp;
 struct tr_variant;
 struct tr_rpc_address;

@@ -1356,7 +1356,7 @@ static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
 
 static void turtleUpdateTable(struct tr_turtle_info* t)
 {
-    t->minutes->setHasNone();
+    t->minutes.setHasNone();
 
     for (int day = 0; day < 7; ++day)
     {
@@ -1372,7 +1372,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             for (time_t i = begin; i < end; ++i)
             {
-                t->minutes->set((i + day * MinutesPerDay) % MinutesPerWeek);
+                t->minutes.set((i + day * MinutesPerDay) % MinutesPerWeek);
             }
         }
     }
@@ -1421,7 +1421,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
         minute_of_the_week = MinutesPerWeek - 1;
     }
 
-    return t->minutes->test(minute_of_the_week);
+    return t->minutes.test(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1452,8 +1452,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 {
     turtle->changedByUser = false;
     turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
-
-    turtle->minutes = new tr_bitfield(MinutesPerWeek);
+    turtle->minutes.setHasNone();
 
     turtleUpdateTable(turtle);
 
@@ -1887,9 +1886,6 @@ void tr_sessionClose(tr_session* session)
             break;
         }
     }
-
-    /* free the session memory */
-    delete session->turtle.minutes;
 
     delete session;
 }
