@@ -2188,7 +2188,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_utp_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsUTPEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsUTP());
         break;
 
     case TR_KEY_dht_enabled:

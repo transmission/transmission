@@ -389,7 +389,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->allowsDHT());
-    tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
+    tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
@@ -1330,7 +1330,7 @@ std::optional<unsigned int> tr_session::activeSpeedLimitBps(tr_direction dir) co
         return tr_sessionGetAltSpeed_Bps(this, dir);
     }
 
-    if (isSpeedLimited(this, dir))
+    if (this->isSpeedLimited(dir))
     {
         return speedLimitBps(dir);
     }
@@ -2030,39 +2030,40 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 ****
 ***/
 
-bool tr_sessionIsUTPEnabled(tr_session const* session)
+bool tr_session::allowsUTP() const noexcept
 {
-    TR_ASSERT(session != nullptr);
-
 #ifdef WITH_UTP
-    return session->isUTPEnabled;
+    return is_utp_enabled_;
 #else
     return false;
 #endif
 }
 
-static void toggle_utp(tr_session* const session)
+bool tr_sessionIsUTPEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isUTPEnabled = !session->isUTPEnabled;
-
-    tr_udpSetSocketBuffers(session);
-
-    tr_udpSetSocketTOS(session);
-
-    /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
-       explanation. */
+    return session->allowsUTP();
 }
 
 void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled != session->isUTPEnabled)
+    if (enabled == session->allowsUTP())
     {
-        tr_runInEventThread(session, toggle_utp, session);
+        return;
     }
+    tr_runInEventThread(
+        session,
+        [session, enabled]()
+        {
+            session->is_utp_enabled_ = enabled;
+            tr_udpSetSocketBuffers(session);
+            tr_udpSetSocketTOS(session);
+            // But don't call tr_utpClose --
+            // see reset_timer in tr-utp.c for an explanation.
+        });
 }
 
 /***

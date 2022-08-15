@@ -2813,7 +2813,7 @@ struct peer_candidate
 void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 {
     time_t const now = tr_time();
-    bool utp = tr_sessionIsUTPEnabled(mgr->session) && !atom.utp_failed;
+    bool utp = mgr->session->allowsUTP() && !atom.utp_failed;
 
     if (atom.fromFirst == TR_PEER_FROM_PEX)
     {

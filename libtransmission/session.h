@@ -460,7 +460,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isUTPEnabled = false;
     bool isPrefetchEnabled = false;
     bool isRatioLimited = false;
 
@@ -640,6 +639,8 @@ public:
         return is_pex_enabled_;
     }
 
+    [[nodiscard]] bool allowsUTP() const noexcept;
+
     [[nodiscard]] auto constexpr isIdleLimited() const noexcept
     {
         return is_idle_limited_;
@@ -735,10 +736,12 @@ private:
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
+    friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
+    bool is_utp_enabled_ = false;
     bool is_pex_enabled_ = false;
     bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;

@@ -92,7 +92,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
 void tr_udpSetSocketBuffers(tr_session* session)
 {
-    bool const utp = tr_sessionIsUTPEnabled(session);
+    bool const utp = session->allowsUTP();
 
     if (session->udp_socket != TR_BAD_SOCKET)
     {
@@ -260,7 +260,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         }
         else
         {
-            if (tr_sessionIsUTPEnabled(session))
+            if (session->allowsUTP())
             {
                 if (!tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, session))
                 {
