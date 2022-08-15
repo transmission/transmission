@@ -546,8 +546,6 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
-    tr_announce_list default_trackers_;
-
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
@@ -760,6 +758,8 @@ private:
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+
+    tr_announce_list default_trackers_;
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
