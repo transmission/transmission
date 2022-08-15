@@ -1293,11 +1293,11 @@ void tr_sessionSetIdleLimited(tr_session* session, bool is_limited)
     session->is_idle_limited_ = is_limited;
 }
 
-void tr_sessionSetIdleLimit(tr_session* session, uint16_t idleMinutes)
+void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes)
 {
     TR_ASSERT(session != nullptr);
 
-    session->idle_limit_minutes_ = idleMinutes;
+    session->idle_limit_minutes_ = idle_minutes;
 }
 
 bool tr_sessionIsIdleLimited(tr_session const* session)

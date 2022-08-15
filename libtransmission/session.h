@@ -506,27 +506,6 @@ public:
 
     std::unique_ptr<Cache> cache;
 
-    class WebMediator final : public tr_web::Mediator
-    {
-    public:
-        explicit WebMediator(tr_session* session)
-            : session_{ session }
-        {
-        }
-        ~WebMediator() override = default;
-
-        [[nodiscard]] std::optional<std::string> cookieFile() const override;
-        [[nodiscard]] std::optional<std::string> publicAddress() const override;
-        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
-        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
-        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
-        // runs the tr_web::fetch response callback in the libtransmission thread
-        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
-
-    private:
-        tr_session* const session_;
-    };
-
     std::unique_ptr<tr_web> web;
 
     tr_session_id session_id;
@@ -729,10 +708,9 @@ private:
 
     void loadBlocklists();
 
-    friend void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes);
-    friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend bool tr_blocklistExists(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
+    friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
@@ -743,6 +721,7 @@ private:
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes);
     friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
@@ -823,6 +802,27 @@ private:
     bool queue_stalled_enabled_ = false;
 
     static std::recursive_mutex session_mutex_;
+
+    class WebMediator final : public tr_web::Mediator
+    {
+    public:
+        explicit WebMediator(tr_session* session)
+            : session_{ session }
+        {
+        }
+        ~WebMediator() override = default;
+
+        [[nodiscard]] std::optional<std::string> cookieFile() const override;
+        [[nodiscard]] std::optional<std::string> publicAddress() const override;
+        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
+        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
+        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
+        // runs the tr_web::fetch response callback in the libtransmission thread
+        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
+
+    private:
+        tr_session* const session_;
+    };
 
     WebMediator web_mediator_{ this };
 
