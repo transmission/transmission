@@ -167,7 +167,7 @@ static void tr_torrentUnsetPeerId(tr_torrent* tor)
 static int peerIdTTL(tr_torrent const* tor)
 {
     auto const ctime = tor->peer_id_creation_time_;
-    return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peer_id_ttl_hours * 3600, tr_time());
+    return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peerIdTTLHours() * 3600, tr_time());
 }
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
@@ -298,14 +298,14 @@ double tr_torrentGetRatioLimit(tr_torrent const* tor)
 
 bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
 {
-    auto isLimited = bool{};
+    auto is_limited = bool{};
 
     TR_ASSERT(tr_isTorrent(tor));
 
     switch (tr_torrentGetRatioMode(tor))
     {
     case TR_RATIOLIMIT_SINGLE:
-        isLimited = true;
+        is_limited = true;
 
         if (ratio != nullptr)
         {
@@ -315,9 +315,9 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
         break;
 
     case TR_RATIOLIMIT_GLOBAL:
-        isLimited = tr_sessionIsRatioLimited(tor->session);
+        is_limited = tor->session->isRatioLimited();
 
-        if (isLimited && ratio != nullptr)
+        if (is_limited && ratio != nullptr)
         {
             *ratio = tor->session->desiredRatio();
         }
@@ -325,11 +325,11 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
         break;
 
     default: /* TR_RATIOLIMIT_UNLIMITED */
-        isLimited = false;
+        is_limited = false;
         break;
     }
 
-    return isLimited;
+    return is_limited;
 }
 
 /* returns true if the seed ratio applies --
@@ -432,7 +432,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
 
         if (isLimited && idleMinutes != nullptr)
         {
-            *idleMinutes = tr_sessionGetIdleLimit(tor->session);
+            *idleMinutes = tor->session->idleLimitMinutes();
         }
 
         break;
@@ -770,7 +770,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if ((loaded & tr_resume::Idlelimit) == 0)
     {
         tr_torrentSetIdleMode(tor, TR_IDLELIMIT_GLOBAL);
-        tr_torrentSetIdleLimit(tor, tr_sessionGetIdleLimit(tor->session));
+        tr_torrentSetIdleLimit(tor, tor->session->idleLimitMinutes());
     }
 
     auto has_local_data = std::optional<bool>{};

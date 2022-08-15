@@ -25,6 +25,7 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
+#include <event2/dns.h>
 #include <event2/event.h>
 
 #include <fmt/chrono.h>
@@ -389,17 +390,17 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->allowsDHT());
-    tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
+    tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, s->queueSize(TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, s->queueEnabled(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited(s, TR_DOWN));
+    tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, s->isSpeedLimited(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
-    tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, tr_sessionGetIdleLimit(s));
-    tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, tr_sessionIsIdleLimited(s));
+    tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, s->idleLimitMinutes());
+    tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, s->isIdleLimited());
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir(s));
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, tr_sessionIsIncompleteDirEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_message_level, tr_logGetLevel());
@@ -414,12 +415,12 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
-    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->isPrefetchEnabled);
-    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
+    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
+    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTTLHours());
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio());
-    tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
+    tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited());
     tr_variantDictAddBool(d, TR_KEY_rename_partial_files, s->isIncompleteFileNamingEnabled());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
@@ -442,9 +443,9 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, tr_sessionGetAltSpeedEnd(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
-    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
-    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->upload_slots_per_torrent);
+    tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
+    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask_));
+    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !s->shouldPauseAddedTorrents());
@@ -646,8 +647,6 @@ void tr_session::onNowTimer()
     now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
 
-static void loadBlocklists(tr_session* session);
-
 void tr_session::initImpl(init_data& data)
 {
     auto lock = unique_lock();
@@ -679,7 +678,7 @@ void tr_session::initImpl(init_data& data)
     **/
 
     tr_sys_dir_create(tr_pathbuf{ configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    loadBlocklists(this);
+    loadBlocklists();
 
     tr_announcerInit(this);
 
@@ -728,14 +727,14 @@ void tr_session::setImpl(init_data& data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        this->umask = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
-        ::umask(this->umask);
+        this->umask_ = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
+        ::umask(this->umask_);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
     {
         /* Or as a base 10 integer to remain compatible with the old settings format. */
-        this->umask = (mode_t)i;
-        ::umask(this->umask);
+        this->umask_ = (mode_t)i;
+        ::umask(this->umask_);
     }
 
 #endif
@@ -819,7 +818,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
     {
-        this->peer_id_ttl_hours = i;
+        this->peer_id_ttl_hours_ = i;
     }
 
     /* torrent queues */
@@ -856,7 +855,7 @@ void tr_session::setImpl(init_data& data)
     /* files and directories */
     if (tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &boolVal))
     {
-        this->isPrefetchEnabled = boolVal;
+        this->is_prefetch_enabled_ = boolVal;
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
@@ -957,7 +956,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_upload_slots_per_torrent, &i))
     {
-        this->upload_slots_per_torrent = i;
+        this->upload_slots_per_torrent_ = i;
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
@@ -1255,11 +1254,11 @@ tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetRatioLimited(tr_session* session, bool isLimited)
+void tr_sessionSetRatioLimited(tr_session* session, bool is_limited)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isRatioLimited = isLimited;
+    session->is_ratio_limited_ = is_limited;
 }
 
 void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio)
@@ -1273,7 +1272,7 @@ bool tr_sessionIsRatioLimited(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->isRatioLimited;
+    return session->isRatioLimited();
 }
 
 double tr_sessionGetRatioLimit(tr_session const* session)
@@ -1294,11 +1293,11 @@ void tr_sessionSetIdleLimited(tr_session* session, bool is_limited)
     session->is_idle_limited_ = is_limited;
 }
 
-void tr_sessionSetIdleLimit(tr_session* session, uint16_t idleMinutes)
+void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes)
 {
     TR_ASSERT(session != nullptr);
 
-    session->idleLimitMinutes = idleMinutes;
+    session->idle_limit_minutes_ = idle_minutes;
 }
 
 bool tr_sessionIsIdleLimited(tr_session const* session)
@@ -1312,7 +1311,7 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->idleLimitMinutes;
+    return session->idleLimitMinutes();
 }
 
 /***
@@ -1330,7 +1329,7 @@ std::optional<unsigned int> tr_session::activeSpeedLimitBps(tr_direction dir) co
         return tr_sessionGetAltSpeed_Bps(this, dir);
     }
 
-    if (tr_sessionIsSpeedLimited(this, dir))
+    if (this->isSpeedLimited(dir))
     {
         return speedLimitBps(dir);
     }
@@ -1471,19 +1470,19 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 ****  Primary session speed limits
 ***/
 
-static void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned int Bps)
+void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    s->speedLimit_Bps[d] = Bps;
+    session->speed_limit_Bps_[dir] = Bps;
 
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* s, tr_direction d, unsigned int KBps)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int KBps)
 {
-    tr_sessionSetSpeedLimit_Bps(s, d, tr_toSpeedBytes(KBps));
+    tr_sessionSetSpeedLimit_Bps(session, dir, tr_toSpeedBytes(KBps));
 }
 
 unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
@@ -1491,22 +1490,22 @@ unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
     return tr_toSpeedKBps(s->speedLimitBps(d));
 }
 
-void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
+void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    s->speedLimitEnabled[d] = b;
+    session->speed_limit_enabled_[dir] = limited;
 
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
-bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
+bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    return s->speedLimitEnabled[d];
+    return session->isSpeedLimited(dir);
 }
 
 /***
@@ -1733,8 +1732,6 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-static void closeBlocklists(tr_session* /*session*/);
-
 void tr_session::closeImplStart()
 {
     is_closing_ = true;
@@ -1818,7 +1815,7 @@ void tr_session::closeImplFinish()
     stats().saveIfDirty();
     tr_peerMgrFree(peerMgr);
     tr_utpClose(this);
-    closeBlocklists(this);
+    blocklists_.clear();
     openFiles().closeAll();
     is_closed_ = true;
 }
@@ -2030,39 +2027,40 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 ****
 ***/
 
-bool tr_sessionIsUTPEnabled(tr_session const* session)
+bool tr_session::allowsUTP() const noexcept
 {
-    TR_ASSERT(session != nullptr);
-
 #ifdef WITH_UTP
-    return session->isUTPEnabled;
+    return is_utp_enabled_;
 #else
     return false;
 #endif
 }
 
-static void toggle_utp(tr_session* const session)
+bool tr_sessionIsUTPEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    session->isUTPEnabled = !session->isUTPEnabled;
-
-    tr_udpSetSocketBuffers(session);
-
-    tr_udpSetSocketTOS(session);
-
-    /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
-       explanation. */
+    return session->allowsUTP();
 }
 
 void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled != session->isUTPEnabled)
+    if (enabled == session->allowsUTP())
     {
-        tr_runInEventThread(session, toggle_utp, session);
+        return;
     }
+    tr_runInEventThread(
+        session,
+        [session, enabled]()
+        {
+            session->is_utp_enabled_ = enabled;
+            tr_udpSetSocketBuffers(session);
+            tr_udpSetSocketTOS(session);
+            // But don't call tr_utpClose --
+            // see reset_timer in tr-utp.c for an explanation.
+        });
 }
 
 /***
@@ -2192,13 +2190,13 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-static void loadBlocklists(tr_session* session)
+void tr_session::loadBlocklists()
 {
     auto loadme = std::unordered_set<std::string>{};
-    auto const is_enabled = session->useBlocklist();
+    auto const is_enabled = useBlocklist();
 
     /* walk the blocklist directory... */
-    auto const dirname = tr_pathbuf{ session->configDir(), "/blocklists"sv };
+    auto const dirname = tr_pathbuf{ configDir(), "/blocklists"sv };
     auto const odir = tr_sys_dir_open(dirname);
 
     if (odir == TR_BAD_SYS_DIR)
@@ -2261,26 +2259,39 @@ static void loadBlocklists(tr_session* session)
         }
     }
 
-    session->blocklists.clear();
+    blocklists_.clear();
     std::transform(
         std::begin(loadme),
         std::end(loadme),
-        std::back_inserter(session->blocklists),
+        std::back_inserter(blocklists_),
         [&is_enabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), is_enabled); });
 
     /* cleanup */
     tr_sys_dir_close(odir);
 }
 
-static void closeBlocklists(tr_session* session)
+void tr_session::useBlocklist(bool enabled)
 {
-    session->blocklists.clear();
+    this->blocklist_enabled_ = enabled;
+
+    std::for_each(
+        std::begin(blocklists_),
+        std::end(blocklists_),
+        [enabled](auto& blocklist) { blocklist->setEnabled(enabled); });
+}
+
+bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
+{
+    return std::any_of(
+        std::begin(blocklists_),
+        std::end(blocklists_),
+        [&addr](auto& blocklist) { return blocklist->hasAddress(addr); });
 }
 
 void tr_sessionReloadBlocklists(tr_session* session)
 {
-    closeBlocklists(session);
-    loadBlocklists(session);
+    session->blocklists_.clear();
+    session->loadBlocklists();
 
     tr_peerMgrOnBlocklistChanged(session->peerMgr);
 }
@@ -2289,7 +2300,7 @@ size_t tr_blocklistGetRuleCount(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    auto& src = session->blocklists;
+    auto& src = session->blocklists_;
     return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto& cur) { return sum + cur->getRuleCount(); });
 }
 
@@ -2298,13 +2309,6 @@ bool tr_blocklistIsEnabled(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->useBlocklist();
-}
-
-void tr_session::useBlocklist(bool enabled)
-{
-    this->blocklist_enabled_ = enabled;
-
-    std::for_each(std::begin(blocklists), std::end(blocklists), [enabled](auto& blocklist) { blocklist->setEnabled(enabled); });
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool enabled)
@@ -2318,15 +2322,15 @@ bool tr_blocklistExists(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return !std::empty(session->blocklists);
+    return !std::empty(session->blocklists_);
 }
 
-size_t tr_blocklistSetContent(tr_session* session, char const* contentFilename)
+size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
 {
     auto const lock = session->unique_lock();
 
     // find (or add) the default blocklist
-    auto& src = session->blocklists;
+    auto& src = session->blocklists_;
     char const* const name = DEFAULT_BLOCKLIST_FILENAME;
     auto const it = std::find_if(
         std::begin(src),
@@ -2346,16 +2350,8 @@ size_t tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     }
 
     // set the default blocklist's content
-    int const ruleCount = b->setContent(contentFilename);
-    return ruleCount;
-}
-
-bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
-{
-    return std::any_of(
-        std::begin(blocklists),
-        std::end(blocklists),
-        [&addr](auto& blocklist) { return blocklist->hasAddress(addr); });
+    auto const rule_count = b->setContent(content_filename);
+    return rule_count;
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
@@ -2876,8 +2872,14 @@ auto makeEventBase()
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : session_id{ tr_time }
+    : session_id_{ tr_time }
     , event_base_{ makeEventBase() }
+    , evdns_base_{ evdns_base_new(eventBase(), EVDNS_BASE_INITIALIZE_NAMESERVERS),
+                   [](evdns_base* dns)
+                   {
+                       // if zero, active requests will be aborted
+                       evdns_base_free(dns, 0);
+                   } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }

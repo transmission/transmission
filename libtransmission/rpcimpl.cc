@@ -2188,7 +2188,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_utp_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsUTPEnabled(s));
+        tr_variantDictAddBool(d, key, s->allowsUTP());
         break;
 
     case TR_KEY_dht_enabled:
@@ -2232,11 +2232,11 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_seedRatioLimited:
-        tr_variantDictAddBool(d, key, tr_sessionIsRatioLimited(s));
+        tr_variantDictAddBool(d, key, s->isRatioLimited());
         break;
 
     case TR_KEY_idle_seeding_limit:
-        tr_variantDictAddInt(d, key, tr_sessionGetIdleLimit(s));
+        tr_variantDictAddInt(d, key, s->idleLimitMinutes());
         break;
 
     case TR_KEY_idle_seeding_limit_enabled:
@@ -2264,7 +2264,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_speed_limit_up_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsSpeedLimited(s, TR_UP));
+        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_UP));
         break;
 
     case TR_KEY_speed_limit_down:
@@ -2272,7 +2272,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_speed_limit_down_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsSpeedLimited(s, TR_DOWN));
+        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_DOWN));
         break;
 
     case TR_KEY_script_torrent_added_filename:
@@ -2328,7 +2328,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_session_id:
-        tr_variantDictAddStr(d, key, s->session_id.sv());
+        tr_variantDictAddStr(d, key, s->sessionId());
         break;
     }
 }

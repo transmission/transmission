@@ -130,9 +130,19 @@ struct tr_session
 public:
     explicit tr_session(std::string_view config_dir);
 
+    [[nodiscard]] std::string_view sessionId() const noexcept
+    {
+        return session_id_.sv();
+    }
+
     [[nodiscard]] event_base* eventBase() noexcept
     {
         return event_base_.get();
+    }
+
+    [[nodiscard]] evdns_base* evdnsBase() noexcept
+    {
+        return evdns_base_.get();
     }
 
     [[nodiscard]] auto& timerMaker() noexcept
@@ -460,23 +470,9 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isUTPEnabled = false;
-    bool isPrefetchEnabled = false;
-    bool isRatioLimited = false;
-
-    uint8_t peer_id_ttl_hours = 0;
-
-    int umask = 0;
-
-    unsigned int speedLimit_Bps[2] = { 0, 0 };
-    bool speedLimitEnabled[2] = { false, false };
-
     struct tr_turtle_info turtle;
 
-    struct evdns_base* evdns_base = nullptr;
     struct tr_event_handle* events = nullptr;
-
-    uint16_t upload_slots_per_torrent = 0;
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
@@ -510,36 +506,12 @@ public:
         public_peer_port = port;
     }
 
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr = nullptr;
     struct tr_shared* shared = nullptr;
 
     std::unique_ptr<Cache> cache;
 
-    class WebMediator final : public tr_web::Mediator
-    {
-    public:
-        explicit WebMediator(tr_session* session)
-            : session_{ session }
-        {
-        }
-        ~WebMediator() override = default;
-
-        [[nodiscard]] std::optional<std::string> cookieFile() const override;
-        [[nodiscard]] std::optional<std::string> publicAddress() const override;
-        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
-        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
-        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
-        // runs the tr_web::fetch response callback in the libtransmission thread
-        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
-
-    private:
-        tr_session* const session_;
-    };
-
     std::unique_ptr<tr_web> web;
-
-    tr_session_id session_id;
 
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
@@ -549,19 +521,10 @@ public:
 
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
-    uint16_t idleLimitMinutes;
-
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
-
-    tr_announce_list default_trackers_;
-
-    // One of <netinet/ip.h>'s IPTOS_ values.
-    // See tr_netTos*() in libtransmission/net.h for more info
-    // Only session.cc should use this.
-    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
     [[nodiscard]] auto constexpr queueEnabled(tr_direction dir) const noexcept
     {
@@ -591,6 +554,11 @@ public:
     [[nodiscard]] auto constexpr peerLimitPerTorrent() const noexcept
     {
         return peer_limit_per_torrent_;
+    }
+
+    [[nodiscard]] auto constexpr uploadSlotsPerTorrent() const noexcept
+    {
+        return upload_slots_per_torrent_;
     }
 
     [[nodiscard]] auto constexpr isClosing() const noexcept
@@ -643,9 +611,21 @@ public:
         return is_pex_enabled_;
     }
 
+    [[nodiscard]] bool allowsUTP() const noexcept;
+
+    [[nodiscard]] auto constexpr allowsPrefetch() const noexcept
+    {
+        return is_prefetch_enabled_;
+    }
+
     [[nodiscard]] auto constexpr isIdleLimited() const noexcept
     {
         return is_idle_limited_;
+    }
+
+    [[nodiscard]] auto constexpr idleLimitMinutes() const noexcept
+    {
+        return idle_limit_minutes_;
     }
 
     [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
@@ -681,7 +661,12 @@ public:
 
     [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const noexcept
     {
-        return speedLimit_Bps[dir];
+        return speed_limit_Bps_[dir];
+    }
+
+    [[nodiscard]] constexpr auto isSpeedLimited(tr_direction dir) const noexcept
+    {
+        return speed_limit_enabled_[dir];
     }
 
     [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
@@ -701,22 +686,40 @@ public:
         return is_port_random_;
     }
 
+    [[nodiscard]] auto constexpr isRatioLimited() const noexcept
+    {
+        return is_ratio_limited_;
+    }
+
     [[nodiscard]] constexpr auto desiredRatio() const noexcept
     {
         return desired_ratio_;
     }
 
+    [[nodiscard]] constexpr auto peerIdTTLHours() const noexcept
+    {
+        return peer_id_ttl_hours_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
+    void loadBlocklists();
+
+    friend bool tr_blocklistExists(tr_session const* session);
+    friend size_t tr_blocklistGetRuleCount(tr_session const* session);
+    friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
+    friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
+    friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+    friend void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes);
     friend void tr_sessionSetIdleLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
@@ -731,12 +734,35 @@ private:
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
+    friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
+    friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
+    friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+
+    tr_announce_list default_trackers_;
+
+    tr_session_id session_id_;
+
+    std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
+    std::array<bool, 2> speed_limit_enabled_ = { false, false };
+
+    int umask_ = 022;
+
+    // One of <netinet/ip.h>'s IPTOS_ values.
+    // See tr_netTos*() in libtransmission/net.h for more info
+    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
+
+    bool is_utp_enabled_ = false;
     bool is_pex_enabled_ = false;
     bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;
 
     bool is_idle_limited_ = false;
+    bool is_prefetch_enabled_ = false;
+    bool is_ratio_limited_ = false;
+
+    uint8_t peer_id_ttl_hours_ = 6;
 
     struct init_data;
     void initImpl(init_data&);
@@ -752,6 +778,8 @@ private:
     void* rpc_func_user_data_ = nullptr;
 
     float desired_ratio_ = 2.0F;
+
+    uint16_t upload_slots_per_torrent_ = 8;
 
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
@@ -770,6 +798,8 @@ private:
     uint16_t peer_limit_ = 200;
     uint16_t peer_limit_per_torrent_ = 50;
 
+    uint16_t idle_limit_minutes_;
+
     std::array<bool, 2> queue_enabled_ = { false, false };
     std::array<int, 2> queue_size_ = { 0, 0 };
     int queue_stalled_minutes_ = 0;
@@ -777,9 +807,31 @@ private:
 
     static std::recursive_mutex session_mutex_;
 
+    class WebMediator final : public tr_web::Mediator
+    {
+    public:
+        explicit WebMediator(tr_session* session)
+            : session_{ session }
+        {
+        }
+        ~WebMediator() override = default;
+
+        [[nodiscard]] std::optional<std::string> cookieFile() const override;
+        [[nodiscard]] std::optional<std::string> publicAddress() const override;
+        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
+        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
+        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
+        // runs the tr_web::fetch response callback in the libtransmission thread
+        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
+
+    private:
+        tr_session* const session_;
+    };
+
     WebMediator web_mediator_{ this };
 
     std::shared_ptr<event_base> const event_base_;
+    std::shared_ptr<evdns_base> const evdns_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
     void onNowTimer();

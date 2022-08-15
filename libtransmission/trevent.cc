@@ -16,7 +16,6 @@
 #include <winsock2.h>
 #endif
 
-#include <event2/dns.h>
 #include <event2/event.h>
 #include <event2/thread.h>
 
@@ -188,11 +187,9 @@ static void libeventThreadFunc(tr_event_handle* events)
 
     // create the libevent base
     auto* base = events->session->eventBase();
-    auto* const dns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
 
     // initialize the session struct's event fields
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
-    events->session->evdns_base = dns_base;
     events->session->events = events;
 
     // tell the thread that's waiting in tr_eventInit()
@@ -203,12 +200,7 @@ static void libeventThreadFunc(tr_event_handle* events)
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
 
     // shut down the thread
-    if (dns_base != nullptr)
-    {
-        evdns_base_free(dns_base, 0);
-    }
     event_free(events->work_queue_event);
-    events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
     tr_logAddTrace("Closing libevent thread");

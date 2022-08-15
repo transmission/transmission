@@ -105,15 +105,6 @@ static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 }
 #endif
 
-/***
-****
-***/
-
-static char const* get_current_session_id(tr_rpc_server const* server)
-{
-    return server->session->session_id.c_str();
-}
-
 /**
 ***
 **/
@@ -398,10 +389,8 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
 
 static bool test_session_id(tr_rpc_server* server, evhttp_request const* req)
 {
-    char const* ours = get_current_session_id(server);
-    char const* theirs = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
-    bool const success = theirs != nullptr && strcmp(theirs, ours) == 0;
-    return success;
+    char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
+    return session_id != nullptr && server->session->sessionId() == session_id;
 }
 
 static bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
@@ -518,7 +507,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 #ifdef REQUIRE_SESSION_ID
         else if (!test_session_id(server, req))
         {
-            char const* sessionId = get_current_session_id(server);
+            auto const session_id = std::string{ server->session->sessionId() };
             auto const tmp = fmt::format(
                 FMT_STRING("<p>Your request had an invalid session-id header.</p>"
                            "<p>To fix this, follow these steps:"
@@ -531,8 +520,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
                            "attacks.</p>"
                            "<p><code>{:s}: {:s}</code></p>"),
                 TR_RPC_SESSION_ID_HEADER,
-                sessionId);
-            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
+                session_id);
+            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
             evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
             send_simple_response(req, 409, tmp.c_str());
         }
