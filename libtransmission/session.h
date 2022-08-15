@@ -27,6 +27,7 @@
 
 #include "announce-list.h"
 #include "bandwidth.h"
+#include "bitfield.h"
 #include "cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
@@ -50,7 +51,6 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 struct evdns_base;
 
-class tr_bitfield;
 class tr_rpc_server;
 class tr_web;
 struct BlocklistFile;
@@ -112,9 +112,7 @@ struct tr_turtle_info
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
      * limits on or off at that given minute in the week. */
-    // Changed to non-owning pointer temporarily till tr_turtle_info becomes C++-constructible and destructible
-    // TODO: remove * and own the value
-    tr_bitfield* minutes = nullptr;
+    tr_bitfield minutes{ 10080 };
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState = TR_AUTO_SWITCH_UNUSED;
