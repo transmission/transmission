@@ -704,6 +704,13 @@ private:
 
     void loadBlocklists();
 
+    struct init_data;
+    void initImpl(init_data&);
+    void setImpl(init_data&);
+    void closeImplStart();
+    void closeImplWaitForIdleUdp();
+    void closeImplFinish();
+
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
@@ -753,6 +760,8 @@ private:
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
+    static std::recursive_mutex session_mutex_;
+
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
@@ -764,11 +773,41 @@ private:
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
+    std::array<bool, 2> queue_enabled_ = { false, false };
+    std::array<int, 2> queue_size_ = { 0, 0 };
+
+    tr_rpc_func rpc_func_ = nullptr;
+    void* rpc_func_user_data_ = nullptr;
+
+    float desired_ratio_ = 2.0F;
+
     int umask_ = 022;
 
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
+
+    int queue_stalled_minutes_ = 0;
+
+    tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
+
+    tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
+
+    tr_port random_port_low_;
+    tr_port random_port_high_;
+
+    uint16_t peer_count_ = 0;
+    uint16_t peer_limit_ = 200;
+    uint16_t peer_limit_per_torrent_ = 50;
+
+    uint16_t idle_limit_minutes_;
+
+    uint16_t upload_slots_per_torrent_ = 8;
+
+    uint8_t peer_id_ttl_hours_ = 6;
+
+    bool is_closing_ = false;
+    bool is_closed_ = false;
 
     bool is_utp_enabled_ = false;
     bool is_pex_enabled_ = false;
@@ -778,51 +817,14 @@ private:
     bool is_idle_limited_ = false;
     bool is_prefetch_enabled_ = false;
     bool is_ratio_limited_ = false;
+    bool queue_stalled_enabled_ = false;
 
-    uint8_t peer_id_ttl_hours_ = 6;
-
-    struct init_data;
-    void initImpl(init_data&);
-    void setImpl(init_data&);
-    void closeImplStart();
-    void closeImplWaitForIdleUdp();
-    void closeImplFinish();
-
-    tr_port random_port_low_;
-    tr_port random_port_high_;
-
-    tr_rpc_func rpc_func_ = nullptr;
-    void* rpc_func_user_data_ = nullptr;
-
-    float desired_ratio_ = 2.0F;
-
-    uint16_t upload_slots_per_torrent_ = 8;
+    bool is_port_random_ = false;
 
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
-
-    tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
-
-    tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
-
-    bool is_closing_ = false;
-    bool is_closed_ = false;
-    bool is_port_random_ = false;
-
-    uint16_t peer_count_ = 0;
-    uint16_t peer_limit_ = 200;
-    uint16_t peer_limit_per_torrent_ = 50;
-
-    uint16_t idle_limit_minutes_;
-
-    std::array<bool, 2> queue_enabled_ = { false, false };
-    std::array<int, 2> queue_size_ = { 0, 0 };
-    int queue_stalled_minutes_ = 0;
-    bool queue_stalled_enabled_ = false;
-
-    static std::recursive_mutex session_mutex_;
 
     class WebMediator final : public tr_web::Mediator
     {
