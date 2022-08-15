@@ -415,7 +415,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
-    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peer_id_ttl_hours);
+    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTTLHours());
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio());
@@ -819,7 +819,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
     {
-        this->peer_id_ttl_hours = i;
+        this->peer_id_ttl_hours_ = i;
     }
 
     /* torrent queues */

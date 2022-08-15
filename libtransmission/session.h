@@ -460,8 +460,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    uint8_t peer_id_ttl_hours = 0;
-
     int umask = 0;
 
     struct tr_turtle_info turtle;
@@ -584,7 +582,7 @@ public:
         return peer_limit_per_torrent_;
     }
 
-    [[nodiscards]] auto constexpr uploadSlotsPerTorrent() const noexcept
+    [[nodiscard]] auto constexpr uploadSlotsPerTorrent() const noexcept
     {
         return upload_slots_per_torrent_;
     }
@@ -719,6 +717,11 @@ public:
         return desired_ratio_;
     }
 
+    [[nodiscard]] constexpr auto peerIdTTLHours() const noexcept
+    {
+        return peer_id_ttl_hours_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -760,6 +763,8 @@ private:
     bool is_idle_limited_ = false;
     bool is_prefetch_enabled_ = false;
     bool is_ratio_limited_ = false;
+
+    uint8_t peer_id_ttl_hours_ = 6;
 
     struct init_data;
     void initImpl(init_data&);
