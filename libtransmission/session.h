@@ -55,12 +55,8 @@ class tr_rpc_server;
 class tr_web;
 struct BlocklistFile;
 struct struct_utp_context;
-struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
-struct tr_bandwidth;
-struct tr_bindsockets;
-struct tr_fdInfo;
 
 struct tr_bindinfo
 {
