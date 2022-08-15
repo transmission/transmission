@@ -526,11 +526,6 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
-    // One of <netinet/ip.h>'s IPTOS_ values.
-    // See tr_netTos*() in libtransmission/net.h for more info
-    // Only session.cc should use this.
-    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
-
     [[nodiscard]] auto constexpr queueEnabled(tr_direction dir) const noexcept
     {
         return queue_enabled_[dir];
@@ -753,6 +748,10 @@ private:
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
     int umask_ = 022;
+
+    // One of <netinet/ip.h>'s IPTOS_ values.
+    // See tr_netTos*() in libtransmission/net.h for more info
+    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
     bool is_utp_enabled_ = false;
     bool is_pex_enabled_ = false;
