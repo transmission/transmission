@@ -583,7 +583,7 @@ void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
 
 double tr_sessionGetRawSpeed_KBps(tr_session const*, tr_direction);
 
-void tr_sessionSetRatioLimited(tr_session*, bool isLimited);
+void tr_sessionSetRatioLimited(tr_session*, bool is_limited);
 bool tr_sessionIsRatioLimited(tr_session const*);
 
 void tr_sessionSetRatioLimit(tr_session*, double desired_ratio);

@@ -298,14 +298,14 @@ double tr_torrentGetRatioLimit(tr_torrent const* tor)
 
 bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
 {
-    auto isLimited = bool{};
+    auto is_limited = bool{};
 
     TR_ASSERT(tr_isTorrent(tor));
 
     switch (tr_torrentGetRatioMode(tor))
     {
     case TR_RATIOLIMIT_SINGLE:
-        isLimited = true;
+        is_limited = true;
 
         if (ratio != nullptr)
         {
@@ -315,9 +315,9 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
         break;
 
     case TR_RATIOLIMIT_GLOBAL:
-        isLimited = tr_sessionIsRatioLimited(tor->session);
+        is_limited = tor->session->isRatioLimited();
 
-        if (isLimited && ratio != nullptr)
+        if (is_limited && ratio != nullptr)
         {
             *ratio = tor->session->desiredRatio();
         }
@@ -325,11 +325,11 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
         break;
 
     default: /* TR_RATIOLIMIT_UNLIMITED */
-        isLimited = false;
+        is_limited = false;
         break;
     }
 
-    return isLimited;
+    return is_limited;
 }
 
 /* returns true if the seed ratio applies --

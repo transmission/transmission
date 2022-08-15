@@ -460,8 +460,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isRatioLimited = false;
-
     uint8_t peer_id_ttl_hours = 0;
 
     int umask = 0;
@@ -708,6 +706,11 @@ public:
         return is_port_random_;
     }
 
+    [[nodiscard]] auto constexpr isRatioLimited() const noexcept
+    {
+        return is_ratio_limited_;
+    }
+
     [[nodiscard]] constexpr auto desiredRatio() const noexcept
     {
         return desired_ratio_;
@@ -739,6 +742,7 @@ private:
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
+    friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
@@ -752,6 +756,7 @@ private:
 
     bool is_idle_limited_ = false;
     bool is_prefetch_enabled_ = false;
+    bool is_ratio_limited_ = false;
 
     struct init_data;
     void initImpl(init_data&);
