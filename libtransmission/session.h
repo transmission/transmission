@@ -524,8 +524,6 @@ public:
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
-    std::unique_ptr<tr_rpc_server> rpc_server_;
-
     [[nodiscard]] auto constexpr queueEnabled(tr_direction dir) const noexcept
     {
         return queue_enabled_[dir];
@@ -707,15 +705,26 @@ private:
     void loadBlocklists();
 
     friend bool tr_blocklistExists(tr_session const* session);
+    friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
+    friend bool tr_sessionIsRPCEnabled(tr_session const* session);
+    friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
+    friend char const* tr_sessionGetRPCPassword(tr_session const* session);
+    friend char const* tr_sessionGetRPCUrl(tr_session const* session);
+    friend char const* tr_sessionGetRPCUsername(tr_session const* session);
+    friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -733,12 +742,20 @@ private:
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
+    friend void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
+    friend void tr_sessionSetRPCPassword(tr_session* session, char const* password);
+    friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetRPCPort(tr_session* session, uint16_t hport);
+    friend void tr_sessionSetRPCUrl(tr_session* session, char const* url);
+    friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+
+    std::unique_ptr<tr_rpc_server> rpc_server_;
 
     tr_announce_list default_trackers_;
 
