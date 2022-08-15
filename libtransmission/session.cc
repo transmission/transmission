@@ -399,8 +399,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, s->isSpeedLimited(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
-    tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, tr_sessionGetIdleLimit(s));
-    tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, tr_sessionIsIdleLimited(s));
+    tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, s->idleLimitMinutes());
+    tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, s->isIdleLimited());
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir(s));
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, tr_sessionIsIncompleteDirEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_message_level, tr_logGetLevel());
@@ -1297,7 +1297,7 @@ void tr_sessionSetIdleLimit(tr_session* session, uint16_t idleMinutes)
 {
     TR_ASSERT(session != nullptr);
 
-    session->idleLimitMinutes = idleMinutes;
+    session->idle_limit_minutes_ = idleMinutes;
 }
 
 bool tr_sessionIsIdleLimited(tr_session const* session)
@@ -1311,7 +1311,7 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->idleLimitMinutes;
+    return session->idleLimitMinutes();
 }
 
 /***

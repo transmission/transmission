@@ -539,8 +539,6 @@ public:
 
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
-    uint16_t idleLimitMinutes;
-
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
@@ -648,6 +646,11 @@ public:
         return is_idle_limited_;
     }
 
+    [[nodiscard]] auto constexpr idleLimitMinutes() const noexcept
+    {
+        return idle_limit_minutes_;
+    }
+
     [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
     {
         return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
@@ -726,6 +729,7 @@ private:
 
     void loadBlocklists();
 
+    friend void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend bool tr_blocklistExists(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
@@ -810,6 +814,8 @@ private:
     uint16_t peer_count_ = 0;
     uint16_t peer_limit_ = 200;
     uint16_t peer_limit_per_torrent_ = 50;
+
+    uint16_t idle_limit_minutes_;
 
     std::array<bool, 2> queue_enabled_ = { false, false };
     std::array<int, 2> queue_size_ = { 0, 0 };
