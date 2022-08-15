@@ -443,7 +443,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
-    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
+    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask_));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
@@ -728,14 +728,14 @@ void tr_session::setImpl(init_data& data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        this->umask = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
-        ::umask(this->umask);
+        this->umask_ = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
+        ::umask(this->umask_);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
     {
         /* Or as a base 10 integer to remain compatible with the old settings format. */
-        this->umask = (mode_t)i;
-        ::umask(this->umask);
+        this->umask_ = (mode_t)i;
+        ::umask(this->umask_);
     }
 
 #endif

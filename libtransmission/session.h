@@ -460,8 +460,6 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    int umask = 0;
-
     struct tr_turtle_info turtle;
 
     struct evdns_base* evdns_base = nullptr;
@@ -761,6 +759,8 @@ private:
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
+
+    int umask_ = 022;
 
     bool is_utp_enabled_ = false;
     bool is_pex_enabled_ = false;
