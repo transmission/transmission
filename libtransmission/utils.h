@@ -19,12 +19,6 @@
 #include "platform-quota.h"
 #include "tr-macros.h"
 
-/***
-****
-***/
-
-struct event;
-struct timeval;
 struct tr_error;
 
 /**
