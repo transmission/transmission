@@ -468,9 +468,6 @@ public:
 
     int umask = 0;
 
-    unsigned int speedLimit_Bps[2] = { 0, 0 };
-    bool speedLimitEnabled[2] = { false, false };
-
     struct tr_turtle_info turtle;
 
     struct evdns_base* evdns_base = nullptr;
@@ -681,7 +678,12 @@ public:
 
     [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const noexcept
     {
-        return speedLimit_Bps[dir];
+        return speed_limit_Bps_[dir];
+    }
+
+    [[nodiscard]] constexpr auto isSpeedLimited(tr_direction dir) const noexcept
+    {
+        return speed_limit_enabled_[dir];
     }
 
     [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
@@ -713,6 +715,7 @@ private:
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
+    friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
@@ -731,6 +734,10 @@ private:
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
+    friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps);
+
+    std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
+    std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
     bool is_pex_enabled_ = false;
     bool is_dht_enabled_ = false;

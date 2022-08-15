@@ -396,7 +396,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, s->queueSize(TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, s->queueEnabled(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited(s, TR_DOWN));
+    tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, s->isSpeedLimited(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
     tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, tr_sessionGetIdleLimit(s));
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, tr_sessionIsIdleLimited(s));
@@ -442,7 +442,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, tr_sessionGetAltSpeedEnd(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
+    tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->upload_slots_per_torrent);
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
@@ -1330,7 +1330,7 @@ std::optional<unsigned int> tr_session::activeSpeedLimitBps(tr_direction dir) co
         return tr_sessionGetAltSpeed_Bps(this, dir);
     }
 
-    if (tr_sessionIsSpeedLimited(this, dir))
+    if (isSpeedLimited(this, dir))
     {
         return speedLimitBps(dir);
     }
@@ -1471,19 +1471,19 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 ****  Primary session speed limits
 ***/
 
-static void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned int Bps)
+void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    s->speedLimit_Bps[d] = Bps;
+    session->speed_limit_Bps_[dir] = Bps;
 
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* s, tr_direction d, unsigned int KBps)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int KBps)
 {
-    tr_sessionSetSpeedLimit_Bps(s, d, tr_toSpeedBytes(KBps));
+    tr_sessionSetSpeedLimit_Bps(session, dir, tr_toSpeedBytes(KBps));
 }
 
 unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
@@ -1491,22 +1491,22 @@ unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
     return tr_toSpeedKBps(s->speedLimitBps(d));
 }
 
-void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
+void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    s->speedLimitEnabled[d] = b;
+    session->speed_limit_enabled_[dir] = limited;
 
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
-bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
+bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    return s->speedLimitEnabled[d];
+    return session->isSpeedLimited(dir);
 }
 
 /***

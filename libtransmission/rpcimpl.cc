@@ -2264,7 +2264,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_speed_limit_up_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsSpeedLimited(s, TR_UP));
+        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_UP));
         break;
 
     case TR_KEY_speed_limit_down:
@@ -2272,7 +2272,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_speed_limit_down_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsSpeedLimited(s, TR_DOWN));
+        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_DOWN));
         break;
 
     case TR_KEY_script_torrent_added_filename:
