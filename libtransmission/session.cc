@@ -647,8 +647,6 @@ void tr_session::onNowTimer()
     now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
 
-static void loadBlocklists(tr_session* session);
-
 void tr_session::initImpl(init_data& data)
 {
     auto lock = unique_lock();
@@ -1734,8 +1732,6 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-static void closeBlocklists(tr_session* /*session*/);
-
 void tr_session::closeImplStart()
 {
     is_closing_ = true;
@@ -2295,7 +2291,7 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
 void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_.clear();
-    loadBlocklists(session);
+    session->loadBlocklists();
 
     tr_peerMgrOnBlocklistChanged(session->peerMgr);
 }
