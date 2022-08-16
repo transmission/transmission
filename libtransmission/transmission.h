@@ -15,9 +15,7 @@
 #pragma once
 
 /***
-****
 ****  Basic Types
-****
 ***/
 
 #include <stdbool.h> /* bool */
@@ -53,8 +51,6 @@ struct tr_byte_span_t
     uint64_t begin;
     uint64_t end;
 };
-
-class tr_announce_list;
 
 struct tr_ctor;
 struct tr_error;
