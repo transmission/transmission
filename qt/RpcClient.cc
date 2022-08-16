@@ -16,7 +16,6 @@
 
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_free
 #include <libtransmission/version.h> // LONG_VERSION_STRING
 
 #include "VariantHelpers.h"
@@ -31,15 +30,14 @@ namespace
 char const constexpr* const RequestDataPropertyKey{ "requestData" };
 char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-void destroyVariant(tr_variant* json)
-{
-    tr_variantFree(json);
-    tr_free(json);
-}
-
 TrVariantPtr createVariant()
 {
-    return { tr_new0(tr_variant, 1), &destroyVariant };
+    return { new tr_variant{},
+             [](tr_variant* var)
+             {
+                 tr_variantFree(var);
+                 delete var;
+             } };
 }
 
 } // namespace
