@@ -11,7 +11,7 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
-#include <libtransmission/utils.h> // tr_free()
+#include <libtransmission/utils.h>
 
 #import "Torrent.h"
 #import "GroupsController.h"

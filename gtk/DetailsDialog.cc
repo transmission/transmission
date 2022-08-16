@@ -22,7 +22,7 @@
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_free */
+#include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h>
 
 #include "Actions.h"

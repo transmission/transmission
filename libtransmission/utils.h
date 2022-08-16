@@ -256,8 +256,7 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
  *        newly-allocated array of all the integers in the set.
- * @return a newly-allocated array of integers that must be freed with tr_free(),
- *         or nullptr if a fragment of the string can't be parsed.
+ * @return a vector of integers, which is empty if the string can't be parsed.
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
