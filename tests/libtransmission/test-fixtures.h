@@ -459,13 +459,7 @@ protected:
     {
         EXPECT_NE(nullptr, tor->session);
         tr_wait_msec(100);
-        EXPECT_TRUE(waitFor(
-            [tor]()
-            {
-                auto const activity = tr_torrentGetActivity(tor);
-                return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT && tor->checked_pieces_.hasAll();
-            },
-            4000));
+        EXPECT_TRUE(waitFor([tor]() { return tor->verifyState() == TR_VERIFY_NONE && tor->checked_pieces_.hasAll(); }, 4000));
     }
 
     void blockingTorrentVerify(tr_torrent* tor) const
