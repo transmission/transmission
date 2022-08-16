@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <optional>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -1535,14 +1536,14 @@ bool trashDataFile(char const* filename, tr_error** error)
 - (void)setFilePriority:(tr_priority_t)priority forIndexes:(NSIndexSet*)indexSet
 {
     NSUInteger const count = indexSet.count;
-    tr_file_index_t* files = static_cast<tr_file_index_t*>(tr_malloc(count * sizeof(tr_file_index_t)));
+    auto files = std::vector<tr_file_index_t>{};
+    files.resize(count);
     for (NSUInteger index = indexSet.firstIndex, i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index], i++)
     {
         files[i] = index;
     }
 
-    tr_torrentSetFilePriorities(self.fHandle, files, count, priority);
-    tr_free(files);
+    tr_torrentSetFilePriorities(self.fHandle, std::data(files), std::size(files), priority);
 }
 
 - (BOOL)hasFilePriority:(tr_priority_t)priority forIndexes:(NSIndexSet*)indexSet
