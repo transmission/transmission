@@ -110,38 +110,60 @@ static std::string xdgConfigHome()
     return fmt::format("{:s}/.config"sv, getHomeDir());
 }
 
-char* tr_getDefaultConfigDir(char const* appname)
+std::string tr_getDefaultConfigDir(std::string_view appname)
 {
-    if (auto dir = tr_env_get_string("TRANSMISSION_HOME"sv); !std::empty(dir))
+    if (std::empty(appname))
     {
-        return tr_strvDup(dir);
+        appname = "Transmission"sv;
     }
 
-    if (tr_str_is_empty(appname))
+    if (auto dir = tr_env_get_string("TRANSMISSION_HOME"sv); !std::empty(dir))
     {
-        appname = "Transmission";
+        return dir;
     }
 
 #ifdef __APPLE__
 
-    return tr_strvDup(fmt::format("{:s}/Library/Application Support/{:s}"sv, getHomeDir(), appname));
+    return fmt::format("{:s}/Library/Application Support/{:s}"sv, getHomeDir(), appname);
 
 #elif defined(_WIN32)
 
     auto const appdata = win32_get_known_folder(FOLDERID_LocalAppData);
-    return tr_strvDup(fmt::format("{:s}/{:s}"sv, appdata, appname));
+    return fmt::format("{:s}/{:s}"sv, appdata, appname);
 
 #elif defined(__HAIKU__)
 
     char buf[PATH_MAX];
     find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf));
-    return tr_strvDup(fmt::format("{:s}/{:s}"sv, buf, appname);
+    return fmt::format("{:s}/{:s}"sv, buf, appname);
 
 #else
 
-    return tr_strvDup(fmt::format("{:s}/{:s}"sv, xdgConfigHome(), appname));
+    return fmt::format("{:s}/{:s}"sv, xdgConfigHome(), appname);
 
 #endif
+}
+
+static size_t strToBuf(std::string const& src, char* buf, size_t buflen)
+{
+    size_t const len = std::size(src);
+
+    if (buflen >= len)
+    {
+        auto out = std::copy(std::begin(src), std::end(src), buf);
+
+        if (buflen > len)
+        {
+            *out = '\0';
+        }
+    }
+
+    return len;
+}
+
+size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen)
+{
+    return strToBuf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
 }
 
 static std::string getXdgEntryFromUserDirs(std::string_view key)

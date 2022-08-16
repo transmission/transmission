@@ -202,10 +202,9 @@ static bool reopen_log_file(char const* filename)
     return true;
 }
 
-static char const* getConfigDir(int argc, char const* const* argv)
+static std::string getConfigDir(int argc, char const* const* argv)
 {
     int c;
-    char const* configDir = nullptr;
     char const* optstr;
     int const ind = tr_optind;
 
@@ -213,19 +212,16 @@ static char const* getConfigDir(int argc, char const* const* argv)
     {
         if (c == 'g')
         {
-            configDir = optstr;
-            break;
+            return optstr;
         }
     }
 
     tr_optind = ind;
 
-    if (configDir == nullptr)
-    {
-        configDir = tr_getDefaultConfigDir(MyName);
-    }
-
-    return configDir;
+    auto config_dir = std::string{};
+    config_dir.resize(tr_getDefaultConfigDir(MyName, nullptr, 0U));
+    tr_getDefaultConfigDir(MyName, std::data(config_dir), std::size(config_dir));
+    return config_dir;
 }
 
 static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
@@ -671,7 +667,7 @@ static bool parse_args(
 struct daemon_data
 {
     tr_variant settings;
-    char const* configDir;
+    std::string config_dir;
     bool paused;
 };
 
@@ -719,7 +715,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     auto* arg = static_cast<daemon_data*>(varg);
     tr_variant* const settings = &arg->settings;
-    char const* const configDir = arg->configDir;
+    char const* const config_dir = arg->config_dir.c_str();
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
@@ -744,10 +740,10 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
-    session = tr_sessionInit(configDir, true, settings);
+    session = tr_sessionInit(config_dir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", configDir)));
-    tr_sessionSaveSettings(session, configDir, settings);
+    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", config_dir)));
+    tr_sessionSaveSettings(session, config_dir, settings);
 
     auto sv = std::string_view{};
     (void)tr_variantDictFindStrView(settings, key_pidfile, &sv);
@@ -893,7 +889,7 @@ CLEANUP:
 
     event_base_free(ev_base);
 
-    tr_sessionSaveSettings(mySession, configDir, settings);
+    tr_sessionSaveSettings(mySession, config_dir, settings);
     tr_sessionClose(mySession);
     pumpLogMessages(logfile);
     printf(" done.\n");
@@ -922,12 +918,12 @@ CLEANUP:
 
 static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground, int* ret)
 {
-    data->configDir = getConfigDir(argc, (char const* const*)argv);
+    data->config_dir = getConfigDir(argc, (char const* const*)argv);
 
     /* load settings from defaults + config file */
     tr_variantInitDict(&data->settings, 0);
     tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MyName);
+    bool const loaded = tr_sessionLoadSettings(&data->settings, data->config_dir.c_str(), MyName);
 
     bool dumpSettings;
 

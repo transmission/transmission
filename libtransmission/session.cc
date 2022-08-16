@@ -469,9 +469,8 @@ static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char 
         return;
     }
 
-    auto* const default_config_dir = tr_getDefaultConfigDir(appname);
+    auto const default_config_dir = tr_getDefaultConfigDir(appname);
     setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
-    tr_free(default_config_dir);
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* appName)

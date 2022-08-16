@@ -53,8 +53,8 @@ TEST_F(PlatformTest, defaultConfigDirEnv)
 {
     setenv("TRANSMISSION_HOME", sandboxDir().c_str(), 1);
 
-    auto actual = makeString(tr_getDefaultConfigDir("appname"));
-    auto expected = sandboxDir();
+    auto const expected = sandboxDir();
+    auto const actual = tr_getDefaultConfigDir("appname");
     EXPECT_EQ(expected, actual);
 
     unsetenv("TRANSMISSION_HOME");
@@ -66,8 +66,8 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfig)
 {
     setenv("XDG_CONFIG_HOME", sandboxDir().c_str(), 1);
 
-    auto expected = fmt::format("{:s}/appname", sandboxDir());
-    auto actual = makeString(tr_getDefaultConfigDir("appname"));
+    auto const expected = fmt::format("{:s}/appname", sandboxDir());
+    auto const actual = tr_getDefaultConfigDir("appname");
     EXPECT_EQ(expected, actual);
 
     unsetenv("XDG_CONFIG_HOME");
@@ -78,8 +78,8 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
     auto const home = tr_pathbuf{ sandboxDir(), "/home/user" };
     setenv("HOME", home, 1);
 
-    auto expected = fmt::format("{:s}/.config/appname", home.sv());
-    auto actual = makeString(tr_getDefaultConfigDir("appname"));
+    auto const expected = fmt::format("{:s}/.config/appname", home.sv());
+    auto const actual = tr_getDefaultConfigDir("appname");
     EXPECT_EQ(expected, actual);
 
     unsetenv("HOME");

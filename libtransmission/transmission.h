@@ -25,6 +25,11 @@
 #include <stdint.h> /* uintN_t */
 #include <time.h> /* time_t */
 
+#ifdef __cplusplus
+#include <string>
+#include <string_view>
+#endif
+
 #include "tr-macros.h"
 
 using tr_file_index_t = uint32_t;
@@ -97,9 +102,7 @@ enum tr_encryption_mode
  */
 
 /**
- * @brief returns Transmission's default configuration file directory.
- *
- * Use tr_free() to free the string when done.
+ * @brief get Transmission's default configuration file directory.
  *
  * The default configuration directory is determined this way:
  * -# If the TRANSMISSION_HOME environment variable is set, its value is used.
@@ -108,7 +111,18 @@ enum tr_encryption_mode
  * -# If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
  * -# ${HOME}/.config/${appname}" is used as a last resort.
  */
-char* tr_getDefaultConfigDir(char const* appname);
+#ifdef __cplusplus
+std::string tr_getDefaultConfigDir(std::string_view appname);
+#endif
+
+/**
+ * @brief buffer variant for tr_getDefaultConfigDir().
+ *
+ * Always returns the strlen() of the full path.
+ * `buf` will get the full path iff buflen >= strlen().
+ * `buf` will also be zero terminated iff buflen >= strlen() + 1.
+ */
+size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
  * @brief returns Transmisson's default download directory.
