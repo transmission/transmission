@@ -88,9 +88,9 @@ public:
     {
     }
 
-    ~tr_bandwidth()
+    ~tr_bandwidth() noexcept
     {
-        this->setParent(nullptr);
+        deparent();
     }
 
     tr_bandwidth& operator=(tr_bandwidth&&) = delete;
@@ -118,6 +118,8 @@ public:
     void allocate(tr_direction dir, unsigned int period_msec);
 
     void setParent(tr_bandwidth* new_parent);
+
+    void deparent() noexcept;
 
     [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {
