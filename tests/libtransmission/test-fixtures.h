@@ -71,13 +71,6 @@ static void depthFirstWalk(char const* path, file_func_t func)
     func(path);
 }
 
-inline std::string makeString(char*&& s)
-{
-    auto const ret = std::string(s != nullptr ? s : "");
-    tr_free(s);
-    return ret;
-}
-
 inline bool waitFor(std::function<bool()> const& test, int msec)
 {
     auto const deadline = std::chrono::milliseconds{ msec };

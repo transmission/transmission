@@ -15,7 +15,6 @@
 
 using namespace std::literals;
 using PlatformTest = ::libtransmission::test::SessionTest;
-using ::libtransmission::test::makeString;
 
 #ifdef _WIN32
 #include <windows.h>
