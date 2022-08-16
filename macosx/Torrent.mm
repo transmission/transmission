@@ -361,7 +361,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)magnetLink
 {
-    return @(tr_torrentGetMagnetLink(self.fHandle));
+    return @(tr_torrentGetMagnetLink(self.fHandle).c_str());
 }
 
 - (CGFloat)ratio

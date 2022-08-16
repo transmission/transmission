@@ -1382,7 +1382,7 @@ tr_torrent* Application::Impl::get_first_selected_torrent() const
 
 void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
 {
-    char* magnet = tr_torrentGetMagnetLink(tor);
+    auto const magnet = tr_torrentGetMagnetLink(tor);
     auto const display = wind_->get_display();
     GdkAtom selection;
     Glib::RefPtr<Gtk::Clipboard> clipboard;
@@ -1396,9 +1396,6 @@ void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
     selection = GDK_SELECTION_PRIMARY;
     clipboard = Gtk::Clipboard::get_for_display(display, selection);
     clipboard->set_text(magnet);
-
-    /* cleanup */
-    tr_free(magnet);
 }
 
 void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data)

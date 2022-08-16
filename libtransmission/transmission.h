@@ -1025,9 +1025,7 @@ uint64_t tr_torrentTotalSize(tr_torrent const*);
 /**
  * @brief find the location of a torrent's file by looking with and without
  *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
- * @return a newly-allocated string (that must be tr_free()d by the caller
- *         when done) that gives the location of this file on disk,
- *         or nullptr if no file exists yet.
+ * @return the path of this file, or an empty string if no file exists yet.
  * @param tor the torrent whose file we're looking for
  * @param fileNum the fileIndex, in [0...tr_torrentFileCount())
  */
@@ -1155,7 +1153,14 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
  * Returns a newly-allocated string with a magnet link of the torrent.
  * Use tr_free() to free the string when done.
  */
-char* tr_torrentGetMagnetLink(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
+#endif
+
+/**
+ * Buffer variant of tr_torrentGetMagnetLink(). See utils' tr_strvToBuf().
+ */
+size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
 ***
