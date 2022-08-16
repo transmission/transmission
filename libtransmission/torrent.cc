@@ -1243,9 +1243,14 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     return ret;
 }
 
-char* tr_torrentFilename(tr_torrent const* tor)
+std::string tr_torrentFilename(tr_torrent const* tor)
 {
-    return tr_strvDup(tor->torrentFile());
+    return std::string{ tor->torrentFile() };
+}
+
+size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
+{
+    return tr_strvToBuf(tr_torrentFilename(tor), buf, buflen);
 }
 
 /***

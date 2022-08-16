@@ -1034,7 +1034,7 @@ uint64_t tr_torrentTotalSize(tr_torrent const*);
 #endif
 
 /**
- * @brief buffer variant of tr_torrentFindFile(). See utils' tr_strvToBuf().
+ * @brief buffer variant of tr_torrentFindFile(). See tr_strvToBuf().
  */
 size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
@@ -1150,15 +1150,14 @@ char const* tr_torrentGetDownloadDir(tr_torrent const* torrent);
 char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 
 /**
- * Returns a newly-allocated string with a magnet link of the torrent.
- * Use tr_free() to free the string when done.
+ * Returns a the magnet link to the torrent.
  */
 #ifdef __cplusplus
 [[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
 #endif
 
 /**
- * Buffer variant of tr_torrentGetMagnetLink(). See utils' tr_strvToBuf().
+ * Buffer variant of tr_torrentGetMagnetLink(). See tr_strvToBuf().
  */
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
@@ -1463,9 +1462,15 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 
 /*
  * Get the filename of Transmission's internal copy of the torrent file.
- * This is a duplicate that must be freed with tr_free() when done.
  */
-char* tr_torrentFilename(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
+#endif
+
+/**
+ * @brief buffer variant of tr_torrentFilename(). See tr_strvToBuf().
+ */
+size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /***********************************************************************
  * tr_torrentAvailability
