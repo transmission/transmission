@@ -390,22 +390,19 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
     return all_good;
 }
 
-static char* strip_non_utf8(std::string_view sv)
+static std::string strip_non_utf8(std::string_view sv)
 {
-    auto* const ret = tr_new(char, std::size(sv) + 1);
-    if (ret != nullptr)
-    {
-        auto const it = utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), ret, '?');
-        *it = '\0';
-    }
-    return ret;
+    auto out = std::string{};
+    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), '?');
+    return out;
 }
 
-static char* to_utf8(std::string_view sv)
+static std::string to_utf8(std::string_view sv)
 {
 #ifdef HAVE_ICONV
     size_t const buflen = std::size(sv) * 4 + 10;
-    auto* const out = tr_new(char, buflen);
+    auto buf = std::vector<char>{};
+    buf.resize(buflen);
 
     auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
     for (auto const* test_encoding : Encodings)
@@ -421,40 +418,30 @@ static char* to_utf8(std::string_view sv)
 #else
         auto* inbuf = const_cast<char*>(std::data(sv));
 #endif
-        char* outbuf = out;
         size_t inbytesleft = std::size(sv);
-        size_t outbytesleft = buflen;
-        auto const rv = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+        char* out = std::data(buf);
+        size_t outbytesleft = std::size(buf);
+        auto const rv = iconv(cd, &inbuf, &inbytesleft, &out, &outbytesleft);
         iconv_close(cd);
         if (rv != size_t(-1))
         {
-            char* const ret = tr_strvDup({ out, buflen - outbytesleft });
-            tr_free(out);
-            return ret;
+            return std::string{ std::data(buf), buflen - outbytesleft };
         }
     }
-
-    tr_free(out);
 
 #endif
 
     return strip_non_utf8(sv);
 }
 
-std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
+std::string tr_strvUtf8Clean(std::string_view cleanme)
 {
     if (tr_utf8_validate(cleanme, nullptr))
     {
-        setme = cleanme;
-    }
-    else
-    {
-        auto* const tmp = to_utf8(cleanme);
-        setme.assign(tmp != nullptr ? tmp : "");
-        tr_free(tmp);
+        return std::string{ cleanme };
     }
 
-    return setme;
+    return to_utf8(cleanme);
 }
 
 #ifdef _WIN32

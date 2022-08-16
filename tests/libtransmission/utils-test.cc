@@ -124,43 +124,51 @@ TEST_F(UtilsTest, trStrvDup)
 TEST_F(UtilsTest, trStrvUtf8Clean)
 {
     auto in = "hello world"sv;
-    auto out = std::string{};
-    tr_strvUtf8Clean(in, out);
+    auto out = tr_strvUtf8Clean(in);
     EXPECT_EQ(in, out);
 
     in = "hello world"sv;
-    tr_strvUtf8Clean(in.substr(0, 5), out);
+    out = tr_strvUtf8Clean(in.substr(0, 5));
     EXPECT_EQ("hello"sv, out);
 
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
-    tr_strvUtf8Clean(in, out);
+    out = tr_strvUtf8Clean(in);
     EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом"sv;
-    tr_strvUtf8Clean(in, out);
-    EXPECT_NE(nullptr, out.data());
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(0U, std::size(out));
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
     EXPECT_EQ(in, out);
 
     // https://trac.transmissionbt.com/ticket/6064
-    // TODO(anyone): It seems like that bug was not fixed so much as we just
-    // let strlen() solve the problem for us; however, it's probably better
-    // to wait until https://github.com/transmission/transmission/issues/612
-    // is resolved before revisiting this.
+    // This was a fuzzer-generated string that crashed Transmission.
+    // Even invalid strings shouldn't cause a crash.
     in = "\xF4\x00\x81\x82"sv;
-    tr_strvUtf8Clean(in, out);
-    EXPECT_NE(nullptr, out.data());
-    EXPECT_TRUE(out.size() == 1 || out.size() == 2);
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(0U, std::size(out));
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     in = "\xF4\x33\x81\x82"sv;
-    tr_strvUtf8Clean(in, out);
+    out = tr_strvUtf8Clean(in);
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 4 || out.size() == 7);
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+}
+
+TEST_F(UtilsTest, trStrvUtf8CleanFuzz)
+{
+    auto buf = std::vector<char>{};
+    for (size_t i = 0; i < 1000; ++i)
+    {
+        buf.resize(tr_rand_int(4096));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        auto const out = tr_strvUtf8Clean({ std::data(buf), std::size(buf) });
+        EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    }
 }
 
 TEST_F(UtilsTest, trParseNumberRange)
