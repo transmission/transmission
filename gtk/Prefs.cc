@@ -49,9 +49,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
 
     if (dir.empty())
     {
-        auto* const tmp = tr_getDefaultDownloadDir();
-        dir = tmp;
-        tr_free(tmp);
+        dir = tr_getDefaultDownloadDir();
     }
 
     tr_variantDictReserve(d, 31);

@@ -28,8 +28,8 @@ TEST_F(PlatformTest, defaultDownloadDirXdg)
     setenv("HOME", sandboxDir().c_str(), 1);
     setenv("XDG_CONFIG_HOME", LIBTRANSMISSION_TEST_ASSETS_DIR, 1);
 
-    auto actual = makeString(tr_getDefaultDownloadDir());
-    auto expected = fmt::format("{:s}/UserDirsDownloads"sv, sandboxDir());
+    auto const expected = fmt::format("{:s}/UserDirsDownloads"sv, sandboxDir());
+    auto const actual = tr_getDefaultDownloadDir();
     EXPECT_EQ(expected, actual);
 
     unsetenv("XDG_CONFIG_HOME");
@@ -41,8 +41,8 @@ TEST_F(PlatformTest, defaultDownloadDir)
 {
     setenv("HOME", sandboxDir().c_str(), 1);
 
-    auto expected = fmt::format("{:s}/Downloads"sv, sandboxDir());
-    auto actual = makeString(tr_getDefaultDownloadDir());
+    auto const expected = fmt::format("{:s}/Downloads"sv, sandboxDir());
+    auto const actual = tr_getDefaultDownloadDir();
     EXPECT_EQ(expected, actual);
 
     unsetenv("HOME");

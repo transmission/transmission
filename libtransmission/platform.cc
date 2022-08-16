@@ -144,26 +144,9 @@ std::string tr_getDefaultConfigDir(std::string_view appname)
 #endif
 }
 
-static size_t strToBuf(std::string const& src, char* buf, size_t buflen)
-{
-    size_t const len = std::size(src);
-
-    if (buflen >= len)
-    {
-        auto out = std::copy(std::begin(src), std::end(src), buf);
-
-        if (buflen > len)
-        {
-            *out = '\0';
-        }
-    }
-
-    return len;
-}
-
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen)
 {
-    return strToBuf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
+    return tr_strvToBuf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
 }
 
 static std::string getXdgEntryFromUserDirs(std::string_view key)
@@ -200,25 +183,30 @@ static std::string getXdgEntryFromUserDirs(std::string_view key)
     return val;
 }
 
-char* tr_getDefaultDownloadDir()
+std::string tr_getDefaultDownloadDir()
 {
-    if (auto const dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv); !std::empty(dir))
+    if (auto dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv); !std::empty(dir))
     {
-        return tr_strvDup(dir);
+        return dir;
     }
 
 #ifdef _WIN32
     if (auto dir = win32_get_known_folder(FOLDERID_Downloads); !std::empty(dir))
     {
-        return tr_strvDup(dir);
+        return dir;
     }
 #endif
 
 #ifdef __HAIKU__
-    return tr_strvDup(fmt::format("{:s}/Desktop"sv, getHomeDir()));
+    return fmt::format("{:s}/Desktop"sv, getHomeDir());
 #endif
 
-    return tr_strvDup(fmt::format("{:s}/Downloads"sv, getHomeDir()));
+    return fmt::format("{:s}/Downloads"sv, getHomeDir());
+}
+
+size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen)
+{
+    return tr_strvToBuf(tr_getDefaultDownloadDir(), buf, buflen);
 }
 
 /***

@@ -218,10 +218,7 @@ static std::string getConfigDir(int argc, char const* const* argv)
 
     tr_optind = ind;
 
-    auto config_dir = std::string{};
-    config_dir.resize(tr_getDefaultConfigDir(MyName, nullptr, 0U));
-    tr_getDefaultConfigDir(MyName, std::data(config_dir), std::size(config_dir));
-    return config_dir;
+    return tr_getDefaultConfigDir(MyName);
 }
 
 static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)

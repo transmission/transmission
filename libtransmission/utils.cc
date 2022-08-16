@@ -222,6 +222,23 @@ char* tr_strdup(void const* in)
     return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
 }
 
+size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
+{
+    size_t const len = std::size(src);
+
+    if (buflen >= len)
+    {
+        auto const out = std::copy(std::begin(src), std::end(src), buf);
+
+        if (buflen > len)
+        {
+            *out = '\0';
+        }
+    }
+
+    return len;
+}
+
 extern "C"
 {
     int DoMatch(char const* text, char const* p);

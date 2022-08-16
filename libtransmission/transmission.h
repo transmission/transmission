@@ -112,29 +112,30 @@ enum tr_encryption_mode
  * -# ${HOME}/.config/${appname}" is used as a last resort.
  */
 #ifdef __cplusplus
-std::string tr_getDefaultConfigDir(std::string_view appname);
+[[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
 #endif
 
 /**
- * @brief buffer variant for tr_getDefaultConfigDir().
- *
- * Always returns the strlen() of the full path.
- * `buf` will get the full path iff buflen >= strlen().
- * `buf` will also be zero terminated iff buflen >= strlen() + 1.
+ * @brief buffer variant of tr_getDefaultConfigDir(). See tr_strvToBuf().
  */
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
  * @brief returns Transmisson's default download directory.
  *
- * Use tr_free() to free the string when done.
- *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
  * -# On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
  * -# Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
  */
-char* tr_getDefaultDownloadDir();
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_getDefaultDownloadDir();
+#endif
+
+/**
+ * @brief buffer variant of tr_getDefaultConfigDir(). See tr_strvToBuf().
+ */
+size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 #define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
 #define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"

@@ -296,7 +296,7 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
 
 void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 {
-    auto* const download_dir = tr_getDefaultDownloadDir();
+    auto const download_dir = tr_getDefaultDownloadDir();
 
     auto* const d = setme_dictionary;
     TR_ASSERT(tr_variantIsDict(d));
@@ -376,8 +376,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
     tr_variantDictAddStrView(d, TR_KEY_announce_ip, "");
     tr_variantDictAddBool(d, TR_KEY_announce_ip_enabled, false);
-
-    tr_free(download_dir);
 }
 
 void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
