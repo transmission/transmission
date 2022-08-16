@@ -2,6 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <vector>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
@@ -26,7 +28,7 @@ enum
 
 @interface PiecesView ()
 
-@property(nonatomic) int8_t* fPieces;
+@property(nonatomic) std::vector<int8_t> fPieces;
 
 @property(nonatomic) NSInteger fNumPieces;
 @property(nonatomic) NSInteger fAcross;
@@ -57,7 +59,6 @@ enum
 
 - (void)dealloc
 {
-    tr_free(_fPieces);
 }
 
 - (void)setTorrent:(Torrent*)torrent
@@ -84,8 +85,7 @@ enum
 
 - (void)clearView
 {
-    tr_free(self.fPieces);
-    self.fPieces = NULL;
+    self.fPieces.clear();
 }
 
 - (void)updateView
@@ -95,26 +95,24 @@ enum
         return;
     }
 
-    //determine if first time
-    BOOL const first = self.fPieces == NULL;
-    if (first)
+    if (std::empty(self.fPieces))
     {
-        self.fPieces = (int8_t*)tr_malloc(self.fNumPieces * sizeof(int8_t));
+        self.fPieces.resize(self.fNumPieces);
     }
 
-    int8_t* pieces = NULL;
-    float* piecesPercent = NULL;
+    auto pieces = std::vector<int8_t>{};
+    auto piecesPercent = std::vector<float>{};
 
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     if (showAvailability)
     {
-        pieces = (int8_t*)tr_malloc(self.fNumPieces * sizeof(int8_t));
-        [self.torrent getAvailability:pieces size:self.fNumPieces];
+        pieces.resize(self.fNumPieces);
+        [self.torrent getAvailability:std::data(pieces) size:std::size(pieces)];
     }
     else
     {
-        piecesPercent = (float*)tr_malloc(self.fNumPieces * sizeof(float));
-        [self.torrent getAmountFinished:piecesPercent size:self.fNumPieces];
+        piecesPercent.resize(self.fNumPieces);
+        [self.torrent getAmountFinished:std::data(piecesPercent) size:std::size(piecesPercent)];
     }
 
     NSImage* image = self.image;
@@ -193,9 +191,6 @@ enum
         [image unlockFocus];
         [self setNeedsDisplay];
     }
-
-    tr_free(pieces);
-    tr_free(piecesPercent);
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent*)event
