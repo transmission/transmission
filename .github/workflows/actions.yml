@@ -246,7 +246,6 @@ jobs:
             curl-dev \
             fmt-dev \
             g++ \
-            gettext \
             gettext-dev \
             git \
             libevent-dev \
