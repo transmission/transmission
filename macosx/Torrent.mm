@@ -785,16 +785,8 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
     else
     {
-        char* location = tr_torrentFindFile(self.fHandle, 0);
-        if (location == NULL)
-        {
-            return nil;
-        }
-
-        NSString* dataLocation = @(location);
-        free(location);
-
-        return dataLocation;
+        auto const location = tr_torrentFindFile(self.fHandle, 0);
+        return std::empty(location) ? nil : @(location.c_str());
     }
 }
 
@@ -814,16 +806,8 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
     else
     {
-        char* location = tr_torrentFindFile(self.fHandle, node.indexes.firstIndex);
-        if (location == NULL)
-        {
-            return nil;
-        }
-
-        NSString* dataLocation = @(location);
-        free(location);
-
-        return dataLocation;
+        auto const location = tr_torrentFindFile(self.fHandle, node.indexes.firstIndex);
+        return std::empty(location) ? nil : @(location.c_str());
     }
 }
 

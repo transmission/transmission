@@ -1031,7 +1031,14 @@ uint64_t tr_torrentTotalSize(tr_torrent const*);
  * @param tor the torrent whose file we're looking for
  * @param fileNum the fileIndex, in [0...tr_torrentFileCount())
  */
-char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
+#endif
+
+/**
+ * @brief buffer variant of tr_torrentFindFile(). See utils' tr_strvToBuf().
+ */
+size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
 /***
 ****  Torrent speed limits

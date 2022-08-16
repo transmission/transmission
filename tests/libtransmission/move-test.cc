@@ -60,9 +60,9 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto path = tr_pathbuf{};
 
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, tr_torrent_files::PartialFileSuffix);
-    EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 0)));
+    EXPECT_EQ(path, tr_torrentFindFile(tor, 0));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
-    EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 1)));
+    EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
     EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
@@ -129,7 +129,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     for (tr_file_index_t i = 0; i < n; ++i)
     {
         auto const expected = tr_pathbuf{ download_dir, '/', tr_torrentFile(tor, i).name };
-        EXPECT_EQ(expected, makeString(tr_torrentFindFile(tor, i)));
+        EXPECT_EQ(expected, tr_torrentFindFile(tor, i));
     }
 
     // cleanup
@@ -183,7 +183,7 @@ TEST_F(MoveTest, setLocation)
     for (tr_file_index_t i = 0; i < n; ++i)
     {
         auto const expected = tr_pathbuf{ target_dir, '/', tr_torrentFile(tor, i).name };
-        EXPECT_EQ(expected, makeString(tr_torrentFindFile(tor, i)));
+        EXPECT_EQ(expected, tr_torrentFindFile(tor, i));
     }
 
     // cleanup
