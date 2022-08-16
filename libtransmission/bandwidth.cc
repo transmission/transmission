@@ -101,15 +101,22 @@ static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me)
     }
 }
 
+void tr_bandwidth::deparent() noexcept
+{
+    if (parent_ == nullptr)
+    {
+        return;
+    }
+
+    remove_child(parent_->children_, this);
+    parent_ = nullptr;
+}
+
 void tr_bandwidth::setParent(tr_bandwidth* new_parent)
 {
     TR_ASSERT(this != new_parent);
 
-    if (this->parent_ != nullptr)
-    {
-        remove_child(this->parent_->children_, this);
-        this->parent_ = nullptr;
-    }
+    deparent();
 
     if (new_parent != nullptr)
     {

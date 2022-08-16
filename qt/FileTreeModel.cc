@@ -286,9 +286,12 @@ void FileTreeModel::clearSubtree(QModelIndex const& top)
         return;
     }
 
-    if (item->fileIndex() != -1)
+    if (auto const idx = item->fileIndex(); idx != -1)
     {
-        index_cache_.remove(item->fileIndex());
+        if (auto const iter = index_cache_.find(idx); iter != std::end(index_cache_))
+        {
+            index_cache_.erase(iter);
+        }
     }
 
     delete item;
@@ -301,12 +304,13 @@ void FileTreeModel::clear()
     root_item_ = std::make_unique<FileTreeItem>();
     endResetModel();
 
-    assert(index_cache_.isEmpty());
+    assert(std::empty(index_cache_));
 }
 
 FileTreeItem* FileTreeModel::findItemForFileIndex(int file_index) const
 {
-    return index_cache_.value(file_index, nullptr);
+    auto iter = index_cache_.find(file_index);
+    return iter == std::end(index_cache_) ? nullptr : iter->second;
 }
 
 void FileTreeModel::addFile(
