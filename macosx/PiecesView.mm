@@ -95,7 +95,9 @@ enum
         return;
     }
 
-    if (std::empty(self.fPieces))
+    //determine if first time
+    BOOL const first = std::empty(self.fPieces);
+    if (first)
     {
         self.fPieces.resize(self.fNumPieces);
     }
