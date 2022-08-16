@@ -217,11 +217,6 @@ char* tr_strvDup(std::string_view in)
     return ret;
 }
 
-char* tr_strdup(void const* in)
-{
-    return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
-}
-
 size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
 {
     size_t const len = std::size(src);

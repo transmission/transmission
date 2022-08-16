@@ -1157,7 +1157,7 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 #endif
 
 /**
- * Buffer variant of tr_torrentGetMagnetLink(). See tr_strvToBuf().
+ * @brief buffer variant of tr_torrentGetMagnetLink(). See tr_strvToBuf().
  */
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
@@ -1180,7 +1180,7 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
 #endif
 
 /**
- * @brief Buffer variant of tr_torrentGetTrackerList(). See tr_strvToBuf().
+ * @brief buffer variant of tr_torrentGetTrackerList(). See tr_strvToBuf().
  */
 size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 

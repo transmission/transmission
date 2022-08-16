@@ -141,13 +141,6 @@ void tr_free(void* p);
 #define tr_renew(struct_type, mem, n_structs) \
     (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
-/**
- * @brief make a newly-allocated copy of a string
- * @param in is a void* so that callers can pass in both signed & unsigned without a cast
- * @return a newly-allocated copy of `in' that can be freed with tr_free()
- */
-[[nodiscard]] char* tr_strdup(void const* in);
-
 constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';
