@@ -245,6 +245,7 @@ jobs:
             cmake \
             g++ \
             gettext \
+            gettext-dev \
             git \
             curl-dev \
             fmt-dev \
