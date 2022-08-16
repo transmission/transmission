@@ -2063,9 +2063,14 @@ bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
     return text != nullptr && tor->setTrackerList(text);
 }
 
-char* tr_torrentGetTrackerList(tr_torrent const* tor)
+std::string tr_torrentGetTrackerList(tr_torrent const* tor)
 {
-    return tr_strvDup(tor->trackerList());
+    return tor->trackerList();
+}
+
+size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen)
+{
+    return tr_strvToBuf(tr_torrentGetTrackerList(tor), buf, buflen);
 }
 
 /**

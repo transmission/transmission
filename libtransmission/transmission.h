@@ -1166,7 +1166,7 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
 **/
 
 /**
- * Returns a newly-allocated string listing its tracker's announce URLs.
+ * Returns a string listing its tracker's announce URLs.
  * One URL per line, with a blank line between tiers.
  *
  * NOTE: this only includes the trackers included in the torrent and,
@@ -1175,7 +1175,14 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
  * are applied to all public torrents. If you want a full display of all
  * trackers, use tr_torrentTracker() and tr_torrentTrackerCount()
  */
-char* tr_torrentGetTrackerList(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
+#endif
+
+/**
+ * @brief Buffer variant of tr_torrentGetTrackerList(). See tr_strvToBuf().
+ */
+size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
  * Sets a torrent's tracker list from a list of announce URLs with one
