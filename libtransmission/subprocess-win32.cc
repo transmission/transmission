@@ -10,6 +10,7 @@
 #include <cwchar>
 #include <map>
 #include <iterator>
+#include <string>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -141,27 +142,20 @@ auto get_current_env()
     return env;
 }
 
-void append_argument(char** arguments, char const* argument)
+void append_argument(std::string& arguments, char const* argument)
 {
-    size_t arguments_len = *arguments != nullptr ? strlen(*arguments) : 0u;
-    size_t const argument_len = strlen(argument);
-
-    if (arguments_len > 0)
+    if (!std::empty(arguments))
     {
-        (*arguments)[arguments_len++] = ' ';
+        arguments += ' ';
     }
 
     if (!tr_str_is_empty(argument) && strpbrk(argument, " \t\n\v\"") == nullptr)
     {
-        *arguments = tr_renew(char, *arguments, arguments_len + argument_len + 2);
-        strcpy(*arguments + arguments_len, argument);
+        arguments += argument;
         return;
     }
 
-    *arguments = tr_renew(char, *arguments, arguments_len + argument_len * 2 + 4);
-
-    char* dst = *arguments + arguments_len;
-    *(dst++) = '"';
+    arguments += '"';
 
     for (char const* src = argument; *src != '\0';)
     {
@@ -186,18 +180,16 @@ void append_argument(char** arguments, char const* argument)
 
         if (backslash_count != 0)
         {
-            memset(dst, '\\', backslash_count);
-            dst += backslash_count;
+            arguments.append(backslash_count, '\\');
         }
 
         if (*src != '\0')
         {
-            *(dst++) = *(src++);
+            arguments += *src++;
         }
     }
 
-    *(dst++) = '"';
-    *(dst++) = '\0';
+    arguments += '"';
 }
 
 bool contains_batch_metachars(char const* text)
@@ -223,7 +215,7 @@ auto get_app_type(char const* app)
     return tr_app_type::EXE;
 }
 
-void append_app_launcher_arguments(tr_app_type app_type, char** args)
+void append_app_launcher_arguments(tr_app_type app_type, std::string& args)
 {
     switch (app_type)
     {
@@ -249,28 +241,25 @@ std::wstring construct_cmd_line(char const* const* cmd)
 {
     auto const app_type = get_app_type(cmd[0]);
 
-    char* args = nullptr;
+    auto args = std::string{};
 
-    append_app_launcher_arguments(app_type, &args);
+    append_app_launcher_arguments(app_type, args);
 
     for (size_t i = 0; cmd[i] != nullptr; ++i)
     {
         if (app_type == tr_app_type::BATCH && i > 0 && contains_batch_metachars(cmd[i]))
         {
             /* FIXME: My attempts to escape them one or another way didn't lead to anything good so far */
-            tr_free(args);
-            args = nullptr;
+            args.clear();
             break;
         }
 
-        append_argument(&args, cmd[i]);
+        append_argument(args, cmd[i]);
     }
 
-    if (args != nullptr)
+    if (!std::empty(args))
     {
-        auto cmd_line = tr_win32_utf8_to_native(args);
-        tr_free(args);
-        return cmd_line;
+        return tr_win32_utf8_to_native(args);
     }
 
     return {};
