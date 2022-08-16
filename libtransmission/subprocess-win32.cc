@@ -149,7 +149,7 @@ void append_argument(std::string& arguments, char const* argument)
         arguments += ' ';
     }
 
-    if (!std::empty(argument) && strpbrk(argument, " \t\n\v\"") == nullptr)
+    if (!tr_str_is_empty(argument) && strpbrk(argument, " \t\n\v\"") == nullptr)
     {
         arguments += argument;
         return;
