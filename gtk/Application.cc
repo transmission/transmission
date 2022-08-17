@@ -5,10 +5,13 @@
 #include <algorithm>
 #include <cstdlib> // exit()
 #include <ctime>
+#include <iterator> // for std::back_inserter
 #include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <locale.h>

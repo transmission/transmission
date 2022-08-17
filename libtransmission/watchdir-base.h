@@ -7,11 +7,14 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef> // for size_t
 #include <map>
 #include <memory>
 #include <optional>
 #include <set>
 #include <string>
+#include <string_view>
+#include <utility>
 
 #include "timer.h"
 #include "watchdir.h"

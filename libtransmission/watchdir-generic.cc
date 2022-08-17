@@ -5,6 +5,8 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
+#include <utility>
+
 #include "transmission.h"
 
 #include "watchdir-base.h"

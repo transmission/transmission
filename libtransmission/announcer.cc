@@ -12,6 +12,7 @@
 #include <deque>
 #include <iterator>
 #include <map>
+#include <memory>
 #include <numeric>
 #include <set>
 #include <string>

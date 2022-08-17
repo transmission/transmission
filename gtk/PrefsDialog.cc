@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <climits> /* USHRT_MAX, INT_MAX */
+#include <memory>
 #include <sstream>
 #include <string>
 

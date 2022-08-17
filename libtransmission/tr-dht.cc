@@ -5,11 +5,13 @@
 #include <algorithm>
 #include <cerrno>
 #include <chrono>
-#include <csignal> /* sig_atomic_t */
+#include <csignal> // for sig_atomic_t
+#include <cstdlib> // for abort()
 #include <cstdio>
-#include <cstring> /* memcpy(), memset() */
+#include <cstring> // for memcpy(), memset()
 #include <ctime>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>

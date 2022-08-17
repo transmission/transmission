@@ -10,8 +10,9 @@
 #endif
 
 #include <array>
-#include <cstdint>
-#include <ctime> // time_t
+#include <cstddef> // for size_t
+#include <cstdint> // for uint32_t
+#include <ctime> // for time_t
 
 /**
  * A short-term memory object that remembers how many times something

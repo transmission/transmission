@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "timer.h"
 
 extern "C"

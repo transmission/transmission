@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <ctime>
 #include <iterator>
+#include <memory>
 #include <numeric>
 #include <set>
 #include <string_view>

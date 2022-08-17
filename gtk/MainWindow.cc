@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <memory>
 #include <string>
 
 #include <glibmm/i18n.h>

@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <map>
+#include <memory>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

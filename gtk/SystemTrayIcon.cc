@@ -8,6 +8,7 @@
 // We're using deprecated Gtk::StatusItem ourselves as well
 #undef GTKMM_DISABLE_DEPRECATED
 
+#include <memory>
 #include <string>
 
 #include <glibmm.h>

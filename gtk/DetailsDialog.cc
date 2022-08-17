@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <limits.h> /* INT_MAX */
+#include <memory>
 #include <numeric>
 #include <sstream>
 #include <stddef.h>

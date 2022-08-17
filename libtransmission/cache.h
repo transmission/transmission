@@ -9,10 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // intX_t, uintX_t
+#include <cstdint> // for size_t
+#include <cstdint> // for intX_t, uintX_t
 #include <ctime>
-#include <memory> // std::unique_ptr
-#include <utility> // std::pair
+#include <memory> // for std::unique_ptr
+#include <utility> // for std::pair
 #include <vector>
 
 #include "transmission.h"

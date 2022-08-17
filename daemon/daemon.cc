@@ -8,9 +8,9 @@
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
+#include <memory>
 #include <string>
 #include <string_view>
-#include <utility>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>

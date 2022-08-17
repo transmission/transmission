@@ -5,9 +5,9 @@
 
 #include <algorithm>
 #include <array>
-#include <cerrno>
 #include <cstdint> // uint8_t, uint64_t
 #include <string_view>
+#include <utility>
 
 #include <fmt/core.h>
 

@@ -5,6 +5,7 @@
 
 #include <chrono>
 #include <memory>
+#include <utility>
 
 #include <event2/event.h>
 

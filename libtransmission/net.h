@@ -18,7 +18,7 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <errno.h>
+#include <cerrno>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif

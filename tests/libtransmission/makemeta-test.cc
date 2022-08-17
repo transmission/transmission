@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cstdlib> // mktemp()
-#include <cstring> // strlen()
 #include <numeric>
 #include <string>
 #include <string_view>

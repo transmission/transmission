@@ -11,6 +11,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
 
 #ifdef _WIN32
 #include <windows.h>

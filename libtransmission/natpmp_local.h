@@ -10,6 +10,7 @@
 #endif
 
 #include <ctime> // time_t
+#include <cstdint>
 
 #include "transmission.h" // tr_port_forwarding
 
