@@ -65,7 +65,7 @@ enum class TrFormat
 struct tr_rpc_idle_data
 {
     tr_session* session;
-    tr_variant* response;
+    tr_variant response;
     tr_variant* args_out;
     tr_rpc_response_func callback;
     void* callback_user_data;
@@ -75,12 +75,11 @@ static auto constexpr SuccessResult = "success"sv;
 
 static void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view result)
 {
-    tr_variantDictAddStr(data->response, TR_KEY_result, result);
+    tr_variantDictAddStr(&data->response, TR_KEY_result, result);
 
-    (*data->callback)(data->session, data->response, data->callback_user_data);
+    (*data->callback)(data->session, &data->response, data->callback_user_data);
 
-    tr_variantFree(data->response);
-    tr_free(data->response);
+    tr_variantFree(&data->response);
     tr_free(data);
 }
 
@@ -2535,15 +2534,14 @@ void tr_rpc_request_exec_json(
     {
         auto* const data = tr_new0(struct tr_rpc_idle_data, 1);
         data->session = session;
-        data->response = tr_new0(tr_variant, 1);
-        tr_variantInitDict(data->response, 3);
+        tr_variantInitDict(&data->response, 3);
 
         if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
-            tr_variantDictAddInt(data->response, TR_KEY_tag, tag);
+            tr_variantDictAddInt(&data->response, TR_KEY_tag, tag);
         }
 
-        data->args_out = tr_variantDictAddDict(data->response, TR_KEY_arguments, 0);
+        data->args_out = tr_variantDictAddDict(&data->response, TR_KEY_arguments, 0);
         data->callback = callback;
         data->callback_user_data = callback_user_data;
         result = (*method->func)(session, args_in, data->args_out, data);
