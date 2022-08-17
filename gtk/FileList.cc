@@ -7,6 +7,7 @@
 #include <climits> /* INT_MAX */
 #include <cstddef>
 #include <list>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>

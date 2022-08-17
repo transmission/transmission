@@ -7,6 +7,7 @@
 #include <chrono>
 #include <csignal> /* sig_atomic_t */
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
+#include <memory>
 #include <type_traits>
 
 #ifdef _WIN32

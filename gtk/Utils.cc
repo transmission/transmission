@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <functional>
 #include <limits.h> /* INT_MAX */
+#include <memory>
 
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>

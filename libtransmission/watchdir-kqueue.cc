@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <cerrno> // for errno
+#include <memory>
 #include <string>
 #include <unordered_set>
 

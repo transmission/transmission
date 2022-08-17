@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cstring> /* memcpy */
 #include <ctime>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>

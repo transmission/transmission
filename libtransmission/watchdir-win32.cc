@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <cstddef> // for offsetof
+#include <memory>
 
 #include <process.h> // for _beginthreadex()
 

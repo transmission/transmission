@@ -6,6 +6,7 @@
 #include <cstdlib> // exit()
 #include <ctime>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <thread>

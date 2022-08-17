@@ -5,8 +5,7 @@
 
 #include <cerrno>
 #include <climits> /* NAME_MAX */
-
-#include <iostream> // NOCOMMIT
+#include <memory>
 
 #include <unistd.h> /* close() */
 

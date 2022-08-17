@@ -6,6 +6,7 @@
 #include <cstdlib> // std::lldiv()
 #include <iterator> // std::distance(), std::next(), std::prev()
 #include <limits> // std::numeric_limits<size_t>::max()
+#include <memory>
 #include <numeric> // std::accumulate()
 #include <utility> // std::make_pair()
 #include <vector>

@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <memory>
 
 #include <fmt/core.h>
 

@@ -11,6 +11,7 @@
 #include <cstring> // for memcpy(), memset()
 #include <ctime>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
