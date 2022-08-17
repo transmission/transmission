@@ -510,7 +510,7 @@ std::optional<std::vector<std::string>> win32MakeUtf8Argv()
     auto argv = std::vector<std::string>{};
     if (wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc); wargv != nullptr)
     {
-        for (int i = 0; i < my_argc; ++i)
+        for (int i = 0; i < argc; ++i)
         {
             if (wargv[i] == nullptr)
             {
@@ -529,7 +529,7 @@ std::optional<std::vector<std::string>> win32MakeUtf8Argv()
         LocalFree(my_wide_argv);
     }
 
-    if (std::size(argv) == argc)
+    if (static_cast<int>(std::size(argv)) == argc)
     {
         return argv;
     }
@@ -548,17 +548,20 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
     SetConsoleOutputCP(CP_UTF8);
 
     // build an argv from GetCommandLineW + CommandLineToArgvW
-    auto const argv_strs = win32MakeUtf8Argv();
-    auto argv_cstrs = std::vector<char*>{};
-    argv_cstrs.reserve(std::size(argv_strs));
-    std::transform(
-        std::begin(argv_strs),
-        std::end(argv_strs),
-        std::back_inserter(argv_cstrs),
-        [](auto& str) { return std::data(str); });
-    argv_cstrs.push_back(nullptr); // argv is nullptr-terminated
+    if (auto const argv_strs = win32MakeUtf8Argv(); argv_strs)
+    {
+        auto argv_cstrs = std::vector<char*>{};
+        argv_cstrs.reserve(std::size(argv_strs));
+        std::transform(
+            std::begin(*argv_strs),
+            std::end(*argv_strs),
+            std::back_inserter(argv_cstrs),
+            [](auto& str) { return std::data(str); });
+        argv_cstrs.push_back(nullptr); // argv is nullptr-terminated
+        return (*real_main)(std::size(argv_strs), std::data(argv_cstrs));
+    }
 
-    return (*real_main)(std::size(argv_strs), std::data(argv_cstrs));
+    return (*real_main)(argc, argv);
 }
 
 #endif
