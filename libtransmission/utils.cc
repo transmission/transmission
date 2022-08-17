@@ -526,7 +526,7 @@ std::optional<std::vector<std::string>> win32MakeUtf8Argv()
             argv.emplace_back(std::move(str));
         }
 
-        LocalFree(my_wide_argv);
+        LocalFree(wargv);
     }
 
     if (static_cast<int>(std::size(argv)) == argc)
@@ -551,14 +551,14 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
     if (auto const argv_strs = win32MakeUtf8Argv(); argv_strs)
     {
         auto argv_cstrs = std::vector<char*>{};
-        argv_cstrs.reserve(std::size(argv_strs));
+        argv_cstrs.reserve(std::size(*argv_strs));
         std::transform(
             std::begin(*argv_strs),
             std::end(*argv_strs),
             std::back_inserter(argv_cstrs),
             [](auto& str) { return std::data(str); });
         argv_cstrs.push_back(nullptr); // argv is nullptr-terminated
-        return (*real_main)(std::size(argv_strs), std::data(argv_cstrs));
+        return (*real_main)(std::size(*argv_strs), std::data(argv_cstrs));
     }
 
     return (*real_main)(argc, argv);
