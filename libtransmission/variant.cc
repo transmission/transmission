@@ -69,7 +69,7 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
 {
     if (str->type == TR_STRING_TYPE_HEAP)
     {
-        tr_free((char*)(str->str.str));
+        delete[] str->str.str;
     }
 
     *str = STRING_INIT;
@@ -130,7 +130,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, std::str
     }
     else
     {
-        auto* tmp = tr_new(char, len + 1);
+        auto* tmp = new char[len + 1];
         std::copy_n(bytes, len, tmp);
         tmp[len] = '\0';
         str->type = TR_STRING_TYPE_HEAP;
