@@ -5,6 +5,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <cstdlib> // for abort()
+
 #include <fmt/format.h>
 
 #include "tr-assert.h"

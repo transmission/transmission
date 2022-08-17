@@ -4,8 +4,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstdlib> // for strtoul()
 #include <chrono>
-#include <cstdint> // uint32_t
+#include <cstdint> // for uint32_t
 #include <future>
 #include <string>
 #include <string_view>

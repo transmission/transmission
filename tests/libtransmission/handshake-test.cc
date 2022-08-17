@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <cstring>
 #include <string_view>
 
 #include <event2/util.h>

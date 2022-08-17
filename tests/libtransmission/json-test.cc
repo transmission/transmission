@@ -6,7 +6,6 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include <clocale> // setlocale()
-#include <cstring> // strlen()
 #include <string>
 #include <string_view>
 

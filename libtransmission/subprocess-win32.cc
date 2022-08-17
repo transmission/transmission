@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <climits>
-#include <cstdlib>
 #include <cstring>
 #include <cwchar>
 #include <map>

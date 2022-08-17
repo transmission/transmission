@@ -7,6 +7,7 @@
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
+#include <cstring>
 #include <iostream>
 #include <sstream>
 #include <string>

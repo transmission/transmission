@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cstring>
 #include <vector>
 
 #include "transmission.h"
