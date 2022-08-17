@@ -128,9 +128,6 @@ void* tr_malloc(size_t size);
 /** @brief Portability wrapper around calloc() in which `0' is a safe argument */
 void* tr_malloc0(size_t size);
 
-/** @brief Portability wrapper around reallocf() in which `0' is a safe argument */
-void* tr_realloc(void* p, size_t size);
-
 /** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
 void tr_free(void* p);
 

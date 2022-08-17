@@ -73,18 +73,6 @@ void* tr_malloc0(size_t size)
     return size != 0 ? calloc(1, size) : nullptr;
 }
 
-void* tr_realloc(void* p, size_t size)
-{
-    void* result = size != 0 ? realloc(p, size) : nullptr;
-
-    if (result == nullptr)
-    {
-        tr_free(p);
-    }
-
-    return result;
-}
-
 void tr_free(void* p)
 {
     if (p != nullptr)
