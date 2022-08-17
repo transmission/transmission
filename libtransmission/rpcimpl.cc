@@ -64,11 +64,11 @@ enum class TrFormat
  * when the task is complete */
 struct tr_rpc_idle_data
 {
-    tr_session* session;
-    tr_variant response;
-    tr_variant* args_out;
-    tr_rpc_response_func callback;
-    void* callback_user_data;
+    tr_variant response = {};
+    tr_session* session = nullptr;
+    tr_variant* args_out = nullptr;
+    tr_rpc_response_func callback = nullptr;
+    void* callback_user_data = nullptr;
 };
 
 static auto constexpr SuccessResult = "success"sv;
@@ -80,7 +80,7 @@ static void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_vie
     (*data->callback)(data->session, &data->response, data->callback_user_data);
 
     tr_variantFree(&data->response);
-    tr_free(data);
+    delete data;
 }
 
 /***
@@ -1523,7 +1523,7 @@ static void onMetadataFetched(tr_web::FetchResponse const& web_response)
                 fmt::arg("error_code", status)));
     }
 
-    tr_free(data);
+    delete data;
 }
 
 static bool isCurlURL(std::string_view url)
@@ -1651,10 +1651,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     if (isCurlURL(filename))
     {
-        auto* const d = tr_new0(struct add_torrent_idle_data, 1);
-        d->data = idle_data;
-        d->ctor = ctor;
-
+        auto* const d = new add_torrent_idle_data{ idle_data, ctor };
         auto options = tr_web::FetchOptions{ filename, onMetadataFetched, d };
         options.cookies = cookies;
         session->web->fetch(std::move(options));
@@ -2532,7 +2529,7 @@ void tr_rpc_request_exec_json(
     }
     else
     {
-        auto* const data = tr_new0(struct tr_rpc_idle_data, 1);
+        auto* const data = new tr_rpc_idle_data{};
         data->session = session;
         tr_variantInitDict(&data->response, 3);
 
