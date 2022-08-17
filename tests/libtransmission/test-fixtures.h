@@ -473,7 +473,7 @@ protected:
             tr_variantInitDict(settings, 10);
             auto constexpr deleter = [](tr_variant* v)
             {
-                tr_variantFree(v);
+                tr_variantReset(v);
                 delete v;
             };
             settings_.reset(settings, deleter);

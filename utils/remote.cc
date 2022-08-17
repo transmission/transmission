@@ -2221,7 +2221,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
                     }
                 }
 
-                tr_variantFree(&top);
+                tr_variantReset(&top);
             }
         }
         else
@@ -2351,7 +2351,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
 
     if (benc != nullptr)
     {
-        tr_variantFree(*benc);
+        tr_variantReset(*benc);
         tr_free(*benc);
         *benc = nullptr;
     }

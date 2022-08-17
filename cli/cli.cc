@@ -350,7 +350,7 @@ int tr_main(int argc, char* argv[])
     tr_sessionSaveSettings(h, config_dir.c_str(), &settings);
 
     printf("\n");
-    tr_variantFree(&settings);
+    tr_variantReset(&settings);
     tr_sessionClose(h);
     return EXIT_SUCCESS;
 }

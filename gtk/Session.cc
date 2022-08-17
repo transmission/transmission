@@ -50,7 +50,7 @@ TrVariantPtr create_variant(tr_variant&& other)
         new tr_variant{},
         [](tr_variant* ptr)
         {
-            tr_variantFree(ptr);
+            tr_variantReset(ptr);
             delete ptr;
         });
     *result = std::move(other);
@@ -1403,7 +1403,7 @@ void Session::start_now(tr_torrent_id_t id)
     auto ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
     exec(&top);
-    tr_variantFree(&top);
+    tr_variantReset(&top);
 }
 
 void Session::Impl::update()
@@ -1674,7 +1674,7 @@ void Session::port_test()
 
             impl_->signal_port_tested.emit(is_open);
         });
-    tr_variantFree(&request);
+    tr_variantReset(&request);
 }
 
 /***
@@ -1711,7 +1711,7 @@ void Session::blocklist_update()
 
             impl_->signal_blocklist_updated.emit(ruleCount);
         });
-    tr_variantFree(&request);
+    tr_variantReset(&request);
 }
 
 /***

@@ -416,7 +416,7 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
     }
 
     core_->exec(&top);
-    tr_variantFree(&top);
+    tr_variantReset(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
@@ -435,7 +435,7 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
     }
 
     core_->exec(&top);
-    tr_variantFree(&top);
+    tr_variantReset(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
@@ -454,7 +454,7 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
     }
 
     core_->exec(&top);
-    tr_variantFree(&top);
+    tr_variantReset(&top);
 }
 
 Gtk::Widget* DetailsDialog::Impl::options_page_new()
@@ -2395,7 +2395,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
                 core_->exec(&top);
                 refresh();
 
-                tr_variantFree(&top);
+                tr_variantReset(&top);
             }
             else
             {
@@ -2465,7 +2465,7 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         core_->exec(&top);
         refresh();
 
-        tr_variantFree(&top);
+        tr_variantReset(&top);
     }
 }
 

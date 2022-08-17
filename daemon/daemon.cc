@@ -692,7 +692,7 @@ static void daemon_reconfigure(void* /*arg*/)
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
         tr_sessionLoadSettings(&settings, configDir, MyName);
         tr_sessionSet(mySession, &settings);
-        tr_variantFree(&settings);
+        tr_variantReset(&settings);
         tr_sessionReloadBlocklists(mySession);
     }
 }
@@ -954,7 +954,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     return true;
 
 EXIT_EARLY:
-    tr_variantFree(&data->settings);
+    tr_variantReset(&data->settings);
     return false;
 }
 
@@ -985,6 +985,6 @@ int tr_main(int argc, char* argv[])
         tr_error_free(error);
     }
 
-    tr_variantFree(&data.settings);
+    tr_variantReset(&data.settings);
     return ret;
 }
