@@ -133,8 +133,6 @@ void tr_free(void* p);
 
 #define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
-
 constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';
