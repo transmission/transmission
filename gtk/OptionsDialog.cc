@@ -5,6 +5,7 @@
 
 #include <list>
 #include <memory>
+#include <utility>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

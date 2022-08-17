@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <utility>
+
 #include <QDir>
 
 #include "RelocateDialog.h"

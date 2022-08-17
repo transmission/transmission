@@ -6,6 +6,7 @@
 #include <cerrno> // for errno
 #include <memory>
 #include <string>
+#include <utility>
 
 #include <fcntl.h> // for open()
 #include <unistd.h> // for close()

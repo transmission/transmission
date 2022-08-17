@@ -13,6 +13,7 @@
 #include <map>
 #include <memory> // std::unique_ptr
 #include <optional>
+#include <utility>
 #include <vector>
 
 #include <event2/buffer.h>

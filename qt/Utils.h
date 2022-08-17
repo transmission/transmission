@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstddef> // size_t
+#include <utility>
 
 #include <QHash>
 #include <QPointer>

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <set>
+#include <utility>
 
 #include <QApplication>
 #include <QStyle>

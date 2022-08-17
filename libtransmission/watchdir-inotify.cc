@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <climits> /* NAME_MAX */
 #include <memory>
+#include <utility>
 
 #include <unistd.h> /* close() */
 

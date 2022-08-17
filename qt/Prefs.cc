@@ -7,6 +7,7 @@
 #include <array>
 #include <cassert>
 #include <string_view>
+#include <utility>
 
 #include <QDateTime>
 #include <QDir>
