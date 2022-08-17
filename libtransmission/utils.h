@@ -227,7 +227,16 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
 
 [[nodiscard]] char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
 
-std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
+[[nodiscard]] std::string tr_strvUtf8Clean(std::string_view cleanme);
+
+/**
+ * @brief copies `src` into `buf`.
+ *
+ * - Always returns std::size(src).
+ * - `src` will be copied into `buf` iff `buflen >= std::size(src)`
+ * - `buf` will also be zero terminated iff `buflen >= std::size(src) + 1`.
+ */
+size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
 
 /**
  * @brief copies `src` into `buf`.
