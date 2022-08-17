@@ -35,7 +35,7 @@ TrVariantPtr createVariant()
     return { new tr_variant{},
              [](tr_variant* var)
              {
-                 tr_variantReset(var);
+                 tr_variantClear(var);
                  delete var;
              } };
 }

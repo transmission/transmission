@@ -1227,7 +1227,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     /* cleanup */
     evbuffer_free(payload);
-    tr_variantReset(&val);
+    tr_variantClear(&val);
 }
 
 static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuffer* inbuf)
@@ -1333,7 +1333,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
         msgs->reqq = i;
     }
 
-    tr_variantReset(&val);
+    tr_variantClear(&val);
 }
 
 static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
@@ -1354,7 +1354,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
         (void)tr_variantDictFindInt(&dict, TR_KEY_total_size, &total_size);
-        tr_variantReset(&dict);
+        tr_variantClear(&dict);
     }
 
     logtrace(
@@ -1401,7 +1401,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
             /* cleanup */
             evbuffer_free(payload);
-            tr_variantReset(&v);
+            tr_variantClear(&v);
         }
     }
 }
@@ -1452,7 +1452,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
 
-        tr_variantReset(&val);
+        tr_variantClear(&val);
     }
 }
 
@@ -2158,7 +2158,7 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 
         /* cleanup */
         evbuffer_free(payload);
-        tr_variantReset(&tmp);
+        tr_variantClear(&tmp);
     }
 }
 
@@ -2253,7 +2253,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             msgs->dbgOutMessageLen();
 
             evbuffer_free(payload);
-            tr_variantReset(&tmp);
+            tr_variantClear(&tmp);
 
             ok = true;
         }
@@ -2278,7 +2278,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             msgs->dbgOutMessageLen();
 
             evbuffer_free(payload);
-            tr_variantReset(&tmp);
+            tr_variantClear(&tmp);
         }
     }
 
@@ -2623,5 +2623,5 @@ void tr_peerMsgsImpl::sendPex()
     this->dbgOutMessageLen();
 
     evbuffer_free(payload);
-    tr_variantReset(&val);
+    tr_variantClear(&val);
 }

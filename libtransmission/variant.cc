@@ -191,7 +191,7 @@ bool tr_variantListRemove(tr_variant* list, size_t pos)
 {
     if (tr_variantIsList(list) && pos < list->val.l.count)
     {
-        tr_variantReset(&list->val.l.vals[pos]);
+        tr_variantClear(&list->val.l.vals[pos]);
         tr_removeElementFromArray(list->val.l.vals, pos, sizeof(tr_variant), list->val.l.count);
         --list->val.l.count;
         return true;
@@ -647,7 +647,7 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
     {
         int const last = (int)dict->val.l.count - 1;
 
-        tr_variantReset(&dict->val.l.vals[i]);
+        tr_variantClear(&dict->val.l.vals[i]);
 
         if (i != last)
         {
@@ -921,7 +921,7 @@ static struct VariantWalkFuncs const freeWalkFuncs = {
     freeContainerEndFunc, //
 };
 
-void tr_variantReset(tr_variant* v)
+void tr_variantClear(tr_variant* v)
 {
     if (!tr_variantIsEmpty(v))
     {
@@ -1161,7 +1161,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
 
     if (!success)
     {
-        tr_variantReset(setme);
+        tr_variantClear(setme);
     }
 
     return success;

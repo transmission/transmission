@@ -318,7 +318,7 @@ Prefs::Prefs(QString config_dir)
         }
     }
 
-    tr_variantReset(&top);
+    tr_variantClear(&top);
 }
 
 Prefs::~Prefs()
@@ -412,10 +412,10 @@ Prefs::~Prefs()
 
     tr_variantMergeDicts(&file_settings, &current_settings);
     tr_variantToFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toStdString());
-    tr_variantReset(&file_settings);
+    tr_variantClear(&file_settings);
 
     // cleanup
-    tr_variantReset(&current_settings);
+    tr_variantClear(&current_settings);
 }
 
 /**

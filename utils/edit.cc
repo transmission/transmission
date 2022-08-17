@@ -210,7 +210,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
                         tierCount + 1,
                         TR_PRIsv_ARG(sv),
                         newstr.c_str());
-                    tr_variantReset(node);
+                    tr_variantClear(node);
                     tr_variantInitStr(node, newstr);
                     changed = true;
                 }
@@ -366,7 +366,7 @@ int tr_main(int argc, char* argv[])
             tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename);
         }
 
-        tr_variantReset(&top);
+        tr_variantClear(&top);
     }
 
     printf("Changed %d files\n", changedCount);

@@ -565,7 +565,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         auto const default_config_dir = tr_getDefaultConfigDir("Transmission");
         _fLib = tr_sessionInit(default_config_dir.c_str(), YES, &settings);
-        tr_variantReset(&settings);
+        tr_variantClear(&settings);
         _fConfigDirectory = @(default_config_dir.c_str());
 
         tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));

@@ -2221,7 +2221,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
                     }
                 }
 
-                tr_variantReset(&top);
+                tr_variantClear(&top);
             }
         }
         else
@@ -2354,7 +2354,7 @@ static int flush(char const* rpcurl, tr_variant* benc)
         tr_curl_easy_cleanup(curl);
     }
 
-    tr_variantReset(benc);
+    tr_variantClear(benc);
 
     return status;
 }

@@ -92,14 +92,14 @@ struct tr_variant
 };
 
 /**
- * @brief Reset the variant to an uninitialized state.
+ * @brief Clear the variant to an empty state.
  *
  * `tr_variantIsEmpty()` will return true after this is called.
  *
  * The variant itself is not freed, but any memory used by
  * its *value* -- e.g. a string or child variants -- is freed.
  */
-void tr_variantReset(tr_variant*);
+void tr_variantClear(tr_variant*);
 
 /***
 ****  Serialization / Deserialization
