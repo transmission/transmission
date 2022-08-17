@@ -68,7 +68,7 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
 {
     if (str->type == TR_STRING_TYPE_HEAP)
     {
-        tr_free((char*)(str->str.str));
+        delete[]((char*)(str->str.str));
     }
 
     *str = STRING_INIT;
@@ -129,7 +129,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, std::str
     }
     else
     {
-        auto* tmp = tr_new(char, len + 1);
+        auto* tmp = new char[len + 1];
         std::copy_n(bytes, len, tmp);
         tmp[len] = '\0';
         str->type = TR_STRING_TYPE_HEAP;
@@ -430,7 +430,10 @@ static tr_variant* containerReserve(tr_variant* v, size_t count)
             n *= 2U;
         }
 
-        v->val.l.vals = tr_renew(tr_variant, v->val.l.vals, n);
+        auto* vals = new tr_variant[n];
+        std::copy_n(v->val.l.vals, v->val.l.count, vals);
+        delete[] v->val.l.vals;
+        v->val.l.vals = vals;
         v->val.l.alloc = n;
     }
 
@@ -911,7 +914,7 @@ static void freeStringFunc(tr_variant const* v, void* /*user_data*/)
 
 static void freeContainerEndFunc(tr_variant const* v, void* /*user_data*/)
 {
-    tr_free(v->val.l.vals);
+    delete[] v->val.l.vals;
 }
 
 static struct VariantWalkFuncs const freeWalkFuncs = {

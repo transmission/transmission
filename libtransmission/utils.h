@@ -128,18 +128,12 @@ void* tr_malloc(size_t size);
 /** @brief Portability wrapper around calloc() in which `0' is a safe argument */
 void* tr_malloc0(size_t size);
 
-/** @brief Portability wrapper around reallocf() in which `0' is a safe argument */
-void* tr_realloc(void* p, size_t size);
-
 /** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
 void tr_free(void* p);
 
 #define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
 #define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
-
-#define tr_renew(struct_type, mem, n_structs) \
-    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 constexpr bool tr_str_is_empty(char const* value)
 {
