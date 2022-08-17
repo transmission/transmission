@@ -9,7 +9,8 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint>
+#include <cstddef> // for size_t
+#include <cstdint> // for uintX_t
 #include <optional>
 #include <string_view>
 #include <utility>

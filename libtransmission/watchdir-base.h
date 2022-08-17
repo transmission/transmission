@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef> // for size_t
 #include <map>
 #include <memory>
 #include <optional>
