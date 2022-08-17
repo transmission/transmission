@@ -1936,7 +1936,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
     }
 
     int const n = std::size(torrents);
-    data->torrents = tr_new(tr_torrent*, n); // NOLINT(bugprone-sizeof-expression)
+    data->torrents = new tr_torrent*[n];
     std::copy(std::begin(torrents), std::end(torrents), data->torrents);
 
     if (n != 0)

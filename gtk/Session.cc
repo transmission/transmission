@@ -1292,7 +1292,7 @@ void Session::load(bool forcePaused)
         impl_->add_torrent(torrents[i], false);
     }
 
-    tr_free(torrents);
+    delete[] torrents;
     tr_ctorFree(ctor);
 }
 

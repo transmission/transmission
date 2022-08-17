@@ -820,7 +820,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         }
 
         torrents = tr_sessionLoadTorrents(mySession, ctor, nullptr);
-        tr_free(torrents);
+        delete[] torrents;
         tr_ctorFree(ctor);
     }
 
