@@ -2447,7 +2447,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'n': /* auth */
-                auth = tr_strdup(optarg);
+                auth = tr_strvDup(optarg);
                 break;
 
             case 810: /* authenv */
@@ -2464,7 +2464,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'N': /* netrc */
-                netrc = tr_strdup(optarg);
+                netrc = tr_strvDup(optarg);
                 break;
 
             case 820: /* UseSSL */
@@ -2543,7 +2543,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             switch (c)
             {
             case 'F':
-                filter = tr_strdup(optarg); /* Unnecessary dup? we will use it before optarg will be changed */
+                filter = tr_strvDup(optarg); /* Unnecessary dup? we will use it before optarg will be changed */
                 tr_variantDictAddInt(top, TR_KEY_tag, TAG_FILTER);
 
                 for (size_t i = 0; i < TR_N_ELEMENTS(details_keys); ++i)

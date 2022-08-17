@@ -217,9 +217,21 @@ char* tr_strvDup(std::string_view in)
     return ret;
 }
 
-char* tr_strdup(void const* in)
+size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
 {
-    return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
+    size_t const len = std::size(src);
+
+    if (buflen >= len)
+    {
+        auto const out = std::copy(std::begin(src), std::end(src), buf);
+
+        if (buflen > len)
+        {
+            *out = '\0';
+        }
+    }
+
+    return len;
 }
 
 extern "C"
@@ -625,7 +637,6 @@ static bool parseNumberSection(std::string_view str, number_range& range)
  * Given a string like "1-4" or "1-4,6,9,14-51", this allocates and returns an
  * array of setmeCount ints of all the values in the array.
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
- * It's the caller's responsibility to call tr_free () on the returned array.
  * If a fragment of the string can't be parsed, nullptr is returned.
  */
 std::vector<int> tr_parseNumberRange(std::string_view str)

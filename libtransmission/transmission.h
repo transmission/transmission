@@ -15,15 +15,18 @@
 #pragma once
 
 /***
-****
 ****  Basic Types
-****
 ***/
 
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uintN_t */
 #include <time.h> /* time_t */
+
+#ifdef __cplusplus
+#include <string>
+#include <string_view>
+#endif
 
 #include "tr-macros.h"
 
@@ -48,8 +51,6 @@ struct tr_byte_span_t
     uint64_t begin;
     uint64_t end;
 };
-
-class tr_announce_list;
 
 struct tr_ctor;
 struct tr_error;
@@ -97,9 +98,7 @@ enum tr_encryption_mode
  */
 
 /**
- * @brief returns Transmission's default configuration file directory.
- *
- * Use tr_free() to free the string when done.
+ * @brief get Transmission's default configuration file directory.
  *
  * The default configuration directory is determined this way:
  * -# If the TRANSMISSION_HOME environment variable is set, its value is used.
@@ -108,19 +107,27 @@ enum tr_encryption_mode
  * -# If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
  * -# ${HOME}/.config/${appname}" is used as a last resort.
  */
-char* tr_getDefaultConfigDir(char const* appname);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
+#endif
+
+/** @brief buffer variant of tr_getDefaultConfigDir(). See tr_strvToBuf(). */
+size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
  * @brief returns Transmisson's default download directory.
- *
- * Use tr_free() to free the string when done.
  *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
  * -# On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
  * -# Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
  */
-char* tr_getDefaultDownloadDir();
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_getDefaultDownloadDir();
+#endif
+
+/** @brief buffer variant of tr_getDefaultDownloadDir(). See tr_strvToBuf(). */
+size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 #define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
 #define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
@@ -1010,13 +1017,16 @@ uint64_t tr_torrentTotalSize(tr_torrent const*);
 /**
  * @brief find the location of a torrent's file by looking with and without
  *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
- * @return a newly-allocated string (that must be tr_free()d by the caller
- *         when done) that gives the location of this file on disk,
- *         or nullptr if no file exists yet.
+ * @return the path of this file, or an empty string if no file exists yet.
  * @param tor the torrent whose file we're looking for
  * @param fileNum the fileIndex, in [0...tr_torrentFileCount())
  */
-char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
+#endif
+
+/** @brief buffer variant of tr_torrentFindFile(). See tr_strvToBuf(). */
+size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
 /***
 ****  Torrent speed limits
@@ -1130,17 +1140,21 @@ char const* tr_torrentGetDownloadDir(tr_torrent const* torrent);
 char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 
 /**
- * Returns a newly-allocated string with a magnet link of the torrent.
- * Use tr_free() to free the string when done.
+ * Returns a the magnet link to the torrent.
  */
-char* tr_torrentGetMagnetLink(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
+#endif
+
+/** @brief buffer variant of tr_torrentGetMagnetLink(). See tr_strvToBuf().  */
+size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
 ***
 **/
 
 /**
- * Returns a newly-allocated string listing its tracker's announce URLs.
+ * Returns a string listing its tracker's announce URLs.
  * One URL per line, with a blank line between tiers.
  *
  * NOTE: this only includes the trackers included in the torrent and,
@@ -1149,7 +1163,12 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
  * are applied to all public torrents. If you want a full display of all
  * trackers, use tr_torrentTracker() and tr_torrentTrackerCount()
  */
-char* tr_torrentGetTrackerList(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
+#endif
+
+/** @brief buffer variant of tr_torrentGetTrackerList(). See tr_strvToBuf(). */
+size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
  * Sets a torrent's tracker list from a list of announce URLs with one
@@ -1436,9 +1455,13 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 
 /*
  * Get the filename of Transmission's internal copy of the torrent file.
- * This is a duplicate that must be freed with tr_free() when done.
  */
-char* tr_torrentFilename(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
+#endif
+
+/** @brief buffer variant of tr_torrentFilename(). See tr_strvToBuf(). */
+size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /***********************************************************************
  * tr_torrentAvailability
@@ -1475,7 +1498,6 @@ enum tr_torrent_activity
     TR_STATUS_SEED_WAIT = 5, /* Queued to seed */
     TR_STATUS_SEED = 6 /* Seeding */
 };
-
 enum
 {
     TR_PEER_FROM_INCOMING = 0, /* connections made to the listening port */

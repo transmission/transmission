@@ -189,9 +189,8 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_FALSE(tr_sys_path_exists(tmpstr)); // confirm the old filename can't be found
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
-    char* const torrent_filename = tr_torrentFilename(tor);
-    EXPECT_STREQ(nullptr, strstr(torrent_filename, "foobar")); // confirm torrent file hasn't changed
-    tr_free(torrent_filename);
+    auto const torrent_filename = tr_torrentFilename(tor);
+    EXPECT_EQ(std::string::npos, torrent_filename.find("foobar")); // confirm torrent file hasn't changed
     tmpstr.assign(tor->currentDir(), "/foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr)); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
@@ -228,7 +227,6 @@ TEST_F(RenameTest, singleFilenameTorrent)
 
 TEST_F(RenameTest, multifileTorrent)
 {
-    char* str;
     auto constexpr TotalSize = size_t{ 67 };
     auto constexpr ExpectedFiles = std::array<std::string_view, 4>{
         "Felidae/Felinae/Acinonyx/Cheetah/Chester"sv,
@@ -332,15 +330,13 @@ TEST_F(RenameTest, multifileTorrent)
     ***/
 
     // remove the directory Felidae/Felinae/Felis/catus
-    str = tr_torrentFindFile(tor, 1);
-    EXPECT_NE(nullptr, str);
+    auto str = tr_torrentFindFile(tor, 1);
+    EXPECT_NE(""sv, str);
     tr_sys_path_remove(str);
-    tr_free(str);
     str = tr_torrentFindFile(tor, 2);
-    EXPECT_NE(nullptr, str);
+    EXPECT_NE(""sv, str);
     tr_sys_path_remove(str);
     tr_sys_path_remove(std::string{ tr_sys_path_dirname(str) });
-    tr_free(str);
     sync();
     blockingTorrentVerify(tor);
     testFileExistsAndConsistsOfThisString(tor, 0, ExpectedContents[0]);
@@ -348,8 +344,7 @@ TEST_F(RenameTest, multifileTorrent)
     for (tr_file_index_t i = 1; i <= 2; ++i)
     {
         str = tr_torrentFindFile(tor, i);
-        EXPECT_STREQ(nullptr, str);
-        tr_free(str);
+        EXPECT_EQ(""sv, str);
     }
 
     testFileExistsAndConsistsOfThisString(tor, 3, ExpectedContents[3]);
@@ -485,9 +480,8 @@ TEST_F(RenameTest, partialFile)
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
         auto const expected = tr_pathbuf{ tor->currentDir(), '/', strings[i] };
-        char* path = tr_torrentFindFile(tor, i);
-        EXPECT_EQ(expected, path);
-        tr_free(path);
+        auto const actual = tr_torrentFindFile(tor, i);
+        EXPECT_EQ(expected, actual);
     }
 
     torrentRemoveAndWait(tor, 0);

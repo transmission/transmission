@@ -414,7 +414,12 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
     return m == nullptr || m->piece_count == 0 ? 0.0 : (m->piece_count - std::size(m->pieces_needed)) / (double)m->piece_count;
 }
 
-char* tr_torrentGetMagnetLink(tr_torrent const* tor)
+std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tr_strvDup(tor->metainfo_.magnet());
+    return std::string{ tor->metainfo_.magnet().sv() };
+}
+
+size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)
+{
+    return tr_strvToBuf(tr_torrentGetMagnetLink(tor), buf, buflen);
 }

@@ -563,11 +563,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         tr_formatter_mem_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
 
-        char* const default_config_dir = tr_getDefaultConfigDir("Transmission");
-        _fLib = tr_sessionInit(default_config_dir, YES, &settings);
+        auto const default_config_dir = tr_getDefaultConfigDir("Transmission");
+        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, &settings);
         tr_variantFree(&settings);
-        _fConfigDirectory = @(default_config_dir);
-        tr_free(default_config_dir);
+        _fConfigDirectory = @(default_config_dir.c_str());
 
         tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
         tr_sessionSetQueueStartCallback(_fLib, onStartQueue, (__bridge void*)(self));

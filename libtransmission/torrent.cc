@@ -1243,9 +1243,14 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     return ret;
 }
 
-char* tr_torrentFilename(tr_torrent const* tor)
+std::string tr_torrentFilename(tr_torrent const* tor)
 {
-    return tr_strvDup(tor->torrentFile());
+    return std::string{ tor->torrentFile() };
+}
+
+size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
+{
+    return tr_strvToBuf(tr_torrentFilename(tor), buf, buflen);
 }
 
 /***
@@ -2058,9 +2063,14 @@ bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
     return text != nullptr && tor->setTrackerList(text);
 }
 
-char* tr_torrentGetTrackerList(tr_torrent const* tor)
+std::string tr_torrentGetTrackerList(tr_torrent const* tor)
 {
-    return tr_strvDup(tor->trackerList());
+    return tor->trackerList();
+}
+
+size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen)
+{
+    return tr_strvToBuf(tr_torrentGetTrackerList(tor), buf, buflen);
 }
 
 /**
@@ -2310,11 +2320,15 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
-// TODO: clients that call this should call tr_torrent::findFile() instead
-char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum)
+std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num)
 {
-    auto const found = tor->findFile(fileNum);
-    return found ? tr_strdup(found->filename()) : nullptr;
+    auto const found = tor->findFile(file_num);
+    return std::string{ found ? found->filename().sv() : ""sv };
+}
+
+size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen)
+{
+    return tr_strvToBuf(tr_torrentFindFile(tor, file_num), buf, buflen);
 }
 
 // decide whether we should be looking for files in downloadDir or incompleteDir

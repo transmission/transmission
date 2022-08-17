@@ -173,10 +173,9 @@ static std::string getStatusStr(tr_stat const* st)
     return "";
 }
 
-static char const* getConfigDir(int argc, char const** argv)
+static std::string getConfigDir(int argc, char const** argv)
 {
     int c;
-    char const* configDir = nullptr;
     char const* my_optarg;
     int const ind = tr_optind;
 
@@ -184,19 +183,14 @@ static char const* getConfigDir(int argc, char const** argv)
     {
         if (c == 'g')
         {
-            configDir = my_optarg;
+            return my_optarg;
             break;
         }
     }
 
     tr_optind = ind;
 
-    if (configDir == nullptr)
-    {
-        configDir = tr_getDefaultConfigDir(MyConfigName);
-    }
-
-    return configDir;
+    return tr_getDefaultConfigDir(MyConfigName);
 }
 
 int tr_main(int argc, char* argv[])
@@ -218,8 +212,8 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     tr_variantInitDict(&settings, 0);
-    char const* const configDir = getConfigDir(argc, (char const**)argv);
-    tr_sessionLoadSettings(&settings, configDir, MyConfigName);
+    auto const config_dir = getConfigDir(argc, (char const**)argv);
+    tr_sessionLoadSettings(&settings, config_dir.c_str(), MyConfigName);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -256,7 +250,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    auto* const h = tr_sessionInit(configDir, false, &settings);
+    auto* const h = tr_sessionInit(config_dir.c_str(), false, &settings);
     auto* const ctor = tr_ctorNew(h);
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
@@ -353,7 +347,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    tr_sessionSaveSettings(h, configDir, &settings);
+    tr_sessionSaveSettings(h, config_dir.c_str(), &settings);
 
     printf("\n");
     tr_variantFree(&settings);

@@ -11,7 +11,7 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
-#include <libtransmission/utils.h> // tr_free()
+#include <libtransmission/utils.h>
 
 #import "Torrent.h"
 #import "GroupsController.h"
@@ -361,7 +361,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)magnetLink
 {
-    return @(tr_torrentGetMagnetLink(self.fHandle));
+    return @(tr_torrentGetMagnetLink(self.fHandle).c_str());
 }
 
 - (CGFloat)ratio
@@ -682,10 +682,9 @@ bool trashDataFile(char const* filename, tr_error** error)
         new_tracker = [@"http://" stringByAppendingString:new_tracker];
     }
 
-    char* old_list = tr_torrentGetTrackerList(self.fHandle);
+    auto const old_list = tr_torrentGetTrackerList(self.fHandle);
     auto const new_list = fmt::format(FMT_STRING("{:s}\n\n{:s}"), old_list, new_tracker.UTF8String);
     BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list.c_str());
-    tr_free(old_list);
 
     return success;
 }
@@ -759,10 +758,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)torrentLocation
 {
-    auto* const filename = tr_torrentFilename(self.fHandle);
-    NSString* ret = @(filename ? filename : "");
-    tr_free(filename);
-    return ret;
+    return @(tr_torrentFilename(self.fHandle).c_str());
 }
 
 - (NSString*)dataLocation
@@ -785,16 +781,8 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
     else
     {
-        char* location = tr_torrentFindFile(self.fHandle, 0);
-        if (location == NULL)
-        {
-            return nil;
-        }
-
-        NSString* dataLocation = @(location);
-        free(location);
-
-        return dataLocation;
+        auto const location = tr_torrentFindFile(self.fHandle, 0);
+        return std::empty(location) ? nil : @(location.c_str());
     }
 }
 
@@ -814,16 +802,8 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
     else
     {
-        char* location = tr_torrentFindFile(self.fHandle, node.indexes.firstIndex);
-        if (location == NULL)
-        {
-            return nil;
-        }
-
-        NSString* dataLocation = @(location);
-        free(location);
-
-        return dataLocation;
+        auto const location = tr_torrentFindFile(self.fHandle, node.indexes.firstIndex);
+        return std::empty(location) ? nil : @(location.c_str());
     }
 }
 
