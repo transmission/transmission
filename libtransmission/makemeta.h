@@ -7,6 +7,7 @@
 
 #include <algorithm> // std::move
 #include <cstddef> // std::byte
+#include <cstdint>
 #include <future>
 #include <string>
 #include <string_view>

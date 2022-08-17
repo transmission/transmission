@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstddef> // size_t
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
