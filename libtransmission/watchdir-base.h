@@ -13,6 +13,7 @@
 #include <optional>
 #include <set>
 #include <string>
+#include <string_view>
 
 #include "timer.h"
 #include "watchdir.h"
