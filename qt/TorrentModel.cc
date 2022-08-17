@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iterator> // for std::back_inserter
 #include <set>
 #include <string_view>
 

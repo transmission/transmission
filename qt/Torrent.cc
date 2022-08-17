@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <iterator>
 #include <set>
 
 #include <QApplication>
