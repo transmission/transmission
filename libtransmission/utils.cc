@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::sort
+#include <algorithm> // for std::sort, std::transform
 #include <array> // std::array
 #include <cerrno>
 #include <cfloat> // DBL_DIG
@@ -14,6 +14,7 @@
 #include <cstring> /* strerror() */
 #include <ctime> // nanosleep()
 #include <iterator> // for std::back_inserter
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -379,14 +380,18 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
     return all_good;
 }
 
-static std::string strip_non_utf8(std::string_view sv)
+namespace
+{
+namespace tr_strvUtf8Clean_impl
+{
+std::string strip_non_utf8(std::string_view sv)
 {
     auto out = std::string{};
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), '?');
     return out;
 }
 
-static std::string to_utf8(std::string_view sv)
+std::string to_utf8(std::string_view sv)
 {
 #ifdef HAVE_ICONV
     size_t const buflen = std::size(sv) * 4 + 10;
@@ -423,8 +428,13 @@ static std::string to_utf8(std::string_view sv)
     return strip_non_utf8(sv);
 }
 
+} // namespace tr_strvUtf8Clean_impl
+} // namespace
+
 std::string tr_strvUtf8Clean(std::string_view cleanme)
 {
+    using namespace tr_strvUtf8Clean_impl;
+
     if (tr_utf8_validate(cleanme, nullptr))
     {
         return std::string{ cleanme };
@@ -443,21 +453,6 @@ std::string tr_win32_native_to_utf8(std::wstring_view in)
         len = WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out), nullptr, nullptr);
     TR_ASSERT(len == std::size(out));
     return out;
-}
-
-static char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
-{
-    if (text == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (text_size < 0)
-    {
-        return tr_strvDup(tr_win32_native_to_utf8(text));
-    }
-
-    return tr_strvDup(tr_win32_native_to_utf8({ text, static_cast<size_t>(text_size) }));
 }
 
 std::wstring tr_win32_utf8_to_native(std::string_view in)
@@ -504,61 +499,66 @@ std::string tr_win32_format_message(uint32_t code)
     return text;
 }
 
-static void tr_win32_make_args_utf8(int* argc, char*** argv)
+namespace
 {
-    int my_argc;
-    wchar_t** my_wide_argv;
+namespace tr_main_win32_impl
+{
 
-    my_wide_argv = CommandLineToArgvW(GetCommandLineW(), &my_argc);
-
-    if (my_wide_argv == nullptr)
+std::optional<std::vector<std::string>> win32MakeUtf8Argv()
+{
+    int argc;
+    auto argv = std::vector<std::string>{};
+    if (wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc); wargv != nullptr)
     {
-        return;
-    }
-
-    TR_ASSERT(*argc == my_argc);
-
-    char** my_argv = tr_new(char*, my_argc + 1);
-    int processed_argc = 0;
-
-    for (int i = 0; i < my_argc; ++i, ++processed_argc)
-    {
-        my_argv[i] = tr_win32_native_to_utf8(my_wide_argv[i], -1);
-
-        if (my_argv[i] == nullptr)
+        for (int i = 0; i < my_argc; ++i)
         {
-            break;
-        }
-    }
+            if (wargv[i] == nullptr)
+            {
+                break;
+            }
 
-    if (processed_argc < my_argc)
-    {
-        for (int i = 0; i < processed_argc; ++i)
-        {
-            tr_free(my_argv[i]);
+            auto str = tr_win32_native_to_utf8(wargv[i]);
+            if (std::empty(str))
+            {
+                break;
+            }
+
+            argv.emplace_back(std::move(str));
         }
 
-        tr_free(my_argv);
+        LocalFree(my_wide_argv);
     }
-    else
+
+    if (std::size(argv) == argc)
     {
-        my_argv[my_argc] = nullptr;
-
-        *argc = my_argc;
-        *argv = my_argv;
-
-        /* TODO: Add atexit handler to cleanup? */
+        return argv;
     }
 
-    LocalFree(my_wide_argv);
+    return {};
 }
+
+} // namespace tr_main_win32_impl
+} // namespace
 
 int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 {
-    tr_win32_make_args_utf8(&argc, &argv);
+    using namespace tr_main_win32_impl;
+
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
-    return (*real_main)(argc, argv);
+
+    // build an argv from GetCommandLineW + CommandLineToArgvW
+    auto const argv_strs = win32MakeUtf8Argv();
+    auto argv_cstrs = std::vector<char*>{};
+    argv_cstrs.reserve(std::size(argv_strs));
+    std::transform(
+        std::begin(argv_strs),
+        std::end(argv_strs),
+        std::back_inserter(argv_cstrs),
+        [](auto& str) { return std::data(str); });
+    argv_cstrs.push_back(nullptr); // argv is nullptr-terminated
+
+    return (*real_main)(std::size(argv_strs), std::data(argv_cstrs));
 }
 
 #endif
@@ -566,6 +566,11 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 /***
 ****
 ***/
+
+namespace
+{
+namespace tr_parseNumberRange_impl
+{
 
 struct number_range
 {
@@ -577,7 +582,7 @@ struct number_range
  * This should be a single number (ex. "6") or a range (ex. "6-9").
  * Anything else is an error and will return failure.
  */
-static bool parseNumberSection(std::string_view str, number_range& range)
+bool parseNumberSection(std::string_view str, number_range& range)
 {
     auto constexpr Delimiter = "-"sv;
 
@@ -609,6 +614,9 @@ static bool parseNumberSection(std::string_view str, number_range& range)
     return true;
 }
 
+} // namespace tr_parseNumberRange_impl
+} // namespace
+
 /**
  * Given a string like "1-4" or "1-4,6,9,14-51", this allocates and returns an
  * array of setmeCount ints of all the values in the array.
@@ -617,6 +625,8 @@ static bool parseNumberSection(std::string_view str, number_range& range)
  */
 std::vector<int> tr_parseNumberRange(std::string_view str)
 {
+    using namespace tr_parseNumberRange_impl;
+
     auto values = std::set<int>{};
     auto token = std::string_view{};
     auto range = number_range{};
@@ -785,9 +795,12 @@ uint64_t tr_ntohll(uint64_t x)
 
 /***
 ****
-****
-****
 ***/
+
+namespace
+{
+namespace formatter_impl
+{
 
 struct formatter_unit
 {
@@ -805,13 +818,7 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(
-    formatter_units& units,
-    uint64_t kilo,
-    char const* kb,
-    char const* mb,
-    char const* gb,
-    char const* tb)
+void formatter_init(formatter_units& units, uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     uint64_t value = kilo;
     tr_strlcpy(std::data(units[TR_FMT_KB].name), kb, std::size(units[TR_FMT_KB].name));
@@ -830,7 +837,7 @@ static void formatter_init(
     units[TR_FMT_TB].value = value;
 }
 
-static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
+char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
 {
     formatter_unit const* unit = nullptr;
 
@@ -873,31 +880,39 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
     return buf;
 }
 
-static formatter_units size_units;
+formatter_units size_units;
+formatter_units speed_units;
+formatter_units mem_units;
+
+} // namespace formatter_impl
+} // namespace
+
+size_t tr_speed_K = 0;
 
 void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
+    using namespace formatter_impl;
     formatter_init(size_units, kilo, kb, mb, gb, tb);
 }
 
 std::string tr_formatter_size_B(uint64_t bytes)
 {
+    using namespace formatter_impl;
     auto buf = std::array<char, 64>{};
     return formatter_get_size_str(size_units, std::data(buf), bytes, std::size(buf));
 }
 
-static formatter_units speed_units;
-
-size_t tr_speed_K = 0;
-
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
+    using namespace formatter_impl;
     tr_speed_K = kilo;
     formatter_init(speed_units, kilo, kb, mb, gb, tb);
 }
 
 std::string tr_formatter_speed_KBps(double KBps)
 {
+    using namespace formatter_impl;
+
     auto speed = KBps;
 
     if (speed <= 999.95) // 0.0 KB to 999.9 KB
@@ -921,24 +936,28 @@ std::string tr_formatter_speed_KBps(double KBps)
     return fmt::format("{:.1f} {:s}", speed / K, std::data(speed_units[TR_FMT_GB].name));
 }
 
-static formatter_units mem_units;
-
 size_t tr_mem_K = 0;
 
 void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
+    using namespace formatter_impl;
+
     tr_mem_K = kilo;
     formatter_init(mem_units, kilo, kb, mb, gb, tb);
 }
 
 std::string tr_formatter_mem_B(size_t bytes_per_second)
 {
+    using namespace formatter_impl;
+
     auto buf = std::array<char, 64>{};
     return formatter_get_size_str(mem_units, std::data(buf), bytes_per_second, std::size(buf));
 }
 
 void tr_formatter_get_units(void* vdict)
 {
+    using namespace formatter_impl;
+
     auto* dict = static_cast<tr_variant*>(vdict);
 
     tr_variantDictReserve(dict, 6);
