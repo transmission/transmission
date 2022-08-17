@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cerrno>
 #include <cstdio>
 #include <cstdlib> // bsearch()
 #include <string_view>

@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::sort
-#include <cerrno>
 #include <cstring>
 #include <stack>
 #include <string>

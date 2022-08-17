@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
-#include <cerrno> /* ENOENT */
 #include <climits> /* INT_MAX */
 #include <condition_variable>
 #include <csignal>
