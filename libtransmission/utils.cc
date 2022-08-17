@@ -529,7 +529,7 @@ static void tr_win32_make_args_utf8(int* argc, char*** argv)
 
     TR_ASSERT(*argc == my_argc);
 
-    char** my_argv = tr_new(char*, my_argc + 1);
+    char** my_argv = new char*[my_argc + 1];
     int processed_argc = 0;
 
     for (int i = 0; i < my_argc; ++i, ++processed_argc)
@@ -549,7 +549,7 @@ static void tr_win32_make_args_utf8(int* argc, char*** argv)
             tr_free(my_argv[i]);
         }
 
-        tr_free(my_argv);
+        delete[] my_argv;
     }
     else
     {
