@@ -64,24 +64,23 @@ enum class TrFormat
  * when the task is complete */
 struct tr_rpc_idle_data
 {
-    tr_session* session;
-    tr_variant* response;
-    tr_variant* args_out;
-    tr_rpc_response_func callback;
-    void* callback_user_data;
+    tr_variant response = {};
+    tr_session* session = nullptr;
+    tr_variant* args_out = nullptr;
+    tr_rpc_response_func callback = nullptr;
+    void* callback_user_data = nullptr;
 };
 
 static auto constexpr SuccessResult = "success"sv;
 
 static void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view result)
 {
-    tr_variantDictAddStr(data->response, TR_KEY_result, result);
+    tr_variantDictAddStr(&data->response, TR_KEY_result, result);
 
-    (*data->callback)(data->session, data->response, data->callback_user_data);
+    (*data->callback)(data->session, &data->response, data->callback_user_data);
 
-    tr_variantFree(data->response);
-    tr_free(data->response);
-    tr_free(data);
+    tr_variantFree(&data->response);
+    delete data;
 }
 
 /***
@@ -1524,7 +1523,7 @@ static void onMetadataFetched(tr_web::FetchResponse const& web_response)
                 fmt::arg("error_code", status)));
     }
 
-    tr_free(data);
+    delete data;
 }
 
 static bool isCurlURL(std::string_view url)
@@ -1652,10 +1651,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     if (isCurlURL(filename))
     {
-        auto* const d = tr_new0(struct add_torrent_idle_data, 1);
-        d->data = idle_data;
-        d->ctor = ctor;
-
+        auto* const d = new add_torrent_idle_data{ idle_data, ctor };
         auto options = tr_web::FetchOptions{ filename, onMetadataFetched, d };
         options.cookies = cookies;
         session->web->fetch(std::move(options));
@@ -2533,17 +2529,16 @@ void tr_rpc_request_exec_json(
     }
     else
     {
-        auto* const data = tr_new0(struct tr_rpc_idle_data, 1);
+        auto* const data = new tr_rpc_idle_data{};
         data->session = session;
-        data->response = tr_new0(tr_variant, 1);
-        tr_variantInitDict(data->response, 3);
+        tr_variantInitDict(&data->response, 3);
 
         if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
-            tr_variantDictAddInt(data->response, TR_KEY_tag, tag);
+            tr_variantDictAddInt(&data->response, TR_KEY_tag, tag);
         }
 
-        data->args_out = tr_variantDictAddDict(data->response, TR_KEY_arguments, 0);
+        data->args_out = tr_variantDictAddDict(&data->response, TR_KEY_arguments, 0);
         data->callback = callback;
         data->callback_user_data = callback_user_data;
         result = (*method->func)(session, args_in, data->args_out, data);
