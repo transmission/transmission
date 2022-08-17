@@ -548,7 +548,7 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
     SetConsoleOutputCP(CP_UTF8);
 
     // build an argv from GetCommandLineW + CommandLineToArgvW
-    if (auto const argv_strs = win32MakeUtf8Argv(); argv_strs)
+    if (auto argv_strs = win32MakeUtf8Argv(); argv_strs)
     {
         auto argv_cstrs = std::vector<char*>{};
         argv_cstrs.reserve(std::size(*argv_strs));
