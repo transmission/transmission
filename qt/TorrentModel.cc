@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <set>
 #include <string_view>
 
 #include <libtransmission/transmission.h>
