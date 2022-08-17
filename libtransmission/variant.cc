@@ -42,12 +42,6 @@ static bool tr_variantIsContainer(tr_variant const* v)
     return tr_variantIsList(v) || tr_variantIsDict(v);
 }
 
-static bool tr_variantIsSomething(tr_variant const* v)
-{
-    return tr_variantIsContainer(v) || tr_variantIsInt(v) || tr_variantIsString(v) || tr_variantIsReal(v) ||
-        tr_variantIsBool(v);
-}
-
 void tr_variantInit(tr_variant* v, char type)
 {
     v->type = type;
@@ -929,10 +923,12 @@ static struct VariantWalkFuncs const freeWalkFuncs = {
 
 void tr_variantReset(tr_variant* v)
 {
-    if (tr_variantIsSomething(v))
+    if (!tr_variantIsEmpty(v))
     {
         tr_variantWalk(v, &freeWalkFuncs, nullptr, false);
     }
+
+    *v = {};
 }
 
 /***

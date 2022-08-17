@@ -27,6 +27,7 @@
 #include "session.h"
 #include "tr-assert.h"
 #include "trevent.h"
+#include "utils.h"
 
 /***
 ****
