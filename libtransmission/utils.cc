@@ -320,7 +320,12 @@ void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeo
 ****
 ***/
 
-bool tr_utf8_validate(std::string_view sv, char const** good_end)
+namespace
+{
+namespace tr_strvUtf8Clean_impl
+{
+
+bool validateUtf8(std::string_view sv, char const** good_end)
 {
     auto const* begin = std::data(sv);
     auto const* const end = begin + std::size(sv);
@@ -349,10 +354,6 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
     return all_good;
 }
 
-namespace
-{
-namespace tr_strvUtf8Clean_impl
-{
 std::string strip_non_utf8(std::string_view sv)
 {
     auto out = std::string{};
@@ -404,7 +405,7 @@ std::string tr_strvUtf8Clean(std::string_view cleanme)
 {
     using namespace tr_strvUtf8Clean_impl;
 
-    if (tr_utf8_validate(cleanme, nullptr))
+    if (validateUtf8(cleanme, nullptr))
     {
         return std::string{ cleanme };
     }
