@@ -111,7 +111,11 @@ void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
     }
 }
 
-void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
+template<typename OutputIt>
+void tr_http_escape(OutputIt out, tr_sha1_digest_t const& digest)
+{
+    tr_http_escape(out, std::string_view{ reinterpret_cast<char const*>(digest.data()), std::size(digest) }, false);
+}
 
 char const* tr_webGetResponseStr(long response_code);
 

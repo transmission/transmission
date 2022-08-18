@@ -8,6 +8,7 @@
 #include <cinttypes> // PRIu64
 #include <cstdio>
 #include <ctime>
+#include <iterator>
 #include <string>
 #include <string_view>
 
@@ -339,14 +340,9 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         }
 
         // build the full scrape URL
-        auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
-        tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
         auto const scrape = tracker.scrape.sv();
-        auto const url = tr_urlbuf{ scrape,
-                                    tr_strvContains(scrape, '?') ? '&' : '?',
-                                    "info_hash="sv,
-                                    std::string_view{ std::data(escaped) } };
-
+        auto url = tr_urlbuf{ scrape, tr_strvContains(scrape, '?') ? '&' : '?', "info_hash="sv };
+        tr_http_escape(std::back_inserter(url), metainfo.infoHash());
         printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(url));
         fflush(stdout);
 

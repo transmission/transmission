@@ -172,29 +172,6 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-static bool is_rfc2396_alnum(uint8_t ch)
-{
-    return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
-        ch == '_' || ch == '~';
-}
-
-void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest)
-{
-    for (auto const b : digest)
-    {
-        if (is_rfc2396_alnum(uint8_t(b)))
-        {
-            *out++ = (char)b;
-        }
-        else
-        {
-            out = fmt::format_to(out, FMT_STRING("%{:02x}"), unsigned(b));
-        }
-    }
-
-    *out = '\0';
-}
-
 //// URLs
 
 namespace
