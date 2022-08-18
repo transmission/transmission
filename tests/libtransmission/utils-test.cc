@@ -113,15 +113,6 @@ TEST_F(UtilsTest, trStrvStrip)
     EXPECT_EQ("test"sv, tr_strvStrip("test"sv));
 }
 
-TEST_F(UtilsTest, trStrvDup)
-{
-    auto constexpr Key = "this is a test"sv;
-    char* str = tr_strvDup(Key);
-    EXPECT_NE(nullptr, str);
-    EXPECT_EQ(Key, str);
-    tr_free(str);
-}
-
 TEST_F(UtilsTest, trStrvUtf8Clean)
 {
     auto in = "hello world"sv;

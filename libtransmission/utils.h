@@ -217,8 +217,6 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
 
 [[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
 
-[[nodiscard]] char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
-
 [[nodiscard]] std::string tr_strvUtf8Clean(std::string_view cleanme);
 
 /**

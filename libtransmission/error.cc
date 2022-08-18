@@ -14,6 +14,15 @@
 #include "tr-macros.h"
 #include "utils.h"
 
+static char* tr_strvDup(std::string_view in)
+{
+    auto const n = std::size(in);
+    auto* const ret = new char[n + 1];
+    std::copy(std::begin(in), std::end(in), ret);
+    ret[n] = '\0';
+    return ret;
+}
+
 void tr_error_free(tr_error* error)
 {
     if (error == nullptr)
@@ -21,7 +30,7 @@ void tr_error_free(tr_error* error)
         return;
     }
 
-    tr_free(error->message);
+    delete[] error->message;
     delete error;
 }
 
@@ -77,6 +86,6 @@ void tr_error_prefix(tr_error** error, char const* prefix)
 
     auto* err = *error;
     auto* const new_message = tr_strvDup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
-    tr_free(err->message);
+    delete[] err->message;
     err->message = new_message;
 }
