@@ -26,7 +26,7 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-assert.h>
-#include <libtransmission/utils.h> // tr_free(), tr_time()
+#include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/web-utils.h> // tr_urlIsValid()
 #include <libtransmission/variant.h>
 

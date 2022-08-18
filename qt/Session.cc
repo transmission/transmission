@@ -24,7 +24,7 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/session-id.h>
-#include <libtransmission/utils.h> // tr_free
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "Session.h"

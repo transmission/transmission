@@ -122,17 +122,6 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 ****
 ***/
 
-/** @brief Portability wrapper around malloc() in which `0' is a safe argument */
-void* tr_malloc(size_t size);
-
-/** @brief Portability wrapper around calloc() in which `0' is a safe argument */
-void* tr_malloc0(size_t size);
-
-/** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
-void tr_free(void* p);
-
-#define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
-
 constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';
