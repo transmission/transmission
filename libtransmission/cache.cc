@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <cstdlib> // std::lldiv()
 #include <iterator> // std::distance(), std::next(), std::prev()
 #include <limits> // std::numeric_limits<size_t>::max()
