@@ -127,13 +127,13 @@ TEST_F(UtilsTest, trStrvUtf8Clean)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
     out = tr_strvUtf8Clean(in);
     EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом"sv;
     out = tr_strvUtf8Clean(in);
     EXPECT_NE(0U, std::size(out));
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
     EXPECT_EQ(in, out);
 
     // https://trac.transmissionbt.com/ticket/6064
@@ -142,13 +142,13 @@ TEST_F(UtilsTest, trStrvUtf8Clean)
     in = "\xF4\x00\x81\x82"sv;
     out = tr_strvUtf8Clean(in);
     EXPECT_NE(0U, std::size(out));
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
 
     in = "\xF4\x33\x81\x82"sv;
     out = tr_strvUtf8Clean(in);
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 4 || out.size() == 7);
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
 }
 
 TEST_F(UtilsTest, trStrvUtf8CleanFuzz)
@@ -159,7 +159,7 @@ TEST_F(UtilsTest, trStrvUtf8CleanFuzz)
         buf.resize(tr_rand_int(4096));
         tr_rand_buffer(std::data(buf), std::size(buf));
         auto const out = tr_strvUtf8Clean({ std::data(buf), std::size(buf) });
-        EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+        EXPECT_EQ(out, tr_strvUtf8Clean(out));
     }
 }
 

@@ -94,8 +94,6 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv);
 
-bool tr_utf8_validate(std::string_view sv, char const** good_end);
-
 #ifdef _WIN32
 
 std::string tr_win32_format_message(uint32_t code);
