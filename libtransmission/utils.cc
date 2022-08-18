@@ -198,15 +198,6 @@ tr_disk_space tr_dirSpace(std::string_view directory)
 *****
 ****/
 
-char* tr_strvDup(std::string_view in)
-{
-    auto const n = std::size(in);
-    auto* const ret = tr_new(char, n + 1);
-    std::copy(std::begin(in), std::end(in), ret);
-    ret[n] = '\0';
-    return ret;
-}
-
 size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
 {
     size_t const len = std::size(src);

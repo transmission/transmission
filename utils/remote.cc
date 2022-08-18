@@ -77,7 +77,16 @@ static char constexpr SpeedMStr[] = "MB/s";
 static char constexpr SpeedGStr[] = "GB/s";
 static char constexpr SpeedTStr[] = "TB/s";
 
-static char id[4096];
+struct Config
+{
+    std::string auth;
+    std::string filter;
+    std::string netrc;
+    std::string session_id;
+    std::string torrent_ids;
+    bool debug = false;
+    bool use_ssl = false;
+};
 
 /***
 ****
@@ -543,13 +552,6 @@ static int getOptMode(int val)
     }
 }
 
-static bool debug = false;
-static char* auth = nullptr;
-static char* filter = nullptr;
-static char* netrc = nullptr;
-static char* session_id = nullptr;
-static bool UseSSL = false;
-
 static std::string getEncodedMetainfo(std::string_view filename)
 {
     if (auto contents = std::vector<char>{}; tr_loadFile(filename, contents))
@@ -560,17 +562,17 @@ static std::string getEncodedMetainfo(std::string_view filename)
     return {};
 }
 
-static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
+static void addIdArg(tr_variant* args, std::string_view id_str, std::string_view fallback = "")
 {
-    if (tr_str_is_empty(id_str))
+    if (std::empty(id_str))
     {
         id_str = fallback;
+    }
 
-        if (tr_str_is_empty(id_str))
-        {
-            fprintf(stderr, "No torrent specified!  Please use the -t option first.\n");
-            id_str = "-1"; /* no torrent will have this ID, so will act as a no-op */
-        }
+    if (std::empty(id_str))
+    {
+        fprintf(stderr, "No torrent specified!  Please use the -t option first.\n");
+        id_str = "-1"sv; /* no torrent will have this ID, so will act as a no-op */
     }
 
     static auto constexpr IdActive = "active"sv;
@@ -582,15 +584,15 @@ static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
     }
     else if (IdAll != id_str)
     {
-        bool isList = strchr(id_str, ',') != nullptr || strchr(id_str, '-') != nullptr;
-        bool isNum = true;
+        bool const is_list = id_str.find_first_of(",-") != std::string_view::npos;
+        bool is_num = true;
 
-        for (char const* pch = id_str; isNum && *pch != '\0'; ++pch)
+        for (auto const& ch : id_str)
         {
-            isNum = isdigit(*pch);
+            is_num = is_num && isdigit(ch);
         }
 
-        if (isNum || isList)
+        if (is_num || is_list)
         {
             tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id_str);
         }
@@ -599,6 +601,11 @@ static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
             tr_variantDictAddStr(args, TR_KEY_ids, id_str); /* it's a torrent sha hash */
         }
     }
+}
+
+static void addIdArg(tr_variant* args, Config const& config, std::string_view fallback = "")
+{
+    return addIdArg(args, config.torrent_ids, fallback);
 }
 
 static void addTime(tr_variant* args, tr_quark const key, char const* arg)
@@ -789,8 +796,9 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 }
 
 /* look for a session id in the header in case the server gives back a 409 */
-static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* /*stream*/)
+static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
+    auto& config = *static_cast<Config*>(vconfig);
     auto const* const line = static_cast<char const*>(ptr);
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
@@ -806,7 +814,7 @@ static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* /*
             ++end;
         }
 
-        session_id = tr_strvDup(std::string_view{ begin, size_t(end - begin) });
+        config.session_id.assign(begin, end - begin);
     }
 
     return line_len;
@@ -1985,7 +1993,7 @@ static void printGroups(tr_variant* top)
     }
 }
 
-static void filterIds(tr_variant* top)
+static void filterIds(tr_variant* top, Config& config)
 {
     tr_variant* args;
     tr_variant* list;
@@ -1998,14 +2006,14 @@ static void filterIds(tr_variant* top)
         bool negate = false;
         std::string_view arg;
 
-        if (filter[pos] == '~')
+        if (config.filter[pos] == '~')
         {
             ++pos;
             negate = true;
         }
-        if (strlen(filter) > pos + 1 && filter[pos + 1] == ':')
+        if (std::size(config.filter) > pos + 1 && config.filter[pos + 1] == ':')
         {
-            arg = filter + pos + 2;
+            arg = &config.filter[pos + 2];
         }
 
         for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
@@ -2018,7 +2026,7 @@ static void filterIds(tr_variant* top)
             }
             bool include = negate;
             auto const status = getStatusString(d);
-            switch (filter[pos])
+            switch (config.filter[pos])
             {
             case 'i': // Status = Idle
                 if (status == "Idle")
@@ -2098,7 +2106,9 @@ static void filterIds(tr_variant* top)
                 ids.insert(torId);
             }
         }
-        std::string res;
+
+        auto& res = config.torrent_ids;
+        res.clear();
         for (auto const& i : ids)
         {
             res += std::to_string(i) + ",";
@@ -2107,15 +2117,14 @@ static void filterIds(tr_variant* top)
         {
             res = ","; // no selected torrents
         }
-        tr_strlcpy(id, res.data(), 4096);
     }
 }
-static int processResponse(char const* rpcurl, std::string_view response)
+static int processResponse(char const* rpcurl, std::string_view response, Config& config)
 {
     auto top = tr_variant{};
     auto status = int{ EXIT_SUCCESS };
 
-    if (debug)
+    if (config.debug)
     {
         fprintf(
             stderr,
@@ -2188,7 +2197,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
                     break;
 
                 case TAG_FILTER:
-                    filterIds(&top);
+                    filterIds(&top, config);
                     break;
 
                 case TAG_TORRENT_ADD:
@@ -2199,8 +2208,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
                         if (tr_variantDictFindDict(&top, Arguments, &b) &&
                             tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) && tr_variantDictFindInt(b, TR_KEY_id, &i))
                         {
-                            auto const [out, len] = fmt::format_to_n(id, sizeof(id) - 1, FMT_STRING("{:d}"), i);
-                            *out = '\0';
+                            config.torrent_ids = std::to_string(i);
                         }
                         [[fallthrough]];
                     }
@@ -2233,44 +2241,45 @@ static int processResponse(char const* rpcurl, std::string_view response)
     return status;
 }
 
-static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
+static CURL* tr_curl_easy_init(struct evbuffer* writebuf, Config& config)
 {
     CURL* curl = curl_easy_init();
     (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format(FMT_STRING("{:s}/{:s}"), MyName, LONG_VERSION_STRING).c_str());
     (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
+    (void)curl_easy_setopt(curl, CURLOPT_HEADERDATA, &config);
     (void)curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, parseResponseHeader);
     (void)curl_easy_setopt(curl, CURLOPT_POST, 1);
     (void)curl_easy_setopt(curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
     (void)curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-    (void)curl_easy_setopt(curl, CURLOPT_VERBOSE, debug);
+    (void)curl_easy_setopt(curl, CURLOPT_VERBOSE, config.debug);
     (void)curl_easy_setopt(
         curl,
         CURLOPT_ENCODING,
         ""); /* "" tells curl to fill in the blanks with what it was compiled to support */
 
-    if (netrc != nullptr)
+    if (auto const& str = config.netrc; !std::empty(str))
     {
-        (void)curl_easy_setopt(curl, CURLOPT_NETRC_FILE, netrc);
+        (void)curl_easy_setopt(curl, CURLOPT_NETRC_FILE, str.c_str());
     }
 
-    if (auth != nullptr)
+    if (auto const& str = config.auth; !std::empty(str))
     {
-        (void)curl_easy_setopt(curl, CURLOPT_USERPWD, auth);
+        (void)curl_easy_setopt(curl, CURLOPT_USERPWD, str.c_str());
     }
 
-    if (UseSSL)
+    if (config.use_ssl)
     {
-        (void)curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); /* do not verify subject/hostname */
-        (void)curl_easy_setopt(
-            curl,
-            CURLOPT_SSL_VERIFYPEER,
-            0); /* since most certs will be self-signed, do not verify against CA */
+        // do not verify subject/hostname
+        (void)curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+
+        // since most certs will be self-signed, do not verify against CA
+        (void)curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     }
 
-    if (!tr_str_is_empty(session_id))
+    if (auto const& str = config.session_id; !std::empty(str))
     {
-        auto const h = fmt::format(FMT_STRING("{:s}: {:s}"), TR_RPC_SESSION_ID_HEADER, session_id);
+        auto const h = fmt::format(FMT_STRING("{:s}: {:s}"), TR_RPC_SESSION_ID_HEADER, str);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
 
         (void)curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
@@ -2293,19 +2302,20 @@ static void tr_curl_easy_cleanup(CURL* curl)
     }
 }
 
-static int flush(char const* rpcurl, tr_variant* benc)
+static int flush(char const* rpcurl, tr_variant* benc, Config& config)
 {
     int status = EXIT_SUCCESS;
     auto const json = tr_variantToStr(benc, TR_VARIANT_FMT_JSON_LEAN);
-    auto const rpcurl_http = fmt::format(FMT_STRING("{:s}://{:s}"), UseSSL ? "https" : "http", rpcurl);
+    auto const scheme = config.use_ssl ? "https"sv : "http"sv;
+    auto const rpcurl_http = fmt::format(FMT_STRING("{:s}://{:s}"), scheme, rpcurl);
 
     auto* const buf = evbuffer_new();
-    auto* curl = tr_curl_easy_init(buf);
+    auto* curl = tr_curl_easy_init(buf, config);
     (void)curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http.c_str());
     (void)curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
     (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, getTimeoutSecs(json));
 
-    if (debug)
+    if (config.debug)
     {
         fprintf(stderr, "posting:\n--------\n%s\n--------\n", json.c_str());
     }
@@ -2326,7 +2336,8 @@ static int flush(char const* rpcurl, tr_variant* benc)
         case 200:
             status |= processResponse(
                 rpcurl,
-                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) });
+                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) },
+                config);
             break;
 
         case 409:
@@ -2335,7 +2346,7 @@ static int flush(char const* rpcurl, tr_variant* benc)
              * build a new CURL* and try again */
             tr_curl_easy_cleanup(curl);
             curl = nullptr;
-            status |= flush(rpcurl, benc);
+            status |= flush(rpcurl, benc, config);
             break;
 
         default:
@@ -2385,15 +2396,13 @@ static tr_variant* ensure_tset(tr_variant* tset)
 
 static char rename_from[4096];
 
-static int processArgs(char const* rpcurl, int argc, char const* const* argv)
+static int processArgs(char const* rpcurl, int argc, char const* const* argv, Config& config)
 {
     int status = EXIT_SUCCESS;
     char const* optarg;
     auto sset = tr_variant{};
     auto tset = tr_variant{};
     auto tadd = tr_variant{};
-
-    *id = '\0';
 
     for (;;)
     {
@@ -2411,18 +2420,18 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             case 'a': /* add torrent */
                 if (!tr_variantIsEmpty(&sset))
                 {
-                    status |= flush(rpcurl, &sset);
+                    status |= flush(rpcurl, &sset, config);
                 }
 
                 if (!tr_variantIsEmpty(&tadd))
                 {
-                    status |= flush(rpcurl, &tadd);
+                    status |= flush(rpcurl, &tadd, config);
                 }
 
                 if (!tr_variantIsEmpty(&tset))
                 {
-                    addIdArg(tr_variantDictFind(&tset, Arguments), id, nullptr);
-                    status |= flush(rpcurl, &tset);
+                    addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                    status |= flush(rpcurl, &tset, config);
                 }
 
                 tr_variantInitDict(&tadd, 3);
@@ -2432,17 +2441,17 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'b': /* debug */
-                debug = true;
+                config.debug = true;
                 break;
 
             case 'n': /* auth */
-                auth = tr_strvDup(optarg);
+                config.auth = optarg;
                 break;
 
             case 810: /* authenv */
                 if (auto const authstr = tr_env_get_string("TR_AUTH"); !std::empty(authstr))
                 {
-                    auth = tr_strvDup(authstr);
+                    config.auth = authstr;
                 }
                 else
                 {
@@ -2452,27 +2461,27 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                 break;
 
-            case 'N': /* netrc */
-                netrc = tr_strvDup(optarg);
+            case 'N':
+                config.netrc = optarg;
                 break;
 
-            case 820: /* UseSSL */
-                UseSSL = true;
+            case 820:
+                config.use_ssl = true;
                 break;
 
             case 't': /* set current torrent */
                 if (!tr_variantIsEmpty(&tadd))
                 {
-                    status |= flush(rpcurl, &tadd);
+                    status |= flush(rpcurl, &tadd, config);
                 }
 
                 if (!tr_variantIsEmpty(&tset))
                 {
-                    addIdArg(tr_variantDictFind(&tset, Arguments), id, nullptr);
-                    status |= flush(rpcurl, &tset);
+                    addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                    status |= flush(rpcurl, &tset, config);
                 }
 
-                tr_strlcpy(id, optarg, sizeof(id));
+                config.torrent_ids = optarg;
                 break;
 
             case 'V': /* show version number */
@@ -2480,7 +2489,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 exit(0);
 
             case 944:
-                printf("%s\n", tr_str_is_empty(id) ? "all" : id);
+                printf("%s\n", std::empty(config.torrent_ids) ? "all" : config.torrent_ids.c_str());
                 break;
 
             case TR_OPT_ERR:
@@ -2525,14 +2534,14 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             if (!tr_variantIsEmpty(&tset))
             {
-                addIdArg(tr_variantDictFind(&tset, Arguments), id, nullptr);
-                status |= flush(rpcurl, &tset);
+                addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                status |= flush(rpcurl, &tset, config);
             }
 
             switch (c)
             {
             case 'F':
-                filter = tr_strvDup(optarg); /* Unnecessary dup? we will use it before optarg will be changed */
+                config.filter = optarg;
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_FILTER);
 
                 for (size_t i = 0; i < TR_N_ELEMENTS(details_keys); ++i)
@@ -2540,7 +2549,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantListAddQuark(fields, details_keys[i]);
                 }
 
-                addIdArg(args, id, "all");
+                addIdArg(args, config, "all");
                 break;
             case 'i':
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_DETAILS);
@@ -2550,7 +2559,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantListAddQuark(fields, details_keys[i]);
                 }
 
-                addIdArg(args, id, nullptr);
+                addIdArg(args, config);
                 break;
 
             case 'l':
@@ -2561,7 +2570,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantListAddQuark(fields, list_keys[i]);
                 }
 
-                addIdArg(args, id, "all");
+                addIdArg(args, config, "all");
                 break;
 
             case 940:
@@ -2572,33 +2581,33 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantListAddQuark(fields, files_keys[i]);
                 }
 
-                addIdArg(args, id, nullptr);
+                addIdArg(args, config);
                 break;
 
             case 941:
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_PEERS);
                 tr_variantListAddStrView(fields, "peers"sv);
-                addIdArg(args, id, nullptr);
+                addIdArg(args, config);
                 break;
 
             case 942:
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_PIECES);
                 tr_variantListAddStrView(fields, "pieces"sv);
                 tr_variantListAddStrView(fields, "pieceCount"sv);
-                addIdArg(args, id, nullptr);
+                addIdArg(args, config);
                 break;
 
             case 943:
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_TRACKERS);
                 tr_variantListAddStrView(fields, "trackerStats"sv);
-                addIdArg(args, id, nullptr);
+                addIdArg(args, config);
                 break;
 
             default:
                 assert("unhandled value" && 0);
             }
 
-            status |= flush(rpcurl, &top);
+            status |= flush(rpcurl, &top, config);
         }
         else if (stepMode == MODE_SESSION_SET)
         {
@@ -2768,7 +2777,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             tr_variant* targs = nullptr;
             tr_variant* sargs = nullptr;
 
-            if (!tr_str_is_empty(id))
+            if (!std::empty(config.torrent_ids))
             {
                 targs = ensure_tset(&tset);
             }
@@ -2981,8 +2990,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 tr_variant* args = tr_variantDictAddDict(&top, Arguments, 3);
                 tr_variantDictAddStr(args, TR_KEY_location, optarg);
                 tr_variantDictAddBool(args, TR_KEY_move, false);
-                addIdArg(args, id, nullptr);
-                status |= flush(rpcurl, &top);
+                addIdArg(args, config);
+                status |= flush(rpcurl, &top, config);
                 break;
             }
         }
@@ -2996,7 +3005,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "session-get"sv);
                     tr_variantDictAddInt(&top, TR_KEY_tag, TAG_SESSION);
-                    status |= flush(rpcurl, &top);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3010,8 +3019,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-start"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), id, nullptr);
-                    status |= flush(rpcurl, &top);
+                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    status |= flush(rpcurl, &top, config);
                 }
                 break;
 
@@ -3025,8 +3034,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-stop"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), id, nullptr);
-                    status |= flush(rpcurl, &top);
+                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    status |= flush(rpcurl, &top, config);
                 }
 
                 break;
@@ -3043,7 +3052,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 1);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "session-close"sv);
-                    status |= flush(rpcurl, &top);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3052,7 +3061,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 1);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "blocklist-update"sv);
-                    status |= flush(rpcurl, &top);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3062,7 +3071,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "session-stats"sv);
                     tr_variantDictAddInt(&top, TR_KEY_tag, TAG_STATS);
-                    status |= flush(rpcurl, &top);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3072,7 +3081,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "port-test"sv);
                     tr_variantDictAddInt(&top, TR_KEY_tag, TAG_PORTTEST);
-                    status |= flush(rpcurl, &top);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3080,15 +3089,15 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 {
                     if (!tr_variantIsEmpty(&tset))
                     {
-                        addIdArg(tr_variantDictFind(&tset, Arguments), id, nullptr);
-                        status |= flush(rpcurl, &tset);
+                        addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                        status |= flush(rpcurl, &tset, config);
                     }
 
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-reannounce"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), id, nullptr);
-                    status |= flush(rpcurl, &top);
+                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3096,15 +3105,15 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 {
                     if (!tr_variantIsEmpty(&tset))
                     {
-                        addIdArg(tr_variantDictFind(&tset, Arguments), id, nullptr);
-                        status |= flush(rpcurl, &tset);
+                        addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                        status |= flush(rpcurl, &tset, config);
                     }
 
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-verify"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), id, nullptr);
-                    status |= flush(rpcurl, &top);
+                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3116,8 +3125,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-remove"sv);
                     auto* args = tr_variantDictAddDict(&top, Arguments, 2);
                     tr_variantDictAddBool(args, TR_KEY_delete_local_data, c == 840);
-                    addIdArg(args, id, nullptr);
-                    status |= flush(rpcurl, &top);
+                    addIdArg(args, config);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3129,8 +3138,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     auto* args = tr_variantDictAddDict(&top, Arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_location, optarg);
                     tr_variantDictAddBool(args, TR_KEY_move, true);
-                    addIdArg(args, id, nullptr);
-                    status |= flush(rpcurl, &top);
+                    addIdArg(args, config);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3142,8 +3151,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     auto* args = tr_variantDictAddDict(&top, Arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_path, rename_from);
                     tr_variantDictAddStr(args, TR_KEY_name, optarg);
-                    addIdArg(args, id, NULL);
-                    status |= flush(rpcurl, &top);
+                    addIdArg(args, config);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3159,7 +3168,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "group-get"sv);
                     tr_variantDictAddInt(&top, TR_KEY_tag, TAG_GROUPS);
-                    status |= flush(rpcurl, &top);
+                    status |= flush(rpcurl, &top, config);
                     break;
                 }
 
@@ -3173,18 +3182,18 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
     if (!tr_variantIsEmpty(&tadd))
     {
-        status |= flush(rpcurl, &tadd);
+        status |= flush(rpcurl, &tadd, config);
     }
 
     if (!tr_variantIsEmpty(&tset))
     {
-        addIdArg(tr_variantDictFind(&tset, Arguments), id, nullptr);
-        status |= flush(rpcurl, &tset);
+        addIdArg(tr_variantDictFind(&tset, Arguments), config);
+        status |= flush(rpcurl, &tset, config);
     }
 
     if (!tr_variantIsEmpty(&sset))
     {
-        status |= flush(rpcurl, &sset);
+        status |= flush(rpcurl, &sset, config);
     }
 
     return status;
@@ -3208,7 +3217,7 @@ static bool parsePortString(char const* s, int* port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl)
+static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl, Config& config)
 {
     if (*argv[1] == '-')
     {
@@ -3224,7 +3233,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, i
     }
     else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
     {
-        UseSSL = true;
+        config.use_ssl = true;
         *rpcurl = fmt::format(FMT_STRING("{:s}/rpc/"), s + 8);
     }
     else if (parsePortString(s, port))
@@ -3266,6 +3275,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, i
 
 int tr_main(int argc, char* argv[])
 {
+    auto config = Config{};
     auto port = DefaultPort;
     auto host = std::string{};
     auto rpcurl = std::string{};
@@ -3280,7 +3290,7 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
-    getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl);
+    getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl, config);
 
     if (std::empty(host))
     {
@@ -3292,5 +3302,5 @@ int tr_main(int argc, char* argv[])
         rpcurl = fmt::format(FMT_STRING("{:s}:{:d}{:s}"), host, port, DefaultUrl);
     }
 
-    return processArgs(rpcurl.c_str(), argc, (char const* const*)argv);
+    return processArgs(rpcurl.c_str(), argc, (char const* const*)argv, config);
 }
