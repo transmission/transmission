@@ -811,7 +811,6 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     /* load the torrents */
     {
-        tr_torrent** torrents;
         tr_ctor* ctor = tr_ctorNew(mySession);
 
         if (arg->paused)
@@ -819,8 +818,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             tr_ctorSetPaused(ctor, TR_FORCE, true);
         }
 
-        torrents = tr_sessionLoadTorrents(mySession, ctor, nullptr);
-        tr_free(torrents);
+        tr_sessionLoadTorrents(mySession, ctor);
         tr_ctorFree(ctor);
     }
 

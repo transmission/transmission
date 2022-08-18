@@ -1891,8 +1891,6 @@ struct sessionLoadTorrentsData
 {
     tr_session* session;
     tr_ctor* ctor;
-    int* setmeCount;
-    tr_torrent** torrents;
     bool done;
 };
 
@@ -1935,41 +1933,41 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
         tr_sys_dir_close(odir);
     }
 
-    int const n = std::size(torrents);
-    data->torrents = tr_new(tr_torrent*, n); // NOLINT(bugprone-sizeof-expression)
-    std::copy(std::begin(torrents), std::end(torrents), data->torrents);
-
-    if (n != 0)
+    if (auto const n = std::size(torrents); n != 0U)
     {
         tr_logAddInfo(fmt::format(ngettext("Loaded {count} torrent", "Loaded {count} torrents", n), fmt::arg("count", n)));
-    }
-
-    if (data->setmeCount != nullptr)
-    {
-        *data->setmeCount = n;
     }
 
     data->done = true;
 }
 
-tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* setmeCount)
+size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
 {
     struct sessionLoadTorrentsData data;
 
     data.session = session;
     data.ctor = ctor;
-    data.setmeCount = setmeCount;
-    data.torrents = nullptr;
     data.done = false;
-
     tr_runInEventThread(session, sessionLoadTorrents, &data);
-
     while (!data.done)
     {
         tr_wait_msec(100);
     }
 
-    return data.torrents;
+    return std::size(session->torrents());
+}
+
+size_t tr_sessionGetAllTorrents(tr_session* session, tr_torrent** buf, size_t buflen)
+{
+    auto& torrents = session->torrents();
+    auto const n = std::size(torrents);
+
+    if (buflen >= n)
+    {
+        std::copy_n(std::begin(torrents), n, buf);
+    }
+
+    return n;
 }
 
 /***

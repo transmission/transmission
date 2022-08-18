@@ -357,7 +357,7 @@ void Session::start()
         rpc_.start(session_);
 
         auto* const ctor = tr_ctorNew(session_);
-        tr_free(tr_sessionLoadTorrents(session_, ctor, nullptr));
+        tr_sessionLoadTorrents(session_, ctor);
         tr_ctorFree(ctor);
     }
 
