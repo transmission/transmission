@@ -12,10 +12,6 @@
 ****
 ***/
 
-#ifndef __has_attribute
-#define __has_attribute(x) 0
-#endif
-
 #ifndef __has_builtin
 #define __has_builtin(x) 0
 #endif
@@ -57,16 +53,6 @@
     Class& operator=(Class&&) = delete; \
     Class(Class const&) = delete; \
     Class(Class&&) = delete;
-
-/***
-****
-***/
-
-#if __has_attribute(__malloc__) || TR_GNUC_CHECK_VERSION(2, 96)
-#define TR_GNUC_MALLOC __attribute__((__malloc__))
-#else
-#define TR_GNUC_MALLOC
-#endif
 
 /***
 ****

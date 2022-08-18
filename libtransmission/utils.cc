@@ -60,28 +60,6 @@ using namespace std::literals;
 
 time_t __tr_current_time = 0;
 
-/***
-****
-***/
-
-void* tr_malloc(size_t size)
-{
-    return size != 0 ? malloc(size) : nullptr;
-}
-
-void* tr_malloc0(size_t size)
-{
-    return size != 0 ? calloc(1, size) : nullptr;
-}
-
-void tr_free(void* p)
-{
-    if (p != nullptr)
-    {
-        free(p);
-    }
-}
-
 /**
 ***
 **/

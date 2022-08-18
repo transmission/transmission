@@ -26,7 +26,7 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-assert.h>
-#include <libtransmission/utils.h> // tr_free(), tr_time()
+#include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/web-utils.h> // tr_urlIsValid()
 #include <libtransmission/variant.h>
 
@@ -1269,32 +1269,30 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_local_data)
     }
 }
 
-void Session::load(bool forcePaused)
+void Session::load(bool force_paused)
 {
-    tr_ctor* ctor;
-    tr_torrent** torrents;
-    int count = 0;
+    auto* const ctor = tr_ctorNew(impl_->get_session());
 
-    ctor = tr_ctorNew(impl_->get_session());
-
-    if (forcePaused)
+    if (force_paused)
     {
         tr_ctorSetPaused(ctor, TR_FORCE, true);
     }
 
     tr_ctorSetPeerLimit(ctor, TR_FALLBACK, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
 
-    torrents = tr_sessionLoadTorrents(impl_->get_session(), ctor, &count);
+    auto* session = impl_->get_session();
+    auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
+    tr_ctorFree(ctor);
 
     ScopedModelSortBlocker disable_sort(*gtr_get_ptr(impl_->get_model()));
 
-    for (int i = 0; i < count; ++i)
+    auto torrents = std::vector<tr_torrent*>{};
+    torrents.resize(n_torrents);
+    tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
+    for (auto* tor : torrents)
     {
-        impl_->add_torrent(torrents[i], false);
+        impl_->add_torrent(tor, false);
     }
-
-    tr_free(torrents);
-    tr_ctorFree(ctor);
 }
 
 void Session::clear()

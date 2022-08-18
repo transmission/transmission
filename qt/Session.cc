@@ -24,7 +24,7 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/session-id.h>
-#include <libtransmission/utils.h> // tr_free
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "Session.h"
@@ -357,7 +357,7 @@ void Session::start()
         rpc_.start(session_);
 
         auto* const ctor = tr_ctorNew(session_);
-        tr_free(tr_sessionLoadTorrents(session_, ctor, nullptr));
+        tr_sessionLoadTorrents(session_, ctor);
         tr_ctorFree(ctor);
     }
 

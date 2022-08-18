@@ -710,11 +710,23 @@ void tr_sessionSetQueueStartCallback(tr_session*, void (*callback)(tr_session*, 
 ***/
 
 /**
- *  Load all the torrents in the session's torrent folder.
- *  This can be used at startup to kickstart all the torrents
- *  from the previous session.
+ * Load all the torrents in the session's torrent folder.
+ * This can be used at startup to kickstart all the torrents
+ * from the previous session.
+ *
+ * @return the number of torrents in the session
  */
-tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* setmeCount);
+size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor);
+
+/**
+ * Get pointers to all the torrents in a session.
+ *
+ * Iff `buflen` is large enough to hold the torrents pointers,
+ * then all of them are copied into `buf`.
+ *
+ * @return the number of torrents in the session
+ */
+size_t tr_sessionGetAllTorrents(tr_session* session, tr_torrent** buf, size_t buflen);
 
 /**
 ***
