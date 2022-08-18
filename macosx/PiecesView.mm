@@ -99,7 +99,7 @@ enum
     BOOL const first = std::empty(self.fPieces);
     if (first)
     {
-        self.fPieces.resize(self.fNumPieces);
+        _fPieces.resize(self.fNumPieces);
     }
 
     auto pieces = std::vector<int8_t>{};
