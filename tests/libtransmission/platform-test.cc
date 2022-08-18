@@ -1,5 +1,5 @@
 // This file Copyright (C) 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -15,7 +15,6 @@
 
 using namespace std::literals;
 using PlatformTest = ::libtransmission::test::SessionTest;
-using ::libtransmission::test::makeString;
 
 #ifdef _WIN32
 #include <windows.h>
@@ -28,8 +27,8 @@ TEST_F(PlatformTest, defaultDownloadDirXdg)
     setenv("HOME", sandboxDir().c_str(), 1);
     setenv("XDG_CONFIG_HOME", LIBTRANSMISSION_TEST_ASSETS_DIR, 1);
 
-    auto actual = makeString(tr_getDefaultDownloadDir());
-    auto expected = fmt::format("{:s}/UserDirsDownloads"sv, sandboxDir());
+    auto const expected = fmt::format("{:s}/UserDirsDownloads"sv, sandboxDir());
+    auto const actual = tr_getDefaultDownloadDir();
     EXPECT_EQ(expected, actual);
 
     unsetenv("XDG_CONFIG_HOME");
@@ -41,8 +40,8 @@ TEST_F(PlatformTest, defaultDownloadDir)
 {
     setenv("HOME", sandboxDir().c_str(), 1);
 
-    auto expected = fmt::format("{:s}/Downloads"sv, sandboxDir());
-    auto actual = makeString(tr_getDefaultDownloadDir());
+    auto const expected = fmt::format("{:s}/Downloads"sv, sandboxDir());
+    auto const actual = tr_getDefaultDownloadDir();
     EXPECT_EQ(expected, actual);
 
     unsetenv("HOME");
@@ -53,8 +52,8 @@ TEST_F(PlatformTest, defaultConfigDirEnv)
 {
     setenv("TRANSMISSION_HOME", sandboxDir().c_str(), 1);
 
-    auto actual = makeString(tr_getDefaultConfigDir("appname"));
-    auto expected = sandboxDir();
+    auto const expected = sandboxDir();
+    auto const actual = tr_getDefaultConfigDir("appname");
     EXPECT_EQ(expected, actual);
 
     unsetenv("TRANSMISSION_HOME");
@@ -66,8 +65,8 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfig)
 {
     setenv("XDG_CONFIG_HOME", sandboxDir().c_str(), 1);
 
-    auto expected = fmt::format("{:s}/appname", sandboxDir());
-    auto actual = makeString(tr_getDefaultConfigDir("appname"));
+    auto const expected = fmt::format("{:s}/appname", sandboxDir());
+    auto const actual = tr_getDefaultConfigDir("appname");
     EXPECT_EQ(expected, actual);
 
     unsetenv("XDG_CONFIG_HOME");
@@ -78,8 +77,8 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
     auto const home = tr_pathbuf{ sandboxDir(), "/home/user" };
     setenv("HOME", home, 1);
 
-    auto expected = fmt::format("{:s}/.config/appname", home.sv());
-    auto actual = makeString(tr_getDefaultConfigDir("appname"));
+    auto const expected = fmt::format("{:s}/.config/appname", home.sv());
+    auto const actual = tr_getDefaultConfigDir("appname");
     EXPECT_EQ(expected, actual);
 
     unsetenv("HOME");

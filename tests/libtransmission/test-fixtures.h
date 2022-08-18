@@ -1,5 +1,5 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -45,15 +45,19 @@ using file_func_t = std::function<void(char const* filename)>;
 
 static void depthFirstWalk(char const* path, file_func_t func)
 {
-    auto info = tr_sys_path_info{};
-    if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+    if (auto const info = tr_sys_path_get_info(path); info && info->isFolder())
     {
         if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
-            char const* name;
-            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+            for (;;)
             {
-                if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+                char const* const name = tr_sys_dir_read_name(odir);
+                if (name == nullptr)
+                {
+                    break;
+                }
+
+                if ("."sv != name && ".."sv != name)
                 {
                     auto const child = fmt::format("{:s}/{:s}"sv, path, name);
                     depthFirstWalk(child.c_str(), func);
@@ -65,13 +69,6 @@ static void depthFirstWalk(char const* path, file_func_t func)
     }
 
     func(path);
-}
-
-inline std::string makeString(char*&& s)
-{
-    auto const ret = std::string(s != nullptr ? s : "");
-    tr_free(s);
-    return ret;
 }
 
 inline bool waitFor(std::function<bool()> const& test, int msec)
@@ -123,17 +120,13 @@ protected:
         }
 
         tr_error* error = nullptr;
-
-        if (auto* path = tr_sys_dir_get_current(&error); path != nullptr)
+        auto path = tr_sys_dir_get_current(&error);
+        if (error != nullptr)
         {
-            auto ret = std::string{ path };
-            tr_free(path);
-            return ret;
+            std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
+            tr_error_free(error);
         }
-
-        std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
-        tr_error_free(error);
-        return {};
+        return path;
     }
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
@@ -194,7 +187,7 @@ protected:
         errno = tmperr;
     }
 
-    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len)
+    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error** error = nullptr)
     {
         uint64_t n_left = data_len;
         auto const* left = static_cast<uint8_t const*>(data);
@@ -202,11 +195,12 @@ protected:
         while (n_left > 0)
         {
             uint64_t n = {};
-            tr_error* error = nullptr;
-            if (!tr_sys_file_write(fd, left, n_left, &n, &error))
+            tr_error* local_error = nullptr;
+            if (!tr_sys_file_write(fd, left, n_left, &n, &local_error))
             {
-                fprintf(stderr, "Error writing file: '%s'\n", error->message);
-                tr_error_free(error);
+                fprintf(stderr, "Error writing file: '%s'\n", local_error->message);
+                tr_error_propagate(error, &local_error);
+                tr_error_free(local_error);
                 break;
             }
 
@@ -221,10 +215,21 @@ protected:
 
         buildParentDir(tmpl);
 
-        // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(tmpl);
-        blockingFileWrite(fd, payload, n);
-        tr_sys_file_close(fd);
+        tr_error* error = nullptr;
+        auto const fd = tr_sys_file_open_temp(tmpl, &error);
+        blockingFileWrite(fd, payload, n, &error);
+        tr_sys_file_flush(fd, &error);
+        tr_sys_file_flush(fd, &error);
+        tr_sys_file_close(fd, &error);
+        if (error != nullptr)
+        {
+            fmt::print(
+                "Couldn't create '{path}': {error} ({error_code})\n",
+                fmt::arg("path", tmpl),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code));
+            tr_error_free(error);
+        }
         sync();
 
         errno = tmperr;
@@ -242,6 +247,8 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
+        tr_sys_file_flush(fd);
+        tr_sys_file_flush(fd);
         tr_sys_file_close(fd);
         sync();
 
@@ -445,13 +452,7 @@ protected:
     {
         EXPECT_NE(nullptr, tor->session);
         tr_wait_msec(100);
-        EXPECT_TRUE(waitFor(
-            [tor]()
-            {
-                auto const activity = tr_torrentGetActivity(tor);
-                return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT && tor->checked_pieces_.hasAll();
-            },
-            4000));
+        EXPECT_TRUE(waitFor([tor]() { return tor->verifyState() == TR_VERIFY_NONE && tor->checked_pieces_.hasAll(); }, 4000));
     }
 
     void blockingTorrentVerify(tr_torrent* tor) const
@@ -472,7 +473,7 @@ protected:
             tr_variantInitDict(settings, 10);
             auto constexpr deleter = [](tr_variant* v)
             {
-                tr_variantFree(v);
+                tr_variantClear(v);
                 delete v;
             };
             settings_.reset(settings, deleter);

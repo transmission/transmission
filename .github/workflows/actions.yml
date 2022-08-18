@@ -20,7 +20,7 @@ jobs:
       make-qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' }}
       make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' }}
       make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
-      make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' }}
+      make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
       make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
       test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' }}
     steps:
@@ -181,7 +181,7 @@ jobs:
         run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install gtkmm3
+        run: brew install gtkmm3 libjpeg
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install qt@5
@@ -243,13 +243,14 @@ jobs:
           apk add \
             ca-certificates \
             cmake \
-            g++ \
-            gettext \
-            git \
             curl-dev \
             fmt-dev \
+            g++ \
+            gettext-dev \
+            git \
             libevent-dev \
             libpsl \
+            linux-headers \
             miniupnpc-dev \
             ninja \
             pkgconfig \
@@ -349,7 +350,7 @@ jobs:
         run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install gtkmm3
+        run: brew install gtkmm3 libjpeg
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install qt@5

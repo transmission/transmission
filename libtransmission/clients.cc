@@ -180,8 +180,7 @@ constexpr std::string_view charint(char ch)
 int strint(char const* pch, int span, int base = 10)
 {
     auto sv = std::string_view{ pch, static_cast<size_t>(span) };
-    auto const num = tr_parseNum<int>(sv, base);
-    return num ? *num : 0;
+    return tr_parseNum<int>(sv, base).value_or(0);
 }
 
 constexpr std::string_view getMnemonicEnd(uint8_t ch)

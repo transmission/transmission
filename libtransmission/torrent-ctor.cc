@@ -7,6 +7,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "transmission.h"
@@ -19,7 +20,6 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 
 using namespace std::literals;
 
@@ -352,9 +352,9 @@ tr_ctor* tr_ctorNew(tr_session const* session)
 {
     auto* const ctor = new tr_ctor{ session };
 
-    tr_ctorSetDeleteSource(ctor, tr_sessionGetDeleteSource(session));
-    tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
-    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
+    tr_ctorSetDeleteSource(ctor, session->shouldDeleteSource());
+    tr_ctorSetPaused(ctor, TR_FALLBACK, session->shouldPauseAddedTorrents());
+    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent());
     tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
 
     return ctor;

@@ -1,5 +1,5 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -12,9 +12,8 @@
 #include "file.h"
 #include "net.h"
 #include "peer-socket.h"
-#include "session.h" // tr_sessionIsAddressBlocked()
+#include "session.h" // tr_session.tr_session.addressIsBlocked()
 #include "tr-strbuf.h"
-#include "utils.h"
 
 #include "test-fixtures.h"
 
@@ -60,7 +59,7 @@ protected:
     bool addressIsBlocked(char const* address_str)
     {
         auto const addr = tr_address::fromString(address_str);
-        return !addr || tr_sessionIsAddressBlocked(session_, &*addr);
+        return !addr || session_->addressIsBlocked(*addr);
     }
 };
 

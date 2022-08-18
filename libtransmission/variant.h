@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -91,7 +91,15 @@ struct tr_variant
     } val = {};
 };
 
-void tr_variantFree(tr_variant*);
+/**
+ * @brief Clear the variant to an empty state.
+ *
+ * `tr_variantIsEmpty()` will return true after this is called.
+ *
+ * The variant itself is not freed, but any memory used by
+ * its *value* -- e.g. a string or child variants -- is freed.
+ */
+void tr_variantClear(tr_variant*);
 
 /***
 ****  Serialization / Deserialization
@@ -130,9 +138,30 @@ bool tr_variantFromBuf(
     char const** setme_end = nullptr,
     tr_error** error = nullptr);
 
+template<typename T>
+bool tr_variantFromBuf(
+    tr_variant* setme,
+    int variant_parse_opts,
+    T const& buf,
+    char const** setme_end = nullptr,
+    tr_error** error = nullptr)
+{
+    return tr_variantFromBuf(
+        setme,
+        variant_parse_opts,
+        std::string_view{ std::data(buf), static_cast<size_t>(std::size(buf)) },
+        setme_end,
+        error);
+}
+
 constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
     return b != nullptr && b->type == type;
+}
+
+constexpr bool tr_variantIsEmpty(tr_variant const* b)
+{
+    return b == nullptr || b->type == '\0';
 }
 
 /***
@@ -151,7 +180,7 @@ void tr_variantInitStrView(tr_variant* initme, std::string_view);
 void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
 
-bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** raw_setme, size_t* len_setme);
+bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
 
 /***
 ****  Real Numbers
@@ -186,7 +215,7 @@ constexpr bool tr_variantIsInt(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
 
-void tr_variantInitInt(tr_variant* variant, int64_t value);
+void tr_variantInitInt(tr_variant* initme, int64_t value);
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 
 /***
@@ -198,17 +227,17 @@ constexpr bool tr_variantIsList(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_LIST;
 }
 
-void tr_variantInitList(tr_variant* list, size_t reserve_count);
+void tr_variantInitList(tr_variant* initme, size_t reserve_count);
 void tr_variantListReserve(tr_variant* list, size_t reserve_count);
 
 tr_variant* tr_variantListAdd(tr_variant* list);
-tr_variant* tr_variantListAddBool(tr_variant* list, bool addme);
-tr_variant* tr_variantListAddInt(tr_variant* list, int64_t addme);
-tr_variant* tr_variantListAddReal(tr_variant* list, double addme);
-tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view);
-tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view);
-tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const addme);
-tr_variant* tr_variantListAddRaw(tr_variant* list, void const* addme_value, size_t addme_len);
+tr_variant* tr_variantListAddBool(tr_variant* list, bool value);
+tr_variant* tr_variantListAddInt(tr_variant* list, int64_t value);
+tr_variant* tr_variantListAddReal(tr_variant* list, double value);
+tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view value);
+tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view value);
+tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const value);
+tr_variant* tr_variantListAddRaw(tr_variant* list, void const* value, size_t value_len);
 tr_variant* tr_variantListAddList(tr_variant* list, size_t reserve_count);
 tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count);
 tr_variant* tr_variantListChild(tr_variant* list, size_t pos);

@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <climits> /* USHRT_MAX, INT_MAX */
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -13,7 +14,6 @@
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 

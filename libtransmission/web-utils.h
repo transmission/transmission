@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,11 +11,9 @@
 #include <string_view>
 #include <utility>
 
-#include "tr-macros.h" // tr_sha1_digest_t
-#include "tr-strbuf.h" // tr_urlbuf
-#include "utils.h"
+#include <fmt/format.h>
 
-struct evbuffer;
+#include "tr-macros.h" // tr_sha1_digest_t
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
@@ -101,7 +99,8 @@ void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
 
     for (auto const& ch : in)
     {
-        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
+        if (UnescapedChars.find(ch) != std::string_view::npos ||
+            (ReservedChars.find(ch) != std::string_view::npos && !escape_reserved))
         {
             out = ch;
         }
@@ -112,7 +111,11 @@ void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
     }
 }
 
-void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
+template<typename OutputIt>
+void tr_http_escape(OutputIt out, tr_sha1_digest_t const& digest)
+{
+    tr_http_escape(out, std::string_view{ reinterpret_cast<char const*>(digest.data()), std::size(digest) }, false);
+}
 
 char const* tr_webGetResponseStr(long response_code);
 

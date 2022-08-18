@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <limits.h> /* INT_MAX */
+#include <memory>
 #include <numeric>
 #include <sstream>
 #include <stddef.h>
@@ -22,7 +23,7 @@
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_free */
+#include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h>
 
 #include "Actions.h"
@@ -415,7 +416,7 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
     }
 
     core_->exec(&top);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
@@ -434,7 +435,7 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
     }
 
     core_->exec(&top);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
@@ -453,7 +454,7 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
     }
 
     core_->exec(&top);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 Gtk::Widget* DetailsDialog::Impl::options_page_new()
@@ -2299,19 +2300,6 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
     }
 }
 
-namespace
-{
-
-std::string get_editable_tracker_list(tr_torrent const* tor)
-{
-    char* cstr = tr_torrentGetTrackerList(tor);
-    auto str = std::string{ cstr != nullptr ? cstr : "" };
-    tr_free(cstr);
-    return str;
-}
-
-} // namespace
-
 void DetailsDialog::Impl::on_edit_trackers()
 {
     tr_torrent const* tor = tracker_list_get_current_torrent();
@@ -2343,7 +2331,7 @@ void DetailsDialog::Impl::on_edit_trackers()
         t->add_wide_control(row, *l);
 
         auto* w = Gtk::make_managed<Gtk::TextView>();
-        w->get_buffer()->set_text(get_editable_tracker_list(tor));
+        w->get_buffer()->set_text(tr_torrentGetTrackerList(tor));
         auto* fr = Gtk::make_managed<Gtk::Frame>();
         fr->set_shadow_type(Gtk::SHADOW_IN);
         auto* sw = Gtk::make_managed<Gtk::ScrolledWindow>();
@@ -2407,7 +2395,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
                 core_->exec(&top);
                 refresh();
 
-                tr_variantFree(&top);
+                tr_variantClear(&top);
             }
             else
             {
@@ -2477,7 +2465,7 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         core_->exec(&top);
         refresh();
 
-        tr_variantFree(&top);
+        tr_variantClear(&top);
     }
 }
 

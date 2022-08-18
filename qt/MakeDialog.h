@@ -1,25 +1,20 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <memory>
+#include <optional>
 
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/makemeta.h>
 
 #include "BaseDialog.h"
 #include "ui_MakeDialog.h"
 
 class QAbstractButton;
-
 class Session;
-
-extern "C"
-{
-    struct tr_metainfo_builder;
-}
 
 class MakeDialog : public BaseDialog
 {
@@ -45,5 +40,5 @@ private:
 
     Ui::MakeDialog ui_ = {};
 
-    std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> builder_;
+    std::optional<tr_metainfo_builder> builder_;
 };

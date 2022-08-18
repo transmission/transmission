@@ -1,5 +1,5 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -58,7 +58,7 @@ TEST(Crypto, DH)
     b.setPeerPublicKey(a.publicKey());
     EXPECT_EQ(toString(a.secret()), toString(b.secret()));
     EXPECT_EQ(a.secret(), b.secret());
-    EXPECT_EQ(96, std::size(a.secret()));
+    EXPECT_EQ(96U, std::size(a.secret()));
 
     auto c = tr_message_stream_encryption::DH{};
     c.setPeerPublicKey(b.publicKey());

@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -68,7 +68,7 @@ public:
     {
         if (!isInitialized())
         {
-            return {};
+            return { 0U, 0U };
         }
 
         return { pieceLoc(piece).block, pieceLastLoc(piece).block + 1 };
@@ -78,7 +78,7 @@ public:
     {
         if (!isInitialized())
         {
-            return {};
+            return { 0U, 0U };
         }
 
         auto const offset = pieceLoc(piece).byte;

@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -14,6 +14,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "transmission.h"
@@ -23,14 +24,12 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "completion.h"
-#include "file.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
 #include "log.h"
 #include "session.h"
 #include "torrent-metainfo.h"
 #include "tr-macros.h"
-#include "tr-strbuf.h"
 
 class tr_swarm;
 struct tr_error;
@@ -60,7 +59,7 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDi
 ***
 **/
 
-void tr_torrentChangeMyPort(tr_torrent* session);
+void tr_torrentChangeMyPort(tr_torrent* tor);
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
 
@@ -98,7 +97,7 @@ public:
 
     void setLocation(
         std::string_view location,
-        bool move_from_current_location,
+        bool move_from_old_path,
         double volatile* setme_progress,
         int volatile* setme_state);
 
@@ -520,17 +519,17 @@ public:
 
     [[nodiscard]] auto allowsPex() const noexcept
     {
-        return this->isPublic() && this->session->isPexEnabled;
+        return this->isPublic() && this->session->allowsPEX();
     }
 
     [[nodiscard]] auto allowsDht() const
     {
-        return this->isPublic() && tr_sessionAllowsDHT(this->session);
+        return this->isPublic() && this->session->allowsDHT();
     }
 
     [[nodiscard]] auto allowsLpd() const // local peer discovery
     {
-        return this->isPublic() && tr_sessionAllowsLPD(this->session);
+        return this->isPublic() && this->session->allowsLPD();
     }
 
     [[nodiscard]] bool isPieceTransferAllowed(tr_direction direction) const;
@@ -757,7 +756,7 @@ private:
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
-    return tor != nullptr && tr_isSession(tor->session);
+    return tor != nullptr && tor->session != nullptr;
 }
 
 /**
@@ -770,7 +769,7 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error = nullptr);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 

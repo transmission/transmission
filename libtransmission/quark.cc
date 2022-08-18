@@ -5,13 +5,13 @@
 
 #include <algorithm>
 #include <array>
+#include <string>
 #include <string_view>
 #include <vector>
 
 #include "transmission.h"
 
 #include "quark.h"
-#include "utils.h" // tr_strvDup()
 
 using namespace std::literals;
 
@@ -429,7 +429,7 @@ bool constexpr quarks_are_sorted()
 static_assert(quarks_are_sorted(), "Predefined quarks must be sorted by their string value");
 static_assert(std::size(my_static) == TR_N_KEYS);
 
-auto& my_runtime{ *new std::vector<std::string_view>{} };
+auto& my_runtime{ *new std::vector<std::string>{} };
 
 } // namespace
 
@@ -464,7 +464,7 @@ tr_quark tr_quark_new(std::string_view str)
     }
 
     auto const ret = TR_N_KEYS + std::size(my_runtime);
-    my_runtime.emplace_back(tr_strvDup(str), std::size(str));
+    my_runtime.emplace_back(std::string{ str });
     return ret;
 }
 

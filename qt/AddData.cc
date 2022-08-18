@@ -8,9 +8,10 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/error.h>
+#include <libtransmission/web-utils.h>
 
 #include "AddData.h"
 #include "Utils.h"

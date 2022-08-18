@@ -9,9 +9,6 @@
 #include <QPixmap>
 #include <QTextDocument>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-
 #include "FaviconCache.h"
 #include "Formatter.h"
 #include "Torrent.h"
@@ -174,7 +171,6 @@ QString timeToStringRounded(int seconds)
 
 QString TrackerDelegate::getText(TrackerInfo const& inf) const
 {
-    QString key;
     QString str;
     auto const err_markup_begin = QStringLiteral("<span style=\"color:red\">");
     auto const err_markup_end = QStringLiteral("</span>");
@@ -197,11 +193,6 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
     auto const url = QUrl(inf.st.announce);
     str += QStringLiteral("%1:%2").arg(url.host()).arg(url.port(80));
-
-    if (!key.isEmpty())
-    {
-        str += QStringLiteral(" - ") + key;
-    }
 
     str += inf.st.is_backup ? QStringLiteral("</i>") : QStringLiteral("</b>");
 

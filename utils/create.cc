@@ -4,13 +4,14 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cinttypes> // PRIu32
-#include <cstdint> // uint32_t
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
+#include <cstdlib> // for strtoul()
+#include <chrono>
+#include <cstdint> // for uint32_t
+#include <future>
 #include <string>
 #include <string_view>
+
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -19,7 +20,6 @@
 #include <libtransmission/log.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -50,16 +50,16 @@ auto constexpr Options = std::array<tr_option, 10>{
 
 struct app_options
 {
-    std::vector<tr_tracker_info> trackers;
-    std::vector<char const*> webseeds;
+    tr_announce_list trackers;
+    std::vector<std::string> webseeds;
     std::string outfile;
-    char const* comment = nullptr;
-    char const* infile = nullptr;
-    char const* source = nullptr;
-    uint32_t piecesize_kib = 0;
+    std::string_view comment;
+    std::string_view infile;
+    std::string_view source;
+    uint32_t piece_size = 0;
+    bool anonymize = false;
     bool is_private = false;
     bool show_version = false;
-    bool anonymize = false;
 };
 
 int parseCommandLine(app_options& options, int argc, char const* const* argv)
@@ -88,25 +88,23 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
             break;
 
         case 't':
-            options.trackers.push_back(tr_tracker_info{ 0, const_cast<char*>(optarg) });
+            options.trackers.add(optarg, options.trackers.nextTier());
             break;
 
         case 'w':
-            options.webseeds.push_back(optarg);
+            options.webseeds.emplace_back(optarg);
             break;
 
         case 's':
             if (optarg != nullptr)
             {
                 char* endptr = nullptr;
-                options.piecesize_kib = strtoul(optarg, &endptr, 10);
-
+                options.piece_size = strtoul(optarg, &endptr, 10) * KiB;
                 if (endptr != nullptr && *endptr == 'M')
                 {
-                    options.piecesize_kib *= KiB;
+                    options.piece_size *= KiB;
                 }
             }
-
             break;
 
         case 'r':
@@ -129,29 +127,21 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
     return 0;
 }
 
-char* tr_getcwd(void)
+std::string tr_getcwd()
 {
-    char* result;
     tr_error* error = nullptr;
-
-    result = tr_sys_dir_get_current(&error);
-
-    if (result == nullptr)
+    auto cur = tr_sys_dir_get_current(&error);
     {
         fprintf(stderr, "getcwd error: \"%s\"", error->message);
         tr_error_free(error);
-        result = tr_strdup("");
     }
-
-    return result;
+    return cur;
 }
 
 } // namespace
 
 int tr_main(int argc, char* argv[])
 {
-    tr_metainfo_builder* b = nullptr;
-
     tr_logSetLevel(TR_LOG_ERROR);
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
@@ -169,7 +159,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    if (options.infile == nullptr)
+    if (std::empty(options.infile))
     {
         fprintf(stderr, "ERROR: No input file or directory specified.\n");
         tr_getopt_usage(MyName, Usage, std::data(Options));
@@ -188,9 +178,7 @@ int tr_main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        char* const cwd = tr_getcwd();
-        options.outfile = tr_strvDup(tr_pathbuf{ std::string_view{ cwd }, '/', base, ".torrent"sv });
-        tr_free(cwd);
+        options.outfile = fmt::format("{:s}/{:s}.torrent"sv, tr_getcwd(), base);
     }
 
     if (std::empty(options.trackers))
@@ -206,92 +194,88 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    printf("Creating torrent \"%s\"\n", options.outfile.c_str());
+    fmt::print("Creating torrent \"{:s}\"\n", options.outfile);
 
-    b = tr_metaInfoBuilderCreate(options.infile);
-
-    if (b == nullptr)
+    auto builder = tr_metainfo_builder(options.infile);
+    auto const n_files = builder.fileCount();
+    if (n_files == 0U)
     {
         fprintf(stderr, "ERROR: Cannot find specified input file or directory.\n");
         return EXIT_FAILURE;
     }
 
-    for (uint32_t i = 0; i < b->fileCount; ++i)
+    for (tr_file_index_t i = 0; i < n_files; ++i)
     {
-        if (auto const& file = b->files[i]; !file.is_portable)
+        auto const& path = builder.path(i);
+        if (!tr_torrent_files::isSubpathPortable(path))
         {
-            fprintf(stderr, "WARNING: consider renaming nonportable filename \"%s\".\n", file.filename);
+            fmt::print(stderr, "WARNING\n");
+            fmt::print(stderr, "filename \"{:s}\" may not be portable on all systems.\n", path);
+            fmt::print(stderr, "consider \"{:s}\" instead.\n", tr_torrent_files::makeSubpathPortable(path));
         }
     }
 
-    if (options.piecesize_kib != 0)
+    if (options.piece_size != 0 && !builder.setPieceSize(options.piece_size))
     {
-        tr_metaInfoBuilderSetPieceSize(b, options.piecesize_kib * KiB);
+        fmt::print(stderr, "ERROR: piece size must be at least 16 KiB and must be a power of two.\n");
+        return EXIT_FAILURE;
     }
 
-    printf(
-        b->fileCount > 1 ? " %" PRIu32 " files, %s\n" : " %" PRIu32 " file, %s\n",
-        b->fileCount,
-        tr_formatter_size_B(b->totalSize).c_str());
-    printf(
-        b->pieceCount > 1 ? " %" PRIu32 " pieces, %s each\n" : " %" PRIu32 " piece, %s\n",
-        b->pieceCount,
-        tr_formatter_size_B(b->pieceSize).c_str());
+    fmt::print(
+        ngettext("{:d} files, {:s}\n", "{:d} file, {:s}\n", builder.fileCount()),
+        builder.fileCount(),
+        tr_formatter_size_B(builder.totalSize()));
 
-    tr_makeMetaInfo(
-        b,
-        options.outfile.c_str(),
-        std::data(options.trackers),
-        static_cast<int>(std::size(options.trackers)),
-        std::data(options.webseeds),
-        static_cast<int>(std::size(options.webseeds)),
-        options.comment,
-        options.is_private,
-        options.anonymize,
-        options.source);
+    fmt::print(
+        ngettext("{:d} pieces, {:s} each\n", "{:d} piece, {:s}\n", builder.pieceCount()),
+        builder.pieceCount(),
+        tr_formatter_size_B(builder.pieceSize()));
 
-    uint32_t last = UINT32_MAX;
-    while (!b->isDone)
+    if (!std::empty(options.comment))
     {
-        tr_wait_msec(500);
+        builder.setComment(options.comment);
+    }
 
-        uint32_t current = b->pieceIndex;
-        if (current != last)
+    if (!std::empty(options.source))
+    {
+        builder.setSource(options.source);
+    }
+
+    builder.setPrivate(options.is_private);
+    builder.setAnonymize(options.anonymize);
+    builder.setWebseeds(std::move(options.webseeds));
+    builder.setAnnounceList(std::move(options.trackers));
+
+    auto future = builder.makeChecksums();
+    auto last = std::optional<tr_piece_index_t>{};
+    while (future.wait_for(std::chrono::milliseconds(500)) != std::future_status::ready)
+    {
+        auto const [current, total] = builder.checksumStatus();
+
+        if (!last || current != *last)
         {
-            printf("\rPiece %" PRIu32 "/%" PRIu32 " ...", current, b->pieceCount);
+            fmt::print("\rPiece {:d}/{:d} ...", current, total);
             fflush(stdout);
-
             last = current;
         }
     }
 
-    putc(' ', stdout);
+    fmt::print(" ");
 
-    switch (b->result)
+    if (tr_error* error = future.get(); error != nullptr)
     {
-    case TrMakemetaResult::OK:
-        printf("done!");
-        break;
-
-    case TrMakemetaResult::ERR_URL:
-        printf("bad announce URL: \"%s\"", b->errfile);
-        break;
-
-    case TrMakemetaResult::ERR_IO_READ:
-        printf("error reading \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
-        break;
-
-    case TrMakemetaResult::ERR_IO_WRITE:
-        printf("error writing \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
-        break;
-
-    case TrMakemetaResult::CANCELLED:
-        printf("cancelled");
-        break;
+        fmt::print("ERROR: {:s} {:d}\n", error->message, error->code);
+        tr_error_free(error);
+        return EXIT_FAILURE;
     }
 
-    putc('\n', stdout);
+    if (tr_error* error = nullptr; !builder.save(options.outfile, &error))
+    {
+        fmt::print("ERROR: could not save \"{:s}\": {:s} {:d}\n", options.outfile, error->message, error->code);
+        tr_error_free(error);
+        return EXIT_FAILURE;
+    }
 
-    tr_metaInfoBuilderFree(b);
+    fmt::print("done!\n");
     return EXIT_SUCCESS;
 }

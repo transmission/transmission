@@ -1,5 +1,5 @@
 // This file Copyright © 2005-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -34,7 +34,7 @@ public:
     // If you're looping through several files, passing in a non-nullptr
     // `buffer` can reduce the number of memory allocations needed to
     // load multiple files.
-    bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* buffer = nullptr, tr_error** error = nullptr);
+    bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error** error = nullptr);
 
     // FILES
 
@@ -146,8 +146,6 @@ public:
     {
         return date_created_;
     }
-
-    [[nodiscard]] std::string benc() const;
 
     [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {

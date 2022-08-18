@@ -4,12 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <utility>
 
 #include <QFileInfo>
 #include <QPushButton>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* mime64 */
+
 #include <libtransmission/variant.h>
 #include <libtransmission/torrent-metainfo.h>
 

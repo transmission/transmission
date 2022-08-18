@@ -3,10 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <set>
-#include <unordered_map>
-#include <unordered_set>
-
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QColor>

@@ -11,6 +11,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -138,6 +139,11 @@ public:
         auto const lock = std::unique_lock(queued_tasks_mutex);
         curl_thread = std::make_unique<std::thread>(curlThreadFunc, this);
     }
+
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
 
     ~Impl()
     {

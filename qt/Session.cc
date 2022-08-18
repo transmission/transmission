@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "Session.h"
-
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -23,10 +21,13 @@
 #include <QTextStream>
 #include <QtDebug>
 
-#include <libtransmission/session-id.h>
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_free
+
+#include <libtransmission/session-id.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
+
+#include "Session.h"
 
 #include "AddData.h"
 #include "CustomVariantType.h"
@@ -351,12 +352,12 @@ void Session::start()
         tr_variantInitDict(&settings, 0);
         tr_sessionLoadSettings(&settings, config_dir_.toUtf8().constData(), "qt");
         session_ = tr_sessionInit(config_dir_.toUtf8().constData(), true, &settings);
-        tr_variantFree(&settings);
+        tr_variantClear(&settings);
 
         rpc_.start(session_);
 
         auto* const ctor = tr_ctorNew(session_);
-        tr_free(tr_sessionLoadTorrents(session_, ctor, nullptr));
+        tr_sessionLoadTorrents(session_, ctor);
         tr_ctorFree(ctor);
     }
 
@@ -815,28 +816,27 @@ RpcResponseFuture Session::exec(std::string_view method, tr_variant* args)
 
 void Session::updateStats(tr_variant* d, tr_session_stats* stats)
 {
-    auto value = dictFind<uint64_t>(d, TR_KEY_uploadedBytes);
-    if (value)
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_uploadedBytes); value)
     {
         stats->uploadedBytes = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_downloadedBytes)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_downloadedBytes); value)
     {
         stats->downloadedBytes = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_filesAdded)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_filesAdded); value)
     {
         stats->filesAdded = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_sessionCount)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_sessionCount); value)
     {
         stats->sessionCount = *value;
     }
 
-    if ((value = dictFind<uint64_t>(d, TR_KEY_secondsActive)))
+    if (auto const value = dictFind<uint64_t>(d, TR_KEY_secondsActive); value)
     {
         stats->secondsActive = *value;
     }
@@ -969,7 +969,7 @@ void Session::updateInfo(tr_variant* d)
     if (auto const str = dictFind<QString>(d, TR_KEY_session_id); str)
     {
         session_id_ = *str;
-        is_definitely_local_session_ = tr_session_id_is_local(session_id_.toUtf8().constData());
+        is_definitely_local_session_ = tr_session_id::isLocal(session_id_.toUtf8().constData());
     }
     else
     {

@@ -14,8 +14,11 @@ Want to learn more?
 Want to contribute?
 
 Much of this documentation is out-of-date or could be improved. Pull requests are greatly appreciated!
-
-# 2. More documentation #
+# 2. FAQ #
+* [Can I sequence the files I download?](./Can-I-sequence-the-files-I-download.md)
+* [Why are my speeds so slow?](./Why-Are-My-Speeds-So-Slow.md)
+* [Why is my port closed?](./Why-is-my-port-closed.md)
+# 3. More documentation #
  * [Configuration files](./Configuration-Files.md)
  * [Editing configuration files](./Editing-Configuration-Files.md)
  * [Environment variables](Environment-Variables.md)

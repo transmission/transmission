@@ -1,5 +1,5 @@
 // This file Copyright 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -57,7 +57,7 @@ tr_session_stats tr_stats::loadOldStats(std::string_view config_dir)
             ret.uploadedBytes = (uint64_t)i;
         }
 
-        tr_variantFree(&top);
+        tr_variantClear(&top);
     }
 
     return ret;
@@ -75,7 +75,7 @@ void tr_stats::save() const
     tr_variantDictAddInt(&top, TR_KEY_session_count, saveme.sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, saveme.uploadedBytes);
     tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 void tr_stats::clear()
@@ -89,6 +89,18 @@ void tr_stats::clear()
 {
     auto ret = single_;
     ret.secondsActive = time(nullptr) - start_time_;
+    ret.ratio = tr_getRatio(ret.uploadedBytes, ret.downloadedBytes);
+    return ret;
+}
+
+tr_session_stats tr_stats::add(tr_session_stats const& a, tr_session_stats const& b)
+{
+    auto ret = tr_session_stats{};
+    ret.uploadedBytes = a.uploadedBytes + b.uploadedBytes;
+    ret.downloadedBytes = a.downloadedBytes + b.downloadedBytes;
+    ret.filesAdded = a.filesAdded + b.filesAdded;
+    ret.sessionCount = a.sessionCount + b.sessionCount;
+    ret.secondsActive = a.secondsActive + b.secondsActive;
     ret.ratio = tr_getRatio(ret.uploadedBytes, ret.downloadedBytes);
     return ret;
 }

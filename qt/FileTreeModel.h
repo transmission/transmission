@@ -1,15 +1,15 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <cstdint> // uint64_t
+#include <map>
 #include <memory>
 
 #include <QAbstractItemModel>
-#include <QMap>
 #include <QSet>
 
 #include <libtransmission/tr-macros.h>
@@ -95,7 +95,7 @@ private:
     FileTreeItem* itemFromIndex(QModelIndex const&) const;
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
-    QMap<int, FileTreeItem*> index_cache_;
+    std::map<int, FileTreeItem*> index_cache_;
     std::unique_ptr<FileTreeItem> root_item_;
     bool is_editable_ = {};
 };

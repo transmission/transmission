@@ -90,29 +90,33 @@ tr_bandwidth::tr_bandwidth(tr_bandwidth* parent)
 ****
 ***/
 
-static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me)
+static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me) noexcept
 {
-    auto it = std::find(std::begin(v), std::end(v), remove_me);
-    if (it == std::end(v))
+    // the list isn't sorted -- so instead of erase()ing `it`,
+    // do the cheaper option of overwriting it with the final item
+    if (auto it = std::find(std::begin(v), std::end(v), remove_me); it != std::end(v))
+    {
+        *it = v.back();
+        v.resize(v.size() - 1);
+    }
+}
+
+void tr_bandwidth::deparent() noexcept
+{
+    if (parent_ == nullptr)
     {
         return;
     }
 
-    // the list isn't sorted -- so instead of erase()ing `it`,
-    // do the cheaper option of overwriting it with the final item
-    *it = v.back();
-    v.resize(v.size() - 1);
+    remove_child(parent_->children_, this);
+    parent_ = nullptr;
 }
 
 void tr_bandwidth::setParent(tr_bandwidth* new_parent)
 {
     TR_ASSERT(this != new_parent);
 
-    if (this->parent_ != nullptr)
-    {
-        remove_child(this->parent_->children_, this);
-        this->parent_ = nullptr;
-    }
+    deparent();
 
     if (new_parent != nullptr)
     {
@@ -160,15 +164,15 @@ void tr_bandwidth::allocateBandwidth(
     }
 }
 
-void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
+void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction dir)
 {
     /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others. Loop through the peers, giving each a
      * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
-    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peerArray.size(), dir == TR_UP ? "upload" : "download"));
+    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peer_array.size(), dir == TR_UP ? "upload" : "download"));
 
-    size_t n = peerArray.size();
+    auto n = peer_array.size();
     while (n > 0)
     {
         int const i = tr_rand_int_weak(n); /* pick a peer at random */
@@ -178,14 +182,14 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir
          * out in a timely manner. */
         size_t const increment = 3000;
 
-        int const bytes_used = tr_peerIoFlush(peerArray[i], dir, increment);
+        int const bytes_used = tr_peerIoFlush(peer_array[i], dir, increment);
 
         tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
 
         if (bytes_used != int(increment))
         {
             /* peer is done writing for now; move it to the end of the list */
-            std::swap(peerArray[i], peerArray[n - 1]);
+            std::swap(peer_array[i], peer_array[n - 1]);
             --n;
         }
     }

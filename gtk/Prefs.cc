@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <errno.h>
-#include <stdlib.h> /* strtol() */
 #include <string>
 #include <string_view>
 
@@ -49,9 +48,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
 
     if (dir.empty())
     {
-        auto* const tmp = tr_getDefaultDownloadDir();
-        dir = tmp;
-        tr_free(tmp);
+        dir = tr_getDefaultDownloadDir();
     }
 
     tr_variantDictReserve(d, 31);

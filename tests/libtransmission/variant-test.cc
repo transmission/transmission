@@ -1,5 +1,5 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,9 +8,8 @@
 #include "transmission.h"
 
 #include "benc.h"
-#include "crypto-utils.h"
+#include "crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
 #include "error.h"
-#include "utils.h" /* tr_free */
 #include "variant-common.h"
 #include "variant.h"
 
@@ -219,7 +218,7 @@ TEST_F(VariantTest, parse)
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
     EXPECT_EQ(int64_t(64), i);
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 
     benc = "li64ei32ei16ee"sv;
     ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
@@ -234,7 +233,7 @@ TEST_F(VariantTest, parse)
     EXPECT_EQ(16, i);
     EXPECT_EQ(benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
 
-    tr_variantFree(&val);
+    tr_variantClear(&val);
     end = nullptr;
 
     benc = "lllee"sv;
@@ -246,7 +245,7 @@ TEST_F(VariantTest, parse)
     EXPECT_TRUE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end));
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
     EXPECT_EQ(benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 
     benc = "d20:"sv;
     end = nullptr;
@@ -286,7 +285,7 @@ TEST_F(VariantTest, bencParseAndReencode)
         {
             EXPECT_EQ(test.benc.data() + test.benc.size(), end);
             EXPECT_EQ(test.benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-            tr_variantFree(&val);
+            tr_variantClear(&val);
         }
     }
 }
@@ -303,7 +302,7 @@ TEST_F(VariantTest, bencSortWhenSerializing)
     EXPECT_EQ(std::data(In) + std::size(In), end);
     EXPECT_EQ(ExpectedOut, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
 
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 }
 
 TEST_F(VariantTest, bencMalformedTooManyEndings)
@@ -318,7 +317,7 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), end);
     EXPECT_EQ(ExpectedOut, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
 
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 }
 
 TEST_F(VariantTest, bencMalformedNoEnding)
@@ -359,7 +358,7 @@ TEST_F(VariantTest, bencToJson)
 
         auto const str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
         EXPECT_EQ(test.expected, stripWhitespace(str));
-        tr_variantFree(&top);
+        tr_variantClear(&top);
     }
 }
 
@@ -415,8 +414,8 @@ TEST_F(VariantTest, merge)
     EXPECT_TRUE(tr_variantDictFindStrView(&dest, s8, &sv));
     EXPECT_EQ("ghi"sv, sv);
 
-    tr_variantFree(&dest);
-    tr_variantFree(&src);
+    tr_variantClear(&dest);
+    tr_variantClear(&src);
 }
 
 TEST_F(VariantTest, stackSmash)
@@ -473,7 +472,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     EXPECT_TRUE(tr_variantDictFindInt(&top, key4, &i));
     EXPECT_NE(0, i);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_F(VariantTest, dictFindType)
@@ -535,7 +534,7 @@ TEST_F(VariantTest, dictFindType)
     EXPECT_TRUE(tr_variantDictFindInt(&top, key_int, &i));
     EXPECT_EQ(ExpectedInt, i);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_F(VariantTest, variantFromBufFuzz)
@@ -546,19 +545,18 @@ TEST_F(VariantTest, variantFromBufFuzz)
     {
         buf.resize(tr_rand_int(4096));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const sv = std::string_view{ std::data(buf), std::size(buf) };
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
         if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
         {
-            tr_variantFree(&top);
+            tr_variantClear(&top);
         }
 
         if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
         {
-            tr_variantFree(&top);
+            tr_variantClear(&top);
         }
     }
 }

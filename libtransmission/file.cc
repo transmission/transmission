@@ -10,7 +10,6 @@
 #include "error.h"
 #include "file.h"
 #include "tr-assert.h"
-#include "utils.h"
 
 using namespace std::literals;
 

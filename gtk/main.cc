@@ -96,9 +96,7 @@ int main(int argc, char** argv)
     /* set up the config dir */
     if (std::empty(config_dir))
     {
-        auto* const default_config_dir = tr_getDefaultConfigDir(AppConfigDirName);
-        config_dir = default_config_dir;
-        tr_free(default_config_dir);
+        config_dir = tr_getDefaultConfigDir(AppConfigDirName);
     }
 
     gtr_pref_init(config_dir);

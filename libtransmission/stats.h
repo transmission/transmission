@@ -1,5 +1,5 @@
 // This file Copyright 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -9,13 +9,12 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstdint>
 #include <ctime>
 #include <string>
 #include <string_view>
 
 #include "transmission.h" // for tr_session_stats
-
-#include "utils.h" // for tr_getRatio()
 
 // per-session data structure for bandwidth use statistics
 class tr_stats
@@ -71,17 +70,7 @@ public:
     }
 
 private:
-    static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b)
-    {
-        auto ret = tr_session_stats{};
-        ret.uploadedBytes = a.uploadedBytes + b.uploadedBytes;
-        ret.downloadedBytes = a.downloadedBytes + b.downloadedBytes;
-        ret.filesAdded = a.filesAdded + b.filesAdded;
-        ret.sessionCount = a.sessionCount + b.sessionCount;
-        ret.secondsActive = a.secondsActive + b.secondsActive;
-        ret.ratio = tr_getRatio(ret.uploadedBytes, ret.downloadedBytes);
-        return ret;
-    }
+    static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b);
 
     void save() const;
 

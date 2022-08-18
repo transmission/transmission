@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cerrno>
 #include <cstdio>
 #include <cstdlib> // bsearch()
 #include <string_view>
@@ -42,14 +41,14 @@ void BlocklistFile::load()
 {
     close();
 
-    auto info = tr_sys_path_info{};
-    if (!tr_sys_path_get_info(getFilename(), 0, &info))
+    auto const info = tr_sys_path_get_info(getFilename());
+    if (!info)
     {
         return;
     }
 
-    auto const byteCount = info.size;
-    if (byteCount == 0)
+    auto const byte_count = info->size;
+    if (byte_count == 0)
     {
         return;
     }
@@ -67,7 +66,7 @@ void BlocklistFile::load()
         return;
     }
 
-    rules_ = static_cast<struct IPv4Range*>(tr_sys_file_map_for_reading(fd, 0, byteCount, &error));
+    rules_ = static_cast<struct IPv4Range*>(tr_sys_file_map_for_reading(fd, 0, byte_count, &error));
     if (rules_ == nullptr)
     {
         tr_logAddWarn(fmt::format(
@@ -81,8 +80,8 @@ void BlocklistFile::load()
     }
 
     fd_ = fd;
-    byte_count_ = byteCount;
-    rule_count_ = byteCount / sizeof(IPv4Range);
+    byte_count_ = byte_count;
+    rule_count_ = byte_count / sizeof(IPv4Range);
 
     tr_logAddInfo(fmt::format(
         ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", rule_count_),

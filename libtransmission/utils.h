@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -19,12 +19,6 @@
 #include "platform-quota.h"
 #include "tr-macros.h"
 
-/***
-****
-***/
-
-struct event;
-struct timeval;
 struct tr_error;
 
 /**
@@ -86,22 +80,7 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-tr_disk_space tr_dirSpace(std::string_view path);
-
-/**
- * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
- * @param timer         the timer to set
- * @param seconds       seconds to wait
- * @param microseconds  microseconds to wait
- */
-void tr_timerAdd(struct event& timer, int seconds, int microseconds);
-
-/**
- * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of milliseconds
- * @param timer         the timer to set
- * @param milliseconds  milliseconds to wait
- */
-void tr_timerAddMsec(struct event& timer, int milliseconds);
+tr_disk_space tr_dirSpace(std::string_view directory);
 
 /** @brief return the current date in milliseconds */
 uint64_t tr_time_msec();
@@ -115,27 +94,11 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv);
 
-bool tr_utf8_validate(std::string_view sv, char const** endptr);
-
 #ifdef _WIN32
 
-char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);
-char* tr_win32_native_to_utf8_ex(
-    wchar_t const* text,
-    int text_size,
-    int extra_chars_before,
-    int extra_chars_after,
-    int* real_result_size);
-wchar_t* tr_win32_utf8_to_native(char const* text, int text_size);
-wchar_t* tr_win32_utf8_to_native_ex(
-    char const* text,
-    int text_size,
-    int extra_chars_before,
-    int extra_chars_after,
-    int* real_result_size);
-char* tr_win32_format_message(uint32_t code);
-
-void tr_win32_make_args_utf8(int* argc, char*** argv);
+std::string tr_win32_format_message(uint32_t code);
+std::string tr_win32_native_to_utf8(std::wstring_view);
+std::wstring tr_win32_utf8_to_native(std::string_view);
 
 int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
@@ -157,32 +120,6 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 ****
 ***/
 
-/** @brief Portability wrapper around malloc() in which `0' is a safe argument */
-void* tr_malloc(size_t size);
-
-/** @brief Portability wrapper around calloc() in which `0' is a safe argument */
-void* tr_malloc0(size_t size);
-
-/** @brief Portability wrapper around reallocf() in which `0' is a safe argument */
-void* tr_realloc(void* p, size_t size);
-
-/** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
-void tr_free(void* p);
-
-#define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
-
-#define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
-
-#define tr_renew(struct_type, mem, n_structs) \
-    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
-
-/**
- * @brief make a newly-allocated copy of a string
- * @param in is a void* so that callers can pass in both signed & unsigned without a cast
- * @return a newly-allocated copy of `in' that can be freed with tr_free()
- */
-[[nodiscard]] char* tr_strdup(void const* in);
-
 constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';
@@ -194,9 +131,6 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 /** @brief Convenience wrapper around strerorr() guaranteed to not return nullptr
     @param errnum the error number to describe */
 [[nodiscard]] char const* tr_strerror(int errnum);
-
-/** @brief Returns true if the string ends with the specified case-insensitive suffix */
-[[nodiscard]] bool tr_str_has_suffix(char const* str, char const* suffix);
 
 template<typename T>
 [[nodiscard]] std::string tr_strlower(T in)
@@ -234,6 +168,11 @@ template<typename T>
     return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
 }
 
+[[nodiscard]] constexpr bool tr_strvStartsWith(std::wstring_view sv, std::wstring_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
+}
+
 [[nodiscard]] constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
@@ -263,11 +202,18 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
     return true;
 }
 
-[[nodiscard]] std::string_view tr_strvStrip(std::string_view sv);
+[[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
 
-[[nodiscard]] char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
+[[nodiscard]] std::string tr_strvUtf8Clean(std::string_view cleanme);
 
-std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
+/**
+ * @brief copies `src` into `buf`.
+ *
+ * - Always returns std::size(src).
+ * - `src` will be copied into `buf` iff `buflen >= std::size(src)`
+ * - `buf` will also be zero terminated iff `buflen >= std::size(src) + 1`.
+ */
+size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
 
 /***
 ****
@@ -280,8 +226,7 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
  *        newly-allocated array of all the integers in the set.
- * @return a newly-allocated array of integers that must be freed with tr_free(),
- *         or nullptr if a fragment of the string can't be parsed.
+ * @return a vector of integers, which is empty if the string can't be parsed.
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
@@ -311,9 +256,6 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
  * @param infinity the string representation of "infinity"
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
-
-/** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
-struct timeval tr_gettimeofday();
 
 /**
  * @brief move a file

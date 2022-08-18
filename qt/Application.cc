@@ -25,8 +25,9 @@
 #include <QDBusReply>
 #endif
 
-#include <libtransmission/tr-getopt.h>
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -219,9 +220,7 @@ Application::Application(int& argc, char** argv)
     // set the fallback config dir
     if (config_dir.isNull())
     {
-        auto* const default_config_dir = tr_getDefaultConfigDir("transmission");
-        config_dir = QString::fromUtf8(default_config_dir);
-        tr_free(default_config_dir);
+        config_dir = QString::fromStdString(tr_getDefaultConfigDir("transmission"));
     }
 
     // ensure our config directory exists

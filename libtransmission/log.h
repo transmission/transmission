@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <ctime>
 #include <optional>
+#include <string>
 #include <string_view>
 
 ///
@@ -50,17 +51,17 @@ struct tr_log_message
     tr_log_level level;
 
     // location in the source code
-    char const* file;
-    int line;
+    std::string_view file;
+    size_t line;
 
     // when the message was generated
     time_t when;
 
     // torrent name or code module name associated with the message
-    char* name;
+    std::string name;
 
     // the message
-    char* message;
+    std::string message;
 
     // linked list of messages
     struct tr_log_message* next;
@@ -92,7 +93,7 @@ void tr_logAddMessage(
     char const* source_file,
     int source_line,
     tr_log_level level,
-    std::string_view message,
+    std::string_view msg,
     std::string_view module_name = {});
 
 #define tr_logAddLevel(level, ...) \

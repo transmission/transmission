@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -9,10 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // intX_t, uintX_t
+#include <cstdint> // for size_t
+#include <cstdint> // for intX_t, uintX_t
 #include <ctime>
-#include <memory> // std::unique_ptr
-#include <utility> // std::pair
+#include <memory> // for std::unique_ptr
+#include <utility> // for std::pair
 #include <vector>
 
 #include "transmission.h"
@@ -20,7 +21,6 @@
 #include "block-info.h"
 
 class tr_torrents;
-struct evbuffer;
 struct tr_torrent;
 
 class Cache

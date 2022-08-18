@@ -133,7 +133,8 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
         for (size_t i = first_byte + 1; i < walk_end;)
         {
             tmp_accum += doPopcount(flags_[i]);
-            if ((i += 2) > walk_end)
+            i += 2;
+            if (i > walk_end)
             {
                 break;
             }

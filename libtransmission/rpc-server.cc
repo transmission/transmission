@@ -5,11 +5,13 @@
 
 #include <algorithm>
 #include <array>
-#include <cerrno>
+#include <chrono>
 #include <cstring> /* memcpy */
 #include <ctime>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #ifndef _WIN32
@@ -19,7 +21,6 @@
 #endif
 
 #include <event2/buffer.h>
-#include <event2/event.h>
 #include <event2/http.h>
 #include <event2/http_struct.h> /* TODO: eventually remove this */
 #include <event2/listener.h>
@@ -105,15 +106,6 @@ static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 }
 #endif
 
-/***
-****
-***/
-
-static char const* get_current_session_id(tr_rpc_server* server)
-{
-    return tr_session_id_get_current(server->session->session_id);
-}
-
 /**
 ***
 **/
@@ -169,9 +161,8 @@ static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server
 
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
-    bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv);
 
-    if (!do_compress)
+    if (bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv); !do_compress)
     {
         evbuffer_add(out, std::data(content), std::size(content));
     }
@@ -221,8 +212,8 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
     }
 
     auto content = std::vector<char>{};
-    tr_error* error = nullptr;
-    if (!tr_loadFile(filename, content, &error))
+
+    if (tr_error* error = nullptr; !tr_loadFile(filename, content, &error))
     {
         send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
         tr_error_free(error);
@@ -316,7 +307,7 @@ static void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* serv
 
     if (have_content)
     {
-        tr_variantFree(&top);
+        tr_variantClear(&top);
     }
 }
 
@@ -399,10 +390,8 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
 
 static bool test_session_id(tr_rpc_server* server, evhttp_request const* req)
 {
-    char const* ours = get_current_session_id(server);
-    char const* theirs = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
-    bool const success = theirs != nullptr && strcmp(theirs, ours) == 0;
-    return success;
+    char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
+    return session_id != nullptr && server->session->sessionId() == session_id;
 }
 
 static bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
@@ -519,7 +508,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 #ifdef REQUIRE_SESSION_ID
         else if (!test_session_id(server, req))
         {
-            char const* sessionId = get_current_session_id(server);
+            auto const session_id = std::string{ server->session->sessionId() };
             auto const tmp = fmt::format(
                 FMT_STRING("<p>Your request had an invalid session-id header.</p>"
                            "<p>To fix this, follow these steps:"
@@ -532,8 +521,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
                            "attacks.</p>"
                            "<p><code>{:s}: {:s}</code></p>"),
                 TR_RPC_SESSION_ID_HEADER,
-                sessionId);
-            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
+                session_id);
+            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
             evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
             send_simple_response(req, 409, tmp.c_str());
         }
@@ -550,9 +539,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
 }
 
 static auto constexpr ServerStartRetryCount = int{ 10 };
-static auto constexpr ServerStartRetryDelayIncrement = int{ 5 };
-static auto constexpr ServerStartRetryDelayStep = int{ 3 };
-static auto constexpr ServerStartRetryMaxDelay = int{ 60 };
+static auto constexpr ServerStartRetryDelayIncrement = 5s;
+static auto constexpr ServerStartRetryMaxDelay = 60s;
 
 static char const* tr_rpc_address_to_string(tr_rpc_address const& addr, char* buf, size_t buflen)
 {
@@ -665,35 +653,22 @@ static bool bindUnixSocket(
 
 static void startServer(tr_rpc_server* server);
 
-static void rpc_server_on_start_retry(evutil_socket_t /*fd*/, short /*type*/, void* context)
+static auto rpc_server_start_retry(tr_rpc_server* server)
 {
-    startServer(static_cast<tr_rpc_server*>(context));
-}
-
-static int rpc_server_start_retry(tr_rpc_server* server)
-{
-    int retry_delay = (server->start_retry_counter / ServerStartRetryDelayStep + 1) * ServerStartRetryDelayIncrement;
-    retry_delay = std::min(retry_delay, int{ ServerStartRetryMaxDelay });
-
-    if (server->start_retry_timer == nullptr)
+    if (!server->start_retry_timer)
     {
-        server->start_retry_timer = evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
+        server->start_retry_timer = server->session->timerMaker().create([server]() { startServer(server); });
     }
 
-    tr_timerAdd(*server->start_retry_timer, retry_delay, 0);
     ++server->start_retry_counter;
-
-    return retry_delay;
+    auto const interval = std::min(ServerStartRetryDelayIncrement * server->start_retry_counter, ServerStartRetryMaxDelay);
+    server->start_retry_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    return interval;
 }
 
 static void rpc_server_start_retry_cancel(tr_rpc_server* server)
 {
-    if (server->start_retry_timer != nullptr)
-    {
-        event_free(server->start_retry_timer);
-        server->start_retry_timer = nullptr;
-    }
-
+    server->start_retry_timer.reset();
     server->start_retry_counter = 0;
 }
 
@@ -704,7 +679,7 @@ static void startServer(tr_rpc_server* server)
         return;
     }
 
-    struct event_base* base = server->session->event_base;
+    struct event_base* base = server->session->eventBase();
     struct evhttp* httpd = evhttp_new(base);
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
@@ -724,9 +699,9 @@ static void startServer(tr_rpc_server* server)
 
         if (server->start_retry_counter < ServerStartRetryCount)
         {
-            int const retry_delay = rpc_server_start_retry(server);
-
-            tr_logAddDebug(fmt::format("Couldn't bind to {}, retrying in {} seconds", addr_port_str, retry_delay));
+            auto const retry_delay = rpc_server_start_retry(server);
+            auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(retry_delay).count();
+            tr_logAddDebug(fmt::format("Couldn't bind to {}, retrying in {} seconds", addr_port_str, seconds));
             return;
         }
 
@@ -852,10 +827,10 @@ static auto parseWhitelist(std::string_view whitelist)
     return list;
 }
 
-void tr_rpc_server::setWhitelist(std::string_view sv)
+void tr_rpc_server::setWhitelist(std::string_view whitelist)
 {
-    this->whitelist_str_ = sv;
-    this->whitelist_ = parseWhitelist(sv);
+    this->whitelist_str_ = whitelist;
+    this->whitelist_ = parseWhitelist(whitelist);
 }
 
 /****

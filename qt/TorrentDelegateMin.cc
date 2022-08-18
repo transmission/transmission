@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <utility>
 
 #include <QApplication>
 #include <QBrush>
@@ -17,6 +18,7 @@
 #include <QStyleOptionProgressBar>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/utils.h>
 
 #include "Torrent.h"

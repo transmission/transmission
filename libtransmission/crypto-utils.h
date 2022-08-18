@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstddef> // size_t
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
@@ -78,7 +79,7 @@ bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert);
 /**
  * @brief Allocate and initialize new X509 certificate from DER-encoded buffer.
  */
-tr_x509_cert_t tr_x509_cert_new(void const* der_data, size_t der_data_size);
+tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length);
 
 /**
  * @brief Free X509 certificate returned by @ref tr_x509_cert_new.
@@ -106,7 +107,7 @@ bool tr_rand_buffer(void* buffer, size_t length);
 /**
  * @brief Generate a SSHA password from its plaintext source.
  */
-std::string tr_ssha1(std::string_view plain_text);
+std::string tr_ssha1(std::string_view plaintext);
 
 /**
  * @brief Return true if this is salted text, false otherwise
@@ -116,7 +117,7 @@ bool tr_ssha1_test(std::string_view text);
 /**
  * @brief Validate a test password against the a ssha1 password.
  */
-bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text);
+bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext);
 
 /**
  * @brief Translate null-terminated string into base64.

@@ -5,6 +5,7 @@
 
 #include <ctime>
 #include <string_view>
+#include <iterator> // for std::back_inserter
 
 #ifndef _WIN32
 #include <sys/stat.h>
@@ -13,81 +14,54 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
-#include "crypto-utils.h"
-#include "error.h"
+
+#include "session-id.h"
+
+#include "crypto-utils.h" // for tr_rand_buf()
 #include "error-types.h"
+#include "error.h"
 #include "file.h"
 #include "log.h"
 #include "platform.h"
-#include "session-id.h"
-#include "utils.h"
+#include "tr-strbuf.h" // for tr_pathbuf
+#include "utils.h" // for _()
 
 using namespace std::literals;
 
-static auto constexpr SessionIdSize = size_t{ 48 };
-static auto constexpr SessionIdDurationSec = time_t{ 60 * 60 }; /* expire in an hour */
-
-struct tr_session_id
+namespace
 {
-    char* current_value;
-    char* previous_value;
-    tr_sys_file_t current_lock_file;
-    tr_sys_file_t previous_lock_file;
-    time_t expires_at;
-};
 
-static char* generate_new_session_id_value()
+void get_lockfile_path(std::string_view session_id, tr_pathbuf& path)
 {
-    char const pool[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    size_t const pool_size = sizeof(pool) - 1;
-
-    auto* buf = tr_new(char, SessionIdSize + 1);
-
-    tr_rand_buffer(buf, SessionIdSize);
-
-    for (size_t i = 0; i < SessionIdSize; ++i)
-    {
-        buf[i] = pool[(unsigned char)buf[i] % pool_size];
-    }
-
-    buf[SessionIdSize] = '\0';
-
-    return buf;
+    fmt::format_to(std::back_inserter(path), FMT_STRING("{:s}/tr_session_id_{:s}"), tr_getSessionIdDir(), session_id);
 }
 
-static std::string get_session_id_lock_file_path(std::string_view session_id)
+tr_sys_file_t create_lockfile(std::string_view session_id)
 {
-    return fmt::format(FMT_STRING("{:s}/tr_session_id_{:s}"), tr_getSessionIdDir(), session_id);
-}
-
-static tr_sys_file_t create_session_id_lock_file(char const* session_id)
-{
-    if (session_id == nullptr)
+    if (std::empty(session_id))
     {
         return TR_BAD_SYS_FILE;
     }
 
-    auto const lock_file_path = get_session_id_lock_file_path(session_id);
-    tr_error* error = nullptr;
-    auto lock_file = tr_sys_file_open(
-        lock_file_path.c_str(),
-        TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE,
-        0600,
-        &error);
+    auto lockfile_path = tr_pathbuf{};
+    get_lockfile_path(session_id, lockfile_path);
 
-    if (lock_file != TR_BAD_SYS_FILE)
+    tr_error* error = nullptr;
+    auto lockfile_fd = tr_sys_file_open(lockfile_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
+
+    if (lockfile_fd != TR_BAD_SYS_FILE)
     {
-        if (tr_sys_file_lock(lock_file, TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB, &error))
+        if (tr_sys_file_lock(lockfile_fd, TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB, &error))
         {
 #ifndef _WIN32
             /* Allow any user to lock the file regardless of current umask */
-            fchmod(lock_file, 0644);
+            fchmod(lockfile_fd, 0644);
 #endif
         }
         else
         {
-            tr_sys_file_close(lock_file);
-            lock_file = TR_BAD_SYS_FILE;
+            tr_sys_file_close(lockfile_fd);
+            lockfile_fd = TR_BAD_SYS_FILE;
         }
     }
 
@@ -95,119 +69,116 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't create '{path}': {error} ({error_code})"),
-            fmt::arg("path", lock_file_path),
+            fmt::arg("path", lockfile_path),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
     }
 
-    return lock_file;
+    return lockfile_fd;
 }
 
-static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* session_id)
+void destroy_lockfile(tr_sys_file_t lockfile_fd, std::string_view session_id)
 {
-    if (lock_file != TR_BAD_SYS_FILE)
+    if (lockfile_fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(lock_file);
+        tr_sys_file_close(lockfile_fd);
     }
 
-    if (session_id != nullptr)
+    if (!std::empty(session_id))
     {
-        auto const lock_file_path = get_session_id_lock_file_path(session_id);
-        tr_sys_path_remove(lock_file_path);
+        auto lockfile_path = tr_pathbuf{};
+        get_lockfile_path(session_id, lockfile_path);
+        tr_sys_path_remove(lockfile_path);
     }
 }
 
-tr_session_id_t tr_session_id_new()
+#ifndef _WIN32
+auto constexpr WouldBlock = EWOULDBLOCK;
+#else
+auto constexpr WouldBlock = ERROR_LOCK_VIOLATION;
+#endif
+
+} // namespace
+
+tr_session_id::session_id_t tr_session_id::make_session_id()
 {
-    auto const session_id = tr_new0(struct tr_session_id, 1);
-
-    session_id->current_lock_file = TR_BAD_SYS_FILE;
-    session_id->previous_lock_file = TR_BAD_SYS_FILE;
-
+    auto session_id = session_id_t{};
+    tr_rand_buffer(std::data(session_id), std::size(session_id));
+    static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
+    for (auto& chr : session_id)
+    {
+        chr = Pool[static_cast<unsigned char>(chr) % std::size(Pool)];
+    }
+    session_id.back() = '\0';
     return session_id;
 }
 
-void tr_session_id_free(tr_session_id_t session_id)
+tr_session_id::~tr_session_id()
 {
-    if (session_id == nullptr)
-    {
-        return;
-    }
-
-    destroy_session_id_lock_file(session_id->previous_lock_file, session_id->previous_value);
-    destroy_session_id_lock_file(session_id->current_lock_file, session_id->current_value);
-
-    tr_free(session_id->previous_value);
-    tr_free(session_id->current_value);
-
-    tr_free(session_id);
+    destroy_lockfile(current_lock_file_, std::data(current_value_));
+    destroy_lockfile(previous_lock_file_, std::data(previous_value_));
 }
 
-char const* tr_session_id_get_current(tr_session_id_t session_id)
+bool tr_session_id::isLocal(std::string_view session_id) noexcept
 {
-    time_t const now = tr_time();
-
-    if (session_id->current_value == nullptr || now >= session_id->expires_at)
+    if (std::empty(session_id))
     {
-        destroy_session_id_lock_file(session_id->previous_lock_file, session_id->previous_value);
-        tr_free(session_id->previous_value);
-
-        session_id->previous_value = session_id->current_value;
-        session_id->current_value = generate_new_session_id_value();
-
-        session_id->previous_lock_file = session_id->current_lock_file;
-        session_id->current_lock_file = create_session_id_lock_file(session_id->current_value);
-
-        session_id->expires_at = now + SessionIdDurationSec;
+        return false;
     }
 
-    return session_id->current_value;
+    auto is_local = bool{ false };
+    auto lockfile_path = tr_pathbuf{};
+    get_lockfile_path(session_id, lockfile_path);
+    tr_error* error = nullptr;
+    if (auto lockfile_fd = tr_sys_file_open(lockfile_path, TR_SYS_FILE_READ, 0, &error); lockfile_fd == TR_BAD_SYS_FILE)
+    {
+        if (TR_ERROR_IS_ENOENT(error->code))
+        {
+            tr_error_clear(&error);
+        }
+    }
+    else
+    {
+        if (!tr_sys_file_lock(lockfile_fd, TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_NB, &error) && (error->code == WouldBlock))
+        {
+            is_local = true;
+            tr_error_clear(&error);
+        }
+
+        tr_sys_file_close(lockfile_fd);
+    }
+
+    if (error != nullptr)
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't open session lock file '{path}': {error} ({error_code})"),
+            fmt::arg("path", lockfile_path),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_free(error);
+    }
+
+    return is_local;
 }
 
-bool tr_session_id_is_local(char const* session_id)
+std::string_view tr_session_id::sv() const noexcept
 {
-    bool ret = false;
-
-    if (session_id != nullptr)
+    if (auto const now = get_current_time_(); now >= expires_at_)
     {
-        auto const lock_file_path = get_session_id_lock_file_path(session_id);
-        tr_error* error = nullptr;
-        auto lock_file = tr_sys_file_open(lock_file_path.c_str(), TR_SYS_FILE_READ, 0, &error);
-
-        if (lock_file == TR_BAD_SYS_FILE)
-        {
-            if (TR_ERROR_IS_ENOENT(error->code))
-            {
-                tr_error_clear(&error);
-            }
-        }
-        else
-        {
-            if (!tr_sys_file_lock(lock_file, TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_NB, &error) &&
-#ifndef _WIN32
-                (error->code == EWOULDBLOCK))
-#else
-                (error->code == ERROR_LOCK_VIOLATION))
-#endif
-            {
-                ret = true;
-                tr_error_clear(&error);
-            }
-
-            tr_sys_file_close(lock_file);
-        }
-
-        if (error != nullptr)
-        {
-            tr_logAddWarn(fmt::format(
-                _("Couldn't open session lock file '{path}': {error} ({error_code})"),
-                fmt::arg("path", lock_file_path),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
-        }
+        destroy_lockfile(previous_lock_file_, std::data(previous_value_));
+        previous_value_ = current_value_;
+        previous_lock_file_ = current_lock_file_;
+        current_value_ = make_session_id();
+        current_lock_file_ = create_lockfile(std::data(current_value_));
+        expires_at_ = now + SessionIdDurationSec;
     }
 
-    return ret;
+    // -1 to strip the '\0'
+    return std::string_view{ std::data(current_value_), std::size(current_value_) - 1 };
+}
+
+char const* tr_session_id::c_str() const noexcept
+{
+    return std::data(sv()); // current_value_ is zero-terminated
 }

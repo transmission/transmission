@@ -3,7 +3,7 @@ This checklist helps to diagnose the most common reasons for bad speeds &mdash; 
 Please go through the _entire checklist_ before asking for more help! Otherwise the forum helpers will likely just point you back here.
 
 ## 1. Is it your network?
-If you are not sure whether the problem is a specific torrent or your network, it is easy to get a point of reference &mdash; add a fast torrent for benchmarking. Many users visit [the Ubuntu torrent page](https://torrent.ubuntu.com:6969/), scan down the page for the line with the most seeders and downloaders, and join the swarm for a few minutes to see what speeds they will reach.
+If you are not sure whether the problem is a specific torrent or your network, it is easy to get a point of reference &mdash; add a fast torrent for benchmarking. Many users visit [the Ubuntu torrent page](https://torrent.ubuntu.com), scan down the page for the line with the most seeders and downloaders, and join the swarm for a few minutes to see what speeds they will reach.
 
 More generally, you can also measure your bandwidth at [speedtest.net](https://www.speedtest.net/). However, this is not as good a BitTorrent benchmark as the previous approach.
 

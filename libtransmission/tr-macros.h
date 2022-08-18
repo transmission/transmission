@@ -1,5 +1,5 @@
 // This file Copyright © 2017-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,10 +11,6 @@
 /***
 ****
 ***/
-
-#ifndef __has_attribute
-#define __has_attribute(x) 0
-#endif
 
 #ifndef __has_builtin
 #define __has_builtin(x) 0
@@ -57,16 +53,6 @@
     Class& operator=(Class&&) = delete; \
     Class(Class const&) = delete; \
     Class(Class&&) = delete;
-
-/***
-****
-***/
-
-#if __has_attribute(__malloc__) || TR_GNUC_CHECK_VERSION(2, 96)
-#define TR_GNUC_MALLOC __attribute__((__malloc__))
-#else
-#define TR_GNUC_MALLOC
-#endif
 
 /***
 ****

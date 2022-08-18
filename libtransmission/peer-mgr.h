@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -12,6 +12,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint64_t
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -153,15 +154,15 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor);
 // return the number of connected peers that have `piece`, or -1 if we already have it
 int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece);
 
-void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int tabCount);
+void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs);
 
 uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor);
 
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor);
 
-void tr_peerMgrOnBlocklistChanged(tr_peerMgr* manager);
+void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr);
 
-struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount);
+struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count);
 
 tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 

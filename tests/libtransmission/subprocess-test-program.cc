@@ -1,12 +1,12 @@
 // This file Copyright (C) 2017-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include "transmission.h"
 #include "file.h"
 #include "subprocess.h"
-#include "utils.h"
+#include "utils.h" // tr_env_get_string()
 
 #include <string>
 
@@ -49,9 +49,8 @@ int main(int argc, char** argv)
     }
     else if (test_action == "--dump-cwd")
     {
-        char* const value = tr_sys_dir_get_current(nullptr);
-        tr_sys_file_write_line(fd, value != nullptr ? value : "<null>");
-        tr_free(value);
+        auto const value = tr_sys_dir_get_current(nullptr);
+        tr_sys_file_write_line(fd, !std::empty(value) ? value : "<null>");
     }
     else
     {

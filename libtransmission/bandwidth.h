@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -88,9 +88,9 @@ public:
     {
     }
 
-    ~tr_bandwidth()
+    ~tr_bandwidth() noexcept
     {
-        this->setParent(nullptr);
+        deparent();
     }
 
     tr_bandwidth& operator=(tr_bandwidth&&) = delete;
@@ -117,7 +117,9 @@ public:
      */
     void allocate(tr_direction dir, unsigned int period_msec);
 
-    void setParent(tr_bandwidth* newParent);
+    void setParent(tr_bandwidth* new_parent);
+
+    void deparent() noexcept;
 
     [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {

@@ -1,5 +1,5 @@
 // This file Copyright © 2014-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -22,7 +22,6 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/quark.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 class QNetworkAccessManager;
@@ -97,5 +96,5 @@ private:
     QNetworkAccessManager* nam_ = {};
     QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     int64_t next_tag_ = {};
-    bool const verbose_ = tr_env_key_exists("TR_RPC_VERBOSE");
+    bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
 };

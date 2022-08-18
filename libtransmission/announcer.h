@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -69,7 +69,7 @@ void tr_announcerClose(tr_session*);
 ***  For torrent customers
 **/
 
-struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
+struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback callback, void* callback_data);
 
 void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
 
@@ -92,11 +92,11 @@ enum
     TR_ANN_CORRUPT
 };
 
-void tr_announcerAddBytes(tr_torrent*, int up_down_or_corrupt, uint32_t byteCount);
+void tr_announcerAddBytes(tr_torrent*, int type, uint32_t byteCount);
 
 time_t tr_announcerNextManualAnnounce(tr_torrent const*);
 
-tr_tracker_view tr_announcerTracker(tr_torrent const* torrent, size_t i);
+tr_tracker_view tr_announcerTracker(tr_torrent const* torrent, size_t nth);
 
 size_t tr_announcerTrackerCount(tr_torrent const* tor);
 

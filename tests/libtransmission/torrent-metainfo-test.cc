@@ -1,10 +1,9 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cstring>
 #include <string_view>
 
 #include "transmission.h"
@@ -253,6 +252,13 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
     EXPECT_TRUE(tm.parseTorrentFile(src_filename));
     EXPECT_EQ(size_t{ 1 }, tm.webseedCount());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
+}
+
+// Test for https://github.com/transmission/transmission/issues/3591
+TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
+{
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
 } // namespace test

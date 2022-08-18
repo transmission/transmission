@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <memory>
 #include <string>
 
 #include <glibmm/i18n.h>
@@ -219,10 +220,8 @@ void MainWindow::Impl::status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, std
 void MainWindow::Impl::syncAltSpeedButton()
 {
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
-    char const* const stock = b ? "alt-speed-on" : "alt-speed-off";
-
     alt_speed_button_->set_active(b);
-    alt_speed_image_->set_from_icon_name(stock, Gtk::BuiltinIconSize::ICON_SIZE_MENU);
+    alt_speed_image_->set_from_icon_name("turtle-symbolic", Gtk::BuiltinIconSize::ICON_SIZE_MENU);
     alt_speed_button_->set_halign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_valign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_tooltip_text(fmt::format(
@@ -481,7 +480,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
 
     /* gear */
     auto* gear_button = Gtk::make_managed<Gtk::Button>();
-    gear_button->add(*Gtk::make_managed<Gtk::Image>("preferences-other", Gtk::ICON_SIZE_MENU));
+    gear_button->add(*Gtk::make_managed<Gtk::Image>("options-symbolic", Gtk::ICON_SIZE_MENU));
     gear_button->set_tooltip_text(_("Options"));
     gear_button->set_relief(Gtk::RELIEF_NONE);
     options_menu_ = createOptionsMenu();
@@ -521,7 +520,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     /* ratio selector */
     auto* ratio_button = Gtk::make_managed<Gtk::Button>();
     ratio_button->set_tooltip_text(_("Statistics"));
-    ratio_button->add(*Gtk::make_managed<Gtk::Image>("ratio", Gtk::ICON_SIZE_MENU));
+    ratio_button->add(*Gtk::make_managed<Gtk::Image>("ratio-symbolic", Gtk::ICON_SIZE_MENU));
     ratio_button->set_relief(Gtk::RELIEF_NONE);
     ratio_button->signal_clicked().connect([this, ratio_button]() { onYinYangClicked(ratio_button); });
     status_->add(*ratio_button);

@@ -4,16 +4,17 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <chrono>
 #include <iterator>
 #include <memory>
 #include <numeric> // std::accumulate()
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <event2/buffer.h>
-#include <event2/event.h>
 
 #include <fmt/format.h>
 
@@ -164,10 +165,15 @@ public:
         , callback{ callback_in }
         , callback_data{ callback_data_in }
         , bandwidth_(&tor->bandwidth_)
-        , pulse_timer(evtimer_new(session->event_base, &tr_webseed::onTimer, this), event_free)
+        , idle_timer(session->timerMaker().create([this]() { on_idle(this); }))
     {
-        startTimer();
+        idle_timer->startRepeating(IdleTimerInterval);
     }
+
+    tr_webseed(tr_webseed&&) = delete;
+    tr_webseed(tr_webseed const&) = delete;
+    tr_webseed& operator=(tr_webseed&&) = delete;
+    tr_webseed& operator=(tr_webseed const&) = delete;
 
     ~tr_webseed() override
     {
@@ -333,21 +339,9 @@ private:
         publish(&e);
     }
 
-    void startTimer()
-    {
-        tr_timerAddMsec(*pulse_timer, IdleTimerMsec);
-    }
-
-    static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vwebseed)
-    {
-        auto* const webseed = static_cast<tr_webseed*>(vwebseed);
-        on_idle(webseed);
-        webseed->startTimer();
-    }
-
     tr_bandwidth bandwidth_;
-    std::shared_ptr<event> const pulse_timer;
-    static int constexpr IdleTimerMsec = 2000;
+    std::unique_ptr<libtransmission::Timer> idle_timer;
+    static auto constexpr IdleTimerInterval = 2s;
 };
 
 /***

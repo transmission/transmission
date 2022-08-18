@@ -8,9 +8,9 @@
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
+#include <memory>
 #include <string>
 #include <string_view>
-#include <utility>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -31,6 +31,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
+#include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
@@ -60,6 +61,7 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 #endif
 
 using namespace std::literals;
+using libtransmission::Watchdir;
 
 /***
 ****
@@ -200,10 +202,9 @@ static bool reopen_log_file(char const* filename)
     return true;
 }
 
-static char const* getConfigDir(int argc, char const* const* argv)
+static std::string getConfigDir(int argc, char const* const* argv)
 {
     int c;
-    char const* configDir = nullptr;
     char const* optstr;
     int const ind = tr_optind;
 
@@ -211,43 +212,39 @@ static char const* getConfigDir(int argc, char const* const* argv)
     {
         if (c == 'g')
         {
-            configDir = optstr;
-            break;
+            return optstr;
         }
     }
 
     tr_optind = ind;
 
-    if (configDir == nullptr)
-    {
-        configDir = tr_getDefaultConfigDir(MyName);
-    }
-
-    return configDir;
+    return tr_getDefaultConfigDir(MyName);
 }
 
-static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
+static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
 {
-    auto const* session = static_cast<tr_session const*>(vsession);
+    auto const lowercase = tr_strlower(basename);
+    auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
+    auto const is_magnet = tr_strvEndsWith(lowercase, ".magnet"sv);
 
-    if (!tr_str_has_suffix(name, ".torrent") && !tr_str_has_suffix(name, ".magnet"))
+    if (!is_torrent && !is_magnet)
     {
-        return TR_WATCHDIR_IGNORE;
+        return Watchdir::Action::Done;
     }
 
-    auto const filename = tr_pathbuf{ tr_watchdir_get_path(dir), '/', name };
+    auto const filename = tr_pathbuf{ dirname, '/', basename };
     tr_ctor* const ctor = tr_ctorNew(session);
 
     bool retry = false;
 
-    if (tr_str_has_suffix(name, ".torrent"))
+    if (is_torrent)
     {
         if (!tr_ctorSetMetainfoFromFile(ctor, filename, nullptr))
         {
             retry = true;
         }
     }
-    else // ".magnet" suffix
+    else // is_magnet
     {
         auto content = std::vector<char>{};
         tr_error* error = nullptr;
@@ -255,7 +252,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),
-                fmt::arg("path", name),
+                fmt::arg("path", basename),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
             tr_error_free(error);
@@ -275,12 +272,12 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
     if (retry)
     {
         tr_ctorFree(ctor);
-        return TR_WATCHDIR_RETRY;
+        return Watchdir::Action::Retry;
     }
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
     {
-        tr_logAddError(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", name)));
+        tr_logAddError(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", basename)));
     }
     else
     {
@@ -291,13 +288,13 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         {
             tr_error* error = nullptr;
 
-            tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", name)));
+            tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", basename)));
 
             if (!tr_sys_path_remove(filename, &error))
             {
                 tr_logAddError(fmt::format(
                     _("Couldn't remove '{path}': {error} ({error_code})"),
-                    fmt::arg("path", name),
+                    fmt::arg("path", basename),
                     fmt::arg("error", error->message),
                     fmt::arg("error_code", error->code)));
                 tr_error_free(error);
@@ -310,7 +307,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
     }
 
     tr_ctorFree(ctor);
-    return TR_WATCHDIR_ACCEPT;
+    return Watchdir::Action::Done;
 }
 
 static char const* levelName(tr_log_level level)
@@ -392,8 +389,7 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     for (tr_log_message const* l = list; l != nullptr; l = l->next)
     {
-        auto const name = std::string_view{ l->name != nullptr ? l->name : "" };
-        printMessage(file, l->level, name, l->message, l->file, l->line);
+        printMessage(file, l->level, l->name, l->message, l->file, l->line);
     }
 
     if (file != TR_BAD_SYS_FILE)
@@ -668,7 +664,7 @@ static bool parse_args(
 struct daemon_data
 {
     tr_variant settings;
-    char const* configDir;
+    std::string config_dir;
     bool paused;
 };
 
@@ -696,7 +692,7 @@ static void daemon_reconfigure(void* /*arg*/)
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
         tr_sessionLoadSettings(&settings, configDir, MyName);
         tr_sessionSet(mySession, &settings);
-        tr_variantFree(&settings);
+        tr_variantClear(&settings);
         tr_sessionReloadBlocklists(mySession);
     }
 }
@@ -712,11 +708,11 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
-    tr_watchdir_t watchdir = nullptr;
+    auto watchdir = std::unique_ptr<Watchdir>{};
 
     auto* arg = static_cast<daemon_data*>(varg);
     tr_variant* const settings = &arg->settings;
-    char const* const configDir = arg->configDir;
+    char const* const config_dir = arg->config_dir.c_str();
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
@@ -741,10 +737,10 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
-    session = tr_sessionInit(configDir, true, settings);
+    session = tr_sessionInit(config_dir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", configDir)));
-    tr_sessionSaveSettings(session, configDir, settings);
+    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", config_dir)));
+    tr_sessionSaveSettings(session, config_dir, settings);
 
     auto sv = std::string_view{};
     (void)tr_variantDictFindStrView(settings, key_pidfile, &sv);
@@ -802,17 +798,19 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             tr_logAddInfo(fmt::format(_("Watching '{path}' for new torrent files"), fmt::arg("path", dir)));
 
-            watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
-            if (watchdir == nullptr)
+            auto handler = [session](std::string_view dirname, std::string_view basename)
             {
-                goto CLEANUP;
-            }
+                return onFileAdded(session, dirname, basename);
+            };
+
+            auto timer_maker = libtransmission::EvTimerMaker{ ev_base };
+            watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
+                                       Watchdir::create(dir, handler, timer_maker, ev_base);
         }
     }
 
     /* load the torrents */
     {
-        tr_torrent** torrents;
         tr_ctor* ctor = tr_ctorNew(mySession);
 
         if (arg->paused)
@@ -820,8 +818,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             tr_ctorSetPaused(ctor, TR_FORCE, true);
         }
 
-        torrents = tr_sessionLoadTorrents(mySession, ctor, nullptr);
-        tr_free(torrents);
+        tr_sessionLoadTorrents(mySession, ctor);
         tr_ctorFree(ctor);
     }
 
@@ -877,7 +874,7 @@ CLEANUP:
     sd_notify(0, "STATUS=Closing transmission session...\n");
     printf("Closing transmission session...");
 
-    tr_watchdir_free(watchdir);
+    watchdir.reset();
 
     if (status_ev != nullptr)
     {
@@ -887,7 +884,7 @@ CLEANUP:
 
     event_base_free(ev_base);
 
-    tr_sessionSaveSettings(mySession, configDir, settings);
+    tr_sessionSaveSettings(mySession, config_dir, settings);
     tr_sessionClose(mySession);
     pumpLogMessages(logfile);
     printf(" done.\n");
@@ -916,12 +913,12 @@ CLEANUP:
 
 static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground, int* ret)
 {
-    data->configDir = getConfigDir(argc, (char const* const*)argv);
+    data->config_dir = getConfigDir(argc, (char const* const*)argv);
 
     /* load settings from defaults + config file */
     tr_variantInitDict(&data->settings, 0);
     tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MyName);
+    bool const loaded = tr_sessionLoadSettings(&data->settings, data->config_dir.c_str(), MyName);
 
     bool dumpSettings;
 
@@ -955,7 +952,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     return true;
 
 EXIT_EARLY:
-    tr_variantFree(&data->settings);
+    tr_variantClear(&data->settings);
     return false;
 }
 
@@ -986,6 +983,6 @@ int tr_main(int argc, char* argv[])
         tr_error_free(error);
     }
 
-    tr_variantFree(&data.settings);
+    tr_variantClear(&data.settings);
     return ret;
 }

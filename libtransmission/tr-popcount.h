@@ -3,10 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_POPCNT_H
 #define TR_POPCNT_H
 
-#include <stdint.h>
+#include <cstdint>
 
 /* Avoid defining irrelevant helpers that might interfere with other
  * preprocessor logic. */

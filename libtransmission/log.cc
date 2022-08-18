@@ -12,8 +12,6 @@
 #include <string_view>
 #include <utility>
 
-#include <event2/buffer.h>
-
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
@@ -135,13 +133,13 @@ void logAddImpl(
 
     if (tr_logGetQueueEnabled())
     {
-        auto* const newmsg = tr_new0(tr_log_message, 1);
+        auto* const newmsg = new tr_log_message{};
         newmsg->level = level;
         newmsg->when = tr_time();
-        newmsg->message = tr_strvDup(msg);
+        newmsg->message = msg;
         newmsg->file = file;
         newmsg->line = line;
-        newmsg->name = tr_strvDup(name);
+        newmsg->name = name;
 
         *log_state.queue_tail_ = newmsg;
         log_state.queue_tail_ = &newmsg->next;
@@ -218,15 +216,13 @@ tr_log_message* tr_logGetQueue()
     return ret;
 }
 
-void tr_logFreeQueue(tr_log_message* list)
+void tr_logFreeQueue(tr_log_message* freeme)
 {
-    while (list != nullptr)
+    while (freeme != nullptr)
     {
-        tr_log_message* next = list->next;
-        tr_free(list->message);
-        tr_free(list->name);
-        tr_free(list);
-        list = next;
+        auto* const next = freeme->next;
+        delete freeme;
+        freeme = next;
     }
 }
 

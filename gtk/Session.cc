@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <glibmm/i18n.h>
 
@@ -25,7 +26,8 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-assert.h>
-#include <libtransmission/utils.h> /* tr_free */
+#include <libtransmission/utils.h> // tr_time()
+#include <libtransmission/web-utils.h> // tr_urlIsValid()
 #include <libtransmission/variant.h>
 
 #include "Actions.h"
@@ -45,11 +47,11 @@ using TrVariantPtr = std::shared_ptr<tr_variant>;
 TrVariantPtr create_variant(tr_variant&& other)
 {
     auto result = TrVariantPtr(
-        tr_new0(tr_variant, 1),
+        new tr_variant{},
         [](tr_variant* ptr)
         {
-            tr_variantFree(ptr);
-            tr_free(ptr);
+            tr_variantClear(ptr);
+            delete ptr;
         });
     *result = std::move(other);
     tr_variantInitBool(&other, false);
@@ -1267,32 +1269,30 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_local_data)
     }
 }
 
-void Session::load(bool forcePaused)
+void Session::load(bool force_paused)
 {
-    tr_ctor* ctor;
-    tr_torrent** torrents;
-    int count = 0;
+    auto* const ctor = tr_ctorNew(impl_->get_session());
 
-    ctor = tr_ctorNew(impl_->get_session());
-
-    if (forcePaused)
+    if (force_paused)
     {
         tr_ctorSetPaused(ctor, TR_FORCE, true);
     }
 
     tr_ctorSetPeerLimit(ctor, TR_FALLBACK, gtr_pref_int_get(TR_KEY_peer_limit_per_torrent));
 
-    torrents = tr_sessionLoadTorrents(impl_->get_session(), ctor, &count);
+    auto* session = impl_->get_session();
+    auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
+    tr_ctorFree(ctor);
 
     ScopedModelSortBlocker disable_sort(*gtr_get_ptr(impl_->get_model()));
 
-    for (int i = 0; i < count; ++i)
+    auto torrents = std::vector<tr_torrent*>{};
+    torrents.resize(n_torrents);
+    tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
+    for (auto* tor : torrents)
     {
-        impl_->add_torrent(torrents[i], false);
+        impl_->add_torrent(tor, false);
     }
-
-    tr_free(torrents);
-    tr_ctorFree(ctor);
 }
 
 void Session::clear()
@@ -1401,7 +1401,7 @@ void Session::start_now(tr_torrent_id_t id)
     auto ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
     exec(&top);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 void Session::Impl::update()
@@ -1672,7 +1672,7 @@ void Session::port_test()
 
             impl_->signal_port_tested.emit(is_open);
         });
-    tr_variantFree(&request);
+    tr_variantClear(&request);
 }
 
 /***
@@ -1709,7 +1709,7 @@ void Session::blocklist_update()
 
             impl_->signal_blocklist_updated.emit(ruleCount);
         });
-    tr_variantFree(&request);
+    tr_variantClear(&request);
 }
 
 /***

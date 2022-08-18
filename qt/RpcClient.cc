@@ -16,7 +16,6 @@
 
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_free
 #include <libtransmission/version.h> // LONG_VERSION_STRING
 
 #include "VariantHelpers.h"
@@ -31,15 +30,14 @@ namespace
 char const constexpr* const RequestDataPropertyKey{ "requestData" };
 char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-void destroyVariant(tr_variant* json)
-{
-    tr_variantFree(json);
-    tr_free(json);
-}
-
 TrVariantPtr createVariant()
 {
-    return { tr_new0(tr_variant, 1), &destroyVariant };
+    return { new tr_variant{},
+             [](tr_variant* var)
+             {
+                 tr_variantClear(var);
+                 delete var;
+             } };
 }
 
 } // namespace
@@ -263,12 +261,10 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        QByteArray const json_data = reply->readAll().trimmed();
-        auto const json_sv = std::string_view{ std::data(json_data), size_t(std::size(json_data)) };
-
-        TrVariantPtr const json = createVariant();
+        auto const json_data = reply->readAll().trimmed();
+        auto const json = createVariant();
         RpcResponse result;
-        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
+        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_data))
         {
             result = parseResponseData(*json);
         }
