@@ -56,14 +56,10 @@ static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request
     auto url = tr_urlbuf{};
     auto out = std::back_inserter(url);
 
-    auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
-    tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
-
     fmt::format_to(
         out,
         "{url}"
-        "{sep}info_hash={info_hash}"
-        "&peer_id={peer_id}"
+        "{sep}peer_id={peer_id}"
         "&port={port}"
         "&uploaded={uploaded}"
         "&downloaded={downloaded}"
@@ -74,7 +70,6 @@ static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request
         "&supportcrypto=1",
         fmt::arg("url", req->announce_url),
         fmt::arg("sep", tr_strvContains(req->announce_url.sv(), '?') ? '&' : '?'),
-        fmt::arg("info_hash", std::data(escaped_info_hash)),
         fmt::arg("peer_id", std::string_view{ std::data(req->peer_id), std::size(req->peer_id) }),
         fmt::arg("port", req->port.host()),
         fmt::arg("uploaded", req->up),
@@ -82,6 +77,9 @@ static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request
         fmt::arg("left", req->leftUntilComplete),
         fmt::arg("numwant", req->numwant),
         fmt::arg("key", req->key));
+
+    fmt::format_to(out, "&info_hash=");
+    tr_http_escape(out, req->info_hash);
 
     if (session->encryptionMode() == TR_ENCRYPTION_REQUIRED)
     {
@@ -652,12 +650,12 @@ static auto scrape_url_new(tr_scrape_request const* req)
     char delimiter = tr_strvContains(sv, '?') ? '&' : '?';
 
     auto scrape_url = tr_pathbuf{ sv };
+    auto out = std::back_inserter(scrape_url);
 
     for (int i = 0; i < req->info_hash_count; ++i)
     {
-        char str[SHA_DIGEST_LENGTH * 3 + 1];
-        tr_http_escape_sha1(str, req->info_hash[i]);
-        scrape_url.append(delimiter, "info_hash=", str);
+        fmt::format_to(out, "{}info_hash=", delimiter);
+        tr_http_escape(out, req->info_hash[i]);
         delimiter = '&';
     }
 
