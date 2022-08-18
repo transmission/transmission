@@ -2430,7 +2430,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
                 if (!tr_variantIsEmpty(&tset))
                 {
-                    addIdArg(tr_variantDictFind(&tset, Arguments), config.torrent_ids);
+                    addIdArg(tr_variantDictFind(&tset, Arguments), config);
                     status |= flush(rpcurl, &tset, config);
                 }
 
