@@ -403,7 +403,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
             }
         }
 
-        tr_variantFree(&top);
+        tr_variantClear(&top);
 
         if (!matched)
         {

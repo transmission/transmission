@@ -91,7 +91,15 @@ struct tr_variant
     } val = {};
 };
 
-void tr_variantFree(tr_variant*);
+/**
+ * @brief Clear the variant to an empty state.
+ *
+ * `tr_variantIsEmpty()` will return true after this is called.
+ *
+ * The variant itself is not freed, but any memory used by
+ * its *value* -- e.g. a string or child variants -- is freed.
+ */
+void tr_variantClear(tr_variant*);
 
 /***
 ****  Serialization / Deserialization
@@ -149,6 +157,11 @@ bool tr_variantFromBuf(
 constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
     return b != nullptr && b->type == type;
+}
+
+constexpr bool tr_variantIsEmpty(tr_variant const* b)
+{
+    return b == nullptr || b->type == '\0';
 }
 
 /***

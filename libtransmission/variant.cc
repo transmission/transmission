@@ -42,12 +42,6 @@ static bool tr_variantIsContainer(tr_variant const* v)
     return tr_variantIsList(v) || tr_variantIsDict(v);
 }
 
-static bool tr_variantIsSomething(tr_variant const* v)
-{
-    return tr_variantIsContainer(v) || tr_variantIsInt(v) || tr_variantIsString(v) || tr_variantIsReal(v) ||
-        tr_variantIsBool(v);
-}
-
 void tr_variantInit(tr_variant* v, char type)
 {
     v->type = type;
@@ -197,7 +191,7 @@ bool tr_variantListRemove(tr_variant* list, size_t pos)
 {
     if (tr_variantIsList(list) && pos < list->val.l.count)
     {
-        tr_variantFree(&list->val.l.vals[pos]);
+        tr_variantClear(&list->val.l.vals[pos]);
         tr_removeElementFromArray(list->val.l.vals, pos, sizeof(tr_variant), list->val.l.count);
         --list->val.l.count;
         return true;
@@ -653,7 +647,7 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
     {
         int const last = (int)dict->val.l.count - 1;
 
-        tr_variantFree(&dict->val.l.vals[i]);
+        tr_variantClear(&dict->val.l.vals[i]);
 
         if (i != last)
         {
@@ -927,12 +921,14 @@ static struct VariantWalkFuncs const freeWalkFuncs = {
     freeContainerEndFunc, //
 };
 
-void tr_variantFree(tr_variant* v)
+void tr_variantClear(tr_variant* v)
 {
-    if (tr_variantIsSomething(v))
+    if (!tr_variantIsEmpty(v))
     {
         tr_variantWalk(v, &freeWalkFuncs, nullptr, false);
     }
+
+    *v = {};
 }
 
 /***
@@ -1165,7 +1161,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
 
     if (!success)
     {
-        tr_variantFree(setme);
+        tr_variantClear(setme);
     }
 
     return success;

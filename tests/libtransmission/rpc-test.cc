@@ -35,7 +35,7 @@ TEST_F(RpcTest, list)
     EXPECT_TRUE(tr_variantIsInt(&top));
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     tr_rpc_parse_list_str(&top, "6,7"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
@@ -44,13 +44,13 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(6, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
     EXPECT_EQ(7, i);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     tr_rpc_parse_list_str(&top, "asdf"sv);
     EXPECT_TRUE(tr_variantIsString(&top));
     EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
     EXPECT_EQ("asdf"sv, sv);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     tr_rpc_parse_list_str(&top, "1,3-5"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
@@ -63,7 +63,7 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(4, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 3), &i));
     EXPECT_EQ(5, i);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 /***
@@ -86,7 +86,7 @@ TEST_F(RpcTest, sessionGet)
     tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
     tr_variant response;
     tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
-    tr_variantFree(&request);
+    tr_variantClear(&request);
 
     EXPECT_TRUE(tr_variantIsDict(&response));
     tr_variant* args;
@@ -183,7 +183,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
-    tr_variantFree(&response);
+    tr_variantClear(&response);
     tr_torrentRemove(tor, false, nullptr);
 }
 

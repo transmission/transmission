@@ -72,7 +72,7 @@ TEST_P(JSONTest, testElements)
     EXPECT_TRUE(tr_variantDictFindStrView(&top, tr_quark_new("null"sv), &sv));
     EXPECT_EQ(""sv, sv);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_P(JSONTest, testUtf8)
@@ -86,14 +86,14 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     in = R"({ "key": "\u005C" })"sv;
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("\\"sv, sv);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     /**
      * 1. Feed it JSON-escaped nonascii to the JSON decoder.
@@ -109,7 +109,7 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
     auto json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     EXPECT_FALSE(std::empty(json));
     EXPECT_NE(std::string::npos, json.find("\\u00f6"));
@@ -118,7 +118,7 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_P(JSONTest, test1)
@@ -167,7 +167,7 @@ TEST_P(JSONTest, test1)
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(ids, 1), &i));
     EXPECT_EQ(10, i);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_P(JSONTest, test2)
@@ -196,7 +196,7 @@ TEST_P(JSONTest, test3)
     EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_errorString, &sv));
     EXPECT_EQ("torrent not registered with this tracker 6UHsVW'*C"sv, sv);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_P(JSONTest, unescape)
@@ -209,7 +209,7 @@ TEST_P(JSONTest, unescape)
     EXPECT_TRUE(tr_variantDictFindStrView(&top, tr_quark_new("string-1"sv), &sv));
     EXPECT_EQ("/usr/lib"sv, sv);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 INSTANTIATE_TEST_SUITE_P( //

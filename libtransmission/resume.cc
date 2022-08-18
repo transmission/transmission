@@ -841,7 +841,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
      * same resume information... */
     tor->isDirty = wasDirty;
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
     return fields_loaded;
 }
 
@@ -955,7 +955,7 @@ void save(tr_torrent* tor)
         tor->setLocalError(fmt::format(FMT_STRING("Unable to save resume file: {:s}"), tr_strerror(err)));
     }
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 } // namespace tr_resume

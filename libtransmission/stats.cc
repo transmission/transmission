@@ -57,7 +57,7 @@ tr_session_stats tr_stats::loadOldStats(std::string_view config_dir)
             ret.uploadedBytes = (uint64_t)i;
         }
 
-        tr_variantFree(&top);
+        tr_variantClear(&top);
     }
 
     return ret;
@@ -75,7 +75,7 @@ void tr_stats::save() const
     tr_variantDictAddInt(&top, TR_KEY_session_count, saveme.sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, saveme.uploadedBytes);
     tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 void tr_stats::clear()

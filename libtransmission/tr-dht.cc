@@ -297,7 +297,7 @@ int tr_dhtInit(tr_session* ss)
             nodes6.assign(raw, raw + raw_len);
         }
 
-        tr_variantFree(&benc);
+        tr_variantClear(&benc);
     }
 
     if (have_id)
@@ -405,7 +405,7 @@ void tr_dhtUninit(tr_session* ss)
 
         auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };
         tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.sv());
-        tr_variantFree(&benc);
+        tr_variantClear(&benc);
     }
 
     dht_uninit();
