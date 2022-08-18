@@ -62,16 +62,6 @@
 ****
 ***/
 
-#if __has_attribute(__malloc__) || TR_GNUC_CHECK_VERSION(2, 96)
-#define TR_GNUC_MALLOC __attribute__((__malloc__))
-#else
-#define TR_GNUC_MALLOC
-#endif
-
-/***
-****
-***/
-
 #define TR_PATH_DELIMITER '/'
 #define TR_PATH_DELIMITER_STR "/"
 
