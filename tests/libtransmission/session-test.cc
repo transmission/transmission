@@ -132,17 +132,6 @@ TEST_F(SessionTest, propertiesApi)
     EXPECT_EQ(""sv, session->blocklistUrl());
     EXPECT_EQ(""sv, tr_blocklistGetURL(session));
 
-    // rpc url
-
-    for (auto const& value : { "http://www.example.com/"sv, "http://www.example.org/transmission"sv, ""sv })
-    {
-        tr_sessionSetRPCUrl(session, std::string{ value }.c_str());
-        EXPECT_EQ(value, tr_sessionGetRPCUrl(session));
-    }
-
-    tr_sessionSetRPCUrl(session, nullptr);
-    EXPECT_EQ(""sv, tr_sessionGetRPCUrl(session));
-
     // rpc username
 
     for (auto const& value : { "foo"sv, "bar"sv, ""sv })

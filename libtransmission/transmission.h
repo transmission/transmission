@@ -129,10 +129,7 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 /** @brief buffer variant of tr_getDefaultDownloadDir(). See tr_strvToBuf(). */
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
-#define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
-#define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
-#define TR_DEFAULT_RPC_HOST_WHITELIST ""
 #define TR_DEFAULT_RPC_PORT_STR "9091"
 #define TR_DEFAULT_RPC_PORT 9091
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
@@ -346,23 +343,6 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
     @see tr_sessionInit()
     @see tr_sessionSetRPCPort */
 uint16_t tr_sessionGetRPCPort(tr_session const* session);
-
-/**
- * @brief Specify which base URL to use.
- *
- * @param session the session to set
- * @param url     the base url to use. The RPC API is accessible under <url>/rpc, the web interface under * <url>/web.
- *
- *  @see tr_sessionGetRPCUrl
- */
-void tr_sessionSetRPCUrl(tr_session* session, char const* url);
-
-/**
- * @brief Get the base URL.
- * @see tr_sessionInit()
- * @see tr_sessionSetRPCUrl
- */
-char const* tr_sessionGetRPCUrl(tr_session const* session);
 
 /**
  * @brief Specify a whitelist for remote RPC access
