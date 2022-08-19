@@ -129,8 +129,6 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 /** @brief buffer variant of tr_getDefaultDownloadDir(). See tr_strvToBuf(). */
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
-#define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
-#define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
 #define TR_DEFAULT_RPC_HOST_WHITELIST ""
 #define TR_DEFAULT_RPC_PORT_STR "9091"

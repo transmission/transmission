@@ -69,6 +69,8 @@ using namespace std::literals;
 
 std::recursive_mutex tr_session::session_mutex_;
 
+static auto constexpr DefaultBindAddressIpv4 = "0.0.0.0"sv;
+static auto constexpr DefaultBindAddressIpv6 = "::"sv;
 #ifdef TR_LIGHTWEIGHT
 static auto constexpr DefaultCacheSizeMB = int{ 2 };
 static auto constexpr DefaultPrefetchEnabled = bool{ false };
@@ -273,10 +275,10 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
     switch (type)
     {
     case TR_AF_INET:
-        return { bind_ipv4.addr_, bind_ipv4.addr_.readable() == TR_DEFAULT_BIND_ADDRESS_IPV4 };
+        return { bind_ipv4.addr_, bind_ipv4.addr_.readable() == DefaultBindAddressIpv4 };
 
     case TR_AF_INET6:
-        return { bind_ipv6.addr_, bind_ipv6.addr_.readable() == TR_DEFAULT_BIND_ADDRESS_IPV6 };
+        return { bind_ipv6.addr_, bind_ipv6.addr_.readable() == DefaultBindAddressIpv6 };
 
     default:
         TR_ASSERT_MSG(false, "invalid type");
@@ -368,8 +370,8 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, 8);
-    tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, TR_DEFAULT_BIND_ADDRESS_IPV4);
-    tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
+    tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, DefaultBindAddressIpv4);
+    tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, DefaultBindAddressIpv6);
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, true);
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
