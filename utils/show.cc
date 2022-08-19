@@ -339,19 +339,15 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         }
 
         // build the full scrape URL
-        auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
-        tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
-        auto const scrape = tracker.scrape.sv();
-        auto const url = tr_urlbuf{ scrape,
-                                    tr_strvContains(scrape, '?') ? '&' : '?',
-                                    "info_hash="sv,
-                                    std::string_view{ std::data(escaped) } };
-
-        printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(url));
+        auto scrape_url = tr_urlbuf{ tracker.scrape.sv() };
+        auto delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
+        scrape_url.append(delimiter, "info_hash=");
+        tr_urlEscape(std::back_inserter(scrape_url), metainfo.infoHash());
+        printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(scrape_url));
         fflush(stdout);
 
         // execute the http scrape
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, scrape_url.c_str());
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
         if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
         {

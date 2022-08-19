@@ -51,13 +51,13 @@ static std::string_view get_event_string(tr_announce_request const* req)
                                                                             tr_announce_event_get_string(req->event);
 }
 
-static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request const* req)
+static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_request const* req)
 {
-    auto url = tr_urlbuf{};
+    url.clear();
     auto out = std::back_inserter(url);
 
-    auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
-    tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
+    auto escaped_info_hash = tr_urlbuf{};
+    tr_urlEscape(std::back_inserter(escaped_info_hash), req->info_hash);
 
     fmt::format_to(
         out,
@@ -102,8 +102,6 @@ static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request
     {
         fmt::format_to(out, "&trackerid={}", req->tracker_id);
     }
-
-    return url;
 }
 
 static std::string format_ipv4_url_arg(tr_address const& ipv4_address)
@@ -120,7 +118,7 @@ static std::string format_ipv6_url_arg(unsigned char const* ipv6_address)
     evutil_inet_ntop(AF_INET6, ipv6_address, readable.data(), readable.size());
 
     auto arg = "&ipv6="s;
-    tr_http_escape(std::back_inserter(arg), readable.data(), true);
+    tr_urlEscape(std::back_inserter(arg), readable.data());
 
     return arg;
 }
@@ -424,9 +422,9 @@ void tr_tracker_http_announce(
        may have been returned from a previous announce and stored in the
        session.
      */
-    auto url_base = announce_url_new(session, request);
-
-    auto options = tr_web::FetchOptions{ url_base.sv(), onAnnounceDone, d };
+    auto url = tr_urlbuf{};
+    announce_url_new(url, session, request);
+    auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
     options.timeout_secs = 90L;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
@@ -646,22 +644,17 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     delete data;
 }
 
-static auto scrape_url_new(tr_scrape_request const* req)
+static void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const* req)
 {
-    auto const sv = req->scrape_url.sv();
-    char delimiter = tr_strvContains(sv, '?') ? '&' : '?';
-
-    auto scrape_url = tr_pathbuf{ sv };
+    scrape_url = req->scrape_url.sv();
+    char delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
 
     for (int i = 0; i < req->info_hash_count; ++i)
     {
-        char str[SHA_DIGEST_LENGTH * 3 + 1];
-        tr_http_escape_sha1(str, req->info_hash[i]);
-        scrape_url.append(delimiter, "info_hash=", str);
+        scrape_url.append(delimiter, "info_hash=");
+        tr_urlEscape(std::back_inserter(scrape_url), req->info_hash[i]);
         delimiter = '&';
     }
-
-    return scrape_url;
 }
 
 void tr_tracker_http_scrape(
@@ -686,10 +679,10 @@ void tr_tracker_http_scrape(
 
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
-    auto const url = scrape_url_new(request);
-    tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", url), request->log_name);
-
-    auto options = tr_web::FetchOptions{ url, onScrapeDone, d };
+    auto scrape_url = tr_pathbuf{};
+    scrape_url_new(scrape_url, request);
+    tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", scrape_url), request->log_name);
+    auto options = tr_web::FetchOptions{ scrape_url, onScrapeDone, d };
     options.timeout_secs = 30L;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
