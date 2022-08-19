@@ -56,8 +56,6 @@ struct tr_error;
 *****
 ****/
 
-#define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
-
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
 /**
