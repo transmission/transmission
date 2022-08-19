@@ -712,14 +712,16 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
-static tr_quark const files_keys[] = {
+// clang-format off
+
+static auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_files,
     TR_KEY_name,
     TR_KEY_priorities,
     TR_KEY_wanted,
 };
 
-static tr_quark const details_keys[] = {
+static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -771,25 +773,27 @@ static tr_quark const details_keys[] = {
     TR_KEY_uploadLimited,
     TR_KEY_uploadRatio,
     TR_KEY_webseeds,
-    TR_KEY_webseedsSendingToUs,
+    TR_KEY_webseedsSendingToUs
 };
 
-static tr_quark const list_keys[] = {
-    TR_KEY_error, //
-    TR_KEY_errorString, //
-    TR_KEY_eta, //
-    TR_KEY_id, //
-    TR_KEY_isFinished, //
-    TR_KEY_leftUntilDone, //
-    TR_KEY_name, //
-    TR_KEY_peersGettingFromUs, //
-    TR_KEY_peersSendingToUs, //
-    TR_KEY_rateDownload, //
-    TR_KEY_rateUpload, //
-    TR_KEY_sizeWhenDone, //
-    TR_KEY_status, //
-    TR_KEY_uploadRatio, //
+static auto constexpr ListKeys = std::array<tr_quark, 14>{
+    TR_KEY_error,
+    TR_KEY_errorString,
+    TR_KEY_eta,
+    TR_KEY_id,
+    TR_KEY_isFinished,
+    TR_KEY_leftUntilDone,
+    TR_KEY_name,
+    TR_KEY_peersGettingFromUs,
+    TR_KEY_peersSendingToUs,
+    TR_KEY_rateDownload,
+    TR_KEY_rateUpload,
+    TR_KEY_sizeWhenDone,
+    TR_KEY_status,
+    TR_KEY_uploadRatio
 };
+
+// clang-format on
 
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
@@ -2557,9 +2561,9 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
                 config.filter = optarg;
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_FILTER);
 
-                for (size_t i = 0; i < TR_N_ELEMENTS(details_keys); ++i)
+                for (auto const& key : DetailsKeys)
                 {
-                    tr_variantListAddQuark(fields, details_keys[i]);
+                    tr_variantListAddQuark(fields, key);
                 }
 
                 addIdArg(args, config, "all");
@@ -2567,9 +2571,9 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
             case 'i':
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_DETAILS);
 
-                for (size_t i = 0; i < TR_N_ELEMENTS(details_keys); ++i)
+                for (auto const& key : DetailsKeys)
                 {
-                    tr_variantListAddQuark(fields, details_keys[i]);
+                    tr_variantListAddQuark(fields, key);
                 }
 
                 addIdArg(args, config);
@@ -2578,9 +2582,9 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
             case 'l':
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_LIST);
 
-                for (size_t i = 0; i < TR_N_ELEMENTS(list_keys); ++i)
+                for (auto const& key : ListKeys)
                 {
-                    tr_variantListAddQuark(fields, list_keys[i]);
+                    tr_variantListAddQuark(fields, key);
                 }
 
                 addIdArg(args, config, "all");
@@ -2589,9 +2593,9 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
             case 940:
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_FILES);
 
-                for (size_t i = 0; i < TR_N_ELEMENTS(files_keys); ++i)
+                for (auto const& key : FilesKeys)
                 {
-                    tr_variantListAddQuark(fields, files_keys[i]);
+                    tr_variantListAddQuark(fields, key);
                 }
 
                 addIdArg(args, config);
