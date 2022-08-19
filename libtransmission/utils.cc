@@ -978,16 +978,16 @@ int tr_env_get_int(char const* key, int default_value)
 
 #ifdef _WIN32
 
-    char value[16];
+    auto value = std::array<char, 16>{};
 
-    if (GetEnvironmentVariableA(key, value, TR_N_ELEMENTS(value)) > 1)
+    if (GetEnvironmentVariableA(key, std::data(value), std::size(value)) > 1)
     {
-        return atoi(value);
+        return atoi(std::data(value));
     }
 
 #else
 
-    if (char const* value = getenv(key); !tr_str_is_empty(value))
+    if (char const* const value = getenv(key); !tr_str_is_empty(value))
     {
         return atoi(value);
     }
