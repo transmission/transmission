@@ -92,7 +92,7 @@ struct tr_url_query_view
 };
 
 template<typename OutputIt>
-void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
+void tr_urlEscape(OutputIt out, std::string_view in, bool escape_reserved = true)
 {
     auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
     auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
@@ -111,7 +111,11 @@ void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
     }
 }
 
-void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
+template<typename OutputIt>
+void tr_urlEscape(OutputIt out, tr_sha1_digest_t const& digest)
+{
+    tr_urlEscape(out, std::string_view{ reinterpret_cast<char const*>(digest.data()), std::size(digest) });
+}
 
 char const* tr_webGetResponseStr(long response_code);
 
