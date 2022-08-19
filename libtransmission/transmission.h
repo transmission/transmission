@@ -345,23 +345,6 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
 uint16_t tr_sessionGetRPCPort(tr_session const* session);
 
 /**
- * @brief Specify which base URL to use.
- *
- * @param session the session to set
- * @param url     the base url to use. The RPC API is accessible under <url>/rpc, the web interface under * <url>/web.
- *
- *  @see tr_sessionGetRPCUrl
- */
-void tr_sessionSetRPCUrl(tr_session* session, char const* url);
-
-/**
- * @brief Get the base URL.
- * @see tr_sessionInit()
- * @see tr_sessionSetRPCUrl
- */
-char const* tr_sessionGetRPCUrl(tr_session const* session);
-
-/**
  * @brief Specify a whitelist for remote RPC access
  *
  * The whitelist is a comma-separated list of dotted-quad IP addresses

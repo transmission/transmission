@@ -429,7 +429,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_password, tr_sessionGetRPCPassword(s));
     tr_variantDictAddInt(d, TR_KEY_rpc_port, tr_sessionGetRPCPort(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", s->rpc_server_->socket_mode_));
-    tr_variantDictAddStr(d, TR_KEY_rpc_url, tr_sessionGetRPCUrl(s));
+    tr_variantDictAddStr(d, TR_KEY_rpc_url, s->rpc_server_->url());
     tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
@@ -2406,20 +2406,6 @@ uint16_t tr_sessionGetRPCPort(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->rpc_server_ ? session->rpc_server_->port().host() : uint16_t{};
-}
-
-void tr_sessionSetRPCUrl(tr_session* session, char const* url)
-{
-    TR_ASSERT(session != nullptr);
-
-    session->rpc_server_->setUrl(url != nullptr ? url : "");
-}
-
-char const* tr_sessionGetRPCUrl(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->rpc_server_->url().c_str();
 }
 
 void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data)

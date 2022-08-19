@@ -710,7 +710,6 @@ private:
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
     friend char const* tr_sessionGetRPCPassword(tr_session const* session);
-    friend char const* tr_sessionGetRPCUrl(tr_session const* session);
     friend char const* tr_sessionGetRPCUsername(tr_session const* session);
     friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
@@ -747,7 +746,6 @@ private:
     friend void tr_sessionSetRPCPassword(tr_session* session, char const* password);
     friend void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetRPCPort(tr_session* session, uint16_t hport);
-    friend void tr_sessionSetRPCUrl(tr_session* session, char const* url);
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
