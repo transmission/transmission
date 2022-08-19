@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <condition_variable>
 #include <list>
 #include <map>
@@ -57,14 +58,14 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
         return CURLE_OK;
     }
 
-    static LPCWSTR const sys_store_names[] = {
+    static auto constexpr SysStoreNames = std::array<LPCWSTR, 2>{
         L"CA",
         L"ROOT",
     };
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(sys_store_names); ++i)
+    for (auto& sys_store_name : SysStoreNames)
     {
-        HCERTSTORE const sys_cert_store = CertOpenSystemStoreW(0, sys_store_names[i]);
+        HCERTSTORE const sys_cert_store = CertOpenSystemStoreW(0, sys_store_name);
         if (sys_cert_store == nullptr)
         {
             continue;
