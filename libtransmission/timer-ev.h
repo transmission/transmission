@@ -20,7 +20,7 @@ namespace libtransmission
 class EvTimerMaker final : public TimerMaker
 {
 public:
-    EvTimerMaker(event_base* base)
+    explicit EvTimerMaker(event_base* base)
         : event_base_{ base }
     {
     }
