@@ -476,9 +476,6 @@ public:
     struct event* udp_event = nullptr;
     struct event* udp6_event = nullptr;
 
-    struct struct_utp_context* utp_context = nullptr;
-    std::unique_ptr<libtransmission::Timer> utp_timer;
-
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
 
@@ -891,6 +888,10 @@ private:
 
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
+
+public:
+    struct struct_utp_context* utp_context = nullptr;
+    std::unique_ptr<libtransmission::Timer> utp_timer;
 };
 
 constexpr bool tr_isPriority(tr_priority_t p)
