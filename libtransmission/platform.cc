@@ -278,9 +278,9 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     }
 
     /* check calling module place */
-    wchar_t wide_module_path[MAX_PATH];
-    GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
-    auto const module_path = tr_win32_native_to_utf8(wide_module_path);
+    auto wide_module_path = std::array<wchar_t, MAX_PATH>{};
+    GetModuleFileNameW(nullptr, std::data(wide_module_path), std::size(wide_module_path));
+    auto const module_path = tr_win32_native_to_utf8({ std::data(wide_module_path) });
     if (auto const dir = tr_sys_path_dirname(module_path); !std::empty(dir))
     {
         if (auto const path = tr_pathbuf{ dir, "/Web"sv }; isWebClientDir(path))
