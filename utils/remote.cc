@@ -84,6 +84,8 @@ struct Config
     std::string netrc;
     std::string session_id;
     std::string torrent_ids;
+    std::string unix_socket_path;
+
     bool debug = false;
     bool use_ssl = false;
 };
@@ -232,7 +234,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 96>{
+static auto constexpr Options = std::array<tr_option, 97>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -277,6 +279,7 @@ static auto constexpr Options = std::array<tr_option, 96>{
       { 'l', "list", "List all torrents", "l", false, nullptr },
       { 'L', "labels", "Set the current torrents' labels", "L", true, "<label[,label...]>" },
       { 960, "move", "Move current torrent's data to a new folder", nullptr, true, "<path>" },
+      { 968, "unix-socket", "Use a Unix domain socket", nullptr, true, "<path>" },
       { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, true, "<path>" },
       { 964, "rename", "Rename torrents root folder or a file", nullptr, true, "<name>" },
       { 965, "path", "Provide path for rename functions", nullptr, true, "<path>" },
@@ -411,6 +414,7 @@ static int getOptMode(int val)
     case 'a': /* add torrent */
     case 'b': /* debug */
     case 'n': /* auth */
+    case 968: /* Unix domain socket */
     case 810: /* authenv */
     case 'N': /* netrc */
     case 820: /* UseSSL */
@@ -2258,6 +2262,11 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf, Config& config)
         CURLOPT_ENCODING,
         ""); /* "" tells curl to fill in the blanks with what it was compiled to support */
 
+    if (auto const& str = config.unix_socket_path; !std::empty(str))
+    {
+        (void)curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, str.c_str());
+    }
+
     if (auto const& str = config.netrc; !std::empty(str))
     {
         (void)curl_easy_setopt(curl, CURLOPT_NETRC_FILE, str.c_str());
@@ -2442,6 +2451,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
             case 'b': /* debug */
                 config.debug = true;
+                break;
+
+            case 968: /* Unix domain socket */
+                config.unix_socket_path = optarg;
                 break;
 
             case 'n': /* auth */
