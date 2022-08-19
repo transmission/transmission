@@ -78,10 +78,10 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-tr_disk_space tr_dirSpace(std::string_view directory);
+[[nodiscard]] tr_disk_space tr_dirSpace(std::string_view directory);
 
 /** @brief return the current date in milliseconds */
-uint64_t tr_time_msec();
+[[nodiscard]] uint64_t tr_time_msec();
 
 /** @brief sleep the specified number of milliseconds */
 void tr_wait_msec(long int delay_milliseconds);
@@ -94,9 +94,9 @@ template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = 
 
 #ifdef _WIN32
 
-std::string tr_win32_format_message(uint32_t code);
-std::string tr_win32_native_to_utf8(std::wstring_view);
-std::wstring tr_win32_utf8_to_native(std::string_view);
+[[nodiscard]] std::string tr_win32_format_message(uint32_t code);
+[[nodiscard]] std::string tr_win32_native_to_utf8(std::wstring_view);
+[[nodiscard]] std::wstring tr_win32_utf8_to_native(std::string_view);
 
 int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
@@ -118,7 +118,7 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 ****
 ***/
 
-constexpr bool tr_str_is_empty(char const* value)
+[[nodiscard]] constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';
 }
@@ -293,10 +293,10 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 }
 
 /** @brief Portability wrapper for htonll() that uses the system implementation if available */
-uint64_t tr_htonll(uint64_t);
+[[nodiscard]] uint64_t tr_htonll(uint64_t);
 
 /** @brief Portability wrapper for htonll() that uses the system implementation if available */
-uint64_t tr_ntohll(uint64_t);
+[[nodiscard]] uint64_t tr_ntohll(uint64_t);
 
 /***
 ****
@@ -315,40 +315,40 @@ extern size_t tr_mem_K;
 extern uint64_t tr_size_K; /* unused? */
 
 /* format a speed from KBps into a user-readable string. */
-std::string tr_formatter_speed_KBps(double KBps);
+[[nodiscard]] std::string tr_formatter_speed_KBps(double KBps);
 
 /* format a memory size from bytes into a user-readable string. */
-std::string tr_formatter_mem_B(size_t bytes);
+[[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
 
 /* format a memory size from MB into a user-readable string. */
-static inline std::string tr_formatter_mem_MB(double MBps)
+[[nodiscard]] static inline std::string tr_formatter_mem_MB(double MBps)
 {
     return tr_formatter_mem_B((size_t)(MBps * tr_mem_K * tr_mem_K));
 }
 
 /* format a file size from bytes into a user-readable string. */
-std::string tr_formatter_size_B(uint64_t bytes);
+[[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
 
 void tr_formatter_get_units(void* dict);
 
-static inline unsigned int tr_toSpeedBytes(unsigned int KBps)
+[[nodiscard]] static inline unsigned int tr_toSpeedBytes(unsigned int KBps)
 {
     return KBps * tr_speed_K;
 }
 
-static inline auto tr_toSpeedKBps(unsigned int Bps)
+[[nodiscard]] static inline auto tr_toSpeedKBps(unsigned int Bps)
 {
     return Bps / double(tr_speed_K);
 }
 
-static inline auto tr_toMemBytes(unsigned int MB)
+[[nodiscard]] static inline auto tr_toMemBytes(unsigned int MB)
 {
     auto B = uint64_t(tr_mem_K) * tr_mem_K;
     B *= MB;
     return B;
 }
 
-static inline auto tr_toMemMB(uint64_t B)
+[[nodiscard]] static inline auto tr_toMemMB(uint64_t B)
 {
     return int(B / (tr_mem_K * tr_mem_K));
 }
@@ -358,13 +358,13 @@ static inline auto tr_toMemMB(uint64_t B)
 ***/
 
 /** @brief Check if environment variable exists. */
-bool tr_env_key_exists(char const* key);
+[[nodiscard]] bool tr_env_key_exists(char const* key);
 
 /** @brief Get environment variable value as int. */
-int tr_env_get_int(char const* key, int default_value);
+[[nodiscard]] int tr_env_get_int(char const* key, int default_value);
 
 /** @brief Get environment variable value as string. */
-std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});
+[[nodiscard]] std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});
 
 /***
 ****
