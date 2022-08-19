@@ -43,6 +43,7 @@ using namespace std::literals;
 ****
 ***/
 
+#ifdef _WIN32
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
     auto const cert_store = tr_ssl_get_x509_store(ssl_ctx);
@@ -50,8 +51,6 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     {
         return CURLE_OK;
     }
-
-#ifdef _WIN32
 
     curl_version_info_data const* const curl_ver = curl_version_info(CURLVERSION_NOW);
     if (curl_ver->age >= 0 && strncmp(curl_ver->ssl_version, "Schannel", 8) == 0)
@@ -95,10 +94,9 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
         CertCloseStore(sys_cert_store, 0);
     }
 
-#endif
-
     return CURLE_OK;
 }
+#endif
 
 /***
 ****
@@ -389,11 +387,15 @@ public:
         }
         else
         {
+#ifdef _WIN32
             (void)curl_easy_setopt(e, CURLOPT_SSL_CTX_FUNCTION, ssl_context_func);
+#endif
         }
 
         if (!impl->curl_proxy_ssl_verify)
         {
+            (void)curl_easy_setopt(e, CURLOPT_CAINFO, NULL);
+            (void)curl_easy_setopt(e, CURLOPT_CAPATH, NULL);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
         }
