@@ -71,6 +71,7 @@ std::recursive_mutex tr_session::session_mutex_;
 
 static auto constexpr DefaultBindAddressIpv4 = "0.0.0.0"sv;
 static auto constexpr DefaultBindAddressIpv6 = "::"sv;
+static auto constexpr DefaultRpcHostWhitelist = ""sv;
 #ifdef TR_LIGHTWEIGHT
 static auto constexpr DefaultCacheSizeMB = int{ 2 };
 static auto constexpr DefaultPrefetchEnabled = bool{ false };
@@ -345,7 +346,7 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddStrView(d, TR_KEY_rpc_username, "");
     tr_variantDictAddStrView(d, TR_KEY_rpc_whitelist, TR_DEFAULT_RPC_WHITELIST);
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, true);
-    tr_variantDictAddStrView(d, TR_KEY_rpc_host_whitelist, TR_DEFAULT_RPC_HOST_WHITELIST);
+    tr_variantDictAddStrView(d, TR_KEY_rpc_host_whitelist, DefaultRpcHostWhitelist);
     tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStrView(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
