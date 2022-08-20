@@ -93,7 +93,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         /* if we're finishing a piece... */
         if (left_in_piece == 0)
         {
-            auto const has_piece = sha->final() == tor->pieceHash(piece);
+            auto const has_piece = sha->finish() == tor->pieceHash(piece);
 
             if (has_piece || had_piece)
             {

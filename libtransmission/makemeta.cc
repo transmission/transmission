@@ -247,7 +247,7 @@ bool tr_metainfo_builder::blockingMakeChecksums(tr_error** error)
         TR_ASSERT(bufptr - std::data(buf) == (int)piece_size);
         TR_ASSERT(left_in_piece == 0);
         sha->add(std::data(buf), std::size(buf));
-        auto const digest = sha->final();
+        auto const digest = sha->finish();
         walk = std::copy(std::begin(digest), std::end(digest), walk);
         sha->clear();
 

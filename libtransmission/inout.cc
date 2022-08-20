@@ -251,7 +251,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
         bytes_left -= len;
     }
 
-    return sha->final();
+    return sha->finish();
 }
 
 } // namespace

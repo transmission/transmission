@@ -170,7 +170,7 @@ public:
         }
     }
 
-    [[nodiscard]] tr_sha1_digest_t final() override
+    [[nodiscard]] tr_sha1_digest_t finish() override
     {
         auto digest = tr_sha1_digest_t{};
         auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
@@ -226,7 +226,7 @@ public:
         }
     }
 
-    [[nodiscard]] tr_sha256_digest_t final() override
+    [[nodiscard]] tr_sha256_digest_t finish() override
     {
         auto digest = tr_sha256_digest_t{};
         auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));

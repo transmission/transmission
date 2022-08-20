@@ -86,7 +86,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_err
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
 {
-    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename != nullptr ? filename : "" }, error);
+    return tr_ctorSetMetainfoFromFile(ctor, std::string_view{ filename != nullptr ? filename : "" }, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
