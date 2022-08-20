@@ -33,4 +33,3 @@ Checks: >
   -readability-identifier-length,
   -readability-magic-numbers,
   -readability-qualified-auto,
-  -readability-redundant-access-specifiers,

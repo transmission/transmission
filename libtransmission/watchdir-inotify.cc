@@ -179,7 +179,6 @@ private:
         }
     }
 
-private:
     int infd_ = -1;
     int inwd_ = -1;
     struct bufferevent* event_ = nullptr;
