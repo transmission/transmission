@@ -17,8 +17,9 @@
 
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-assert.h"
+#include "tr-arc4.h"
 
-struct arc4_context;
+class tr_arc4;
 
 // Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption
@@ -81,8 +82,8 @@ public:
     void encrypt(size_t buf_len, void* buf);
 
 private:
-    std::shared_ptr<struct arc4_context> dec_key_;
-    std::shared_ptr<struct arc4_context> enc_key_;
+    std::unique_ptr<tr_arc4> dec_key_;
+    std::unique_ptr<tr_arc4> enc_key_;
 };
 
 } // namespace tr_message_stream_encryption

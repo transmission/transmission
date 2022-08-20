@@ -379,8 +379,6 @@ endif()
 
 tr_add_external_auto_library(B64 libb64 b64)
 
-add_subdirectory(third-party/arc4)
-
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)
 

@@ -6,14 +6,13 @@
 #include <array>
 #include <memory>
 
-#include <arc4.h>
-
 #include <math/wide_integer/uintwide_t.h>
 
 #include "transmission.h"
 
 #include "crypto-utils.h" // tr_sha1
 #include "peer-mse.h"
+#include "tr-arc4.h"
 
 using namespace std::literals;
 
@@ -109,36 +108,32 @@ void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
-
-    dec_key_ = std::make_shared<struct arc4_context>();
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
-    arc4_init(dec_key_.get(), std::data(buf), std::size(buf));
-    arc4_discard(dec_key_.get(), 1024);
+    dec_key_ = std::make_unique<tr_arc4>(std::data(buf), std::size(buf));
+    dec_key_->discard(1024);
 }
 
 void Filter::decrypt(size_t buf_len, void* buf)
 {
     if (dec_key_)
     {
-        arc4_process(dec_key_.get(), buf, buf, buf_len);
+        dec_key_->process(buf, buf, buf_len);
     }
 }
 
 void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
-
-    enc_key_ = std::make_shared<struct arc4_context>();
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
-    arc4_init(enc_key_.get(), std::data(buf), std::size(buf));
-    arc4_discard(enc_key_.get(), 1024);
+    enc_key_ = std::make_unique<tr_arc4>(std::data(buf), std::size(buf));
+    enc_key_->discard(1024);
 }
 
 void Filter::encrypt(size_t buf_len, void* buf)
 {
     if (enc_key_)
     {
-        arc4_process(enc_key_.get(), buf, buf, buf_len);
+        enc_key_->process(buf, buf, buf_len);
     }
 }
 
