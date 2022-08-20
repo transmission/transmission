@@ -176,7 +176,6 @@ public:
         queued_tasks_cv.notify_one();
     }
 
-private:
     class Task
     {
     private:
@@ -544,7 +543,6 @@ private:
         impl->is_closed_ = true;
     }
 
-private:
     std::shared_ptr<CURLSH> const curlsh_{ curl_share_init(), curl_share_cleanup };
 
     std::mutex queued_tasks_mutex;
