@@ -79,7 +79,7 @@ void BaseWatchdir::processFile(std::string_view basename)
     tr_logAddDebug(fmt::format("Callback decided to {:s} file '{:s}'", actionToString(action), basename));
     if (action == Action::Retry)
     {
-        auto const [iter, added] = pending_.try_emplace(std::string{ basename }, Pending{});
+        auto const [iter, added] = pending_.try_emplace(std::string{ basename });
 
         auto const now = std::chrono::steady_clock::now();
         auto& info = iter->second;
@@ -104,7 +104,7 @@ void BaseWatchdir::processFile(std::string_view basename)
     }
     else if (action == Action::Done)
     {
-        handled_.insert(std::string{ basename });
+        handled_.emplace(basename);
     }
 }
 

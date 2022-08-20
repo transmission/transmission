@@ -130,7 +130,7 @@ private:
             }
             else
             {
-                pending_.emplace(basename, info);
+                pending_.try_emplace(basename, info);
             }
         }
 

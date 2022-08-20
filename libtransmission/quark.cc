@@ -464,7 +464,7 @@ tr_quark tr_quark_new(std::string_view str)
     }
 
     auto const ret = TR_N_KEYS + std::size(my_runtime);
-    my_runtime.emplace_back(std::string{ str });
+    my_runtime.emplace_back(str);
     return ret;
 }
 
