@@ -13,8 +13,6 @@
 #include <string_view>
 #include <vector>
 
-#include <arc4.h>
-
 extern "C"
 {
 #include <b64/cdecode.h>

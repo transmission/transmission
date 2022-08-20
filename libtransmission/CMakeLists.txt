@@ -312,7 +312,6 @@ target_link_libraries(${TR_NAME}
     ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
     ${TR_NETWORK_LIBRARIES}
-    arc4::arc4
 )
 
 if(ICONV_FOUND)

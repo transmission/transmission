@@ -1,6 +1,3 @@
-[submodule "third-party/arc4"]
-	path = third-party/arc4
-	url = https://github.com/transmission/arc4
 [submodule "third-party/dht"]
 	path = third-party/dht
 	url = https://github.com/transmission/dht
