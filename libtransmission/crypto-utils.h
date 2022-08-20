@@ -29,14 +29,14 @@ public:
 
     virtual void clear() = 0;
     virtual void add(void const* data, size_t data_length) = 0;
-    [[nodiscard]] virtual tr_sha1_digest_t final() = 0;
+    [[nodiscard]] virtual tr_sha1_digest_t finish() = 0;
 
     template<typename... T>
     [[nodiscard]] static tr_sha1_digest_t digest(T... args)
     {
         auto context = tr_sha1::create();
         (context->add(std::data(args), std::size(args)), ...);
-        return context->final();
+        return context->finish();
     }
 };
 
@@ -48,14 +48,14 @@ public:
 
     virtual void clear() = 0;
     virtual void add(void const* data, size_t data_length) = 0;
-    [[nodiscard]] virtual tr_sha256_digest_t final() = 0;
+    [[nodiscard]] virtual tr_sha256_digest_t finish() = 0;
 
     template<typename... T>
     [[nodiscard]] static tr_sha256_digest_t digest(T... args)
     {
         auto context = tr_sha256::create();
         (context->add(std::data(args), std::size(args)), ...);
-        return context->final();
+        return context->finish();
     }
 };
 

@@ -125,7 +125,7 @@ public:
         }
     }
 
-    [[nodiscard]] tr_sha1_digest_t final() override
+    [[nodiscard]] tr_sha1_digest_t finish() override
     {
         auto digest = tr_sha1_digest_t{};
         CC_SHA1_Final(reinterpret_cast<unsigned char*>(std::data(digest)), &handle_);
@@ -160,7 +160,7 @@ public:
         }
     }
 
-    [[nodiscard]] tr_sha256_digest_t final() override
+    [[nodiscard]] tr_sha256_digest_t finish() override
     {
         auto digest = tr_sha256_digest_t{};
         CC_SHA256_Final(reinterpret_cast<unsigned char*>(std::data(digest)), &handle_);
