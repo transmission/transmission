@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <list>
 #include <memory>
 #include <utility>
 
@@ -21,61 +20,6 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h" /* gtr_priority_combo_get_value() */
-
-/****
-*****
-****/
-
-namespace
-{
-
-auto const MaxRecentDestinations = size_t{ 4 };
-
-std::list<std::string> get_recent_destinations()
-{
-    std::list<std::string> list;
-
-    for (size_t i = 0; i < MaxRecentDestinations; ++i)
-    {
-        auto const key = gtr_sprintf("recent-download-dir-%d", i + 1);
-
-        if (auto const val = gtr_pref_string_get(tr_quark_new({ key.c_str(), key.size() })); !val.empty())
-        {
-            list.push_back(val);
-        }
-    }
-
-    return list;
-}
-
-void save_recent_destination(Glib::RefPtr<Session> const& core, std::string const& dir)
-{
-    if (dir.empty())
-    {
-        return;
-    }
-
-    auto list = get_recent_destinations();
-
-    /* if it was already in the list, remove it */
-    list.remove(dir);
-
-    /* add it to the front of the list */
-    list.push_front(dir);
-
-    /* save the first MaxRecentDestinations directories */
-    list.resize(MaxRecentDestinations);
-    int i = 0;
-    for (auto const& d : list)
-    {
-        auto const key = gtr_sprintf("recent-download-dir-%d", ++i);
-        gtr_pref_string_set(tr_quark_new({ key.c_str(), key.size() }), d);
-    }
-
-    gtr_pref_save(core->get_session());
-}
-
-} // namespace
 
 /****
 *****
@@ -146,7 +90,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
                 gtr_file_trash_or_remove(filename_, nullptr);
             }
 
-            save_recent_destination(core_, downloadDir_);
+            gtr_save_recent_dir("download", core_, downloadDir_);
         }
     }
 
@@ -334,7 +278,7 @@ OptionsDialog::Impl::Impl(
         g_warning("couldn't select '%s'", downloadDir_.c_str());
     }
 
-    for (auto const& folder : get_recent_destinations())
+    for (auto const& folder : gtr_get_recent_dirs("download"))
     {
         destination_chooser->remove_shortcut_folder(folder);
         destination_chooser->add_shortcut_folder(folder);
