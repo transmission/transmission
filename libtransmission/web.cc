@@ -249,6 +249,25 @@ public:
             }
         }
 
+        [[nodiscard]] auto publicAddress() const
+        {
+            switch (options.ip_proto)
+            {
+            case FetchOptions::IPProtocol::V4:
+                return impl.mediator.publicAddressV4();
+            case FetchOptions::IPProtocol::V6:
+                return impl.mediator.publicAddressV6();
+            default:
+                auto ip = impl.mediator.publicAddressV4();
+                if (ip == std::nullopt)
+                {
+                    ip = impl.mediator.publicAddressV6();
+                }
+
+                return ip;
+            }
+        }
+
         void done()
         {
             if (options.done_func == nullptr)
@@ -394,7 +413,7 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
-        if (auto const addrstr = impl->mediator.publicAddress(); addrstr)
+        if (auto const addrstr = task->publicAddress(); addrstr)
         {
             (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
         }
