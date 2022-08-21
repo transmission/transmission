@@ -92,7 +92,7 @@ struct tr_url_query_view
 };
 
 template<typename BackInsertIter>
-constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view in, bool escape_reserved = true)
+constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view input, bool escape_reserved = true)
 {
     auto constexpr is_unreserved = [](unsigned char ch)
     {
@@ -107,9 +107,9 @@ constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view in, bool
             ch == ']' || ch == '\'';
     };
 
-    for (unsigned char ch : in)
+    for (unsigned char ch : input)
     {
-        if (is_unreserved(ch) || (escape_reserved && is_reserved(ch)))
+        if (is_unreserved(ch) || (!escape_reserved && is_reserved(ch)))
         {
             out = ch;
         }
