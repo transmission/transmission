@@ -176,19 +176,19 @@ tr_urlbuf tr_magnet_metainfo::magnet() const
     if (!std::empty(name_))
     {
         s += "&dn="sv;
-        tr_urlEscape(std::back_inserter(s), name_);
+        tr_urlPercentEncode(std::back_inserter(s), name_);
     }
 
     for (auto const& tracker : this->announceList())
     {
         s += "&tr="sv;
-        tr_urlEscape(std::back_inserter(s), tracker.announce.sv());
+        tr_urlPercentEncode(std::back_inserter(s), tracker.announce.sv());
     }
 
     for (auto const& webseed : webseed_urls_)
     {
         s += "&ws="sv;
-        tr_urlEscape(std::back_inserter(s), webseed);
+        tr_urlPercentEncode(std::back_inserter(s), webseed);
     }
 
     return s;

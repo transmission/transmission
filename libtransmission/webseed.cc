@@ -521,7 +521,7 @@ void makeUrl(tr_webseed* w, std::string_view name, OutputIt out)
 
     if (tr_strvEndsWith(url, "/"sv) && !std::empty(name))
     {
-        tr_urlEscape(out, name, false);
+        tr_urlPercentEncode(out, name, false);
     }
 }
 
