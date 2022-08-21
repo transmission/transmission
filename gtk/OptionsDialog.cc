@@ -336,6 +336,7 @@ OptionsDialog::Impl::Impl(
 
     for (auto const& folder : get_recent_destinations())
     {
+        destination_chooser->remove_shortcut_folder(folder);
         destination_chooser->add_shortcut_folder(folder);
     }
 
