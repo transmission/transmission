@@ -57,7 +57,7 @@ static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_annou
     auto out = std::back_inserter(url);
 
     auto escaped_info_hash = tr_urlbuf{};
-    tr_urlEscape(std::back_inserter(escaped_info_hash), req->info_hash);
+    tr_urlPercentEncode(std::back_inserter(escaped_info_hash), req->info_hash);
 
     fmt::format_to(
         out,
@@ -118,7 +118,7 @@ static std::string format_ipv6_url_arg(unsigned char const* ipv6_address)
     evutil_inet_ntop(AF_INET6, ipv6_address, readable.data(), readable.size());
 
     auto arg = "&ipv6="s;
-    tr_urlEscape(std::back_inserter(arg), readable.data());
+    tr_urlPercentEncode(std::back_inserter(arg), readable.data());
 
     return arg;
 }
@@ -652,7 +652,7 @@ static void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const* req)
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         scrape_url.append(delimiter, "info_hash=");
-        tr_urlEscape(std::back_inserter(scrape_url), req->info_hash[i]);
+        tr_urlPercentEncode(std::back_inserter(scrape_url), req->info_hash[i]);
         delimiter = '&';
     }
 }
