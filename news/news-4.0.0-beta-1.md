@@ -4,10 +4,8 @@ Downloads: [Linux(https://TODO), [macOS(https://TODO), [Windows(https://TODO)
 
 ## TODO (Pull Requests Welcome!)
 
-- update with commits added after 2022-06-10
-- credits for the website redesign
+- update with commits newer than 8a77f571ecf2503989f77ebaf7f9ba952bc4c9c5 (Thu Aug 4)
 - the whole thing needs some copyediting. It's not as focused as it could be.
-- benchmarks (@ckerr)
 
 ---
 
@@ -18,35 +16,37 @@ Welcome to the first beta release of Transmission 4.0.0. This release has been i
 - [**Better Community**](#Community) - Pull requests welcomed
 - [**Resource Efficiency**](#Resource-Efficiency) - Use less memory and fewer CPU cycles
 - [**Code modernization**](#Code-modernization) - Rewritten in C++
-- [**Web Client Refresh**](#Web-Client) - With mobile support, dark mode, fullscreen. 68K gzipped.
-- [**BitTorrent 2.0 .torrent Support**](#BitTorrent-20-File-Support) - Now supports BitTorrent 2.0-style .torrent files
 - [**New Features**](#New-Features) - What would a major release be without them?
+- [**Web Client Refresh**](#Web-Client) - With mobile support, dark mode, fullscreen. 68K gzipped.
 
 ### Community
 
-The project is more responsive to bug reports and code submissions than it has been in the past. Transmission 4.0.0-beta.1 includes over 250 new community commits (see [the Thank You section below](#Thank-You) for a list) and is welcoming new contributors.
+The project is far more responsive to bug reports and code submissions than it has been in the past. It also has a new group of volunteer contributors who work on the project. Transmission 4.0.0-beta.1 includes over 250 (FIXME) new community commits (see [the Thank You section below](#Thank-You) for a list) and is welcoming new contributors.
 
 ### Resource Efficiency
 
-libtransmission and the Qt client have been profiled and re-profiled to avoid unnecessary memory allocations and to fix inefficient code. For example, a stress test of starting transmission-daemon with 25,000 torrents is almost entirely IO-bound, using 50% fewer CPU cycles and 70% fewer temporary memory allocations than Transmission 3.00.
+- Transmission has been extensively profiled and improved to avoid unnecessary memory use and to fix inefficient code. For example, a stress test of starting transmission-daemon with 25,000 torrents is almost entirely IO-bound, using 50% fewer CPU cycles and 70% fewer temporary memory allocations than Transmission 3.00.
+- The remote control GUIs (transmission-qt and transmission-web) now use the RPC API "table" mode, resulting in smaller payloads / less bandwidth use.
+- RPC payloads are now compressed using [libdeflate](https://github.com/ebiggers/libdeflate), a "heavily optimized [library that is] significantly faster than the zlib library."
 
-libtransmission now uses [fast_float](https://github.com/fastfloat/fast_float) for faster floating-point parsing of JSON.
-
-**TODO(ckerr): benchmarks**
-
-The remote control GUIs (transmission-qt and transmission-web) now use the RPC API "table" mode, resulting in smaller payloads / less bandwidth use.
-
-**TODO(ckerr): benchmarks**
-
-RPC payloads are now compressed using [libdeflate](https://github.com/ebiggers/libdeflate), a "heavily optimized [library that is] significantly faster than the zlib library."
-
-### Code modernization
+### Code Modernization
 
 - The entire codebase has been migrated from C to C++. In the process, we were able to remove thousands of lines of custom code and use standard C++ libraries instead. libtransmission's source code size has shrunk by 15% compared to Transmission 3.00.
 - The GTK client has been ported to [gtkmm](http://www.gtkmm.org/en/).
 - The Web client no longer uses jQuery and uses modern JavaScript.
-- The unit tests have been ported to [Google Test](https://github.com/google/googletest). Many new tests, including fuzz testing, have been added. CI has been improved to run sanitizer builds of the tests for new code.
-- Transmission now uses Sonarcloud, Coverity, and clang-tidy static analysis on new code. Hundreds of code warnings have been fixed compared to Transmission 3.00.
+- The unit tests have been ported to [Google Test](https://github.com/google/googletest). Many new tests, including fuzz testing, have been added. CI has been improved to run sanitizer builds when testing new code.
+- Transmission now uses Sonarcloud, Coverity, LGTM, and clang-tidy static analysis on new code. Hundreds of code warnings have been fixed compared to Transmission 3.00.
+
+### New Features
+
+- Transmission 4.0.0 now supports .torrent files that were created with the [BitTorrent v2 spec](http://bittorrent.org/beps/bep_0052.html). 4.0.0 users will be able to download and seed torrents created by both BitTorrent v1 and v2. Support for _creating_ v2 torrents is slated for the next major release of Transmission.
+- Support setting "default" trackers that can be used for announcing all public torrents
+- Newly-added seeds can start immediately and verify pieces as needed, instead of requiring a full verify before seeding can begin ([#2626](https://github.com/transmission/transmission/pull/2626))
+- Added `transmission-create` option to omit potentially-identifying information, such as User-Agent and date created, when creating torrents. ([#3452](https://github.com/transmission/transmission/pull/3452))
+
+### Updated macOS UI
+
+- TODO
 
 ### Web Client
 
@@ -65,15 +65,9 @@ Maintainer highlights include:
 * Added eslint / prettier / stylelint tooling.
 * Uses torrent-get's 'table' mode for more efficient RPC calls.
 
-### BitTorrent 2.0 File Support
+## Website Redesign
 
-- Transmission 4.0.0 now supports .torrent files that were created with the [BitTorrent v2 spec](http://bittorrent.org/beps/bep_0052.html). 4.0.0 users will be able to download and seed torrents created by both BitTorrent v1 and v2. Support for _creating_ v2 torrents is slated for the next major release of Transmission.
-
-### New Features
-
-- Support setting "default" trackers that can be used for announcing all public torrents
-- Newly-added seeds can start immediately and verify pieces as needed, instead of requiring a full verify before seeding can begin ([#2626](https://github.com/transmission/transmission/pull/2626))
-
+The Transmission website at https://transmissionbt.com/ has been redesigned. Thanks to [@shatteredsite](https://github.com/shatteredsite) for doing the work, to [@Oleg-Chashko](https://github.com/Oleg-Chashko) for providing feedback, and to [@GaryElshaw](https://github.com/GaryElshaw) for feedback and for the initial suggestion!
 
 ## Other Changes
 
@@ -83,6 +77,7 @@ Maintainer highlights include:
 
 TODO
 
+ - Fix small scrape/announce packet size that could trip SYN flood detection on some systems ([#3236](https://github.com/transmission/transmission/pull/3236))
 - Remove the 1024 open files limit previously required by how libcurl was used ([#893](https://github.com/transmission/transmission/pull/893))
  - Add configurable anti-brute force settings ([#1447](https://github.com/transmission/transmission/pull/1447))
  - Fetch metadata of stopped magnets ([#1080](https://github.com/transmission/transmission/pull/1080))
@@ -185,6 +180,8 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Use android logger on Android ([#585](https://github.com/transmission/transmission/pull/585))
 - [bkkuhls](https://github.com/bkuhls):
   - Fix cross-compile build error ([#2576](https://github.com/transmission/transmission/pull/2576))
+- [carandraug](https://github.com/carandraug) (David Miguel Susano Pinto):
+  - Added `transmission-create` option to omit potentially-identifying information, such as User-Agent and date created, when creating torrents. ([#3452](https://github.com/transmission/transmission/pull/3452))
 - [cfpp2p](https://github.com/cfpp2p):
   - add an option to run a script when a torrent is added ([#1896](https://github.com/transmission/transmission/pull/1896))
 - [Chrool](https://github.com/Chrool)
@@ -207,6 +204,7 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
 - [Ivella](https://github.com/lvella) (Lucas Clemente Vella):
   - Implement latest version of BEP-7 for HTTP requests ([#1661](https://github.com/transmission/transmission/pull/1661))
 - [ile6695](https://github.com/ile6695) (Ilkka Kallioniemi):
+  - Fix filename reserved prefix detection. ([#3541](https://github.com/transmission/transmission/pull/3541))
   - Add more decimals for low wratios ([#2508](https://github.com/transmission/transmission/pull/2508))
   - Add regression tests for tr_strlcpy ([#2679](https://github.com/transmission/transmission/pull/2679))
 - [johman10](https://github.com/johman10) (Johan):
@@ -215,6 +213,9 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Fix detection of PSL library ([#2812](https://github.com/transmission/transmission/pull/2812))
 - [kakuhen](https://github.com/kakuhen):
   - Clarify documentation on torrent-add result on duplicate torrents ([#2690](https://github.com/transmission/transmission/pull/2690))
+- [lanzaa](https://github.com/lanzaa) (Colin B):
+  - Add basic support for BitTorrent v2 hashes ([#3380](https://github.com/transmission/transmission/pull/3380), [#3388](https://github.com/transmission/transmission/pull/3388)a
+  - Support single-file hybrid torrents ([#3446](https://github.com/transmission/transmission/pull/3446))
 - [LaserEyess](https://github.com/LaserEyess):
   - Add labels to torrent-add RPC method ([#2539](https://github.com/transmission/transmission/pull/2539))
   - Support binding RPC to a Unix socket ([#2574](https://github.com/transmission/transmission/pull/2574))
@@ -238,6 +239,7 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
 - [qu1ck](https://github.com/qu1ck):
   - Add label support to the core ([#822](https://github.com/transmission/transmission/pull/822), [#868](https://github.com/transmission/transmission/pull/868))
   - Fix unreleased fields handling regression in RPC ([#2972](https://github.com/transmission/transmission/pull/2972))
+  - Fix peer port change in session rpc ([#3573](https://github.com/transmission/transmission/pull/3573))
 - [razaq](https://github.com/razaqq):
   - add TR_TORRENT_TRACKERS env variable to script call ([#2053](https://github.com/transmission/transmission/pull/2053))
 - [RobCrowston](https://github.com/RobCrowston) (Rob Crowston):
@@ -256,6 +258,9 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
 - [uprt](https://github.com/uprt) (Kirill):
   - Replace NULL back with nullptr (mistake after auto-rebase) ([#1933](https://github.com/transmission/transmission/pull/1933))
   - Slashes fixes ([#857](https://github.com/transmission/transmission/pull/857))
+- [vchimishuk](https://github.com/vchimishuk) (Viacheslav Chimishuk):
+  - Add announce-ip and announce-ip-enabled parameters. ([#3461](https://github.com/transmission/transmission/pull/3461)
+  - Fix broken tr_sessionSetPeerPortRandom() function. ([#3569](https://github.com/transmission/transmission/pull/3569)
 - [vjunk](https://github.com/vjunk):
   - Add support for adding torrents by raw hash values ([#2608](https://github.com/transmission/transmission/pull/2608))
 - [vuori](https://github.com/vuori):
@@ -278,19 +283,23 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Add ⌘C support ([#3072](https://github.com/transmission/transmission/pull/3072))
   - Documentation improvements ([#2955](https://github.com/transmission/transmission/pull/2955), [#2975](https://github.com/transmission/transmission/pull/2975), [#2985](https://github.com/transmission/transmission/pull/2985), [#2986](https://github.com/transmission/transmission/pull/2986))
 - [DevilDimon](https://github.com/DevilDimon) (Dmitry Serov):
+  - Optimize framework imports ([#3323](https://github.com/transmission/transmission/pull/3323))
+  - Use standard macOS toolbar buttons ([#3356](https://github.com/transmission/transmission/pull/3356))
   - macOS client code modernization ([#2453](https://github.com/transmission/transmission/pull/2453), [#509](https://github.com/transmission/transmission/pull/509))
 - [federicobond](https://github.com/federicobond) (Federico Bond):
   - Replace deprecated NSRunAlertPanel call in Controller.m ([#1441](https://github.com/transmission/transmission/pull/1441))
 - [floppym](https://github.com/floppym) (Mike Gilbert):
   - Restore support for the INSTALL_LIB option ([#1756](https://github.com/transmission/transmission/pull/1756))
 - [fxcoudert](https://github.com/fxcoudert) (FX Coudert):
+  - Update deprecated macOS code ([#3330](https://github.com/transmission/transmission/pull/3330))
+  - Update links in macOS credits ([#3329](https://github.com/transmission/transmission/pull/3329))
   - Improve crash report debug information ([#2471](https://github.com/transmission/transmission/pull/2471))
   - Change accent color to match macOS red choice
   - Mac client uses freed memory ([#2234](https://github.com/transmission/transmission/pull/2234))
   - macOS: remove quitting badge ([#2495](https://github.com/transmission/transmission/pull/2495))
   - fix build warnings ([#3174](https://github.com/transmission/transmission/pull/3174))
 - [GaryElshaw](https://github.com/GaryElshaw) (Gary Elshaw):
-  - Update some app icons ([#3178](https://github.com/transmission/transmission/pull/3178), [#3238](https://github.com/transmission/transmission/pull/3238), [#3130](https://github.com/transmission/transmission/pull/3130), [#31128](https://github.com/transmission/transmission/pull/31128), [#2779](https://github.com/transmission/transmission/pull/2779))
+  - Icon updates ([#3178](https://github.com/transmission/transmission/pull/3178), [#3238](https://github.com/transmission/transmission/pull/3238), [#3130](https://github.com/transmission/transmission/pull/3130), [#31128](https://github.com/transmission/transmission/pull/31128), [#2779](https://github.com/transmission/transmission/pull/2779)), [#3239](https://github.com/transmission/transmission/pull/3239), [#3364](https://github.com/transmission/transmission/pull/3364), [#3348](https://github.com/transmission/transmission/pull/3348)
 - [kvakvs](https://github.com/kvakvs) (Dmytro Lytovchenko):
   - C++ migration in libtransmission ([#3108](https://github.com/transmission/transmission/pull/3108), [#2010](https://github.com/transmission/transmission/pull/2010), [#1927](https://github.com/transmission/transmission/pull/1927), [#1917](https://github.com/transmission/transmission/pull/1917), [#1914](https://github.com/transmission/transmission/pull/1914), [#1895](https://github.com/transmission/transmission/pull/1895))
 - [MaddTheSane](https://github.com/MaddTheSane) (Charles W. Betts):
@@ -300,6 +309,11 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Specify umask and IPC socket permission as strings ([#2984](https://github.com/transmission/transmission/pull/2984), [#3248](https://github.com/transmission/transmission/pull/3248))
   - Documentation improvements ([#2875](https://github.com/transmission/transmission/pull/2875), [#2889](https://github.com/transmission/transmission/pull/2889), [#2900](https://github.com/transmission/transmission/pull/2900))
 - [nevack](https://github.com/nevack) (Dzmitry Neviadomski):
+  - Revamp Toolbar Segments ([#3512](https://github.com/transmission/transmission/pull/3512))
+  - Use NSAlert APIs to show alert suppression checkbox ([#3360](https://github.com/transmission/transmission/pull/3360))
+  - Apply ObjC modernization ([#3358](https://github.com/transmission/transmission/pull/3358))
+  - Hide NSPopover arrow for Torrent options ([#3294](https://github.com/transmission/transmission/pull/3294))
+  - Fix group auto-assigning based on NSPredicate ([#3289](https://github.com/transmission/transmission/pull/3289))
   - Xcode wrangling ([#2141](https://github.com/transmission/transmission/pull/2141), [#3266](https://github.com/transmission/transmission/pull/3266), [#3267](https://github.com/transmission/transmission/pull/3267))
   - Update info window ([#2269](https://github.com/transmission/transmission/pull/2269))
   - Update blocklist downloader ([#2101](https://github.com/transmission/transmission/pull/2101), [#2191](https://github.com/transmission/transmission/pull/2191))
@@ -314,7 +328,19 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
 - [rsekman](https://github.com/rsekman) (Robin Seth Ekman):
   - fix daemon invocation regression: deprecated --log-error -> --log-level=error ([#3201](https://github.com/transmission/transmission/pull/3201))
 - [SweetPPro](https://github.com/sweetppro) SweetPPro:
-  - macOS client icon improvements ([#3221](https://github.com/transmission/transmission/pull/3221), 3113)
+  - Unify the margin between headers and content on the Activity tab and the Options tab in the Info Window ([#3522](https://github.com/transmission/transmission/pull/3522))
+  - macOS disable green maximize button on Inspector window ([#3563](https://github.com/transmission/transmission/pull/3563))
+  - macOS autolayout fixes on Inspector - Options tab ([#3559](https://github.com/transmission/transmission/pull/3559))
+  - macOS preference window localization autolayout fixes ([#3472](https://github.com/transmission/transmission/pull/3472))
+  - macOS fix some autolayout issues in Info window ([#3497](https://github.com/transmission/transmission/pull/3497))
+  - OS fix clipping and crashing on the Info Inspector Options tab ([#3473](https://github.com/transmission/transmission/pull/3473))
+  - macOS internationalization of xibs ([#3409](https://github.com/transmission/transmission/pull/3409))
+  - Use the default toolbar button size on macOS 11+ ([#3433](https://github.com/transmission/transmission/pull/3433))
+  - Remove gradient from PiecesView ([#3342](https://github.com/transmission/transmission/pull/3342))
+  - Use AutoLayout in utility bars ([#3326](https://github.com/transmission/transmission/pull/3326))
+  - macOS fix quicklook in the Torrent Inspector files view ([#3321](https://github.com/transmission/transmission/pull/3321))
+  - macOS fullscreen and autosize fixes ([#3315](https://github.com/transmission/transmission/pull/3315))
+  - macOS client icon improvements ([#3221](https://github.com/transmission/transmission/pull/3221), [#3113](https://github.com/transmission/transmission/pull/3113)
   - Update macOS group indicators ([#3183](https://github.com/transmission/transmission/pull/3183))
   - Fullscreen mode fixes ([#195](https://github.com/transmission/transmission/pull/195))
   - Fix for editing magnet links' tracker lists ([#2793](https://github.com/transmission/transmission/pull/2793))
@@ -337,6 +363,7 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Fix xgettext markup issues ([#3210](https://github.com/transmission/transmission/pull/3210))
 - [noobsai](https://github.com/Noobsai):
   - Fixed showing popup menu on RMB at tray icon ([#1210](https://github.com/transmission/transmission/pull/1210))
+  - Use correct variable for uploading speed ([#3560](https://github.com/transmission/transmission/pull/3560))
 - [okias](https://github.com/okias) (David Heidelberg):
   - Use metainfo folder instead of appdata ([#2624](https://github.com/transmission/transmission/pull/2624))
 - [orbital-mango](https://github.com/orbital-mango):
@@ -362,6 +389,8 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Move icon after "Alternative Speed Limits" label ([#503](https://github.com/transmission/transmission/pull/503))
   - Use file selector in Set Location if session is local ([#502](https://github.com/transmission/transmission/pull/502))
   - Qt: Add tooltips for Options, Statistics buttons ([#501](https://github.com/transmission/transmission/pull/501))
+- [GaryElshaw](https://github.com/GaryElshaw) (Gary Elshaw):
+  - Icon updates ([#3377](https://github.com/transmission/transmission/pull/3377)
 - [saidinesh5](https://github.com/saidinesh5) (Dinesh Manajipet):
   - Feature: Support Batch Adding Tracker Urls in Qt UI ([#1161](https://github.com/transmission/transmission/pull/1161))
 - [sewe2000](https://github.com/sewe2000) (Seweryn Pajor):
@@ -398,6 +427,7 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Add support for incomplete-dir ([#2183](https://github.com/transmission/transmission/pull/2183))
   - Add option to alter the download queue ([#2071](https://github.com/transmission/transmission/pull/2071))
 - [vchimishuk](https://github.com/vchimishuk) (Viacheslav Chimishuk):
+  - Fix broken state and labels filter ([#3311](https://github.com/transmission/transmission/pull/3311))
   - Add label support ([#2596](https://github.com/transmission/transmission/pull/2596), [#1406](https://github.com/transmission/transmission/pull/1406), [#3311](https://github.com/transmission/transmission/pull/3311))
   - Fix broken Cancel and Rename buttons on RenameDialog. ([#2577](https://github.com/transmission/transmission/pull/2577))
 - [xavery](https://github.com/xavery) (Daniel Kamil Kozar):
@@ -452,6 +482,19 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Updated Port Forwarding guide ([#2847](https://github.com/transmission/transmission/pull/2847))
 - [mlopezfm](https://github.com/mlopezfm) (Michael Lopez):
   - Fix man pages listing invalid cli options ([#2549](https://github.com/transmission/transmission/pull/2549))
+- [Petrprogs](https://github.com/Petrprogs) (Pwrwe):
+  - Lots of improvements in docs/, e.g. fixing broken markdown (
+     [#3456](https://github.com/transmission/transmission/pull/3456),
+     [#3475](https://github.com/transmission/transmission/pull/3475),
+     [#3480](https://github.com/transmission/transmission/pull/3480),
+     [#3490](https://github.com/transmission/transmission/pull/3490),
+     [#3517](https://github.com/transmission/transmission/pull/3517),
+     [#3518](https://github.com/transmission/transmission/pull/3518),
+     [#3539](https://github.com/transmission/transmission/pull/3539),
+     [#3555](https://github.com/transmission/transmission/pull/3555),
+     [#3557](https://github.com/transmission/transmission/pull/3557),
+     [#3564](https://github.com/transmission/transmission/pull/3564),
+    )
 - [pedrinho](https://github.com/pedrinho) (Pedro Scarapicchia Junior):
   - Remove unused html ([#1313](https://github.com/transmission/transmission/pull/1313))
 - [pborzenkov](https://github.com/pborzenkov) (Pavel Borzenkov):

@@ -29,13 +29,13 @@ using TorrentMetainfoTest = SessionTest;
 TEST_F(TorrentMetainfoTest, magnetLink)
 {
     // background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding
-    char const constexpr* const MagnetLink =
+    auto constexpr MagnetLink =
         "magnet:?"
         "xt=urn:btih:14ffe5dd23188fd5cb53a1d47f1289db70abf31e"
         "&dn=ubuntu_12_04_1_desktop_32_bit"
         "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce"
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
-        "&ws=http%3A%2F%2Ftransmissionbt.com";
+        "&ws=http%3A%2F%2Ftransmissionbt.com"sv;
 
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));

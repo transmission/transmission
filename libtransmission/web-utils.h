@@ -91,30 +91,39 @@ struct tr_url_query_view
     }
 };
 
-template<typename OutputIt>
-void tr_urlEscape(OutputIt out, std::string_view in, bool escape_reserved = true)
+template<typename BackInsertIter>
+constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view input, bool escape_reserved = true)
 {
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : in)
+    auto constexpr is_unreserved = [](unsigned char ch)
     {
-        if (UnescapedChars.find(ch) != std::string_view::npos ||
-            (ReservedChars.find(ch) != std::string_view::npos && !escape_reserved))
+        return ('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '-' || ch == '_' ||
+            ch == '.' || ch == '~';
+    };
+
+    auto constexpr is_reserved = [](unsigned char ch)
+    {
+        return ch == '!' || ch == '*' || ch == '(' || ch == ')' || ch == ';' || ch == ':' || ch == '@' || ch == '&' ||
+            ch == '=' || ch == '+' || ch == '$' || ch == ',' || ch == '/' || ch == '?' || ch == '%' || ch == '#' || ch == '[' ||
+            ch == ']' || ch == '\'';
+    };
+
+    for (unsigned char ch : input)
+    {
+        if (is_unreserved(ch) || (!escape_reserved && is_reserved(ch)))
         {
             out = ch;
         }
         else
         {
-            fmt::format_to(out, "%{:02X}", unsigned(ch & 0xFF));
+            fmt::format_to(out, "%{:02X}", ch);
         }
     }
 }
 
-template<typename OutputIt>
-void tr_urlEscape(OutputIt out, tr_sha1_digest_t const& digest)
+template<typename BackInsertIter>
+constexpr void tr_urlPercentEncode(BackInsertIter out, tr_sha1_digest_t const& digest)
 {
-    tr_urlEscape(out, std::string_view{ reinterpret_cast<char const*>(digest.data()), std::size(digest) });
+    tr_urlPercentEncode(out, std::string_view{ reinterpret_cast<char const*>(digest.data()), std::size(digest) });
 }
 
 char const* tr_webGetResponseStr(long response_code);
