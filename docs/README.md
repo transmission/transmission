@@ -18,6 +18,9 @@ Much of this documentation is out-of-date or could be improved. Pull requests ar
 * [Can I sequence the files I download?](./Can-I-sequence-the-files-I-download.md)
 * [Why are my speeds so slow?](./Why-Are-My-Speeds-So-Slow.md)
 * [Why is my port closed?](./Why-is-my-port-closed.md)
+* Q: How can I prevent the fragmentation of my downloaded files? 
+
+  A: Use the [configuration option](./Editing-Configuration-Files.md) "preallocation": 2
 # 3. More documentation #
  * [Configuration files](./Configuration-Files.md)
  * [Editing configuration files](./Editing-Configuration-Files.md)
