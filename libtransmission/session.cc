@@ -145,15 +145,23 @@ std::optional<std::string_view> tr_session::WebMediator::userAgent() const
     return TR_NAME "/" SHORT_VERSION_STRING;
 }
 
-std::optional<std::string> tr_session::WebMediator::publicAddress() const
+std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 {
-    for (auto const type : { TR_AF_INET, TR_AF_INET6 })
+    auto const [addr, is_default_value] = session_->publicAddress(TR_AF_INET);
+    if (!is_default_value)
     {
-        auto const [addr, is_default_value] = session_->publicAddress(type);
-        if (!is_default_value)
-        {
-            return addr.readable();
-        }
+        return addr.readable();
+    }
+
+    return std::nullopt;
+}
+
+std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
+{
+    auto const [addr, is_default_value] = session_->publicAddress(TR_AF_INET6);
+    if (!is_default_value)
+    {
+        return addr.readable();
     }
 
     return std::nullopt;

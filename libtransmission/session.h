@@ -825,7 +825,8 @@ private:
         ~WebMediator() override = default;
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
-        [[nodiscard]] std::optional<std::string> publicAddress() const override;
+        [[nodiscard]] std::optional<std::string> publicAddressV4() const override;
+        [[nodiscard]] std::optional<std::string> publicAddressV6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
