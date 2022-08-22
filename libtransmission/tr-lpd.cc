@@ -55,7 +55,6 @@ auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 tr_socket_t lpd_socket; /**<separate multicast receive socket */
 tr_socket_t lpd_socket2; /**<and multicast send socket */
 event* lpd_event = nullptr;
-tr_port lpd_port;
 
 tr_session* my_session;
 
@@ -306,10 +305,10 @@ int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     return res;
 }
 
-bool tr_lpdSendAnnounce(tr_torrent const* t);
-
 /**
 * @} */
+
+bool tr_lpdSendAnnounce(tr_lpd::Mediator& mediator, tr_torrent const* t);
 
 /**
 * @note Since it possible for tr_lpdAnnounceMore to get called from outside the LPD module,
@@ -321,7 +320,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t);
 * most of the previous paragraph isn't true anymore... we weren't using that functionality
 * before. are there cases where we should? if not, should we remove the bells & whistles?
 */
-int tr_lpdAnnounceMore(time_t const now, int const interval)
+int tr_lpdAnnounceMore(tr_lpd::Mediator& mediator, time_t const now, int const interval)
 {
     int announcesSent = 0;
 
@@ -358,7 +357,7 @@ int tr_lpdAnnounceMore(time_t const now, int const interval)
 
             if (announcePrio > 0 && tor->lpdAnnounceAt <= now)
             {
-                if (tr_lpdSendAnnounce(tor))
+                if (tr_lpdSendAnnounce(mediator, tor))
                 {
                     announcesSent++;
                 }
@@ -471,12 +470,6 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
 
     TR_ASSERT(lpd_announceInterval > 0);
     TR_ASSERT(lpd_announceScope > 0);
-
-    lpd_port = ss->peerPort();
-    if (std::empty(lpd_port))
-    {
-        return -1;
-    }
 
     tr_logAddDebug("Initialising Local Peer Discovery");
 
@@ -627,7 +620,7 @@ void tr_lpdUninit(tr_session* ss)
 * matter). A listening client on the same network might react by adding us to his
 * peer pool for torrent t.
 */
-bool tr_lpdSendAnnounce(tr_torrent const* t)
+bool tr_lpdSendAnnounce(tr_lpd::Mediator& mediator, tr_torrent const* t)
 {
     if (t == nullptr)
     {
@@ -640,7 +633,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
         1,
         lpd_mcastGroup,
         lpd_mcastPort,
-        lpd_port.host(),
+        mediator.port().host(),
         tr_strupper(t->infoHashString()));
 
     // send the query out using [lpd_socket2]
@@ -671,9 +664,10 @@ struct tr_torrent;
 class tr_lpd_impl final : public tr_lpd
 {
 public:
-    tr_lpd_impl(tr_session& session, tr_address address)
-        : session_{ session }
-        , upkeep_timer_{ session.timerMaker().create(on_upkeep_timer) }
+    tr_lpd_impl(Mediator& mediator, tr_session& session, tr_address address)
+        : mediator_{ mediator }
+        , session_{ session }
+        , upkeep_timer_{ session.timerMaker().create([this]() { onUpkeepTimer(); }) }
     {
         auto const ok = tr_lpdInit(&session_, &address) != -1;
 
@@ -695,20 +689,21 @@ public:
     }
 
 private:
-    static void on_upkeep_timer()
+    void onUpkeepTimer()
     {
         time_t const now = tr_time();
         auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
-        tr_lpdAnnounceMore(now, seconds);
+        tr_lpdAnnounceMore(mediator_, now, seconds);
     }
 
+    Mediator& mediator_;
     tr_session& session_;
 
     static auto constexpr UpkeepInterval = 5s;
     std::unique_ptr<libtransmission::Timer> upkeep_timer_;
 };
 
-std::unique_ptr<tr_lpd> tr_lpd::create(tr_session& session, tr_address address)
+std::unique_ptr<tr_lpd> tr_lpd::create(Mediator& mediator, tr_session& session, tr_address address)
 {
-    return std::make_unique<tr_lpd_impl>(session, address);
+    return std::make_unique<tr_lpd_impl>(mediator, session, address);
 }

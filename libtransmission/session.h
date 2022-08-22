@@ -37,6 +37,7 @@
 #include "stats.h"
 #include "timer.h"
 #include "torrents.h"
+#include "tr-lpd.h"
 #include "web.h"
 
 enum tr_auto_switch_state_t
@@ -840,6 +841,26 @@ private:
     };
 
     WebMediator web_mediator_{ this };
+
+    class LpdMediator final : public tr_lpd::Mediator
+    {
+    public:
+        explicit LpdMediator(tr_session* session)
+            : session_{ session }
+        {
+        }
+        ~LpdMediator() override = default;
+
+        [[nodiscard]] tr_port port() const override
+        {
+            return session_->peerPort();
+        }
+
+    private:
+        tr_session* const session_;
+    };
+
+    LpdMediator lpd_mediator_{ this };
 
     std::shared_ptr<event_base> const event_base_;
     std::shared_ptr<evdns_base> const evdns_base_;

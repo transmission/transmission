@@ -20,8 +20,15 @@ struct tr_torrent;
 class tr_lpd
 {
 public:
+    class Mediator
+    {
+    public:
+        virtual ~Mediator() = default;
+        virtual tr_port port() const = 0;
+    };
+
     virtual ~tr_lpd() = default;
-    static std::unique_ptr<tr_lpd> create(tr_session& session, tr_address addr);
+    static std::unique_ptr<tr_lpd> create(Mediator& mediator, tr_session& session, tr_address addr);
 
 protected:
     tr_lpd() = default;
