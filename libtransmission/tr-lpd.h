@@ -14,9 +14,11 @@
 #include "transmission.h"
 
 #include "net.h" // for tr_address
+#include "timer.h"
 
 class tr_torrents;
 struct tr_session;
+struct event_base;
 
 class tr_lpd
 {
@@ -34,7 +36,7 @@ public:
     };
 
     virtual ~tr_lpd() = default;
-    static std::unique_ptr<tr_lpd> create(Mediator& mediator, tr_session& session, tr_address addr);
+    static std::unique_ptr<tr_lpd> create(Mediator& mediator, libtransmission::TimerMaker&, event_base* event_base);
 
 protected:
     tr_lpd() = default;

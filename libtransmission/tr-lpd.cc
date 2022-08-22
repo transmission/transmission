@@ -29,8 +29,7 @@ using in_port_t = uint16_t; /* all missing */
 
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h" /* tr_peerMgrAddPex() */
-#include "session.h"
+#include "peer-mgr.h" /* tr_pex() */
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
@@ -432,7 +431,7 @@ void event_callback(evutil_socket_t /*s*/, short type, void* vmediator)
 * @remark Since the LPD service does not use another protocol family yet, this code is
 * IPv4 only for the time being.
 */
-int tr_lpdInit(tr_lpd::Mediator& mediator, tr_session* ss, tr_address* /*tr_addr*/)
+int tr_lpdInit(tr_lpd::Mediator& mediator, struct event_base* event_base)
 {
     /* if this check fails (i.e. the definition of hashString changed), update
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
@@ -533,7 +532,7 @@ int tr_lpdInit(tr_lpd::Mediator& mediator, tr_session* ss, tr_address* /*tr_addr
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    lpd_event = event_new(ss->eventBase(), lpd_socket, EV_READ | EV_PERSIST, event_callback, &mediator);
+    lpd_event = event_new(event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, &mediator);
     event_add(lpd_event, nullptr);
 
     tr_logAddDebug("Local Peer Discovery initialised");
@@ -556,7 +555,7 @@ fail:
     return -1;
 }
 
-void tr_lpdUninit(tr_session* ss)
+void tr_lpdUninit()
 {
     tr_logAddTrace("Uninitialising Local Peer Discovery");
 
@@ -625,18 +624,16 @@ bool tr_lpdSendAnnounce(tr_lpd::Mediator& mediator, tr_torrent const* t)
 
 } // namespace
 
-struct tr_session;
 struct tr_torrent;
 
 class tr_lpd_impl final : public tr_lpd
 {
 public:
-    tr_lpd_impl(Mediator& mediator, tr_session& session, tr_address address)
+    tr_lpd_impl(Mediator& mediator, libtransmission::TimerMaker& timer_maker, struct event_base* event_base)
         : mediator_{ mediator }
-        , session_{ session }
-        , upkeep_timer_{ session.timerMaker().create([this]() { onUpkeepTimer(); }) }
+        , upkeep_timer_{ timer_maker.create([this]() { onUpkeepTimer(); }) }
     {
-        auto const ok = tr_lpdInit(mediator_, &session_, &address) != -1;
+        auto const ok = tr_lpdInit(mediator_, event_base) != -1;
 
         if (ok)
         {
@@ -652,7 +649,7 @@ public:
     {
         upkeep_timer_.reset();
 
-        tr_lpdUninit(&session_);
+        tr_lpdUninit();
     }
 
 private:
@@ -664,13 +661,15 @@ private:
     }
 
     Mediator& mediator_;
-    tr_session& session_;
 
     static auto constexpr UpkeepInterval = 5s;
     std::unique_ptr<libtransmission::Timer> upkeep_timer_;
 };
 
-std::unique_ptr<tr_lpd> tr_lpd::create(Mediator& mediator, tr_session& session, tr_address address)
+std::unique_ptr<tr_lpd> tr_lpd::create(
+    Mediator& mediator,
+    libtransmission::TimerMaker& timer_maker,
+    struct event_base* event_base)
 {
-    return std::make_unique<tr_lpd_impl>(mediator, session, address);
+    return std::make_unique<tr_lpd_impl>(mediator, timer_maker, event_base);
 }
