@@ -293,80 +293,6 @@ int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, cha
 /**
 * @} */
 
-bool tr_lpdSendAnnounce(tr_lpd::Mediator& mediator, tr_torrent const* t);
-
-/**
-* @note Since it possible for tr_lpdAnnounceMore to get called from outside the LPD module,
-* the function needs to be informed of the externally employed housekeeping interval.
-* Further, by setting interval to zero (or negative) the caller may actually disable LPD
-* announces on a per-interval basis.
-*
-* TODO: since this function's been made private and is called by a periodic timer,
-* most of the previous paragraph isn't true anymore... we weren't using that functionality
-* before. are there cases where we should? if not, should we remove the bells & whistles?
-*/
-int tr_lpdAnnounceMore(tr_lpd::Mediator& mediator, time_t const now, int const interval)
-{
-    int announcesSent = 0;
-
-    if (mediator.allowsLPD())
-    {
-        for (auto* const tor : mediator.torrents())
-        {
-            int announcePrio = 0;
-
-            if (!tor->allowsLpd())
-            {
-                continue;
-            }
-
-            /* issue #3208: prioritize downloads before seeds */
-            switch (tr_torrentGetActivity(tor))
-            {
-            case TR_STATUS_DOWNLOAD:
-                announcePrio = 1;
-                break;
-
-            case TR_STATUS_SEED:
-                announcePrio = 2;
-                break;
-
-            default:
-                break;
-            }
-
-            if (announcePrio > 0 && tor->lpdAnnounceAt <= now)
-            {
-                if (tr_lpdSendAnnounce(mediator, tor))
-                {
-                    announcesSent++;
-                }
-
-                tor->lpdAnnounceAt = now + lpd_announceInterval * announcePrio;
-
-                break; /* that's enough; for this interval */
-            }
-        }
-    }
-
-    /* perform housekeeping for the flood protection mechanism */
-    {
-        int const maxAnnounceCap = interval * lpd_announceCapFactor;
-
-        if (lpd_unsolicitedMsgCounter < 0)
-        {
-            tr_logAddTrace(fmt::format(
-                "Dropped {} announces in the last interval (max. {} allowed)",
-                -lpd_unsolicitedMsgCounter,
-                maxAnnounceCap));
-        }
-
-        lpd_unsolicitedMsgCounter = maxAnnounceCap;
-    }
-
-    return announcesSent;
-}
-
 /**
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
@@ -574,52 +500,6 @@ void tr_lpdUninit()
 * @{
 */
 
-/**
-* @brief Announce the given torrent on the local network
-*
-* @param[in] t Torrent to announce
-* @return Returns true on success
-*
-* Send a query for torrent t out to the LPD multicast group (or the LAN, for that
-* matter). A listening client on the same network might react by adding us to his
-* peer pool for torrent t.
-*/
-bool tr_lpdSendAnnounce(tr_lpd::Mediator& mediator, tr_torrent const* t)
-{
-    if (t == nullptr)
-    {
-        return false;
-    }
-
-    auto const query = fmt::format(
-        FMT_STRING("BT-SEARCH * HTTP/{:d}.{:d}" CRLF "Host: {:s}:{:d}" CRLF "Port: {:d}" CRLF "Infohash: {:s}" CRLF CRLF CRLF),
-        1,
-        1,
-        lpd_mcastGroup,
-        lpd_mcastPort,
-        mediator.port().host(),
-        tr_strupper(t->infoHashString()));
-
-    // send the query out using [lpd_socket2]
-    // destination address info has already been set up in tr_lpdInit(),
-    // so we refrain from preparing another sockaddr_in here
-    if (auto const res = sendto(
-            lpd_socket2,
-            std::data(query),
-            std::size(query),
-            0,
-            (struct sockaddr const*)&lpd_mcastAddr,
-            sizeof(lpd_mcastAddr));
-        res != static_cast<int>(std::size(query)))
-    {
-        return false;
-    }
-
-    tr_logAddTraceTor(t, "LPD announce message away");
-
-    return true;
-}
-
 } // namespace
 
 struct tr_torrent;
@@ -655,7 +535,109 @@ private:
     {
         time_t const now = tr_time();
         auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
-        tr_lpdAnnounceMore(mediator_, now, seconds);
+        announceMore(now, seconds);
+    }
+
+    /**
+     * @note Since it possible for tr_lpdAnnounceMore to get called from outside the LPD module,
+     * the function needs to be informed of the externally employed housekeeping interval.
+     * Further, by setting interval to zero (or negative) the caller may actually disable LPD
+     * announces on a per-interval basis.
+     *
+     * TODO: since this function's been made private and is called by a periodic timer,
+     * most of the previous paragraph isn't true anymore... we weren't using that functionality
+     * before. are there cases where we should? if not, should we remove the bells & whistles?
+     */
+    void announceMore(time_t const now, int const interval)
+    {
+        if (mediator_.allowsLPD())
+        {
+            for (auto* const tor : mediator_.torrents())
+            {
+                if (!tor->allowsLpd())
+                {
+                    continue;
+                }
+
+                int announce_prio = 0;
+
+                /* issue #3208: prioritize downloads before seeds */
+                switch (tr_torrentGetActivity(tor))
+                {
+                case TR_STATUS_DOWNLOAD:
+                    announce_prio = 1;
+                    break;
+
+                case TR_STATUS_SEED:
+                    announce_prio = 2;
+                    break;
+
+                default:
+                    break;
+                }
+
+                if (announce_prio > 0 && tor->lpdAnnounceAt <= now)
+                {
+                    if (sendAnnounce(tor->infoHashString()))
+                    {
+                        tr_logAddTraceTor(tor, "LPD announce message away");
+                        tor->lpdAnnounceAt = now + lpd_announceInterval * announce_prio;
+                        break; /* that's enough; for this interval */
+                    }
+                }
+            }
+        }
+
+        /* perform housekeeping for the flood protection mechanism */
+        {
+            int const maxAnnounceCap = interval * lpd_announceCapFactor;
+
+            if (lpd_unsolicitedMsgCounter < 0)
+            {
+                tr_logAddTrace(fmt::format(
+                    "Dropped {} announces in the last interval (max. {} allowed)",
+                    -lpd_unsolicitedMsgCounter,
+                    maxAnnounceCap));
+            }
+
+            lpd_unsolicitedMsgCounter = maxAnnounceCap;
+        }
+    }
+
+    /**
+     * @brief Announce the given torrent on the local network
+     *
+     * @param[in] t Torrent to announce
+     * @return Returns true on success
+     *
+     * Send a query for torrent t out to the LPD multicast group (or the LAN, for that
+     * matter). A listening client on the same network might react by adding us to his
+     * peer pool for torrent t.
+     */
+    bool sendAnnounce(std::string_view info_hash_str)
+    {
+        auto const query = fmt::format(
+            FMT_STRING("BT-SEARCH * HTTP/{:d}.{:d}" CRLF "Host: {:s}:{:d}" CRLF "Port: {:d}" CRLF
+                       "Infohash: {:s}" CRLF CRLF CRLF),
+            1,
+            1,
+            lpd_mcastGroup,
+            lpd_mcastPort,
+            mediator_.port().host(),
+            tr_strupper(info_hash_str));
+
+        // send the query out using [lpd_socket2]
+        // destination address info has already been set up in tr_lpdInit(),
+        // so we refrain from preparing another sockaddr_in here
+        auto const res = sendto(
+            lpd_socket2,
+            std::data(query),
+            std::size(query),
+            0,
+            (struct sockaddr const*)&lpd_mcastAddr,
+            sizeof(lpd_mcastAddr));
+        auto const sent = res == static_cast<int>(std::size(query));
+        return sent;
     }
 
     Mediator& mediator_;
