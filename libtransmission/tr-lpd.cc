@@ -50,14 +50,10 @@ auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 *
 */
 
-tr_socket_t lpd_socket; /**<separate multicast receive socket */
-tr_socket_t lpd_socket2; /**<and multicast send socket */
-event* lpd_event = nullptr;
-
 auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
 char constexpr lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
 auto constexpr lpd_mcastPort = int{ 6771 }; /**<LPD source and destination UPD port */
-auto lpd_mcastAddr = sockaddr_in{}; /**<initialized from the above constants in tr_lpdInit */
+auto lpd_mcastAddr = sockaddr_in{}; /**<initialized from the above constants in init() */
 
 /**
 * @brief Protocol-related information carried by a Local Peer Discovery packet */
@@ -66,41 +62,6 @@ struct lpd_protocolVersion
     int major;
     int minor;
 };
-
-auto constexpr lpd_ttlSameSubnet = int{ 1 };
-// auto constexpr lpd_ttlSameSite = int{ 32 };
-// auto constexpr lpd_ttlSameRegion = int{ 64 };
-// auto constexpr lpd_ttlSameContinent = int{ 128 };
-// auto constexpr lpd_ttlUnrestricted = int{ 255 };
-
-auto constexpr lpd_announceInterval = int{ 4 * 60 }; /**<4 min announce interval per torrent */
-auto constexpr lpd_announceScope = int{ lpd_ttlSameSubnet }; /**<the maximum scope for LPD datagrams */
-
-/**
-* @defgroup DoS Message Flood Protection
-* @{
-* We want to have a means to protect the libtransmission backend against message
-* flooding: the strategy is to cap event processing once more than ten messages
-* per second (that is, taking the average over one of our housekeeping intervals)
-* got into our processing handler.
-* If we'd really hit the limit and start discarding events, we either joined an
-* extremely crowded multicast group or a malevolent host is sending bogus data to
-* our socket. In this situation, we rather miss some announcements than blocking
-* the actual task.
-* @}
-*/
-
-/**
-* @ingroup DoS
-* @brief allow at most ten messages per second (interval average)
-* @note this constraint is only enforced once per housekeeping interval */
-auto constexpr lpd_announceCapFactor = int{ 10 };
-
-/**
-* @ingroup DoS
-* @brief number of unsolicited messages during the last HK interval
-* @remark counts downwards */
-int lpd_unsolicitedMsgCounter;
 
 /**
 * @def CRLF
@@ -294,205 +255,6 @@ int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, cha
 * @} */
 
 /**
-* @brief Processing of timeout notifications and incoming data on the socket
-* @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
-* @see DoS */
-void event_callback(evutil_socket_t /*s*/, short type, void* vmediator)
-{
-    auto& mediator = *static_cast<tr_lpd::Mediator*>(vmediator);
-
-    /* do not allow announces to be processed if LPD is disabled */
-    if (!mediator.allowsLPD())
-    {
-        return;
-    }
-
-    if ((type & EV_READ) != 0)
-    {
-        struct sockaddr_in foreignAddr;
-        int addrLen = sizeof(foreignAddr);
-        char foreignMsg[lpd_maxDatagramLength + 1];
-
-        /* process local announcement from foreign peer */
-        int const res = recvfrom(
-            lpd_socket,
-            foreignMsg,
-            lpd_maxDatagramLength,
-            0,
-            (struct sockaddr*)&foreignAddr,
-            (socklen_t*)&addrLen);
-
-        /* besides, do we get flooded? then bail out! */
-        if (--lpd_unsolicitedMsgCounter < 0)
-        {
-            return;
-        }
-
-        if (res > 0 && res <= lpd_maxDatagramLength)
-        {
-            auto foreign_peer = tr_address{};
-            foreign_peer.addr.addr4 = foreignAddr.sin_addr;
-
-            /* be paranoid enough about zero terminating the foreign string */
-            foreignMsg[res] = '\0';
-
-            if (tr_lpdConsiderAnnounce(mediator, foreign_peer, foreignMsg) != 0)
-            {
-                return; /* OK so far, no log message */
-            }
-        }
-
-        tr_logAddTrace("Discarded invalid multicast message");
-    }
-}
-
-/**
-* @brief Initializes Local Peer Discovery for this node
-*
-* For the most part, this means setting up an appropriately configured multicast socket
-* and event-based message handling.
-*
-* @remark Since the LPD service does not use another protocol family yet, this code is
-* IPv4 only for the time being.
-*/
-int tr_lpdInit(tr_lpd::Mediator& mediator, struct event_base* event_base)
-{
-    /* if this check fails (i.e. the definition of hashString changed), update
-     * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
-     * However, the code should work as long as interfaces to the rest of
-     * libtransmission are compatible with char* strings. */
-    static_assert(
-        std::is_same_v<std::string const&, std::remove_pointer_t<decltype(std::declval<tr_torrent>().infoHashString())>>);
-
-    struct ip_mreq mcastReq;
-    int const opt_on = 1;
-    int const opt_off = 0;
-
-    TR_ASSERT(lpd_announceInterval > 0);
-    TR_ASSERT(lpd_announceScope > 0);
-
-    tr_logAddDebug("Initialising Local Peer Discovery");
-
-    /* setup datagram socket (receive) */
-    {
-        lpd_socket = socket(PF_INET, SOCK_DGRAM, 0);
-
-        if (lpd_socket == TR_BAD_SOCKET)
-        {
-            goto fail;
-        }
-
-        if (evutil_make_socket_nonblocking(lpd_socket) == -1)
-        {
-            goto fail;
-        }
-
-        if (setsockopt(lpd_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) == -1)
-        {
-            goto fail;
-        }
-
-        memset(&lpd_mcastAddr, 0, sizeof(lpd_mcastAddr));
-        lpd_mcastAddr.sin_family = AF_INET;
-        lpd_mcastAddr.sin_port = htons(lpd_mcastPort);
-
-        if (evutil_inet_pton(lpd_mcastAddr.sin_family, lpd_mcastGroup, &lpd_mcastAddr.sin_addr) == -1)
-        {
-            goto fail;
-        }
-
-        if (bind(lpd_socket, (struct sockaddr*)&lpd_mcastAddr, sizeof(lpd_mcastAddr)) == -1)
-        {
-            goto fail;
-        }
-
-        /* we want to join that LPD multicast group */
-        memset(&mcastReq, 0, sizeof(mcastReq));
-        mcastReq.imr_multiaddr = lpd_mcastAddr.sin_addr;
-        mcastReq.imr_interface.s_addr = htonl(INADDR_ANY);
-
-        if (setsockopt(lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<char const*>(&mcastReq), sizeof(mcastReq)) ==
-            -1)
-        {
-            goto fail;
-        }
-
-        if (setsockopt(lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP, reinterpret_cast<char const*>(&opt_off), sizeof(opt_off)) ==
-            -1)
-        {
-            goto fail;
-        }
-    }
-
-    /* setup datagram socket (send) */
-    {
-        unsigned char const scope = lpd_announceScope;
-
-        lpd_socket2 = socket(PF_INET, SOCK_DGRAM, 0);
-
-        if (lpd_socket2 == TR_BAD_SOCKET)
-        {
-            goto fail;
-        }
-
-        if (evutil_make_socket_nonblocking(lpd_socket2) == -1)
-        {
-            goto fail;
-        }
-
-        /* configure outbound multicast TTL */
-        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL, reinterpret_cast<char const*>(&scope), sizeof(scope)) == -1)
-        {
-            goto fail;
-        }
-
-        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP, reinterpret_cast<char const*>(&opt_off), sizeof(opt_off)) ==
-            -1)
-        {
-            goto fail;
-        }
-    }
-
-    /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
-     * any announcement received during the initial interval will be discarded. */
-
-    lpd_event = event_new(event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, &mediator);
-    event_add(lpd_event, nullptr);
-
-    tr_logAddDebug("Local Peer Discovery initialised");
-
-    return 1;
-
-fail:
-    {
-        int const save = errno;
-        evutil_closesocket(lpd_socket);
-        evutil_closesocket(lpd_socket2);
-        lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
-        tr_logAddWarn(fmt::format(
-            _("Couldn't initialize LPD: {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(save)),
-            fmt::arg("error_code", save)));
-        errno = save;
-    }
-
-    return -1;
-}
-
-void tr_lpdUninit()
-{
-    tr_logAddTrace("Uninitialising Local Peer Discovery");
-
-    event_free(lpd_event);
-    lpd_event = nullptr;
-
-    /* just shut down, we won't remember any former nodes */
-    evutil_closesocket(lpd_socket);
-    evutil_closesocket(lpd_socket2);
-    tr_logAddTrace("Done uninitialising Local Peer Discovery");
-}
-
-/**
 * @endcond */
 
 /**
@@ -511,9 +273,7 @@ public:
         : mediator_{ mediator }
         , upkeep_timer_{ timer_maker.create([this]() { onUpkeepTimer(); }) }
     {
-        auto const ok = tr_lpdInit(mediator_, event_base) != -1;
-
-        if (ok)
+        if (init(mediator_, event_base))
         {
             upkeep_timer_->startRepeating(UpkeepInterval);
         }
@@ -527,10 +287,242 @@ public:
     {
         upkeep_timer_.reset();
 
-        tr_lpdUninit();
+        if (lpd_event != nullptr)
+        {
+            event_free(lpd_event);
+            lpd_event = nullptr;
+        }
+
+        if (mcast_rcv_socket_ != TR_BAD_SOCKET)
+        {
+            evutil_closesocket(mcast_rcv_socket_);
+        }
+
+        if (mcast_snd_socket_ != TR_BAD_SOCKET)
+        {
+            evutil_closesocket(mcast_snd_socket_);
+        }
+
+        tr_logAddTrace("Done uninitialising Local Peer Discovery");
     }
 
 private:
+    bool init(tr_lpd::Mediator& mediator, struct event_base* event_base)
+    {
+        if (initImpl(mediator, event_base))
+        {
+            return true;
+        }
+
+        auto const save = errno;
+        evutil_closesocket(mcast_rcv_socket_);
+        evutil_closesocket(mcast_snd_socket_);
+        mcast_rcv_socket_ = TR_BAD_SOCKET;
+        mcast_snd_socket_ = TR_BAD_SOCKET;
+        tr_logAddWarn(fmt::format(
+            _("Couldn't initialize LPD: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(save)),
+            fmt::arg("error_code", save)));
+        errno = save;
+        return false;
+    }
+
+    /**
+     * @brief Initializes Local Peer Discovery for this node
+     *
+     * For the most part, this means setting up an appropriately configured multicast socket
+     * and event-based message handling.
+     *
+     * @remark Since the LPD service does not use another protocol family yet, this code is
+     * IPv4 only for the time being.
+     */
+    bool initImpl(tr_lpd::Mediator& mediator, struct event_base* event_base)
+    {
+        /* if this check fails (i.e. the definition of hashString changed), update
+         * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
+         * However, the code should work as long as interfaces to the rest of
+         * libtransmission are compatible with char* strings. */
+        static_assert(
+            std::is_same_v<std::string const&, std::remove_pointer_t<decltype(std::declval<tr_torrent>().infoHashString())>>);
+
+        struct ip_mreq mcastReq;
+        int const opt_on = 1;
+        int const opt_off = 0;
+
+        static_assert(AnnounceInterval > 0);
+        static_assert(AnnounceScope > 0);
+
+        tr_logAddDebug("Initialising Local Peer Discovery");
+
+        /* setup datagram socket (receive) */
+        {
+            mcast_rcv_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
+
+            if (mcast_rcv_socket_ == TR_BAD_SOCKET)
+            {
+                return false;
+            }
+
+            if (evutil_make_socket_nonblocking(mcast_rcv_socket_) == -1)
+            {
+                return false;
+            }
+
+            if (setsockopt(
+                    mcast_rcv_socket_,
+                    SOL_SOCKET,
+                    SO_REUSEADDR,
+                    reinterpret_cast<char const*>(&opt_on),
+                    sizeof(opt_on)) == -1)
+            {
+                return false;
+            }
+
+            memset(&lpd_mcastAddr, 0, sizeof(lpd_mcastAddr));
+            lpd_mcastAddr.sin_family = AF_INET;
+            lpd_mcastAddr.sin_port = htons(lpd_mcastPort);
+
+            if (evutil_inet_pton(lpd_mcastAddr.sin_family, lpd_mcastGroup, &lpd_mcastAddr.sin_addr) == -1)
+            {
+                return false;
+            }
+
+            if (bind(mcast_rcv_socket_, (struct sockaddr*)&lpd_mcastAddr, sizeof(lpd_mcastAddr)) == -1)
+            {
+                return false;
+            }
+
+            /* we want to join that LPD multicast group */
+            memset(&mcastReq, 0, sizeof(mcastReq));
+            mcastReq.imr_multiaddr = lpd_mcastAddr.sin_addr;
+            mcastReq.imr_interface.s_addr = htonl(INADDR_ANY);
+
+            if (setsockopt(
+                    mcast_rcv_socket_,
+                    IPPROTO_IP,
+                    IP_ADD_MEMBERSHIP,
+                    reinterpret_cast<char const*>(&mcastReq),
+                    sizeof(mcastReq)) == -1)
+            {
+                return false;
+            }
+
+            if (setsockopt(
+                    mcast_rcv_socket_,
+                    IPPROTO_IP,
+                    IP_MULTICAST_LOOP,
+                    reinterpret_cast<char const*>(&opt_off),
+                    sizeof(opt_off)) == -1)
+            {
+                return false;
+            }
+        }
+
+        /* setup datagram socket (send) */
+        {
+            unsigned char const scope = AnnounceScope;
+
+            mcast_snd_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
+
+            if (mcast_snd_socket_ == TR_BAD_SOCKET)
+            {
+                return false;
+            }
+
+            if (evutil_make_socket_nonblocking(mcast_snd_socket_) == -1)
+            {
+                return false;
+            }
+
+            /* configure outbound multicast TTL */
+            if (setsockopt(
+                    mcast_snd_socket_,
+                    IPPROTO_IP,
+                    IP_MULTICAST_TTL,
+                    reinterpret_cast<char const*>(&scope),
+                    sizeof(scope)) == -1)
+            {
+                return false;
+            }
+
+            if (setsockopt(
+                    mcast_snd_socket_,
+                    IPPROTO_IP,
+                    IP_MULTICAST_LOOP,
+                    reinterpret_cast<char const*>(&opt_off),
+                    sizeof(opt_off)) == -1)
+            {
+                return false;
+            }
+        }
+
+        /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
+         * any announcement received during the initial interval will be discarded. */
+
+        lpd_event = event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, &mediator);
+        event_add(lpd_event, nullptr);
+
+        tr_logAddDebug("Local Peer Discovery initialised");
+
+        return true;
+    }
+
+    /**
+    * @brief Processing of timeout notifications and incoming data on the socket
+    * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
+    * @see DoS */
+    static void event_callback(evutil_socket_t /*s*/, short type, void* vself)
+    {
+        if ((type & EV_READ) != 0)
+        {
+            static_cast<tr_lpd_impl*>(vself)->onCanRead();
+        }
+    }
+
+    void onCanRead()
+    {
+        /* do not allow announces to be processed if LPD is disabled */
+        if (!mediator_.allowsLPD())
+        {
+            return;
+        }
+
+        struct sockaddr_in foreignAddr;
+        int addrLen = sizeof(foreignAddr);
+        char foreignMsg[lpd_maxDatagramLength + 1];
+
+        /* process local announcement from foreign peer */
+        int const res = recvfrom(
+            mcast_rcv_socket_,
+            foreignMsg,
+            lpd_maxDatagramLength,
+            0,
+            (struct sockaddr*)&foreignAddr,
+            (socklen_t*)&addrLen);
+
+        /* besides, do we get flooded? then bail out! */
+        if (--unsolicited_msg_counter_ < 0)
+        {
+            return;
+        }
+
+        if (res > 0 && res <= lpd_maxDatagramLength)
+        {
+            auto foreign_peer = tr_address{};
+            foreign_peer.addr.addr4 = foreignAddr.sin_addr;
+
+            /* be paranoid enough about zero terminating the foreign string */
+            foreignMsg[res] = '\0';
+
+            if (tr_lpdConsiderAnnounce(mediator_, foreign_peer, foreignMsg) != 0)
+            {
+                return; /* OK so far, no log message */
+            }
+        }
+
+        tr_logAddTrace("Discarded invalid multicast message");
+    }
+
     void onUpkeepTimer()
     {
         time_t const now = tr_time();
@@ -581,7 +573,7 @@ private:
                     if (sendAnnounce(tor->infoHashString()))
                     {
                         tr_logAddTraceTor(tor, "LPD announce message away");
-                        tor->lpdAnnounceAt = now + lpd_announceInterval * announce_prio;
+                        tor->lpdAnnounceAt = now + AnnounceInterval * announce_prio;
                         break; /* that's enough; for this interval */
                     }
                 }
@@ -590,17 +582,19 @@ private:
 
         /* perform housekeeping for the flood protection mechanism */
         {
-            int const maxAnnounceCap = interval * lpd_announceCapFactor;
+            int const maxAnnounceCap = interval * AnnounceCapFactor;
 
-            if (lpd_unsolicitedMsgCounter < 0)
+            if (unsolicited_msg_counter_ < 0)
             {
+                --unsolicited_msg_counter_;
+
                 tr_logAddTrace(fmt::format(
                     "Dropped {} announces in the last interval (max. {} allowed)",
-                    -lpd_unsolicitedMsgCounter,
+                    unsolicited_msg_counter_,
                     maxAnnounceCap));
             }
 
-            lpd_unsolicitedMsgCounter = maxAnnounceCap;
+            unsolicited_msg_counter_ = maxAnnounceCap;
         }
     }
 
@@ -626,11 +620,11 @@ private:
             mediator_.port().host(),
             tr_strupper(info_hash_str));
 
-        // send the query out using [lpd_socket2]
-        // destination address info has already been set up in tr_lpdInit(),
+        // send the query out using [mcast_snd_socket_]
+        // destination address info has already been set up in init(),
         // so we refrain from preparing another sockaddr_in here
         auto const res = sendto(
-            lpd_socket2,
+            mcast_snd_socket_,
             std::data(query),
             std::size(query),
             0,
@@ -641,9 +635,40 @@ private:
     }
 
     Mediator& mediator_;
+    tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
+    tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
+    event* lpd_event = nullptr;
+
+    /// DoS Message Flood Protection
+    // We want to have a means to protect the libtransmission backend against message
+    // flooding: the strategy is to cap event processing once more than ten messages
+    // per second (that is, taking the average over one of our housekeeping intervals)
+    // got into our processing handler.
+    // If we'd really hit the limit and start discarding events, we either joined an
+    // extremely crowded multicast group or a malevolent host is sending bogus data to
+    // our socket. In this situation, we rather miss some announcements than blocking
+    // the actual task.
+    //
+    // @brief allow at most ten messages per second (interval average)
+    // @note this constraint is only enforced once per housekeeping interval
+    static auto constexpr AnnounceCapFactor = int{ 10 };
+
+    // @ingroup DoS
+    // @brief number of unsolicited messages during the last HK interval
+    // @remark counts downwards
+    int unsolicited_msg_counter_;
 
     static auto constexpr UpkeepInterval = 5s;
     std::unique_ptr<libtransmission::Timer> upkeep_timer_;
+
+    static auto constexpr AnnounceInterval = time_t{ 4 * 60 }; /**<4 min announce interval per torrent */
+    static auto constexpr TtlSameSubnet = int{ 1 };
+    static auto constexpr AnnounceScope = int{ TtlSameSubnet }; /**<the maximum scope for LPD datagrams */
+
+    // static auto constexpr lpd_ttlSameSite = int{ 32 };
+    // static auto constexpr lpd_ttlSameRegion = int{ 64 };
+    // static auto constexpr lpd_ttlSameContinent = int{ 128 };
+    // static auto constexpr lpd_ttlUnrestricted = int{ 255 };
 };
 
 std::unique_ptr<tr_lpd> tr_lpd::create(
