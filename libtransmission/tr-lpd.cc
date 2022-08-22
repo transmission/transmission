@@ -56,8 +56,6 @@ tr_socket_t lpd_socket; /**<separate multicast receive socket */
 tr_socket_t lpd_socket2; /**<and multicast send socket */
 event* lpd_event = nullptr;
 
-tr_session* my_session;
-
 auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
 char constexpr lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
 auto constexpr lpd_mcastPort = int{ 6771 }; /**<LPD source and destination UPD port */
@@ -313,11 +311,6 @@ int tr_lpdAnnounceMore(tr_lpd::Mediator& mediator, time_t const now, int const i
 {
     int announcesSent = 0;
 
-    if (my_session == nullptr)
-    {
-        return -1;
-    }
-
     if (mediator.allowsLPD())
     {
         for (auto* const tor : mediator.torrents())
@@ -452,11 +445,6 @@ int tr_lpdInit(tr_lpd::Mediator& mediator, tr_session* ss, tr_address* /*tr_addr
     int const opt_on = 1;
     int const opt_off = 0;
 
-    if (my_session != nullptr) /* already initialized */
-    {
-        return -1;
-    }
-
     TR_ASSERT(lpd_announceInterval > 0);
     TR_ASSERT(lpd_announceScope > 0);
 
@@ -542,8 +530,6 @@ int tr_lpdInit(tr_lpd::Mediator& mediator, tr_session* ss, tr_address* /*tr_addr
         }
     }
 
-    my_session = ss;
-
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
@@ -560,7 +546,6 @@ fail:
         evutil_closesocket(lpd_socket);
         evutil_closesocket(lpd_socket2);
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
-        my_session = nullptr;
         tr_logAddWarn(fmt::format(
             _("Couldn't initialize LPD: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(save)),
@@ -573,11 +558,6 @@ fail:
 
 void tr_lpdUninit(tr_session* ss)
 {
-    if (my_session != ss)
-    {
-        return;
-    }
-
     tr_logAddTrace("Uninitialising Local Peer Discovery");
 
     event_free(lpd_event);
@@ -587,8 +567,6 @@ void tr_lpdUninit(tr_session* ss)
     evutil_closesocket(lpd_socket);
     evutil_closesocket(lpd_socket2);
     tr_logAddTrace("Done uninitialising Local Peer Discovery");
-
-    my_session = nullptr;
 }
 
 /**
