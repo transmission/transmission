@@ -597,3 +597,53 @@ std::string gtr_get_full_resource_path(std::string const& rel_path)
     static auto const BasePath = "/com/transmissionbt/transmission/"s;
     return BasePath + rel_path;
 }
+
+/***
+****
+***/
+
+size_t const max_recent_dirs = size_t{ 4 };
+
+std::list<std::string> gtr_get_recent_dirs(std::string const& pref)
+{
+    std::list<std::string> list;
+
+    for (size_t i = 0; i < max_recent_dirs; ++i)
+    {
+        auto const key = gtr_sprintf("recent-%s-dir-%d", pref, i + 1);
+
+        if (auto const val = gtr_pref_string_get(tr_quark_new({ key.c_str(), key.size() })); !val.empty())
+        {
+            list.push_back(val);
+        }
+    }
+
+    return list;
+}
+
+void gtr_save_recent_dir(std::string const& pref, Glib::RefPtr<Session> const& core, std::string const& dir)
+{
+    if (dir.empty())
+    {
+        return;
+    }
+
+    auto list = gtr_get_recent_dirs(pref);
+
+    /* if it was already in the list, remove it */
+    list.remove(dir);
+
+    /* add it to the front of the list */
+    list.push_front(dir);
+
+    /* save the first max_recent_dirs directories */
+    list.resize(max_recent_dirs);
+    int i = 0;
+    for (auto const& d : list)
+    {
+        auto const key = gtr_sprintf("recent-%s-dir-%d", pref, ++i);
+        gtr_pref_string_set(tr_quark_new({ key.c_str(), key.size() }), d);
+    }
+
+    gtr_pref_save(core->get_session());
+}
