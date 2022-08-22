@@ -38,7 +38,10 @@ using in_port_t = uint16_t; /* all missing */
 
 using namespace std::literals;
 
-static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
+namespace
+{
+
+auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
 /**
 * @brief Local Peer Discovery
@@ -49,23 +52,23 @@ static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 *
 */
 
-static void event_callback(evutil_socket_t, short /*type*/, void* /*unused*/);
+void event_callback(evutil_socket_t, short /*type*/, void* /*unused*/);
 
-static auto constexpr UpkeepInterval = 5s;
+auto constexpr UpkeepInterval = 5s;
 
-static std::unique_ptr<libtransmission::Timer> upkeep_timer;
+std::unique_ptr<libtransmission::Timer> upkeep_timer;
 
-static tr_socket_t lpd_socket; /**<separate multicast receive socket */
-static tr_socket_t lpd_socket2; /**<and multicast send socket */
-static event* lpd_event = nullptr;
-static tr_port lpd_port;
+tr_socket_t lpd_socket; /**<separate multicast receive socket */
+tr_socket_t lpd_socket2; /**<and multicast send socket */
+event* lpd_event = nullptr;
+tr_port lpd_port;
 
-static tr_session* session;
+tr_session* session;
 
-static auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
-static char constexpr lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
-static auto constexpr lpd_mcastPort = int{ 6771 }; /**<LPD source and destination UPD port */
-static auto lpd_mcastAddr = sockaddr_in{}; /**<initialized from the above constants in tr_lpdInit */
+auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
+char constexpr lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
+auto constexpr lpd_mcastPort = int{ 6771 }; /**<LPD source and destination UPD port */
+auto lpd_mcastAddr = sockaddr_in{}; /**<initialized from the above constants in tr_lpdInit */
 
 /**
 * @brief Protocol-related information carried by a Local Peer Discovery packet */
@@ -75,14 +78,14 @@ struct lpd_protocolVersion
     int minor;
 };
 
-static auto constexpr lpd_ttlSameSubnet = int{ 1 };
-// static auto constexpr lpd_ttlSameSite = int{ 32 };
-// static auto constexpr lpd_ttlSameRegion = int{ 64 };
-// static auto constexpr lpd_ttlSameContinent = int{ 128 };
-// static auto constexpr lpd_ttlUnrestricted = int{ 255 };
+auto constexpr lpd_ttlSameSubnet = int{ 1 };
+// auto constexpr lpd_ttlSameSite = int{ 32 };
+// auto constexpr lpd_ttlSameRegion = int{ 64 };
+// auto constexpr lpd_ttlSameContinent = int{ 128 };
+// auto constexpr lpd_ttlUnrestricted = int{ 255 };
 
-static auto constexpr lpd_announceInterval = int{ 4 * 60 }; /**<4 min announce interval per torrent */
-static auto constexpr lpd_announceScope = int{ lpd_ttlSameSubnet }; /**<the maximum scope for LPD datagrams */
+auto constexpr lpd_announceInterval = int{ 4 * 60 }; /**<4 min announce interval per torrent */
+auto constexpr lpd_announceScope = int{ lpd_ttlSameSubnet }; /**<the maximum scope for LPD datagrams */
 
 /**
 * @defgroup DoS Message Flood Protection
@@ -102,13 +105,13 @@ static auto constexpr lpd_announceScope = int{ lpd_ttlSameSubnet }; /**<the maxi
 * @ingroup DoS
 * @brief allow at most ten messages per second (interval average)
 * @note this constraint is only enforced once per housekeeping interval */
-static auto constexpr lpd_announceCapFactor = int{ 10 };
+auto constexpr lpd_announceCapFactor = int{ 10 };
 
 /**
 * @ingroup DoS
 * @brief number of unsolicited messages during the last HK interval
 * @remark counts downwards */
-static int lpd_unsolicitedMsgCounter;
+int lpd_unsolicitedMsgCounter;
 
 /**
 * @def CRLF
@@ -135,7 +138,7 @@ static int lpd_unsolicitedMsgCounter;
 * If parameter is not nullptr, the declared protocol version is returned as part
 * of the lpd_protocolVersion structure.
 */
-static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
+char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
     TR_ASSERT(s != nullptr);
 
@@ -196,7 +199,7 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 *   - copy back value from end to next "\r\n"
 */
 // TODO: string_view
-static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
+bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
     TR_ASSERT(str != nullptr);
     TR_ASSERT(name != nullptr);
@@ -231,7 +234,226 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 /**
 * @} */
 
-static void on_upkeep_timer();
+/**
+* @brief Process incoming unsolicited messages and add the peer to the announced
+* torrent if all checks are passed.
+*
+* @param[in,out] peer Address information of the peer to add
+* @param[in] msg The announcement message to consider
+* @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
+* was successfully added, -1 if not; a non-null return value indicates a side-effect to
+* the peer in/out parameter.
+*
+* @note The port information gets added to the peer structure if tr_lpdConsiderAnnounce
+* is able to extract the necessary information from the announce message. That is, if
+* return != 0, the caller may retrieve the value from the passed structure.
+*/
+int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
+{
+    auto constexpr MaxValueLen = int{ 25 };
+    auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
+
+    auto ver = lpd_protocolVersion{ -1, -1 };
+    char value[MaxValueLen] = { 0 };
+    char hashString[MaxHashLen] = { 0 };
+    int res = 0;
+
+    if (peer != nullptr && msg != nullptr)
+    {
+        tr_torrent* tor = nullptr;
+
+        char const* params = lpd_extractHeader(msg, &ver);
+
+        if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
+        {
+            return 0;
+        }
+
+        /* save the effort to check Host, which seems to be optional anyway */
+
+        if (!lpd_extractParam(params, "Port", MaxValueLen, value))
+        {
+            return 0;
+        }
+
+        /* determine announced peer port, refuse if value too large */
+        int peer_port = 0;
+        if (sscanf(value, "%d", &peer_port) != 1 || peer_port > (in_port_t)-1)
+        {
+            return 0;
+        }
+
+        peer->port.setHost(peer_port);
+        res = -1; /* signal caller side-effect to peer->port via return != 0 */
+
+        if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
+        {
+            return res;
+        }
+
+        tor = session->torrents().get(hashString);
+
+        if (tr_isTorrent(tor) && tor->allowsLpd())
+        {
+            /* we found a suitable peer, add it to the torrent */
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
+            tr_logAddDebugTor(
+                tor,
+                fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), peer->addr.readable(peer->port)));
+
+            /* periodic reconnectPulse() deals with the rest... */
+
+            return 1;
+        }
+
+        tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hashString));
+    }
+
+    return res;
+}
+
+/**
+* @} */
+
+/**
+* @note Since it possible for tr_lpdAnnounceMore to get called from outside the LPD module,
+* the function needs to be informed of the externally employed housekeeping interval.
+* Further, by setting interval to zero (or negative) the caller may actually disable LPD
+* announces on a per-interval basis.
+*
+* TODO: since this function's been made private and is called by a periodic timer,
+* most of the previous paragraph isn't true anymore... we weren't using that functionality
+* before. are there cases where we should? if not, should we remove the bells & whistles?
+*/
+int tr_lpdAnnounceMore(time_t const now, int const interval)
+{
+    int announcesSent = 0;
+
+    if (session == nullptr)
+    {
+        return -1;
+    }
+
+    if (session->allowsLPD())
+    {
+        for (auto* const tor : session->torrents())
+        {
+            int announcePrio = 0;
+
+            if (!tor->allowsLpd())
+            {
+                continue;
+            }
+
+            /* issue #3208: prioritize downloads before seeds */
+            switch (tr_torrentGetActivity(tor))
+            {
+            case TR_STATUS_DOWNLOAD:
+                announcePrio = 1;
+                break;
+
+            case TR_STATUS_SEED:
+                announcePrio = 2;
+                break;
+
+            default:
+                break;
+            }
+
+            if (announcePrio > 0 && tor->lpdAnnounceAt <= now)
+            {
+                if (tr_lpdSendAnnounce(tor))
+                {
+                    announcesSent++;
+                }
+
+                tor->lpdAnnounceAt = now + lpd_announceInterval * announcePrio;
+
+                break; /* that's enough; for this interval */
+            }
+        }
+    }
+
+    /* perform housekeeping for the flood protection mechanism */
+    {
+        int const maxAnnounceCap = interval * lpd_announceCapFactor;
+
+        if (lpd_unsolicitedMsgCounter < 0)
+        {
+            tr_logAddTrace(fmt::format(
+                "Dropped {} announces in the last interval (max. {} allowed)",
+                -lpd_unsolicitedMsgCounter,
+                maxAnnounceCap));
+        }
+
+        lpd_unsolicitedMsgCounter = maxAnnounceCap;
+    }
+
+    return announcesSent;
+}
+
+void on_upkeep_timer()
+{
+    time_t const now = tr_time();
+    auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
+    tr_lpdAnnounceMore(now, seconds);
+}
+
+/**
+* @brief Processing of timeout notifications and incoming data on the socket
+* @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
+* @see DoS */
+void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
+{
+    TR_ASSERT(session != nullptr);
+
+    /* do not allow announces to be processed if LPD is disabled */
+    if (!session->allowsLPD())
+    {
+        return;
+    }
+
+    if ((type & EV_READ) != 0)
+    {
+        struct sockaddr_in foreignAddr;
+        int addrLen = sizeof(foreignAddr);
+        char foreignMsg[lpd_maxDatagramLength + 1];
+
+        /* process local announcement from foreign peer */
+        int const res = recvfrom(
+            lpd_socket,
+            foreignMsg,
+            lpd_maxDatagramLength,
+            0,
+            (struct sockaddr*)&foreignAddr,
+            (socklen_t*)&addrLen);
+
+        /* besides, do we get flooded? then bail out! */
+        if (--lpd_unsolicitedMsgCounter < 0)
+        {
+            return;
+        }
+
+        if (res > 0 && res <= lpd_maxDatagramLength)
+        {
+            auto foreignPeer = tr_pex{};
+
+            /* be paranoid enough about zero terminating the foreign string */
+            foreignMsg[res] = '\0';
+
+            foreignPeer.addr.addr.addr4 = foreignAddr.sin_addr;
+
+            if (tr_lpdConsiderAnnounce(&foreignPeer, foreignMsg) != 0)
+            {
+                return; /* OK so far, no log message */
+            }
+        }
+
+        tr_logAddTrace("Discarded invalid multicast message");
+    }
+}
+
+} // namespace
 
 /**
 * @brief Initializes Local Peer Discovery for this node
@@ -457,223 +679,4 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     tr_logAddTraceTor(t, "LPD announce message away");
 
     return true;
-}
-
-/**
-* @brief Process incoming unsolicited messages and add the peer to the announced
-* torrent if all checks are passed.
-*
-* @param[in,out] peer Address information of the peer to add
-* @param[in] msg The announcement message to consider
-* @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
-* was successfully added, -1 if not; a non-null return value indicates a side-effect to
-* the peer in/out parameter.
-*
-* @note The port information gets added to the peer structure if tr_lpdConsiderAnnounce
-* is able to extract the necessary information from the announce message. That is, if
-* return != 0, the caller may retrieve the value from the passed structure.
-*/
-static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
-{
-    auto constexpr MaxValueLen = int{ 25 };
-    auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
-
-    auto ver = lpd_protocolVersion{ -1, -1 };
-    char value[MaxValueLen] = { 0 };
-    char hashString[MaxHashLen] = { 0 };
-    int res = 0;
-
-    if (peer != nullptr && msg != nullptr)
-    {
-        tr_torrent* tor = nullptr;
-
-        char const* params = lpd_extractHeader(msg, &ver);
-
-        if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
-        {
-            return 0;
-        }
-
-        /* save the effort to check Host, which seems to be optional anyway */
-
-        if (!lpd_extractParam(params, "Port", MaxValueLen, value))
-        {
-            return 0;
-        }
-
-        /* determine announced peer port, refuse if value too large */
-        int peer_port = 0;
-        if (sscanf(value, "%d", &peer_port) != 1 || peer_port > (in_port_t)-1)
-        {
-            return 0;
-        }
-
-        peer->port.setHost(peer_port);
-        res = -1; /* signal caller side-effect to peer->port via return != 0 */
-
-        if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
-        {
-            return res;
-        }
-
-        tor = session->torrents().get(hashString);
-
-        if (tr_isTorrent(tor) && tor->allowsLpd())
-        {
-            /* we found a suitable peer, add it to the torrent */
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
-            tr_logAddDebugTor(
-                tor,
-                fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), peer->addr.readable(peer->port)));
-
-            /* periodic reconnectPulse() deals with the rest... */
-
-            return 1;
-        }
-
-        tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hashString));
-    }
-
-    return res;
-}
-
-/**
-* @} */
-
-/**
-* @note Since it possible for tr_lpdAnnounceMore to get called from outside the LPD module,
-* the function needs to be informed of the externally employed housekeeping interval.
-* Further, by setting interval to zero (or negative) the caller may actually disable LPD
-* announces on a per-interval basis.
-*
-* TODO: since this function's been made private and is called by a periodic timer,
-* most of the previous paragraph isn't true anymore... we weren't using that functionality
-* before. are there cases where we should? if not, should we remove the bells & whistles?
-*/
-static int tr_lpdAnnounceMore(time_t const now, int const interval)
-{
-    int announcesSent = 0;
-
-    if (session == nullptr)
-    {
-        return -1;
-    }
-
-    if (session->allowsLPD())
-    {
-        for (auto* const tor : session->torrents())
-        {
-            int announcePrio = 0;
-
-            if (!tor->allowsLpd())
-            {
-                continue;
-            }
-
-            /* issue #3208: prioritize downloads before seeds */
-            switch (tr_torrentGetActivity(tor))
-            {
-            case TR_STATUS_DOWNLOAD:
-                announcePrio = 1;
-                break;
-
-            case TR_STATUS_SEED:
-                announcePrio = 2;
-                break;
-
-            default:
-                break;
-            }
-
-            if (announcePrio > 0 && tor->lpdAnnounceAt <= now)
-            {
-                if (tr_lpdSendAnnounce(tor))
-                {
-                    announcesSent++;
-                }
-
-                tor->lpdAnnounceAt = now + lpd_announceInterval * announcePrio;
-
-                break; /* that's enough; for this interval */
-            }
-        }
-    }
-
-    /* perform housekeeping for the flood protection mechanism */
-    {
-        int const maxAnnounceCap = interval * lpd_announceCapFactor;
-
-        if (lpd_unsolicitedMsgCounter < 0)
-        {
-            tr_logAddTrace(fmt::format(
-                "Dropped {} announces in the last interval (max. {} allowed)",
-                -lpd_unsolicitedMsgCounter,
-                maxAnnounceCap));
-        }
-
-        lpd_unsolicitedMsgCounter = maxAnnounceCap;
-    }
-
-    return announcesSent;
-}
-
-static void on_upkeep_timer()
-{
-    time_t const now = tr_time();
-    auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
-    tr_lpdAnnounceMore(now, seconds);
-}
-
-/**
-* @brief Processing of timeout notifications and incoming data on the socket
-* @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
-* @see DoS */
-static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
-{
-    TR_ASSERT(session != nullptr);
-
-    /* do not allow announces to be processed if LPD is disabled */
-    if (!session->allowsLPD())
-    {
-        return;
-    }
-
-    if ((type & EV_READ) != 0)
-    {
-        struct sockaddr_in foreignAddr;
-        int addrLen = sizeof(foreignAddr);
-        char foreignMsg[lpd_maxDatagramLength + 1];
-
-        /* process local announcement from foreign peer */
-        int const res = recvfrom(
-            lpd_socket,
-            foreignMsg,
-            lpd_maxDatagramLength,
-            0,
-            (struct sockaddr*)&foreignAddr,
-            (socklen_t*)&addrLen);
-
-        /* besides, do we get flooded? then bail out! */
-        if (--lpd_unsolicitedMsgCounter < 0)
-        {
-            return;
-        }
-
-        if (res > 0 && res <= lpd_maxDatagramLength)
-        {
-            auto foreignPeer = tr_pex{};
-
-            /* be paranoid enough about zero terminating the foreign string */
-            foreignMsg[res] = '\0';
-
-            foreignPeer.addr.addr.addr4 = foreignAddr.sin_addr;
-
-            if (tr_lpdConsiderAnnounce(&foreignPeer, foreignMsg) != 0)
-            {
-                return; /* OK so far, no log message */
-            }
-        }
-
-        tr_logAddTrace("Discarded invalid multicast message");
-    }
 }
