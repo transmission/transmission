@@ -114,7 +114,7 @@ private:
     bool initImpl(struct event_base* event_base)
     {
         /* if this check fails (i.e. the definition of hashString changed), update
-         * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
+         * string handling in tr_lpdSendAnnounce() and considerAnnounce().
          * However, the code should work as long as interfaces to the rest of
          * libtransmission are compatible with char* strings. */
         static_assert(
@@ -289,7 +289,7 @@ private:
             /* be paranoid enough about zero terminating the foreign string */
             foreignMsg[res] = '\0';
 
-            if (tr_lpdConsiderAnnounce(mediator_, foreign_peer, foreignMsg) != 0)
+            if (considerAnnounce(mediator_, foreign_peer, foreignMsg) != 0)
             {
                 return; /* OK so far, no log message */
             }
@@ -530,14 +530,9 @@ private:
     * @param[in,out] peer Address information of the peer to add
     * @param[in] msg The announcement message to consider
     * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
-    * was successfully added, -1 if not; a non-null return value indicates a side-effect to
-    * the peer in/out parameter.
-    *
-    * @note The port information gets added to the peer structure if tr_lpdConsiderAnnounce
-    * is able to extract the necessary information from the announce message. That is, if
-    * return != 0, the caller may retrieve the value from the passed structure.
+    * was successfully added, -1 if not.
     */
-    int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, char const* const msg)
+    int considerAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, char const* const msg)
     {
         auto constexpr MaxValueLen = int{ 25 };
         auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
