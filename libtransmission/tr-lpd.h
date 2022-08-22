@@ -8,9 +8,21 @@
 #error only libtransmission should #include this header.
 #endif
 
-int tr_lpdInit(tr_session*, tr_address*);
-void tr_lpdUninit(tr_session*);
-bool tr_lpdSendAnnounce(tr_torrent const*);
+#include <memory> // for std::unique_ptr
 
-/**
-* @} */
+#include "transmission.h"
+
+#include "net.h" // for tr_address
+
+struct tr_session;
+struct tr_torrent;
+
+class tr_lpd
+{
+public:
+    virtual ~tr_lpd() = default;
+    static std::unique_ptr<tr_lpd> create(tr_session& session, tr_address addr);
+
+protected:
+    tr_lpd() = default;
+};

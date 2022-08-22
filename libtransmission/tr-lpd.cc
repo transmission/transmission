@@ -63,7 +63,7 @@ tr_socket_t lpd_socket2; /**<and multicast send socket */
 event* lpd_event = nullptr;
 tr_port lpd_port;
 
-tr_session* session;
+tr_session* my_session;
 
 auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
 char constexpr lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
@@ -291,7 +291,7 @@ int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             return res;
         }
 
-        tor = session->torrents().get(hashString);
+        tor = my_session->torrents().get(hashString);
 
         if (tr_isTorrent(tor) && tor->allowsLpd())
         {
@@ -312,6 +312,8 @@ int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     return res;
 }
 
+bool tr_lpdSendAnnounce(tr_torrent const* t);
+
 /**
 * @} */
 
@@ -329,14 +331,14 @@ int tr_lpdAnnounceMore(time_t const now, int const interval)
 {
     int announcesSent = 0;
 
-    if (session == nullptr)
+    if (my_session == nullptr)
     {
         return -1;
     }
 
-    if (session->allowsLPD())
+    if (my_session->allowsLPD())
     {
-        for (auto* const tor : session->torrents())
+        for (auto* const tor : my_session->torrents())
         {
             int announcePrio = 0;
 
@@ -405,10 +407,10 @@ void on_upkeep_timer()
 * @see DoS */
 void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
 {
-    TR_ASSERT(session != nullptr);
+    TR_ASSERT(my_session != nullptr);
 
     /* do not allow announces to be processed if LPD is disabled */
-    if (!session->allowsLPD())
+    if (!my_session->allowsLPD())
     {
         return;
     }
@@ -453,8 +455,6 @@ void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
     }
 }
 
-} // namespace
-
 /**
 * @brief Initializes Local Peer Discovery for this node
 *
@@ -477,7 +477,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     int const opt_on = 1;
     int const opt_off = 0;
 
-    if (session != nullptr) /* already initialized */
+    if (my_session != nullptr) /* already initialized */
     {
         return -1;
     }
@@ -573,7 +573,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
         }
     }
 
-    session = ss;
+    my_session = ss;
 
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
@@ -594,7 +594,7 @@ fail:
         evutil_closesocket(lpd_socket);
         evutil_closesocket(lpd_socket2);
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
-        session = nullptr;
+        my_session = nullptr;
         tr_logAddWarn(fmt::format(
             _("Couldn't initialize LPD: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(save)),
@@ -607,7 +607,7 @@ fail:
 
 void tr_lpdUninit(tr_session* ss)
 {
-    if (session != ss)
+    if (my_session != ss)
     {
         return;
     }
@@ -624,7 +624,7 @@ void tr_lpdUninit(tr_session* ss)
     evutil_closesocket(lpd_socket2);
     tr_logAddTrace("Done uninitialising Local Peer Discovery");
 
-    session = nullptr;
+    my_session = nullptr;
 }
 
 /**
@@ -679,4 +679,36 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     tr_logAddTraceTor(t, "LPD announce message away");
 
     return true;
+}
+
+} // namespace
+
+struct tr_session;
+struct tr_torrent;
+
+class tr_lpd_impl final : public tr_lpd
+{
+public:
+    tr_lpd_impl(tr_session& session, tr_address address)
+        : session_{ session }
+    {
+        tr_lpdInit(&session_, &address);
+    }
+    tr_lpd_impl(tr_lpd_impl&&) = delete;
+    tr_lpd_impl(tr_lpd_impl const&) = delete;
+    tr_lpd_impl& operator=(tr_lpd_impl&&) = delete;
+    tr_lpd_impl& operator=(tr_lpd_impl const&) = delete;
+
+    ~tr_lpd_impl() override
+    {
+        tr_lpdUninit(&session_);
+    }
+
+private:
+    tr_session& session_;
+};
+
+std::unique_ptr<tr_lpd> tr_lpd::create(tr_session& session, tr_address address)
+{
+    return std::make_unique<tr_lpd_impl>(session, address);
 }

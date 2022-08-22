@@ -700,7 +700,7 @@ void tr_session::initImpl(init_data& data)
 
     if (this->allowsLPD())
     {
-        tr_lpdInit(this, &this->bind_ipv4.addr_);
+        this->lpd_ = tr_lpd::create(*this, bind_ipv4.addr_);
     }
 
     tr_utpInit(this);
@@ -1743,10 +1743,7 @@ void tr_session::closeImplStart()
 {
     is_closing_ = true;
 
-    if (this->allowsLPD())
-    {
-        tr_lpdUninit(this);
-    }
+    lpd_.reset();
 
     tr_dhtUninit(this);
 
@@ -2082,16 +2079,11 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
         session,
         [session, enabled]()
         {
-            if (session->allowsLPD())
-            {
-                tr_lpdUninit(session);
-            }
-
+            session->lpd_.reset();
             session->is_lpd_enabled_ = enabled;
-
-            if (session->allowsLPD())
+            if (enabled)
             {
-                tr_lpdInit(session, &session->bind_ipv4.addr_);
+                session->lpd_ = tr_lpd::create(*session, session->bind_ipv4.addr_);
             }
         });
 }

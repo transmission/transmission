@@ -53,6 +53,7 @@ struct evdns_base;
 
 class tr_rpc_server;
 class tr_web;
+class tr_lpd;
 struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
@@ -503,6 +504,7 @@ public:
     std::unique_ptr<Cache> cache;
 
     std::unique_ptr<tr_web> web;
+    std::unique_ptr<tr_lpd> lpd_;
 
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
