@@ -52,8 +52,6 @@ auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 *
 */
 
-void event_callback(evutil_socket_t, short /*type*/, void* /*unused*/);
-
 tr_socket_t lpd_socket; /**<separate multicast receive socket */
 tr_socket_t lpd_socket2; /**<and multicast send socket */
 event* lpd_event = nullptr;
