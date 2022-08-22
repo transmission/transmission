@@ -36,235 +36,10 @@ using in_port_t = uint16_t; /* all missing */
 
 using namespace std::literals;
 
-namespace
-{
-
-auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
-
-/**
-* @brief Local Peer Discovery
-* @file tr-lpd.c
-*
-* This module implements the Local Peer Discovery (LPD) protocol as supported by the
-* uTorrent client application. A typical LPD datagram is 119 bytes long.
-*
-*/
-
-auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
-char constexpr lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
-auto constexpr lpd_mcastPort = int{ 6771 }; /**<LPD source and destination UPD port */
-auto lpd_mcastAddr = sockaddr_in{}; /**<initialized from the above constants in init() */
-
-/**
-* @brief Protocol-related information carried by a Local Peer Discovery packet */
-struct lpd_protocolVersion
-{
-    int major;
-    int minor;
-};
-
 /**
 * @def CRLF
 * @brief a line-feed, as understood by the LPD protocol */
 #define CRLF "\r\n"
-
-/**
-* @defgroup HttpReqProc HTTP-style request handling
-* @{
-*/
-
-/**
-* @brief Checks for BT-SEARCH method and separates the parameter section
-* @param[in] s The request string
-* @param[out] ver If non-nullptr, gets filled with protocol info from the request
-* @return Returns a relative pointer to the beginning of the parameter section.
-*         If result is nullptr, s was invalid and no information will be returned
-* @remark Note that the returned pointer is only usable as long as the given
-*         pointer s is valid; that is, return storage is temporary.
-*
-* Determines whether the given string checks out to be a valid BT-SEARCH message.
-* If so, the return value points to the beginning of the parameter section (note:
-* in this case the function returns a character sequence beginning with CRLF).
-* If parameter is not nullptr, the declared protocol version is returned as part
-* of the lpd_protocolVersion structure.
-*/
-char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
-{
-    TR_ASSERT(s != nullptr);
-
-    int major = -1;
-    int minor = -1;
-    size_t const len = strlen(s);
-
-    /* something might be rotten with this chunk of data */
-    if (len == 0 || len > lpd_maxDatagramLength)
-    {
-        return nullptr;
-    }
-
-    /* now we can attempt to look up the BT-SEARCH header */
-    if (sscanf(s, "BT-SEARCH * HTTP/%d.%d" CRLF, &major, &minor) != 2)
-    {
-        return nullptr;
-    }
-
-    if (major < 0 || minor < 0)
-    {
-        return nullptr;
-    }
-
-    {
-        /* a pair of blank lines at the end of the string, no place else */
-        char const* const two_blank = CRLF CRLF CRLF;
-        char const* const end = strstr(s, two_blank);
-
-        if (end == nullptr || strlen(end) > strlen(two_blank))
-        {
-            return nullptr;
-        }
-    }
-
-    if (ver != nullptr)
-    {
-        ver->major = major;
-        ver->minor = minor;
-    }
-
-    /* separate the header, begins with CRLF */
-    return strstr(s, CRLF);
-}
-
-/**
-* @brief Return the value of a named parameter
-*
-* @param[in] str Input string of "\r\nName: Value" pairs without HTTP-style method part
-* @param[in] name Name of parameter to extract
-* @param[in] n Maximum available storage for value to return
-* @param[out] val Output parameter for the actual value
-* @return Returns 1 if value could be copied successfully
-*
-* Extracts the associated value of a named parameter from a HTTP-style header by
-* performing the following steps:
-*   - assemble search string "\r\nName: " and locate position
-*   - copy back value from end to next "\r\n"
-*/
-// TODO: string_view
-bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
-{
-    TR_ASSERT(str != nullptr);
-    TR_ASSERT(name != nullptr);
-    TR_ASSERT(val != nullptr);
-
-    auto const key = tr_strbuf<char, 30>{ CRLF, name, ": "sv };
-
-    char const* const pos = strstr(str, key);
-    if (pos == nullptr)
-    {
-        return false; /* search was not successful */
-    }
-
-    {
-        char const* const beg = pos + std::size(key);
-        char const* const new_line = strstr(beg, CRLF);
-
-        /* the value is delimited by the next CRLF */
-        int const len = new_line - beg;
-
-        /* if value string hits the length limit n,
-         * leave space for a trailing '\0' character */
-        n = std::min(len, n - 1);
-        strncpy(val, beg, n);
-        val[n] = 0;
-    }
-
-    /* we successfully returned the value string */
-    return true;
-}
-
-/**
-* @} */
-
-/**
-* @brief Process incoming unsolicited messages and add the peer to the announced
-* torrent if all checks are passed.
-*
-* @param[in,out] peer Address information of the peer to add
-* @param[in] msg The announcement message to consider
-* @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
-* was successfully added, -1 if not; a non-null return value indicates a side-effect to
-* the peer in/out parameter.
-*
-* @note The port information gets added to the peer structure if tr_lpdConsiderAnnounce
-* is able to extract the necessary information from the announce message. That is, if
-* return != 0, the caller may retrieve the value from the passed structure.
-*/
-int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, char const* const msg)
-{
-    auto constexpr MaxValueLen = int{ 25 };
-    auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
-
-    auto ver = lpd_protocolVersion{ -1, -1 };
-    char value[MaxValueLen] = { 0 };
-    char hashString[MaxHashLen] = { 0 };
-    int res = 0;
-
-    if (msg != nullptr)
-    {
-        char const* params = lpd_extractHeader(msg, &ver);
-
-        if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
-        {
-            return 0;
-        }
-
-        /* save the effort to check Host, which seems to be optional anyway */
-
-        if (!lpd_extractParam(params, "Port", MaxValueLen, value))
-        {
-            return 0;
-        }
-
-        /* determine announced peer port, refuse if value too large */
-        int peer_port = 0;
-        if (sscanf(value, "%d", &peer_port) != 1 || peer_port > (in_port_t)-1)
-        {
-            return 0;
-        }
-        auto const port = tr_port::fromHost(peer_port);
-
-        res = -1; /* signal caller side-effect to peer->port via return != 0 */
-
-        if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
-        {
-            return res;
-        }
-
-        if (mediator.onPeerFound(hashString, peer_addr, port))
-        {
-            /* periodic reconnectPulse() deals with the rest... */
-            return 1;
-        }
-
-        tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hashString));
-    }
-
-    return res;
-}
-
-/**
-* @} */
-
-/**
-* @endcond */
-
-/**
-* @defgroup LdsProto LPD announcement processing
-* @{
-*/
-
-} // namespace
-
-struct tr_torrent;
 
 class tr_lpd_impl final : public tr_lpd
 {
@@ -273,7 +48,7 @@ public:
         : mediator_{ mediator }
         , upkeep_timer_{ timer_maker.create([this]() { onUpkeepTimer(); }) }
     {
-        if (init(mediator_, event_base))
+        if (init(event_base))
         {
             upkeep_timer_->startRepeating(UpkeepInterval);
         }
@@ -287,10 +62,10 @@ public:
     {
         upkeep_timer_.reset();
 
-        if (lpd_event != nullptr)
+        if (event_ != nullptr)
         {
-            event_free(lpd_event);
-            lpd_event = nullptr;
+            event_free(event_);
+            event_ = nullptr;
         }
 
         if (mcast_rcv_socket_ != TR_BAD_SOCKET)
@@ -307,9 +82,9 @@ public:
     }
 
 private:
-    bool init(tr_lpd::Mediator& mediator, struct event_base* event_base)
+    bool init(struct event_base* event_base)
     {
-        if (initImpl(mediator, event_base))
+        if (initImpl(event_base))
         {
             return true;
         }
@@ -336,7 +111,7 @@ private:
      * @remark Since the LPD service does not use another protocol family yet, this code is
      * IPv4 only for the time being.
      */
-    bool initImpl(tr_lpd::Mediator& mediator, struct event_base* event_base)
+    bool initImpl(struct event_base* event_base)
     {
         /* if this check fails (i.e. the definition of hashString changed), update
          * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
@@ -378,23 +153,23 @@ private:
                 return false;
             }
 
-            memset(&lpd_mcastAddr, 0, sizeof(lpd_mcastAddr));
-            lpd_mcastAddr.sin_family = AF_INET;
-            lpd_mcastAddr.sin_port = htons(lpd_mcastPort);
+            memset(&mcast_addr_, 0, sizeof(mcast_addr_));
+            mcast_addr_.sin_family = AF_INET;
+            mcast_addr_.sin_port = McastPort.network();
 
-            if (evutil_inet_pton(lpd_mcastAddr.sin_family, lpd_mcastGroup, &lpd_mcastAddr.sin_addr) == -1)
+            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
             {
                 return false;
             }
 
-            if (bind(mcast_rcv_socket_, (struct sockaddr*)&lpd_mcastAddr, sizeof(lpd_mcastAddr)) == -1)
+            if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
             {
                 return false;
             }
 
             /* we want to join that LPD multicast group */
             memset(&mcastReq, 0, sizeof(mcastReq));
-            mcastReq.imr_multiaddr = lpd_mcastAddr.sin_addr;
+            mcastReq.imr_multiaddr = mcast_addr_.sin_addr;
             mcastReq.imr_interface.s_addr = htonl(INADDR_ANY);
 
             if (setsockopt(
@@ -459,8 +234,8 @@ private:
         /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
          * any announcement received during the initial interval will be discarded. */
 
-        lpd_event = event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, &mediator);
-        event_add(lpd_event, nullptr);
+        event_ = event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, this);
+        event_add(event_, nullptr);
 
         tr_logAddDebug("Local Peer Discovery initialised");
 
@@ -582,7 +357,7 @@ private:
 
         /* perform housekeeping for the flood protection mechanism */
         {
-            int const maxAnnounceCap = interval * AnnounceCapFactor;
+            int const max_announce_cap = interval * AnnounceCapFactor;
 
             if (unsolicited_msg_counter_ < 0)
             {
@@ -591,10 +366,10 @@ private:
                 tr_logAddTrace(fmt::format(
                     "Dropped {} announces in the last interval (max. {} allowed)",
                     unsolicited_msg_counter_,
-                    maxAnnounceCap));
+                    max_announce_cap));
             }
 
-            unsolicited_msg_counter_ = maxAnnounceCap;
+            unsolicited_msg_counter_ = max_announce_cap;
         }
     }
 
@@ -615,8 +390,8 @@ private:
                        "Infohash: {:s}" CRLF CRLF CRLF),
             1,
             1,
-            lpd_mcastGroup,
-            lpd_mcastPort,
+            McastGroup,
+            McastPort.host(),
             mediator_.port().host(),
             tr_strupper(info_hash_str));
 
@@ -628,20 +403,207 @@ private:
             std::data(query),
             std::size(query),
             0,
-            (struct sockaddr const*)&lpd_mcastAddr,
-            sizeof(lpd_mcastAddr));
+            (struct sockaddr const*)&mcast_addr_,
+            sizeof(mcast_addr_));
         auto const sent = res == static_cast<int>(std::size(query));
         return sent;
+    }
+
+    struct lpd_protocolVersion
+    {
+        int major;
+        int minor;
+    };
+
+    /**
+    * @brief Checks for BT-SEARCH method and separates the parameter section
+    * @param[in] s The request string
+    * @param[out] ver If non-nullptr, gets filled with protocol info from the request
+    * @return Returns a relative pointer to the beginning of the parameter section.
+    *         If result is nullptr, s was invalid and no information will be returned
+    * @remark Note that the returned pointer is only usable as long as the given
+    *         pointer s is valid; that is, return storage is temporary.
+    *
+    * Determines whether the given string checks out to be a valid BT-SEARCH message.
+    * If so, the return value points to the beginning of the parameter section (note:
+    * in this case the function returns a character sequence beginning with CRLF).
+    * If parameter is not nullptr, the declared protocol version is returned as part
+    * of the lpd_protocolVersion structure.
+    */
+    static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
+    {
+        TR_ASSERT(s != nullptr);
+
+        int major = -1;
+        int minor = -1;
+        size_t const len = strlen(s);
+
+        /* something might be rotten with this chunk of data */
+        if (len == 0 || len > lpd_maxDatagramLength)
+        {
+            return nullptr;
+        }
+
+        /* now we can attempt to look up the BT-SEARCH header */
+        if (sscanf(s, "BT-SEARCH * HTTP/%d.%d" CRLF, &major, &minor) != 2)
+        {
+            return nullptr;
+        }
+
+        if (major < 0 || minor < 0)
+        {
+            return nullptr;
+        }
+
+        {
+            /* a pair of blank lines at the end of the string, no place else */
+            char const* const two_blank = CRLF CRLF CRLF;
+            char const* const end = strstr(s, two_blank);
+
+            if (end == nullptr || strlen(end) > strlen(two_blank))
+            {
+                return nullptr;
+            }
+        }
+
+        if (ver != nullptr)
+        {
+            ver->major = major;
+            ver->minor = minor;
+        }
+
+        /* separate the header, begins with CRLF */
+        return strstr(s, CRLF);
+    }
+
+    /**
+    * @brief Return the value of a named parameter
+    *
+    * @param[in] str Input string of "\r\nName: Value" pairs without HTTP-style method part
+    * @param[in] name Name of parameter to extract
+    * @param[in] n Maximum available storage for value to return
+    * @param[out] val Output parameter for the actual value
+    * @return Returns 1 if value could be copied successfully
+    *
+    * Extracts the associated value of a named parameter from a HTTP-style header by
+    * performing the following steps:
+    *   - assemble search string "\r\nName: " and locate position
+    *   - copy back value from end to next "\r\n"
+    */
+    // TODO: string_view
+    static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
+    {
+        TR_ASSERT(str != nullptr);
+        TR_ASSERT(name != nullptr);
+        TR_ASSERT(val != nullptr);
+
+        auto const key = tr_strbuf<char, 30>{ CRLF, name, ": "sv };
+
+        char const* const pos = strstr(str, key);
+        if (pos == nullptr)
+        {
+            return false; /* search was not successful */
+        }
+
+        {
+            char const* const beg = pos + std::size(key);
+            char const* const new_line = strstr(beg, CRLF);
+
+            /* the value is delimited by the next CRLF */
+            int const len = new_line - beg;
+
+            /* if value string hits the length limit n,
+             * leave space for a trailing '\0' character */
+            n = std::min(len, n - 1);
+            strncpy(val, beg, n);
+            val[n] = 0;
+        }
+
+        /* we successfully returned the value string */
+        return true;
+    }
+
+    /**
+    * @brief Process incoming unsolicited messages and add the peer to the announced
+    * torrent if all checks are passed.
+    *
+    * @param[in,out] peer Address information of the peer to add
+    * @param[in] msg The announcement message to consider
+    * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
+    * was successfully added, -1 if not; a non-null return value indicates a side-effect to
+    * the peer in/out parameter.
+    *
+    * @note The port information gets added to the peer structure if tr_lpdConsiderAnnounce
+    * is able to extract the necessary information from the announce message. That is, if
+    * return != 0, the caller may retrieve the value from the passed structure.
+    */
+    int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, char const* const msg)
+    {
+        auto constexpr MaxValueLen = int{ 25 };
+        auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
+
+        auto ver = lpd_protocolVersion{ -1, -1 };
+        char value[MaxValueLen] = { 0 };
+        char hashString[MaxHashLen] = { 0 };
+        int res = 0;
+
+        if (msg != nullptr)
+        {
+            char const* params = lpd_extractHeader(msg, &ver);
+
+            if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
+            {
+                return 0;
+            }
+
+            /* save the effort to check Host, which seems to be optional anyway */
+
+            if (!lpd_extractParam(params, "Port", MaxValueLen, value))
+            {
+                return 0;
+            }
+
+            /* determine announced peer port, refuse if value too large */
+            int peer_port = 0;
+            if (sscanf(value, "%d", &peer_port) != 1 || peer_port > (in_port_t)-1)
+            {
+                return 0;
+            }
+            auto const port = tr_port::fromHost(peer_port);
+
+            res = -1; /* signal caller side-effect to peer->port via return != 0 */
+
+            if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
+            {
+                return res;
+            }
+
+            if (mediator.onPeerFound(hashString, peer_addr, port))
+            {
+                /* periodic reconnectPulse() deals with the rest... */
+                return 1;
+            }
+
+            tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hashString));
+        }
+
+        return res;
     }
 
     Mediator& mediator_;
     tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
     tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
-    event* lpd_event = nullptr;
+    event* event_ = nullptr;
+
+    static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
+
+    static auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
+    static constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
+    static auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
+    sockaddr_in mcast_addr_ = {}; /**<initialized from the above constants in init() */
 
     /// DoS Message Flood Protection
-    // We want to have a means to protect the libtransmission backend against message
-    // flooding: the strategy is to cap event processing once more than ten messages
+    // To protect against message flooding, cap event processing after ten messages
     // per second (that is, taking the average over one of our housekeeping intervals)
     // got into our processing handler.
     // If we'd really hit the limit and start discarding events, we either joined an
@@ -665,10 +627,10 @@ private:
     static auto constexpr TtlSameSubnet = int{ 1 };
     static auto constexpr AnnounceScope = int{ TtlSameSubnet }; /**<the maximum scope for LPD datagrams */
 
-    // static auto constexpr lpd_ttlSameSite = int{ 32 };
-    // static auto constexpr lpd_ttlSameRegion = int{ 64 };
-    // static auto constexpr lpd_ttlSameContinent = int{ 128 };
-    // static auto constexpr lpd_ttlUnrestricted = int{ 255 };
+    // static auto constexpr TtlSameSite = int{ 32 };
+    // static auto constexpr TtlSameRegion = int{ 64 };
+    // static auto constexpr TtlSameContinent = int{ 128 };
+    // static auto constexpr TtlUnrestricted = int{ 255 };
 };
 
 std::unique_ptr<tr_lpd> tr_lpd::create(
