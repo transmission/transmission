@@ -1135,6 +1135,7 @@ template std::optional<char> tr_parseNum(std::string_view& sv, int base);
 template std::optional<unsigned long long> tr_parseNum(std::string_view& sv, int base);
 template std::optional<unsigned long> tr_parseNum(std::string_view& sv, int base);
 template std::optional<unsigned int> tr_parseNum(std::string_view& sv, int base);
+template std::optional<unsigned short> tr_parseNum(std::string_view& sv, int base);
 template std::optional<unsigned char> tr_parseNum(std::string_view& sv, int base);
 
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>

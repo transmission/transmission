@@ -17,6 +17,7 @@ add_executable(libtransmission-test
     handshake-test.cc
     history-test.cc
     json-test.cc
+    lpd-test.cc
     magnet-metainfo-test.cc
     makemeta-test.cc
     move-test.cc

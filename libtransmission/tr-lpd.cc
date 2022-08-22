@@ -1,16 +1,18 @@
-// This file Copyright © 2010 Johannes Lieder.
+// This file Copyright © 2010-2022 Johannes Lieder.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <chrono>
-#include <cstring> /* strlen(), strncpy(), strstr(), memset() */
+#include <cstring> // for memset()
 #include <memory>
+#include <optional>
+#include <sstream>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
-using in_port_t = uint16_t; /* all missing */
 #else
 #include <ctime>
 #include <sys/types.h>
@@ -25,6 +27,7 @@ using in_port_t = uint16_t; /* all missing */
 
 #include "transmission.h"
 
+#include "crypto-utils.h"
 #include "log.h"
 #include "net.h"
 #include "tr-lpd.h"
@@ -33,10 +36,22 @@ using in_port_t = uint16_t; /* all missing */
 
 using namespace std::literals;
 
-/**
-* @def CRLF
-* @brief a line-feed, as understood by the LPD protocol */
-#define CRLF "\r\n"
+namespace
+{
+
+auto makeCookie()
+{
+    auto buf = std::array<char, 12>{};
+    tr_rand_buffer(std::data(buf), std::size(buf));
+    static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
+    for (auto& ch : buf)
+    {
+        ch = Pool[static_cast<unsigned char>(ch) % std::size(Pool)];
+    }
+    return std::string{ std::data(buf), std::size(buf) };
+}
+
+} // namespace
 
 class tr_lpd_impl final : public tr_lpd
 {
@@ -45,11 +60,15 @@ public:
         : mediator_{ mediator }
         , upkeep_timer_{ timer_maker.create([this]() { onUpkeepTimer(); }) }
     {
-        if (init(event_base))
+        if (!init(event_base))
         {
-            upkeep_timer_->startRepeating(UpkeepInterval);
+            return;
         }
+
+        upkeep_timer_->startRepeating(UpkeepInterval);
+        onUpkeepTimer();
     }
+
     tr_lpd_impl(tr_lpd_impl&&) = delete;
     tr_lpd_impl(tr_lpd_impl const&) = delete;
     tr_lpd_impl& operator=(tr_lpd_impl&&) = delete;
@@ -110,9 +129,8 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        struct ip_mreq mcastReq;
         int const opt_on = 1;
-        int const opt_off = 0;
+        // int const opt_off = 0;
 
         static_assert(AnnounceInterval > 0);
         static_assert(AnnounceScope > 0);
@@ -158,6 +176,7 @@ private:
             }
 
             /* we want to join that LPD multicast group */
+            struct ip_mreq mcastReq;
             memset(&mcastReq, 0, sizeof(mcastReq));
             mcastReq.imr_multiaddr = mcast_addr_.sin_addr;
             mcastReq.imr_interface.s_addr = htonl(INADDR_ANY);
@@ -167,11 +186,12 @@ private:
                     IPPROTO_IP,
                     IP_ADD_MEMBERSHIP,
                     reinterpret_cast<char const*>(&mcastReq),
-                    sizeof(mcastReq)) == -1)
+                    sizeof(struct ip_mreq)) == -1)
             {
                 return false;
             }
 
+#if 0
             if (setsockopt(
                     mcast_rcv_socket_,
                     IPPROTO_IP,
@@ -181,6 +201,7 @@ private:
             {
                 return false;
             }
+#endif
         }
 
         /* setup datagram socket (send) */
@@ -210,6 +231,7 @@ private:
                 return false;
             }
 
+#if 0
             if (setsockopt(
                     mcast_snd_socket_,
                     IPPROTO_IP,
@@ -219,6 +241,7 @@ private:
             {
                 return false;
             }
+#endif
         }
 
         /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
@@ -246,24 +269,22 @@ private:
 
     void onCanRead()
     {
-        /* do not allow announces to be processed if LPD is disabled */
         if (!mediator_.allowsLPD())
         {
             return;
         }
 
-        struct sockaddr_in foreignAddr;
-        int addrLen = sizeof(foreignAddr);
-        char foreignMsg[lpd_maxDatagramLength + 1];
-
-        /* process local announcement from foreign peer */
-        int const res = recvfrom(
+        // process announcement from foreign peer
+        struct sockaddr_in foreign_addr;
+        int addr_len = sizeof(foreign_addr);
+        auto foreign_msg = std::array<char, MaxDatagramLength>{};
+        auto const res = recvfrom(
             mcast_rcv_socket_,
-            foreignMsg,
-            lpd_maxDatagramLength,
+            std::data(foreign_msg),
+            MaxDatagramLength,
             0,
-            (struct sockaddr*)&foreignAddr,
-            (socklen_t*)&addrLen);
+            (struct sockaddr*)&foreign_addr,
+            (socklen_t*)&addr_len);
 
         /* besides, do we get flooded? then bail out! */
         if (--unsolicited_msg_counter_ < 0)
@@ -271,21 +292,16 @@ private:
             return;
         }
 
-        if (res > 0 && res <= lpd_maxDatagramLength)
+        if (res > 0 && static_cast<size_t>(res) <= MaxDatagramLength)
         {
             auto foreign_peer = tr_address{};
-            foreign_peer.addr.addr4 = foreignAddr.sin_addr;
+            foreign_peer.addr.addr4 = foreign_addr.sin_addr;
 
-            /* be paranoid enough about zero terminating the foreign string */
-            foreignMsg[res] = '\0';
-
-            if (considerAnnounce(foreign_peer, foreignMsg) != 0)
+            if (considerAnnounce(foreign_peer, { std::data(foreign_msg), static_cast<size_t>(res) }) == 0)
             {
-                return; /* OK so far, no log message */
+                tr_logAddTrace("Discarded invalid multicast message");
             }
         }
-
-        tr_logAddTrace("Discarded invalid multicast message");
     }
 
     void onUpkeepTimer()
@@ -326,7 +342,7 @@ private:
                     continue;
                 }
 
-                if (sendAnnounce(info_hash_str))
+                if (sendAnnounce(&info_hash_str, 1))
                 {
                     // downloads re-announce twice as often as seeds
                     auto const next_announce_at = now +
@@ -358,24 +374,27 @@ private:
     /**
      * @brief Announce the given torrent on the local network
      *
-     * @param[in] t Torrent to announce
-     * @return Returns true on success
+     * @return Returns success
      *
      * Send a query for torrent t out to the LPD multicast group (or the LAN, for that
      * matter). A listening client on the same network might react by adding us to his
      * peer pool for torrent t.
      */
-    bool sendAnnounce(std::string_view info_hash_str)
+    bool sendAnnounce(std::string_view const* info_hash_strings, size_t n_strings)
     {
-        auto const query = fmt::format(
-            FMT_STRING("BT-SEARCH * HTTP/{:d}.{:d}" CRLF "Host: {:s}:{:d}" CRLF "Port: {:d}" CRLF
-                       "Infohash: {:s}" CRLF CRLF CRLF),
-            1,
-            1,
-            McastGroup,
-            McastPort.host(),
-            mediator_.port().host(),
-            tr_strupper(info_hash_str));
+        static auto constexpr Major = 1;
+        static auto constexpr Minor = 1;
+        static auto constexpr CrLf = "\r\n"sv;
+
+        auto ostr = std::ostringstream{};
+        ostr << "BT-SEARCH * HTTP/" << Major << '.' << Minor << CrLf << "Host: " << McastGroup << ':' << McastPort.host()
+             << CrLf << "Port: " << mediator_.port().host() << CrLf;
+        for (size_t i = 0; i < n_strings; ++i)
+        {
+            ostr << "Infohash: " << tr_strupper(info_hash_strings[i]) << CrLf;
+        }
+        ostr << "cookie: " << cookie_ << CrLf << CrLf << CrLf;
+        auto const query = ostr.str();
 
         // send the query out using [mcast_snd_socket_]
         // destination address info has already been set up in init(),
@@ -391,182 +410,165 @@ private:
         return sent;
     }
 
-    struct lpd_protocolVersion
+    struct ParsedAnnounce
     {
         int major;
         int minor;
+        tr_port port;
+        std::vector<std::string_view> info_hash_strings;
+        std::string_view cookie;
     };
 
-    /**
-    * @brief Checks for BT-SEARCH method and separates the parameter section
-    * @param[in] s The request string
-    * @param[out] ver If non-nullptr, gets filled with protocol info from the request
-    * @return Returns a relative pointer to the beginning of the parameter section.
-    *         If result is nullptr, s was invalid and no information will be returned
-    * @remark Note that the returned pointer is only usable as long as the given
-    *         pointer s is valid; that is, return storage is temporary.
-    *
-    * Determines whether the given string checks out to be a valid BT-SEARCH message.
-    * If so, the return value points to the beginning of the parameter section (note:
-    * in this case the function returns a character sequence beginning with CRLF).
-    * If parameter is not nullptr, the declared protocol version is returned as part
-    * of the lpd_protocolVersion structure.
-    */
-    static char const* extractHeader(char const* s, struct lpd_protocolVersion* const ver)
+    /*
+     * A LSD announce is formatted as follows:
+     * 
+     * ```
+     * BT-SEARCH * HTTP/1.1\r\n
+     * Host: <host>\r\n
+     * Port: <port>\r\n
+     * Infohash: <ihash>\r\n
+     * cookie: <cookie (optional)>\r\n
+     * \r\n
+     * \r\n
+     * ```
+     *
+     * An announce may contain multiple, consecutive Infohash headers
+     * to announce the participation in more than one torrent. This
+     * may not be supported by older implementations. When sending
+     * multiple infohashes the packet length should not exceed 1400
+     * bytes to avoid MTU/fragmentation problems.
+     */
+    static std::optional<ParsedAnnounce> parseAnnounce(std::string_view announce)
     {
-        int major = -1;
-        int minor = -1;
-        size_t const len = strlen(s);
+        static auto constexpr CrLf = "\r\n"sv;
 
-        /* something might be rotten with this chunk of data */
-        if (len == 0 || len > lpd_maxDatagramLength)
+        auto ret = ParsedAnnounce{};
+
+        // get major, minor
+        auto key = "BT-SEARCH * HTTP/"sv;
+        if (auto const pos = announce.find(key); pos != std::string_view::npos)
         {
-            return nullptr;
-        }
-
-        /* now we can attempt to look up the BT-SEARCH header */
-        if (sscanf(s, "BT-SEARCH * HTTP/%d.%d" CRLF, &major, &minor) != 2)
-        {
-            return nullptr;
-        }
-
-        if (major < 0 || minor < 0)
-        {
-            return nullptr;
-        }
-
-        {
-            /* a pair of blank lines at the end of the string, no place else */
-            char const* const two_blank = CRLF CRLF CRLF;
-            char const* const end = strstr(s, two_blank);
-
-            if (end == nullptr || strlen(end) > strlen(two_blank))
+            // parse `${major}.${minor}`
+            auto walk = announce.substr(pos + std::size(key));
+            if (auto const major = tr_parseNum<int>(walk); major && tr_strvStartsWith(walk, '.'))
             {
-                return nullptr;
+                ret.major = *major;
+            }
+            else
+            {
+                return {};
+            }
+
+            walk.remove_prefix(1); // the '.' between major and minor
+            if (auto const minor = tr_parseNum<int>(walk); minor && tr_strvStartsWith(walk, CrLf))
+            {
+                ret.minor = *minor;
+            }
+            else
+            {
+                return {};
             }
         }
 
-        if (ver != nullptr)
+        key = "Port: "sv;
+        if (auto const pos = announce.find(key); pos != std::string_view::npos)
         {
-            ver->major = major;
-            ver->minor = minor;
+            auto walk = announce.substr(pos + std::size(key));
+            if (auto const port = tr_parseNum<uint16_t>(walk); port && tr_strvStartsWith(walk, CrLf))
+            {
+                ret.port = tr_port::fromHost(*port);
+            }
+            else
+            {
+                return {};
+            }
         }
 
-        /* separate the header, begins with CRLF */
-        return strstr(s, CRLF);
+        key = "cookie: "sv;
+        if (auto const pos = announce.find(key); pos != std::string_view::npos)
+        {
+            auto walk = announce.substr(pos + std::size(key));
+            if (auto const end = walk.find(CrLf); end != std::string_view::npos)
+            {
+                ret.cookie = walk.substr(0, end);
+            }
+            else
+            {
+                return {};
+            }
+        }
+
+        key = "Infohash: "sv;
+        for (;;)
+        {
+            if (auto const pos = announce.find(key); pos != std::string_view::npos)
+            {
+                announce.remove_prefix(pos + std::size(key));
+            }
+            else
+            {
+                break;
+            }
+
+            if (auto const end = announce.find(CrLf); end != std::string_view::npos)
+            {
+                ret.info_hash_strings.push_back(announce.substr(0, end));
+                announce.remove_prefix(end + std::size(CrLf));
+            }
+            else
+            {
+                return {};
+            }
+        }
+
+        return ret;
     }
 
     /**
-    * @brief Return the value of a named parameter
-    *
-    * @param[in] str Input string of "\r\nName: Value" pairs without HTTP-style method part
-    * @param[in] name Name of parameter to extract
-    * @param[in] n Maximum available storage for value to return
-    * @param[out] val Output parameter for the actual value
-    * @return Returns 1 if value could be copied successfully
-    *
-    * Extracts the associated value of a named parameter from a HTTP-style header by
-    * performing the following steps:
-    *   - assemble search string "\r\nName: " and locate position
-    *   - copy back value from end to next "\r\n"
-    */
-    // TODO: string_view
-    static bool extractParam(char const* const str, char const* const name, int n, char* const val)
+     * @brief Process incoming unsolicited messages and add the peer to the announced
+     * torrent if all checks are passed.
+     *
+     * @param[in,out] peer Address information of the peer to add
+     * @param[in] msg The announcement message to consider
+     * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
+     * was successfully added, -1 if not.
+     */
+    int considerAnnounce(tr_address peer_addr, std::string_view msg)
     {
-        auto const key = tr_strbuf<char, 30>{ CRLF, name, ": "sv };
-
-        char const* const pos = strstr(str, key);
-        if (pos == nullptr)
+        auto const parsed = parseAnnounce(msg);
+        if (!parsed || parsed->major != 1 || parsed->minor < 1)
         {
-            return false; /* search was not successful */
+            return 0;
+        }
+        if (parsed->cookie == cookie_)
+        {
+            return -1; // it's our own message
         }
 
+        auto any_added = false;
+
+        for (auto const& hash_string : parsed->info_hash_strings)
         {
-            char const* const beg = pos + std::size(key);
-            char const* const new_line = strstr(beg, CRLF);
-
-            /* the value is delimited by the next CRLF */
-            int const len = new_line - beg;
-
-            /* if value string hits the length limit n,
-             * leave space for a trailing '\0' character */
-            n = std::min(len, n - 1);
-            strncpy(val, beg, n);
-            val[n] = 0;
+            if (mediator_.onPeerFound(hash_string, peer_addr, parsed->port))
+            {
+                any_added = true;
+            }
+            else
+            {
+                tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
+            }
         }
 
-        /* we successfully returned the value string */
-        return true;
+        return any_added ? 1 : -1;
     }
 
-    /**
-    * @brief Process incoming unsolicited messages and add the peer to the announced
-    * torrent if all checks are passed.
-    *
-    * @param[in,out] peer Address information of the peer to add
-    * @param[in] msg The announcement message to consider
-    * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
-    * was successfully added, -1 if not.
-    */
-    int considerAnnounce(tr_address peer_addr, char const* const msg)
-    {
-        auto constexpr MaxValueLen = int{ 25 };
-        auto constexpr MaxHashLen = TR_SHA1_DIGEST_STRLEN;
-
-        auto ver = lpd_protocolVersion{ -1, -1 };
-        char value[MaxValueLen] = { 0 };
-        char hash_string[MaxHashLen] = { 0 };
-        int res = 0;
-
-        if (msg != nullptr)
-        {
-            char const* params = extractHeader(msg, &ver);
-
-            if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
-            {
-                return 0;
-            }
-
-            /* save the effort to check Host, which seems to be optional anyway */
-
-            if (!extractParam(params, "Port", MaxValueLen, value))
-            {
-                return 0;
-            }
-
-            /* determine announced peer port, refuse if value too large */
-            int peer_port = 0;
-            if (sscanf(value, "%d", &peer_port) != 1 || peer_port > (in_port_t)-1)
-            {
-                return 0;
-            }
-            auto const port = tr_port::fromHost(peer_port);
-
-            res = -1; /* signal caller side-effect to peer->port via return != 0 */
-
-            if (!extractParam(params, "Infohash", MaxHashLen, hash_string))
-            {
-                return res;
-            }
-
-            if (mediator_.onPeerFound(hash_string, peer_addr, port))
-            {
-                /* periodic reconnectPulse() deals with the rest... */
-                return 1;
-            }
-
-            tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
-        }
-
-        return res;
-    }
-
+    std::string const cookie_ = makeCookie();
     Mediator& mediator_;
     tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
     tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
     event* event_ = nullptr;
 
-    static auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
+    static auto constexpr MaxDatagramLength = size_t{ 1400 };
     static constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
     static auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
     sockaddr_in mcast_addr_ = {}; /**<initialized from the above constants in init() */
