@@ -5,10 +5,8 @@
 #include <algorithm>
 #include <cerrno>
 #include <chrono>
-#include <csignal> /* sig_atomic_t */
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
 #include <memory>
-#include <type_traits>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -29,9 +27,8 @@ using in_port_t = uint16_t; /* all missing */
 
 #include "log.h"
 #include "net.h"
-#include "torrent.h"
-#include "tr-assert.h"
 #include "tr-lpd.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 using namespace std::literals;
@@ -113,13 +110,6 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        /* if this check fails (i.e. the definition of hashString changed), update
-         * string handling in tr_lpdSendAnnounce() and considerAnnounce().
-         * However, the code should work as long as interfaces to the rest of
-         * libtransmission are compatible with char* strings. */
-        static_assert(
-            std::is_same_v<std::string const&, std::remove_pointer_t<decltype(std::declval<tr_torrent>().infoHashString())>>);
-
         struct ip_mreq mcastReq;
         int const opt_on = 1;
         int const opt_off = 0;
@@ -289,7 +279,7 @@ private:
             /* be paranoid enough about zero terminating the foreign string */
             foreignMsg[res] = '\0';
 
-            if (considerAnnounce(mediator_, foreign_peer, foreignMsg) != 0)
+            if (considerAnnounce(foreign_peer, foreignMsg) != 0)
             {
                 return; /* OK so far, no log message */
             }
@@ -319,38 +309,30 @@ private:
     {
         if (mediator_.allowsLPD())
         {
-            for (auto* const tor : mediator_.torrents())
+            for (auto const& [info_hash_str, activity, allows_lpd, announce_at] : mediator_.torrents())
             {
-                if (!tor->allowsLpd())
+                if (!allows_lpd)
                 {
                     continue;
                 }
 
-                int announce_prio = 0;
-
-                /* issue #3208: prioritize downloads before seeds */
-                switch (tr_torrentGetActivity(tor))
+                if (activity != TR_STATUS_DOWNLOAD && activity != TR_STATUS_SEED)
                 {
-                case TR_STATUS_DOWNLOAD:
-                    announce_prio = 1;
-                    break;
-
-                case TR_STATUS_SEED:
-                    announce_prio = 2;
-                    break;
-
-                default:
-                    break;
+                    continue;
                 }
 
-                if (announce_prio > 0 && tor->lpdAnnounceAt <= now)
+                if (announce_at > now)
                 {
-                    if (sendAnnounce(tor->infoHashString()))
-                    {
-                        tr_logAddTraceTor(tor, "LPD announce message away");
-                        tor->lpdAnnounceAt = now + AnnounceInterval * announce_prio;
-                        break; /* that's enough; for this interval */
-                    }
+                    continue;
+                }
+
+                if (sendAnnounce(info_hash_str))
+                {
+                    // downloads re-announce twice as often as seeds
+                    auto const next_announce_at = now +
+                        (activity == TR_STATUS_DOWNLOAD ? AnnounceInterval : AnnounceInterval * 2U);
+                    mediator_.setNextAnnounceTime(info_hash_str, next_announce_at);
+                    break; /* that's enough for this interval */
                 }
             }
         }
@@ -430,10 +412,8 @@ private:
     * If parameter is not nullptr, the declared protocol version is returned as part
     * of the lpd_protocolVersion structure.
     */
-    static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
+    static char const* extractHeader(char const* s, struct lpd_protocolVersion* const ver)
     {
-        TR_ASSERT(s != nullptr);
-
         int major = -1;
         int minor = -1;
         size_t const len = strlen(s);
@@ -491,12 +471,8 @@ private:
     *   - copy back value from end to next "\r\n"
     */
     // TODO: string_view
-    static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
+    static bool extractParam(char const* const str, char const* const name, int n, char* const val)
     {
-        TR_ASSERT(str != nullptr);
-        TR_ASSERT(name != nullptr);
-        TR_ASSERT(val != nullptr);
-
         auto const key = tr_strbuf<char, 30>{ CRLF, name, ": "sv };
 
         char const* const pos = strstr(str, key);
@@ -532,19 +508,19 @@ private:
     * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
     * was successfully added, -1 if not.
     */
-    int considerAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, char const* const msg)
+    int considerAnnounce(tr_address peer_addr, char const* const msg)
     {
         auto constexpr MaxValueLen = int{ 25 };
-        auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
+        auto constexpr MaxHashLen = TR_SHA1_DIGEST_STRLEN;
 
         auto ver = lpd_protocolVersion{ -1, -1 };
         char value[MaxValueLen] = { 0 };
-        char hashString[MaxHashLen] = { 0 };
+        char hash_string[MaxHashLen] = { 0 };
         int res = 0;
 
         if (msg != nullptr)
         {
-            char const* params = lpd_extractHeader(msg, &ver);
+            char const* params = extractHeader(msg, &ver);
 
             if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
             {
@@ -553,7 +529,7 @@ private:
 
             /* save the effort to check Host, which seems to be optional anyway */
 
-            if (!lpd_extractParam(params, "Port", MaxValueLen, value))
+            if (!extractParam(params, "Port", MaxValueLen, value))
             {
                 return 0;
             }
@@ -568,18 +544,18 @@ private:
 
             res = -1; /* signal caller side-effect to peer->port via return != 0 */
 
-            if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
+            if (!extractParam(params, "Infohash", MaxHashLen, hash_string))
             {
                 return res;
             }
 
-            if (mediator.onPeerFound(hashString, peer_addr, port))
+            if (mediator_.onPeerFound(hash_string, peer_addr, port))
             {
                 /* periodic reconnectPulse() deals with the rest... */
                 return 1;
             }
 
-            tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hashString));
+            tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
         }
 
         return res;
@@ -589,8 +565,6 @@ private:
     tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
     tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
     event* event_ = nullptr;
-
-    static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
     static auto constexpr lpd_maxDatagramLength = int{ 200 }; /**<the size an LPD datagram must not exceed */
     static constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */

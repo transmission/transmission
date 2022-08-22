@@ -8,12 +8,14 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <ctime>
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
-#include "net.h" // for tr_address
+#include "net.h" // for tr_address, tr_port
 #include "timer.h"
 
 class tr_torrents;
@@ -27,9 +29,21 @@ public:
     {
     public:
         virtual ~Mediator() = default;
+
         [[nodiscard]] virtual tr_port port() const = 0;
+
         [[nodiscard]] virtual bool allowsLPD() const = 0;
-        [[nodiscard]] virtual tr_torrents const& torrents() const = 0;
+
+        struct TorrentInfo
+        {
+            std::string_view info_hash_str;
+            tr_torrent_activity activity;
+            bool allows_lpd;
+            time_t announce_at;
+        };
+        [[nodiscard]] virtual std::vector<TorrentInfo> torrents() const = 0;
+
+        virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
 
         // returns true if info was used
         virtual bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) = 0;

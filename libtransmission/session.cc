@@ -145,6 +145,33 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
     return false;
 }
 
+std::vector<tr_lpd::Mediator::TorrentInfo> tr_session::LpdMediator::torrents() const
+{
+    auto ret = std::vector<tr_lpd::Mediator::TorrentInfo>{};
+    ret.reserve(std::size(session_.torrents()));
+    for (auto const* const tor : session_.torrents())
+    {
+        auto info = tr_lpd::Mediator::TorrentInfo{};
+        info.info_hash_str = tor->infoHashString();
+        info.activity = tr_torrentGetActivity(tor);
+        info.allows_lpd = tor->allowsLpd();
+        info.announce_at = tor->lpdAnnounceAt;
+        ret.emplace_back(info);
+    }
+    return ret;
+}
+
+void tr_session::LpdMediator::setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at)
+{
+    if (auto digest = tr_sha1_from_string(info_hash_str); digest)
+    {
+        if (tr_torrent* const tor = session_.torrents_.get(*digest); tr_isTorrent(tor))
+        {
+            tor->lpdAnnounceAt = announce_at;
+        }
+    }
+}
+
 /***
 ****
 ***/
