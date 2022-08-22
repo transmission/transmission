@@ -856,6 +856,11 @@ private:
             return session_->peerPort();
         }
 
+        [[nodiscard]] bool allowsLPD() const override
+        {
+            return session_->allowsLPD();
+        }
+
     private:
         tr_session* const session_;
     };

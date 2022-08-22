@@ -329,7 +329,7 @@ int tr_lpdAnnounceMore(tr_lpd::Mediator& mediator, time_t const now, int const i
         return -1;
     }
 
-    if (my_session->allowsLPD())
+    if (mediator.allowsLPD())
     {
         for (auto* const tor : my_session->torrents())
         {
@@ -391,12 +391,12 @@ int tr_lpdAnnounceMore(tr_lpd::Mediator& mediator, time_t const now, int const i
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
+void event_callback(evutil_socket_t /*s*/, short type, void* vmediator)
 {
-    TR_ASSERT(my_session != nullptr);
+    auto& mediator = *static_cast<tr_lpd::Mediator*>(vmediator);
 
     /* do not allow announces to be processed if LPD is disabled */
-    if (!my_session->allowsLPD())
+    if (!mediator.allowsLPD())
     {
         return;
     }
@@ -450,7 +450,7 @@ void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
 * @remark Since the LPD service does not use another protocol family yet, this code is
 * IPv4 only for the time being.
 */
-int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
+int tr_lpdInit(tr_lpd::Mediator& mediator, tr_session* ss, tr_address* /*tr_addr*/)
 {
     /* if this check fails (i.e. the definition of hashString changed), update
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
@@ -558,7 +558,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    lpd_event = event_new(ss->eventBase(), lpd_socket, EV_READ | EV_PERSIST, event_callback, nullptr);
+    lpd_event = event_new(ss->eventBase(), lpd_socket, EV_READ | EV_PERSIST, event_callback, &mediator);
     event_add(lpd_event, nullptr);
 
     tr_logAddDebug("Local Peer Discovery initialised");
@@ -669,7 +669,7 @@ public:
         , session_{ session }
         , upkeep_timer_{ session.timerMaker().create([this]() { onUpkeepTimer(); }) }
     {
-        auto const ok = tr_lpdInit(&session_, &address) != -1;
+        auto const ok = tr_lpdInit(mediator_, &session_, &address) != -1;
 
         if (ok)
         {

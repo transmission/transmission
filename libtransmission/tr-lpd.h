@@ -24,7 +24,8 @@ public:
     {
     public:
         virtual ~Mediator() = default;
-        virtual tr_port port() const = 0;
+        [[nodiscard]] virtual tr_port port() const = 0;
+        [[nodiscard]] virtual bool allowsLPD() const = 0;
     };
 
     virtual ~tr_lpd() = default;
