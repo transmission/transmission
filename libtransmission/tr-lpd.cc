@@ -241,7 +241,7 @@ bool lpd_extractParam(char const* const str, char const* const name, int n, char
 * is able to extract the necessary information from the announce message. That is, if
 * return != 0, the caller may retrieve the value from the passed structure.
 */
-int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
+int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_pex* peer, char const* const msg)
 {
     auto constexpr MaxValueLen = int{ 25 };
     auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
@@ -253,8 +253,6 @@ int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 
     if (peer != nullptr && msg != nullptr)
     {
-        tr_torrent* tor = nullptr;
-
         char const* params = lpd_extractHeader(msg, &ver);
 
         if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
@@ -284,18 +282,9 @@ int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             return res;
         }
 
-        tor = my_session->torrents().get(hashString);
-
-        if (tr_isTorrent(tor) && tor->allowsLpd())
+        if (mediator.onPeerFound(hashString, peer->addr, peer->port))
         {
-            /* we found a suitable peer, add it to the torrent */
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
-            tr_logAddDebugTor(
-                tor,
-                fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), peer->addr.readable(peer->port)));
-
             /* periodic reconnectPulse() deals with the rest... */
-
             return 1;
         }
 
@@ -331,7 +320,7 @@ int tr_lpdAnnounceMore(tr_lpd::Mediator& mediator, time_t const now, int const i
 
     if (mediator.allowsLPD())
     {
-        for (auto* const tor : my_session->torrents())
+        for (auto* const tor : mediator.torrents())
         {
             int announcePrio = 0;
 
@@ -431,7 +420,7 @@ void event_callback(evutil_socket_t /*s*/, short type, void* vmediator)
 
             foreignPeer.addr.addr.addr4 = foreignAddr.sin_addr;
 
-            if (tr_lpdConsiderAnnounce(&foreignPeer, foreignMsg) != 0)
+            if (tr_lpdConsiderAnnounce(mediator, &foreignPeer, foreignMsg) != 0)
             {
                 return; /* OK so far, no log message */
             }

@@ -128,6 +128,27 @@ tr_peer_id_t tr_peerIdInit()
 ****
 ***/
 
+bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port)
+{
+    if (auto digest = tr_sha1_from_string(info_hash_str); digest)
+    {
+        if (tr_torrent* const tor = session_.torrents_.get(*digest); tr_isTorrent(tor) && tor->allowsLpd())
+        {
+            // we found a suitable peer, add it to the torrent
+            auto pex = tr_pex{ address, port };
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
+            tr_logAddDebugTor(tor, fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), address.readable(port)));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/***
+****
+***/
+
 std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
     auto const path = tr_pathbuf{ session_->configDir(), "/cookies.txt"sv };

@@ -845,7 +845,7 @@ private:
     class LpdMediator final : public tr_lpd::Mediator
     {
     public:
-        explicit LpdMediator(tr_session* session)
+        explicit LpdMediator(tr_session& session)
             : session_{ session }
         {
         }
@@ -853,19 +853,26 @@ private:
 
         [[nodiscard]] tr_port port() const override
         {
-            return session_->peerPort();
+            return session_.peerPort();
         }
 
         [[nodiscard]] bool allowsLPD() const override
         {
-            return session_->allowsLPD();
+            return session_.allowsLPD();
         }
 
+        [[nodiscard]] tr_torrents const& torrents() const override
+        {
+            return session_.torrents();
+        }
+
+        bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;
+
     private:
-        tr_session* const session_;
+        tr_session& session_;
     };
 
-    LpdMediator lpd_mediator_{ this };
+    LpdMediator lpd_mediator_{ *this };
 
     std::shared_ptr<event_base> const event_base_;
     std::shared_ptr<evdns_base> const evdns_base_;

@@ -8,14 +8,15 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <memory> // for std::unique_ptr
+#include <memory>
+#include <string_view>
 
 #include "transmission.h"
 
 #include "net.h" // for tr_address
 
+class tr_torrents;
 struct tr_session;
-struct tr_torrent;
 
 class tr_lpd
 {
@@ -26,6 +27,10 @@ public:
         virtual ~Mediator() = default;
         [[nodiscard]] virtual tr_port port() const = 0;
         [[nodiscard]] virtual bool allowsLPD() const = 0;
+        [[nodiscard]] virtual tr_torrents const& torrents() const = 0;
+
+        // returns true if info was used
+        virtual bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) = 0;
     };
 
     virtual ~tr_lpd() = default;
