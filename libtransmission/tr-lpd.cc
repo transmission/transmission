@@ -29,7 +29,6 @@ using in_port_t = uint16_t; /* all missing */
 
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h" /* tr_pex() */
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
@@ -238,7 +237,7 @@ bool lpd_extractParam(char const* const str, char const* const name, int n, char
 * is able to extract the necessary information from the announce message. That is, if
 * return != 0, the caller may retrieve the value from the passed structure.
 */
-int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_pex* peer, char const* const msg)
+int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_address peer_addr, char const* const msg)
 {
     auto constexpr MaxValueLen = int{ 25 };
     auto constexpr MaxHashLen = int{ SIZEOF_HASH_STRING };
@@ -248,7 +247,7 @@ int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_pex* peer, char const*
     char hashString[MaxHashLen] = { 0 };
     int res = 0;
 
-    if (peer != nullptr && msg != nullptr)
+    if (msg != nullptr)
     {
         char const* params = lpd_extractHeader(msg, &ver);
 
@@ -270,8 +269,8 @@ int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_pex* peer, char const*
         {
             return 0;
         }
+        auto const port = tr_port::fromHost(peer_port);
 
-        peer->port.setHost(peer_port);
         res = -1; /* signal caller side-effect to peer->port via return != 0 */
 
         if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
@@ -279,7 +278,7 @@ int tr_lpdConsiderAnnounce(tr_lpd::Mediator& mediator, tr_pex* peer, char const*
             return res;
         }
 
-        if (mediator.onPeerFound(hashString, peer->addr, peer->port))
+        if (mediator.onPeerFound(hashString, peer_addr, port))
         {
             /* periodic reconnectPulse() deals with the rest... */
             return 1;
@@ -405,14 +404,13 @@ void event_callback(evutil_socket_t /*s*/, short type, void* vmediator)
 
         if (res > 0 && res <= lpd_maxDatagramLength)
         {
-            auto foreignPeer = tr_pex{};
+            auto foreign_peer = tr_address{};
+            foreign_peer.addr.addr4 = foreignAddr.sin_addr;
 
             /* be paranoid enough about zero terminating the foreign string */
             foreignMsg[res] = '\0';
 
-            foreignPeer.addr.addr.addr4 = foreignAddr.sin_addr;
-
-            if (tr_lpdConsiderAnnounce(mediator, &foreignPeer, foreignMsg) != 0)
+            if (tr_lpdConsiderAnnounce(mediator, foreign_peer, foreignMsg) != 0)
             {
                 return; /* OK so far, no log message */
             }
