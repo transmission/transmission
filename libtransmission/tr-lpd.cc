@@ -54,10 +54,6 @@ auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
 void event_callback(evutil_socket_t, short /*type*/, void* /*unused*/);
 
-auto constexpr UpkeepInterval = 5s;
-
-std::unique_ptr<libtransmission::Timer> upkeep_timer;
-
 tr_socket_t lpd_socket; /**<separate multicast receive socket */
 tr_socket_t lpd_socket2; /**<and multicast send socket */
 event* lpd_event = nullptr;
@@ -394,13 +390,6 @@ int tr_lpdAnnounceMore(time_t const now, int const interval)
     return announcesSent;
 }
 
-void on_upkeep_timer()
-{
-    time_t const now = tr_time();
-    auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
-    tr_lpdAnnounceMore(now, seconds);
-}
-
 /**
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
@@ -581,9 +570,6 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     lpd_event = event_new(ss->eventBase(), lpd_socket, EV_READ | EV_PERSIST, event_callback, nullptr);
     event_add(lpd_event, nullptr);
 
-    upkeep_timer = ss->timerMaker().create([]() { on_upkeep_timer(); });
-    upkeep_timer->startRepeating(UpkeepInterval);
-
     tr_logAddDebug("Local Peer Discovery initialised");
 
     return 1;
@@ -616,8 +602,6 @@ void tr_lpdUninit(tr_session* ss)
 
     event_free(lpd_event);
     lpd_event = nullptr;
-
-    upkeep_timer.reset();
 
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket(lpd_socket);
@@ -691,8 +675,14 @@ class tr_lpd_impl final : public tr_lpd
 public:
     tr_lpd_impl(tr_session& session, tr_address address)
         : session_{ session }
+        , upkeep_timer_{ session.timerMaker().create(on_upkeep_timer) }
     {
-        tr_lpdInit(&session_, &address);
+        auto const ok = tr_lpdInit(&session_, &address) != -1;
+
+        if (ok)
+        {
+            upkeep_timer_->startRepeating(UpkeepInterval);
+        }
     }
     tr_lpd_impl(tr_lpd_impl&&) = delete;
     tr_lpd_impl(tr_lpd_impl const&) = delete;
@@ -701,11 +691,23 @@ public:
 
     ~tr_lpd_impl() override
     {
+        upkeep_timer_.reset();
+
         tr_lpdUninit(&session_);
     }
 
 private:
+    static void on_upkeep_timer()
+    {
+        time_t const now = tr_time();
+        auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
+        tr_lpdAnnounceMore(now, seconds);
+    }
+
     tr_session& session_;
+
+    static auto constexpr UpkeepInterval = 5s;
+    std::unique_ptr<libtransmission::Timer> upkeep_timer_;
 };
 
 std::unique_ptr<tr_lpd> tr_lpd::create(tr_session& session, tr_address address)
