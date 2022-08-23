@@ -30,6 +30,7 @@
 #include "crypto-utils.h"
 #include "log.h"
 #include "net.h"
+#include "tr-assert.h"
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
 #include "utils.h"
@@ -53,6 +54,32 @@ auto makeCookie()
     return std::string{ std::data(buf), std::size(buf) };
 }
 
+constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
+auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
+
+auto makeAnnounce(std::string_view cookie, tr_port port, std::string_view const* info_hash_strings, size_t n_strings)
+{
+    static auto constexpr Major = 1;
+    static auto constexpr Minor = 1;
+    static auto constexpr CrLf = "\r\n"sv;
+
+    auto ostr = std::ostringstream{};
+    ostr << "BT-SEARCH * HTTP/" << Major << '.' << Minor << CrLf //
+         << "Host: " << McastGroup << ':' << McastPort.host() << CrLf //
+         << "Port: " << port.host() << CrLf;
+    for (size_t i = 0; i < n_strings; ++i)
+    {
+        ostr << "Infohash: " << tr_strupper(info_hash_strings[i]) << CrLf;
+    }
+
+    if (!std::empty(cookie))
+    {
+        ostr << "cookie: " << cookie << CrLf << CrLf << CrLf;
+    }
+
+    return ostr.str();
+}
+
 } // namespace
 
 class tr_lpd_impl final : public tr_lpd
@@ -60,15 +87,18 @@ class tr_lpd_impl final : public tr_lpd
 public:
     tr_lpd_impl(Mediator& mediator, libtransmission::TimerMaker& timer_maker, struct event_base* event_base)
         : mediator_{ mediator }
-        , upkeep_timer_{ timer_maker.create([this]() { onUpkeepTimer(); }) }
+        , announce_timer_{ timer_maker.create([this]() { announceUpkeep(); }) }
+        , dos_timer_{ timer_maker.create([this]() { dosUpkeep(); }) }
     {
         if (!init(event_base))
         {
             return;
         }
 
-        upkeep_timer_->startRepeating(UpkeepInterval);
-        onUpkeepTimer();
+        announce_timer_->startRepeating(AnnounceInterval);
+        announceUpkeep();
+        dos_timer_->startRepeating(DosInterval);
+        dosUpkeep();
     }
 
     tr_lpd_impl(tr_lpd_impl&&) = delete;
@@ -78,7 +108,8 @@ public:
 
     ~tr_lpd_impl() override
     {
-        upkeep_timer_.reset();
+        dos_timer_.reset();
+        announce_timer_.reset();
 
         if (event_ != nullptr)
         {
@@ -132,7 +163,6 @@ private:
     {
         int const opt_on = 1;
 
-        static_assert(AnnounceInterval > 0);
         static_assert(AnnounceScope > 0);
 
         tr_logAddDebug("Initialising Local Peer Discovery");
@@ -262,98 +292,132 @@ private:
             (struct sockaddr*)&foreign_addr,
             (socklen_t*)&addr_len);
 
-        /* besides, do we get flooded? then bail out! */
-        if (--unsolicited_msg_counter_ < 0)
+        // If we couldn't read it or it was too big, discard it
+        if (res < 1 || static_cast<size_t>(res) > MaxDatagramLength)
         {
             return;
         }
 
-        if (res > 0 && static_cast<size_t>(res) <= MaxDatagramLength)
+        // If it doesn't look like a BEP14 message, discard it
+        auto const msg = std::string_view{ std::data(foreign_msg), static_cast<size_t>(res) };
+        static auto constexpr SearchKey = "BT-SEARCH * HTTP/"sv;
+        if (msg.find(SearchKey) == std::string_view::npos)
         {
-            auto foreign_peer = tr_address{};
-            foreign_peer.addr.addr4 = foreign_addr.sin_addr;
+            return;
+        }
 
-            if (considerAnnounce(foreign_peer, { std::data(foreign_msg), static_cast<size_t>(res) }) == 0)
+        // If we're receiving too many, discard it
+        if (++messages_received_since_upkeep_ > MaxIncomingPerUpkeep)
+        {
+            return;
+        }
+
+        // If it's an invalid message or the wrong protocol version, discard it.
+        // Note this comes *after* incrementing the count since there is some
+        // small CPU overhead in parsing, so don't do it for *every* message
+        auto const parsed = parseAnnounce(msg);
+        if (!parsed || parsed->major != 1 || parsed->minor < 1 || parsed->cookie == cookie_)
+        {
+            tr_logAddTrace("Discarded invalid multicast message");
+            return;
+        }
+
+        auto peer_addr = tr_address{};
+        peer_addr.addr.addr4 = foreign_addr.sin_addr;
+        for (auto const& hash_string : parsed->info_hash_strings)
+        {
+            if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))
             {
-                tr_logAddTrace("Discarded invalid multicast message");
+                tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
             }
         }
     }
 
-    void onUpkeepTimer()
+    void announceUpkeep()
     {
-        time_t const now = tr_time();
-        auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(UpkeepInterval).count();
-        announceMore(now, seconds);
-    }
-
-    void announceMore(time_t const now, int const interval)
-    {
-        if (mediator_.allowsLPD())
+        if (!mediator_.allowsLPD())
         {
-            auto torrents = mediator_.torrents();
+            return;
+        }
 
-            // remove torrents that don't need to be announced
-            auto const needs_announce = [&now](auto& info)
+        auto torrents = mediator_.torrents();
+
+        // remove torrents that don't need to be announced
+        auto const now = tr_time();
+        auto const needs_announce = [&now](auto& info)
+        {
+            return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
+                (info.announce_after < now);
+        };
+        torrents.erase(
+            std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce)),
+            std::end(torrents));
+
+        if (std::empty(torrents))
+        {
+            return;
+        }
+
+        // prioritize the remaining torrents
+        std::sort(
+            std::begin(torrents),
+            std::end(torrents),
+            [](auto const& a, auto const& b)
             {
-                return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
-                    (info.announce_after < now);
-            };
-            torrents.erase(
-                std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce)),
-                std::end(torrents));
-
-            // prioritize the remaining torrents
-            std::sort(
-                std::begin(torrents),
-                std::end(torrents),
-                [](auto const& a, auto const& b)
+                if (a.activity != b.activity)
                 {
-                    if (a.activity != b.activity)
-                    {
-                        return a.activity < b.activity;
-                    }
-
-                    if (a.announce_after != b.announce_after)
-                    {
-                        return a.announce_after < b.announce_after;
-                    }
-                    return false;
-                });
-
-            for (auto const& tor : torrents)
-            {
-                if (sendAnnounce(&tor.info_hash_str, 1))
-                {
-                    auto const next_announce_after = now + AnnounceInterval;
-                    mediator_.setNextAnnounceTime(tor.info_hash_str, next_announce_after);
-                    break; /* that's enough for this interval */
+                    return a.activity < b.activity;
                 }
-            }
-        }
 
-        /* perform housekeeping for the flood protection mechanism */
+                if (a.announce_after != b.announce_after)
+                {
+                    return a.announce_after < b.announce_after;
+                }
+                return false;
+            });
+
+        // cram in as many as will fit in a message
+        auto const baseline_size = std::size(makeAnnounce(cookie_, mediator_.port(), nullptr, 0));
+        auto const size_with_one = std::size(makeAnnounce(cookie_, mediator_.port(), &torrents.front().info_hash_str, 1));
+        auto const size_per_hash = size_with_one - baseline_size;
+        auto const max_torrents_per_announce = (MaxDatagramLength - baseline_size) / size_per_hash;
+        auto info_hash_strings = std::vector<std::string_view>{};
+        info_hash_strings.resize(std::min(std::size(torrents), max_torrents_per_announce));
+        std::transform(
+            std::begin(torrents),
+            std::begin(torrents) + std::size(info_hash_strings),
+            std::begin(info_hash_strings),
+            [](auto const& tor) { return tor.info_hash_str; });
+
+        if (!sendAnnounce(std::data(info_hash_strings), std::size(info_hash_strings)))
         {
-            int const max_announce_cap = interval * AnnounceCapFactor;
-
-            if (unsolicited_msg_counter_ < 0)
-            {
-                --unsolicited_msg_counter_;
-
-                tr_logAddTrace(fmt::format(
-                    "Dropped {} announces in the last interval (max. {} allowed)",
-                    unsolicited_msg_counter_,
-                    max_announce_cap));
-            }
-
-            unsolicited_msg_counter_ = max_announce_cap;
+            return;
         }
+
+        auto const next_announce_after = now + TorrentAnnounceIntervalSec;
+        for (auto& info_hash_string : info_hash_strings)
+        {
+            mediator_.setNextAnnounceTime(info_hash_string, next_announce_after);
+        }
+    }
+
+    void dosUpkeep()
+    {
+        if (messages_received_since_upkeep_ > MaxIncomingPerUpkeep)
+        {
+            tr_logAddTrace(fmt::format(
+                "Dropped {} announces in the last interval (max. {} allowed)",
+                messages_received_since_upkeep_ - MaxIncomingPerUpkeep,
+                MaxIncomingPerUpkeep));
+        }
+
+        messages_received_since_upkeep_ = 0;
     }
 
     /**
      * @brief Announce the given torrent on the local network
      *
-     * @return Returns success
+     * @return Returns a success flag
      *
      * Send a query for torrent t out to the LPD multicast group (or the LAN, for that
      * matter). A listening client on the same network might react by adding us to his
@@ -361,31 +425,16 @@ private:
      */
     bool sendAnnounce(std::string_view const* info_hash_strings, size_t n_strings)
     {
-        static auto constexpr Major = 1;
-        static auto constexpr Minor = 1;
-        static auto constexpr CrLf = "\r\n"sv;
-
-        auto ostr = std::ostringstream{};
-        ostr << "BT-SEARCH * HTTP/" << Major << '.' << Minor << CrLf << "Host: " << McastGroup << ':' << McastPort.host()
-             << CrLf << "Port: " << mediator_.port().host() << CrLf;
-        for (size_t i = 0; i < n_strings; ++i)
-        {
-            ostr << "Infohash: " << tr_strupper(info_hash_strings[i]) << CrLf;
-        }
-        ostr << "cookie: " << cookie_ << CrLf << CrLf << CrLf;
-        auto const query = ostr.str();
-
-        // send the query out using [mcast_snd_socket_]
-        // destination address info has already been set up in init(),
-        // so we refrain from preparing another sockaddr_in here
+        auto const announce = makeAnnounce(cookie_, mediator_.port(), info_hash_strings, n_strings);
+        TR_ASSERT(std::size(announce) <= MaxDatagramLength);
         auto const res = sendto(
             mcast_snd_socket_,
-            std::data(query),
-            std::size(query),
+            std::data(announce),
+            std::size(announce),
             0,
             (struct sockaddr const*)&mcast_addr_,
             sizeof(mcast_addr_));
-        auto const sent = res == static_cast<int>(std::size(query));
+        auto const sent = res == static_cast<int>(std::size(announce));
         return sent;
     }
 
@@ -503,44 +552,6 @@ private:
         return ret;
     }
 
-    /**
-     * @brief Process incoming unsolicited messages and add the peer to the announced
-     * torrent if all checks are passed.
-     *
-     * @param[in,out] peer Address information of the peer to add
-     * @param[in] msg The announcement message to consider
-     * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
-     * was successfully added, -1 if not.
-     */
-    int considerAnnounce(tr_address peer_addr, std::string_view msg)
-    {
-        auto const parsed = parseAnnounce(msg);
-        if (!parsed || parsed->major != 1 || parsed->minor < 1)
-        {
-            return 0;
-        }
-        if (parsed->cookie == cookie_)
-        {
-            return -1; // it's our own message
-        }
-
-        auto any_added = false;
-
-        for (auto const& hash_string : parsed->info_hash_strings)
-        {
-            if (mediator_.onPeerFound(hash_string, peer_addr, parsed->port))
-            {
-                any_added = true;
-            }
-            else
-            {
-                tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
-            }
-        }
-
-        return any_added ? 1 : -1;
-    }
-
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
     tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
@@ -548,32 +559,30 @@ private:
     event* event_ = nullptr;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
-    static constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
-    static auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
     sockaddr_in mcast_addr_ = {}; /**<initialized from the above constants in init() */
 
-    /// DoS Message Flood Protection
-    // To protect against message flooding, cap event processing after ten messages
-    // per second (that is, taking the average over one of our housekeeping intervals)
-    // got into our processing handler.
-    // If we'd really hit the limit and start discarding events, we either joined an
-    // extremely crowded multicast group or a malevolent host is sending bogus data to
-    // our socket. In this situation, we rather miss some announcements than blocking
-    // the actual task.
-    //
-    // @brief allow at most ten messages per second (interval average)
-    // @note this constraint is only enforced once per housekeeping interval
-    static auto constexpr AnnounceCapFactor = int{ 10 };
+    // BEP14: "To avoid causing multicast storms on large networks a
+    // client should send no more than 1 announce per minute."
+    static auto constexpr AnnounceInterval = 1min;
+    std::unique_ptr<libtransmission::Timer> announce_timer_;
 
-    // @ingroup DoS
-    // @brief number of unsolicited messages during the last HK interval
-    // @remark counts downwards
-    int unsolicited_msg_counter_;
+    // Flood Protection:
+    // To protect against message flooding, stop processing search messages
+    // after processing N per second. If we'd really hit the limit and start
+    // discarding events, we either joined an extremely crowded multicast
+    // group or a malevolent host is sending bogus data to our socket. In
+    // this situation, better to miss announcments than blocking on this.
+    // @brief how often to reset the DoS counter
+    static auto constexpr DosInterval = 5s;
+    // @brief timer to periodically reset the DoS counter
+    std::unique_ptr<libtransmission::Timer> dos_timer_;
+    static auto constexpr MaxIncomingPerSecond = int{ 10 };
+    static auto constexpr MaxIncomingPerUpkeep = std::chrono::duration_cast<std::chrono::seconds>(DosInterval).count() *
+        MaxIncomingPerSecond;
+    // @brief throw away messages after this number exceeds MaxIncomingPerUpkeep
+    size_t messages_received_since_upkeep_ = 0U;
 
-    static auto constexpr UpkeepInterval = 5s;
-    std::unique_ptr<libtransmission::Timer> upkeep_timer_;
-
-    static auto constexpr AnnounceInterval = time_t{ 4 * 60 }; /**<4 min announce interval per torrent */
+    static auto constexpr TorrentAnnounceIntervalSec = time_t{ 240U }; // how frequently to reannounce the same torrent
     static auto constexpr TtlSameSubnet = int{ 1 };
     static auto constexpr AnnounceScope = int{ TtlSameSubnet }; /**<the maximum scope for LPD datagrams */
 

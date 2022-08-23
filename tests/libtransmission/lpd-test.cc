@@ -82,10 +82,9 @@ public:
     std::vector<Found> found_;
 };
 
-auto constexpr UbuntuInfo = tr_lpd::Mediator::TorrentInfo{ "B26C81363AC1A236765385A702AEC107A49581B5"sv,
-                                                           TR_STATUS_SEED,
-                                                           true,
-                                                           0 };
+using TorrentInfo = tr_lpd::Mediator::TorrentInfo;
+auto constexpr ThorInfo = TorrentInfo{ "43FDD3E72588E9119C9C94C54332EE533CF80BD6"sv, TR_STATUS_SEED, true, 0 };
+auto constexpr UbuntuInfo = TorrentInfo{ "B26C81363AC1A236765385A702AEC107A49581B5"sv, TR_STATUS_SEED, true, 0 };
 
 } // namespace
 
@@ -113,6 +112,29 @@ TEST_F(LpdTest, CanAnnounceAndRead)
     {
         EXPECT_EQ(mediator_a.port_, mediator_a.found_.front().port);
         EXPECT_EQ(UbuntuInfo.info_hash_str, mediator_a.found_.front().info_hash_str);
+    }
+    EXPECT_EQ(0U, std::size(mediator_b.found_));
+}
+
+TEST_F(LpdTest, CanAnnounceTwo)
+{
+    auto mediator_a = MyMediator{};
+    auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
+    EXPECT_TRUE(lpd_a);
+
+    auto mediator_b = MyMediator{};
+    mediator_b.torrents_.push_back(UbuntuInfo);
+    mediator_b.torrents_.push_back(ThorInfo);
+    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
+
+    waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
+    EXPECT_EQ(2U, std::size(mediator_a.found_));
+    if (!std::empty(mediator_a.found_))
+    {
+        EXPECT_EQ(mediator_a.port_, mediator_a.found_[0].port);
+        EXPECT_EQ(UbuntuInfo.info_hash_str, mediator_a.found_[0].info_hash_str);
+        EXPECT_EQ(mediator_a.port_, mediator_a.found_[1].port);
+        EXPECT_EQ(ThorInfo.info_hash_str, mediator_a.found_[1].info_hash_str);
     }
     EXPECT_EQ(0U, std::size(mediator_b.found_));
 }
