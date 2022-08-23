@@ -309,14 +309,13 @@ private:
             memset(&mcast_addr_, 0, sizeof(mcast_addr_));
             mcast_addr_.sin_family = AF_INET;
             mcast_addr_.sin_port = McastPort.network();
-            mcast_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
 
-            if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
+            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
             {
                 return false;
             }
 
-            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
+            if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
             {
                 return false;
             }
