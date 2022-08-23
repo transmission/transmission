@@ -155,19 +155,19 @@ std::vector<tr_lpd::Mediator::TorrentInfo> tr_session::LpdMediator::torrents() c
         info.info_hash_str = tor->infoHashString();
         info.activity = tr_torrentGetActivity(tor);
         info.allows_lpd = tor->allowsLpd();
-        info.announce_at = tor->lpdAnnounceAt;
+        info.announce_after = tor->lpdAnnounceAt;
         ret.emplace_back(info);
     }
     return ret;
 }
 
-void tr_session::LpdMediator::setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at)
+void tr_session::LpdMediator::setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after)
 {
     if (auto digest = tr_sha1_from_string(info_hash_str); digest)
     {
         if (tr_torrent* const tor = session_.torrents_.get(*digest); tr_isTorrent(tor))
         {
-            tor->lpdAnnounceAt = announce_at;
+            tor->lpdAnnounceAt = announce_after;
         }
     }
 }

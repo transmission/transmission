@@ -39,7 +39,7 @@ public:
             std::string_view info_hash_str;
             tr_torrent_activity activity;
             bool allows_lpd;
-            time_t announce_at;
+            time_t announce_after;
         };
         [[nodiscard]] virtual std::vector<TorrentInfo> torrents() const = 0;
 

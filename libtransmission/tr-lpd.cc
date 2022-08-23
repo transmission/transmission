@@ -331,7 +331,7 @@ private:
             auto const is_wanted = [&now](auto& info)
             {
                 return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
-                    (info.announce_at <= now);
+                    (info.announce_after < now);
             };
             torrents.erase(
                 std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(is_wanted)),
@@ -348,19 +348,19 @@ private:
                         return a.activity < b.activity;
                     }
 
-                    if (a.announce_at != b.announce_at)
+                    if (a.announce_after != b.announce_after)
                     {
-                        return a.announce_at < b.announce_at;
+                        return a.announce_after < b.announce_after;
                     }
                     return false;
                 });
 
-            for (auto const& [info_hash_str, activity, allows_lpd, announce_at] : torrents)
+            for (auto const& tor : torrents)
             {
-                if (sendAnnounce(&info_hash_str, 1))
+                if (sendAnnounce(&tor.info_hash_str, 1))
                 {
-                    auto const next_announce_at = now + AnnounceInterval;
-                    mediator_.setNextAnnounceTime(info_hash_str, next_announce_at);
+                    auto const next_announce_after = now + AnnounceInterval;
+                    mediator_.setNextAnnounceTime(tor.info_hash_str, next_announce_after);
                     break; /* that's enough for this interval */
                 }
             }

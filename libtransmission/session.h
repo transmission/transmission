@@ -865,7 +865,7 @@ private:
 
         bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;
 
-        void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) override;
+        void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after) override;
 
     private:
         tr_session& session_;

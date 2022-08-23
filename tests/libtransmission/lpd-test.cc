@@ -45,13 +45,13 @@ public:
         return torrents_;
     }
 
-    void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) override
+    void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after) override
     {
         for (auto& tor : torrents_)
         {
             if (tor.info_hash_str == info_hash_str)
             {
-                tor.announce_at = announce_at;
+                tor.announce_after = announce_after;
                 break;
             }
         }
@@ -82,6 +82,11 @@ public:
     std::vector<Found> found_;
 };
 
+auto constexpr UbuntuInfo = tr_lpd::Mediator::TorrentInfo{ "B26C81363AC1A236765385A702AEC107A49581B5"sv,
+                                                           TR_STATUS_SEED,
+                                                           true,
+                                                           0 };
+
 } // namespace
 
 TEST_F(LpdTest, HelloWorld)
@@ -99,21 +104,33 @@ TEST_F(LpdTest, CanAnnounceAndRead)
     EXPECT_TRUE(lpd_a);
 
     auto mediator_b = MyMediator{};
-    auto tor = tr_lpd::Mediator::TorrentInfo{};
-    tor.info_hash_str = "B26C81363AC1A236765385A702AEC107A49581B5"sv;
-    tor.activity = TR_STATUS_SEED;
-    tor.allows_lpd = true;
-    tor.announce_at = 0;
-    mediator_b.torrents_.push_back(tor);
+    mediator_b.torrents_.push_back(UbuntuInfo);
     auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
 
-    waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 10s);
+    waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
     EXPECT_EQ(1U, std::size(mediator_a.found_));
     if (!std::empty(mediator_a.found_))
     {
         EXPECT_EQ(mediator_a.port_, mediator_a.found_.front().port);
-        EXPECT_EQ(tor.info_hash_str, mediator_a.found_.front().info_hash_str);
+        EXPECT_EQ(UbuntuInfo.info_hash_str, mediator_a.found_.front().info_hash_str);
     }
+    EXPECT_EQ(0U, std::size(mediator_b.found_));
+}
+
+TEST_F(LpdTest, DoesNotReannounceTooSoon)
+{
+    auto mediator_a = MyMediator{};
+    auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
+    EXPECT_TRUE(lpd_a);
+
+    auto mediator_b = MyMediator{};
+    auto tor = UbuntuInfo;
+    tor.announce_after = tr_time() + 5;
+    mediator_b.torrents_.push_back(tor);
+    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
+
+    waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
+    EXPECT_EQ(0U, std::size(mediator_a.found_));
     EXPECT_EQ(0U, std::size(mediator_b.found_));
 }
 

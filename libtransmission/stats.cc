@@ -5,6 +5,7 @@
 
 #include "transmission.h"
 
+#include "file.h"
 #include "stats.h"
 #include "tr-strbuf.h"
 #include "utils.h" // for tr_getRatio(), tr_time()
@@ -18,14 +19,14 @@ tr_session_stats tr_stats::loadOldStats(std::string_view config_dir)
 
     auto top = tr_variant{};
     auto filename = tr_pathbuf{ config_dir, "/stats.json"sv };
-    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr);
+    bool loaded = tr_sys_path_exists(filename) && tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr);
 
     if (!loaded)
     {
         // maybe the user just upgraded from an old version of Transmission
         // that was still using stats.benc
         filename.assign(config_dir, "/stats.benc");
-        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename.sv(), nullptr);
+        loaded = tr_sys_path_exists(filename) && tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename.sv(), nullptr);
     }
 
     if (loaded)
