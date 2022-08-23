@@ -184,6 +184,10 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
             break;
         }
 
+        std::cerr << __FILE__ << ':' << __LINE__ << " parsing info hashes; remainder of message is:" << std::endl
+                  << announce << std::endl
+                  << __FILE__ << ':' << __LINE__ << "===" << std::endl;
+
         if (auto const end = announce.find(CrLf); end != std::string_view::npos)
         {
             ret.info_hash_strings.push_back(announce.substr(0, end));
@@ -464,6 +468,9 @@ private:
         // If it's an invalid message or the wrong protocol version, discard it.
         // Note this comes *after* incrementing the count since there is some
         // small CPU overhead in parsing, so don't do it for *every* message
+        std::cerr << __FILE__ << ':' << __LINE__ << " MSG BEGIN" << std::endl;
+        std::cerr << msg << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " MSG end" << std::endl;
         auto const parsed = parseAnnounceMsg(msg);
         if (!parsed || parsed->major != 1 || parsed->minor < 1 || parsed->cookie == cookie_)
         {
@@ -475,6 +482,7 @@ private:
         peer_addr.addr.addr4 = foreign_addr.sin_addr;
         for (auto const& hash_string : parsed->info_hash_strings)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " [" << hash_string << ']' << std::endl;
             if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))
             {
                 tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
