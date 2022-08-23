@@ -57,7 +57,7 @@ auto makeCookie()
 constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
 auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
 
-auto makeAnnounce(std::string_view cookie, tr_port port, std::string_view const* info_hash_strings, size_t n_strings)
+auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::string_view const* info_hash_strings, size_t n_strings)
 {
     static auto constexpr Major = 1;
     static auto constexpr Minor = 1;
@@ -161,6 +161,8 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
+        tr_net_init();
+
         int const opt_on = 1;
 
         static_assert(AnnounceScope > 0);
@@ -377,8 +379,8 @@ private:
             });
 
         // cram in as many as will fit in a message
-        auto const baseline_size = std::size(makeAnnounce(cookie_, mediator_.port(), nullptr, 0));
-        auto const size_with_one = std::size(makeAnnounce(cookie_, mediator_.port(), &torrents.front().info_hash_str, 1));
+        auto const baseline_size = std::size(makeAnnounceMsg(cookie_, mediator_.port(), nullptr, 0));
+        auto const size_with_one = std::size(makeAnnounceMsg(cookie_, mediator_.port(), &torrents.front().info_hash_str, 1));
         auto const size_per_hash = size_with_one - baseline_size;
         auto const max_torrents_per_announce = (MaxDatagramLength - baseline_size) / size_per_hash;
         auto info_hash_strings = std::vector<std::string_view>{};
@@ -425,7 +427,7 @@ private:
      */
     bool sendAnnounce(std::string_view const* info_hash_strings, size_t n_strings)
     {
-        auto const announce = makeAnnounce(cookie_, mediator_.port(), info_hash_strings, n_strings);
+        auto const announce = makeAnnounceMsg(cookie_, mediator_.port(), info_hash_strings, n_strings);
         TR_ASSERT(std::size(announce) <= MaxDatagramLength);
         auto const res = sendto(
             mcast_snd_socket_,
