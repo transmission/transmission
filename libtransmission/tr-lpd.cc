@@ -184,10 +184,6 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
             break;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " parsing info hashes; remainder of message is:" << std::endl
-                  << announce << std::endl
-                  << __FILE__ << ':' << __LINE__ << "===" << std::endl;
-
         if (auto const end = announce.find(CrLf); end != std::string_view::npos)
         {
             ret.info_hash_strings.push_back(announce.substr(0, end));
@@ -291,7 +287,6 @@ private:
         {
             mcast_rcv_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
 
-            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (mcast_rcv_socket_ == TR_BAD_SOCKET)
             {
                 std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
@@ -299,7 +294,6 @@ private:
                 return false;
             }
 
-            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (evutil_make_socket_nonblocking(mcast_rcv_socket_) == -1)
             {
                 std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
@@ -307,7 +301,6 @@ private:
                 return false;
             }
 
-            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (setsockopt(
                     mcast_rcv_socket_,
                     SOL_SOCKET,
@@ -321,7 +314,6 @@ private:
             }
 
 #if HAVE_SO_REUSEPORT
-            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (setsockopt(
                     mcast_rcv_socket_,
                     SOL_SOCKET,
@@ -340,7 +332,6 @@ private:
             mcast_addr_.sin_port = McastPort.network();
             mcast_addr_.sin_addr.s_addr = INADDR_ANY;
 
-            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
             {
                 std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
@@ -348,7 +339,6 @@ private:
                 return false;
             }
 
-            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
             {
                 std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
@@ -361,7 +351,6 @@ private:
             mcastReq.imr_multiaddr = mcast_addr_.sin_addr;
             mcastReq.imr_interface.s_addr = INADDR_ANY;
 
-            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (setsockopt(
                     mcast_rcv_socket_,
                     IPPROTO_IP,
@@ -468,9 +457,6 @@ private:
         // If it's an invalid message or the wrong protocol version, discard it.
         // Note this comes *after* incrementing the count since there is some
         // small CPU overhead in parsing, so don't do it for *every* message
-        std::cerr << __FILE__ << ':' << __LINE__ << " MSG BEGIN" << std::endl;
-        std::cerr << msg << std::endl;
-        std::cerr << __FILE__ << ':' << __LINE__ << " MSG end" << std::endl;
         auto const parsed = parseAnnounceMsg(msg);
         if (!parsed || parsed->major != 1 || parsed->minor < 1 || parsed->cookie == cookie_)
         {
@@ -482,7 +468,6 @@ private:
         peer_addr.addr.addr4 = foreign_addr.sin_addr;
         for (auto const& hash_string : parsed->info_hash_strings)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " [" << hash_string << ']' << std::endl;
             if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))
             {
                 tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
@@ -501,7 +486,6 @@ private:
 
         // remove torrents that don't need to be announced
         auto const now = tr_time();
-        std::cerr << __FILE__ << ':' << __LINE__ << " now " << now << std::endl;
         auto const needs_announce = [&now](auto& info)
         {
             return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
