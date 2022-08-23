@@ -325,28 +325,41 @@ private:
     {
         if (mediator_.allowsLPD())
         {
-            for (auto const& [info_hash_str, activity, allows_lpd, announce_at] : mediator_.torrents())
+            auto torrents = mediator_.torrents();
+
+            // remove torrents that should not be announced
+            auto const is_wanted = [&now](auto& info)
             {
-                if (!allows_lpd)
-                {
-                    continue;
-                }
+                return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
+                    (info.announce_at <= now);
+            };
+            torrents.erase(
+                std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(is_wanted)),
+                std::end(torrents));
 
-                if (activity != TR_STATUS_DOWNLOAD && activity != TR_STATUS_SEED)
+            // prioritize the torrents
+            std::sort(
+                std::begin(torrents),
+                std::end(torrents),
+                [](auto const& a, auto const& b)
                 {
-                    continue;
-                }
+                    if (a.activity != b.activity)
+                    {
+                        return a.activity < b.activity;
+                    }
 
-                if (announce_at > now)
-                {
-                    continue;
-                }
+                    if (a.announce_at != b.announce_at)
+                    {
+                        return a.announce_at < b.announce_at;
+                    }
+                    return false;
+                });
 
+            for (auto const& [info_hash_str, activity, allows_lpd, announce_at] : torrents)
+            {
                 if (sendAnnounce(&info_hash_str, 1))
                 {
-                    // downloads re-announce twice as often as seeds
-                    auto const next_announce_at = now +
-                        (activity == TR_STATUS_DOWNLOAD ? AnnounceInterval : AnnounceInterval * 2U);
+                    auto const next_announce_at = now + AnnounceInterval;
                     mediator_.setNextAnnounceTime(info_hash_str, next_announce_at);
                     break; /* that's enough for this interval */
                 }
