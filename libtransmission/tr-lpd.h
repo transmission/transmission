@@ -51,7 +51,4 @@ public:
 
     virtual ~tr_lpd() = default;
     static std::unique_ptr<tr_lpd> create(Mediator& mediator, libtransmission::TimerMaker&, event_base* event_base);
-
-protected:
-    tr_lpd() = default;
 };

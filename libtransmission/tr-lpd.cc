@@ -1,5 +1,4 @@
-// This file Copyright © 2010-2022 Johannes Lieder.
-// It may be used under the MIT (SPDX: MIT) license.
+// Except where noted, this file Copyright © 2010-2022 Johannes Lieder.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
@@ -26,19 +25,24 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h"
+#include "crypto-utils.h" // for tr_rand_buffer()
 #include "log.h"
 #include "net.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
-#include "tr-strbuf.h"
-#include "utils.h"
+#include "utils.h" // for tr_net_init()
 
 using namespace std::literals;
 
+// Code in this namespace Copyright © 2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only), MIT (SPDX: MIT),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 namespace
 {
 
+// opaque value, allowing the sending client to filter out its
+// own announces if it receives them via multicast loopback
 auto makeCookie()
 {
     static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
@@ -56,6 +60,25 @@ auto makeCookie()
 constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
 auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
 
+/*
+ * A LSD announce is formatted as follows:
+ *
+ * ```
+ * BT-SEARCH * HTTP/1.1\r\n
+ * Host: <host>\r\n
+ * Port: <port>\r\n
+ * Infohash: <ihash>\r\n
+ * cookie: <cookie (optional)>\r\n
+ * \r\n
+ * \r\n
+ * ```
+ *
+ * An announce may contain multiple, consecutive Infohash headers
+ * to announce the participation in more than one torrent. This
+ * may not be supported by older implementations. When sending
+ * multiple infohashes the packet length should not exceed 1400
+ * bytes to avoid MTU/fragmentation problems.
+ */
 auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::string_view const* info_hash_strings, size_t n_strings)
 {
     static auto constexpr Major = 1;
@@ -77,6 +100,101 @@ auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::string_view con
     }
 
     return ostr.str();
+}
+
+struct ParsedAnnounce
+{
+    int major;
+    int minor;
+    tr_port port;
+    std::vector<std::string_view> info_hash_strings;
+    std::string_view cookie;
+};
+
+std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
+{
+    static auto constexpr CrLf = "\r\n"sv;
+
+    auto ret = ParsedAnnounce{};
+
+    // get major, minor
+    auto key = "BT-SEARCH * HTTP/"sv;
+    if (auto const pos = announce.find(key); pos != std::string_view::npos)
+    {
+        // parse `${major}.${minor}`
+        auto walk = announce.substr(pos + std::size(key));
+        if (auto const major = tr_parseNum<int>(walk); major && tr_strvStartsWith(walk, '.'))
+        {
+            ret.major = *major;
+        }
+        else
+        {
+            return {};
+        }
+
+        walk.remove_prefix(1); // the '.' between major and minor
+        if (auto const minor = tr_parseNum<int>(walk); minor && tr_strvStartsWith(walk, CrLf))
+        {
+            ret.minor = *minor;
+        }
+        else
+        {
+            return {};
+        }
+    }
+
+    key = "Port: "sv;
+    if (auto const pos = announce.find(key); pos != std::string_view::npos)
+    {
+        auto walk = announce.substr(pos + std::size(key));
+        if (auto const port = tr_parseNum<uint16_t>(walk); port && tr_strvStartsWith(walk, CrLf))
+        {
+            ret.port = tr_port::fromHost(*port);
+        }
+        else
+        {
+            return {};
+        }
+    }
+
+    key = "cookie: "sv;
+    if (auto const pos = announce.find(key); pos != std::string_view::npos)
+    {
+        auto walk = announce.substr(pos + std::size(key));
+        if (auto const end = walk.find(CrLf); end != std::string_view::npos)
+        {
+            ret.cookie = walk.substr(0, end);
+        }
+        else
+        {
+            return {};
+        }
+    }
+
+    key = "Infohash: "sv;
+    for (;;)
+    {
+        if (auto const pos = announce.find(key); pos != std::string_view::npos)
+        {
+            announce.remove_prefix(pos + std::size(key));
+        }
+        else
+        {
+            break;
+        }
+
+        if (auto const end = announce.find(CrLf); end != std::string_view::npos)
+        {
+            ret.info_hash_strings.push_back(announce.substr(0, end));
+            announce.remove_prefix(end + std::size(CrLf));
+        }
+        else
+        {
+            return {};
+        }
+    }
+
+    return ret;
 }
 
 } // namespace
@@ -107,9 +225,6 @@ public:
 
     ~tr_lpd_impl() override
     {
-        dos_timer_.reset();
-        announce_timer_.reset();
-
         if (event_ != nullptr)
         {
             event_free(event_);
@@ -316,7 +431,7 @@ private:
         // If it's an invalid message or the wrong protocol version, discard it.
         // Note this comes *after* incrementing the count since there is some
         // small CPU overhead in parsing, so don't do it for *every* message
-        auto const parsed = parseAnnounce(msg);
+        auto const parsed = parseAnnounceMsg(msg);
         if (!parsed || parsed->major != 1 || parsed->minor < 1 || parsed->cookie == cookie_)
         {
             tr_logAddTrace("Discarded invalid multicast message");
@@ -439,120 +554,6 @@ private:
         return sent;
     }
 
-    struct ParsedAnnounce
-    {
-        int major;
-        int minor;
-        tr_port port;
-        std::vector<std::string_view> info_hash_strings;
-        std::string_view cookie;
-    };
-
-    /*
-     * A LSD announce is formatted as follows:
-     * 
-     * ```
-     * BT-SEARCH * HTTP/1.1\r\n
-     * Host: <host>\r\n
-     * Port: <port>\r\n
-     * Infohash: <ihash>\r\n
-     * cookie: <cookie (optional)>\r\n
-     * \r\n
-     * \r\n
-     * ```
-     *
-     * An announce may contain multiple, consecutive Infohash headers
-     * to announce the participation in more than one torrent. This
-     * may not be supported by older implementations. When sending
-     * multiple infohashes the packet length should not exceed 1400
-     * bytes to avoid MTU/fragmentation problems.
-     */
-    static std::optional<ParsedAnnounce> parseAnnounce(std::string_view announce)
-    {
-        static auto constexpr CrLf = "\r\n"sv;
-
-        auto ret = ParsedAnnounce{};
-
-        // get major, minor
-        auto key = "BT-SEARCH * HTTP/"sv;
-        if (auto const pos = announce.find(key); pos != std::string_view::npos)
-        {
-            // parse `${major}.${minor}`
-            auto walk = announce.substr(pos + std::size(key));
-            if (auto const major = tr_parseNum<int>(walk); major && tr_strvStartsWith(walk, '.'))
-            {
-                ret.major = *major;
-            }
-            else
-            {
-                return {};
-            }
-
-            walk.remove_prefix(1); // the '.' between major and minor
-            if (auto const minor = tr_parseNum<int>(walk); minor && tr_strvStartsWith(walk, CrLf))
-            {
-                ret.minor = *minor;
-            }
-            else
-            {
-                return {};
-            }
-        }
-
-        key = "Port: "sv;
-        if (auto const pos = announce.find(key); pos != std::string_view::npos)
-        {
-            auto walk = announce.substr(pos + std::size(key));
-            if (auto const port = tr_parseNum<uint16_t>(walk); port && tr_strvStartsWith(walk, CrLf))
-            {
-                ret.port = tr_port::fromHost(*port);
-            }
-            else
-            {
-                return {};
-            }
-        }
-
-        key = "cookie: "sv;
-        if (auto const pos = announce.find(key); pos != std::string_view::npos)
-        {
-            auto walk = announce.substr(pos + std::size(key));
-            if (auto const end = walk.find(CrLf); end != std::string_view::npos)
-            {
-                ret.cookie = walk.substr(0, end);
-            }
-            else
-            {
-                return {};
-            }
-        }
-
-        key = "Infohash: "sv;
-        for (;;)
-        {
-            if (auto const pos = announce.find(key); pos != std::string_view::npos)
-            {
-                announce.remove_prefix(pos + std::size(key));
-            }
-            else
-            {
-                break;
-            }
-
-            if (auto const end = announce.find(CrLf); end != std::string_view::npos)
-            {
-                ret.info_hash_strings.push_back(announce.substr(0, end));
-                announce.remove_prefix(end + std::size(CrLf));
-            }
-            else
-            {
-                return {};
-            }
-        }
-
-        return ret;
-    }
-
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
     tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
@@ -569,13 +570,10 @@ private:
 
     // Flood Protection:
     // To protect against message flooding, stop processing search messages
-    // after processing N per second. If we'd really hit the limit and start
-    // discarding events, we either joined an extremely crowded multicast
-    // group or a malevolent host is sending bogus data to our socket. In
-    // this situation, better to miss announcments than blocking on this.
-    // @brief how often to reset the DoS counter
+    // after processing N per upkeep. If we hit that limit, we're either
+    // in a *very* crowded multicast group or a hostile host is sending us
+    // bogus data. Better to drop a few packets than get DoS'ed.
     static auto constexpr DosInterval = 5s;
-    // @brief timer to periodically reset the DoS counter
     std::unique_ptr<libtransmission::Timer> dos_timer_;
     static auto constexpr MaxIncomingPerSecond = int{ 10 };
     static auto constexpr MaxIncomingPerUpkeep = std::chrono::duration_cast<std::chrono::seconds>(DosInterval).count() *
