@@ -433,7 +433,7 @@ bool constexpr quarks_are_sorted()
 static_assert(quarks_are_sorted(), "Predefined quarks must be sorted by their string value");
 static_assert(std::size(my_static) == TR_N_KEYS);
 
-auto& my_runtime{ *new std::vector<std::string>{} };
+auto& my_runtime{ *new std::vector<std::string_view>{} };
 
 } // namespace
 
@@ -468,7 +468,11 @@ tr_quark tr_quark_new(std::string_view str)
     }
 
     auto const ret = TR_N_KEYS + std::size(my_runtime);
-    my_runtime.emplace_back(str);
+    auto const len = std::size(str);
+    auto* perma = new char[len + 1];
+    std::copy_n(std::begin(str), len, perma);
+    perma[len] = '\0';
+    my_runtime.emplace_back(perma);
     return ret;
 }
 
