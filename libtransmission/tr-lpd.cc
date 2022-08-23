@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstring> // for memset()
 #include <memory>
 #include <optional>
 #include <sstream>
@@ -306,25 +305,25 @@ private:
                 return false;
             }
 
-            memset(&mcast_addr_, 0, sizeof(mcast_addr_));
+            mcast_addr_ = {};
             mcast_addr_.sin_family = AF_INET;
             mcast_addr_.sin_port = McastPort.network();
-
-            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
-            {
-                return false;
-            }
+            mcast_addr_.sin_addr.s_addr = INADDR_ANY;
 
             if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
             {
                 return false;
             }
 
+            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
+            {
+                return false;
+            }
+
             /* we want to join that LPD multicast group */
-            struct ip_mreq mcastReq;
-            memset(&mcastReq, 0, sizeof(mcastReq));
+            struct ip_mreq mcastReq = {};
             mcastReq.imr_multiaddr = mcast_addr_.sin_addr;
-            mcastReq.imr_interface.s_addr = htonl(INADDR_ANY);
+            mcastReq.imr_interface.s_addr = INADDR_ANY;
 
             if (setsockopt(
                     mcast_rcv_socket_,
