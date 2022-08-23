@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cerrno>
 #include <chrono>
 #include <cstring> // for memset()
 #include <memory>
@@ -137,16 +136,15 @@ private:
             return true;
         }
 
-        auto const save = errno;
+        auto const err = sockerrno;
         evutil_closesocket(mcast_rcv_socket_);
         evutil_closesocket(mcast_snd_socket_);
         mcast_rcv_socket_ = TR_BAD_SOCKET;
         mcast_snd_socket_ = TR_BAD_SOCKET;
         tr_logAddWarn(fmt::format(
             _("Couldn't initialize LPD: {error} ({error_code})"),
-            fmt::arg("error", tr_strerror(save)),
-            fmt::arg("error_code", save)));
-        errno = save;
+            fmt::arg("error", tr_strerror(err)),
+            fmt::arg("error_code", err)));
         return false;
     }
 
@@ -196,13 +194,14 @@ private:
             memset(&mcast_addr_, 0, sizeof(mcast_addr_));
             mcast_addr_.sin_family = AF_INET;
             mcast_addr_.sin_port = McastPort.network();
+            mcast_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
 
-            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
+            if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
             {
                 return false;
             }
 
-            if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
+            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
             {
                 return false;
             }
