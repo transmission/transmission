@@ -41,13 +41,15 @@ namespace
 
 auto makeCookie()
 {
+    static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
+
     auto buf = std::array<char, 12>{};
     tr_rand_buffer(std::data(buf), std::size(buf));
-    static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
     for (auto& ch : buf)
     {
         ch = Pool[static_cast<unsigned char>(ch) % std::size(Pool)];
     }
+
     return std::string{ std::data(buf), std::size(buf) };
 }
 
@@ -81,7 +83,6 @@ public:
         if (event_ != nullptr)
         {
             event_free(event_);
-            event_ = nullptr;
         }
 
         if (mcast_rcv_socket_ != TR_BAD_SOCKET)
@@ -130,7 +131,6 @@ private:
     bool initImpl(struct event_base* event_base)
     {
         int const opt_on = 1;
-        // int const opt_off = 0;
 
         static_assert(AnnounceInterval > 0);
         static_assert(AnnounceScope > 0);
@@ -190,18 +190,6 @@ private:
             {
                 return false;
             }
-
-#if 0
-            if (setsockopt(
-                    mcast_rcv_socket_,
-                    IPPROTO_IP,
-                    IP_MULTICAST_LOOP,
-                    reinterpret_cast<char const*>(&opt_off),
-                    sizeof(opt_off)) == -1)
-            {
-                return false;
-            }
-#endif
         }
 
         /* setup datagram socket (send) */
@@ -230,18 +218,6 @@ private:
             {
                 return false;
             }
-
-#if 0
-            if (setsockopt(
-                    mcast_snd_socket_,
-                    IPPROTO_IP,
-                    IP_MULTICAST_LOOP,
-                    reinterpret_cast<char const*>(&opt_off),
-                    sizeof(opt_off)) == -1)
-            {
-                return false;
-            }
-#endif
         }
 
         /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
@@ -311,33 +287,23 @@ private:
         announceMore(now, seconds);
     }
 
-    /**
-     * @note Since it possible for tr_lpdAnnounceMore to get called from outside the LPD module,
-     * the function needs to be informed of the externally employed housekeeping interval.
-     * Further, by setting interval to zero (or negative) the caller may actually disable LPD
-     * announces on a per-interval basis.
-     *
-     * TODO: since this function's been made private and is called by a periodic timer,
-     * most of the previous paragraph isn't true anymore... we weren't using that functionality
-     * before. are there cases where we should? if not, should we remove the bells & whistles?
-     */
     void announceMore(time_t const now, int const interval)
     {
         if (mediator_.allowsLPD())
         {
             auto torrents = mediator_.torrents();
 
-            // remove torrents that should not be announced
-            auto const is_wanted = [&now](auto& info)
+            // remove torrents that don't need to be announced
+            auto const needs_announce = [&now](auto& info)
             {
                 return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
                     (info.announce_after < now);
             };
             torrents.erase(
-                std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(is_wanted)),
+                std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce)),
                 std::end(torrents));
 
-            // prioritize the torrents
+            // prioritize the remaining torrents
             std::sort(
                 std::begin(torrents),
                 std::end(torrents),
