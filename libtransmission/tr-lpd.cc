@@ -501,6 +501,7 @@ private:
 
         // remove torrents that don't need to be announced
         auto const now = tr_time();
+        std::cerr << __FILE__ << ':' << __LINE__ << " now " << now << std::endl;
         auto const needs_announce = [&now](auto& info)
         {
             return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&

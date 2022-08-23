@@ -147,7 +147,8 @@ TEST_F(LpdTest, DoesNotReannounceTooSoon)
 
     auto mediator_b = MyMediator{};
     auto tor = UbuntuInfo;
-    tor.announce_after = tr_time() + 5;
+    std::cerr << __FILE__ << ':' << __LINE__ << " now " << tr_time() << ' ' << time(nullptr) << std::endl;
+    tor.announce_after = time(nullptr) + 5;
     mediator_b.torrents_.push_back(tor);
     auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
 
