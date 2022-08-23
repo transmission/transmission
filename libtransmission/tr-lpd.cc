@@ -8,6 +8,8 @@
 #include <optional>
 #include <sstream>
 
+#include <iostream>
+
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
@@ -285,16 +287,23 @@ private:
         {
             mcast_rcv_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (mcast_rcv_socket_ == TR_BAD_SOCKET)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
+                          << std::endl;
                 return false;
             }
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (evutil_make_socket_nonblocking(mcast_rcv_socket_) == -1)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
+                          << std::endl;
                 return false;
             }
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (setsockopt(
                     mcast_rcv_socket_,
                     SOL_SOCKET,
@@ -302,21 +311,44 @@ private:
                     reinterpret_cast<char const*>(&opt_on),
                     sizeof(opt_on)) == -1)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
+                          << std::endl;
                 return false;
             }
+
+#if HAVE_SO_REUSEPORT
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
+            if (setsockopt(
+                    mcast_rcv_socket_,
+                    SOL_SOCKET,
+                    SO_REUSEPORT,
+                    reinterpret_cast<char const*>(&opt_on),
+                    sizeof(opt_on)) == -1)
+            {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
+                          << std::endl;
+                return false;
+            }
+#endif
 
             mcast_addr_ = {};
             mcast_addr_.sin_family = AF_INET;
             mcast_addr_.sin_port = McastPort.network();
             mcast_addr_.sin_addr.s_addr = INADDR_ANY;
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
+                          << std::endl;
                 return false;
             }
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
+                          << std::endl;
                 return false;
             }
 
@@ -325,6 +357,7 @@ private:
             mcastReq.imr_multiaddr = mcast_addr_.sin_addr;
             mcastReq.imr_interface.s_addr = INADDR_ANY;
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << std::endl;
             if (setsockopt(
                     mcast_rcv_socket_,
                     IPPROTO_IP,
@@ -332,6 +365,8 @@ private:
                     reinterpret_cast<char const*>(&mcastReq),
                     sizeof(struct ip_mreq)) == -1)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << this << ' ' << sockerrno << ' ' << tr_strerror(sockerrno)
+                          << std::endl;
                 return false;
             }
         }
