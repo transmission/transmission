@@ -37,6 +37,7 @@
 #include "stats.h"
 #include "timer.h"
 #include "torrents.h"
+#include "tr-lpd.h"
 #include "web.h"
 
 enum tr_auto_switch_state_t
@@ -53,6 +54,7 @@ struct evdns_base;
 
 class tr_rpc_server;
 class tr_web;
+class tr_lpd;
 struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
@@ -503,6 +505,7 @@ public:
     std::unique_ptr<Cache> cache;
 
     std::unique_ptr<tr_web> web;
+    std::unique_ptr<tr_lpd> lpd_;
 
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
@@ -838,6 +841,37 @@ private:
     };
 
     WebMediator web_mediator_{ this };
+
+    class LpdMediator final : public tr_lpd::Mediator
+    {
+    public:
+        explicit LpdMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+        ~LpdMediator() override = default;
+
+        [[nodiscard]] tr_port port() const override
+        {
+            return session_.peerPort();
+        }
+
+        [[nodiscard]] bool allowsLPD() const override
+        {
+            return session_.allowsLPD();
+        }
+
+        [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
+
+        bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;
+
+        void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after) override;
+
+    private:
+        tr_session& session_;
+    };
+
+    LpdMediator lpd_mediator_{ *this };
 
     std::shared_ptr<event_base> const event_base_;
     std::shared_ptr<evdns_base> const evdns_base_;

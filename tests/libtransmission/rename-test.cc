@@ -33,7 +33,7 @@ class RenameTest : public SessionTest
     static auto constexpr MaxWaitMsec = 3000;
 
 protected:
-    void torrentRemoveAndWait(tr_torrent* tor, int expected_torrent_count)
+    void torrentRemoveAndWait(tr_torrent* tor, size_t expected_torrent_count)
     {
         tr_torrentRemove(tor, false, nullptr);
         auto const test = [this, expected_torrent_count]()

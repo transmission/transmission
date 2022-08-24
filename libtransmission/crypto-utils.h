@@ -137,7 +137,7 @@ std::string tr_base64_decode(std::string_view input);
 std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 
 /**
- * @brief Generate a sha256 digest from a hex string.
+ * @brief Generate a sha1 digest from a hex string.
  */
 std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
 

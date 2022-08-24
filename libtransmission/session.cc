@@ -128,6 +128,58 @@ tr_peer_id_t tr_peerIdInit()
 ****
 ***/
 
+bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port)
+{
+    auto const digest = tr_sha1_from_string(info_hash_str);
+    if (!digest)
+    {
+        return false;
+    }
+
+    tr_torrent* const tor = session_.torrents_.get(*digest);
+    if (!tr_isTorrent(tor) || !tor->allowsLpd())
+    {
+        return false;
+    }
+
+    // we found a suitable peer, add it to the torrent
+    auto pex = tr_pex{ address, port };
+    tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
+    tr_logAddDebugTor(tor, fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), address.readable(port)));
+    return true;
+}
+
+std::vector<tr_lpd::Mediator::TorrentInfo> tr_session::LpdMediator::torrents() const
+{
+    auto ret = std::vector<tr_lpd::Mediator::TorrentInfo>{};
+    ret.reserve(std::size(session_.torrents()));
+    for (auto const* const tor : session_.torrents())
+    {
+        auto info = tr_lpd::Mediator::TorrentInfo{};
+        info.info_hash_str = tor->infoHashString();
+        info.activity = tr_torrentGetActivity(tor);
+        info.allows_lpd = tor->allowsLpd();
+        info.announce_after = tor->lpdAnnounceAt;
+        ret.emplace_back(info);
+    }
+    return ret;
+}
+
+void tr_session::LpdMediator::setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after)
+{
+    if (auto digest = tr_sha1_from_string(info_hash_str); digest)
+    {
+        if (tr_torrent* const tor = session_.torrents_.get(*digest); tr_isTorrent(tor))
+        {
+            tor->lpdAnnounceAt = announce_after;
+        }
+    }
+}
+
+/***
+****
+***/
+
 std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
     auto const path = tr_pathbuf{ session_->configDir(), "/cookies.txt"sv };
@@ -700,7 +752,7 @@ void tr_session::initImpl(init_data& data)
 
     if (this->allowsLPD())
     {
-        tr_lpdInit(this, &this->bind_ipv4.addr_);
+        this->lpd_ = tr_lpd::create(lpd_mediator_, timerMaker(), eventBase());
     }
 
     tr_utpInit(this);
@@ -1743,10 +1795,7 @@ void tr_session::closeImplStart()
 {
     is_closing_ = true;
 
-    if (this->allowsLPD())
-    {
-        tr_lpdUninit(this);
-    }
+    lpd_.reset();
 
     tr_dhtUninit(this);
 
@@ -2082,16 +2131,11 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
         session,
         [session, enabled]()
         {
-            if (session->allowsLPD())
-            {
-                tr_lpdUninit(session);
-            }
-
+            session->lpd_.reset();
             session->is_lpd_enabled_ = enabled;
-
-            if (session->allowsLPD())
+            if (enabled)
             {
-                tr_lpdInit(session, &session->bind_ipv4.addr_);
+                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->timerMaker(), session->eventBase());
             }
         });
 }

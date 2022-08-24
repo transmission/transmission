@@ -254,6 +254,10 @@ if(POLARSSL_IS_MBEDTLS)
     add_definitions(-DPOLARSSL_IS_MBEDTLS)
 endif()
 
+if(HAVE_SO_REUSEPORT)
+    add_definitions(-DHAVE_SO_REUSEPORT=1)
+endif()
+
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}

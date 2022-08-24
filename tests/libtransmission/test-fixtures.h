@@ -71,10 +71,9 @@ static void depthFirstWalk(char const* path, file_func_t func)
     func(path);
 }
 
-inline bool waitFor(std::function<bool()> const& test, int msec)
+inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds msec)
 {
-    auto const deadline = std::chrono::milliseconds{ msec };
-    auto const begin = std::chrono::steady_clock::now();
+    auto const deadline = std::chrono::steady_clock::now() + msec;
 
     for (;;)
     {
@@ -83,13 +82,18 @@ inline bool waitFor(std::function<bool()> const& test, int msec)
             return true;
         }
 
-        if ((std::chrono::steady_clock::now() - begin) >= deadline)
+        if (std::chrono::steady_clock::now() > deadline)
         {
             return false;
         }
 
         tr_wait_msec(10);
     }
+}
+
+inline bool waitFor(std::function<bool()> const& test, int msec)
+{
+    return waitFor(test, std::chrono::milliseconds{ msec });
 }
 
 class Sandbox
