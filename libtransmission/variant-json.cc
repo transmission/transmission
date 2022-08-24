@@ -421,17 +421,17 @@ struct jsonWalk
 
 static void jsonIndent(struct jsonWalk* data)
 {
-    static char buf[1024] = { '\0' };
+    static auto buf = std::array<char, 1024>{};
 
-    if (*buf == '\0')
+    if (buf.front() == '\0')
     {
-        memset(buf, ' ', sizeof(buf));
+        memset(std::data(buf), ' ', std::size(buf));
         buf[0] = '\n';
     }
 
     if (data->doIndent)
     {
-        evbuffer_add(data->out, buf, std::size(data->parents) * 4 + 1);
+        evbuffer_add(data->out, std::data(buf), std::size(data->parents) * 4 + 1);
     }
 }
 
