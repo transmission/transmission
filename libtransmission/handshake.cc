@@ -241,9 +241,6 @@ enum handshake_parse_err_t
 
 static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    uint8_t name[HANDSHAKE_NAME_LEN];
-    uint8_t reserved[HANDSHAKE_FLAGS_LEN];
-
     tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", HANDSHAKE_SIZE, evbuffer_get_length(inbuf)));
 
     if (evbuffer_get_length(inbuf) < HANDSHAKE_SIZE)
@@ -252,15 +249,16 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     }
 
     /* confirm the protocol */
-    tr_peerIoReadBytes(handshake->io, inbuf, name, HANDSHAKE_NAME_LEN);
-
-    if (memcmp(name, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN) != 0)
+    auto name = std::array<uint8_t, HANDSHAKE_NAME_LEN>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(name), std::size(name));
+    if (memcmp(std::data(name), HANDSHAKE_NAME, std::size(name)) != 0)
     {
         return HANDSHAKE_ENCRYPTION_WRONG;
     }
 
     /* read the reserved bytes */
-    tr_peerIoReadBytes(handshake->io, inbuf, reserved, HANDSHAKE_FLAGS_LEN);
+    auto reserved = std::array<uint8_t, HANDSHAKE_FLAGS_LEN>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(reserved), std::size(reserved));
 
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};
