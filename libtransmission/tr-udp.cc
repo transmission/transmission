@@ -234,7 +234,8 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     auto* session = static_cast<tr_session*>(vsession);
 
     socklen_t fromlen = sizeof(from);
-    int const rc = recvfrom(s, std::data(buf), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
+    int const
+        rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols. The logic is as follows:
