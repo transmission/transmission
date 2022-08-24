@@ -166,24 +166,24 @@ struct tr_handshake
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->io->addrStr())
 
-static char const* getStateName(handshake_state_t const state)
+static constexpr std::string_view getStateName(handshake_state_t const state)
 {
-    static char const* const state_strings[N_STATES] = {
-        "awaiting handshake", /* AWAITING_HANDSHAKE */
-        "awaiting peer id", /* AWAITING_PEER_ID */
-        "awaiting ya", /* AWAITING_YA */
-        "awaiting pad a", /* AWAITING_PAD_A */
-        "awaiting crypto_provide", /* AWAITING_CRYPTO_PROVIDE */
-        "awaiting pad c", /* AWAITING_PAD_C */
-        "awaiting ia", /* AWAITING_IA */
-        "awaiting payload stream", /* AWAITING_PAYLOAD_STREAM */
-        "awaiting yb", /* AWAITING_YB */
-        "awaiting vc", /* AWAITING_VC */
-        "awaiting crypto select", /* AWAITING_CRYPTO_SELECT */
-        "awaiting pad d" /* AWAITING_PAD_D */
+    auto StateStrings = std::array<std::string_view, N_STATES>{
+        "awaiting handshake"sv, /* AWAITING_HANDSHAKE */
+        "awaiting peer id"sv, /* AWAITING_PEER_ID */
+        "awaiting ya"sv, /* AWAITING_YA */
+        "awaiting pad a"sv, /* AWAITING_PAD_A */
+        "awaiting crypto_provide"sv, /* AWAITING_CRYPTO_PROVIDE */
+        "awaiting pad c"sv, /* AWAITING_PAD_C */
+        "awaiting ia"sv, /* AWAITING_IA */
+        "awaiting payload stream"sv, /* AWAITING_PAYLOAD_STREAM */
+        "awaiting yb"sv, /* AWAITING_YB */
+        "awaiting vc"sv, /* AWAITING_VC */
+        "awaiting crypto select"sv, /* AWAITING_CRYPTO_SELECT */
+        "awaiting pad d"sv /* AWAITING_PAD_D */
     };
 
-    return state < N_STATES ? state_strings[state] : "unknown state";
+    return state < N_STATES ? StateStrings[state] : "unknown state"sv;
 }
 
 static void setState(tr_handshake* handshake, handshake_state_t state)
