@@ -170,27 +170,27 @@ static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server
     {
         auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor.get(), std::size(content));
 
-        struct evbuffer_iovec iovec[1];
-        evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), iovec, 1);
+        struct evbuffer_iovec iovec;
+        evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), &iovec, 1);
 
         auto const compressed_len = libdeflate_gzip_compress(
             server->compressor.get(),
             std::data(content),
             std::size(content),
-            iovec[0].iov_base,
-            iovec[0].iov_len);
+            iovec.iov_base,
+            iovec.iov_len);
         if (0 < compressed_len && compressed_len < std::size(content))
         {
-            iovec[0].iov_len = compressed_len;
+            iovec.iov_len = compressed_len;
             evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
         }
         else
         {
-            std::copy(std::begin(content), std::end(content), static_cast<char*>(iovec[0].iov_base));
-            iovec[0].iov_len = std::size(content);
+            std::copy(std::begin(content), std::end(content), static_cast<char*>(iovec.iov_base));
+            iovec.iov_len = std::size(content);
         }
 
-        evbuffer_commit_space(out, iovec, 1);
+        evbuffer_commit_space(out, &iovec, 1);
     }
 
     return out;
@@ -565,10 +565,10 @@ static char const* tr_rpc_address_to_string(tr_rpc_address const& addr, char* bu
 
 static std::string tr_rpc_address_with_port(tr_rpc_server const* server)
 {
-    char addr_buf[TrUnixAddrStrLen];
-    tr_rpc_address_to_string(*server->bindAddress, addr_buf, sizeof(addr_buf));
+    auto addr_buf = std::array<char, TrUnixAddrStrLen>{};
+    tr_rpc_address_to_string(*server->bindAddress, std::data(addr_buf), std::size(addr_buf));
 
-    std::string addr_port_str{ addr_buf };
+    std::string addr_port_str = std::data(addr_buf);
     if (server->bindAddress->type != TR_RPC_AF_UNIX)
     {
         addr_port_str.append(":" + std::to_string(server->port().host()));
