@@ -8,7 +8,6 @@
 #include <cstddef>
 #include <ctime>
 #include <functional>
-#include <list>
 #include <string>
 #include <utility>
 #include <vector>
@@ -23,8 +22,6 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
-
-#include "Session.h"
 
 extern int const mem_K;
 extern char const* const mem_K_str;
@@ -132,14 +129,6 @@ inline T gtr_str_strip(T const& text)
 }
 
 std::string gtr_get_full_resource_path(std::string const& rel_path);
-
-/***
-****
-***/
-
-extern size_t const max_recent_dirs;
-std::list<std::string> gtr_get_recent_dirs(std::string const& pref);
-void gtr_save_recent_dir(std::string const& pref, Glib::RefPtr<Session> const& core, std::string const& dir);
 
 namespace gtr_detail
 {

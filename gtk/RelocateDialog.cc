@@ -22,7 +22,7 @@
 namespace
 {
 
-std::string targetLocation;
+std::string previousLocation;
 
 }
 
@@ -68,7 +68,7 @@ void RelocateDialog::Impl::startMovingNextTorrent()
 
     if (tor != nullptr)
     {
-        tr_torrentSetLocation(tor, targetLocation.c_str(), do_move_, nullptr, &done_);
+        tr_torrentSetLocation(tor, previousLocation.c_str(), do_move_, nullptr, &done_);
     }
 
     torrent_ids_.pop_back();
@@ -123,11 +123,8 @@ void RelocateDialog::Impl::onResponse(int response)
         message_dialog_->set_response_sensitive(Gtk::RESPONSE_CLOSE, false);
         message_dialog_->show();
 
-        /* remember this location for the next torrent */
-        targetLocation = location;
-
         /* remember this location so that it can be the default next time */
-        gtr_save_recent_dir("relocate", core_, location);
+        previousLocation = location;
 
         /* start the move and periodically check its status */
         done_ = TR_LOC_DONE;
@@ -178,28 +175,13 @@ RelocateDialog::Impl::Impl(
     auto* t = Gtk::make_managed<HigWorkarea>();
     t->add_section_title(row, _("Location"));
 
+    if (previousLocation.empty())
+    {
+        previousLocation = gtr_pref_string_get(TR_KEY_download_dir);
+    }
+
     chooser_ = Gtk::make_managed<Gtk::FileChooserButton>(_("Set Torrent Location"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
-
-    auto recent_dirs = gtr_get_recent_dirs("relocate");
-    if (recent_dirs.empty())
-    {
-        /* default to download dir */
-        chooser_->set_current_folder(gtr_pref_string_get(TR_KEY_download_dir));
-    }
-    else
-    {
-        /* set last used as target */
-        chooser_->set_current_folder(recent_dirs.front());
-        recent_dirs.pop_front();
-
-        /* add remaining as shortcut */
-        for (auto const& folder : recent_dirs)
-        {
-            chooser_->remove_shortcut_folder(folder);
-            chooser_->add_shortcut_folder(folder);
-        }
-    }
-
+    chooser_->set_current_folder(previousLocation);
     t->add_row(row, _("Torrent _location:"), *chooser_);
 
     Gtk::RadioButton::Group group;
