@@ -685,9 +685,11 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(peer_id), std::size(peer_id));
     handshake->peer_id = peer_id;
 
-    char client[128] = {};
-    tr_clientForId(client, sizeof(client), peer_id);
-    tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}' ... isIncoming is {}", client, handshake->isIncoming()));
+    auto client = std::array<char, 128>{};
+    tr_clientForId(std::data(client), std::size(client), peer_id);
+    tr_logAddTraceHand(
+        handshake,
+        fmt::format("peer-id is '{}' ... isIncoming is {}", std::data(client), handshake->isIncoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const hash = handshake->io->torrentHash();
