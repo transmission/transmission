@@ -446,10 +446,10 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer_add_uint16(outbuf, 0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
-    if (uint8_t msg[HANDSHAKE_SIZE]; buildHandshakeMessage(handshake, msg))
+    if (auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{}; buildHandshakeMessage(handshake, std::data(msg)))
     {
-        evbuffer_add_uint16(outbuf, sizeof(msg));
-        evbuffer_add(outbuf, msg, sizeof(msg));
+        evbuffer_add_uint16(outbuf, std::size(msg));
+        evbuffer_add(outbuf, std::data(msg), std::size(msg));
         handshake->haveSentBitTorrentHandshake = true;
     }
     else
@@ -898,9 +898,9 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     tr_logAddTraceHand(handshake, "sending handshake");
 
     /* send our handshake */
-    if (uint8_t msg[HANDSHAKE_SIZE]; buildHandshakeMessage(handshake, msg))
+    if (auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{}; buildHandshakeMessage(handshake, std::data(msg)))
     {
-        evbuffer_add(outbuf, msg, sizeof(msg));
+        evbuffer_add(outbuf, std::data(msg), std::size(msg));
         handshake->haveSentBitTorrentHandshake = true;
     }
     else
@@ -1097,11 +1097,11 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 
         if (tr_peerIoReconnect(handshake->io) == 0)
         {
-            uint8_t msg[HANDSHAKE_SIZE];
-            buildHandshakeMessage(handshake, msg);
+            auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
+            buildHandshakeMessage(handshake, std::data(msg));
             handshake->haveSentBitTorrentHandshake = true;
             setReadState(handshake, AWAITING_HANDSHAKE);
-            tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+            tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
         }
     }
 
@@ -1111,13 +1111,12 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     if ((handshake->state == AWAITING_YB || handshake->state == AWAITING_VC) &&
         handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && tr_peerIoReconnect(handshake->io) == 0)
     {
-        uint8_t msg[HANDSHAKE_SIZE];
-
+        auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
-        buildHandshakeMessage(handshake, msg);
+        buildHandshakeMessage(handshake, std::data(msg));
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
     }
     else
     {
