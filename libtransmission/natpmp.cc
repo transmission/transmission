@@ -3,9 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cerrno>
-#include <ctime>
 #include <cstdint> // uint32_t
+#include <ctime>
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
@@ -75,9 +76,9 @@ tr_port_forwarding tr_natpmp::pulse(tr_port private_port, bool is_enabled, tr_po
 
         if (val >= 0)
         {
-            char str[128];
-            evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
-            tr_logAddInfo(fmt::format(_("Found public address '{address}'"), fmt::arg("address", str)));
+            auto str = std::array<char, 128>{};
+            evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, std::data(str), std::size(str));
+            tr_logAddInfo(fmt::format(_("Found public address '{address}'"), fmt::arg("address", std::data(str))));
             state_ = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
