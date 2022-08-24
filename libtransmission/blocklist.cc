@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cstdio>
 #include <cstdlib> // bsearch()
 #include <string_view>
@@ -227,11 +228,12 @@ bool BlocklistFile::parseLine2(std::string_view line, struct IPv4Range* range)
  */
 bool BlocklistFile::parseLine3(char const* line, IPv4Range* range)
 {
-    unsigned int ip[4];
+    auto ip = std::array<unsigned int, 4>{};
     unsigned int pflen = 0;
     uint32_t ip_u = 0;
     uint32_t mask = 0xffffffff;
 
+    // NOLINTNEXTLINE readability-container-data-pointer
     if (sscanf(line, "%u.%u.%u.%u/%u", TR_ARG_TUPLE(&ip[0], &ip[1], &ip[2], &ip[3]), &pflen) != 5)
     {
         return false;
@@ -266,7 +268,7 @@ bool BlocklistFile::compareAddressRangesByFirstAddress(IPv4Range const& a, IPv4R
 size_t BlocklistFile::setContent(char const* filename)
 {
     int inCount = 0;
-    char line[2048];
+    auto line = std::array<char, 2048>{};
     tr_error* error = nullptr;
 
     if (filename == nullptr)
@@ -307,13 +309,13 @@ size_t BlocklistFile::setContent(char const* filename)
 
     /* load the rules into memory */
     std::vector<IPv4Range> ranges;
-    while (tr_sys_file_read_line(in, line, sizeof(line)))
+    while (tr_sys_file_read_line(in, std::data(line), std::size(line)))
     {
         IPv4Range range = {};
 
         ++inCount;
 
-        if (!parseLine(line, &range))
+        if (!parseLine(std::data(line), &range))
         {
             /* don't try to display the actual lines - it causes issues */
             tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", inCount)));
