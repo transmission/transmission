@@ -4,9 +4,14 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
+#include <set>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
+#include "crypto-utils.h"
 #include "session.h"
 #include "tr-lpd.h"
 
@@ -57,34 +62,30 @@ public:
         }
     }
 
-    bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override
+    bool onPeerFound(std::string_view info_hash_str, tr_address /*address*/, tr_port /*port*/) override
     {
-        auto found = Found{};
-        found.info_hash_str = info_hash_str;
-        found.address = address;
-        found.port = port;
-        found_.emplace_back(found);
+        found_.insert(std::string{ info_hash_str });
         return found_returns_;
     }
 
     tr_port port_ = tr_port::fromHost(51413);
     bool allows_lpd_ = true;
     std::vector<TorrentInfo> torrents_;
+    std::set<std::string> found_;
     bool found_returns_ = true;
-
-    struct Found
-    {
-        std::string info_hash_str;
-        tr_address address;
-        tr_port port;
-    };
-
-    std::vector<Found> found_;
 };
 
-using TorrentInfo = tr_lpd::Mediator::TorrentInfo;
-auto constexpr ThorInfo = TorrentInfo{ "43FDD3E72588E9119C9C94C54332EE533CF80BD6"sv, TR_STATUS_SEED, true, 0 };
-auto constexpr UbuntuInfo = TorrentInfo{ "B26C81363AC1A236765385A702AEC107A49581B5"sv, TR_STATUS_SEED, true, 0 };
+auto makeRandomHash()
+{
+    auto buf = std::array<char, 256>{};
+    tr_rand_buffer(std::data(buf), std::size(buf));
+    return tr_sha1::digest(buf);
+}
+
+auto makeRandomHashString()
+{
+    return tr_strupper(tr_sha1_to_string(makeRandomHash()));
+}
 
 } // namespace
 
@@ -102,41 +103,56 @@ TEST_F(LpdTest, CanAnnounceAndRead)
     auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
     EXPECT_TRUE(lpd_a);
 
+    auto const info_hash_str = makeRandomHashString();
+    auto info = tr_lpd::Mediator::TorrentInfo{};
+    info.info_hash_str = info_hash_str;
+    info.activity = TR_STATUS_SEED;
+    info.allows_lpd = true;
+    info.announce_after = 0; // never announced
+
     auto mediator_b = MyMediator{};
-    mediator_b.torrents_.push_back(UbuntuInfo);
+    mediator_b.torrents_.push_back(info);
     auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
 
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
-    EXPECT_EQ(1U, std::size(mediator_a.found_));
-    if (!std::empty(mediator_a.found_))
-    {
-        EXPECT_EQ(mediator_a.port_, mediator_a.found_.front().port);
-        EXPECT_EQ(UbuntuInfo.info_hash_str, mediator_a.found_.front().info_hash_str);
-    }
-    EXPECT_EQ(0U, std::size(mediator_b.found_));
+    EXPECT_EQ(1U, mediator_a.found_.count(info_hash_str));
+    EXPECT_EQ(0U, mediator_b.found_.count(info_hash_str));
 }
 
-TEST_F(LpdTest, CanAnnounceTwo)
+TEST_F(LpdTest, canMultiAnnounce)
 {
     auto mediator_a = MyMediator{};
     auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
     EXPECT_TRUE(lpd_a);
 
+    auto info_hash_strings = std::array<std::string, 2>{};
+    auto infos = std::array<tr_lpd::Mediator::TorrentInfo, 2>{};
     auto mediator_b = MyMediator{};
-    mediator_b.torrents_.push_back(UbuntuInfo);
-    mediator_b.torrents_.push_back(ThorInfo);
-    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
-
-    waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
-    EXPECT_EQ(2U, std::size(mediator_a.found_));
-    if (!std::empty(mediator_a.found_))
+    for (size_t i = 0; i < std::size(info_hash_strings); ++i)
     {
-        EXPECT_EQ(mediator_a.port_, mediator_a.found_[0].port);
-        EXPECT_EQ(UbuntuInfo.info_hash_str, mediator_a.found_[0].info_hash_str);
-        EXPECT_EQ(mediator_a.port_, mediator_a.found_[1].port);
-        EXPECT_EQ(ThorInfo.info_hash_str, mediator_a.found_[1].info_hash_str);
+        auto& info_hash_string = info_hash_strings[i];
+        auto& info = infos[i];
+
+        info_hash_string = makeRandomHashString();
+
+        info.info_hash_str = info_hash_string;
+        info.activity = TR_STATUS_SEED;
+        info.allows_lpd = true;
+        info.announce_after = 0; // never announced
     }
-    EXPECT_EQ(0U, std::size(mediator_b.found_));
+
+    for (auto const& info : infos)
+    {
+        mediator_b.torrents_.push_back(info);
+    }
+
+    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
+    waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
+
+    for (auto const& info : infos)
+    {
+        EXPECT_EQ(1U, mediator_a.found_.count(std::string{ info.info_hash_str }));
+    }
 }
 
 TEST_F(LpdTest, DoesNotReannounceTooSoon)
@@ -145,23 +161,41 @@ TEST_F(LpdTest, DoesNotReannounceTooSoon)
     auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
     EXPECT_TRUE(lpd_a);
 
+    // similar to canMultiAnnounce...
+    auto info_hash_strings = std::array<std::string, 2>{};
+    auto infos = std::array<tr_lpd::Mediator::TorrentInfo, 2>{};
     auto mediator_b = MyMediator{};
-    auto unannounced = UbuntuInfo;
-    mediator_b.torrents_.push_back(unannounced);
-    auto recently_announced = ThorInfo;
-    recently_announced.announce_after = time(nullptr) + 60;
-    mediator_b.torrents_.push_back(recently_announced);
-    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
+    for (size_t i = 0; i < std::size(info_hash_strings); ++i)
+    {
+        auto& info_hash_string = info_hash_strings[i];
+        auto& info = infos[i];
 
+        info_hash_string = makeRandomHashString();
+
+        info.info_hash_str = info_hash_string;
+        info.activity = TR_STATUS_SEED;
+        info.allows_lpd = true;
+        info.announce_after = 0; // never announced
+    }
+
+    // ...except one torrent has already been announced
+    // and doesn't need to be reannounced until later
+    auto const now = time(nullptr);
+    infos[0].announce_after = now + 60;
+
+    for (auto const& info : infos)
+    {
+        mediator_b.torrents_.push_back(info);
+    }
+
+    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
 
-    // confirm that lpd_b announced the `unannounced` torrent,
-    // but that `recently_announced` was skipped (it's too recent)
-    EXPECT_EQ(1U, std::size(mediator_a.found_));
-
-    // confirm that lpd_b discards its own multicast messages, i.e. it
-    // doesn't call mediator.find() for the torrents it just announced
-    EXPECT_EQ(0U, std::size(mediator_b.found_));
+    for (auto& info : infos)
+    {
+        auto const expected_count = info.announce_after <= now ? 1U : 0U;
+        EXPECT_EQ(expected_count, mediator_a.found_.count(std::string{ info.info_hash_str }));
+    }
 }
 
 } // namespace test
