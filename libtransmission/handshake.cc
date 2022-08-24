@@ -1160,12 +1160,12 @@ tr_handshake* tr_handshakeNew(
     }
     else
     {
-        uint8_t msg[HANDSHAKE_SIZE];
-        buildHandshakeMessage(handshake, msg);
+        auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
+        buildHandshakeMessage(handshake, std::data(msg));
 
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
     }
 
     return handshake;
