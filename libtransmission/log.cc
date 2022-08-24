@@ -157,8 +157,6 @@ void logAddImpl(
     }
     else
     {
-        char timestr[64];
-
         tr_sys_file_t fp = tr_logGetFile();
 
         if (fp == TR_BAD_SYS_FILE)
@@ -166,12 +164,12 @@ void logAddImpl(
             fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
         }
 
-        tr_logGetTimeStr(timestr, sizeof(timestr));
-
+        auto timestr = std::array<char, 64>{};
+        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
         tr_sys_file_write_line(
             fp,
-            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), timestr, name, msg) :
-                                fmt::format(FMT_STRING("[{:s}] {:s}"), timestr, msg));
+            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), std::data(timestr), name, msg) :
+                                fmt::format(FMT_STRING("[{:s}] {:s}"), std::data(timestr), msg));
         tr_sys_file_flush(fp);
     }
 #endif
