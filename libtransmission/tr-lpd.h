@@ -28,12 +28,6 @@ public:
     class Mediator
     {
     public:
-        virtual ~Mediator() = default;
-
-        [[nodiscard]] virtual tr_port port() const = 0;
-
-        [[nodiscard]] virtual bool allowsLPD() const = 0;
-
         struct TorrentInfo
         {
             std::string_view info_hash_str;
@@ -41,6 +35,13 @@ public:
             bool allows_lpd;
             time_t announce_after;
         };
+
+        virtual ~Mediator() = default;
+
+        [[nodiscard]] virtual tr_port port() const = 0;
+
+        [[nodiscard]] virtual bool allowsLPD() const = 0;
+
         [[nodiscard]] virtual std::vector<TorrentInfo> torrents() const = 0;
 
         virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
