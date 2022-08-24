@@ -146,14 +146,21 @@ TEST_F(LpdTest, DoesNotReannounceTooSoon)
     EXPECT_TRUE(lpd_a);
 
     auto mediator_b = MyMediator{};
-    auto tor = UbuntuInfo;
-    std::cerr << __FILE__ << ':' << __LINE__ << " now " << tr_time() << ' ' << time(nullptr) << std::endl;
-    tor.announce_after = time(nullptr) + 5;
-    mediator_b.torrents_.push_back(tor);
+    auto unannounced = UbuntuInfo;
+    mediator_b.torrents_.push_back(unannounced);
+    auto recently_announced = ThorInfo;
+    recently_announced.announce_after = time(nullptr) + 60;
+    mediator_b.torrents_.push_back(recently_announced);
     auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
 
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
-    EXPECT_EQ(0U, std::size(mediator_a.found_));
+
+    // confirm that lpd_b announced the `unannounced` torrent,
+    // but that `recently_announced` was skipped (it's too recent)
+    EXPECT_EQ(1U, std::size(mediator_a.found_));
+
+    // confirm that lpd_b discards its own multicast messages, i.e. it
+    // doesn't call mediator.find() for the torrents it just announced
     EXPECT_EQ(0U, std::size(mediator_b.found_));
 }
 
