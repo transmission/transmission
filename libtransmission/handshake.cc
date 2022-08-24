@@ -339,33 +339,33 @@ static uint32_t getCryptoProvide(tr_handshake const* handshake)
     return provide;
 }
 
-static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_provide)
+static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, uint32_t crypto_provide)
 {
-    uint32_t choices[2];
-    int nChoices = 0;
+    auto choices = std::array<uint32_t, 2>{};
+    int n_choices = 0;
 
-    switch (handshake->encryption_mode)
+    switch (encryption_mode)
     {
     case TR_ENCRYPTION_REQUIRED:
-        choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
+        choices[n_choices++] = CRYPTO_PROVIDE_CRYPTO;
         break;
 
     case TR_ENCRYPTION_PREFERRED:
-        choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
-        choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
+        choices[n_choices++] = CRYPTO_PROVIDE_CRYPTO;
+        choices[n_choices++] = CRYPTO_PROVIDE_PLAINTEXT;
         break;
 
     case TR_CLEAR_PREFERRED:
-        choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
-        choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
+        choices[n_choices++] = CRYPTO_PROVIDE_PLAINTEXT;
+        choices[n_choices++] = CRYPTO_PROVIDE_CRYPTO;
         break;
     }
 
-    for (int i = 0; i < nChoices; ++i)
+    for (auto const& choice : choices)
     {
-        if ((crypto_provide & choices[i]) != 0)
+        if ((crypto_provide & choice) != 0)
         {
-            return choices[i];
+            return choice;
         }
     }
 
@@ -865,7 +865,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     evbuffer_add(outbuf, std::data(VC), std::size(VC));
 
     /* send crypto_select */
-    uint32_t const crypto_select = getCryptoSelect(handshake, handshake->crypto_provide);
+    uint32_t const crypto_select = getCryptoSelect(handshake->encryption_mode, handshake->crypto_provide);
 
     if (crypto_select != 0)
     {
