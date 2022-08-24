@@ -617,8 +617,8 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* reserved bytes */
-    uint8_t reserved[HANDSHAKE_FLAGS_LEN];
-    tr_peerIoReadBytes(handshake->io, inbuf, reserved, sizeof(reserved));
+    auto reserved = std::array<uint8_t, HANDSHAKE_FLAGS_LEN>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(reserved), std::size(reserved));
 
     /**
     *** Extensions
