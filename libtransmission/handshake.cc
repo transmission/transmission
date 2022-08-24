@@ -605,11 +605,11 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* pstr (BitTorrent) */
     TR_ASSERT(pstrlen == 19);
-    uint8_t pstr[20];
-    tr_peerIoReadBytes(handshake->io, inbuf, pstr, pstrlen);
+    auto pstr = std::array<uint8_t, 20>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(pstr), pstrlen);
     pstr[pstrlen] = '\0';
 
-    if (strncmp((char const*)pstr, "BitTorrent protocol", 19) != 0)
+    if (strncmp(reinterpret_cast<char const*>(std::data(pstr)), "BitTorrent protocol", 19) != 0)
     {
         return tr_handshakeDone(handshake, false);
     }
@@ -657,14 +657,14 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (!handshake->haveSentBitTorrentHandshake)
     {
-        uint8_t msg[HANDSHAKE_SIZE];
+        auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
 
-        if (!buildHandshakeMessage(handshake, msg))
+        if (!buildHandshakeMessage(handshake, std::data(msg)))
         {
             return tr_handshakeDone(handshake, false);
         }
 
-        tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
         handshake->haveSentBitTorrentHandshake = true;
     }
 
