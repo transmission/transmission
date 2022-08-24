@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <cstring> // memmove(), memset()
 #include <iterator>
 #include <random>
 #include <string>
@@ -159,7 +158,7 @@ std::string tr_base64_decode(std::string_view input)
 
 static void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
 {
-    static char constexpr Hex[] = "0123456789abcdef";
+    static auto constexpr Hex = "0123456789abcdef"sv;
 
     auto const* input = static_cast<uint8_t const*>(vinput);
     auto* output = static_cast<char*>(voutput);
@@ -194,15 +193,15 @@ std::string tr_sha256_to_string(tr_sha256_digest_t const& digest)
 
 static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)
 {
-    static char constexpr Hex[] = "0123456789abcdef";
+    static auto constexpr Hex = "0123456789abcdef"sv;
 
     auto* output = static_cast<uint8_t*>(voutput);
 
     for (size_t i = 0; i < byte_length; ++i)
     {
-        int const hi = strchr(Hex, tolower(*input++)) - Hex;
-        int const lo = strchr(Hex, tolower(*input++)) - Hex;
-        *output++ = (uint8_t)((hi << 4) | lo);
+        auto const upper_nibble = Hex.find(std::tolower(*input++));
+        auto const lower_nibble = Hex.find(std::tolower(*input++));
+        *output++ = (uint8_t)((upper_nibble << 4) | lower_nibble);
     }
 }
 
