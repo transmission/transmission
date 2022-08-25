@@ -37,8 +37,6 @@ static void log_openssl_error(char const* file, int line)
 
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
-        char buf[512];
-
 #ifndef TR_LIGHTWEIGHT
 
         static bool strings_loaded = false;
@@ -56,7 +54,8 @@ static void log_openssl_error(char const* file, int line)
 
 #endif
 
-        ERR_error_string_n(error_code, buf, sizeof(buf));
+        auto buf = std::array<char, 512>{};
+        ERR_error_string_n(error_code, std::data(buf), std::size(buf));
         tr_logAddMessage(
             file,
             line,
@@ -64,7 +63,7 @@ static void log_openssl_error(char const* file, int line)
             fmt::format(
                 _("{crypto_library} error: {error} ({error_code})"),
                 fmt::arg("crypto_library", "OpenSSL"),
-                fmt::arg("error", buf),
+                fmt::arg("error", std::data(buf)),
                 fmt::arg("error_code", error_code)));
     }
 }

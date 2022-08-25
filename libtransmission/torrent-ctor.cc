@@ -41,9 +41,9 @@ struct tr_ctor
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    tr_torrent::labels_t labels = {};
+    tr_torrent::labels_t labels{};
 
-    struct optional_args optional_args[2];
+    std::array<struct optional_args, 2> optional_args{};
 
     std::string incomplete_dir;
     std::string torrent_filename;

@@ -398,7 +398,7 @@ void tr_peerIoReadUint16(tr_peerIo* io, struct evbuffer* inbuf, uint16_t* setme)
 
 void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme);
 
-void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount);
+void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count);
 
 /**
 ***

@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno> /* error codes ERANGE, ... */
 #include <chrono>
 #include <climits> /* INT_MAX */
@@ -1221,9 +1222,9 @@ static bool on_handshake_done(tr_handshake_result const& result)
             auto client = tr_quark{ TR_KEY_NONE };
             if (result.peer_id)
             {
-                char buf[128] = {};
-                tr_clientForId(buf, sizeof(buf), *result.peer_id);
-                client = tr_quark_new(buf);
+                auto buf = std::array<char, 128>{};
+                tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
+                client = tr_quark_new(std::data(buf));
             }
 
             /* this steals its refcount too, which is balanced by our unref in peerDelete() */

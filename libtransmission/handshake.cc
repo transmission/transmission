@@ -166,24 +166,24 @@ struct tr_handshake
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->io->addrStr())
 
-static char const* getStateName(handshake_state_t const state)
+static constexpr std::string_view getStateName(handshake_state_t const state)
 {
-    static char const* const state_strings[N_STATES] = {
-        "awaiting handshake", /* AWAITING_HANDSHAKE */
-        "awaiting peer id", /* AWAITING_PEER_ID */
-        "awaiting ya", /* AWAITING_YA */
-        "awaiting pad a", /* AWAITING_PAD_A */
-        "awaiting crypto_provide", /* AWAITING_CRYPTO_PROVIDE */
-        "awaiting pad c", /* AWAITING_PAD_C */
-        "awaiting ia", /* AWAITING_IA */
-        "awaiting payload stream", /* AWAITING_PAYLOAD_STREAM */
-        "awaiting yb", /* AWAITING_YB */
-        "awaiting vc", /* AWAITING_VC */
-        "awaiting crypto select", /* AWAITING_CRYPTO_SELECT */
-        "awaiting pad d" /* AWAITING_PAD_D */
+    auto StateStrings = std::array<std::string_view, N_STATES>{
+        "awaiting handshake"sv, /* AWAITING_HANDSHAKE */
+        "awaiting peer id"sv, /* AWAITING_PEER_ID */
+        "awaiting ya"sv, /* AWAITING_YA */
+        "awaiting pad a"sv, /* AWAITING_PAD_A */
+        "awaiting crypto_provide"sv, /* AWAITING_CRYPTO_PROVIDE */
+        "awaiting pad c"sv, /* AWAITING_PAD_C */
+        "awaiting ia"sv, /* AWAITING_IA */
+        "awaiting payload stream"sv, /* AWAITING_PAYLOAD_STREAM */
+        "awaiting yb"sv, /* AWAITING_YB */
+        "awaiting vc"sv, /* AWAITING_VC */
+        "awaiting crypto select"sv, /* AWAITING_CRYPTO_SELECT */
+        "awaiting pad d"sv /* AWAITING_PAD_D */
     };
 
-    return state < N_STATES ? state_strings[state] : "unknown state";
+    return state < N_STATES ? StateStrings[state] : "unknown state"sv;
 }
 
 static void setState(tr_handshake* handshake, handshake_state_t state)
@@ -241,9 +241,6 @@ enum handshake_parse_err_t
 
 static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    uint8_t name[HANDSHAKE_NAME_LEN];
-    uint8_t reserved[HANDSHAKE_FLAGS_LEN];
-
     tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", HANDSHAKE_SIZE, evbuffer_get_length(inbuf)));
 
     if (evbuffer_get_length(inbuf) < HANDSHAKE_SIZE)
@@ -252,15 +249,16 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     }
 
     /* confirm the protocol */
-    tr_peerIoReadBytes(handshake->io, inbuf, name, HANDSHAKE_NAME_LEN);
-
-    if (memcmp(name, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN) != 0)
+    auto name = std::array<uint8_t, HANDSHAKE_NAME_LEN>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(name), std::size(name));
+    if (memcmp(std::data(name), HANDSHAKE_NAME, std::size(name)) != 0)
     {
         return HANDSHAKE_ENCRYPTION_WRONG;
     }
 
     /* read the reserved bytes */
-    tr_peerIoReadBytes(handshake->io, inbuf, reserved, HANDSHAKE_FLAGS_LEN);
+    auto reserved = std::array<uint8_t, HANDSHAKE_FLAGS_LEN>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(reserved), std::size(reserved));
 
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};
@@ -341,33 +339,33 @@ static uint32_t getCryptoProvide(tr_handshake const* handshake)
     return provide;
 }
 
-static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_provide)
+static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, uint32_t crypto_provide)
 {
-    uint32_t choices[2];
-    int nChoices = 0;
+    auto choices = std::array<uint32_t, 2>{};
+    int n_choices = 0;
 
-    switch (handshake->encryption_mode)
+    switch (encryption_mode)
     {
     case TR_ENCRYPTION_REQUIRED:
-        choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
+        choices[n_choices++] = CRYPTO_PROVIDE_CRYPTO;
         break;
 
     case TR_ENCRYPTION_PREFERRED:
-        choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
-        choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
+        choices[n_choices++] = CRYPTO_PROVIDE_CRYPTO;
+        choices[n_choices++] = CRYPTO_PROVIDE_PLAINTEXT;
         break;
 
     case TR_CLEAR_PREFERRED:
-        choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
-        choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
+        choices[n_choices++] = CRYPTO_PROVIDE_PLAINTEXT;
+        choices[n_choices++] = CRYPTO_PROVIDE_CRYPTO;
         break;
     }
 
-    for (int i = 0; i < nChoices; ++i)
+    for (auto const& choice : choices)
     {
-        if ((crypto_provide & choices[i]) != 0)
+        if ((crypto_provide & choice) != 0)
         {
-            return choices[i];
+            return choice;
         }
     }
 
@@ -448,10 +446,10 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     evbuffer_add_uint16(outbuf, 0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
-    if (uint8_t msg[HANDSHAKE_SIZE]; buildHandshakeMessage(handshake, msg))
+    if (auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{}; buildHandshakeMessage(handshake, std::data(msg)))
     {
-        evbuffer_add_uint16(outbuf, sizeof(msg));
-        evbuffer_add(outbuf, msg, sizeof(msg));
+        evbuffer_add_uint16(outbuf, std::size(msg));
+        evbuffer_add(outbuf, std::data(msg), std::size(msg));
         handshake->haveSentBitTorrentHandshake = true;
     }
     else
@@ -607,18 +605,18 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* pstr (BitTorrent) */
     TR_ASSERT(pstrlen == 19);
-    uint8_t pstr[20];
-    tr_peerIoReadBytes(handshake->io, inbuf, pstr, pstrlen);
+    auto pstr = std::array<uint8_t, 20>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(pstr), pstrlen);
     pstr[pstrlen] = '\0';
 
-    if (strncmp((char const*)pstr, "BitTorrent protocol", 19) != 0)
+    if (strncmp(reinterpret_cast<char const*>(std::data(pstr)), "BitTorrent protocol", 19) != 0)
     {
         return tr_handshakeDone(handshake, false);
     }
 
     /* reserved bytes */
-    uint8_t reserved[HANDSHAKE_FLAGS_LEN];
-    tr_peerIoReadBytes(handshake->io, inbuf, reserved, sizeof(reserved));
+    auto reserved = std::array<uint8_t, HANDSHAKE_FLAGS_LEN>{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(reserved), std::size(reserved));
 
     /**
     *** Extensions
@@ -659,14 +657,14 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (!handshake->haveSentBitTorrentHandshake)
     {
-        uint8_t msg[HANDSHAKE_SIZE];
+        auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
 
-        if (!buildHandshakeMessage(handshake, msg))
+        if (!buildHandshakeMessage(handshake, std::data(msg)))
         {
             return tr_handshakeDone(handshake, false);
         }
 
-        tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
         handshake->haveSentBitTorrentHandshake = true;
     }
 
@@ -685,9 +683,11 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(peer_id), std::size(peer_id));
     handshake->peer_id = peer_id;
 
-    char client[128] = {};
-    tr_clientForId(client, sizeof(client), peer_id);
-    tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}' ... isIncoming is {}", client, handshake->isIncoming()));
+    auto client = std::array<char, 128>{};
+    tr_clientForId(std::data(client), std::size(client), peer_id);
+    tr_logAddTraceHand(
+        handshake,
+        fmt::format("peer-id is '{}' ... isIncoming is {}", std::data(client), handshake->isIncoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const hash = handshake->io->torrentHash();
@@ -865,7 +865,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     evbuffer_add(outbuf, std::data(VC), std::size(VC));
 
     /* send crypto_select */
-    uint32_t const crypto_select = getCryptoSelect(handshake, handshake->crypto_provide);
+    uint32_t const crypto_select = getCryptoSelect(handshake->encryption_mode, handshake->crypto_provide);
 
     if (crypto_select != 0)
     {
@@ -898,9 +898,9 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     tr_logAddTraceHand(handshake, "sending handshake");
 
     /* send our handshake */
-    if (uint8_t msg[HANDSHAKE_SIZE]; buildHandshakeMessage(handshake, msg))
+    if (auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{}; buildHandshakeMessage(handshake, std::data(msg)))
     {
-        evbuffer_add(outbuf, msg, sizeof(msg));
+        evbuffer_add(outbuf, std::data(msg), std::size(msg));
         handshake->haveSentBitTorrentHandshake = true;
     }
     else
@@ -1097,11 +1097,11 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 
         if (tr_peerIoReconnect(handshake->io) == 0)
         {
-            uint8_t msg[HANDSHAKE_SIZE];
-            buildHandshakeMessage(handshake, msg);
+            auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
+            buildHandshakeMessage(handshake, std::data(msg));
             handshake->haveSentBitTorrentHandshake = true;
             setReadState(handshake, AWAITING_HANDSHAKE);
-            tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+            tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
         }
     }
 
@@ -1111,13 +1111,12 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     if ((handshake->state == AWAITING_YB || handshake->state == AWAITING_VC) &&
         handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && tr_peerIoReconnect(handshake->io) == 0)
     {
-        uint8_t msg[HANDSHAKE_SIZE];
-
+        auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
-        buildHandshakeMessage(handshake, msg);
+        buildHandshakeMessage(handshake, std::data(msg));
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
     }
     else
     {
@@ -1160,12 +1159,12 @@ tr_handshake* tr_handshakeNew(
     }
     else
     {
-        uint8_t msg[HANDSHAKE_SIZE];
-        buildHandshakeMessage(handshake, msg);
+        auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
+        buildHandshakeMessage(handshake, std::data(msg));
 
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, msg, sizeof(msg), false);
+        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
     }
 
     return handshake;

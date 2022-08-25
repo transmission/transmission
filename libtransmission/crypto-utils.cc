@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <cstring> // memmove(), memset()
 #include <iterator>
 #include <random>
 #include <string>
@@ -63,6 +62,8 @@ int tr_rand_int_weak(int upper_bound)
 
 namespace
 {
+namespace ssha1_impl
+{
 
 auto constexpr DigestStringSize = TR_SHA1_DIGEST_STRLEN;
 auto constexpr SaltedPrefix = "{"sv;
@@ -79,10 +80,13 @@ std::string tr_salt(std::string_view plaintext, std::string_view salt)
     return fmt::format(FMT_STRING("{:s}{:s}{:s}"), SaltedPrefix, tr_sha1_to_string(digest), salt);
 }
 
+} // namespace ssha1_impl
 } // namespace
 
 std::string tr_ssha1(std::string_view plaintext)
 {
+    using namespace ssha1_impl;
+
     // build an array of random Salter chars
     auto constexpr Salter = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ./"sv;
     static_assert(std::size(Salter) == 64);
@@ -100,11 +104,15 @@ std::string tr_ssha1(std::string_view plaintext)
 
 bool tr_ssha1_test(std::string_view text)
 {
+    using namespace ssha1_impl;
+
     return tr_strvStartsWith(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
 }
 
 bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 {
+    using namespace ssha1_impl;
+
     if (!tr_ssha1_test(ssha1))
     {
         return false;
@@ -118,7 +126,12 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 ****
 ***/
 
-static size_t base64_alloc_size(std::string_view input)
+namespace
+{
+namespace base64_impl
+{
+
+constexpr size_t base64AllocSize(std::string_view input)
 {
     size_t ret_length = 4 * ((std::size(input) + 2) / 3); // NOLINT misc-const-correctness
 #ifdef USE_SYSTEM_B64
@@ -128,9 +141,14 @@ static size_t base64_alloc_size(std::string_view input)
     return ret_length * 8;
 }
 
+} // namespace base64_impl
+} // namespace
+
 std::string tr_base64_encode(std::string_view input)
 {
-    auto buf = std::vector<char>(base64_alloc_size(input));
+    using namespace base64_impl;
+
+    auto buf = std::vector<char>(base64AllocSize(input));
     auto state = base64_encodestate{};
     base64_init_encodestate(&state);
     size_t len = base64_encode_block(std::data(input), std::size(input), std::data(buf), &state);
@@ -157,9 +175,14 @@ std::string tr_base64_decode(std::string_view input)
 ****
 ***/
 
-static void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
+namespace
 {
-    static char constexpr Hex[] = "0123456789abcdef";
+namespace hex_impl
+{
+
+constexpr void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
+{
+    auto constexpr Hex = "0123456789abcdef"sv;
 
     auto const* input = static_cast<uint8_t const*>(vinput);
     auto* output = static_cast<char*>(voutput);
@@ -178,8 +201,27 @@ static void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_leng
     }
 }
 
+constexpr void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)
+{
+    auto constexpr Hex = "0123456789abcdef"sv;
+
+    auto* output = static_cast<uint8_t*>(voutput);
+
+    for (size_t i = 0; i < byte_length; ++i)
+    {
+        auto const upper_nibble = Hex.find(std::tolower(*input++));
+        auto const lower_nibble = Hex.find(std::tolower(*input++));
+        *output++ = (uint8_t)((upper_nibble << 4) | lower_nibble);
+    }
+}
+
+} // namespace hex_impl
+} // namespace
+
 std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
 {
+    using namespace hex_impl;
+
     auto str = std::string(std::size(digest) * 2, '?');
     tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
     return str;
@@ -187,27 +229,17 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
 
 std::string tr_sha256_to_string(tr_sha256_digest_t const& digest)
 {
+    using namespace hex_impl;
+
     auto str = std::string(std::size(digest) * 2, '?');
     tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
     return str;
 }
 
-static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)
-{
-    static char constexpr Hex[] = "0123456789abcdef";
-
-    auto* output = static_cast<uint8_t*>(voutput);
-
-    for (size_t i = 0; i < byte_length; ++i)
-    {
-        int const hi = strchr(Hex, tolower(*input++)) - Hex;
-        int const lo = strchr(Hex, tolower(*input++)) - Hex;
-        *output++ = (uint8_t)((hi << 4) | lo);
-    }
-}
-
 std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
 {
+    using namespace hex_impl;
+
     if (std::size(hex) != TR_SHA1_DIGEST_STRLEN)
     {
         return {};
@@ -225,6 +257,8 @@ std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
 
 std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
 {
+    using namespace hex_impl;
+
     if (std::size(hex) != TR_SHA256_DIGEST_STRLEN)
     {
         return {};

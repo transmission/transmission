@@ -57,9 +57,9 @@ static size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
     size_t const n_in = buflen / sizeof(tr_pex);
     size_t const n_pex = std::min(n_in, size_t{ MAX_REMEMBERED_PEERS });
 
-    tr_pex pex[MAX_REMEMBERED_PEERS];
-    memcpy(pex, buf, sizeof(tr_pex) * n_pex);
-    return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, pex, n_pex);
+    auto pex = std::array<tr_pex, MAX_REMEMBERED_PEERS>{};
+    memcpy(std::data(pex), buf, sizeof(tr_pex) * n_pex);
+    return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, std::data(pex), n_pex);
 }
 
 static auto loadPeers(tr_variant* dict, tr_torrent* tor)

@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
@@ -1004,16 +1005,15 @@ void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme)
     *setme = ntohl(tmp);
 }
 
-void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount)
+void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count)
 {
-    char buf[4096];
-    size_t const buflen = sizeof(buf);
+    auto buf = std::array<char, 4096>{};
 
-    while (byteCount > 0)
+    while (byte_count > 0)
     {
-        size_t const thisPass = std::min(byteCount, buflen);
-        tr_peerIoReadBytes(io, inbuf, buf, thisPass);
-        byteCount -= thisPass;
+        size_t const this_pass = std::min(byte_count, std::size(buf));
+        tr_peerIoReadBytes(io, inbuf, std::data(buf), this_pass);
+        byte_count -= this_pass;
     }
 }
 

@@ -2,6 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cerrno>
 #include <cstdint>
 #include <cstring> /* memcmp(), memcpy(), memset() */
@@ -228,12 +229,13 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     TR_ASSERT(vsession != nullptr);
     TR_ASSERT(type == EV_READ);
 
-    unsigned char buf[4096];
+    auto buf = std::array<unsigned char, 4096>{};
     struct sockaddr_storage from;
     auto* session = static_cast<tr_session*>(vsession);
 
     socklen_t fromlen = sizeof(from);
-    int const rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
+    int const
+        rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols. The logic is as follows:
@@ -249,12 +251,12 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
             if (session->allowsDHT())
             {
                 buf[rc] = '\0'; /* required by the DHT code */
-                tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, vsession);
+                tr_dhtCallback(std::data(buf), rc, (struct sockaddr*)&from, fromlen, vsession);
             }
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            if (!tau_handle_message(session, buf, rc))
+            if (!tau_handle_message(session, std::data(buf), rc))
             {
                 tr_logAddTrace("Couldn't parse UDP tracker packet.");
             }
@@ -263,7 +265,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         {
             if (session->allowsUTP())
             {
-                if (!tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, session))
+                if (!tr_utpPacket(std::data(buf), rc, (struct sockaddr*)&from, fromlen, session))
                 {
                     tr_logAddTrace("Unexpected UDP packet");
                 }
