@@ -96,9 +96,10 @@ auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::string_view con
 
     if (!std::empty(cookie))
     {
-        ostr << "cookie: " << cookie << CrLf << CrLf << CrLf;
+        ostr << "cookie: " << cookie << CrLf;
     }
 
+    ostr << CrLf << CrLf;
     return ostr.str();
 }
 
