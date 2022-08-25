@@ -19,8 +19,6 @@
 #include "net.h" // for tr_address, tr_port
 #include "timer.h"
 
-class tr_torrents;
-struct tr_session;
 struct event_base;
 
 class tr_lpd
