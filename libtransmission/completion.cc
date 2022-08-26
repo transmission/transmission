@@ -130,6 +130,7 @@ std::vector<uint8_t> tr_completion::createPieceBitfield() const
     size_t const n = block_info_->pieceCount();
     auto pieces = tr_bitfield{ n };
 
+    // NOLINTNEXTLINE modernize-avoid-c-arrays
     auto flags = std::make_unique<bool[]>(n);
     for (tr_piece_index_t piece = 0; piece < n; ++piece)
     {
