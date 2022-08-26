@@ -22,8 +22,7 @@ public:
 
     static std::unique_ptr<MainWindow> create(
         Gtk::Application& app,
-        Glib::RefPtr<Gio::ActionGroup> const& actions_window,
-        Glib::RefPtr<Gio::ActionGroup> const& actions_torrent,
+        Glib::RefPtr<Gio::ActionGroup> const& actions,
         Glib::RefPtr<Session> const& core);
 
     Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
@@ -32,11 +31,7 @@ public:
     void refresh();
 
 protected:
-    MainWindow(
-        Gtk::Application& app,
-        Glib::RefPtr<Gio::ActionGroup> const& actions_window,
-        Glib::RefPtr<Gio::ActionGroup> const& actions_torrent,
-        Glib::RefPtr<Session> const& core);
+    MainWindow(Gtk::Application& app, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core);
 
 private:
     class Impl;

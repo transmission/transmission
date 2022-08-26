@@ -62,39 +62,36 @@ std::array<std::string_view, 6> const pref_toggle_entries = {
     "show-toolbar"sv, //
 };
 
-std::array<std::string_view, 12> const window_entries = {
-    "open-torrent-from-url"sv, //
-    "open-torrent"sv, //
-    "show-stats"sv, //
-    "donate"sv, //
-    "pause-all-torrents"sv, //
-    "start-all-torrents"sv, //
-    "new-torrent"sv, //
-    "quit"sv, //
-    "edit-preferences"sv, //
-    "show-about-dialog"sv, //
-    "help"sv, //
-    "present-main-window"sv, //
-};
-
-std::array<std::string_view, 17> const torrent_entries = {
+std::array<std::string_view, 29> const entries = {
     "copy-magnet-link-to-clipboard"sv,
+    "open-torrent-from-url"sv,
+    "open-torrent"sv,
     "torrent-start"sv,
     "torrent-start-now"sv,
+    "show-stats"sv,
+    "donate"sv,
     "torrent-verify"sv,
     "torrent-stop"sv,
+    "pause-all-torrents"sv,
+    "start-all-torrents"sv,
     "relocate-torrent"sv,
     "remove-torrent"sv,
     "delete-torrent"sv,
+    "new-torrent"sv,
+    "quit"sv,
     "select-all"sv,
     "deselect-all"sv,
+    "edit-preferences"sv,
     "show-torrent-properties"sv,
     "open-torrent-folder"sv,
+    "show-about-dialog"sv,
+    "help"sv,
     "torrent-reannounce"sv,
     "queue-move-top"sv,
     "queue-move-up"sv,
     "queue-move-down"sv,
     "queue-move-bottom"sv,
+    "present-main-window"sv,
 };
 
 Gtk::Builder* myBuilder = nullptr;
@@ -108,9 +105,7 @@ void gtr_actions_set_core(Glib::RefPtr<Session> const& core)
     myCore = gtr_get_ptr(core);
 }
 
-Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init_window(
-    Glib::RefPtr<Gtk::Builder> const& builder,
-    gpointer callback_user_data)
+Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, gpointer callback_user_data)
 {
     myBuilder = gtr_get_ptr(builder);
 
@@ -147,24 +142,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init_window(
         key_to_action.try_emplace(action_name, action);
     }
 
-    for (auto const& action_name_view : window_entries)
-    {
-        auto const action_name = Glib::ustring(std::string(action_name_view));
-        auto const action = Gio::SimpleAction::create(action_name);
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
-                                          { action_cb(*a, callback_user_data); });
-        action_group->add_action(action);
-        key_to_action.try_emplace(action_name, action);
-    }
-
-    return action_group;
-}
-
-Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init_torrent(gpointer callback_user_data)
-{
-    auto const action_group = Gio::SimpleActionGroup::create();
-
-    for (auto const& action_name_view : torrent_entries)
+    for (auto const& action_name_view : entries)
     {
         auto const action_name = Glib::ustring(std::string(action_name_view));
         auto const action = Gio::SimpleAction::create(action_name);
