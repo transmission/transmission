@@ -355,18 +355,18 @@ void tr_dhtUninit(tr_session* ss)
     }
     else
     {
-        auto constexpr MaxNodes = size_t{ 300 };
+        auto constexpr MaxNodes = int{ 300 };
         auto constexpr PortLen = size_t{ 2 };
         auto constexpr CompactAddrLen = size_t{ 4 };
         auto constexpr CompactLen = size_t{ CompactAddrLen + PortLen };
         auto constexpr Compact6AddrLen = size_t{ 16 };
         auto constexpr Compact6Len = size_t{ Compact6AddrLen + PortLen };
 
-        struct sockaddr_in sins[MaxNodes];
-        struct sockaddr_in6 sins6[MaxNodes];
+        auto sins = std::array<struct sockaddr_in, MaxNodes>{};
+        auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
         int num = MaxNodes;
         int num6 = MaxNodes;
-        int const n = dht_get_nodes(sins, &num, sins6, &num6);
+        int const n = dht_get_nodes(std::data(sins), &num, std::data(sins6), &num6);
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num, num6));
 
         tr_variant benc;
@@ -375,9 +375,9 @@ void tr_dhtUninit(tr_session* ss)
 
         if (num > 0)
         {
-            char compact[MaxNodes * CompactLen];
-            char* out = compact;
-            for (struct sockaddr_in const* in = sins; in < sins + num; ++in)
+            auto compact = std::array<char, MaxNodes * CompactLen>{};
+            char* out = std::data(compact);
+            for (auto const* in = std::data(sins), *end = in + num; in != end; ++in)
             {
                 memcpy(out, &in->sin_addr, CompactAddrLen);
                 out += CompactAddrLen;
@@ -385,14 +385,14 @@ void tr_dhtUninit(tr_session* ss)
                 out += PortLen;
             }
 
-            tr_variantDictAddRaw(&benc, TR_KEY_nodes, compact, out - compact);
+            tr_variantDictAddRaw(&benc, TR_KEY_nodes, std::data(compact), out - std::data(compact));
         }
 
         if (num6 > 0)
         {
-            char compact6[MaxNodes * Compact6Len];
-            char* out6 = compact6;
-            for (struct sockaddr_in6 const* in = sins6; in < sins6 + num6; ++in)
+            auto compact6 = std::array<char, MaxNodes * Compact6Len>{};
+            char* out6 = std::data(compact6);
+            for (auto const* in = std::data(sins6), *end = in + num6; in != end; ++in)
             {
                 memcpy(out6, &in->sin6_addr, Compact6AddrLen);
                 out6 += Compact6AddrLen;
@@ -400,7 +400,7 @@ void tr_dhtUninit(tr_session* ss)
                 out6 += PortLen;
             }
 
-            tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
+            tr_variantDictAddRaw(&benc, TR_KEY_nodes6, std::data(compact6), out6 - std::data(compact6));
         }
 
         auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };

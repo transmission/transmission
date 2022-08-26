@@ -239,8 +239,8 @@ void tr_tracker_udp_announce(
 
 void tr_tracker_udp_start_shutdown(tr_session* session);
 
-void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, char const* log_name);
+void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, std::string_view log_name);
 
-void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, char const* log_name);
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, std::string_view log_name);
 
 tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed);

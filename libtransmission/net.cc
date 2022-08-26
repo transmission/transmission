@@ -770,7 +770,7 @@ static bool isMartianAddr(struct tr_address const* a)
 {
     TR_ASSERT(tr_address_is_valid(a));
 
-    static unsigned char const zeroes[16] = {};
+    static auto constexpr Zeroes = std::array<unsigned char, 16>{};
 
     switch (a->type)
     {
@@ -783,7 +783,8 @@ static bool isMartianAddr(struct tr_address const* a)
     case TR_AF_INET6:
         {
             auto const* const address = (unsigned char const*)&a->addr.addr6;
-            return address[0] == 0xFF || (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1));
+            return address[0] == 0xFF ||
+                (memcmp(address, std::data(Zeroes), 15) == 0 && (address[15] == 0 || address[15] == 1));
         }
 
     default:

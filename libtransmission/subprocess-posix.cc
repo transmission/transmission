@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cerrno>
 #include <csignal>
 #include <map>
@@ -139,9 +140,9 @@ bool tr_spawn_async(
         sigchld_handler_set = true;
     }
 
-    int pipe_fds[2];
+    auto pipe_fds = std::array<int, 2>{};
 
-    if (pipe(pipe_fds) == -1)
+    if (pipe(std::data(pipe_fds)) == -1)
     {
         set_system_error(error, errno, "Call to pipe()");
         return false;

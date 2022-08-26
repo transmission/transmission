@@ -85,7 +85,7 @@ struct tr_rpc_address
     {
         struct in_addr addr4;
         struct in6_addr addr6;
-        char unixSocketPath[TrUnixAddrStrLen];
+        std::array<char, TrUnixAddrStrLen> unixSocketPath;
     } addr;
 
     void set_inaddr_any()
@@ -555,7 +555,7 @@ static char const* tr_rpc_address_to_string(tr_rpc_address const& addr, char* bu
         return evutil_inet_ntop(AF_INET6, &addr.addr, buf, buflen);
 
     case TR_RPC_AF_UNIX:
-        tr_strlcpy(buf, addr.addr.unixSocketPath, buflen);
+        tr_strlcpy(buf, std::data(addr.addr.unixSocketPath), buflen);
         return buf;
 
     default:
@@ -590,7 +590,7 @@ static bool tr_rpc_address_from_string(tr_rpc_address& dst, std::string_view src
         }
 
         dst.type = TR_RPC_AF_UNIX;
-        tr_strlcpy(dst.addr.unixSocketPath, std::string{ src }.c_str(), TrUnixAddrStrLen);
+        tr_strlcpy(std::data(dst.addr.unixSocketPath), std::string{ src }.c_str(), std::size(dst.addr.unixSocketPath));
         return true;
     }
 

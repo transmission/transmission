@@ -100,7 +100,7 @@ static void maxWidth(struct tr_option const* o, size_t& long_width, size_t& shor
     }
 }
 
-void tr_getopt_usage(char const* appName, char const* description, struct tr_option const opts[])
+void tr_getopt_usage(char const* appName, char const* description, struct tr_option const* opts)
 {
     auto long_width = size_t{ 0 };
     auto short_width = size_t{ 0 };

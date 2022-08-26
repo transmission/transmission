@@ -158,7 +158,7 @@ static void verboseLog(std::string_view description, tr_direction direction, std
 
 static auto constexpr MaxBencDepth = 8;
 
-void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, char const* log_name)
+void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, std::string_view log_name)
 {
     verboseLog("Announce response:", TR_DOWN, benc);
 
@@ -308,7 +308,7 @@ struct announce_data
     uint8_t requests_sent_count;
     uint8_t requests_answered_count;
 
-    char log_name[128];
+    std::string log_name;
 };
 
 static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response* const response)
@@ -407,7 +407,7 @@ void tr_tracker_http_announce(
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     d->info_hash = request->info_hash;
-    tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
+    d->log_name = request->log_name;
 
     /* There are two alternative techniques for announcing both IPv4 and
        IPv6 addresses. Previous version of BEP-7 suggests adding "ipv4="
@@ -502,7 +502,7 @@ void tr_tracker_http_announce(
 *****
 ****/
 
-void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, char const* log_name)
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, std::string_view log_name)
 {
     verboseLog("Scrape response:", TR_DOWN, benc);
 
@@ -611,7 +611,7 @@ struct scrape_data
     tr_scrape_response response;
     tr_scrape_response_func response_func;
     void* response_func_user_data;
-    char log_name[128];
+    std::string log_name;
 };
 
 static void onScrapeDone(tr_web::FetchResponse const& web_response)
@@ -677,7 +677,7 @@ void tr_tracker_http_scrape(
         d->response.rows[i].downloads = -1;
     }
 
-    tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
+    d->log_name = request->log_name;
 
     auto scrape_url = tr_pathbuf{};
     scrape_url_new(scrape_url, request);
