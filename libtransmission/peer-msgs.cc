@@ -832,7 +832,7 @@ public:
     std::vector<tr_pex> pex;
     std::vector<tr_pex> pex6;
 
-    int peerAskedForMetadata[MetadataReqQ] = {};
+    std::array<int, MetadataReqQ> peerAskedForMetadata = {};
     int peerAskedForMetadataCount = 0;
 
     time_t clientSentAnythingAt = 0;
@@ -1096,7 +1096,7 @@ static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
 
     *piece = msgs->peerAskedForMetadata[0];
 
-    tr_removeElementFromArray(msgs->peerAskedForMetadata, 0, sizeof(int), msgs->peerAskedForMetadataCount);
+    tr_removeElementFromArray(std::data(msgs->peerAskedForMetadata), 0, sizeof(int), msgs->peerAskedForMetadataCount);
     --msgs->peerAskedForMetadataCount;
 
     return true;
