@@ -12,10 +12,10 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
-#include "FaviconCache.h" /* gtr_get_favicon() */
+#include "FaviconCache.h" // gtr_get_favicon()
 #include "FilterBar.h"
-#include "HigWorkarea.h" /* GUI_PAD */
-#include "Session.h" /* MC_TORRENT */
+#include "HigWorkarea.h" // GUI_PAD
+#include "Session.h" // torrent_cols
 #include "Utils.h"
 
 namespace
@@ -30,7 +30,11 @@ auto const TORRENT_MODEL_KEY = Glib::Quark("tr-filter-torrent-model-key");
 class FilterBar::Impl
 {
 public:
-    Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
+    Impl(
+        FilterBar& widget,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        tr_session* session,
+        Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -38,8 +42,8 @@ public:
     Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
 
 private:
-    Gtk::ComboBox* activity_combo_box_new(Glib::RefPtr<Gtk::TreeModel> const& tmodel);
-    Gtk::ComboBox* tracker_combo_box_new(Glib::RefPtr<Gtk::TreeModel> const& tmodel);
+    void activity_combo_box_init(Gtk::ComboBox* combo, Glib::RefPtr<Gtk::TreeModel> const& tmodel);
+    void tracker_combo_box_init(Gtk::ComboBox* combo, Glib::RefPtr<Gtk::TreeModel> const& tmodel);
 
     void update_count_label_idle();
 
@@ -332,31 +336,32 @@ Gtk::CellRendererText* number_renderer_new()
 
 } // namespace
 
-Gtk::ComboBox* FilterBar::Impl::tracker_combo_box_new(Glib::RefPtr<Gtk::TreeModel> const& tmodel)
+void FilterBar::Impl::tracker_combo_box_init(Gtk::ComboBox* combo, Glib::RefPtr<Gtk::TreeModel> const& tmodel)
 {
     /* create the tracker combobox */
     auto const cat_model = tracker_filter_model_new(tmodel);
-    auto* c = Gtk::make_managed<Gtk::ComboBox>(static_cast<Glib::RefPtr<Gtk::TreeModel> const&>(cat_model));
-    c->set_row_separator_func(&is_it_a_separator);
-    c->set_active(0);
+
+    combo->set_model(cat_model);
+    combo->set_row_separator_func(&is_it_a_separator);
+    combo->set_active(0);
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererPixbuf>();
-        c->pack_start(*r, false);
-        c->set_cell_data_func(*r, [r](auto const& iter) { render_pixbuf_func(r, iter); });
-        c->add_attribute(r->property_pixbuf(), tracker_filter_cols.pixbuf);
+        combo->pack_start(*r, false);
+        combo->set_cell_data_func(*r, [r](auto const& iter) { render_pixbuf_func(r, iter); });
+        combo->add_attribute(r->property_pixbuf(), tracker_filter_cols.pixbuf);
     }
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-        c->pack_start(*r, false);
-        c->add_attribute(r->property_text(), tracker_filter_cols.displayname);
+        combo->pack_start(*r, false);
+        combo->add_attribute(r->property_text(), tracker_filter_cols.displayname);
     }
 
     {
         auto* r = number_renderer_new();
-        c->pack_end(*r, true);
-        c->set_cell_data_func(*r, [r](auto const& iter) { render_number_func(r, iter); });
+        combo->pack_end(*r, true);
+        combo->set_cell_data_func(*r, [r](auto const& iter) { render_number_func(r, iter); });
     }
 
     torrent_model_row_changed_tag_ = tmodel->signal_row_changed().connect(
@@ -365,8 +370,6 @@ Gtk::ComboBox* FilterBar::Impl::tracker_combo_box_new(Glib::RefPtr<Gtk::TreeMode
         [cat_model](auto const& /*path*/, auto const& /*iter*/) { tracker_model_update_idle(cat_model); });
     torrent_model_row_deleted_cb_tag_ = tmodel->signal_row_deleted().connect( //
         [cat_model](auto const& /*path*/) { tracker_model_update_idle(cat_model); });
-
-    return c;
 }
 
 namespace
@@ -557,30 +560,31 @@ void activity_model_update_idle(Glib::RefPtr<Gtk::ListStore> const& activity_mod
 
 } // namespace
 
-Gtk::ComboBox* FilterBar::Impl::activity_combo_box_new(Glib::RefPtr<Gtk::TreeModel> const& tmodel)
+void FilterBar::Impl::activity_combo_box_init(Gtk::ComboBox* combo, Glib::RefPtr<Gtk::TreeModel> const& tmodel)
 {
     auto const activity_model = activity_filter_model_new(tmodel);
-    auto* c = Gtk::make_managed<Gtk::ComboBox>(static_cast<Glib::RefPtr<Gtk::TreeModel> const&>(activity_model));
-    c->set_row_separator_func(&activity_is_it_a_separator);
-    c->set_active(0);
+
+    combo->set_model(activity_model);
+    combo->set_row_separator_func(&activity_is_it_a_separator);
+    combo->set_active(0);
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererPixbuf>();
-        c->pack_start(*r, false);
-        c->add_attribute(r->property_icon_name(), activity_filter_cols.icon_name);
-        c->set_cell_data_func(*r, [r](auto const& iter) { render_activity_pixbuf_func(r, iter); });
+        combo->pack_start(*r, false);
+        combo->add_attribute(r->property_icon_name(), activity_filter_cols.icon_name);
+        combo->set_cell_data_func(*r, [r](auto const& iter) { render_activity_pixbuf_func(r, iter); });
     }
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-        c->pack_start(*r, true);
-        c->add_attribute(r->property_text(), activity_filter_cols.name);
+        combo->pack_start(*r, true);
+        combo->add_attribute(r->property_text(), activity_filter_cols.name);
     }
 
     {
         auto* r = number_renderer_new();
-        c->pack_end(*r, true);
-        c->set_cell_data_func(*r, [r](auto const& iter) { render_number_func(r, iter); });
+        combo->pack_end(*r, true);
+        combo->set_cell_data_func(*r, [r](auto const& iter) { render_number_func(r, iter); });
     }
 
     activity_model_row_changed_tag_ = tmodel->signal_row_changed().connect(
@@ -589,8 +593,6 @@ Gtk::ComboBox* FilterBar::Impl::activity_combo_box_new(Glib::RefPtr<Gtk::TreeMod
         [activity_model](auto const& /*path*/, auto const& /*iter*/) { activity_model_update_idle(activity_model); });
     activity_model_row_deleted_cb_tag_ = tmodel->signal_row_deleted().connect( //
         [activity_model](auto const& /*path*/) { activity_model_update_idle(activity_model); });
-
-    return c;
 }
 
 /****
@@ -731,24 +733,45 @@ void FilterBar::Impl::update_count_label_idle()
 ****
 ***/
 
-FilterBar::FilterBar(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& tmodel)
-    : Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_SMALL)
-    , impl_(std::make_unique<Impl>(*this, session, tmodel))
+FilterBar::FilterBar(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    tr_session* session,
+    Glib::RefPtr<Gtk::TreeModel> const& tmodel)
+    : Gtk::Box(cast_item)
+    , impl_(std::make_unique<Impl>(*this, builder, session, tmodel))
 {
 }
 
-FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& tmodel)
-    : widget_(widget)
+FilterBar::~FilterBar() = default;
+
+std::unique_ptr<FilterBar> FilterBar::create(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model)
 {
-    show_lb_ = Gtk::make_managed<Gtk::Label>();
-    activity_ = activity_combo_box_new(tmodel);
-    tracker_ = tracker_combo_box_new(tmodel);
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("FilterBar.ui"));
+    auto result = std::unique_ptr<FilterBar>(gtr_get_widget_derived<FilterBar>(builder, "FilterBar", session, torrent_model));
+    result->reference(); // Not a top-level window, avoid destruction along with the builder
+    return result;
+}
+
+FilterBar::Impl::Impl(
+    FilterBar& widget,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    tr_session* session,
+    Glib::RefPtr<Gtk::TreeModel> const& tmodel)
+    : widget_(widget)
+    , activity_(gtr_get_widget<Gtk::ComboBox>(builder, "activity_combo"))
+    , tracker_(gtr_get_widget<Gtk::ComboBox>(builder, "tracker_combo"))
+    , entry_(gtr_get_widget<Gtk::Entry>(builder, "text_entry"))
+    , show_lb_(gtr_get_widget<Gtk::Label>(builder, "show_label"))
+{
+    activity_combo_box_init(activity_, tmodel);
+    tracker_combo_box_init(tracker_, tmodel);
+
     filter_model_ = Gtk::TreeModelFilter::create(tmodel);
     filter_model_->signal_row_deleted().connect([this](auto const& /*path*/) { update_count_label_idle(); });
     filter_model_->signal_row_inserted().connect([this](auto const& /*path*/, auto const& /*iter*/)
                                                  { update_count_label_idle(); });
 
-    tracker_->property_width_request() = 170;
     static_cast<Gtk::TreeStore*>(gtr_get_ptr(tracker_->get_model()))->set_data(SESSION_KEY, session);
 
     filter_model_->set_visible_func(sigc::mem_fun(*this, &Impl::is_row_visible));
@@ -756,29 +779,12 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     tracker_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
     activity_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
 
-    /* add the activity combobox */
-    show_lb_->set_mnemonic_widget(*activity_);
-    widget_.pack_start(*show_lb_, false, false, 0);
-    widget_.pack_start(*activity_, true, true, 0);
-    activity_->set_margin_end(GUI_PAD);
-
-    /* add the tracker combobox */
-    widget_.pack_start(*tracker_, true, true, 0);
-    tracker_->set_margin_end(GUI_PAD);
-
-    /* add the entry field */
-    entry_ = Gtk::make_managed<Gtk::Entry>();
-    entry_->set_icon_from_icon_name("edit-clear", Gtk::ENTRY_ICON_SECONDARY);
     entry_->signal_icon_release().connect([this](auto /*icon_position*/, auto const* /*event*/) { entry_->set_text({}); });
-    widget_.pack_start(*entry_, true, true, 0);
-
     entry_->signal_changed().connect(sigc::mem_fun(*this, &Impl::filter_entry_changed));
-    selection_changed_cb();
 
+    selection_changed_cb();
     update_count_label();
 }
-
-FilterBar::~FilterBar() = default;
 
 FilterBar::Impl::~Impl()
 {

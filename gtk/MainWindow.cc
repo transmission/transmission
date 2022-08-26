@@ -71,7 +71,7 @@ private:
     Gtk::ScrolledWindow* scroll_ = nullptr;
     Gtk::TreeView* view_ = nullptr;
     Gtk::Toolbar* toolbar_ = nullptr;
-    FilterBar* filter_ = nullptr;
+    std::unique_ptr<FilterBar> filter_;
     Gtk::Grid* status_ = nullptr;
     Gtk::Menu* status_menu_;
     Gtk::Label* ul_lb_ = nullptr;
@@ -444,8 +444,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     toolbar_->get_style_context()->add_class(GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
     /* filter */
-    filter_ = Gtk::make_managed<FilterBar>(core_->get_session(), core_->get_model());
-    filter_->set_border_width(GUI_PAD_SMALL);
+    filter_ = FilterBar::create(core_->get_session(), core_->get_model());
 
     /* status menu */
     status_menu_ = Gtk::make_managed<Gtk::Menu>();

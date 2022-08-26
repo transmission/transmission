@@ -16,12 +16,18 @@ typedef struct tr_session tr_session;
 class FilterBar : public Gtk::Box
 {
 public:
-    FilterBar(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
+    FilterBar(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        tr_session* session,
+        Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
     ~FilterBar() override;
 
     TR_DISABLE_COPY_MOVE(FilterBar)
 
     Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
+
+    static std::unique_ptr<FilterBar> create(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
 
 private:
     class Impl;
