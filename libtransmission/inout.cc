@@ -218,6 +218,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         {
             auto const path = tr_pathbuf{ tor->downloadDir(), '/', tor->fileSubpath(file_index) };
             tor->setLocalError(fmt::format(FMT_STRING("{:s} ({:s})"), tr_strerror(err), path));
+            tr_torrentStop(tor);
         }
 
         ++file_index;

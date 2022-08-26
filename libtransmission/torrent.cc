@@ -2132,12 +2132,13 @@ static void setLocationInEventThread(
         ok = tor->metainfo_.files().move(tor->currentDir(), path, setme_progress, tor->name(), &error);
         if (error != nullptr)
         {
-            tr_logAddError(fmt::format(
+            tor->setLocalError(fmt::format(
                 _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
                 fmt::arg("old_path", tor->currentDir()),
                 fmt::arg("path", path),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
+            tr_torrentStop(tor);
             tr_error_clear(&error);
         }
     }

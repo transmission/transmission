@@ -827,6 +827,7 @@ void tr_peerIoClear(tr_peerIo* io)
     tr_peerIoSetIOFuncs(io, nullptr, nullptr, nullptr, nullptr);
     tr_peerIoSetEnabled(io, TR_UP, false);
     tr_peerIoSetEnabled(io, TR_DOWN, false);
+    io_close_socket(io);
 }
 
 int tr_peerIoReconnect(tr_peerIo* io)
