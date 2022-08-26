@@ -362,11 +362,11 @@ tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_me
         /* if it's an error message, dump it to the terminal too */
         if (i->level == TR_LOG_ERROR)
         {
-            auto gstr = gtr_sprintf("%s:%d %s", i->file, i->line, i->message);
+            auto gstr = fmt::format("{}:{} {}", i->file, i->line, i->message);
 
             if (!std::empty(i->name))
             {
-                gstr += gtr_sprintf(" (%s)", i->name.c_str());
+                gstr += fmt::format(" ({})", i->name.c_str());
             }
 
             g_warning("%s", gstr.c_str());
