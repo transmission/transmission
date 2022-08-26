@@ -49,7 +49,7 @@ macOS Translators, current release:
 
 GTK+ Translators:
   Hundreds of people in an ever-changing list.
-  See the po files for a full list.
+  See the po files and the translation website (https://www.transifex.com/transmissionbt/teams/) for a full list.
 
 Third-Party Resources:
   Nick Mathewson and Niels Provos for libevent. <http://monkey.org/~provos/libevent/>
