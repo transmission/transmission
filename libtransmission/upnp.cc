@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cerrno>
 #include <future>
 #include <mutex>
@@ -41,7 +42,7 @@ enum class UpnpState
     WILL_UNMAP // next action is UPNP_DeletePortMapping()
 };
 
-tr_port_forwarding portFwdState(UpnpState upnp_state, bool is_mapped)
+constexpr tr_port_forwarding portFwdState(UpnpState upnp_state, bool is_mapped)
 {
     switch (upnp_state)
     {
@@ -87,7 +88,7 @@ struct tr_upnp
     UPNPUrls urls = {};
     IGDdatas data = {};
     tr_port port;
-    char lanaddr[16] = {};
+    std::string lanaddr;
     bool isMapped = false;
     UpnpState state = UpnpState::WILL_DISCOVER;
 
@@ -145,11 +146,8 @@ static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
 
 static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto)
 {
-    char intClient[16];
-    char intPort[16];
-
-    *intClient = '\0';
-    *intPort = '\0';
+    auto int_client = std::array<char, 16>{};
+    auto int_port = std::array<char, 16>{};
 
     auto const port_str = fmt::format(FMT_STRING("{:d}"), handle->port.host());
 
@@ -160,8 +158,8 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         port_str.c_str(),
         proto,
         nullptr /*remoteHost*/,
-        intClient,
-        intPort,
+        std::data(int_client),
+        std::data(int_port),
         nullptr /*desc*/,
         nullptr /*enabled*/,
         nullptr /*duration*/);
@@ -171,8 +169,8 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         handle->data.first.servicetype,
         port_str.c_str(),
         proto,
-        intClient,
-        intPort,
+        std::data(int_client),
+        std::data(int_port),
         nullptr /*desc*/,
         nullptr /*enabled*/,
         nullptr /*duration*/);
@@ -182,8 +180,8 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         handle->data.first.servicetype,
         port_str.c_str(),
         proto,
-        intClient,
-        intPort);
+        std::data(int_client),
+        std::data(int_port));
 #endif
 
     return err;
@@ -202,7 +200,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
         handle->data.first.servicetype,
         port_str.c_str(),
         port_str.c_str(),
-        handle->lanaddr,
+        handle->lanaddr.c_str(),
         desc,
         proto,
         nullptr,
@@ -213,7 +211,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
         handle->data.first.servicetype,
         port_str.c_str(),
         port_str.c_str(),
-        handle->lanaddr,
+        handle->lanaddr.c_str(),
         desc,
         proto,
         nullptr);
@@ -278,13 +276,15 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         handle->discover_future.reset();
 
         FreeUPNPUrls(&handle->urls);
-        if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==
+        auto lanaddr = std::array<char, TR_ADDRSTRLEN>{};
+        if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr)) ==
             UPNP_IGD_VALID_CONNECTED)
         {
             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
-            tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", handle->lanaddr)));
+            tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", std::data(handle->lanaddr))));
             handle->state = UpnpState::IDLE;
             handle->hasDiscovered = true;
+            handle->lanaddr = std::data(lanaddr);
         }
         else
         {
