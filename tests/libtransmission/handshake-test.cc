@@ -78,6 +78,11 @@ public:
         return false;
     }
 
+    [[nodiscard]] bool allowsTCP() const override
+    {
+        return true;
+    }
+
     [[nodiscard]] bool isPeerKnownSeed(tr_torrent_id_t /*tor_id*/, tr_address /*addr*/) const override
     {
         return false;

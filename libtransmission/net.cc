@@ -284,6 +284,11 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
+    if (!session->allowsTCP())
+    {
+        return {};
+    }
+
     if (!tr_address_is_valid_for_peers(addr, port))
     {
         return {};

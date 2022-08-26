@@ -113,6 +113,11 @@ public:
         return tr_dhtEnabled(&session_);
     }
 
+    [[nodiscard]] bool allowsTCP() const override
+    {
+        return session_.allowsTCP();
+    }
+
     void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address addr) override
     {
         if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
@@ -2822,6 +2827,11 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
            originally came from PEX and doesn't have the uTP flag, skip the
            uTP connection attempt.  Are we being optimistic here? */
         utp = utp && (atom.flags & ADDED_F_UTP_FLAGS) != 0;
+    }
+
+    if (!utp && !mgr->session->allowsTCP())
+    {
+        return;
     }
 
     tr_logAddTraceSwarm(s, fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", atom.readable()));

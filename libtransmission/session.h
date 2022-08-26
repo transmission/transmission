@@ -603,6 +603,11 @@ public:
         return is_pex_enabled_;
     }
 
+    [[nodiscard]] auto constexpr allowsTCP() const noexcept
+    {
+        return is_tcp_enabled_;
+    }
+
     [[nodiscard]] bool allowsUTP() const noexcept;
 
     [[nodiscard]] auto constexpr allowsPrefetch() const noexcept
@@ -805,6 +810,7 @@ private:
     bool is_pex_enabled_ = false;
     bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;
+    bool is_tcp_enabled_ = true;
 
     bool is_idle_limited_ = false;
     bool is_prefetch_enabled_ = false;

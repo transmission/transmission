@@ -303,6 +303,8 @@ static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsess
 
 void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
 {
+    TR_ASSERT(session->allowsTCP());
+
     socket_ = tr_netBindTCP(&addr_, session->private_peer_port, false);
 
     if (socket_ != TR_BAD_SOCKET)
@@ -323,6 +325,8 @@ static void close_incoming_peer_port(tr_session* session)
 
 static void open_incoming_peer_port(tr_session* session)
 {
+    TR_ASSERT(session->allowsTCP());
+
     session->bind_ipv4.bindAndListenForIncomingPeers(session);
 
     if (tr_net_hasIPv6(session->private_peer_port))
@@ -453,6 +457,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->allowsDHT());
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
+    tr_variantDictAddBool(d, TR_KEY_tcp_enabled, s->allowsTCP());
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, s->queueSize(TR_DOWN));
@@ -823,6 +828,11 @@ void tr_session::setImpl(init_data& data)
     if (tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &boolVal))
     {
         tr_sessionSetDHTEnabled(this, boolVal);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_tcp_enabled, &boolVal))
+    {
+        is_tcp_enabled_ = boolVal;
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_utp_enabled, &boolVal))
@@ -1252,7 +1262,12 @@ static void peerPortChanged(tr_session* const session)
     TR_ASSERT(session != nullptr);
 
     close_incoming_peer_port(session);
-    open_incoming_peer_port(session);
+
+    if (session->allowsTCP())
+    {
+        open_incoming_peer_port(session);
+    }
+
     tr_sharedPortChanged(*session);
 
     for (auto* const tor : session->torrents())

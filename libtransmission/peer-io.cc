@@ -511,6 +511,7 @@ tr_peerIo* tr_peerIoNew(
 #else
     TR_ASSERT(socket.type == TR_PEER_SOCKET_TYPE_TCP);
 #endif
+    TR_ASSERT(session->allowsTCP() || socket.type != TR_PEER_SOCKET_TYPE_TCP);
 
     if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
@@ -588,6 +589,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
+    TR_ASSERT(utp || session->allowsTCP());
 
     auto socket = tr_peer_socket{};
 
@@ -831,6 +833,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(!io->isIncoming());
+    TR_ASSERT(io->session->allowsTCP());
 
     tr_session* session = tr_peerIoGetSession(io);
 
