@@ -117,6 +117,12 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
         return {};
     }
 
+    auto const n_pieces = std::max(1, static_cast<int>(tor->infoDictSize() / METADATA_PIECE_SIZE));
+    if (piece < 0 || piece >= n_pieces)
+    {
+        return {};
+    }
+
     auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
     if (fd == TR_BAD_SYS_FILE)
     {
