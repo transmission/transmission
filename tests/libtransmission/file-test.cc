@@ -1295,43 +1295,6 @@ TEST_F(FileTest, filePreallocate)
     tr_sys_path_remove(path1);
 }
 
-TEST_F(FileTest, map)
-{
-    auto const test_dir = createTestDir(currentTestName());
-
-    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
-    auto const contents = std::string{ "test" };
-    createFileWithContents(path1, contents.data());
-
-    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600);
-
-    tr_error* err = nullptr;
-    auto map_len = contents.size();
-    auto* view = static_cast<char*>(tr_sys_file_map_for_reading(fd, 0, map_len, &err));
-    EXPECT_NE(nullptr, view);
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(contents, std::string(view, map_len));
-
-#ifdef HAVE_UNIFIED_BUFFER_CACHE
-
-    auto const contents_2 = std::string{ "more" };
-    auto n_written = uint64_t{};
-    tr_sys_file_write_at(fd, contents_2.data(), contents_2.size(), 0, &n_written, &err);
-    EXPECT_EQ(map_len, contents_2.size());
-    EXPECT_EQ(map_len, n_written);
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(contents_2, std::string(view, map_len));
-
-#endif
-
-    EXPECT_TRUE(tr_sys_file_unmap(view, map_len, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-
-    tr_sys_file_close(fd);
-
-    tr_sys_path_remove(path1);
-}
-
 TEST_F(FileTest, dirCreate)
 {
     auto const test_dir = createTestDir(currentTestName());

@@ -31,8 +31,8 @@ public:
     BlocklistFile& operator=(BlocklistFile&&) = delete;
 
     BlocklistFile(char const* filename, bool isEnabled)
-        : is_enabled_(isEnabled)
-        , filename_(filename)
+        : filename_(filename)
+        , is_enabled_(isEnabled)
     {
     }
 
@@ -41,22 +41,21 @@ public:
         close();
     }
 
+    [[nodiscard]] constexpr auto& filename() const
+    {
+        return filename_;
+    }
+
     [[nodiscard]] bool exists() const
     {
-        return tr_sys_path_exists(getFilename(), nullptr);
+        return tr_sys_path_exists(filename_.c_str(), nullptr);
     }
 
-    [[nodiscard]] char const* getFilename() const
-    {
-        return filename_.c_str();
-    }
-
-    // TODO: This function should be const, but cannot be const due to it calling ensureLoaded()
-    size_t getRuleCount()
+    [[nodiscard]] size_t getRuleCount() const
     {
         ensureLoaded();
 
-        return rule_count_;
+        return std::size(rules_);
     }
 
     [[nodiscard]] constexpr bool isEnabled() const
@@ -100,7 +99,7 @@ private:
         }
     };
 
-    void ensureLoaded();
+    void ensureLoaded() const;
     void load();
     void close();
 
@@ -116,12 +115,8 @@ private:
     static void assertValidRules(std::vector<IPv4Range> const& ranges);
 #endif
 
-    bool is_enabled_;
-    tr_sys_file_t fd_{ TR_BAD_SYS_FILE };
-    size_t rule_count_ = 0;
-    uint64_t byte_count_ = 0;
     std::string const filename_;
 
-    /// @brief Not a container, memory mapped file
-    IPv4Range* rules_ = nullptr;
+    bool is_enabled_ = false;
+    mutable std::vector<IPv4Range> rules_;
 };

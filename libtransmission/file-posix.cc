@@ -21,7 +21,6 @@
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
 #include <sys/file.h> /* flock() */
-#include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
@@ -1068,37 +1067,6 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
     set_system_error(error, errno);
     return false;
-}
-
-void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(size > 0);
-
-    void* ret = mmap(nullptr, size, PROT_READ, MAP_SHARED, handle, offset);
-
-    if (ret == MAP_FAILED) // NOLINT(performance-no-int-to-ptr)
-    {
-        set_system_error(error, errno);
-        ret = nullptr;
-    }
-
-    return ret;
-}
-
-bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
-{
-    TR_ASSERT(address != nullptr);
-    TR_ASSERT(size > 0);
-
-    bool const ret = munmap(const_cast<void*>(address), size) != -1;
-
-    if (!ret)
-    {
-        set_system_error(error, errno);
-    }
-
-    return ret;
 }
 
 bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] int operation, tr_error** error)
