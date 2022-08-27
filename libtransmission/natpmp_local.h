@@ -22,7 +22,7 @@ class tr_natpmp
 public:
     tr_natpmp()
     {
-        natpmp_.s = TR_BAD_SOCKET; /* socket */
+        natpmp_.s = static_cast<decltype(natpmp_.s)>(TR_BAD_SOCKET);
     }
 
     ~tr_natpmp()
