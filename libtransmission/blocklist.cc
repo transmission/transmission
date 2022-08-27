@@ -38,23 +38,22 @@ void BlocklistFile::ensureLoaded() const
         return;
     }
 
-    tr_error* error = nullptr;
-    auto contents = std::vector<char>{};
-    tr_loadFile(filename_, contents, &error);
-    if (error != nullptr)
+    auto in = std::ifstream{ filename_, std::ios_base::in | std::ios_base::binary };
+    if (!in)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename_),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
+            fmt::arg("error", tr_strerror(errno)),
+            fmt::arg("error_code", errno)));
         return;
     }
 
-    auto const n_rules = std::size(contents) / sizeof(IPv4Range);
-    auto const* const first_rule = reinterpret_cast<IPv4Range const*>(std::data(contents));
-    rules_.assign(first_rule, first_rule + n_rules);
+    auto range = IPv4Range{};
+    while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
+    {
+        rules_.emplace_back(range);
+    }
 
     tr_logAddInfo(fmt::format(
         ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", std::size(rules_)),
@@ -247,7 +246,7 @@ size_t BlocklistFile::setContent(char const* filename)
     {
         ++line_number;
         auto range = IPv4Range{};
-        if (!parseLine(std::data(line), &range))
+        if (!parseLine(line.c_str(), &range))
         {
             /* don't try to display the actual lines - it causes issues */
             tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line_number)));
@@ -263,22 +262,20 @@ size_t BlocklistFile::setContent(char const* filename)
         return {};
     }
 
-    close();
-
     size_t keep = 0; // index in ranges
 
     std::sort(std::begin(ranges), std::end(ranges), BlocklistFile::compareAddressRangesByFirstAddress);
 
     // merge
-    for (auto const& r : ranges)
+    for (auto const& range : ranges)
     {
-        if (ranges[keep].end_ < r.begin_)
+        if (ranges[keep].end_ < range.begin_)
         {
-            ranges[++keep] = r;
+            ranges[++keep] = range;
         }
-        else if (ranges[keep].end_ < r.end_)
+        else if (ranges[keep].end_ < range.end_)
         {
-            ranges[keep].end_ = r.end_;
+            ranges[keep].end_ = range.end_;
         }
     }
 
@@ -289,7 +286,7 @@ size_t BlocklistFile::setContent(char const* filename)
     assertValidRules(ranges);
 #endif
 
-    auto out = std::ofstream{ filename_, std::ios_base::out | std::ios_base::trunc };
+    auto out = std::ofstream{ filename_, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary };
     if (!out.is_open())
     {
         tr_logAddWarn(fmt::format(
