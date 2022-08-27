@@ -7,6 +7,7 @@
 #include <climits> /* INT_MAX */
 #include <ctime>
 #include <deque>
+#include <fstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -17,7 +18,6 @@
 
 #include "crypto-utils.h" /* tr_sha1() */
 #include "error.h"
-#include "file.h"
 #include "log.h"
 #include "magnet-metainfo.h"
 #include "resume.h"
@@ -123,35 +123,31 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
         return {};
     }
 
-    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
-    if (fd == TR_BAD_SYS_FILE)
+    auto in = std::ifstream{ tor->torrentFile(), std::ios_base::in };
+    if (!in.is_open())
     {
         return {};
     }
 
     auto const info_dict_size = tor->infoDictSize();
     TR_ASSERT(info_dict_size > 0);
-
-    if (size_t const o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr))
+    auto const offset_in_info_dict = static_cast<uint64_t>(piece) * METADATA_PIECE_SIZE;
+    auto const offset_in_file = tor->infoDictOffset() + offset_in_info_dict;
+    if (!in.seekg(offset_in_file))
     {
-        size_t const piece_len = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
-
-        if (piece_len <= METADATA_PIECE_SIZE)
-        {
-            auto buf = std::vector<std::byte>{};
-            buf.resize(piece_len);
-
-            if (auto n_read = uint64_t{};
-                tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_read) && n_read == std::size(buf))
-            {
-                tr_sys_file_close(fd);
-                return buf;
-            }
-        }
+        return {};
     }
 
-    tr_sys_file_close(fd);
-    return {};
+    auto buf = std::vector<std::byte>{};
+    auto const piece_len = offset_in_info_dict + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE :
+                                                                                         info_dict_size - offset_in_info_dict;
+    buf.resize(piece_len);
+    if (!in.read(reinterpret_cast<char*>(std::data(buf)), std::size(buf)))
+    {
+        return {};
+    }
+
+    return buf;
 }
 
 static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)

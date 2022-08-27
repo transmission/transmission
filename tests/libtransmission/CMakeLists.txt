@@ -36,6 +36,7 @@ add_executable(libtransmission-test
     subprocess-test.cc
     test-fixtures.h
     torrent-files-test.cc
+    torrent-magnet-test.cc
     torrent-metainfo-test.cc
     torrents-test.cc
     utils-test.cc
