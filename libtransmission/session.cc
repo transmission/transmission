@@ -2396,7 +2396,7 @@ size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
     auto const it = std::find_if(
         std::begin(src),
         std::end(src),
-        [&name](auto const& blocklist) { return tr_strvEndsWith(blocklist->getFilename(), name); });
+        [&name](auto const& blocklist) { return tr_strvEndsWith(blocklist->filename(), name); });
 
     BlocklistFile* b = nullptr;
     if (it == std::end(src))

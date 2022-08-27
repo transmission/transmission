@@ -1198,54 +1198,6 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
     return tr_sys_file_truncate(handle, size, error);
 }
 
-void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(size > 0);
-
-    if (size > MAXSIZE_T)
-    {
-        set_system_error(error, ERROR_INVALID_PARAMETER);
-        return nullptr;
-    }
-
-    void* ret = nullptr;
-    HANDLE mappingHandle = CreateFileMappingW(handle, nullptr, PAGE_READONLY, 0, 0, nullptr);
-
-    if (mappingHandle != nullptr)
-    {
-        ULARGE_INTEGER native_offset;
-
-        native_offset.QuadPart = offset;
-
-        ret = MapViewOfFile(mappingHandle, FILE_MAP_READ, native_offset.u.HighPart, native_offset.u.LowPart, (SIZE_T)size);
-    }
-
-    if (ret == nullptr)
-    {
-        set_system_error(error, GetLastError());
-    }
-
-    CloseHandle(mappingHandle);
-
-    return ret;
-}
-
-bool tr_sys_file_unmap(void const* address, [[maybe_unused]] uint64_t size, tr_error** error)
-{
-    TR_ASSERT(address != nullptr);
-    TR_ASSERT(size > 0);
-
-    bool ret = UnmapViewOfFile(address);
-
-    if (!ret)
-    {
-        set_system_error(error, GetLastError());
-    }
-
-    return ret;
-}
-
 bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
