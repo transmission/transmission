@@ -24,11 +24,7 @@
 class MainWindow::Impl
 {
 public:
-    Impl(
-        MainWindow& window,
-        Glib::RefPtr<Gio::ActionGroup> const& actions_window,
-        Glib::RefPtr<Gio::ActionGroup> const& actions_torrent,
-        Glib::RefPtr<Session> const& core);
+    Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -40,7 +36,7 @@ public:
     void prefsChanged(tr_quark key);
 
 private:
-    Gtk::TreeView* makeview(Glib::RefPtr<Gtk::TreeModel> const& model, Glib::RefPtr<Gio::ActionGroup> const& actions_torrent);
+    Gtk::TreeView* makeview(Glib::RefPtr<Gtk::TreeModel> const& model);
 
     Gtk::Menu* createOptionsMenu();
     Gtk::Menu* createSpeedMenu(tr_direction dir);
@@ -122,9 +118,7 @@ bool tree_view_search_equal_func(
 
 } // namespace
 
-Gtk::TreeView* MainWindow::Impl::makeview(
-    Glib::RefPtr<Gtk::TreeModel> const& model,
-    Glib::RefPtr<Gio::ActionGroup> const& actions_torrent)
+Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& model)
 {
     auto* view = Gtk::make_managed<Gtk::TreeView>();
     view->set_search_column(torrent_cols.name_collated);
@@ -160,16 +154,6 @@ Gtk::TreeView* MainWindow::Impl::makeview(
                                                 { return on_tree_view_button_released(view, event); });
     view->signal_row_activated().connect([](auto const& /*path*/, auto* /*column*/)
                                          { gtr_action_activate("show-torrent-properties"); });
-    view->signal_state_flags_changed().connect(
-        [this, view, actions_torrent](Gtk::StateFlags previous)
-        {
-            Gtk::StateFlags changed = previous ^ view->get_state_flags();
-            if (changed & Gtk::StateFlags::STATE_FLAG_FOCUSED)
-            {
-                view->has_focus() ? window_.insert_action_group("torrent", actions_torrent) :
-                                    window_.remove_action_group("torrent");
-            }
-        });
 
     view->set_model(model);
 
@@ -408,31 +392,22 @@ void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 
 std::unique_ptr<MainWindow> MainWindow::create(
     Gtk::Application& app,
-    Glib::RefPtr<Gio::ActionGroup> const& actions_window,
-    Glib::RefPtr<Gio::ActionGroup> const& actions_torrent,
+    Glib::RefPtr<Gio::ActionGroup> const& actions,
     Glib::RefPtr<Session> const& core)
 {
-    return std::unique_ptr<MainWindow>(new MainWindow(app, actions_window, actions_torrent, core));
+    return std::unique_ptr<MainWindow>(new MainWindow(app, actions, core));
 }
 
-MainWindow::MainWindow(
-    Gtk::Application& app,
-    Glib::RefPtr<Gio::ActionGroup> const& actions_window,
-    Glib::RefPtr<Gio::ActionGroup> const& actions_torrent,
-    Glib::RefPtr<Session> const& core)
+MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core)
     : Gtk::ApplicationWindow()
-    , impl_(std::make_unique<Impl>(*this, actions_window, actions_torrent, core))
+    , impl_(std::make_unique<Impl>(*this, actions, core))
 {
     app.add_window(*this);
 }
 
 MainWindow::~MainWindow() = default;
 
-MainWindow::Impl::Impl(
-    MainWindow& window,
-    Glib::RefPtr<Gio::ActionGroup> const& actions_window,
-    Glib::RefPtr<Gio::ActionGroup> const& actions_torrent,
-    Glib::RefPtr<Session> const& core)
+MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core)
     : window_(window)
     , core_(core)
 {
@@ -458,8 +433,7 @@ MainWindow::Impl::Impl(
         window.maximize();
     }
 
-    window.insert_action_group("win", actions_window);
-    window.insert_action_group("torrent", actions_torrent);
+    window.insert_action_group("win", actions);
     /* Add style provider to the window. */
     /* Please move it to separate .css file if you’re adding more styles here. */
     auto const* style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
@@ -555,7 +529,7 @@ MainWindow::Impl::Impl(
     *** Workarea
     **/
 
-    view_ = makeview(filter_->get_filter_model(), actions_torrent);
+    view_ = makeview(filter_->get_filter_model());
     scroll_ = Gtk::make_managed<Gtk::ScrolledWindow>();
     scroll_->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
     scroll_->set_shadow_type(Gtk::SHADOW_OUT);
