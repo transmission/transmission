@@ -14,6 +14,7 @@
 #include "test-fixtures.h"
 
 #include <array>
+#include <fstream>
 #include <map>
 #include <string>
 #include <string_view>
@@ -122,38 +123,26 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open());
 
-    auto buffer = std::array<char, 1024>{};
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_arg1, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-    EXPECT_EQ(test_arg1, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_arg2, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-    EXPECT_EQ(test_arg2, buffer.data());
-
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-    EXPECT_EQ(test_arg3, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_arg3, line);
 
     if (allow_batch_metachars)
     {
-        buffer[0] = '\0';
-        EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-        buffer.back() = '\0';
-        EXPECT_EQ(test_arg4, buffer.data());
+        EXPECT_TRUE(std::getline(in, line));
+        EXPECT_EQ(test_arg4, line);
     }
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-
-    tr_sys_file_close(fd);
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncEnv)
@@ -203,38 +192,29 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open());
 
-    auto buffer = std::array<char, 1024>{};
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value1, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value1, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value2, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value2, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value3, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value3, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value4, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value4, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value5, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value5, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ("<null>"sv, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_STREQ("<null>", buffer.data());
-
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-
-    tr_sys_file_close(fd);
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
@@ -251,20 +231,18 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open());
 
-    auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
     auto expected = std::string{ test_dir };
     tr_sys_path_native_separators(std::data(expected));
-    auto actual = std::string{ std::data(buffer) };
+    auto actual = line;
     tr_sys_path_native_separators(std::data(actual));
     EXPECT_EQ(expected, actual);
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-
-    tr_sys_file_close(fd);
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
@@ -280,15 +258,17 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     EXPECT_EQ(nullptr, error) << *error;
 
     waitForFileToExist(result_path);
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
-    auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(&buffer.front()));
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open());
 
-    tr_sys_file_close(fd);
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
+    auto actual = line;
+    tr_sys_path_native_separators(std::data(actual));
+    EXPECT_EQ(expected_cwd, actual);
+
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdMissing)

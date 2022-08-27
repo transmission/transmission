@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdio>
 #include <cstdlib> // bsearch()
+#include <fstream>
 #include <string_view>
 #include <vector>
 
@@ -267,99 +268,89 @@ bool BlocklistFile::compareAddressRangesByFirstAddress(IPv4Range const& a, IPv4R
 
 size_t BlocklistFile::setContent(char const* filename)
 {
-    int inCount = 0;
-    auto line = std::array<char, 2048>{};
-    tr_error* error = nullptr;
-
     if (filename == nullptr)
     {
-        return 0;
+        return {};
     }
 
-    auto const in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
-    if (in == TR_BAD_SYS_FILE)
+    auto in = std::ifstream{ filename };
+    if (!in.is_open())
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
-        return 0;
+            fmt::arg("error", tr_strerror(errno)),
+            fmt::arg("error_code", errno)));
+        return {};
     }
 
-    close();
-
-    auto const out = tr_sys_file_open(
-        getFilename(),
-        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-        0666,
-        &error);
-    if (out == TR_BAD_SYS_FILE)
+    auto line = std::string{};
+    auto line_number = size_t{ 0U };
+    auto ranges = std::vector<IPv4Range>{};
+    while (std::getline(in, line))
     {
-        tr_logAddWarn(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", getFilename()),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
-        tr_sys_file_close(in);
-        return 0;
-    }
-
-    /* load the rules into memory */
-    std::vector<IPv4Range> ranges;
-    while (tr_sys_file_read_line(in, std::data(line), std::size(line)))
-    {
-        IPv4Range range = {};
-
-        ++inCount;
-
+        ++line_number;
+        auto range = IPv4Range{};
         if (!parseLine(std::data(line), &range))
         {
             /* don't try to display the actual lines - it causes issues */
-            tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", inCount)));
+            tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line_number)));
             continue;
         }
 
         ranges.push_back(range);
     }
+    in.close();
 
-    if (!std::empty(ranges)) // sort and merge
+    if (std::empty(ranges))
     {
-        size_t keep = 0; // index in ranges
-
-        std::sort(std::begin(ranges), std::end(ranges), BlocklistFile::compareAddressRangesByFirstAddress);
-
-        // merge
-        for (auto const& r : ranges)
-        {
-            if (ranges[keep].end_ < r.begin_)
-            {
-                ranges[++keep] = r;
-            }
-            else if (ranges[keep].end_ < r.end_)
-            {
-                ranges[keep].end_ = r.end_;
-            }
-        }
-
-        TR_ASSERT_MSG(keep + 1 <= std::size(ranges), "Can shrink `ranges` or leave intact, but not grow");
-        ranges.resize(keep + 1);
-
-#ifdef TR_ENABLE_ASSERTS
-        assertValidRules(ranges);
-#endif
+        return {};
     }
 
-    if (!tr_sys_file_write(out, ranges.data(), sizeof(IPv4Range) * std::size(ranges), nullptr, &error))
+    close();
+
+    size_t keep = 0; // index in ranges
+
+    std::sort(std::begin(ranges), std::end(ranges), BlocklistFile::compareAddressRangesByFirstAddress);
+
+    // merge
+    for (auto const& r : ranges)
+    {
+        if (ranges[keep].end_ < r.begin_)
+        {
+            ranges[++keep] = r;
+        }
+        else if (ranges[keep].end_ < r.end_)
+        {
+            ranges[keep].end_ = r.end_;
+        }
+    }
+
+    TR_ASSERT_MSG(keep + 1 <= std::size(ranges), "Can shrink `ranges` or leave intact, but not grow");
+    ranges.resize(keep + 1);
+
+#ifdef TR_ENABLE_ASSERTS
+    assertValidRules(ranges);
+#endif
+
+    auto out = std::ofstream{ getFilename(), std::ios_base::out | std::ios_base::trunc };
+    if (!out.is_open())
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", getFilename()),
+            fmt::arg("error", tr_strerror(errno)),
+            fmt::arg("error_code", errno)));
+        return {};
+    }
+
+    if (!out.write(reinterpret_cast<char const*>(ranges.data()), std::size(ranges) * sizeof(IPv4Range)))
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", getFilename()),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
+            fmt::arg("error", tr_strerror(errno)),
+            fmt::arg("error_code", errno)));
     }
     else
     {
@@ -369,8 +360,7 @@ size_t BlocklistFile::setContent(char const* filename)
             fmt::arg("count", rule_count_)));
     }
 
-    tr_sys_file_close(out);
-    tr_sys_file_close(in);
+    out.close();
 
     load();
 

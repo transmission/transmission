@@ -585,29 +585,6 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, struct tr_error** err
 /* File-related wrappers (utility) */
 
 /**
- * @brief Portability wrapper for `fgets()`, removing EOL internally.
- *
- * Special care should be taken when reading from one of standard input streams
- * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
- *
- * Reading from other streams (files, pipes) also leaves data untouched, so it
- * should already be in UTF-8 encoding, or whichever else you expect.
- *
- * @param[in]  handle      Valid file descriptor.
- * @param[out] buffer      Buffer to store read zero-terminated string to.
- * @param[in]  buffer_size Buffer size in bytes, taking '\0' character into
- *                         account.
- * @param[out] error       Pointer to error object. Optional, pass `nullptr` if
- *                         you are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- *         Note that `false` will also be returned in case of end of file; if
- *         you need to distinguish the two, check if `error` is `nullptr`
- *         afterwards.
- */
-bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, struct tr_error** error = nullptr);
-
-/**
  * @brief Portability wrapper for `fputs()`, appending EOL internally.
  *
  * Special care should be taken when writing to one of standard output streams
