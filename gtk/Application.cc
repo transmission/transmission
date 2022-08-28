@@ -1168,7 +1168,9 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         {
             bool const b = gtr_pref_flag_get(key);
             tr_sessionUseAltSpeed(tr, b);
-            gtr_action_set_toggled(tr_quark_get_string(key), b);
+            auto const key_sv = tr_quark_get_string_view(key);
+            auto const key_ustr = Glib::ustring{ std::data(key_sv), std::size(key_sv) };
+            gtr_action_set_toggled(key_ustr, b);
             break;
         }
 

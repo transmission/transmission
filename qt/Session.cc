@@ -603,9 +603,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         auto const append = [&names](tr_quark key)
         {
-            size_t len = {};
-            char const* str = tr_quark_get_string(key, &len);
-            names.emplace_back(str, len);
+            names.emplace_back(tr_quark_get_string_view(key));
         };
 
         switch (props)

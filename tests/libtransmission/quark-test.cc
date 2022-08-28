@@ -18,10 +18,7 @@ protected:
     template<typename T>
     std::string quarkGetString(T i)
     {
-        size_t len;
-        char const* const str = tr_quark_get_string(tr_quark(i), &len);
-        EXPECT_EQ(strlen(str), len);
-        return std::string(str, len);
+        return std::string{ tr_quark_get_string_view(tr_quark(i)) };
     }
 };
 
@@ -40,7 +37,5 @@ TEST_F(QuarkTest, newQuarkByStringView)
 {
     auto constexpr UniqueString = std::string_view{ "this string is not a predefined quark" };
     auto const q = tr_quark_new(UniqueString);
-    auto len = size_t{};
-    EXPECT_EQ(UniqueString, tr_quark_get_string(q, &len));
-    EXPECT_EQ(std::size(UniqueString), len);
+    EXPECT_EQ(UniqueString, tr_quark_get_string_view(q));
 }

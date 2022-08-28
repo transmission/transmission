@@ -618,7 +618,7 @@ static bool bindUnixSocket(
 #ifdef _WIN32
     tr_logAddError(fmt::format(
         _("Unix sockets are unsupported on Windows. Please change '{key}' in your settings."),
-        fmt::arg("key", tr_quark_get_string(TR_KEY_rpc_bind_address))));
+        fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address))));
     return false;
 #else
     struct sockaddr_un addr;
@@ -883,7 +883,7 @@ void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
 
 static void missing_settings_key(tr_quark const q)
 {
-    tr_logAddDebug(fmt::format("Couldn't find settings key '{}'", tr_quark_get_string(q)));
+    tr_logAddDebug(fmt::format("Couldn't find settings key '{}'", tr_quark_get_string_view(q)));
 }
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
@@ -1066,7 +1066,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     {
         tr_logAddWarn(fmt::format(
             _("The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
-            fmt::format("key", tr_quark_get_string(key)),
+            fmt::format("key", tr_quark_get_string_view(key)),
             fmt::format("value", sv)));
         bindAddress->set_inaddr_any();
     }
