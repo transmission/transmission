@@ -481,15 +481,3 @@ std::string_view tr_quark_get_string_view(tr_quark q)
 {
     return q < TR_N_KEYS ? my_static[q] : my_runtime[q - TR_N_KEYS];
 }
-
-char const* tr_quark_get_string(tr_quark q, size_t* len)
-{
-    auto const tmp = tr_quark_get_string_view(q);
-
-    if (len != nullptr)
-    {
-        *len = std::size(tmp);
-    }
-
-    return std::data(tmp);
-}

@@ -2348,8 +2348,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
                 continue;
             }
 
-            auto const field_id = tr_quark_lookup(field_name);
-            if (field_id)
+            if (auto const field_id = tr_quark_lookup(field_name); field_id)
             {
                 addSessionField(s, args_out, *field_id);
             }
