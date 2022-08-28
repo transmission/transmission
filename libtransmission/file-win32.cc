@@ -947,38 +947,6 @@ std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_er
     return {};
 }
 
-bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
-{
-    static_assert(TR_SEEK_SET == FILE_BEGIN, "values should match");
-    static_assert(TR_SEEK_CUR == FILE_CURRENT, "values should match");
-    static_assert(TR_SEEK_END == FILE_END, "values should match");
-
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
-
-    bool ret = false;
-    LARGE_INTEGER native_offset;
-    LARGE_INTEGER new_native_pointer;
-
-    native_offset.QuadPart = offset;
-
-    if (SetFilePointerEx(handle, native_offset, &new_native_pointer, origin))
-    {
-        if (new_offset != nullptr)
-        {
-            *new_offset = new_native_pointer.QuadPart;
-        }
-
-        ret = true;
-    }
-    else
-    {
-        set_system_error(error, GetLastError());
-    }
-
-    return ret;
-}
-
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
