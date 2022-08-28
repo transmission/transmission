@@ -64,17 +64,9 @@ enum tr_sys_file_open_flags_t
     TR_SYS_FILE_READ = (1 << 0),
     TR_SYS_FILE_WRITE = (1 << 1),
     TR_SYS_FILE_CREATE = (1 << 2),
-    TR_SYS_FILE_CREATE_NEW = (1 << 3),
-    TR_SYS_FILE_APPEND = (1 << 4),
-    TR_SYS_FILE_TRUNCATE = (1 << 5),
-    TR_SYS_FILE_SEQUENTIAL = (1 << 6)
-};
-
-enum tr_seek_origin_t
-{
-    TR_SEEK_SET,
-    TR_SEEK_CUR,
-    TR_SEEK_END
+    TR_SYS_FILE_APPEND = (1 << 3),
+    TR_SYS_FILE_TRUNCATE = (1 << 4),
+    TR_SYS_FILE_SEQUENTIAL = (1 << 5)
 };
 
 enum tr_sys_file_lock_flags_t
@@ -380,26 +372,6 @@ bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error = nullptr);
  * @return info on success, or nullopt with `error` set accordingly.
  */
 [[nodiscard]] std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, struct tr_error** error = nullptr);
-
-/**
- * @brief Portability wrapper for `lseek()`.
- *
- * @param[in]  handle     Valid file descriptor.
- * @param[in]  offset     Relative file offset in bytes to seek to.
- * @param[in]  origin     Offset origin.
- * @param[out] new_offset New offset in bytes from beginning of file. Optional,
- *                        pass `nullptr` if you are not interested.
- * @param[out] error      Pointer to error object. Optional, pass `nullptr` if
- *                        you are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_seek(
-    tr_sys_file_t handle,
-    int64_t offset,
-    tr_seek_origin_t origin,
-    uint64_t* new_offset,
-    struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `read()`.

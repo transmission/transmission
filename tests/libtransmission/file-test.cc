@@ -1072,26 +1072,14 @@ TEST_F(FileTest, fileOpen)
     tr_sys_path_remove(path1);
     createFileWithContents(path1, "test");
 
-    /* Can't create new file if it already exists */
-    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE_NEW, 0640, &err);
-    EXPECT_EQ(TR_BAD_SYS_FILE, fd);
-    EXPECT_NE(nullptr, err);
-    tr_error_clear(&err);
-    auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info);
-    EXPECT_EQ(4U, info->size);
-
     /* Pointer is at the end of file */
-    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
+    auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info);
     EXPECT_EQ(4U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
     tr_sys_file_write(fd, "s", 1, nullptr); /* On *NIX, pointer is positioned on each write but not initially */
-    auto n = uint64_t{};
-    tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n);
-    EXPECT_EQ(5, n);
     tr_sys_file_close(fd);
 
     /* File gets truncated */
@@ -1110,89 +1098,6 @@ TEST_F(FileTest, fileOpen)
     EXPECT_EQ(0U, info->size);
 
     /* TODO: symlink and hardlink tests */
-
-    tr_sys_path_remove(path1);
-}
-
-TEST_F(FileTest, fileReadWriteSeek)
-{
-    auto const test_dir = createTestDir(currentTestName());
-
-    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
-    auto const fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
-
-    uint64_t n;
-    tr_error* err = nullptr;
-    EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(0, n);
-
-    EXPECT_TRUE(tr_sys_file_write(fd, "test", 4, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(4, n);
-
-    EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(4, n);
-
-    EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(0, n);
-
-    auto buf = std::array<char, 100>{};
-    EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(4, n);
-
-    EXPECT_EQ(0, memcmp("test", buf.data(), 4));
-
-    EXPECT_TRUE(tr_sys_file_seek(fd, -3, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(1, n);
-
-    EXPECT_TRUE(tr_sys_file_write(fd, "E", 1, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(1, n);
-
-    EXPECT_TRUE(tr_sys_file_seek(fd, -2, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(0, n);
-
-    EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(4, n);
-
-    EXPECT_EQ(0, memcmp("tEst", buf.data(), 4));
-
-    EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_END, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(4, n);
-
-    EXPECT_TRUE(tr_sys_file_write(fd, " ok", 3, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(3, n);
-
-    EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(0, n);
-
-    EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(7, n);
-
-    EXPECT_EQ(0, memcmp("tEst ok", buf.data(), 7));
-
-    EXPECT_TRUE(tr_sys_file_write_at(fd, "-", 1, 4, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(1, n);
-
-    EXPECT_TRUE(tr_sys_file_read_at(fd, buf.data(), 5, 2, &n, &err));
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(5, n);
-
-    EXPECT_EQ(0, memcmp("st-ok", buf.data(), 5));
-
-    tr_sys_file_close(fd);
 
     tr_sys_path_remove(path1);
 }
