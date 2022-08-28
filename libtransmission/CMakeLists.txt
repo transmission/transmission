@@ -330,6 +330,39 @@ if(APPLE)
     target_link_libraries(${TR_NAME} "-framework Foundation")
 endif()
 
+IF (BUILD_FUZZER)
+    IF (NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        MESSAGE(FATAL ERROR "The fuzzer needs clang as a compiler")
+    ENDIF()
+
+    ADD_EXECUTABLE(fuzzer-variant ../fuzzers/fuzzer-variant.cpp)
+    ADD_EXECUTABLE(fuzzer-parseBenc ../fuzzers/fuzzer-parseBenc.cpp)
+    ADD_EXECUTABLE(fuzzer-parseMagnet ../fuzzers/fuzzer-parseMagnet.cpp)
+
+    IF (OSS_FUZZ)
+        # Use https://github.com/google/oss-fuzz compatible options
+        SET(LIB_FUZZER FuzzingEngine)
+        SET_TARGET_PROPERTIES(fuzzer-variant
+            fuzzer-parseBenc
+            fuzzer-parseMagnet
+            PROPERTIES
+            LINKER_LANGUAGE CXX)
+    ELSE()
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=fuzzer-no-link")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=fuzzer-no-link")
+        SET_TARGET_PROPERTIES(fuzzer-variant
+            fuzzer-parseBenc
+            fuzzer-parseMagnet
+            PROPERTIES
+            COMPILE_FLAGS "-fsanitize=fuzzer"
+            LINK_FLAGS "-fsanitize=fuzzer")
+    ENDIF (OSS_FUZZ)
+
+    TARGET_LINK_LIBRARIES(fuzzer-variant ${TR_NAME} ${LIB_FUZZER})
+    TARGET_LINK_LIBRARIES(fuzzer-parseBenc ${TR_NAME} ${LIB_FUZZER})
+    TARGET_LINK_LIBRARIES(fuzzer-parseMagnet ${TR_NAME} ${LIB_FUZZER})
+ENDIF()
+
 if(INSTALL_LIB)
     install(TARGETS ${TR_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(FILES ${${PROJECT_NAME}_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TR_NAME})
