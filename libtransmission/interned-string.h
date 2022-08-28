@@ -50,13 +50,13 @@ public:
     {
         return quark_;
     }
-    [[nodiscard]] char const* c_str() const
-    {
-        return tr_quark_get_string(quark_);
-    }
     [[nodiscard]] std::string_view sv() const
     {
         return tr_quark_get_string_view(quark_);
+    }
+    [[nodiscard]] char const* c_str() const
+    {
+        return std::data(sv()); // tr_quark strs are always zero-terminated
     }
 
     [[nodiscard]] auto data() const
