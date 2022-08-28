@@ -858,11 +858,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/,
         native_access |= GENERIC_WRITE;
     }
 
-    if ((flags & TR_SYS_FILE_CREATE_NEW) != 0)
-    {
-        native_disposition = CREATE_NEW;
-    }
-    else if ((flags & TR_SYS_FILE_CREATE) != 0)
+    if ((flags & TR_SYS_FILE_CREATE) != 0)
     {
         native_disposition = (flags & TR_SYS_FILE_TRUNCATE) != 0 ? CREATE_ALWAYS : OPEN_ALWAYS;
     }

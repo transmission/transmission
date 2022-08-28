@@ -1072,17 +1072,8 @@ TEST_F(FileTest, fileOpen)
     tr_sys_path_remove(path1);
     createFileWithContents(path1, "test");
 
-    /* Can't create new file if it already exists */
-    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE_NEW, 0640, &err);
-    EXPECT_EQ(TR_BAD_SYS_FILE, fd);
-    EXPECT_NE(nullptr, err);
-    tr_error_clear(&err);
-    auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info);
-    EXPECT_EQ(4U, info->size);
-
     /* Pointer is at the end of file */
-    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
+    auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info);
     EXPECT_EQ(4U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
