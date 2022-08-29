@@ -1001,12 +1001,10 @@ void tr_peerIo::readUint16(uint16_t* setme)
     *setme = ntohs(tmp);
 }
 
-void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme)
+void tr_peerIo::readUint32(uint32_t* setme)
 {
-    TR_ASSERT(inbuf == io->readBuffer());
-
     auto tmp = uint32_t{};
-    io->readBytes(&tmp, sizeof(tmp));
+    readBytes(&tmp, sizeof(tmp));
     *setme = ntohl(tmp);
 }
 

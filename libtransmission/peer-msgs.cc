@@ -1500,7 +1500,7 @@ static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, siz
         return READ_LATER;
     }
 
-    tr_peerIoReadUint32(msgs->io, inbuf, &len);
+    msgs->io->readUint32(&len);
     if (len == 0) /* peer sent us a keepalive message */
     {
         logtrace(msgs, "got KeepAlive");
@@ -1674,8 +1674,8 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
         }
 
         auto req = peer_request{};
-        tr_peerIoReadUint32(msgs->io, inbuf, &req.index);
-        tr_peerIoReadUint32(msgs->io, inbuf, &req.offset);
+        msgs->io->readUint32(&req.index);
+        msgs->io->readUint32(&req.offset);
         req.length = msgs->incoming.length - 9;
         logtrace(msgs, fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
         msgs->incoming.block_req = req;
@@ -1811,7 +1811,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         break;
 
     case BtPeerMsgs::Have:
-        tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
+        msgs->io->readUint32(&ui32);
         logtrace(msgs, fmt::format(FMT_STRING("got Have: {:d}"), ui32));
 
         if (msgs->torrent->hasMetainfo() && ui32 >= msgs->torrent->pieceCount())
@@ -1845,9 +1845,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
     case BtPeerMsgs::Request:
         {
             struct peer_request r;
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
+            msgs->io->readUint32(&r.index);
+            msgs->io->readUint32(&r.offset);
+            msgs->io->readUint32(&r.length);
             logtrace(msgs, fmt::format(FMT_STRING("got Request: {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
             peerMadeRequest(msgs, &r);
             break;
@@ -1856,9 +1856,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
     case BtPeerMsgs::Cancel:
         {
             struct peer_request r;
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
+            msgs->io->readUint32(&r.index);
+            msgs->io->readUint32(&r.offset);
+            msgs->io->readUint32(&r.length);
             msgs->cancels_sent_to_client.add(tr_time(), 1);
             logtrace(msgs, fmt::format(FMT_STRING("got a Cancel {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
 
@@ -1904,7 +1904,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     case BtPeerMsgs::FextSuggest:
         logtrace(msgs, "Got a BtPeerMsgs::FextSuggest");
-        tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
+        msgs->io->readUint32(&ui32);
 
         if (fext)
         {
@@ -1920,7 +1920,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     case BtPeerMsgs::FextAllowedFast:
         logtrace(msgs, "Got a BtPeerMsgs::FextAllowedFast");
-        tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
+        msgs->io->readUint32(&ui32);
 
         if (fext)
         {
@@ -1972,9 +1972,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         {
             struct peer_request r;
             logtrace(msgs, "Got a BtPeerMsgs::FextReject");
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
-            tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
+            msgs->io->readUint32(&r.index);
+            msgs->io->readUint32(&r.offset);
+            msgs->io->readUint32(&r.length);
 
             if (fext)
             {
@@ -2070,7 +2070,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-    evbuffer* const in = io->getReadBuffer();
+    auto* const in = io->readBuffer();
     size_t const inlen = evbuffer_get_length(in);
 
     logtrace(

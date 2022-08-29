@@ -103,6 +103,7 @@ public:
     }
 
     void readUint16(uint16_t* setme);
+    void readUint32(uint32_t* setme);
 
     [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
@@ -400,8 +401,6 @@ constexpr void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
 {
     evbuffer_add_uint64(buf, val);
 }
-
-void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme);
 
 void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count);
 

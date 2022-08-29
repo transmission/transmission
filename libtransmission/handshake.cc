@@ -513,7 +513,7 @@ static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbu
     }
 
     uint32_t crypto_select = 0;
-    tr_peerIoReadUint32(handshake->io, inbuf, &crypto_select);
+    handshake->io->readUint32(&crypto_select);
     handshake->crypto_select = crypto_select;
     tr_logAddTraceHand(handshake, fmt::format("crypto select is {}", crypto_select));
 
@@ -804,7 +804,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     auto vc_in = vc_t{};
     handshake->io->readBytes(std::data(vc_in), std::size(vc_in));
 
-    tr_peerIoReadUint32(handshake->io, inbuf, &crypto_provide);
+    handshake->io->readUint32(&crypto_provide);
     handshake->crypto_provide = crypto_provide;
     tr_logAddTraceHand(handshake, fmt::format("crypto_provide is {}", crypto_provide));
 
