@@ -248,12 +248,17 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 class tr_peerMsgsImpl final : public tr_peerMsgs
 {
 public:
-    tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
+    tr_peerMsgsImpl(
+        tr_torrent* torrent_in,
+        peer_atom* atom_in,
+        std::shared_ptr<tr_peerIo> io_in,
+        tr_peer_callback callback,
+        void* callbackData)
         : tr_peerMsgs{ torrent_in, atom_in }
         , outMessagesBatchPeriod{ LowPriorityIntervalSecs }
         , torrent{ torrent_in }
         , outMessages{ evbuffer_new() }
-        , io{ io_in }
+        , io{ std::move(io_in) }
         , have_{ torrent_in->pieceCount() }
         , callback_{ callback }
         , callbackData_{ callbackData }
@@ -300,10 +305,9 @@ public:
         set_active(TR_UP, false);
         set_active(TR_DOWN, false);
 
-        if (this->io != nullptr)
+        if (this->io)
         {
             this->io->clear();
-            tr_peerIoUnref(this->io); /* balanced by the ref in handshakeDoneCB() */
         }
 
         evbuffer_free(this->outMessages);
@@ -816,7 +820,7 @@ public:
 
     evbuffer* const outMessages; /* all the non-piece messages */
 
-    tr_peerIo* const io;
+    std::shared_ptr<tr_peerIo> const io;
 
     struct QueuedPeerRequest : public peer_request
     {
@@ -864,9 +868,14 @@ private:
     static auto constexpr SendPexInterval = 90s;
 };
 
-tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data)
+tr_peerMsgs* tr_peerMsgsNew(
+    tr_torrent* torrent,
+    peer_atom* atom,
+    std::shared_ptr<tr_peerIo> io,
+    tr_peer_callback callback,
+    void* callback_data)
 {
-    return new tr_peerMsgsImpl(torrent, atom, io, callback, callback_data);
+    return new tr_peerMsgsImpl(torrent, atom, std::move(io), callback, callback_data);
 }
 
 /**
@@ -2377,7 +2386,7 @@ static void peerPulse(void* vmsgs)
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
     time_t const now = tr_time();
 
-    if (tr_isPeerIo(msgs->io))
+    if (msgs->io)
     {
         updateDesiredRequestCount(msgs);
         updateBlockRequests(msgs);

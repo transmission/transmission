@@ -12,6 +12,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
+#include <memory>
 #include <vector>
 
 #include "transmission.h"
@@ -98,12 +99,10 @@ public:
     tr_bandwidth(tr_bandwidth&&) = delete;
     tr_bandwidth(tr_bandwidth&) = delete;
 
-    /**
-     * @brief Sets new peer, nullptr is allowed.
-     */
-    constexpr void setPeer(tr_peerIo* peer) noexcept
+    // @brief Sets the peer. nullptr is allowed.
+    void setPeer(std::weak_ptr<tr_peerIo> peer) noexcept
     {
-        this->peer_ = peer;
+        this->peer_ = std::move(peer);
     }
 
     /**
@@ -258,12 +257,12 @@ private:
         tr_priority_t parent_priority,
         tr_direction dir,
         unsigned int period_msec,
-        std::vector<tr_peerIo*>& peer_pool);
+        std::vector<std::shared_ptr<tr_peerIo>>& peer_pool);
 
     mutable std::array<Band, 2> band_ = {};
     std::vector<tr_bandwidth*> children_;
     tr_bandwidth* parent_ = nullptr;
-    tr_peerIo* peer_ = nullptr;
+    std::weak_ptr<tr_peerIo> peer_;
     tr_priority_t priority_ = 0;
 };
 

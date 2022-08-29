@@ -31,7 +31,7 @@ struct tr_handshake;
 struct tr_handshake_result
 {
     struct tr_handshake* handshake;
-    tr_peerIo* io;
+    std::shared_ptr<tr_peerIo> io;
     bool readAnythingFromPeer;
     bool isConnected;
     void* userData;
@@ -77,13 +77,11 @@ using tr_handshake_done_func = bool (*)(tr_handshake_result const& result);
 /** @brief create a new handshake */
 tr_handshake* tr_handshakeNew(
     std::shared_ptr<tr_handshake_mediator> mediator,
-    tr_peerIo* io,
+    std::shared_ptr<tr_peerIo> io,
     tr_encryption_mode encryption_mode,
     tr_handshake_done_func done_func,
     void* done_func_user_data);
 
 void tr_handshakeAbort(tr_handshake* handshake);
-
-tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake);
 
 /** @} */

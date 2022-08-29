@@ -139,7 +139,7 @@ void tr_bandwidth::allocateBandwidth(
     tr_priority_t parent_priority,
     tr_direction dir,
     unsigned int period_msec,
-    std::vector<tr_peerIo*>& peer_pool)
+    std::vector<std::shared_ptr<tr_peerIo>>& peer_pool)
 {
     tr_priority_t const priority = std::max(parent_priority, this->priority_);
 
@@ -151,10 +151,10 @@ void tr_bandwidth::allocateBandwidth(
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */
-    if (this->peer_ != nullptr)
+    if (auto shared = this->peer_.lock(); shared)
     {
-        this->peer_->priority = priority;
-        peer_pool.push_back(this->peer_);
+        shared->priority = priority;
+        peer_pool.push_back(std::move(shared));
     }
 
     // traverse & repeat for the subtree
@@ -199,33 +199,34 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
     TR_ASSERT(tr_isDirection(dir));
 
+    // keep these peers alive for the scope of this function
+    auto refs = std::vector<std::shared_ptr<tr_peerIo>>{};
+
     auto high = std::vector<tr_peerIo*>{};
     auto low = std::vector<tr_peerIo*>{};
     auto normal = std::vector<tr_peerIo*>{};
-    auto tmp = std::vector<tr_peerIo*>{};
 
     /* allocateBandwidth () is a helper function with two purposes:
      * 1. allocate bandwidth to b and its subtree
      * 2. accumulate an array of all the peerIos from b and its subtree. */
-    this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, tmp);
+    this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, refs);
 
-    for (auto* io : tmp)
+    for (auto& io : refs)
     {
-        tr_peerIoRef(io);
         io->flushOutgoingProtocolMsgs();
 
         switch (io->priority)
         {
         case TR_PRI_HIGH:
-            high.push_back(io);
+            high.push_back(io.get());
             [[fallthrough]];
 
         case TR_PRI_NORMAL:
-            normal.push_back(io);
+            normal.push_back(io.get());
             [[fallthrough]];
 
         default:
-            low.push_back(io);
+            low.push_back(io.get());
         }
     }
 
@@ -241,14 +242,9 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
-    for (auto* io : tmp)
+    for (auto& io : refs)
     {
         io->setEnabled(dir, io->hasBandwidthLeft(dir));
-    }
-
-    for (auto* io : tmp)
-    {
-        tr_peerIoUnref(io);
     }
 }
 

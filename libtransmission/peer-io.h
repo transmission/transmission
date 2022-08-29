@@ -66,14 +66,16 @@ struct evbuffer_deleter
 
 using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
 
-class tr_peerIo
+class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {
     using DH = tr_message_stream_encryption::DH;
     using Filter = tr_message_stream_encryption::Filter;
 
 public:
+    ~tr_peerIo();
+
     // TODO: 8 constructor args is too many; maybe a builder object?
-    static tr_peerIo* newOutgoing(
+    static std::shared_ptr<tr_peerIo> newOutgoing(
         tr_session* session,
         tr_bandwidth* parent,
         struct tr_address const* addr,
@@ -83,7 +85,7 @@ public:
         bool is_seed,
         bool utp);
 
-    static tr_peerIo* newIncoming(
+    static std::shared_ptr<tr_peerIo> newIncoming(
         tr_session* session,
         tr_bandwidth* parent,
         struct tr_address const* addr,
@@ -93,7 +95,7 @@ public:
 
     // this is only public for testing purposes.
     // production code should use newOutgoing() or newIncoming()
-    static tr_peerIo* create(
+    static std::shared_ptr<tr_peerIo> create(
         tr_session* session,
         tr_bandwidth* parent,
         tr_address const* addr,
@@ -103,6 +105,29 @@ public:
         bool is_incoming,
         bool is_seed,
         struct tr_peer_socket const socket);
+
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        tr_address const& addr,
+        tr_port port,
+        bool is_seed,
+        time_t current_time,
+        tr_bandwidth* parent_bandwidth)
+        : session{ session_in }
+        , time_created{ current_time }
+        , bandwidth_{ parent_bandwidth }
+        , addr_{ addr }
+        , port_{ port }
+        , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
+    {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
+    }
 
     void clear();
 
@@ -235,12 +260,6 @@ public:
 
     void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
-    // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
-    // like this one isn't being used just for assertions, but also in
-    // didWriteWrapper() to see if the tr_peerIo got freed during the
-    // notify-consumed events. Fix this before removing this field.
-    int magic_number = PEER_IO_MAGIC_NUMBER;
-
     struct tr_peer_socket socket = {};
 
     tr_session* const session;
@@ -259,9 +278,6 @@ public:
 
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
-
-    // TODO: use std::shared_ptr instead of manual refcounting?
-    int refCount = 1;
 
     short int pendingEvents = 0;
 
@@ -297,29 +313,6 @@ public:
     static void utpInit(struct_utp_context* ctx);
 
 private:
-    tr_peerIo(
-        tr_session* session_in,
-        tr_sha1_digest_t const* torrent_hash,
-        bool is_incoming,
-        tr_address const& addr,
-        tr_port port,
-        bool is_seed,
-        time_t current_time,
-        tr_bandwidth* parent_bandwidth)
-        : session{ session_in }
-        , time_created{ current_time }
-        , bandwidth_{ parent_bandwidth }
-        , addr_{ addr }
-        , port_{ port }
-        , is_seed_{ is_seed }
-        , is_incoming_{ is_incoming }
-    {
-        if (torrent_hash != nullptr)
-        {
-            torrent_hash_ = *torrent_hash;
-        }
-    }
-
     Filter& filter()
     {
         if (!filter_)
@@ -347,18 +340,9 @@ private:
     bool fast_extension_supported_ = false;
 };
 
-void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
-
-#define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io))
-
-void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
-
-#define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io))
-
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 &&
-        tr_address_is_valid(&io->address());
+    return io != nullptr && tr_address_is_valid(&io->address());
 }
 
 void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme);
