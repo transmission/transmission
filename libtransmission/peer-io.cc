@@ -1164,21 +1164,21 @@ int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t limit)
     return bytes_used;
 }
 
-int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)
+int tr_peerIo::flushOutgoingProtocolMsgs()
 {
-    size_t byteCount = 0;
+    size_t byte_count = 0;
 
     /* count up how many bytes are used by non-piece-data messages
        at the front of our outbound queue */
-    for (auto const& [n_bytes, is_piece_data] : io->outbuf_info)
+    for (auto const& [n_bytes, is_piece_data] : outbuf_info)
     {
         if (is_piece_data)
         {
             break;
         }
 
-        byteCount += n_bytes;
+        byte_count += n_bytes;
     }
 
-    return tr_peerIoFlush(io, TR_UP, byteCount);
+    return tr_peerIoFlush(this, TR_UP, byte_count);
 }

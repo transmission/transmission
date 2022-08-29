@@ -212,7 +212,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
     for (auto* io : tmp)
     {
         tr_peerIoRef(io);
-        tr_peerIoFlushOutgoingProtocolMsgs(io);
+        io->flushOutgoingProtocolMsgs();
 
         switch (io->priority)
         {

@@ -137,6 +137,8 @@ public:
 
     void readBufferAdd(void const* data, size_t n_bytes);
 
+    int flushOutgoingProtocolMsgs();
+
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
         return bandwidth_.clamp(dir, 1024) > 0;
@@ -392,7 +394,5 @@ void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCo
 **/
 
 int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t byteLimit);
-
-int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io);
 
 /* @} */
