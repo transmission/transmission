@@ -2836,7 +2836,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 
     tr_logAddTraceSwarm(s, fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", atom.readable()));
 
-    tr_peerIo* const io = tr_peerIoNewOutgoing(
+    tr_peerIo* const io = tr_peerIo::newOutgoing(
         mgr->session,
         &mgr->session->top_bandwidth_,
         &atom.addr,
@@ -2859,7 +2859,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 
         TR_ASSERT(io->torrentHash());
 
-        tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIoNewOutgoing() */
+        tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIo::newOutgoing() */
 
         s->outgoing_handshakes.add(atom.addr, handshake);
     }

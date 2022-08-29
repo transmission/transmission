@@ -72,8 +72,19 @@ class tr_peerIo
     using Filter = tr_message_stream_encryption::Filter;
 
 public:
+    // TODO: 8 constructor args is too many; maybe a builder object?
+    tr_peerIo* newOutgoing(
+        tr_session* session,
+        tr_bandwidth* parent,
+        struct tr_address const* addr,
+        tr_port port,
+        time_t current_time,
+        tr_sha1_digest_t const& torrent_hash,
+        bool is_seed,
+        bool utp);
+
     // this is only public for testing purposes.
-    // production code should use tr_peerIoNewOutgoing() or tr_peerIoNewIncoming()
+    // production code should use tr_peerIo::newOutgoing() or tr_peerIoNewIncoming()
     static tr_peerIo* create(
         tr_session* session,
         tr_bandwidth* parent,
@@ -327,17 +338,6 @@ private:
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;
 };
-
-// TODO: 8 constructor args is too many; maybe a builder object?
-tr_peerIo* tr_peerIoNewOutgoing(
-    tr_session* session,
-    tr_bandwidth* parent,
-    struct tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    tr_sha1_digest_t const& torrent_hash,
-    bool is_seed,
-    bool utp);
 
 tr_peerIo* tr_peerIoNewIncoming(
     tr_session* session,

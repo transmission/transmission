@@ -577,7 +577,7 @@ tr_peerIo* tr_peerIoNewIncoming(
     return tr_peerIo::create(session, parent, addr, port, current_time, nullptr, true, false, socket);
 }
 
-tr_peerIo* tr_peerIoNewOutgoing(
+tr_peerIo* tr_peerIo::newOutgoing(
     tr_session* session,
     tr_bandwidth* parent,
     tr_address const* addr,
@@ -611,7 +611,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
         return nullptr;
     }
 
-    return tr_peerIo::create(session, parent, addr, port, current_time, &torrent_hash, false, is_seed, socket);
+    return create(session, parent, addr, port, current_time, &torrent_hash, false, is_seed, socket);
 }
 
 /***
