@@ -1459,7 +1459,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
     TR_ASSERT(msglen > 0);
 
     auto ltep_msgid = uint8_t{};
-    tr_peerIoReadUint8(msgs->io, inbuf, &ltep_msgid);
+    msgs->io->readUint8(&ltep_msgid);
     msglen--;
 
     if (ltep_msgid == LtepMessages::Handshake)
@@ -1524,7 +1524,7 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
     }
 
     auto id = uint8_t{};
-    tr_peerIoReadUint8(msgs->io, inbuf, &id);
+    msgs->io->readUint8(&id);
     msgs->incoming.id = id;
     logtrace(
         msgs,
