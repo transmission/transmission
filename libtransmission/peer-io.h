@@ -140,6 +140,8 @@ public:
     int flushOutgoingProtocolMsgs();
     int flush(tr_direction dir, size_t byte_limit);
 
+    void writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data);
+
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
         return bandwidth_.clamp(dir, 1024) > 0;
@@ -364,8 +366,6 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
 /**
 ***
 **/
-
-void tr_peerIoWriteBytes(tr_peerIo* io, void const* writeme, size_t writeme_len, bool is_piece_data);
 
 void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 

@@ -310,7 +310,7 @@ static void sendPublicKeyAndPad(tr_handshake* handshake)
     auto walk = data;
     walk = std::copy(std::begin(public_key), std::end(public_key), walk);
     walk += handshake->mediator->pad(walk, PadMax);
-    tr_peerIoWriteBytes(handshake->io, data, walk - data, false);
+    handshake->io->writeBytes(data, walk - data, false);
 }
 
 // 1 A->B: our public key (Ya) and some padding (PadA)
@@ -664,7 +664,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return tr_handshakeDone(handshake, false);
         }
 
-        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+        handshake->io->writeBytes(std::data(msg), std::size(msg), false);
         handshake->haveSentBitTorrentHandshake = true;
     }
 
@@ -1100,7 +1100,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
             buildHandshakeMessage(handshake, std::data(msg));
             handshake->haveSentBitTorrentHandshake = true;
             setReadState(handshake, AWAITING_HANDSHAKE);
-            tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+            handshake->io->writeBytes(std::data(msg), std::size(msg), false);
         }
     }
 
@@ -1116,7 +1116,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
         buildHandshakeMessage(handshake, std::data(msg));
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+        handshake->io->writeBytes(std::data(msg), std::size(msg), false);
     }
     else
     {
@@ -1164,7 +1164,7 @@ tr_handshake* tr_handshakeNew(
 
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+        handshake->io->writeBytes(std::data(msg), std::size(msg), false);
     }
 
     return handshake;

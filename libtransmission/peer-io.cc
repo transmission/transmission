@@ -929,23 +929,22 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
     io->outbuf_info.emplace_back(byteCount, isPieceData);
 }
 
-void tr_peerIoWriteBytes(tr_peerIo* io, void const* writeme, size_t writeme_len, bool is_piece_data)
+void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)
 {
     struct evbuffer_iovec iovec;
-    evbuffer_reserve_space(io->outbuf.get(), writeme_len, &iovec, 1);
 
+    evbuffer_reserve_space(outbuf.get(), writeme_len, &iovec, 1);
     iovec.iov_len = writeme_len;
-
     memcpy(iovec.iov_base, writeme, iovec.iov_len);
 
-    if (io->isEncrypted())
+    if (isEncrypted())
     {
-        io->encrypt(iovec.iov_len, iovec.iov_base);
+        encrypt(iovec.iov_len, iovec.iov_base);
     }
 
-    evbuffer_commit_space(io->outbuf.get(), &iovec, 1);
+    evbuffer_commit_space(outbuf.get(), &iovec, 1);
 
-    io->outbuf_info.emplace_back(writeme_len, is_piece_data);
+    outbuf_info.emplace_back(writeme_len, is_piece_data);
 }
 
 /***
