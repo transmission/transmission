@@ -916,17 +916,17 @@ static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset,
     TR_ASSERT(size == 0);
 }
 
-void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData)
+void tr_peerIo::writeBuf(struct evbuffer* buf, bool isPieceData)
 {
     size_t const byteCount = evbuffer_get_length(buf);
 
-    if (io->isEncrypted())
+    if (isEncrypted())
     {
-        processBuffer(*io, buf, 0, byteCount);
+        processBuffer(*this, buf, 0, byteCount);
     }
 
-    evbuffer_add_buffer(io->outbuf.get(), buf);
-    io->outbuf_info.emplace_back(byteCount, isPieceData);
+    evbuffer_add_buffer(outbuf.get(), buf);
+    outbuf_info.emplace_back(byteCount, isPieceData);
 }
 
 void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)

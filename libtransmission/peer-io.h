@@ -141,6 +141,7 @@ public:
     int flush(tr_direction dir, size_t byte_limit);
 
     void writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data);
+    void writeBuf(struct evbuffer* buf, bool isPieceData);
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
@@ -366,8 +367,6 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
 /**
 ***
 **/
-
-void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 
 /**
 ***

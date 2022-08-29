@@ -439,7 +439,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
-    tr_peerIoWriteBuf(handshake->io, outbuf, false);
+    handshake->io->writeBuf(outbuf, false);
     handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
     evbuffer_add(outbuf, std::data(VC), std::size(VC));
     evbuffer_add_uint32(outbuf, getCryptoProvide(handshake));
@@ -460,7 +460,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     /* send it */
     handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
     setReadState(handshake, AWAITING_VC);
-    tr_peerIoWriteBuf(handshake->io, outbuf, false);
+    handshake->io->writeBuf(outbuf, false);
 
     /* cleanup */
     evbuffer_free(outbuf);
@@ -891,7 +891,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     /* maybe de-encrypt our connection */
     if (crypto_select == CRYPTO_PROVIDE_PLAINTEXT)
     {
-        tr_peerIoWriteBuf(handshake->io, outbuf, false);
+        handshake->io->writeBuf(outbuf, false);
     }
 
     tr_logAddTraceHand(handshake, "sending handshake");
@@ -908,7 +908,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     }
 
     /* send it out */
-    tr_peerIoWriteBuf(handshake->io, outbuf, false);
+    handshake->io->writeBuf(outbuf, false);
     evbuffer_free(outbuf);
 
     /* now await the handshake */
