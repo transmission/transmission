@@ -203,36 +203,6 @@ TEST_F(UtilsTest, trStrlower)
     EXPECT_EQ("hello"sv, tr_strlower("hello"sv));
 }
 
-TEST_F(UtilsTest, array)
-{
-    auto array = std::array<size_t, 10>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    auto n = array.size();
-
-    tr_removeElementFromArray(array.data(), 5U, sizeof(size_t), n);
-    --n;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        EXPECT_EQ(array[i], i < 5 ? i : i + 1);
-    }
-
-    tr_removeElementFromArray(array.data(), 0U, sizeof(size_t), n);
-    --n;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        EXPECT_EQ(array[i], i < 4 ? i + 1 : i + 2);
-    }
-
-    tr_removeElementFromArray(array.data(), n - 1, sizeof(size_t), n);
-    --n;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        EXPECT_EQ(array[i], i < 4 ? i + 1 : i + 2);
-    }
-}
-
 TEST_F(UtilsTest, truncd)
 {
     EXPECT_EQ("100.00%"sv, fmt::format("{:.2f}%", 99.999));

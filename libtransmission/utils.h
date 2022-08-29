@@ -261,9 +261,6 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
  */
 bool tr_moveFile(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
 
-/** @brief convenience function to remove an item from an array */
-void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb);
-
 /***
 ****
 ***/

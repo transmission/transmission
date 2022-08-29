@@ -306,20 +306,6 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 ****
 ***/
 
-void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb)
-{
-    auto* a = static_cast<char*>(array);
-
-    memmove(
-        a + sizeof_element * index_to_remove,
-        a + sizeof_element * (index_to_remove + 1),
-        sizeof_element * (--nmemb - index_to_remove));
-}
-
-/***
-****
-***/
-
 namespace
 {
 namespace tr_strvUtf8Clean_impl
