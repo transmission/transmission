@@ -347,41 +347,6 @@ private:
     bool fast_extension_supported_ = false;
 };
 
-<<<<<<< HEAD
-=======
-// TODO: 8 constructor args is too many; maybe a builder object?
-tr_peerIo* tr_peerIoNewOutgoing(
-    tr_session* session,
-    tr_bandwidth* parent,
-    struct tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    tr_sha1_digest_t const& torrent_hash,
-    bool is_seed,
-    bool utp);
-
-tr_peerIo* tr_peerIoNewIncoming(
-    tr_session* session,
-    tr_bandwidth* parent,
-    struct tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    struct tr_peer_socket const socket);
-
-// this is only public for testing purposes.
-// production code should use tr_peerIoNewOutgoing() or tr_peerIoNewIncoming()
-tr_peerIo* tr_peerIoNew(
-    tr_session* session,
-    tr_bandwidth* parent,
-    tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    tr_sha1_digest_t const* torrent_hash,
-    bool is_incoming,
-    bool is_seed,
-    struct tr_peer_socket const socket);
-
->>>>>>> 4f971ba08 (refactor: make tr_peerIoUtpInit() a member method)
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
 #define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io))
