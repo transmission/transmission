@@ -95,6 +95,8 @@ public:
         }
     }
 
+    void clear();
+
     void readBytes(void* bytes, size_t n_bytes);
 
     void readUint8(uint8_t* setme)
@@ -351,12 +353,6 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
     return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 &&
         tr_address_is_valid(&io->address());
 }
-
-/**
-***
-**/
-
-void tr_peerIoClear(tr_peerIo* io);
 
 /**
 ***

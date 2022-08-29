@@ -822,12 +822,12 @@ void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_
     this->userData = user_data;
 }
 
-void tr_peerIoClear(tr_peerIo* io)
+void tr_peerIo::clear()
 {
-    io->setCallbacks(nullptr, nullptr, nullptr, nullptr);
-    tr_peerIoSetEnabled(io, TR_UP, false);
-    tr_peerIoSetEnabled(io, TR_DOWN, false);
-    io_close_socket(io);
+    setCallbacks(nullptr, nullptr, nullptr, nullptr);
+    tr_peerIoSetEnabled(this, TR_UP, false);
+    tr_peerIoSetEnabled(this, TR_DOWN, false);
+    io_close_socket(this);
 }
 
 int tr_peerIo::reconnect()
