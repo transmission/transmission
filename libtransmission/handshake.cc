@@ -310,7 +310,7 @@ static void sendPublicKeyAndPad(tr_handshake* handshake)
     auto walk = data;
     walk = std::copy(std::begin(public_key), std::end(public_key), walk);
     walk += handshake->mediator->pad(walk, PadMax);
-    tr_peerIoWriteBytes(handshake->io, data, walk - data, false);
+    handshake->io->writeBytes(data, walk - data, false);
 }
 
 // 1 A->B: our public key (Ya) and some padding (PadA)
@@ -439,7 +439,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
-    tr_peerIoWriteBuf(handshake->io, outbuf, false);
+    handshake->io->writeBuf(outbuf, false);
     handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
     evbuffer_add(outbuf, std::data(VC), std::size(VC));
     evbuffer_add_uint32(outbuf, getCryptoProvide(handshake));
@@ -460,7 +460,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     /* send it */
     handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
     setReadState(handshake, AWAITING_VC);
-    tr_peerIoWriteBuf(handshake->io, outbuf, false);
+    handshake->io->writeBuf(outbuf, false);
 
     /* cleanup */
     evbuffer_free(outbuf);
@@ -664,7 +664,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return tr_handshakeDone(handshake, false);
         }
 
-        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+        handshake->io->writeBytes(std::data(msg), std::size(msg), false);
         handshake->haveSentBitTorrentHandshake = true;
     }
 
@@ -891,7 +891,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     /* maybe de-encrypt our connection */
     if (crypto_select == CRYPTO_PROVIDE_PLAINTEXT)
     {
-        tr_peerIoWriteBuf(handshake->io, outbuf, false);
+        handshake->io->writeBuf(outbuf, false);
     }
 
     tr_logAddTraceHand(handshake, "sending handshake");
@@ -908,7 +908,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
     }
 
     /* send it out */
-    tr_peerIoWriteBuf(handshake->io, outbuf, false);
+    handshake->io->writeBuf(outbuf, false);
     evbuffer_free(outbuf);
 
     /* now await the handshake */
@@ -1100,7 +1100,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
             buildHandshakeMessage(handshake, std::data(msg));
             handshake->haveSentBitTorrentHandshake = true;
             setReadState(handshake, AWAITING_HANDSHAKE);
-            tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+            handshake->io->writeBytes(std::data(msg), std::size(msg), false);
         }
     }
 
@@ -1116,7 +1116,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
         buildHandshakeMessage(handshake, std::data(msg));
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+        handshake->io->writeBytes(std::data(msg), std::size(msg), false);
     }
     else
     {
@@ -1164,7 +1164,7 @@ tr_handshake* tr_handshakeNew(
 
         handshake->haveSentBitTorrentHandshake = true;
         setReadState(handshake, AWAITING_HANDSHAKE);
-        tr_peerIoWriteBytes(handshake->io, std::data(msg), std::size(msg), false);
+        handshake->io->writeBytes(std::data(msg), std::size(msg), false);
     }
 
     return handshake;

@@ -182,7 +182,7 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction di
          * out in a timely manner. */
         size_t const increment = 3000;
 
-        int const bytes_used = tr_peerIoFlush(peer_array[i], dir, increment);
+        int const bytes_used = peer_array[i]->flush(dir, increment);
 
         tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
 
@@ -212,7 +212,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
     for (auto* io : tmp)
     {
         tr_peerIoRef(io);
-        tr_peerIoFlushOutgoingProtocolMsgs(io);
+        io->flushOutgoingProtocolMsgs();
 
         switch (io->priority)
         {
@@ -243,7 +243,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
     for (auto* io : tmp)
     {
-        tr_peerIoSetEnabled(io, dir, io->hasBandwidthLeft(dir));
+        io->setEnabled(dir, io->hasBandwidthLeft(dir));
     }
 
     for (auto* io : tmp)

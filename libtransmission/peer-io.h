@@ -72,28 +72,37 @@ class tr_peerIo
     using Filter = tr_message_stream_encryption::Filter;
 
 public:
-    tr_peerIo(
-        tr_session* session_in,
+    // TODO: 8 constructor args is too many; maybe a builder object?
+    static tr_peerIo* newOutgoing(
+        tr_session* session,
+        tr_bandwidth* parent,
+        struct tr_address const* addr,
+        tr_port port,
+        time_t current_time,
+        tr_sha1_digest_t const& torrent_hash,
+        bool is_seed,
+        bool utp);
+
+    static tr_peerIo* newIncoming(
+        tr_session* session,
+        tr_bandwidth* parent,
+        struct tr_address const* addr,
+        tr_port port,
+        time_t current_time,
+        struct tr_peer_socket const socket);
+
+    // this is only public for testing purposes.
+    // production code should use newOutgoing() or newIncoming()
+    static tr_peerIo* create(
+        tr_session* session,
+        tr_bandwidth* parent,
+        tr_address const* addr,
+        tr_port port,
+        time_t current_time,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
-        tr_address const& addr,
-        tr_port port,
         bool is_seed,
-        time_t current_time,
-        tr_bandwidth* parent_bandwidth)
-        : session{ session_in }
-        , time_created{ current_time }
-        , bandwidth_{ parent_bandwidth }
-        , addr_{ addr }
-        , port_{ port }
-        , is_seed_{ is_seed }
-        , is_incoming_{ is_incoming }
-    {
-        if (torrent_hash != nullptr)
-        {
-            torrent_hash_ = *torrent_hash;
-        }
-    }
+        struct tr_peer_socket const socket);
 
     void clear();
 
@@ -108,6 +117,8 @@ public:
     void readUint32(uint32_t* setme);
 
     int reconnect();
+
+    void setEnabled(tr_direction dir, bool is_enabled);
 
     [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
@@ -134,6 +145,13 @@ public:
     }
 
     void readBufferAdd(void const* data, size_t n_bytes);
+
+    int flushOutgoingProtocolMsgs();
+    int flush(tr_direction dir, size_t byte_limit);
+
+    void writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data);
+    void writeBuf(struct evbuffer* buf, bool isPieceData);
+    size_t getWriteBufferSpace(uint64_t now) const;
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
@@ -276,10 +294,31 @@ public:
         return filter_.get() != nullptr;
     }
 
-private:
-    tr_bandwidth bandwidth_;
+    static void utpInit(struct_utp_context* ctx);
 
-    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
+private:
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        tr_address const& addr,
+        tr_port port,
+        bool is_seed,
+        time_t current_time,
+        tr_bandwidth* parent_bandwidth)
+        : session{ session_in }
+        , time_created{ current_time }
+        , bandwidth_{ parent_bandwidth }
+        , addr_{ addr }
+        , port_{ port }
+        , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
+    {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
+    }
 
     Filter& filter()
     {
@@ -290,6 +329,10 @@ private:
 
         return *filter_;
     }
+
+    tr_bandwidth bandwidth_;
+
+    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
 
     std::optional<tr_sha1_digest_t> torrent_hash_;
 
@@ -303,44 +346,6 @@ private:
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;
 };
-
-/**
-***
-**/
-
-void tr_peerIoUtpInit(struct_utp_context* ctx);
-
-// TODO: 8 constructor args is too many; maybe a builder object?
-tr_peerIo* tr_peerIoNewOutgoing(
-    tr_session* session,
-    tr_bandwidth* parent,
-    struct tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    tr_sha1_digest_t const& torrent_hash,
-    bool is_seed,
-    bool utp);
-
-tr_peerIo* tr_peerIoNewIncoming(
-    tr_session* session,
-    tr_bandwidth* parent,
-    struct tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    struct tr_peer_socket const socket);
-
-// this is only public for testing purposes.
-// production code should use tr_peerIoNewOutgoing() or tr_peerIoNewIncoming()
-tr_peerIo* tr_peerIoNew(
-    tr_session* session,
-    tr_bandwidth* parent,
-    tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    tr_sha1_digest_t const* torrent_hash,
-    bool is_incoming,
-    bool is_seed,
-    struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
@@ -360,14 +365,6 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
 ***
 **/
 
-void tr_peerIoWriteBytes(tr_peerIo* io, void const* writeme, size_t writeme_len, bool is_piece_data);
-
-void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
-
-/**
-***
-**/
-
 void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme);
 void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
 void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t hl);
@@ -376,23 +373,5 @@ void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t hll);
 void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val);
 void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val);
 void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val);
-
-/**
-***
-**/
-
-size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
-
-void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
-
-/**
-***
-**/
-
-void tr_peerIoSetEnabled(tr_peerIo* io, tr_direction dir, bool isEnabled);
-
-int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t byteLimit);
-
-int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io);
 
 /* @} */

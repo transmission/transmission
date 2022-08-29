@@ -214,7 +214,7 @@ void tr_utpInit(tr_session* session)
     utp_set_callback(ctx, UTP_ON_ACCEPT, &utp_callback);
     utp_set_callback(ctx, UTP_SENDTO, &utp_callback);
 
-    tr_peerIoUtpInit(ctx);
+    tr_peerIo::utpInit(ctx);
 
 #ifdef TR_UTP_TRACE
 
