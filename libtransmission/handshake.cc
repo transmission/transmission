@@ -524,7 +524,7 @@ static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbu
     }
 
     uint16_t pad_d_len = 0;
-    tr_peerIoReadUint16(handshake->io, inbuf, &pad_d_len);
+    handshake->io->readUint16(&pad_d_len);
     tr_logAddTraceHand(handshake, fmt::format("pad_d_len is {}", pad_d_len));
 
     if (pad_d_len > 512)
@@ -808,7 +808,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     handshake->crypto_provide = crypto_provide;
     tr_logAddTraceHand(handshake, fmt::format("crypto_provide is {}", crypto_provide));
 
-    tr_peerIoReadUint16(handshake->io, inbuf, &padc_len);
+    handshake->io->readUint16(&padc_len);
     tr_logAddTraceHand(handshake, fmt::format("padc is {}", padc_len));
     if (padc_len > PadC_MAXLEN)
     {
@@ -823,8 +823,6 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
 static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    uint16_t ia_len = 0;
-
     if (auto const needlen = handshake->pad_c_len + sizeof(uint16_t); evbuffer_get_length(inbuf) < needlen)
     {
         return READ_LATER;
@@ -835,7 +833,8 @@ static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
     handshake->io->readBytes(std::data(pad_c), handshake->pad_c_len);
 
     /* read ia_len */
-    tr_peerIoReadUint16(handshake->io, inbuf, &ia_len);
+    uint16_t ia_len = 0;
+    handshake->io->readUint16(&ia_len);
     tr_logAddTraceHand(handshake, fmt::format("ia_len is {}", ia_len));
     handshake->ia_len = ia_len;
     setState(handshake, AWAITING_IA);

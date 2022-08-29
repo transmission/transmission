@@ -1893,7 +1893,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             logtrace(msgs, "Got a BtPeerMsgs::Port");
 
             auto nport = uint16_t{};
-            tr_peerIoReadUint16(msgs->io, inbuf, &nport);
+            msgs->io->readUint16(&nport);
             if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
