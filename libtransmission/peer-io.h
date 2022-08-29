@@ -138,6 +138,7 @@ public:
     void readBufferAdd(void const* data, size_t n_bytes);
 
     int flushOutgoingProtocolMsgs();
+    int flush(tr_direction dir, size_t byte_limit);
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
@@ -388,11 +389,5 @@ void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val);
 size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
 void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
-
-/**
-***
-**/
-
-int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t byteLimit);
 
 /* @} */

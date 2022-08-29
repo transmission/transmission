@@ -182,7 +182,7 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction di
          * out in a timely manner. */
         size_t const increment = 3000;
 
-        int const bytes_used = tr_peerIoFlush(peer_array[i], dir, increment);
+        int const bytes_used = peer_array[i]->flush(dir, increment);
 
         tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
 

@@ -1154,13 +1154,12 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     return n;
 }
 
-int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t limit)
+int tr_peerIo::flush(tr_direction dir, size_t limit)
 {
-    TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_isDirection(dir));
 
-    int const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(io, limit) : tr_peerIoTryWrite(io, limit);
-    tr_logAddTraceIo(io, fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", dir, limit, bytes_used));
+    int const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
+    tr_logAddTraceIo(this, fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", dir, limit, bytes_used));
     return bytes_used;
 }
 
@@ -1180,5 +1179,5 @@ int tr_peerIo::flushOutgoingProtocolMsgs()
         byte_count += n_bytes;
     }
 
-    return tr_peerIoFlush(this, TR_UP, byte_count);
+    return flush(TR_UP, byte_count);
 }
