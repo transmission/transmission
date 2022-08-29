@@ -285,6 +285,8 @@ public:
         return filter_.get() != nullptr;
     }
 
+    static void utpInit(struct_utp_context* ctx);
+
 private:
     tr_bandwidth bandwidth_;
 
@@ -312,12 +314,6 @@ private:
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;
 };
-
-/**
-***
-**/
-
-void tr_peerIoUtpInit(struct_utp_context* ctx);
 
 // TODO: 8 constructor args is too many; maybe a builder object?
 tr_peerIo* tr_peerIoNewOutgoing(

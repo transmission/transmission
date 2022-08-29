@@ -548,7 +548,7 @@ tr_peerIo* tr_peerIoNew(
     return io;
 }
 
-void tr_peerIoUtpInit([[maybe_unused]] struct_utp_context* ctx)
+void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 {
 #ifdef WITH_UTP
 
