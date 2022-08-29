@@ -105,6 +105,8 @@ public:
     void readUint16(uint16_t* setme);
     void readUint32(uint32_t* setme);
 
+    int reconnect();
+
     [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
         return addr_;
@@ -349,20 +351,6 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
     return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 &&
         tr_address_is_valid(&io->address());
 }
-
-/**
-***
-**/
-
-constexpr tr_session* tr_peerIoGetSession(tr_peerIo* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->session != nullptr);
-
-    return io->session;
-}
-
-int tr_peerIoReconnect(tr_peerIo* io);
 
 /**
 ***

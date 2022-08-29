@@ -1094,7 +1094,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
             handshake->mediator->setUTPFailed(*hash, io->address());
         }
 
-        if (handshake->mediator->allowsTCP() && tr_peerIoReconnect(handshake->io) == 0)
+        if (handshake->mediator->allowsTCP() && handshake->io->reconnect() == 0)
         {
             auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
             buildHandshakeMessage(handshake, std::data(msg));
@@ -1109,7 +1109,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
      * try a plaintext handshake */
     if ((handshake->state == AWAITING_YB || handshake->state == AWAITING_VC) &&
         handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && handshake->mediator->allowsTCP() &&
-        tr_peerIoReconnect(handshake->io) == 0)
+        handshake->io->reconnect() == 0)
     {
         auto msg = std::array<uint8_t, HANDSHAKE_SIZE>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");

@@ -830,33 +830,31 @@ void tr_peerIoClear(tr_peerIo* io)
     io_close_socket(io);
 }
 
-int tr_peerIoReconnect(tr_peerIo* io)
+int tr_peerIo::reconnect()
 {
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(!io->isIncoming());
-    TR_ASSERT(io->session->allowsTCP());
+    TR_ASSERT(tr_isPeerIo(this));
+    TR_ASSERT(!this->isIncoming());
+    TR_ASSERT(this->session->allowsTCP());
 
-    tr_session* session = tr_peerIoGetSession(io);
+    short int const pendingEvents = this->pendingEvents;
+    event_disable(this, EV_READ | EV_WRITE);
 
-    short int const pendingEvents = io->pendingEvents;
-    event_disable(io, EV_READ | EV_WRITE);
+    io_close_socket(this);
 
-    io_close_socket(io);
+    auto const [addr, port] = this->socketAddress();
+    this->socket = tr_netOpenPeerSocket(session, &addr, port, this->isSeed());
 
-    auto const [addr, port] = io->socketAddress();
-    io->socket = tr_netOpenPeerSocket(session, &addr, port, io->isSeed());
-
-    if (io->socket.type != TR_PEER_SOCKET_TYPE_TCP)
+    if (this->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {
         return -1;
     }
 
-    io->event_read = event_new(session->eventBase(), io->socket.handle.tcp, EV_READ, event_read_cb, io);
-    io->event_write = event_new(session->eventBase(), io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
+    this->event_read = event_new(session->eventBase(), this->socket.handle.tcp, EV_READ, event_read_cb, this);
+    this->event_write = event_new(session->eventBase(), this->socket.handle.tcp, EV_WRITE, event_write_cb, this);
 
-    event_enable(io, pendingEvents);
-    io->session->setSocketTOS(io->socket.handle.tcp, addr.type);
-    maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peerCongestionAlgorithm());
+    event_enable(this, pendingEvents);
+    this->session->setSocketTOS(this->socket.handle.tcp, addr.type);
+    maybeSetCongestionAlgorithm(this->socket.handle.tcp, session->peerCongestionAlgorithm());
 
     return 0;
 }
