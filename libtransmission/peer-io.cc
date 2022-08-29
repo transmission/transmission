@@ -875,18 +875,11 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
     return std::max(ceiling, currentSpeed_Bps * period);
 }
 
-size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now)
+size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
 {
-    size_t const desiredLen = getDesiredOutputBufferSize(io, now);
-    size_t const currentLen = evbuffer_get_length(io->outbuf.get());
-    size_t freeSpace = 0;
-
-    if (desiredLen > currentLen)
-    {
-        freeSpace = desiredLen - currentLen;
-    }
-
-    return freeSpace;
+    size_t const desired_len = getDesiredOutputBufferSize(this, now);
+    size_t const current_len = evbuffer_get_length(outbuf.get());
+    return desired_len > current_len ? desired_len - current_len : 0U;
 }
 
 /**

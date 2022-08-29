@@ -2224,7 +2224,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     **/
 
     auto piece = int{};
-    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
+    if (msgs->io->getWriteBufferSpace(now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
     {
         auto ok = bool{ false };
 
@@ -2283,7 +2283,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Data Blocks
     **/
 
-    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= tr_block_info::BlockSize && !std::empty(msgs->peer_requested_))
+    if (msgs->io->getWriteBufferSpace(now) >= tr_block_info::BlockSize && !std::empty(msgs->peer_requested_))
     {
         req = msgs->peer_requested_.front();
         msgs->peer_requested_.erase(std::begin(msgs->peer_requested_));
