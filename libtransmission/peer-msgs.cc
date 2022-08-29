@@ -13,6 +13,7 @@
 #include <map>
 #include <memory> // std::unique_ptr
 #include <optional>
+#include <queue>
 #include <utility>
 #include <vector>
 
@@ -832,8 +833,7 @@ public:
     std::vector<tr_pex> pex;
     std::vector<tr_pex> pex6;
 
-    std::array<int, MetadataReqQ> peerAskedForMetadata = {};
-    int peerAskedForMetadataCount = 0;
+    std::queue<int> peerAskedForMetadata;
 
     time_t clientSentAnythingAt = 0;
 
@@ -1087,18 +1087,16 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
     msgs->dbgOutMessageLen();
 }
 
-static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
+static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* setme)
 {
-    if (msgs->peerAskedForMetadataCount == 0)
+    if (std::empty(msgs->peerAskedForMetadata))
     {
         return false;
     }
 
-    *piece = msgs->peerAskedForMetadata[0];
-
-    tr_removeElementFromArray(std::data(msgs->peerAskedForMetadata), 0, sizeof(int), msgs->peerAskedForMetadataCount);
-    --msgs->peerAskedForMetadataCount;
-
+    auto& reqs = msgs->peerAskedForMetadata;
+    *setme = reqs.front();
+    reqs.pop();
     return true;
 }
 
@@ -1376,9 +1374,9 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     if (msg_type == MetadataMsgType::Request)
     {
         if (piece >= 0 && msgs->torrent->hasMetainfo() && msgs->torrent->isPublic() &&
-            msgs->peerAskedForMetadataCount < MetadataReqQ)
+            std::size(msgs->peerAskedForMetadata) < MetadataReqQ)
         {
-            msgs->peerAskedForMetadata[msgs->peerAskedForMetadataCount++] = piece;
+            msgs->peerAskedForMetadata.push(piece);
         }
         else
         {

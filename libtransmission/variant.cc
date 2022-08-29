@@ -189,12 +189,22 @@ tr_variant* tr_variantListChild(tr_variant* list, size_t pos)
     return {};
 }
 
+static void removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb)
+{
+    auto* a = static_cast<char*>(array);
+
+    memmove(
+        a + sizeof_element * index_to_remove,
+        a + sizeof_element * (index_to_remove + 1),
+        sizeof_element * (--nmemb - index_to_remove));
+}
+
 bool tr_variantListRemove(tr_variant* list, size_t pos)
 {
     if (tr_variantIsList(list) && pos < list->val.l.count)
     {
         tr_variantClear(&list->val.l.vals[pos]);
-        tr_removeElementFromArray(list->val.l.vals, pos, sizeof(tr_variant), list->val.l.count);
+        removeElementFromArray(list->val.l.vals, pos, sizeof(tr_variant), list->val.l.count);
         --list->val.l.count;
         return true;
     }
