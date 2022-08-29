@@ -836,7 +836,7 @@ int tr_peerIo::reconnect()
     TR_ASSERT(!this->isIncoming());
     TR_ASSERT(this->session->allowsTCP());
 
-    short int const pendingEvents = this->pendingEvents;
+    short int const pending_events = this->pendingEvents;
     event_disable(this, EV_READ | EV_WRITE);
 
     io_close_socket(this);
@@ -852,7 +852,7 @@ int tr_peerIo::reconnect()
     this->event_read = event_new(session->eventBase(), this->socket.handle.tcp, EV_READ, event_read_cb, this);
     this->event_write = event_new(session->eventBase(), this->socket.handle.tcp, EV_WRITE, event_write_cb, this);
 
-    event_enable(this, pendingEvents);
+    event_enable(this, pending_events);
     this->session->setSocketTOS(this->socket.handle.tcp, addr.type);
     maybeSetCongestionAlgorithm(this->socket.handle.tcp, session->peerCongestionAlgorithm());
 
@@ -984,7 +984,7 @@ void tr_peerIo::readBytes(void* bytes, size_t byte_count)
 {
     TR_ASSERT(readBufferSize() >= byte_count);
 
-    evbuffer_remove(readBuffer(), bytes, byte_count);
+    evbuffer_remove(inbuf.get(), bytes, byte_count);
 
     if (isEncrypted())
     {
@@ -1006,16 +1006,14 @@ void tr_peerIo::readUint32(uint32_t* setme)
     *setme = ntohl(tmp);
 }
 
-void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count)
+void tr_peerIo::readBufferDrain(size_t byte_count)
 {
-    TR_ASSERT(inbuf == io->readBuffer());
-
     auto buf = std::array<char, 4096>{};
 
     while (byte_count > 0)
     {
-        size_t const this_pass = std::min(byte_count, std::size(buf));
-        io->readBytes(std::data(buf), this_pass);
+        auto const this_pass = std::min(byte_count, std::size(buf));
+        readBytes(std::data(buf), this_pass);
         byte_count -= this_pass;
     }
 }

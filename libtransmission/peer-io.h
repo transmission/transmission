@@ -97,7 +97,7 @@ public:
 
     void clear();
 
-    void readBytes(void* bytes, size_t n_bytes);
+    void readBytes(void* bytes, size_t byte_count);
 
     void readUint8(uint8_t* setme)
     {
@@ -125,6 +125,8 @@ public:
     {
         return inbuf.get();
     }
+
+    void readBufferDrain(size_t byte_count);
 
     [[nodiscard]] auto readBufferSize() const noexcept
     {
@@ -385,8 +387,6 @@ constexpr void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
 {
     evbuffer_add_uint64(buf, val);
 }
-
-void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count);
 
 /**
 ***

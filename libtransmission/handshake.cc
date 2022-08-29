@@ -550,7 +550,7 @@ static ReadState readPadD(tr_handshake* handshake, struct evbuffer* inbuf)
         return READ_LATER;
     }
 
-    tr_peerIoDrain(handshake->io, inbuf, needlen);
+    handshake->io->readBufferDrain(needlen);
 
     setState(handshake, AWAITING_HANDSHAKE);
     return READ_NOW;
@@ -954,7 +954,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    evbuffer* const inbuf = io->getReadBuffer();
+    auto* const inbuf = io->readBuffer();
     bool readyForMore = true;
 
     /* no piece data in handshake */

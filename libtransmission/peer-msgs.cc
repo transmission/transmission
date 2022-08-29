@@ -302,7 +302,7 @@ public:
 
         if (this->io != nullptr)
         {
-            tr_peerIoClear(this->io);
+            this->io->clear();
             tr_peerIoUnref(this->io); /* balanced by the ref in handshakeDoneCB() */
         }
 
@@ -1228,7 +1228,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantClear(&val);
 }
 
-static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuffer* inbuf)
+static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len)
 {
     msgs->peerSentLtepHandshake = true;
 
@@ -1334,7 +1334,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     tr_variantClear(&val);
 }
 
-static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
+static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
     int64_t msg_type = -1;
     int64_t piece = -1;
@@ -1404,7 +1404,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     }
 }
 
-static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
+static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
     tr_torrent* tor = msgs->torrent;
     if (!tor->allowsPex())
@@ -1454,7 +1454,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
     }
 }
 
-static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
+static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
     TR_ASSERT(msglen > 0);
 
@@ -1465,7 +1465,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
     if (ltep_msgid == LtepMessages::Handshake)
     {
         logtrace(msgs, "got ltep handshake");
-        parseLtepHandshake(msgs, msglen, inbuf);
+        parseLtepHandshake(msgs, msglen);
 
         if (msgs->io->supportsLTEP())
         {
@@ -1477,22 +1477,22 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
     {
         logtrace(msgs, "got ut pex");
         msgs->peerSupportsPex = true;
-        parseUtPex(msgs, msglen, inbuf);
+        parseUtPex(msgs, msglen);
     }
     else if (ltep_msgid == UT_METADATA_ID)
     {
         logtrace(msgs, "got ut metadata");
         msgs->peerSupportsMetadataXfer = true;
-        parseUtMetadata(msgs, msglen, inbuf);
+        parseUtMetadata(msgs, msglen);
     }
     else
     {
         logtrace(msgs, fmt::format(FMT_STRING("skipping unknown ltep message ({:d})"), static_cast<int>(ltep_msgid)));
-        evbuffer_drain(inbuf, msglen);
+        msgs->io->readBufferDrain(msglen);
     }
 }
 
-static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtLength(tr_peerMsgsImpl* msgs, size_t inlen)
 {
     auto len = uint32_t{};
     if (inlen < sizeof(len))
@@ -1514,9 +1514,9 @@ static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, siz
     return READ_NOW;
 }
 
-static ReadState readBtMessage(tr_peerMsgsImpl* /*msgs*/, struct evbuffer* /*inbuf*/, size_t /*inlen*/);
+static ReadState readBtMessage(tr_peerMsgsImpl* /*msgs*/, size_t /*inlen*/);
 
-static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtId(tr_peerMsgsImpl* msgs, size_t inlen)
 {
     if (inlen < sizeof(uint8_t))
     {
@@ -1542,7 +1542,7 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
         return READ_NOW;
     }
 
-    return readBtMessage(msgs, inbuf, inlen - 1);
+    return readBtMessage(msgs, inlen - 1);
 }
 
 static void prefetchPieces(tr_peerMsgsImpl* msgs)
@@ -1659,9 +1659,9 @@ static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint3
 
 static int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>>& block_data, tr_block_index_t block);
 
-static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen, size_t* setme_piece_bytes_read)
+static ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_bytes_read)
 {
-    TR_ASSERT(evbuffer_get_length(inbuf) >= inlen);
+    TR_ASSERT(msgs->io->readBufferSize() >= inlen);
 
     logtrace(msgs, "In readBtPiece");
 
@@ -1699,7 +1699,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     auto const n_to_read = std::min({ n_left_in_block, n_left_in_req, inlen });
     auto const old_length = std::size(*block_buf);
     block_buf->resize(old_length + n_to_read);
-    msgs->io->readBuf(&((*block_buf)[old_length]), n_to_read);
+    msgs->io->readBytes(&((*block_buf)[old_length]), n_to_read);
 
     msgs->publishClientGotPieceData(n_to_read);
     *setme_piece_bytes_read += n_to_read;
@@ -1744,11 +1744,11 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     return err != 0 ? READ_ERR : READ_NOW;
 }
 
-static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 {
     uint8_t const id = msgs->incoming.id;
 #ifdef TR_ENABLE_ASSERTS
-    size_t const startBufLen = evbuffer_get_length(inbuf);
+    auto const start_buflen = msgs->io->readBufferSize();
 #endif
     bool const fext = msgs->io->supportsFEXT();
 
@@ -1991,17 +1991,17 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     case BtPeerMsgs::Ltep:
         logtrace(msgs, "Got a BtPeerMsgs::Ltep");
-        parseLtep(msgs, msglen, inbuf);
+        parseLtep(msgs, msglen);
         break;
 
     default:
         logtrace(msgs, fmt::format(FMT_STRING("peer sent us an UNKNOWN: {:d}"), static_cast<int>(id)));
-        tr_peerIoDrain(msgs->io, inbuf, msglen);
+        msgs->io->readBufferDrain(msglen);
         break;
     }
 
     TR_ASSERT(msglen + 1 == msgs->incoming.length);
-    TR_ASSERT(evbuffer_get_length(inbuf) == startBufLen - msglen);
+    TR_ASSERT(msgs->io->readBufferSize() == start_buflen - msglen);
 
     msgs->state = AwaitingBt::Length;
     return READ_NOW;
@@ -2070,8 +2070,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-    auto* const in = io->readBuffer();
-    size_t const inlen = evbuffer_get_length(in);
+    size_t const inlen = io->readBufferSize();
 
     logtrace(
         msgs,
@@ -2084,22 +2083,22 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     }
     else if (msgs->state == AwaitingBt::Piece)
     {
-        ret = readBtPiece(msgs, in, inlen, piece);
+        ret = readBtPiece(msgs, inlen, piece);
     }
     else
     {
         switch (msgs->state)
         {
         case AwaitingBt::Length:
-            ret = readBtLength(msgs, in, inlen);
+            ret = readBtLength(msgs, inlen);
             break;
 
         case AwaitingBt::Id:
-            ret = readBtId(msgs, in, inlen);
+            ret = readBtId(msgs, inlen);
             break;
 
         case AwaitingBt::Message:
-            ret = readBtMessage(msgs, in, inlen);
+            ret = readBtMessage(msgs, inlen);
             break;
 
         default:
