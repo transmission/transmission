@@ -209,6 +209,8 @@ public:
         return torrent_hash_;
     }
 
+    void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
+
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
     // like this one isn't being used just for assertions, but also in
     // didWriteWrapper() to see if the tr_peerIo got freed during the
@@ -365,8 +367,6 @@ int tr_peerIoReconnect(tr_peerIo* io);
 /**
 ***
 **/
-
-void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
 void tr_peerIoClear(tr_peerIo* io);
 

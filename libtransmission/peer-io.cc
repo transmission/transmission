@@ -814,17 +814,17 @@ std::string tr_peerIo::addrStr() const
     return tr_isPeerIo(this) ? this->addr_.readable(this->port_) : "error";
 }
 
-void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
+void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
 {
-    io->canRead = readcb;
-    io->didWrite = writecb;
-    io->gotError = errcb;
-    io->userData = user_data;
+    this->canRead = readcb;
+    this->didWrite = writecb;
+    this->gotError = errcb;
+    this->userData = user_data;
 }
 
 void tr_peerIoClear(tr_peerIo* io)
 {
-    tr_peerIoSetIOFuncs(io, nullptr, nullptr, nullptr, nullptr);
+    io->setCallbacks(nullptr, nullptr, nullptr, nullptr);
     tr_peerIoSetEnabled(io, TR_UP, false);
     tr_peerIoSetEnabled(io, TR_DOWN, false);
     io_close_socket(io);

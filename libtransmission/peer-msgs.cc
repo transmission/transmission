@@ -286,7 +286,7 @@ public:
             }
         }
 
-        tr_peerIoSetIOFuncs(io, canRead, didWrite, gotError, this);
+        io->setCallbacks(canRead, didWrite, gotError, this);
         updateDesiredRequestCount(this);
     }
 

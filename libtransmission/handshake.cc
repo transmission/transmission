@@ -1061,7 +1061,7 @@ static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool is_connected)
 {
     tr_logAddTraceHand(handshake, is_connected ? "handshakeDone: connected" : "handshakeDone: aborting");
-    tr_peerIoSetIOFuncs(handshake->io, nullptr, nullptr, nullptr, nullptr);
+    handshake->io->setCallbacks(nullptr, nullptr, nullptr, nullptr);
 
     bool const success = fireDoneFunc(handshake, is_connected);
     delete handshake;
@@ -1147,7 +1147,7 @@ tr_handshake* tr_handshakeNew(
     handshake->timeout_timer->startSingleShot(HandshakeTimeoutSec);
 
     tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
-    tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
+    handshake->io->setCallbacks(canRead, nullptr, gotError, handshake);
 
     if (handshake->isIncoming())
     {
