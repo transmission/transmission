@@ -976,6 +976,21 @@ void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t addme_hll)
     evbuffer_add(outbuf, &nll, sizeof(nll));
 }
 
+void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
+{
+    evbuffer_add_uint16(buf, val);
+}
+
+void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
+{
+    evbuffer_add_uint32(buf, val);
+}
+
+void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
+{
+    evbuffer_add_uint64(buf, val);
+}
+
 /***
 ****
 ***/
