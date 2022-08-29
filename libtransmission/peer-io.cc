@@ -491,7 +491,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
 
 #endif /* #ifdef WITH_UTP */
 
-tr_peerIo* tr_peerIoNew(
+tr_peerIo* tr_peerIo::create(
     tr_session* session,
     tr_bandwidth* parent,
     tr_address const* addr,
@@ -574,7 +574,7 @@ tr_peerIo* tr_peerIoNewIncoming(
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
 
-    return tr_peerIoNew(session, parent, addr, port, current_time, nullptr, true, false, socket);
+    return tr_peerIo::create(session, parent, addr, port, current_time, nullptr, true, false, socket);
 }
 
 tr_peerIo* tr_peerIoNewOutgoing(
@@ -611,7 +611,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
         return nullptr;
     }
 
-    return tr_peerIoNew(session, parent, addr, port, current_time, &torrent_hash, false, is_seed, socket);
+    return tr_peerIo::create(session, parent, addr, port, current_time, &torrent_hash, false, is_seed, socket);
 }
 
 /***

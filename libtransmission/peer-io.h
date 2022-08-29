@@ -72,28 +72,18 @@ class tr_peerIo
     using Filter = tr_message_stream_encryption::Filter;
 
 public:
-    tr_peerIo(
-        tr_session* session_in,
+    // this is only public for testing purposes.
+    // production code should use tr_peerIoNewOutgoing() or tr_peerIoNewIncoming()
+    static tr_peerIo* create(
+        tr_session* session,
+        tr_bandwidth* parent,
+        tr_address const* addr,
+        tr_port port,
+        time_t current_time,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
-        tr_address const& addr,
-        tr_port port,
         bool is_seed,
-        time_t current_time,
-        tr_bandwidth* parent_bandwidth)
-        : session{ session_in }
-        , time_created{ current_time }
-        , bandwidth_{ parent_bandwidth }
-        , addr_{ addr }
-        , port_{ port }
-        , is_seed_{ is_seed }
-        , is_incoming_{ is_incoming }
-    {
-        if (torrent_hash != nullptr)
-        {
-            torrent_hash_ = *torrent_hash;
-        }
-    }
+        struct tr_peer_socket const socket);
 
     void clear();
 
@@ -288,9 +278,28 @@ public:
     static void utpInit(struct_utp_context* ctx);
 
 private:
-    tr_bandwidth bandwidth_;
-
-    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        tr_address const& addr,
+        tr_port port,
+        bool is_seed,
+        time_t current_time,
+        tr_bandwidth* parent_bandwidth)
+        : session{ session_in }
+        , time_created{ current_time }
+        , bandwidth_{ parent_bandwidth }
+        , addr_{ addr }
+        , port_{ port }
+        , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
+    {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
+    }
 
     Filter& filter()
     {
@@ -301,6 +310,10 @@ private:
 
         return *filter_;
     }
+
+    tr_bandwidth bandwidth_;
+
+    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
 
     std::optional<tr_sha1_digest_t> torrent_hash_;
 
@@ -332,19 +345,6 @@ tr_peerIo* tr_peerIoNewIncoming(
     struct tr_address const* addr,
     tr_port port,
     time_t current_time,
-    struct tr_peer_socket const socket);
-
-// this is only public for testing purposes.
-// production code should use tr_peerIoNewOutgoing() or tr_peerIoNewIncoming()
-tr_peerIo* tr_peerIoNew(
-    tr_session* session,
-    tr_bandwidth* parent,
-    tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    tr_sha1_digest_t const* torrent_hash,
-    bool is_incoming,
-    bool is_seed,
     struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);

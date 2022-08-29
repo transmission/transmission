@@ -173,7 +173,7 @@ auto createOutgoingIo(tr_session* session, tr_sha1_digest_t const& info_hash)
     EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
     auto const now = tr_time();
     auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
-    auto* const io = tr_peerIoNew(
+    auto* const io = tr_peerIo::create(
         session,
         &session->top_bandwidth_,
         &DefaultPeerAddr,
