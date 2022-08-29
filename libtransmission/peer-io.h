@@ -109,6 +109,8 @@ public:
 
     int reconnect();
 
+    void setEnabled(tr_direction dir, bool is_enabled);
+
     [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
         return addr_;
@@ -388,8 +390,6 @@ void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCo
 /**
 ***
 **/
-
-void tr_peerIoSetEnabled(tr_peerIo* io, tr_direction dir, bool isEnabled);
 
 int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t byteLimit);
 

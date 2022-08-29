@@ -205,7 +205,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     /* if we don't have any bandwidth left, stop reading */
     if (howmuch < 1)
     {
-        tr_peerIoSetEnabled(io, dir, false);
+        io->setEnabled(dir, false);
         return;
     }
 
@@ -215,7 +215,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     if (res > 0)
     {
-        tr_peerIoSetEnabled(io, dir, true);
+        io->setEnabled(dir, true);
 
         /* Invoke the user callback - must always be called last */
         canReadWrapper(io);
@@ -232,7 +232,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
         {
             if (e == EAGAIN || e == EINTR)
             {
-                tr_peerIoSetEnabled(io, dir, true);
+                io->setEnabled(dir, true);
                 return;
             }
 
@@ -282,7 +282,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     /* if we don't have any bandwidth left, stop writing */
     if (howmuch < 1)
     {
-        tr_peerIoSetEnabled(io, dir, false);
+        io->setEnabled(dir, false);
         return;
     }
 
@@ -313,7 +313,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     if (evbuffer_get_length(io->outbuf.get()) != 0)
     {
-        tr_peerIoSetEnabled(io, dir, true);
+        io->setEnabled(dir, true);
     }
 
     didWriteWrapper(io, res);
@@ -322,7 +322,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 RESCHEDULE:
     if (evbuffer_get_length(io->outbuf.get()) != 0)
     {
-        tr_peerIoSetEnabled(io, dir, true);
+        io->setEnabled(dir, true);
     }
 
     return;
@@ -360,7 +360,7 @@ void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
         return;
     }
 
-    tr_peerIoSetEnabled(this, TR_DOWN, true);
+    setEnabled(TR_DOWN, true);
     canReadWrapper(this);
 }
 
@@ -379,7 +379,7 @@ static void utp_on_writable(tr_peerIo* io)
     tr_logAddTraceIo(io, "libutp says this peer is ready to write");
 
     int const n = tr_peerIoTryWrite(io, SIZE_MAX);
-    tr_peerIoSetEnabled(io, TR_UP, n != 0 && evbuffer_get_length(io->outbuf.get()) != 0);
+    io->setEnabled(TR_UP, n != 0 && evbuffer_get_length(io->outbuf.get()) != 0);
 }
 
 static void utp_on_state_change(tr_peerIo* const io, int const state)
@@ -696,22 +696,21 @@ static void event_disable(tr_peerIo* io, short event)
     }
 }
 
-void tr_peerIoSetEnabled(tr_peerIo* io, tr_direction dir, bool isEnabled)
+void tr_peerIo::setEnabled(tr_direction dir, bool is_enabled)
 {
-    TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_isDirection(dir));
-    TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session->events != nullptr);
+    TR_ASSERT(tr_amInEventThread(session));
+    TR_ASSERT(session->events != nullptr);
 
     short const event = dir == TR_UP ? EV_WRITE : EV_READ;
 
-    if (isEnabled)
+    if (is_enabled)
     {
-        event_enable(io, event);
+        event_enable(this, event);
     }
     else
     {
-        event_disable(io, event);
+        event_disable(this, event);
     }
 }
 
@@ -825,8 +824,8 @@ void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_
 void tr_peerIo::clear()
 {
     setCallbacks(nullptr, nullptr, nullptr, nullptr);
-    tr_peerIoSetEnabled(this, TR_UP, false);
-    tr_peerIoSetEnabled(this, TR_DOWN, false);
+    setEnabled(TR_UP, false);
+    setEnabled(TR_DOWN, false);
     io_close_socket(this);
 }
 
