@@ -265,16 +265,6 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* downloadDir);
 char const* tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
- * @brief Set the torrent's bandwidth priority.
- */
-void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
-
-/**
- * @brief Get the torrent's bandwidth priority.
- */
-tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
-
-/**
  * @brief set the per-session incomplete download folder.
  *
  * When you add a new torrent and the session's incomplete directory is enabled,
