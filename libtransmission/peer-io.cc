@@ -814,49 +814,47 @@ std::string tr_peerIo::addrStr() const
     return tr_isPeerIo(this) ? this->addr_.readable(this->port_) : "error";
 }
 
-void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
+void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
 {
-    io->canRead = readcb;
-    io->didWrite = writecb;
-    io->gotError = errcb;
-    io->userData = user_data;
+    this->canRead = readcb;
+    this->didWrite = writecb;
+    this->gotError = errcb;
+    this->userData = user_data;
 }
 
-void tr_peerIoClear(tr_peerIo* io)
+void tr_peerIo::clear()
 {
-    tr_peerIoSetIOFuncs(io, nullptr, nullptr, nullptr, nullptr);
-    tr_peerIoSetEnabled(io, TR_UP, false);
-    tr_peerIoSetEnabled(io, TR_DOWN, false);
-    io_close_socket(io);
+    setCallbacks(nullptr, nullptr, nullptr, nullptr);
+    tr_peerIoSetEnabled(this, TR_UP, false);
+    tr_peerIoSetEnabled(this, TR_DOWN, false);
+    io_close_socket(this);
 }
 
-int tr_peerIoReconnect(tr_peerIo* io)
+int tr_peerIo::reconnect()
 {
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(!io->isIncoming());
-    TR_ASSERT(io->session->allowsTCP());
+    TR_ASSERT(tr_isPeerIo(this));
+    TR_ASSERT(!this->isIncoming());
+    TR_ASSERT(this->session->allowsTCP());
 
-    tr_session* session = tr_peerIoGetSession(io);
+    short int const pending_events = this->pendingEvents;
+    event_disable(this, EV_READ | EV_WRITE);
 
-    short int const pendingEvents = io->pendingEvents;
-    event_disable(io, EV_READ | EV_WRITE);
+    io_close_socket(this);
 
-    io_close_socket(io);
+    auto const [addr, port] = this->socketAddress();
+    this->socket = tr_netOpenPeerSocket(session, &addr, port, this->isSeed());
 
-    auto const [addr, port] = io->socketAddress();
-    io->socket = tr_netOpenPeerSocket(session, &addr, port, io->isSeed());
-
-    if (io->socket.type != TR_PEER_SOCKET_TYPE_TCP)
+    if (this->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {
         return -1;
     }
 
-    io->event_read = event_new(session->eventBase(), io->socket.handle.tcp, EV_READ, event_read_cb, io);
-    io->event_write = event_new(session->eventBase(), io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
+    this->event_read = event_new(session->eventBase(), this->socket.handle.tcp, EV_READ, event_read_cb, this);
+    this->event_write = event_new(session->eventBase(), this->socket.handle.tcp, EV_WRITE, event_write_cb, this);
 
-    event_enable(io, pendingEvents);
-    io->session->setSocketTOS(io->socket.handle.tcp, addr.type);
-    maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peerCongestionAlgorithm());
+    event_enable(this, pending_events);
+    this->session->setSocketTOS(this->socket.handle.tcp, addr.type);
+    maybeSetCongestionAlgorithm(this->socket.handle.tcp, session->peerCongestionAlgorithm());
 
     return 0;
 }
@@ -978,45 +976,59 @@ void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t addme_hll)
     evbuffer_add(outbuf, &nll, sizeof(nll));
 }
 
+void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
+{
+    evbuffer_add_uint16(buf, val);
+}
+
+void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
+{
+    evbuffer_add_uint32(buf, val);
+}
+
+void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
+{
+    evbuffer_add_uint64(buf, val);
+}
+
 /***
 ****
 ***/
 
-void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount)
+void tr_peerIo::readBytes(void* bytes, size_t byte_count)
 {
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(evbuffer_get_length(inbuf) >= byteCount);
+    TR_ASSERT(readBufferSize() >= byte_count);
 
-    evbuffer_remove(inbuf, bytes, byteCount);
+    evbuffer_remove(inbuf.get(), bytes, byte_count);
 
-    if (io->isEncrypted())
+    if (isEncrypted())
     {
-        io->decrypt(byteCount, bytes);
+        decrypt(byte_count, bytes);
     }
 }
 
-void tr_peerIoReadUint16(tr_peerIo* io, struct evbuffer* inbuf, uint16_t* setme)
+void tr_peerIo::readUint16(uint16_t* setme)
 {
     auto tmp = uint16_t{};
-    tr_peerIoReadBytes(io, inbuf, &tmp, sizeof(uint16_t));
+    readBytes(&tmp, sizeof(tmp));
     *setme = ntohs(tmp);
 }
 
-void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme)
+void tr_peerIo::readUint32(uint32_t* setme)
 {
     auto tmp = uint32_t{};
-    tr_peerIoReadBytes(io, inbuf, &tmp, sizeof(uint32_t));
+    readBytes(&tmp, sizeof(tmp));
     *setme = ntohl(tmp);
 }
 
-void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count)
+void tr_peerIo::readBufferDrain(size_t byte_count)
 {
     auto buf = std::array<char, 4096>{};
 
     while (byte_count > 0)
     {
-        size_t const this_pass = std::min(byte_count, std::size(buf));
-        tr_peerIoReadBytes(io, inbuf, std::data(buf), this_pass);
+        auto const this_pass = std::min(byte_count, std::size(buf));
+        readBytes(std::data(buf), this_pass);
         byte_count -= this_pass;
     }
 }

@@ -95,6 +95,20 @@ public:
         }
     }
 
+    void clear();
+
+    void readBytes(void* bytes, size_t byte_count);
+
+    void readUint8(uint8_t* setme)
+    {
+        readBytes(setme, sizeof(uint8_t));
+    }
+
+    void readUint16(uint16_t* setme);
+    void readUint32(uint32_t* setme);
+
+    int reconnect();
+
     [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
         return addr_;
@@ -107,9 +121,16 @@ public:
 
     std::string addrStr() const;
 
-    [[nodiscard]] auto getReadBuffer() noexcept
+    [[nodiscard]] auto readBuffer() noexcept
     {
         return inbuf.get();
+    }
+
+    void readBufferDrain(size_t byte_count);
+
+    [[nodiscard]] auto readBufferSize() const noexcept
+    {
+        return evbuffer_get_length(inbuf.get());
     }
 
     void readBufferAdd(void const* data, size_t n_bytes);
@@ -193,6 +214,8 @@ public:
     {
         return torrent_hash_;
     }
+
+    void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
     // like this one isn't being used just for assertions, but also in
@@ -337,28 +360,6 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
 ***
 **/
 
-constexpr tr_session* tr_peerIoGetSession(tr_peerIo* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->session != nullptr);
-
-    return io->session;
-}
-
-int tr_peerIoReconnect(tr_peerIo* io);
-
-/**
-***
-**/
-
-void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
-
-void tr_peerIoClear(tr_peerIo* io);
-
-/**
-***
-**/
-
 void tr_peerIoWriteBytes(tr_peerIo* io, void const* writeme, size_t writeme_len, bool is_piece_data);
 
 void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
@@ -372,33 +373,9 @@ void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
 void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t hl);
 void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t hll);
 
-static inline void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
-{
-    evbuffer_add_uint16(buf, val);
-}
-
-static inline void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
-{
-    evbuffer_add_uint32(buf, val);
-}
-
-static inline void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
-{
-    evbuffer_add_uint64(buf, val);
-}
-
-void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount);
-
-static inline void tr_peerIoReadUint8(tr_peerIo* io, struct evbuffer* inbuf, uint8_t* setme)
-{
-    tr_peerIoReadBytes(io, inbuf, setme, sizeof(uint8_t));
-}
-
-void tr_peerIoReadUint16(tr_peerIo* io, struct evbuffer* inbuf, uint16_t* setme);
-
-void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme);
-
-void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count);
+void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val);
+void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val);
+void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val);
 
 /**
 ***
