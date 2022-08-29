@@ -1236,7 +1236,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     // so try using a strbuf to handle it on the stack
     auto tmp = tr_strbuf<char, 512>{};
     tmp.resize(len);
-    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+    msgs->io->readBytes(std::data(tmp), std::size(tmp));
     auto const handshake_sv = tmp.sv();
 
     auto val = tr_variant{};
@@ -1342,7 +1342,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     auto tmp = std::vector<char>{};
     tmp.resize(msglen);
-    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+    msgs->io->readBytes(std::data(tmp), std::size(tmp));
     char const* const msg_end = std::data(tmp) + std::size(tmp);
 
     auto dict = tr_variant{};
@@ -1414,7 +1414,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
 
     auto tmp = std::vector<char>{};
     tmp.resize(msglen);
-    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+    msgs->io->readBytes(std::data(tmp), std::size(tmp));
 
     if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp))
     {
@@ -1699,7 +1699,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     auto const n_to_read = std::min({ n_left_in_block, n_left_in_req, inlen });
     auto const old_length = std::size(*block_buf);
     block_buf->resize(old_length + n_to_read);
-    tr_peerIoReadBytes(msgs->io, inbuf, &((*block_buf)[old_length]), n_to_read);
+    msgs->io->readBuf(&((*block_buf)[old_length]), n_to_read);
 
     msgs->publishClientGotPieceData(n_to_read);
     *setme_piece_bytes_read += n_to_read;
@@ -1834,7 +1834,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         {
             logtrace(msgs, "got a bitfield");
             auto tmp = std::vector<uint8_t>(msglen);
-            tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+            msgs->io->readBytes(std::data(tmp), std::size(tmp));
             msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : std::size(tmp) * 8 };
             msgs->have_.setRaw(std::data(tmp), std::size(tmp));
             msgs->publishClientGotBitfield(&msgs->have_);

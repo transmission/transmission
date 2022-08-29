@@ -95,6 +95,8 @@ public:
         }
     }
 
+    void readBytes(void* bytes, size_t n_bytes);
+
     [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
         return addr_;
@@ -107,9 +109,14 @@ public:
 
     std::string addrStr() const;
 
-    [[nodiscard]] auto getReadBuffer() noexcept
+    [[nodiscard]] auto readBuffer() noexcept
     {
         return inbuf.get();
+    }
+
+    [[nodiscard]] auto readBufferSize() const noexcept
+    {
+        return evbuffer_get_length(inbuf.get());
     }
 
     void readBufferAdd(void const* data, size_t n_bytes);
@@ -372,26 +379,26 @@ void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
 void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t hl);
 void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t hll);
 
-static inline void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
+constexpr void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
 {
     evbuffer_add_uint16(buf, val);
 }
 
-static inline void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
+constexpr void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
 {
     evbuffer_add_uint32(buf, val);
 }
 
-static inline void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
+constexpr void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
 {
     evbuffer_add_uint64(buf, val);
 }
 
-void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount);
-
-static inline void tr_peerIoReadUint8(tr_peerIo* io, struct evbuffer* inbuf, uint8_t* setme)
+constexpr void tr_peerIoReadUint8(tr_peerIo* io, struct evbuffer* inbuf, uint8_t* setme)
 {
-    tr_peerIoReadBytes(io, inbuf, setme, sizeof(uint8_t));
+    TR_ASSERT(inbuf == io->readBuffer());
+
+    io->readBytes(setme, sizeof(uint8_t));
 }
 
 void tr_peerIoReadUint16(tr_peerIo* io, struct evbuffer* inbuf, uint16_t* setme);

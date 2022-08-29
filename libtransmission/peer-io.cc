@@ -982,41 +982,46 @@ void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t addme_hll)
 ****
 ***/
 
-void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount)
+void tr_peerIo::readBytes(void* bytes, size_t byte_count)
 {
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(evbuffer_get_length(inbuf) >= byteCount);
+    TR_ASSERT(readBufferSize() >= byte_count);
 
-    evbuffer_remove(inbuf, bytes, byteCount);
+    evbuffer_remove(readBuffer(), bytes, byte_count);
 
-    if (io->isEncrypted())
+    if (isEncrypted())
     {
-        io->decrypt(byteCount, bytes);
+        decrypt(byte_count, bytes);
     }
 }
 
 void tr_peerIoReadUint16(tr_peerIo* io, struct evbuffer* inbuf, uint16_t* setme)
 {
+    TR_ASSERT(inbuf == io->readBuffer());
+
     auto tmp = uint16_t{};
-    tr_peerIoReadBytes(io, inbuf, &tmp, sizeof(uint16_t));
+    io->readBytes(&tmp, sizeof(tmp));
     *setme = ntohs(tmp);
 }
 
 void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme)
 {
+    TR_ASSERT(inbuf == io->readBuffer());
+
     auto tmp = uint32_t{};
-    tr_peerIoReadBytes(io, inbuf, &tmp, sizeof(uint32_t));
+    io->readBytes(&tmp, sizeof(tmp));
     *setme = ntohl(tmp);
 }
 
 void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byte_count)
 {
+    TR_ASSERT(inbuf == io->readBuffer());
+
     auto buf = std::array<char, 4096>{};
 
     while (byte_count > 0)
     {
         size_t const this_pass = std::min(byte_count, std::size(buf));
-        tr_peerIoReadBytes(io, inbuf, std::data(buf), this_pass);
+        io->readBytes(std::data(buf), this_pass);
         byte_count -= this_pass;
     }
 }
