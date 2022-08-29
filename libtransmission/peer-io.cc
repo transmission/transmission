@@ -563,7 +563,7 @@ void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 #endif
 }
 
-tr_peerIo* tr_peerIoNewIncoming(
+tr_peerIo* tr_peerIo::newIncoming(
     tr_session* session,
     tr_bandwidth* parent,
     tr_address const* addr,

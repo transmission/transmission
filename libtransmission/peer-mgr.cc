@@ -1263,10 +1263,10 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     else /* we don't have a connection to them yet... */
     {
         auto mediator = std::make_shared<tr_handshake_mediator_impl>(*session);
-        tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket);
+        tr_peerIo* const io = tr_peerIo::newIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket);
         tr_handshake* const handshake = tr_handshakeNew(mediator, io, session->encryptionMode(), on_handshake_done, manager);
 
-        tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
+        tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIo::NewIncoming() */
 
         manager->incoming_handshakes.add(*addr, handshake);
     }

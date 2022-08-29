@@ -73,7 +73,7 @@ class tr_peerIo
 
 public:
     // TODO: 8 constructor args is too many; maybe a builder object?
-    tr_peerIo* newOutgoing(
+    static tr_peerIo* newOutgoing(
         tr_session* session,
         tr_bandwidth* parent,
         struct tr_address const* addr,
@@ -83,8 +83,16 @@ public:
         bool is_seed,
         bool utp);
 
+    static tr_peerIo* newIncoming(
+        tr_session* session,
+        tr_bandwidth* parent,
+        struct tr_address const* addr,
+        tr_port port,
+        time_t current_time,
+        struct tr_peer_socket const socket);
+
     // this is only public for testing purposes.
-    // production code should use tr_peerIo::newOutgoing() or tr_peerIoNewIncoming()
+    // production code should use newOutgoing() or newIncoming()
     static tr_peerIo* create(
         tr_session* session,
         tr_bandwidth* parent,
@@ -338,14 +346,6 @@ private:
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;
 };
-
-tr_peerIo* tr_peerIoNewIncoming(
-    tr_session* session,
-    tr_bandwidth* parent,
-    struct tr_address const* addr,
-    tr_port port,
-    time_t current_time,
-    struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
