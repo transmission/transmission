@@ -33,7 +33,9 @@ namespace test
 
 auto constexpr MaxWaitMsec = int{ 5000 };
 
-using HandshakeTest = SessionTest;
+class HandshakeTest : public SessionTest
+{
+public:
 
 class MediatorMock final : public tr_handshake_mediator
 {
@@ -142,19 +144,20 @@ void sendB64ToClient(evutil_socket_t sock, std::string_view b64)
     sendToClient(sock, tr_base64_decode(b64));
 }
 
-auto constexpr ReservedBytesNoExtensions = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
-auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
-auto const DefaultPeerAddr = *tr_address::fromString("127.0.0.1"sv);
-auto const DefaultPeerPort = tr_port::fromHost(8080);
-auto const TorrentWeAreSeeding = tr_handshake_mediator::torrent_info{ tr_sha1::digest("abcde"sv),
-                                                                      tr_peerIdInit(),
-                                                                      tr_torrent_id_t{ 100 },
-                                                                      true /*is_done*/ };
-auto const UbuntuTorrent = tr_handshake_mediator::torrent_info{ *tr_sha1_from_string(
-                                                                    "2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
+static auto constexpr ReservedBytesNoExtensions = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
+static auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
+
+tr_address const DefaultPeerAddr = *tr_address::fromString("127.0.0.1"sv);
+tr_port const DefaultPeerPort = tr_port::fromHost(8080);
+tr_handshake_mediator::torrent_info const TorrentWeAreSeeding { tr_sha1::digest("abcde"sv),
                                                                 tr_peerIdInit(),
-                                                                tr_torrent_id_t{ 101 },
-                                                                false /*is_done*/ };
+                                                                tr_torrent_id_t{ 100 },
+                                                                true /*is_done*/ };
+tr_handshake_mediator::torrent_info const UbuntuTorrent{ *tr_sha1_from_string(
+                                                         "2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
+                                                         tr_peerIdInit(),
+                                                         tr_torrent_id_t{ 101 },
+                                                         false /*is_done*/ };
 
 auto createIncomingIo(tr_session* session)
 {
@@ -185,7 +188,7 @@ auto createOutgoingIo(tr_session* session, tr_sha1_digest_t const& info_hash)
     return std::make_pair(io, sockpair[1]);
 }
 
-constexpr auto makePeerId(std::string_view sv)
+static constexpr auto makePeerId(std::string_view sv)
 {
     auto peer_id = tr_peer_id_t{};
     for (size_t i = 0, n = std::size(sv); i < n; ++i)
@@ -195,7 +198,7 @@ constexpr auto makePeerId(std::string_view sv)
     return peer_id;
 }
 
-auto makeRandomPeerId()
+static auto makeRandomPeerId()
 {
     auto peer_id = tr_peer_id_t{};
     tr_rand_buffer(std::data(peer_id), std::size(peer_id));
@@ -204,7 +207,7 @@ auto makeRandomPeerId()
     return peer_id;
 }
 
-auto runHandshake(
+static auto runHandshake(
     std::shared_ptr<tr_handshake_mediator> mediator,
     std::shared_ptr<tr_peerIo> io,
     tr_encryption_mode encryption_mode = TR_CLEAR_PREFERRED)
@@ -223,6 +226,8 @@ auto runHandshake(
 
     return result;
 }
+
+};
 
 TEST_F(HandshakeTest, incomingPlaintext)
 {
