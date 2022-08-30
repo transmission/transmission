@@ -104,7 +104,7 @@ public:
         anti_brute_force_limit_ = limit;
     }
 
-    std::shared_ptr<libdeflate_compressor> compressor;
+    std::unique_ptr<libdeflate_compressor, void (*)(libdeflate_compressor*)> compressor;
 
     [[nodiscard]] constexpr auto const& url() const noexcept
     {

@@ -1395,8 +1395,10 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     content.resize(1024 * 128);
     for (;;)
     {
-        auto decompressor = std::shared_ptr<libdeflate_decompressor>{ libdeflate_alloc_decompressor(),
-                                                                      libdeflate_free_decompressor };
+        auto decompressor = std::unique_ptr<libdeflate_decompressor, void (*)(libdeflate_decompressor*)>{
+            libdeflate_alloc_decompressor(),
+            libdeflate_free_decompressor
+        };
         auto actual_size = size_t{};
         auto const decompress_result = libdeflate_gzip_decompress(
             decompressor.get(),
