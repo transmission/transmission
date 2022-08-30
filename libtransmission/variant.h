@@ -191,7 +191,13 @@ constexpr bool tr_variantIsReal(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
 }
 
-void tr_variantInitReal(tr_variant* initme, double value);
+constexpr void tr_variantInitReal(tr_variant* initme, double value)
+{
+    initme->type = TR_VARIANT_TYPE_REAL;
+    initme->val = {};
+    initme->val.d = value;
+}
+
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
 /***

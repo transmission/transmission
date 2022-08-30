@@ -391,12 +391,6 @@ void tr_variantInitStrView(tr_variant* initme, std::string_view str)
     tr_variant_string_set_string_view(&initme->val.s, str);
 }
 
-void tr_variantInitReal(tr_variant* initme, double value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_REAL);
-    initme->val.d = value;
-}
-
 void tr_variantInitList(tr_variant* initme, size_t reserve_count)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_LIST);
