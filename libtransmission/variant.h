@@ -221,7 +221,13 @@ constexpr bool tr_variantIsInt(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
 
-void tr_variantInitInt(tr_variant* initme, int64_t value);
+constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
+{
+    initme->type = TR_VARIANT_TYPE_INT;
+    initme->val = {};
+    initme->val.i = value;
+}
+
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 
 /***

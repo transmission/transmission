@@ -42,12 +42,6 @@ static bool tr_variantIsContainer(tr_variant const* v)
     return tr_variantIsList(v) || tr_variantIsDict(v);
 }
 
-constexpr void tr_variantInit(tr_variant* v, char type)
-{
-    v->type = type;
-    v->val = {};
-}
-
 /***
 ****
 ***/
@@ -401,12 +395,6 @@ void tr_variantInitReal(tr_variant* initme, double value)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_REAL);
     initme->val.d = value;
-}
-
-void tr_variantInitInt(tr_variant* initme, int64_t value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_INT);
-    initme->val.i = value;
 }
 
 void tr_variantInitList(tr_variant* initme, size_t reserve_count)
