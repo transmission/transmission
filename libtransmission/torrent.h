@@ -187,7 +187,7 @@ public:
         return completion.sizeWhenDone();
     }
 
-    [[nodiscard]] auto hasMetainfo() const noexcept
+    [[nodiscard]] constexpr auto hasMetainfo() const noexcept
     {
         return completion.hasMetainfo();
     }
