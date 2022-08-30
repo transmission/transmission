@@ -71,7 +71,7 @@ public:
     {
         return blockInfo().blockCount();
     }
-    [[nodiscard]] auto byteLoc(uint64_t nth_byte) const
+    [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const
     {
         return blockInfo().byteLoc(nth_byte);
     }

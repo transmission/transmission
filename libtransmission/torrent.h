@@ -138,7 +138,7 @@ public:
     {
         return metainfo_.blockCount();
     }
-    [[nodiscard]] auto byteLoc(uint64_t byte) const
+    [[nodiscard]] constexpr auto byteLoc(uint64_t byte) const
     {
         return metainfo_.byteLoc(byte);
     }
