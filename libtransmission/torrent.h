@@ -222,7 +222,7 @@ public:
         return completion.countMissingBytesInPiece(piece);
     }
 
-    [[nodiscard]] auto hasTotal() const
+    [[nodiscard]] constexpr auto hasTotal() const
     {
         return completion.hasTotal();
     }
@@ -288,7 +288,7 @@ public:
         return files_wanted_.pieceWanted(piece);
     }
 
-    [[nodiscard]] bool fileIsWanted(tr_file_index_t file) const
+    [[nodiscard]] constexpr bool fileIsWanted(tr_file_index_t file) const
     {
         return files_wanted_.fileWanted(file);
     }
