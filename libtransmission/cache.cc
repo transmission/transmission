@@ -21,7 +21,6 @@
 #include "torrent.h"
 #include "torrents.h"
 #include "tr-assert.h"
-#include "trevent.h"
 #include "utils.h" // tr_time(), tr_formatter
 
 Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept

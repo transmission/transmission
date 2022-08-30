@@ -114,8 +114,12 @@ enum handshake_state_t
 
 struct tr_handshake
 {
-    tr_handshake(std::shared_ptr<tr_handshake_mediator> mediator_in, tr_encryption_mode encryption_mode_in)
+    tr_handshake(
+        std::shared_ptr<tr_handshake_mediator> mediator_in,
+        std::shared_ptr<tr_peerIo> io_in,
+        tr_encryption_mode encryption_mode_in)
         : mediator{ std::move(mediator_in) }
+        , io{ std::move(io_in) }
         , dh{ mediator->privateKey() }
         , encryption_mode{ encryption_mode_in }
     {
@@ -125,16 +129,9 @@ struct tr_handshake
     tr_handshake(tr_handshake const&) = delete;
     tr_handshake& operator=(tr_handshake&&) = delete;
     tr_handshake& operator=(tr_handshake const&) = delete;
+    ~tr_handshake() = default;
 
-    ~tr_handshake()
-    {
-        if (io != nullptr)
-        {
-            tr_peerIoUnref(io); /* balanced by the ref in tr_handshakeNew */
-        }
-    }
-
-    [[nodiscard]] auto constexpr isIncoming() const noexcept
+    [[nodiscard]] auto isIncoming() const noexcept
     {
         return io->isIncoming();
     }
@@ -143,7 +140,7 @@ struct tr_handshake
 
     bool haveReadAnythingFromPeer = false;
     bool haveSentBitTorrentHandshake = false;
-    tr_peerIo* io = nullptr;
+    std::shared_ptr<tr_peerIo> const io;
     DH dh = {};
     handshake_state_t state = AWAITING_HANDSHAKE;
     tr_encryption_mode encryption_mode;
@@ -1133,20 +1130,18 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 
 tr_handshake* tr_handshakeNew(
     std::shared_ptr<tr_handshake_mediator> mediator,
-    tr_peerIo* io,
+    std::shared_ptr<tr_peerIo> io,
     tr_encryption_mode encryption_mode,
     tr_handshake_done_func done_func,
     void* done_func_user_data)
 {
-    auto* const handshake = new tr_handshake{ std::move(mediator), encryption_mode };
-    handshake->io = io;
+    auto* const handshake = new tr_handshake{ std::move(mediator), std::move(io), encryption_mode };
     handshake->done_func = done_func;
     handshake->done_func_user_data = done_func_user_data;
     handshake->timeout_timer = handshake->mediator->createTimer();
     handshake->timeout_timer->setCallback([handshake]() { tr_handshakeAbort(handshake); });
     handshake->timeout_timer->startSingleShot(HandshakeTimeoutSec);
 
-    tr_peerIoRef(io); /* balanced by the unref in ~tr_handshake() */
     handshake->io->setCallbacks(canRead, nullptr, gotError, handshake);
 
     if (handshake->isIncoming())
@@ -1168,14 +1163,4 @@ tr_handshake* tr_handshakeNew(
     }
 
     return handshake;
-}
-
-tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
-{
-    TR_ASSERT(handshake != nullptr);
-    TR_ASSERT(handshake->io != nullptr);
-
-    tr_peerIo* io = handshake->io;
-    handshake->io = nullptr;
-    return io;
 }

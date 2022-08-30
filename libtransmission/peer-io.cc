@@ -26,7 +26,6 @@
 #include "peer-io.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
-#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 
 #ifdef _WIN32
@@ -113,11 +112,10 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
     }
 }
 
-static void canReadWrapper(tr_peerIo* io)
+static void canReadWrapper(tr_peerIo* io_in)
 {
+    auto const io = io_in->shared_from_this();
     tr_logAddTraceIo(io, "canRead");
-
-    tr_peerIoRef(io);
 
     tr_session const* const session = io->session;
 
@@ -134,7 +132,7 @@ static void canReadWrapper(tr_peerIo* io)
         {
             size_t piece = 0;
             size_t const oldLen = evbuffer_get_length(io->inbuf.get());
-            int const ret = io->canRead(io, io->userData, &piece);
+            int const ret = io->canRead(io.get(), io->userData, &piece);
             size_t const used = oldLen - evbuffer_get_length(io->inbuf.get());
             unsigned int const overhead = guessPacketOverhead(used);
 
@@ -175,12 +173,8 @@ static void canReadWrapper(tr_peerIo* io)
                 err = true;
                 break;
             }
-
-            TR_ASSERT(tr_isPeerIo(io));
         }
     }
-
-    tr_peerIoUnref(io);
 }
 
 static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
@@ -491,7 +485,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
 
 #endif /* #ifdef WITH_UTP */
 
-tr_peerIo* tr_peerIo::create(
+std::shared_ptr<tr_peerIo> tr_peerIo::create(
     tr_session* session,
     tr_bandwidth* parent,
     tr_address const* addr,
@@ -519,7 +513,9 @@ tr_peerIo* tr_peerIo::create(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time, parent };
+    auto io = std::shared_ptr<tr_peerIo>{
+        new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time, parent }
+    };
     io->socket = socket;
     io->bandwidth().setPeer(io);
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
@@ -528,15 +524,15 @@ tr_peerIo* tr_peerIo::create(
     {
     case TR_PEER_SOCKET_TYPE_TCP:
         tr_logAddTraceIo(io, fmt::format("socket (tcp) is {}", socket.handle.tcp));
-        io->event_read = event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, io);
-        io->event_write = event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, io);
+        io->event_read = event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, io.get());
+        io->event_write = event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, io.get());
         break;
 
 #ifdef WITH_UTP
 
     case TR_PEER_SOCKET_TYPE_UTP:
         tr_logAddTraceIo(io, fmt::format("socket (utp) is {}", fmt::ptr(socket.handle.utp)));
-        utp_set_userdata(socket.handle.utp, io);
+        utp_set_userdata(socket.handle.utp, io.get());
         break;
 
 #endif
@@ -563,7 +559,7 @@ void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 #endif
 }
 
-tr_peerIo* tr_peerIo::newIncoming(
+std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(
     tr_session* session,
     tr_bandwidth* parent,
     tr_address const* addr,
@@ -577,7 +573,7 @@ tr_peerIo* tr_peerIo::newIncoming(
     return tr_peerIo::create(session, parent, addr, port, current_time, nullptr, true, false, socket);
 }
 
-tr_peerIo* tr_peerIo::newOutgoing(
+std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
     tr_session* session,
     tr_bandwidth* parent,
     tr_address const* addr,
@@ -620,7 +616,6 @@ tr_peerIo* tr_peerIo::newOutgoing(
 
 static void event_enable(tr_peerIo* io, short event)
 {
-    TR_ASSERT(tr_amInEventThread(io->session));
     TR_ASSERT(io->session != nullptr);
     TR_ASSERT(io->session->events != nullptr);
 
@@ -659,8 +654,6 @@ static void event_enable(tr_peerIo* io, short event)
 
 static void event_disable(tr_peerIo* io, short event)
 {
-    TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session != nullptr);
     TR_ASSERT(io->session->events != nullptr);
 
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
@@ -699,8 +692,6 @@ static void event_disable(tr_peerIo* io, short event)
 void tr_peerIo::setEnabled(tr_direction dir, bool is_enabled)
 {
     TR_ASSERT(tr_isDirection(dir));
-    TR_ASSERT(tr_amInEventThread(session));
-    TR_ASSERT(session->events != nullptr);
 
     short const event = dir == TR_UP ? EV_WRITE : EV_READ;
 
@@ -757,55 +748,18 @@ static void io_close_socket(tr_peerIo* io)
     }
 }
 
-static void io_dtor(tr_peerIo* const io)
+tr_peerIo::~tr_peerIo()
 {
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session->events != nullptr);
+    auto const lock = session->unique_lock();
+    TR_ASSERT(session->events != nullptr);
 
-    tr_logAddTraceIo(io, "in tr_peerIo destructor");
-    event_disable(io, EV_READ | EV_WRITE);
-    io_close_socket(io);
+    this->canRead = nullptr;
+    this->didWrite = nullptr;
+    this->gotError = nullptr;
 
-    io->magic_number = ~0;
-    delete io;
-}
-
-static void tr_peerIoFree(tr_peerIo* io)
-{
-    if (io != nullptr)
-    {
-        tr_logAddTraceIo(io, "in tr_peerIoFree");
-        io->canRead = nullptr;
-        io->didWrite = nullptr;
-        io->gotError = nullptr;
-        tr_runInEventThread(io->session, io_dtor, io);
-    }
-}
-
-void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    tr_logAddTraceIo(
-        io,
-        fmt::format("{}:{} incrementing the IO's refcount from {} to {}", file, line, io->refCount, io->refCount + 1));
-
-    ++io->refCount;
-}
-
-void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    tr_logAddTraceIo(
-        io,
-        fmt::format("{}:{} decrementing the IO's refcount from {} to {}", file, line, io->refCount, io->refCount - 1));
-
-    if (--io->refCount == 0)
-    {
-        tr_peerIoFree(io);
-    }
+    tr_logAddTraceIo(this, "in tr_peerIo destructor");
+    event_disable(this, EV_READ | EV_WRITE);
+    io_close_socket(this);
 }
 
 std::string tr_peerIo::addrStr() const
