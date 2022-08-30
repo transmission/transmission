@@ -93,8 +93,6 @@ public:
     {
     }
 
-    ~tr_torrent() override = default;
-
     void setLocation(
         std::string_view location,
         bool move_from_old_path,

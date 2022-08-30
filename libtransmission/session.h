@@ -831,7 +831,6 @@ private:
             : session_{ session }
         {
         }
-        ~WebMediator() override = default;
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddressV4() const override;
@@ -855,7 +854,6 @@ private:
             : session_{ session }
         {
         }
-        ~LpdMediator() override = default;
 
         [[nodiscard]] tr_port port() const override
         {

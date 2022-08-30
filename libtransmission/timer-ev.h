@@ -25,8 +25,6 @@ public:
     {
     }
 
-    ~EvTimerMaker() override = default;
-
     [[nodiscard]] std::unique_ptr<Timer> create() override;
 
 private:
