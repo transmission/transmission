@@ -176,11 +176,6 @@ void tr_files_wanted::set(tr_file_index_t const* files, size_t n, bool wanted)
     }
 }
 
-bool tr_files_wanted::fileWanted(tr_file_index_t file) const
-{
-    return wanted_.test(file);
-}
-
 bool tr_files_wanted::pieceWanted(tr_piece_index_t piece) const
 {
     if (wanted_.hasAll())
