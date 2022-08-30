@@ -66,6 +66,13 @@ struct evbuffer_deleter
 
 using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
 
+namespace libtransmission::test
+{
+
+class HandshakeTest;
+
+} // namespace libtransmission::test
+
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {
     using DH = tr_message_stream_encryption::DH;
@@ -91,19 +98,6 @@ public:
         struct tr_address const* addr,
         tr_port port,
         time_t current_time,
-        struct tr_peer_socket const socket);
-
-    // this is only public for testing purposes.
-    // production code should use newOutgoing() or newIncoming()
-    static std::shared_ptr<tr_peerIo> create(
-        tr_session* session,
-        tr_bandwidth* parent,
-        tr_address const* addr,
-        tr_port port,
-        time_t current_time,
-        tr_sha1_digest_t const* torrent_hash,
-        bool is_incoming,
-        bool is_seed,
         struct tr_peer_socket const socket);
 
     void clear();
@@ -290,6 +284,21 @@ public:
     static void utpInit(struct_utp_context* ctx);
 
 private:
+    friend class libtransmission::test::HandshakeTest;
+
+    // this is only public for testing purposes.
+    // production code should use newOutgoing() or newIncoming()
+    static std::shared_ptr<tr_peerIo> create(
+        tr_session* session,
+        tr_bandwidth* parent,
+        tr_address const* addr,
+        tr_port port,
+        time_t current_time,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        bool is_seed,
+        struct tr_peer_socket const socket);
+
     tr_peerIo(
         tr_session* session_in,
         tr_sha1_digest_t const* torrent_hash,
