@@ -616,7 +616,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
 
 static void event_enable(tr_peerIo* io, short event)
 {
-    auto const lock = io->session->unique_lock();
     TR_ASSERT(io->session != nullptr);
     TR_ASSERT(io->session->events != nullptr);
 
@@ -655,7 +654,6 @@ static void event_enable(tr_peerIo* io, short event)
 
 static void event_disable(tr_peerIo* io, short event)
 {
-    auto const lock = io->session->unique_lock();
     TR_ASSERT(io->session->events != nullptr);
 
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
