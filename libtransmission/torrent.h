@@ -146,7 +146,7 @@ public:
     {
         return metainfo_.blockLoc(block);
     }
-    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
     {
         return metainfo_.pieceLoc(piece, offset, length);
     }
