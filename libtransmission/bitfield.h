@@ -99,7 +99,7 @@ private:
     [[nodiscard]] size_t countFlags() const noexcept;
     [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
 
-    [[nodiscard]] bool testFlag(size_t n) const
+    [[nodiscard]] constexpr bool testFlag(size_t n) const
     {
         if (n >> 3U >= std::size(flags_))
         {
