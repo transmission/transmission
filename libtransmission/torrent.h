@@ -266,7 +266,7 @@ public:
 
     /// FILE <-> PIECE
 
-    [[nodiscard]] auto piecesInFile(tr_file_index_t file) const
+    [[nodiscard]] constexpr auto piecesInFile(tr_file_index_t file) const
     {
         return fpm_.pieceSpan(file);
     }
