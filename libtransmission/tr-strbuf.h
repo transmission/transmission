@@ -33,7 +33,6 @@ public:
         ensure_sz();
     }
 
-    ~tr_strbuf() = default;
     tr_strbuf(tr_strbuf const& other) = delete;
     tr_strbuf& operator=(tr_strbuf const& other) = delete;
 
