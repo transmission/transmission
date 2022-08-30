@@ -877,8 +877,8 @@ private:
 
     LpdMediator lpd_mediator_{ *this };
 
-    std::shared_ptr<event_base> const event_base_;
-    std::shared_ptr<evdns_base> const evdns_base_;
+    std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+    std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
     void onNowTimer();
