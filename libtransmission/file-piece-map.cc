@@ -60,11 +60,6 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
     reset({ tm.totalSize(), tm.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
 }
 
-tr_file_piece_map::piece_span_t tr_file_piece_map::pieceSpan(tr_file_index_t file) const
-{
-    return file_pieces_[file];
-}
-
 tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piece) const
 {
     auto compare = CompareToSpan<tr_piece_index_t>{};

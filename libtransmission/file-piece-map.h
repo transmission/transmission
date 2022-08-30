@@ -52,7 +52,11 @@ public:
     void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
     void reset(tr_torrent_metainfo const& tm);
 
-    [[nodiscard]] piece_span_t pieceSpan(tr_file_index_t file) const;
+    [[nodiscard]] constexpr piece_span_t pieceSpan(tr_file_index_t file) const
+    {
+        return file_pieces_[file];
+    }
+
     [[nodiscard]] file_span_t fileSpan(tr_piece_index_t piece) const;
 
     [[nodiscard]] file_offset_t fileOffset(uint64_t offset) const;
