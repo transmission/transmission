@@ -28,6 +28,7 @@
 
 #include "crypto-utils.h"
 #include "log.h"
+#include "peer-io.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "web.h"
@@ -179,7 +180,7 @@ public:
     class Task
     {
     private:
-        std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
+        tr_evbuffer_ptr const privbuf = tr_evbuffer_ptr{ evbuffer_new() };
         std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
         tr_web::FetchOptions options;
 
