@@ -514,7 +514,9 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto io = std::make_shared<tr_peerIo>(session, torrent_hash, is_incoming, *addr, port, is_seed, current_time, parent);
+    auto io = std::shared_ptr<tr_peerIo>{
+        new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time, parent }
+    };
     io->socket = socket;
     io->bandwidth().setPeer(io);
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));

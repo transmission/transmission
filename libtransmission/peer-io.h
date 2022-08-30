@@ -106,29 +106,6 @@ public:
         bool is_seed,
         struct tr_peer_socket const socket);
 
-    tr_peerIo(
-        tr_session* session_in,
-        tr_sha1_digest_t const* torrent_hash,
-        bool is_incoming,
-        tr_address const& addr,
-        tr_port port,
-        bool is_seed,
-        time_t current_time,
-        tr_bandwidth* parent_bandwidth)
-        : session{ session_in }
-        , time_created{ current_time }
-        , bandwidth_{ parent_bandwidth }
-        , addr_{ addr }
-        , port_{ port }
-        , is_seed_{ is_seed }
-        , is_incoming_{ is_incoming }
-    {
-        if (torrent_hash != nullptr)
-        {
-            torrent_hash_ = *torrent_hash;
-        }
-    }
-
     void clear();
 
     void readBytes(void* bytes, size_t byte_count);
@@ -243,7 +220,7 @@ public:
         bandwidth_.setParent(parent);
     }
 
-    [[nodiscard]] constexpr auto isIncoming() noexcept
+    [[nodiscard]] constexpr auto isIncoming() const noexcept
     {
         return is_incoming_;
     }
@@ -313,6 +290,29 @@ public:
     static void utpInit(struct_utp_context* ctx);
 
 private:
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        tr_address const& addr,
+        tr_port port,
+        bool is_seed,
+        time_t current_time,
+        tr_bandwidth* parent_bandwidth)
+        : session{ session_in }
+        , time_created{ current_time }
+        , bandwidth_{ parent_bandwidth }
+        , addr_{ addr }
+        , port_{ port }
+        , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
+    {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
+    }
+
     Filter& filter()
     {
         if (!filter_)
