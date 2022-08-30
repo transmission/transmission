@@ -207,7 +207,7 @@ public:
         return completion.hasPiece(piece);
     }
 
-    [[nodiscard]] auto hasBlock(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
