@@ -26,7 +26,6 @@
 #include "peer-io.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
-#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 
 #ifdef _WIN32
@@ -617,7 +616,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
 
 static void event_enable(tr_peerIo* io, short event)
 {
-    TR_ASSERT(tr_amInEventThread(io->session));
+    auto const lock = io->session->unique_lock();
     TR_ASSERT(io->session != nullptr);
     TR_ASSERT(io->session->events != nullptr);
 
@@ -656,8 +655,7 @@ static void event_enable(tr_peerIo* io, short event)
 
 static void event_disable(tr_peerIo* io, short event)
 {
-    TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session != nullptr);
+    auto const lock = io->session->unique_lock();
     TR_ASSERT(io->session->events != nullptr);
 
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
@@ -696,8 +694,6 @@ static void event_disable(tr_peerIo* io, short event)
 void tr_peerIo::setEnabled(tr_direction dir, bool is_enabled)
 {
     TR_ASSERT(tr_isDirection(dir));
-    TR_ASSERT(tr_amInEventThread(session));
-    TR_ASSERT(session->events != nullptr);
 
     short const event = dir == TR_UP ? EV_WRITE : EV_READ;
 
