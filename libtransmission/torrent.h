@@ -142,7 +142,7 @@ public:
     {
         return metainfo_.byteLoc(byte);
     }
-    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const
     {
         return metainfo_.blockLoc(block);
     }

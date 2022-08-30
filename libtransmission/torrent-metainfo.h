@@ -75,7 +75,7 @@ public:
     {
         return blockInfo().byteLoc(nth_byte);
     }
-    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const
     {
         return blockInfo().blockLoc(block);
     }
