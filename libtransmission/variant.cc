@@ -42,10 +42,10 @@ static bool tr_variantIsContainer(tr_variant const* v)
     return tr_variantIsList(v) || tr_variantIsDict(v);
 }
 
-constexpr void tr_variantInit(tr_variant* v, char type)
+void tr_variantInit(tr_variant* v, char type)
 {
     v->type = type;
-    v->val = {};
+    memset(&v->val, 0, sizeof(v->val));
 }
 
 /***
@@ -367,12 +367,6 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const**
 ****
 ***/
 
-void tr_variantInit(tr_variant* v, char type)
-{
-    v->type = type;
-    v->val = {};
-}
-
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
@@ -395,6 +389,12 @@ void tr_variantInitStrView(tr_variant* initme, std::string_view str)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
     tr_variant_string_set_string_view(&initme->val.s, str);
+}
+
+void tr_variantInitBool(tr_variant* initme, bool value)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_BOOL);
+    initme->val.b = value;
 }
 
 void tr_variantInitReal(tr_variant* initme, double value)

@@ -203,13 +203,7 @@ constexpr bool tr_variantIsBool(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
 }
 
-constexpr void tr_variantInitBool(tr_variant* initme, bool value)
-{
-    initme->type = TR_VARIANT_TYPE_BOOL;
-    initme->val = {};
-    initme->val.b = value;
-}
-
+void tr_variantInitBool(tr_variant* initme, bool value);
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
 /***
