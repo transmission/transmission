@@ -206,7 +206,7 @@ constexpr std::string_view getPortForScheme(std::string_view scheme)
     return "-1"sv;
 }
 
-constexpr bool urlCharsAreValid(std::string_view url)
+bool urlCharsAreValid(std::string_view url)
 {
     // rfc2396
     auto constexpr ValidChars = std::string_view{
@@ -219,22 +219,14 @@ constexpr bool urlCharsAreValid(std::string_view url)
         "{}|\\^[]`" // unwise
     };
 
-    return !std::empty(url) && url.find_first_not_of(ValidChars) == std::string_view::npos;
+    return !std::empty(url) &&
+        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return tr_strvContains(ValidChars, ch); });
 }
 
-constexpr bool isValidTrackerScheme(std::string_view scheme)
+bool tr_isValidTrackerScheme(std::string_view scheme)
 {
-    auto constexpr ValidSchemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
-
-    for (auto const& valid_scheme : ValidSchemes)
-    {
-        if (scheme == valid_scheme)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
+    return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
 }
 
 bool isAsciiNonUpperCase(std::string_view host)
@@ -368,7 +360,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
 {
     auto const parsed = tr_urlParse(url);
-    return parsed && isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
+    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
 }
 
 bool tr_urlIsValidTracker(std::string_view url)
