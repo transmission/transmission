@@ -515,7 +515,7 @@ public:
         return this->isDone() ? TR_UP : TR_DOWN;
     }
 
-    [[nodiscard]] auto allowsPex() const noexcept
+    [[nodiscard]] constexpr auto allowsPex() const noexcept
     {
         return this->isPublic() && this->session->allowsPEX();
     }
