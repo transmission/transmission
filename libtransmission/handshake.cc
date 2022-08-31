@@ -131,7 +131,7 @@ struct tr_handshake
     tr_handshake& operator=(tr_handshake const&) = delete;
     ~tr_handshake() = default;
 
-    [[nodiscard]] constexpr auto isIncoming() const noexcept
+    [[nodiscard]] auto isIncoming() const noexcept
     {
         return io->isIncoming();
     }
