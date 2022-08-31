@@ -435,7 +435,7 @@ public:
         return !this->isPrivate();
     }
 
-    [[nodiscard]] auto const& infoHashString() const noexcept
+    [[nodiscard]] constexpr auto const& infoHashString() const noexcept
     {
         return metainfo_.infoHashString();
     }
