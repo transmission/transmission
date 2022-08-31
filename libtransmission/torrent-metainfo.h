@@ -137,7 +137,7 @@ public:
         return !std::empty(pieces_);
     }
 
-    [[nodiscard]] constxpr bool hasV2Metadata() const noexcept
+    [[nodiscard]] constexpr bool hasV2Metadata() const noexcept
     {
         return is_v2_;
     }
