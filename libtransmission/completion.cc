@@ -105,26 +105,6 @@ size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
     return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
 }
 
-tr_completeness tr_completion::status() const
-{
-    if (!hasMetainfo())
-    {
-        return TR_LEECH;
-    }
-
-    if (hasAll())
-    {
-        return TR_SEED;
-    }
-
-    if (size_now_ == sizeWhenDone())
-    {
-        return TR_PARTIAL_SEED;
-    }
-
-    return TR_LEECH;
-}
-
 std::vector<uint8_t> tr_completion::createPieceBitfield() const
 {
     size_t const n = block_info_->pieceCount();
