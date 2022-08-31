@@ -22,6 +22,7 @@
 
 #include "bandwidth.h"
 #include "cache.h"
+#include "peer-io.h"
 #include "peer-mgr.h"
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -42,7 +43,7 @@ void on_idle(tr_webseed* w);
 class tr_webseed_task
 {
 private:
-    std::shared_ptr<evbuffer> const content_{ evbuffer_new(), evbuffer_free };
+    tr_evbuffer_ptr const content_{ evbuffer_new() };
 
 public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t blocks_in)
@@ -351,7 +352,7 @@ private:
 struct write_block_data
 {
 private:
-    std::shared_ptr<evbuffer> const content_{ evbuffer_new(), evbuffer_free };
+    tr_evbuffer_ptr const content_{ evbuffer_new() };
 
 public:
     write_block_data(

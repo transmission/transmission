@@ -115,7 +115,7 @@ enum handshake_state_t
 struct tr_handshake
 {
     tr_handshake(
-        std::shared_ptr<tr_handshake_mediator> mediator_in,
+        std::unique_ptr<tr_handshake_mediator> mediator_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_encryption_mode encryption_mode_in)
         : mediator{ std::move(mediator_in) }
@@ -136,7 +136,7 @@ struct tr_handshake
         return io->isIncoming();
     }
 
-    std::shared_ptr<tr_handshake_mediator> const mediator;
+    std::unique_ptr<tr_handshake_mediator> const mediator;
 
     bool haveReadAnythingFromPeer = false;
     bool haveSentBitTorrentHandshake = false;
@@ -1129,7 +1129,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 **/
 
 tr_handshake* tr_handshakeNew(
-    std::shared_ptr<tr_handshake_mediator> mediator,
+    std::unique_ptr<tr_handshake_mediator> mediator,
     std::shared_ptr<tr_peerIo> io,
     tr_encryption_mode encryption_mode,
     tr_handshake_done_func done_func,

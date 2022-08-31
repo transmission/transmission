@@ -2913,7 +2913,7 @@ auto makeTorrentDir(std::string_view config_dir)
 auto makeEventBase()
 {
     tr_evthread_init();
-    return std::shared_ptr<event_base>{ event_base_new(), event_base_free };
+    return std::unique_ptr<event_base, void (*)(event_base*)>{ event_base_new(), event_base_free };
 }
 
 } // namespace

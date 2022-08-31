@@ -28,6 +28,7 @@
 
 #include "crypto-utils.h"
 #include "log.h"
+#include "peer-io.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "web.h"
@@ -179,8 +180,8 @@ public:
     class Task
     {
     private:
-        std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
-        std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
+        tr_evbuffer_ptr const privbuf = tr_evbuffer_ptr{ evbuffer_new() };
+        std::unique_ptr<CURL, void (*)(CURL*)> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
         tr_web::FetchOptions options;
 
     public:
@@ -465,7 +466,7 @@ public:
     // the thread started by Impl.curl_thread runs this function
     static void curlThreadFunc(Impl* impl)
     {
-        auto const multi = std::shared_ptr<CURLM>(curl_multi_init(), curl_multi_cleanup);
+        auto const multi = std::unique_ptr<CURLM, CURLMcode (*)(CURLM*)>(curl_multi_init(), curl_multi_cleanup);
 
         auto running_tasks = int{ 0 };
         auto repeats = unsigned{};
@@ -562,7 +563,7 @@ public:
         impl->is_closed_ = true;
     }
 
-    std::shared_ptr<CURLSH> const curlsh_{ curl_share_init(), curl_share_cleanup };
+    std::unique_ptr<CURLSH, CURLSHcode (*)(CURLSH*)> const curlsh_{ curl_share_init(), curl_share_cleanup };
 
     std::mutex queued_tasks_mutex;
     std::condition_variable queued_tasks_cv;
