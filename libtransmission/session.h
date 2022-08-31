@@ -131,7 +131,7 @@ public:
         return session_id_.sv();
     }
 
-    [[nodiscard]] constexpr event_base* eventBase() noexcept
+    [[nodiscard]] event_base* eventBase() noexcept
     {
         return event_base_.get();
     }
