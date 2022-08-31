@@ -100,7 +100,7 @@ private:
         entry.sequence_ = InvalidSeq;
     }
 
-    [[nodiscard]] Entry* find(Key const& key) noexcept
+    [[nodiscard]] constexpr Entry* find(Key const& key) noexcept
     {
         for (auto& entry : entries_)
         {
@@ -113,7 +113,7 @@ private:
         return nullptr;
     }
 
-    [[nodiscard]] Entry const* find(Key const& key) const noexcept
+    [[nodiscard]] constexpr Entry const* find(Key const& key) const noexcept
     {
         for (auto const& entry : entries_)
         {
