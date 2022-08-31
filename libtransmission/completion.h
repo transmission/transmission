@@ -96,7 +96,7 @@ struct tr_completion
 
     [[nodiscard]] uint64_t sizeWhenDone() const;
 
-    [[nodiscard]] constexpr tr_completeness status() const
+    [[nodiscard]] tr_completeness status() const
     {
         if (!hasMetainfo())
         {
