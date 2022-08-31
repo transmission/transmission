@@ -224,7 +224,9 @@ constexpr bool urlCharsAreValid(std::string_view url)
 
 constexpr bool isValidTrackerScheme(std::string_view scheme)
 {
-    for (auto const& valid_scheme : { "http"sv, "https"sv, "udp"sv })
+    auto constexpr ValidSchemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
+
+    for (auto const& valid_scheme : ValidSchemes)
     {
         if (scheme == valid_scheme)
         {
