@@ -493,7 +493,7 @@ constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, 
     // Opera 8 previews and Opera 9.x releases use the following peer_id
     // scheme: The first two characters are OP and the next four digits equal
     // the build number. All following characters are random lowercase
-    // hexdecimal digits.
+    // hexadecimal digits.
     buf_append(buf, buflen, name, ' ', std::string_view(&id[2], 4));
 }
 

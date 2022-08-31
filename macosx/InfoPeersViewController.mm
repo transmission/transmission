@@ -463,7 +463,7 @@
             NSAssert1(NO, @"Peer from unknown source: %ld", peerFrom);
         }
 
-        //determing status strings from flags
+        //determine status strings from flags
         NSMutableArray* statusArray = [NSMutableArray arrayWithCapacity:6];
         NSString* flags = peer[@"Flags"];
 

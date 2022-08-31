@@ -29,7 +29,7 @@ namespace
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }
 
-/* Used only in cases where it can be guranteed bit_count <= SIZE_MAX - 8 */
+/* Used only in cases where it can be guaranteed bit_count <= SIZE_MAX - 8 */
 [[nodiscard]] constexpr size_t getBytesNeededSafe(size_t bit_count) noexcept
 {
     return ((bit_count + 7) >> 3);
