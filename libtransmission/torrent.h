@@ -520,7 +520,7 @@ public:
         return this->isPublic() && this->session->allowsPEX();
     }
 
-    [[nodiscard]] auto allowsDht() const
+    [[nodiscard]] constexpr auto allowsDht() const
     {
         return this->isPublic() && this->session->allowsDHT();
     }
