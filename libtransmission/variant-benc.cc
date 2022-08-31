@@ -160,7 +160,7 @@ struct MyHandler : public transmission::benc::Handler
             return false;
         }
 
-        tr_variantInitInt(variant, value);
+        variant->initInt(value);
         return true;
     }
 
@@ -174,7 +174,7 @@ struct MyHandler : public transmission::benc::Handler
 
         if ((parse_opts_ & TR_VARIANT_PARSE_INPLACE) != 0)
         {
-            tr_variantInitStrView(variant, sv);
+            variant->initStrView(sv);
         }
         else
         {

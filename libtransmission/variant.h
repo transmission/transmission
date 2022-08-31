@@ -68,6 +68,31 @@ enum
  * it's included in the header for inlining and composition */
 struct tr_variant
 {
+    constexpr void initInt(int64_t value)
+    {
+        init(TR_VARIANT_TYPE_INT);
+        val.i = value;
+    }
+
+    constexpr void initReal(double value)
+    {
+        init(TR_VARIANT_TYPE_REAL);
+        val.d = value;
+    }
+
+    constexpr void initBool(bool value)
+    {
+        init(TR_VARIANT_TYPE_BOOL);
+        val.b = value;
+    }
+
+    constexpr void initStrView(std::string_view str)
+    {
+        init(TR_STRING_TYPE_VIEW);
+        val.s.str.str = std::data(str);
+        val.s.len = std::size(str);
+    }
+
     char type = '\0';
 
     tr_quark key = TR_KEY_NONE;
@@ -89,6 +114,13 @@ struct tr_variant
             struct tr_variant* vals;
         } l;
     } val = {};
+
+private:
+    constexpr void init(char new_type)
+    {
+        type = new_type;
+        val = {};
+    }
 };
 
 /**
@@ -176,7 +208,6 @@ constexpr bool tr_variantIsString(tr_variant const* b)
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view);
-void tr_variantInitStrView(tr_variant* initme, std::string_view);
 void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
 
@@ -191,13 +222,6 @@ constexpr bool tr_variantIsReal(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
 }
 
-constexpr void tr_variantInitReal(tr_variant* initme, double value)
-{
-    initme->type = TR_VARIANT_TYPE_REAL;
-    initme->val = {};
-    initme->val.d = value;
-}
-
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
 /***
@@ -209,13 +233,6 @@ constexpr bool tr_variantIsBool(tr_variant const* v)
     return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
 }
 
-constexpr void tr_variantInitBool(tr_variant* initme, bool value)
-{
-    initme->type = TR_VARIANT_TYPE_BOOL;
-    initme->val = {};
-    initme->val.b = value;
-}
-
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
 /***
@@ -225,13 +242,6 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 constexpr bool tr_variantIsInt(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
-}
-
-constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
-{
-    initme->type = TR_VARIANT_TYPE_INT;
-    initme->val = {};
-    initme->val.i = value;
 }
 
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);

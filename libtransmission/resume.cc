@@ -444,7 +444,7 @@ static void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
     }
     else if (b.hasAll())
     {
-        tr_variantInitStrView(benc, "all"sv);
+        benc->initStrView("all"sv);
     }
     else
     {

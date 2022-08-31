@@ -463,11 +463,11 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     switch (key)
     {
     case TR_KEY_activityDate:
-        tr_variantInitInt(initme, st->activityDate);
+        initme->initInt(st->activityDate);
         break;
 
     case TR_KEY_addedDate:
-        tr_variantInitInt(initme, st->addedDate);
+        initme->initInt(st->addedDate);
         break;
 
     case TR_KEY_availability:
@@ -479,7 +479,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_bandwidthPriority:
-        tr_variantInitInt(initme, tr_torrentGetPriority(tor));
+        initme->initInt(tr_torrentGetPriority(tor));
         break;
 
     case TR_KEY_comment:
@@ -487,55 +487,55 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_corruptEver:
-        tr_variantInitInt(initme, st->corruptEver);
+        initme->initInt(st->corruptEver);
         break;
 
     case TR_KEY_creator:
-        tr_variantInitStrView(initme, tor->creator());
+        initme->initStrView(tor->creator());
         break;
 
     case TR_KEY_dateCreated:
-        tr_variantInitInt(initme, tor->dateCreated());
+        initme->initInt(tor->dateCreated());
         break;
 
     case TR_KEY_desiredAvailable:
-        tr_variantInitInt(initme, st->desiredAvailable);
+        initme->initInt(st->desiredAvailable);
         break;
 
     case TR_KEY_doneDate:
-        tr_variantInitInt(initme, st->doneDate);
+        initme->initInt(st->doneDate);
         break;
 
     case TR_KEY_downloadDir:
-        tr_variantInitStrView(initme, tr_torrentGetDownloadDir(tor));
+        initme->initStrView(tr_torrentGetDownloadDir(tor));
         break;
 
     case TR_KEY_downloadedEver:
-        tr_variantInitInt(initme, st->downloadedEver);
+        initme->initInt(st->downloadedEver);
         break;
 
     case TR_KEY_downloadLimit:
-        tr_variantInitInt(initme, tr_torrentGetSpeedLimit_KBps(tor, TR_DOWN));
+        initme->initInt(tr_torrentGetSpeedLimit_KBps(tor, TR_DOWN));
         break;
 
     case TR_KEY_downloadLimited:
-        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_DOWN));
+        initme->initBool(tr_torrentUsesSpeedLimit(tor, TR_DOWN));
         break;
 
     case TR_KEY_error:
-        tr_variantInitInt(initme, st->error);
+        initme->initInt(st->error);
         break;
 
     case TR_KEY_errorString:
-        tr_variantInitStrView(initme, st->errorString);
+        initme->initStrView(st->errorString);
         break;
 
     case TR_KEY_eta:
-        tr_variantInitInt(initme, st->eta);
+        initme->initInt(st->eta);
         break;
 
     case TR_KEY_file_count:
-        tr_variantInitInt(initme, tor->fileCount());
+        initme->initInt(tor->fileCount());
         break;
 
     case TR_KEY_files:
@@ -549,43 +549,43 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_group:
-        tr_variantInitStrView(initme, tor->bandwidthGroup().sv());
+        initme->initStrView(tor->bandwidthGroup().sv());
         break;
 
     case TR_KEY_hashString:
-        tr_variantInitStrView(initme, tor->infoHashString());
+        initme->initStrView(tor->infoHashString());
         break;
 
     case TR_KEY_haveUnchecked:
-        tr_variantInitInt(initme, st->haveUnchecked);
+        initme->initInt(st->haveUnchecked);
         break;
 
     case TR_KEY_haveValid:
-        tr_variantInitInt(initme, st->haveValid);
+        initme->initInt(st->haveValid);
         break;
 
     case TR_KEY_honorsSessionLimits:
-        tr_variantInitBool(initme, tr_torrentUsesSessionLimits(tor));
+        initme->initBool(tr_torrentUsesSessionLimits(tor));
         break;
 
     case TR_KEY_id:
-        tr_variantInitInt(initme, st->id);
+        initme->initInt(st->id);
         break;
 
     case TR_KEY_editDate:
-        tr_variantInitInt(initme, st->editDate);
+        initme->initInt(st->editDate);
         break;
 
     case TR_KEY_isFinished:
-        tr_variantInitBool(initme, st->finished);
+        initme->initBool(st->finished);
         break;
 
     case TR_KEY_isPrivate:
-        tr_variantInitBool(initme, tor->isPrivate());
+        initme->initBool(tor->isPrivate());
         break;
 
     case TR_KEY_isStalled:
-        tr_variantInitBool(initme, st->isStalled);
+        initme->initBool(st->isStalled);
         break;
 
     case TR_KEY_labels:
@@ -593,15 +593,15 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_leftUntilDone:
-        tr_variantInitInt(initme, st->leftUntilDone);
+        initme->initInt(st->leftUntilDone);
         break;
 
     case TR_KEY_manualAnnounceTime:
-        tr_variantInitInt(initme, tr_announcerNextManualAnnounce(tor));
+        initme->initInt(tr_announcerNextManualAnnounce(tor));
         break;
 
     case TR_KEY_maxConnectedPeers:
-        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
+        initme->initInt(tr_torrentGetPeerLimit(tor));
         break;
 
     case TR_KEY_magnetLink:
@@ -609,23 +609,23 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_metadataPercentComplete:
-        tr_variantInitReal(initme, st->metadataPercentComplete);
+        initme->initReal(st->metadataPercentComplete);
         break;
 
     case TR_KEY_name:
-        tr_variantInitStrView(initme, tr_torrentName(tor));
+        initme->initStrView(tr_torrentName(tor));
         break;
 
     case TR_KEY_percentComplete:
-        tr_variantInitReal(initme, st->percentComplete);
+        initme->initReal(st->percentComplete);
         break;
 
     case TR_KEY_percentDone:
-        tr_variantInitReal(initme, st->percentDone);
+        initme->initReal(st->percentDone);
         break;
 
     case TR_KEY_peer_limit:
-        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
+        initme->initInt(tr_torrentGetPeerLimit(tor));
         break;
 
     case TR_KEY_peers:
@@ -633,7 +633,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_peersConnected:
-        tr_variantInitInt(initme, st->peersConnected);
+        initme->initInt(st->peersConnected);
         break;
 
     case TR_KEY_peersFrom:
@@ -651,11 +651,11 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         }
 
     case TR_KEY_peersGettingFromUs:
-        tr_variantInitInt(initme, st->peersGettingFromUs);
+        initme->initInt(st->peersGettingFromUs);
         break;
 
     case TR_KEY_peersSendingToUs:
-        tr_variantInitInt(initme, st->peersSendingToUs);
+        initme->initInt(st->peersSendingToUs);
         break;
 
     case TR_KEY_pieces:
@@ -667,21 +667,21 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         }
         else
         {
-            tr_variantInitStrView(initme, ""sv);
+            initme->initStrView(""sv);
         }
 
         break;
 
     case TR_KEY_pieceCount:
-        tr_variantInitInt(initme, tor->pieceCount());
+        initme->initInt(tor->pieceCount());
         break;
 
     case TR_KEY_pieceSize:
-        tr_variantInitInt(initme, tor->pieceSize());
+        initme->initInt(tor->pieceSize());
         break;
 
     case TR_KEY_primary_mime_type:
-        tr_variantInitStrView(initme, tor->primaryMimeType());
+        initme->initStrView(tor->primaryMimeType());
         break;
 
     case TR_KEY_priorities:
@@ -696,63 +696,63 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_queuePosition:
-        tr_variantInitInt(initme, st->queuePosition);
+        initme->initInt(st->queuePosition);
         break;
 
     case TR_KEY_etaIdle:
-        tr_variantInitInt(initme, st->etaIdle);
+        initme->initInt(st->etaIdle);
         break;
 
     case TR_KEY_rateDownload:
-        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceDownloadSpeed_KBps));
+        initme->initInt(tr_toSpeedBytes(st->pieceDownloadSpeed_KBps));
         break;
 
     case TR_KEY_rateUpload:
-        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceUploadSpeed_KBps));
+        initme->initInt(tr_toSpeedBytes(st->pieceUploadSpeed_KBps));
         break;
 
     case TR_KEY_recheckProgress:
-        tr_variantInitReal(initme, st->recheckProgress);
+        initme->initReal(st->recheckProgress);
         break;
 
     case TR_KEY_seedIdleLimit:
-        tr_variantInitInt(initme, tr_torrentGetIdleLimit(tor));
+        initme->initInt(tr_torrentGetIdleLimit(tor));
         break;
 
     case TR_KEY_seedIdleMode:
-        tr_variantInitInt(initme, tr_torrentGetIdleMode(tor));
+        initme->initInt(tr_torrentGetIdleMode(tor));
         break;
 
     case TR_KEY_seedRatioLimit:
-        tr_variantInitReal(initme, tr_torrentGetRatioLimit(tor));
+        initme->initReal(tr_torrentGetRatioLimit(tor));
         break;
 
     case TR_KEY_seedRatioMode:
-        tr_variantInitInt(initme, tr_torrentGetRatioMode(tor));
+        initme->initInt(tr_torrentGetRatioMode(tor));
         break;
 
     case TR_KEY_sizeWhenDone:
-        tr_variantInitInt(initme, st->sizeWhenDone);
+        initme->initInt(st->sizeWhenDone);
         break;
 
     case TR_KEY_source:
-        tr_variantInitStrView(initme, tor->source());
+        initme->initStrView(tor->source());
         break;
 
     case TR_KEY_startDate:
-        tr_variantInitInt(initme, st->startDate);
+        initme->initInt(st->startDate);
         break;
 
     case TR_KEY_status:
-        tr_variantInitInt(initme, st->activity);
+        initme->initInt(st->activity);
         break;
 
     case TR_KEY_secondsDownloading:
-        tr_variantInitInt(initme, st->secondsDownloading);
+        initme->initInt(st->secondsDownloading);
         break;
 
     case TR_KEY_secondsSeeding:
-        tr_variantInitInt(initme, st->secondsSeeding);
+        initme->initInt(st->secondsSeeding);
         break;
 
     case TR_KEY_trackers:
@@ -781,23 +781,23 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_totalSize:
-        tr_variantInitInt(initme, tor->totalSize());
+        initme->initInt(tor->totalSize());
         break;
 
     case TR_KEY_uploadedEver:
-        tr_variantInitInt(initme, st->uploadedEver);
+        initme->initInt(st->uploadedEver);
         break;
 
     case TR_KEY_uploadLimit:
-        tr_variantInitInt(initme, tr_torrentGetSpeedLimit_KBps(tor, TR_UP));
+        initme->initInt(tr_torrentGetSpeedLimit_KBps(tor, TR_UP));
         break;
 
     case TR_KEY_uploadLimited:
-        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_UP));
+        initme->initBool(tr_torrentUsesSpeedLimit(tor, TR_UP));
         break;
 
     case TR_KEY_uploadRatio:
-        tr_variantInitReal(initme, st->ratio);
+        initme->initReal(st->ratio);
         break;
 
     case TR_KEY_wanted:
@@ -817,7 +817,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_webseedsSendingToUs:
-        tr_variantInitInt(initme, st->webseedsSendingToUs);
+        initme->initInt(st->webseedsSendingToUs);
         break;
 
     default:
@@ -2576,7 +2576,7 @@ void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
     }
     else if (valueCount == 1)
     {
-        tr_variantInitInt(setme, values[0]);
+        setme->initInt(values[0]);
     }
     else
     {
