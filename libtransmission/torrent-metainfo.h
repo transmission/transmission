@@ -130,14 +130,14 @@ public:
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
-    [[nodiscard]] bool hasV1Metadata() const
+    [[nodiscard]] bool hasV1Metadata() const noexcept
     {
         // need 'pieces' field and 'files' or 'length'
         // TODO check for 'files' or 'length'
-        return pieces_.size() > 0;
+        return !std::empty(pieces_);
     }
 
-    [[nodiscard]] bool hasV2Metadata() const
+    [[nodiscard]] constxpr bool hasV2Metadata() const noexcept
     {
         return is_v2_;
     }
