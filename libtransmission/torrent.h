@@ -247,7 +247,7 @@ public:
         return completeness == TR_PARTIAL_SEED;
     }
 
-    [[nodiscard]] tr_bitfield const& blocks() const noexcept
+    [[nodiscard]] constexpr auto& blocks() const noexcept
     {
         return completion.blocks();
     }
