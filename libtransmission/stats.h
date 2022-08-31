@@ -48,7 +48,7 @@ public:
         is_dirty_ = true;
     }
 
-    void addDownloaded(uint32_t n_bytes) noexcept
+    constexpr void addDownloaded(uint32_t n_bytes) noexcept
     {
         single_.downloadedBytes += n_bytes;
         is_dirty_ = true;
