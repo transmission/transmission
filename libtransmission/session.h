@@ -232,7 +232,7 @@ public:
         scripts_enabled_[i] = enabled;
     }
 
-    [[nodiscard]] auto useScript(TrScript i) const
+    [[nodiscard]] constexpr auto useScript(TrScript i) const
     {
         return scripts_enabled_[i];
     }
