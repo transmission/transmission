@@ -136,7 +136,7 @@ public:
         return event_base_.get();
     }
 
-    [[nodiscard]] evdns_base* evdnsBase() noexcept
+    [[nodiscard]] constexpr evdns_base* evdnsBase() noexcept
     {
         return evdns_base_.get();
     }
