@@ -480,7 +480,7 @@ public:
         return metainfo_.source();
     }
 
-    [[nodiscard]] auto infoDictSize() const noexcept
+    [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {
         return metainfo_.infoDictSize();
     }
