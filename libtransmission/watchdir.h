@@ -39,12 +39,12 @@ public:
 
     using Callback = std::function<Action(std::string_view dirname, std::string_view basename)>;
 
-    [[nodiscard]] static auto genericRescanInterval() noexcept
+    [[nodiscard]] static constexpr auto genericRescanInterval() noexcept
     {
         return generic_rescan_interval_;
     }
 
-    static void setGenericRescanInterval(std::chrono::milliseconds interval) noexcept
+    static constexpr void setGenericRescanInterval(std::chrono::milliseconds interval) noexcept
     {
         generic_rescan_interval_ = interval;
     }
