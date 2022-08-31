@@ -525,7 +525,7 @@ public:
         return this->isPublic() && this->session->allowsDHT();
     }
 
-    [[nodiscard]] auto allowsLpd() const // local peer discovery
+    [[nodiscard]] constexpr auto allowsLpd() const // local peer discovery
     {
         return this->isPublic() && this->session->allowsLPD();
     }
