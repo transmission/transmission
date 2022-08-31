@@ -520,12 +520,12 @@ public:
         return this->isPublic() && this->session->allowsPEX();
     }
 
-    [[nodiscard]] constexpr auto allowsDht() const
+    [[nodiscard]] constexpr auto allowsDht() const noexcept
     {
         return this->isPublic() && this->session->allowsDHT();
     }
 
-    [[nodiscard]] constexpr auto allowsLpd() const // local peer discovery
+    [[nodiscard]] constexpr auto allowsLpd() const noexcept // local peer discovery
     {
         return this->isPublic() && this->session->allowsLPD();
     }
@@ -602,7 +602,7 @@ public:
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
 
-    constexpr void setDirty()
+    constexpr void setDirty() noexcept
     {
         this->isDirty = true;
     }
