@@ -232,7 +232,7 @@ public:
         scripts_enabled_[i] = enabled;
     }
 
-    [[nodiscard]] auto useScript(TrScript i) const
+    [[nodiscard]] constexpr auto useScript(TrScript i) const
     {
         return scripts_enabled_[i];
     }
@@ -274,7 +274,7 @@ public:
 
     [[nodiscard]] bool useRpcWhitelist() const;
 
-    [[nodiscard]] auto externalIP() const noexcept
+    [[nodiscard]] constexpr auto externalIP() const noexcept
     {
         return external_ip_;
     }
@@ -432,12 +432,12 @@ public:
 
     /// stats
 
-    [[nodiscard]] auto& stats() noexcept
+    [[nodiscard]] constexpr auto& stats() noexcept
     {
         return session_stats_;
     }
 
-    [[nodiscard]] auto const& stats() const noexcept
+    [[nodiscard]] constexpr auto const& stats() const noexcept
     {
         return session_stats_;
     }
@@ -518,109 +518,109 @@ public:
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
-    [[nodiscard]] auto constexpr queueEnabled(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
         return queue_enabled_[dir];
     }
 
-    [[nodiscard]] auto constexpr queueSize(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto queueSize(tr_direction dir) const noexcept
     {
         return queue_size_[dir];
     }
 
-    [[nodiscard]] auto constexpr queueStalledEnabled() const noexcept
+    [[nodiscard]] constexpr auto queueStalledEnabled() const noexcept
     {
         return queue_stalled_enabled_;
     }
 
-    [[nodiscard]] auto constexpr queueStalledMinutes() const noexcept
+    [[nodiscard]] constexpr auto queueStalledMinutes() const noexcept
     {
         return queue_stalled_minutes_;
     }
 
-    [[nodiscard]] auto constexpr peerLimit() const noexcept
+    [[nodiscard]] constexpr auto peerLimit() const noexcept
     {
         return peer_limit_;
     }
 
-    [[nodiscard]] auto constexpr peerLimitPerTorrent() const noexcept
+    [[nodiscard]] constexpr auto peerLimitPerTorrent() const noexcept
     {
         return peer_limit_per_torrent_;
     }
 
-    [[nodiscard]] auto constexpr uploadSlotsPerTorrent() const noexcept
+    [[nodiscard]] constexpr auto uploadSlotsPerTorrent() const noexcept
     {
         return upload_slots_per_torrent_;
     }
 
-    [[nodiscard]] auto constexpr isClosing() const noexcept
+    [[nodiscard]] constexpr auto isClosing() const noexcept
     {
         return is_closing_;
     }
 
-    [[nodiscard]] auto constexpr isClosed() const noexcept
+    [[nodiscard]] constexpr auto isClosed() const noexcept
     {
         return is_closed_;
     }
 
-    [[nodiscard]] auto constexpr encryptionMode() const noexcept
+    [[nodiscard]] constexpr auto encryptionMode() const noexcept
     {
         return encryption_mode_;
     }
 
-    [[nodiscard]] auto constexpr preallocationMode() const noexcept
+    [[nodiscard]] constexpr auto preallocationMode() const noexcept
     {
         return preallocation_mode_;
     }
 
-    [[nodiscard]] auto constexpr shouldScrapePausedTorrents() const noexcept
+    [[nodiscard]] constexpr auto shouldScrapePausedTorrents() const noexcept
     {
         return should_scrape_paused_torrents_;
     }
 
-    [[nodiscard]] auto constexpr shouldPauseAddedTorrents() const noexcept
+    [[nodiscard]] constexpr auto shouldPauseAddedTorrents() const noexcept
     {
         return should_pause_added_torrents_;
     }
 
-    [[nodiscard]] auto constexpr shouldDeleteSource() const noexcept
+    [[nodiscard]] constexpr auto shouldDeleteSource() const noexcept
     {
         return should_pause_added_torrents_;
     }
 
-    [[nodiscard]] auto constexpr allowsDHT() const noexcept
+    [[nodiscard]] constexpr auto allowsDHT() const noexcept
     {
         return is_dht_enabled_;
     }
 
-    [[nodiscard]] auto constexpr allowsLPD() const noexcept
+    [[nodiscard]] constexpr auto allowsLPD() const noexcept
     {
         return is_lpd_enabled_;
     }
 
-    [[nodiscard]] auto constexpr allowsPEX() const noexcept
+    [[nodiscard]] constexpr auto allowsPEX() const noexcept
     {
         return is_pex_enabled_;
     }
 
-    [[nodiscard]] auto constexpr allowsTCP() const noexcept
+    [[nodiscard]] constexpr auto allowsTCP() const noexcept
     {
         return is_tcp_enabled_;
     }
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
-    [[nodiscard]] auto constexpr allowsPrefetch() const noexcept
+    [[nodiscard]] constexpr auto allowsPrefetch() const noexcept
     {
         return is_prefetch_enabled_;
     }
 
-    [[nodiscard]] auto constexpr isIdleLimited() const noexcept
+    [[nodiscard]] constexpr auto isIdleLimited() const noexcept
     {
         return is_idle_limited_;
     }
 
-    [[nodiscard]] auto constexpr idleLimitMinutes() const noexcept
+    [[nodiscard]] constexpr auto idleLimitMinutes() const noexcept
     {
         return idle_limit_minutes_;
     }
@@ -673,7 +673,7 @@ public:
 
     [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
 
-    [[nodiscard]] auto isIncompleteFileNamingEnabled() const noexcept
+    [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
         return is_incomplete_file_naming_enabled_;
     }
@@ -683,7 +683,7 @@ public:
         return is_port_random_;
     }
 
-    [[nodiscard]] auto constexpr isRatioLimited() const noexcept
+    [[nodiscard]] constexpr auto isRatioLimited() const noexcept
     {
         return is_ratio_limited_;
     }

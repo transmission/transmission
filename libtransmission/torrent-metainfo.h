@@ -87,7 +87,7 @@ public:
     {
         return blockInfo().blockSize(block);
     }
-    [[nodiscard]] auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return blockInfo().blockSpanForPiece(piece);
     }

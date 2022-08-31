@@ -42,19 +42,19 @@ public:
         return add(current(), old_);
     }
 
-    void addUploaded(uint32_t n_bytes) noexcept
+    constexpr void addUploaded(uint32_t n_bytes) noexcept
     {
         single_.uploadedBytes += n_bytes;
         is_dirty_ = true;
     }
 
-    void addDownloaded(uint32_t n_bytes) noexcept
+    constexpr void addDownloaded(uint32_t n_bytes) noexcept
     {
         single_.downloadedBytes += n_bytes;
         is_dirty_ = true;
     }
 
-    void addFileCreated() noexcept
+    constexpr void addFileCreated() noexcept
     {
         ++single_.filesAdded;
         is_dirty_ = true;

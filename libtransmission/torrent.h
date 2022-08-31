@@ -154,7 +154,7 @@ public:
     {
         return metainfo_.blockSize(block);
     }
-    [[nodiscard]] auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return metainfo_.blockSpanForPiece(piece);
     }
@@ -415,32 +415,32 @@ public:
         metainfo_.setName(name);
     }
 
-    [[nodiscard]] auto const& name() const noexcept
+    [[nodiscard]] constexpr auto const& name() const noexcept
     {
         return metainfo_.name();
     }
 
-    [[nodiscard]] auto const& infoHash() const noexcept
+    [[nodiscard]] constexpr auto const& infoHash() const noexcept
     {
         return metainfo_.infoHash();
     }
 
-    [[nodiscard]] auto isPrivate() const noexcept
+    [[nodiscard]] constexpr auto isPrivate() const noexcept
     {
         return metainfo_.isPrivate();
     }
 
-    [[nodiscard]] auto isPublic() const noexcept
+    [[nodiscard]] constexpr auto isPublic() const noexcept
     {
         return !this->isPrivate();
     }
 
-    [[nodiscard]] auto const& infoHashString() const noexcept
+    [[nodiscard]] constexpr auto const& infoHashString() const noexcept
     {
         return metainfo_.infoHashString();
     }
 
-    [[nodiscard]] auto dateCreated() const noexcept
+    [[nodiscard]] constexpr auto dateCreated() const noexcept
     {
         return metainfo_.dateCreated();
     }
@@ -465,27 +465,27 @@ public:
         return metainfo_.magnet();
     }
 
-    [[nodiscard]] auto const& comment() const noexcept
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
         return metainfo_.comment();
     }
 
-    [[nodiscard]] auto const& creator() const noexcept
+    [[nodiscard]] constexpr auto const& creator() const noexcept
     {
         return metainfo_.creator();
     }
 
-    [[nodiscard]] auto const& source() const noexcept
+    [[nodiscard]] constexpr auto const& source() const noexcept
     {
         return metainfo_.source();
     }
 
-    [[nodiscard]] auto infoDictSize() const noexcept
+    [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {
         return metainfo_.infoDictSize();
     }
 
-    [[nodiscard]] auto infoDictOffset() const noexcept
+    [[nodiscard]] constexpr auto infoDictOffset() const noexcept
     {
         return metainfo_.infoDictOffset();
     }
@@ -515,17 +515,17 @@ public:
         return this->isDone() ? TR_UP : TR_DOWN;
     }
 
-    [[nodiscard]] auto allowsPex() const noexcept
+    [[nodiscard]] constexpr auto allowsPex() const noexcept
     {
         return this->isPublic() && this->session->allowsPEX();
     }
 
-    [[nodiscard]] auto allowsDht() const
+    [[nodiscard]] constexpr auto allowsDht() const noexcept
     {
         return this->isPublic() && this->session->allowsDHT();
     }
 
-    [[nodiscard]] auto allowsLpd() const // local peer discovery
+    [[nodiscard]] constexpr auto allowsLpd() const noexcept // local peer discovery
     {
         return this->isPublic() && this->session->allowsLPD();
     }
@@ -586,7 +586,15 @@ public:
         return unique_id_;
     }
 
-    void setDateActive(time_t t);
+    constexpr void setDateActive(time_t t) noexcept
+    {
+        this->activityDate = t;
+
+        if (this->anyDate < t)
+        {
+            this->anyDate = t;
+        }
+    }
 
     void setLabels(std::vector<tr_quark> const& new_labels);
 
@@ -594,7 +602,7 @@ public:
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
 
-    void setDirty()
+    constexpr void setDirty() noexcept
     {
         this->isDirty = true;
     }
