@@ -430,7 +430,7 @@ public:
         return metainfo_.isPrivate();
     }
 
-    [[nodiscard]] auto isPublic() const noexcept
+    [[nodiscard]] constexpr auto isPublic() const noexcept
     {
         return !this->isPrivate();
     }
