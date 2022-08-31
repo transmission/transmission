@@ -206,7 +206,7 @@ constexpr std::string_view getPortForScheme(std::string_view scheme)
     return "-1"sv;
 }
 
-bool urlCharsAreValid(std::string_view url)
+constexpr bool urlCharsAreValid(std::string_view url)
 {
     // rfc2396
     auto constexpr ValidChars = std::string_view{
@@ -219,8 +219,7 @@ bool urlCharsAreValid(std::string_view url)
         "{}|\\^[]`" // unwise
     };
 
-    return !std::empty(url) &&
-        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return tr_strvContains(ValidChars, ch); });
+    return !std::empty(url) && url.find_first_not_of(ValidChars) == std::string_view::npos;
 }
 
 bool tr_isValidTrackerScheme(std::string_view scheme)
