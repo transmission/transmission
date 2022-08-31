@@ -425,7 +425,7 @@ public:
         return metainfo_.infoHash();
     }
 
-    [[nodiscard]] auto isPrivate() const noexcept
+    [[nodiscard]] constexpr auto isPrivate() const noexcept
     {
         return metainfo_.isPrivate();
     }
