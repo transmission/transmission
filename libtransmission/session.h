@@ -673,7 +673,7 @@ public:
 
     [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
 
-    [[nodiscard]] auto isIncompleteFileNamingEnabled() const noexcept
+    [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
         return is_incomplete_file_naming_enabled_;
     }
