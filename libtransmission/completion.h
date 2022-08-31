@@ -96,7 +96,25 @@ struct tr_completion
 
     [[nodiscard]] uint64_t sizeWhenDone() const;
 
-    [[nodiscard]] tr_completeness status() const;
+    [[nodiscard]] tr_completeness status() const
+    {
+        if (!hasMetainfo())
+        {
+            return TR_LEECH;
+        }
+
+        if (hasAll())
+        {
+            return TR_SEED;
+        }
+
+        if (size_now_ == sizeWhenDone())
+        {
+            return TR_PARTIAL_SEED;
+        }
+
+        return TR_LEECH;
+    }
 
     [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
 

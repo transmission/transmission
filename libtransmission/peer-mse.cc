@@ -113,28 +113,12 @@ void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     dec_key_->discard(1024);
 }
 
-void Filter::decrypt(size_t buf_len, void* buf)
-{
-    if (dec_key_)
-    {
-        dec_key_->process(buf, buf, buf_len);
-    }
-}
-
 void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
     enc_key_ = std::make_unique<tr_arc4>(std::data(buf), std::size(buf));
     enc_key_->discard(1024);
-}
-
-void Filter::encrypt(size_t buf_len, void* buf)
-{
-    if (enc_key_)
-    {
-        enc_key_->process(buf, buf, buf_len);
-    }
 }
 
 } // namespace tr_message_stream_encryption

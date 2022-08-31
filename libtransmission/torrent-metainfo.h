@@ -71,15 +71,15 @@ public:
     {
         return blockInfo().blockCount();
     }
-    [[nodiscard]] auto byteLoc(uint64_t nth_byte) const
+    [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const
     {
         return blockInfo().byteLoc(nth_byte);
     }
-    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const
     {
         return blockInfo().blockLoc(block);
     }
-    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
     {
         return blockInfo().pieceLoc(piece, offset, length);
     }
@@ -130,14 +130,14 @@ public:
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
-    [[nodiscard]] bool hasV1Metadata() const
+    [[nodiscard]] bool hasV1Metadata() const noexcept
     {
         // need 'pieces' field and 'files' or 'length'
         // TODO check for 'files' or 'length'
-        return pieces_.size() > 0;
+        return !std::empty(pieces_);
     }
 
-    [[nodiscard]] bool hasV2Metadata() const
+    [[nodiscard]] constexpr bool hasV2Metadata() const noexcept
     {
         return is_v2_;
     }

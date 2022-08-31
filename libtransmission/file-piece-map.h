@@ -141,7 +141,11 @@ public:
     void set(tr_file_index_t file, bool wanted);
     void set(tr_file_index_t const* files, size_t n, bool wanted);
 
-    [[nodiscard]] bool fileWanted(tr_file_index_t file) const;
+    [[nodiscard]] bool fileWanted(tr_file_index_t file) const
+    {
+        return wanted_.test(file);
+    }
+
     [[nodiscard]] bool pieceWanted(tr_piece_index_t piece) const;
 
 private:
