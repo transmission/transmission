@@ -373,12 +373,6 @@ void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len)
     tr_variant_string_set_string(&initme->val.s, { static_cast<char const*>(raw), raw_len });
 }
 
-void tr_variantInitQuark(tr_variant* initme, tr_quark const q)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_quark(&initme->val.s, q);
-}
-
 void tr_variantInitStr(tr_variant* initme, std::string_view str)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
@@ -487,7 +481,7 @@ tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view value)
 tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const value)
 {
     tr_variant* child = tr_variantListAdd(list);
-    tr_variantInitQuark(child, value);
+    child->initQuark(value);
     return child;
 }
 
@@ -574,7 +568,7 @@ tr_variant* tr_variantDictAddReal(tr_variant* dict, tr_quark const key, double v
 tr_variant* tr_variantDictAddQuark(tr_variant* dict, tr_quark const key, tr_quark const val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
-    tr_variantInitQuark(child, val);
+    child->initQuark(val);
     return child;
 }
 
@@ -809,7 +803,7 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFu
                 if (tr_variantIsDict(&node.v))
                 {
                     auto tmp = tr_variant{};
-                    tr_variantInitQuark(&tmp, v->key);
+                    tmp.initQuark(v->key);
                     walkFuncs->stringFunc(&tmp, user_data);
                 }
             }

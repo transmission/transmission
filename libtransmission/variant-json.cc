@@ -345,7 +345,7 @@ static void action_callback_POP(
         else if ((state->special_flags & JSONSL_SPECIALf_NULL) != 0)
         {
             data->has_content = true;
-            tr_variantInitQuark(get_node(jsn), TR_KEY_NONE);
+            get_node(jsn)->initQuark(TR_KEY_NONE);
         }
     }
 }

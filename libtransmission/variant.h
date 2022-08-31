@@ -93,6 +93,14 @@ struct tr_variant
         val.s.len = std::size(str);
     }
 
+    void initQuark(tr_quark quark)
+    {
+        init(TR_STRING_TYPE_QUARK);
+        auto const sv = tr_quark_get_string_view(quark);
+        val.s.str.str = std::data(sv);
+        val.s.len = std::size(sv);
+    }
+
     char type = '\0';
 
     tr_quark key = TR_KEY_NONE;
@@ -208,7 +216,6 @@ constexpr bool tr_variantIsString(tr_variant const* b)
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view);
-void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
 
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
