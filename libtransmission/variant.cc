@@ -385,6 +385,12 @@ void tr_variantInitStr(tr_variant* initme, std::string_view str)
     tr_variant_string_set_string(&initme->val.s, str);
 }
 
+void tr_variantInitStrView(tr_variant* initme, std::string_view str)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    tr_variant_string_set_string_view(&initme->val.s, str);
+}
+
 void tr_variantInitList(tr_variant* initme, size_t reserve_count)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_LIST);
@@ -452,21 +458,21 @@ tr_variant* tr_variantListAdd(tr_variant* list)
 tr_variant* tr_variantListAddInt(tr_variant* list, int64_t value)
 {
     tr_variant* child = tr_variantListAdd(list);
-    child->initInt(value);
+    tr_variantInitInt(child, value);
     return child;
 }
 
 tr_variant* tr_variantListAddReal(tr_variant* list, double value)
 {
     tr_variant* child = tr_variantListAdd(list);
-    child->initReal(value);
+    tr_variantInitReal(child, value);
     return child;
 }
 
 tr_variant* tr_variantListAddBool(tr_variant* list, bool value)
 {
     tr_variant* child = tr_variantListAdd(list);
-    child->initBool(value);
+    tr_variantInitBool(child, value);
     return child;
 }
 
@@ -480,7 +486,7 @@ tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view value)
 tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view value)
 {
     tr_variant* child = tr_variantListAdd(list);
-    child->initStrView(value);
+    tr_variantInitStrView(child, value);
     return child;
 }
 
@@ -553,21 +559,21 @@ static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
 tr_variant* tr_variantDictAddInt(tr_variant* dict, tr_quark const key, int64_t val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_INT);
-    child->initInt(val);
+    tr_variantInitInt(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddBool(tr_variant* dict, tr_quark const key, bool val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_BOOL);
-    child->initBool(val);
+    tr_variantInitBool(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddReal(tr_variant* dict, tr_quark const key, double val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_REAL);
-    child->initReal(val);
+    tr_variantInitReal(child, val);
     return child;
 }
 
@@ -588,7 +594,7 @@ tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, std::stri
 tr_variant* tr_variantDictAddStrView(tr_variant* dict, tr_quark const key, std::string_view str)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
-    child->initStrView(str);
+    tr_variantInitStrView(child, str);
     return child;
 }
 

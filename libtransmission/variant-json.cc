@@ -298,7 +298,7 @@ static void action_callback_POP(
         auto const [str, inplace] = extract_string(jsn, state, data->strbuf);
         if (inplace && ((data->parse_opts & TR_VARIANT_PARSE_INPLACE) != 0))
         {
-            get_node(jsn)->initStrView(str);
+            tr_variantInitStrView(get_node(jsn), str);
         }
         else
         {
@@ -328,19 +328,19 @@ static void action_callback_POP(
         {
             auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
             auto const val = tr_parseNum<double>(sv);
-            get_node(jsn)->initReal(val ? *val : double{});
+            tr_variantInitReal(get_node(jsn), val ? *val : double{});
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {
             char const* begin = jsn->base + state->pos_begin;
             data->has_content = true;
-            get_node(jsn)->initInt(std::strtoll(begin, nullptr, 10));
+            tr_variantInitInt(get_node(jsn), std::strtoll(begin, nullptr, 10));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_BOOLEAN) != 0)
         {
             bool const b = (state->special_flags & JSONSL_SPECIALf_TRUE) != 0;
             data->has_content = true;
-            get_node(jsn)->initBool(b);
+            tr_variantInitBool(get_node(jsn), b);
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NULL) != 0)
         {

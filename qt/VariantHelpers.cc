@@ -190,22 +190,22 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
 void variantInit(tr_variant* init_me, bool value)
 {
-    init_me->initBool(value);
+    tr_variantInitBool(init_me, value);
 }
 
 void variantInit(tr_variant* init_me, int64_t value)
 {
-    init_me->initInt(value);
+    tr_variantInitInt(init_me, value);
 }
 
 void variantInit(tr_variant* init_me, int value)
 {
-    init_me->initInt(value);
+    tr_variantInitInt(init_me, value);
 }
 
 void variantInit(tr_variant* init_me, double value)
 {
-    init_me->initReal(value);
+    tr_variantInitReal(init_me, value);
 }
 
 void variantInit(tr_variant* init_me, QByteArray const& value)

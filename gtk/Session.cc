@@ -54,7 +54,7 @@ TrVariantPtr create_variant(tr_variant&& other)
             delete ptr;
         });
     *result = std::move(other);
-    other->initBool(false);
+    tr_variantInitBool(&other, false);
     return result;
 }
 

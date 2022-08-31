@@ -50,7 +50,7 @@ TEST_F(VariantTest, getType)
     auto sv = std::string_view{};
     auto v = tr_variant{};
 
-    v.initInt(30);
+    tr_variantInitInt(&v, 30);
     EXPECT_TRUE(tr_variantGetInt(&v, &i));
     EXPECT_EQ(30, i);
     EXPECT_TRUE(tr_variantGetReal(&v, &d));
@@ -66,7 +66,7 @@ TEST_F(VariantTest, getType)
     EXPECT_NE(std::data(strkey), std::data(sv));
 
     strkey = "anything"sv;
-    v.initStrView(strkey);
+    tr_variantInitStrView(&v, strkey);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_EQ(std::data(strkey), std::data(sv)); // literally the same memory
