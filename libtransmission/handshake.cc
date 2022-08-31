@@ -136,6 +136,25 @@ struct tr_handshake
         return io->isIncoming();
     }
 
+    [[nodiscard]] constexpr uint32_t cryptoProvide() const
+    {
+        uint32_t provide = 0;
+
+        switch (encryption_mode)
+        {
+        case TR_ENCRYPTION_REQUIRED:
+        case TR_ENCRYPTION_PREFERRED:
+            provide |= CRYPTO_PROVIDE_CRYPTO;
+            break;
+
+        case TR_CLEAR_PREFERRED:
+            provide |= CRYPTO_PROVIDE_CRYPTO | CRYPTO_PROVIDE_PLAINTEXT;
+            break;
+        }
+
+        return provide;
+    }
+
     std::unique_ptr<tr_handshake_mediator> const mediator;
 
     bool haveReadAnythingFromPeer = false;
@@ -317,25 +336,6 @@ static void sendYa(tr_handshake* handshake)
     setReadState(handshake, AWAITING_YB);
 }
 
-static uint32_t getCryptoProvide(tr_handshake const* handshake)
-{
-    uint32_t provide = 0;
-
-    switch (handshake->encryption_mode)
-    {
-    case TR_ENCRYPTION_REQUIRED:
-    case TR_ENCRYPTION_PREFERRED:
-        provide |= CRYPTO_PROVIDE_CRYPTO;
-        break;
-
-    case TR_CLEAR_PREFERRED:
-        provide |= CRYPTO_PROVIDE_CRYPTO | CRYPTO_PROVIDE_PLAINTEXT;
-        break;
-    }
-
-    return provide;
-}
-
 static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, uint32_t crypto_provide)
 {
     auto choices = std::array<uint32_t, 2>{};
@@ -439,7 +439,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     handshake->io->writeBuf(outbuf, false);
     handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
     evbuffer_add(outbuf, std::data(VC), std::size(VC));
-    evbuffer_add_uint32(outbuf, getCryptoProvide(handshake));
+    evbuffer_add_uint32(outbuf, handshake->cryptoProvide());
     evbuffer_add_uint16(outbuf, 0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
@@ -514,7 +514,7 @@ static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbu
     handshake->crypto_select = crypto_select;
     tr_logAddTraceHand(handshake, fmt::format("crypto select is {}", crypto_select));
 
-    if ((crypto_select & getCryptoProvide(handshake)) == 0)
+    if ((crypto_select & handshake->cryptoProvide()) == 0)
     {
         tr_logAddTraceHand(handshake, "peer selected an encryption option we didn't offer");
         return tr_handshakeDone(handshake, false);
