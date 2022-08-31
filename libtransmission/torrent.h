@@ -465,7 +465,7 @@ public:
         return metainfo_.magnet();
     }
 
-    [[nodiscard]] auto const& comment() const noexcept
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
         return metainfo_.comment();
     }
