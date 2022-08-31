@@ -440,7 +440,7 @@ public:
         return metainfo_.infoHashString();
     }
 
-    [[nodiscard]] auto dateCreated() const noexcept
+    [[nodiscard]] constexpr auto dateCreated() const noexcept
     {
         return metainfo_.dateCreated();
     }
