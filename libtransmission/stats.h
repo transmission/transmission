@@ -42,7 +42,7 @@ public:
         return add(current(), old_);
     }
 
-    void addUploaded(uint32_t n_bytes) noexcept
+    constexpr void addUploaded(uint32_t n_bytes) noexcept
     {
         single_.uploadedBytes += n_bytes;
         is_dirty_ = true;
