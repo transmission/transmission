@@ -415,7 +415,7 @@ public:
         metainfo_.setName(name);
     }
 
-    [[nodiscard]] auto const& name() const noexcept
+    [[nodiscard]] constexpr auto const& name() const noexcept
     {
         return metainfo_.name();
     }
