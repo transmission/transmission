@@ -279,7 +279,7 @@ public:
         return external_ip_;
     }
 
-    constexpr void setExternalIP(tr_address external_ip)
+    void setExternalIP(tr_address external_ip)
     {
         external_ip_ = external_ip;
     }
