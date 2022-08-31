@@ -54,7 +54,7 @@ public:
         is_dirty_ = true;
     }
 
-    void addFileCreated() noexcept
+    constexpr void addFileCreated() noexcept
     {
         ++single_.filesAdded;
         is_dirty_ = true;
