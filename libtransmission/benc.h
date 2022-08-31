@@ -115,17 +115,17 @@ struct BasicHandler : public Handler
         return true;
     }
 
-    auto key(size_t i) const
+    constexpr auto key(size_t i) const
     {
         return keys_[i];
     }
 
-    auto depth() const
+    constexpr auto depth() const
     {
         return depth_;
     }
 
-    auto currentKey() const
+    constexpr auto currentKey() const
     {
         return key(depth());
     }
