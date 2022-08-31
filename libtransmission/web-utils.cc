@@ -222,10 +222,17 @@ constexpr bool urlCharsAreValid(std::string_view url)
     return !std::empty(url) && url.find_first_not_of(ValidChars) == std::string_view::npos;
 }
 
-bool tr_isValidTrackerScheme(std::string_view scheme)
+constexpr bool isValidTrackerScheme(std::string_view scheme)
 {
-    auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
-    return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
+    for (auto const& valid_scheme : { "http"sv, "https"sv, "udp"sv })
+    {
+        if (scheme == valid_scheme)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool isAsciiNonUpperCase(std::string_view host)
@@ -359,7 +366,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
 {
     auto const parsed = tr_urlParse(url);
-    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
+    return parsed && isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
 }
 
 bool tr_urlIsValidTracker(std::string_view url)
