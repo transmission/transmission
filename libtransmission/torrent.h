@@ -470,7 +470,7 @@ public:
         return metainfo_.comment();
     }
 
-    [[nodiscard]] auto const& creator() const noexcept
+    [[nodiscard]] constexpr auto const& creator() const noexcept
     {
         return metainfo_.creator();
     }
