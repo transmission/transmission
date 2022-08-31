@@ -485,7 +485,7 @@ public:
         return metainfo_.infoDictSize();
     }
 
-    [[nodiscard]] auto infoDictOffset() const noexcept
+    [[nodiscard]] constexpr auto infoDictOffset() const noexcept
     {
         return metainfo_.infoDictOffset();
     }
