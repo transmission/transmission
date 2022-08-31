@@ -594,7 +594,7 @@ public:
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
 
-    void setDirty()
+    constexpr void setDirty()
     {
         this->isDirty = true;
     }
