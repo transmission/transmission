@@ -71,7 +71,7 @@ public:
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    [[nodiscard]] constexpr bool test(size_t bit) const
+    [[nodiscard]] bool test(size_t bit) const
     {
         return hasAll() || (!hasNone() && testFlag(bit));
     }
@@ -99,7 +99,7 @@ private:
     [[nodiscard]] size_t countFlags() const noexcept;
     [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
 
-    [[nodiscard]] constexpr bool testFlag(size_t n) const
+    [[nodiscard]] bool testFlag(size_t n) const
     {
         if (n >> 3U >= std::size(flags_))
         {

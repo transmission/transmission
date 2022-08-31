@@ -207,7 +207,7 @@ public:
         return completion.hasPiece(piece);
     }
 
-    [[nodiscard]] constexpr auto hasBlock(tr_block_index_t block) const
+    [[nodiscard]] auto hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
@@ -288,7 +288,7 @@ public:
         return files_wanted_.pieceWanted(piece);
     }
 
-    [[nodiscard]] constexpr bool fileIsWanted(tr_file_index_t file) const
+    [[nodiscard]] bool fileIsWanted(tr_file_index_t file) const
     {
         return files_wanted_.fileWanted(file);
     }

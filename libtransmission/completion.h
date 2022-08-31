@@ -50,7 +50,7 @@ struct tr_completion
         return hasMetainfo() && blocks_.hasAll();
     }
 
-    [[nodiscard]] constexpr bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
     {
         return blocks_.test(block);
     }
