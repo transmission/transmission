@@ -28,7 +28,7 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] bool contains(Key const& key) const noexcept
+    [[nodiscard]] constexpr bool contains(Key const& key) const noexcept
     {
         return !!find(key);
     }
