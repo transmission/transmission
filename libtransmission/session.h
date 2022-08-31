@@ -432,12 +432,12 @@ public:
 
     /// stats
 
-    [[nodiscard]] auto& stats() noexcept
+    [[nodiscard]] constexpr auto& stats() noexcept
     {
         return session_stats_;
     }
 
-    [[nodiscard]] auto const& stats() const noexcept
+    [[nodiscard]] constexpr auto const& stats() const noexcept
     {
         return session_stats_;
     }
