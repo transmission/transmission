@@ -24,44 +24,44 @@ set(TRWEB_SRCS
   src/torrent-row.js
   src/transmission.js
   src/utils.js
-  style/transmission-app.scss
+  assets/css/transmission-app.scss
 )
 
 set(TRWEB_IMGS
-  style/images/analytics.svg
-  style/images/application-x-executable.png
-  style/images/audio-x-generic.png
-  style/images/blue-turtle.png
-  style/images/checkered-flag.svg
-  style/images/chevron-down.svg
-  style/images/chevron-up.svg
-  style/images/diagram-3-fill.svg
-  style/images/files.svg
-  style/images/folder.png
-  style/images/font-x-generic.png
-  style/images/gear-fill.svg
-  style/images/horizontal-rule.svg
-  style/images/image-x-generic.png
-  style/images/lock-fill.svg
-  style/images/logo.png
-  style/images/package-x-generic.png
-  style/images/pause-circle-active.svg
-  style/images/pause-circle-idle.svg
-  style/images/play-circle-active.svg
-  style/images/play-circle-idle.svg
-  style/images/router.svg
-  style/images/search.svg
-  style/images/team.svg
-  style/images/text-x-generic.png
-  style/images/three-dots-vertical.svg
-  style/images/toolbar-close.png
-  style/images/toolbar-folder.png
-  style/images/toolbar-info.png
-  style/images/toolbar-pause.png
-  style/images/toolbar-start.png
-  style/images/turtle.png
-  style/images/up-and-down-arrows.svg
-  style/images/video-x-generic.png
+  assets/img/analytics.svg
+  assets/img/application-x-executable.png
+  assets/img/audio-x-generic.png
+  assets/img/blue-turtle.png
+  assets/img/checkered-flag.svg
+  assets/img/chevron-down.svg
+  assets/img/chevron-up.svg
+  assets/img/diagram-3-fill.svg
+  assets/img/files.svg
+  assets/img/folder.png
+  assets/img/font-x-generic.png
+  assets/img/gear-fill.svg
+  assets/img/horizontal-rule.svg
+  assets/img/image-x-generic.png
+  assets/img/lock-fill.svg
+  assets/img/logo.png
+  assets/img/package-x-generic.png
+  assets/img/pause-circle-active.svg
+  assets/img/pause-circle-idle.svg
+  assets/img/play-circle-active.svg
+  assets/img/play-circle-idle.svg
+  assets/img/router.svg
+  assets/img/search.svg
+  assets/img/team.svg
+  assets/img/text-x-generic.png
+  assets/img/three-dots-vertical.svg
+  assets/img/toolbar-close.png
+  assets/img/toolbar-folder.png
+  assets/img/toolbar-info.png
+  assets/img/toolbar-pause.png
+  assets/img/toolbar-start.png
+  assets/img/turtle.png
+  assets/img/up-and-down-arrows.svg
+  assets/img/video-x-generic.png
 )
 
 add_custom_target(
