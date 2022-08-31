@@ -131,7 +131,7 @@ HASH() is SHA1 binary output (20 bytes)
 ###### The handshake "packet" format
 
 
-The handshake is seperated into 5 blocking steps.
+The handshake is separated into 5 blocking steps.
 
 1 A->B: Diffie Hellman Ya, PadA
 2 B->A: Diffie Hellman Yb, PadB

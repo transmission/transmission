@@ -56,7 +56,7 @@ struct tr_bandwidth_limits
  *
  *   When you ask a bandwidth object for its speed, it gives the speed of the
  *   subtree underneath it as well. So you can get Transmission's overall
- *   speed by quering tr_session's bandwidth, per-torrent speeds by asking
+ *   speed by querying tr_session's bandwidth, per-torrent speeds by asking
  *   tr_torrent's bandwidth, and per-peer speeds by asking tr_peer's bandwidth.
  *
  * CONSTRAINING

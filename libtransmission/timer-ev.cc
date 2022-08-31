@@ -59,7 +59,7 @@ public:
 
     void setInterval(std::chrono::milliseconds interval) override
     {
-        TR_ASSERT_MSG(interval.count() > 0 || !is_repeating_, "repeating timers must have a postiive interval");
+        TR_ASSERT_MSG(interval.count() > 0 || !is_repeating_, "repeating timers must have a positive interval");
 
         interval_ = interval;
 

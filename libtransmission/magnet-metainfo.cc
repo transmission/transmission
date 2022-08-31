@@ -135,7 +135,7 @@ std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
 {
     // http://bittorrent.org/beps/bep_0009.html
     // Is the info-hash hex encoded, for a total of 40 characters.
-    // For compatability with existing links in the wild, clients
+    // For compatibility with existing links in the wild, clients
     // should also support the 32 character base32 encoded info-hash.
 
     if (auto const hash = tr_sha1_from_string(sv); hash)

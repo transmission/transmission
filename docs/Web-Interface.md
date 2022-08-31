@@ -10,7 +10,7 @@ Click "Preferences". Then go to tab "Remote"
 
 ![image](resources/QT-Enable-Web-Win-2.png)
 
-Click on "Allow remote access" checkbox. If password protection is required, click on "Use authentication" checkbox, set username and password. If "Only allow these IP adresses" is checked, Transmission will only allow the specified list of addresses to access the web interface.
+Click on "Allow remote access" checkbox. If password protection is required, click on "Use authentication" checkbox, set username and password. If "Only allow these IP addresses" is checked, Transmission will only allow the specified list of addresses to access the web interface.
 
 ![image](resources/QT-Enable-Web-Win-3.png)
 
@@ -26,7 +26,7 @@ Then go to tab "Remote"
 
 ![Screenshot_2022-07-20_23-49-18](resources/QT-Enable-Web-Lnx-2.png)
 
-Click on "Allow remote access" checkbox. If password protection is required, click on "Use authentication" checkbox, set username and password. If "Only allow these IP adresses" is checked, Transmission will only allow the specified list of addresses to access the web interface.
+Click on "Allow remote access" checkbox. If password protection is required, click on "Use authentication" checkbox, set username and password. If "Only allow these IP addresses" is checked, Transmission will only allow the specified list of addresses to access the web interface.
 
 ![image](resources/QT-Enable-Web-Lnx-3.png)
 

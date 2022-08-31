@@ -367,7 +367,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
         {
             auto const* response_used = &response;
 
-            // All requests have been answered, but none were successfull.
+            // All requests have been answered, but none were successful.
             // Choose the one that went further to report.
             if (data->previous_response && !response.did_connect && !response.did_timeout)
             {

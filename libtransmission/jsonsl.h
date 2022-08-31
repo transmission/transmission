@@ -392,7 +392,7 @@ struct jsonsl_state_st {
 
 /*
  * So now we need some special structure for keeping the
- * JPR info in sync. Preferrably all in a single block
+ * JPR info in sync. Preferably all in a single block
  * of memory (there's no need for separate allocations.
  * So we will define a 'table' with the following layout
  *
