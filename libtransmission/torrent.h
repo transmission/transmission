@@ -475,7 +475,7 @@ public:
         return metainfo_.creator();
     }
 
-    [[nodiscard]] auto const& source() const noexcept
+    [[nodiscard]] constexpr auto const& source() const noexcept
     {
         return metainfo_.source();
     }
