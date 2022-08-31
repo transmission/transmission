@@ -2732,12 +2732,6 @@ void tr_torrent::markChanged()
     this->anyDate = tr_time();
 }
 
-void tr_torrent::setDateActive(time_t t)
-{
-    this->activityDate = t;
-    this->anyDate = std::max(this->anyDate, this->activityDate);
-}
-
 void tr_torrent::setBlocks(tr_bitfield blocks)
 {
     this->completion.setBlocks(std::move(blocks));

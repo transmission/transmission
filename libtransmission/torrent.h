@@ -586,7 +586,15 @@ public:
         return unique_id_;
     }
 
-    void setDateActive(time_t t);
+    constexpr void setDateActive(time_t t) noexcept
+    {
+        this->activityDate = t;
+
+        if (this->anyDate < t)
+        {
+            this->anyDate = t;
+        }
+    }
 
     void setLabels(std::vector<tr_quark> const& new_labels);
 
