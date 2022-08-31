@@ -197,7 +197,7 @@ public:
         return completion.hasAll();
     }
 
-    [[nodiscard]] auto hasNone() const noexcept
+    [[nodiscard]] constexpr auto hasNone() const noexcept
     {
         return completion.hasNone();
     }
