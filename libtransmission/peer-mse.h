@@ -77,9 +77,24 @@ class Filter
 {
 public:
     void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void decrypt(size_t buf_len, void* buf);
+
+    void decrypt(size_t buf_len, void* buf)
+    {
+        if (dec_key_)
+        {
+            dec_key_->process(buf, buf, buf_len);
+        }
+    }
+
     void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void encrypt(size_t buf_len, void* buf);
+
+    void encrypt(size_t buf_len, void* buf)
+    {
+        if (enc_key_)
+        {
+            enc_key_->process(buf, buf, buf_len);
+        }
+    }
 
 private:
     std::unique_ptr<tr_arc4> dec_key_;
