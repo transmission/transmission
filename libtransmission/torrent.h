@@ -420,7 +420,7 @@ public:
         return metainfo_.name();
     }
 
-    [[nodiscard]] auto const& infoHash() const noexcept
+    [[nodiscard]] constexpr auto const& infoHash() const noexcept
     {
         return metainfo_.infoHash();
     }
