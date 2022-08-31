@@ -19,7 +19,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_truncd() */
 
-#include "HigWorkarea.h"
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_SMALL
 #include "IconCache.h"
 #include "TorrentCellRenderer.h"
 #include "Utils.h"

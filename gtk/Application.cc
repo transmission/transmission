@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -34,6 +35,7 @@
 #include "Application.h"
 #include "DetailsDialog.h"
 #include "Dialogs.h"
+#include "FilterBar.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
 #include "MainWindow.h"
 #include "MakeDialog.h"
@@ -542,6 +544,8 @@ void Application::Impl::on_startup()
         Gdk::Screen::get_default(),
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    std::ignore = FilterBar();
 
     tr_session* session;
 

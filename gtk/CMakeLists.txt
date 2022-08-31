@@ -22,6 +22,7 @@ find_program(APPSTREAM appstreamcli)
 
 set(${PROJECT_NAME}_UI_FILES
     FilterBar.ui
+    MainWindow.ui
     MakeDialog.ui
     MakeProgressDialog.ui
     OptionsDialog.ui

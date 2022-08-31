@@ -30,11 +30,7 @@ auto const TORRENT_MODEL_KEY = Glib::Quark("tr-filter-torrent-model-key");
 class FilterBar::Impl
 {
 public:
-    Impl(
-        FilterBar& widget,
-        Glib::RefPtr<Gtk::Builder> const& builder,
-        tr_session* session,
-        Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
+    Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -42,6 +38,9 @@ public:
     Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
 
 private:
+    template<typename T>
+    T* get_template_child(char const* name) const;
+
     void activity_combo_box_init(Gtk::ComboBox* combo, Glib::RefPtr<Gtk::TreeModel> const& tmodel);
     void tracker_combo_box_init(Gtk::ComboBox* combo, Glib::RefPtr<Gtk::TreeModel> const& tmodel);
 
@@ -733,36 +732,56 @@ void FilterBar::Impl::update_count_label_idle()
 ****
 ***/
 
+FilterBarExtraInit::FilterBarExtraInit()
+    : ExtraClassInit(&FilterBarExtraInit::class_init, nullptr, &FilterBarExtraInit::instance_init)
+{
+}
+
+void FilterBarExtraInit::class_init(void* klass, void* /*user_data*/)
+{
+    auto* const widget_klass = GTK_WIDGET_CLASS(klass);
+
+    gtk_widget_class_set_template_from_resource(widget_klass, gtr_get_full_resource_path("FilterBar.ui").c_str());
+
+    gtk_widget_class_bind_template_child_full(widget_klass, "activity_combo", FALSE, 0);
+    gtk_widget_class_bind_template_child_full(widget_klass, "tracker_combo", FALSE, 0);
+    gtk_widget_class_bind_template_child_full(widget_klass, "text_entry", FALSE, 0);
+    gtk_widget_class_bind_template_child_full(widget_klass, "show_label", FALSE, 0);
+}
+
+void FilterBarExtraInit::instance_init(GTypeInstance* instance, void* /*klass*/)
+{
+    gtk_widget_init_template(GTK_WIDGET(instance));
+}
+
+/***
+****
+***/
+
+FilterBar::FilterBar()
+    : Glib::ObjectBase(typeid(FilterBar))
+{
+}
+
 FilterBar::FilterBar(
     BaseObjectType* cast_item,
-    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::RefPtr<Gtk::Builder> const& /*builder*/,
     tr_session* session,
     Glib::RefPtr<Gtk::TreeModel> const& tmodel)
-    : Gtk::Box(cast_item)
-    , impl_(std::make_unique<Impl>(*this, builder, session, tmodel))
+    : Glib::ObjectBase(typeid(FilterBar))
+    , Gtk::Box(cast_item)
+    , impl_(std::make_unique<Impl>(*this, session, tmodel))
 {
 }
 
 FilterBar::~FilterBar() = default;
 
-std::unique_ptr<FilterBar> FilterBar::create(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model)
-{
-    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("FilterBar.ui"));
-    auto result = std::unique_ptr<FilterBar>(gtr_get_widget_derived<FilterBar>(builder, "FilterBar", session, torrent_model));
-    result->reference(); // Not a top-level window, avoid destruction along with the builder
-    return result;
-}
-
-FilterBar::Impl::Impl(
-    FilterBar& widget,
-    Glib::RefPtr<Gtk::Builder> const& builder,
-    tr_session* session,
-    Glib::RefPtr<Gtk::TreeModel> const& tmodel)
+FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& tmodel)
     : widget_(widget)
-    , activity_(gtr_get_widget<Gtk::ComboBox>(builder, "activity_combo"))
-    , tracker_(gtr_get_widget<Gtk::ComboBox>(builder, "tracker_combo"))
-    , entry_(gtr_get_widget<Gtk::Entry>(builder, "text_entry"))
-    , show_lb_(gtr_get_widget<Gtk::Label>(builder, "show_label"))
+    , activity_(get_template_child<Gtk::ComboBox>("activity_combo"))
+    , tracker_(get_template_child<Gtk::ComboBox>("tracker_combo"))
+    , entry_(get_template_child<Gtk::Entry>("text_entry"))
+    , show_lb_(get_template_child<Gtk::Label>("show_label"))
 {
     activity_combo_box_init(activity_, tmodel);
     tracker_combo_box_init(tracker_, tmodel);
@@ -805,4 +824,14 @@ Glib::RefPtr<Gtk::TreeModel> FilterBar::get_filter_model() const
 Glib::RefPtr<Gtk::TreeModel> FilterBar::Impl::get_filter_model() const
 {
     return filter_model_;
+}
+
+template<typename T>
+T* FilterBar::Impl::get_template_child(char const* name) const
+{
+    auto full_type_name = std::string("gtkmm__CustomObject_");
+    Glib::append_canonical_typename(full_type_name, typeid(FilterBar).name());
+
+    return Glib::wrap(reinterpret_cast<typename T::BaseObjectType*>(
+        gtk_widget_get_template_child(GTK_WIDGET(widget_.gobj()), g_type_from_name(full_type_name.c_str()), name)));
 }

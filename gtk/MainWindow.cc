@@ -9,11 +9,11 @@
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_formatter_speed_KBps() */
+#include <libtransmission/utils.h> // tr_formatter_speed_KBps()
 
 #include "Actions.h"
 #include "FilterBar.h"
-#include "HigWorkarea.h"
+#include "HigWorkarea.h" // GUI_PAD_SMALL
 #include "MainWindow.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -24,7 +24,11 @@
 class MainWindow::Impl
 {
 public:
-    Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core);
+    Impl(
+        MainWindow& window,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Gio::ActionGroup> const& actions,
+        Glib::RefPtr<Session> const& core);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -36,7 +40,7 @@ public:
     void prefsChanged(tr_quark key);
 
 private:
-    Gtk::TreeView* makeview(Glib::RefPtr<Gtk::TreeModel> const& model);
+    void init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeModel> const& model);
 
     Gtk::Menu* createOptionsMenu();
     Gtk::Menu* createSpeedMenu(tr_direction dir);
@@ -63,6 +67,7 @@ private:
 
 private:
     MainWindow& window_;
+    Glib::RefPtr<Session> const core_;
 
     std::array<Gtk::RadioMenuItem*, 2> speedlimit_on_item_;
     std::array<Gtk::RadioMenuItem*, 2> speedlimit_off_item_;
@@ -70,9 +75,9 @@ private:
     Gtk::RadioMenuItem* ratio_off_item_ = nullptr;
     Gtk::ScrolledWindow* scroll_ = nullptr;
     Gtk::TreeView* view_ = nullptr;
-    Gtk::Toolbar* toolbar_ = nullptr;
-    std::unique_ptr<FilterBar> filter_;
-    Gtk::Grid* status_ = nullptr;
+    Gtk::Widget* toolbar_ = nullptr;
+    FilterBar* filter_;
+    Gtk::Widget* status_ = nullptr;
     Gtk::Menu* status_menu_;
     Gtk::Label* ul_lb_ = nullptr;
     Gtk::Label* dl_lb_ = nullptr;
@@ -80,10 +85,8 @@ private:
     Gtk::Image* alt_speed_image_ = nullptr;
     Gtk::ToggleButton* alt_speed_button_ = nullptr;
     Gtk::Menu* options_menu_ = nullptr;
-    Glib::RefPtr<Gtk::TreeSelection> selection_;
     TorrentCellRenderer* renderer_ = nullptr;
     Gtk::TreeViewColumn* column_ = nullptr;
-    Glib::RefPtr<Session> const core_;
     sigc::connection pref_handler_id_;
     Gtk::Menu* popup_menu_ = nullptr;
 };
@@ -118,20 +121,12 @@ bool tree_view_search_equal_func(
 
 } // namespace
 
-Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& model)
+void MainWindow::Impl::init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeModel> const& model)
 {
-    auto* view = Gtk::make_managed<Gtk::TreeView>();
     view->set_search_column(torrent_cols.name_collated);
     view->set_search_equal_func(&tree_view_search_equal_func);
-    view->set_headers_visible(false);
-    view->set_fixed_height_mode(true);
 
-    selection_ = view->get_selection();
-
-    column_ = Gtk::make_managed<Gtk::TreeViewColumn>();
-    column_->set_title(_("Torrent"));
-    column_->set_resizable(true);
-    column_->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+    column_ = view->get_column(0);
 
     renderer_ = Gtk::make_managed<TorrentCellRenderer>();
     column_->pack_start(*renderer_, false);
@@ -139,11 +134,8 @@ Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& mo
     column_->add_attribute(renderer_->property_piece_upload_speed(), torrent_cols.speed_up);
     column_->add_attribute(renderer_->property_piece_download_speed(), torrent_cols.speed_down);
 
-    view->append_column(*column_);
     renderer_->property_xpad() = GUI_PAD_SMALL;
     renderer_->property_ypad() = GUI_PAD_SMALL;
-
-    selection_->set_mode(Gtk::SELECTION_MULTIPLE);
 
     view->signal_popup_menu().connect_notify([this]() { on_popup_menu(nullptr); });
     view->signal_button_press_event().connect(
@@ -156,8 +148,6 @@ Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& mo
                                          { gtr_action_activate("show-torrent-properties"); });
 
     view->set_model(model);
-
-    return view;
 }
 
 void MainWindow::Impl::prefsChanged(tr_quark const key)
@@ -395,21 +385,41 @@ std::unique_ptr<MainWindow> MainWindow::create(
     Glib::RefPtr<Gio::ActionGroup> const& actions,
     Glib::RefPtr<Session> const& core)
 {
-    return std::unique_ptr<MainWindow>(new MainWindow(app, actions, core));
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MainWindow.ui"));
+    return std::unique_ptr<MainWindow>(gtr_get_widget_derived<MainWindow>(builder, "MainWindow", app, actions, core));
 }
 
-MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core)
-    : Gtk::ApplicationWindow()
-    , impl_(std::make_unique<Impl>(*this, actions, core))
+MainWindow::MainWindow(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Gtk::Application& app,
+    Glib::RefPtr<Gio::ActionGroup> const& actions,
+    Glib::RefPtr<Session> const& core)
+    : Gtk::ApplicationWindow(cast_item)
+    , impl_(std::make_unique<Impl>(*this, builder, actions, core))
 {
     app.add_window(*this);
 }
 
 MainWindow::~MainWindow() = default;
 
-MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core)
+MainWindow::Impl::Impl(
+    MainWindow& window,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::RefPtr<Gio::ActionGroup> const& actions,
+    Glib::RefPtr<Session> const& core)
     : window_(window)
     , core_(core)
+    , scroll_(gtr_get_widget<Gtk::ScrolledWindow>(builder, "torrents_view_scroll"))
+    , view_(gtr_get_widget<Gtk::TreeView>(builder, "torrents_view"))
+    , toolbar_(gtr_get_widget<Gtk::Widget>(builder, "toolbar"))
+    , filter_(gtr_get_widget_derived<FilterBar>(builder, "filterbar", core_->get_session(), core_->get_model()))
+    , status_(gtr_get_widget<Gtk::Widget>(builder, "statusbar"))
+    , ul_lb_(gtr_get_widget<Gtk::Label>(builder, "upload_speed_label"))
+    , dl_lb_(gtr_get_widget<Gtk::Label>(builder, "download_speed_label"))
+    , stats_lb_(gtr_get_widget<Gtk::Label>(builder, "statistics_label"))
+    , alt_speed_image_(gtr_get_widget<Gtk::Image>(builder, "alt_speed_button_image"))
+    , alt_speed_button_(gtr_get_widget<Gtk::ToggleButton>(builder, "alt_speed_button"))
 {
     static struct
     {
@@ -424,7 +434,6 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
 
     /* make the window */
     window.set_title(Glib::get_application_name());
-    window.set_role("tr-main");
     window.set_default_size(gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
     window.move(gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
 
@@ -434,17 +443,6 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     }
 
     window.insert_action_group("win", actions);
-
-    /* window's main container */
-    auto* vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 0);
-    window.add(*vbox);
-
-    /* toolbar */
-    toolbar_ = gtr_action_get_widget<Gtk::Toolbar>("main-window-toolbar");
-    toolbar_->get_style_context()->add_class(GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
-
-    /* filter */
-    filter_ = FilterBar::create(core_->get_session(), core_->get_model());
 
     /* status menu */
     status_menu_ = Gtk::make_managed<Gtk::Menu>();
@@ -464,73 +462,23 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     *** Statusbar
     **/
 
-    status_ = Gtk::make_managed<Gtk::Grid>();
-    status_->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-    status_->set_border_width(GUI_PAD_SMALL);
-
     /* gear */
-    auto* gear_button = Gtk::make_managed<Gtk::Button>();
-    gear_button->add(*Gtk::make_managed<Gtk::Image>("options-symbolic", Gtk::ICON_SIZE_MENU));
-    gear_button->set_tooltip_text(_("Options"));
-    gear_button->set_relief(Gtk::RELIEF_NONE);
+    auto* gear_button = gtr_get_widget<Gtk::Button>(builder, "gear_button");
     options_menu_ = createOptionsMenu();
     gear_button->signal_clicked().connect([this, gear_button]() { onOptionsClicked(gear_button); });
-    status_->add(*gear_button);
 
     /* turtle */
-    alt_speed_image_ = Gtk::make_managed<Gtk::Image>();
-    alt_speed_button_ = Gtk::make_managed<Gtk::ToggleButton>();
-    alt_speed_button_->set_image(*alt_speed_image_);
-    alt_speed_button_->set_relief(Gtk::RELIEF_NONE);
     alt_speed_button_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::alt_speed_toggled_cb));
-    status_->add(*alt_speed_button_);
-
-    /* spacer */
-    auto* w = Gtk::make_managed<Gtk::Fixed>();
-    w->set_hexpand(true);
-    status_->add(*w);
-
-    /* download */
-    dl_lb_ = Gtk::make_managed<Gtk::Label>();
-    dl_lb_->set_single_line_mode(true);
-    status_->add(*dl_lb_);
-
-    /* upload */
-    ul_lb_ = Gtk::make_managed<Gtk::Label>();
-    ul_lb_->set_margin_start(GUI_PAD);
-    ul_lb_->set_single_line_mode(true);
-    status_->add(*ul_lb_);
-
-    /* ratio */
-    stats_lb_ = Gtk::make_managed<Gtk::Label>();
-    stats_lb_->set_margin_start(GUI_PAD_BIG);
-    stats_lb_->set_single_line_mode(true);
-    status_->add(*stats_lb_);
 
     /* ratio selector */
-    auto* ratio_button = Gtk::make_managed<Gtk::Button>();
-    ratio_button->set_tooltip_text(_("Statistics"));
-    ratio_button->add(*Gtk::make_managed<Gtk::Image>("ratio-symbolic", Gtk::ICON_SIZE_MENU));
-    ratio_button->set_relief(Gtk::RELIEF_NONE);
+    auto* ratio_button = gtr_get_widget<Gtk::Button>(builder, "ratio_button");
     ratio_button->signal_clicked().connect([this, ratio_button]() { onYinYangClicked(ratio_button); });
-    status_->add(*ratio_button);
 
     /**
     *** Workarea
     **/
 
-    view_ = makeview(filter_->get_filter_model());
-    scroll_ = Gtk::make_managed<Gtk::ScrolledWindow>();
-    scroll_->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
-    scroll_->set_shadow_type(Gtk::SHADOW_OUT);
-    scroll_->get_style_context()->add_class("tr-workarea");
-    scroll_->add(*view_);
-
-    /* lay out the widgets */
-    vbox->pack_start(*toolbar_, false, false);
-    vbox->pack_start(*filter_, false, false);
-    vbox->pack_start(*scroll_, true, true);
-    vbox->pack_start(*status_, false, false);
+    init_view(view_, filter_->get_filter_model());
 
     {
         /* this is to determine the maximum width/height for the label */
@@ -540,14 +488,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
         pango_layout->get_pixel_size(width, height);
         ul_lb_->set_size_request(width, height);
         dl_lb_->set_size_request(width, height);
-        ul_lb_->set_halign(Gtk::ALIGN_END);
-        ul_lb_->set_valign(Gtk::ALIGN_CENTER);
-        dl_lb_->set_halign(Gtk::ALIGN_END);
-        dl_lb_->set_valign(Gtk::ALIGN_CENTER);
     }
-
-    /* show all but the window */
-    vbox->show_all();
 
     /* listen for prefs changes that affect the window */
     prefsChanged(TR_KEY_compact_view);
@@ -660,7 +601,7 @@ Glib::RefPtr<Gtk::TreeSelection> MainWindow::get_selection() const
 
 Glib::RefPtr<Gtk::TreeSelection> MainWindow::Impl::get_selection() const
 {
-    return selection_;
+    return view_->get_selection();
 }
 
 void MainWindow::set_busy(bool isBusy)

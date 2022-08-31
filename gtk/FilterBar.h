@@ -7,15 +7,29 @@
 
 #include <memory>
 
+#include <glibmm/extraclassinit.h>
 #include <gtkmm.h>
 
 #include <libtransmission/tr-macros.h>
 
 typedef struct tr_session tr_session;
 
-class FilterBar : public Gtk::Box
+class FilterBarExtraInit : public Glib::ExtraClassInit
 {
 public:
+    FilterBarExtraInit();
+
+private:
+    static void class_init(void* klass, void* user_data);
+    static void instance_init(GTypeInstance* instance, void* klass);
+};
+
+class FilterBar
+    : public FilterBarExtraInit
+    , public Gtk::Box
+{
+public:
+    FilterBar();
     FilterBar(
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
@@ -26,8 +40,6 @@ public:
     TR_DISABLE_COPY_MOVE(FilterBar)
 
     Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
-
-    static std::unique_ptr<FilterBar> create(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
 
 private:
     class Impl;
