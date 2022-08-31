@@ -205,7 +205,7 @@ struct ParserStack
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }
 
-    std::optional<ParentType> parentType() const
+    constexpr std::optional<ParentType> parentType() const
     {
         if (depth == 0)
         {
