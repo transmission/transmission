@@ -192,7 +192,7 @@ public:
         return completion.hasMetainfo();
     }
 
-    [[nodiscard]] auto hasAll() const noexcept
+    [[nodiscard]] constexpr auto hasAll() const noexcept
     {
         return completion.hasAll();
     }
