@@ -274,7 +274,7 @@ public:
 
     [[nodiscard]] bool useRpcWhitelist() const;
 
-    [[nodiscard]] auto externalIP() const noexcept
+    [[nodiscard]] constexpr auto externalIP() const noexcept
     {
         return external_ip_;
     }
