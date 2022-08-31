@@ -17,7 +17,7 @@ template<typename Key, typename Val, std::size_t N>
 class tr_lru_cache
 {
 public:
-    [[nodiscard]] Val* get(Key const& key) noexcept
+    [[nodiscard]] constexpr Val* get(Key const& key) noexcept
     {
         if (auto const found = find(key); found != nullptr)
         {
