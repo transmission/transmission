@@ -41,14 +41,14 @@
 
 /* The amount of read bufferring that we allow for uTP sockets. */
 
-static auto constexpr UtpReadBufferSize = 256 * 1024;
+static constexpr auto UtpReadBufferSize = 256 * 1024;
 
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->addrStr())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->addrStr())
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
 
-static size_t guessPacketOverhead(size_t d)
+static constexpr size_t guessPacketOverhead(size_t d)
 {
     /**
      * http://sd.wareonearth.com/~phil/net/overhead/
