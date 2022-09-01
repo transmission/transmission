@@ -100,6 +100,13 @@ public:
         event.length = block_info.blockSize(block);
         return event;
     }
+
+    [[nodiscard]] constexpr static tr_peer_event GotHaveAll() noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
+        return event;
+    }
 };
 
 using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const* event, void* client_data);

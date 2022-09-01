@@ -528,7 +528,7 @@ public:
 
     void publishGotRej(struct peer_request const* req)
     {
-        publish(tr_peer_event::GotRejected(torrent->blockInfo(), torrent->pieceLoc(req->index, req->offset)));
+        publish(tr_peer_event::GotRejected(torrent->blockInfo(), torrent->pieceLoc(req->index, req->offset).block));
     }
 
     void publishGotChoke()
@@ -540,9 +540,7 @@ public:
 
     void publishClientGotHaveAll()
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
-        publish(e);
+        publish(tr_peer_event::GotHaveAll());
     }
 
     void publishClientGotHaveNone()
