@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishError(int err)
-    {
-        publish(tr_peer_event::GotError(err));
-    }
-
     void publishGotBlock(tr_block_index_t block)
     {
         publish(tr_peer_event::GotBlock(torrent->blockInfo(), block));
@@ -626,6 +621,14 @@ public:
 
     void sendPex();
 
+    void publish(tr_peer_event const& e)
+    {
+        if (callback_ != nullptr)
+        {
+            (*callback_)(this, &e, callbackData_);
+        }
+    }
+
 private:
     [[nodiscard]] size_t maxAvailableReqs() const
     {
@@ -723,14 +726,6 @@ private:
             val = active;
 
             tr_swarmIncrementActivePeers(torrent->swarm, direction, active);
-        }
-    }
-
-    void publish(tr_peer_event const& e)
-    {
-        if (callback_ != nullptr)
-        {
-            (*callback_)(this, &e, callbackData_);
         }
     }
 
@@ -1741,7 +1736,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         logdbg(
             msgs,
             fmt::format(FMT_STRING("bad packet - BT message #{:d} with a length of {:d}"), static_cast<int>(id), msglen));
-        msgs->publishError(EMSGSIZE);
+        msgs->publish(tr_peer_event::GotError(EMSGSIZE));
         return READ_ERR;
     }
 
@@ -1784,7 +1779,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 
         if (msgs->torrent->hasMetainfo() && ui32 >= msgs->torrent->pieceCount())
         {
-            msgs->publishError(ERANGE);
+            msgs->publish(tr_peer_event::GotError(ERANGE));
             return READ_ERR;
         }
 
@@ -1880,7 +1875,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         }
         else
         {
-            msgs->publishError(EMSGSIZE);
+            msgs->publish(tr_peer_event::GotError(EMSGSIZE));
             return READ_ERR;
         }
 
@@ -1896,7 +1891,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         }
         else
         {
-            msgs->publishError(EMSGSIZE);
+            msgs->publish(tr_peer_event::GotError(EMSGSIZE));
             return READ_ERR;
         }
 
@@ -1913,7 +1908,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         }
         else
         {
-            msgs->publishError(EMSGSIZE);
+            msgs->publish(tr_peer_event::GotError(EMSGSIZE));
             return READ_ERR;
         }
 
@@ -1930,7 +1925,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         }
         else
         {
-            msgs->publishError(EMSGSIZE);
+            msgs->publish(tr_peer_event::GotError(EMSGSIZE));
             return READ_ERR;
         }
 
@@ -1950,7 +1945,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             }
             else
             {
-                msgs->publishError(EMSGSIZE);
+                msgs->publish(tr_peer_event::GotError(EMSGSIZE));
                 return READ_ERR;
             }
 
@@ -2377,7 +2372,7 @@ static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
             fmt::format(FMT_STRING("libevent got an error! what={:d}, errno={:d} ({:s})"), what, errno, tr_strerror(errno)));
     }
 
-    msgs->publishError(ENOTCONN);
+    msgs->publish(tr_peer_event::GotError(ENOTCONN));
 }
 
 static void sendBitfield(tr_peerMsgsImpl* msgs)
