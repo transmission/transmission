@@ -297,11 +297,11 @@ public:
         return { n_slots, n_slots * PreferredBlocksPerTask };
     }
 
-    void publish(tr_peer_event event)
+    void publish(tr_peer_event const& peer_event)
     {
         if (callback != nullptr)
         {
-            (*callback)(this, &event, callback_data);
+            (*callback)(this, peer_event, callback_data);
         }
     }
 

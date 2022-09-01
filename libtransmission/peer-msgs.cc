@@ -561,11 +561,11 @@ public:
 
     void sendPex();
 
-    void publish(tr_peer_event const& e)
+    void publish(tr_peer_event const& peer_event)
     {
         if (callback_ != nullptr)
         {
-            (*callback_)(this, &e, callbackData_);
+            (*callback_)(this, peer_event, callbackData_);
         }
     }
 

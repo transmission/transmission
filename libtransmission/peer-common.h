@@ -171,7 +171,7 @@ public:
     }
 };
 
-using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const* event, void* client_data);
+using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const& event, void* client_data);
 
 /**
  * State information about a connected peer.

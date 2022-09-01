@@ -353,7 +353,7 @@ private:
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
 
-static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const* /*e*/, void* /*vs*/);
+static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const& /*e*/, void* /*vs*/);
 
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
@@ -969,24 +969,24 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     s->needs_completeness_check = true;
 }
 
-static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
+static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs)
 {
     TR_ASSERT(peer != nullptr);
     auto* s = static_cast<tr_swarm*>(vs);
     auto const lock = s->unique_lock();
 
-    switch (e->type)
+    switch (event.type)
     {
     case tr_peer_event::Type::ClientSentPieceData:
         {
             auto const now = tr_time();
             auto* const tor = s->tor;
 
-            tor->uploadedCur += e->length;
-            tr_announcerAddBytes(tor, TR_ANN_UP, e->length);
+            tor->uploadedCur += event.length;
+            tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
             tor->setDateActive(now);
             tor->setDirty();
-            tor->session->addUploaded(e->length);
+            tor->session->addUploaded(event.length);
 
             if (peer->atom != nullptr)
             {
@@ -1001,10 +1001,10 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             auto const now = tr_time();
             auto* const tor = s->tor;
 
-            tor->downloadedCur += e->length;
+            tor->downloadedCur += event.length;
             tor->setDateActive(now);
             tor->setDirty();
-            tor->session->addDownloaded(e->length);
+            tor->session->addDownloaded(event.length);
 
             if (peer->atom != nullptr)
             {
@@ -1023,7 +1023,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         break;
 
     case tr_peer_event::Type::ClientGotRej:
-        s->active_requests.remove(s->tor->pieceLoc(e->pieceIndex, e->offset).block, peer);
+        s->active_requests.remove(s->tor->pieceLoc(event.pieceIndex, event.offset).block, peer);
         break;
 
     case tr_peer_event::Type::ClientGotChoke:
@@ -1033,23 +1033,23 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
     case tr_peer_event::Type::ClientGotPort:
         if (peer->atom != nullptr)
         {
-            peer->atom->port = e->port;
+            peer->atom->port = event.port;
         }
 
         break;
 
     case tr_peer_event::Type::ClientGotSuggest:
-        peerSuggestedPiece(s, peer, e->pieceIndex, false);
+        peerSuggestedPiece(s, peer, event.pieceIndex, false);
         break;
 
     case tr_peer_event::Type::ClientGotAllowedFast:
-        peerSuggestedPiece(s, peer, e->pieceIndex, true);
+        peerSuggestedPiece(s, peer, event.pieceIndex, true);
         break;
 
     case tr_peer_event::Type::ClientGotBlock:
         {
             auto* const tor = s->tor;
-            auto const loc = tor->pieceLoc(e->pieceIndex, e->offset);
+            auto const loc = tor->pieceLoc(event.pieceIndex, event.offset);
             s->cancelAllRequestsForBlock(loc.block, peer);
             peer->blocks_sent_to_client.add(tr_time(), 1);
             tr_torrentGotBlock(tor, loc.block);
@@ -1057,7 +1057,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         }
 
     case tr_peer_event::Type::Error:
-        if (e->err == ERANGE || e->err == EMSGSIZE || e->err == ENOTCONN)
+        if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
         {
             /* some protocol error from the peer */
             peer->do_purge = true;
@@ -1069,7 +1069,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         }
         else
         {
-            tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(e->err)));
+            tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
         }
 
         break;
