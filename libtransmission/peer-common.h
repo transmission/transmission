@@ -101,6 +101,13 @@ public:
         return event;
     }
 
+    [[nodiscard]] constexpr static tr_peer_event GotChoke() noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_CHOKE;
+        return event;
+    }
+
     [[nodiscard]] constexpr static tr_peer_event GotHaveAll() noexcept
     {
         auto event = tr_peer_event{};

@@ -533,9 +533,7 @@ public:
 
     void publishGotChoke()
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_CHOKE;
-        publish(e);
+        publish(tr_peer_event::GotChoke());
     }
 
     void publishClientGotHaveAll()
