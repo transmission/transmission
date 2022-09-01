@@ -569,12 +569,9 @@ public:
         publish(tr_peer_event::GotPort(port));
     }
 
-    void publishClientGotAllowedFast(tr_piece_index_t pieceIndex)
+    void publishClientGotAllowedFast(tr_piece_index_t piece)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
-        e.pieceIndex = pieceIndex;
-        publish(e);
+        publish(tr_peer_event::GotAllowedFast(piece));
     }
 
     void publishClientGotBitfield(tr_bitfield* bitfield)
