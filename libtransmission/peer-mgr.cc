@@ -2273,15 +2273,19 @@ void tr_peerMgr::rechokePulse() const
 
     for (auto* const tor : session->torrents())
     {
-        if (!tor->isRunning)
+        if (tor->isRunning)
         {
-            continue;
+            // possibly stop torrents that have seeded enough
+            tr_torrentCheckSeedLimit(tor);
         }
 
-        if (auto* const swarm = tor->swarm; swarm->stats.peer_count > 0)
+        if (tor->isRunning)
         {
-            rechokeUploads(swarm, now);
-            rechokeDownloads(swarm);
+            if (auto* const swarm = tor->swarm; swarm->stats.peer_count > 0)
+            {
+                rechokeUploads(swarm, now);
+                rechokeDownloads(swarm);
+            }
         }
     }
 }
@@ -2564,9 +2568,6 @@ void tr_peerMgr::bandwidthPulse()
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
     {
-        /* possibly stop torrents that have seeded enough */
-        tr_torrentCheckSeedLimit(tor);
-
         /* run the completeness check for any torrents that need it */
         if (tor->swarm->needs_completeness_check)
         {
