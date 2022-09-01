@@ -556,12 +556,9 @@ public:
         publish(tr_peer_event::GotPieceData(length));
     }
 
-    void publishClientGotSuggest(tr_piece_index_t pieceIndex)
+    void publishClientGotSuggest(tr_piece_index_t piece)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
-        e.pieceIndex = pieceIndex;
-        publish(e);
+        publish(tr_peer_event::GotSuggest(piece));
     }
 
     void publishClientGotPort(tr_port port)
