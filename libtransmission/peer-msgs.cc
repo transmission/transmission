@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishGotRej(struct peer_request const* req)
-    {
-        publish(tr_peer_event::GotRejected(torrent->blockInfo(), torrent->pieceLoc(req->index, req->offset).block));
-    }
-
     void publishGotChoke()
     {
         publish(tr_peer_event::GotChoke());
@@ -1936,7 +1931,8 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 
             if (fext)
             {
-                msgs->publishGotRej(&r);
+                msgs->publish(
+                    tr_peer_event::GotRejected(msgs->torrent->blockInfo(), msgs->torrent->pieceLoc(r.index, r.offset).block));
             }
             else
             {
