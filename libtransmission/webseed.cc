@@ -258,11 +258,6 @@ public:
         }
     }
 
-    void publishGotBlock(tr_torrent const* tor, tr_block_index_t block)
-    {
-        publish(tr_peer_event::GotBlock(tor->blockInfo(), block));
-    }
-
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         auto* const tor = getTorrent();
@@ -302,6 +297,14 @@ public:
         return { n_slots, n_slots * PreferredBlocksPerTask };
     }
 
+    void publish(tr_peer_event event)
+    {
+        if (callback != nullptr)
+        {
+            (*callback)(this, &event, callback_data);
+        }
+    }
+
     tr_torrent_id_t const torrent_id;
     std::string const base_url;
     tr_peer_callback const callback;
@@ -311,14 +314,6 @@ public:
     std::set<tr_webseed_task*> tasks;
 
 private:
-    void publish(tr_peer_event event)
-    {
-        if (callback != nullptr)
-        {
-            (*callback)(this, &event, callback_data);
-        }
-    }
-
     tr_bandwidth bandwidth_;
     std::unique_ptr<libtransmission::Timer> idle_timer;
     static auto constexpr IdleTimerInterval = 2s;
@@ -353,7 +348,7 @@ public:
         if (auto* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
             session_->cache->writeBlock(tor_id_, block_, data_);
-            webseed_->publishGotBlock(tor, block_);
+            webseed_->publish(tr_peer_event::GotBlock(tor->blockInfo(), block_));
         }
 
         delete this;
