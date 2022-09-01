@@ -975,9 +975,9 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
     auto* s = static_cast<tr_swarm*>(vs);
     auto const lock = s->unique_lock();
 
-    switch (e->eventType)
+    switch (e->type)
     {
-    case TR_PEER_CLIENT_SENT_PIECE_DATA:
+    case tr_peer_event::Type::ClientSentPieceData:
         {
             auto const now = tr_time();
             auto* const tor = s->tor;
@@ -996,7 +996,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             break;
         }
 
-    case TR_PEER_CLIENT_GOT_PIECE_DATA:
+    case tr_peer_event::Type::ClientGotPieceData:
         {
             auto const now = tr_time();
             auto* const tor = s->tor;
@@ -1014,23 +1014,23 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             break;
         }
 
-    case TR_PEER_CLIENT_GOT_HAVE:
-    case TR_PEER_CLIENT_GOT_HAVE_ALL:
-    case TR_PEER_CLIENT_GOT_HAVE_NONE:
-    case TR_PEER_CLIENT_GOT_BITFIELD:
+    case tr_peer_event::Type::ClientGotHave:
+    case tr_peer_event::Type::ClientGotHaveAll:
+    case tr_peer_event::Type::ClientGotHaveNone:
+    case tr_peer_event::Type::ClientGotBitfield:
         /* TODO: if we don't need these, should these events be removed? */
         /* noop */
         break;
 
-    case TR_PEER_CLIENT_GOT_REJ:
+    case tr_peer_event::Type::ClientGotRej:
         s->active_requests.remove(s->tor->pieceLoc(e->pieceIndex, e->offset).block, peer);
         break;
 
-    case TR_PEER_CLIENT_GOT_CHOKE:
+    case tr_peer_event::Type::ClientGotChoke:
         s->active_requests.remove(peer);
         break;
 
-    case TR_PEER_CLIENT_GOT_PORT:
+    case tr_peer_event::Type::ClientGotPort:
         if (peer->atom != nullptr)
         {
             peer->atom->port = e->port;
@@ -1038,15 +1038,15 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 
         break;
 
-    case TR_PEER_CLIENT_GOT_SUGGEST:
+    case tr_peer_event::Type::ClientGotSuggest:
         peerSuggestedPiece(s, peer, e->pieceIndex, false);
         break;
 
-    case TR_PEER_CLIENT_GOT_ALLOWED_FAST:
+    case tr_peer_event::Type::ClientGotAllowedFast:
         peerSuggestedPiece(s, peer, e->pieceIndex, true);
         break;
 
-    case TR_PEER_CLIENT_GOT_BLOCK:
+    case tr_peer_event::Type::ClientGotBlock:
         {
             auto* const tor = s->tor;
             auto const loc = tor->pieceLoc(e->pieceIndex, e->offset);
@@ -1056,7 +1056,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             break;
         }
 
-    case TR_PEER_ERROR:
+    case tr_peer_event::Type::Error:
         if (e->err == ERANGE || e->err == EMSGSIZE || e->err == ENOTCONN)
         {
             /* some protocol error from the peer */
@@ -1073,9 +1073,6 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         }
 
         break;
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled peer event type {:d}"), e->eventType));
     }
 }
 

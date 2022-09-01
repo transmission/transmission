@@ -34,27 +34,27 @@ struct tr_bandwidth;
 ***  Peer Publish / Subscribe
 **/
 
-enum PeerEventType
-{
-    TR_PEER_CLIENT_GOT_BLOCK,
-    TR_PEER_CLIENT_GOT_CHOKE,
-    TR_PEER_CLIENT_GOT_PIECE_DATA,
-    TR_PEER_CLIENT_GOT_ALLOWED_FAST,
-    TR_PEER_CLIENT_GOT_SUGGEST,
-    TR_PEER_CLIENT_GOT_PORT,
-    TR_PEER_CLIENT_GOT_REJ,
-    TR_PEER_CLIENT_GOT_BITFIELD,
-    TR_PEER_CLIENT_GOT_HAVE,
-    TR_PEER_CLIENT_GOT_HAVE_ALL,
-    TR_PEER_CLIENT_GOT_HAVE_NONE,
-    TR_PEER_CLIENT_SENT_PIECE_DATA,
-    TR_PEER_ERROR
-};
-
 class tr_peer_event
 {
 public:
-    PeerEventType eventType;
+    enum class Type
+    {
+        ClientGotBlock,
+        ClientGotChoke,
+        ClientGotPieceData,
+        ClientGotAllowedFast,
+        ClientGotSuggest,
+        ClientGotPort,
+        ClientGotRej,
+        ClientGotBitfield,
+        ClientGotHave,
+        ClientGotHaveAll,
+        ClientGotHaveNone,
+        ClientSentPieceData,
+        Error
+    };
+
+    Type type = Type::Error;
 
     uint32_t pieceIndex = 0; /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
     tr_bitfield* bitfield = nullptr; /* for GOT_BITFIELD */
@@ -67,7 +67,7 @@ public:
     {
         auto const loc = block_info.blockLoc(block);
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_BLOCK;
+        event.type = Type::ClientGotBlock;
         event.pieceIndex = loc.piece;
         event.offset = loc.piece_offset;
         event.length = block_info.blockSize(block);
@@ -77,7 +77,7 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotAllowedFast(tr_piece_index_t piece) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
+        event.type = Type::ClientGotAllowedFast;
         event.pieceIndex = piece;
         return event;
     }
@@ -85,7 +85,7 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotBitfield(tr_bitfield* bitfield) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
+        event.type = Type::ClientGotBitfield;
         event.bitfield = bitfield;
         return event;
     }
@@ -93,14 +93,14 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotChoke() noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_CHOKE;
+        event.type = Type::ClientGotChoke;
         return event;
     }
 
     [[nodiscard]] constexpr static tr_peer_event GotError(int err) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_ERROR;
+        event.type = Type::Error;
         event.err = err;
         return event;
     }
@@ -108,7 +108,7 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotHave(tr_piece_index_t piece) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_HAVE;
+        event.type = Type::ClientGotHave;
         event.pieceIndex = piece;
         return event;
     }
@@ -116,21 +116,21 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotHaveAll() noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
+        event.type = Type::ClientGotHaveAll;
         return event;
     }
 
     [[nodiscard]] constexpr static tr_peer_event GotHaveNone() noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_HAVE_NONE;
+        event.type = Type::ClientGotHaveNone;
         return event;
     }
 
     [[nodiscard]] constexpr static tr_peer_event GotPieceData(uint32_t length) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
+        event.type = Type::ClientGotPieceData;
         event.length = length;
         return event;
     }
@@ -138,7 +138,7 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotPort(tr_port port) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_PORT;
+        event.type = Type::ClientGotPort;
         event.port = port;
         return event;
     }
@@ -147,7 +147,7 @@ public:
     {
         auto const loc = block_info.blockLoc(block);
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_REJ;
+        event.type = Type::ClientGotRej;
         event.pieceIndex = loc.piece;
         event.offset = loc.piece_offset;
         event.length = block_info.blockSize(block);
@@ -157,7 +157,7 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotSuggest(tr_piece_index_t piece) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
+        event.type = Type::ClientGotSuggest;
         event.pieceIndex = piece;
         return event;
     }
@@ -165,7 +165,7 @@ public:
     [[nodiscard]] constexpr static tr_peer_event ClientSentPieceData(uint32_t length) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_SENT_PIECE_DATA;
+        event.type = Type::ClientSentPieceData;
         event.length = length;
         return event;
     }
