@@ -425,7 +425,7 @@ void tr_tracker_http_announce(
     auto url = tr_urlbuf{};
     announce_url_new(url, session, request);
     auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
-    options.timeout_secs = 90L;
+    options.timeout_secs = 45L;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
 
