@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishGotBlock(tr_block_index_t block)
-    {
-        publish(tr_peer_event::GotBlock(torrent->blockInfo(), block));
-    }
-
     void publishGotRej(struct peer_request const* req)
     {
         publish(tr_peer_event::GotRejected(torrent->blockInfo(), torrent->pieceLoc(req->index, req->offset).block));
@@ -2011,7 +2006,7 @@ static int clientGotBlock(
 
     msgs->session->cache->writeBlock(tor->id(), block, block_data);
     msgs->blame.set(loc.piece);
-    msgs->publishGotBlock(block);
+    msgs->publish(tr_peer_event::GotBlock(tor->blockInfo(), block));
     return 0;
 }
 
