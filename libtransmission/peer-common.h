@@ -56,12 +56,12 @@ class tr_peer_event
 public:
     PeerEventType eventType;
 
-    uint32_t pieceIndex; /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
-    tr_bitfield* bitfield; /* for GOT_BITFIELD */
-    uint32_t offset; /* for GOT_BLOCK */
-    uint32_t length; /* for GOT_BLOCK + GOT_PIECE_DATA */
-    int err; /* errno for GOT_ERROR */
-    tr_port port; /* for GOT_PORT */
+    uint32_t pieceIndex = 0; /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
+    tr_bitfield* bitfield = nullptr; /* for GOT_BITFIELD */
+    uint32_t offset = 0; /* for GOT_BLOCK */
+    uint32_t length = 0; /* for GOT_BLOCK + GOT_PIECE_DATA */
+    int err = 0; /* errno for GOT_ERROR */
+    tr_port port = {}; /* for GOT_PORT */
 
     [[nodiscard]] constexpr static tr_peer_event GotBlock(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
@@ -105,6 +105,13 @@ public:
     {
         auto event = tr_peer_event{};
         event.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static tr_peer_event GotHaveNone() noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_HAVE_NONE;
         return event;
     }
 };

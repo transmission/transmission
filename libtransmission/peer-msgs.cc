@@ -545,9 +545,7 @@ public:
 
     void publishClientGotHaveNone()
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_HAVE_NONE;
-        publish(e);
+        publish(tr_peer_event::GotHaveNone());
     }
 
     void publishClientGotPieceData(uint32_t length)
