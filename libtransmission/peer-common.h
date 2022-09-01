@@ -137,6 +137,14 @@ public:
         event.port = port;
         return event;
     }
+
+    [[nodiscard]] constexpr static tr_peer_event GotBitfield(tr_bitfield* bitfield) noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
+        event.bitfield = bitfield;
+        return event;
+    }
 };
 
 using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const* event, void* client_data);

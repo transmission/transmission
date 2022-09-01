@@ -579,10 +579,7 @@ public:
 
     void publishClientGotBitfield(tr_bitfield* bitfield)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
-        e.bitfield = bitfield;
-        publish(e);
+        publish(tr_peer_event::GotBitfield(bitfield));
     }
 
     void publishClientGotHave(tr_piece_index_t index)
