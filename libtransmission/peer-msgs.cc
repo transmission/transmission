@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishClientGotPort(tr_port port)
-    {
-        publish(tr_peer_event::GotPort(port));
-    }
-
     void publishClientGotAllowedFast(tr_piece_index_t piece)
     {
         publish(tr_peer_event::GotAllowedFast(piece));
@@ -1228,7 +1223,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len)
     if (tr_variantDictFindInt(&val, TR_KEY_p, &i))
     {
         pex.port.setHost(i);
-        msgs->publishClientGotPort(pex.port);
+        msgs->publish(tr_peer_event::GotPort(pex.port));
         logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
     }
 
