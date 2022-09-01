@@ -514,12 +514,7 @@ public:
         // TODO -- might need to poke the mgr on startup
     }
 
-    // publishing events
-
-    void publishClientGotHave(tr_piece_index_t index)
-    {
-        publish(tr_peer_event::GotHave(index));
-    }
+    //
 
     [[nodiscard]] bool isValidRequest(peer_request const& req) const
     {
@@ -1732,7 +1727,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         if (!msgs->have_.test(ui32))
         {
             msgs->have_.set(ui32);
-            msgs->publishClientGotHave(ui32);
+            msgs->publish(tr_peer_event::GotHave(ui32));
         }
 
         msgs->invalidatePercentDone();
