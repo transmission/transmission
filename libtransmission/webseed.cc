@@ -245,7 +245,7 @@ public:
     void gotPieceData(uint32_t n_bytes)
     {
         bandwidth_.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
-        publishClientGotPieceData(n_bytes);
+        publish(tr_peer_event::GotPieceData(n_bytes));
         connection_limiter.gotData();
     }
 
@@ -317,14 +317,6 @@ private:
         {
             (*callback)(this, &event, callback_data);
         }
-    }
-
-    void publishClientGotPieceData(uint32_t length)
-    {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
-        e.length = length;
-        publish(e);
     }
 
     tr_bandwidth bandwidth_;
