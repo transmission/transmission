@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishClientGotSuggest(tr_piece_index_t piece)
-    {
-        publish(tr_peer_event::GotSuggest(piece));
-    }
-
     void publishClientGotPort(tr_port port)
     {
         publish(tr_peer_event::GotPort(port));
@@ -1836,7 +1831,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 
         if (fext)
         {
-            msgs->publishClientGotSuggest(ui32);
+            msgs->publish(tr_peer_event::GotSuggest(ui32));
         }
         else
         {
