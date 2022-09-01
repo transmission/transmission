@@ -129,6 +129,14 @@ public:
         event.pieceIndex = piece;
         return event;
     }
+
+    [[nodiscard]] constexpr static tr_peer_event GotPort(tr_port port) noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_PORT;
+        event.port = port;
+        return event;
+    }
 };
 
 using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const* event, void* client_data);

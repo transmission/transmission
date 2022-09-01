@@ -566,10 +566,7 @@ public:
 
     void publishClientGotPort(tr_port port)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_PORT;
-        e.port = port;
-        publish(e);
+        publish(tr_peer_event::GotPort(port));
     }
 
     void publishClientGotAllowedFast(tr_piece_index_t pieceIndex)
