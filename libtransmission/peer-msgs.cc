@@ -518,10 +518,7 @@ public:
 
     void publishError(int err)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_ERROR;
-        e.err = err;
-        publish(e);
+        publish(tr_peer_event::GotError(err));
     }
 
     void publishGotBlock(tr_block_index_t block)
