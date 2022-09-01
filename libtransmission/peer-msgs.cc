@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishClientGotHaveAll()
-    {
-        publish(tr_peer_event::GotHaveAll());
-    }
-
     void publishClientGotHaveNone()
     {
         publish(tr_peer_event::GotHaveNone());
@@ -1888,7 +1883,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         if (fext)
         {
             msgs->have_.setHasAll();
-            msgs->publishClientGotHaveAll();
+            msgs->publish(tr_peer_event::GotHaveAll());
             msgs->invalidatePercentDone();
         }
         else
