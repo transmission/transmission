@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishClientGotPieceData(uint32_t length)
-    {
-        publish(tr_peer_event::GotPieceData(length));
-    }
-
     void publishPeerGotPieceData(uint32_t length)
     {
         publish(tr_peer_event::GotPieceData(length));
@@ -1639,7 +1634,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_
     block_buf->resize(old_length + n_to_read);
     msgs->io->readBytes(&((*block_buf)[old_length]), n_to_read);
 
-    msgs->publishClientGotPieceData(n_to_read);
+    msgs->publish(tr_peer_event::GotPieceData(n_to_read));
     *setme_piece_bytes_read += n_to_read;
     logtrace(
         msgs,
