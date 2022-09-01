@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishGotChoke()
-    {
-        publish(tr_peer_event::GotChoke());
-    }
-
     void publishClientGotHaveAll()
     {
         publish(tr_peer_event::GotHaveAll());
@@ -1738,7 +1733,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 
         if (!fext)
         {
-            msgs->publishGotChoke();
+            msgs->publish(tr_peer_event::GotChoke());
         }
 
         msgs->update_active(TR_PEER_TO_CLIENT);
