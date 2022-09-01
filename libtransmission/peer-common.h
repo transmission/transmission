@@ -74,11 +74,30 @@ public:
         return event;
     }
 
+    [[nodiscard]] constexpr static tr_peer_event GotPieceData(uint32_t length) noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
+        event.length = length;
+        return event;
+    }
+
     [[nodiscard]] constexpr static tr_peer_event GotError(int err) noexcept
     {
         auto event = tr_peer_event{};
         event.eventType = TR_PEER_ERROR;
         event.err = err;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static tr_peer_event GotRejected(tr_block_info const& block_info, tr_block_index_t block) noexcept
+    {
+        auto const loc = block_info.blockLoc(block);
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_REJ;
+        event.pieceIndex = loc.piece;
+        event.offset = loc.piece_offset;
+        event.length = block_info.blockSize(block);
         return event;
     }
 };

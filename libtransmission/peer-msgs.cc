@@ -528,12 +528,7 @@ public:
 
     void publishGotRej(struct peer_request const* req)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_REJ;
-        e.pieceIndex = req->index;
-        e.offset = req->offset;
-        e.length = req->length;
-        publish(e);
+        publish(tr_peer_event::GotRejected(torrent->blockInfo(), torrent->pieceLoc(req->index, req->offset)));
     }
 
     void publishGotChoke()
@@ -559,18 +554,12 @@ public:
 
     void publishClientGotPieceData(uint32_t length)
     {
-        auto e = tr_peer_event{};
-        e.length = length;
-        e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
-        publish(e);
+        publish(tr_peer_event::GotPieceData(length));
     }
 
     void publishPeerGotPieceData(uint32_t length)
     {
-        auto e = tr_peer_event{};
-        e.length = length;
-        e.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
-        publish(e);
+        publish(tr_peer_event::GotPieceData(length));
     }
 
     void publishClientGotSuggest(tr_piece_index_t pieceIndex)

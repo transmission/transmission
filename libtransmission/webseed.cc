@@ -251,15 +251,10 @@ public:
 
     void publishRejection(tr_block_span_t block_span)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_REJ;
-
+        auto const* const tor = getTorrent();
         for (auto block = block_span.begin; block < block_span.end; ++block)
         {
-            auto const loc = getTorrent()->blockLoc(block);
-            e.pieceIndex = loc.piece;
-            e.offset = loc.piece_offset;
-            publish(e);
+            publish(tr_peer_event::GotRejected(tor->blockInfo(), block));
         }
     }
 
@@ -316,7 +311,7 @@ public:
     std::set<tr_webseed_task*> tasks;
 
 private:
-    void publish(tr_peer_event& event)
+    void publish(tr_peer_event event)
     {
         if (callback != nullptr)
         {
