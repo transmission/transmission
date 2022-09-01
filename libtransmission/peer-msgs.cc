@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishClientGotBitfield(tr_bitfield* bitfield)
-    {
-        publish(tr_peer_event::GotBitfield(bitfield));
-    }
-
     void publishClientGotHave(tr_piece_index_t index)
     {
         publish(tr_peer_event::GotHave(index));
@@ -1750,7 +1745,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             msgs->io->readBytes(std::data(tmp), std::size(tmp));
             msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : std::size(tmp) * 8 };
             msgs->have_.setRaw(std::data(tmp), std::size(tmp));
-            msgs->publishClientGotBitfield(&msgs->have_);
+            msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
             msgs->invalidatePercentDone();
             break;
         }
