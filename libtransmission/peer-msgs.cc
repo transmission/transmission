@@ -526,13 +526,7 @@ public:
 
     void publishGotBlock(tr_block_index_t block)
     {
-        auto const loc = torrent->blockLoc(block);
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
-        e.pieceIndex = loc.piece;
-        e.offset = loc.piece_offset;
-        e.length = torrent->blockSize(block);
-        publish(e);
+        publish(tr_peer_event::GotBlock(torrent->blockInfo(), block));
     }
 
     void publishGotRej(struct peer_request const* req)

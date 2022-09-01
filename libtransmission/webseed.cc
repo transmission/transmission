@@ -259,21 +259,13 @@ public:
             auto const loc = getTorrent()->blockLoc(block);
             e.pieceIndex = loc.piece;
             e.offset = loc.piece_offset;
-            publish(&e);
+            publish(e);
         }
     }
 
     void publishGotBlock(tr_torrent const* tor, tr_block_index_t block)
     {
-        TR_ASSERT(block < tor->blockCount());
-
-        auto const loc = tor->blockLoc(block);
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
-        e.pieceIndex = loc.piece;
-        e.offset = loc.piece_offset;
-        e.length = tor->blockSize(loc.block);
-        publish(&e);
+        publish(tr_peer_event::GotBlock(tor->blockInfo(), block));
     }
 
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
@@ -324,11 +316,11 @@ public:
     std::set<tr_webseed_task*> tasks;
 
 private:
-    void publish(tr_peer_event* event)
+    void publish(tr_peer_event& event)
     {
         if (callback != nullptr)
         {
-            (*callback)(this, event, callback_data);
+            (*callback)(this, &event, callback_data);
         }
     }
 
@@ -337,7 +329,7 @@ private:
         auto e = tr_peer_event{};
         e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
         e.length = length;
-        publish(&e);
+        publish(e);
     }
 
     tr_bandwidth bandwidth_;

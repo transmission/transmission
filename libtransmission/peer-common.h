@@ -15,6 +15,7 @@
 #include "transmission.h"
 
 #include "bitfield.h"
+#include "block-info.h"
 #include "history.h"
 #include "interned-string.h"
 #include "net.h" // tr_port
@@ -50,8 +51,9 @@ enum PeerEventType
     TR_PEER_ERROR
 };
 
-struct tr_peer_event
+class tr_peer_event
 {
+public:
     PeerEventType eventType;
 
     uint32_t pieceIndex; /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
@@ -60,6 +62,16 @@ struct tr_peer_event
     uint32_t length; /* for GOT_BLOCK + GOT_PIECE_DATA */
     int err; /* errno for GOT_ERROR */
     tr_port port; /* for GOT_PORT */
+
+    [[nodiscard]] constexpr static tr_peer_event GotBlock(tr_block_info::Location loc, uint32_t length) noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_BLOCK;
+        event.pieceIndex = loc.piece;
+        event.offset = loc.piece_offset;
+        event.length = length;
+        return event;
+    }
 };
 
 using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const* event, void* client_data);
