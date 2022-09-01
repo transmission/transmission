@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishClientGotAllowedFast(tr_piece_index_t piece)
-    {
-        publish(tr_peer_event::GotAllowedFast(piece));
-    }
-
     void publishClientGotBitfield(tr_bitfield* bitfield)
     {
         publish(tr_peer_event::GotBitfield(bitfield));
@@ -1842,7 +1837,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 
         if (fext)
         {
-            msgs->publishClientGotAllowedFast(ui32);
+            msgs->publish(tr_peer_event::GotAllowedFast(ui32));
         }
         else
         {
