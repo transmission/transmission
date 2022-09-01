@@ -74,11 +74,26 @@ public:
         return event;
     }
 
-    [[nodiscard]] constexpr static tr_peer_event GotPieceData(uint32_t length) noexcept
+    [[nodiscard]] constexpr static tr_peer_event GotAllowedFast(tr_piece_index_t piece) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
-        event.length = length;
+        event.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
+        event.pieceIndex = piece;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static tr_peer_event GotBitfield(tr_bitfield* bitfield) noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
+        event.bitfield = bitfield;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static tr_peer_event GotChoke() noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_CLIENT_GOT_CHOKE;
         return event;
     }
 
@@ -90,21 +105,11 @@ public:
         return event;
     }
 
-    [[nodiscard]] constexpr static tr_peer_event GotRejected(tr_block_info const& block_info, tr_block_index_t block) noexcept
-    {
-        auto const loc = block_info.blockLoc(block);
-        auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_REJ;
-        event.pieceIndex = loc.piece;
-        event.offset = loc.piece_offset;
-        event.length = block_info.blockSize(block);
-        return event;
-    }
-
-    [[nodiscard]] constexpr static tr_peer_event GotChoke() noexcept
+    [[nodiscard]] constexpr static tr_peer_event GotHave(tr_piece_index_t piece) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_CHOKE;
+        event.eventType = TR_PEER_CLIENT_GOT_HAVE;
+        event.pieceIndex = piece;
         return event;
     }
 
@@ -122,11 +127,11 @@ public:
         return event;
     }
 
-    [[nodiscard]] constexpr static tr_peer_event GotHave(tr_piece_index_t piece) noexcept
+    [[nodiscard]] constexpr static tr_peer_event GotPieceData(uint32_t length) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_HAVE;
-        event.pieceIndex = piece;
+        event.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
+        event.length = length;
         return event;
     }
 
@@ -138,19 +143,14 @@ public:
         return event;
     }
 
-    [[nodiscard]] constexpr static tr_peer_event GotBitfield(tr_bitfield* bitfield) noexcept
+    [[nodiscard]] constexpr static tr_peer_event GotRejected(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
+        auto const loc = block_info.blockLoc(block);
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
-        event.bitfield = bitfield;
-        return event;
-    }
-
-    [[nodiscard]] constexpr static tr_peer_event GotAllowedFast(tr_piece_index_t piece) noexcept
-    {
-        auto event = tr_peer_event{};
-        event.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
-        event.pieceIndex = piece;
+        event.eventType = TR_PEER_CLIENT_GOT_REJ;
+        event.pieceIndex = loc.piece;
+        event.offset = loc.piece_offset;
+        event.length = block_info.blockSize(block);
         return event;
     }
 
