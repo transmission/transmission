@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishClientGotHaveNone()
-    {
-        publish(tr_peer_event::GotHaveNone());
-    }
-
     void publishClientGotPieceData(uint32_t length)
     {
         publish(tr_peer_event::GotPieceData(length));
@@ -1900,7 +1895,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         if (fext)
         {
             msgs->have_.setHasNone();
-            msgs->publishClientGotHaveNone();
+            msgs->publish(tr_peer_event::GotHaveNone());
             msgs->invalidatePercentDone();
         }
         else
