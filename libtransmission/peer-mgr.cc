@@ -977,7 +977,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 
     switch (e->eventType)
     {
-    case TR_PEER_PEER_GOT_PIECE_DATA:
+    case TR_PEER_CLIENT_SENT_PIECE_DATA:
         {
             auto const now = tr_time();
             auto* const tor = s->tor;

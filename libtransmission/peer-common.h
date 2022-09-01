@@ -47,7 +47,7 @@ enum PeerEventType
     TR_PEER_CLIENT_GOT_HAVE,
     TR_PEER_CLIENT_GOT_HAVE_ALL,
     TR_PEER_CLIENT_GOT_HAVE_NONE,
-    TR_PEER_PEER_GOT_PIECE_DATA,
+    TR_PEER_CLIENT_SENT_PIECE_DATA,
     TR_PEER_ERROR
 };
 
@@ -162,10 +162,10 @@ public:
         return event;
     }
 
-    [[nodiscard]] constexpr static tr_peer_event PeerGotPieceData(uint32_t length) noexcept
+    [[nodiscard]] constexpr static tr_peer_event ClientSentPieceData(uint32_t length) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
+        event.eventType = TR_PEER_CLIENT_SENT_PIECE_DATA;
         event.length = length;
         return event;
     }

@@ -1962,7 +1962,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 
     if (wasPieceData)
     {
-        msgs->publish(tr_peer_event::PeerGotPieceData(bytesWritten));
+        msgs->publish(tr_peer_event::ClientSentPieceData(bytesWritten));
     }
 
     if (tr_isPeerIo(io) && io->userData != nullptr)
