@@ -353,7 +353,7 @@ private:
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
 
-static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const* /*e*/, void* /*vs*/);
+static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const& /*e*/, void* /*vs*/);
 
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
@@ -969,24 +969,24 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     s->needs_completeness_check = true;
 }
 
-static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
+static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs)
 {
     TR_ASSERT(peer != nullptr);
     auto* s = static_cast<tr_swarm*>(vs);
     auto const lock = s->unique_lock();
 
-    switch (e->eventType)
+    switch (event.type)
     {
-    case TR_PEER_PEER_GOT_PIECE_DATA:
+    case tr_peer_event::Type::ClientSentPieceData:
         {
             auto const now = tr_time();
             auto* const tor = s->tor;
 
-            tor->uploadedCur += e->length;
-            tr_announcerAddBytes(tor, TR_ANN_UP, e->length);
+            tor->uploadedCur += event.length;
+            tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
             tor->setDateActive(now);
             tor->setDirty();
-            tor->session->addUploaded(e->length);
+            tor->session->addUploaded(event.length);
 
             if (peer->atom != nullptr)
             {
@@ -996,15 +996,15 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             break;
         }
 
-    case TR_PEER_CLIENT_GOT_PIECE_DATA:
+    case tr_peer_event::Type::ClientGotPieceData:
         {
             auto const now = tr_time();
             auto* const tor = s->tor;
 
-            tor->downloadedCur += e->length;
+            tor->downloadedCur += event.length;
             tor->setDateActive(now);
             tor->setDirty();
-            tor->session->addDownloaded(e->length);
+            tor->session->addDownloaded(event.length);
 
             if (peer->atom != nullptr)
             {
@@ -1014,50 +1014,50 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             break;
         }
 
-    case TR_PEER_CLIENT_GOT_HAVE:
-    case TR_PEER_CLIENT_GOT_HAVE_ALL:
-    case TR_PEER_CLIENT_GOT_HAVE_NONE:
-    case TR_PEER_CLIENT_GOT_BITFIELD:
+    case tr_peer_event::Type::ClientGotHave:
+    case tr_peer_event::Type::ClientGotHaveAll:
+    case tr_peer_event::Type::ClientGotHaveNone:
+    case tr_peer_event::Type::ClientGotBitfield:
         /* TODO: if we don't need these, should these events be removed? */
         /* noop */
         break;
 
-    case TR_PEER_CLIENT_GOT_REJ:
-        s->active_requests.remove(s->tor->pieceLoc(e->pieceIndex, e->offset).block, peer);
+    case tr_peer_event::Type::ClientGotRej:
+        s->active_requests.remove(s->tor->pieceLoc(event.pieceIndex, event.offset).block, peer);
         break;
 
-    case TR_PEER_CLIENT_GOT_CHOKE:
+    case tr_peer_event::Type::ClientGotChoke:
         s->active_requests.remove(peer);
         break;
 
-    case TR_PEER_CLIENT_GOT_PORT:
+    case tr_peer_event::Type::ClientGotPort:
         if (peer->atom != nullptr)
         {
-            peer->atom->port = e->port;
+            peer->atom->port = event.port;
         }
 
         break;
 
-    case TR_PEER_CLIENT_GOT_SUGGEST:
-        peerSuggestedPiece(s, peer, e->pieceIndex, false);
+    case tr_peer_event::Type::ClientGotSuggest:
+        peerSuggestedPiece(s, peer, event.pieceIndex, false);
         break;
 
-    case TR_PEER_CLIENT_GOT_ALLOWED_FAST:
-        peerSuggestedPiece(s, peer, e->pieceIndex, true);
+    case tr_peer_event::Type::ClientGotAllowedFast:
+        peerSuggestedPiece(s, peer, event.pieceIndex, true);
         break;
 
-    case TR_PEER_CLIENT_GOT_BLOCK:
+    case tr_peer_event::Type::ClientGotBlock:
         {
             auto* const tor = s->tor;
-            auto const loc = tor->pieceLoc(e->pieceIndex, e->offset);
+            auto const loc = tor->pieceLoc(event.pieceIndex, event.offset);
             s->cancelAllRequestsForBlock(loc.block, peer);
             peer->blocks_sent_to_client.add(tr_time(), 1);
             tr_torrentGotBlock(tor, loc.block);
             break;
         }
 
-    case TR_PEER_ERROR:
-        if (e->err == ERANGE || e->err == EMSGSIZE || e->err == ENOTCONN)
+    case tr_peer_event::Type::Error:
+        if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
         {
             /* some protocol error from the peer */
             peer->do_purge = true;
@@ -1069,13 +1069,10 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         }
         else
         {
-            tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(e->err)));
+            tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
         }
 
         break;
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled peer event type {:d}"), e->eventType));
     }
 }
 
