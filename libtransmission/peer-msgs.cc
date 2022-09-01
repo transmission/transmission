@@ -592,10 +592,7 @@ public:
 
     void publishClientGotHave(tr_piece_index_t index)
     {
-        auto e = tr_peer_event{};
-        e.eventType = TR_PEER_CLIENT_GOT_HAVE;
-        e.pieceIndex = index;
-        publish(e);
+        publish(tr_peer_event::GotHave(index));
     }
 
     [[nodiscard]] bool isValidRequest(peer_request const& req) const
