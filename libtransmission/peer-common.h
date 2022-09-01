@@ -130,7 +130,7 @@ public:
     [[nodiscard]] constexpr static tr_peer_event GotPieceData(uint32_t length) noexcept
     {
         auto event = tr_peer_event{};
-        event.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
+        event.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
         event.length = length;
         return event;
     }
@@ -159,6 +159,14 @@ public:
         auto event = tr_peer_event{};
         event.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
         event.pieceIndex = piece;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static tr_peer_event PeerGotPieceData(uint32_t length) noexcept
+    {
+        auto event = tr_peer_event{};
+        event.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
+        event.length = length;
         return event;
     }
 };

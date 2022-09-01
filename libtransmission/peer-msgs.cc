@@ -516,11 +516,6 @@ public:
 
     // publishing events
 
-    void publishPeerGotPieceData(uint32_t length)
-    {
-        publish(tr_peer_event::GotPieceData(length));
-    }
-
     void publishClientGotSuggest(tr_piece_index_t piece)
     {
         publish(tr_peer_event::GotSuggest(piece));
@@ -1992,7 +1987,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 
     if (wasPieceData)
     {
-        msgs->publishPeerGotPieceData(bytesWritten);
+        msgs->publish(tr_peer_event::PeerGotPieceData(bytesWritten));
     }
 
     if (tr_isPeerIo(io) && io->userData != nullptr)
