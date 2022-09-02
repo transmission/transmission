@@ -599,7 +599,8 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 127>{ {
+auto constexpr Clients = std::array<Client, 129>{ {
+    { "-AD", "Advanced Download Manager", three_digit_formatter },
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
     { "-AT", "Artemis", four_digit_formatter },
@@ -650,6 +651,7 @@ auto constexpr Clients = std::array<Client, 127>{ {
     { "-LP", "Lphant", two_major_two_minor_formatter },
     { "-LT", "libtorrent (Rasterbar)", three_digit_formatter },
     { "-LW", "LimeWire", no_version_formatter },
+    { "-Lr", "LibreTorrent", three_digit_formatter },
     { "-MG", "MediaGet", mediaget_formatter },
     { "-MK", "Meerkat", four_digit_formatter },
     { "-ML", "MLDonkey", mldonkey_formatter },
