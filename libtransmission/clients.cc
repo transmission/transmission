@@ -622,7 +622,7 @@ auto constexpr Clients = std::array<Client, 129>{ {
 
 } // namespace
 
-char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
+void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 {
     *buf = '\0';
 
@@ -630,13 +630,13 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 
     if (decodeShad0wClient(buf, buflen, key) || decodeBitCometClient(buf, buflen, key))
     {
-        return buf;
+        return;
     }
 
     if (peer_id[0] == '\0' && peer_id[2] == 'B' && peer_id[3] == 'S')
     {
         *fmt::format_to_n(buf, buflen - 1, FMT_STRING("BitSpirit {:d}"), peer_id[1] == '\0' ? 1 : int(peer_id[1])).out = '\0';
-        return buf;
+        return;
     }
 
     struct Compare
@@ -657,7 +657,7 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
     if (eq.first != std::end(Clients) && eq.first != eq.second)
     {
         eq.first->formatter(buf, buflen, eq.first->name, peer_id);
-        return buf;
+        return;
     }
 
     // no match
@@ -684,6 +684,4 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 
         buf_append(buf, buflen, std::string_view(begin, walk - begin));
     }
-
-    return buf;
 }
