@@ -575,6 +575,14 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
         this);
 
     refresh();
+
+    /* prevent keyboard events being sent to the window first */
+    window.signal_key_press_event().connect(
+        [this](GdkEventKey* event) { return gtk_window_propagate_key_event(static_cast<Gtk::Window&>(window_).gobj(), event); },
+        false);
+    window.signal_key_release_event().connect(
+        [this](GdkEventKey* event) { return gtk_window_propagate_key_event(static_cast<Gtk::Window&>(window_).gobj(), event); },
+        false);
 }
 
 void MainWindow::Impl::updateStats()
