@@ -220,26 +220,6 @@ char const* tr_strerror(int errnum)
 *****
 ****/
 
-std::string_view tr_strvStrip(std::string_view str)
-{
-    auto constexpr test = [](auto ch)
-    {
-        return isspace(static_cast<unsigned char>(ch));
-    };
-
-    auto const it = std::find_if_not(std::begin(str), std::end(str), test);
-    str.remove_prefix(std::distance(std::begin(str), it));
-
-    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), test);
-    str.remove_suffix(std::distance(std::rbegin(str), rit));
-
-    return str;
-}
-
-/****
-*****
-****/
-
 uint64_t tr_time_msec()
 {
     return std::chrono::system_clock::now().time_since_epoch() / 1ms;

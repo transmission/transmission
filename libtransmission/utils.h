@@ -200,7 +200,12 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
     return true;
 }
 
-[[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
+[[nodiscard]] constexpr std::string_view tr_strvStrip(std::string_view str) noexcept
+{
+    auto constexpr Spaces = std::string_view{ " \f\n\r\t\v" };
+    auto const first = str.find_first_not_of(Spaces);
+    return first == std::string_view::npos ? "" : str.substr(first, str.find_last_not_of(Spaces) + 1 - first);
+}
 
 [[nodiscard]] std::string tr_strvUtf8Clean(std::string_view cleanme);
 
