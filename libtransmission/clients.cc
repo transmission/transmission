@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
-#include <limits>
+#include <climits>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -40,10 +40,10 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T t, Arg
     return buf_append(buf, buflen, args...);
 }
 
-constexpr std::string_view charint(unsigned char ch)
+constexpr std::string_view charint(uint8_t chr)
 {
     // clang-format off
-    auto constexpr Strings = std::array<std::string_view, std::numeric_limits<unsigned char>::max()>{
+    auto constexpr Strings = std::array<std::string_view, UCHAR_MAX>{
         "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ,
         "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ,
         "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ,
@@ -63,7 +63,7 @@ constexpr std::string_view charint(unsigned char ch)
     };
     // clang-format on
 
-    return Strings[ch];
+    return Strings[chr];
 }
 
 int strint(char const* pch, int span, int base = 10)
