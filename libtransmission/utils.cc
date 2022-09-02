@@ -545,7 +545,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
 {
     auto constexpr Delimiter = "-"sv;
 
-    auto const first = tr_parseNum<size_t>(str);
+    auto const first = tr_parseNum<size_t>(str, &str);
     if (!first)
     {
         return false;
@@ -615,7 +615,7 @@ double tr_truncd(double x, int decimal_places)
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    return atof(std::data(buf));
+    return *tr_parseNum<double>(std::data(buf));
 }
 
 std::string tr_strpercent(double x)
@@ -962,23 +962,13 @@ int tr_env_get_int(char const* key, int default_value)
 {
     TR_ASSERT(key != nullptr);
 
-#ifdef _WIN32
-
-    auto value = std::array<char, 16>{};
-
-    if (GetEnvironmentVariableA(key, std::data(value), std::size(value)) > 1)
+    if (auto const valstr = tr_env_get_string(key); !std::empty(valstr))
     {
-        return atoi(std::data(value));
+        if (auto const valint = tr_parseNum<int>(valstr); valint)
+        {
+            return *valint;
+        }
     }
-
-#else
-
-    if (char const* const value = getenv(key); !tr_str_is_empty(value))
-    {
-        return atoi(value);
-    }
-
-#endif
 
     return default_value;
 }
@@ -1069,11 +1059,11 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 #include <sstream>
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
-    auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
-    auto sstream = std::stringstream{ str };
+    auto const tmpstr = std::string(std::data(str), std::min(std::size(str), size_t{ 64 }));
+    auto sstream = std::stringstream{ tmpstr };
     auto const oldpos = sstream.tellg();
     /* The base parameter only works for bases 8, 10 and 16.
        All other bases will be converted to 0 which activates the
@@ -1085,7 +1075,11 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     {
         return std::nullopt;
     }
-    sv.remove_prefix(sstream.eof() ? std::size(sv) : newpos - oldpos);
+    if (remainder != nullptr)
+    {
+        *remainder = str;
+        remainder->remove_prefix(sstream.eof() ? std::size(str) : newpos - oldpos);
+    }
     return val;
 }
 
@@ -1094,11 +1088,11 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 #include <charconv> // std::from_chars()
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
-    auto const* const begin_ch = std::data(sv);
-    auto const* const end_ch = begin_ch + std::size(sv);
+    auto const* const begin_ch = std::data(str);
+    auto const* const end_ch = begin_ch + std::size(str);
     /* The base parameter works for any base from 2 to 36 (inclusive).
        This is different from the behaviour of the stringstream
        based solution above. */
@@ -1107,36 +1101,44 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
     {
         return std::nullopt;
     }
-    sv.remove_prefix(result.ptr - std::data(sv));
+    if (remainder != nullptr)
+    {
+        *remainder = str;
+        remainder->remove_prefix(result.ptr - std::data(str));
+    }
     return val;
 }
 
 #endif // #if defined(__GNUC__) && !__has_include(<charconv>)
 
-template std::optional<long long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<int> tr_parseNum(std::string_view& sv, int base);
-template std::optional<char> tr_parseNum(std::string_view& sv, int base);
+template std::optional<long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
 
-template std::optional<unsigned long long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<unsigned long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<unsigned int> tr_parseNum(std::string_view& sv, int base);
-template std::optional<unsigned short> tr_parseNum(std::string_view& sv, int base);
-template std::optional<unsigned char> tr_parseNum(std::string_view& sv, int base);
+template std::optional<unsigned long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned short> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
 
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder)
 {
-    auto const* const begin_ch = std::data(sv);
-    auto const* const end_ch = begin_ch + std::size(sv);
+    auto const* const begin_ch = std::data(str);
+    auto const* const end_ch = begin_ch + std::size(str);
     auto val = T{};
     auto const result = fast_float::from_chars(begin_ch, end_ch, val);
     if (result.ec != std::errc{})
     {
         return std::nullopt;
     }
-    sv.remove_prefix(result.ptr - std::data(sv));
+    if (remainder != nullptr)
+    {
+        *remainder = str;
+        remainder->remove_prefix(result.ptr - std::data(str));
+    }
     return val;
 }
 
-template std::optional<double> tr_parseNum(std::string_view& sv);
+template std::optional<double> tr_parseNum(std::string_view sv, std::string_view* remainder);

@@ -386,9 +386,9 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_message_level, TR_LOG_INFO);
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, 5);
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, true);
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_global, atoi(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, atoi(TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
-    tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(TR_DEFAULT_PEER_PORT_STR));
+    tr_variantDictAddInt(d, TR_KEY_peer_limit_global, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
+    tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
+    tr_variantDictAddInt(d, TR_KEY_peer_port, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_PORT_STR));
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, false);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, 49152);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, 65535);
@@ -792,7 +792,7 @@ void tr_session::setImpl(init_data& data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        this->umask_ = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
+        this->umask_ = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, nullptr, 8).value_or(DefaultUmask));
         ::umask(this->umask_);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))

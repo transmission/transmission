@@ -1039,7 +1039,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     {
         /* Read the socket permission as a string representing an octal number. */
         is_missing_rpc_socket_mode_key = false;
-        i = tr_parseNum<int>(sv, 8).value_or(tr_rpc_server::DefaultRpcSocketMode);
+        i = tr_parseNum<int>(sv, nullptr, 8).value_or(tr_rpc_server::DefaultRpcSocketMode);
     }
     else if (tr_variantDictFindInt(settings, key, &i))
     {
