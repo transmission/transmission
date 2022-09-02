@@ -24,8 +24,9 @@ TEST(Client, clientForId)
         std::string_view expected_client;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 38>{
-        { { "-AZ8421-"sv, "Azureus / Vuze 8.4.2.1"sv },
+    auto constexpr Tests = std::array<LocalTest, 40>{
+        { { "-ADB560-"sv, "Advanced Download Manager 11.5.6"sv },
+          { "-AZ8421-"sv, "Azureus / Vuze 8.4.2.1"sv },
           { "-BC0241-"sv, "BitComet 2.41"sv }, // two major, two minor
           { "-BI2300-"sv, "BiglyBT 2.3.0.0"sv },
           { "-BL246326"sv, "BitLord 2.4.6-326"sv }, // Style used after BitLord 0.59
@@ -42,6 +43,7 @@ TEST(Client, clientForId)
           { "-IIO\x10\x2D\x04-"sv, "-IIO%10-%04-"sv },
           { "-I\05O\x08\x03\x01-"sv, "-I%05O%08%03%01-"sv },
           { "-KT33D1-"sv, "KTorrent 3.3 Dev 1"sv },
+          { "-Lr10X0-"sv, "LibreTorrent 1.0.33"sv },
           { "-MR1100-"sv, "Miro 1.1.0.0"sv },
           { "-PI0091-"sv, "PicoTorrent 0.09.1"sv },
           { "-PI0120-"sv, "PicoTorrent 0.12.0"sv },
