@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
+#include <limits>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -46,111 +47,42 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T t, Arg
     return buf_append(buf, buflen, args...);
 }
 
-constexpr std::string_view charint(char ch)
+constexpr std::string_view charint(uint8_t chr)
 {
-    switch (ch)
-    {
-    case '0':
-        return "0"sv;
-    case '1':
-        return "1"sv;
-    case '2':
-        return "2"sv;
-    case '3':
-        return "3"sv;
-    case '4':
-        return "4"sv;
-    case '5':
-        return "5"sv;
-    case '6':
-        return "6"sv;
-    case '7':
-        return "7"sv;
-    case '8':
-        return "8"sv;
-    case '9':
-        return "9"sv;
-    case 'a':
-    case 'A':
-        return "10"sv;
-    case 'b':
-    case 'B':
-        return "11"sv;
-    case 'c':
-    case 'C':
-        return "12"sv;
-    case 'd':
-    case 'D':
-        return "13"sv;
-    case 'e':
-    case 'E':
-        return "14"sv;
-    case 'f':
-    case 'F':
-        return "15"sv;
-    case 'g':
-    case 'G':
-        return "16"sv;
-    case 'h':
-    case 'H':
-        return "17"sv;
-    case 'i':
-    case 'I':
-        return "18"sv;
-    case 'j':
-    case 'J':
-        return "19"sv;
-    case 'k':
-    case 'K':
-        return "20"sv;
-    case 'l':
-    case 'L':
-        return "21"sv;
-    case 'm':
-    case 'M':
-        return "22"sv;
-    case 'n':
-    case 'N':
-        return "23"sv;
-    case 'o':
-    case 'O':
-        return "24"sv;
-    case 'p':
-    case 'P':
-        return "25"sv;
-    case 'q':
-    case 'Q':
-        return "26"sv;
-    case 'r':
-    case 'R':
-        return "27"sv;
-    case 's':
-    case 'S':
-        return "28"sv;
-    case 't':
-    case 'T':
-        return "29"sv;
-    case 'u':
-    case 'U':
-        return "30"sv;
-    case 'v':
-    case 'V':
-        return "31"sv;
-    case 'w':
-    case 'W':
-        return "32"sv;
-    case 'x':
-    case 'X':
-        return "33"sv;
-    case 'y':
-    case 'Y':
-        return "34"sv;
-    case 'z':
-    case 'Z':
-        return "35"sv;
-    default:
-        return "x"sv;
-    }
+    // clang-format off
+    auto constexpr Strings = std::array<std::string_view, 256>{
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "0",  "1",
+         "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x", "10", "11", "12", "13", "14",
+        "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
+        "25", "26", "27", "28", "29", "30", "31", "32", "33", "34",
+        "35",  "x",  "x",  "x",  "x",  "x",  "x", "10", "11", "12",
+        "13", "14", "15", "16", "17", "18", "19", "20", "21", "22",
+        "23", "24", "25", "26", "27", "28", "29", "30", "31", "32",
+        "33", "34", "35",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+         "x",  "x",  "x",  "x",  "x",  "x"
+    } ;
+    // clang-format on
+
+    static_assert(std::numeric_limits<decltype(chr)>::min() == 0);
+    static_assert(std::numeric_limits<decltype(chr)>::max() == 255);
+    return Strings[chr];
 }
 
 int strint(char const* pch, int span, int base = 10)
