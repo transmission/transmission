@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
-#include <climits>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -26,12 +25,42 @@ using namespace std::literals; // "foo"sv
 namespace
 {
 
-template<typename T>
-constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const& val)
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, char ch)
 {
-    auto const [out, len] = fmt::format_to_n(buf, buflen, "{}", val);
-    *out = '\0';
-    return { out, buflen - (out - buf) };
+    if (buflen >= 2)
+    {
+        *buf++ = ch;
+    }
+    *buf = '\0';
+    return { buf, buflen - 1 };
+}
+
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, std::string_view name)
+{
+    auto const len = std::min(buflen - 1, std::size(name));
+    for (size_t i = 0; i < len; ++i)
+    {
+        *buf++ = name[i];
+    }
+    *buf = '\0';
+    return { buf, buflen - len };
+}
+
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
+{
+    auto mybuf = std::array<char, 32>{};
+    auto const end = std::data(mybuf) + std::size(mybuf);
+    auto constexpr base = 10;
+    auto* ptr = end;
+
+    while ((n / base) > 0)
+    {
+        *--ptr = char('0' + (n % base));
+        n /= base;
+    }
+    *--ptr = char('0' + (n % base));
+
+    return buf_append(buf, buflen, std::string_view(ptr, end - ptr));
 }
 
 template<typename T, typename... ArgTypes>
