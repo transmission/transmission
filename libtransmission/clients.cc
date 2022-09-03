@@ -17,10 +17,11 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
+
 #include "clients.h"
 #include "utils.h"
 
-using namespace std::literals; // "foo"sv
+using namespace std::literals;
 
 namespace
 {
@@ -167,22 +168,22 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
         name = "ABC"sv;
         break;
     case 'O':
-        name = "Osprey";
+        name = "Osprey"sv;
         break;
     case 'Q':
-        name = "BTQueue";
+        name = "BTQueue"sv;
         break;
     case 'R':
-        name = "Tribler";
+        name = "Tribler"sv;
         break;
     case 'S':
-        name = "Shad0w";
+        name = "Shad0w"sv;
         break;
     case 'T':
-        name = "BitTornado";
+        name = "BitTornado"sv;
         break;
     case 'U':
-        name = "UPnP NAT Bit Torrent";
+        name = "UPnP NAT Bit Torrent"sv;
         break;
     default:
         return false;
@@ -213,15 +214,15 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     auto const lead = std::string_view{ std::data(peer_id), std::min(std::size(peer_id), size_t{ 4 }) };
     if (lead == "exbc")
     {
-        mod = "";
+        mod = ""sv;
     }
     else if (lead == "FUTB")
     {
-        mod = "(Solidox Mod) ";
+        mod = "(Solidox Mod) "sv;
     }
     else if (lead == "xUTB"sv)
     {
-        mod = "(Mod 2) ";
+        mod = "(Mod 2) "sv;
     }
     else
     {
@@ -306,11 +307,11 @@ void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, t
     // (uppercase letters) and x depends on the version.
     // Version 1.0.6 has xxx = A0C.
 
-    if (strncmp(&id[4], "A0B", 3) == 0)
+    if (std::equal(&id[4], &id[7], "A0B"))
     {
         buf_append(buf, buflen, name, " 1.0.5"sv);
     }
-    else if (strncmp(&id[4], "A0C", 3) == 0)
+    else if (std::equal(&id[4], &id[7], "A0C"))
     {
         buf_append(buf, buflen, name, " 1.0.6"sv);
     }
@@ -421,11 +422,11 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
 
-    if (strncmp(&id[3], "000", 3) == 0) // very old client style: -TR0006- is 0.6
+    if (std::equal(&id[3], &id[6], "000")) // very old client style: -TR0006- is 0.6
     {
         *fmt::format_to_n(buf, buflen - 1, FMT_STRING("0.{:c}"), id[6]).out = '\0';
     }
-    else if (strncmp(&id[3], "00", 2) == 0) // previous client style: -TR0072- is 0.72
+    else if (std::equal(&id[3], &id[5], "00")) // previous client style: -TR0072- is 0.72
     {
         *fmt::format_to_n(buf, buflen - 1, FMT_STRING("0.{:02d}"), strint(&id[5], 2)).out = '\0';
     }
@@ -659,13 +660,11 @@ void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
     {
         bool operator()(std::string_view const& key, Client const& client) const
         {
-            auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
-            return key_lhs < client.begins_with;
+            return key.substr(0, std::min(std::size(key), std::size(client.begins_with))) < client.begins_with;
         }
         bool operator()(Client const& client, std::string_view const& key) const
         {
-            auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
-            return client.begins_with < key_lhs;
+            return client.begins_with < key.substr(0, std::min(std::size(key), std::size(client.begins_with)));
         }
     };
 
@@ -677,7 +676,7 @@ void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
     }
 
     // no match
-    if (tr_str_is_empty(buf))
+    if (*buf == '\0')
     {
         auto out = std::array<char, 32>{};
         char* walk = std::data(out);
