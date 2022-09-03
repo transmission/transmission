@@ -17,50 +17,27 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
+
 #include "clients.h"
 #include "utils.h"
 
-using namespace std::literals; // "foo"sv
+using namespace std::literals;
 
 namespace
 {
 
-constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, char ch)
+template<typename T>
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const& value)
 {
-    if (buflen >= 2)
+    if (buflen == 0)
     {
-        *buf++ = ch;
+        return { buf, buflen };
     }
-    *buf = '\0';
-    return { buf, buflen - 1 };
-}
 
-constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, std::string_view name)
-{
-    auto const len = std::min(buflen - 1, std::size(name));
-    for (size_t i = 0; i < len; ++i)
-    {
-        *buf++ = name[i];
-    }
-    *buf = '\0';
-    return { buf, buflen - len };
-}
-
-constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
-{
-    auto mybuf = std::array<char, 32>{};
-    auto const end = std::data(mybuf) + std::size(mybuf);
-    auto constexpr base = 10;
-    auto* ptr = end;
-
-    while ((n / base) > 0)
-    {
-        *--ptr = char('0' + (n % base));
-        n /= base;
-    }
-    *--ptr = char('0' + (n % base));
-
-    return buf_append(buf, buflen, std::string_view(ptr, end - ptr));
+    auto const [out, len] = fmt::format_to_n(buf, buflen, "{}", value);
+    auto* const end = buf + std::min(buflen - 1, static_cast<size_t>(out - buf));
+    *end = '\0';
+    return { end, buflen - (end - buf) };
 }
 
 template<typename T, typename... ArgTypes>
@@ -70,111 +47,40 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T t, Arg
     return buf_append(buf, buflen, args...);
 }
 
-constexpr std::string_view charint(char ch)
+constexpr std::string_view charint(uint8_t chr)
 {
-    switch (ch)
-    {
-    case '0':
-        return "0"sv;
-    case '1':
-        return "1"sv;
-    case '2':
-        return "2"sv;
-    case '3':
-        return "3"sv;
-    case '4':
-        return "4"sv;
-    case '5':
-        return "5"sv;
-    case '6':
-        return "6"sv;
-    case '7':
-        return "7"sv;
-    case '8':
-        return "8"sv;
-    case '9':
-        return "9"sv;
-    case 'a':
-    case 'A':
-        return "10"sv;
-    case 'b':
-    case 'B':
-        return "11"sv;
-    case 'c':
-    case 'C':
-        return "12"sv;
-    case 'd':
-    case 'D':
-        return "13"sv;
-    case 'e':
-    case 'E':
-        return "14"sv;
-    case 'f':
-    case 'F':
-        return "15"sv;
-    case 'g':
-    case 'G':
-        return "16"sv;
-    case 'h':
-    case 'H':
-        return "17"sv;
-    case 'i':
-    case 'I':
-        return "18"sv;
-    case 'j':
-    case 'J':
-        return "19"sv;
-    case 'k':
-    case 'K':
-        return "20"sv;
-    case 'l':
-    case 'L':
-        return "21"sv;
-    case 'm':
-    case 'M':
-        return "22"sv;
-    case 'n':
-    case 'N':
-        return "23"sv;
-    case 'o':
-    case 'O':
-        return "24"sv;
-    case 'p':
-    case 'P':
-        return "25"sv;
-    case 'q':
-    case 'Q':
-        return "26"sv;
-    case 'r':
-    case 'R':
-        return "27"sv;
-    case 's':
-    case 'S':
-        return "28"sv;
-    case 't':
-    case 'T':
-        return "29"sv;
-    case 'u':
-    case 'U':
-        return "30"sv;
-    case 'v':
-    case 'V':
-        return "31"sv;
-    case 'w':
-    case 'W':
-        return "32"sv;
-    case 'x':
-    case 'X':
-        return "33"sv;
-    case 'y':
-    case 'Y':
-        return "34"sv;
-    case 'z':
-    case 'Z':
-        return "35"sv;
-    default:
-        return "x"sv;
-    }
+    // clang-format off
+    auto constexpr Strings = std::array<std::string_view, 256>{
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "0"sv,  "1"sv,
+         "2"sv,  "3"sv,  "4"sv,  "5"sv,  "6"sv,  "7"sv,  "8"sv,  "9"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv, "10"sv, "11"sv, "12"sv, "13"sv, "14"sv,
+        "15"sv, "16"sv, "17"sv, "18"sv, "19"sv, "20"sv, "21"sv, "22"sv, "23"sv, "24"sv,
+        "25"sv, "26"sv, "27"sv, "28"sv, "29"sv, "30"sv, "31"sv, "32"sv, "33"sv, "34"sv,
+        "35"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv, "10"sv, "11"sv, "12"sv,
+        "13"sv, "14"sv, "15"sv, "16"sv, "17"sv, "18"sv, "19"sv, "20"sv, "21"sv, "22"sv,
+        "23"sv, "24"sv, "25"sv, "26"sv, "27"sv, "28"sv, "29"sv, "30"sv, "31"sv, "32"sv,
+        "33"sv, "34"sv, "35"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,
+         "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv,  "x"sv
+    } ;
+    // clang-format on
+
+    return Strings[chr];
 }
 
 int strint(char const* pch, int span, int base = 10)
@@ -262,22 +168,22 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
         name = "ABC"sv;
         break;
     case 'O':
-        name = "Osprey";
+        name = "Osprey"sv;
         break;
     case 'Q':
-        name = "BTQueue";
+        name = "BTQueue"sv;
         break;
     case 'R':
-        name = "Tribler";
+        name = "Tribler"sv;
         break;
     case 'S':
-        name = "Shad0w";
+        name = "Shad0w"sv;
         break;
     case 'T':
-        name = "BitTornado";
+        name = "BitTornado"sv;
         break;
     case 'U':
-        name = "UPnP NAT Bit Torrent";
+        name = "UPnP NAT Bit Torrent"sv;
         break;
     default:
         return false;
@@ -308,15 +214,15 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     auto const lead = std::string_view{ std::data(peer_id), std::min(std::size(peer_id), size_t{ 4 }) };
     if (lead == "exbc")
     {
-        mod = "";
+        mod = ""sv;
     }
     else if (lead == "FUTB")
     {
-        mod = "(Solidox Mod) ";
+        mod = "(Solidox Mod) "sv;
     }
     else if (lead == "xUTB"sv)
     {
-        mod = "(Mod 2) ";
+        mod = "(Mod 2) "sv;
     }
     else
     {
@@ -401,11 +307,11 @@ void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, t
     // (uppercase letters) and x depends on the version.
     // Version 1.0.6 has xxx = A0C.
 
-    if (strncmp(&id[4], "A0B", 3) == 0)
+    if (std::equal(&id[4], &id[7], "A0B"))
     {
         buf_append(buf, buflen, name, " 1.0.5"sv);
     }
-    else if (strncmp(&id[4], "A0C", 3) == 0)
+    else if (std::equal(&id[4], &id[7], "A0C"))
     {
         buf_append(buf, buflen, name, " 1.0.6"sv);
     }
@@ -516,11 +422,11 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
 
-    if (strncmp(&id[3], "000", 3) == 0) // very old client style: -TR0006- is 0.6
+    if (std::equal(&id[3], &id[6], "000")) // very old client style: -TR0006- is 0.6
     {
         *fmt::format_to_n(buf, buflen - 1, FMT_STRING("0.{:c}"), id[6]).out = '\0';
     }
-    else if (strncmp(&id[3], "00", 2) == 0) // previous client style: -TR0072- is 0.72
+    else if (std::equal(&id[3], &id[5], "00")) // previous client style: -TR0072- is 0.72
     {
         *fmt::format_to_n(buf, buflen - 1, FMT_STRING("0.{:02d}"), strint(&id[5], 2)).out = '\0';
     }
@@ -733,7 +639,7 @@ auto constexpr Clients = std::array<Client, 129>{ {
 
 } // namespace
 
-char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
+void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 {
     *buf = '\0';
 
@@ -741,26 +647,24 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 
     if (decodeShad0wClient(buf, buflen, key) || decodeBitCometClient(buf, buflen, key))
     {
-        return buf;
+        return;
     }
 
     if (peer_id[0] == '\0' && peer_id[2] == 'B' && peer_id[3] == 'S')
     {
         *fmt::format_to_n(buf, buflen - 1, FMT_STRING("BitSpirit {:d}"), peer_id[1] == '\0' ? 1 : int(peer_id[1])).out = '\0';
-        return buf;
+        return;
     }
 
     struct Compare
     {
         bool operator()(std::string_view const& key, Client const& client) const
         {
-            auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
-            return key_lhs < client.begins_with;
+            return key.substr(0, std::min(std::size(key), std::size(client.begins_with))) < client.begins_with;
         }
         bool operator()(Client const& client, std::string_view const& key) const
         {
-            auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
-            return client.begins_with < key_lhs;
+            return client.begins_with < key.substr(0, std::min(std::size(key), std::size(client.begins_with)));
         }
     };
 
@@ -768,11 +672,11 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
     if (eq.first != std::end(Clients) && eq.first != eq.second)
     {
         eq.first->formatter(buf, buflen, eq.first->name, peer_id);
-        return buf;
+        return;
     }
 
     // no match
-    if (tr_str_is_empty(buf))
+    if (*buf == '\0')
     {
         auto out = std::array<char, 32>{};
         char* walk = std::data(out);
@@ -795,6 +699,4 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 
         buf_append(buf, buflen, std::string_view(begin, walk - begin));
     }
-
-    return buf;
 }
