@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
-#include <limits>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -35,7 +34,7 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const&
     }
 
     auto const [out, len] = fmt::format_to_n(buf, buflen, "{}", value);
-    auto* end = buf + std::min(buflen - 1, static_cast<size_t>(out - buf));
+    auto* const end = buf + std::min(buflen - 1, static_cast<size_t>(out - buf));
     *end = '\0';
     return { end, buflen - (end - buf) };
 }
@@ -80,8 +79,6 @@ constexpr std::string_view charint(uint8_t chr)
     } ;
     // clang-format on
 
-    static_assert(std::numeric_limits<decltype(chr)>::min() == 0);
-    static_assert(std::numeric_limits<decltype(chr)>::max() == 255);
     return Strings[chr];
 }
 
