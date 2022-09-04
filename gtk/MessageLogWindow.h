@@ -16,6 +16,11 @@ class Session;
 class MessageLogWindow : public Gtk::Window
 {
 public:
+    MessageLogWindow(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core);
     ~MessageLogWindow() override;
 
     TR_DISABLE_COPY_MOVE(MessageLogWindow)
@@ -23,8 +28,6 @@ public:
     static std::unique_ptr<MessageLogWindow> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
 protected:
-    MessageLogWindow(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
-
     void on_show() override;
     void on_hide() override;
 

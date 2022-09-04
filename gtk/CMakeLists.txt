@@ -25,6 +25,7 @@ set(${PROJECT_NAME}_UI_FILES
     MainWindow.ui
     MakeDialog.ui
     MakeProgressDialog.ui
+    MessageLogWindow.ui
     OptionsDialog.ui
     RelocateDialog.ui
     StatsDialog.ui
