@@ -349,7 +349,6 @@ TEST_F(FileTest, pathExists)
     chmod(test_dir, 0);
     EXPECT_FALSE(tr_sys_path_exists(path1, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_TRUE(err == nullptr || err->code == EACCES);
     tr_error_clear(&err);
     chmod(test_dir, 0700);
 
@@ -1033,6 +1032,40 @@ TEST_F(FileTest, pathNativeSeparators)
     }
 }
 
+TEST_F(FileTest, fileCopy)
+{
+    auto const test_dir = createTestDir(currentTestName());
+
+    auto const path1 = tr_pathbuf{ test_dir, "/a.txt" };
+    auto const path2 = tr_pathbuf{ test_dir, "/b.txt" };
+    auto constexpr Contents = "hello, world!"sv;
+
+    // no source file
+    tr_error* err = nullptr;
+    EXPECT_FALSE(tr_sys_path_copy(path1, path2, &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    createFileWithContents(path1, Contents);
+
+    // source file exists but is inaccessible
+    chmod(path1, 0);
+    EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+    chmod(path1, 0600);
+
+    // source file exists but target is invalid
+    EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    // source and target are valid
+    createFileWithContents(path1, Contents);
+    EXPECT_TRUE(tr_sys_path_copy(path1, path2, &err));
+    EXPECT_EQ(nullptr, err);
+}
+
 TEST_F(FileTest, fileOpen)
 {
     auto const test_dir = createTestDir(currentTestName());
@@ -1165,7 +1198,6 @@ TEST_F(FileTest, fileTruncate)
     // try to truncate a closed file
     EXPECT_FALSE(tr_sys_file_truncate(fd, 10, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_TRUE(err == nullptr || err->code == EBADF);
     tr_error_clear(&err);
 
     tr_sys_path_remove(path1);
@@ -1272,7 +1304,6 @@ TEST_F(FileTest, dirCreate)
     chmod(path1, 0);
     EXPECT_FALSE(tr_sys_dir_create(path2, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_TRUE(err == nullptr || err->code == EACCES);
     chmod(path1, 0700);
     tr_error_clear(&err);
 
@@ -1293,7 +1324,6 @@ TEST_F(FileTest, dirCreateTemp)
     path.assign(test_dir, "/path-does-not-exist/test-XXXXXX");
     EXPECT_FALSE(tr_sys_dir_create_temp(std::data(path), &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_TRUE(err == nullptr || err->code == ENOENT);
     tr_error_clear(&err);
 }
 
@@ -1339,14 +1369,12 @@ TEST_F(FileTest, dirOpen)
     auto odir = tr_sys_dir_open("/no/such/path", &err);
     EXPECT_EQ(TR_BAD_SYS_DIR, odir);
     EXPECT_NE(err, nullptr);
-    EXPECT_TRUE(err == nullptr || err->code == ENOENT);
     tr_error_clear(&err);
 
     // path is not a directory
     odir = tr_sys_dir_open(file, &err);
     EXPECT_EQ(TR_BAD_SYS_DIR, odir);
     EXPECT_NE(err, nullptr);
-    EXPECT_TRUE(err == nullptr || err->code == ENOTDIR);
     tr_error_clear(&err);
 
     // path exists and is readable

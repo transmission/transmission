@@ -339,19 +339,18 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
 #else /* USE_COPYFILE */
 
+    auto const info = tr_sys_path_get_info(src_path, 0, error);
+    if (!info)
+    {
+        tr_error_prefix(error, "Unable to get information on source file: ");
+        return false;
+    }
+
     /* Other OSes require us to copy between file descriptors, so open them. */
     tr_sys_file_t const in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (in == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open source file: ");
-        return false;
-    }
-
-    auto const info = tr_sys_file_get_info(in, error);
-    if (!info)
-    {
-        tr_error_prefix(error, "Unable to get information on source file: ");
-        tr_sys_file_close(in);
         return false;
     }
 
@@ -1025,7 +1024,7 @@ std::string tr_sys_dir_get_current(tr_error** error)
 
 #ifndef HAVE_MKDIRP
 
-static bool _tr_mkdirp(std::string_view path, int permissions, tr_error** error)
+static bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
 {
     auto walk = path.find_first_not_of('/'); // walk past the root
     auto subpath = tr_pathbuf{};
@@ -1079,7 +1078,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 #ifdef HAVE_MKDIRP
         ret = mkdirp(path, permissions) != -1;
 #else
-        ret = _tr_mkdirp(path, permissions, &my_error);
+        ret = tr_mkdirp_(path, permissions, &my_error);
 #endif
     }
     else
