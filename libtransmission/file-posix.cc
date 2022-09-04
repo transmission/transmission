@@ -116,29 +116,6 @@ static void set_system_error_if_file_found(tr_error** error, int code)
     }
 }
 
-static constexpr auto stat_to_sys_path_info(struct stat const& sb)
-{
-    auto info = tr_sys_path_info{};
-
-    if (S_ISREG(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_FILE;
-    }
-    else if (S_ISDIR(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_DIRECTORY;
-    }
-    else
-    {
-        info.type = TR_SYS_PATH_IS_OTHER;
-    }
-
-    info.size = static_cast<uint64_t>(sb.st_size);
-    info.last_modified_at = sb.st_mtime;
-
-    return info;
-}
-
 static void set_file_for_single_pass(tr_sys_file_t handle)
 {
     /* Set hints about the lookahead buffer and caching. It's okay
@@ -197,13 +174,31 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
         ok = lstat(szpath, &sb) != -1;
     }
 
-    if (ok)
+    if (!ok)
     {
-        return stat_to_sys_path_info(sb);
+        set_system_error(error, errno);
+        return {};
     }
 
-    set_system_error(error, errno);
-    return {};
+    auto info = tr_sys_path_info{};
+
+    if (S_ISREG(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_FILE;
+    }
+    else if (S_ISDIR(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_DIRECTORY;
+    }
+    else
+    {
+        info.type = TR_SYS_PATH_IS_OTHER;
+    }
+
+    info.size = static_cast<uint64_t>(sb.st_size);
+    info.last_modified_at = sb.st_mtime;
+
+    return info;
 }
 
 bool tr_sys_path_is_relative(std::string_view path)
@@ -562,19 +557,6 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     }
 
     return ret;
-}
-
-std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    if (struct stat sb; fstat(handle, &sb) != -1)
-    {
-        return stat_to_sys_path_info(sb);
-    }
-
-    set_system_error(error, errno);
-    return {};
 }
 
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)

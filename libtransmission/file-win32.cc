@@ -375,6 +375,24 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     return ret;
 }
 
+static std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_error** error)
+{
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+
+    auto attributes = BY_HANDLE_FILE_INFORMATION{};
+    if (GetFileInformationByHandle(handle, &attributes))
+    {
+        return stat_to_sys_path_info(
+            attributes.dwFileAttributes,
+            attributes.nFileSizeLow,
+            attributes.nFileSizeHigh,
+            attributes.ftLastWriteTime);
+    }
+
+    set_system_error(error, GetLastError());
+    return {};
+}
+
 std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
 {
     if (auto const wide_path = path_to_native_path(path); std::empty(wide_path))
@@ -397,7 +415,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
                  handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
              handle != INVALID_HANDLE_VALUE)
     {
-        auto ret = tr_sys_file_get_info(handle, error);
+        auto ret = tr_sys_file_get_info_(handle, error);
         CloseHandle(handle);
         return ret;
     }
@@ -927,24 +945,6 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     }
 
     return ret;
-}
-
-std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    auto attributes = BY_HANDLE_FILE_INFORMATION{};
-    if (GetFileInformationByHandle(handle, &attributes))
-    {
-        return stat_to_sys_path_info(
-            attributes.dwFileAttributes,
-            attributes.nFileSizeLow,
-            attributes.nFileSizeHigh,
-            attributes.ftLastWriteTime);
-    }
-
-    set_system_error(error, GetLastError());
-    return {};
 }
 
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
