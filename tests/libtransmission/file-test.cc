@@ -1260,6 +1260,23 @@ TEST_F(FileTest, dirCreate)
     tr_sys_path_remove(path1);
 }
 
+TEST_F(FileTest, dirCreateTemp)
+{
+    auto const test_dir = createTestDir(currentTestName());
+
+    tr_error* err = nullptr;
+    auto path = tr_pathbuf{ test_dir, "/test-XXXXXX" };
+    EXPECT_TRUE(tr_sys_dir_create_temp(std::data(path), &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_path_remove(path);
+
+    path.assign(test_dir, "/path-does-not-exist/test-XXXXXX");
+    EXPECT_FALSE(tr_sys_dir_create_temp(std::data(path), &err));
+    EXPECT_NE(nullptr, err);
+    EXPECT_TRUE(err == nullptr || err->code == ENOENT);
+    tr_error_clear(&err);
+}
+
 TEST_F(FileTest, dirRead)
 {
     auto const test_dir = createTestDir(currentTestName());
