@@ -167,126 +167,6 @@ static void set_file_for_single_pass(tr_sys_file_t handle)
     errno = err;
 }
 
-#ifndef HAVE_MKDIRP
-
-static bool create_path_require_dir(char const* path, tr_error** error)
-{
-    struct stat sb;
-
-    if (stat(path, &sb) == -1)
-    {
-        set_system_error(error, errno);
-        return false;
-    }
-
-    if ((sb.st_mode & S_IFMT) != S_IFDIR)
-    {
-        tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
-        return false;
-    }
-
-    return true;
-}
-
-static bool create_path(char const* path_in, int permissions, tr_error** error)
-{
-    /* make a temporary copy of path */
-    auto path = tr_pathbuf{ path_in };
-
-    /* walk past the root */
-    char* p = std::data(path);
-
-    while (*p == TR_PATH_DELIMITER)
-    {
-        ++p;
-    }
-
-    char* path_end = p + strlen(p);
-
-    while (path_end > path && *path_end == TR_PATH_DELIMITER)
-    {
-        --path_end;
-    }
-
-    char* pp = nullptr;
-    bool ret = false;
-    tr_error* my_error = nullptr;
-
-    /* Go one level up on each iteration and attempt to create */
-    for (pp = path_end; pp != nullptr; pp = strrchr(p, TR_PATH_DELIMITER))
-    {
-        *pp = '\0';
-
-        ret = mkdir(path, permissions) != -1;
-
-        if (ret)
-        {
-            break;
-        }
-
-        if (errno == EEXIST)
-        {
-            ret = create_path_require_dir(path, &my_error);
-
-            if (ret)
-            {
-                break;
-            }
-
-            goto FAILURE;
-        }
-
-        if (errno != ENOENT)
-        {
-            set_system_error(&my_error, errno);
-            goto FAILURE;
-        }
-    }
-
-    if (ret && pp == path_end)
-    {
-        goto CLEANUP;
-    }
-
-    /* Go one level down on each iteration and attempt to create */
-    for (pp = pp == nullptr ? p + strlen(p) : pp; pp < path_end; pp += strlen(pp))
-    {
-        *pp = TR_PATH_DELIMITER;
-
-        if (mkdir(path, permissions) == -1)
-        {
-            break;
-        }
-    }
-
-    ret = create_path_require_dir(path, &my_error);
-
-    if (ret)
-    {
-        goto CLEANUP;
-    }
-
-FAILURE:
-
-    TR_ASSERT(!ret);
-    TR_ASSERT(my_error != nullptr);
-
-    tr_logAddError(fmt::format(
-        _("Couldn't create '{path}': {error} ({error_code})"),
-        fmt::arg("path", path),
-        fmt::arg("error", my_error->message),
-        fmt::arg("error_code", my_error->code)));
-    tr_error_propagate(error, &my_error);
-
-CLEANUP:
-
-    TR_ASSERT(my_error == nullptr);
-
-    return ret;
-}
-
-#endif
-
 bool tr_sys_path_exists(char const* path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
@@ -1143,6 +1023,50 @@ std::string tr_sys_dir_get_current(tr_error** error)
     }
 }
 
+#ifndef HAVE_MKDIRP
+
+static bool _tr_mkdirp(std::string_view path, int permissions, tr_error** error)
+{
+    auto walk = path.find_first_not_of('/'); // walk past the root
+    auto subpath = tr_pathbuf{};
+
+    for (;;)
+    {
+        auto const end = path.find('/', walk);
+        subpath.assign(path.substr(0, end));
+        if (mkdir(subpath, permissions) == -1)
+        {
+            if (errno != EEXIST)
+            {
+                set_system_error(error, errno);
+                return false;
+            }
+
+            auto const info = tr_sys_path_get_info(subpath, 0, error);
+            if (!info)
+            {
+                return false;
+            }
+            if (info->type != TR_SYS_PATH_IS_DIRECTORY)
+            {
+                tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
+                return false;
+            }
+        }
+        if (subpath == path)
+        {
+            return true;
+        }
+        walk = end + 1;
+        if (walk >= std::size(path))
+        {
+            return true;
+        }
+    }
+}
+
+#endif
+
 bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
@@ -1155,7 +1079,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 #ifdef HAVE_MKDIRP
         ret = mkdirp(path, permissions) != -1;
 #else
-        ret = create_path(path, permissions, &my_error);
+        ret = _tr_mkdirp(path, permissions, &my_error);
 #endif
     }
     else
@@ -1165,9 +1089,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 
     if (!ret && errno == EEXIST)
     {
-        struct stat sb;
-
-        if (stat(path, &sb) != -1 && S_ISDIR(sb.st_mode))
+        if (auto const info = tr_sys_path_get_info(path); info && info->type == TR_SYS_PATH_IS_DIRECTORY)
         {
             tr_error_clear(&my_error);
             ret = true;

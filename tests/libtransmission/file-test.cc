@@ -1247,6 +1247,15 @@ TEST_F(FileTest, dirCreate)
     EXPECT_TRUE(tr_sys_dir_create(path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
     EXPECT_EQ(nullptr, err) << *err;
 
+    // Can't create directory when parent exists and has restrictive permissions
+    tr_sys_path_remove(path2);
+    chmod(path1, 0);
+    EXPECT_FALSE(tr_sys_dir_create(path2, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
+    EXPECT_NE(nullptr, err);
+    EXPECT_TRUE(err == nullptr || err->code == EACCES);
+    chmod(path1, 0700);
+    tr_error_clear(&err);
+
     tr_sys_path_remove(path2);
     tr_sys_path_remove(path1);
 }
