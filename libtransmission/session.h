@@ -585,7 +585,7 @@ public:
 
     [[nodiscard]] constexpr auto shouldDeleteSource() const noexcept
     {
-        return should_pause_added_torrents_;
+        return should_delete_source_torrents_;
     }
 
     [[nodiscard]] constexpr auto allowsDHT() const noexcept
