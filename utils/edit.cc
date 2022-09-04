@@ -28,13 +28,15 @@ struct app_options
     char const* add = nullptr;
     char const* deleteme = nullptr;
     std::array<char const*, 2> replace;
+    char const* source = nullptr;
     bool show_version = false;
 };
 
-static auto constexpr Options = std::array<tr_option, 5>{
+static auto constexpr Options = std::array<tr_option, 6>{
     { { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
       { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
       { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
+      { 's', "source", "Set the source", "s", true, "<source>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
@@ -66,6 +68,10 @@ static int parseCommandLine(app_options& opts, int argc, char const* const* argv
             }
 
             opts.replace[1] = optarg;
+            break;
+
+        case 's':
+            opts.source = optarg;
             break;
 
         case 'V':
@@ -296,6 +302,28 @@ static bool addURL(tr_variant* metainfo, char const* url)
     return changed;
 }
 
+static bool setSource(tr_variant* metainfo, char const* source_value)
+{
+    auto current_source = std::string_view{};
+    bool const had_source = tr_variantDictFindStrView(metainfo, TR_KEY_source, &current_source);
+    bool changed = false;
+
+    if (!had_source)
+    {
+        printf("\tAdded \"%s\" as source\n", source_value);
+        tr_variantDictAddStr(metainfo, TR_KEY_source, source_value);
+        changed = true;
+    }
+    else if (current_source.compare(source_value) != 0)
+    {
+        printf("\tUpdated source: \"%s\" -> \"%s\"\n", current_source.data(), source_value);
+        tr_variantDictAddStr(metainfo, TR_KEY_source, source_value);
+        changed = true;
+    }
+
+    return changed;
+}
+
 int tr_main(int argc, char* argv[])
 {
     int changedCount = 0;
@@ -322,9 +350,9 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == nullptr)
+    if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == nullptr && options.source == nullptr)
     {
-        fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
+        fprintf(stderr, "ERROR: Must specify -a, -d, -r or -s\n");
         tr_getopt_usage(MyName, Usage, std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
@@ -358,6 +386,11 @@ int tr_main(int argc, char* argv[])
         if (options.replace[0] != nullptr && options.replace[1] != nullptr)
         {
             changed |= replaceURL(&top, options.replace[0], options.replace[1]);
+        }
+
+        if (options.source != nullptr)
+        {
+            changed = setSource(&top, options.source);
         }
 
         if (changed)
