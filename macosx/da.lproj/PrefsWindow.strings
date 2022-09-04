@@ -33,10 +33,10 @@
 "1204.title" = "Dock ikon:";
 
 /* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
-"1205.title" = "Vis samlet download hastighed";
+"1205.title" = "Samlet downloadratio";
 
 /* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
-"1206.title" = "Vis samlet upload hastighed";
+"1206.title" = "Samlet uploadratio";
 
 /* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
 "1207.title" = "Kun hvis der hentes";
@@ -63,7 +63,7 @@
 "1214.title" = "Opdateringer:";
 
 /* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
-"1216.title" = "Standard placering:";
+"1216.title" = "Standardplacering:";
 
 /* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
 "1217.title" = "Indstillinger:";
@@ -129,10 +129,10 @@
 "1255.title" = "Vågeblus:";
 
 /* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
-"1265.title" = "Upload hastighed:";
+"1265.title" = "Uploadratio:";
 
 /* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
-"1267.title" = "Download hastighed:";
+"1267.title" = "Downloadratio:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
 "1268.title" = "KB/s";
@@ -150,16 +150,16 @@
 "1274.title" = "KB/s";
 
 /* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
-"1275.title" = "Begræns hastighed:";
+"1275.title" = "Hastighedsbegrænsning:";
 
 /* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
-"1276.title" = "Upload hastighed:";
+"1276.title" = "Uploadratio:";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
-"1277.title" = "Download hastighed:";
+"1277.title" = "Downloadratio:";
 
 /* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
-"1278.title" = "Begræns hastighed tilstand overskriver generelle begrænsninger";
+"1278.title" = "Når hastighedsbegrænsningstilstanden overskrider de globale begrænsninger";
 
 /* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
 "1280.title" = "Planlæg begrænsning:";
@@ -345,7 +345,7 @@
 "1931.title" = "Magnetlinks:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
-"1933.title" = "Sæt som standard program";
+"1933.title" = "Sæt som standardprogram";
 
 /* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
 "1940.title" = "Føj .part endelse til ufuldstændige filer";

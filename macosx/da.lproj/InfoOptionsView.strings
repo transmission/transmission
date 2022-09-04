@@ -33,19 +33,19 @@
 "42.title" = "Stop ved forhold";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Begræns upload hastighed:";
+"43.title" = "Begræns uploadhastighed:";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
-"44.title" = "Begræns download hastighed:";
+"44.title" = "Begræns downloadhastighed:";
 
 /* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
 "45.title" = "Overhold de generelle indstillinger";
 
 /* Class = "NSTextFieldCell"; title = "Priority"; ObjectID = "46"; */
-"46.title" = "Priotet";
+"46.title" = "Prioritet";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
-"47.title" = "Priotet for overførsel:";
+"47.title" = "Prioritet for overførsel:";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
 "50.title" = "Lav";

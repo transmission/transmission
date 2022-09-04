@@ -120,7 +120,7 @@
 "A blocklist must first be downloaded" = "Une liste de blocage doit d’abord être téléchargée";
 
 /* Create torrent -> file already exists warning -> warning */
-"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Un fichier nommé « %1$@ » existe déjà dans le répertoire « %2$@ ». Choisissez un nouveau nom ou un nouveau répertoire pour créer le torrent.";
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Un fichier nommé « %1$@ » existe déjà dans le dossier « %2$@ ». Choisissez un nouveau nom ou un nouveau dossier pour créer le torrent.";
 
 /* Move inside itself alert -> title */
 "A folder cannot be moved to inside itself." = "Un dossier ne peut être déplacé à l’intérieur de lui-même.";
@@ -129,7 +129,7 @@
 "A torrent file cannot be created for files with no size." = "Un fichier torrent ne peut être créé pour des fichiers sans taille.";
 
 /* Create torrent -> file already exists warning -> title */
-"A torrent file with this name and directory cannot be created." = "Un fichier torrent ne peut être créé avec ce nom et ce répertoire.";
+"A torrent file with this name and directory cannot be created." = "Un fichier torrent ne peut être créé avec ce nom et ce dossier.";
 
 /* Create torrent -> blank address -> message */
 "A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Un transfert marqué comme privé sans adresse de traceur ne pourra pas se connecter à des pairs. Le fichier torrent ne sera utile que si vous prévoyez de téléverser le fichier vers un site Web traceur qui ajoutera les adresses pour vous.";
@@ -296,10 +296,10 @@
    inspector -> web seed table -> header
    status bar -> status label
    Torrent -> status string */
-"DL" = "Téléchargement";
+"DL" = "Téléch.";
 
 /* Inspector -> Peers tab -> peers */
-"DL from %lu" = "Téléchargement de %lu";
+"DL from %lu" = "Téléch. de %lu";
 
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Ne plus vérifier l’espace disque";
@@ -456,7 +456,7 @@
 "I Accept" = "J’accepte";
 
 /* Add torrent -> same name -> message */
-"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Si vous tentez d’utiliser des données existantes, le répertoire racine des données devrait être dans le répertoire de destination.";
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Si vous tentez d’utiliser des données existantes, le dossier racine des données devrait être dans le dossier de destination.";
 
 /* Torrent -> eta string */
 "inactive" = "inactif";
@@ -550,7 +550,7 @@
 "Never" = "Jamais";
 
 /* Inspector -> tracker table */
-"New Tier" = "Nouveau palier";
+"New Tier" = "Nouveau niveau";
 
 /* Tracker next announce */
 "Next announce in %@" = "Prochaine annonce dans %@";
@@ -927,10 +927,10 @@
 "The chosen torrent file location does not exist." = "La destination du fichier n’existe pas.";
 
 /* Add torrent -> same name -> title */
-"The destination directory and root data directory have the same name." = "Le répertoire de destination et le répertoire racine des données ont le même nom.";
+"The destination directory and root data directory have the same name." = "Le dossier de destination et le dossier racine des données ont le même nom.";
 
 /* Create torrent -> directory doesn't exist warning -> warning */
-"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "Le répertoire « %@ » n’existe pas. Créez ce répertoire ou choisissez-en un différent pour créer le fichier torrent.";
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "Le dossier « %@ » n’existe pas. Créez ce dossier ou choisissez-en un différent pour créer le fichier torrent.";
 
 /* Open duplicate magnet alert -> message */
 "The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Le lien magnet « %@ » ne peut pas être ajouté, car c’est le doublon d’un transfert existant.";
@@ -1003,7 +1003,7 @@
 "This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Les statistiques globales affichées par Transmission seront effacées. Les statistiques individuelles de transfert ne seront pas affectées.";
 
 /* Inspector -> tracker table */
-"Tier %ld" = "Palier %ld";
+"Tier %ld" = "Niveau %ld";
 
 /* Filter toolbar item -> palette label */
 "Toggle Filter" = "Activer/désactiver le filtre";
@@ -1080,10 +1080,10 @@
 /* inspector -> peer table -> header
    status bar -> status label
    Torrent -> status string */
-"UL" = "Téléversement";
+"UL" = "Télévers.";
 
 /* Inspector -> Peers tab -> peers */
-"UL to %lu" = "Téléversement vers %lu";
+"UL to %lu" = "Télévers. vers %lu";
 
 /* File Outline -> Menu */
 "Uncheck Selected" = "Décocher la sélection";

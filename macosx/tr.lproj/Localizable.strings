@@ -20,7 +20,7 @@
 
 /* Action menu -> upload/download limit
    Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld KB/s";
+"%ld KB/s" = "%ld KB/sn";
 
 /* Info options -> global setting */
 "%ld minutes" = "%ld dakika";

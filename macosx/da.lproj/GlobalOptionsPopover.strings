@@ -9,10 +9,10 @@
 "26.title" = "KB/s";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Begræns upload hastighed:";
+"43.title" = "Begræns uploadhastighed:";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
-"44.title" = "Begræns download hastighed:";
+"44.title" = "Begræns downloadhastighed:";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
 "98.title" = "minutter";

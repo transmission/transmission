@@ -282,10 +282,10 @@
 "1946.title" = "Illimité";
 
 /* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Limite d'envoi";
+"1950.title" = "Limite de bande passante en téléversement";
 
 /* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Limite d'envoi";
+"1951.title" = "Limite de bande passante en téléversement";
 
 /* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
 "1960.title" = "Limité";
@@ -297,13 +297,13 @@
 "1964.title" = "Limité";
 
 /* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
-"2017.title" = "Arrêter l'envoi";
+"2017.title" = "Propager jusqu’au ratio";
 
 /* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
-"2018.title" = "Arrêter l'envoi";
+"2018.title" = "Propager jusqu’au ratio";
 
 /* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
-"2024.title" = "Jamais";
+"2024.title" = "Toujours propager";
 
 /* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
 "2025.title" = "Arrêter au ratio";
@@ -345,10 +345,10 @@
 "3093.headerCell.title" = "Couleur";
 
 /* Class = "NSTableColumn"; headerCell.title = "DL Speed"; ObjectID = "3126"; */
-"3126.headerCell.title" = "Vitesse DL";
+"3126.headerCell.title" = "Vitesse de téléch.";
 
 /* Class = "NSTableColumn"; headerCell.title = "UL Speed"; ObjectID = "3135"; */
-"3135.headerCell.title" = "Vitesse UL";
+"3135.headerCell.title" = "Vitesse de télévers.";
 
 /* Class = "NSTableColumn"; headerCell.title = "Group"; ObjectID = "3140"; */
 "3140.headerCell.title" = "Groupe";

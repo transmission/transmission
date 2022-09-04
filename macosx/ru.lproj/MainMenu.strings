@@ -3,7 +3,7 @@
 "21.title" = "Transmission";
 
 /* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
-"29.title" = "MainMenu";
+"29.title" = "Главное меню";
 
 /* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
 "56.title" = "Transmission";
@@ -12,7 +12,7 @@
 "57.title" = "Transmission";
 
 /* Class = "NSMenuItem"; title = "About Transmission"; ObjectID = "58"; */
-"58.title" = "О программе Transmission";
+"58.title" = "О Transmission";
 
 /* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "72"; */
 "72.title" = "Открыть торрент-файл...";
@@ -45,7 +45,7 @@
 "134.title" = "Скрыть Transmission";
 
 /* Class = "NSMenuItem"; title = "Quit Transmission"; ObjectID = "136"; */
-"136.title" = "Завершить Transmission";
+"136.title" = "Выйти из Transmission";
 
 /* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
 "145.title" = "Скрыть остальные";
@@ -81,7 +81,7 @@
 "418.title" = "Форумы Transmission";
 
 /* Class = "NSMenu"; title = "Menu"; ObjectID = "456"; */
-"456.title" = "Menu";
+"456.title" = "Меню";
 
 /* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "457"; */
 "457.title" = "Приостановить выбранные";
@@ -99,7 +99,7 @@
 "547.title" = "Скрыть панель статуса";
 
 /* Class = "NSMenu"; title = "Menu"; ObjectID = "589"; */
-"589.title" = "Menu";
+"589.title" = "Меню";
 
 /* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "598"; */
 "598.title" = "Показать Инспектор";
@@ -204,7 +204,7 @@
 "1696.title" = "Transmission";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "1766"; */
-"1766.title" = "Очистить";
+"1766.title" = "Удалить";
 
 /* Class = "NSMenuItem"; title = "Message Log"; ObjectID = "1795"; */
 "1795.title" = "Журнал сообщений";
@@ -270,7 +270,7 @@
 "1933.title" = "Трекеру";
 
 /* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
-"1936.title" = "Menu";
+"1936.title" = "Меню";
 
 /* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
 "1944.title" = "Скорость скачивания";
@@ -387,10 +387,10 @@
 "3212.title" = "Сделать пожертвование…";
 
 /* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3216"; */
-"3216.title" = "Копировать magnet-ссылку";
+"3216.title" = "Копировать магнет-ссылку в буфер";
 
 /* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3218"; */
-"3218.title" = "Копировать magnet-ссылку";
+"3218.title" = "Копировать магнет-ссылку в буфер";
 
 /* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "3221"; */
 "3221.title" = "Перепроверить существующие данные";

@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Marek Adamski, 2022
 # Piotr Drąg <piotrdrag@gmail.com>, 2022
+# Marek Adamski, 2022
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-04 11:15+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2022\n"
+"Last-Translator: Marek Adamski, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1666,10 +1666,10 @@ msgstr "Błąd lokalny: „{error}”"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Pobieranie metadanych od {active_count} połączonego partnera (ukończono {percent_done}%)"
+msgstr[1] "Pobieranie metadanych od {active_count} połączonych partnerów (ukończono {percent_done}%)"
+msgstr[2] "Pobieranie metadanych od {active_count} połączonych partnerów (ukończono {percent_done}%)"
+msgstr[3] "Pobieranie metadanych od {active_count} połączonych partnerów (ukończono {percent_done}%)"
 
 #: ../gtk/TorrentCellRenderer.cc:239
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"

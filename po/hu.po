@@ -6,7 +6,7 @@
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
 # gyeben <gyonkibendeguz@gmail.com>, 2017
-# Ács Zoltán <acszoltan111@gmail.com>, 2020
+# c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2020
 # Kristóf Korcsog <kristofkorcsog@gmail.com>, 2020
 # Béla Bajza, 2021
 # Balázs Meskó <meskobalazs@mailbox.org>, 2022

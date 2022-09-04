@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © Transmission-projektet</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Klient</translation>
+        <translation>Klient</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent tilføjet</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -227,7 +227,7 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj URL&apos;er</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -242,7 +242,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der blev ikke fundet nye URL&apos;er.</translation>
     </message>
     <message>
         <location line="-832"/>
@@ -392,7 +392,7 @@
     <message>
         <location line="+26"/>
         <source>Running time:</source>
-        <translation>Køretid:</translation>
+        <translation>Igangværende tid:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -427,7 +427,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger trackere</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -447,7 +447,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføjet:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -907,12 +907,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Indstillinger</translation>
+        <translation>Indstillinger</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistik</translation>
+        <translation>Statistik</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1514,7 +1514,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Kilde:</translation>
+        <translation>&amp;Kilde:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -2023,7 +2023,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Offentlige trackers (standard)</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2187,7 +2187,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Start nu</translation>
     </message>
 </context>
 <context>
@@ -2248,9 +2248,9 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrentdublet</numerusform>
+            <numerusform>Torrentdubletter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2633,7 +2633,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rediger trackere</translation>
     </message>
     <message>
         <location line="+9"/>

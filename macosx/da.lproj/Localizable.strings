@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minutter";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu gange";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu cache";
@@ -1041,7 +1041,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Trace" = "";
+"Trace" = "Sporing";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1120,7 +1120,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warning" = "";
+"Warning" = "Advarsel";
 
 /* Drag overlay -> url */
 "Web Address" = "Webadresse";

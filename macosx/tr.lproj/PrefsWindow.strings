@@ -1,6 +1,6 @@
 
 /* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
-"23.title" = "Tercihler";
+"23.title" = "Ayarlar";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
 "53.title" = "Diğer...";
@@ -63,13 +63,13 @@
 "1214.title" = "Güncellemeleri denetle:";
 
 /* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
-"1216.title" = "Öntanımlı konum";
+"1216.title" = "Öntanımlı konum:";
 
 /* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
 "1217.title" = "Ayarlar:";
 
 /* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
-"1218.title" = "Kaynak torrent dosyalarını Çöp Sepetine at";
+"1218.title" = "Kaynak torrent dosyalarını çöpe at";
 
 /* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
 "1219.title" = "Burada torrent varsa ekle:";
@@ -111,13 +111,13 @@
 "1243.title" = "Şu kadar boşta kalırsa aktarımı beklet:";
 
 /* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
-"1247.title" = "Portu otomatik ata";
+"1247.title" = "Kapıyı otomatik ata";
 
 /* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
-"1248.title" = "NAT traversal uses either NAT-PMP or UPnP";
+"1248.title" = "NAT basamaklandırması ya NAT-PMP ya da UPnP kullanır";
 
 /* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
-"1250.title" = "Port açık";
+"1250.title" = "Kapı açık";
 
 /* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
 "1253.title" = "İletişim:";
@@ -135,19 +135,19 @@
 "1267.title" = "İndirme oranı:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
-"1268.title" = "KB/s";
+"1268.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
-"1269.title" = "KB/s";
+"1269.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
-"1270.title" = "Genel Bant Genişliği:";
+"1270.title" = "Genel bant genişliği limitleri:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
-"1273.title" = "KB/s";
+"1273.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
-"1274.title" = "KB/s";
+"1274.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
 "1275.title" = "Hız Limiti Kipi:";
@@ -192,13 +192,13 @@
 "1437.title" = "Güncelle";
 
 /* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
-"1438.title" = "engelli dizelgesi yüklü/yüklü değil";
+"1438.title" = "kara dizelge yüklü/yüklü değil";
 
 /* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
 "1439.title" = "Kara Dizelge:";
 
 /* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
-"1440.title" = "Engelli kullanıcıların bağlanmasına izin verme";
+"1440.title" = "Kara dizelgedeki kullanıcıların bağlanmasına izin verme";
 
 /* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
 "1441.title" = "Yüksek bağlantı limitleri sistem başarımını önemli ölçüde etkiler";
@@ -234,7 +234,7 @@
 "1477.title" = "Yalnızca el ile eklerken";
 
 /* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
-"1493.title" = "Dinleme portu:";
+"1493.title" = "Dinleme kapısı:";
 
 /* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
 "1502.title" = "Uzaktan erişimi etkinleştir";
@@ -243,13 +243,13 @@
 "1505.title" = "Kimlik denetimi iste";
 
 /* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
-"1523.headerCell.title" = "IP Address";
+"1523.headerCell.title" = "IP Adresi";
 
 /* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
-"1542.title" = "IP adresleri * jokerini içerebilir";
+"1542.title" = "IP adresleri, * jokerini içerebilir";
 
 /* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
-"1555.title" = "Açarsöz:";
+"1555.title" = "Parola:";
 
 /* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
 "1557.title" = "Kullanıcı adı: ";
@@ -261,7 +261,7 @@
 "1718.title" = "Web Arabirimini Çalıştır";
 
 /* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
-"1739.title" = "Son güncelleme: N/A";
+"1739.title" = "Son güncelleme: Bilinmiyor";
 
 /* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
 "1742.title" = "Haftalık olarak güncelle";
@@ -270,10 +270,10 @@
 "1748.title" = "Yalnızca aşağıdaki IP adreslerinin bağlanmasına izin ver";
 
 /* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
-"1777.headerCell.title" = "Color";
+"1777.headerCell.title" = "Renk";
 
 /* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
-"1779.headerCell.title" = "Name";
+"1779.headerCell.title" = "Ad";
 
 /* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
 "1796.title" = "Öbek Adı:";
@@ -300,7 +300,7 @@
 "1835.title" = "Aktarımlar tüm kriterlerin sağlandığı ilk gruba atanacaklardır";
 
 /* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
-"1890.title" = "Başlangıçta portları rastgele dağıt:";
+"1890.title" = "Başlangıçta kapıları rastgele dağıt:";
 
 /* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
 "1892.title" = "Dağıt";
@@ -312,10 +312,10 @@
 "1910.title" = "Her gün";
 
 /* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
-"1911.title" = "Haftaiçi";
+"1911.title" = "Hafta içi";
 
 /* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
-"1912.title" = "Haftasonu";
+"1912.title" = "Hafta sonu";
 
 /* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
 "1914.title" = "Pazartesi";
@@ -351,7 +351,7 @@
 "1940.title" = ".part parçacıklarını bitmemiş dosyalara iliştir";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
-"1948.title" = "Mıknatıslı bağları açarken pencere görüntüle";
+"1948.title" = "Mıknatıs bağlantıları açarken pencere görüntüle";
 
 /* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
 "1952.title" = "Genel torrentler için yerel kullanıcıları bul";
@@ -360,7 +360,7 @@
 "1962.title" = "Beslemeyi şu kadar boş kalınca durdur:";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
-"1970.title" = "dk.";
+"1970.title" = "dakika";
 
 /* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
 "1988.title" = "URL:";
@@ -378,13 +378,13 @@
 "2078.title" = "Mikro İletişim Protokolünü etkinleştir (µTP)";
 
 /* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
-"2082.title" = "Kişi dinleme portu:";
+"2082.title" = "Eş dinleme kapısı:";
 
 /* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
 "2087.title" = "Bildirimler:";
 
 /* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
-"2114.title" = "Sistem Tercihlerinde Yapılandır";
+"2114.title" = "Sistem Ayarlarında Yapılandır";
 
 /* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
 "2119.title" = "Besleme bitince aktarım dizelgesinden kaldır";

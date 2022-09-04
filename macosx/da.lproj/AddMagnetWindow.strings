@@ -27,7 +27,7 @@
 "90.title" = "Høj";
 
 /* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
-"91.title" = "Priotet:";
+"91.title" = "Prioritet:";
 
 /* Class = "NSTextFieldCell"; title = "Magnet Link"; ObjectID = "101"; */
 "101.title" = "Magnet Link";

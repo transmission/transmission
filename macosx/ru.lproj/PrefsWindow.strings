@@ -342,7 +342,7 @@
 "1926.title" = "Использовать DHT для публичных торрентов";
 
 /* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
-"1931.title" = "Magnet-ссылки:";
+"1931.title" = "Принимать магнет-ссылки:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
 "1933.title" = "Сделать программой по умолчанию";
@@ -351,7 +351,7 @@
 "1940.title" = "Добавлять .part к недокачанным файлам";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
-"1948.title" = "Показывать окно опций для magnet-ссылок";
+"1948.title" = "Показывать окно при открытии магнет-ссылки";
 
 /* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
 "1952.title" = "Искать местных пользователей для публичных торрентов";
@@ -369,7 +369,7 @@
 "2044.title" = "По завершении скачивания:";
 
 /* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
-"2047.title" = "Cкрипт:";
+"2047.title" = "Сценарий вызова:";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
 "2053.title" = "Выбрать…";

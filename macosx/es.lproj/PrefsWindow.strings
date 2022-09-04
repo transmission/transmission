@@ -6,7 +6,7 @@
 "53.title" = "Otro...";
 
 /* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
-"55.title" = "Igual que el torrent";
+"55.title" = "Igual que el archivo de torrent";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
 "219.title" = "Otro...";

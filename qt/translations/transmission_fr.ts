@@ -1792,7 +1792,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation>Sélectionner le script «&#xa0;Le torrent a fini de propoager&#xa0;»</translation>
+        <translation>Sélectionner le script «&#xa0;Le torrent a fini de propager&#xa0;»</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -2103,12 +2103,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location filename="../PrefsDialog.cc" line="+153"/>
         <source>Select Incomplete Directory</source>
-        <translation>Sélectionner le répertoire des incomplets</translation>
+        <translation>Sélectionner le dossier des incomplets</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation>Sélectionner le répertoire surveillé</translation>
+        <translation>Sélectionner le dossier surveillé</translation>
     </message>
     <message>
         <location line="+1"/>

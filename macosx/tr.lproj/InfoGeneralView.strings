@@ -3,46 +3,46 @@
 "21.title" = "Parçalar:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
-"22.placeholderString" = "N/A";
+"22.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Secure:"; ObjectID = "24"; */
 "24.title" = "Güvenlik:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "25"; */
-"25.placeholderString" = "N/A";
+"25.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Data File:"; ObjectID = "26"; */
 "26.title" = "Veri:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "27"; */
-"27.placeholderString" = "N/A";
+"27.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
 "28.title" = "Nerede";
 
 /* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
-"29.title" = "RevealDataFile";
+"29.title" = "Veri Dosyasını Göster";
 
 /* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
 "30.title" = "Oluşturan:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
-"31.placeholderString" = "N/A";
+"31.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Created On:"; ObjectID = "32"; */
-"32.title" = "Oluşturuldu:";
+"32.title" = "Oluşturulma:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
-"33.placeholderString" = "N/A";
+"33.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "35"; */
-"35.title" = "Yorumlar:";
+"35.title" = "Açıklama:";
 
 /* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
 "36.title" = "Sağlama:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
-"37.placeholderString" = "N/A";
+"37.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
 "41.title" = "Torrent Bilgisi";

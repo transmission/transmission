@@ -21,7 +21,7 @@
 "47.headerCell.title" = "Priorité";
 
 /* Class = "NSTableColumn"; headerCell.title = "DL"; ObjectID = "48"; */
-"48.headerCell.title" = "DL";
+"48.headerCell.title" = "Téléch.";
 
 /* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "49"; */
 "49.headerCell.title" = "Nom";

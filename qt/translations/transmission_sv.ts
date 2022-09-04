@@ -307,7 +307,7 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Stoppa distribution vid kvot:</translation>
+        <translation>Stoppa distribuering vid kvot:</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -317,7 +317,7 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Stoppa distribution om inaktiv i:</translation>
+        <translation>Stoppa distribuering om inaktiv i:</translation>
     </message>
     <message>
         <location line="+75"/>
@@ -1043,7 +1043,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Filterbar</source>
-        <translation>&amp;Filterfält</translation>
+        <translation>&amp;Filtreringsfält</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1256,7 +1256,7 @@
     <message>
         <location line="+9"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>Stoppa distribution vid kvot</translation>
+        <translation>Stoppa distribuering vid kvot</translation>
     </message>
     <message>
         <location line="-40"/>
@@ -1595,7 +1595,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+13"/>
         <source>S&amp;tart when added</source>
-        <translation>S&amp;tarta när den läggs till</translation>
+        <translation>S&amp;tarta när den lagts till</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2058,7 +2058,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location filename="../PrefsDialog.cc" line="-78"/>
         <source>Testing TCP Port...</source>
-        <translation>Testar TCP-port…</translation>
+        <translation>Testar TCP-port...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-281"/>
@@ -2149,7 +2149,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+282"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>Stoppa distribution vid &amp;kvot:</translation>
+        <translation>Stoppa distribuering vid &amp;kvot:</translation>
     </message>
     <message>
         <location line="+20"/>

@@ -59,7 +59,7 @@
 "%lu LTEP" = "%lu LTEP";
 
 /* Inspector -> selected torrents */
-"%lu magnetized transfers" = "%lu maget-разд.";
+"%lu magnetized transfers" = "%lu магент-разд.";
 
 /* Inspector -> Peers tab -> peers */
 "%lu PEX" = "%lu PEX";

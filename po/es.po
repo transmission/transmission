@@ -1690,9 +1690,9 @@ msgstr "Error de local: «{error}»"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Descargando metadatos desde {active_count} par conectado ({percent_done}% hecho)"
+msgstr[1] "Descargando metadatos desde {active_count} pares conectados ({percent_done}% hecho)"
+msgstr[2] "Descargando metadatos desde {active_count} pares conectados ({percent_done}% hecho)"
 
 #: ../gtk/TorrentCellRenderer.cc:239
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"

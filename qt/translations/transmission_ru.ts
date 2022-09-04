@@ -546,7 +546,7 @@
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Максимальное количество участников:</translation>
+        <translation>&amp;Максимум участников:</translation>
     </message>
 </context>
 <context>
@@ -676,7 +676,7 @@
     <message>
         <location line="+4"/>
         <source>Verifying</source>
-        <translation>Проверяются</translation>
+        <translation>Проверяемые</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1516,8 +1516,8 @@
         <location line="+23"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
-        <translation>Чтобы добавить резервный URL, добавьте его после основного URL в той же строке.
-Чтобы добавить ещё один основной URL, добавьте пустую строку, а затем его в новой строке.</translation>
+        <translation>Чтобы добавить резервный адрес, добавьте его после основного в той же строке.
+Чтобы добавить ещё один основной адрес, добавьте пустую строку, а затем его в новой строке.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1680,7 +1680,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+99"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
-        <translation>&lt;small&gt;Изменение нормального ограничения скорости вручную или по расписанию&lt;/small&gt;</translation>
+        <translation>&lt;small&gt;Изменение стандартного ограничения скорости вручную или по расписанию&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+47"/>
@@ -1846,7 +1846,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>&amp;Максимальное количество одновременных загрузок:</translation>
+        <translation>Ма&amp;ксимум активных загрузок:</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1890,7 +1890,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>&amp;Общее максимальное количество участников:</translation>
+        <translation>Об&amp;щий максимум участников</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-253"/>
@@ -1904,7 +1904,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Обновление чёрного списка&lt;/b&gt;&lt;p&gt;Получение нового чёрного списка…</translation>
+        <translation>&lt;b&gt;Обновить чёрный список&lt;/b&gt;&lt;p&gt;Получение нового чёрного списка…</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
@@ -1934,7 +1934,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-97"/>
         <source>Privacy</source>
-        <translation>Безопасность</translation>
+        <translation>Конфиденциальность</translation>
     </message>
     <message>
         <location line="-435"/>
@@ -1995,17 +1995,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-1212"/>
         <source>&amp;Upload:</source>
-        <translation>Отдача:</translation>
+        <translation>&amp;Отдача:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Download:</source>
-        <translation>Загрузка:</translation>
+        <translation>&amp;Загрузка:</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Alternative Speed Limits</source>
-        <translation>Расширенное ограничение скорости</translation>
+        <translation>Особые ограничения скорости</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -2040,7 +2040,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation>Стандартные публичные трекеры</translation>
+        <translation>Публичные трекеры по умолчанию</translation>
     </message>
     <message>
         <location line="+12"/>

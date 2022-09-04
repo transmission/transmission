@@ -209,7 +209,7 @@ msgstr "Distribuera oavsett kvot"
 
 #: ../gtk/DetailsDialog.cc:507
 msgid "Stop seeding at ratio:"
-msgstr "Stoppa distribution vid kvot:"
+msgstr "Stoppa distribuering vid kvot:"
 
 #: ../gtk/DetailsDialog.cc:521
 msgid "_Ratio:"
@@ -221,7 +221,7 @@ msgstr "Distribuera oavsett aktivitet"
 
 #: ../gtk/DetailsDialog.cc:527
 msgid "Stop seeding if idle for N minutes:"
-msgstr "Stoppa distribution om inaktiv i N minuter:"
+msgstr "Stoppa distribuering om inaktiv i N minuter:"
 
 #: ../gtk/DetailsDialog.cc:540
 msgid "_Idle:"
@@ -254,7 +254,7 @@ msgstr "Hämtar"
 
 #: ../gtk/DetailsDialog.cc:579 ../gtk/TorrentCellRenderer.cc:169
 msgid "Queued for seeding"
-msgstr "I kö för distribution"
+msgstr "I kö för distribuering"
 
 #: ../gtk/DetailsDialog.cc:582 ../gtk/FilterBar.cc:515
 msgctxt "Verb"
@@ -844,7 +844,7 @@ msgstr "Begränsa sändningshastighet"
 
 #: ../gtk/MainWindow.cc:356
 msgid "Stop Seeding at Ratio"
-msgstr "Stoppa distribution vid kvot"
+msgstr "Stoppa distribuering vid kvot"
 
 #: ../gtk/MainWindow.cc:382
 msgid "Stop at Ratio ({ratio})"
@@ -1050,7 +1050,7 @@ msgstr "Fl_ytta torrentfilen till papperskorgen"
 
 #: ../gtk/OptionsDialog.cc:242
 msgid "_Start when added"
-msgstr "_Starta när den läggs till"
+msgstr "_Starta när den lagts till"
 
 #. "torrent file" row
 #: ../gtk/OptionsDialog.cc:255
@@ -1144,11 +1144,11 @@ msgstr "Gränser"
 
 #: ../gtk/PrefsDialog.cc:327
 msgid "Stop seeding at _ratio:"
-msgstr "Stoppa distribution vid _kvot:"
+msgstr "Stoppa distribuering vid _kvot:"
 
 #: ../gtk/PrefsDialog.cc:335
 msgid "Stop seeding if idle for _N minutes:"
-msgstr "Stoppa distribution om inaktiv i _N minuter:"
+msgstr "Stoppa distribuering om inaktiv i _N minuter:"
 
 #: ../gtk/PrefsDialog.cc:343
 msgid "Call scrip_t when done seeding:"
@@ -1609,8 +1609,8 @@ msgstr "Lokalt fel: '{error}'"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Hämtar metadata från {active_count} anslutna jämlikar ({percent_done}% klart)"
+msgstr[1] "Hämtar metadata från {active_count} anslutna jämlikar ({percent_done}% klart)"
 
 #: ../gtk/TorrentCellRenderer.cc:239
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"

@@ -36,7 +36,7 @@
 "1205.title" = "Vitesse de réception totale";
 
 /* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
-"1206.title" = "Vitesse d'envoi totale";
+"1206.title" = "Débit total en téléversement";
 
 /* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
 "1207.title" = "Seulement si des transferts sont incomplets";
@@ -63,7 +63,7 @@
 "1214.title" = "Mises à jour :";
 
 /* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
-"1216.title" = "Par défaut :";
+"1216.title" = "Emplacement par défaut :";
 
 /* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
 "1217.title" = "Emplacement :";
@@ -87,13 +87,13 @@
 "1231.title" = "transferts actifs";
 
 /* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
-"1232.title" = "Arrêt de l'envoi au ratio :";
+"1232.title" = "Propager jusqu’au ratio :";
 
 /* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
 "1234.title" = "Limites :";
 
 /* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
-"1235.title" = "Le ratio est la quantité de données envoyées divisée par la quantité de données téléchargées";
+"1235.title" = "Le ratio est la quantité téléversée divisée par la quantité téléchargée";
 
 /* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
 "1236.title" = "Limiter les téléchargements à";
@@ -102,7 +102,7 @@
 "1239.title" = "transferts actifs";
 
 /* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
-"1240.title" = "Limiter les envois à ";
+"1240.title" = "Propagation avec un maximum de :";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
 "1242.title" = "minutes inactif";
@@ -129,7 +129,7 @@
 "1255.title" = "Veille Système :";
 
 /* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
-"1265.title" = "Vitesse d'émission :";
+"1265.title" = "Débit de téléversement :";
 
 /* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
 "1267.title" = "Vitesse de réception :";
@@ -153,7 +153,7 @@
 "1275.title" = "Mode tortue :";
 
 /* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
-"1276.title" = "Vitesse d'émission :";
+"1276.title" = "Débit de téléversement :";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
 "1277.title" = "Vitesse de réception :";
@@ -174,7 +174,7 @@
 "1302.title" = "À la fin d'un téléchargement :";
 
 /* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
-"1306.title" = "À la fin d'un envoi :";
+"1306.title" = "Après propagation :";
 
 /* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
 "1310.title" = "Jouer le son :";
@@ -357,7 +357,7 @@
 "1952.title" = "Utiliser la découverte de pairs locale (LPD)";
 
 /* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
-"1962.title" = "Arrêt de l'envoi si inactif pendant :";
+"1962.title" = "Arrêter la propagation si inactif depuis :";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
 "1970.title" = "minutes";
@@ -387,7 +387,7 @@
 "2114.title" = "Configurer dans les Préférences Système";
 
 /* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
-"2119.title" = "Supprimer un transfert quand l'envoi est terminé";
+"2119.title" = "Supprimer de la liste des transferts après propagation";
 
 /* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
 "2123.title" = "S'applique aux nouveaux transferts uniquement";

@@ -42,7 +42,7 @@
 "90.title" = "Høj";
 
 /* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
-"91.title" = "Priotet:";
+"91.title" = "Prioritet:";
 
 /* Class = "NSButtonCell"; title = "All"; ObjectID = "104"; */
 "104.title" = "Alt";
