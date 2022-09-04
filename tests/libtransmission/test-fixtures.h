@@ -179,14 +179,12 @@ protected:
 
     void buildParentDir(std::string_view path) const
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
         auto const tmperr = errno;
 
         auto dir = tr_pathbuf{ path };
         dir.popdir();
         if (auto const info = tr_sys_path_get_info(path); !info)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_error* error = nullptr;
             tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
             EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
@@ -194,12 +192,10 @@ protected:
         }
 
         errno = tmperr;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
     static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error** error = nullptr)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " fd " << fd << " data_len " << data_len << std::endl;
         uint64_t n_left = data_len;
         auto const* left = static_cast<uint8_t const*>(data);
 
@@ -207,7 +203,6 @@ protected:
         {
             uint64_t n = {};
             tr_error* local_error = nullptr;
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             if (!tr_sys_file_write(fd, left, n_left, &n, &local_error))
             {
                 fprintf(stderr, "Error writing file: '%s'\n", local_error->message);
@@ -219,7 +214,6 @@ protected:
             left += n;
             n_left -= n;
         }
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
     void createTmpfileWithContents(char* tmpl, void const* payload, size_t n) const
@@ -228,13 +222,9 @@ protected:
 
         buildParentDir(tmpl);
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_error* error = nullptr;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         auto const fd = tr_sys_file_open_temp(tmpl, &error);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         blockingFileWrite(fd, payload, n, &error);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_sys_file_flush(fd, &error);
         tr_sys_file_flush(fd, &error);
         tr_sys_file_close(fd, &error);

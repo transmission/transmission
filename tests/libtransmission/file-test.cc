@@ -1301,36 +1301,21 @@ TEST_F(FileTest, dirCreate)
     tr_error_clear(&err);
 
     // Can create directory with parent directories
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_sys_dir_create(path2, TR_SYS_DIR_CREATE_PARENTS, 0751, &err));
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(nullptr, err) << *err;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_sys_path_exists(path1));
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_sys_path_exists(path2));
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(validatePermissions(path1, 0751));
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(validatePermissions(path2, 0751));
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // Can create existing directory (no-op)
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_sys_dir_create(path1, 0, 0700, &err));
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(nullptr, err) << *err;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_sys_dir_create(path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(nullptr, err) << *err;
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_sys_path_remove(path2);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_sys_path_remove(path1);
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 }
 
 TEST_F(FileTest, dirCreateTemp)
