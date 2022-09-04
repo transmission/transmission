@@ -1,6 +1,6 @@
 
 /* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
-"22.title" = "Limites d'envoi";
+"22.title" = "Limites de propagation";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
 "23.title" = "Bande-passante";
@@ -33,10 +33,10 @@
 "42.title" = "Arrêter au ratio";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Limiter l'envoi à";
+"43.title" = "Limiter le téléversement :";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
-"44.title" = "Limiter la réception à";
+"44.title" = "Limiter le téléchargement :";
 
 /* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
 "45.title" = "Respecter les limites globales de bande-passante";
@@ -72,4 +72,4 @@
 "98.title" = "minutes";
 
 /* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "114"; */
-"114.title" = "Supprimer le transfert quand l'envoi est terminé";
+"114.title" = "Supprimer de la liste des transferts après propagation";

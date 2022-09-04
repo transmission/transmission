@@ -6,10 +6,10 @@
 "23.title" = "Aktarım Bant Genişliği";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
-"26.title" = "KB/s";
+"26.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
-"29.title" = "KB/s";
+"29.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
 "30.title" = "Oran:";
@@ -21,7 +21,7 @@
 "32.title" = "Kullanıcı başına:";
 
 /* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "35"; */
-"35.title" = "bağlantı";
+"35.title" = "eş";
 
 /* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "40"; */
 "40.title" = "Limitsiz";
@@ -33,10 +33,10 @@
 "42.title" = "Oranda Dur";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Gönderme limiti:";
+"43.title" = "Gönderme Limiti:";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
-"44.title" = "İndirme limiti:";
+"44.title" = "İndirme Limiti:";
 
 /* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
 "45.title" = "Genel bant genişliği limitlerine uy";
@@ -45,7 +45,7 @@
 "46.title" = "Öncelik";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
-"47.title" = "Aktarım önceliği:";
+"47.title" = "Aktarım Önceliği:";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
 "50.title" = "Düşük";
@@ -66,7 +66,7 @@
 "88.title" = "Limitsiz";
 
 /* Class = "NSTextFieldCell"; title = "Inactivity:"; ObjectID = "89"; */
-"89.title" = "Etkisizlik:";
+"89.title" = "Boşta:";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
 "98.title" = "dakika";

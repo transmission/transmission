@@ -59,7 +59,7 @@
 "%lu LTEP" = "%lu LTEP";
 
 /* Inspector -> selected torrents */
-"%lu magnetized transfers" = "%lu maget-разд.";
+"%lu magnetized transfers" = "%lu магент-разд.";
 
 /* Inspector -> Peers tab -> peers */
 "%lu PEX" = "%lu PEX";
@@ -162,9 +162,6 @@
    Groups -> Button */
 "All Groups" = "Все группы";
 
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Произошла неизвестная ошибка.";
-
 /* Tracker last announce */
 "Announce error" = "Ошибка анонса";
 
@@ -261,12 +258,6 @@
 
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "Копия «%@» не может быть создана";
-
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "Не могу прочитать «%1$s»: %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "Не могу записать «%1$s»: %2$s.";
 
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */

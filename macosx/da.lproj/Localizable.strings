@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minutter";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu gange";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu cache";
@@ -162,9 +162,6 @@
    Groups -> Button */
 "All Groups" = "Alle grupper";
 
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Der opstod en ukendt fejl.";
-
 /* Tracker last announce */
 "Announce error" = "Annonceringsfejl";
 
@@ -261,12 +258,6 @@
 
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "En kopi af \"%@\" kan ikke oprettes";
-
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "Kunne ikke læse \"%1$s\": %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "Kunne ikke skrive \"%1$s\": %2$s.";
 
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */
@@ -1050,7 +1041,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Trace" = "";
+"Trace" = "Sporing";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1129,7 +1120,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warning" = "";
+"Warning" = "Advarsel";
 
 /* Drag overlay -> url */
 "Web Address" = "Webadresse";

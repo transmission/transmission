@@ -3,34 +3,34 @@
 "30.title" = "İndirildi:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
-"31.placeholderString" = "N/A";
+"31.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
 "32.title" = "Gönderildi:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
-"33.placeholderString" = "N/A";
+"33.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "34"; */
 "34.title" = "Oran:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "35"; */
-"35.placeholderString" = "N/A";
+"35.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Have:"; ObjectID = "36"; */
 "36.title" = "Elde var:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
-"37.placeholderString" = "N/A";
+"37.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "State:"; ObjectID = "38"; */
 "38.title" = "Durum:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "39"; */
-"39.placeholderString" = "N/A";
+"39.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Error:"; ObjectID = "41"; */
-"41.title" = "Hatalar:";
+"41.title" = "Hata:";
 
 /* Class = "NSTextFieldCell"; title = "Dates"; ObjectID = "42"; */
 "42.title" = "Tarih";
@@ -39,13 +39,13 @@
 "43.title" = "Eklenme:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "44"; */
-"44.placeholderString" = "N/A";
+"44.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Completed:"; ObjectID = "46"; */
-"46.title" = "Bitiş:";
+"46.title" = "Bitti:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "47"; */
-"47.placeholderString" = "N/A";
+"47.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Transfer"; ObjectID = "50"; */
 "50.title" = "Aktarım";
@@ -54,7 +54,7 @@
 "51.title" = "Son Etkinlik:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
-"52.placeholderString" = "N/A";
+"52.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progress"; ObjectID = "54"; */
 "54.ibShadowedLabels[0]" = "İlerleme";
@@ -66,25 +66,25 @@
 "55.title" = "İlerleme:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "56"; */
-"56.placeholderString" = "N/A";
+"56.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
 "57.title" = "Hatalı İnd.:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
-"58.placeholderString" = "N/A";
+"58.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Time Elapsed"; ObjectID = "85"; */
 "85.title" = "Geçen Süre";
 
 /* Class = "NSTextFieldCell"; title = "Downloading:"; ObjectID = "86"; */
-"86.title" = "İndirilirken:";
+"86.title" = "İndiriliyor:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "87"; */
-"87.placeholderString" = "N/A";
+"87.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Seeding:"; ObjectID = "89"; */
-"89.title" = "Beslerken:";
+"89.title" = "Besleniyor:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "90"; */
-"90.placeholderString" = "N/A";
+"90.placeholderString" = "Erişilemiyor";

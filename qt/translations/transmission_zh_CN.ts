@@ -77,7 +77,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+428"/>
+        <location filename="../DetailsDialog.cc" line="+429"/>
         <source>None</source>
         <translation>无</translation>
     </message>
@@ -544,7 +544,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+296"/>
+        <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
@@ -635,7 +635,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+47"/>
+        <location filename="../FilterBar.cc" line="+48"/>
         <location line="+145"/>
         <source>All</source>
         <translation>全部</translation>
@@ -1224,7 +1224,7 @@
         <translation>按队列排序(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+470"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>限制下载速度</translation>
     </message>
@@ -1433,7 +1433,7 @@
         <translation>新的 Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+231"/>
+        <location filename="../MakeDialog.cc" line="+227"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;没有选择来源&lt;/i&gt;</translation>
     </message>
@@ -1517,40 +1517,25 @@ To add another primary URL, add it after a blank line.</source>
         <translation>新的 Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-137"/>
+        <location filename="../MakeDialog.cc" line="-106"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>正在制作 &quot;%1&quot;</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+13"/>
         <source>Created &quot;%1&quot;!</source>
         <translation>已制作 &quot;%1&quot;!</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>错误: 无效的通告链接 &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="-4"/>
-        <source>Cancelled</source>
-        <translation>已取消</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>读取 &quot;%1&quot; 时出错: %2</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>写入 &quot;%1&quot; 时出错: %2</translation>
+        <location line="+5"/>
+        <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+62"/>
+        <location filename="../OptionsDialog.cc" line="+63"/>
         <source>Open Torrent</source>
         <translation>打开 Torrent</translation>
     </message>
@@ -2178,12 +2163,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-277"/>
         <source>Invalid option</source>
         <translation>无效选项</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+305"/>
         <source>Start Now</source>
         <translation>现在开始</translation>
     </message>
@@ -2191,7 +2176,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../RelocateDialog.cc" line="+63"/>
+        <location filename="../RelocateDialog.cc" line="+65"/>
         <source>Select Location</source>
         <translation>选择位置</translation>
     </message>
@@ -2224,7 +2209,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+498"/>
+        <location filename="../Session.cc" line="+499"/>
         <source>Error Renaming Path</source>
         <translation>重命名路径错误</translation>
     </message>
@@ -2234,7 +2219,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;无法重命名 &quot;%1&quot; 为 &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;请纠正错误后重试。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+531"/>
+        <location line="+528"/>
         <source>Error Adding Torrent</source>
         <translation>添加 Torrent 时错误</translation>
     </message>
@@ -2358,7 +2343,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+300"/>
+        <location filename="../Torrent.cc" line="+297"/>
         <source>Verifying local data</source>
         <translation>正在检查本地数据</translation>
     </message>
@@ -2416,7 +2401,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+171"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>磁力传输 - 正在检索元数据 (%1%)</translation>
@@ -2527,7 +2512,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+219"/>
+        <location filename="../TrackerDelegate.cc" line="+210"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

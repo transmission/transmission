@@ -78,7 +78,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+428"/>
+        <location filename="../DetailsDialog.cc" line="+429"/>
         <source>None</source>
         <translation>Ingen</translation>
     </message>
@@ -307,7 +307,7 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Stoppa distribution vid kvot:</translation>
+        <translation>Stoppa distribuering vid kvot:</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -317,7 +317,7 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Stoppa distribution om inaktiv i:</translation>
+        <translation>Stoppa distribuering om inaktiv i:</translation>
     </message>
     <message>
         <location line="+75"/>
@@ -548,7 +548,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+296"/>
+        <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
@@ -639,7 +639,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+47"/>
+        <location filename="../FilterBar.cc" line="+48"/>
         <location line="+145"/>
         <source>All</source>
         <translation>Alla</translation>
@@ -1043,7 +1043,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Filterbar</source>
-        <translation>&amp;Filterfält</translation>
+        <translation>&amp;Filtreringsfält</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1232,7 +1232,7 @@
         <translation>Sortera efter &amp;kö</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+470"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>Begränsa hämtningshastighet</translation>
     </message>
@@ -1256,7 +1256,7 @@
     <message>
         <location line="+9"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>Stoppa distribution vid kvot</translation>
+        <translation>Stoppa distribuering vid kvot</translation>
     </message>
     <message>
         <location line="-40"/>
@@ -1444,7 +1444,7 @@
         <translation>Ny torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+231"/>
+        <location filename="../MakeDialog.cc" line="+227"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Ingen källa vald&lt;/i&gt;</translation>
     </message>
@@ -1530,40 +1530,25 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>Ny torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-137"/>
+        <location filename="../MakeDialog.cc" line="-106"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>Skapar &quot;%1&quot;</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+13"/>
         <source>Created &quot;%1&quot;!</source>
         <translation>Skapade &quot;%1&quot;!</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Fel: felaktig annonseringswebbadress &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="-4"/>
-        <source>Cancelled</source>
-        <translation>Avbruten</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Fel vid läsning &quot;%1&quot;: %2</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Fel vid skrivning &quot;%1&quot;: %2</translation>
+        <location line="+5"/>
+        <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+62"/>
+        <location filename="../OptionsDialog.cc" line="+63"/>
         <source>Open Torrent</source>
         <translation>Öppna torrent</translation>
     </message>
@@ -1610,7 +1595,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+13"/>
         <source>S&amp;tart when added</source>
-        <translation>S&amp;tarta när den läggs till</translation>
+        <translation>S&amp;tarta när den lagts till</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2073,7 +2058,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location filename="../PrefsDialog.cc" line="-78"/>
         <source>Testing TCP Port...</source>
-        <translation>Testar TCP-port…</translation>
+        <translation>Testar TCP-port...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-281"/>
@@ -2164,7 +2149,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+282"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>Stoppa distribution vid &amp;kvot:</translation>
+        <translation>Stoppa distribuering vid &amp;kvot:</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -2195,12 +2180,12 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-277"/>
         <source>Invalid option</source>
         <translation>Ogiltigt alternativ</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+305"/>
         <source>Start Now</source>
         <translation>Starta nu</translation>
     </message>
@@ -2208,7 +2193,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../RelocateDialog.cc" line="+63"/>
+        <location filename="../RelocateDialog.cc" line="+65"/>
         <source>Select Location</source>
         <translation>Välj plats</translation>
     </message>
@@ -2241,7 +2226,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+498"/>
+        <location filename="../Session.cc" line="+499"/>
         <source>Error Renaming Path</source>
         <translation>Fel vid namnbyte av sökväg</translation>
     </message>
@@ -2251,7 +2236,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>&lt;p&gt;&lt;b&gt;Fel när &quot;%1&quot; döptes om till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Rätta till felen och försök igen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+531"/>
+        <location line="+528"/>
         <source>Error Adding Torrent</source>
         <translation>Fel vi tillägg av torrent</translation>
     </message>
@@ -2378,7 +2363,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+300"/>
+        <location filename="../Torrent.cc" line="+297"/>
         <source>Verifying local data</source>
         <translation>Verifierar lokala data</translation>
     </message>
@@ -2436,7 +2421,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+171"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Magnetöverföring - hämtar metadata (%1%)</translation>
@@ -2553,7 +2538,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+219"/>
+        <location filename="../TrackerDelegate.cc" line="+210"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

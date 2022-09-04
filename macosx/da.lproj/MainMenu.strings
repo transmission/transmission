@@ -273,19 +273,19 @@
 "1936.title" = "Menu";
 
 /* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
-"1944.title" = "Download hastighed";
+"1944.title" = "Downloadhastighedsbegrænsning";
 
 /* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
-"1945.title" = "Download hastighed";
+"1945.title" = "Downloadhastighedsbegrænsning";
 
 /* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
 "1946.title" = "Ubegrænset";
 
 /* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Upload hastighed";
+"1950.title" = "Uploadhastighedsbegrænsning";
 
 /* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Upload hastighed";
+"1951.title" = "Uploadhastighedsbegrænsning";
 
 /* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
 "1960.title" = "limit";
@@ -363,10 +363,10 @@
 "3190.title" = "Hold indenfor generelle begrænsninger";
 
 /* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
-"3196.title" = "Priotet";
+"3196.title" = "Prioritet";
 
 /* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
-"3197.title" = "Priotet";
+"3197.title" = "Prioritet";
 
 /* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
 "3198.title" = "Høj";

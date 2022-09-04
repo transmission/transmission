@@ -6,7 +6,7 @@
 "12.title" = "Vazgeç";
 
 /* Class = "NSMenuItem"; title = "begins with"; ObjectID = "40"; */
-"40.title" = "başlayan";
+"40.title" = "şununla başlar";
 
 /* Class = "NSMenuItem"; title = "is"; ObjectID = "42"; */
 "42.title" = "eşit";
@@ -24,7 +24,7 @@
 "100.title" = "Ad";
 
 /* Class = "NSMenuItem"; title = "Comment"; ObjectID = "102"; */
-"102.title" = "Yorum";
+"102.title" = "Açıklama";
 
 /* Class = "NSMenuItem"; title = "matches"; ObjectID = "118"; */
 "118.title" = "eşleşen";

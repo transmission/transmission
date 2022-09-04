@@ -1,6 +1,6 @@
 
 /* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
-"15.title" = "Şuraya indir";
+"15.title" = "Şuraya indir:";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
 "16.title" = "Değiştir...";
@@ -18,19 +18,19 @@
 "41.title" = "Öbek:";
 
 /* Class = "NSTableColumn"; headerCell.title = "Rank"; ObjectID = "47"; */
-"47.headerCell.title" = "Важн.";
+"47.headerCell.title" = "Önem";
 
 /* Class = "NSTableColumn"; headerCell.title = "DL"; ObjectID = "48"; */
-"48.headerCell.title" = "Скач.";
+"48.headerCell.title" = "İN";
 
 /* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "49"; */
-"49.headerCell.title" = "Имя";
+"49.headerCell.title" = "Ad";
 
 /* Class = "NSButtonCell"; title = "Trash torrent file"; ObjectID = "59"; */
 "59.title" = "Torrent dosyasını sil";
 
 /* Class = "NSButtonCell"; title = "Verify Local Data"; ObjectID = "66"; */
-"66.title" = "Bilgileri Denetle";
+"66.title" = "Yerel Veriyi Denetle";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
 "88.title" = "Düşük";
@@ -51,4 +51,4 @@
 "105.title" = "Hiçbiri";
 
 /* Class = "NSSearchFieldCell"; placeholderString = "Filter"; ObjectID = "113"; */
-"113.placeholderString" = "Фильтр";
+"113.placeholderString" = "Süz";

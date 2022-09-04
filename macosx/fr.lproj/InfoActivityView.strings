@@ -6,7 +6,7 @@
 "31.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
-"32.title" = "Envoyé :";
+"32.title" = "Téléversé :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
 "33.placeholderString" = "N/A";
@@ -69,7 +69,7 @@
 "56.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
-"57.title" = "Échoué :";
+"57.title" = "Téléch. en échec :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
 "58.placeholderString" = "N/A";
@@ -84,7 +84,7 @@
 "87.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Seeding:"; ObjectID = "89"; */
-"89.title" = "Envoi :";
+"89.title" = "Propagation :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "90"; */
 "90.placeholderString" = "N/A";
