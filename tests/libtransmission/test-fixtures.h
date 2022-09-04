@@ -127,7 +127,6 @@ protected:
         auto path = tr_sys_dir_get_current(&error);
         if (error != nullptr)
         {
-            std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
             tr_error_free(error);
         }
         return path;
@@ -184,9 +183,13 @@ protected:
 
         auto dir = tr_pathbuf{ path };
         dir.popdir();
-        tr_error* error = nullptr;
-        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-        EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
+        if (auto const info = tr_sys_path_get_info(path); !info)
+        {
+            tr_error* error = nullptr;
+            tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+            EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
+            tr_error_clear(&error);
+        }
 
         errno = tmperr;
     }
