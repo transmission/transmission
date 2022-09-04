@@ -321,7 +321,7 @@ TEST_F(FileTest, getInfo)
     }
 }
 
-TEST_F(FileTest, readFileAt)
+TEST_F(FileTest, readFile)
 {
     auto const test_dir = createTestDir(currentTestName());
 
@@ -329,22 +329,36 @@ TEST_F(FileTest, readFileAt)
     auto constexpr Contents = "hello, world!"sv;
     createFileWithContents(path, Contents);
 
-    // successful read
     auto n_bytes_read = uint64_t{};
     tr_error* err = nullptr;
     auto buf = std::array<char, 64>{};
     auto fd = tr_sys_file_open(path, TR_SYS_FILE_READ, 0);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
+
+    // successful read
+    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_bytes_read, &err));
+    EXPECT_EQ(Contents, std::string_view(std::data(buf), n_bytes_read));
+    EXPECT_EQ(std::size(Contents), n_bytes_read);
+    EXPECT_EQ(nullptr, err) << *err;
+
+    // successful read_at
     auto const offset = 1U;
     EXPECT_TRUE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_bytes_read, &err));
     auto constexpr Expected = Contents.substr(offset);
-    EXPECT_EQ(Expected, std::data(buf));
+    EXPECT_EQ(Expected, std::string_view(std::data(buf), n_bytes_read));
     EXPECT_EQ(std::size(Expected), n_bytes_read);
     EXPECT_EQ(nullptr, err) << *err;
 
-    // read from closed file
     tr_sys_file_close(fd);
+
+    // read from closed file
     n_bytes_read = 0;
+    EXPECT_FALSE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_bytes_read, &err));
+    EXPECT_EQ(0, n_bytes_read);
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    // read_at from closed file
     EXPECT_FALSE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_bytes_read, &err));
     EXPECT_EQ(0, n_bytes_read);
     EXPECT_NE(nullptr, err);
