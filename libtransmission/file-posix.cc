@@ -1015,22 +1015,16 @@ static bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
     {
         auto const end = path.find('/', walk);
         subpath.assign(path.substr(0, end));
+        if (auto const info = tr_sys_path_get_info(subpath, 0); info && info->type == TR_SYS_PATH_IS_FILE)
+        {
+            tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
+            return false;
+        }
         if (mkdir(subpath, permissions) == -1)
         {
             if (errno != EEXIST)
             {
                 set_system_error(error, errno);
-                return false;
-            }
-
-            auto const info = tr_sys_path_get_info(subpath, 0, error);
-            if (!info)
-            {
-                return false;
-            }
-            if (info->type != TR_SYS_PATH_IS_DIRECTORY)
-            {
-                tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
                 return false;
             }
         }
