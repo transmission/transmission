@@ -345,6 +345,14 @@ TEST_F(FileTest, pathExists)
     EXPECT_TRUE(tr_sys_path_exists(path1, &err));
     EXPECT_EQ(nullptr, err) << *err;
 
+    // No permissions to find out
+    chmod(test_dir, 0);
+    EXPECT_FALSE(tr_sys_path_exists(path1, &err));
+    EXPECT_NE(nullptr, err);
+    EXPECT_TRUE(err == nullptr || err->code == EACCES);
+    tr_error_clear(&err);
+    chmod(test_dir, 0700);
+
     tr_sys_path_remove(path1);
 
     if (createSymlink(path1, path2, false))
