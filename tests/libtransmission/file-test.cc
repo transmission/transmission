@@ -1306,6 +1306,44 @@ TEST_F(FileTest, dirRead)
     EXPECT_TRUE(have2);
 }
 
+TEST_F(FileTest, dirOpen)
+{
+    auto const test_dir = createTestDir(currentTestName());
+
+    auto const file = tr_pathbuf{ test_dir, "/foo.fxt" };
+    auto constexpr Contents = "hello, world!"sv;
+    createFileWithContents(file, std::data(Contents), std::size(Contents));
+
+    // path does not exist
+    tr_error* err = nullptr;
+    auto odir = tr_sys_dir_open("/no/such/path", &err);
+    EXPECT_EQ(TR_BAD_SYS_DIR, odir);
+    EXPECT_NE(err, nullptr);
+    EXPECT_TRUE(err == nullptr || err->code == ENOENT);
+    tr_error_clear(&err);
+
+    // path is not a directory
+    odir = tr_sys_dir_open(file, &err);
+    EXPECT_EQ(TR_BAD_SYS_DIR, odir);
+    EXPECT_NE(err, nullptr);
+    EXPECT_TRUE(err == nullptr || err->code == ENOTDIR);
+    tr_error_clear(&err);
+
+    // path exists and is readable
+    odir = tr_sys_dir_open(test_dir);
+    EXPECT_NE(TR_BAD_SYS_DIR, odir);
+    auto files = std::set<std::string>{};
+    char const* filename = nullptr;
+    while ((filename = tr_sys_dir_read_name(odir, &err)))
+    {
+        files.insert(filename);
+    }
+    EXPECT_EQ(3U, files.size());
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_TRUE(tr_sys_dir_close(odir, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+}
+
 } // namespace test
 
 } // namespace libtransmission
