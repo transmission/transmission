@@ -21,6 +21,9 @@ endif()
 find_program(APPSTREAM appstreamcli)
 
 set(${PROJECT_NAME}_UI_FILES
+    AddTrackerDialog.ui
+    DetailsDialog.ui
+    EditTrackersDialog.ui
     FilterBar.ui
     MainWindow.ui
     MakeDialog.ui

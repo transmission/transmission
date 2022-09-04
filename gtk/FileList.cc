@@ -4,7 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <climits> /* INT_MAX */
+#include <climits> // INT_MAX
 #include <cstddef>
 #include <list>
 #include <memory>
@@ -22,7 +22,7 @@
 #include <libtransmission/utils.h>
 
 #include "FileList.h"
-#include "HigWorkarea.h"
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
 #include "IconCache.h"
 #include "PrefsDialog.h"
 #include "Session.h"
