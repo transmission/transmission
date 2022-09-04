@@ -162,9 +162,6 @@
    Groups -> Button */
 "All Groups" = "Alle grupper";
 
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Der opstod en ukendt fejl.";
-
 /* Tracker last announce */
 "Announce error" = "Annonceringsfejl";
 
@@ -261,12 +258,6 @@
 
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "En kopi af \"%@\" kan ikke oprettes";
-
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "Kunne ikke læse \"%1$s\": %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "Kunne ikke skrive \"%1$s\": %2$s.";
 
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */

@@ -162,9 +162,6 @@
    Groups -> Button */
 "All Groups" = "Bütün Öbekler";
 
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Bilinmeyen bir hata oluştu.";
-
 /* Tracker last announce */
 "Announce error" = "Duyuru hatası";
 
@@ -261,12 +258,6 @@
 
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "\"%@\" Kopyası Oluşturulamadı";
-
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "\"%1$s\" okunamadı: %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "\"%1$s\" yazılamadı: %2$s.";
 
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */

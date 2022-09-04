@@ -162,9 +162,6 @@
    Groups -> Button */
 "All Groups" = "Todos os grupos";
 
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Ocorreu um erro desconhecido.";
-
 /* Tracker last announce */
 "Announce error" = "Erro no anúncio";
 
@@ -261,12 +258,6 @@
 
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "Não foi possível criar cópia de \"%@\"";
-
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "Não foi possível ler \"%1$s\": %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "Não foi possível escrever \"%1$s\": %2$s.";
 
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */
