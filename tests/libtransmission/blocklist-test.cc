@@ -68,33 +68,59 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const path = tr_pathbuf{ session_->configDir(), "/blocklists/level1"sv };
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     createFileWithContents(path, Contents1);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_sessionReloadBlocklists(session_);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_blocklistExists(session_));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(size_t{ 5 }, tr_blocklistGetRuleCount(session_));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // enable the blocklist
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(tr_blocklistIsEnabled(session_));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_blocklistSetEnabled(session_, true);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_blocklistIsEnabled(session_));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // test blocked addresses
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(addressIsBlocked("0.0.0.1"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("10.1.2.3"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(addressIsBlocked("216.16.1.143"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.144"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.145"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.146"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.147"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.148"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.149"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.150"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(addressIsBlocked("216.16.1.151"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(addressIsBlocked("216.16.1.152"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(addressIsBlocked("216.16.1.153"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(addressIsBlocked("217.0.0.1"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_FALSE(addressIsBlocked("255.0.0.1"));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 }
 
 /***

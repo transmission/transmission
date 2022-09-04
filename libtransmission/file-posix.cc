@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
@@ -1008,36 +1010,39 @@ std::string tr_sys_dir_get_current(tr_error** error)
 
 static bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << path << ']' << std::endl;
     auto walk = path.find_first_not_of('/'); // walk past the root
     auto subpath = tr_pathbuf{};
 
-    for (;;)
+    while (walk < std::size(path))
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " walk " << walk << " size " << std::size(path) << std::endl;
         auto const end = path.find('/', walk);
         subpath.assign(path.substr(0, end));
-        if (auto const info = tr_sys_path_get_info(subpath, 0); info && info->type == TR_SYS_PATH_IS_FILE)
+        std::cerr << __FILE__ << ':' << __LINE__ << " [" << subpath << ']' << std::endl;
+        auto const info = tr_sys_path_get_info(subpath, 0);
+        if (info && !info->isFolder())
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
             return false;
         }
-        if (mkdir(subpath, permissions) == -1)
+        if (!info && mkdir(subpath, permissions) == -1)
         {
-            if (errno != EEXIST)
-            {
-                set_system_error(error, errno);
-                return false;
-            }
+            set_system_error(error, errno);
+            return false;
         }
-        if (subpath == path)
+        if (end == std::string_view::npos)
         {
-            return true;
+            break;
         }
+        std::cerr << __FILE__ << ':' << __LINE__ << " before increment at end of while, walk " << walk << " end " << end
+                  << std::endl;
         walk = end + 1;
-        if (walk >= std::size(path))
-        {
-            return true;
-        }
     }
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " success" << std::endl;
+    return true;
 }
 
 #endif
