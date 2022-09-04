@@ -489,15 +489,24 @@ Gtk::ComboBox* gtr_priority_combo_new()
 ****
 ***/
 
+namespace
+{
+
 auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
+
+} // namespace
 
 void gtr_widget_set_visible(Gtk::Widget& w, bool b)
 {
     /* toggle the transient children, too */
     if (auto const* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
     {
-        for (auto* const l : Gtk::Window::list_toplevels())
+        auto top_levels = Gtk::Window::list_toplevels();
+
+        for (auto top_level_it = top_levels.begin(); top_level_it != top_levels.end();)
         {
+            auto* const l = *top_level_it++;
+
             if (l->get_transient_for() != window)
             {
                 continue;
@@ -517,6 +526,10 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
             {
                 l->set_data(ChildHiddenKey, GINT_TO_POINTER(1));
                 gtr_widget_set_visible(*l, false);
+
+                // Retrieve updated top-levels list in case hiding the window resulted in its destruction
+                top_levels = Gtk::Window::list_toplevels();
+                top_level_it = top_levels.begin();
             }
         }
     }
