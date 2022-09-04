@@ -1148,6 +1148,12 @@ TEST_F(FileTest, fileTruncate)
     EXPECT_TRUE(info);
     EXPECT_EQ(25U, info->size);
 
+    // try to truncate a closed file
+    EXPECT_FALSE(tr_sys_file_truncate(fd, 10, &err));
+    EXPECT_NE(nullptr, err);
+    EXPECT_TRUE(err == nullptr || err->code == EBADF);
+    tr_error_clear(&err);
+
     tr_sys_path_remove(path1);
 }
 
