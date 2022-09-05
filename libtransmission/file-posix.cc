@@ -362,63 +362,138 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     }
 
     uint64_t file_size = info->size;
+    int errno_cpy = 0; /* keep errno intact across copy attempts */
 
-#if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
+#if defined(USE_COPY_FILE_RANGE)
+
+    /* Kernel copy by copy_file_range */
+    /* try this first if available, no need to check previous copy attempts */
+    /* might throw EXDEV when used between filesystems in most kernels */
 
     while (file_size > 0U)
     {
         size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
-        ssize_t const copied =
-#ifdef USE_COPY_FILE_RANGE
-            copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
-#elif defined(USE_SENDFILE64)
-            sendfile64(out, in, nullptr, chunk_size);
-#else
-#error File copy mechanism not implemented.
-#endif
+        ssize_t const copied = copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
+
         TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
         if (copied == -1)
         {
-            set_system_error(error, errno);
-            break;
+            errno_cpy = errno; /* remember me for later */
+	    if (errno != EXDEV) { /* EXDEV is expected, don't log error */
+                set_system_error(error, errno);
+	    }
+            if (file_size > 0U)
+            {
+                file_size = info->size; /* restore file_size for next fallback */
+            }
+            break; /* break copy */
         }
 
         TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= file_size);
         TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= chunk_size);
         file_size -= copied;
-    }
+    } /* end file_size loop */
+    /* at this point errno_cpy is either set or file_size is 0 due to while condition */
 
-#else /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+#endif /* USE_COPY_FILE_RANGE */
+
+#if defined(USE_SENDFILE64)
+
+    /* Kernel copy by sendfile64 */
+    /* if file_size>0 and errno_cpy==0, we probably never entered any previous copy attempt, also: */
+    /* if we (still) got something to copy and we encountered certain error in copy_file_range */
+
+    /* duplicated code, this could be refactored in a function */
+    /* keeping the copy paths in blocks helps with error tracing though */
+    /* trying sendfile after EXDEV is more efficient than falling to user-space straight away */
+
+    if (file_size > 0U && (!errno_cpy || errno_cpy == EXDEV))
+    {
+        /* set file offsets to 0 in case previous copy did move them */
+        /* TR_BAD_SYS_FILE has previously been checked, we can directly lseek */
+        /* in case we have no pending errno, be kind enough to report any error */
+        if (lseek(in, 0, SEEK_SET) == -1 || lseek(out, 0, SEEK_SET) == -1)
+        {
+            if (!errno_cpy)
+            {
+                set_system_error(error, errno);
+            }
+        }
+        else
+        {
+            while (file_size > 0U)
+            {
+                size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+                ssize_t const copied = sendfile64(out, in, nullptr, chunk_size);
+                TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
+
+                if (copied == -1)
+                {
+                    errno_cpy = errno; /* remember me for later */
+                    set_system_error(error, errno);
+                    if (file_size > 0U)
+                    {
+                        file_size = info->size; /* restore file_size for next fallback */
+                    }
+                    break; /* break copy */
+                }
+
+                TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= file_size);
+                TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= chunk_size);
+                file_size -= copied;
+            } /* end file_size loop */
+        } /* end lseek error */
+    } /* end fallback check */
+    /* at this point errno_cpy is either set or file_size is 0 due to while condition */
+
+#endif /* USE_SENDFILE64 */
 
     /* Fallback to user-space copy. */
-
-    static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
-    auto buf = std::vector<char>{};
-    buf.resize(Buflen);
-
-    while (file_size > 0U)
+    /* if file_size>0 and errno_cpy==0, we probably never entered any copy attempt, also: */
+    /* if we (still) got something to copy and we encountered certain error in previous attempts */
+    if (file_size > 0U && (!errno_cpy || errno_cpy == EXDEV))
     {
-        uint64_t const chunk_size = std::min(file_size, uint64_t{ Buflen });
-        uint64_t bytes_read;
-        uint64_t bytes_written;
+        static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
+        auto buf = std::vector<char>{};
+        buf.resize(Buflen);
 
-        if (!tr_sys_file_read(in, std::data(buf), chunk_size, &bytes_read, error))
+        /* set file offsets to 0 in case previous copy did move them */
+        /* TR_BAD_SYS_FILE has previously been checked, we can directly lseek */
+        /* in case we have no pending errno, be kind enough to report any error */
+        if (lseek(in, 0, SEEK_SET) == -1 || lseek(out, 0, SEEK_SET) == -1)
         {
-            break;
+            if (!errno_cpy)
+            {
+                set_system_error(error, errno);
+            }
         }
-
-        if (!tr_sys_file_write(out, std::data(buf), bytes_read, &bytes_written, error))
+        else
         {
-            break;
-        }
+            while (file_size > 0U)
+            {
+                uint64_t const chunk_size = std::min(file_size, uint64_t{ Buflen });
+                uint64_t bytes_read;
+                uint64_t bytes_written;
 
-        TR_ASSERT(bytes_read == bytes_written);
-        TR_ASSERT(bytes_written <= file_size);
-        file_size -= bytes_written;
-    }
+                if (!tr_sys_file_read(in, std::data(buf), chunk_size, &bytes_read, error))
+                {
+                    break;
+                }
 
-#endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+                if (!tr_sys_file_write(out, std::data(buf), bytes_read, &bytes_written, error))
+                {
+                    break;
+                }
+
+                TR_ASSERT(bytes_read == bytes_written);
+                TR_ASSERT(bytes_written <= file_size);
+                file_size -= bytes_written;
+            } /* end file_size loop */
+        } /* end lseek error */
+    } /* end fallback check */
+
+    /* all copy paths will end here, file_size>0 signifies error */
 
     /* cleanup */
     tr_sys_file_close(out);
