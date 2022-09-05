@@ -434,15 +434,6 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     }
 
     window.insert_action_group("win", actions);
-    /* Add style provider to the window. */
-    /* Please move it to separate .css file if you’re adding more styles here. */
-    auto const* style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
-    auto css_provider = Gtk::CssProvider::create();
-    css_provider->load_from_data(style);
-    Gtk::StyleContext::add_provider_for_screen(
-        Gdk::Screen::get_default(),
-        css_provider,
-        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     /* window's main container */
     auto* vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 0);
