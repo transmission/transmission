@@ -80,16 +80,10 @@
 auto inline constexpr PEER_ID_LEN = size_t{ 20 };
 using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
 
-#define SHA_DIGEST_LENGTH 20
-
-// TODO #1: all arrays of SHA_DIGEST_LENGTH should be replaced with tr_sha1_digest_t
-// TODO #2: tr_peer_id_t, tr_sha1_digest_t should be moved into a new 'types.h' header
-auto inline constexpr TR_SHA1_DIGEST_LEN = size_t{ 20 };
 auto inline constexpr TR_SHA1_DIGEST_STRLEN = size_t{ 40 };
-using tr_sha1_digest_t = std::array<std::byte, TR_SHA1_DIGEST_LEN>;
+using tr_sha1_digest_t = std::array<std::byte, 20>;
 using tr_sha1_digest_string_t = std::array<char, TR_SHA1_DIGEST_STRLEN + 1>; // +1 for '\0'
 
-auto inline constexpr TR_SHA256_DIGEST_LEN = size_t{ 32 };
 auto inline constexpr TR_SHA256_DIGEST_STRLEN = size_t{ 64 };
-using tr_sha256_digest_t = std::array<std::byte, TR_SHA256_DIGEST_LEN>;
+using tr_sha256_digest_t = std::array<std::byte, 32>;
 using tr_sha256_digest_string_t = std::array<char, TR_SHA256_DIGEST_STRLEN + 1>; // +1 for '\0'
