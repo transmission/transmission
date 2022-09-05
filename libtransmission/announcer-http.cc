@@ -296,7 +296,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     }
 }
 
-struct announce_data
+struct http_announce_data
 {
     tr_sha1_digest_t info_hash;
     std::optional<tr_announce_response> previous_response;
@@ -314,7 +314,7 @@ struct announce_data
 static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response* const response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
-    auto* data = static_cast<struct announce_data*>(vdata);
+    auto* data = static_cast<struct http_announce_data*>(vdata);
 
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
@@ -346,7 +346,7 @@ static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr
 static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
-    auto* data = static_cast<struct announce_data*>(vdata);
+    auto* data = static_cast<struct http_announce_data*>(vdata);
 
     ++data->requests_answered_count;
 
@@ -403,7 +403,7 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    auto* const d = new announce_data();
+    auto* const d = new http_announce_data();
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     d->info_hash = request->info_hash;
