@@ -363,17 +363,6 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, struct tr_error** error
 bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error = nullptr);
 
 /**
- * @brief Portability wrapper for `fstat()`.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- *
- * @return info on success, or nullopt with `error` set accordingly.
- */
-[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, struct tr_error** error = nullptr);
-
-/**
  * @brief Portability wrapper for `read()`.
  *
  * @param[in]  handle     Valid file descriptor.

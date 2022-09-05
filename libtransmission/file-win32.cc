@@ -255,6 +255,12 @@ static bool create_dir(std::string_view path, int flags, int /*permissions*/, bo
     DWORD error_code = ERROR_SUCCESS;
     auto const wide_path = path_to_native_path(path);
 
+    // already exists (no-op)
+    if (auto const info = tr_sys_path_get_info(path); info && info->isFolder())
+    {
+        return true;
+    }
+
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
         error_code = SHCreateDirectoryExW(nullptr, wide_path.c_str(), nullptr);
@@ -375,6 +381,24 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     return ret;
 }
 
+static std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_error** error)
+{
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+
+    auto attributes = BY_HANDLE_FILE_INFORMATION{};
+    if (GetFileInformationByHandle(handle, &attributes))
+    {
+        return stat_to_sys_path_info(
+            attributes.dwFileAttributes,
+            attributes.nFileSizeLow,
+            attributes.nFileSizeHigh,
+            attributes.ftLastWriteTime);
+    }
+
+    set_system_error(error, GetLastError());
+    return {};
+}
+
 std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
 {
     if (auto const wide_path = path_to_native_path(path); std::empty(wide_path))
@@ -397,7 +421,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
                  handle = CreateFileW(wide_path.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
              handle != INVALID_HANDLE_VALUE)
     {
-        auto ret = tr_sys_file_get_info(handle, error);
+        auto ret = tr_sys_file_get_info_(handle, error);
         CloseHandle(handle);
         return ret;
     }
@@ -929,24 +953,6 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
-std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    auto attributes = BY_HANDLE_FILE_INFORMATION{};
-    if (GetFileInformationByHandle(handle, &attributes))
-    {
-        return stat_to_sys_path_info(
-            attributes.dwFileAttributes,
-            attributes.nFileSizeLow,
-            attributes.nFileSizeHigh,
-            attributes.ftLastWriteTime);
-    }
-
-    set_system_error(error, GetLastError());
-    return {};
-}
-
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -1248,16 +1254,17 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
-#ifndef __clang__
-    /* Clang gives "static_assert expression is not an integral constant expression" error */
-    static_assert(TR_BAD_SYS_DIR == nullptr, "values should match");
-#endif
+    if (auto const info = tr_sys_path_get_info(path, 0); !info || !info->isFolder())
+    {
+        set_system_error(error, ERROR_DIRECTORY);
+        return TR_BAD_SYS_DIR;
+    }
 
     auto pattern = path_to_native_path(path);
     if (std::empty(pattern))
     {
         set_system_error(error, GetLastError());
-        return nullptr;
+        return TR_BAD_SYS_DIR;
     }
 
     auto* const ret = new tr_sys_dir_win32{};

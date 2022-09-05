@@ -116,29 +116,6 @@ static void set_system_error_if_file_found(tr_error** error, int code)
     }
 }
 
-static constexpr auto stat_to_sys_path_info(struct stat const& sb)
-{
-    auto info = tr_sys_path_info{};
-
-    if (S_ISREG(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_FILE;
-    }
-    else if (S_ISDIR(sb.st_mode))
-    {
-        info.type = TR_SYS_PATH_IS_DIRECTORY;
-    }
-    else
-    {
-        info.type = TR_SYS_PATH_IS_OTHER;
-    }
-
-    info.size = static_cast<uint64_t>(sb.st_size);
-    info.last_modified_at = sb.st_mtime;
-
-    return info;
-}
-
 static void set_file_for_single_pass(tr_sys_file_t handle)
 {
     /* Set hints about the lookahead buffer and caching. It's okay
@@ -166,126 +143,6 @@ static void set_file_for_single_pass(tr_sys_file_t handle)
 
     errno = err;
 }
-
-#ifndef HAVE_MKDIRP
-
-static bool create_path_require_dir(char const* path, tr_error** error)
-{
-    struct stat sb;
-
-    if (stat(path, &sb) == -1)
-    {
-        set_system_error(error, errno);
-        return false;
-    }
-
-    if ((sb.st_mode & S_IFMT) != S_IFDIR)
-    {
-        tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
-        return false;
-    }
-
-    return true;
-}
-
-static bool create_path(char const* path_in, int permissions, tr_error** error)
-{
-    /* make a temporary copy of path */
-    auto path = tr_pathbuf{ path_in };
-
-    /* walk past the root */
-    char* p = std::data(path);
-
-    while (*p == TR_PATH_DELIMITER)
-    {
-        ++p;
-    }
-
-    char* path_end = p + strlen(p);
-
-    while (path_end > path && *path_end == TR_PATH_DELIMITER)
-    {
-        --path_end;
-    }
-
-    char* pp = nullptr;
-    bool ret = false;
-    tr_error* my_error = nullptr;
-
-    /* Go one level up on each iteration and attempt to create */
-    for (pp = path_end; pp != nullptr; pp = strrchr(p, TR_PATH_DELIMITER))
-    {
-        *pp = '\0';
-
-        ret = mkdir(path, permissions) != -1;
-
-        if (ret)
-        {
-            break;
-        }
-
-        if (errno == EEXIST)
-        {
-            ret = create_path_require_dir(path, &my_error);
-
-            if (ret)
-            {
-                break;
-            }
-
-            goto FAILURE;
-        }
-
-        if (errno != ENOENT)
-        {
-            set_system_error(&my_error, errno);
-            goto FAILURE;
-        }
-    }
-
-    if (ret && pp == path_end)
-    {
-        goto CLEANUP;
-    }
-
-    /* Go one level down on each iteration and attempt to create */
-    for (pp = pp == nullptr ? p + strlen(p) : pp; pp < path_end; pp += strlen(pp))
-    {
-        *pp = TR_PATH_DELIMITER;
-
-        if (mkdir(path, permissions) == -1)
-        {
-            break;
-        }
-    }
-
-    ret = create_path_require_dir(path, &my_error);
-
-    if (ret)
-    {
-        goto CLEANUP;
-    }
-
-FAILURE:
-
-    TR_ASSERT(!ret);
-    TR_ASSERT(my_error != nullptr);
-
-    tr_logAddError(fmt::format(
-        _("Couldn't create '{path}': {error} ({error_code})"),
-        fmt::arg("path", path),
-        fmt::arg("error", my_error->message),
-        fmt::arg("error_code", my_error->code)));
-    tr_error_propagate(error, &my_error);
-
-CLEANUP:
-
-    TR_ASSERT(my_error == nullptr);
-
-    return ret;
-}
-
-#endif
 
 bool tr_sys_path_exists(char const* path, tr_error** error)
 {
@@ -317,13 +174,31 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
         ok = lstat(szpath, &sb) != -1;
     }
 
-    if (ok)
+    if (!ok)
     {
-        return stat_to_sys_path_info(sb);
+        set_system_error(error, errno);
+        return {};
     }
 
-    set_system_error(error, errno);
-    return {};
+    auto info = tr_sys_path_info{};
+
+    if (S_ISREG(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_FILE;
+    }
+    else if (S_ISDIR(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_DIRECTORY;
+    }
+    else
+    {
+        info.type = TR_SYS_PATH_IS_OTHER;
+    }
+
+    info.size = static_cast<uint64_t>(sb.st_size);
+    info.last_modified_at = sb.st_mtime;
+
+    return info;
 }
 
 bool tr_sys_path_is_relative(std::string_view path)
@@ -459,19 +334,18 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
 #else /* USE_COPYFILE */
 
+    auto const info = tr_sys_path_get_info(src_path, 0, error);
+    if (!info)
+    {
+        tr_error_prefix(error, "Unable to get information on source file: ");
+        return false;
+    }
+
     /* Other OSes require us to copy between file descriptors, so open them. */
     tr_sys_file_t const in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (in == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open source file: ");
-        return false;
-    }
-
-    auto const info = tr_sys_file_get_info(in, error);
-    if (!info)
-    {
-        tr_error_prefix(error, "Unable to get information on source file: ");
-        tr_sys_file_close(in);
         return false;
     }
 
@@ -683,19 +557,6 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     }
 
     return ret;
-}
-
-std::optional<tr_sys_path_info> tr_sys_file_get_info(tr_sys_file_t handle, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    if (struct stat sb; fstat(handle, &sb) != -1)
-    {
-        return stat_to_sys_path_info(sb);
-    }
-
-    set_system_error(error, errno);
-    return {};
 }
 
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
@@ -1143,6 +1004,40 @@ std::string tr_sys_dir_get_current(tr_error** error)
     }
 }
 
+#ifndef HAVE_MKDIRP
+
+static bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
+{
+    auto walk = path.find_first_not_of('/'); // walk past the root
+    auto subpath = tr_pathbuf{};
+
+    while (walk < std::size(path))
+    {
+        auto const end = path.find('/', walk);
+        subpath.assign(path.substr(0, end));
+        auto const info = tr_sys_path_get_info(subpath, 0);
+        if (info && !info->isFolder())
+        {
+            tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
+            return false;
+        }
+        if (!info && mkdir(subpath, permissions) == -1)
+        {
+            set_system_error(error, errno);
+            return false;
+        }
+        if (end == std::string_view::npos)
+        {
+            break;
+        }
+        walk = end + 1;
+    }
+
+    return true;
+}
+
+#endif
+
 bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
@@ -1155,7 +1050,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 #ifdef HAVE_MKDIRP
         ret = mkdirp(path, permissions) != -1;
 #else
-        ret = create_path(path, permissions, &my_error);
+        ret = tr_mkdirp_(path, permissions, &my_error);
 #endif
     }
     else
@@ -1165,9 +1060,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 
     if (!ret && errno == EEXIST)
     {
-        struct stat sb;
-
-        if (stat(path, &sb) != -1 && S_ISDIR(sb.st_mode))
+        if (auto const info = tr_sys_path_get_info(path); info && info->type == TR_SYS_PATH_IS_DIRECTORY)
         {
             tr_error_clear(&my_error);
             ret = true;

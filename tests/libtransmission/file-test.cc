@@ -235,17 +235,6 @@ TEST_F(FileTest, getInfo)
     EXPECT_GE(info->last_modified_at, t - 1);
     EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
 
-    // Good file info (by handle)
-    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0);
-    info = tr_sys_file_get_info(fd, &err);
-    EXPECT_TRUE(info);
-    EXPECT_EQ(nullptr, err) << *err;
-    EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
-    EXPECT_EQ(4, info->size);
-    EXPECT_GE(info->last_modified_at, t - 1);
-    EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
-    tr_sys_file_close(fd);
-
     tr_sys_path_remove(path1);
 
     // Good directory info
@@ -280,16 +269,11 @@ TEST_F(FileTest, getInfo)
         EXPECT_GE(info->last_modified_at, t - 1);
         EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
 
-        // Good file info (by handle)
-        fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0);
-        info = tr_sys_file_get_info(fd, &err);
+        // Symlink
+        info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &err);
         EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
-        EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
-        EXPECT_EQ(4, info->size);
-        EXPECT_GE(info->last_modified_at, t - 1);
-        EXPECT_LE(info->last_modified_at, time(nullptr) + 1);
-        tr_sys_file_close(fd);
+        EXPECT_EQ(TR_SYS_PATH_IS_OTHER, info->type);
 
         tr_sys_path_remove(path2);
         tr_sys_path_remove(path1);
@@ -313,6 +297,50 @@ TEST_F(FileTest, getInfo)
     {
         fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
+}
+
+TEST_F(FileTest, readFile)
+{
+    auto const test_dir = createTestDir(currentTestName());
+
+    auto const path = tr_pathbuf{ test_dir, "/a.txt"sv };
+    auto constexpr Contents = "hello, world!"sv;
+    createFileWithContents(path, Contents);
+
+    auto n_bytes_read = uint64_t{};
+    tr_error* err = nullptr;
+    auto buf = std::array<char, 64>{};
+    auto fd = tr_sys_file_open(path, TR_SYS_FILE_READ, 0);
+    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+
+    // successful read
+    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_bytes_read, &err));
+    EXPECT_EQ(Contents, std::string_view(std::data(buf), n_bytes_read));
+    EXPECT_EQ(std::size(Contents), n_bytes_read);
+    EXPECT_EQ(nullptr, err) << *err;
+
+    // successful read_at
+    auto const offset = 1U;
+    EXPECT_TRUE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_bytes_read, &err));
+    auto constexpr Expected = Contents.substr(offset);
+    EXPECT_EQ(Expected, std::string_view(std::data(buf), n_bytes_read));
+    EXPECT_EQ(std::size(Expected), n_bytes_read);
+    EXPECT_EQ(nullptr, err) << *err;
+
+    tr_sys_file_close(fd);
+
+    // read from closed file
+    n_bytes_read = 0;
+    EXPECT_FALSE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_bytes_read, &err));
+    EXPECT_EQ(0, n_bytes_read);
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    // read_at from closed file
+    EXPECT_FALSE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_bytes_read, &err));
+    EXPECT_EQ(0, n_bytes_read);
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
 }
 
 TEST_F(FileTest, pathExists)
@@ -1019,6 +1047,40 @@ TEST_F(FileTest, pathNativeSeparators)
     }
 }
 
+TEST_F(FileTest, fileCopy)
+{
+    auto const test_dir = createTestDir(currentTestName());
+
+    auto const path1 = tr_pathbuf{ test_dir, "/a.txt" };
+    auto const path2 = tr_pathbuf{ test_dir, "/b.txt" };
+    auto constexpr Contents = "hello, world!"sv;
+
+    // no source file
+    tr_error* err = nullptr;
+    EXPECT_FALSE(tr_sys_path_copy(path1, path2, &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    createFileWithContents(path1, Contents);
+
+    // source file exists but is inaccessible
+    chmod(path1, 0);
+    EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+    chmod(path1, 0600);
+
+    // source file exists but target is invalid
+    EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    // source and target are valid
+    createFileWithContents(path1, Contents);
+    EXPECT_TRUE(tr_sys_path_copy(path1, path2, &err));
+    EXPECT_EQ(nullptr, err);
+}
+
 TEST_F(FileTest, fileOpen)
 {
     auto const test_dir = createTestDir(currentTestName());
@@ -1089,7 +1151,7 @@ TEST_F(FileTest, fileOpen)
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
-    info = tr_sys_file_get_info(fd);
+    info = tr_sys_path_get_info(path1);
     EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
     tr_sys_file_close(fd);
@@ -1106,25 +1168,25 @@ TEST_F(FileTest, fileTruncate)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
-    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
+    auto const path = tr_pathbuf{ test_dir, "/a"sv };
+    auto fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
     tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_truncate(fd, 10, &err));
     EXPECT_EQ(nullptr, err) << *err;
-    auto info = tr_sys_file_get_info(fd);
+    auto info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info);
     EXPECT_EQ(10U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 20, &err));
     EXPECT_EQ(nullptr, err) << *err;
-    info = tr_sys_file_get_info(fd);
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info);
     EXPECT_EQ(20U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 0, &err));
     EXPECT_EQ(nullptr, err) << *err;
-    info = tr_sys_file_get_info(fd);
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
 
@@ -1133,22 +1195,27 @@ TEST_F(FileTest, fileTruncate)
 
     tr_sys_file_close(fd);
 
-    info = tr_sys_path_get_info(path1);
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info);
     EXPECT_EQ(50U, info->size);
 
-    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
+    fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 25, &err));
     EXPECT_EQ(nullptr, err) << *err;
 
     tr_sys_file_close(fd);
 
-    info = tr_sys_path_get_info(path1);
+    info = tr_sys_path_get_info(path);
     EXPECT_TRUE(info);
     EXPECT_EQ(25U, info->size);
 
-    tr_sys_path_remove(path1);
+    // try to truncate a closed file
+    EXPECT_FALSE(tr_sys_file_truncate(fd, 10, &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    tr_sys_path_remove(path);
 }
 
 TEST_F(FileTest, filePreallocate)
@@ -1163,7 +1230,7 @@ TEST_F(FileTest, filePreallocate)
     if (tr_sys_file_preallocate(fd, prealloc_size, 0, &err))
     {
         EXPECT_EQ(nullptr, err) << *err;
-        auto info = tr_sys_file_get_info(fd);
+        auto info = tr_sys_path_get_info(path1);
         EXPECT_TRUE(info);
         EXPECT_EQ(prealloc_size, info->size);
     }
@@ -1184,7 +1251,7 @@ TEST_F(FileTest, filePreallocate)
     if (tr_sys_file_preallocate(fd, prealloc_size, TR_SYS_FILE_PREALLOC_SPARSE, &err))
     {
         EXPECT_EQ(nullptr, err) << *err;
-        auto info = tr_sys_file_get_info(fd);
+        auto info = tr_sys_path_get_info(path1);
         EXPECT_TRUE(info);
         EXPECT_EQ(prealloc_size, info->size);
     }
@@ -1251,6 +1318,22 @@ TEST_F(FileTest, dirCreate)
     tr_sys_path_remove(path1);
 }
 
+TEST_F(FileTest, dirCreateTemp)
+{
+    auto const test_dir = createTestDir(currentTestName());
+
+    tr_error* err = nullptr;
+    auto path = tr_pathbuf{ test_dir, "/test-XXXXXX" };
+    EXPECT_TRUE(tr_sys_dir_create_temp(std::data(path), &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_path_remove(path);
+
+    path.assign(test_dir, "/path-does-not-exist/test-XXXXXX");
+    EXPECT_FALSE(tr_sys_dir_create_temp(std::data(path), &err));
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+}
+
 TEST_F(FileTest, dirRead)
 {
     auto const test_dir = createTestDir(currentTestName());
@@ -1278,6 +1361,42 @@ TEST_F(FileTest, dirRead)
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_FALSE(have1);
     EXPECT_TRUE(have2);
+}
+
+TEST_F(FileTest, dirOpen)
+{
+    auto const test_dir = createTestDir(currentTestName());
+
+    auto const file = tr_pathbuf{ test_dir, "/foo.fxt" };
+    auto constexpr Contents = "hello, world!"sv;
+    createFileWithContents(file, std::data(Contents), std::size(Contents));
+
+    // path does not exist
+    tr_error* err = nullptr;
+    auto odir = tr_sys_dir_open("/no/such/path", &err);
+    EXPECT_EQ(TR_BAD_SYS_DIR, odir);
+    EXPECT_NE(err, nullptr);
+    tr_error_clear(&err);
+
+    // path is not a directory
+    odir = tr_sys_dir_open(file, &err);
+    EXPECT_EQ(TR_BAD_SYS_DIR, odir);
+    EXPECT_NE(err, nullptr);
+    tr_error_clear(&err);
+
+    // path exists and is readable
+    odir = tr_sys_dir_open(test_dir);
+    EXPECT_NE(TR_BAD_SYS_DIR, odir);
+    auto files = std::set<std::string>{};
+    char const* filename = nullptr;
+    while ((filename = tr_sys_dir_read_name(odir, &err)))
+    {
+        files.insert(filename);
+    }
+    EXPECT_EQ(3U, files.size());
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_TRUE(tr_sys_dir_close(odir, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 }
 
 } // namespace test
