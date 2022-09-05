@@ -703,12 +703,6 @@ public:
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
     size_t metadata_size_hint = 0;
-#if 0
-    /* number of pieces we'll allow in our fast set */
-    static auto constexpr MAX_FAST_SET_SIZE = int{ 3 };
-    size_t fastsetSize;
-    tr_piece_index_t fastset[MAX_FAST_SET_SIZE];
-#endif
 
     tr_torrent* const torrent;
 
@@ -830,25 +824,6 @@ static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
     msgs->pokeBatchPeriod(LowPriorityIntervalSecs);
 }
 
-#if 0
-
-static void protocolSendAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
-{
-    TR_ASSERT(msgs->io->supportsFEXT());
-
-    tr_peerIo* io = msgs->io;
-    struct evbuffer* out = msgs->outMessages;
-
-    evbuffer_add_uint32(io, out, sizeof(uint8_t) + sizeof(uint32_t));
-    evbuffer_add_uint8(io, out, BtPeerMsgs::FextAllowedFast);
-    evbuffer_add_uint32(io, out, pieceIndex);
-
-    logtrace(msgs, "sending Allowed Fast %u...", pieceIndex);
-    msgs->dbgOutMessageLen();
-}
-
-#endif
-
 static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
 {
     struct evbuffer* out = msgs->outMessages;
@@ -889,89 +864,6 @@ static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
 }
 
-/**
-***  ALLOWED FAST SET
-***  For explanation, see http://www.bittorrent.org/beps/bep_0006.html
-**/
-
-#if 0
-
-size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSize, size_t pieceCount, uint8_t const* infohash,
-    tr_address const* addr)
-{
-    TR_ASSERT(setmePieces != nullptr);
-    TR_ASSERT(desiredSetSize <= pieceCount);
-    TR_ASSERT(desiredSetSize != 0);
-    TR_ASSERT(pieceCount != 0);
-    TR_ASSERT(infohash != nullptr);
-    TR_ASSERT(addr != nullptr);
-
-    size_t setSize = 0;
-
-    if (addr->isIPv4())
-    {
-        uint8_t w[SHA_DIGEST_LENGTH + 4];
-        uint8_t* walk = w;
-        uint8_t x[SHA_DIGEST_LENGTH];
-
-        uint32_t ui32 = ntohl(htonl(addr->addr.addr4.s_addr) & 0xffffff00); /* (1) */
-        memcpy(w, &ui32, sizeof(uint32_t));
-        walk += sizeof(uint32_t);
-        memcpy(walk, infohash, SHA_DIGEST_LENGTH); /* (2) */
-        walk += SHA_DIGEST_LENGTH;
-        tr_sha1(x, w, walk - w, nullptr); /* (3) */
-        TR_ASSERT(sizeof(w) == walk - w);
-
-        while (setSize < desiredSetSize)
-        {
-            for (int i = 0; i < 5 && setSize < desiredSetSize; ++i) /* (4) */
-            {
-                uint32_t j = i * 4; /* (5) */
-                uint32_t y = ntohl(*(uint32_t*)(x + j)); /* (6) */
-                uint32_t index = y % pieceCount; /* (7) */
-                bool found = false;
-
-                for (size_t k = 0; !found && k < setSize; ++k) /* (8) */
-                {
-                    found = setmePieces[k] == index;
-                }
-
-                if (!found)
-                {
-                    setmePieces[setSize++] = index; /* (9) */
-                }
-            }
-
-            tr_sha1(x, x, sizeof(x), nullptr); /* (3) */
-        }
-    }
-
-    return setSize;
-}
-
-static void updateFastSet(tr_peerMsgs*)
-{
-    bool const fext = msgs->io->supportsFEXT();
-    bool const peerIsNeedy = msgs->peer->progress < 0.10;
-
-    if (fext && peerIsNeedy && !msgs->haveFastSet)
-    {
-        tr_info const* inf = &msgs->torrent->info;
-        size_t const numwant = std::min(MAX_FAST_SET_SIZE, inf->pieceCount);
-
-        /* build the fast set */
-        msgs->fastsetSize = tr_generateAllowedSet(msgs->fastset, numwant, inf->pieceCount, inf->hash, msgs->io->address());
-        msgs->haveFastSet = true;
-
-        /* send it to the peer */
-        for (size_t i = 0; i < msgs->fastsetSize; ++i)
-        {
-            protocolSendAllowedFast(msgs, msgs->fastset[i]);
-        }
-    }
-}
-
-#endif
 /**
 ***  INTEREST
 **/

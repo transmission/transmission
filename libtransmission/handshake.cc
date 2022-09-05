@@ -753,7 +753,8 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
-    size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req2', SKEY) xor HASH('req3', S) */
+    auto obfuscated_hash = tr_sha1_digest_t{};
+    size_t const needlen = sizeof(obfuscated_hash) + /* HASH('req2', SKEY) xor HASH('req3', S) */
         std::size(VC) + sizeof(crypto_provide) + sizeof(padc_len);
 
     if (evbuffer_get_length(inbuf) < needlen)
@@ -769,7 +770,6 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     evbuffer_remove(inbuf, std::data(req2), std::size(req2));
 
     auto const req3 = tr_sha1::digest("req3"sv, handshake->dh.secret());
-    auto obfuscated_hash = tr_sha1_digest_t{};
     for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
     {
         obfuscated_hash[i] = req2[i] ^ req3[i];

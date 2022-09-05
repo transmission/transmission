@@ -596,11 +596,6 @@ private:
     static auto constexpr TorrentAnnounceIntervalSec = time_t{ 240U }; // how frequently to reannounce the same torrent
     static auto constexpr TtlSameSubnet = int{ 1 };
     static auto constexpr AnnounceScope = int{ TtlSameSubnet }; /**<the maximum scope for LPD datagrams */
-
-    // static auto constexpr TtlSameSite = int{ 32 };
-    // static auto constexpr TtlSameRegion = int{ 64 };
-    // static auto constexpr TtlSameContinent = int{ 128 };
-    // static auto constexpr TtlUnrestricted = int{ 255 };
 };
 
 std::unique_ptr<tr_lpd> tr_lpd::create(
