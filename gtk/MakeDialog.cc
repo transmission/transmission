@@ -379,8 +379,8 @@ void MakeDialog::Impl::updatePiecesLabel()
 
 void MakeDialog::Impl::configurePieceSizeScale()
 {
-    // the below lower & upper bounds would allow piece size selection between approx 1KiB - 16MiB
-    auto adjustment = Gtk::Adjustment::create(log2(builder_->pieceSize()), 10, 24, 1.0, 1.0);
+    // the below lower & upper bounds would allow piece size selection between approx 1KiB - 64MiB
+    auto adjustment = Gtk::Adjustment::create(log2(builder_->pieceSize()), 10, 26, 1.0, 1.0);
     piece_size_scale_->set_adjustment(adjustment);
     piece_size_scale_->set_visible(true);
 }
