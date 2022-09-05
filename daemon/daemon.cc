@@ -63,6 +63,40 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 using namespace std::literals;
 using libtransmission::Watchdir;
 
+class Daemon
+{
+public:
+    struct event_base* ev_base_ = nullptr;
+    tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
+
+private:
+    bool seen_hup_ = false;
+    bool paused_ = false;
+    std::string config_dir_;
+    char const* log_file_name_ = nullptr;
+    tr_session* my_session_ = nullptr;
+    tr_variant settings_ = {};
+    tr_quark key_pidfile_ = tr_quark_new("pidfile"sv);
+    tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic"sv);
+
+public:
+    Daemon() = default;
+
+    ~Daemon()
+    {
+        tr_variantClear(&settings_);
+    }
+
+    bool init(int argc, char* argv[], bool* foreground, int* ret);
+    bool parseArgs(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code);
+    bool reopenLogFile(char const* filename);
+    int start(bool foreground);
+    void periodicUpdate();
+    void reportStatus();
+    void reconfigure();
+    void stop();
+};
+
 /***
 ****
 ***/
@@ -94,14 +128,6 @@ static char constexpr SpeedKStr[] = "kB/s";
 static char constexpr SpeedMStr[] = "MB/s";
 static char constexpr SpeedGStr[] = "GB/s";
 static char constexpr SpeedTStr[] = "TB/s";
-
-static bool seenHUP = false;
-static char const* logfileName = nullptr;
-static tr_sys_file_t logfile = TR_BAD_SYS_FILE;
-static tr_session* mySession = nullptr;
-static tr_quark key_pidfile = 0;
-static tr_quark key_watch_dir_force_generic = 0;
-static struct event_base* ev_base = nullptr;
 
 /***
 ****  Config File
@@ -175,10 +201,10 @@ static auto constexpr Options = std::array<tr_option, 45>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static bool reopen_log_file(char const* filename)
+bool Daemon::reopenLogFile(char const* filename)
 {
     tr_error* error = nullptr;
-    tr_sys_file_t const old_log_file = logfile;
+    tr_sys_file_t const old_log_file = logfile_;
     tr_sys_file_t const new_log_file = tr_sys_file_open(
         filename,
         TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
@@ -192,7 +218,7 @@ static bool reopen_log_file(char const* filename)
         return false;
     }
 
-    logfile = new_log_file;
+    logfile_ = new_log_file;
 
     if (old_log_file != TR_BAD_SYS_FILE)
     {
@@ -400,10 +426,10 @@ static void pumpLogMessages(tr_sys_file_t file)
     tr_logFreeQueue(list);
 }
 
-static void reportStatus(void)
+void Daemon::reportStatus(void)
 {
-    double const up = tr_sessionGetRawSpeed_KBps(mySession, TR_UP);
-    double const dn = tr_sessionGetRawSpeed_KBps(mySession, TR_DOWN);
+    double const up = tr_sessionGetRawSpeed_KBps(my_session_, TR_UP);
+    double const dn = tr_sessionGetRawSpeed_KBps(my_session_, TR_DOWN);
 
     if (up > 0 || dn > 0)
     {
@@ -415,39 +441,39 @@ static void reportStatus(void)
     }
 }
 
-static void periodicUpdate(evutil_socket_t /*fd*/, short /*what*/, void* /*context*/)
+void Daemon::periodicUpdate(void)
 {
-    pumpLogMessages(logfile);
+    pumpLogMessages(logfile_);
     reportStatus();
+}
+
+static void periodicUpdate(evutil_socket_t /*fd*/, short /*what*/, void* arg)
+{
+    static_cast<Daemon*>(arg)->periodicUpdate();
 }
 
 static tr_rpc_callback_status on_rpc_callback(
     tr_session* /*session*/,
     tr_rpc_callback_type type,
     tr_torrent* /*tor*/,
-    void* /*user_data*/)
+    void* arg)
 {
+    Daemon* daemon = static_cast<Daemon*>(arg);
+
     if (type == TR_RPC_SESSION_CLOSE)
     {
-        event_base_loopexit(ev_base, nullptr);
+        event_base_loopexit(daemon->ev_base_, nullptr);
     }
 
     return TR_RPC_OK;
 }
 
-static bool parse_args(
-    int argc,
-    char const** argv,
-    tr_variant* settings,
-    bool* paused,
-    bool* dump_settings,
-    bool* foreground,
-    int* exit_code)
+bool Daemon::parseArgs(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code)
 {
     int c;
     char const* optstr;
 
-    *paused = false;
+    paused_ = false;
     *dump_settings = false;
     *foreground = false;
 
@@ -458,38 +484,38 @@ static bool parse_args(
         switch (c)
         {
         case 'a':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_whitelist, optstr);
-            tr_variantDictAddBool(settings, TR_KEY_rpc_whitelist_enabled, true);
+            tr_variantDictAddStr(&settings_, TR_KEY_rpc_whitelist, optstr);
+            tr_variantDictAddBool(&settings_, TR_KEY_rpc_whitelist_enabled, true);
             break;
 
         case 'b':
-            tr_variantDictAddBool(settings, TR_KEY_blocklist_enabled, true);
+            tr_variantDictAddBool(&settings_, TR_KEY_blocklist_enabled, true);
             break;
 
         case 'B':
-            tr_variantDictAddBool(settings, TR_KEY_blocklist_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_blocklist_enabled, false);
             break;
 
         case 'c':
-            tr_variantDictAddStr(settings, TR_KEY_watch_dir, optstr);
-            tr_variantDictAddBool(settings, TR_KEY_watch_dir_enabled, true);
+            tr_variantDictAddStr(&settings_, TR_KEY_watch_dir, optstr);
+            tr_variantDictAddBool(&settings_, TR_KEY_watch_dir_enabled, true);
             break;
 
         case 'C':
-            tr_variantDictAddBool(settings, TR_KEY_watch_dir_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_watch_dir_enabled, false);
             break;
 
         case 941:
-            tr_variantDictAddStr(settings, TR_KEY_incomplete_dir, optstr);
-            tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, true);
+            tr_variantDictAddStr(&settings_, TR_KEY_incomplete_dir, optstr);
+            tr_variantDictAddBool(&settings_, TR_KEY_incomplete_dir_enabled, true);
             break;
 
         case 942:
-            tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_incomplete_dir_enabled, false);
             break;
 
         case 943:
-            tr_variantDictAddStr(settings, TR_KEY_default_trackers, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_default_trackers, optstr);
             break;
 
         case 'd':
@@ -497,9 +523,9 @@ static bool parse_args(
             break;
 
         case 'e':
-            if (reopen_log_file(optstr))
+            if (reopenLogFile(optstr))
             {
-                logfileName = optstr;
+                log_file_name_ = optstr;
             }
 
             break;
@@ -517,110 +543,110 @@ static bool parse_args(
             return false;
 
         case 'o':
-            tr_variantDictAddBool(settings, TR_KEY_dht_enabled, true);
+            tr_variantDictAddBool(&settings_, TR_KEY_dht_enabled, true);
             break;
 
         case 'O':
-            tr_variantDictAddBool(settings, TR_KEY_dht_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_dht_enabled, false);
             break;
 
         case 'p':
-            tr_variantDictAddInt(settings, TR_KEY_rpc_port, atoi(optstr));
+            tr_variantDictAddInt(&settings_, TR_KEY_rpc_port, atoi(optstr));
             break;
 
         case 't':
-            tr_variantDictAddBool(settings, TR_KEY_rpc_authentication_required, true);
+            tr_variantDictAddBool(&settings_, TR_KEY_rpc_authentication_required, true);
             break;
 
         case 'T':
-            tr_variantDictAddBool(settings, TR_KEY_rpc_authentication_required, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_rpc_authentication_required, false);
             break;
 
         case 'u':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_username, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_rpc_username, optstr);
             break;
 
         case 'v':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_password, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_rpc_password, optstr);
             break;
 
         case 'w':
-            tr_variantDictAddStr(settings, TR_KEY_download_dir, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_download_dir, optstr);
             break;
 
         case 'P':
-            tr_variantDictAddInt(settings, TR_KEY_peer_port, atoi(optstr));
+            tr_variantDictAddInt(&settings_, TR_KEY_peer_port, atoi(optstr));
             break;
 
         case 'm':
-            tr_variantDictAddBool(settings, TR_KEY_port_forwarding_enabled, true);
+            tr_variantDictAddBool(&settings_, TR_KEY_port_forwarding_enabled, true);
             break;
 
         case 'M':
-            tr_variantDictAddBool(settings, TR_KEY_port_forwarding_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_port_forwarding_enabled, false);
             break;
 
         case 'L':
-            tr_variantDictAddInt(settings, TR_KEY_peer_limit_global, atoi(optstr));
+            tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_global, atoi(optstr));
             break;
 
         case 'l':
-            tr_variantDictAddInt(settings, TR_KEY_peer_limit_per_torrent, atoi(optstr));
+            tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_per_torrent, atoi(optstr));
             break;
 
         case 800:
-            *paused = true;
+            paused_ = true;
             break;
 
         case 910:
-            tr_variantDictAddInt(settings, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+            tr_variantDictAddInt(&settings_, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
             break;
 
         case 911:
-            tr_variantDictAddInt(settings, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+            tr_variantDictAddInt(&settings_, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
             break;
 
         case 912:
-            tr_variantDictAddInt(settings, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            tr_variantDictAddInt(&settings_, TR_KEY_encryption, TR_CLEAR_PREFERRED);
             break;
 
         case 'i':
-            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv4, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_bind_address_ipv4, optstr);
             break;
 
         case 'I':
-            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv6, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_bind_address_ipv6, optstr);
             break;
 
         case 'r':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_bind_address, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_rpc_bind_address, optstr);
             break;
 
         case 953:
-            tr_variantDictAddReal(settings, TR_KEY_ratio_limit, atof(optstr));
-            tr_variantDictAddBool(settings, TR_KEY_ratio_limit_enabled, true);
+            tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, atof(optstr));
+            tr_variantDictAddBool(&settings_, TR_KEY_ratio_limit_enabled, true);
             break;
 
         case 954:
-            tr_variantDictAddBool(settings, TR_KEY_ratio_limit_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_ratio_limit_enabled, false);
             break;
 
         case 'x':
-            tr_variantDictAddStr(settings, key_pidfile, optstr);
+            tr_variantDictAddStr(&settings_, key_pidfile_, optstr);
             break;
 
         case 'y':
-            tr_variantDictAddBool(settings, TR_KEY_lpd_enabled, true);
+            tr_variantDictAddBool(&settings_, TR_KEY_lpd_enabled, true);
             break;
 
         case 'Y':
-            tr_variantDictAddBool(settings, TR_KEY_lpd_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_lpd_enabled, false);
             break;
 
         case 810:
             if (auto const level = tr_logGetLevelFromKey(optstr); level)
             {
-                tr_variantDictAddInt(settings, TR_KEY_message_level, *level);
+                tr_variantDictAddInt(&settings_, TR_KEY_message_level, *level);
             }
             else
             {
@@ -630,25 +656,25 @@ static bool parse_args(
 
         case 811:
             std::cerr << "WARN: --log-error is deprecated. Use --log-level=error" << std::endl;
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
+            tr_variantDictAddInt(&settings_, TR_KEY_message_level, TR_LOG_ERROR);
             break;
 
         case 812:
             std::cerr << "WARN: --log-info is deprecated. Use --log-level=info" << std::endl;
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            tr_variantDictAddInt(&settings_, TR_KEY_message_level, TR_LOG_INFO);
             break;
 
         case 813:
             std::cerr << "WARN: --log-debug is deprecated. Use --log-level=debug" << std::endl;
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_DEBUG);
+            tr_variantDictAddInt(&settings_, TR_KEY_message_level, TR_LOG_DEBUG);
             break;
 
         case 830:
-            tr_variantDictAddBool(settings, TR_KEY_utp_enabled, true);
+            tr_variantDictAddBool(&settings_, TR_KEY_utp_enabled, true);
             break;
 
         case 831:
-            tr_variantDictAddBool(settings, TR_KEY_utp_enabled, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_utp_enabled, false);
             break;
 
         default:
@@ -661,58 +687,58 @@ static bool parse_args(
     return true;
 }
 
-struct daemon_data
+static void daemon_reconfigure(void* arg)
 {
-    tr_variant settings;
-    std::string config_dir;
-    bool paused;
-};
+    static_cast<Daemon*>(arg)->reconfigure();
+}
 
-static void daemon_reconfigure(void* /*arg*/)
+void Daemon::reconfigure(void)
 {
-    if (mySession == nullptr)
+    if (my_session_ == nullptr)
     {
         tr_logAddInfo(_("Deferring reload until session is fully started."));
-        seenHUP = true;
+        seen_hup_ = true;
     }
     else
     {
-        tr_variant settings;
+        tr_variant newsettings;
         char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
-        if (logfileName != nullptr)
+        if (log_file_name_ != nullptr)
         {
-            reopen_log_file(logfileName);
+            reopenLogFile(log_file_name_);
         }
 
-        configDir = tr_sessionGetConfigDir(mySession);
+        configDir = tr_sessionGetConfigDir(my_session_);
         tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
-        tr_variantInitDict(&settings, 0);
-        tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
-        tr_sessionLoadSettings(&settings, configDir, MyName);
-        tr_sessionSet(mySession, &settings);
-        tr_variantClear(&settings);
-        tr_sessionReloadBlocklists(mySession);
+        tr_variantInitDict(&newsettings, 0);
+        tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
+        tr_sessionLoadSettings(&newsettings, configDir, MyName);
+        tr_sessionSet(my_session_, &newsettings);
+        tr_variantClear(&newsettings);
+        tr_sessionReloadBlocklists(my_session_);
     }
 }
 
-static void daemon_stop(void* /*arg*/)
+static void daemon_stop(void* arg)
 {
-    event_base_loopexit(ev_base, nullptr);
+    static_cast<Daemon*>(arg)->stop();
 }
 
-static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
+void Daemon::stop(void)
+{
+    event_base_loopexit(ev_base_, nullptr);
+}
+
+int Daemon::start(bool foreground)
 {
     bool boolVal;
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
     auto watchdir = std::unique_ptr<Watchdir>{};
-
-    auto* arg = static_cast<daemon_data*>(varg);
-    tr_variant* const settings = &arg->settings;
-    char const* const config_dir = arg->config_dir.c_str();
+    char const* const cdir = this->config_dir_.c_str();
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
@@ -720,16 +746,16 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_net_init();
 
     /* setup event state */
-    ev_base = event_base_new();
+    ev_base_ = event_base_new();
 
-    if (ev_base == nullptr)
+    if (ev_base_ == nullptr)
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
             _("Couldn't initialize daemon: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code));
-        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+        printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         return 1;
     }
 
@@ -737,13 +763,13 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
-    session = tr_sessionInit(config_dir, true, settings);
-    tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", config_dir)));
-    tr_sessionSaveSettings(session, config_dir, settings);
+    session = tr_sessionInit(cdir, true, &settings_);
+    tr_sessionSetRPCCallback(session, on_rpc_callback, this);
+    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));
+    tr_sessionSaveSettings(session, cdir, &settings_);
 
     auto sv = std::string_view{};
-    (void)tr_variantDictFindStrView(settings, key_pidfile, &sv);
+    (void)tr_variantDictFindStrView(&settings_, key_pidfile_, &sv);
     auto const sz_pid_filename = std::string{ sv };
     if (!std::empty(sz_pid_filename))
     {
@@ -773,27 +799,27 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         }
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
+    if (tr_variantDictFindBool(&settings_, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
     {
         tr_logAddInfo(_("Requiring authentication"));
     }
 
-    mySession = session;
+    my_session_ = session;
 
     /* If we got a SIGHUP during startup, process that now. */
-    if (seenHUP)
+    if (seen_hup_)
     {
-        daemon_reconfigure(arg);
+        daemon_reconfigure(this);
     }
 
     /* maybe add a watchdir */
-    if (tr_variantDictFindBool(settings, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
+    if (tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
     {
         auto force_generic = bool{ false };
-        (void)tr_variantDictFindBool(settings, key_watch_dir_force_generic, &force_generic);
+        (void)tr_variantDictFindBool(&settings_, key_watch_dir_force_generic_, &force_generic);
 
         auto dir = std::string_view{};
-        (void)tr_variantDictFindStrView(settings, TR_KEY_watch_dir, &dir);
+        (void)tr_variantDictFindStrView(&settings_, TR_KEY_watch_dir, &dir);
         if (!std::empty(dir))
         {
             tr_logAddInfo(fmt::format(_("Watching '{path}' for new torrent files"), fmt::arg("path", dir)));
@@ -803,22 +829,22 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
                 return onFileAdded(session, dirname, basename);
             };
 
-            auto timer_maker = libtransmission::EvTimerMaker{ ev_base };
+            auto timer_maker = libtransmission::EvTimerMaker{ ev_base_ };
             watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
-                                       Watchdir::create(dir, handler, timer_maker, ev_base);
+                                       Watchdir::create(dir, handler, timer_maker, ev_base_);
         }
     }
 
     /* load the torrents */
     {
-        tr_ctor* ctor = tr_ctorNew(mySession);
+        tr_ctor* ctor = tr_ctorNew(my_session_);
 
-        if (arg->paused)
+        if (paused_)
         {
             tr_ctorSetPaused(ctor, TR_FORCE, true);
         }
 
-        tr_sessionLoadTorrents(mySession, ctor);
+        tr_sessionLoadTorrents(my_session_, ctor);
         tr_ctorFree(ctor);
     }
 
@@ -834,7 +860,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     /* Create new timer event to report daemon status */
     {
         constexpr auto one_sec = timeval{ 1, 0 }; // 1 second
-        status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, nullptr);
+        status_ev = event_new(ev_base_, -1, EV_PERSIST, &::periodicUpdate, this);
 
         if (status_ev == nullptr)
         {
@@ -860,7 +886,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     sd_notify(0, "READY=1\n");
 
     /* Run daemon event loop */
-    if (event_base_dispatch(ev_base) == -1)
+    if (event_base_dispatch(ev_base_) == -1)
     {
         auto const error_code = errno;
         tr_logAddError(fmt::format(
@@ -882,11 +908,11 @@ CLEANUP:
         event_free(status_ev);
     }
 
-    event_base_free(ev_base);
+    event_base_free(ev_base_);
 
-    tr_sessionSaveSettings(mySession, config_dir, settings);
-    tr_sessionClose(mySession);
-    pumpLogMessages(logfile);
+    tr_sessionSaveSettings(my_session_, cdir, &settings_);
+    tr_sessionClose(my_session_);
+    pumpLogMessages(logfile_);
     printf(" done.\n");
 
     /* shutdown */
@@ -911,40 +937,45 @@ CLEANUP:
     return 0;
 }
 
-static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground, int* ret)
+static int daemon_start(void* varg, bool foreground)
 {
-    data->config_dir = getConfigDir(argc, (char const* const*)argv);
+    return static_cast<Daemon*>(varg)->start(foreground);
+}
+
+bool Daemon::init(int argc, char* argv[], bool* foreground, int* ret)
+{
+    config_dir_ = getConfigDir(argc, (char const* const*)argv);
 
     /* load settings from defaults + config file */
-    tr_variantInitDict(&data->settings, 0);
-    tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&data->settings, data->config_dir.c_str(), MyName);
+    tr_variantInitDict(&settings_, 0);
+    tr_variantDictAddBool(&settings_, TR_KEY_rpc_enabled, true);
+    bool const loaded = tr_sessionLoadSettings(&settings_, config_dir_.c_str(), MyName);
 
     bool dumpSettings;
 
     *ret = 0;
 
     /* overwrite settings from the command line */
-    if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
+    if (!parseArgs(argc, (char const**)argv, &dumpSettings, foreground, ret))
     {
         goto EXIT_EARLY;
     }
 
-    if (*foreground && logfile == TR_BAD_SYS_FILE)
+    if (*foreground && logfile_ == TR_BAD_SYS_FILE)
     {
-        logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
+        logfile_ = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
     }
 
     if (!loaded)
     {
-        printMessage(logfile, TR_LOG_ERROR, MyName, "Error loading config file -- exiting.", __FILE__, __LINE__);
+        printMessage(logfile_, TR_LOG_ERROR, MyName, "Error loading config file -- exiting.", __FILE__, __LINE__);
         *ret = 1;
         goto EXIT_EARLY;
     }
 
     if (dumpSettings)
     {
-        auto const str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON);
+        auto const str = tr_variantToStr(&settings_, TR_VARIANT_FMT_JSON);
         fprintf(stderr, "%s", str.c_str());
         goto EXIT_EARLY;
     }
@@ -952,20 +983,17 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     return true;
 
 EXIT_EARLY:
-    tr_variantClear(&data->settings);
+    tr_variantClear(&settings_);
     return false;
 }
 
 int tr_main(int argc, char* argv[])
 {
-    key_pidfile = tr_quark_new("pidfile"sv);
-    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic"sv);
-
-    struct daemon_data data;
+    Daemon daemon;
     bool foreground;
     int ret;
 
-    if (!init_daemon_data(argc, argv, &data, &foreground, &ret))
+    if (!daemon.init(argc, argv, &foreground, &ret))
     {
         return ret;
     }
@@ -976,13 +1004,12 @@ int tr_main(int argc, char* argv[])
         &daemon_reconfigure,
     };
 
-    if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
+    if (tr_error* error = nullptr; !dtr_daemon(&cb, &daemon, foreground, &ret, &error))
     {
         auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
-        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+        printMessage(daemon.logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         tr_error_free(error);
     }
 
-    tr_variantClear(&data.settings);
     return ret;
 }
