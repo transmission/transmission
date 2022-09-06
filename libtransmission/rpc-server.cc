@@ -155,7 +155,7 @@ static char const* mimetype_guess(std::string_view path)
     return "application/octet-stream";
 }
 
-static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server, std::string_view content)
+static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server const* server, std::string_view content)
 {
     auto* const out = evbuffer_new();
 
@@ -202,7 +202,7 @@ static void add_time_header(struct evkeyvalq* headers, char const* key, time_t n
     evhttp_add_header(headers, key, fmt::format("{:%a %b %d %T %Y%n}", fmt::gmtime(now)).c_str());
 }
 
-static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::string_view filename)
+static void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::string_view filename)
 {
     if (req->type != EVHTTP_REQ_GET)
     {
