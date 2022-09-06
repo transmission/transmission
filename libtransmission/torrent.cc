@@ -1303,7 +1303,7 @@ static void tr_torrentResetTransferStats(tr_torrent* tor)
 ***/
 
 #ifdef TR_ENABLE_ASSERTS
-static bool queueIsSequenced(tr_session* /*session*/);
+static bool queueIsSequenced(tr_session const* /*session*/);
 #endif
 
 static void freeTorrent(tr_torrent* tor)
@@ -2364,7 +2364,7 @@ void tr_torrent::refreshCurrentDir()
 
 #ifdef TR_ENABLE_ASSERTS
 
-static bool queueIsSequenced(tr_session* session)
+static bool queueIsSequenced(tr_session const* session)
 {
     auto torrents = session->getAllTorrents();
     std::sort(
