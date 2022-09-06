@@ -30,6 +30,7 @@ set(${PROJECT_NAME}_UI_FILES
     MakeProgressDialog.ui
     MessageLogWindow.ui
     OptionsDialog.ui
+    PrefsDialog.ui
     RelocateDialog.ui
     StatsDialog.ui
     TorrentUrlChooserDialog.ui

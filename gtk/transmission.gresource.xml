@@ -17,6 +17,7 @@
     <file compressed="true" preprocess="xml-stripblanks">MakeProgressDialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">MessageLogWindow.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">OptionsDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">PrefsDialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">RelocateDialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">StatsDialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">TorrentUrlChooserDialog.ui</file>
