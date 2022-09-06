@@ -226,7 +226,7 @@ struct tr_announce_response
 using tr_announce_response_func = void (*)(tr_announce_response const* response, void* userdata);
 
 void tr_tracker_http_announce(
-    tr_session* session,
+    tr_session const* session,
     tr_announce_request const* req,
     tr_announce_response_func response_func,
     void* user_data);
