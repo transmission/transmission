@@ -1029,7 +1029,7 @@ void tr_net_init()
 
 std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 {
-    auto constexpr compare = [](mime_type_suffix const& entry, auto const& suffix)
+    auto constexpr Compare = [](mime_type_suffix const& entry, auto const& suffix)
     {
         return entry.suffix < suffix;
     };
@@ -1037,7 +1037,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
-        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, compare);
+        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, Compare);
         if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
         {
             return it->mime_type;
