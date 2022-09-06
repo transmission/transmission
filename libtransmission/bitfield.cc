@@ -328,7 +328,7 @@ void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
 
 void tr_bitfield::setFromBools(bool const* flags, size_t n)
 {
-    size_t trueCount = 0;
+    size_t true_count = 0;
 
     freeArray();
     ensureBitsAlloced(n);
@@ -337,12 +337,12 @@ void tr_bitfield::setFromBools(bool const* flags, size_t n)
     {
         if (flags[i])
         {
-            ++trueCount;
+            ++true_count;
             flags_[i >> 3U] |= (0x80 >> (i & 7U));
         }
     }
 
-    setTrueCount(trueCount);
+    setTrueCount(true_count);
 }
 
 void tr_bitfield::set(size_t nth, bool value)
