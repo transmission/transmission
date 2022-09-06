@@ -213,7 +213,7 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
     setState(handshake, state);
 }
 
-static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
+static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* buf)
 {
     auto const info_hash = handshake->io->torrentHash();
     auto const info = info_hash ? handshake->mediator->torrentInfo(*info_hash) : std::nullopt;
