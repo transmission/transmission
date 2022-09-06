@@ -184,7 +184,7 @@ struct tr_handshake
 
 static constexpr std::string_view getStateName(handshake_state_t const state)
 {
-    auto StateStrings = std::array<std::string_view, N_STATES>{
+    auto state_strings = std::array<std::string_view, N_STATES>{
         "awaiting handshake"sv, /* AWAITING_HANDSHAKE */
         "awaiting peer id"sv, /* AWAITING_PEER_ID */
         "awaiting ya"sv, /* AWAITING_YA */
@@ -199,7 +199,7 @@ static constexpr std::string_view getStateName(handshake_state_t const state)
         "awaiting pad d"sv /* AWAITING_PAD_D */
     };
 
-    return state < N_STATES ? StateStrings[state] : "unknown state"sv;
+    return state < N_STATES ? state_strings[state] : "unknown state"sv;
 }
 
 static void setState(tr_handshake* handshake, handshake_state_t state)
