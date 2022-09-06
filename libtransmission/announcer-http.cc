@@ -658,7 +658,7 @@ static void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const* req)
 }
 
 void tr_tracker_http_scrape(
-    tr_session* session,
+    tr_session const* session,
     tr_scrape_request const* request,
     tr_scrape_response_func response_func,
     void* response_func_user_data)
