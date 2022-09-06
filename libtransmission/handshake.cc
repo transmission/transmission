@@ -952,7 +952,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
     auto* const inbuf = io->readBuffer();
-    bool readyForMore = true;
+    bool ready_for_more = true;
 
     /* no piece data in handshake */
     *piece = 0;
@@ -960,7 +960,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
     tr_logAddTraceHand(handshake, fmt::format("handling canRead; state is [{}]", getStateName(handshake->state)));
 
     ReadState ret = READ_NOW;
-    while (readyForMore)
+    while (ready_for_more)
     {
         switch (handshake->state)
         {
@@ -1023,19 +1023,19 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 
         if (ret != READ_NOW)
         {
-            readyForMore = false;
+            ready_for_more = false;
         }
         else if (handshake->state == AWAITING_PAD_C)
         {
-            readyForMore = evbuffer_get_length(inbuf) >= handshake->pad_c_len;
+            ready_for_more = evbuffer_get_length(inbuf) >= handshake->pad_c_len;
         }
         else if (handshake->state == AWAITING_PAD_D)
         {
-            readyForMore = evbuffer_get_length(inbuf) >= handshake->pad_d_len;
+            ready_for_more = evbuffer_get_length(inbuf) >= handshake->pad_d_len;
         }
         else if (handshake->state == AWAITING_IA)
         {
-            readyForMore = evbuffer_get_length(inbuf) >= handshake->ia_len;
+            ready_for_more = evbuffer_get_length(inbuf) >= handshake->ia_len;
         }
     }
 
