@@ -115,17 +115,17 @@ void initEvthreadsOnce()
 {
     tr_net_init();
 
-    evthread_lock_callbacks constexpr lock_cbs{
+    evthread_lock_callbacks constexpr LockCbs{
         EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
     };
-    evthread_set_lock_callbacks(&lock_cbs);
+    evthread_set_lock_callbacks(&LockCbs);
 
-    evthread_condition_callbacks constexpr cond_cbs{ EVTHREAD_CONDITION_API_VERSION,
-                                                     cond_alloc,
-                                                     cond_free,
-                                                     cond_signal,
-                                                     cond_wait };
-    evthread_set_condition_callbacks(&cond_cbs);
+    evthread_condition_callbacks constexpr CondCbs{ EVTHREAD_CONDITION_API_VERSION,
+                                                    cond_alloc,
+                                                    cond_free,
+                                                    cond_signal,
+                                                    cond_wait };
+    evthread_set_condition_callbacks(&CondCbs);
 
     evthread_set_id_callback(thread_current_id);
 }
