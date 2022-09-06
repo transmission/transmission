@@ -1388,9 +1388,13 @@ TEST_F(FileTest, dirOpen)
     odir = tr_sys_dir_open(test_dir);
     EXPECT_NE(TR_BAD_SYS_DIR, odir);
     auto files = std::set<std::string>{};
-    char const* filename = nullptr;
-    while ((filename = tr_sys_dir_read_name(odir, &err)))
+    for (;;)
     {
+        char const* const filename = tr_sys_dir_read_name(odir, &err);
+        if (filename == nullptr)
+        {
+            break;
+        }
         files.insert(filename);
     }
     EXPECT_EQ(3U, files.size());

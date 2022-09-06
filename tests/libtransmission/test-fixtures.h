@@ -446,28 +446,29 @@ protected:
         }
 
         // create the torrent
+        auto const n_previously_verified = std::size(verified_);
         auto* const tor = tr_torrentNew(ctor, nullptr);
         EXPECT_NE(nullptr, tor);
-        waitForVerify(tor);
+        waitFor(
+            [this, tor, n_previously_verified]()
+            { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
+            5s);
 
         // cleanup
         tr_ctorFree(ctor);
         return tor;
     }
 
-    void waitForVerify(tr_torrent* tor) const
-    {
-        EXPECT_NE(nullptr, tor->session);
-        tr_wait_msec(100);
-        EXPECT_TRUE(waitFor([tor]() { return tor->verifyState() == TR_VERIFY_NONE && tor->checked_pieces_.hasAll(); }, 4000));
-    }
-
     void blockingTorrentVerify(tr_torrent* tor) const
     {
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
+        auto const n_previously_verified = std::size(verified_);
         tr_torrentVerify(tor);
-        waitForVerify(tor);
+        waitFor(
+            [this, tor, n_previously_verified]()
+            { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
+            5s);
     }
 
     tr_session* session_ = nullptr;
@@ -494,6 +495,7 @@ protected:
         SandboxedTest::SetUp();
 
         session_ = sessionInit(settings());
+        session_->verifier_->addCallback([this](tr_torrent* tor, bool /*aborted*/) { verified_.emplace_back(tor); });
     }
 
     virtual void TearDown() override
@@ -504,6 +506,9 @@ protected:
 
         SandboxedTest::TearDown();
     }
+
+private:
+    std::vector<tr_torrent*> verified_;
 };
 
 } // namespace test

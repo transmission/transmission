@@ -1817,7 +1817,7 @@ void tr_session::closeImplStart()
     save_timer_.reset();
     now_timer_.reset();
 
-    tr_verifyClose(this);
+    verifier_.reset();
     tr_sharedClose(*this);
 
     close_incoming_peer_port(this);
@@ -2950,4 +2950,6 @@ tr_session::tr_session(std::string_view config_dir)
             stats().saveIfDirty();
         });
     save_timer_->startRepeating(SaveIntervalSecs);
+
+    verifier_->addCallback(tr_torrentOnVerifyDone);
 }

@@ -9,20 +9,64 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstdint>
+#include <functional>
+#include <list>
+#include <mutex>
+#include <optional>
+#include <set>
+#include <thread>
+
 struct tr_session;
 struct tr_torrent;
 
-/**
- * @addtogroup file_io File IO
- * @{
- */
+class tr_verify_worker
+{
+public:
+    using callback_func = std::function<void(tr_torrent*, bool aborted)>;
 
-using tr_verify_done_func = void (*)(tr_torrent*, bool aborted, void* user_data);
+    ~tr_verify_worker();
 
-void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data);
+    void addCallback(callback_func callback)
+    {
+        callbacks_.emplace_back(std::move(callback));
+    }
 
-void tr_verifyRemove(tr_torrent* tor);
+    void add(tr_torrent* tor);
 
-void tr_verifyClose(tr_session*);
+    void remove(tr_torrent* tor);
 
-/* @} */
+private:
+    struct Node
+    {
+        tr_torrent* torrent = nullptr;
+        uint64_t current_size = 0;
+
+        [[nodiscard]] int compare(Node const& that) const;
+
+        [[nodiscard]] bool operator<(Node const& that) const
+        {
+            return compare(that) < 0;
+        }
+    };
+
+    void callCallback(tr_torrent* tor, bool aborted)
+    {
+        for (auto& callback : callbacks_)
+        {
+            callback(tor, aborted);
+        }
+    }
+
+    void verifyThreadFunc();
+    [[nodiscard]] static bool verifyTorrent(tr_torrent* tor, bool const* stop_flag);
+
+    std::list<callback_func> callbacks_;
+    std::mutex verify_mutex_;
+
+    std::set<Node> todo_;
+    std::optional<Node> current_node_;
+
+    std::optional<std::thread::id> verify_thread_id_;
+    bool stop_current_ = false;
+};

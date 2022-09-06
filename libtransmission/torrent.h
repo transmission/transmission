@@ -781,6 +781,8 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 
+void tr_torrentOnVerifyDone(tr_torrent* tor, bool aborted);
+
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())
 #define tr_logAddWarnTor(tor, msg) tr_logAddWarn(msg, (tor)->name())
