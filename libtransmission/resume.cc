@@ -846,10 +846,9 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
 
     if ((fields & tr_resume::Run) != 0)
     {
-        auto isPaused = bool{};
-        if (tr_ctorGetPaused(ctor, mode, &isPaused))
+        if (auto is_paused = bool{}; tr_ctorGetPaused(ctor, mode, &is_paused))
         {
-            tor->isRunning = !isPaused;
+            tor->isRunning = !is_paused;
             ret |= tr_resume::Run;
         }
     }
