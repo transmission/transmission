@@ -245,7 +245,7 @@ static auto loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void saveSingleSpeedLimit(tr_variant* d, tr_torrent* tor, tr_direction dir)
+static void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direction dir)
 {
     tr_variantDictReserve(d, 3);
     tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speedLimitBps(dir));
@@ -253,20 +253,20 @@ static void saveSingleSpeedLimit(tr_variant* d, tr_torrent* tor, tr_direction di
     tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tr_torrentUsesSpeedLimit(tor, dir));
 }
 
-static void saveSpeedLimits(tr_variant* dict, tr_torrent* tor)
+static void saveSpeedLimits(tr_variant* dict, tr_torrent const* tor)
 {
     saveSingleSpeedLimit(tr_variantDictAddDict(dict, TR_KEY_speed_limit_down, 0), tor, TR_DOWN);
     saveSingleSpeedLimit(tr_variantDictAddDict(dict, TR_KEY_speed_limit_up, 0), tor, TR_UP);
 }
 
-static void saveRatioLimits(tr_variant* dict, tr_torrent* tor)
+static void saveRatioLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_ratio_limit, 2);
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, tr_torrentGetRatioLimit(tor));
     tr_variantDictAddInt(d, TR_KEY_ratio_mode, tr_torrentGetRatioMode(tor));
 }
 
-static void saveIdleLimits(tr_variant* dict, tr_torrent* tor)
+static void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_idle_limit, 2);
     tr_variantDictAddInt(d, TR_KEY_idle_limit, tr_torrentGetIdleLimit(tor));
