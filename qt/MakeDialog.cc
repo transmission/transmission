@@ -220,24 +220,14 @@ void MakeDialog::onSourceChanged()
         builder_.emplace(filename.toStdString());
     }
 
-    QString text;
-
     if (!builder_)
     {
-        text = tr("<i>No source selected</i>");
+        updatePiecesLabel();
     }
     else
     {
-        auto const files = tr("%Ln File(s)", nullptr, builder_->fileCount());
-        auto const pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount());
-        text = tr("%1 in %2; %3 @ %4")
-                   .arg(Formatter::get().sizeToString(builder_->totalSize()))
-                   .arg(files)
-                   .arg(pieces)
-                   .arg(Formatter::get().sizeToString(static_cast<uint64_t>(builder_->pieceSize())));
+        ui_.pieceSizeSlider->setValue(log2(builder_->pieceSize()));
     }
-
-    ui_.sourceSizeLabel->setText(text);
 }
 
 MakeDialog::MakeDialog(Session& session, QWidget* parent)
@@ -266,6 +256,7 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent)
 
     connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &MakeDialog::makeTorrent);
     connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &MakeDialog::close);
+    connect(ui_.pieceSizeSlider, &QSlider::valueChanged, this, &MakeDialog::onPieceSizeUpdated);
 
     onSourceChanged();
 }
@@ -302,4 +293,35 @@ void MakeDialog::dropEvent(QDropEvent* event)
             ui_.sourceFileButton->setPath(filename);
         }
     }
+}
+
+void MakeDialog::updatePiecesLabel()
+{
+    QString text;
+
+    if (!builder_)
+    {
+        text = tr("<i>No source selected</i>");
+        ui_.pieceSizeSlider->setEnabled(false);
+    }
+    else
+    {
+        auto const files = tr("%Ln File(s)", nullptr, builder_->fileCount());
+        auto const pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount());
+        text = tr("%1 in %2; %3 @ %4")
+                   .arg(Formatter::get().sizeToString(builder_->totalSize()))
+                   .arg(files)
+                   .arg(pieces)
+                   .arg(Formatter::get().memToString(static_cast<uint64_t>(builder_->pieceSize())));
+        ui_.pieceSizeSlider->setEnabled(true);
+    }
+
+    ui_.sourceSizeLabel->setText(text);
+}
+
+void MakeDialog::onPieceSizeUpdated(int value)
+{
+    auto new_size = static_cast<uint64_t>(pow(2, value));
+    builder_->setPieceSize(new_size);
+    updatePiecesLabel();
 }

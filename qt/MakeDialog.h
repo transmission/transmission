@@ -32,10 +32,11 @@ protected:
 private slots:
     void onSourceChanged();
     void makeTorrent();
+    void onPieceSizeUpdated(int);
 
 private:
     QString getSource() const;
-
+    void updatePiecesLabel();
     Session& session_;
 
     Ui::MakeDialog ui_ = {};
