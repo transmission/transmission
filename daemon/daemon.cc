@@ -90,7 +90,7 @@ public:
     bool init(int argc, char* argv[], bool* foreground, int* ret);
     bool parseArgs(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopenLogFile(char const* filename);
-    int start(bool foreground);
+    int start(bool (*setupsigfn)(void*), bool foreground);
     void periodicUpdate();
     void reportStatus();
     void reconfigure();
@@ -731,7 +731,7 @@ void Daemon::stop(void)
     event_base_loopexit(ev_base_, nullptr);
 }
 
-int Daemon::start(bool foreground)
+int Daemon::start(bool (*setupsigfn)(void*), bool foreground)
 {
     bool boolVal;
     bool pidfile_created = false;
@@ -748,7 +748,7 @@ int Daemon::start(bool foreground)
     /* setup event state */
     ev_base_ = event_base_new();
 
-    if (ev_base_ == nullptr)
+    if (ev_base_ == nullptr || (setupsigfn ? setupsigfn(ev_base_) : true) == false)
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
@@ -937,9 +937,9 @@ CLEANUP:
     return 0;
 }
 
-static int daemon_start(void* varg, bool foreground)
+static int daemon_start(void* varg, bool (*setupsigfn)(void*), bool foreground)
 {
-    return static_cast<Daemon*>(varg)->start(foreground);
+    return static_cast<Daemon*>(varg)->start(setupsigfn, foreground);
 }
 
 bool Daemon::init(int argc, char* argv[], bool* foreground, int* ret)
