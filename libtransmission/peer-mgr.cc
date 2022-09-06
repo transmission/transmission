@@ -2402,7 +2402,7 @@ struct ComparePeerByActivity
     }
 };
 
-[[nodiscard]] auto getPeersToClose(tr_swarm* swarm, time_t const now_sec)
+[[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
 {
     auto peers_to_close = std::vector<tr_peer*>{};
 
