@@ -131,9 +131,9 @@ static void canReadWrapper(tr_peerIo* io_in)
         while (!done && !err)
         {
             size_t piece = 0;
-            size_t const oldLen = evbuffer_get_length(io->inbuf.get());
+            size_t const old_len = evbuffer_get_length(io->inbuf.get());
             int const ret = io->canRead(io.get(), io->userData, &piece);
-            size_t const used = oldLen - evbuffer_get_length(io->inbuf.get());
+            size_t const used = old_len - evbuffer_get_length(io->inbuf.get());
             unsigned int const overhead = guessPacketOverhead(used);
 
             if (piece != 0 || piece != used)
