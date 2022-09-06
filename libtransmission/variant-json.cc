@@ -265,7 +265,10 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, ev
     return { (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };
 }
 
-static std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, evbuffer* buf)
+static std::pair<std::string_view, bool> extract_string(
+    jsonsl_t const jsn,
+    struct jsonsl_state_st const* const state,
+    evbuffer* const buf)
 {
     // figure out where the string is
     char const* in_begin = jsn->base + state->pos_begin;
