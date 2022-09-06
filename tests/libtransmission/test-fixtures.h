@@ -449,14 +449,22 @@ protected:
         auto const n_previously_verified = std::size(verified_);
         auto* const tor = tr_torrentNew(ctor, nullptr);
         EXPECT_NE(nullptr, tor);
-        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify n_previously_verified " << n_previously_verified
-                  << std::endl;
+        fmt::print(
+            stderr,
+            FMT_STRING("{:s}:{:d} blockingTorrentVerify n_previously_verified {:d}\n"),
+            __FILE__,
+            __LINE__,
+            n_previously_verified);
         waitFor(
             [this, tor, n_previously_verified]()
             { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
             20s);
-        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify std::size(verified_) " << std::size(verified_)
-                  << std::endl;
+        fmt::print(
+            stderr,
+            FMT_STRING("{:s}:{:d} blockingTorrentVerify std::size(verified_) {:d}\n"),
+            __FILE__,
+            __LINE__,
+            std::size(verified_));
 
         // cleanup
         tr_ctorFree(ctor);
@@ -468,15 +476,23 @@ protected:
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
         auto const n_previously_verified = std::size(verified_);
-        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify n_previously_verified " << n_previously_verified
-                  << std::endl;
+        fmt::print(
+            stderr,
+            FMT_STRING("{:s}:{:d} blockingTorrentVerify n_previously_verified {:d}\n"),
+            __FILE__,
+            __LINE__,
+            n_previously_verified);
         tr_torrentVerify(tor);
         waitFor(
             [this, tor, n_previously_verified]()
             { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
             20s);
-        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify std::size(verified_) " << std::size(verified_)
-                  << std::endl;
+        fmt::print(
+            stderr,
+            FMT_STRING("{:s}:{:d} blockingTorrentVerify std::size(verified_) {:d}\n"),
+            __FILE__,
+            __LINE__,
+            std::size(verified_));
     }
 
     tr_session* session_ = nullptr;
