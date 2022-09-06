@@ -53,7 +53,7 @@
 using namespace std::literals;
 
 static std::unique_ptr<libtransmission::Timer> dht_timer;
-static unsigned char myid[20];
+static std::array<unsigned char, 20> myid;
 static tr_session* session_ = nullptr;
 
 static bool bootstrap_done(tr_session* session, int af)
@@ -281,7 +281,7 @@ int tr_dhtInit(tr_session* ss)
         have_id = tr_variantDictFindStrView(&benc, TR_KEY_id, &sv);
         if (have_id && std::size(sv) == 20)
         {
-            std::copy(std::begin(sv), std::end(sv), myid);
+            std::copy(std::begin(sv), std::end(sv), std::data(myid));
         }
 
         size_t raw_len = 0U;
@@ -309,10 +309,10 @@ int tr_dhtInit(tr_session* ss)
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
         tr_logAddTrace("Generating new id");
-        tr_rand_buffer(myid, 20);
+        tr_rand_buffer(std::data(myid), std::size(myid));
     }
 
-    if (int const rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
+    if (int const rc = dht_init(ss->udp_socket, ss->udp6_socket, std::data(myid), nullptr); rc < 0)
     {
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
@@ -371,7 +371,7 @@ void tr_dhtUninit(tr_session* ss)
 
         tr_variant benc;
         tr_variantInitDict(&benc, 3);
-        tr_variantDictAddRaw(&benc, TR_KEY_id, myid, 20);
+        tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(myid), std::size(myid));
 
         if (num > 0)
         {
