@@ -892,7 +892,11 @@ void tr_peerMgr::refillUpkeep() const
     }
 }
 
-static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_index_t /*pieceIndex*/, bool /*isFastAllowed*/)
+static void peerSuggestedPiece(
+    tr_swarm const* /*s*/,
+    tr_peer const* /*peer*/,
+    tr_piece_index_t /*pieceIndex*/,
+    bool /*isFastAllowed*/)
 {
 #if 0
 
@@ -1818,7 +1822,7 @@ namespace
 
 /* does this peer have any pieces that we want? */
 [[nodiscard]] bool isPeerInteresting(
-    tr_torrent* const tor,
+    tr_torrent const* const tor,
     std::vector<bool> const& piece_is_interesting,
     tr_peerMsgs const* const peer)
 {
@@ -2402,7 +2406,7 @@ struct ComparePeerByActivity
     }
 };
 
-[[nodiscard]] auto getPeersToClose(tr_swarm* swarm, time_t const now_sec)
+[[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
 {
     auto peers_to_close = std::vector<tr_peer*>{};
 

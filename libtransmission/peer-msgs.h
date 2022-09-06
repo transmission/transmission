@@ -31,7 +31,7 @@ struct tr_address;
 class tr_peerMsgs : public tr_peer
 {
 public:
-    tr_peerMsgs(tr_torrent* tor, peer_atom* atom_in)
+    tr_peerMsgs(tr_torrent const* tor, peer_atom* atom_in)
         : tr_peer{ tor, atom_in }
         , have_{ tor->pieceCount() }
     {

@@ -211,7 +211,7 @@ int Cache::flushSpan(CIter const begin, CIter const end)
     return {};
 }
 
-int Cache::flushFile(tr_torrent* torrent, tr_file_index_t file)
+int Cache::flushFile(tr_torrent const* torrent, tr_file_index_t file)
 {
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
@@ -222,7 +222,7 @@ int Cache::flushFile(tr_torrent* torrent, tr_file_index_t file)
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), compare));
 }
 
-int Cache::flushTorrent(tr_torrent* torrent)
+int Cache::flushTorrent(tr_torrent const* torrent)
 {
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();

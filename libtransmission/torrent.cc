@@ -109,7 +109,7 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest
     return nullptr;
 }
 
-bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo* metainfo, char const* filename)
+bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename)
 {
     if (tr_torrentHasMetadata(tor))
     {
@@ -1303,7 +1303,7 @@ static void tr_torrentResetTransferStats(tr_torrent* tor)
 ***/
 
 #ifdef TR_ENABLE_ASSERTS
-static bool queueIsSequenced(tr_session* /*session*/);
+static bool queueIsSequenced(tr_session const* /*session*/);
 #endif
 
 static void freeTorrent(tr_torrent* tor)
@@ -2364,7 +2364,7 @@ void tr_torrent::refreshCurrentDir()
 
 #ifdef TR_ENABLE_ASSERTS
 
-static bool queueIsSequenced(tr_session* session)
+static bool queueIsSequenced(tr_session const* session)
 {
     auto torrents = session->getAllTorrents();
     std::sort(
@@ -2531,7 +2531,7 @@ static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldp
     return indices;
 }
 
-static int renamePath(tr_torrent* tor, std::string_view oldpath, std::string_view newname)
+static int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
 {
     int err = 0;
 

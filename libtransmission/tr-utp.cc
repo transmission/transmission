@@ -102,7 +102,7 @@ static void utp_on_accept(tr_session* const session, UTPSocket* const s)
 }
 
 static void utp_send_to(
-    tr_session* const ss,
+    tr_session const* const ss,
     uint8_t const* const buf,
     size_t const buflen,
     struct sockaddr const* const to,

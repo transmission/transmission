@@ -155,7 +155,7 @@ static char const* mimetype_guess(std::string_view path)
     return "application/octet-stream";
 }
 
-static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server* server, std::string_view content)
+static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server const* server, std::string_view content)
 {
     auto* const out = evbuffer_new();
 
@@ -202,7 +202,7 @@ static void add_time_header(struct evkeyvalq* headers, char const* key, time_t n
     evhttp_add_header(headers, key, fmt::format("{:%a %b %d %T %Y%n}", fmt::gmtime(now)).c_str());
 }
 
-static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::string_view filename)
+static void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::string_view filename)
 {
     if (req->type != EVHTTP_REQ_GET)
     {
@@ -344,7 +344,7 @@ static bool isIPAddressWithOptionalPort(char const* host)
     return evutil_parse_sockaddr_port(host, (struct sockaddr*)&address, &address_len) != -1;
 }
 
-static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request* req)
+static bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
 {
     /* If password auth is enabled, any hostname is permitted. */
     if (server->isPasswordEnabled())
@@ -388,7 +388,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
         [&hostname](auto const& str) { return tr_wildmat(hostname.c_str(), str.c_str()); });
 }
 
-static bool test_session_id(tr_rpc_server* server, evhttp_request const* req)
+static bool test_session_id(tr_rpc_server const* server, evhttp_request const* req)
 {
     char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
     return session_id != nullptr && server->session->sessionId() == session_id;
