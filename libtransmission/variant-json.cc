@@ -638,13 +638,13 @@ static void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 
 static void jsonListBeginFunc(tr_variant const* val, void* vdata)
 {
-    size_t const nChildren = tr_variantListSize(val);
+    size_t const n_children = tr_variantListSize(val);
     auto* data = static_cast<struct jsonWalk*>(vdata);
 
     jsonPushParent(data, val);
     evbuffer_add(data->out, "[", 1);
 
-    if (nChildren != 0)
+    if (n_children != 0)
     {
         jsonIndent(data);
     }
