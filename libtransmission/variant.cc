@@ -944,49 +944,50 @@ void tr_variantClear(tr_variant* v)
 
 static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
 {
-    int i = 0;
-    tr_variant const* val = nullptr;
-
-    while ((val = tr_variantListChild(const_cast<tr_variant*>(src), i)) != nullptr)
+    for (size_t i = 0;; ++i)
     {
-        if (tr_variantIsBool(val))
+        auto const* const child = tr_variantListChild(const_cast<tr_variant*>(src), i);
+        if (child == nullptr)
         {
-            bool boolVal = false;
-            tr_variantGetBool(val, &boolVal);
-            tr_variantListAddBool(target, boolVal);
+            break;
         }
-        else if (tr_variantIsReal(val))
+
+        if (tr_variantIsBool(child))
         {
-            double realVal = 0;
-            tr_variantGetReal(val, &realVal);
-            tr_variantListAddReal(target, realVal);
+            auto val = bool{};
+            tr_variantGetBool(child, &val);
+            tr_variantListAddBool(target, val);
         }
-        else if (tr_variantIsInt(val))
+        else if (tr_variantIsReal(child))
         {
-            int64_t intVal = 0;
-            tr_variantGetInt(val, &intVal);
-            tr_variantListAddInt(target, intVal);
+            auto val = double{};
+            tr_variantGetReal(child, &val);
+            tr_variantListAddReal(target, val);
         }
-        else if (tr_variantIsString(val))
+        else if (tr_variantIsInt(child))
         {
-            auto sv = std::string_view{};
-            (void)tr_variantGetStrView(val, &sv);
-            tr_variantListAddRaw(target, std::data(sv), std::size(sv));
+            auto val = int64_t{};
+            tr_variantGetInt(child, &val);
+            tr_variantListAddInt(target, val);
         }
-        else if (tr_variantIsDict(val))
+        else if (tr_variantIsString(child))
         {
-            tr_variantMergeDicts(tr_variantListAddDict(target, 0), val);
+            auto val = std::string_view{};
+            (void)tr_variantGetStrView(child, &val);
+            tr_variantListAddRaw(target, std::data(val), std::size(val));
         }
-        else if (tr_variantIsList(val))
+        else if (tr_variantIsDict(child))
         {
-            tr_variantListCopy(tr_variantListAddList(target, 0), val);
+            tr_variantMergeDicts(tr_variantListAddDict(target, 0), child);
+        }
+        else if (tr_variantIsList(child))
+        {
+            tr_variantListCopy(tr_variantListAddList(target, 0), child);
         }
         else
         {
             tr_logAddWarn("tr_variantListCopy skipping item");
         }
-
-        ++i;
     }
 }
 
