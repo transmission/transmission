@@ -66,7 +66,7 @@ protected:
         sync();
     }
 
-    static tr_torrent* createTorrentFromBase64Metainfo(tr_ctor* ctor, char const* benc_base64)
+    tr_torrent* createTorrentFromBase64Metainfo(tr_ctor* ctor, char const* benc_base64)
     {
         // create the torrent ctor
         auto const benc = tr_base64_decode(benc_base64);
@@ -77,10 +77,8 @@ protected:
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
-        auto* const tor = tr_torrentNew(ctor, nullptr);
+        auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
         EXPECT_NE(nullptr, tor);
-
-        // cleanup
         return tor;
     }
 

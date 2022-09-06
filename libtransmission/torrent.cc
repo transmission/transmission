@@ -50,7 +50,6 @@
 #include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
-#include "verify.h"
 #include "version.h"
 #include "web-utils.h"
 
@@ -1480,7 +1479,7 @@ static void onVerifyDoneThreadFunc(tr_torrent* const tor)
     }
 }
 
-static void onVerifyDone(tr_torrent* tor, bool aborted, void* /*unused*/)
+void tr_torrentOnVerifyDone(tr_torrent* tor, bool aborted)
 {
     if (aborted || tor->isDeleting)
     {
@@ -1501,7 +1500,7 @@ static void verifyTorrent(tr_torrent* const tor)
     }
 
     /* if the torrent's already being verified, stop it */
-    tr_verifyRemove(tor);
+    tor->session->verifyRemove(tor);
 
     bool const startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
 
@@ -1517,7 +1516,7 @@ static void verifyTorrent(tr_torrent* const tor)
     else
     {
         tor->startAfterVerify = startAfter;
-        tr_verifyAdd(tor, onVerifyDone, nullptr);
+        tor->session->verifyAdd(tor);
     }
 }
 
@@ -1548,7 +1547,8 @@ static void stopTorrent(tr_torrent* const tor)
         tr_logAddInfoTor(tor, _("Pausing torrent"));
     }
 
-    tr_verifyRemove(tor);
+    tor->session->verifyRemove(tor);
+
     tr_peerMgrStopTorrent(tor);
     tr_announcerTorrentStopped(tor);
 
@@ -1633,7 +1633,7 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
     {
         // ensure the files are all closed and idle before moving
         tor->session->closeTorrentFiles(tor);
-        tr_verifyRemove(tor);
+        tor->session->verifyRemove(tor);
 
         if (delete_func == nullptr)
         {
@@ -2126,7 +2126,7 @@ static void setLocationInEventThread(
 
         // ensure the files are all closed and idle before moving
         tor->session->closeTorrentFiles(tor);
-        tr_verifyRemove(tor);
+        tor->session->verifyRemove(tor);
 
         tr_error* error = nullptr;
         ok = tor->metainfo_.files().move(tor->currentDir(), path, setme_progress, tor->name(), &error);
