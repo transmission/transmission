@@ -648,7 +648,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     auto fields_loaded = tr_resume::fields_t{};
 
     TR_ASSERT(tr_isTorrent(tor));
-    auto const wasDirty = tor->isDirty;
+    auto const was_dirty = tor->isDirty;
 
     auto const migrated = tr_torrent_metainfo::migrateFile(
         tor->session->resumeDir(),
@@ -834,7 +834,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     /* loading the resume file triggers of a lot of changes,
      * but none of them needs to trigger a re-saving of the
      * same resume information... */
-    tor->isDirty = wasDirty;
+    tor->isDirty = was_dirty;
 
     tr_variantClear(&top);
     return fields_loaded;
