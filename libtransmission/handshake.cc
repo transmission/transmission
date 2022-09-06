@@ -378,10 +378,10 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         return READ_LATER;
     }
 
-    bool const isEncrypted = memcmp(evbuffer_pullup(inbuf, HandshakeNameLen), HANDSHAKE_NAME, HandshakeNameLen) != 0;
+    bool const is_encrypted = memcmp(evbuffer_pullup(inbuf, HandshakeNameLen), HANDSHAKE_NAME, HandshakeNameLen) != 0;
 
     auto peer_public_key = DH::key_bigend_t{};
-    if (isEncrypted)
+    if (is_encrypted)
     {
         needlen = std::size(peer_public_key);
 
@@ -391,9 +391,9 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         }
     }
 
-    tr_logAddTraceHand(handshake, isEncrypted ? "got an encrypted handshake" : "got a plain handshake");
+    tr_logAddTraceHand(handshake, is_encrypted ? "got an encrypted handshake" : "got a plain handshake");
 
-    if (!isEncrypted)
+    if (!is_encrypted)
     {
         setState(handshake, AWAITING_HANDSHAKE);
         return READ_NOW;
