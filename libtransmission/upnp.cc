@@ -144,7 +144,7 @@ static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
     return ret;
 }
 
-static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto)
+static int tr_upnpGetSpecificPortMappingEntry(tr_upnp const* handle, char const* proto)
 {
     auto int_client = std::array<char, 16>{};
     auto int_port = std::array<char, 16>{};
