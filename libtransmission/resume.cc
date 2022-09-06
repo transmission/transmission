@@ -275,26 +275,23 @@ static void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
 
 static void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* tor)
 {
-    auto i = int64_t{};
-    auto boolVal = false;
-
-    if (tr_variantDictFindInt(d, TR_KEY_speed_Bps, &i))
+    if (auto val = int64_t{}; tr_variantDictFindInt(d, TR_KEY_speed_Bps, &val))
     {
-        tor->setSpeedLimitBps(dir, i);
+        tor->setSpeedLimitBps(dir, val);
     }
-    else if (tr_variantDictFindInt(d, TR_KEY_speed, &i))
+    else if (tr_variantDictFindInt(d, TR_KEY_speed, &val))
     {
-        tor->setSpeedLimitBps(dir, i * 1024);
+        tor->setSpeedLimitBps(dir, val * 1024);
     }
 
-    if (tr_variantDictFindBool(d, TR_KEY_use_speed_limit, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(d, TR_KEY_use_speed_limit, &val))
     {
-        tr_torrentUseSpeedLimit(tor, dir, boolVal);
+        tr_torrentUseSpeedLimit(tor, dir, val);
     }
 
-    if (tr_variantDictFindBool(d, TR_KEY_use_global_speed_limit, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(d, TR_KEY_use_global_speed_limit, &val))
     {
-        tr_torrentUseSessionLimits(tor, boolVal);
+        tr_torrentUseSessionLimits(tor, val);
     }
 }
 
@@ -302,16 +299,15 @@ static auto loadSpeedLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
-    tr_variant* d = nullptr;
-    if (tr_variantDictFindDict(dict, TR_KEY_speed_limit_up, &d))
+    if (tr_variant* child = nullptr; tr_variantDictFindDict(dict, TR_KEY_speed_limit_up, &child))
     {
-        loadSingleSpeedLimit(d, TR_UP, tor);
+        loadSingleSpeedLimit(child, TR_UP, tor);
         ret = tr_resume::Speedlimit;
     }
 
-    if (tr_variantDictFindDict(dict, TR_KEY_speed_limit_down, &d))
+    if (tr_variant* child = nullptr; tr_variantDictFindDict(dict, TR_KEY_speed_limit_down, &child))
     {
-        loadSingleSpeedLimit(d, TR_DOWN, tor);
+        loadSingleSpeedLimit(child, TR_DOWN, tor);
         ret = tr_resume::Speedlimit;
     }
 
