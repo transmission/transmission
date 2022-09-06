@@ -70,15 +70,15 @@ static auto loadPeers(tr_variant* dict, tr_torrent* tor)
     auto len = size_t{};
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2, &str, &len))
     {
-        size_t const numAdded = addPeers(tor, str, len);
-        tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv4 peers from resume file", numAdded));
+        size_t const num_added = addPeers(tor, str, len);
+        tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv4 peers from resume file", num_added));
         ret = tr_resume::Peers;
     }
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2_6, &str, &len))
     {
-        size_t const numAdded = addPeers(tor, str, len);
-        tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv6 peers from resume file", numAdded));
+        size_t const num_added = addPeers(tor, str, len);
+        tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv6 peers from resume file", num_added));
         ret = tr_resume::Peers;
     }
 
