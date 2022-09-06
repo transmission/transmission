@@ -865,15 +865,15 @@ static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset,
 
 void tr_peerIo::writeBuf(struct evbuffer* buf, bool isPieceData)
 {
-    size_t const byteCount = evbuffer_get_length(buf);
+    size_t const n_bytes = evbuffer_get_length(buf);
 
     if (isEncrypted())
     {
-        processBuffer(*this, buf, 0, byteCount);
+        processBuffer(*this, buf, 0, n_bytes);
     }
 
     evbuffer_add_buffer(outbuf.get(), buf);
-    outbuf_info.emplace_back(byteCount, isPieceData);
+    outbuf_info.emplace_back(n_bytes, isPieceData);
 }
 
 void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)
