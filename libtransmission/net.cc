@@ -516,9 +516,9 @@ tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsg
 bool tr_net_hasIPv6(tr_port port)
 {
     static bool result = false;
-    static bool alreadyDone = false;
+    static bool already_done = false;
 
-    if (!alreadyDone)
+    if (!already_done)
     {
         int err = 0;
         auto const fd = tr_netBindTCPImpl(&tr_in6addr_any, port, true, &err);
@@ -533,7 +533,7 @@ bool tr_net_hasIPv6(tr_port port)
             tr_netCloseSocket(fd);
         }
 
-        alreadyDone = true;
+        already_done = true;
     }
 
     return result;
