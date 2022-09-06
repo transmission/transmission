@@ -1500,7 +1500,6 @@ static void verifyTorrent(tr_torrent* const tor)
     }
 
     /* if the torrent's already being verified, stop it */
-    fmt::print(FMT_STRING("{:s}:{:d} calling verifyRemove()\n"), __FILE__, __LINE__);
     tor->session->verifyRemove(tor);
 
     bool const startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
@@ -1517,7 +1516,6 @@ static void verifyTorrent(tr_torrent* const tor)
     else
     {
         tor->startAfterVerify = startAfter;
-        fmt::print(FMT_STRING("{:s}:{:d} calling verifyAdd()\n"), __FILE__, __LINE__);
         tor->session->verifyAdd(tor);
     }
 }

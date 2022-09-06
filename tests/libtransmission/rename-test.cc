@@ -130,44 +130,29 @@ TEST_F(RenameTest, singleFilenameTorrent)
     static auto constexpr TotalSize = size_t{ 14 };
 
     // this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!"
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     auto* ctor = tr_ctorNew(session_);
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     auto* tor = createTorrentFromBase64Metainfo(
         ctor,
         "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
         "ZWkxMzU4NTQ5MDk4ZTg6ZW5jb2Rpbmc1OlVURi04NDppbmZvZDY6bGVuZ3RoaTE0ZTQ6bmFtZTE1"
         "OmhlbGxvLXdvcmxkLnR4dDEyOnBpZWNlIGxlbmd0aGkzMjc2OGU2OnBpZWNlczIwOukboJcrkFUY"
         "f6LvqLXBVvSHqCk6Nzpwcml2YXRlaTBlZWU=");
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     EXPECT_TRUE(tr_isTorrent(tor));
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
 
     // sanity check the info
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     EXPECT_EQ(tr_file_index_t{ 1 }, tor->fileCount());
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
 
     // sanity check the (empty) stats
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     blockingTorrentVerify(tor);
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     expectHaveNone(tor, TotalSize);
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
 
     createSingleFileTorrentContents(tor->currentDir().sv());
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
 
     // sanity check the stats again, now that we've added the file
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     blockingTorrentVerify(tor);
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     auto const* st = tr_torrentStat(tor);
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
-    fmt::print(FMT_STRING("{:s}:{:d}\n"), __FILE__, __LINE__);
     EXPECT_EQ(TR_STAT_OK, st->error);
     EXPECT_EQ(0, st->leftUntilDone);
     EXPECT_EQ(0, st->haveUnchecked);
