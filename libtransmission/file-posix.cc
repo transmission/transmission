@@ -380,9 +380,10 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         if (copied == -1)
         {
             errno_cpy = errno; /* remember me for later */
-	    if (errno != EXDEV) { /* EXDEV is expected, don't log error */
+            if (errno != EXDEV) /* EXDEV is expected, don't log error */
+            {
                 set_system_error(error, errno);
-	    }
+            }
             if (file_size > 0U)
             {
                 file_size = info->size; /* restore file_size for next fallback */
