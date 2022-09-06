@@ -31,7 +31,7 @@ using namespace std::literals;
 namespace
 {
 
-constexpr int MAX_REMEMBERED_PEERS = 200;
+constexpr int MaxRememberedPeers = 200;
 
 } // unnamed namespace
 
@@ -41,12 +41,12 @@ constexpr int MAX_REMEMBERED_PEERS = 200;
 
 static void savePeers(tr_variant* dict, tr_torrent const* tor)
 {
-    if (auto const pex = tr_peerMgrGetPeers(tor, TR_AF_INET, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS); !std::empty(pex))
+    if (auto const pex = tr_peerMgrGetPeers(tor, TR_AF_INET, TR_PEERS_INTERESTING, MaxRememberedPeers); !std::empty(pex))
     {
         tr_variantDictAddRaw(dict, TR_KEY_peers2, std::data(pex), sizeof(tr_pex) * std::size(pex));
     }
 
-    if (auto const pex = tr_peerMgrGetPeers(tor, TR_AF_INET6, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS); !std::empty(pex))
+    if (auto const pex = tr_peerMgrGetPeers(tor, TR_AF_INET6, TR_PEERS_INTERESTING, MaxRememberedPeers); !std::empty(pex))
     {
         tr_variantDictAddRaw(dict, TR_KEY_peers2_6, std::data(pex), sizeof(tr_pex) * std::size(pex));
     }
@@ -55,9 +55,9 @@ static void savePeers(tr_variant* dict, tr_torrent const* tor)
 static size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
 {
     size_t const n_in = buflen / sizeof(tr_pex);
-    size_t const n_pex = std::min(n_in, size_t{ MAX_REMEMBERED_PEERS });
+    size_t const n_pex = std::min(n_in, size_t{ MaxRememberedPeers });
 
-    auto pex = std::array<tr_pex, MAX_REMEMBERED_PEERS>{};
+    auto pex = std::array<tr_pex, MaxRememberedPeers>{};
     memcpy(std::data(pex), buf, sizeof(tr_pex) * n_pex);
     return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, std::data(pex), n_pex);
 }
