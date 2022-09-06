@@ -258,7 +258,7 @@ void tr_verify_worker::add(tr_torrent* tor)
     node.torrent = tor;
     node.current_size = tor->hasTotal();
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tor->name() << std::endl;
     auto const lock = std::lock_guard(verify_mutex_);
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tor->setVerifyState(TR_VERIFY_WAIT);

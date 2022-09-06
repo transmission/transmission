@@ -132,29 +132,44 @@ TEST_F(RenameTest, singleFilenameTorrent)
     static auto constexpr TotalSize = size_t{ 14 };
 
     // this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!"
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto* ctor = tr_ctorNew(session_);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto* tor = createTorrentFromBase64Metainfo(
         ctor,
         "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
         "ZWkxMzU4NTQ5MDk4ZTg6ZW5jb2Rpbmc1OlVURi04NDppbmZvZDY6bGVuZ3RoaTE0ZTQ6bmFtZTE1"
         "OmhlbGxvLXdvcmxkLnR4dDEyOnBpZWNlIGxlbmd0aGkzMjc2OGU2OnBpZWNlczIwOukboJcrkFUY"
         "f6LvqLXBVvSHqCk6Nzpwcml2YXRlaTBlZWU=");
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_TRUE(tr_isTorrent(tor));
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // sanity check the info
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(tr_file_index_t{ 1 }, tor->fileCount());
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // sanity check the (empty) stats
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     blockingTorrentVerify(tor);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     expectHaveNone(tor, TotalSize);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     createSingleFileTorrentContents(tor->currentDir().sv());
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
     // sanity check the stats again, now that we've added the file
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     blockingTorrentVerify(tor);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const* st = tr_torrentStat(tor);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     EXPECT_EQ(TR_STAT_OK, st->error);
     EXPECT_EQ(0, st->leftUntilDone);
     EXPECT_EQ(0, st->haveUnchecked);

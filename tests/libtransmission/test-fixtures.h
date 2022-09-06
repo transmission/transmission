@@ -449,10 +449,14 @@ protected:
         auto const n_previously_verified = std::size(verified_);
         auto* const tor = tr_torrentNew(ctor, nullptr);
         EXPECT_NE(nullptr, tor);
+        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify n_previously_verified " << n_previously_verified
+                  << std::endl;
         waitFor(
             [this, tor, n_previously_verified]()
             { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
-            5s);
+            20s);
+        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify std::size(verified_) " << std::size(verified_)
+                  << std::endl;
 
         // cleanup
         tr_ctorFree(ctor);
@@ -464,11 +468,15 @@ protected:
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
         auto const n_previously_verified = std::size(verified_);
+        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify n_previously_verified " << n_previously_verified
+                  << std::endl;
         tr_torrentVerify(tor);
         waitFor(
             [this, tor, n_previously_verified]()
             { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
             20s);
+        std::cerr << __FILE__ << ':' << __LINE__ << " blockingTorrentVerify std::size(verified_) " << std::size(verified_)
+                  << std::endl;
     }
 
     tr_session* session_ = nullptr;
