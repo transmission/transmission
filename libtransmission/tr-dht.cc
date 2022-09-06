@@ -483,7 +483,7 @@ int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
     return closure.status;
 }
 
-tr_port tr_dhtPort(tr_session* ss)
+tr_port tr_dhtPort(tr_session const* ss)
 {
     return tr_dhtEnabled(ss) ? ss->udp_port : tr_port{};
 }
