@@ -468,7 +468,7 @@ protected:
         waitFor(
             [this, tor, n_previously_verified]()
             { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
-            5s);
+            20s);
     }
 
     tr_session* session_ = nullptr;
