@@ -222,15 +222,15 @@ char const* tr_strerror(int errnum)
 
 std::string_view tr_strvStrip(std::string_view str)
 {
-    auto constexpr test = [](auto ch)
+    auto constexpr Test = [](auto ch)
     {
         return isspace(static_cast<unsigned char>(ch));
     };
 
-    auto const it = std::find_if_not(std::begin(str), std::end(str), test);
+    auto const it = std::find_if_not(std::begin(str), std::end(str), Test);
     str.remove_prefix(std::distance(std::begin(str), it));
 
-    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), test);
+    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), Test);
     str.remove_suffix(std::distance(std::rbegin(str), rit));
 
     return str;
