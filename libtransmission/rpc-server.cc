@@ -344,7 +344,7 @@ static bool isIPAddressWithOptionalPort(char const* host)
     return evutil_parse_sockaddr_port(host, (struct sockaddr*)&address, &address_len) != -1;
 }
 
-static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request* req)
+static bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
 {
     /* If password auth is enabled, any hostname is permitted. */
     if (server->isPasswordEnabled())
