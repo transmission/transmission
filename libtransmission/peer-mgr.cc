@@ -892,7 +892,11 @@ void tr_peerMgr::refillUpkeep() const
     }
 }
 
-static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_index_t /*pieceIndex*/, bool /*isFastAllowed*/)
+static void peerSuggestedPiece(
+    tr_swarm const* /*s*/,
+    tr_peer const* /*peer*/,
+    tr_piece_index_t /*pieceIndex*/,
+    bool /*isFastAllowed*/)
 {
 #if 0
 
