@@ -674,7 +674,6 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
 
     tr_logAddDebugTor(tor, fmt::format("Read resume file '{}'", filename));
 
-    auto boolVal = false;
     auto i = int64_t{};
     auto sv = std::string_view{};
 
@@ -728,9 +727,9 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= tr_resume::MaxPeers;
     }
 
-    if ((fieldsToLoad & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &boolVal))
+    if (auto val = bool{}; (fieldsToLoad & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &val))
     {
-        tor->isRunning = !boolVal;
+        tor->isRunning = !val;
         fields_loaded |= tr_resume::Run;
     }
 
