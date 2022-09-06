@@ -52,7 +52,7 @@ void tr_variantInit(tr_variant* v, char type)
 ****
 ***/
 
-static auto constexpr STRING_INIT = tr_variant_string{
+static auto constexpr StringInit = tr_variant_string{
     TR_STRING_TYPE_QUARK,
     0,
     {},
@@ -65,7 +65,7 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
         delete[]((char*)(str->str.str));
     }
 
-    *str = STRING_INIT;
+    *str = StringInit;
 }
 
 /* returns a const pointer to the variant's string */
