@@ -380,7 +380,31 @@ protected:
         Complete
     };
 
-    tr_torrent* zeroTorrentInit(ZeroTorrentState state) const
+    [[nodiscard]] tr_torrent* createTorrentAndWaitForVerifyDone(tr_ctor* ctor) const
+    {
+        auto const n_previously_verified = std::size(verified_);
+        auto* const tor = tr_torrentNew(ctor, nullptr);
+        EXPECT_NE(nullptr, tor);
+        fmt::print(
+            stderr,
+            FMT_STRING("{:s}:{:d} blockingTorrentVerify n_previously_verified {:d}\n"),
+            __FILE__,
+            __LINE__,
+            n_previously_verified);
+        waitFor(
+            [this, tor, n_previously_verified]()
+            { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
+            20s);
+        fmt::print(
+            stderr,
+            FMT_STRING("{:s}:{:d} blockingTorrentVerify std::size(verified_) {:d}\n"),
+            __FILE__,
+            __LINE__,
+            std::size(verified_));
+        return tor;
+    }
+
+    [[nodiscard]] tr_torrent* zeroTorrentInit(ZeroTorrentState state) const
     {
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
@@ -445,28 +469,7 @@ protected:
             }
         }
 
-        // create the torrent
-        auto const n_previously_verified = std::size(verified_);
-        auto* const tor = tr_torrentNew(ctor, nullptr);
-        EXPECT_NE(nullptr, tor);
-        fmt::print(
-            stderr,
-            FMT_STRING("{:s}:{:d} blockingTorrentVerify n_previously_verified {:d}\n"),
-            __FILE__,
-            __LINE__,
-            n_previously_verified);
-        waitFor(
-            [this, tor, n_previously_verified]()
-            { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
-            20s);
-        fmt::print(
-            stderr,
-            FMT_STRING("{:s}:{:d} blockingTorrentVerify std::size(verified_) {:d}\n"),
-            __FILE__,
-            __LINE__,
-            std::size(verified_));
-
-        // cleanup
+        auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
         tr_ctorFree(ctor);
         return tor;
     }
