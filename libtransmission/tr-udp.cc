@@ -92,7 +92,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     }
 }
 
-void tr_udpSetSocketBuffers(tr_session* session)
+void tr_udpSetSocketBuffers(tr_session const* session)
 {
     bool const utp = session->allowsUTP();
 
