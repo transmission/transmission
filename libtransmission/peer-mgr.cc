@@ -1818,7 +1818,7 @@ namespace
 
 /* does this peer have any pieces that we want? */
 [[nodiscard]] bool isPeerInteresting(
-    tr_torrent* const tor,
+    tr_torrent const* const tor,
     std::vector<bool> const& piece_is_interesting,
     tr_peerMsgs const* const peer)
 {
