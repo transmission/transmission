@@ -892,19 +892,18 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     , bindAddress(std::make_unique<struct tr_rpc_address>())
     , session{ session_in }
 {
-    auto boolVal = bool{};
     auto i = int64_t{};
     auto sv = std::string_view{};
 
     auto key = TR_KEY_rpc_enabled;
 
-    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
     {
         missing_settings_key(key);
     }
     else
     {
-        this->is_enabled_ = boolVal;
+        this->is_enabled_ = val;
     }
 
     key = TR_KEY_rpc_port;
@@ -935,24 +934,24 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     key = TR_KEY_rpc_whitelist_enabled;
 
-    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
     {
         missing_settings_key(key);
     }
     else
     {
-        this->setWhitelistEnabled(boolVal);
+        this->setWhitelistEnabled(val);
     }
 
     key = TR_KEY_rpc_host_whitelist_enabled;
 
-    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
     {
         missing_settings_key(key);
     }
     else
     {
-        this->isHostWhitelistEnabled = boolVal;
+        this->isHostWhitelistEnabled = val;
     }
 
     key = TR_KEY_rpc_host_whitelist;
@@ -968,13 +967,13 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     key = TR_KEY_rpc_authentication_required;
 
-    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
     {
         missing_settings_key(key);
     }
     else
     {
-        this->setPasswordEnabled(boolVal);
+        this->setPasswordEnabled(val);
     }
 
     key = TR_KEY_rpc_whitelist;
@@ -1012,13 +1011,13 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     key = TR_KEY_anti_brute_force_enabled;
 
-    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
     {
         missing_settings_key(key);
     }
     else
     {
-        this->setAntiBruteForceEnabled(boolVal);
+        this->setAntiBruteForceEnabled(val);
     }
 
     key = TR_KEY_anti_brute_force_threshold;
