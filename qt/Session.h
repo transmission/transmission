@@ -93,7 +93,7 @@ public:
 
     void torrentSetLocation(torrent_ids_t const& ids, QString const& path, bool do_move);
     void torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath, QString const& newname);
-    void addTorrent(AddData const& addme, tr_variant* top, bool trash_original);
+    void addTorrent(AddData addme, tr_variant* top, bool trash_original);
     void initTorrents(torrent_ids_t const& ids = {});
     void pauseTorrents(torrent_ids_t const& torrentIds = {});
     void startTorrents(torrent_ids_t const& torrentIds = {});
@@ -117,7 +117,7 @@ public:
     };
 
 public slots:
-    void addTorrent(AddData const& addme);
+    void addTorrent(AddData addme);
     void launchWebInterface() const;
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
