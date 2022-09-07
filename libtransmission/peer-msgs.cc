@@ -2174,12 +2174,9 @@ static void peerPulse(void* vmsgs)
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
     time_t const now = tr_time();
 
-    if (msgs->io)
-    {
-        updateDesiredRequestCount(msgs);
-        updateBlockRequests(msgs);
-        updateMetadataRequests(msgs, now);
-    }
+    updateDesiredRequestCount(msgs);
+    updateBlockRequests(msgs);
+    updateMetadataRequests(msgs, now);
 
     for (;;)
     {
