@@ -1296,7 +1296,7 @@ struct tr_peer_stat
     int activeReqsToPeer;
 };
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, int* peerCount);
+tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, int* peer_count);
 
 void tr_torrentPeersFree(tr_peer_stat* peerStats, int peerCount);
 

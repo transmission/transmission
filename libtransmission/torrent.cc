@@ -1257,11 +1257,11 @@ size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
 ****
 ***/
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
+tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peer_count)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_peerMgrPeerStats(tor, peerCount);
+    return tr_peerMgrPeerStats(tor, peer_count);
 }
 
 void tr_torrentPeersFree(tr_peer_stat* peers, int /*peerCount*/)
