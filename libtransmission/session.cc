@@ -1552,9 +1552,9 @@ void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned
     updateBandwidth(session, dir);
 }
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int KBps)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int kilo_per_second)
 {
-    tr_sessionSetSpeedLimit_Bps(session, dir, tr_toSpeedBytes(KBps));
+    tr_sessionSetSpeedLimit_Bps(session, dir, tr_toSpeedBytes(kilo_per_second));
 }
 
 unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)

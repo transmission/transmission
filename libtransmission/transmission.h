@@ -508,7 +508,7 @@ enum tr_direction
 ***/
 
 void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int Bps);
-void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, unsigned int KBps);
+void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, unsigned int kilo_per_second);
 unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
 
 void tr_sessionLimitSpeed(tr_session*, tr_direction, bool);
