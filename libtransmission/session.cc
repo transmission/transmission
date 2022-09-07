@@ -545,11 +545,11 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
 
     /* initializing the defaults: caller may have passed in some app-level defaults.
      * preserve those and use the session defaults to fill in any missing gaps. */
-    auto oldDict = *dict;
+    auto old_dict = *dict;
     tr_variantInitDict(dict, 0);
     tr_sessionGetDefaultSettings(dict);
-    tr_variantMergeDicts(dict, &oldDict);
-    tr_variantClear(&oldDict);
+    tr_variantMergeDicts(dict, &old_dict);
+    tr_variantClear(&old_dict);
 
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
