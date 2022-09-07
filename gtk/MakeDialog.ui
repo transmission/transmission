@@ -310,8 +310,8 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="hexpand">True</property>
-                        <property name="label" translatable="yes">To add a backup URL, add it on the line after the primary URL.
-To add another primary URL, add it after a blank line.</property>
+                        <property name="label" translatable="yes">To add a backup URL, add it on the next line after a primary URL.
+To add a new primary URL, add it after a blank line.</property>
                         <property name="xalign">0</property>
                       </object>
                       <packing>

@@ -213,7 +213,7 @@
                       <object class="GtkLabel" id="alt_speed_limits_section_comment_label">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Override normal speed limits manually or at scheduled times	</property>
+                        <property name="label" translatable="yes">Override normal speed limits manually or at scheduled times</property>
                         <property name="xalign">0</property>
                         <style>
                           <class name="tr-small"/>
