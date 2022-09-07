@@ -428,12 +428,12 @@ static void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
 
 static void addPeers(tr_torrent const* tor, tr_variant* list)
 {
-    auto peerCount = int{};
-    tr_peer_stat* peers = tr_torrentPeers(tor, &peerCount);
+    auto peer_count = int{};
+    tr_peer_stat* peers = tr_torrentPeers(tor, &peer_count);
 
-    tr_variantInitList(list, peerCount);
+    tr_variantInitList(list, peer_count);
 
-    for (int i = 0; i < peerCount; ++i)
+    for (int i = 0; i < peer_count; ++i)
     {
         tr_variant* d = tr_variantListAddDict(list, 16);
         tr_peer_stat const* peer = peers + i;
@@ -455,7 +455,7 @@ static void addPeers(tr_torrent const* tor, tr_variant* list)
         tr_variantDictAddInt(d, TR_KEY_rateToPeer, tr_toSpeedBytes(peer->rateToPeer_KBps));
     }
 
-    tr_torrentPeersFree(peers, peerCount);
+    tr_torrentPeersFree(peers, peer_count);
 }
 
 static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
