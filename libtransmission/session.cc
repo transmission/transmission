@@ -1718,12 +1718,12 @@ bool tr_sessionUsesAltSpeed(tr_session const* s)
     return s->turtle.isEnabled;
 }
 
-void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* userData)
+void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data)
 {
     TR_ASSERT(session != nullptr);
 
     session->turtle.callback = func;
-    session->turtle.callbackUserData = userData;
+    session->turtle.callbackUserData = user_data;
 }
 
 /***

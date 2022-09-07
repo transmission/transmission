@@ -552,7 +552,7 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const*);
 
 using tr_altSpeedFunc = void (*)(tr_session*, bool active, bool userDriven, void*);
 
-void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
+void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void* user_data);
 
 /***
 ****
