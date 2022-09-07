@@ -100,7 +100,7 @@ static void maxWidth(struct tr_option const* o, size_t& long_width, size_t& shor
     }
 }
 
-void tr_getopt_usage(char const* appName, char const* description, struct tr_option const* opts)
+void tr_getopt_usage(char const* app_name, char const* description, struct tr_option const* opts)
 {
     auto long_width = size_t{ 0 };
     auto short_width = size_t{ 0 };
@@ -119,7 +119,7 @@ void tr_getopt_usage(char const* appName, char const* description, struct tr_opt
         description = "Usage: %s [options]";
     }
 
-    printf(description, appName);
+    printf(description, app_name);
     printf("\n\nOptions:\n");
     getopts_usage_line(&help, long_width, short_width, arg_width);
 

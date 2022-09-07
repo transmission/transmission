@@ -41,6 +41,6 @@ enum
 int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg);
 
 /** @brief prints the `Usage' help section to stdout */
-void tr_getopt_usage(char const* appName, char const* description, tr_option const* opts);
+void tr_getopt_usage(char const* app_name, char const* description, tr_option const* opts);
 
 /** @} */
