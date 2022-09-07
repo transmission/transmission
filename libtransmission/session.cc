@@ -1510,9 +1510,9 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
 
     bool const enabled = getInTurtleTime(t);
     tr_auto_switch_state_t const newAutoTurtleState = autoSwitchState(enabled);
-    bool const alreadySwitched = t->autoTurtleState == newAutoTurtleState;
+    bool const already_switched = t->autoTurtleState == newAutoTurtleState;
 
-    if (!alreadySwitched)
+    if (!already_switched)
     {
         tr_logAddInfo(enabled ? _("Time to turn on turtle mode") : _("Time to turn off turtle mode"));
         t->autoTurtleState = newAutoTurtleState;
