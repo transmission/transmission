@@ -539,7 +539,7 @@ static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char 
     setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
 }
 
-bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* appName)
+bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* app_name)
 {
     TR_ASSERT(tr_variantIsDict(dict));
 
@@ -554,7 +554,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     /* file settings override the defaults */
     auto success = bool{};
     auto filename = tr_pathbuf{};
-    getSettingsFilename(filename, config_dir, appName);
+    getSettingsFilename(filename, config_dir, app_name);
     if (!tr_sys_path_exists(filename))
     {
         success = true;

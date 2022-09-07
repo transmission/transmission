@@ -186,7 +186,7 @@ void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_d
  * @see tr_sessionInit()
  * @see tr_sessionSaveSettings()
  */
-bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* appName);
+bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
