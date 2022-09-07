@@ -285,19 +285,19 @@ void tr_bindinfo::close()
     }
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsession)
+static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
     auto clientAddr = tr_address{};
     auto clientPort = tr_port{};
-    auto const clientSocket = tr_netAccept(session, fd, &clientAddr, &clientPort);
+    auto const client_socket = tr_netAccept(session, fd, &clientAddr, &clientPort);
 
-    if (clientSocket != TR_BAD_SOCKET)
+    if (client_socket != TR_BAD_SOCKET)
     {
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", clientSocket, clientAddr.readable(clientPort)));
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", client_socket, clientAddr.readable(clientPort)));
 
-        tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
+        tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(client_socket));
     }
 }
 
@@ -312,7 +312,7 @@ void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
         tr_logAddInfo(fmt::format(
             _("Listening to incoming peer connections on {hostport}"),
             fmt::arg("hostport", addr_.readable(session->private_peer_port))));
-        ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, accept_incoming_peer, session);
+        ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, acceptIncomingPeer, session);
         event_add(ev_, nullptr);
     }
 }
