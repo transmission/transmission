@@ -2311,7 +2311,7 @@ auto constexpr MinUploadIdleSecs = int{ 60 };
 // when few peers are available, keep idle ones this long
 auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
 
-[[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, int peerCount, time_t const now)
+[[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, int peer_count, time_t const now)
 {
     /* if it's marked for purging, close it */
     if (peer->do_purge)
@@ -2335,9 +2335,9 @@ auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
         auto const relax_strictness_if_fewer_than_n = std::lround(getMaxPeerCount(tor) * 0.9);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
-        float const strictness = peerCount >= relax_strictness_if_fewer_than_n ?
+        float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?
             1.0 :
-            peerCount / (float)relax_strictness_if_fewer_than_n;
+            peer_count / (float)relax_strictness_if_fewer_than_n;
         int const lo = MinUploadIdleSecs;
         int const hi = MaxUploadIdleSecs;
         int const limit = hi - (hi - lo) * strictness;
