@@ -21,6 +21,7 @@
 #include "Prefs.h"
 #include "Session.h"
 #include "Torrent.h"
+#include "TorrentModel.h"
 #include "Utils.h"
 #include "VariantHelpers.h"
 
@@ -31,7 +32,7 @@ using ::trqt::variant_helpers::listAdd;
 ****
 ***/
 
-OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent)
+OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, TorrentModel const& torrents, AddData addme, QWidget* parent)
     : BaseDialog(parent)
     , add_(std::move(addme))
     , session_(session)
@@ -87,7 +88,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.destinationButton->setMode(PathButton::DirectoryMode);
     ui_.destinationButton->setTitle(tr("Select Destination"));
     ui_.destinationButton->setPath(download_dir);
-    ui_.destinationEdit->setText(download_dir);
+    ui_.destinationBox->setModel(torrents.pathModel());
+    ui_.destinationBox->setCurrentText(download_dir);
 
     if (is_local_)
     {
@@ -95,8 +97,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     }
 
     connect(ui_.destinationButton, &PathButton::pathChanged, this, &OptionsDialog::onDestinationChanged);
-    connect(ui_.destinationEdit, &QLineEdit::textEdited, &edit_timer_, qOverload<>(&QTimer::start));
-    connect(ui_.destinationEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onDestinationChanged);
+    connect(ui_.destinationBox->lineEdit(), &QLineEdit::textEdited, &edit_timer_, qOverload<>(&QTimer::start));
+    connect(ui_.destinationBox->lineEdit(), &QLineEdit::editingFinished, this, &OptionsDialog::onDestinationChanged);
 
     ui_.filesView->setEditable(false);
     ui_.priorityCombo->addItem(tr("High"), TR_PRI_HIGH);
@@ -200,7 +202,7 @@ void OptionsDialog::reload()
 
 void OptionsDialog::updateWidgetsLocality()
 {
-    ui_.destinationStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.destinationButton) : ui_.destinationEdit);
+    ui_.destinationStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.destinationButton) : ui_.destinationBox);
     ui_.destinationStack->setFixedHeight(ui_.destinationStack->currentWidget()->sizeHint().height());
     ui_.destinationLabel->setBuddy(ui_.destinationStack->currentWidget());
 }
@@ -247,7 +249,7 @@ void OptionsDialog::onAccepted()
     }
     else
     {
-        download_dir = ui_.destinationEdit->text();
+        download_dir = ui_.destinationBox->currentText();
     }
 
     dictAdd(&args, TR_KEY_download_dir, download_dir);
@@ -336,6 +338,6 @@ void OptionsDialog::onDestinationChanged()
     }
     else
     {
-        ui_.freeSpaceLabel->setPath(ui_.destinationEdit->text());
+        ui_.freeSpaceLabel->setPath(ui_.destinationBox->currentText());
     }
 }

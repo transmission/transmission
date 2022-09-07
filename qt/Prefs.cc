@@ -88,6 +88,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { MAIN_WINDOW_X, TR_KEY_main_window_x, QVariant::Int },
     { MAIN_WINDOW_Y, TR_KEY_main_window_y, QVariant::Int },
     { FILTER_MODE, TR_KEY_filter_mode, CustomVariantType::FilterModeType },
+    { FILTER_PATH, ~0u, QVariant::String },
     { FILTER_TRACKERS, TR_KEY_filter_trackers, QVariant::String },
     { FILTER_TEXT, TR_KEY_filter_text, QVariant::String },
     { SESSION_IS_REMOTE, TR_KEY_remote_session_enabled, QVariant::Bool },
@@ -224,7 +225,7 @@ Prefs::Prefs(QString config_dir)
 
     // these are the prefs that don't get saved to settings.json
     // when the application exits.
-    temporary_prefs_ << FILTER_TEXT;
+    temporary_prefs_ << FILTER_TEXT << FILTER_PATH;
 
     tr_variant top;
     tr_variantInitDict(&top, 0);

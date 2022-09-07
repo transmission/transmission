@@ -717,6 +717,9 @@
    <property name="text">
     <string>Set &amp;Location...</string>
    </property>
+   <property name="shortcut">
+    <string notr="true">F6</string>
+   </property>
   </action>
   <action name="action_CopyMagnetToClipboard">
    <property name="text">

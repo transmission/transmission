@@ -37,6 +37,8 @@ FileTreeView::FileTreeView(QWidget* parent, bool is_editable)
     proxy_->setSourceModel(model_);
     proxy_->setSortRole(FileTreeModel::SortRole);
     proxy_->setSortCaseSensitivity(Qt::CaseInsensitive);
+    proxy_->setRecursiveFilteringEnabled(true);
+    proxy_->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     setModel(proxy_);
     setItemDelegate(delegate_);

@@ -1312,7 +1312,7 @@ void MainWindow::addTorrent(AddData const& addMe, bool show_options)
 {
     if (show_options)
     {
-        auto* o = new OptionsDialog(session_, prefs_, addMe, this);
+        auto* o = new OptionsDialog(session_, prefs_, model_, addMe, this);
         o->show();
         QApplication::alert(o);
     }

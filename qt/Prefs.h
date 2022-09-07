@@ -58,6 +58,7 @@ public:
         MAIN_WINDOW_X,
         MAIN_WINDOW_Y,
         FILTER_MODE,
+        FILTER_PATH,
         FILTER_TRACKERS,
         FILTER_TEXT,
         SESSION_IS_REMOTE,

@@ -5,10 +5,6 @@
 
 #pragma once
 
-#include <bitset>
-#include <map>
-
-#include <QTimer>
 #include <QWidget>
 
 #include <libtransmission/tr-macros.h>
@@ -19,6 +15,7 @@
 
 class QLabel;
 class QLineEdit;
+class QStandardItem;
 class QStandardItemModel;
 class QString;
 
@@ -39,56 +36,23 @@ public slots:
     void clear();
 
 private:
-    FilterBarComboBox* createTrackerCombo(QStandardItemModel*);
-    FilterBarComboBox* createActivityCombo();
-    void refreshTrackers();
-
-    enum
-    {
-        ACTIVITY,
-        TRACKERS,
-
-        NUM_FLAGS
-    };
-
-    using Pending = std::bitset<NUM_FLAGS>;
+    FilterBarComboBox* createCombo(QStandardItemModel*);
 
     Prefs& prefs_;
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
 
-    std::map<QString, int> sitename_counts_;
     FilterBarComboBox* activity_combo_ = {};
+    FilterBarComboBox* path_combo_ = {};
     FilterBarComboBox* tracker_combo_ = {};
     QLabel* count_label_ = {};
-    QStandardItemModel* tracker_model_ = {};
-    QTimer recount_timer_;
     QLineEdit* line_edit_ = {};
-    Pending pending_ = {};
     bool is_bootstrapping_ = {};
 
 private slots:
-    void recount();
-    void recountSoon(Pending const& fields);
-
-    void recountActivitySoon()
-    {
-        recountSoon(Pending().set(ACTIVITY));
-    }
-
-    void recountTrackersSoon()
-    {
-        recountSoon(Pending().set(TRACKERS));
-    }
-
-    void recountAllSoon()
-    {
-        recountSoon(Pending().set(ACTIVITY).set(TRACKERS));
-    }
-
     void refreshPref(int key);
     void onActivityIndexChanged(int index);
+    void onPathIndexChanged(int index);
     void onTextChanged(QString const&);
-    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
     void onTrackerIndexChanged(int index);
 };

@@ -270,6 +270,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     connect(&model_, &TorrentModel::torrentsChanged, this, &DetailsDialog::onTorrentsChanged);
     connect(&model_, &TorrentModel::torrentsEdited, this, &DetailsDialog::onTorrentsEdited);
     connect(&prefs_, &Prefs::changed, this, &DetailsDialog::refreshPref);
+    connect(ui_.filterEdit, &QLineEdit::textChanged, ui_.filesView->filter(), &QSortFilterProxyModel::setFilterFixedString);
 
     // call refreshModel periodically
     connect(&model_timer_, &QTimer::timeout, this, &DetailsDialog::refreshModel);

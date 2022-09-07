@@ -472,7 +472,10 @@ void Session::torrentSetLocation(torrent_ids_t const& ids, QString const& locati
     dictAdd(&args, TR_KEY_location, location);
     dictAdd(&args, TR_KEY_move, do_move);
 
-    exec(TR_KEY_torrent_set_location, &args);
+    auto* q = new RpcQueue();
+    q->add([this, &args]() { return exec(TR_KEY_torrent_set_location, &args); });
+    q->add([this, ids]() { refreshTorrents(ids, TorrentProperties::MainInfo); });
+    q->run();
 }
 
 void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath, QString const& newname)

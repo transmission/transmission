@@ -5,14 +5,10 @@
 
 #pragma once
 
-#include <array>
-
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
 #include <libtransmission/tr-macros.h>
-
-#include "Filters.h"
 
 class QString;
 
@@ -34,7 +30,6 @@ public:
     };
 
     explicit TorrentFilter(Prefs const& prefs);
-    [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 
 protected:
     // QSortFilterProxyModel

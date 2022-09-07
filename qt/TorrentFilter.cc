@@ -45,6 +45,7 @@ void TorrentFilter::onPrefChanged(int key)
         break;
 
     case Prefs::FILTER_MODE:
+    case Prefs::FILTER_PATH:
     case Prefs::FILTER_TRACKERS:
     case Prefs::SORT_MODE:
     case Prefs::SORT_REVERSED:
@@ -254,23 +255,11 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
             tor.hash().toString().contains(text, Qt::CaseInsensitive);
     }
 
-    return accepts;
-}
-
-std::array<int, FilterMode::NUM_MODES> TorrentFilter::countTorrentsPerMode() const
-{
-    std::array<int, FilterMode::NUM_MODES> torrent_counts = {};
-
-    for (auto const& tor : dynamic_cast<TorrentModel*>(sourceModel())->torrents())
+    if (accepts)
     {
-        for (int mode = 0; mode < FilterMode::NUM_MODES; ++mode)
-        {
-            if (FilterMode::test(*tor, mode))
-            {
-                ++torrent_counts[mode];
-            }
-        }
+        auto const path = prefs_.getString(Prefs::FILTER_PATH);
+        accepts = path.isEmpty() || tor.getPath() == path;
     }
 
-    return torrent_counts;
+    return accepts;
 }

@@ -6,6 +6,7 @@
 #include <utility>
 
 #include <QDir>
+#include <QLineEdit>
 
 #include "RelocateDialog.h"
 #include "Session.h"
@@ -67,9 +68,23 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
     }
     else
     {
-        ui_.newLocationStack->setCurrentWidget(ui_.newLocationEdit);
-        ui_.newLocationEdit->setText(path);
-        ui_.newLocationEdit->selectAll();
+        auto* m = model.pathModel();
+        auto* box = ui_.newLocationBox;
+        ui_.newLocationStack->setCurrentWidget(box);
+        box->setModel(m);
+        box->setCurrentText(path);
+        for (auto i = 0; i < m->rowCount(); ++i)
+        {
+            auto index = m->index(i, 0);
+            auto const& p = m->data(index, TorrentModel::PathRole).toString();
+            if (path == p)
+            {
+                box->setCurrentIndex(i);
+                break;
+            }
+        }
+
+        box->lineEdit()->selectAll();
     }
 
     ui_.newLocationStack->setFixedHeight(ui_.newLocationStack->currentWidget()->sizeHint().height());
@@ -92,5 +107,5 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
 QString RelocateDialog::newLocation() const
 {
     return ui_.newLocationStack->currentWidget() == ui_.newLocationButton ? ui_.newLocationButton->path() :
-                                                                            ui_.newLocationEdit->text();
+                                                                            ui_.newLocationBox->currentText();
 }
