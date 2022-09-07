@@ -447,9 +447,9 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
 
 static bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
 {
-    auto idleMinutes = uint16_t{};
-    return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
-        difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
+    auto idle_minutes = uint16_t{};
+    return tr_torrentGetSeedIdle(tor, &idle_minutes) &&
+        difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idle_minutes * 60U;
 }
 
 static void torrentCallScript(tr_torrent const* tor, std::string const& script);
