@@ -552,7 +552,6 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     tr_variantClear(&old_dict);
 
     /* file settings override the defaults */
-    auto fileSettings = tr_variant{};
     auto success = bool{};
     auto filename = tr_pathbuf{};
     getSettingsFilename(filename, config_dir, appName);
@@ -560,10 +559,10 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     {
         success = true;
     }
-    else if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename))
+    else if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
     {
-        tr_variantMergeDicts(dict, &fileSettings);
-        tr_variantClear(&fileSettings);
+        tr_variantMergeDicts(dict, &file_settings);
+        tr_variantClear(&file_settings);
         success = true;
     }
     else
