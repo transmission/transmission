@@ -1584,12 +1584,12 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned int Bps)
+static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned int bytes_per_second)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(tr_isDirection(d));
 
-    s->turtle.speedLimit_Bps[d] = Bps;
+    s->turtle.speedLimit_Bps[d] = bytes_per_second;
 
     updateBandwidth(s, d);
 }
