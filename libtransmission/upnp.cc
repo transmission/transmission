@@ -256,9 +256,9 @@ static bool isFutureReady(std::future<T> const& future)
     return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 }
 
-tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, std::string bindaddr)
+tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_enabled, bool do_port_check, std::string bindaddr)
 {
-    if (isEnabled && handle->state == UpnpState::WILL_DISCOVER)
+    if (is_enabled && handle->state == UpnpState::WILL_DISCOVER)
     {
         TR_ASSERT(!handle->discover_future);
 
@@ -269,7 +269,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         std::thread(std::move(task), std::move(bindaddr)).detach();
     }
 
-    if (isEnabled && handle->state == UpnpState::DISCOVERING && handle->discover_future &&
+    if (is_enabled && handle->state == UpnpState::DISCOVERING && handle->discover_future &&
         isFutureReady(*handle->discover_future))
     {
         auto* const devlist = handle->discover_future->get();
@@ -296,12 +296,12 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         freeUPNPDevlist(devlist);
     }
 
-    if ((handle->state == UpnpState::IDLE) && (handle->isMapped) && (!isEnabled || handle->port != port))
+    if ((handle->state == UpnpState::IDLE) && (handle->isMapped) && (!is_enabled || handle->port != port))
     {
         handle->state = UpnpState::WILL_UNMAP;
     }
 
-    if (isEnabled && handle->isMapped && doPortCheck &&
+    if (is_enabled && handle->isMapped && do_port_check &&
         ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
          (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
@@ -324,7 +324,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         handle->port = {};
     }
 
-    if ((handle->state == UpnpState::IDLE) && isEnabled && !handle->isMapped)
+    if ((handle->state == UpnpState::IDLE) && is_enabled && !handle->isMapped)
     {
         handle->state = UpnpState::WILL_MAP;
     }
