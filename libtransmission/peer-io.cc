@@ -822,11 +822,11 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    unsigned int const currentSpeed_Bps = io->bandwidth().getPieceSpeedBytesPerSecond(now, TR_UP);
+    unsigned int const current_speed_bytes_per_second = io->bandwidth().getPieceSpeedBytesPerSecond(now, TR_UP);
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static auto const ceiling = (unsigned int)(tr_block_info::BlockSize * 3.5);
-    return std::max(ceiling, currentSpeed_Bps * period);
+    return std::max(ceiling, current_speed_bytes_per_second * period);
 }
 
 size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
