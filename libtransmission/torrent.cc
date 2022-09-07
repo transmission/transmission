@@ -1072,9 +1072,9 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     s->ratio = tr_getRatio(s->uploadedEver, tor->sizeWhenDone());
 
-    auto seedRatioBytesLeft = uint64_t{};
-    auto seedRatioBytesGoal = uint64_t{};
-    bool const seedRatioApplies = tr_torrentGetSeedRatioBytes(tor, &seedRatioBytesLeft, &seedRatioBytesGoal);
+    auto seed_ratio_bytes_left = uint64_t{};
+    auto seed_ratio_bytes_goal = uint64_t{};
+    bool const seed_ratio_applies = tr_torrentGetSeedRatioBytes(tor, &seed_ratio_bytes_left, &seed_ratio_bytes_goal);
 
     switch (s->activity)
     {
@@ -1108,7 +1108,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         break;
 
     case TR_STATUS_SEED:
-        if (!seedRatioApplies)
+        if (!seed_ratio_applies)
         {
             s->eta = TR_ETA_NOT_AVAIL;
         }
@@ -1128,14 +1128,14 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             }
             else
             {
-                s->eta = seedRatioBytesLeft / tor->etaSpeed_Bps;
+                s->eta = seed_ratio_bytes_left / tor->etaSpeed_Bps;
             }
         }
 
         {
-            auto seedIdleMinutes = uint16_t{};
-            s->etaIdle = tor->etaSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seedIdleMinutes) ?
-                seedIdleMinutes * 60 - s->idleSecs :
+            auto seed_idle_minutes = uint16_t{};
+            s->etaIdle = tor->etaSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seed_idle_minutes) ?
+                seed_idle_minutes * 60 - s->idleSecs :
                 TR_ETA_NOT_AVAIL;
         }
 
@@ -1149,19 +1149,19 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     /* s->haveValid is here to make sure a torrent isn't marked 'finished'
      * when the user hits "uncheck all" prior to starting the torrent... */
-    s->finished = tor->finishedSeedingByIdle || (seedRatioApplies && seedRatioBytesLeft == 0 && s->haveValid != 0);
+    s->finished = tor->finishedSeedingByIdle || (seed_ratio_applies && seed_ratio_bytes_left == 0 && s->haveValid != 0);
 
-    if (!seedRatioApplies || s->finished)
+    if (!seed_ratio_applies || s->finished)
     {
         s->seedRatioPercentDone = 1.0F;
     }
-    else if (seedRatioBytesGoal == 0) /* impossible? safeguard for div by zero */
+    else if (seed_ratio_bytes_goal == 0) /* impossible? safeguard for div by zero */
     {
         s->seedRatioPercentDone = 0.0F;
     }
     else
     {
-        s->seedRatioPercentDone = float(seedRatioBytesGoal - seedRatioBytesLeft) / seedRatioBytesGoal;
+        s->seedRatioPercentDone = float(seed_ratio_bytes_goal - seed_ratio_bytes_left) / seed_ratio_bytes_goal;
     }
 
     /* test some of the constraints */
