@@ -770,7 +770,7 @@ static void tier_announce_remove_trailing(tr_tier* tier, tr_announce_event e)
     tier_update_announce_priority(tier);
 }
 
-static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announceAt)
+static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announce_at)
 {
     TR_ASSERT(tier != nullptr);
 
@@ -801,11 +801,11 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
 
     /* add it */
     events.push_back(e);
-    tier->announceAt = announceAt;
+    tier->announceAt = announce_at;
     tier_update_announce_priority(tier);
 
     tr_logAddTrace_tier_announce_queue(tier);
-    tr_logAddTraceTier(tier, fmt::format("announcing in {} seconds", difftime(announceAt, tr_time())));
+    tr_logAddTraceTier(tier, fmt::format("announcing in {} seconds", difftime(announce_at, tr_time())));
 }
 
 static auto tier_announce_event_pull(tr_tier* tier)
