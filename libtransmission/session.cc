@@ -289,15 +289,15 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    auto clientAddr = tr_address{};
-    auto clientPort = tr_port{};
-    auto const client_socket = tr_netAccept(session, fd, &clientAddr, &clientPort);
+    auto client_addr = tr_address{};
+    auto client_port = tr_port{};
+    auto const client_socket = tr_netAccept(session, fd, &client_addr, &client_port);
 
     if (client_socket != TR_BAD_SOCKET)
     {
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", client_socket, clientAddr.readable(clientPort)));
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", client_socket, client_addr.readable(client_port)));
 
-        tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(client_socket));
+        tr_peerMgrAddIncoming(session->peerMgr, &client_addr, client_port, tr_peer_socket_tcp_create(client_socket));
     }
 }
 
