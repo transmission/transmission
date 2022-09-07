@@ -1894,7 +1894,7 @@ void rechokeDownloads(tr_swarm* s)
 {
     static auto constexpr MinInterestingPeers = uint16_t{ 5 };
 
-    auto const peerCount = s->peerCount();
+    auto const peer_count = s->peerCount();
     auto const& peers = s->peers;
     auto const now = tr_time();
 
@@ -1956,20 +1956,20 @@ void rechokeDownloads(tr_swarm* s)
             s->lastCancel = now;
         }
 
-        time_t const timeSinceCancel = now - s->lastCancel;
+        time_t const time_since_cancel = now - s->lastCancel;
 
-        if (timeSinceCancel != 0)
+        if (time_since_cancel != 0)
         {
             int const max_increase = 15;
             time_t const max_history = 2 * CancelHistorySec;
-            double const mult = std::min(timeSinceCancel, max_history) / static_cast<double>(max_history);
+            double const mult = std::min(time_since_cancel, max_history) / static_cast<double>(max_history);
             int const inc = max_increase * mult;
             max_peers = s->max_peers + inc;
             tr_logAddTraceSwarm(
                 s,
                 fmt::format(
                     "time since last cancel is {} -- increasing the number of peers we're interested in by {}",
-                    timeSinceCancel,
+                    time_since_cancel,
                     inc));
         }
     }
@@ -1979,9 +1979,9 @@ void rechokeDownloads(tr_swarm* s)
 
     s->max_peers = max_peers;
 
-    if (peerCount > 0)
+    if (peer_count > 0)
     {
-        rechoke.reserve(peerCount);
+        rechoke.reserve(peer_count);
 
         auto const* const tor = s->tor;
         int const n = tor->pieceCount();
