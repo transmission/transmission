@@ -2339,13 +2339,13 @@ auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
         int const lo = MinUploadIdleSecs;
         int const hi = MaxUploadIdleSecs;
         int const limit = hi - (hi - lo) * strictness;
-        int const idleTime = now - std::max(atom->time, atom->piece_data_time);
+        int const idle_time = now - std::max(atom->time, atom->piece_data_time);
 
-        if (idleTime > limit)
+        if (idle_time > limit)
         {
             tr_logAddTraceSwarm(
                 s,
-                fmt::format("purging peer {} because it's been {} secs since we shared anything", peer->readable(), idleTime));
+                fmt::format("purging peer {} because it's been {} secs since we shared anything", peer->readable(), idle_time));
             return true;
         }
     }
