@@ -35,6 +35,7 @@ Checks: >
   -readability-qualified-auto,
 
 CheckOptions:
+  - { key: readability-identifier-naming.ParameterCase,            value: lower_case }
   - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase  }
   - { key: readability-identifier-naming.VariableCase,             value: lower_case }
 
