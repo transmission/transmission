@@ -1506,14 +1506,14 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
 {
     TR_ASSERT(t->isClockEnabled);
 
-    bool const enabled = getInTurtleTime(t);
-    tr_auto_switch_state_t const newAutoTurtleState = autoSwitchState(enabled);
-    bool const already_switched = t->autoTurtleState == newAutoTurtleState;
+    auto const enabled = getInTurtleTime(t);
+    auto const new_auto_turtle_state = autoSwitchState(enabled);
+    auto const already_switched = t->autoTurtleState == new_auto_turtle_state;
 
     if (!already_switched)
     {
         tr_logAddInfo(enabled ? _("Time to turn on turtle mode") : _("Time to turn off turtle mode"));
-        t->autoTurtleState = newAutoTurtleState;
+        t->autoTurtleState = new_auto_turtle_state;
         useAltSpeed(s, t, enabled, false);
     }
 }
