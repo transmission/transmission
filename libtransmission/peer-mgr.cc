@@ -949,7 +949,7 @@ static void peerSuggestedPiece(
 
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 {
-    bool pieceCameFromPeers = false;
+    bool piece_came_from_peers = false;
     tr_swarm* const s = tor->swarm;
 
     /* walk through our peers */
@@ -958,13 +958,13 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
         // notify the peer that we now have this piece
         peer->on_piece_completed(p);
 
-        if (!pieceCameFromPeers)
+        if (!piece_came_from_peers)
         {
-            pieceCameFromPeers = peer->blame.test(p);
+            piece_came_from_peers = peer->blame.test(p);
         }
     }
 
-    if (pieceCameFromPeers) /* webseed downloads don't belong in announce totals */
+    if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
     {
         tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->pieceSize(p));
     }
