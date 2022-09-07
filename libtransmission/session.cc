@@ -1542,12 +1542,12 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int Bps)
+void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int bytes_per_second)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->speed_limit_Bps_[dir] = Bps;
+    session->speed_limit_Bps_[dir] = bytes_per_second;
 
     updateBandwidth(session, dir);
 }
