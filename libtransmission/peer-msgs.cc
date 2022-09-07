@@ -1987,7 +1987,7 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 
 static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 {
-    size_t bytesWritten = 0;
+    size_t bytes_written = 0;
     struct peer_request req;
     bool const have_messages = evbuffer_get_length(msgs->outMessages) != 0;
     bool const fext = msgs->io->supportsFEXT();
@@ -2012,7 +2012,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
         msgs->outMessagesBatchPeriod = LowPriorityIntervalSecs;
-        bytesWritten += len;
+        bytes_written += len;
     }
 
     /**
@@ -2130,7 +2130,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
                 logtrace(msgs, fmt::format(FMT_STRING("sending block {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
                 TR_ASSERT(n == msglen);
                 msgs->io->writeBuf(out, true);
-                bytesWritten += n;
+                bytes_written += n;
                 msgs->clientSentAnythingAt = now;
                 msgs->blocks_sent_to_peer.add(tr_time(), 1);
             }
@@ -2139,7 +2139,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 
             if (err)
             {
-                bytesWritten = 0;
+                bytes_written = 0;
                 msgs = nullptr;
             }
         }
@@ -2165,7 +2165,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
     }
 
-    return bytesWritten;
+    return bytes_written;
 }
 
 static void peerPulse(void* vmsgs)
