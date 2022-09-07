@@ -1502,7 +1502,7 @@ static void verifyTorrent(tr_torrent* const tor)
     /* if the torrent's already being verified, stop it */
     tor->session->verifyRemove(tor);
 
-    bool const startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
+    bool const start_after = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
 
     if (tor->isRunning)
     {
@@ -1515,7 +1515,7 @@ static void verifyTorrent(tr_torrent* const tor)
     }
     else
     {
-        tor->startAfterVerify = startAfter;
+        tor->startAfterVerify = start_after;
         tor->session->verifyAdd(tor);
     }
 }
