@@ -1989,21 +1989,21 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 {
     size_t bytesWritten = 0;
     struct peer_request req;
-    bool const haveMessages = evbuffer_get_length(msgs->outMessages) != 0;
+    bool const have_messages = evbuffer_get_length(msgs->outMessages) != 0;
     bool const fext = msgs->io->supportsFEXT();
 
     /**
     ***  Protocol messages
     **/
 
-    if (haveMessages && msgs->outMessagesBatchedAt == 0) /* fresh batch */
+    if (have_messages && msgs->outMessagesBatchedAt == 0) /* fresh batch */
     {
         logtrace(
             msgs,
             fmt::format(FMT_STRING("started an outMessages batch (length is {:d})"), evbuffer_get_length(msgs->outMessages)));
         msgs->outMessagesBatchedAt = now;
     }
-    else if (haveMessages && now - msgs->outMessagesBatchedAt >= msgs->outMessagesBatchPeriod)
+    else if (have_messages && now - msgs->outMessagesBatchedAt >= msgs->outMessagesBatchPeriod)
     {
         size_t const len = evbuffer_get_length(msgs->outMessages);
         /* flush the protocol messages */
