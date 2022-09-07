@@ -518,7 +518,7 @@ bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, unsigned int kilo_per_seond);
+void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, unsigned int kilo_per_second);
 unsigned int tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
 
 void tr_sessionUseAltSpeed(tr_session*, bool);
