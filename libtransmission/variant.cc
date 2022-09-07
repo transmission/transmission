@@ -918,7 +918,7 @@ static void freeContainerEndFunc(tr_variant const* v, void* /*user_data*/)
     delete[] v->val.l.vals;
 }
 
-static struct VariantWalkFuncs const freeWalkFuncs = {
+static VariantWalkFuncs constexpr FreeWalkFuncs = {
     freeDummyFunc, //
     freeDummyFunc, //
     freeDummyFunc, //
@@ -932,7 +932,7 @@ void tr_variantClear(tr_variant* v)
 {
     if (!tr_variantIsEmpty(v))
     {
-        tr_variantWalk(v, &freeWalkFuncs, nullptr, false);
+        tr_variantWalk(v, &FreeWalkFuncs, nullptr, false);
     }
 
     *v = {};
