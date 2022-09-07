@@ -409,14 +409,14 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* keeping the copy paths in blocks helps with error tracing though */
     /* trying sendfile after EXDEV is more efficient than falling to user-space straight away */
 
-    if (file_size > 0U && (!errno_cpy || errno_cpy == EXDEV))
+    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV))
     {
         /* set file offsets to 0 in case previous copy did move them */
         /* TR_BAD_SYS_FILE has previously been checked, we can directly lseek */
         /* in case we have no pending errno, be kind enough to report any error */
         if (lseek(in, 0, SEEK_SET) == -1 || lseek(out, 0, SEEK_SET) == -1)
         {
-            if (!errno_cpy)
+            if (errno_cpy == 0)
             {
                 set_system_error(error, errno);
             }
@@ -453,7 +453,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
     /* if file_size>0 and errno_cpy==0, we probably never entered any copy attempt, also: */
     /* if we (still) got something to copy and we encountered certain error in previous attempts */
-    if (file_size > 0U && (!errno_cpy || errno_cpy == EXDEV))
+    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV))
     {
         static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
         auto buf = std::vector<char>{};
@@ -464,7 +464,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         /* in case we have no pending errno, be kind enough to report any error */
         if (lseek(in, 0, SEEK_SET) == -1 || lseek(out, 0, SEEK_SET) == -1)
         {
-            if (!errno_cpy)
+            if (errno_cpy == 0)
             {
                 set_system_error(error, errno);
             }
@@ -474,8 +474,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
             while (file_size > 0U)
             {
                 uint64_t const chunk_size = std::min(file_size, uint64_t{ Buflen });
-                uint64_t bytes_read;
-                uint64_t bytes_written;
+                uint64_t bytes_read = 0;
+                uint64_t bytes_written = 0;
 
                 if (!tr_sys_file_read(in, std::data(buf), chunk_size, &bytes_read, error))
                 {
