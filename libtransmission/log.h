@@ -73,7 +73,7 @@ struct tr_log_message
 
 [[nodiscard]] bool tr_logGetQueueEnabled();
 
-void tr_logSetQueueEnabled(bool isEnabled);
+void tr_logSetQueueEnabled(bool is_enabled);
 
 [[nodiscard]] tr_log_message* tr_logGetQueue();
 

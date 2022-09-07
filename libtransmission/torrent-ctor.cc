@@ -132,20 +132,20 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_erro
 ****
 ***/
 
-void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
+void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
 {
     switch (priority)
     {
     case TR_PRI_LOW:
-        ctor->low.assign(files, files + fileCount);
+        ctor->low.assign(files, files + file_count);
         break;
 
     case TR_PRI_HIGH:
-        ctor->high.assign(files, files + fileCount);
+        ctor->high.assign(files, files + file_count);
         break;
 
     default: // TR_PRI_NORMAL
-        ctor->normal.assign(files, files + fileCount);
+        ctor->normal.assign(files, files + file_count);
         break;
     }
 }
@@ -157,10 +157,10 @@ void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
     tor->setFilePriorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
 }
 
-void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)
+void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, bool wanted)
 {
     auto& indices = wanted ? ctor->wanted : ctor->unwanted;
-    indices.assign(files, files + fileCount);
+    indices.assign(files, files + file_count);
 }
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)

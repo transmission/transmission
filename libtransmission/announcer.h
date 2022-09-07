@@ -92,7 +92,7 @@ enum
     TR_ANN_CORRUPT
 };
 
-void tr_announcerAddBytes(tr_torrent*, int type, uint32_t byteCount);
+void tr_announcerAddBytes(tr_torrent*, int type, uint32_t n_bytes);
 
 time_t tr_announcerNextManualAnnounce(tr_torrent const*);
 

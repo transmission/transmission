@@ -770,7 +770,7 @@ static void tier_announce_remove_trailing(tr_tier* tier, tr_announce_event e)
     tier_update_announce_priority(tier);
 }
 
-static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announceAt)
+static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announce_at)
 {
     TR_ASSERT(tier != nullptr);
 
@@ -801,11 +801,11 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
 
     /* add it */
     events.push_back(e);
-    tier->announceAt = announceAt;
+    tier->announceAt = announce_at;
     tier_update_announce_priority(tier);
 
     tr_logAddTrace_tier_announce_queue(tier);
-    tr_logAddTraceTier(tier, fmt::format("announcing in {} seconds", difftime(announceAt, tr_time())));
+    tr_logAddTraceTier(tier, fmt::format("announcing in {} seconds", difftime(announce_at, tr_time())));
 }
 
 static auto tier_announce_event_pull(tr_tier* tier)
@@ -816,12 +816,12 @@ static auto tier_announce_event_pull(tr_tier* tier)
     return e;
 }
 
-static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announceAt)
+static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announce_at)
 {
     // tell each tier to announce
     for (auto& tier : tor->torrent_announcer->tiers)
     {
-        tier_announce_event_push(&tier, e, announceAt);
+        tier_announce_event_push(&tier, e, announce_at);
     }
 }
 
@@ -854,14 +854,14 @@ void tr_announcerChangeMyPort(tr_torrent* tor)
 ****
 ***/
 
-void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
+void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(type == TR_ANN_UP || type == TR_ANN_DOWN || type == TR_ANN_CORRUPT);
 
     for (auto& tier : tor->torrent_announcer->tiers)
     {
-        tier.byteCounts[type] += byteCount;
+        tier.byteCounts[type] += n_bytes;
     }
 }
 
@@ -982,7 +982,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     }
 }
 
-static void on_announce_done(tr_announce_response const* response, void* vdata)
+static void onAnnounceDone(tr_announce_response const* response, void* vdata)
 {
     auto* const data = static_cast<announce_data*>(vdata);
 
@@ -1056,7 +1056,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
         }
         else
         {
-            auto const isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
+            auto const is_stopped = event == TR_ANNOUNCE_EVENT_STOPPED;
             auto leechers = int{};
             auto scrape_fields = int{};
             auto seeders = int{};
@@ -1148,7 +1148,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             tier->lastAnnounceSucceeded = true;
             tier->lastAnnouncePeerCount = std::size(response->pex) + std::size(response->pex6);
 
-            if (isStopped)
+            if (is_stopped)
             {
                 /* now that we've successfully stopped the torrent,
                  * we can reset the up/down/corrupt count we've kept
@@ -1158,7 +1158,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 tier->byteCounts[TR_ANN_CORRUPT] = 0;
             }
 
-            if (!isStopped && std::empty(tier->announce_events))
+            if (!is_stopped && std::empty(tier->announce_events))
             {
                 /* the queue is empty, so enqueue a periodic update */
                 int const i = tier->announceIntervalSec;
@@ -1224,7 +1224,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
     tier->isAnnouncing = true;
     tier->lastAnnounceStartTime = now;
 
-    announce_request_delegate(announcer, req, on_announce_done, data);
+    announce_request_delegate(announcer, req, onAnnounceDone, data);
 }
 
 /***

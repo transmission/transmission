@@ -568,7 +568,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         int native_value;
     };
 
-    auto constexpr native_map = std::array<native_map_item, 8>{
+    auto constexpr NativeMap = std::array<native_map_item, 8>{
         { { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, O_RDWR },
           { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ, O_RDONLY },
           { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_WRITE, O_WRONLY },
@@ -580,7 +580,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
 
     int native_flags = O_BINARY | O_LARGEFILE | O_CLOEXEC;
 
-    for (auto const& item : native_map)
+    for (auto const& item : NativeMap)
     {
         if ((flags & item.symbolic_mask) == item.symbolic_value)
         {

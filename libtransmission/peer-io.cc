@@ -131,9 +131,9 @@ static void canReadWrapper(tr_peerIo* io_in)
         while (!done && !err)
         {
             size_t piece = 0;
-            size_t const oldLen = evbuffer_get_length(io->inbuf.get());
+            size_t const old_len = evbuffer_get_length(io->inbuf.get());
             int const ret = io->canRead(io.get(), io->userData, &piece);
-            size_t const used = oldLen - evbuffer_get_length(io->inbuf.get());
+            size_t const used = old_len - evbuffer_get_length(io->inbuf.get());
             unsigned int const overhead = guessPacketOverhead(used);
 
             if (piece != 0 || piece != used)
@@ -822,11 +822,11 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    unsigned int const currentSpeed_Bps = io->bandwidth().getPieceSpeedBytesPerSecond(now, TR_UP);
+    unsigned int const current_speed_bytes_per_second = io->bandwidth().getPieceSpeedBytesPerSecond(now, TR_UP);
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static auto const ceiling = (unsigned int)(tr_block_info::BlockSize * 3.5);
-    return std::max(ceiling, currentSpeed_Bps * period);
+    return std::max(ceiling, current_speed_bytes_per_second * period);
 }
 
 size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
@@ -863,17 +863,17 @@ static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset,
     TR_ASSERT(size == 0);
 }
 
-void tr_peerIo::writeBuf(struct evbuffer* buf, bool isPieceData)
+void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
 {
-    size_t const byteCount = evbuffer_get_length(buf);
+    size_t const n_bytes = evbuffer_get_length(buf);
 
     if (isEncrypted())
     {
-        processBuffer(*this, buf, 0, byteCount);
+        processBuffer(*this, buf, 0, n_bytes);
     }
 
     evbuffer_add_buffer(outbuf.get(), buf);
-    outbuf_info.emplace_back(byteCount, isPieceData);
+    outbuf_info.emplace_back(n_bytes, is_piece_data);
 }
 
 void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)

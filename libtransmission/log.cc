@@ -192,9 +192,9 @@ void tr_logSetLevel(tr_log_level level)
     log_state.level = level;
 }
 
-void tr_logSetQueueEnabled(bool isEnabled)
+void tr_logSetQueueEnabled(bool is_enabled)
 {
-    log_state.queue_enabled_ = isEnabled;
+    log_state.queue_enabled_ = is_enabled;
 }
 
 bool tr_logGetQueueEnabled()

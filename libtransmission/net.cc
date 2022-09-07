@@ -415,7 +415,7 @@ void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
     }
 }
 
-static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppressMsgs, int* errOut)
+static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppress_msgs, int* err_out)
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
@@ -425,13 +425,13 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     auto const fd = socket(Domains[addr->type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
-        *errOut = sockerrno;
+        *err_out = sockerrno;
         return TR_BAD_SOCKET;
     }
 
     if (evutil_make_socket_nonblocking(fd) == -1)
     {
-        *errOut = sockerrno;
+        *err_out = sockerrno;
         tr_netCloseSocket(fd);
         return TR_BAD_SOCKET;
     }
@@ -446,7 +446,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
         (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
         (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
-        *errOut = sockerrno;
+        *err_out = sockerrno;
         tr_netCloseSocket(fd);
         return TR_BAD_SOCKET;
     }
@@ -459,7 +459,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     {
         int const err = sockerrno;
 
-        if (!suppressMsgs)
+        if (!suppress_msgs)
         {
             tr_logAddError(fmt::format(
                 err == EADDRINUSE ?
@@ -472,11 +472,11 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
         }
 
         tr_netCloseSocket(fd);
-        *errOut = err;
+        *err_out = err;
         return TR_BAD_SOCKET;
     }
 
-    if (!suppressMsgs)
+    if (!suppress_msgs)
     {
         tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr->readable()));
     }
@@ -499,7 +499,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     if (listen(fd, INT_MAX) == -1)
 #endif /* _WIN32 */
     {
-        *errOut = sockerrno;
+        *err_out = sockerrno;
         tr_netCloseSocket(fd);
         return TR_BAD_SOCKET;
     }
@@ -507,18 +507,18 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     return fd;
 }
 
-tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs)
+tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppress_msgs)
 {
     int unused = 0;
-    return tr_netBindTCPImpl(addr, port, suppressMsgs, &unused);
+    return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
 bool tr_net_hasIPv6(tr_port port)
 {
     static bool result = false;
-    static bool alreadyDone = false;
+    static bool already_done = false;
 
-    if (!alreadyDone)
+    if (!already_done)
     {
         int err = 0;
         auto const fd = tr_netBindTCPImpl(&tr_in6addr_any, port, true, &err);
@@ -533,7 +533,7 @@ bool tr_net_hasIPv6(tr_port port)
             tr_netCloseSocket(fd);
         }
 
-        alreadyDone = true;
+        already_done = true;
     }
 
     return result;

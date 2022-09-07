@@ -42,14 +42,14 @@ void* lock_alloc(unsigned /*locktype*/)
     return new std::recursive_mutex{};
 }
 
-void lock_free(void* lock_, unsigned /*locktype*/)
+void lock_free(void* vlock, unsigned /*locktype*/)
 {
-    delete static_cast<std::recursive_mutex*>(lock_);
+    delete static_cast<std::recursive_mutex*>(vlock);
 }
 
-int lock_lock(unsigned mode, void* lock_)
+int lock_lock(unsigned mode, void* vlock)
 {
-    auto* lock = static_cast<std::recursive_mutex*>(lock_);
+    auto* lock = static_cast<std::recursive_mutex*>(vlock);
     if ((mode & EVTHREAD_TRY) != 0U)
     {
         auto const success = lock->try_lock();
@@ -59,9 +59,9 @@ int lock_lock(unsigned mode, void* lock_)
     return 0;
 }
 
-int lock_unlock(unsigned /*mode*/, void* lock_)
+int lock_unlock(unsigned /*mode*/, void* vlock)
 {
-    static_cast<std::recursive_mutex*>(lock_)->unlock();
+    static_cast<std::recursive_mutex*>(vlock)->unlock();
     return 0;
 }
 
@@ -70,14 +70,14 @@ void* cond_alloc(unsigned /*condflags*/)
     return new std::condition_variable_any();
 }
 
-void cond_free(void* cond_)
+void cond_free(void* vcond)
 {
-    delete static_cast<std::condition_variable_any*>(cond_);
+    delete static_cast<std::condition_variable_any*>(vcond);
 }
 
-int cond_signal(void* cond_, int broadcast)
+int cond_signal(void* vcond, int broadcast)
 {
-    auto* cond = static_cast<std::condition_variable_any*>(cond_);
+    auto* cond = static_cast<std::condition_variable_any*>(vcond);
     if (broadcast != 0)
     {
         cond->notify_all();
@@ -89,10 +89,10 @@ int cond_signal(void* cond_, int broadcast)
     return 0;
 }
 
-int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
+int cond_wait(void* vcond, void* vlock, struct timeval const* tv)
 {
-    auto* cond = static_cast<std::condition_variable_any*>(cond_);
-    auto* lock = static_cast<std::recursive_mutex*>(lock_);
+    auto* cond = static_cast<std::condition_variable_any*>(vcond);
+    auto* lock = static_cast<std::recursive_mutex*>(vlock);
     if (tv == nullptr)
     {
         cond->wait(*lock);
@@ -115,17 +115,17 @@ void initEvthreadsOnce()
 {
     tr_net_init();
 
-    evthread_lock_callbacks constexpr lock_cbs{
+    evthread_lock_callbacks constexpr LockCbs{
         EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
     };
-    evthread_set_lock_callbacks(&lock_cbs);
+    evthread_set_lock_callbacks(&LockCbs);
 
-    evthread_condition_callbacks constexpr cond_cbs{ EVTHREAD_CONDITION_API_VERSION,
-                                                     cond_alloc,
-                                                     cond_free,
-                                                     cond_signal,
-                                                     cond_wait };
-    evthread_set_condition_callbacks(&cond_cbs);
+    evthread_condition_callbacks constexpr CondCbs{ EVTHREAD_CONDITION_API_VERSION,
+                                                    cond_alloc,
+                                                    cond_free,
+                                                    cond_signal,
+                                                    cond_wait };
+    evthread_set_condition_callbacks(&CondCbs);
 
     evthread_set_id_callback(thread_current_id);
 }

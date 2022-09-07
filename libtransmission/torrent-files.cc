@@ -404,11 +404,11 @@ void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
     }
 
     // replace reserved characters with an underscore
-    static auto constexpr add_char = [](auto ch)
+    static auto constexpr AddChar = [](auto ch)
     {
         return isReservedChar(ch) ? '_' : ch;
     };
-    std::transform(std::begin(in), std::end(in), std::back_inserter(out), add_char);
+    std::transform(std::begin(in), std::end(in), std::back_inserter(out), AddChar);
 }
 
 } // namespace

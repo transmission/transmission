@@ -188,20 +188,20 @@ public:
         return tr_torrentFindFromId(session, torrent_id);
     }
 
-    [[nodiscard]] bool isTransferringPieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
+    [[nodiscard]] bool isTransferringPieces(uint64_t now, tr_direction dir, unsigned int* setme_bytes_per_second) const override
     {
-        unsigned int Bps = 0;
+        unsigned int bytes_per_second = 0;
         bool is_active = false;
 
-        if (direction == TR_DOWN)
+        if (dir == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            Bps = bandwidth_.getPieceSpeedBytesPerSecond(now, direction);
+            bytes_per_second = bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
         }
 
-        if (setme_Bps != nullptr)
+        if (setme_bytes_per_second != nullptr)
         {
-            *setme_Bps = Bps;
+            *setme_bytes_per_second = bytes_per_second;
         }
 
         return is_active;

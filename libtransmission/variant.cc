@@ -52,7 +52,7 @@ void tr_variantInit(tr_variant* v, char type)
 ****
 ***/
 
-static auto constexpr STRING_INIT = tr_variant_string{
+static auto constexpr StringInit = tr_variant_string{
     TR_STRING_TYPE_QUARK,
     0,
     {},
@@ -65,7 +65,7 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
         delete[]((char*)(str->str.str));
     }
 
-    *str = STRING_INIT;
+    *str = StringInit;
 }
 
 /* returns a const pointer to the variant's string */
@@ -808,7 +808,7 @@ private:
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted data. (#667)
  */
-void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
+void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_funcs, void* user_data, bool sort_dicts)
 {
     auto stack = VariantWalker{};
     stack.emplace(top, sort_dicts);
@@ -834,14 +834,14 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFu
                 {
                     auto tmp = tr_variant{};
                     tr_variantInitQuark(&tmp, v->key);
-                    walkFuncs->stringFunc(&tmp, user_data);
+                    walk_funcs->stringFunc(&tmp, user_data);
                 }
             }
             else // finished with this node
             {
                 if (tr_variantIsContainer(&node.v))
                 {
-                    walkFuncs->containerEndFunc(&node.v, user_data);
+                    walk_funcs->containerEndFunc(&node.v, user_data);
                 }
 
                 stack.pop();
@@ -854,25 +854,25 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFu
             switch (v->type)
             {
             case TR_VARIANT_TYPE_INT:
-                walkFuncs->intFunc(v, user_data);
+                walk_funcs->intFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_BOOL:
-                walkFuncs->boolFunc(v, user_data);
+                walk_funcs->boolFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_REAL:
-                walkFuncs->realFunc(v, user_data);
+                walk_funcs->realFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_STR:
-                walkFuncs->stringFunc(v, user_data);
+                walk_funcs->stringFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_LIST:
                 if (v == &node.v)
                 {
-                    walkFuncs->listBeginFunc(v, user_data);
+                    walk_funcs->listBeginFunc(v, user_data);
                 }
                 else
                 {
@@ -883,7 +883,7 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFu
             case TR_VARIANT_TYPE_DICT:
                 if (v == &node.v)
                 {
-                    walkFuncs->dictBeginFunc(v, user_data);
+                    walk_funcs->dictBeginFunc(v, user_data);
                 }
                 else
                 {
@@ -918,7 +918,7 @@ static void freeContainerEndFunc(tr_variant const* v, void* /*user_data*/)
     delete[] v->val.l.vals;
 }
 
-static struct VariantWalkFuncs const freeWalkFuncs = {
+static VariantWalkFuncs constexpr FreeWalkFuncs = {
     freeDummyFunc, //
     freeDummyFunc, //
     freeDummyFunc, //
@@ -932,7 +932,7 @@ void tr_variantClear(tr_variant* v)
 {
     if (!tr_variantIsEmpty(v))
     {
-        tr_variantWalk(v, &freeWalkFuncs, nullptr, false);
+        tr_variantWalk(v, &FreeWalkFuncs, nullptr, false);
     }
 
     *v = {};
@@ -944,49 +944,50 @@ void tr_variantClear(tr_variant* v)
 
 static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
 {
-    int i = 0;
-    tr_variant const* val = nullptr;
-
-    while ((val = tr_variantListChild(const_cast<tr_variant*>(src), i)) != nullptr)
+    for (size_t i = 0;; ++i)
     {
-        if (tr_variantIsBool(val))
+        auto const* const child = tr_variantListChild(const_cast<tr_variant*>(src), i);
+        if (child == nullptr)
         {
-            bool boolVal = false;
-            tr_variantGetBool(val, &boolVal);
-            tr_variantListAddBool(target, boolVal);
+            break;
         }
-        else if (tr_variantIsReal(val))
+
+        if (tr_variantIsBool(child))
         {
-            double realVal = 0;
-            tr_variantGetReal(val, &realVal);
-            tr_variantListAddReal(target, realVal);
+            auto val = bool{};
+            tr_variantGetBool(child, &val);
+            tr_variantListAddBool(target, val);
         }
-        else if (tr_variantIsInt(val))
+        else if (tr_variantIsReal(child))
         {
-            int64_t intVal = 0;
-            tr_variantGetInt(val, &intVal);
-            tr_variantListAddInt(target, intVal);
+            auto val = double{};
+            tr_variantGetReal(child, &val);
+            tr_variantListAddReal(target, val);
         }
-        else if (tr_variantIsString(val))
+        else if (tr_variantIsInt(child))
         {
-            auto sv = std::string_view{};
-            (void)tr_variantGetStrView(val, &sv);
-            tr_variantListAddRaw(target, std::data(sv), std::size(sv));
+            auto val = int64_t{};
+            tr_variantGetInt(child, &val);
+            tr_variantListAddInt(target, val);
         }
-        else if (tr_variantIsDict(val))
+        else if (tr_variantIsString(child))
         {
-            tr_variantMergeDicts(tr_variantListAddDict(target, 0), val);
+            auto val = std::string_view{};
+            (void)tr_variantGetStrView(child, &val);
+            tr_variantListAddRaw(target, std::data(val), std::size(val));
         }
-        else if (tr_variantIsList(val))
+        else if (tr_variantIsDict(child))
         {
-            tr_variantListCopy(tr_variantListAddList(target, 0), val);
+            tr_variantMergeDicts(tr_variantListAddDict(target, 0), child);
+        }
+        else if (tr_variantIsList(child))
+        {
+            tr_variantListCopy(tr_variantListAddList(target, 0), child);
         }
         else
         {
             tr_logAddWarn("tr_variantListCopy skipping item");
         }
-
-        ++i;
     }
 }
 
@@ -1016,72 +1017,72 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
     TR_ASSERT(tr_variantIsDict(target));
     TR_ASSERT(tr_variantIsDict(source));
 
-    size_t const sourceCount = tr_variantDictSize(source);
+    size_t const source_count = tr_variantDictSize(source);
 
-    tr_variantDictReserve(target, sourceCount + tr_variantDictSize(target));
+    tr_variantDictReserve(target, source_count + tr_variantDictSize(target));
 
-    for (size_t i = 0; i < sourceCount; ++i)
+    for (size_t i = 0; i < source_count; ++i)
     {
         auto key = tr_quark{};
-        tr_variant* val = nullptr;
-        if (tr_variantDictChild(const_cast<tr_variant*>(source), i, &key, &val))
+        tr_variant* child = nullptr;
+        if (tr_variantDictChild(const_cast<tr_variant*>(source), i, &key, &child))
         {
             tr_variant* t = nullptr;
 
             // if types differ, ensure that target will overwrite source
             auto const* const target_child = tr_variantDictFind(target, key);
-            if ((target_child != nullptr) && !tr_variantIsType(target_child, val->type))
+            if ((target_child != nullptr) && !tr_variantIsType(target_child, child->type))
             {
                 tr_variantDictRemove(target, key);
             }
 
-            if (tr_variantIsBool(val))
+            if (tr_variantIsBool(child))
             {
-                bool boolVal = false;
-                tr_variantGetBool(val, &boolVal);
-                tr_variantDictAddBool(target, key, boolVal);
+                auto val = bool{};
+                tr_variantGetBool(child, &val);
+                tr_variantDictAddBool(target, key, val);
             }
-            else if (tr_variantIsReal(val))
+            else if (tr_variantIsReal(child))
             {
-                double realVal = 0;
-                tr_variantGetReal(val, &realVal);
-                tr_variantDictAddReal(target, key, realVal);
+                auto val = double{};
+                tr_variantGetReal(child, &val);
+                tr_variantDictAddReal(target, key, val);
             }
-            else if (tr_variantIsInt(val))
+            else if (tr_variantIsInt(child))
             {
-                int64_t intVal = 0;
-                tr_variantGetInt(val, &intVal);
-                tr_variantDictAddInt(target, key, intVal);
+                auto val = int64_t{};
+                tr_variantGetInt(child, &val);
+                tr_variantDictAddInt(target, key, val);
             }
-            else if (tr_variantIsString(val))
+            else if (tr_variantIsString(child))
             {
-                auto sv = std::string_view{};
-                (void)tr_variantGetStrView(val, &sv);
-                tr_variantDictAddRaw(target, key, std::data(sv), std::size(sv));
+                auto val = std::string_view{};
+                (void)tr_variantGetStrView(child, &val);
+                tr_variantDictAddRaw(target, key, std::data(val), std::size(val));
             }
-            else if (tr_variantIsDict(val) && tr_variantDictFindDict(target, key, &t))
+            else if (tr_variantIsDict(child) && tr_variantDictFindDict(target, key, &t))
             {
-                tr_variantMergeDicts(t, val);
+                tr_variantMergeDicts(t, child);
             }
-            else if (tr_variantIsList(val))
+            else if (tr_variantIsList(child))
             {
                 if (tr_variantDictFind(target, key) == nullptr)
                 {
-                    tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)), val);
+                    tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(child)), child);
                 }
             }
-            else if (tr_variantIsDict(val))
+            else if (tr_variantIsDict(child))
             {
                 tr_variant* target_dict = tr_variantDictFind(target, key);
 
                 if (target_dict == nullptr)
                 {
-                    target_dict = tr_variantDictAddDict(target, key, tr_variantDictSize(val));
+                    target_dict = tr_variantDictAddDict(target, key, tr_variantDictSize(child));
                 }
 
                 if (tr_variantIsDict(target_dict))
                 {
-                    tr_variantMergeDicts(target_dict, val);
+                    tr_variantMergeDicts(target_dict, child);
                 }
             }
             else

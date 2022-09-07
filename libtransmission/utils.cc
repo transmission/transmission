@@ -222,15 +222,15 @@ char const* tr_strerror(int errnum)
 
 std::string_view tr_strvStrip(std::string_view str)
 {
-    auto constexpr test = [](auto ch)
+    auto constexpr Test = [](auto ch)
     {
         return isspace(static_cast<unsigned char>(ch));
     };
 
-    auto const it = std::find_if_not(std::begin(str), std::end(str), test);
+    auto const it = std::find_if_not(std::begin(str), std::end(str), Test);
     str.remove_prefix(std::distance(std::begin(str), it));
 
-    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), test);
+    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), Test);
     str.remove_suffix(std::distance(std::rbegin(str), rit));
 
     return str;
@@ -868,19 +868,19 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
     formatter_init(speed_units, kilo, kb, mb, gb, tb);
 }
 
-std::string tr_formatter_speed_KBps(double KBps)
+std::string tr_formatter_speed_KBps(double kilo_per_second)
 {
     using namespace formatter_impl;
 
-    auto speed = KBps;
+    auto speed = kilo_per_second;
 
     if (speed <= 999.95) // 0.0 KB to 999.9 KB
     {
         return fmt::format("{:d} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
     }
 
-    double const K = speed_units[TR_FMT_KB].value;
-    speed /= K;
+    double const kilo = speed_units[TR_FMT_KB].value;
+    speed /= kilo;
 
     if (speed <= 99.995) // 0.98 MB to 99.99 MB
     {
@@ -892,7 +892,7 @@ std::string tr_formatter_speed_KBps(double KBps)
         return fmt::format("{:.1f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
 
-    return fmt::format("{:.1f} {:s}", speed / K, std::data(speed_units[TR_FMT_GB].name));
+    return fmt::format("{:.1f} {:s}", speed / kilo, std::data(speed_units[TR_FMT_GB].name));
 }
 
 size_t tr_mem_K = 0;
@@ -1029,7 +1029,7 @@ void tr_net_init()
 
 std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 {
-    auto constexpr compare = [](mime_type_suffix const& entry, auto const& suffix)
+    auto constexpr Compare = [](mime_type_suffix const& entry, auto const& suffix)
     {
         return entry.suffix < suffix;
     };
@@ -1037,7 +1037,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
-        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, compare);
+        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, Compare);
         if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
         {
             return it->mime_type;

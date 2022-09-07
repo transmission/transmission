@@ -123,7 +123,7 @@ public:
 
     /// SPEED LIMIT
 
-    void setSpeedLimitBps(tr_direction, unsigned int Bps);
+    void setSpeedLimitBps(tr_direction, unsigned int bytes_per_second);
 
     [[nodiscard]] unsigned int speedLimitBps(tr_direction) const;
 

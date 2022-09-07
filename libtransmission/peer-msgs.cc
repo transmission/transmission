@@ -202,7 +202,7 @@ class tr_peerMsgsImpl;
 // TODO: make these to be member functions
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
 static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
-static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
+static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
 static void peerPulse(void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
@@ -253,7 +253,7 @@ public:
         peer_atom* atom_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_peer_callback callback,
-        void* callbackData)
+        void* callback_data)
         : tr_peerMsgs{ torrent_in, atom_in }
         , outMessagesBatchPeriod{ LowPriorityIntervalSecs }
         , torrent{ torrent_in }
@@ -261,7 +261,7 @@ public:
         , io{ std::move(io_in) }
         , have_{ torrent_in->pieceCount() }
         , callback_{ callback }
-        , callbackData_{ callbackData }
+        , callback_data_{ callback_data }
     {
         if (torrent->allowsPex())
         {
@@ -327,16 +327,16 @@ public:
         }
     }
 
-    bool isTransferringPieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
+    bool isTransferringPieces(uint64_t now, tr_direction dir, unsigned int* setme_bytes_per_second) const override
     {
-        auto const Bps = io->getPieceSpeed_Bps(now, direction);
+        auto const bytes_per_second = io->getPieceSpeedBytesPerSecond(now, dir);
 
-        if (setme_Bps != nullptr)
+        if (setme_bytes_per_second != nullptr)
         {
-            *setme_Bps = Bps;
+            *setme_bytes_per_second = bytes_per_second;
         }
 
-        return Bps > 0;
+        return bytes_per_second > 0;
     }
 
     [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
@@ -465,9 +465,9 @@ public:
     void set_choke(bool peer_is_choked) override
     {
         time_t const now = tr_time();
-        time_t const fibrillationTime = now - MinChokePeriodSec;
+        time_t const fibrillation_time = now - MinChokePeriodSec;
 
-        if (chokeChangedAt > fibrillationTime)
+        if (chokeChangedAt > fibrillation_time)
         {
             // TODO logtrace(msgs, "Not changing choke to %d to avoid fibrillation", peer_is_choked);
         }
@@ -565,7 +565,7 @@ public:
     {
         if (callback_ != nullptr)
         {
-            (*callback_)(this, peer_event, callbackData_);
+            (*callback_)(this, peer_event, callback_data_);
         }
     }
 
@@ -580,18 +580,19 @@ private:
         // Get the rate limit we should use.
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
-        auto rate_Bps = tr_peerGetPieceSpeed_Bps(this, now, TR_PEER_TO_CLIENT);
+        auto rate_bytes_per_second = tr_peerGetPieceSpeedBytesPerSecond(this, now, TR_PEER_TO_CLIENT);
         if (tr_torrentUsesSpeedLimit(torrent, TR_PEER_TO_CLIENT))
         {
-            rate_Bps = std::min(rate_Bps, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
+            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
         }
 
         // honor the session limits, if enabled
         if (tr_torrentUsesSessionLimits(torrent))
         {
-            if (auto const irate_Bps = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT); irate_Bps)
+            if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
+                irate_bytes_per_second)
             {
-                rate_Bps = std::min(rate_Bps, *irate_Bps);
+                rate_bytes_per_second = std::min(rate_bytes_per_second, *irate_bytes_per_second);
             }
         }
 
@@ -599,7 +600,7 @@ private:
         // many requests we should send to this peer
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / tr_block_info::BlockSize;
+        size_t const estimated_blocks_in_period = (rate_bytes_per_second * Seconds) / tr_block_info::BlockSize;
         size_t const ceil = reqq ? *reqq : 250;
         return std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
@@ -748,7 +749,7 @@ private:
     std::array<bool, 2> is_active_ = { false, false };
 
     tr_peer_callback const callback_;
-    void* const callbackData_;
+    void* const callback_data_;
 
     mutable std::optional<float> percent_done_;
 
@@ -1162,8 +1163,8 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
     if (msg_type == MetadataMsgType::Data && !msgs->torrent->hasMetainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
         piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
-        int const pieceLen = msg_end - benc_end;
-        tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, pieceLen);
+        int const piece_len = msg_end - benc_end;
+        tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
     }
 
     if (msg_type == MetadataMsgType::Request)
@@ -1848,13 +1849,13 @@ static int clientGotBlock(
     return 0;
 }
 
-static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs)
+static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
-    if (wasPieceData)
+    if (was_piece_data)
     {
-        msgs->publish(tr_peer_event::SentPieceData(bytesWritten));
+        msgs->publish(tr_peer_event::SentPieceData(bytes_written));
     }
 
     if (tr_isPeerIo(io) && io->userData != nullptr)
@@ -1987,23 +1988,23 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 
 static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 {
-    size_t bytesWritten = 0;
+    size_t bytes_written = 0;
     struct peer_request req;
-    bool const haveMessages = evbuffer_get_length(msgs->outMessages) != 0;
+    bool const have_messages = evbuffer_get_length(msgs->outMessages) != 0;
     bool const fext = msgs->io->supportsFEXT();
 
     /**
     ***  Protocol messages
     **/
 
-    if (haveMessages && msgs->outMessagesBatchedAt == 0) /* fresh batch */
+    if (have_messages && msgs->outMessagesBatchedAt == 0) /* fresh batch */
     {
         logtrace(
             msgs,
             fmt::format(FMT_STRING("started an outMessages batch (length is {:d})"), evbuffer_get_length(msgs->outMessages)));
         msgs->outMessagesBatchedAt = now;
     }
-    else if (haveMessages && now - msgs->outMessagesBatchedAt >= msgs->outMessagesBatchPeriod)
+    else if (have_messages && now - msgs->outMessagesBatchedAt >= msgs->outMessagesBatchPeriod)
     {
         size_t const len = evbuffer_get_length(msgs->outMessages);
         /* flush the protocol messages */
@@ -2012,7 +2013,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
         msgs->outMessagesBatchPeriod = LowPriorityIntervalSecs;
-        bytesWritten += len;
+        bytes_written += len;
     }
 
     /**
@@ -2130,7 +2131,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
                 logtrace(msgs, fmt::format(FMT_STRING("sending block {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
                 TR_ASSERT(n == msglen);
                 msgs->io->writeBuf(out, true);
-                bytesWritten += n;
+                bytes_written += n;
                 msgs->clientSentAnythingAt = now;
                 msgs->blocks_sent_to_peer.add(tr_time(), 1);
             }
@@ -2139,7 +2140,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 
             if (err)
             {
-                bytesWritten = 0;
+                bytes_written = 0;
                 msgs = nullptr;
             }
         }
@@ -2165,7 +2166,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
     }
 
-    return bytesWritten;
+    return bytes_written;
 }
 
 static void peerPulse(void* vmsgs)

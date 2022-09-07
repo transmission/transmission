@@ -335,15 +335,15 @@ private:
             }
 
             /* we want to join that LPD multicast group */
-            struct ip_mreq mcastReq = {};
-            mcastReq.imr_multiaddr = mcast_addr_.sin_addr;
-            mcastReq.imr_interface.s_addr = INADDR_ANY;
+            struct ip_mreq mcast_req = {};
+            mcast_req.imr_multiaddr = mcast_addr_.sin_addr;
+            mcast_req.imr_interface.s_addr = INADDR_ANY;
 
             if (setsockopt(
                     mcast_rcv_socket_,
                     IPPROTO_IP,
                     IP_ADD_MEMBERSHIP,
-                    reinterpret_cast<char const*>(&mcastReq),
+                    reinterpret_cast<char const*>(&mcast_req),
                     sizeof(struct ip_mreq)) == -1)
             {
                 return false;

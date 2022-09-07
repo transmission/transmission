@@ -630,11 +630,11 @@ private:
 *** tr_peer virtual functions
 **/
 
-unsigned int tr_peerGetPieceSpeed_Bps(tr_peer const* peer, uint64_t now, tr_direction direction)
+unsigned int tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction)
 {
-    unsigned int Bps = 0;
-    peer->isTransferringPieces(now, direction, &Bps);
-    return Bps;
+    unsigned int bytes_per_second = 0;
+    peer->isTransferringPieces(now, direction, &bytes_per_second);
+    return bytes_per_second;
 }
 
 tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
@@ -949,7 +949,7 @@ static void peerSuggestedPiece(
 
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 {
-    bool pieceCameFromPeers = false;
+    bool piece_came_from_peers = false;
     tr_swarm* const s = tor->swarm;
 
     /* walk through our peers */
@@ -958,13 +958,13 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
         // notify the peer that we now have this piece
         peer->on_piece_completed(p);
 
-        if (!pieceCameFromPeers)
+        if (!piece_came_from_peers)
         {
-            pieceCameFromPeers = peer->blame.test(p);
+            piece_came_from_peers = peer->blame.test(p);
         }
     }
 
-    if (pieceCameFromPeers) /* webseed downloads don't belong in announce totals */
+    if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
     {
         tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->pieceSize(p));
     }
@@ -1297,9 +1297,9 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
     return n_used;
 }
 
-std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
+std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
 {
-    size_t const n = compactLen / 6;
+    size_t const n = compact_len / 6;
     auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
@@ -1317,9 +1317,9 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
     return pex;
 }
 
-std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
+std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
 {
-    size_t const n = compactLen / 18;
+    size_t const n = compact_len / 18;
     auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
@@ -1341,27 +1341,27 @@ std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactL
 ***
 **/
 
-void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
+void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
 {
     auto* const swarm = tor->swarm;
-    auto const byteCount = tor->pieceSize(pieceIndex);
+    auto const byte_count = tor->pieceSize(piece_index);
 
     for (auto* const peer : swarm->peers)
     {
-        if (peer->blame.test(pieceIndex))
+        if (peer->blame.test(piece_index))
         {
             tr_logAddTraceSwarm(
                 swarm,
                 fmt::format(
                     "peer {} contributed to corrupt piece ({}); now has {} strikes",
                     peer->readable(),
-                    pieceIndex,
+                    piece_index,
                     peer->strikes + 1));
             swarm->addStrike(peer);
         }
     }
 
-    tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byteCount);
+    tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
 }
 
 namespace get_peers_helpers
@@ -1699,8 +1699,8 @@ namespace peer_stat_helpers
     stats.progress = peer->percentDone();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
-    stats.rateToPeer_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
-    stats.rateToClient_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
+    stats.rateToPeer_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeedBytesPerSecond(peer, now_msec, TR_CLIENT_TO_PEER));
+    stats.rateToClient_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeedBytesPerSecond(peer, now_msec, TR_PEER_TO_CLIENT));
     stats.peerIsChoked = peer->is_peer_choked();
     stats.peerIsInterested = peer->is_peer_interested();
     stats.clientIsChoked = peer->is_client_choked();
@@ -1894,7 +1894,7 @@ void rechokeDownloads(tr_swarm* s)
 {
     static auto constexpr MinInterestingPeers = uint16_t{ 5 };
 
-    auto const peerCount = s->peerCount();
+    auto const peer_count = s->peerCount();
     auto const& peers = s->peers;
     auto const now = tr_time();
 
@@ -1942,34 +1942,34 @@ void rechokeDownloads(tr_swarm* s)
 
         if (cancels > 0)
         {
-            /* cancelRate: of the block requests we've recently made, the percentage we cancelled.
+            /* cancel_rate: of the block requests we've recently made, the percentage we cancelled.
              * higher values indicate more congestion. */
-            double const cancelRate = cancels / (double)(cancels + blocks);
-            double const mult = 1 - std::min(cancelRate, 0.5);
+            double const cancel_rate = cancels / (double)(cancels + blocks);
+            double const mult = 1 - std::min(cancel_rate, 0.5);
             max_peers = s->interested_count * mult;
             tr_logAddTraceSwarm(
                 s,
                 fmt::format(
                     "cancel rate is {} -- reducing the number of peers we're interested in by {} percent",
-                    cancelRate,
+                    cancel_rate,
                     mult * 100));
             s->lastCancel = now;
         }
 
-        time_t const timeSinceCancel = now - s->lastCancel;
+        time_t const time_since_cancel = now - s->lastCancel;
 
-        if (timeSinceCancel != 0)
+        if (time_since_cancel != 0)
         {
-            int const maxIncrease = 15;
-            time_t const maxHistory = 2 * CancelHistorySec;
-            double const mult = std::min(timeSinceCancel, maxHistory) / (double)maxHistory;
-            int const inc = maxIncrease * mult;
+            int const max_increase = 15;
+            time_t const max_history = 2 * CancelHistorySec;
+            double const mult = std::min(time_since_cancel, max_history) / static_cast<double>(max_history);
+            int const inc = max_increase * mult;
             max_peers = s->max_peers + inc;
             tr_logAddTraceSwarm(
                 s,
                 fmt::format(
                     "time since last cancel is {} -- increasing the number of peers we're interested in by {}",
-                    timeSinceCancel,
+                    time_since_cancel,
                     inc));
         }
     }
@@ -1979,9 +1979,9 @@ void rechokeDownloads(tr_swarm* s)
 
     s->max_peers = max_peers;
 
-    if (peerCount > 0)
+    if (peer_count > 0)
     {
-        rechoke.reserve(peerCount);
+        rechoke.reserve(peer_count);
 
         auto const* const tor = s->tor;
         int const n = tor->pieceCount();
@@ -2126,18 +2126,19 @@ struct ChokeData
 {
     if (tor->isDone())
     {
-        return tr_peerGetPieceSpeed_Bps(peer, now, TR_CLIENT_TO_PEER);
+        return tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_CLIENT_TO_PEER);
     }
 
     /* downloading a private torrent... take upload speed into account
      * because there may only be a small window of opportunity to share */
     if (tor->isPrivate())
     {
-        return tr_peerGetPieceSpeed_Bps(peer, now, TR_PEER_TO_CLIENT) + tr_peerGetPieceSpeed_Bps(peer, now, TR_CLIENT_TO_PEER);
+        return tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_PEER_TO_CLIENT) +
+            tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_CLIENT_TO_PEER);
     }
 
     /* downloading a public torrent */
-    return tr_peerGetPieceSpeed_Bps(peer, now, TR_PEER_TO_CLIENT);
+    return tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_PEER_TO_CLIENT);
 }
 
 // an optimistically unchoked peer is immune from rechoking
@@ -2150,13 +2151,13 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
     auto const lock = s->unique_lock();
 
-    auto const peerCount = s->peerCount();
+    auto const peer_count = s->peerCount();
     auto& peers = s->peers;
     auto choked = std::vector<ChokeData>{};
-    choked.reserve(peerCount);
+    choked.reserve(peer_count);
     auto const* const session = s->manager->session;
-    bool const chokeAll = !s->tor->clientCanUpload();
-    bool const isMaxedOut = isBandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
+    bool const choke_all = !s->tor->clientCanUpload();
+    bool const is_maxed_out = isBandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -2178,7 +2179,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             /* choke seeds and partial seeds */
             peer->set_choke(true);
         }
-        else if (chokeAll)
+        else if (choke_all)
         {
             /* choke everyone if we're not uploading */
             peer->set_choke(true);
@@ -2222,7 +2223,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             break;
         }
 
-        item.is_choked = isMaxedOut ? item.was_choked : false;
+        item.is_choked = is_maxed_out ? item.was_choked : false;
 
         ++checked_choke_count;
 
@@ -2233,7 +2234,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     }
 
     /* optimistic unchoke */
-    if (s->optimistic == nullptr && !isMaxedOut && checked_choke_count < std::size(choked))
+    if (s->optimistic == nullptr && !is_maxed_out && checked_choke_count < std::size(choked))
     {
         auto rand_pool = std::vector<ChokeData*>{};
 
@@ -2310,7 +2311,7 @@ auto constexpr MinUploadIdleSecs = int{ 60 };
 // when few peers are available, keep idle ones this long
 auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
 
-[[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, int peerCount, time_t const now)
+[[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, int peer_count, time_t const now)
 {
     /* if it's marked for purging, close it */
     if (peer->do_purge)
@@ -2331,21 +2332,22 @@ auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        auto const relaxStrictnessIfFewerThanN = std::lround(getMaxPeerCount(tor) * 0.9);
+        auto const relax_strictness_if_fewer_than_n = std::lround(getMaxPeerCount(tor) * 0.9);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
-        float const strictness = peerCount >= relaxStrictnessIfFewerThanN ? 1.0 :
-                                                                            peerCount / (float)relaxStrictnessIfFewerThanN;
+        float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?
+            1.0 :
+            peer_count / (float)relax_strictness_if_fewer_than_n;
         int const lo = MinUploadIdleSecs;
         int const hi = MaxUploadIdleSecs;
         int const limit = hi - (hi - lo) * strictness;
-        int const idleTime = now - std::max(atom->time, atom->piece_data_time);
+        int const idle_time = now - std::max(atom->time, atom->piece_data_time);
 
-        if (idleTime > limit)
+        if (idle_time > limit)
         {
             tr_logAddTraceSwarm(
                 s,
-                fmt::format("purging peer {} because it's been {} secs since we shared anything", peer->readable(), idleTime));
+                fmt::format("purging peer {} because it's been {} secs since we shared anything", peer->readable(), idle_time));
             return true;
         }
     }

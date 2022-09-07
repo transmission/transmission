@@ -186,7 +186,7 @@ void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_d
  * @see tr_sessionInit()
  * @see tr_sessionSaveSettings()
  */
-bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* appName);
+bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -507,8 +507,8 @@ enum tr_direction
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int Bps);
-void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, unsigned int KBps);
+void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int bytes_per_second);
+void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, unsigned int kilo_per_second);
 unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
 
 void tr_sessionLimitSpeed(tr_session*, tr_direction, bool);
@@ -518,7 +518,7 @@ bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, unsigned int Bps);
+void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, unsigned int kilo_per_seond);
 unsigned int tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
 
 void tr_sessionUseAltSpeed(tr_session*, bool);
@@ -552,7 +552,7 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const*);
 
 using tr_altSpeedFunc = void (*)(tr_session*, bool active, bool userDriven, void*);
 
-void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
+void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void* user_data);
 
 /***
 ****
@@ -828,10 +828,10 @@ void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory);
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused);
 
 /** @brief Set the priorities for files in a torrent */
-void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority);
+void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority);
 
 /** @brief Set the download flag for files in a torrent */
-void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted);
+void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, bool wanted);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount);
@@ -1015,7 +1015,7 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
 ****
 ***/
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, unsigned int KBps);
+void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, unsigned int kilo_per_second);
 unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const*, tr_direction);
 
 void tr_torrentUseSpeedLimit(tr_torrent*, tr_direction, bool);
@@ -1042,7 +1042,7 @@ void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode);
 
 tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor);
 
-void tr_torrentSetRatioLimit(tr_torrent* tor, double ratio);
+void tr_torrentSetRatioLimit(tr_torrent* tor, double desired_ratio);
 
 double tr_torrentGetRatioLimit(tr_torrent const* tor);
 
@@ -1066,7 +1066,7 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode);
 
 tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* tor);
 
-void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idleMinutes);
+void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes);
 
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor);
 
@@ -1099,7 +1099,7 @@ enum
 void tr_torrentSetFilePriorities(
     tr_torrent* torrent,
     tr_file_index_t const* files,
-    tr_file_index_t fileCount,
+    tr_file_index_t file_count,
     tr_priority_t priority);
 
 /** @brief Set a batch of files to be downloaded or not. */
@@ -1296,7 +1296,7 @@ struct tr_peer_stat
     int activeReqsToPeer;
 };
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, int* peerCount);
+tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, int* peer_count);
 
 void tr_torrentPeersFree(tr_peer_stat* peerStats, int peerCount);
 

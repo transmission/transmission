@@ -91,9 +91,9 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
         /* fallback: the old-fashioned way */
         while (success && length > 0)
         {
-            uint64_t const thisPass = std::min(length, uint64_t{ std::size(buf) });
+            uint64_t const this_pass = std::min(length, uint64_t{ std::size(buf) });
             uint64_t bytes_written = 0;
-            success = tr_sys_file_write(fd, std::data(buf), thisPass, &bytes_written, &my_error);
+            success = tr_sys_file_write(fd, std::data(buf), this_pass, &bytes_written, &my_error);
             length -= bytes_written;
         }
 
