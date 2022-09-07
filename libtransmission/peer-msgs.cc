@@ -1162,8 +1162,8 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
     if (msg_type == MetadataMsgType::Data && !msgs->torrent->hasMetainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
         piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
-        int const pieceLen = msg_end - benc_end;
-        tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, pieceLen);
+        int const piece_len = msg_end - benc_end;
+        tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
     }
 
     if (msg_type == MetadataMsgType::Request)
