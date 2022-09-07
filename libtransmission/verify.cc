@@ -272,10 +272,11 @@ void tr_verify_worker::remove(tr_torrent* tor)
 
 tr_verify_worker::~tr_verify_worker()
 {
-    auto const lock = std::lock_guard(verify_mutex_);
-
-    stop_current_ = true;
-    todo_.clear();
+    {
+        auto const lock = std::lock_guard(verify_mutex_);
+        stop_current_ = true;
+        todo_.clear();
+    }
 
     while (verify_thread_id_.has_value())
     {
