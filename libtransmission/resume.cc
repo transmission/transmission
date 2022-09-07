@@ -643,7 +643,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool* did_migrate_filename)
+static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did_migrate_filename)
 {
     auto fields_loaded = tr_resume::fields_t{};
 
@@ -677,13 +677,13 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     auto i = int64_t{};
     auto sv = std::string_view{};
 
-    if ((fieldsToLoad & tr_resume::Corrupt) != 0 && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
+    if ((fields_to_load & tr_resume::Corrupt) != 0 && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
     {
         tor->corruptPrev = i;
         fields_loaded |= tr_resume::Corrupt;
     }
 
-    if ((fieldsToLoad & (tr_resume::Progress | tr_resume::DownloadDir)) != 0 &&
+    if ((fields_to_load & (tr_resume::Progress | tr_resume::DownloadDir)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_destination, &sv) && !std::empty(sv))
     {
         bool const is_current_dir = tor->current_dir == tor->download_dir;
@@ -696,7 +696,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= tr_resume::DownloadDir;
     }
 
-    if ((fieldsToLoad & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0 &&
+    if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
     {
         bool const is_current_dir = tor->current_dir == tor->incomplete_dir;
@@ -709,68 +709,68 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= tr_resume::IncompleteDir;
     }
 
-    if ((fieldsToLoad & tr_resume::Downloaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))
+    if ((fields_to_load & tr_resume::Downloaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))
     {
         tor->downloadedPrev = i;
         fields_loaded |= tr_resume::Downloaded;
     }
 
-    if ((fieldsToLoad & tr_resume::Uploaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_uploaded, &i))
+    if ((fields_to_load & tr_resume::Uploaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_uploaded, &i))
     {
         tor->uploadedPrev = i;
         fields_loaded |= tr_resume::Uploaded;
     }
 
-    if ((fieldsToLoad & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
+    if ((fields_to_load & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
     {
         tor->max_connected_peers = static_cast<uint16_t>(i);
         fields_loaded |= tr_resume::MaxPeers;
     }
 
-    if (auto val = bool{}; (fieldsToLoad & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &val))
+    if (auto val = bool{}; (fields_to_load & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &val))
     {
         tor->isRunning = !val;
         fields_loaded |= tr_resume::Run;
     }
 
-    if ((fieldsToLoad & tr_resume::AddedDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_added_date, &i))
+    if ((fields_to_load & tr_resume::AddedDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_added_date, &i))
     {
         tor->addedDate = i;
         fields_loaded |= tr_resume::AddedDate;
     }
 
-    if ((fieldsToLoad & tr_resume::DoneDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_done_date, &i))
+    if ((fields_to_load & tr_resume::DoneDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_done_date, &i))
     {
         tor->doneDate = i;
         fields_loaded |= tr_resume::DoneDate;
     }
 
-    if ((fieldsToLoad & tr_resume::ActivityDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_activity_date, &i))
+    if ((fields_to_load & tr_resume::ActivityDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_activity_date, &i))
     {
         tor->setDateActive(i);
         fields_loaded |= tr_resume::ActivityDate;
     }
 
-    if ((fieldsToLoad & tr_resume::TimeSeeding) != 0 && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
+    if ((fields_to_load & tr_resume::TimeSeeding) != 0 && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
     {
         tor->secondsSeeding = i;
         fields_loaded |= tr_resume::TimeSeeding;
     }
 
-    if ((fieldsToLoad & tr_resume::TimeDownloading) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
+    if ((fields_to_load & tr_resume::TimeDownloading) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
     {
         tor->secondsDownloading = i;
         fields_loaded |= tr_resume::TimeDownloading;
     }
 
-    if ((fieldsToLoad & tr_resume::BandwidthPriority) != 0 && tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) &&
+    if ((fields_to_load & tr_resume::BandwidthPriority) != 0 && tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) &&
         tr_isPriority(i))
     {
         tr_torrentSetPriority(tor, i);
         fields_loaded |= tr_resume::BandwidthPriority;
     }
 
-    if ((fieldsToLoad & tr_resume::Peers) != 0)
+    if ((fields_to_load & tr_resume::Peers) != 0)
     {
         fields_loaded |= loadPeers(&top, tor);
     }
@@ -778,7 +778,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     // Note: loadFilenames() must come before loadProgress()
     // so that loadProgress() -> tor->initCheckedPieces() -> tor->findFile()
     // will know where to look
-    if ((fieldsToLoad & tr_resume::Filenames) != 0)
+    if ((fields_to_load & tr_resume::Filenames) != 0)
     {
         fields_loaded |= loadFilenames(&top, tor);
     }
@@ -786,47 +786,47 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     // Note: loadProgress should come before loadFilePriorities()
     // so that we can skip loading priorities iff the torrent is a
     // seed or a partial seed.
-    if ((fieldsToLoad & tr_resume::Progress) != 0)
+    if ((fields_to_load & tr_resume::Progress) != 0)
     {
         fields_loaded |= loadProgress(&top, tor);
     }
 
-    if (!tor->isDone() && (fieldsToLoad & tr_resume::FilePriorities) != 0)
+    if (!tor->isDone() && (fields_to_load & tr_resume::FilePriorities) != 0)
     {
         fields_loaded |= loadFilePriorities(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Dnd) != 0)
+    if ((fields_to_load & tr_resume::Dnd) != 0)
     {
         fields_loaded |= loadDND(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Speedlimit) != 0)
+    if ((fields_to_load & tr_resume::Speedlimit) != 0)
     {
         fields_loaded |= loadSpeedLimits(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Ratiolimit) != 0)
+    if ((fields_to_load & tr_resume::Ratiolimit) != 0)
     {
         fields_loaded |= loadRatioLimits(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Idlelimit) != 0)
+    if ((fields_to_load & tr_resume::Idlelimit) != 0)
     {
         fields_loaded |= loadIdleLimits(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Name) != 0)
+    if ((fields_to_load & tr_resume::Name) != 0)
     {
         fields_loaded |= loadName(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Labels) != 0)
+    if ((fields_to_load & tr_resume::Labels) != 0)
     {
         fields_loaded |= loadLabels(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Group) != 0)
+    if ((fields_to_load & tr_resume::Group) != 0)
     {
         fields_loaded |= loadGroup(&top, tor);
     }
