@@ -1344,7 +1344,7 @@ std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactL
 void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
 {
     auto* const swarm = tor->swarm;
-    auto const byteCount = tor->pieceSize(pieceIndex);
+    auto const byte_count = tor->pieceSize(pieceIndex);
 
     for (auto* const peer : swarm->peers)
     {
@@ -1361,7 +1361,7 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
         }
     }
 
-    tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byteCount);
+    tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
 }
 
 namespace get_peers_helpers
