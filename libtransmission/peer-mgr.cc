@@ -1942,16 +1942,16 @@ void rechokeDownloads(tr_swarm* s)
 
         if (cancels > 0)
         {
-            /* cancelRate: of the block requests we've recently made, the percentage we cancelled.
+            /* cancel_rate: of the block requests we've recently made, the percentage we cancelled.
              * higher values indicate more congestion. */
-            double const cancelRate = cancels / (double)(cancels + blocks);
-            double const mult = 1 - std::min(cancelRate, 0.5);
+            double const cancel_rate = cancels / (double)(cancels + blocks);
+            double const mult = 1 - std::min(cancel_rate, 0.5);
             max_peers = s->interested_count * mult;
             tr_logAddTraceSwarm(
                 s,
                 fmt::format(
                     "cancel rate is {} -- reducing the number of peers we're interested in by {} percent",
-                    cancelRate,
+                    cancel_rate,
                     mult * 100));
             s->lastCancel = now;
         }
@@ -1960,10 +1960,10 @@ void rechokeDownloads(tr_swarm* s)
 
         if (timeSinceCancel != 0)
         {
-            int const maxIncrease = 15;
-            time_t const maxHistory = 2 * CancelHistorySec;
-            double const mult = std::min(timeSinceCancel, maxHistory) / (double)maxHistory;
-            int const inc = maxIncrease * mult;
+            int const max_increase = 15;
+            time_t const max_history = 2 * CancelHistorySec;
+            double const mult = std::min(timeSinceCancel, max_history) / static_cast<double>(max_history);
+            int const inc = max_increase * mult;
             max_peers = s->max_peers + inc;
             tr_logAddTraceSwarm(
                 s,
