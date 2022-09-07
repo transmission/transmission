@@ -170,7 +170,7 @@ unsigned int tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t no
 
 void tr_peerMgrClearInterest(tr_torrent* tor);
 
-void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
+void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index);
 
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t pieceIndex);
 

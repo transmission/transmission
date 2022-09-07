@@ -1341,21 +1341,21 @@ std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactL
 ***
 **/
 
-void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
+void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
 {
     auto* const swarm = tor->swarm;
-    auto const byte_count = tor->pieceSize(pieceIndex);
+    auto const byte_count = tor->pieceSize(piece_index);
 
     for (auto* const peer : swarm->peers)
     {
-        if (peer->blame.test(pieceIndex))
+        if (peer->blame.test(piece_index))
         {
             tr_logAddTraceSwarm(
                 swarm,
                 fmt::format(
                     "peer {} contributed to corrupt piece ({}); now has {} strikes",
                     peer->readable(),
-                    pieceIndex,
+                    piece_index,
                     peer->strikes + 1));
             swarm->addStrike(peer);
         }
