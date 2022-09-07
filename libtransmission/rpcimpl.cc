@@ -2565,19 +2565,19 @@ void tr_rpc_request_exec_json(
 void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 {
     auto const values = tr_parseNumberRange(str);
-    auto const valueCount = std::size(values);
+    auto const value_count = std::size(values);
 
-    if (valueCount == 0)
+    if (value_count == 0)
     {
         tr_variantInitStr(setme, str);
     }
-    else if (valueCount == 1)
+    else if (value_count == 1)
     {
         tr_variantInitInt(setme, values[0]);
     }
     else
     {
-        tr_variantInitList(setme, valueCount);
+        tr_variantInitList(setme, value_count);
 
         for (auto const& value : values)
         {
