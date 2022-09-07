@@ -1127,7 +1127,6 @@ static char const* torrentSet(
     {
         auto tmp = int64_t{};
         auto d = double{};
-        auto boolVal = bool{};
         tr_variant* tmp_variant = nullptr;
 
         if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
@@ -1185,14 +1184,14 @@ static char const* torrentSet(
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, tmp);
         }
 
-        if (tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &boolVal))
+        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))
         {
-            tr_torrentUseSpeedLimit(tor, TR_DOWN, boolVal);
+            tr_torrentUseSpeedLimit(tor, TR_DOWN, val);
         }
 
-        if (tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &boolVal))
+        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &val))
         {
-            tr_torrentUseSessionLimits(tor, boolVal);
+            tr_torrentUseSessionLimits(tor, val);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_uploadLimit, &tmp))
@@ -1200,9 +1199,9 @@ static char const* torrentSet(
             tr_torrentSetSpeedLimit_KBps(tor, TR_UP, tmp);
         }
 
-        if (tr_variantDictFindBool(args_in, TR_KEY_uploadLimited, &boolVal))
+        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_uploadLimited, &val))
         {
-            tr_torrentUseSpeedLimit(tor, TR_UP, boolVal);
+            tr_torrentUseSpeedLimit(tor, TR_UP, val);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
@@ -1576,7 +1575,6 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     }
 
     auto i = int64_t{};
-    auto boolVal = bool{};
     tr_variant* l = nullptr;
     tr_ctor* ctor = tr_ctorNew(session);
 
@@ -1591,9 +1589,9 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_ctorSetDownloadDir(ctor, TR_FORCE, sz_download_dir.c_str());
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_paused, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_paused, &val))
     {
-        tr_ctorSetPaused(ctor, TR_FORCE, boolVal);
+        tr_ctorSetPaused(ctor, TR_FORCE, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit, &i))
@@ -1792,7 +1790,6 @@ static char const* sessionSet(
         return "incomplete torrents directory path is not absolute";
     }
 
-    auto boolVal = bool{};
     auto d = double{};
     auto i = int64_t{};
     auto sv = std::string_view{};
@@ -1812,9 +1809,9 @@ static char const* sessionSet(
         tr_sessionSetAltSpeed_KBps(session, TR_DOWN, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_alt_speed_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_alt_speed_enabled, &val))
     {
-        tr_sessionUseAltSpeed(session, boolVal);
+        tr_sessionUseAltSpeed(session, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_begin, &i))
@@ -1832,14 +1829,14 @@ static char const* sessionSet(
         tr_sessionSetAltSpeedDay(session, tr_sched_day(i));
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_alt_speed_time_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_alt_speed_time_enabled, &val))
     {
-        tr_sessionUseAltSpeedTime(session, boolVal);
+        tr_sessionUseAltSpeedTime(session, val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_blocklist_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_blocklist_enabled, &val))
     {
-        session->useBlocklist(boolVal);
+        session->useBlocklist(val);
     }
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_blocklist_url, &sv))
@@ -1857,9 +1854,9 @@ static char const* sessionSet(
         tr_sessionSetQueueStalledMinutes(session, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_queue_stalled_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_queue_stalled_enabled, &val))
     {
-        tr_sessionSetQueueStalledEnabled(session, boolVal);
+        tr_sessionSetQueueStalledEnabled(session, val);
     }
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_default_trackers, &sv))
@@ -1872,9 +1869,9 @@ static char const* sessionSet(
         tr_sessionSetQueueSize(session, TR_DOWN, (int)i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_download_queue_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_download_queue_enabled, &val))
     {
-        tr_sessionSetQueueEnabled(session, TR_DOWN, boolVal);
+        tr_sessionSetQueueEnabled(session, TR_DOWN, val);
     }
 
     if (!std::empty(incomplete_dir))
@@ -1882,9 +1879,9 @@ static char const* sessionSet(
         session->setIncompleteDir(incomplete_dir);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_incomplete_dir_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_incomplete_dir_enabled, &val))
     {
-        session->useIncompleteDir(boolVal);
+        session->useIncompleteDir(val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit_global, &i))
@@ -1897,29 +1894,29 @@ static char const* sessionSet(
         tr_sessionSetPeerLimitPerTorrent(session, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_pex_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_pex_enabled, &val))
     {
-        tr_sessionSetPexEnabled(session, boolVal);
+        tr_sessionSetPexEnabled(session, val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_dht_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_dht_enabled, &val))
     {
-        tr_sessionSetDHTEnabled(session, boolVal);
+        tr_sessionSetDHTEnabled(session, val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_utp_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_utp_enabled, &val))
     {
-        tr_sessionSetUTPEnabled(session, boolVal);
+        tr_sessionSetUTPEnabled(session, val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_lpd_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_lpd_enabled, &val))
     {
-        tr_sessionSetLPDEnabled(session, boolVal);
+        tr_sessionSetLPDEnabled(session, val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_peer_port_random_on_start, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_peer_port_random_on_start, &val))
     {
-        tr_sessionSetPeerPortRandomOnStart(session, boolVal);
+        tr_sessionSetPeerPortRandomOnStart(session, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_port, &i))
@@ -1927,14 +1924,14 @@ static char const* sessionSet(
         tr_sessionSetPeerPort(session, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_port_forwarding_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_port_forwarding_enabled, &val))
     {
-        tr_sessionSetPortForwardingEnabled(session, boolVal);
+        tr_sessionSetPortForwardingEnabled(session, val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_rename_partial_files, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_rename_partial_files, &val))
     {
-        tr_sessionSetIncompleteFileNamingEnabled(session, boolVal);
+        tr_sessionSetIncompleteFileNamingEnabled(session, val);
     }
 
     if (tr_variantDictFindReal(args_in, TR_KEY_seedRatioLimit, &d))
@@ -1942,9 +1939,9 @@ static char const* sessionSet(
         tr_sessionSetRatioLimit(session, d);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_seedRatioLimited, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_seedRatioLimited, &val))
     {
-        tr_sessionSetRatioLimited(session, boolVal);
+        tr_sessionSetRatioLimited(session, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_idle_seeding_limit, &i))
@@ -1952,19 +1949,19 @@ static char const* sessionSet(
         tr_sessionSetIdleLimit(session, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_idle_seeding_limit_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_idle_seeding_limit_enabled, &val))
     {
-        tr_sessionSetIdleLimited(session, boolVal);
+        tr_sessionSetIdleLimited(session, val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_start_added_torrents, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_start_added_torrents, &val))
     {
-        tr_sessionSetPaused(session, !boolVal);
+        tr_sessionSetPaused(session, !val);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_seed_queue_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_seed_queue_enabled, &val))
     {
-        tr_sessionSetQueueEnabled(session, TR_UP, boolVal);
+        tr_sessionSetQueueEnabled(session, TR_UP, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_seed_queue_size, &i))
@@ -1985,9 +1982,9 @@ static char const* sessionSet(
         }
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_trash_original_torrent_files, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_trash_original_torrent_files, &val))
     {
-        tr_sessionSetDeleteSource(session, boolVal);
+        tr_sessionSetDeleteSource(session, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &i))
@@ -1995,9 +1992,9 @@ static char const* sessionSet(
         tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &val))
     {
-        tr_sessionLimitSpeed(session, TR_DOWN, boolVal);
+        tr_sessionLimitSpeed(session, TR_DOWN, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &i))
@@ -2005,9 +2002,9 @@ static char const* sessionSet(
         tr_sessionSetSpeedLimit_KBps(session, TR_UP, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &val))
     {
-        tr_sessionLimitSpeed(session, TR_UP, boolVal);
+        tr_sessionLimitSpeed(session, TR_UP, val);
     }
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_encryption, &sv))
@@ -2031,9 +2028,9 @@ static char const* sessionSet(
         tr_sessionSetAntiBruteForceThreshold(session, i);
     }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_anti_brute_force_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_anti_brute_force_enabled, &val))
     {
-        tr_sessionSetAntiBruteForceEnabled(session, boolVal);
+        tr_sessionSetAntiBruteForceEnabled(session, val);
     }
 
     session->rpcNotify(TR_RPC_SESSION_CHANGED, nullptr);
