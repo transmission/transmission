@@ -863,7 +863,7 @@ static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset,
     TR_ASSERT(size == 0);
 }
 
-void tr_peerIo::writeBuf(struct evbuffer* buf, bool isPieceData)
+void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
 {
     size_t const n_bytes = evbuffer_get_length(buf);
 
@@ -873,7 +873,7 @@ void tr_peerIo::writeBuf(struct evbuffer* buf, bool isPieceData)
     }
 
     evbuffer_add_buffer(outbuf.get(), buf);
-    outbuf_info.emplace_back(n_bytes, isPieceData);
+    outbuf_info.emplace_back(n_bytes, is_piece_data);
 }
 
 void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)
