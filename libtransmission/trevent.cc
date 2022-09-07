@@ -70,14 +70,14 @@ void* cond_alloc(unsigned /*condflags*/)
     return new std::condition_variable_any();
 }
 
-void cond_free(void* cond_)
+void cond_free(void* vcond)
 {
-    delete static_cast<std::condition_variable_any*>(cond_);
+    delete static_cast<std::condition_variable_any*>(vcond);
 }
 
-int cond_signal(void* cond_, int broadcast)
+int cond_signal(void* vcond, int broadcast)
 {
-    auto* cond = static_cast<std::condition_variable_any*>(cond_);
+    auto* cond = static_cast<std::condition_variable_any*>(vcond);
     if (broadcast != 0)
     {
         cond->notify_all();
