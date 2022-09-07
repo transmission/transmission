@@ -1,0 +1,9 @@
+.tr-workarea.frame {
+    border-left-width: 0;
+    border-right-width: 0;
+    border-radius: 0;
+}
+
+.tr-small {
+    font-size: small;
+}

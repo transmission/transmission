@@ -21,7 +21,6 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h> /* tr_formatter_mem_B() */
 
-#include "HigWorkarea.h"
 #include "MakeDialog.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -38,10 +37,12 @@ class MakeProgressDialog : public Gtk::Dialog
 {
 public:
     MakeProgressDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
-        tr_metainfo_builder& builder,
+        tr_metainfo_builder& metainfo_builder,
         std::future<tr_error*> future,
-        std::string_view target,
+        std::string_view const& target,
         Glib::RefPtr<Session> const& core);
     ~MakeProgressDialog() override;
 
@@ -75,7 +76,7 @@ private:
 class MakeDialog::Impl
 {
 public:
-    Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core);
+    Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -237,48 +238,41 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
 }
 
 MakeProgressDialog::MakeProgressDialog(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
     Gtk::Window& parent,
-    tr_metainfo_builder& builder,
+    tr_metainfo_builder& metainfo_builder,
     std::future<tr_error*> future,
-    std::string_view target,
+    std::string_view const& target,
     Glib::RefPtr<Session> const& core)
-    : Gtk::Dialog(_("New Torrent"), parent, true)
-    , builder_{ builder }
+    : Gtk::Dialog(cast_item)
+    , builder_(metainfo_builder)
     , future_{ std::move(future) }
-    , target_{ target }
-    , core_{ core }
+    , target_(target)
+    , core_(core)
+    , progress_label_(gtr_get_widget<Gtk::Label>(builder, "progress_label"))
+    , progress_bar_(gtr_get_widget<Gtk::ProgressBar>(builder, "progress_bar"))
 {
-    add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-    add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
-    add_button(_("_Add"), Gtk::RESPONSE_ACCEPT);
+    set_transient_for(parent);
     signal_response().connect(sigc::mem_fun(*this, &MakeProgressDialog::onProgressDialogResponse));
-
-    auto* fr = Gtk::make_managed<Gtk::Frame>();
-    fr->set_border_width(GUI_PAD_BIG);
-    fr->set_shadow_type(Gtk::SHADOW_NONE);
-    auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, GUI_PAD);
-    fr->add(*v);
-
-    progress_label_ = Gtk::make_managed<Gtk::Label>(_("Creating torrent…"));
-    progress_label_->set_halign(Gtk::ALIGN_START);
-    progress_label_->set_valign(Gtk::ALIGN_CENTER);
-    progress_label_->set_justify(Gtk::JUSTIFY_LEFT);
-    v->pack_start(*progress_label_, false, false, 0);
-
-    progress_bar_ = Gtk::make_managed<Gtk::ProgressBar>();
-    v->pack_start(*progress_bar_, false, false, 0);
 
     progress_tag_ = Glib::signal_timeout().connect_seconds(
         sigc::mem_fun(*this, &MakeProgressDialog::onProgressDialogRefresh),
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
     onProgressDialogRefresh();
-
-    gtr_dialog_set_content(*this, *fr);
 }
 
 void MakeDialog::Impl::makeProgressDialog(std::string_view target, std::future<tr_error*> future)
 {
-    progress_dialog_ = std::make_unique<MakeProgressDialog>(dialog_, *builder_, std::move(future), target, core_);
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MakeProgressDialog.ui"));
+    progress_dialog_ = std::unique_ptr<MakeProgressDialog>(gtr_get_widget_derived<MakeProgressDialog>(
+        builder,
+        "MakeProgressDialog",
+        dialog_,
+        *builder_,
+        std::move(future),
+        target,
+        core_));
     progress_dialog_->signal_hide().connect(
         [this]()
         {
@@ -350,7 +344,7 @@ void MakeDialog::Impl::updatePiecesLabel()
 {
     auto const filename = builder_ ? builder_->top() : ""sv;
 
-    auto gstr = Glib::ustring{ "<i>" };
+    auto gstr = Glib::ustring();
 
     if (std::empty(filename))
     {
@@ -373,8 +367,7 @@ void MakeDialog::Impl::updatePiecesLabel()
             fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize())));
     }
 
-    gstr += "</i>";
-    pieces_lb_->set_markup(gstr);
+    pieces_lb_->set_text(gstr);
 }
 
 void MakeDialog::Impl::configurePieceSizeScale()
@@ -453,106 +446,69 @@ void MakeDialog::Impl::on_drag_data_received(
     drag_context->drag_finish(success, false, time_);
 }
 
-std::unique_ptr<MakeDialog> MakeDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
+MakeDialog::MakeDialog(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core)
+    : Gtk::Dialog(cast_item)
+    , impl_(std::make_unique<Impl>(*this, builder, core))
 {
-    return std::unique_ptr<MakeDialog>(new MakeDialog(parent, core));
-}
-
-MakeDialog::MakeDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
-    : Gtk::Dialog(_("New Torrent"), parent)
-    , impl_(std::make_unique<Impl>(*this, core))
-{
+    set_transient_for(parent);
 }
 
 MakeDialog::~MakeDialog() = default;
 
-MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
+std::unique_ptr<MakeDialog> MakeDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
+{
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MakeDialog.ui"));
+    return std::unique_ptr<MakeDialog>(gtr_get_widget_derived<MakeDialog>(builder, "MakeDialog", parent, core));
+}
+
+MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
+    , file_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_file_radio"))
+    , file_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "source_file_button"))
+    , folder_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_folder_radio"))
+    , folder_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "source_folder_button"))
+    , pieces_lb_(gtr_get_widget<Gtk::Label>(builder, "source_size_label"))
+    , piece_size_scale_(gtr_get_widget<Gtk::Scale>(builder, "piece_size_scale"))
+    , destination_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "destination_button"))
+    , comment_check_(gtr_get_widget<Gtk::CheckButton>(builder, "comment_check"))
+    , comment_entry_(gtr_get_widget<Gtk::Entry>(builder, "comment_entry"))
+    , private_check_(gtr_get_widget<Gtk::CheckButton>(builder, "private_check"))
+    , source_check_(gtr_get_widget<Gtk::CheckButton>(builder, "source_check"))
+    , source_entry_(gtr_get_widget<Gtk::Entry>(builder, "source_entry"))
+    , announce_text_buffer_(gtr_get_widget<Gtk::TextView>(builder, "trackers_view")->get_buffer())
 {
-    guint row = 0;
-
-    dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
-    dialog_.add_button(_("_New"), Gtk::RESPONSE_ACCEPT);
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
-    auto* t = Gtk::make_managed<HigWorkarea>();
-
-    t->add_section_title(row, _("Files"));
-
-    destination_chooser_ = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
     destination_chooser_->set_current_folder(Glib::get_user_special_dir(Glib::USER_DIRECTORY_DESKTOP));
-    t->add_row(row, _("Sa_ve to:"), *destination_chooser_);
 
-    Gtk::RadioButton::Group slist;
-
-    folder_radio_ = Gtk::make_managed<Gtk::RadioButton>(slist, _("Source F_older:"), true);
     folder_radio_->set_active(false);
-    folder_chooser_ = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
     folder_radio_->signal_toggled().connect([this]() { onSourceToggled2(folder_radio_, folder_chooser_); });
     folder_radio_->signal_toggled().connect([this]() { onSourceToggled(folder_radio_, folder_chooser_); });
     folder_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(folder_chooser_); });
     folder_chooser_->set_sensitive(false);
-    t->add_row_w(row, *folder_radio_, *folder_chooser_);
 
-    file_radio_ = Gtk::make_managed<Gtk::RadioButton>(slist, _("Source _File:"), true);
     file_radio_->set_active(true);
-    file_chooser_ = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_OPEN);
     file_radio_->signal_toggled().connect([this]() { onSourceToggled2(file_radio_, file_chooser_); });
     file_radio_->signal_toggled().connect([this]() { onSourceToggled(file_radio_, file_chooser_); });
     file_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(file_chooser_); });
-    t->add_row_w(row, *file_radio_, *file_chooser_);
 
-    pieces_lb_ = Gtk::make_managed<Gtk::Label>();
     pieces_lb_->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("No source selected")));
-    t->add_row(row, {}, *pieces_lb_);
 
-    piece_size_scale_ = Gtk::make_managed<Gtk::Scale>();
-    piece_size_scale_->set_draw_value(false);
     piece_size_scale_->set_visible(false);
     piece_size_scale_->signal_value_changed().connect([this]() { onPieceSizeUpdated(); });
-    t->add_row(row, _("Piece size:"), *piece_size_scale_);
 
-    t->add_section_divider(row);
-    t->add_section_title(row, _("Properties"));
-
-    auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, GUI_PAD_SMALL);
-    announce_text_buffer_ = Gtk::TextBuffer::create();
-    auto* w = Gtk::make_managed<Gtk::TextView>(announce_text_buffer_);
-    w->set_size_request(-1, 80);
-    auto* sw = Gtk::make_managed<Gtk::ScrolledWindow>();
-    sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    sw->add(*w);
-    auto* fr = Gtk::make_managed<Gtk::Frame>();
-    fr->set_shadow_type(Gtk::SHADOW_IN);
-    fr->add(*sw);
-    v->pack_start(*fr, true, true, 0);
-    auto* l = Gtk::make_managed<Gtk::Label>();
-    l->set_markup(_(
-        "To add a backup URL, add it on the next line after a primary URL.\nTo add a new primary URL, add it after a blank line."));
-    l->set_justify(Gtk::JUSTIFY_LEFT);
-    l->set_halign(Gtk::ALIGN_START);
-    l->set_valign(Gtk::ALIGN_CENTER);
-    v->pack_start(*l, false, false, 0);
-    t->add_tall_row(row, _("_Trackers:"), *v);
-
-    comment_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Co_mment:"), true);
     comment_check_->set_active(false);
-    comment_entry_ = Gtk::make_managed<Gtk::Entry>();
     comment_entry_->set_sensitive(false);
     comment_check_->signal_toggled().connect([this]() { onSourceToggled(comment_check_, comment_entry_); });
-    t->add_row_w(row, *comment_check_, *comment_entry_);
 
-    source_check_ = Gtk::make_managed<Gtk::CheckButton>(_("_Source:"), true);
     source_check_->set_active(false);
-    source_entry_ = Gtk::make_managed<Gtk::Entry>();
     source_entry_->set_sensitive(false);
     source_check_->signal_toggled().connect([this]() { onSourceToggled(source_check_, source_entry_); });
-    t->add_row_w(row, *source_check_, *source_entry_);
-
-    private_check_ = t->add_wide_checkbutton(row, _("_Private torrent"), false);
-
-    gtr_dialog_set_content(dialog_, *t);
 
     dialog_.drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     dialog_.drag_dest_add_uri_targets();

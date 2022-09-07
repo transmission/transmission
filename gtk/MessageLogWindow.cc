@@ -17,7 +17,6 @@
 #include <libtransmission/log.h>
 
 #include "Actions.h"
-#include "HigWorkarea.h"
 #include "MessageLogWindow.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -46,7 +45,7 @@ MessageLogColumnsModel const message_log_cols;
 class MessageLogWindow::Impl
 {
 public:
-    Impl(MessageLogWindow& window, Glib::RefPtr<Session> const& core);
+    Impl(MessageLogWindow& window, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -59,19 +58,19 @@ private:
     void doSave(Gtk::Window& parent, Glib::ustring const& filename);
 
     void onClearRequest();
-    void onPauseToggled(Gtk::ToggleToolButton* w);
+    void onPauseToggled(Gio::SimpleAction& action);
 
     void scroll_to_bottom();
     void level_combo_changed_cb(Gtk::ComboBox* combo_box);
-    Gtk::ComboBox* level_combo_new() const;
+    void level_combo_init(Gtk::ComboBox* level_combo) const;
 
     bool is_pinned_to_new() const;
     bool isRowVisible(Gtk::TreeModel::const_iterator const& iter) const;
 
 private:
     MessageLogWindow& window_;
-
     Glib::RefPtr<Session> const core_;
+
     Gtk::TreeView* view_ = nullptr;
     Glib::RefPtr<Gtk::ListStore> store_;
     Glib::RefPtr<Gtk::TreeModelFilter> filter_;
@@ -139,16 +138,15 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 *****
 ****/
 
-Gtk::ComboBox* MessageLogWindow::Impl::level_combo_new() const
+void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
 {
     auto items = std::vector<std::pair<Glib::ustring, int>>{};
     for (auto const& [level, name] : level_names_)
     {
         items.emplace_back(name, level);
     }
-    auto* w = gtr_combo_box_new_enum(items);
-    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
-    return w;
+    gtr_combo_box_set_enum(*level_combo, items);
+    gtr_combo_box_set_active_enum(*level_combo, gtr_pref_int_get(TR_KEY_message_level));
 }
 
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
@@ -243,9 +241,14 @@ void MessageLogWindow::Impl::onClearRequest()
     myHead = myTail = nullptr;
 }
 
-void MessageLogWindow::Impl::onPauseToggled(Gtk::ToggleToolButton* w)
+void MessageLogWindow::Impl::onPauseToggled(Gio::SimpleAction& action)
 {
-    isPaused_ = w->get_active();
+    bool value = false;
+    action.get_state(value);
+
+    action.set_state(Glib::Variant<bool>::create(!value));
+
+    isPaused_ = !value;
 }
 
 namespace
@@ -417,21 +420,31 @@ bool MessageLogWindow::Impl::onRefresh()
 
 std::unique_ptr<MessageLogWindow> MessageLogWindow::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
 {
-    return std::unique_ptr<MessageLogWindow>(new MessageLogWindow(parent, core));
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MessageLogWindow.ui"));
+    return std::unique_ptr<MessageLogWindow>(
+        gtr_get_widget_derived<MessageLogWindow>(builder, "MessageLogWindow", parent, core));
 }
 
-MessageLogWindow::MessageLogWindow(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
-    : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
-    , impl_(std::make_unique<Impl>(*this, core))
+MessageLogWindow::MessageLogWindow(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core)
+    : Gtk::Window(cast_item)
+    , impl_(std::make_unique<Impl>(*this, builder, core))
 {
     set_transient_for(parent);
 }
 
 MessageLogWindow::~MessageLogWindow() = default;
 
-MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> const& core)
+MessageLogWindow::Impl::Impl(
+    MessageLogWindow& window,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::RefPtr<Session> const& core)
     : window_(window)
     , core_(core)
+    , view_(gtr_get_widget<Gtk::TreeView>(builder, "messages_view"))
     , level_names_{ { { TR_LOG_CRITICAL, _("Critical") },
                       { TR_LOG_ERROR, _("Error") },
                       { TR_LOG_WARN, _("Warning") },
@@ -439,73 +452,30 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
                       { TR_LOG_DEBUG, _("Debug") },
                       { TR_LOG_TRACE, _("Trace") } } }
 {
-    window_.set_title(_("Message Log"));
-    window_.set_default_size(560, 350);
-    window_.set_role("message-log");
-    auto* vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 0);
-
     /**
     ***  toolbar
     **/
 
-    auto* toolbar = Gtk::make_managed<Gtk::Toolbar>();
-    toolbar->set_toolbar_style(Gtk::TOOLBAR_BOTH_HORIZ);
-    toolbar->get_style_context()->add_class(GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
+    auto const action_group = Gio::SimpleActionGroup::create();
 
-    {
-        auto* icon = Gtk::make_managed<Gtk::Image>();
-        icon->set_from_icon_name("document-save-as", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
-        auto* item = Gtk::make_managed<Gtk::ToolButton>(*icon);
-        item->set_is_important(true);
-        item->set_label(_("Save _As"));
-        item->set_use_underline(true);
-        item->signal_clicked().connect(sigc::mem_fun(*this, &Impl::onSaveRequest));
-        toolbar->insert(*item, -1);
-    }
+    auto const save_action = Gio::SimpleAction::create("save-message-log");
+    save_action->signal_activate().connect([this](auto const& /*value*/) { onSaveRequest(); });
+    action_group->add_action(save_action);
 
-    {
-        auto* icon = Gtk::make_managed<Gtk::Image>();
-        icon->set_from_icon_name("edit-clear", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
-        auto* item = Gtk::make_managed<Gtk::ToolButton>(*icon);
-        item->set_is_important(true);
-        item->set_label(_("Clear"));
-        item->set_use_underline(true);
-        item->signal_clicked().connect(sigc::mem_fun(*this, &Impl::onClearRequest));
-        toolbar->insert(*item, -1);
-    }
+    auto const clear_action = Gio::SimpleAction::create("clear-message-log");
+    clear_action->signal_activate().connect([this](auto const& /*value*/) { onClearRequest(); });
+    action_group->add_action(clear_action);
 
-    toolbar->insert(*Gtk::make_managed<Gtk::SeparatorToolItem>(), -1);
+    auto const pause_action = Gio::SimpleAction::create_bool("pause-message-log");
+    pause_action->signal_activate().connect([this, &action = *gtr_get_ptr(pause_action)](auto const& /*value*/)
+                                            { onPauseToggled(action); });
+    action_group->add_action(pause_action);
 
-    {
-        auto* icon = Gtk::make_managed<Gtk::Image>();
-        icon->set_from_icon_name("media-playback-pause", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
-        auto* item = Gtk::make_managed<Gtk::ToggleToolButton>(*icon);
-        item->set_is_important(true);
-        item->set_label(_("P_ause"));
-        item->set_use_underline(true);
-        item->signal_toggled().connect([this, item]() { onPauseToggled(item); });
-        toolbar->insert(*item, -1);
-    }
+    auto* const level_combo = gtr_get_widget<Gtk::ComboBox>(builder, "level_combo");
+    level_combo_init(level_combo);
+    level_combo->signal_changed().connect([this, level_combo]() { level_combo_changed_cb(level_combo); });
 
-    toolbar->insert(*Gtk::make_managed<Gtk::SeparatorToolItem>(), -1);
-
-    {
-        auto* w = Gtk::make_managed<Gtk::Label>(_("Level"));
-        w->property_margin() = GUI_PAD;
-        auto* item = Gtk::make_managed<Gtk::ToolItem>();
-        item->add(*w);
-        toolbar->insert(*item, -1);
-    }
-
-    {
-        auto* w = level_combo_new();
-        w->signal_changed().connect([this, w]() { level_combo_changed_cb(w); });
-        auto* item = Gtk::make_managed<Gtk::ToolItem>();
-        item->add(*w);
-        toolbar->insert(*item, -1);
-    }
-
-    vbox->pack_start(*toolbar, false, false, 0);
+    window_.insert_action_group("win", action_group);
 
     /**
     ***  messages
@@ -522,18 +492,12 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     maxLevel_ = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
     filter_->set_visible_func(sigc::mem_fun(*this, &Impl::isRowVisible));
 
-    view_ = Gtk::make_managed<Gtk::TreeView>(sort_);
+    view_->set_model(sort_);
     view_->signal_button_release_event().connect([this](GdkEventButton* event)
                                                  { return on_tree_view_button_released(view_, event); });
     appendColumn(view_, message_log_cols.sequence);
     appendColumn(view_, message_log_cols.name);
     appendColumn(view_, message_log_cols.message);
-    auto* w = Gtk::make_managed<Gtk::ScrolledWindow>();
-    w->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    w->set_shadow_type(Gtk::SHADOW_IN);
-    w->add(*view_);
-    vbox->pack_start(*w, true, true, 0);
-    window_.add(*vbox);
 
     refresh_tag_ = Glib::signal_timeout().connect_seconds(
         sigc::mem_fun(*this, &Impl::onRefresh),

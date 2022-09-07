@@ -5,13 +5,13 @@
 
 #include <algorithm>
 #include <array>
-#include <limits.h> /* INT_MAX */
+#include <limits.h> // INT_MAX
 #include <memory>
 #include <numeric>
 #include <sstream>
 #include <stddef.h>
-#include <stdio.h> /* sscanf() */
-#include <stdlib.h> /* abort() */
+#include <stdio.h> // sscanf()
+#include <stdlib.h> // abort()
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -28,9 +28,9 @@
 
 #include "Actions.h"
 #include "DetailsDialog.h"
-#include "FaviconCache.h" /* gtr_get_favicon() */
+#include "FaviconCache.h" // gtr_get_favicon()
 #include "FileList.h"
-#include "HigWorkarea.h"
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -41,18 +41,19 @@ using namespace std::literals;
 class DetailsDialog::Impl
 {
 public:
-    Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& core);
+    Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
 
     void set_torrents(std::vector<tr_torrent_id_t> const& torrent_ids);
+    void refresh();
 
 private:
-    Gtk::Widget* info_page_new();
-    Gtk::Widget* peer_page_new();
-    Gtk::Widget* tracker_page_new();
-    Gtk::Widget* options_page_new();
+    void info_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
+    void peer_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
+    void tracker_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
+    void options_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
 
     void on_details_window_size_allocated(Gtk::Allocation& alloc);
 
@@ -68,14 +69,9 @@ private:
     void onScrapeToggled();
     void onBackupToggled();
 
-    void on_add_tracker_response(int response, std::shared_ptr<Gtk::Dialog>& dialog);
-    void on_edit_trackers_response(int response, std::shared_ptr<Gtk::Dialog>& dialog);
-
     void torrent_set_bool(tr_quark key, bool value);
     void torrent_set_int(tr_quark key, int value);
     void torrent_set_real(tr_quark key, double value);
-
-    void refresh();
 
     void refreshInfo(std::vector<tr_torrent*> const& torrents);
     void refreshPeers(std::vector<tr_torrent*> const& torrents);
@@ -92,6 +88,7 @@ private:
 
 private:
     DetailsDialog& dialog_;
+    Glib::RefPtr<Session> const core_;
 
     Gtk::CheckButton* honor_limits_check_ = nullptr;
     Gtk::CheckButton* up_limited_check_ = nullptr;
@@ -157,7 +154,6 @@ private:
     Gtk::Label* file_label_ = nullptr;
 
     std::vector<tr_torrent_id_t> ids_;
-    Glib::RefPtr<Session> const core_;
     sigc::connection periodic_refresh_tag_;
 
     Glib::Quark const TORRENT_ID_KEY = Glib::Quark("tr-torrent-id-key");
@@ -457,97 +453,69 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
     tr_variantClear(&top);
 }
 
-Gtk::Widget* DetailsDialog::Impl::options_page_new()
+void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*builder*/)
 {
-    guint row;
-
-    row = 0;
-    auto* t = Gtk::make_managed<HigWorkarea>();
-    t->add_section_title(row, _("Speed"));
-
-    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), false);
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
-    down_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
-        fmt::format(_("Limit _download speed ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
-        true);
-    down_limited_check_->set_active(false);
+    down_limited_check_->set_label(fmt::format(down_limited_check_->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_downloadLimited, down_limited_check_->get_active()); });
 
-    down_limit_spin_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
+    down_limit_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
     down_limit_spin_tag_ = down_limit_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_downloadLimit, down_limit_spin_->get_value_as_int()); });
-    t->add_row_w(row, *down_limited_check_, *down_limit_spin_);
 
-    up_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
-        fmt::format(_("Limit _upload speed ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
-        true);
+    up_limited_check_->set_label(fmt::format(up_limited_check_->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_uploadLimited, up_limited_check_->get_active()); });
 
-    up_limit_sping_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
+    up_limit_sping_->set_adjustment(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
     up_limit_spin_tag_ = up_limit_sping_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_uploadLimit, up_limit_sping_->get_value_as_int()); });
-    t->add_row_w(row, *up_limited_check_, *up_limit_sping_);
 
-    bandwidth_combo_ = gtr_priority_combo_new();
+    gtr_priority_combo_init(*bandwidth_combo_);
     bandwidth_combo_tag_ = bandwidth_combo_->signal_changed().connect(
         [this]() { torrent_set_int(TR_KEY_bandwidthPriority, gtr_priority_combo_get_value(*bandwidth_combo_)); });
-    t->add_row(row, _("Torrent _priority:"), *bandwidth_combo_);
 
-    t->add_section_divider(row);
-    t->add_section_title(row, _("Seeding Limits"));
-
-    auto* h1 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-    ratio_combo_ = gtr_combo_box_new_enum({
-        { _("Use global settings"), TR_RATIOLIMIT_GLOBAL },
-        { _("Seed regardless of ratio"), TR_RATIOLIMIT_UNLIMITED },
-        { _("Stop seeding at ratio:"), TR_RATIOLIMIT_SINGLE },
-    });
+    gtr_combo_box_set_enum(
+        *ratio_combo_,
+        {
+            { _("Use global settings"), TR_RATIOLIMIT_GLOBAL },
+            { _("Seed regardless of ratio"), TR_RATIOLIMIT_UNLIMITED },
+            { _("Stop seeding at ratio:"), TR_RATIOLIMIT_SINGLE },
+        });
     ratio_combo_tag_ = ratio_combo_->signal_changed().connect(
         [this]()
         {
             torrent_set_int(TR_KEY_seedRatioMode, gtr_combo_box_get_active_enum(*ratio_combo_));
             refresh();
         });
-    h1->pack_start(*ratio_combo_, true, true, 0);
-    ratio_spin_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(0, 0, 1000, .05));
+    ratio_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, 1000, .05));
     ratio_spin_->set_width_chars(7);
     ratio_spin_tag_ = ratio_spin_->signal_value_changed().connect(
         [this]() { torrent_set_real(TR_KEY_seedRatioLimit, ratio_spin_->get_value()); });
-    h1->pack_start(*ratio_spin_, false, false, 0);
-    t->add_row(row, _("_Ratio:"), *h1);
 
-    auto* h2 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-    idle_combo_ = gtr_combo_box_new_enum({
-        { _("Use global settings"), TR_IDLELIMIT_GLOBAL },
-        { _("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED },
-        { _("Stop seeding if idle for N minutes:"), TR_IDLELIMIT_SINGLE },
-    });
+    gtr_combo_box_set_enum(
+        *idle_combo_,
+        {
+            { _("Use global settings"), TR_IDLELIMIT_GLOBAL },
+            { _("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED },
+            { _("Stop seeding if idle for N minutes:"), TR_IDLELIMIT_SINGLE },
+        });
     idle_combo_tag_ = idle_combo_->signal_changed().connect(
         [this]()
         {
             torrent_set_int(TR_KEY_seedIdleMode, gtr_combo_box_get_active_enum(*idle_combo_));
             refresh();
         });
-    h2->pack_start(*idle_combo_, true, true, 0);
-    idle_spin_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(1, 1, 40320, 5));
+    idle_spin_->set_adjustment(Gtk::Adjustment::create(1, 1, 40320, 5));
     idle_spin_tag_ = idle_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_seedIdleLimit, idle_spin_->get_value_as_int()); });
-    h2->pack_start(*idle_spin_, false, false, 0);
-    t->add_row(row, _("_Idle:"), *h2);
 
-    t->add_section_divider(row);
-    t->add_section_title(row, _("Peer Connections"));
-
-    max_peers_spin_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(1, 1, 3000, 5));
-    t->add_row(row, _("_Maximum peers:"), *max_peers_spin_, max_peers_spin_);
+    max_peers_spin_->set_adjustment(Gtk::Adjustment::create(1, 1, 3000, 5));
     max_peers_spin_tag_ = max_peers_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_peer_limit, max_peers_spin_->get_value_as_int()); });
-
-    return t;
 }
 
 /****
@@ -1084,111 +1052,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     last_activity_lb_->set_text(str);
 }
 
-Gtk::Widget* DetailsDialog::Impl::info_page_new()
+void DetailsDialog::Impl::info_page_init(Glib::RefPtr<Gtk::Builder> const& builder)
 {
-    guint row = 0;
-    auto* t = Gtk::make_managed<HigWorkarea>();
-
-    t->add_section_title(row, _("Activity"));
-
-    /* size */
-    size_lb_ = Gtk::make_managed<Gtk::Label>();
-    size_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Torrent size:"), *size_lb_);
-
-    /* have */
-    have_lb_ = Gtk::make_managed<Gtk::Label>();
-    have_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Have:"), *have_lb_);
-
-    /* uploaded */
-    ul_lb_ = Gtk::make_managed<Gtk::Label>();
-    ul_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Uploaded:"), *ul_lb_);
-
-    /* downloaded */
-    dl_lb_ = Gtk::make_managed<Gtk::Label>();
-    dl_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Downloaded:"), *dl_lb_);
-
-    /* state */
-    state_lb_ = Gtk::make_managed<Gtk::Label>();
-    state_lb_->set_single_line_mode(true);
-    t->add_row(row, _("State:"), *state_lb_);
-
-    /* running for */
-    date_started_lb_ = Gtk::make_managed<Gtk::Label>();
-    date_started_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Running time:"), *date_started_lb_);
-
-    /* eta */
-    eta_lb_ = Gtk::make_managed<Gtk::Label>();
-    eta_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Remaining time:"), *eta_lb_);
-
-    /* last activity */
-    last_activity_lb_ = Gtk::make_managed<Gtk::Label>();
-    last_activity_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Last activity:"), *last_activity_lb_);
-
-    /* error */
-    error_lb_ = Gtk::make_managed<Gtk::Label>();
-    error_lb_->set_selectable(true);
-    error_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    error_lb_->set_line_wrap(true);
-    error_lb_->set_lines(10);
-    t->add_row(row, _("Error:"), *error_lb_);
-
-    /* details */
-    t->add_section_divider(row);
-    t->add_section_title(row, _("Details"));
-
-    /* destination */
-    destination_lb_ = Gtk::make_managed<Gtk::Label>();
-    destination_lb_->set_selectable(true);
-    destination_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    t->add_row(row, _("Location:"), *destination_lb_);
-
-    /* hash */
-    hash_lb_ = Gtk::make_managed<Gtk::Label>();
-    hash_lb_->set_selectable(true);
-    hash_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    t->add_row(row, _("Hash:"), *hash_lb_);
-
-    /* privacy */
-    privacy_lb_ = Gtk::make_managed<Gtk::Label>();
-    privacy_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Privacy:"), *privacy_lb_);
-
-    /* origins */
-    origin_lb_ = Gtk::make_managed<Gtk::Label>();
-    origin_lb_->set_selectable(true);
-    origin_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    t->add_row(row, _("Origin:"), *origin_lb_);
-
-    /* added */
-    added_lb_ = Gtk::make_managed<Gtk::Label>();
-    added_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Added:"), *added_lb_);
-
-    /* comment */
     comment_buffer_ = Gtk::TextBuffer::create();
-    auto* tw = Gtk::make_managed<Gtk::TextView>(comment_buffer_);
-    tw->set_wrap_mode(Gtk::WRAP_WORD);
-    tw->set_editable(false);
-    auto* sw = Gtk::make_managed<Gtk::ScrolledWindow>();
-    sw->set_size_request(350, 36);
-    sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    sw->add(*tw);
-    auto* fr = Gtk::make_managed<Gtk::Frame>();
-    fr->set_shadow_type(Gtk::SHADOW_IN);
-    fr->add(*sw);
-    auto* w = t->add_tall_row(row, _("Comment:"), *fr);
-    w->set_halign(Gtk::ALIGN_START);
-    w->set_valign(Gtk::ALIGN_START);
-
-    t->add_section_divider(row);
-    return t;
+    auto* tw = gtr_get_widget<Gtk::TextView>(builder, "comment_value_view");
+    tw->set_buffer(comment_buffer_);
 }
 
 /****
@@ -1823,12 +1691,13 @@ void DetailsDialog::Impl::onMorePeerInfoToggled()
     setPeerViewColumns(peer_view_);
 }
 
-Gtk::Widget* DetailsDialog::Impl::peer_page_new()
+void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& builder)
 {
     /* webseeds */
 
     webseed_store_ = Gtk::ListStore::create(webseed_cols);
-    auto* v = Gtk::make_managed<Gtk::TreeView>(webseed_store_);
+    auto* v = gtr_get_widget<Gtk::TreeView>(builder, "webseeds_view");
+    v->set_model(webseed_store_);
     v->signal_button_release_event().connect([v](GdkEventButton* event) { return on_tree_view_button_released(v, event); });
 
     {
@@ -1849,44 +1718,22 @@ Gtk::Widget* DetailsDialog::Impl::peer_page_new()
         v->append_column(*c);
     }
 
-    webseed_view_ = Gtk::make_managed<Gtk::ScrolledWindow>();
-    webseed_view_->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    webseed_view_->set_shadow_type(Gtk::SHADOW_IN);
-    webseed_view_->add(*v);
-
     /* peers */
 
     peer_store_ = Gtk::ListStore::create(peer_cols);
     auto m = Gtk::TreeModelSort::create(peer_store_);
     m->set_sort_column(peer_cols.progress, Gtk::SORT_DESCENDING);
-    peer_view_ = Gtk::make_managed<Gtk::TreeView>(m);
-    peer_view_->set_has_tooltip(true);
 
+    peer_view_->set_model(m);
+    peer_view_->set_has_tooltip(true);
     peer_view_->signal_query_tooltip().connect(sigc::mem_fun(*this, &Impl::onPeerViewQueryTooltip));
     peer_view_->signal_button_release_event().connect([this](GdkEventButton* event)
                                                       { return on_tree_view_button_released(peer_view_, event); });
 
     setPeerViewColumns(peer_view_);
 
-    auto* sw = Gtk::make_managed<Gtk::ScrolledWindow>();
-    sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    sw->set_shadow_type(Gtk::SHADOW_IN);
-    sw->add(*peer_view_);
-
-    auto* vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, GUI_PAD);
-    vbox->set_border_width(GUI_PAD_BIG);
-
-    auto* v2 = Gtk::make_managed<Gtk::Paned>(Gtk::ORIENTATION_VERTICAL);
-    v2->add(*webseed_view_);
-    v2->add(*sw);
-    vbox->pack_start(*v2, true, true);
-
-    more_peer_details_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Show _more details"), true);
     more_peer_details_check_->set_active(gtr_pref_flag_get(TR_KEY_show_extra_peer_details));
     more_peer_details_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onMorePeerInfoToggled));
-    vbox->pack_start(*more_peer_details_check_, false, false);
-
-    return vbox;
 }
 
 /****
@@ -2267,25 +2114,81 @@ void DetailsDialog::Impl::onBackupToggled()
     refresh();
 }
 
-void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_ptr<Gtk::Dialog>& dialog)
+namespace
+{
+
+class EditTrackersDialog : public Gtk::Dialog
+{
+public:
+    EditTrackersDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> core,
+        tr_torrent const* torrent);
+
+    TR_DISABLE_COPY_MOVE(EditTrackersDialog)
+
+    static std::unique_ptr<EditTrackersDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+
+private:
+    void on_response(int response);
+
+private:
+    DetailsDialog& parent_;
+    Glib::RefPtr<Session> const core_;
+    tr_torrent_id_t const torrent_id_;
+    Gtk::TextView* const urls_view_;
+};
+
+EditTrackersDialog::EditTrackersDialog(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    DetailsDialog& parent,
+    Glib::RefPtr<Session> core,
+    tr_torrent const* torrent)
+    : Gtk::Dialog(cast_item)
+    , parent_(parent)
+    , core_(core)
+    , torrent_id_(tr_torrentId(torrent))
+    , urls_view_(gtr_get_widget<Gtk::TextView>(builder, "urls_view"))
+{
+    set_title(fmt::format(_("{torrent_name} - Edit Trackers"), fmt::arg("torrent_name", tr_torrentName(torrent))));
+    set_transient_for(parent);
+
+    urls_view_->get_buffer()->set_text(tr_torrentGetTrackerList(torrent));
+
+    signal_response().connect([this](int response) { on_response(response); });
+}
+
+std::unique_ptr<EditTrackersDialog> EditTrackersDialog::create(
+    DetailsDialog& parent,
+    Glib::RefPtr<Session> core,
+    tr_torrent const* torrent)
+{
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("EditTrackersDialog.ui"));
+    return std::unique_ptr<EditTrackersDialog>(
+        gtr_get_widget_derived<EditTrackersDialog>(builder, "EditTrackersDialog", parent, core, torrent));
+}
+
+void EditTrackersDialog::on_response(int response)
 {
     bool do_destroy = true;
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
-        auto const* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
+        auto const text_buffer = urls_view_->get_buffer();
 
-        if (auto* const tor = core_->find_torrent(torrent_id); tor != nullptr)
+        if (auto* const tor = core_->find_torrent(torrent_id_); tor != nullptr)
         {
             if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).c_str()))
             {
-                refresh();
+                parent_.refresh();
             }
             else
             {
                 Gtk::MessageDialog
-                    w(*dialog, _("List contains invalid URLs"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+                    w(*this, _("List contains invalid URLs"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
                 w.set_secondary_text(_("Please correct the errors and try again."));
                 w.run();
 
@@ -2296,63 +2199,18 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
 
     if (do_destroy)
     {
-        dialog.reset();
+        hide();
     }
 }
 
+} // namespace
+
 void DetailsDialog::Impl::on_edit_trackers()
 {
-    tr_torrent const* tor = tracker_list_get_current_torrent();
-
-    if (tor != nullptr)
+    if (auto const* const tor = tracker_list_get_current_torrent(); tor != nullptr)
     {
-        guint row;
-        auto const torrent_id = tr_torrentId(tor);
-
-        auto d = std::make_shared<Gtk::Dialog>(
-            fmt::format(_("{torrent_name} - Edit Trackers"), fmt::arg("torrent_name", tr_torrentName(tor))),
-            dialog_,
-            Gtk::DIALOG_MODAL | Gtk::DIALOG_DESTROY_WITH_PARENT);
-        d->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-        d->add_button(_("_Save"), Gtk::RESPONSE_ACCEPT);
-        d->signal_response().connect([this, d](int response) mutable { on_edit_trackers_response(response, d); });
-
-        row = 0;
-        auto* t = Gtk::make_managed<HigWorkarea>();
-        t->add_section_title(row, _("Tracker Announce URLs"));
-
-        auto* l = Gtk::make_managed<Gtk::Label>();
-        l->set_markup(
-            _("To add a backup URL, add it on the next line after a primary URL.\n"
-              "To add a new primary URL, add it after a blank line."));
-        l->set_justify(Gtk::JUSTIFY_LEFT);
-        l->set_halign(Gtk::ALIGN_START);
-        l->set_valign(Gtk::ALIGN_CENTER);
-        t->add_wide_control(row, *l);
-
-        auto* w = Gtk::make_managed<Gtk::TextView>();
-        w->get_buffer()->set_text(tr_torrentGetTrackerList(tor));
-        auto* fr = Gtk::make_managed<Gtk::Frame>();
-        fr->set_shadow_type(Gtk::SHADOW_IN);
-        auto* sw = Gtk::make_managed<Gtk::ScrolledWindow>();
-        sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-        sw->add(*w);
-        fr->add(*sw);
-        fr->set_size_request(500U, 166U);
-        t->add_wide_tall_control(row, *fr);
-
-        l = Gtk::make_managed<Gtk::Label>();
-        l->set_markup(_("Also see Default Public Trackers in Edit > Preferences > Network"));
-        l->set_justify(Gtk::JUSTIFY_LEFT);
-        l->set_halign(Gtk::ALIGN_START);
-        l->set_valign(Gtk::ALIGN_CENTER);
-        t->add_wide_control(row, *l);
-
-        gtr_dialog_set_content(*d, *t);
-
-        d->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(torrent_id));
-        d->set_data(TEXT_BUFFER_KEY, gtr_get_ptr(w->get_buffer()));
-
+        auto d = std::shared_ptr<EditTrackersDialog>(EditTrackersDialog::create(dialog_, core_, tor));
+        d->signal_hide().connect([d]() mutable { d.reset(); });
         d->show();
     }
 }
@@ -2367,15 +2225,70 @@ void DetailsDialog::Impl::on_tracker_list_selection_changed()
     edit_trackers_button_->set_sensitive(tor != nullptr);
 }
 
-void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<Gtk::Dialog>& dialog)
+namespace
+{
+
+class AddTrackerDialog : public Gtk::Dialog
+{
+public:
+    AddTrackerDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> core,
+        tr_torrent const* torrent);
+
+    TR_DISABLE_COPY_MOVE(AddTrackerDialog)
+
+    static std::unique_ptr<AddTrackerDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+
+private:
+    void on_response(int response);
+
+private:
+    DetailsDialog& parent_;
+    Glib::RefPtr<Session> const core_;
+    tr_torrent_id_t const torrent_id_;
+    Gtk::Entry* const url_entry_;
+};
+
+AddTrackerDialog::AddTrackerDialog(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    DetailsDialog& parent,
+    Glib::RefPtr<Session> core,
+    tr_torrent const* torrent)
+    : Gtk::Dialog(cast_item)
+    , parent_(parent)
+    , core_(core)
+    , torrent_id_(tr_torrentId(torrent))
+    , url_entry_(gtr_get_widget<Gtk::Entry>(builder, "url_entry"))
+{
+    set_title(fmt::format(_("{torrent_name} - Add Tracker"), fmt::arg("torrent_name", tr_torrentName(torrent))));
+    set_transient_for(parent);
+
+    gtr_paste_clipboard_url_into_entry(*url_entry_);
+
+    signal_response().connect([this](int response) { on_response(response); });
+}
+
+std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(
+    DetailsDialog& parent,
+    Glib::RefPtr<Session> core,
+    tr_torrent const* torrent)
+{
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("AddTrackerDialog.ui"));
+    return std::unique_ptr<AddTrackerDialog>(
+        gtr_get_widget_derived<AddTrackerDialog>(builder, "AddTrackerDialog", parent, core, torrent));
+}
+
+void AddTrackerDialog::on_response(int response)
 {
     bool destroy = true;
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto const* const e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
-        auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
-        auto const url = gtr_str_strip(e->get_text());
+        auto const url = gtr_str_strip(url_entry_->get_text());
 
         if (!url.empty())
         {
@@ -2388,18 +2301,18 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
                 args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-                tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
+                tr_variantDictAddInt(args, TR_KEY_id, torrent_id_);
                 trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
                 tr_variantListAddStr(trackers, url.raw());
 
                 core_->exec(&top);
-                refresh();
+                parent_.refresh();
 
                 tr_variantClear(&top);
             }
             else
             {
-                gtr_unrecognized_url_dialog(*dialog, url);
+                gtr_unrecognized_url_dialog(*this, url);
                 destroy = false;
             }
         }
@@ -2407,38 +2320,19 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
 
     if (destroy)
     {
-        dialog.reset();
+        hide();
     }
 }
 
+} // namespace
+
 void DetailsDialog::Impl::on_tracker_list_add_button_clicked()
 {
-    tr_torrent const* tor = tracker_list_get_current_torrent();
-
-    if (tor != nullptr)
+    if (auto const* const tor = tracker_list_get_current_torrent(); tor != nullptr)
     {
-        guint row;
-
-        auto w = std::make_shared<Gtk::Dialog>(
-            fmt::format(_("{torrent_name} - Add Tracker"), fmt::arg("torrent_name", tr_torrentName(tor))),
-            dialog_,
-            Gtk::DIALOG_DESTROY_WITH_PARENT);
-        w->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-        w->add_button(_("_Add"), Gtk::RESPONSE_ACCEPT);
-        w->signal_response().connect([this, w](int response) mutable { on_add_tracker_response(response, w); });
-
-        row = 0;
-        auto* t = Gtk::make_managed<HigWorkarea>();
-        t->add_section_title(row, _("Tracker"));
-        auto* e = Gtk::make_managed<Gtk::Entry>();
-        e->set_size_request(400, -1);
-        gtr_paste_clipboard_url_into_entry(*e);
-        w->set_data(URL_ENTRY_KEY, e);
-        w->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(tr_torrentId(tor)));
-        t->add_row(row, _("_Announce URL:"), *e);
-        gtr_dialog_set_content(*w, *t);
-
-        w->show_all();
+        auto d = std::shared_ptr<AddTrackerDialog>(AddTrackerDialog::create(dialog_, core_, tor));
+        d->signal_hide().connect([d]() mutable { d.reset(); });
+        d->show();
     }
 }
 
@@ -2469,22 +2363,16 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
     }
 }
 
-Gtk::Widget* DetailsDialog::Impl::tracker_page_new()
+void DetailsDialog::Impl::tracker_page_init(Glib::RefPtr<Gtk::Builder> const& /*builder*/)
 {
     int const pad = (GUI_PAD + GUI_PAD_BIG) / 2;
-
-    auto* vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, GUI_PAD);
-    vbox->set_border_width(GUI_PAD_BIG);
 
     tracker_store_ = Gtk::ListStore::create(tracker_cols);
 
     trackers_filtered_ = Gtk::TreeModelFilter::create(tracker_store_);
     trackers_filtered_->set_visible_func(sigc::mem_fun(*this, &Impl::trackerVisibleFunc));
 
-    auto* hbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
-
-    tracker_view_ = Gtk::make_managed<Gtk::TreeView>(trackers_filtered_);
-    tracker_view_->set_headers_visible(false);
+    tracker_view_->set_model(trackers_filtered_);
     tracker_view_->signal_button_press_event().connect([this](GdkEventButton* event)
                                                        { return on_tree_view_button_pressed(tracker_view_, event); });
     tracker_view_->signal_button_release_event().connect([this](GdkEventButton* event)
@@ -2516,44 +2404,15 @@ Gtk::Widget* DetailsDialog::Impl::tracker_page_new()
         c->add_attribute(r->property_markup(), tracker_cols.text);
     }
 
-    auto* sw = Gtk::make_managed<Gtk::ScrolledWindow>();
-    sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    sw->add(*tracker_view_);
-    auto* w = Gtk::make_managed<Gtk::Frame>();
-    w->set_shadow_type(Gtk::SHADOW_IN);
-    w->add(*sw);
-
-    hbox->pack_start(*w, true, true);
-
-    auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, GUI_PAD);
-
-    add_tracker_button_ = Gtk::make_managed<Gtk::Button>(_("_Add"), true);
     add_tracker_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_add_button_clicked));
-    v->pack_start(*add_tracker_button_, false, false);
-
-    edit_trackers_button_ = Gtk::make_managed<Gtk::Button>(_("_Edit"), true);
     edit_trackers_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_edit_trackers));
-    v->pack_start(*edit_trackers_button_, false, false);
-
-    remove_tracker_button_ = Gtk::make_managed<Gtk::Button>(_("_Remove"), true);
     remove_tracker_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_remove_button_clicked));
-    v->pack_start(*remove_tracker_button_, false, false);
 
-    hbox->pack_start(*v, false, false);
-
-    vbox->pack_start(*hbox, true, true);
-
-    scrape_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Show _more details"), true);
     scrape_check_->set_active(gtr_pref_flag_get(TR_KEY_show_tracker_scrapes));
     scrape_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onScrapeToggled));
-    vbox->pack_start(*scrape_check_, false, false);
 
-    all_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Show _backup trackers"), true);
     all_check_->set_active(gtr_pref_flag_get(TR_KEY_show_backup_trackers));
     all_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onBackupToggled));
-    vbox->pack_start(*all_check_, false, false);
-
-    return vbox;
 }
 
 /****
@@ -2592,54 +2451,79 @@ DetailsDialog::Impl::~Impl()
 
 std::unique_ptr<DetailsDialog> DetailsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
 {
-    return std::unique_ptr<DetailsDialog>(new DetailsDialog(parent, core));
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("DetailsDialog.ui"));
+    return std::unique_ptr<DetailsDialog>(gtr_get_widget_derived<DetailsDialog>(builder, "DetailsDialog", parent, core));
 }
 
-DetailsDialog::DetailsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
-    : Gtk::Dialog({}, parent)
-    , impl_(std::make_unique<Impl>(*this, core))
+DetailsDialog::DetailsDialog(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core)
+    : Gtk::Dialog(cast_item)
+    , impl_(std::make_unique<Impl>(*this, builder, core))
 {
+    set_transient_for(parent);
 }
 
 DetailsDialog::~DetailsDialog() = default;
 
-DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& core)
+DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
+    , honor_limits_check_(gtr_get_widget<Gtk::CheckButton>(builder, "honor_limits_check"))
+    , up_limited_check_(gtr_get_widget<Gtk::CheckButton>(builder, "upload_limit_check"))
+    , up_limit_sping_(gtr_get_widget<Gtk::SpinButton>(builder, "upload_limit_spin"))
+    , down_limited_check_(gtr_get_widget<Gtk::CheckButton>(builder, "download_limit_check"))
+    , down_limit_spin_(gtr_get_widget<Gtk::SpinButton>(builder, "download_limit_spin"))
+    , bandwidth_combo_(gtr_get_widget<Gtk::ComboBox>(builder, "priority_combo"))
+    , ratio_combo_(gtr_get_widget<Gtk::ComboBox>(builder, "ratio_limit_combo"))
+    , ratio_spin_(gtr_get_widget<Gtk::SpinButton>(builder, "ratio_limit_spin"))
+    , idle_combo_(gtr_get_widget<Gtk::ComboBox>(builder, "idle_limit_combo"))
+    , idle_spin_(gtr_get_widget<Gtk::SpinButton>(builder, "idle_limit_spin"))
+    , max_peers_spin_(gtr_get_widget<Gtk::SpinButton>(builder, "max_peers_spin"))
+    , added_lb_(gtr_get_widget<Gtk::Label>(builder, "added_value_label"))
+    , size_lb_(gtr_get_widget<Gtk::Label>(builder, "torrent_size_value_label"))
+    , state_lb_(gtr_get_widget<Gtk::Label>(builder, "state_value_label"))
+    , have_lb_(gtr_get_widget<Gtk::Label>(builder, "have_value_label"))
+    , dl_lb_(gtr_get_widget<Gtk::Label>(builder, "downloaded_value_label"))
+    , ul_lb_(gtr_get_widget<Gtk::Label>(builder, "uploaded_value_label"))
+    , error_lb_(gtr_get_widget<Gtk::Label>(builder, "error_value_label"))
+    , date_started_lb_(gtr_get_widget<Gtk::Label>(builder, "running_time_value_label"))
+    , eta_lb_(gtr_get_widget<Gtk::Label>(builder, "remaining_time_value_label"))
+    , last_activity_lb_(gtr_get_widget<Gtk::Label>(builder, "last_activity_value_label"))
+    , hash_lb_(gtr_get_widget<Gtk::Label>(builder, "hash_value_label"))
+    , privacy_lb_(gtr_get_widget<Gtk::Label>(builder, "privacy_value_label"))
+    , origin_lb_(gtr_get_widget<Gtk::Label>(builder, "origin_value_label"))
+    , destination_lb_(gtr_get_widget<Gtk::Label>(builder, "location_value_label"))
+    , webseed_view_(gtr_get_widget<Gtk::ScrolledWindow>(builder, "webseeds_view_scroll"))
+    , peer_view_(gtr_get_widget<Gtk::TreeView>(builder, "peers_view"))
+    , more_peer_details_check_(gtr_get_widget<Gtk::CheckButton>(builder, "more_peer_details_check"))
+    , add_tracker_button_(gtr_get_widget<Gtk::Button>(builder, "add_tracker_button"))
+    , edit_trackers_button_(gtr_get_widget<Gtk::Button>(builder, "edit_tracker_button"))
+    , remove_tracker_button_(gtr_get_widget<Gtk::Button>(builder, "remove_tracker_button"))
+    , tracker_view_(gtr_get_widget<Gtk::TreeView>(builder, "trackers_view"))
+    , scrape_check_(gtr_get_widget<Gtk::CheckButton>(builder, "more_tracker_details_check"))
+    , all_check_(gtr_get_widget<Gtk::CheckButton>(builder, "backup_trackers_check"))
+    , file_list_(gtr_get_widget_derived<FileList>(builder, "files_view_scroll", "files_view", core, 0))
+    , file_label_(gtr_get_widget<Gtk::Label>(builder, "files_label"))
 {
-    /* create the dialog */
-    dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
-    dialog_.set_role("tr-info");
-
     /* return saved window size */
     dialog_.resize((int)gtr_pref_int_get(TR_KEY_details_window_width), (int)gtr_pref_int_get(TR_KEY_details_window_height));
     dialog_.signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
 
     dialog_.signal_response().connect(sigc::hide<0>(sigc::mem_fun(dialog_, &DetailsDialog::hide)));
-    dialog_.set_border_width(GUI_PAD);
 
-    auto* n = Gtk::make_managed<Gtk::Notebook>();
-    n->set_border_width(GUI_PAD);
+    info_page_init(builder);
+    peer_page_init(builder);
+    tracker_page_init(builder);
+    options_page_init(builder);
 
-    n->append_page(*info_page_new(), _("Information"));
-    n->append_page(*peer_page_new(), _("Peers"));
-    n->append_page(*tracker_page_new(), _("Trackers"));
-
-    auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
-    file_list_ = Gtk::make_managed<FileList>(core, 0);
-    file_label_ = Gtk::make_managed<Gtk::Label>(_("File listing not available for combined torrent properties"));
-    v->pack_start(*file_list_, true, true, 0);
-    v->pack_start(*file_label_, true, true, 0);
-    v->set_border_width(GUI_PAD_BIG);
-    n->append_page(*v, _("Files"));
-
-    n->append_page(*options_page_new(), _("Options"));
-
-    gtr_dialog_set_content(dialog_, *n);
     periodic_refresh_tag_ = Glib::signal_timeout().connect_seconds(
         [this]() { return refresh(), true; },
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
+    auto* const n = gtr_get_widget<Gtk::Notebook>(builder, "dialog_pages");
     n->set_current_page(last_page_);
     last_page_tag_ = n->signal_switch_page().connect([](Widget*, guint page) { DetailsDialog::Impl::last_page_ = page; });
 }
@@ -2647,6 +2531,11 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& co
 void DetailsDialog::set_torrents(std::vector<tr_torrent_id_t> const& ids)
 {
     impl_->set_torrents(ids);
+}
+
+void DetailsDialog::refresh()
+{
+    impl_->refresh();
 }
 
 void DetailsDialog::Impl::set_torrents(std::vector<tr_torrent_id_t> const& ids)

@@ -16,14 +16,16 @@ class Session;
 class PrefsDialog : public Gtk::Dialog
 {
 public:
+    PrefsDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core);
     ~PrefsDialog() override;
 
     TR_DISABLE_COPY_MOVE(PrefsDialog)
 
     static std::unique_ptr<PrefsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
-
-protected:
-    PrefsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
 private:
     class Impl;

@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface domain="transmission-gtk">
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkDialog" id="StatsDialog">
+    <property name="can-focus">False</property>
+    <property name="border-width">6</property>
+    <property name="title" translatable="yes">Statistics</property>
+    <property name="type-hint">dialog</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog_layout">
+        <property name="can-focus">False</property>
+        <property name="margin-top">1</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog_buttons">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="reset_button">
+                <property name="label" translatable="yes">_Reset</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-underline">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="close_button">
+                <property name="label" translatable="yes">_Close</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-underline">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="dialog_content_layout">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkLabel" id="current_session_section_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="hexpand">True</property>
+                <property name="label" translatable="yes">Current Session</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <!-- n-columns=2 n-rows=4 -->
+              <object class="GtkGrid" id="current_session_section_layout">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">18</property>
+                <property name="row-spacing">6</property>
+                <property name="column-spacing">12</property>
+                <child>
+                  <object class="GtkLabel" id="current_uploaded_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Uploaded:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="current_uploaded_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="current_downloaded_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Downloaded:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="current_downloaded_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="current_ratio_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Ratio:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="current_ratio_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="current_duration_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Duration:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="current_duration_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">3</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkFixed" id="total_section_spacer">
+                <property name="height-request">6</property>
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="total_section_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="hexpand">True</property>
+                <property name="label" translatable="yes">Total</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <!-- n-columns=2 n-rows=5 -->
+              <object class="GtkGrid" id="total_section_layout">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">18</property>
+                <property name="row-spacing">6</property>
+                <property name="column-spacing">12</property>
+                <child>
+                  <object class="GtkLabel" id="start_count_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">0</property>
+                    <property name="width">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_uploaded_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Uploaded:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_uploaded_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_downloaded_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Downloaded:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_downloaded_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_ratio_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Ratio:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_ratio_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_duration_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Duration:</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">0</property>
+                    <property name="top-attach">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="total_duration_value_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="label">...</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">1</property>
+                    <property name="top-attach">4</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="1">reset_button</action-widget>
+      <action-widget response="-7">close_button</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkSizeGroup" id="labels_width_group">
+    <widgets>
+      <widget name="current_uploaded_label"/>
+      <widget name="current_downloaded_label"/>
+      <widget name="current_ratio_label"/>
+      <widget name="current_duration_label"/>
+      <widget name="total_uploaded_label"/>
+      <widget name="total_downloaded_label"/>
+      <widget name="total_ratio_label"/>
+      <widget name="total_duration_label"/>
+    </widgets>
+  </object>
+</interface>

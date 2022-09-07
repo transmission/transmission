@@ -20,6 +20,22 @@ endif()
 
 find_program(APPSTREAM appstreamcli)
 
+set(${PROJECT_NAME}_UI_FILES
+    AddTrackerDialog.ui
+    DetailsDialog.ui
+    EditTrackersDialog.ui
+    FilterBar.ui
+    MainWindow.ui
+    MakeDialog.ui
+    MakeProgressDialog.ui
+    MessageLogWindow.ui
+    OptionsDialog.ui
+    PrefsDialog.ui
+    RelocateDialog.ui
+    StatsDialog.ui
+    TorrentUrlChooserDialog.ui
+)
+
 add_custom_command(
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
@@ -46,6 +62,7 @@ add_custom_command(
         icons/turtle-symbolic.svg
         transmission-ui.xml
         transmission.gresource.xml
+        ${${PROJECT_NAME}_UI_FILES}
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}
 )

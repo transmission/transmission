@@ -16,14 +16,16 @@ class Session;
 class StatsDialog : public Gtk::Dialog
 {
 public:
+    StatsDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core);
     ~StatsDialog() override;
 
     TR_DISABLE_COPY_MOVE(StatsDialog)
 
     static std::unique_ptr<StatsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
-
-protected:
-    StatsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
 private:
     class Impl;

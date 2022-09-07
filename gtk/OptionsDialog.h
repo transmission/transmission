@@ -17,15 +17,18 @@ typedef struct tr_ctor tr_ctor;
 class TorrentUrlChooserDialog : public Gtk::Dialog
 {
 public:
+    TorrentUrlChooserDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core);
+
     TR_DISABLE_COPY_MOVE(TorrentUrlChooserDialog)
 
     static std::unique_ptr<TorrentUrlChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
-protected:
-    TorrentUrlChooserDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
-
 private:
-    void onOpenURLResponse(int response, Glib::RefPtr<Session> const& core);
+    void onOpenURLResponse(int response, Gtk::Entry const& entry, Glib::RefPtr<Session> const& core);
 };
 
 class TorrentFileChooserDialog : public Gtk::FileChooserDialog
@@ -45,6 +48,12 @@ private:
 class OptionsDialog : public Gtk::Dialog
 {
 public:
+    OptionsDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core,
+        std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
     ~OptionsDialog() override;
 
     TR_DISABLE_COPY_MOVE(OptionsDialog)
@@ -53,9 +62,6 @@ public:
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
-
-protected:
-    OptionsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
 
 private:
     class Impl;

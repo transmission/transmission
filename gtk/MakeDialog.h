@@ -16,14 +16,16 @@ class Session;
 class MakeDialog : public Gtk::Dialog
 {
 public:
+    MakeDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core);
     ~MakeDialog() override;
 
     TR_DISABLE_COPY_MOVE(MakeDialog)
 
     static std::unique_ptr<MakeDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
-
-protected:
-    MakeDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
 private:
     class Impl;

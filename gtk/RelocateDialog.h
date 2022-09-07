@@ -17,6 +17,12 @@ class Session;
 class RelocateDialog : public Gtk::Dialog
 {
 public:
+    RelocateDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core,
+        std::vector<tr_torrent_id_t> const& torrent_ids);
     ~RelocateDialog() override;
 
     TR_DISABLE_COPY_MOVE(RelocateDialog)
@@ -25,9 +31,6 @@ public:
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
         std::vector<tr_torrent_id_t> const& torrent_ids);
-
-protected:
-    RelocateDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core, std::vector<tr_torrent_id_t> const& torrent_ids);
 
 private:
     class Impl;

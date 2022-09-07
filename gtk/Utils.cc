@@ -24,7 +24,6 @@
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 #include <libtransmission/web-utils.h>
 
-#include "HigWorkarea.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -447,6 +446,13 @@ void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo_box, int value)
 
 Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>> const& items)
 {
+    auto w = Gtk::make_managed<Gtk::ComboBox>();
+    gtr_combo_box_set_enum(*w, items);
+    return w;
+}
+
+void gtr_combo_box_set_enum(Gtk::ComboBox& combo, std::vector<std::pair<Glib::ustring, int>> const& items)
+{
     auto store = Gtk::ListStore::create(enum_combo_cols);
 
     for (auto const& [label, value] : items)
@@ -456,12 +462,12 @@ Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>>
         (*iter)[enum_combo_cols.label] = label;
     }
 
-    auto w = Gtk::make_managed<Gtk::ComboBox>(static_cast<Glib::RefPtr<Gtk::TreeModel> const&>(store));
-    auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-    w->pack_start(*r, true);
-    w->add_attribute(r->property_text(), enum_combo_cols.label);
+    combo.clear();
+    combo.set_model(store);
 
-    return w;
+    auto* r = Gtk::make_managed<Gtk::CellRendererText>();
+    combo.pack_start(*r, true);
+    combo.add_attribute(r->property_text(), enum_combo_cols.label);
 }
 
 int gtr_combo_box_get_active_enum(Gtk::ComboBox const& combo_box)
@@ -478,11 +484,20 @@ int gtr_combo_box_get_active_enum(Gtk::ComboBox const& combo_box)
 
 Gtk::ComboBox* gtr_priority_combo_new()
 {
-    return gtr_combo_box_new_enum({
-        { _("High"), TR_PRI_HIGH },
-        { _("Normal"), TR_PRI_NORMAL },
-        { _("Low"), TR_PRI_LOW },
-    });
+    auto w = Gtk::make_managed<Gtk::ComboBox>();
+    gtr_priority_combo_init(*w);
+    return w;
+}
+
+void gtr_priority_combo_init(Gtk::ComboBox& combo)
+{
+    gtr_combo_box_set_enum(
+        combo,
+        {
+            { _("High"), TR_PRI_HIGH },
+            { _("Normal"), TR_PRI_NORMAL },
+            { _("Low"), TR_PRI_LOW },
+        });
 }
 
 /***

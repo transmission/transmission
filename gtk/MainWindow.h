@@ -16,6 +16,12 @@ class Session;
 class MainWindow : public Gtk::ApplicationWindow
 {
 public:
+    MainWindow(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Application& app,
+        Glib::RefPtr<Gio::ActionGroup> const& actions,
+        Glib::RefPtr<Session> const& core);
     ~MainWindow() override;
 
     TR_DISABLE_COPY_MOVE(MainWindow)
@@ -29,9 +35,6 @@ public:
 
     void set_busy(bool isBusy);
     void refresh();
-
-protected:
-    MainWindow(Gtk::Application& app, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core);
 
 private:
     class Impl;

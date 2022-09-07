@@ -4,7 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <climits> /* INT_MAX */
+#include <climits> // INT_MAX
 #include <cstddef>
 #include <list>
 #include <memory>
@@ -22,7 +22,7 @@
 #include <libtransmission/utils.h>
 
 #include "FileList.h"
-#include "HigWorkarea.h"
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
 #include "IconCache.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -81,7 +81,14 @@ FileModelColumns const file_cols;
 class FileList::Impl
 {
 public:
-    Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id);
+    Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
+    Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
+    Impl(
+        FileList& widget,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::ustring const& view_name,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent_id_t torrent_id);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -838,13 +845,23 @@ FileList::FileList(Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
 {
 }
 
-FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
+FileList::FileList(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& view_name,
+    Glib::RefPtr<Session> const& core,
+    tr_torrent_id_t torrent_id)
+    : Gtk::ScrolledWindow(cast_item)
+    , impl_(std::make_unique<Impl>(*this, builder, view_name, core, torrent_id))
+{
+}
+
+FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id)
     : widget_(widget)
     , core_(core)
+    , view_(view)
 {
     /* create the view */
-    view_ = Gtk::make_managed<Gtk::TreeView>();
-    view_->set_border_width(GUI_PAD_BIG);
     view_->signal_button_press_event().connect(sigc::mem_fun(*this, &Impl::onViewButtonPressed), false);
     view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
     view_->signal_button_release_event().connect([this](GdkEventButton* event)
@@ -951,13 +968,29 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_tor
     /* add tooltip to tree */
     view_->set_tooltip_column(file_cols.label_esc.index());
 
+    set_torrent(torrent_id);
+}
+
+FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id)
+    : Impl(widget, Gtk::make_managed<Gtk::TreeView>(), core, torrent_id)
+{
+    view_->set_border_width(GUI_PAD_BIG);
+
     /* create the scrolled window and stick the view in it */
     widget_.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     widget_.set_shadow_type(Gtk::SHADOW_IN);
     widget_.add(*view_);
     widget_.set_size_request(-1, 200);
+}
 
-    set_torrent(tor_id);
+FileList::Impl::Impl(
+    FileList& widget,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& view_name,
+    Glib::RefPtr<Session> const& core,
+    tr_torrent_id_t torrent_id)
+    : Impl(widget, gtr_get_widget<Gtk::TreeView>(builder, view_name), core, torrent_id)
+{
 }
 
 FileList::~FileList() = default;

@@ -5,12 +5,13 @@
 #include <algorithm>
 #include <cstdlib> // exit()
 #include <ctime>
-#include <iterator> // for std::back_inserter
+#include <iterator> // std::back_inserter
 #include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -34,7 +35,8 @@
 #include "Application.h"
 #include "DetailsDialog.h"
 #include "Dialogs.h"
-#include "HigWorkarea.h"
+#include "FilterBar.h"
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
 #include "MainWindow.h"
 #include "MakeDialog.h"
 #include "MessageLogWindow.h"
@@ -534,6 +536,16 @@ void Application::Impl::on_startup()
 {
     Gtk::IconTheme::get_default()->add_resource_path(gtr_get_full_resource_path("icons"s));
     Gtk::Window::set_default_icon_name(AppIconName);
+
+    /* Add style provider to the window. */
+    auto css_provider = Gtk::CssProvider::create();
+    css_provider->load_from_resource(gtr_get_full_resource_path("transmission-ui.css"));
+    Gtk::StyleContext::add_provider_for_screen(
+        Gdk::Screen::get_default(),
+        css_provider,
+        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    std::ignore = FilterBar();
 
     tr_session* session;
 

@@ -61,6 +61,16 @@ FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_vi
 {
 }
 
+FreeSpaceLabel::FreeSpaceLabel(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& /*builder*/,
+    Glib::RefPtr<Session> const& core,
+    std::string_view dir)
+    : Gtk::Label(cast_item)
+    , impl_(std::make_unique<Impl>(*this, core, dir))
+{
+}
+
 FreeSpaceLabel::~FreeSpaceLabel() = default;
 
 FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir)

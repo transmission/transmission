@@ -18,6 +18,11 @@ class Session;
 class DetailsDialog : public Gtk::Dialog
 {
 public:
+    DetailsDialog(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core);
     ~DetailsDialog() override;
 
     TR_DISABLE_COPY_MOVE(DetailsDialog)
@@ -25,9 +30,7 @@ public:
     static std::unique_ptr<DetailsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
     void set_torrents(std::vector<tr_torrent_id_t> const& torrent_ids);
-
-protected:
-    DetailsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
+    void refresh();
 
 private:
     class Impl;
