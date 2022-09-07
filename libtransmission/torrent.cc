@@ -1771,11 +1771,11 @@ void tr_torrent::recheckCompleteness()
 
     if (new_completeness != completeness)
     {
-        bool const recentChange = downloadedCur != 0;
-        bool const wasLeeching = !this->isDone();
-        bool const wasRunning = isRunning;
+        bool const recent_change = downloadedCur != 0;
+        bool const was_leeching = !this->isDone();
+        bool const was_running = isRunning;
 
-        if (recentChange)
+        if (recent_change)
         {
             tr_logAddTraceTor(
                 this,
@@ -1790,14 +1790,14 @@ void tr_torrent::recheckCompleteness()
 
         if (this->isDone())
         {
-            if (recentChange)
+            if (recent_change)
             {
                 tr_announcerTorrentCompleted(this);
                 this->markChanged();
                 this->doneDate = tr_time();
             }
 
-            if (wasLeeching && wasRunning)
+            if (was_leeching && was_running)
             {
                 /* clear interested flag on all peers */
                 tr_peerMgrClearInterest(this);
@@ -1809,9 +1809,9 @@ void tr_torrent::recheckCompleteness()
             }
         }
 
-        this->session->onTorrentCompletenessChanged(this, completeness, wasRunning);
+        this->session->onTorrentCompletenessChanged(this, completeness, was_running);
 
-        if (this->isDone() && wasLeeching && wasRunning)
+        if (this->isDone() && was_leeching && was_running)
         {
             /* if completeness was TR_LEECH, the seed limit check
                will have been skipped in bandwidthPulse */
