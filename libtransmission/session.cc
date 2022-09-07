@@ -777,7 +777,6 @@ void tr_session::setImpl(init_data& data)
     tr_variant* const settings = data.client_settings;
     TR_ASSERT(tr_variantIsDict(settings));
 
-    auto boolVal = bool{};
     auto d = double{};
     auto i = int64_t{};
     auto sv = std::string_view{};
@@ -820,29 +819,29 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetPeerLimitPerTorrent(this, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_pex_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_pex_enabled, &val))
     {
-        tr_sessionSetPexEnabled(this, boolVal);
+        tr_sessionSetPexEnabled(this, val);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &val))
     {
-        tr_sessionSetDHTEnabled(this, boolVal);
+        tr_sessionSetDHTEnabled(this, val);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_tcp_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_tcp_enabled, &val))
     {
-        is_tcp_enabled_ = boolVal;
+        is_tcp_enabled_ = val;
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_utp_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_utp_enabled, &val))
     {
-        tr_sessionSetUTPEnabled(this, boolVal);
+        tr_sessionSetUTPEnabled(this, val);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_lpd_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_lpd_enabled, &val))
     {
-        tr_sessionSetLPDEnabled(this, boolVal);
+        tr_sessionSetLPDEnabled(this, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_encryption, &i))
@@ -866,9 +865,9 @@ void tr_session::setImpl(init_data& data)
     (void)tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
     setPeerCongestionAlgorithm(sv);
 
-    if (tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &val))
     {
-        useBlocklist(boolVal);
+        useBlocklist(val);
     }
 
     if (tr_variantDictFindStrView(settings, TR_KEY_blocklist_url, &sv))
@@ -876,14 +875,14 @@ void tr_session::setImpl(init_data& data)
         setBlocklistUrl(sv);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &val))
     {
-        tr_sessionSetPaused(this, !boolVal);
+        tr_sessionSetPaused(this, !val);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_trash_original_torrent_files, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_trash_original_torrent_files, &val))
     {
-        tr_sessionSetDeleteSource(this, boolVal);
+        tr_sessionSetDeleteSource(this, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
@@ -897,9 +896,9 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetQueueStalledMinutes(this, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_queue_stalled_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_queue_stalled_enabled, &val))
     {
-        tr_sessionSetQueueStalledEnabled(this, boolVal);
+        tr_sessionSetQueueStalledEnabled(this, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_download_queue_size, &i))
@@ -907,9 +906,9 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetQueueSize(this, TR_DOWN, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_download_queue_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_download_queue_enabled, &val))
     {
-        tr_sessionSetQueueEnabled(this, TR_DOWN, boolVal);
+        tr_sessionSetQueueEnabled(this, TR_DOWN, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_seed_queue_size, &i))
@@ -917,15 +916,15 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetQueueSize(this, TR_UP, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_seed_queue_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_seed_queue_enabled, &val))
     {
-        tr_sessionSetQueueEnabled(this, TR_UP, boolVal);
+        tr_sessionSetQueueEnabled(this, TR_UP, val);
     }
 
     /* files and directories */
-    if (tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &val))
     {
-        this->is_prefetch_enabled_ = boolVal;
+        this->is_prefetch_enabled_ = val;
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
@@ -943,14 +942,14 @@ void tr_session::setImpl(init_data& data)
         this->setIncompleteDir(sv);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &val))
     {
-        this->useIncompleteDir(boolVal);
+        this->useIncompleteDir(val);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &val))
     {
-        tr_sessionSetIncompleteFileNamingEnabled(this, boolVal);
+        tr_sessionSetIncompleteFileNamingEnabled(this, val);
     }
 
     /* rpc server */
@@ -995,9 +994,9 @@ void tr_session::setImpl(init_data& data)
         this->random_port_high_.setHost(i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &val))
     {
-        tr_sessionSetPeerPortRandomOnStart(this, boolVal);
+        tr_sessionSetPeerPortRandomOnStart(this, val);
     }
 
     {
@@ -1008,12 +1007,12 @@ void tr_session::setImpl(init_data& data)
             peer_port.setHost(static_cast<uint16_t>(port));
         }
 
-        ::setPeerPort(this, boolVal ? randomPort() : peer_port);
+        ::setPeerPort(this, isPortRandom() ? randomPort() : peer_port);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &val))
     {
-        tr_sessionSetPortForwardingEnabled(this, boolVal);
+        tr_sessionSetPortForwardingEnabled(this, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_global, &i))
@@ -1034,9 +1033,9 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetSpeedLimit_KBps(this, TR_UP, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_speed_limit_up_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_up_enabled, &val))
     {
-        tr_sessionLimitSpeed(this, TR_UP, boolVal);
+        tr_sessionLimitSpeed(this, TR_UP, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_down, &i))
@@ -1044,9 +1043,9 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_speed_limit_down_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_down_enabled, &val))
     {
-        tr_sessionLimitSpeed(this, TR_DOWN, boolVal);
+        tr_sessionLimitSpeed(this, TR_DOWN, val);
     }
 
     if (tr_variantDictFindReal(settings, TR_KEY_ratio_limit, &d))
@@ -1054,9 +1053,9 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetRatioLimit(this, d);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_ratio_limit_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_ratio_limit_enabled, &val))
     {
-        tr_sessionSetRatioLimited(this, boolVal);
+        tr_sessionSetRatioLimited(this, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_idle_seeding_limit, &i))
@@ -1064,9 +1063,9 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetIdleLimit(this, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_idle_seeding_limit_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_idle_seeding_limit_enabled, &val))
     {
-        tr_sessionSetIdleLimited(this, boolVal);
+        tr_sessionSetIdleLimited(this, val);
     }
 
     /**
@@ -1099,14 +1098,14 @@ void tr_session::setImpl(init_data& data)
         turtle.days = tr_sched_day(i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_alt_speed_time_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_alt_speed_time_enabled, &val))
     {
-        turtle.isClockEnabled = boolVal;
+        turtle.isClockEnabled = val;
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_alt_speed_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_alt_speed_enabled, &val))
     {
-        turtle.isEnabled = boolVal;
+        turtle.isEnabled = val;
     }
 
     turtleBootstrap(this, &turtle);
@@ -1124,9 +1123,9 @@ void tr_session::setImpl(init_data& data)
         }
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &val))
     {
-        this->should_scrape_paused_torrents_ = boolVal;
+        this->should_scrape_paused_torrents_ = val;
     }
 
     /**
@@ -1138,9 +1137,9 @@ void tr_session::setImpl(init_data& data)
         tr_sessionSetAntiBruteForceThreshold(this, i);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &val))
     {
-        tr_sessionSetAntiBruteForceEnabled(this, boolVal);
+        tr_sessionSetAntiBruteForceEnabled(this, val);
     }
 
     /*
@@ -1151,9 +1150,9 @@ void tr_session::setImpl(init_data& data)
         this->setAnnounceIP(sv);
     }
 
-    if (tr_variantDictFindBool(settings, TR_KEY_announce_ip_enabled, &boolVal))
+    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_announce_ip_enabled, &val))
     {
-        this->useAnnounceIP(boolVal);
+        this->useAnnounceIP(val);
     }
 
     data.done_cv.notify_one();
