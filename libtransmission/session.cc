@@ -595,11 +595,11 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
     /* the session's true values override the file & client settings */
     {
-        tr_variant sessionSettings;
-        tr_variantInitDict(&sessionSettings, 0);
-        tr_sessionGetSettings(session, &sessionSettings);
-        tr_variantMergeDicts(&settings, &sessionSettings);
-        tr_variantClear(&sessionSettings);
+        auto session_settings = tr_variant{};
+        tr_variantInitDict(&session_settings, 0);
+        tr_sessionGetSettings(session, &session_settings);
+        tr_variantMergeDicts(&settings, &session_settings);
+        tr_variantClear(&session_settings);
     }
 
     /* save the result */
