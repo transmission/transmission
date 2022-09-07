@@ -411,38 +411,38 @@ uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor)
     return tor->idleLimitMinutes;
 }
 
-bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
+bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idle_minutes)
 {
-    auto isLimited = bool{};
+    auto is_limited = bool{};
 
     switch (tr_torrentGetIdleMode(tor))
     {
     case TR_IDLELIMIT_SINGLE:
-        isLimited = true;
+        is_limited = true;
 
-        if (idleMinutes != nullptr)
+        if (idle_minutes != nullptr)
         {
-            *idleMinutes = tr_torrentGetIdleLimit(tor);
+            *idle_minutes = tr_torrentGetIdleLimit(tor);
         }
 
         break;
 
     case TR_IDLELIMIT_GLOBAL:
-        isLimited = tor->session->isIdleLimited();
+        is_limited = tor->session->isIdleLimited();
 
-        if (isLimited && idleMinutes != nullptr)
+        if (is_limited && idle_minutes != nullptr)
         {
-            *idleMinutes = tor->session->idleLimitMinutes();
+            *idle_minutes = tor->session->idleLimitMinutes();
         }
 
         break;
 
     default: /* TR_IDLELIMIT_UNLIMITED */
-        isLimited = false;
+        is_limited = false;
         break;
     }
 
-    return isLimited;
+    return is_limited;
 }
 
 static bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
