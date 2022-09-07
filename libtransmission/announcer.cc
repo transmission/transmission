@@ -816,12 +816,12 @@ static auto tier_announce_event_pull(tr_tier* tier)
     return e;
 }
 
-static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announceAt)
+static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announce_at)
 {
     // tell each tier to announce
     for (auto& tier : tor->torrent_announcer->tiers)
     {
-        tier_announce_event_push(&tier, e, announceAt);
+        tier_announce_event_push(&tier, e, announce_at);
     }
 }
 
