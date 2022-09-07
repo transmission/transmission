@@ -539,6 +539,7 @@ endif()
 include(LargeFileSupport)
 
 set(NEEDED_HEADERS
+    sys/signalfd.h
     sys/statvfs.h
     xfs/xfs.h
     xlocale.h)

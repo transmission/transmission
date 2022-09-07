@@ -9,7 +9,7 @@ struct tr_error;
 
 typedef struct dtr_callbacks
 {
-    int (*on_start)(void* arg, bool foreground);
+    int (*on_start)(void* arg, bool (*setupsigfn)(void*), bool foreground);
     void (*on_stop)(void* arg);
     void (*on_reconfigure)(void* arg);
 } dtr_callbacks;

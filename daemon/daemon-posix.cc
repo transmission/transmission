@@ -6,6 +6,10 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
+#ifdef HAVE_SYS_SIGNALFD_H
+#include <event2/event.h>
+#include <sys/signalfd.h>
+#endif /* signalfd API */
 #include <signal.h>
 #include <stdlib.h> /* abort(), daemon(), exit() */
 #include <fcntl.h> /* open() */
@@ -30,7 +34,11 @@ using namespace std::literals;
 static dtr_callbacks const* callbacks = nullptr;
 static void* callback_arg = nullptr;
 
+#ifdef HAVE_SYS_SIGNALFD_H
+static int sigfd = -1;
+#else
 static int signal_pipe[2];
+#endif /* signalfd API */
 
 /***
 ****
@@ -62,6 +70,55 @@ static void handle_signal(int sig)
         assert("Unexpected signal" && 0);
     }
 }
+
+#ifdef HAVE_SYS_SIGNALFD_H
+
+static void handle_signals(evutil_socket_t fd, short /*what*/, void* /*arg*/)
+{
+    struct signalfd_siginfo fdsi;
+
+    if (read(fd, &fdsi, sizeof(fdsi)) != sizeof(fdsi))
+        assert("Error reading signal descriptor" && 0);
+    else
+        handle_signal(fdsi.ssi_signo);
+}
+
+static bool setup_signals(void* arg)
+{
+    sigset_t mask = {};
+    struct event* sigev = nullptr;
+    struct event_base* base = static_cast<struct event_base*>(arg);
+
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
+    sigaddset(&mask, SIGTERM);
+    sigaddset(&mask, SIGHUP);
+
+    if (sigprocmask(SIG_BLOCK, &mask, nullptr) < 0)
+        return false;
+
+    sigfd = signalfd(-1, &mask, 0);
+    if (sigfd < 0)
+        return false;
+
+    sigev = event_new(base, sigfd, EV_READ | EV_PERSIST, handle_signals, nullptr);
+    if (sigev == nullptr)
+    {
+        close(sigfd);
+        return false;
+    }
+
+    if (event_add(sigev, nullptr) < 0)
+    {
+        event_del(sigev);
+        close(sigfd);
+        return false;
+    }
+
+    return true;
+}
+
+#else /* no signalfd API */
 
 static void send_signal_to_pipe(int sig)
 {
@@ -142,6 +199,8 @@ static bool setup_signal_handler(int sig, tr_error** error)
     return true;
 }
 
+#endif /* signalfd API */
+
 /***
 ****
 ***/
@@ -207,6 +266,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
 #endif
     }
 
+#ifndef HAVE_SYS_SIGNALFD_H
     pthread_t signal_thread;
 
     if (!create_signal_handler_thread(&signal_thread, error))
@@ -220,9 +280,14 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
         return false;
     }
 
-    *exit_code = cb->on_start(cb_arg, foreground);
+    *exit_code = cb->on_start(cb_arg, nullptr, foreground);
+#else
+    *exit_code = cb->on_start(cb_arg, setup_signals, foreground);
+#endif /* signalfd API */
 
+#ifndef HAVE_SYS_SIGNALFD_H
     destroy_signal_handler_thread(signal_thread);
+#endif /* no signalfd API */
 
     return true;
 }

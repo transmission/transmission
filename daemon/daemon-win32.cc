@@ -171,7 +171,7 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD /*event_type*/
 
 static unsigned int __stdcall service_thread_main(void* /*context*/)
 {
-    return callbacks->on_start(callback_arg, false);
+    return callbacks->on_start(callback_arg, nullptr, false);
 }
 
 static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
@@ -238,7 +238,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
             return false;
         }
 
-        *exit_code = cb->on_start(cb_arg, true);
+        *exit_code = cb->on_start(cb_arg, nullptr, true);
     }
     else
     {
