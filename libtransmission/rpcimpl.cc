@@ -1693,13 +1693,13 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
     {
         names.insert(one_name);
     }
-    else if (tr_variant* namesList = nullptr; tr_variantDictFindList(args_in, TR_KEY_name, &namesList))
+    else if (tr_variant* names_list = nullptr; tr_variantDictFindList(args_in, TR_KEY_name, &names_list))
     {
-        auto const names_count = tr_variantListSize(namesList);
+        auto const names_count = tr_variantListSize(names_list);
 
         for (size_t i = 0; i < names_count; ++i)
         {
-            auto const* const v = tr_variantListChild(namesList, i);
+            auto const* const v = tr_variantListChild(names_list, i);
             if (std::string_view l; tr_variantIsString(v) && tr_variantGetStrView(v, &l))
             {
                 names.insert(l);
