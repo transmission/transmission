@@ -1594,9 +1594,9 @@ static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned in
     updateBandwidth(s, d);
 }
 
-void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int KBps)
+void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int kilo_per_second)
 {
-    tr_sessionSetAltSpeed_Bps(s, d, tr_toSpeedBytes(KBps));
+    tr_sessionSetAltSpeed_Bps(s, d, tr_toSpeedBytes(kilo_per_second));
 }
 
 static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
