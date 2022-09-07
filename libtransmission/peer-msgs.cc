@@ -202,7 +202,7 @@ class tr_peerMsgsImpl;
 // TODO: make these to be member functions
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
 static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
-static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
+static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
 static void peerPulse(void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
@@ -1849,13 +1849,13 @@ static int clientGotBlock(
     return 0;
 }
 
-static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs)
+static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
-    if (wasPieceData)
+    if (was_piece_data)
     {
-        msgs->publish(tr_peer_event::SentPieceData(bytesWritten));
+        msgs->publish(tr_peer_event::SentPieceData(bytes_written));
     }
 
     if (tr_isPeerIo(io) && io->userData != nullptr)
