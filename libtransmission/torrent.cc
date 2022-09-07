@@ -392,13 +392,13 @@ tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* tor)
     return tor->idleLimitMode;
 }
 
-void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idleMinutes)
+void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (idleMinutes > 0)
+    if (idle_minutes > 0)
     {
-        tor->idleLimitMinutes = idleMinutes;
+        tor->idleLimitMinutes = idle_minutes;
 
         tor->setDirty();
     }
