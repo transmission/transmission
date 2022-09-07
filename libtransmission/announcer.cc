@@ -854,14 +854,14 @@ void tr_announcerChangeMyPort(tr_torrent* tor)
 ****
 ***/
 
-void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
+void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(type == TR_ANN_UP || type == TR_ANN_DOWN || type == TR_ANN_CORRUPT);
 
     for (auto& tier : tor->torrent_announcer->tiers)
     {
-        tier.byteCounts[type] += byteCount;
+        tier.byteCounts[type] += n_bytes;
     }
 }
 
