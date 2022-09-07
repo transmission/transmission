@@ -236,11 +236,11 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
     return tor->bandwidth_.isLimited(dir);
 }
 
-void tr_torrentUseSessionLimits(tr_torrent* tor, bool doUse)
+void tr_torrentUseSessionLimits(tr_torrent* tor, bool do_use)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->bandwidth_.honorParentLimits(TR_UP, doUse) || tor->bandwidth_.honorParentLimits(TR_DOWN, doUse))
+    if (tor->bandwidth_.honorParentLimits(TR_UP, do_use) || tor->bandwidth_.honorParentLimits(TR_DOWN, do_use))
     {
         tor->setDirty();
     }
