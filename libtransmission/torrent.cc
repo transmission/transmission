@@ -749,7 +749,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->refreshCurrentDir();
 
-    bool const doStart = tor->isRunning;
+    bool const do_start = tor->isRunning;
     tor->isRunning = false;
 
     if ((loaded & tr_resume::Speedlimit) == 0)
@@ -824,7 +824,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
         }
 
-        if (!tor->hasMetainfo() && !doStart)
+        if (!tor->hasMetainfo() && !do_start)
         {
             auto opts = torrent_start_opts{};
             opts.bypass_queue = true;
@@ -839,11 +839,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         }
         else
         {
-            tor->startAfterVerify = doStart;
+            tor->startAfterVerify = do_start;
             tr_torrentVerify(tor);
         }
     }
-    else if (doStart)
+    else if (do_start)
     {
         // if checked_pieces_ got populated from the loading the resume
         // file above, then torrentStart doesn't need to check again
