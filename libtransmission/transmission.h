@@ -1099,7 +1099,7 @@ enum
 void tr_torrentSetFilePriorities(
     tr_torrent* torrent,
     tr_file_index_t const* files,
-    tr_file_index_t fileCount,
+    tr_file_index_t file_count,
     tr_priority_t priority);
 
 /** @brief Set a batch of files to be downloaded or not. */

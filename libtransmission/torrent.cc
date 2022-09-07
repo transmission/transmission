@@ -2711,10 +2711,10 @@ void tr_torrentRenamePath(
 void tr_torrentSetFilePriorities(
     tr_torrent* tor,
     tr_file_index_t const* files,
-    tr_file_index_t fileCount,
+    tr_file_index_t file_count,
     tr_priority_t priority)
 {
-    tor->setFilePriorities(files, fileCount, priority);
+    tor->setFilePriorities(files, file_count, priority);
 }
 
 bool tr_torrentHasMetadata(tr_torrent const* tor)
