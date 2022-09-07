@@ -825,22 +825,22 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     }
 }
 
-static void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quark const* fields, size_t fieldCount)
+static void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quark const* fields, size_t field_count)
 {
     if (format == TrFormat::Table)
     {
-        tr_variantInitList(entry, fieldCount);
+        tr_variantInitList(entry, field_count);
     }
     else
     {
-        tr_variantInitDict(entry, fieldCount);
+        tr_variantInitDict(entry, field_count);
     }
 
-    if (fieldCount > 0)
+    if (field_count > 0)
     {
         tr_stat const* const st = tr_torrentStat(tor);
 
-        for (size_t i = 0; i < fieldCount; ++i)
+        for (size_t i = 0; i < field_count; ++i)
         {
             tr_variant* child = format == TrFormat::Table ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
 
