@@ -1412,10 +1412,10 @@ std::optional<unsigned int> tr_session::activeSpeedLimitBps(tr_direction dir) co
 
 static void updateBandwidth(tr_session* session, tr_direction dir)
 {
-    if (auto const limit_Bps = session->activeSpeedLimitBps(dir); limit_Bps)
+    if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
     {
-        session->top_bandwidth_.setLimited(dir, *limit_Bps > 0U);
-        session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, *limit_Bps);
+        session->top_bandwidth_.setLimited(dir, *limit_bytes_per_second > 0U);
+        session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, *limit_bytes_per_second);
     }
     else
     {

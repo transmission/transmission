@@ -868,19 +868,19 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
     formatter_init(speed_units, kilo, kb, mb, gb, tb);
 }
 
-std::string tr_formatter_speed_KBps(double KBps)
+std::string tr_formatter_speed_KBps(double kilo_per_second)
 {
     using namespace formatter_impl;
 
-    auto speed = KBps;
+    auto speed = kilo_per_second;
 
     if (speed <= 999.95) // 0.0 KB to 999.9 KB
     {
         return fmt::format("{:d} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
     }
 
-    double const K = speed_units[TR_FMT_KB].value;
-    speed /= K;
+    double const kilo = speed_units[TR_FMT_KB].value;
+    speed /= kilo;
 
     if (speed <= 99.995) // 0.98 MB to 99.99 MB
     {
@@ -892,7 +892,7 @@ std::string tr_formatter_speed_KBps(double KBps)
         return fmt::format("{:.1f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
 
-    return fmt::format("{:.1f} {:s}", speed / K, std::data(speed_units[TR_FMT_GB].name));
+    return fmt::format("{:.1f} {:s}", speed / kilo, std::data(speed_units[TR_FMT_GB].name));
 }
 
 size_t tr_mem_K = 0;

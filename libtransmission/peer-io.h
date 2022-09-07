@@ -154,7 +154,7 @@ public:
         return bandwidth_.clamp(dir, 1024) > 0;
     }
 
-    [[nodiscard]] auto getPieceSpeed_Bps(uint64_t now, tr_direction dir) noexcept
+    [[nodiscard]] auto getPieceSpeedBytesPerSecond(uint64_t now, tr_direction dir) noexcept
     {
         return bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
     }

@@ -327,16 +327,16 @@ public:
         }
     }
 
-    bool isTransferringPieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
+    bool isTransferringPieces(uint64_t now, tr_direction dir, unsigned int* setme_bytes_per_second) const override
     {
-        auto const Bps = io->getPieceSpeed_Bps(now, direction);
+        auto const bytes_per_second = io->getPieceSpeedBytesPerSecond(now, dir);
 
-        if (setme_Bps != nullptr)
+        if (setme_bytes_per_second != nullptr)
         {
-            *setme_Bps = Bps;
+            *setme_bytes_per_second = bytes_per_second;
         }
 
-        return Bps > 0;
+        return bytes_per_second > 0;
     }
 
     [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
@@ -580,18 +580,19 @@ private:
         // Get the rate limit we should use.
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
-        auto rate_Bps = tr_peerGetPieceSpeed_Bps(this, now, TR_PEER_TO_CLIENT);
+        auto rate_bytes_per_second = tr_peerGetPieceSpeedBytesPerSecond(this, now, TR_PEER_TO_CLIENT);
         if (tr_torrentUsesSpeedLimit(torrent, TR_PEER_TO_CLIENT))
         {
-            rate_Bps = std::min(rate_Bps, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
+            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
         }
 
         // honor the session limits, if enabled
         if (tr_torrentUsesSessionLimits(torrent))
         {
-            if (auto const irate_Bps = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT); irate_Bps)
+            if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
+                irate_bytes_per_second)
             {
-                rate_Bps = std::min(rate_Bps, *irate_Bps);
+                rate_bytes_per_second = std::min(rate_bytes_per_second, *irate_bytes_per_second);
             }
         }
 
@@ -599,7 +600,7 @@ private:
         // many requests we should send to this peer
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / tr_block_info::BlockSize;
+        size_t const estimated_blocks_in_period = (rate_bytes_per_second * Seconds) / tr_block_info::BlockSize;
         size_t const ceil = reqq ? *reqq : 250;
         return std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
