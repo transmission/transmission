@@ -808,7 +808,7 @@ private:
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted data. (#667)
  */
-void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
+void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_funcs, void* user_data, bool sort_dicts)
 {
     auto stack = VariantWalker{};
     stack.emplace(top, sort_dicts);
@@ -834,14 +834,14 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFu
                 {
                     auto tmp = tr_variant{};
                     tr_variantInitQuark(&tmp, v->key);
-                    walkFuncs->stringFunc(&tmp, user_data);
+                    walk_funcs->stringFunc(&tmp, user_data);
                 }
             }
             else // finished with this node
             {
                 if (tr_variantIsContainer(&node.v))
                 {
-                    walkFuncs->containerEndFunc(&node.v, user_data);
+                    walk_funcs->containerEndFunc(&node.v, user_data);
                 }
 
                 stack.pop();
@@ -854,25 +854,25 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFu
             switch (v->type)
             {
             case TR_VARIANT_TYPE_INT:
-                walkFuncs->intFunc(v, user_data);
+                walk_funcs->intFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_BOOL:
-                walkFuncs->boolFunc(v, user_data);
+                walk_funcs->boolFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_REAL:
-                walkFuncs->realFunc(v, user_data);
+                walk_funcs->realFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_STR:
-                walkFuncs->stringFunc(v, user_data);
+                walk_funcs->stringFunc(v, user_data);
                 break;
 
             case TR_VARIANT_TYPE_LIST:
                 if (v == &node.v)
                 {
-                    walkFuncs->listBeginFunc(v, user_data);
+                    walk_funcs->listBeginFunc(v, user_data);
                 }
                 else
                 {
@@ -883,7 +883,7 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFu
             case TR_VARIANT_TYPE_DICT:
                 if (v == &node.v)
                 {
-                    walkFuncs->dictBeginFunc(v, user_data);
+                    walk_funcs->dictBeginFunc(v, user_data);
                 }
                 else
                 {

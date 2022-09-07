@@ -30,7 +30,7 @@ struct VariantWalkFuncs
     VariantWalkFunc containerEndFunc;
 };
 
-void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts);
+void tr_variantWalk(tr_variant const* top, VariantWalkFuncs const* walk_funcs, void* user_data, bool sort_dicts);
 
 void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean);
 
