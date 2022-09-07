@@ -1041,10 +1041,10 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
-    auto const pieceUploadSpeed_Bps = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_UP);
-    s->pieceUploadSpeed_KBps = tr_toSpeedKBps(pieceUploadSpeed_Bps);
-    auto const pieceDownloadSpeed_Bps = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_DOWN);
-    s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(pieceDownloadSpeed_Bps);
+    auto const piece_upload_speed_bytes_per_second = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_UP);
+    s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_bytes_per_second);
+    auto const piece_download_speed_bytes_per_second = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_DOWN);
+    s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_bytes_per_second);
 
     s->percentComplete = tor->completion.percentComplete();
     s->metadataPercentComplete = tr_torrentGetMetadataPercent(tor);
@@ -1086,8 +1086,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         if (tor->etaSpeedCalculatedAt + 800 < now)
         {
             tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
-                pieceDownloadSpeed_Bps : /* if no recent previous speed, no need to smooth */
-                (tor->etaSpeed_Bps * 4.0 + pieceDownloadSpeed_Bps) / 5.0; /* smooth across 5 readings */
+                piece_download_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
+                (tor->etaSpeed_Bps * 4.0 + piece_download_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
             tor->etaSpeedCalculatedAt = now;
         }
 
@@ -1117,8 +1117,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             if (tor->etaSpeedCalculatedAt + 800 < now)
             {
                 tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
-                    pieceUploadSpeed_Bps : /* if no recent previous speed, no need to smooth */
-                    (tor->etaSpeed_Bps * 4.0 + pieceUploadSpeed_Bps) / 5.0; /* smooth across 5 readings */
+                    piece_upload_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
+                    (tor->etaSpeed_Bps * 4.0 + piece_upload_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
                 tor->etaSpeedCalculatedAt = now;
             }
 
