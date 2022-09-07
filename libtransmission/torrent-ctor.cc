@@ -157,10 +157,10 @@ void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
     tor->setFilePriorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
 }
 
-void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)
+void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, bool wanted)
 {
     auto& indices = wanted ? ctor->wanted : ctor->unwanted;
-    indices.assign(files, files + fileCount);
+    indices.assign(files, files + file_count);
 }
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
