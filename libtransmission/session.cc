@@ -1466,7 +1466,7 @@ static void altSpeedToggled(tr_session* const session)
     }
 }
 
-static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, bool byUser)
+static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, bool by_user)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(t != nullptr);
@@ -1474,7 +1474,7 @@ static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, b
     if (t->isEnabled != enabled)
     {
         t->isEnabled = enabled;
-        t->changedByUser = byUser;
+        t->changedByUser = by_user;
         tr_runInEventThread(s, altSpeedToggled, s);
     }
 }
