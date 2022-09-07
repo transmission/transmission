@@ -2150,13 +2150,13 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
     auto const lock = s->unique_lock();
 
-    auto const peerCount = s->peerCount();
+    auto const peer_count = s->peerCount();
     auto& peers = s->peers;
     auto choked = std::vector<ChokeData>{};
-    choked.reserve(peerCount);
+    choked.reserve(peer_count);
     auto const* const session = s->manager->session;
-    bool const chokeAll = !s->tor->clientCanUpload();
-    bool const isMaxedOut = isBandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
+    bool const choke_all = !s->tor->clientCanUpload();
+    bool const is_maxed_out = isBandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -2178,7 +2178,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             /* choke seeds and partial seeds */
             peer->set_choke(true);
         }
-        else if (chokeAll)
+        else if (choke_all)
         {
             /* choke everyone if we're not uploading */
             peer->set_choke(true);
@@ -2222,7 +2222,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             break;
         }
 
-        item.is_choked = isMaxedOut ? item.was_choked : false;
+        item.is_choked = is_maxed_out ? item.was_choked : false;
 
         ++checked_choke_count;
 
@@ -2233,7 +2233,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     }
 
     /* optimistic unchoke */
-    if (s->optimistic == nullptr && !isMaxedOut && checked_choke_count < std::size(choked))
+    if (s->optimistic == nullptr && !is_maxed_out && checked_choke_count < std::size(choked))
     {
         auto rand_pool = std::vector<ChokeData*>{};
 
