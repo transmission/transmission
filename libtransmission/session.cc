@@ -1830,9 +1830,9 @@ void tr_session::closeImplStart()
         std::end(torrents),
         [](auto const* a, auto const* b)
         {
-            auto const aCur = a->downloadedCur + a->uploadedCur;
-            auto const bCur = b->downloadedCur + b->uploadedCur;
-            return aCur > bCur; // larger xfers go first
+            auto const a_cur = a->downloadedCur + a->uploadedCur;
+            auto const b_cur = b->downloadedCur + b->uploadedCur;
+            return a_cur > b_cur; // larger xfers go first
         });
 
     for (auto* tor : torrents)
