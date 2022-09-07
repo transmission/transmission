@@ -133,7 +133,7 @@ private:
     void initStatusBar();
 
     void clearSelection();
-    void addTorrent(AddData const& add_me, bool show_options);
+    void addTorrent(AddData add_me, bool show_options);
 
     // QWidget
     void hideEvent(QHideEvent* event) override;

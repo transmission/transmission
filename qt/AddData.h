@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QByteArray>
 #include <QString>
 #include <QUrl>
@@ -34,9 +36,14 @@ public:
     QString readableName() const;
     QString readableShortName() const;
 
-    static bool isSupported(QString const& str)
+    static std::optional<AddData> create(QString const& str)
     {
-        return AddData(str).type != NONE;
+        if (auto ret = AddData{ str }; ret.type != NONE)
+        {
+            return ret;
+        }
+
+        return {};
     }
 
     int type = NONE;

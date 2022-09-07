@@ -986,7 +986,7 @@ void Session::setBlocklistSize(int64_t i)
     emit blocklistUpdated(i);
 }
 
-void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_original)
+void Session::addTorrent(AddData add_me, tr_variant* args, bool trash_original)
 {
     assert(tr_variantDictFind(args, TR_KEY_filename) == nullptr);
     assert(tr_variantDictFind(args, TR_KEY_metainfo) == nullptr);
@@ -1105,12 +1105,12 @@ void Session::onDuplicatesTimer()
     }
 }
 
-void Session::addTorrent(AddData const& add_me)
+void Session::addTorrent(AddData add_me)
 {
     tr_variant args;
     tr_variantInitDict(&args, 3);
 
-    addTorrent(add_me, &args, prefs_.getBool(Prefs::TRASH_ORIGINAL));
+    addTorrent(std::move(add_me), &args, prefs_.getBool(Prefs::TRASH_ORIGINAL));
 }
 
 void Session::addNewlyCreatedTorrent(QString const& filename, QString const& local_path)

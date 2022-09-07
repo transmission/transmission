@@ -1273,19 +1273,19 @@ void MainWindow::openTorrent()
 
 void MainWindow::openURL()
 {
-    QString str = QApplication::clipboard()->text(QClipboard::Selection);
+    auto add = AddData::create(QApplication::clipboard()->text(QClipboard::Selection));
 
-    if (!AddData::isSupported(str))
+    if (!add)
     {
-        str = QApplication::clipboard()->text(QClipboard::Clipboard);
+        add = AddData::create(QApplication::clipboard()->text(QClipboard::Clipboard));
     }
 
-    if (!AddData::isSupported(str))
+    if (!add)
     {
-        str.clear();
+        add = AddData{};
     }
 
-    addTorrent(AddData(str), true);
+    addTorrent(std::move(*add), true);
 }
 
 void MainWindow::addTorrents(QStringList const& filenames)
@@ -1308,17 +1308,17 @@ void MainWindow::addTorrents(QStringList const& filenames)
     }
 }
 
-void MainWindow::addTorrent(AddData const& addMe, bool show_options)
+void MainWindow::addTorrent(AddData add_me, bool show_options)
 {
     if (show_options)
     {
-        auto* o = new OptionsDialog(session_, prefs_, addMe, this);
+        auto* o = new OptionsDialog(session_, prefs_, std::move(add_me), this);
         o->show();
         QApplication::alert(o);
     }
     else
     {
-        session_.addTorrent(addMe);
+        session_.addTorrent(std::move(add_me));
         QApplication::alert(this);
     }
 }
