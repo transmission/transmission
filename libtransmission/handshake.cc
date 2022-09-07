@@ -1042,13 +1042,13 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
     return ret;
 }
 
-static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
+static bool fireDoneFunc(tr_handshake* handshake, bool is_connected)
 {
     auto result = tr_handshake_result{};
     result.handshake = handshake;
     result.io = handshake->io;
     result.readAnythingFromPeer = handshake->haveReadAnythingFromPeer;
-    result.isConnected = isConnected;
+    result.isConnected = is_connected;
     result.userData = handshake->done_func_user_data;
     result.peer_id = handshake->peer_id;
     bool const success = (*handshake->done_func)(result);
