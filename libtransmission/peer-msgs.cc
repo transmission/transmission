@@ -465,9 +465,9 @@ public:
     void set_choke(bool peer_is_choked) override
     {
         time_t const now = tr_time();
-        time_t const fibrillationTime = now - MinChokePeriodSec;
+        time_t const fibrillation_time = now - MinChokePeriodSec;
 
-        if (chokeChangedAt > fibrillationTime)
+        if (chokeChangedAt > fibrillation_time)
         {
             // TODO logtrace(msgs, "Not changing choke to %d to avoid fibrillation", peer_is_choked);
         }
