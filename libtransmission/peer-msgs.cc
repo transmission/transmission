@@ -253,7 +253,7 @@ public:
         peer_atom* atom_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_peer_callback callback,
-        void* callbackData)
+        void* callback_data)
         : tr_peerMsgs{ torrent_in, atom_in }
         , outMessagesBatchPeriod{ LowPriorityIntervalSecs }
         , torrent{ torrent_in }
@@ -261,7 +261,7 @@ public:
         , io{ std::move(io_in) }
         , have_{ torrent_in->pieceCount() }
         , callback_{ callback }
-        , callbackData_{ callbackData }
+        , callback_data_{ callback_data }
     {
         if (torrent->allowsPex())
         {
@@ -565,7 +565,7 @@ public:
     {
         if (callback_ != nullptr)
         {
-            (*callback_)(this, peer_event, callbackData_);
+            (*callback_)(this, peer_event, callback_data_);
         }
     }
 
@@ -749,7 +749,7 @@ private:
     std::array<bool, 2> is_active_ = { false, false };
 
     tr_peer_callback const callback_;
-    void* const callbackData_;
+    void* const callback_data_;
 
     mutable std::optional<float> percent_done_;
 
