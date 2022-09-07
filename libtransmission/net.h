@@ -216,7 +216,7 @@ constexpr bool tr_address_is_valid(tr_address const* a)
 
 struct tr_session;
 
-tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs);
+tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppress_msgs);
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_address* setme_addr, tr_port* setme_port);
 
