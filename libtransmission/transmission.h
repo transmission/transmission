@@ -1042,7 +1042,7 @@ void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode);
 
 tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor);
 
-void tr_torrentSetRatioLimit(tr_torrent* tor, double ratio);
+void tr_torrentSetRatioLimit(tr_torrent* tor, double desired_ratio);
 
 double tr_torrentGetRatioLimit(tr_torrent const* tor);
 

@@ -277,13 +277,13 @@ tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor)
     return tor->ratioLimitMode;
 }
 
-void tr_torrentSetRatioLimit(tr_torrent* tor, double desiredRatio)
+void tr_torrentSetRatioLimit(tr_torrent* tor, double desired_ratio)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if ((int)(desiredRatio * 100.0) != (int)(tor->desiredRatio * 100.0))
+    if ((int)(desired_ratio * 100.0) != (int)(tor->desiredRatio * 100.0))
     {
-        tor->desiredRatio = desiredRatio;
+        tor->desiredRatio = desired_ratio;
 
         tor->setDirty();
     }
