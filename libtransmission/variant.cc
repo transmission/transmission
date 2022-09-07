@@ -1017,72 +1017,72 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
     TR_ASSERT(tr_variantIsDict(target));
     TR_ASSERT(tr_variantIsDict(source));
 
-    size_t const sourceCount = tr_variantDictSize(source);
+    size_t const source_count = tr_variantDictSize(source);
 
-    tr_variantDictReserve(target, sourceCount + tr_variantDictSize(target));
+    tr_variantDictReserve(target, source_count + tr_variantDictSize(target));
 
-    for (size_t i = 0; i < sourceCount; ++i)
+    for (size_t i = 0; i < source_count; ++i)
     {
         auto key = tr_quark{};
-        tr_variant* val = nullptr;
-        if (tr_variantDictChild(const_cast<tr_variant*>(source), i, &key, &val))
+        tr_variant* child = nullptr;
+        if (tr_variantDictChild(const_cast<tr_variant*>(source), i, &key, &child))
         {
             tr_variant* t = nullptr;
 
             // if types differ, ensure that target will overwrite source
             auto const* const target_child = tr_variantDictFind(target, key);
-            if ((target_child != nullptr) && !tr_variantIsType(target_child, val->type))
+            if ((target_child != nullptr) && !tr_variantIsType(target_child, child->type))
             {
                 tr_variantDictRemove(target, key);
             }
 
-            if (tr_variantIsBool(val))
+            if (tr_variantIsBool(child))
             {
-                bool boolVal = false;
-                tr_variantGetBool(val, &boolVal);
-                tr_variantDictAddBool(target, key, boolVal);
+                auto val = bool{};
+                tr_variantGetBool(child, &val);
+                tr_variantDictAddBool(target, key, val);
             }
-            else if (tr_variantIsReal(val))
+            else if (tr_variantIsReal(child))
             {
-                double realVal = 0;
-                tr_variantGetReal(val, &realVal);
-                tr_variantDictAddReal(target, key, realVal);
+                auto val = double{};
+                tr_variantGetReal(child, &val);
+                tr_variantDictAddReal(target, key, val);
             }
-            else if (tr_variantIsInt(val))
+            else if (tr_variantIsInt(child))
             {
-                int64_t intVal = 0;
-                tr_variantGetInt(val, &intVal);
-                tr_variantDictAddInt(target, key, intVal);
+                auto val = int64_t{};
+                tr_variantGetInt(child, &val);
+                tr_variantDictAddInt(target, key, val);
             }
-            else if (tr_variantIsString(val))
+            else if (tr_variantIsString(child))
             {
-                auto sv = std::string_view{};
-                (void)tr_variantGetStrView(val, &sv);
-                tr_variantDictAddRaw(target, key, std::data(sv), std::size(sv));
+                auto val = std::string_view{};
+                (void)tr_variantGetStrView(child, &val);
+                tr_variantDictAddRaw(target, key, std::data(val), std::size(val));
             }
-            else if (tr_variantIsDict(val) && tr_variantDictFindDict(target, key, &t))
+            else if (tr_variantIsDict(child) && tr_variantDictFindDict(target, key, &t))
             {
-                tr_variantMergeDicts(t, val);
+                tr_variantMergeDicts(t, child);
             }
-            else if (tr_variantIsList(val))
+            else if (tr_variantIsList(child))
             {
                 if (tr_variantDictFind(target, key) == nullptr)
                 {
-                    tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)), val);
+                    tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(child)), child);
                 }
             }
-            else if (tr_variantIsDict(val))
+            else if (tr_variantIsDict(child))
             {
                 tr_variant* target_dict = tr_variantDictFind(target, key);
 
                 if (target_dict == nullptr)
                 {
-                    target_dict = tr_variantDictAddDict(target, key, tr_variantDictSize(val));
+                    target_dict = tr_variantDictAddDict(target, key, tr_variantDictSize(child));
                 }
 
                 if (tr_variantIsDict(target_dict))
                 {
-                    tr_variantMergeDicts(target_dict, val);
+                    tr_variantMergeDicts(target_dict, child);
                 }
             }
             else
