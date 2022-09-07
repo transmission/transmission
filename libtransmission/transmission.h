@@ -828,7 +828,7 @@ void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory);
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused);
 
 /** @brief Set the priorities for files in a torrent */
-void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority);
+void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority);
 
 /** @brief Set the download flag for files in a torrent */
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted);
