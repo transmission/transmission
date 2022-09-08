@@ -161,7 +161,7 @@
             <property name="border-width">3</property>
             <property name="spacing">3</property>
             <child>
-              <object class="GtkButton" id="gear_button">
+              <object class="GtkMenuButton" id="gear_button">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -243,7 +243,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="ratio_button">
+              <object class="GtkMenuButton" id="ratio_button">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>

@@ -21,8 +21,30 @@
 #include "TorrentCellRenderer.h"
 #include "Utils.h"
 
+using namespace std::string_literals;
+using namespace std::string_view_literals;
+
+using VariantInt = Glib::Variant<int>;
+using VariantDouble = Glib::Variant<double>;
+using VariantString = Glib::Variant<Glib::ustring>;
+
+namespace
+{
+
+auto constexpr OptionsMenuActionGroupName = "options-menu"sv;
+auto constexpr StatsMenuActionGroupName = "stats-menu"sv;
+
+} // namespace
+
 class MainWindow::Impl
 {
+    struct OptionMenuInfo
+    {
+        Glib::RefPtr<Gio::SimpleAction> action;
+        Glib::RefPtr<Gio::MenuItem> on_item;
+        Glib::RefPtr<Gio::Menu> section;
+    };
+
 public:
     Impl(
         MainWindow& window,
@@ -42,16 +64,18 @@ public:
 private:
     void init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeModel> const& model);
 
-    Gtk::Menu* createOptionsMenu();
-    Gtk::Menu* createSpeedMenu(tr_direction dir);
-    Gtk::Menu* createRatioMenu();
+    Glib::RefPtr<Gio::MenuModel> createOptionsMenu();
+    Glib::RefPtr<Gio::MenuModel> createSpeedMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions, tr_direction dir);
+    Glib::RefPtr<Gio::MenuModel> createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions);
+
+    Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
     void on_popup_menu(GdkEventButton* event);
 
-    void onSpeedToggled(Gtk::CheckMenuItem* check, tr_direction dir, bool enabled);
+    void onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled);
     void onSpeedSet(tr_direction dir, int KBps);
 
-    void onRatioToggled(Gtk::CheckMenuItem* check, bool enabled);
+    void onRatioToggled(std::string const& action_name, bool enabled);
     void onRatioSet(double ratio);
 
     void updateStats();
@@ -59,9 +83,8 @@ private:
 
     void syncAltSpeedButton();
 
-    void status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, std::string const& val);
-    void onOptionsClicked(Gtk::Button* button);
-    void onYinYangClicked(Gtk::Button* button);
+    void status_menu_toggled_cb(std::string const& action_name, Glib::ustring const& val);
+    void onOptionsClicked();
     void alt_speed_toggled_cb();
     void onAltSpeedToggledIdle();
 
@@ -69,22 +92,22 @@ private:
     MainWindow& window_;
     Glib::RefPtr<Session> const core_;
 
-    std::array<Gtk::RadioMenuItem*, 2> speedlimit_on_item_;
-    std::array<Gtk::RadioMenuItem*, 2> speedlimit_off_item_;
-    Gtk::RadioMenuItem* ratio_on_item_ = nullptr;
-    Gtk::RadioMenuItem* ratio_off_item_ = nullptr;
+    Glib::RefPtr<Gio::ActionGroup> options_actions_;
+    Glib::RefPtr<Gio::ActionGroup> stats_actions_;
+
+    std::array<OptionMenuInfo, 2> speed_menu_info_;
+    OptionMenuInfo ratio_menu_info_;
+
     Gtk::ScrolledWindow* scroll_ = nullptr;
     Gtk::TreeView* view_ = nullptr;
     Gtk::Widget* toolbar_ = nullptr;
     FilterBar* filter_;
     Gtk::Widget* status_ = nullptr;
-    Gtk::Menu* status_menu_;
     Gtk::Label* ul_lb_ = nullptr;
     Gtk::Label* dl_lb_ = nullptr;
     Gtk::Label* stats_lb_ = nullptr;
     Gtk::Image* alt_speed_image_ = nullptr;
     Gtk::ToggleButton* alt_speed_button_ = nullptr;
-    Gtk::Menu* options_menu_ = nullptr;
     TorrentCellRenderer* renderer_ = nullptr;
     Gtk::TreeViewColumn* column_ = nullptr;
     sigc::connection pref_handler_id_;
@@ -194,17 +217,10 @@ MainWindow::Impl::~Impl()
     pref_handler_id_.disconnect();
 }
 
-void MainWindow::Impl::onYinYangClicked(Gtk::Button* button)
+void MainWindow::Impl::status_menu_toggled_cb(std::string const& action_name, Glib::ustring const& val)
 {
-    status_menu_->popup_at_widget(button, Gdk::GRAVITY_NORTH_EAST, Gdk::GRAVITY_SOUTH_EAST, nullptr);
-}
-
-void MainWindow::Impl::status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, std::string const& val)
-{
-    if (menu_item->get_active())
-    {
-        core_->set_pref(TR_KEY_statusbar_stats, val);
-    }
+    stats_actions_->change_action_state(action_name, VariantString::create(val));
+    core_->set_pref(TR_KEY_statusbar_stats, val.raw());
 }
 
 void MainWindow::Impl::syncAltSpeedButton()
@@ -239,12 +255,10 @@ void MainWindow::Impl::onAltSpeedToggledIdle()
 ****  Speed limit menu
 ***/
 
-void MainWindow::Impl::onSpeedToggled(Gtk::CheckMenuItem* check, tr_direction dir, bool enabled)
+void MainWindow::Impl::onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled)
 {
-    if (check->get_active())
-    {
-        core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, enabled);
-    }
+    options_actions_->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
+    core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, enabled);
 }
 
 void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
@@ -253,29 +267,48 @@ void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
     core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, true);
 }
 
-Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions, tr_direction dir)
 {
-    auto* m = Gtk::make_managed<Gtk::Menu>();
-    Gtk::RadioButtonGroup group;
+    auto& info = speed_menu_info_[dir];
 
-    speedlimit_off_item_[dir] = Gtk::make_managed<Gtk::RadioMenuItem>(group, _("Unlimited"));
-    speedlimit_off_item_[dir]->signal_toggled().connect([this, dir]()
-                                                        { onSpeedToggled(speedlimit_off_item_[dir], dir, false); });
-    m->append(*speedlimit_off_item_[dir]);
+    auto m = Gio::Menu::create();
 
-    speedlimit_on_item_[dir] = Gtk::make_managed<Gtk::RadioMenuItem>(group, "");
-    speedlimit_on_item_[dir]->signal_toggled().connect([this, dir]() { onSpeedToggled(speedlimit_on_item_[dir], dir, true); });
-    m->append(*speedlimit_on_item_[dir]);
+    auto const action_name = fmt::format("speed-limit-{}", dir == TR_UP ? "up" : "down");
+    auto const full_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, action_name);
+    info.action = actions->add_action_radio_integer(
+        action_name,
+        [this, action_name, dir](int value) { onSpeedToggled(action_name, dir, value != 0); },
+        0);
 
-    m->append(*Gtk::make_managed<Gtk::SeparatorMenuItem>());
+    info.section = Gio::Menu::create();
+
+    auto speedlimit_off_item = Gio::MenuItem::create(_("Unlimited"), full_action_name);
+    speedlimit_off_item->set_action_and_target(full_action_name, VariantInt::create(0));
+    info.section->append_item(speedlimit_off_item);
+
+    info.on_item = Gio::MenuItem::create("...", full_action_name);
+    info.on_item->set_action_and_target(full_action_name, VariantInt::create(1));
+    info.section->append_item(info.on_item);
+
+    m->append_section(info.section);
+    auto section = Gio::Menu::create();
+
+    auto const stock_action_name = fmt::format("{}-stock", action_name);
+    auto const full_stock_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, stock_action_name);
+    actions->add_action_with_parameter(
+        stock_action_name,
+        VariantInt::variant_type(),
+        [this, dir](Glib::VariantBase const& value)
+        { onSpeedSet(dir, Glib::VariantBase::cast_dynamic<VariantInt>(value).get()); });
 
     for (auto const KBps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
     {
-        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_formatter_speed_KBps(KBps));
-        w->signal_activate().connect([this, dir, KBps]() { onSpeedSet(dir, KBps); });
-        m->append(*w);
+        auto item = Gio::MenuItem::create(tr_formatter_speed_KBps(KBps), full_stock_action_name);
+        item->set_action_and_target(full_stock_action_name, VariantInt::create(KBps));
+        section->append_item(item);
     }
 
+    m->append_section(section);
     return m;
 }
 
@@ -283,12 +316,10 @@ Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
 ****  Speed limit menu
 ***/
 
-void MainWindow::Impl::onRatioToggled(Gtk::CheckMenuItem* check, bool enabled)
+void MainWindow::Impl::onRatioToggled(std::string const& action_name, bool enabled)
 {
-    if (check->get_active())
-    {
-        core_->set_pref(TR_KEY_ratio_limit_enabled, enabled);
-    }
+    options_actions_->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
+    core_->set_pref(TR_KEY_ratio_limit_enabled, enabled);
 }
 
 void MainWindow::Impl::onRatioSet(double ratio)
@@ -297,30 +328,49 @@ void MainWindow::Impl::onRatioSet(double ratio)
     core_->set_pref(TR_KEY_ratio_limit_enabled, true);
 }
 
-Gtk::Menu* MainWindow::Impl::createRatioMenu()
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions)
 {
     static double const stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
 
-    auto* m = Gtk::make_managed<Gtk::Menu>();
-    Gtk::RadioButtonGroup group;
+    auto& info = ratio_menu_info_;
 
-    ratio_off_item_ = Gtk::make_managed<Gtk::RadioMenuItem>(group, _("Seed Forever"));
-    ratio_off_item_->signal_toggled().connect([this]() { onRatioToggled(ratio_off_item_, false); });
-    m->append(*ratio_off_item_);
+    auto m = Gio::Menu::create();
 
-    ratio_on_item_ = Gtk::make_managed<Gtk::RadioMenuItem>(group, "");
-    ratio_on_item_->signal_toggled().connect([this]() { onRatioToggled(ratio_on_item_, true); });
-    m->append(*ratio_on_item_);
+    auto const action_name = "ratio-limit"s;
+    auto const full_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, action_name);
+    info.action = actions->add_action_radio_integer(
+        action_name,
+        [this, action_name](int value) { onRatioToggled(action_name, value != 0); },
+        0);
 
-    m->append(*Gtk::make_managed<Gtk::SeparatorMenuItem>());
+    info.section = Gio::Menu::create();
+
+    auto ratio_off_item = Gio::MenuItem::create(_("Seed Forever"), full_action_name);
+    ratio_off_item->set_action_and_target(full_action_name, VariantInt::create(0));
+    info.section->append_item(ratio_off_item);
+
+    info.on_item = Gio::MenuItem::create("...", full_action_name);
+    info.on_item->set_action_and_target(full_action_name, VariantInt::create(1));
+    info.section->append_item(info.on_item);
+
+    m->append_section(info.section);
+    auto section = Gio::Menu::create();
+
+    auto const stock_action_name = fmt::format("{}-stock", action_name);
+    auto const full_stock_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, stock_action_name);
+    actions->add_action_with_parameter(
+        stock_action_name,
+        VariantDouble::variant_type(),
+        [this](Glib::VariantBase const& value) { onRatioSet(Glib::VariantBase::cast_dynamic<VariantDouble>(value).get()); });
 
     for (auto const ratio : stockRatios)
     {
-        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_strlratio(ratio));
-        w->signal_activate().connect([this, ratio]() { onRatioSet(ratio); });
-        m->append(*w);
+        auto item = Gio::MenuItem::create(tr_strlratio(ratio), full_stock_action_name);
+        item->set_action_and_target(full_stock_action_name, VariantDouble::create(ratio));
+        section->append_item(item);
     }
 
+    m->append_section(section);
     return m;
 }
 
@@ -328,52 +378,94 @@ Gtk::Menu* MainWindow::Impl::createRatioMenu()
 ****  Option menu
 ***/
 
-Gtk::Menu* MainWindow::Impl::createOptionsMenu()
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createOptionsMenu()
 {
-    Gtk::MenuItem* m;
-    auto* top = Gtk::make_managed<Gtk::Menu>();
+    auto top = Gio::Menu::create();
+    auto actions = Gio::SimpleActionGroup::create();
 
-    m = Gtk::make_managed<Gtk::MenuItem>(_("Limit Download Speed"));
-    m->set_submenu(*createSpeedMenu(TR_DOWN));
-    top->append(*m);
+    auto section = Gio::Menu::create();
+    section->append_submenu(_("Limit Download Speed"), createSpeedMenu(actions, TR_DOWN));
+    section->append_submenu(_("Limit Upload Speed"), createSpeedMenu(actions, TR_UP));
+    top->append_section(section);
 
-    m = Gtk::make_managed<Gtk::MenuItem>(_("Limit Upload Speed"));
-    m->set_submenu(*createSpeedMenu(TR_UP));
-    top->append(*m);
+    section = Gio::Menu::create();
+    section->append_submenu(_("Stop Seeding at Ratio"), createRatioMenu(actions));
+    top->append_section(section);
 
-    top->append(*Gtk::make_managed<Gtk::SeparatorMenuItem>());
+    window_.insert_action_group(std::string(OptionsMenuActionGroupName), actions);
+    options_actions_ = actions;
 
-    m = Gtk::make_managed<Gtk::MenuItem>(_("Stop Seeding at Ratio"));
-    m->set_submenu(*createRatioMenu());
-    top->append(*m);
-
-    top->show_all();
     return top;
 }
 
-void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
+void MainWindow::Impl::onOptionsClicked()
 {
-    gtr_label_set_text(
-        *static_cast<Gtk::Label*>(speedlimit_on_item_[TR_DOWN]->get_child()),
-        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_down)));
+    static auto const update_menu = [](OptionMenuInfo& info, Glib::ustring const& new_on_label, tr_quark on_off_key)
+    {
+        if (auto on_label = Glib::VariantBase::cast_dynamic<VariantString>(info.on_item->get_attribute_value("label")).get();
+            on_label != new_on_label)
+        {
+            info.on_item->set_label(new_on_label);
 
-    (gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled) ? speedlimit_on_item_[TR_DOWN] : speedlimit_off_item_[TR_DOWN])
-        ->set_active(true);
+            // Items aren't refed by menu on insert but their attributes copied instead, so need to replace.
+            // (see https://docs.gtk.org/gio/method.Menu.insert_item.html)
+            info.section->remove(info.section->get_n_items() - 1);
+            info.section->append_item(info.on_item);
+        }
 
-    gtr_label_set_text(
-        *static_cast<Gtk::Label*>(speedlimit_on_item_[TR_UP]->get_child()),
-        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_up)));
+        info.action->change_state(gtr_pref_flag_get(on_off_key) ? 1 : 0);
+    };
 
-    (gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled) ? speedlimit_on_item_[TR_UP] : speedlimit_off_item_[TR_UP])
-        ->set_active(true);
+    update_menu(
+        speed_menu_info_[TR_DOWN],
+        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_down)),
+        TR_KEY_speed_limit_down_enabled);
 
-    gtr_label_set_text(
-        *static_cast<Gtk::Label*>(ratio_on_item_->get_child()),
-        fmt::format(_("Stop at Ratio ({ratio})"), fmt::arg("ratio", tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit)))));
+    update_menu(
+        speed_menu_info_[TR_UP],
+        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_up)),
+        TR_KEY_speed_limit_up_enabled);
 
-    (gtr_pref_flag_get(TR_KEY_ratio_limit_enabled) ? ratio_on_item_ : ratio_off_item_)->set_active(true);
+    update_menu(
+        ratio_menu_info_,
+        fmt::format(_("Stop at Ratio ({ratio})"), fmt::arg("ratio", tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit)))),
+        TR_KEY_ratio_limit_enabled);
+}
 
-    options_menu_->popup_at_widget(button, Gdk::GRAVITY_NORTH_WEST, Gdk::GRAVITY_SOUTH_WEST, nullptr);
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
+{
+    static struct
+    {
+        char const* val;
+        char const* i18n;
+    } const stats_modes[] = {
+        { "total-ratio", N_("Total Ratio") },
+        { "session-ratio", N_("Session Ratio") },
+        { "total-transfer", N_("Total Transfer") },
+        { "session-transfer", N_("Session Transfer") },
+    };
+
+    auto top = Gio::Menu::create();
+    auto actions = Gio::SimpleActionGroup::create();
+
+    auto const action_name = "stats-mode"s;
+    auto const full_action_name = fmt::format("{}.{}", StatsMenuActionGroupName, action_name);
+    auto stats_mode_action = actions->add_action_radio_string(
+        action_name,
+        [this, action_name](Glib::ustring const& value) { status_menu_toggled_cb(action_name, value); },
+        gtr_pref_string_get(TR_KEY_statusbar_stats));
+
+    for (auto const& mode : stats_modes)
+    {
+        auto item = Gio::MenuItem::create(_(mode.i18n), full_action_name);
+        item->set_action_and_target(full_action_name, VariantString::create(mode.val));
+        top->append_item(item);
+    }
+
+    window_.insert_action_group(std::string(StatsMenuActionGroupName), actions);
+    stats_actions_ = actions;
+
+    return top;
 }
 
 /***
@@ -421,17 +513,6 @@ MainWindow::Impl::Impl(
     , alt_speed_image_(gtr_get_widget<Gtk::Image>(builder, "alt_speed_button_image"))
     , alt_speed_button_(gtr_get_widget<Gtk::ToggleButton>(builder, "alt_speed_button"))
 {
-    static struct
-    {
-        char const* val;
-        char const* i18n;
-    } const stats_modes[] = {
-        { "total-ratio", N_("Total Ratio") },
-        { "session-ratio", N_("Session Ratio") },
-        { "total-transfer", N_("Total Transfer") },
-        { "session-transfer", N_("Session Transfer") },
-    };
-
     /* make the window */
     window.set_title(Glib::get_application_name());
     window.set_default_size(gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
@@ -444,35 +525,21 @@ MainWindow::Impl::Impl(
 
     window.insert_action_group("win", actions);
 
-    /* status menu */
-    status_menu_ = Gtk::make_managed<Gtk::Menu>();
-    Gtk::RadioButtonGroup stats_modes_group;
-    auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
-
-    for (auto const& mode : stats_modes)
-    {
-        auto* w = Gtk::make_managed<Gtk::RadioMenuItem>(stats_modes_group, _(mode.i18n));
-        w->set_active(mode.val == pch);
-        w->signal_toggled().connect([this, w, val = mode.val]() { status_menu_toggled_cb(w, val); });
-        status_menu_->append(*w);
-        w->show();
-    }
-
     /**
     *** Statusbar
     **/
 
     /* gear */
-    auto* gear_button = gtr_get_widget<Gtk::Button>(builder, "gear_button");
-    options_menu_ = createOptionsMenu();
-    gear_button->signal_clicked().connect([this, gear_button]() { onOptionsClicked(gear_button); });
+    auto* gear_button = gtr_get_widget<Gtk::MenuButton>(builder, "gear_button");
+    gear_button->set_menu_model(createOptionsMenu());
+    gear_button->signal_clicked().connect([this]() { onOptionsClicked(); }, false);
 
     /* turtle */
     alt_speed_button_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::alt_speed_toggled_cb));
 
     /* ratio selector */
-    auto* ratio_button = gtr_get_widget<Gtk::Button>(builder, "ratio_button");
-    ratio_button->signal_clicked().connect([this, ratio_button]() { onYinYangClicked(ratio_button); });
+    auto* ratio_button = gtr_get_widget<Gtk::MenuButton>(builder, "ratio_button");
+    ratio_button->set_menu_model(createStatsMenu());
 
     /**
     *** Workarea
