@@ -283,23 +283,23 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     promise.reportFinished(&result);
 }
 
-int64_t RpcClient::parseResponseTag(tr_variant& json) const
+int64_t RpcClient::parseResponseTag(tr_variant& response) const
 {
-    auto const tag = dictFind<int>(&json, TR_KEY_tag);
+    auto const tag = dictFind<int>(&response, TR_KEY_tag);
     return tag ? *tag : -1;
 }
 
-RpcResponse RpcClient::parseResponseData(tr_variant& json) const
+RpcResponse RpcClient::parseResponseData(tr_variant& response) const
 {
     RpcResponse ret;
 
-    if (auto const result = dictFind<QString>(&json, TR_KEY_result); result)
+    if (auto const result = dictFind<QString>(&response, TR_KEY_result); result)
     {
         ret.result = *result;
         ret.success = *result == QStringLiteral("success");
     }
 
-    if (tr_variant* args = nullptr; tr_variantDictFindDict(&json, TR_KEY_arguments, &args))
+    if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
     {
         ret.args = createVariant();
         *ret.args = *args;

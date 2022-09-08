@@ -55,11 +55,11 @@ SqueezeLabel::SqueezeLabel(QWidget* parent)
 {
 }
 
-void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
+void SqueezeLabel::paintEvent(QPaintEvent* paint_event)
 {
     if (hasFocus() && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)) != 0)
     {
-        return QLabel::paintEvent(paintEvent);
+        return QLabel::paintEvent(paint_event);
     }
 
     QPainter painter(this);

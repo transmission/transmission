@@ -337,11 +337,11 @@ int FileTreeItem::priority() const
     return i;
 }
 
-void FileTreeItem::setSubtreePriority(int i, QSet<int>& ids)
+void FileTreeItem::setSubtreePriority(int priority, QSet<int>& ids)
 {
-    if (priority_ != i)
+    if (priority_ != priority)
     {
-        priority_ = i;
+        priority_ = priority;
 
         if (file_index_ >= 0)
         {
@@ -351,7 +351,7 @@ void FileTreeItem::setSubtreePriority(int i, QSet<int>& ids)
 
     for (FileTreeItem* const child : children_)
     {
-        child->setSubtreePriority(i, ids);
+        child->setSubtreePriority(priority, ids);
     }
 }
 

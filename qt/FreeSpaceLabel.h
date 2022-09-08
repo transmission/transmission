@@ -27,7 +27,7 @@ public:
     explicit FreeSpaceLabel(QWidget* parent = nullptr);
 
     void setSession(Session& session);
-    void setPath(QString const& folder);
+    void setPath(QString const& path);
 
 private slots:
     void onTimer();

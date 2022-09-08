@@ -54,7 +54,7 @@ public:
         int priority,
         uint64_t size,
         uint64_t have,
-        bool torrent_changed);
+        bool update_fields);
 
     bool openFile(QModelIndex const& index);
 
@@ -69,7 +69,7 @@ public:
     // QAbstractItemModel
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(QModelIndex const& index) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int column, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     QModelIndex index(int row, int column, QModelIndex const& parent = {}) const override;
     QModelIndex parent(QModelIndex const& child) const override;
     int rowCount(QModelIndex const& parent = {}) const override;

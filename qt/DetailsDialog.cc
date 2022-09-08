@@ -71,7 +71,7 @@ public:
     }
 
 signals:
-    void trackerListEdited(QString trackerList);
+    void trackerListEdited(QString /*tracker_list*/);
 
 private slots:
     void onButtonBoxClicked(QAbstractButton* button)
@@ -664,7 +664,7 @@ void DetailsDialog::refreshUI()
         }
         else
         {
-            auto const seconds = int(std::difftime(now, baseline));
+            auto const seconds = static_cast<int>(std::difftime(now, baseline));
             string = fmt.timeToString(seconds);
         }
     }
@@ -725,7 +725,7 @@ void DetailsDialog::refreshUI()
             }
         }
 
-        auto const seconds = int(std::difftime(now, latest));
+        auto const seconds = static_cast<int>(std::difftime(now, latest));
 
         if (seconds < 0)
         {
@@ -1037,8 +1037,8 @@ void DetailsDialog::refreshUI()
 
         setIfIdle(ui_.bandwidthPriorityCombo, i);
 
-        setIfIdle(ui_.singleDownSpin, int(baseline.downloadLimit().getKBps()));
-        setIfIdle(ui_.singleUpSpin, int(baseline.uploadLimit().getKBps()));
+        setIfIdle(ui_.singleDownSpin, static_cast<int>(baseline.downloadLimit().getKBps()));
+        setIfIdle(ui_.singleUpSpin, static_cast<int>(baseline.uploadLimit().getKBps()));
         setIfIdle(ui_.peerLimitSpin, baseline.peerLimit());
     }
 
@@ -1198,7 +1198,9 @@ void DetailsDialog::refreshUI()
 
             item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString() : fmt.speedToString(peer.rate_to_peer));
             item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString() : fmt.speedToString(peer.rate_to_client));
-            item->setText(COL_PERCENT, peer.progress > 0 ? QStringLiteral("%1%").arg(int(peer.progress * 100.0)) : QString());
+            item->setText(
+                COL_PERCENT,
+                peer.progress > 0 ? QStringLiteral("%1%").arg(static_cast<int>(peer.progress * 100.0)) : QString());
             item->setText(COL_STATUS, code);
             item->setToolTip(COL_STATUS, code_tip);
 
@@ -1572,9 +1574,9 @@ void DetailsDialog::onFileWantedChanged(QSet<int> const& indices, bool wanted)
     torrentSet(key, indices.values());
 }
 
-void DetailsDialog::onPathEdited(QString const& oldpath, QString const& newname)
+void DetailsDialog::onPathEdited(QString const& old_path, QString const& new_name)
 {
-    session_.torrentRenamePath(ids_, oldpath, newname);
+    session_.torrentRenamePath(ids_, old_path, new_name);
 }
 
 void DetailsDialog::onOpenRequested(QString const& path) const

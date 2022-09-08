@@ -398,7 +398,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    auto const m = QSize(margin(*QApplication::style()));
+    auto const m = margin(*QApplication::style());
     auto const layout = ItemLayout(
         tor.name(),
         progressString(tor),

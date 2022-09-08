@@ -54,10 +54,10 @@ public slots:
 private slots:
     void consentGiven(int result) const;
     void onSessionSourceChanged() const;
-    void onTorrentsAdded(torrent_ids_t const& torrents) const;
-    void onTorrentsCompleted(torrent_ids_t const& torrents) const;
-    void onTorrentsEdited(torrent_ids_t const& torrents) const;
-    void onTorrentsNeedInfo(torrent_ids_t const& torrents) const;
+    void onTorrentsAdded(torrent_ids_t const& torrent_ids) const;
+    void onTorrentsCompleted(torrent_ids_t const& torrent_ids) const;
+    void onTorrentsEdited(torrent_ids_t const& torrent_ids) const;
+    void onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const;
     void refreshPref(int key) const;
     void refreshTorrents();
     void saveGeometry() const;
