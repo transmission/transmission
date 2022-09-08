@@ -16,7 +16,6 @@ Checks: >
   clang-analyzer-security.*,
   clang-analyzer-valist.*,
   cppcoreguidelines-init-variables,
-  cppcoreguidelines-prefer-member-initializer,
   cppcoreguidelines-slicing,
   cppcoreguidelines-special-member-functions,
   cppcoreguidelines-virtual-class-destructor,
