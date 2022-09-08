@@ -18,7 +18,6 @@ Checks: >
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -cppcoreguidelines-pro-type-const-cast,
   google-readability-*,
-  -google-readability-casting,
   google-runtime-operator,
   hicpp-*,
   -hicpp-multiway-paths-covered,

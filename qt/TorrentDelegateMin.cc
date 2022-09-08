@@ -108,7 +108,7 @@ ItemLayout::ItemLayout(
     int const icon_size = style->pixelMetric(QStyle::PM_SmallIconSize);
 
     auto const name_fm = QFontMetrics(name_font);
-    auto const name_size = QSize(name_fm.size(0, name_text_));
+    auto const name_size = name_fm.size(0, name_text_);
 
     status_font.setPointSize(static_cast<int>(status_font.pointSize() * 0.85));
     QFontMetrics const status_fm(status_font);
@@ -148,8 +148,8 @@ ItemLayout::ItemLayout(
 
 QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    auto const is_magnet = bool(!tor.hasMetadata());
-    auto const m = QSize(margin(*QApplication::style()));
+    auto const is_magnet = !tor.hasMetadata();
+    auto const m = margin(*QApplication::style());
     auto const layout = ItemLayout(
         is_magnet ? progressString(tor) : tor.name(),
         shortStatusString(tor),

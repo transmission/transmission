@@ -99,7 +99,7 @@ QString getCountString(size_t n)
 }
 
 Torrent::fields_t constexpr TrackerFields = {
-    uint64_t(1) << Torrent::TRACKER_STATS,
+    static_cast<uint64_t>(1) << Torrent::TRACKER_STATS,
 };
 
 auto constexpr ActivityFields = FilterMode::TorrentFields;
@@ -127,7 +127,7 @@ void FilterBar::refreshTrackers()
     // update the "All" row
     auto const num_trackers = torrents_per_sitename.size();
     auto* item = tracker_model_->item(ROW_TOTALS);
-    item->setData(int(num_trackers), FilterBarComboBox::CountRole);
+    item->setData(static_cast<int>(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
@@ -140,7 +140,7 @@ void FilterBar::refreshTrackers()
         i->setData(display_name, TRACKER_ROLE);
         i->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
         i->setData(icon, Qt::DecorationRole);
-        i->setData(int(count), FilterBarComboBox::CountRole);
+        i->setData(static_cast<int>(count), FilterBarComboBox::CountRole);
 
         return i;
     };

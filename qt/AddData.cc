@@ -22,7 +22,7 @@ namespace
 QString getNameFromMetainfo(QByteArray const& benc)
 {
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseBenc({ benc.constData(), size_t(benc.size()) }))
+    if (!metainfo.parseBenc({ benc.constData(), static_cast<size_t>(benc.size()) }))
     {
         return {};
     }
