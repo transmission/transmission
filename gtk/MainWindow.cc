@@ -65,8 +65,8 @@ private:
     void init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeModel> const& model);
 
     Glib::RefPtr<Gio::MenuModel> createOptionsMenu();
-    Glib::RefPtr<Gio::MenuModel> createSpeedMenu(Gio::SimpleActionGroup& actions, tr_direction dir);
-    Glib::RefPtr<Gio::MenuModel> createRatioMenu(Gio::SimpleActionGroup& actions);
+    Glib::RefPtr<Gio::MenuModel> createSpeedMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions, tr_direction dir);
+    Glib::RefPtr<Gio::MenuModel> createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions);
 
     Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
@@ -91,6 +91,9 @@ private:
 private:
     MainWindow& window_;
     Glib::RefPtr<Session> const core_;
+
+    Glib::RefPtr<Gio::ActionGroup> options_actions_;
+    Glib::RefPtr<Gio::ActionGroup> stats_actions_;
 
     std::array<OptionMenuInfo, 2> speed_menu_info_;
     OptionMenuInfo ratio_menu_info_;
@@ -216,11 +219,7 @@ MainWindow::Impl::~Impl()
 
 void MainWindow::Impl::status_menu_toggled_cb(std::string const& action_name, Glib::ustring const& val)
 {
-    if (auto action_group = window_.get_action_group(std::string(StatsMenuActionGroupName)); action_group != nullptr)
-    {
-        action_group->change_action_state(action_name, VariantString::create(val));
-    }
-
+    stats_actions_->change_action_state(action_name, VariantString::create(val));
     core_->set_pref(TR_KEY_statusbar_stats, val.raw());
 }
 
@@ -258,11 +257,7 @@ void MainWindow::Impl::onAltSpeedToggledIdle()
 
 void MainWindow::Impl::onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled)
 {
-    if (auto action_group = window_.get_action_group(std::string(OptionsMenuActionGroupName)); action_group != nullptr)
-    {
-        action_group->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
-    }
-
+    options_actions_->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
     core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, enabled);
 }
 
@@ -272,7 +267,7 @@ void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
     core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, true);
 }
 
-Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(Gio::SimpleActionGroup& actions, tr_direction dir)
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions, tr_direction dir)
 {
     auto& info = speed_menu_info_[dir];
 
@@ -280,7 +275,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(Gio::SimpleAction
 
     auto const action_name = fmt::format("speed-limit-{}", dir == TR_UP ? "up" : "down");
     auto const full_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, action_name);
-    info.action = actions.add_action_radio_integer(
+    info.action = actions->add_action_radio_integer(
         action_name,
         [this, action_name, dir](int value) { onSpeedToggled(action_name, dir, value != 0); },
         0);
@@ -300,7 +295,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(Gio::SimpleAction
 
     auto const stock_action_name = fmt::format("{}-stock", action_name);
     auto const full_stock_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, stock_action_name);
-    actions.add_action_with_parameter(
+    actions->add_action_with_parameter(
         stock_action_name,
         VariantInt::variant_type(),
         [this, dir](Glib::VariantBase const& value)
@@ -323,11 +318,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(Gio::SimpleAction
 
 void MainWindow::Impl::onRatioToggled(std::string const& action_name, bool enabled)
 {
-    if (auto action_group = window_.get_action_group(std::string(OptionsMenuActionGroupName)); action_group != nullptr)
-    {
-        action_group->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
-    }
-
+    options_actions_->change_action_state(action_name, VariantInt::create(enabled ? 1 : 0));
     core_->set_pref(TR_KEY_ratio_limit_enabled, enabled);
 }
 
@@ -337,7 +328,7 @@ void MainWindow::Impl::onRatioSet(double ratio)
     core_->set_pref(TR_KEY_ratio_limit_enabled, true);
 }
 
-Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Gio::SimpleActionGroup& actions)
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions)
 {
     static double const stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
 
@@ -347,7 +338,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Gio::SimpleAction
 
     auto const action_name = "ratio-limit"s;
     auto const full_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, action_name);
-    info.action = actions.add_action_radio_integer(
+    info.action = actions->add_action_radio_integer(
         action_name,
         [this, action_name](int value) { onRatioToggled(action_name, value != 0); },
         0);
@@ -367,7 +358,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Gio::SimpleAction
 
     auto const stock_action_name = fmt::format("{}-stock", action_name);
     auto const full_stock_action_name = fmt::format("{}.{}", OptionsMenuActionGroupName, stock_action_name);
-    actions.add_action_with_parameter(
+    actions->add_action_with_parameter(
         stock_action_name,
         VariantDouble::variant_type(),
         [this](Glib::VariantBase const& value) { onRatioSet(Glib::VariantBase::cast_dynamic<VariantDouble>(value).get()); });
@@ -393,15 +384,16 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createOptionsMenu()
     auto actions = Gio::SimpleActionGroup::create();
 
     auto section = Gio::Menu::create();
-    section->append_submenu(_("Limit Download Speed"), createSpeedMenu(*gtr_get_ptr(actions), TR_DOWN));
-    section->append_submenu(_("Limit Upload Speed"), createSpeedMenu(*gtr_get_ptr(actions), TR_UP));
+    section->append_submenu(_("Limit Download Speed"), createSpeedMenu(actions, TR_DOWN));
+    section->append_submenu(_("Limit Upload Speed"), createSpeedMenu(actions, TR_UP));
     top->append_section(section);
 
     section = Gio::Menu::create();
-    section->append_submenu(_("Stop Seeding at Ratio"), createRatioMenu(*gtr_get_ptr(actions)));
+    section->append_submenu(_("Stop Seeding at Ratio"), createRatioMenu(actions));
     top->append_section(section);
 
     window_.insert_action_group(std::string(OptionsMenuActionGroupName), actions);
+    options_actions_ = actions;
 
     return top;
 }
@@ -471,6 +463,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
     }
 
     window_.insert_action_group(std::string(StatsMenuActionGroupName), actions);
+    stats_actions_ = actions;
 
     return top;
 }
