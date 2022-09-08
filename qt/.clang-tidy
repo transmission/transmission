@@ -6,7 +6,6 @@ Checks: >
   -bugprone-branch-clone,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
-  -bugprone-unchecked-optional-access,
   cert-*,
   clang-analyzer-optin*,
   cppcoreguidelines-*,
