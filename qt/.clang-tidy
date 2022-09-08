@@ -23,7 +23,6 @@ Checks: >
   hicpp-*,
   -hicpp-multiway-paths-covered,
   -hicpp-signed-bitwise,
-  -hicpp-special-member-functions,
   misc-*,
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
