@@ -307,38 +307,38 @@ TEST_F(FileTest, readFile)
     auto constexpr Contents = "hello, world!"sv;
     createFileWithContents(path, Contents);
 
-    auto n_bytes_read = uint64_t{};
+    auto n_read = uint64_t{};
     tr_error* err = nullptr;
     auto buf = std::array<char, 64>{};
     auto fd = tr_sys_file_open(path, TR_SYS_FILE_READ, 0);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     // successful read
-    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_bytes_read, &err));
-    EXPECT_EQ(Contents, std::string_view(std::data(buf), n_bytes_read));
-    EXPECT_EQ(std::size(Contents), n_bytes_read);
+    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_read, &err));
+    EXPECT_EQ(Contents, std::string_view(std::data(buf), n_read));
+    EXPECT_EQ(std::size(Contents), n_read);
     EXPECT_EQ(nullptr, err) << *err;
 
     // successful read_at
     auto const offset = 1U;
-    EXPECT_TRUE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_bytes_read, &err));
+    EXPECT_TRUE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_read, &err));
     auto constexpr Expected = Contents.substr(offset);
-    EXPECT_EQ(Expected, std::string_view(std::data(buf), n_bytes_read));
-    EXPECT_EQ(std::size(Expected), n_bytes_read);
+    EXPECT_EQ(Expected, std::string_view(std::data(buf), n_read));
+    EXPECT_EQ(std::size(Expected), n_read);
     EXPECT_EQ(nullptr, err) << *err;
 
     tr_sys_file_close(fd);
 
     // read from closed file
-    n_bytes_read = 0;
-    EXPECT_FALSE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_bytes_read, &err));
-    EXPECT_EQ(0, n_bytes_read);
+    n_read = 0;
+    EXPECT_FALSE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_read, &err)); // coverity USE_AFTER_FREE
+    EXPECT_EQ(0, n_read);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
     // read_at from closed file
-    EXPECT_FALSE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_bytes_read, &err));
-    EXPECT_EQ(0, n_bytes_read);
+    EXPECT_FALSE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_read, &err)); // coverity USE_AFTER_FREE
+    EXPECT_EQ(0, n_read);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 }
@@ -1064,11 +1064,11 @@ TEST_F(FileTest, fileCopy)
     createFileWithContents(path1, Contents);
 
     // source file exists but is inaccessible
-    chmod(path1, 0);
+    (void)chmod(path1, 0);
     EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
-    chmod(path1, 0600);
+    (void)chmod(path1, 0600);
 
     // source file exists but target is invalid
     EXPECT_FALSE(tr_sys_path_copy(path1, test_dir, &err));
@@ -1211,7 +1211,7 @@ TEST_F(FileTest, fileTruncate)
     EXPECT_EQ(25U, info->size);
 
     // try to truncate a closed file
-    EXPECT_FALSE(tr_sys_file_truncate(fd, 10, &err));
+    EXPECT_FALSE(tr_sys_file_truncate(fd, 10, &err)); // coverity USE_AFTER_FREE
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
