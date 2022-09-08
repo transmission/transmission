@@ -173,13 +173,13 @@ Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
     return { i };
 }
 
-bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, int role)
+bool FileTreeModel::setData(QModelIndex const& index, QVariant const& value, int role)
 {
     if (role == Qt::EditRole)
     {
         FileTreeItem const* item = itemFromIndex(index);
 
-        emit pathEdited(item->path(), newname.toString());
+        emit pathEdited(item->path(), value.toString());
     }
 
     return false; // don't update the view until the session confirms the change

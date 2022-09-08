@@ -405,16 +405,16 @@ void Application::quitLater() const
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-void Application::onTorrentsEdited(torrent_ids_t const& ids) const
+void Application::onTorrentsEdited(torrent_ids_t const& torrent_ids) const
 {
     // the backend's tr_info has changed, so reload those fields
-    session_->initTorrents(ids);
+    session_->initTorrents(torrent_ids);
 }
 
-QStringList Application::getNames(torrent_ids_t const& ids) const
+QStringList Application::getNames(torrent_ids_t const& torrent_ids) const
 {
     QStringList names;
-    for (auto const& id : ids)
+    for (auto const& id : torrent_ids)
     {
         names.push_back(model_->getTorrentFromId(id)->name());
     }
@@ -423,23 +423,25 @@ QStringList Application::getNames(torrent_ids_t const& ids) const
     return names;
 }
 
-void Application::onTorrentsAdded(torrent_ids_t const& ids) const
+void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 {
-    if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    if (!prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
-        for (auto id : ids)
-        {
-            notifyTorrentAdded(model_->getTorrentFromId(id));
-        }
+        return;
+    }
+
+    for (auto id : torrent_ids)
+    {
+        notifyTorrentAdded(model_->getTorrentFromId(id));
     }
 }
 
-void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
+void Application::onTorrentsCompleted(torrent_ids_t const& torrent_ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
-        auto const title = tr("Torrent Completed", nullptr, static_cast<int>(ids.size()));
-        auto const body = getNames(ids).join(QStringLiteral("\n"));
+        auto const title = tr("Torrent Completed", nullptr, static_cast<int>(std::size(torrent_ids)));
+        auto const body = getNames(torrent_ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
 
@@ -455,11 +457,11 @@ void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
     }
 }
 
-void Application::onTorrentsNeedInfo(torrent_ids_t const& ids) const
+void Application::onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const
 {
-    if (!ids.empty())
+    if (!torrent_ids.empty())
     {
-        session_->initTorrents(ids);
+        session_->initTorrents(torrent_ids);
     }
 }
 

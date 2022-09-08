@@ -28,7 +28,7 @@ public:
     FileTreeView(QWidget* parent = nullptr, bool editable = true);
 
     void clear();
-    void update(FileList const& files, bool update_properties = true);
+    void update(FileList const& files, bool update_fields = true);
 
     void setEditable(bool editable);
 

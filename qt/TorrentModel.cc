@@ -118,14 +118,14 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
 ****
 ***/
 
-void TorrentModel::removeTorrents(tr_variant* list)
+void TorrentModel::removeTorrents(tr_variant* torrent_list)
 {
-    torrents_t torrents;
-    torrents.reserve(tr_variantListSize(list));
+    auto torrents = torrents_t{};
+    torrents.reserve(tr_variantListSize(torrent_list));
 
     int i = 0;
     tr_variant const* child = nullptr;
-    while ((child = tr_variantListChild(list, i++)) != nullptr)
+    while ((child = tr_variantListChild(torrent_list, i++)) != nullptr)
     {
         if (auto const id = getValue<int>(child); id)
         {
@@ -142,7 +142,7 @@ void TorrentModel::removeTorrents(tr_variant* list)
     }
 }
 
-void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
+void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_list)
 {
     auto const old = is_complete_list ? torrents_ : torrents_t{};
     auto added = torrent_ids_t{};
@@ -163,7 +163,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     };
 
     // build a list of the property keys
-    tr_variant* const first_child = tr_variantListChild(torrents, 0);
+    tr_variant* const first_child = tr_variantListChild(torrent_list, 0);
     bool const table = tr_variantIsList(first_child);
     std::vector<tr_quark> keys;
     if (table)
@@ -202,9 +202,9 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     std::vector<tr_variant*> values;
     values.reserve(keys.size());
     size_t tor_index = table ? 1 : 0;
-    processed.reserve(tr_variantListSize(torrents));
+    processed.reserve(tr_variantListSize(torrent_list));
     tr_variant* v = nullptr;
-    while ((v = tr_variantListChild(torrents, tor_index++)))
+    while ((v = tr_variantListChild(torrent_list, tor_index++)))
     {
         // Build an array of values
         values.clear();

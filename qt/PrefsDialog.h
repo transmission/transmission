@@ -29,7 +29,7 @@ public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
 
 private slots:
-    void focusChanged(QWidget* old, QWidget* now);
+    void focusChanged(QWidget* old, QWidget* cur);
     void checkBoxToggled(bool checked);
     void spinBoxEditingFinished();
     void timeEditingFinished();

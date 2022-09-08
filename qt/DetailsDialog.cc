@@ -71,7 +71,7 @@ public:
     }
 
 signals:
-    void trackerListEdited(QString trackerList);
+    void trackerListEdited(QString /*tracker_list*/);
 
 private slots:
     void onButtonBoxClicked(QAbstractButton* button)
@@ -1572,9 +1572,9 @@ void DetailsDialog::onFileWantedChanged(QSet<int> const& indices, bool wanted)
     torrentSet(key, indices.values());
 }
 
-void DetailsDialog::onPathEdited(QString const& oldpath, QString const& newname)
+void DetailsDialog::onPathEdited(QString const& old_path, QString const& new_name)
 {
-    session_.torrentRenamePath(ids_, oldpath, newname);
+    session_.torrentRenamePath(ids_, old_path, new_name);
 }
 
 void DetailsDialog::onOpenRequested(QString const& path) const

@@ -354,9 +354,9 @@ void FilterBar::onActivityIndexChanged(int i)
 ****
 ***/
 
-void FilterBar::recountSoon(Pending const& pending)
+void FilterBar::recountSoon(Pending const& fields)
 {
-    pending_ |= pending;
+    pending_ |= fields;
 
     if (!recount_timer_.isActive())
     {

@@ -84,27 +84,27 @@ public:
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
     using Tag = RpcQueue::Tag;
-    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, bool val);
-    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, int val);
-    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, double val);
-    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QString const& val);
-    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& val);
-    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, bool val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, int val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, double val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QString const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QList<int> const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QStringList const& val);
 
-    void torrentSetLocation(torrent_ids_t const& ids, QString const& path, bool do_move);
-    void torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath, QString const& newname);
-    void addTorrent(AddData addme, tr_variant* top, bool trash_original);
+    void torrentSetLocation(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);
+    void torrentRenamePath(torrent_ids_t const& torrent_ids, QString const& oldpath, QString const& newname);
+    void addTorrent(AddData add_me, tr_variant* args_dict, bool trash_original);
     void initTorrents(torrent_ids_t const& ids = {});
-    void pauseTorrents(torrent_ids_t const& torrentIds = {});
-    void startTorrents(torrent_ids_t const& torrentIds = {});
-    void startTorrentsNow(torrent_ids_t const& torrentIds = {});
+    void pauseTorrents(torrent_ids_t const& torrent_ids = {});
+    void startTorrents(torrent_ids_t const& torrent_ids = {});
+    void startTorrentsNow(torrent_ids_t const& torrent_ids = {});
     void refreshDetailInfo(torrent_ids_t const& torrent_ids);
     void refreshActiveTorrents();
     void refreshAllTorrents();
     void addNewlyCreatedTorrent(QString const& filename, QString const& local_path);
     void verifyTorrents(torrent_ids_t const& torrent_ids);
     void reannounceTorrents(torrent_ids_t const& torrent_ids);
-    void refreshExtraStats(torrent_ids_t const& ids);
+    void refreshExtraStats(torrent_ids_t const& torrent_ids);
 
     enum class TorrentProperties
     {
@@ -117,7 +117,7 @@ public:
     };
 
 public slots:
-    void addTorrent(AddData addme);
+    void addTorrent(AddData add_me);
     void launchWebInterface() const;
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
@@ -148,19 +148,19 @@ private slots:
 private:
     void start();
 
-    void updateStats(tr_variant* args);
-    void updateInfo(tr_variant* args);
+    void updateStats(tr_variant* args_dict);
+    void updateInfo(tr_variant* args_dict);
 
     Tag torrentSetImpl(tr_variant* args);
-    void sessionSet(tr_quark const key, QVariant const& variant);
+    void sessionSet(tr_quark const key, QVariant const& value);
     void pumpRequests();
     void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
     void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
     std::vector<std::string_view> const& getKeyNames(TorrentProperties props);
 
-    static void updateStats(tr_variant* d, tr_session_stats* stats);
+    static void updateStats(tr_variant* args_dict, tr_session_stats* stats);
 
-    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const;
+    void addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const;
 
     QString const config_dir_;
     Prefs& prefs_;
