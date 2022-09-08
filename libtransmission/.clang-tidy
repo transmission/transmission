@@ -9,6 +9,7 @@ Checks: >
   cert-*,
   -cert-err58-cpp,
   clang-analyzer-*,
+  cppcoreguidelines-avoid-const-or-ref-data-members,
   cppcoreguidelines-init-variables,
   cppcoreguidelines-prefer-member-initializer,
   cppcoreguidelines-slicing,
