@@ -91,89 +91,32 @@ QString Formatter::sizeToString(int64_t bytes) const
     return Formatter::sizeToString(static_cast<uint64_t>(bytes));
 }
 
-QString Formatter::speedToString(Speed const& speed) const
-{
-    return QString::fromStdString(tr_formatter_speed_KBps(speed.getKBps()));
-}
-
-QString Formatter::uploadSpeedToString(Speed const& upload_speed) const
-{
-    static QChar constexpr UploadSymbol(0x25B4);
-
-    return tr("%1 %2").arg(speedToString(upload_speed)).arg(UploadSymbol);
-}
-
-QString Formatter::downloadSpeedToString(Speed const& download_speed) const
-{
-    static QChar constexpr DownloadSymbol(0x25BE);
-
-    return tr("%1 %2").arg(speedToString(download_speed)).arg(DownloadSymbol);
-}
-
-QString Formatter::percentToString(double x) const
-{
-    return QString::fromStdString(tr_strpercent(x));
-}
-
-QString Formatter::ratioToString(double ratio) const
-{
-    return QString::fromStdString(tr_strratio(ratio, "\xE2\x88\x9E"));
-}
-
 QString Formatter::timeToString(int seconds) const
 {
     seconds = std::max(seconds, 0);
-    auto const days = seconds / 86400;
-    auto const hours = (seconds % 86400) / 3600;
-    auto const minutes = (seconds % 3600) / 60;
-    seconds %= 60;
 
-    auto const d = tr("%Ln day(s)", nullptr, days);
-    auto const h = tr("%Ln hour(s)", nullptr, hours);
-    auto const m = tr("%Ln minute(s)", nullptr, minutes);
-    auto const s = tr("%Ln second(s)", nullptr, seconds);
-
-    QString str;
-
-    if (days != 0)
+    if (seconds < 60)
     {
-        if (days >= 4 || hours == 0)
-        {
-            str = d;
-        }
-        else
-        {
-            str = tr("%1, %2").arg(d).arg(h);
-        }
-    }
-    else if (hours != 0)
-    {
-        if (hours >= 4 || minutes == 0)
-        {
-            str = h;
-        }
-        else
-        {
-            str = tr("%1, %2").arg(h).arg(m);
-        }
-    }
-    else if (minutes != 0)
-    {
-        if (minutes >= 4 || seconds == 0)
-        {
-            str = m;
-        }
-        else
-        {
-            str = tr("%1, %2").arg(m).arg(s);
-        }
-    }
-    else
-    {
-        str = s;
+        return tr("%Ln second(s)", nullptr, seconds);
     }
 
-    return str;
+    auto const minutes = seconds / 60;
+
+    if (minutes < 60)
+    {
+        return tr("%Ln minute(s)", nullptr, minutes);
+    }
+
+    auto const hours = minutes / 60;
+
+    if (hours < 24)
+    {
+        return tr("%Ln hour(s)", nullptr, hours);
+    }
+
+    auto const days = hours / 24;
+
+    return tr("%Ln day(s)", nullptr, days);
 }
 
 /***

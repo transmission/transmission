@@ -11,7 +11,9 @@
 #include <QCoreApplication> // Q_DECLARE_TR_FUNCTIONS
 #include <QString>
 
-class Speed;
+#include "libtransmission/utils.h"
+
+#include "Speed.h"
 
 class Formatter
 {
@@ -42,18 +44,44 @@ public:
     static constexpr int SizeBase = 1000;
     static constexpr int MemBase = 1024;
 
-    static Formatter& get();
+    [[nodiscard]] static Formatter& get();
 
-    QString memToString(int64_t bytes) const;
-    QString sizeToString(int64_t bytes) const;
-    QString sizeToString(uint64_t bytes) const;
-    QString speedToString(Speed const& speed) const;
-    QString percentToString(double x) const;
-    QString ratioToString(double ratio) const;
-    QString timeToString(int seconds) const;
-    QString uploadSpeedToString(Speed const& up) const;
-    QString downloadSpeedToString(Speed const& down) const;
-    QString unitStr(Type t, Size s) const;
+    [[nodiscard]] QString memToString(int64_t bytes) const;
+    [[nodiscard]] QString sizeToString(int64_t bytes) const;
+    [[nodiscard]] QString sizeToString(uint64_t bytes) const;
+    [[nodiscard]] QString timeToString(int seconds) const;
+    [[nodiscard]] QString unitStr(Type t, Size s) const;
+
+    [[nodiscard]] auto speedToString(Speed const& speed) const
+    {
+        return QString::fromStdString(tr_formatter_speed_KBps(speed.getKBps()));
+    }
+
+    [[nodiscard]] auto uploadSpeedToString(Speed const& upload_speed) const
+    {
+        static auto constexpr UploadSymbol = QChar{ 0x25B4 };
+
+        return tr("%1 %2").arg(speedToString(upload_speed)).arg(UploadSymbol);
+    }
+
+    [[nodiscard]] auto downloadSpeedToString(Speed const& download_speed) const
+    {
+        static auto constexpr DownloadSymbol = QChar{ 0x25BE };
+
+        return tr("%1 %2").arg(speedToString(download_speed)).arg(DownloadSymbol);
+    }
+
+    [[nodiscard]] auto percentToString(double x) const
+    {
+        return QString::fromStdString(tr_strpercent(x));
+    }
+
+    [[nodiscard]] auto ratioToString(double ratio) const
+    {
+        static auto constexpr InfinitySymbol = "\xE2\x88\x9E";
+
+        return QString::fromStdString(tr_strratio(ratio, InfinitySymbol));
+    }
 
 protected:
     Formatter();
