@@ -25,7 +25,6 @@ Checks: >
   google-runtime-operator,
   hicpp-*,
   -hicpp-multiway-paths-covered,
-  -hicpp-no-array-decay,
   -hicpp-signed-bitwise,
   -hicpp-special-member-functions,
   misc-*,
