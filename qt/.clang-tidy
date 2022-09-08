@@ -9,13 +9,6 @@ Checks: >
   -bugprone-unchecked-optional-access,
   cert-*,
   clang-analyzer-optin*,
-  -clang-diagnostic-c++98*,
-  -clang-diagnostic-double-promotion,
-  -clang-diagnostic-exit-time-destructors,
-  -clang-diagnostic-global-constructors,
-  -clang-diagnostic-shorten-64-to-32,
-  -clang-diagnostic-sign-compare,
-  -clang-diagnostic-sign-conversion,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-macro-usage,
@@ -48,7 +41,7 @@ Checks: >
   -readability-implicit-bool-conversion,
   -readability-inconsistent-declaration-parameter-name,
   -readability-magic-numbers,
-  -readability-redundant-access-specifiers
+  -readability-redundant-access-specifiers, # keep: 'private' vs 'private slots'
 
 CheckOptions:
   - { key: readability-identifier-naming.ClassCase,                value: CamelCase  }
