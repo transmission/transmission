@@ -221,16 +221,13 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     count_label_ = new QLabel(tr("Show:"), this);
     h->addWidget(count_label_);
 
-    activity_combo_ = createActivityCombo();
     h->addWidget(activity_combo_);
 
-    tracker_model_ = new QStandardItemModel(this);
     tracker_combo_ = createTrackerCombo(tracker_model_);
     h->addWidget(tracker_combo_);
 
     h->addStretch();
 
-    line_edit_ = new QLineEdit(this);
     line_edit_->setClearButtonEnabled(true);
     line_edit_->setPlaceholderText(tr("Search..."));
     line_edit_->setMaximumWidth(250);
@@ -249,7 +246,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&trApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
     recountAllSoon();
-    is_bootstrapping_ = false;
+    is_bootstrapping_ = false; // NOLINT cppcoreguidelines-prefer-member-initializer
 
     // initialize our state
     for (int const key : { Prefs::FILTER_MODE, Prefs::FILTER_TRACKERS })

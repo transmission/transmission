@@ -288,10 +288,6 @@ Session::Session(QString config_dir, Prefs& prefs)
     : config_dir_(std::move(config_dir))
     , prefs_(prefs)
 {
-    stats_ = {};
-    stats_.ratio = TR_RATIO_NA;
-    cumulative_stats_ = stats_;
-
     connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
     connect(&rpc_, &RpcClient::httpAuthenticationRequired, this, &Session::httpAuthenticationRequired);
     connect(&rpc_, &RpcClient::dataReadProgress, this, &Session::dataReadProgress);

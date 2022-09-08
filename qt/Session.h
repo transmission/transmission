@@ -170,8 +170,8 @@ private:
     int64_t blocklist_size_ = -1;
     tr_session* session_ = {};
     QStringList idle_json_;
-    tr_session_stats stats_ = {};
-    tr_session_stats cumulative_stats_ = {};
+    tr_session_stats stats_ = EmptyStats;
+    tr_session_stats cumulative_stats_ = EmptyStats;
     QString session_version_;
     QString session_id_;
     bool is_definitely_local_session_ = true;
@@ -180,4 +180,6 @@ private:
 
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
+
+    static auto constexpr EmptyStats = tr_session_stats{ TR_RATIO_NA, 0, 0, 0, 0, 0 };
 };
