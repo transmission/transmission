@@ -154,12 +154,12 @@ bool tr_variantFromBuf(
         error);
 }
 
-constexpr bool tr_variantIsType(tr_variant const* b, int type)
+[[nodiscard]] constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
     return b != nullptr && b->type == type;
 }
 
-constexpr bool tr_variantIsEmpty(tr_variant const* b)
+[[nodiscard]] constexpr bool tr_variantIsEmpty(tr_variant const* b)
 {
     return b == nullptr || b->type == '\0';
 }
@@ -168,7 +168,7 @@ constexpr bool tr_variantIsEmpty(tr_variant const* b)
 ****  Strings
 ***/
 
-constexpr bool tr_variantIsString(tr_variant const* b)
+[[nodiscard]] constexpr bool tr_variantIsString(tr_variant const* b)
 {
     return b != nullptr && b->type == TR_VARIANT_TYPE_STR;
 }
@@ -186,7 +186,7 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
 ****  Real Numbers
 ***/
 
-constexpr bool tr_variantIsReal(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsReal(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
 }
@@ -198,7 +198,7 @@ bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 ****  Booleans
 ***/
 
-constexpr bool tr_variantIsBool(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsBool(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
 }
@@ -210,7 +210,7 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 ****  Ints
 ***/
 
-constexpr bool tr_variantIsInt(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsInt(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
@@ -222,7 +222,7 @@ bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 ****  Lists
 ***/
 
-constexpr bool tr_variantIsList(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsList(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_LIST;
 }
@@ -243,13 +243,13 @@ tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count);
 tr_variant* tr_variantListChild(tr_variant* list, size_t pos);
 
 bool tr_variantListRemove(tr_variant* list, size_t pos);
-size_t tr_variantListSize(tr_variant const* list);
+[[nodiscard]] size_t tr_variantListSize(tr_variant const* list);
 
 /***
 ****  Dictionaries
 ***/
 
-constexpr bool tr_variantIsDict(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsDict(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_DICT;
 }

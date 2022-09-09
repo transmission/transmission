@@ -130,7 +130,7 @@ TEST(WebUtilsTest, urlParseFuzz)
     {
         buf.resize(tr_rand_int(1024));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        tr_urlParse({ std::data(buf), std::size(buf) });
+        (void)tr_urlParse({ std::data(buf), std::size(buf) });
     }
 }
 
