@@ -7,7 +7,6 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
-#include <cstring>
 #include <string_view>
 #include <utility>
 
@@ -230,7 +229,7 @@ static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* 
 
     walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(HandshakeName)), std::size(HandshakeName), walk);
 
-    memset(walk, 0, HandshakeFlagsLen);
+    std::fill_n(walk, HandshakeFlagsLen, 0);
     HANDSHAKE_SET_LTEP(walk);
     HANDSHAKE_SET_FASTEXT(walk);
     /* Note that this doesn't depend on whether the torrent is private.
@@ -556,20 +555,21 @@ static ReadState readPadD(tr_handshake* handshake, tr_peerIo* peer_io)
 ****
 ***/
 
-static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
+static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
 {
-    tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", IncomingHandshakeLen, evbuffer_get_length(inbuf)));
+    tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", IncomingHandshakeLen, peer_io->readBufferSize()));
 
-    if (evbuffer_get_length(inbuf) < IncomingHandshakeLen)
+    auto const* const peek = peer_io->peek(IncomingHandshakeLen);
+    if (peek == nullptr)
     {
         return READ_LATER;
     }
 
     handshake->haveReadAnythingFromPeer = true;
 
-    uint8_t pstrlen = evbuffer_pullup(inbuf, 1)[0]; /* peek, don't read. We may be handing inbuf to AWAITING_YA */
-
-    if (pstrlen == 19) /* unencrypted */
+    // peek instead of reading, because if we decide the handshake is
+    // encrypted we'll pass the unconsumed buffer to AWAITING_YA
+    if (std::equal(std::begin(HandshakeName), std::end(HandshakeName), peek)) // unencrypted
     {
         if (handshake->encryption_mode == TR_ENCRYPTION_REQUIRED)
         {
@@ -577,7 +577,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return tr_handshakeDone(handshake, false);
         }
     }
-    else /* encrypted or corrupt */
+    else // either encrypted or corrupt
     {
         if (handshake->isIncoming())
         {
@@ -585,44 +585,30 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             setState(handshake, AWAITING_YA);
             return READ_NOW;
         }
-
-        handshake->io->decrypt(1, &pstrlen);
-
-        if (pstrlen != 19)
-        {
-            tr_logAddTraceHand(handshake, "I think peer has sent us a corrupt handshake...");
-            return tr_handshakeDone(handshake, false);
-        }
     }
 
-    evbuffer_drain(inbuf, 1);
-
-    /* pstr (BitTorrent) */
-    TR_ASSERT(pstrlen == 19);
-    auto pstr = std::array<uint8_t, 20>{};
-    handshake->io->readBytes(std::data(pstr), pstrlen);
-    pstr[pstrlen] = '\0';
-
-    if (strncmp(reinterpret_cast<char const*>(std::data(pstr)), "BitTorrent protocol", 19) != 0)
+    auto name = decltype(HandshakeName){};
+    peer_io->readBytes(std::data(name), std::size(name));
+    if (name != HandshakeName)
     {
         return tr_handshakeDone(handshake, false);
     }
 
     /* reserved bytes */
     auto reserved = std::array<uint8_t, HandshakeFlagsLen>{};
-    handshake->io->readBytes(std::data(reserved), std::size(reserved));
+    peer_io->readBytes(std::data(reserved), std::size(reserved));
 
     /**
     *** Extensions
     **/
 
-    handshake->io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
-    handshake->io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
-    handshake->io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
+    peer_io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
+    peer_io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
+    peer_io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
 
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};
-    handshake->io->readBytes(std::data(hash), std::size(hash));
+    peer_io->readBytes(std::data(hash), std::size(hash));
 
     if (handshake->isIncoming())
     {
@@ -632,11 +618,11 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return tr_handshakeDone(handshake, false);
         }
 
-        handshake->io->setTorrentHash(hash);
+        peer_io->setTorrentHash(hash);
     }
     else /* outgoing */
     {
-        auto const torrent_hash = handshake->io->torrentHash();
+        auto const torrent_hash = peer_io->torrentHash();
 
         if (!torrent_hash || *torrent_hash != hash)
         {
@@ -658,7 +644,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return tr_handshakeDone(handshake, false);
         }
 
-        handshake->io->writeBytes(std::data(msg), std::size(msg), false);
+        peer_io->writeBytes(std::data(msg), std::size(msg), false);
         handshake->haveSentBitTorrentHandshake = true;
     }
 
@@ -948,7 +934,6 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
 
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    auto* const inbuf = peer_io->readBuffer();
     bool ready_for_more = true;
 
     /* no piece data in handshake */
@@ -962,7 +947,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
         switch (handshake->state)
         {
         case AWAITING_HANDSHAKE:
-            ret = readHandshake(handshake, inbuf);
+            ret = readHandshake(handshake, peer_io);
             break;
 
         case AWAITING_PEER_ID:
