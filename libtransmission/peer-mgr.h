@@ -105,7 +105,7 @@ constexpr bool tr_isPex(tr_pex const* pex)
     return pex && tr_address_is_valid(&pex->addr);
 }
 
-tr_peerMgr* tr_peerMgrNew(tr_session* session);
+[[nodiscard]] tr_peerMgr* tr_peerMgrNew(tr_session* session);
 
 void tr_peerMgrFree(tr_peerMgr* manager);
 
@@ -113,19 +113,23 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed);
 
-std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
+[[nodiscard]] std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
 
-bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
+[[nodiscard]] bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
 
 void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span);
 
-size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
+[[nodiscard]] size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket);
 
-std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len);
+[[nodiscard]] std::vector<tr_pex> tr_peerMgrCompactToPex(
+    void const* compact,
+    size_t compact_len,
+    uint8_t const* added_f,
+    size_t added_f_len);
 
-std::vector<tr_pex> tr_peerMgrCompact6ToPex(
+[[nodiscard]] std::vector<tr_pex> tr_peerMgrCompact6ToPex(
     void const* compact,
     size_t compact_len,
     uint8_t const* added_f,
@@ -141,7 +145,7 @@ enum
     TR_PEERS_INTERESTING
 };
 
-std::vector<tr_pex> tr_peerMgrGetPeers(
+[[nodiscard]] std::vector<tr_pex> tr_peerMgrGetPeers(
     tr_torrent const* tor,
     uint8_t address_type,
     uint8_t peer_list_mode,
@@ -156,21 +160,21 @@ void tr_peerMgrAddTorrent(tr_peerMgr* manager, struct tr_torrent* tor);
 void tr_peerMgrRemoveTorrent(tr_torrent* tor);
 
 // return the number of connected peers that have `piece`, or -1 if we already have it
-int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece);
+[[nodiscard]] int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece);
 
 void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs);
 
-uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor);
+[[nodiscard]] uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor);
 
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor);
 
 void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr);
 
-struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count);
+[[nodiscard]] struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count);
 
-tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
+[[nodiscard]] tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 
-unsigned int tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction);
+[[nodiscard]] unsigned int tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction);
 
 void tr_peerMgrClearInterest(tr_torrent* tor);
 

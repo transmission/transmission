@@ -89,7 +89,7 @@ void tr_x509_cert_free(tr_x509_cert_t handle);
 /**
  * @brief Returns a random number in the range of [0...upper_bound).
  */
-int tr_rand_int(int upper_bound);
+[[nodiscard]] int tr_rand_int(int upper_bound);
 
 /**
  * @brief Returns a pseudorandom number in the range of [0...upper_bound).
@@ -97,7 +97,7 @@ int tr_rand_int(int upper_bound);
  * This is faster, BUT WEAKER, than tr_rand_int() and never be used in sensitive cases.
  * @see tr_rand_int()
  */
-int tr_rand_int_weak(int upper_bound);
+[[nodiscard]] int tr_rand_int_weak(int upper_bound);
 
 /**
  * @brief Fill a buffer with random bytes.
@@ -107,52 +107,53 @@ bool tr_rand_buffer(void* buffer, size_t length);
 /**
  * @brief Generate a SSHA password from its plaintext source.
  */
-std::string tr_ssha1(std::string_view plaintext);
+[[nodiscard]] std::string tr_ssha1(std::string_view plaintext);
 
 /**
  * @brief Return true if this is salted text, false otherwise
  */
-bool tr_ssha1_test(std::string_view text);
+[[nodiscard]] bool tr_ssha1_test(std::string_view text);
 
 /**
  * @brief Validate a test password against the a ssha1 password.
  */
-bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext);
+[[nodiscard]] bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext);
 
 /**
  * @brief Translate null-terminated string into base64.
  * @return a new std::string with the encoded contents
  */
-std::string tr_base64_encode(std::string_view input);
+[[nodiscard]] std::string tr_base64_encode(std::string_view input);
 
 /**
  * @brief Translate a character range from base64 into raw form.
  * @return a new std::string with the decoded contents.
  */
-std::string tr_base64_decode(std::string_view input);
+[[nodiscard]] std::string tr_base64_decode(std::string_view input);
 
 /**
  * @brief Generate an ascii hex string for a sha1 digest.
  */
-std::string tr_sha1_to_string(tr_sha1_digest_t const&);
+[[nodiscard]] std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 
 /**
  * @brief Generate a sha1 digest from a hex string.
  */
-std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
+[[nodiscard]] std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
 
 /**
  * @brief Generate an ascii hex string for a sha256 digest.
  */
-std::string tr_sha256_to_string(tr_sha256_digest_t const&);
+[[nodiscard]] std::string tr_sha256_to_string(tr_sha256_digest_t const&);
 
 /**
  * @brief Generate a sha256 digest from a hex string.
  */
-std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
+[[nodiscard]] std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
 
 // Convenience utility to efficiently get many random small values.
 // Use this instead of making a lot of calls to tr_rand_int().
+template<typename T = uint8_t, size_t N = 1024U>
 class tr_salt_shaker
 {
 public:
@@ -165,7 +166,7 @@ public:
 
         if (pos == 0U)
         {
-            tr_rand_buffer(std::data(buf), std::size(buf));
+            tr_rand_buffer(std::data(buf), std::size(buf) * sizeof(T));
         }
 
         return buf[pos++];
@@ -173,7 +174,7 @@ public:
 
 private:
     size_t pos = 0;
-    std::array<uint8_t, 1024U> buf;
+    std::array<T, N> buf;
 };
 
 /** @} */

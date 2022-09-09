@@ -231,10 +231,10 @@ bool tr_net_hasIPv6(tr_port);
 /// TOS / DSCP
 
 // get a string of one of <netinet/ip.h>'s IPTOS_ values, e.g. "cs0"
-std::string tr_netTosToName(int tos);
+[[nodiscard]] std::string tr_netTosToName(int tos);
 
 // get the number that corresponds to the specified IPTOS_ name, e.g. "cs0" returns 0x00
-std::optional<int> tr_netTosFromName(std::string_view name);
+[[nodiscard]] std::optional<int> tr_netTosFromName(std::string_view name);
 
 // set the IPTOS_ value for the specified socket
 void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
@@ -243,6 +243,6 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * @brief get a human-representable string representing the network error.
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
-std::string tr_net_strerror(int err);
+[[nodiscard]] std::string tr_net_strerror(int err);
 
 unsigned char const* tr_globalIPv6(tr_session const* session);

@@ -39,11 +39,11 @@ struct tr_url_parsed_t
     uint16_t port = 0;
 };
 
-std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
+[[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
 
 // like tr_urlParse(), but with the added constraint that 'scheme'
 // must be one we that Transmission supports for announce and scrape
-std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url);
+[[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url);
 
 // example use: `for (auto const [key, val] : tr_url_query_view{ querystr })`
 struct tr_url_query_view
@@ -62,30 +62,30 @@ struct tr_url_query_view
 
         iterator& operator++();
 
-        constexpr auto const& operator*() const
+        [[nodiscard]] constexpr auto const& operator*() const
         {
             return keyval;
         }
 
-        constexpr auto const* operator->() const
+        [[nodiscard]] constexpr auto const* operator->() const
         {
             return &keyval;
         }
 
-        constexpr bool operator==(iterator const& that) const
+        [[nodiscard]] constexpr bool operator==(iterator const& that) const
         {
             return this->remain == that.remain && this->keyval == that.keyval;
         }
 
-        constexpr bool operator!=(iterator const& that) const
+        [[nodiscard]] constexpr bool operator!=(iterator const& that) const
         {
             return !(*this == that);
         }
     };
 
-    iterator begin() const;
+    [[nodiscard]] iterator begin() const;
 
-    constexpr iterator end() const
+    [[nodiscard]] constexpr iterator end() const
     {
         return iterator{};
     }
@@ -126,6 +126,6 @@ constexpr void tr_urlPercentEncode(BackInsertIter out, tr_sha1_digest_t const& d
     tr_urlPercentEncode(out, std::string_view{ reinterpret_cast<char const*>(digest.data()), std::size(digest) });
 }
 
-char const* tr_webGetResponseStr(long response_code);
+[[nodiscard]] char const* tr_webGetResponseStr(long response_code);
 
-std::string tr_urlPercentDecode(std::string_view);
+[[nodiscard]] std::string tr_urlPercentDecode(std::string_view);

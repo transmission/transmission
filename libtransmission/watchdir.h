@@ -49,13 +49,13 @@ public:
         generic_rescan_interval_ = interval;
     }
 
-    static std::unique_ptr<Watchdir> create(
+    [[nodiscard]] static std::unique_ptr<Watchdir> create(
         std::string_view dirname,
         Callback callback,
         libtransmission::TimerMaker& timer_maker,
         struct event_base* evbase);
 
-    static std::unique_ptr<Watchdir> createGeneric(
+    [[nodiscard]] static std::unique_ptr<Watchdir> createGeneric(
         std::string_view dirname,
         Callback callback,
         libtransmission::TimerMaker& timer_maker,
