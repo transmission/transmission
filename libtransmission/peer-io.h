@@ -140,6 +140,16 @@ public:
         return evbuffer_get_length(inbuf.get());
     }
 
+    [[nodiscard]] std::byte const* peek(size_t n_bytes) const noexcept
+    {
+        if (readBufferSize() < n_bytes)
+        {
+            return nullptr;
+        }
+
+        return reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf.get(), n_bytes));
+    }
+
     void readBufferAdd(void const* data, size_t n_bytes);
 
     int flushOutgoingProtocolMsgs();
