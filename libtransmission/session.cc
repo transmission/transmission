@@ -56,7 +56,6 @@
 #include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
-#include "tr-udp.h"
 #include "tr-utp.h"
 #include "trevent.h"
 #include "utils.h"
@@ -632,8 +631,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     /* initialize the bare skeleton of the session object */
     auto* const session = new tr_session{ config_dir };
-    session->udp_socket = TR_BAD_SOCKET;
-    session->udp6_socket = TR_BAD_SOCKET;
     session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     bandwidthGroupRead(session, config_dir);
 
@@ -750,7 +747,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_sessionSet(this, &settings);
 
-    tr_udpInit(this);
+    this->udp_core_.init();
 
     this->web = tr_web::create(this->web_mediator_);
 
@@ -1879,7 +1876,7 @@ void tr_session::closeImplFinish()
 
     /* we had to wait until UDP trackers were closed before closing these: */
     tr_tracker_udp_close(this);
-    tr_udpUninit(this);
+    this->udp_core_.uninit();
 
     stats().saveIfDirty();
     tr_peerMgrFree(peerMgr);
@@ -2081,9 +2078,9 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         session,
         [session, enabled]()
         {
-            tr_udpUninit(session);
+            session->udp_core_.uninit();
             session->is_dht_enabled_ = enabled;
-            tr_udpInit(session);
+            session->udp_core_.init();
         });
 }
 
@@ -2120,8 +2117,8 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
         [session, enabled]()
         {
             session->is_utp_enabled_ = enabled;
-            tr_udpSetSocketBuffers(session);
-            tr_udpSetSocketTOS(session);
+            session->udp_core_.set_socket_buffers();
+            session->udp_core_.set_socket_tos();
             // But don't call tr_utpClose --
             // see reset_timer in tr-utp.c for an explanation.
         });

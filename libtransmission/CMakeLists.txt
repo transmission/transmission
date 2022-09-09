@@ -201,7 +201,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     torrents.h
     tr-dht.h
     tr-lpd.h
-    tr-udp.h
     tr-utp.h
     trevent.h
     upnp.h

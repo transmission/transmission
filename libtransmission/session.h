@@ -478,13 +478,55 @@ public:
 
     struct tr_event_handle* events = nullptr;
 
-    /* The UDP sockets used for the DHT and uTP. */
-    tr_port udp_port;
-    tr_socket_t udp_socket = TR_BAD_SOCKET;
-    tr_socket_t udp6_socket = TR_BAD_SOCKET;
-    unsigned char* udp6_bound = nullptr;
-    struct event* udp_event = nullptr;
-    struct event* udp6_event = nullptr;
+    // UDP connectivity used for the DHT and uTP
+    class tr_udp_core
+    {
+    public:
+        tr_udp_core(tr_session* session)
+            : session_{ session }
+        {
+        }
+
+        void init();
+        void uninit();
+        void set_socket_buffers();
+
+        void set_socket_tos()
+        {
+            session_->setSocketTOS(udp_socket_, TR_AF_INET);
+            session_->setSocketTOS(udp6_socket_, TR_AF_INET6);
+        }
+
+        void sendto(char const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+
+        [[nodiscard]] constexpr auto port() const noexcept
+        {
+            return udp_port_;
+        }
+
+        [[nodiscard]] constexpr auto udp_socket() const noexcept
+        {
+            return udp_socket_;
+        }
+
+        [[nodiscard]] constexpr auto udp6_socket() const noexcept
+        {
+            return udp6_socket_;
+        }
+
+    private:
+        tr_port udp_port_ = {};
+        tr_session* const session_;
+        struct event* udp_event_ = nullptr;
+        struct event* udp6_event_ = nullptr;
+        unsigned char* udp6_bound_ = nullptr;
+        tr_socket_t udp_socket_ = TR_BAD_SOCKET;
+        tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
+
+        void rebind_ipv6(bool);
+    };
+
+    tr_udp_core udp_core_{ this };
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
@@ -958,6 +1000,10 @@ private:
 public:
     struct struct_utp_context* utp_context = nullptr;
     std::unique_ptr<libtransmission::Timer> utp_timer;
+
+    // These UDP announcer quirks are tightly hooked with session
+    bool tau_handle_message(uint8_t const* msg, size_t msglen) const;
+    void tau_sendto(struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen) const;
 };
 
 constexpr bool tr_isPriority(tr_priority_t p)
