@@ -38,6 +38,8 @@ using namespace std::literals;
 ****
 ***/
 
+static auto constexpr HandshakeName = "\023BitTorrent protocol"sv;
+
 #define HANDSHAKE_NAME "\023BitTorrent protocol"
 
 // bittorrent handshake constants
@@ -369,23 +371,20 @@ static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, ui
     return 0;
 }
 
-static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
+static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
 {
-    size_t needlen = HandshakeNameLen;
-
-    if (evbuffer_get_length(inbuf) < needlen)
+    auto const peek = peer_io->peek(std::size(HandshakeName));
+    if (!peek)
     {
         return READ_LATER;
     }
 
-    bool const is_encrypted = memcmp(evbuffer_pullup(inbuf, HandshakeNameLen), HANDSHAKE_NAME, HandshakeNameLen) != 0;
-
+    auto const is_encrypted = *peek == HandshakeName;
     auto peer_public_key = DH::key_bigend_t{};
     if (is_encrypted)
     {
-        needlen = std::size(peer_public_key);
-
-        if (evbuffer_get_length(inbuf) < needlen)
+        auto const needlen = std::size(peer_public_key);
+        if (peer_io->readBufferSize() < needlen)
         {
             return READ_LATER;
         }
@@ -402,7 +401,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     handshake->haveReadAnythingFromPeer = true;
 
     // get the peer's public key
-    evbuffer_remove(inbuf, std::data(peer_public_key), std::size(peer_public_key));
+    peer_io->readBytes(std::data(peer_public_key), std::size(peer_public_key));
     handshake->dh.setPeerPublicKey(peer_public_key);
 
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
@@ -413,7 +412,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     auto const req1 = tr_sha1::digest("req1"sv, handshake->dh.secret());
     evbuffer_add(outbuf, std::data(req1), std::size(req1));
 
-    auto const info_hash = handshake->io->torrentHash();
+    auto const info_hash = peer_io->torrentHash();
     if (!info_hash)
     {
         tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
@@ -436,8 +435,8 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
-    handshake->io->writeBuf(outbuf, false);
-    handshake->io->encryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
+    peer_io->writeBuf(outbuf, false);
+    peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, *info_hash);
     evbuffer_add(outbuf, std::data(VC), std::size(VC));
     evbuffer_add_uint32(outbuf, handshake->cryptoProvide());
     evbuffer_add_uint16(outbuf, 0);
@@ -455,9 +454,9 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* send it */
-    handshake->io->decryptInit(handshake->io->isIncoming(), handshake->dh, *info_hash);
+    peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, *info_hash);
     setReadState(handshake, AWAITING_VC);
-    handshake->io->writeBuf(outbuf, false);
+    peer_io->writeBuf(outbuf, false);
 
     /* cleanup */
     evbuffer_free(outbuf);
@@ -997,7 +996,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
             break;
 
         case AWAITING_YB:
-            ret = readYb(handshake, inbuf);
+            ret = readYb(handshake, peer_io);
             break;
 
         case AWAITING_VC:
