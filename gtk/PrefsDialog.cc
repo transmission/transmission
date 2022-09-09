@@ -203,7 +203,7 @@ class DownloadingPage : public Gtk::Box
 {
 public:
     DownloadingPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
-    ~DownloadingPage();
+    ~DownloadingPage() override;
 
     TR_DISABLE_COPY_MOVE(DownloadingPage)
 
@@ -431,7 +431,7 @@ class PrivacyPage : public Gtk::Box
 {
 public:
     PrivacyPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
-    ~PrivacyPage();
+    ~PrivacyPage() override;
 
     TR_DISABLE_COPY_MOVE(PrivacyPage)
 
@@ -814,7 +814,7 @@ class SpeedPage : public Gtk::Box
 public:
     SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
 
-    TR_DISABLE_COPY_MOVE(SpeedPage);
+    TR_DISABLE_COPY_MOVE(SpeedPage)
 
 private:
     void refreshSchedSensitivity();
@@ -992,9 +992,9 @@ class NetworkPage : public Gtk::Box
 {
 public:
     NetworkPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
-    ~NetworkPage();
+    ~NetworkPage() override;
 
-    TR_DISABLE_COPY_MOVE(NetworkPage);
+    TR_DISABLE_COPY_MOVE(NetworkPage)
 
 private:
     void onCorePrefsChanged(tr_quark const key);
