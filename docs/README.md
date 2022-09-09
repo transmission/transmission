@@ -46,5 +46,5 @@ Please contact us if you are interested in supporting Transmission in any of the
   * [Language translations](Translating.md)
   * Bug and request management
   * Documentation and Wiki editing
-  * [Donations](https://transmissionbt.com/donate/)
+  * [Donations](https://transmissionbt.com/donate)
   * If you want to alert us of a security vulnerability, please email security@transmissionbt.com. Please note that general support questions belong on the forum, and will be ignored if sent to this email address.

@@ -456,7 +456,7 @@ export class OverflowMenu extends EventTarget {
     options.append(e);
 
     e = document.createElement('a');
-    e.href = 'https://transmissionbt.com/donate/';
+    e.href = 'https://transmissionbt.com/donate';
     e.tabindex = '0';
     e.textContent = 'Tip Jar';
     options.append(e);

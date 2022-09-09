@@ -685,7 +685,7 @@ void MainWindow::openStats()
 
 void MainWindow::openDonate() const
 {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/donate/")));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/donate")));
 }
 
 void MainWindow::openAbout()

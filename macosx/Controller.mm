@@ -116,7 +116,7 @@ typedef NS_ENUM(unsigned int, sortOrderTag) { //
 #define WEBSITE_URL @"https://transmissionbt.com/"
 #define FORUM_URL @"https://forum.transmissionbt.com/"
 #define GITHUB_URL @"https://github.com/transmission/transmission"
-#define DONATE_URL @"https://transmissionbt.com/donate/"
+#define DONATE_URL @"https://transmissionbt.com/donate"
 
 #define DONATE_NAG_TIME (60 * 60 * 24 * 7)
 
