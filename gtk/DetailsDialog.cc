@@ -2132,7 +2132,7 @@ public:
     static std::unique_ptr<EditTrackersDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
 
 private:
-    void on_response(int response);
+    void on_response(int response) override;
 
 private:
     DetailsDialog& parent_;
@@ -2243,7 +2243,7 @@ public:
     static std::unique_ptr<AddTrackerDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
 
 private:
-    void on_response(int response);
+    void on_response(int response) override;
 
 private:
     DetailsDialog& parent_;
