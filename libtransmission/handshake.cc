@@ -715,29 +715,29 @@ static ReadState readYa(tr_handshake* handshake, tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
+static ReadState readPadA(tr_handshake* handshake, tr_peerIo* peer_io)
 {
     // find the end of PadA by looking for HASH('req1', S)
     auto const needle = tr_sha1::digest("req1"sv, handshake->dh.secret());
 
     for (size_t i = 0; i < PadaMaxlen; ++i)
     {
-        if (evbuffer_get_length(inbuf) < std::size(needle))
+        auto const* const peek = peer_io->peek(std::size(needle));
+        if (peek == nullptr)
         {
             tr_logAddTraceHand(handshake, "not enough bytes... returning read_more");
             return READ_LATER;
         }
 
-        auto const* peek = reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf, std::size(needle)));
         if (std::equal(std::begin(needle), std::end(needle), peek))
         {
             tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
-            evbuffer_drain(inbuf, std::size(needle));
+            peer_io->readBufferDrain(std::size(needle));
             setState(handshake, AWAITING_CRYPTO_PROVIDE);
             return READ_NOW;
         }
 
-        evbuffer_drain(inbuf, 1);
+        peer_io->readBufferDrain(1U);
     }
 
     tr_logAddTraceHand(handshake, "couldn't find HASH('req', S)");
@@ -974,7 +974,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
             break;
 
         case AWAITING_PAD_A:
-            ret = readPadA(handshake, inbuf);
+            ret = readPadA(handshake, peer_io);
             break;
 
         case AWAITING_CRYPTO_PROVIDE:
