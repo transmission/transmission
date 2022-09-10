@@ -87,7 +87,13 @@ bool RelocateDialog::Impl::onTimer()
 {
     if (done_ == TR_LOC_ERROR)
     {
-        Gtk::MessageDialog(*message_dialog_, _("Couldn't move torrent"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true)
+        Gtk::MessageDialog(
+            *message_dialog_,
+            _("Couldn't move torrent"),
+            false,
+            TR_GTK_MESSAGE_TYPE(ERROR),
+            TR_GTK_BUTTONS_TYPE(CLOSE),
+            true)
             .run();
         message_dialog_.reset();
     }
@@ -108,7 +114,7 @@ bool RelocateDialog::Impl::onTimer()
 
 void RelocateDialog::Impl::onResponse(int response)
 {
-    if (response == Gtk::RESPONSE_APPLY)
+    if (response == TR_GTK_RESPONSE_TYPE(APPLY))
     {
         auto const location = chooser_->get_filename();
 
@@ -119,11 +125,11 @@ void RelocateDialog::Impl::onResponse(int response)
             dialog_,
             Glib::ustring(),
             false,
-            Gtk::MESSAGE_INFO,
-            Gtk::BUTTONS_CLOSE,
+            TR_GTK_MESSAGE_TYPE(INFO),
+            TR_GTK_BUTTONS_TYPE(CLOSE),
             true);
         message_dialog_->set_secondary_text(_("This may take a moment…"));
-        message_dialog_->set_response_sensitive(Gtk::RESPONSE_CLOSE, false);
+        message_dialog_->set_response_sensitive(TR_GTK_RESPONSE_TYPE(CLOSE), false);
         message_dialog_->show();
 
         /* remember this location for the next torrent */
@@ -178,7 +184,7 @@ RelocateDialog::Impl::Impl(
     , chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "new_location_button"))
     , move_tb_(gtr_get_widget<Gtk::RadioButton>(builder, "move_data_radio"))
 {
-    dialog_.set_default_response(Gtk::RESPONSE_CANCEL);
+    dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(CANCEL));
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
     auto recent_dirs = gtr_get_recent_dirs("relocate");

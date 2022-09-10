@@ -1588,7 +1588,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             r->property_yalign() = 0.5F;
             c = Gtk::make_managed<Gtk::TreeViewColumn>(Glib::ustring(), *r);
             c->add_attribute(r->property_icon_name(), *col);
-            c->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+            c->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
             c->set_fixed_width(20);
         }
         else if (*col == peer_cols.download_request_count_string)
@@ -1702,7 +1702,7 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-        r->property_ellipsize() = Pango::ELLIPSIZE_END;
+        r->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
         auto* c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Web Seeds"), *r);
         c->add_attribute(r->property_text(), webseed_cols.url);
         c->set_expand(true);
@@ -1722,7 +1722,7 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
 
     peer_store_ = Gtk::ListStore::create(peer_cols);
     auto m = Gtk::TreeModelSort::create(peer_store_);
-    m->set_sort_column(peer_cols.progress, Gtk::SORT_DESCENDING);
+    m->set_sort_column(peer_cols.progress, TR_GTK_SORT_TYPE(DESCENDING));
 
     peer_view_->set_model(m);
     peer_view_->set_has_tooltip(true);
@@ -2175,7 +2175,7 @@ void EditTrackersDialog::on_response(int response)
 {
     bool do_destroy = true;
 
-    if (response == Gtk::RESPONSE_ACCEPT)
+    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
         auto const text_buffer = urls_view_->get_buffer();
 
@@ -2187,8 +2187,13 @@ void EditTrackersDialog::on_response(int response)
             }
             else
             {
-                Gtk::MessageDialog
-                    w(*this, _("List contains invalid URLs"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+                Gtk::MessageDialog w(
+                    *this,
+                    _("List contains invalid URLs"),
+                    false,
+                    TR_GTK_MESSAGE_TYPE(ERROR),
+                    TR_GTK_BUTTONS_TYPE(CLOSE),
+                    true);
                 w.set_secondary_text(_("Please correct the errors and try again."));
                 w.run();
 
@@ -2286,7 +2291,7 @@ void AddTrackerDialog::on_response(int response)
 {
     bool destroy = true;
 
-    if (response == Gtk::RESPONSE_ACCEPT)
+    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
         auto const url = gtr_str_strip(url_entry_->get_text());
 
@@ -2397,7 +2402,7 @@ void DetailsDialog::Impl::tracker_page_init(Glib::RefPtr<Gtk::Builder> const& /*
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-        r->property_ellipsize() = Pango::ELLIPSIZE_END;
+        r->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
         r->property_xpad() = GUI_PAD_SMALL;
         r->property_ypad() = pad;
         c->pack_start(*r, true);
@@ -2430,7 +2435,7 @@ void DetailsDialog::Impl::refresh()
 
     if (torrents.empty())
     {
-        dialog_.response(Gtk::RESPONSE_CLOSE);
+        dialog_.response(TR_GTK_RESPONSE_TYPE(CLOSE));
     }
 }
 

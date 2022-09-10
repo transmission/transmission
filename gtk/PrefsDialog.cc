@@ -48,12 +48,12 @@ private:
 
 void PrefsDialog::Impl::response_cb(int response)
 {
-    if (response == Gtk::RESPONSE_HELP)
+    if (response == TR_GTK_RESPONSE_TYPE(HELP))
     {
         gtr_open_uri(gtr_get_help_uri() + "/html/preferences.html");
     }
 
-    if (response == Gtk::RESPONSE_CLOSE)
+    if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
         dialog_.hide();
     }
@@ -503,8 +503,8 @@ void PrivacyPage::onBlocklistUpdate()
         *static_cast<Gtk::Window*>(get_toplevel()),
         _("Update Blocklist"),
         false,
-        Gtk::MESSAGE_INFO,
-        Gtk::BUTTONS_CLOSE);
+        TR_GTK_MESSAGE_TYPE(INFO),
+        TR_GTK_BUTTONS_TYPE(CLOSE));
     updateBlocklistButton_->set_sensitive(false);
     updateBlocklistDialog_->set_secondary_text(_("Getting new blocklist…"));
     updateBlocklistDialog_->signal_response().connect([this](int /*response*/) { onBlocklistUpdateResponse(); });
@@ -899,13 +899,13 @@ void SpeedPage::init_week_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> cons
             { _("Every Day"), TR_SCHED_ALL },
             { _("Weekdays"), TR_SCHED_WEEKDAY },
             { _("Weekends"), TR_SCHED_WEEKEND },
-            { get_weekday_string(Glib::Date::MONDAY), TR_SCHED_MON },
-            { get_weekday_string(Glib::Date::TUESDAY), TR_SCHED_TUES },
-            { get_weekday_string(Glib::Date::WEDNESDAY), TR_SCHED_WED },
-            { get_weekday_string(Glib::Date::THURSDAY), TR_SCHED_THURS },
-            { get_weekday_string(Glib::Date::FRIDAY), TR_SCHED_FRI },
-            { get_weekday_string(Glib::Date::SATURDAY), TR_SCHED_SAT },
-            { get_weekday_string(Glib::Date::SUNDAY), TR_SCHED_SUN },
+            { get_weekday_string(Glib::Date::Weekday::MONDAY), TR_SCHED_MON },
+            { get_weekday_string(Glib::Date::Weekday::TUESDAY), TR_SCHED_TUES },
+            { get_weekday_string(Glib::Date::Weekday::WEDNESDAY), TR_SCHED_WED },
+            { get_weekday_string(Glib::Date::Weekday::THURSDAY), TR_SCHED_THURS },
+            { get_weekday_string(Glib::Date::Weekday::FRIDAY), TR_SCHED_FRI },
+            { get_weekday_string(Glib::Date::Weekday::SATURDAY), TR_SCHED_SAT },
+            { get_weekday_string(Glib::Date::Weekday::SUNDAY), TR_SCHED_SUN },
         });
     gtr_combo_box_set_active_enum(combo, gtr_pref_int_get(key));
     combo.signal_changed().connect([&combo, key, core]() { onIntComboChanged(&combo, key, core); });

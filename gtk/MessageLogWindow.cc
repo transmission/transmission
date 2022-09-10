@@ -191,8 +191,8 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
                 fmt::arg("error", g_strerror(errcode)),
                 fmt::arg("error_code", errcode)),
             false,
-            Gtk::MESSAGE_ERROR,
-            Gtk::BUTTONS_CLOSE);
+            TR_GTK_MESSAGE_TYPE(ERROR),
+            TR_GTK_BUTTONS_TYPE(CLOSE));
         w->set_secondary_text(Glib::strerror(errno));
         w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
         w->show();
@@ -216,7 +216,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
 
 void MessageLogWindow::Impl::onSaveDialogResponse(std::shared_ptr<Gtk::FileChooserDialog>& d, int response)
 {
-    if (response == Gtk::RESPONSE_ACCEPT)
+    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
         doSave(*d, d->get_filename());
     }
@@ -226,9 +226,9 @@ void MessageLogWindow::Impl::onSaveDialogResponse(std::shared_ptr<Gtk::FileChoos
 
 void MessageLogWindow::Impl::onSaveRequest()
 {
-    auto d = std::make_shared<Gtk::FileChooserDialog>(window_, _("Save Log"), Gtk::FILE_CHOOSER_ACTION_SAVE);
-    d->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-    d->add_button(_("_Save"), Gtk::RESPONSE_ACCEPT);
+    auto d = std::make_shared<Gtk::FileChooserDialog>(window_, _("Save Log"), TR_GTK_FILE_CHOOSER_ACTION(SAVE));
+    d->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(CANCEL));
+    d->add_button(_("_Save"), TR_GTK_RESPONSE_TYPE(ACCEPT));
 
     d->signal_response().connect([this, d](int response) mutable { onSaveDialogResponse(d, response); });
     d->show();
@@ -282,7 +282,7 @@ void renderText(
 {
     auto const* const node = iter->get_value(message_log_cols.tr_msg);
     renderer->property_text() = iter->get_value(col);
-    renderer->property_ellipsize() = Pango::ELLIPSIZE_END;
+    renderer->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
     setForegroundColor(renderer, node->level);
 }
 
@@ -302,7 +302,7 @@ void appendColumn(Gtk::TreeView* view, Gtk::TreeModelColumnBase const& col)
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
         c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Name"), *r);
         c->set_cell_data_func(*r, [r](auto* /*renderer*/, auto const& iter) { renderText(r, iter, message_log_cols.name); });
-        c->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+        c->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         c->set_fixed_width(200);
         c->set_resizable(true);
     }
@@ -311,7 +311,7 @@ void appendColumn(Gtk::TreeView* view, Gtk::TreeModelColumnBase const& col)
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
         c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Message"), *r);
         c->set_cell_data_func(*r, [r](auto* /*renderer*/, auto const& iter) { renderText(r, iter, message_log_cols.message); });
-        c->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+        c->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         c->set_fixed_width(500);
         c->set_resizable(true);
     }
@@ -488,7 +488,7 @@ MessageLogWindow::Impl::Impl(
 
     filter_ = Gtk::TreeModelFilter::create(store_);
     sort_ = Gtk::TreeModelSort::create(filter_);
-    sort_->set_sort_column(message_log_cols.sequence, Gtk::SORT_ASCENDING);
+    sort_->set_sort_column(message_log_cols.sequence, TR_GTK_SORT_TYPE(ASCENDING));
     maxLevel_ = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
     filter_->set_visible_func(sigc::mem_fun(*this, &Impl::isRowVisible));
 

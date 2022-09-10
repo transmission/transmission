@@ -261,8 +261,8 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
         *win,
         _("Couldn't open torrent"),
         false,
-        Gtk::MESSAGE_ERROR,
-        Gtk::BUTTONS_CLOSE);
+        TR_GTK_MESSAGE_TYPE(ERROR),
+        TR_GTK_BUTTONS_TYPE(CLOSE));
     w->set_secondary_text(secondary);
     w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
     w->show_all();
@@ -381,7 +381,7 @@ void gtr_open_uri(Glib::ustring const& uri)
         {
             try
             {
-                Glib::spawn_async({}, std::vector<std::string>{ "xdg-open", uri }, Glib::SPAWN_SEARCH_PATH);
+                Glib::spawn_async({}, std::vector<std::string>{ "xdg-open", uri }, TR_GLIB_SPAWN_FLAGS(SEARCH_PATH));
                 opened = true;
             }
             catch (Glib::SpawnError const&)
@@ -573,8 +573,8 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
         *window,
         fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url)),
         false /*use markup*/,
-        Gtk::MESSAGE_ERROR,
-        Gtk::BUTTONS_CLOSE,
+        TR_GTK_MESSAGE_TYPE(ERROR),
+        TR_GTK_BUTTONS_TYPE(CLOSE),
         true /*modal*/);
 
     gstr += fmt::format(_("Transmission doesn't know how to use '{url}'"), fmt::arg("url", url));
