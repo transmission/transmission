@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-04 11:15+0100\n"
+"POT-Creation-Date: 2022-09-10 02:53+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Uyghur (https://www.transifex.com/transmissionbt/teams/33778/ug/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.cc:105 ../gtk/Utils.cc:89 ../libtransmission/utils.cc:640
+#: ../cli/cli.cc:105 ../gtk/Utils.cc:88 ../libtransmission/utils.cc:640
 msgid "None"
 msgstr "يوق"
 
@@ -29,126 +29,137 @@ msgstr "يوق"
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:254 ../gtk/Session.cc:1138 ../libtransmission/blocklist.cc:45 ../libtransmission/blocklist.cc:235 ../libtransmission/blocklist.cc:293 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:77 ../libtransmission/utils.cc:97 ../libtransmission/utils.cc:109 ../libtransmission/watchdir.cc:120 ../libtransmission/watchdir.cc:147
+#: ../daemon/daemon.cc:280 ../gtk/Session.cc:1138 ../libtransmission/blocklist.cc:45 ../libtransmission/blocklist.cc:235 ../libtransmission/blocklist.cc:293 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:77 ../libtransmission/utils.cc:97 ../libtransmission/utils.cc:109 ../libtransmission/watchdir.cc:120 ../libtransmission/watchdir.cc:147
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:280 ../gtk/Session.cc:1190 ../gtk/Utils.cc:258 ../libtransmission/watchdir.cc:96
+#: ../daemon/daemon.cc:306 ../gtk/Session.cc:1190 ../gtk/Utils.cc:257 ../libtransmission/watchdir.cc:96
 msgid "Couldn't add torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:291
+#: ../daemon/daemon.cc:317
 msgid "Removing torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:296 ../libtransmission/utils.cc:700
+#: ../daemon/daemon.cc:322 ../libtransmission/utils.cc:700
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:627
+#: ../daemon/daemon.cc:653
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:675
+#: ../daemon/daemon.cc:699
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:690
+#: ../daemon/daemon.cc:714
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:729
+#: ../daemon/daemon.cc:755
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:742
+#: ../daemon/daemon.cc:768
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:762
+#: ../daemon/daemon.cc:788
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:768 ../gtk/MessageLogWindow.cc:191 ../libtransmission/blocklist.cc:303 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1432 ../libtransmission/torrent.cc:811 ../libtransmission/torrent.cc:2032 ../libtransmission/variant.cc:1144
+#: ../daemon/daemon.cc:794 ../gtk/MessageLogWindow.cc:189 ../libtransmission/blocklist.cc:303 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1431 ../libtransmission/torrent.cc:810 ../libtransmission/torrent.cc:2032 ../libtransmission/variant.cc:1145
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:778
+#: ../daemon/daemon.cc:804
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:799
+#: ../daemon/daemon.cc:825
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:843 ../libtransmission/watchdir-kqueue.cc:120 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:869 ../libtransmission/watchdir-kqueue.cc:120 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:853 ../libtransmission/watchdir-kqueue.cc:130
+#: ../daemon/daemon.cc:879 ../libtransmission/watchdir-kqueue.cc:130
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:867
+#: ../daemon/daemon.cc:893
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:355
+#: ../gtk/AddTrackerDialog.ui:21 ../gtk/Application.cc:730 ../gtk/Dialogs.cc:114 ../gtk/EditTrackersDialog.ui:21 ../gtk/MakeProgressDialog.ui:22 ../gtk/MessageLogWindow.cc:230 ../gtk/OptionsDialog.cc:361 ../gtk/OptionsDialog.ui:21 ../gtk/RelocateDialog.ui:21 ../gtk/StatsDialog.cc:99 ../gtk/TorrentUrlChooserDialog.ui:21
+msgid "_Cancel"
+msgstr ""
+
+#: ../gtk/AddTrackerDialog.ui:35 ../gtk/DetailsDialog.ui:666 ../gtk/MakeProgressDialog.ui:52 ../gtk/PrefsDialog.ui:1985
+msgid "_Add"
+msgstr "قوش(_A)"
+
+#: ../gtk/AddTrackerDialog.ui:64
+msgid "Tracker"
+msgstr "ئىزلىغۇچ"
+
+#: ../gtk/AddTrackerDialog.ui:88
+msgid "_Announce URL:"
+msgstr "ئېلان قىلغان URL(_A):"
+
+#: ../gtk/Application.cc:357
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:514
+#: ../gtk/Application.cc:516
 #, c-format
 msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr "سىگنال %d نى قوبۇل قىلدى؛ پاكىز تاقاشقا تىرىشىۋاتىدۇ. ئەگەر تۇيۇق يولغا كىرىپ قالسا، يەنە قايتا قىلىڭ."
 
-#: ../gtk/Application.cc:712
+#: ../gtk/Application.cc:724
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr ""
 
-#. make the dialog
-#: ../gtk/Application.cc:718 ../gtk/DetailsDialog.cc:2316 ../gtk/DetailsDialog.cc:2426 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:251 ../gtk/MessageLogWindow.cc:232 ../gtk/OptionsDialog.cc:226 ../gtk/OptionsDialog.cc:387 ../gtk/OptionsDialog.cc:447 ../gtk/RelocateDialog.cc:172 ../gtk/StatsDialog.cc:100
-msgid "_Cancel"
-msgstr ""
-
-#: ../gtk/Application.cc:719
+#: ../gtk/Application.cc:731
 msgid "I _Agree"
 msgstr ""
 
-#: ../gtk/Application.cc:899
+#: ../gtk/Application.cc:911
 msgid "Closing Connections…"
 msgstr ""
 
-#: ../gtk/Application.cc:904
+#: ../gtk/Application.cc:916
 msgid "Sending upload/download totals to tracker…"
 msgstr ""
 
-#: ../gtk/Application.cc:909
+#: ../gtk/Application.cc:921
 msgid "_Quit Now"
 msgstr "ھازىرلا ئاخىرلاشتۇر(_Q)"
 
-#: ../gtk/Application.cc:962
+#: ../gtk/Application.cc:974
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "بۇزۇلغان توررېنتلارنى قوشقىلى بولمىدى"
 
-#: ../gtk/Application.cc:969
+#: ../gtk/Application.cc:981
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "تەكرارلانغان توررېنتلارنى قوشقىلى بولمىدى"
 
-#: ../gtk/Application.cc:1289
+#: ../gtk/Application.cc:1301
 msgid "A fast and easy BitTorrent client"
 msgstr "تېز ۋە ئىشلىتىش ئوڭاي بولغان BitTorrent خېرىدارى"
 
-#: ../gtk/Application.cc:1290
+#: ../gtk/Application.cc:1302
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1296
+#: ../gtk/Application.cc:1308
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -156,518 +167,487 @@ msgstr ""
 "  Sahran https://launchpad.net/~sahran\n"
 "  Shatur.uigur https://launchpad.net/~azimat"
 
-#: ../gtk/DetailsDialog.cc:466 ../gtk/PrefsDialog.cc:1183
-msgid "Speed"
-msgstr "سۈرئىتى"
-
-#: ../gtk/DetailsDialog.cc:468
-msgid "Honor global _limits"
-msgstr "ئومۇمىي چەكلىمىگە ھۆرمەت قىل(_L)"
-
-#: ../gtk/DetailsDialog.cc:473
-msgid "Limit _download speed ({speed_units}):"
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:485
-msgid "Limit _upload speed ({speed_units}):"
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:498 ../gtk/OptionsDialog.cc:307
-msgid "Torrent _priority:"
-msgstr "توررېنت مەرتىۋىسى(_P):"
-
-#: ../gtk/DetailsDialog.cc:501
-msgid "Seeding Limits"
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:505 ../gtk/DetailsDialog.cc:525
+#: ../gtk/DetailsDialog.cc:484 ../gtk/DetailsDialog.cc:502
 msgid "Use global settings"
 msgstr "ئومۇمىي تەڭشەكنى ئىشلىتىش"
 
-#: ../gtk/DetailsDialog.cc:506
+#: ../gtk/DetailsDialog.cc:485
 msgid "Seed regardless of ratio"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:507
+#: ../gtk/DetailsDialog.cc:486
 msgid "Stop seeding at ratio:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:521
-msgid "_Ratio:"
-msgstr "نىسبەت(_R):"
-
-#: ../gtk/DetailsDialog.cc:526
+#: ../gtk/DetailsDialog.cc:503
 msgid "Seed regardless of activity"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:527
+#: ../gtk/DetailsDialog.cc:504
 msgid "Stop seeding if idle for N minutes:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:540
-msgid "_Idle:"
-msgstr "بىكار(_I):"
-
-#: ../gtk/DetailsDialog.cc:543
-msgid "Peer Connections"
-msgstr "Peer باغلىنىشلىرى"
-
-#: ../gtk/DetailsDialog.cc:546
-msgid "_Maximum peers:"
-msgstr "ئەڭ چوڭ Peer سانى(_M):"
-
-#: ../gtk/DetailsDialog.cc:567 ../gtk/TorrentCellRenderer.cc:163
+#: ../gtk/DetailsDialog.cc:535 ../gtk/TorrentCellRenderer.cc:163
 msgid "Queued for verification"
 msgstr "تەكشۈرۈش ئۈچۈن قاتارغا قوشۇلدى"
 
-#: ../gtk/DetailsDialog.cc:570
+#: ../gtk/DetailsDialog.cc:538
 msgid "Verifying local data"
 msgstr "يەرلىك سانلىق-مەلۇماتنى تەكشۈرۈۋاتىدۇ"
 
-#: ../gtk/DetailsDialog.cc:573 ../gtk/TorrentCellRenderer.cc:166
+#: ../gtk/DetailsDialog.cc:541 ../gtk/TorrentCellRenderer.cc:166
 msgid "Queued for download"
 msgstr "چۈشۈرۈش ئۈچۈن قاتارغا قوشۇلدى"
 
-#: ../gtk/DetailsDialog.cc:576 ../gtk/FilterBar.cc:514
+#: ../gtk/DetailsDialog.cc:544 ../gtk/FilterBar.cc:516
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "چۈشۈرۈۋاتىدۇ"
 
-#: ../gtk/DetailsDialog.cc:579 ../gtk/TorrentCellRenderer.cc:169
+#: ../gtk/DetailsDialog.cc:547 ../gtk/TorrentCellRenderer.cc:169
 msgid "Queued for seeding"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:582 ../gtk/FilterBar.cc:515
+#: ../gtk/DetailsDialog.cc:550 ../gtk/FilterBar.cc:517
 msgctxt "Verb"
 msgid "Seeding"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:585 ../gtk/FilterBar.cc:517 ../gtk/TorrentCellRenderer.cc:160
+#: ../gtk/DetailsDialog.cc:553 ../gtk/FilterBar.cc:519 ../gtk/TorrentCellRenderer.cc:160
 msgid "Finished"
 msgstr "تاماملاندى"
 
-#: ../gtk/DetailsDialog.cc:585 ../gtk/FilterBar.cc:516 ../gtk/TorrentCellRenderer.cc:160
+#: ../gtk/DetailsDialog.cc:553 ../gtk/FilterBar.cc:518 ../gtk/TorrentCellRenderer.cc:160
 msgid "Paused"
 msgstr "ۋاقىتلىق توختىدى"
 
-#: ../gtk/DetailsDialog.cc:606 ../gtk/DetailsDialog.cc:611 ../gtk/DetailsDialog.cc:725
+#: ../gtk/DetailsDialog.cc:574 ../gtk/DetailsDialog.cc:579 ../gtk/DetailsDialog.cc:693
 msgid "N/A"
 msgstr "ئۇچۇر يوق"
 
-#: ../gtk/DetailsDialog.cc:620 ../gtk/FileList.cc:593
+#: ../gtk/DetailsDialog.cc:588 ../gtk/FileList.cc:600
 msgid "Mixed"
 msgstr "ئارىلاش"
 
-#: ../gtk/DetailsDialog.cc:621
+#: ../gtk/DetailsDialog.cc:589
 msgid "No Torrents Selected"
 msgstr "توررېنت تاللانمىغان"
 
-#: ../gtk/DetailsDialog.cc:650
+#: ../gtk/DetailsDialog.cc:618
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "بۇ ئىزلىغۇچنى شەخسىي قىلىش -- DHT ۋە PEX ئىناۋەتسىز بولىدۇ"
 
-#: ../gtk/DetailsDialog.cc:650
+#: ../gtk/DetailsDialog.cc:618
 msgid "Public torrent"
 msgstr "ئاممىۋى توررېنت"
 
-#: ../gtk/DetailsDialog.cc:713
+#: ../gtk/DetailsDialog.cc:681
 msgid "Created by {creator} on {date}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:717
+#: ../gtk/DetailsDialog.cc:685
 msgid "Created by {creator}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:721
+#: ../gtk/DetailsDialog.cc:689
 msgid "Created on {date}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:835
+#: ../gtk/DetailsDialog.cc:803
 msgid "Unknown"
 msgstr "نامەلۇم"
 
-#: ../gtk/DetailsDialog.cc:872 ../gtk/MakeDialog.cc:363
+#: ../gtk/DetailsDialog.cc:840 ../gtk/MakeDialog.cc:357
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:887 ../gtk/MakeDialog.cc:369
+#: ../gtk/DetailsDialog.cc:855 ../gtk/MakeDialog.cc:363
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:931
+#: ../gtk/DetailsDialog.cc:899
 msgid "{current_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:939
+#: ../gtk/DetailsDialog.cc:907
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:948
+#: ../gtk/DetailsDialog.cc:916
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:981
+#: ../gtk/DetailsDialog.cc:949
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1011
+#: ../gtk/DetailsDialog.cc:979
 msgid "{uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1052
+#: ../gtk/DetailsDialog.cc:1020
 msgid "No errors"
 msgstr "خاتالىق يوق"
 
-#: ../gtk/DetailsDialog.cc:1072
+#: ../gtk/DetailsDialog.cc:1040
 msgid "Never"
 msgstr "ھەرگىز"
 
-#: ../gtk/DetailsDialog.cc:1076
+#: ../gtk/DetailsDialog.cc:1044
 msgid "Active now"
 msgstr "ھازىر ئاكتىپ"
 
-#: ../gtk/DetailsDialog.cc:1092
-msgid "Activity"
-msgstr "پائالىيەت"
-
-#: ../gtk/DetailsDialog.cc:1097
-msgid "Torrent size:"
-msgstr "توررېنت چوڭلۇقى:"
-
-#: ../gtk/DetailsDialog.cc:1102
-msgid "Have:"
-msgstr "بارى:"
-
-#: ../gtk/DetailsDialog.cc:1107 ../gtk/StatsDialog.cc:147 ../gtk/StatsDialog.cc:168
-msgid "Uploaded:"
-msgstr "يۈكلەنگىنى:"
-
-#: ../gtk/DetailsDialog.cc:1112 ../gtk/StatsDialog.cc:150 ../gtk/StatsDialog.cc:171
-msgid "Downloaded:"
-msgstr "چۈشۈرگىنى:"
-
-#: ../gtk/DetailsDialog.cc:1117
-msgid "State:"
-msgstr "ھالەت:"
-
-#: ../gtk/DetailsDialog.cc:1122
-msgid "Running time:"
-msgstr "ئىجرا ۋاقتى:"
-
-#: ../gtk/DetailsDialog.cc:1127
-msgid "Remaining time:"
-msgstr "قالغان ۋاقىت:"
-
-#: ../gtk/DetailsDialog.cc:1132
-msgid "Last activity:"
-msgstr "ئەڭ ئاخىرقى پائالىيىتى:"
-
-#: ../gtk/DetailsDialog.cc:1140
-msgid "Error:"
-msgstr "خاتالىق:"
-
-#: ../gtk/DetailsDialog.cc:1144
-msgid "Details"
-msgstr "تەپسىلاتلار"
-
-#: ../gtk/DetailsDialog.cc:1150
-msgid "Location:"
-msgstr "ئورنى:"
-
-#: ../gtk/DetailsDialog.cc:1156
-msgid "Hash:"
-msgstr "ئالاھىدىلىك كودى:"
-
-#: ../gtk/DetailsDialog.cc:1161
-msgid "Privacy:"
-msgstr "شەخسىيەت:"
-
-#: ../gtk/DetailsDialog.cc:1167
-msgid "Origin:"
-msgstr "مەنبە:"
-
-#: ../gtk/DetailsDialog.cc:1172
-msgid "Added:"
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:1186
-msgid "Comment:"
-msgstr "ئىزاھات:"
-
-#: ../gtk/DetailsDialog.cc:1575
+#: ../gtk/DetailsDialog.cc:1443
 msgid "Optimistic unchoke"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1579
+#: ../gtk/DetailsDialog.cc:1447
 msgid "Downloading from this peer"
 msgstr "مەزكۇر Peer دىن چۈشۈرۈش"
 
-#: ../gtk/DetailsDialog.cc:1583
+#: ../gtk/DetailsDialog.cc:1451
 msgid "We would download from this peer if they would let us"
 msgstr "ئەگەر مەزكۇر Peer ئىجازەت بەرسە، مۇشۇنىڭدىن چۈشۈرسەك"
 
-#: ../gtk/DetailsDialog.cc:1587
+#: ../gtk/DetailsDialog.cc:1455
 msgid "Uploading to peer"
 msgstr "Peer غا يۈكلەش"
 
-#: ../gtk/DetailsDialog.cc:1591
+#: ../gtk/DetailsDialog.cc:1459
 msgid "We would upload to this peer if they asked"
 msgstr "ئەگەر ئىلتىماس قىلسا مۇشۇ Peer غا يۈكلىسەك"
 
-#: ../gtk/DetailsDialog.cc:1595
+#: ../gtk/DetailsDialog.cc:1463
 msgid "Peer has unchoked us, but we're not interested"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1599
+#: ../gtk/DetailsDialog.cc:1467
 msgid "We unchoked this peer, but they're not interested"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1603
+#: ../gtk/DetailsDialog.cc:1471
 msgid "Encrypted connection"
 msgstr "شىفىرلانغان باغلىنىش"
 
-#: ../gtk/DetailsDialog.cc:1607
+#: ../gtk/DetailsDialog.cc:1475
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1611
+#: ../gtk/DetailsDialog.cc:1479
 msgid "Peer was found through DHT"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1615
+#: ../gtk/DetailsDialog.cc:1483
 msgid "Peer is an incoming connection"
 msgstr "Peer بولسا كىرگەن باغلىنىش"
 
-#: ../gtk/DetailsDialog.cc:1619
+#: ../gtk/DetailsDialog.cc:1487
 msgid "Peer is connected over µTP"
 msgstr "بۇ Peer µTP نى ئىشلىتىپ باغلانغان"
 
-#: ../gtk/DetailsDialog.cc:1705
+#: ../gtk/DetailsDialog.cc:1573
 msgid "Address"
 msgstr "ئادرېس"
 
 #. % is percent done
-#: ../gtk/DetailsDialog.cc:1713
+#: ../gtk/DetailsDialog.cc:1581
 msgid "%"
 msgstr "%"
 
-#: ../gtk/DetailsDialog.cc:1729
+#: ../gtk/DetailsDialog.cc:1597
 msgid "Dn Reqs"
 msgstr "چۈشۈرۈش ئىلتىماسى"
 
-#: ../gtk/DetailsDialog.cc:1736
+#: ../gtk/DetailsDialog.cc:1604
 msgid "Up Reqs"
 msgstr "يۈكلەش ئىلتىماسى"
 
-#: ../gtk/DetailsDialog.cc:1743
+#: ../gtk/DetailsDialog.cc:1611
 msgid "Dn Blocks"
 msgstr "چۈشۈرۈش بۆلەكلىرى"
 
-#: ../gtk/DetailsDialog.cc:1750
+#: ../gtk/DetailsDialog.cc:1618
 msgid "Up Blocks"
 msgstr "يۈكلەش بۆلەكلىرى"
 
-#: ../gtk/DetailsDialog.cc:1757
+#: ../gtk/DetailsDialog.cc:1625
 msgid "We Cancelled"
 msgstr "ئەمەلدىن قالدۇردۇق"
 
-#: ../gtk/DetailsDialog.cc:1764
+#: ../gtk/DetailsDialog.cc:1632
 msgid "They Cancelled"
 msgstr "ئەمەلدىن قالدۇردى"
 
-#: ../gtk/DetailsDialog.cc:1772 ../gtk/DetailsDialog.cc:1846
+#: ../gtk/DetailsDialog.cc:1640 ../gtk/DetailsDialog.cc:1715
 msgid "Down"
 msgstr "تۆۋەن"
 
-#: ../gtk/DetailsDialog.cc:1780
+#: ../gtk/DetailsDialog.cc:1648
 msgid "Up"
 msgstr "يۇقىرى"
 
-#: ../gtk/DetailsDialog.cc:1787
+#: ../gtk/DetailsDialog.cc:1655
 msgid "Client"
 msgstr "خېرىدار"
 
-#: ../gtk/DetailsDialog.cc:1793
+#: ../gtk/DetailsDialog.cc:1661
 msgid "Flags"
 msgstr "تاللانمىلار"
 
-#: ../gtk/DetailsDialog.cc:1837
+#: ../gtk/DetailsDialog.cc:1706
 msgid "Web Seeds"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1884 ../gtk/DetailsDialog.cc:2546
-msgid "Show _more details"
-msgstr "تېخىمۇ كوپ تەپسىلاتلار(_M)"
-
-#: ../gtk/DetailsDialog.cc:1923
+#: ../gtk/DetailsDialog.cc:1770
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1935
+#: ../gtk/DetailsDialog.cc:1782
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the error
-#: ../gtk/DetailsDialog.cc:1944
+#: ../gtk/DetailsDialog.cc:1791
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1957
+#: ../gtk/DetailsDialog.cc:1804
 msgid "No updates scheduled"
 msgstr "يېڭىلاش پىلانى يوق"
 
-#: ../gtk/DetailsDialog.cc:1964
+#: ../gtk/DetailsDialog.cc:1811
 msgid "Asking for more peers {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1971
+#: ../gtk/DetailsDialog.cc:1818
 msgid "Queued to ask for more peers"
 msgstr "تېخىمۇ كوپ Peer ئىلتىماس قىلىش ئۈچۈن قاتارغا تىزىلدى"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
-#: ../gtk/DetailsDialog.cc:1979
+#: ../gtk/DetailsDialog.cc:1826
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
-#: ../gtk/DetailsDialog.cc:2002
+#: ../gtk/DetailsDialog.cc:1849
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2004
+#: ../gtk/DetailsDialog.cc:1851
 msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:2006
+#: ../gtk/DetailsDialog.cc:1853
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the error text
-#: ../gtk/DetailsDialog.cc:2015
+#: ../gtk/DetailsDialog.cc:1862
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2032
+#: ../gtk/DetailsDialog.cc:1879
 msgid "Asking for peer counts in {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2039
+#: ../gtk/DetailsDialog.cc:1886
 msgid "Queued to ask for peer counts"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2046
+#: ../gtk/DetailsDialog.cc:1893
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2288
-msgid "List contains invalid URLs"
-msgstr "تىزىمدا ئىناۋەتسىز URL لار بار"
-
-#: ../gtk/DetailsDialog.cc:2289 ../gtk/FileList.cc:777
-msgid "Please correct the errors and try again."
-msgstr "خاتالىقنى تۈزىتىپ قايتا سىناڭ."
-
-#: ../gtk/DetailsDialog.cc:2313
+#: ../gtk/DetailsDialog.cc:2156
 msgid "{torrent_name} - Edit Trackers"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2317 ../gtk/MessageLogWindow.cc:233
-msgid "_Save"
-msgstr ""
+#: ../gtk/DetailsDialog.cc:2191
+msgid "List contains invalid URLs"
+msgstr "تىزىمدا ئىناۋەتسىز URL لار بار"
 
-#: ../gtk/DetailsDialog.cc:2322
-msgid "Tracker Announce URLs"
-msgstr "ئىزچى ئېلان قىلغان URL لار"
+#: ../gtk/DetailsDialog.cc:2192 ../gtk/FileList.cc:784
+msgid "Please correct the errors and try again."
+msgstr "خاتالىقنى تۈزىتىپ قايتا سىناڭ."
 
-#: ../gtk/DetailsDialog.cc:2326 ../gtk/MakeDialog.cc:532
-msgid ""
-"To add a backup URL, add it on the next line after a primary URL.\n"
-"To add a new primary URL, add it after a blank line."
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:2345
-msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:2423
+#: ../gtk/DetailsDialog.cc:2267
 msgid "{torrent_name} - Add Tracker"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2427 ../gtk/DetailsDialog.cc:2530 ../gtk/MakeDialog.cc:253 ../gtk/PrefsDialog.cc:771
-msgid "_Add"
-msgstr "قوش(_A)"
-
-#: ../gtk/DetailsDialog.cc:2432
-msgid "Tracker"
-msgstr "ئىزلىغۇچ"
-
-#: ../gtk/DetailsDialog.cc:2438
-msgid "_Announce URL:"
-msgstr "ئېلان قىلغان URL(_A):"
-
-#: ../gtk/DetailsDialog.cc:2497 ../gtk/DetailsDialog.cc:2626
+#: ../gtk/DetailsDialog.cc:2385 ../gtk/DetailsDialog.ui:761
 msgid "Trackers"
 msgstr "ئىزلىغۇچلار"
 
-#: ../gtk/DetailsDialog.cc:2534
-msgid "_Edit"
-msgstr "تەھرىر(_E)"
-
-#: ../gtk/DetailsDialog.cc:2538 ../gtk/Dialogs.cc:115 ../gtk/PrefsDialog.cc:767
-msgid "_Remove"
-msgstr "ئۆچۈر(_R)"
-
-#: ../gtk/DetailsDialog.cc:2551
-msgid "Show _backup trackers"
-msgstr "زاپاس ئىزلىغۇچنى كۆرسەت(_B)"
-
-#. create the dialog
-#: ../gtk/DetailsDialog.cc:2611 ../gtk/MakeDialog.cc:252 ../gtk/MakeDialog.cc:475 ../gtk/PrefsDialog.cc:1176 ../gtk/StatsDialog.cc:139
-msgid "_Close"
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:2624 ../gtk/MessageLogWindow.cc:438
-msgid "Information"
-msgstr "ئۇچۇر"
-
-#: ../gtk/DetailsDialog.cc:2625
-msgid "Peers"
-msgstr "ئىشلەتكۈچىلەر"
-
-#: ../gtk/DetailsDialog.cc:2630
-msgid "File listing not available for combined torrent properties"
-msgstr "بىرىكتۈرۈلگەن توررېنت خاسلىقى ئۈچۈن ھۆججەتنى تىزىپ كۆرسەتكىلى بولمايدۇ"
-
-#: ../gtk/DetailsDialog.cc:2634 ../gtk/MakeDialog.cc:481
-msgid "Files"
-msgstr "ھۆججەتلەر"
-
-#: ../gtk/DetailsDialog.cc:2636 ../gtk/MainWindow.cc:484 ../gtk/PrefsDialog.cc:1088
-msgid "Options"
-msgstr "تاللانما"
-
-#: ../gtk/DetailsDialog.cc:2663
+#: ../gtk/DetailsDialog.cc:2552
 msgid "{torrent_name} Properties"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2672
+#: ../gtk/DetailsDialog.cc:2561
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../gtk/DetailsDialog.ui:21 ../gtk/MakeDialog.ui:21 ../gtk/MakeProgressDialog.ui:37 ../gtk/PrefsDialog.ui:38 ../gtk/StatsDialog.ui:37
+msgid "_Close"
+msgstr ""
+
+#: ../gtk/DetailsDialog.ui:56
+msgid "Activity"
+msgstr "پائالىيەت"
+
+#: ../gtk/DetailsDialog.ui:80
+msgid "Torrent size:"
+msgstr "توررېنت چوڭلۇقى:"
+
+#: ../gtk/DetailsDialog.ui:92
+msgid "Have:"
+msgstr "بارى:"
+
+#: ../gtk/DetailsDialog.ui:104 ../gtk/StatsDialog.ui:92 ../gtk/StatsDialog.ui:250
+msgid "Uploaded:"
+msgstr "يۈكلەنگىنى:"
+
+#: ../gtk/DetailsDialog.ui:116 ../gtk/StatsDialog.ui:117 ../gtk/StatsDialog.ui:275
+msgid "Downloaded:"
+msgstr "چۈشۈرگىنى:"
+
+#: ../gtk/DetailsDialog.ui:128
+msgid "State:"
+msgstr "ھالەت:"
+
+#: ../gtk/DetailsDialog.ui:140
+msgid "Running time:"
+msgstr "ئىجرا ۋاقتى:"
+
+#: ../gtk/DetailsDialog.ui:152
+msgid "Remaining time:"
+msgstr "قالغان ۋاقىت:"
+
+#: ../gtk/DetailsDialog.ui:164
+msgid "Last activity:"
+msgstr "ئەڭ ئاخىرقى پائالىيىتى:"
+
+#: ../gtk/DetailsDialog.ui:176
+msgid "Error:"
+msgstr "خاتالىق:"
+
+#: ../gtk/DetailsDialog.ui:330
+msgid "Details"
+msgstr "تەپسىلاتلار"
+
+#: ../gtk/DetailsDialog.ui:354
+msgid "Location:"
+msgstr "ئورنى:"
+
+#: ../gtk/DetailsDialog.ui:366
+msgid "Hash:"
+msgstr "ئالاھىدىلىك كودى:"
+
+#: ../gtk/DetailsDialog.ui:378
+msgid "Privacy:"
+msgstr "شەخسىيەت:"
+
+#: ../gtk/DetailsDialog.ui:390
+msgid "Origin:"
+msgstr "مەنبە:"
+
+#: ../gtk/DetailsDialog.ui:402
+msgid "Added:"
+msgstr ""
+
+#: ../gtk/DetailsDialog.ui:416
+msgid "Comment:"
+msgstr "ئىزاھات:"
+
+#: ../gtk/DetailsDialog.ui:527 ../gtk/MessageLogWindow.cc:451
+msgid "Information"
+msgstr "ئۇچۇر"
+
+#: ../gtk/DetailsDialog.ui:594 ../gtk/DetailsDialog.ui:722
+msgid "Show _more details"
+msgstr "تېخىمۇ كوپ تەپسىلاتلار(_M)"
+
+#: ../gtk/DetailsDialog.ui:617
+msgid "Peers"
+msgstr "ئىشلەتكۈچىلەر"
+
+#: ../gtk/DetailsDialog.ui:680
+msgid "_Edit"
+msgstr "تەھرىر(_E)"
+
+#: ../gtk/DetailsDialog.ui:694 ../gtk/Dialogs.cc:115 ../gtk/PrefsDialog.ui:2000
+msgid "_Remove"
+msgstr "ئۆچۈر(_R)"
+
+#: ../gtk/DetailsDialog.ui:738
+msgid "Show _backup trackers"
+msgstr "زاپاس ئىزلىغۇچنى كۆرسەت(_B)"
+
+#: ../gtk/DetailsDialog.ui:799
+msgid "File listing not available for combined torrent properties"
+msgstr "بىرىكتۈرۈلگەن توررېنت خاسلىقى ئۈچۈن ھۆججەتنى تىزىپ كۆرسەتكىلى بولمايدۇ"
+
+#: ../gtk/DetailsDialog.ui:816 ../gtk/MakeDialog.ui:67
+msgid "Files"
+msgstr "ھۆججەتلەر"
+
+#: ../gtk/DetailsDialog.ui:835 ../gtk/PrefsDialog.ui:383
+msgid "Speed"
+msgstr "سۈرئىتى"
+
+#: ../gtk/DetailsDialog.ui:857
+msgid "Honor global _limits"
+msgstr "ئومۇمىي چەكلىمىگە ھۆرمەت قىل(_L)"
+
+#: ../gtk/DetailsDialog.ui:873
+msgid "Limit _download speed ({speed_units}):"
+msgstr ""
+
+#: ../gtk/DetailsDialog.ui:888
+msgid "Limit _upload speed ({speed_units}):"
+msgstr ""
+
+#: ../gtk/DetailsDialog.ui:905 ../gtk/OptionsDialog.ui:145
+msgid "Torrent _priority:"
+msgstr "توررېنت مەرتىۋىسى(_P):"
+
+#: ../gtk/DetailsDialog.ui:972
+msgid "Seeding Limits"
+msgstr ""
+
+#: ../gtk/DetailsDialog.ui:996
+msgid "_Ratio:"
+msgstr "نىسبەت(_R):"
+
+#: ../gtk/DetailsDialog.ui:1010
+msgid "_Idle:"
+msgstr "بىكار(_I):"
+
+#: ../gtk/DetailsDialog.ui:1115
+msgid "Peer Connections"
+msgstr "Peer باغلىنىشلىرى"
+
+#: ../gtk/DetailsDialog.ui:1139
+msgid "_Maximum peers:"
+msgstr "ئەڭ چوڭ Peer سانى(_M):"
+
+#: ../gtk/DetailsDialog.ui:1176 ../gtk/MainWindow.ui:168 ../gtk/PrefsDialog.ui:1399
+msgid "Options"
+msgstr "تاللانما"
 
 #: ../gtk/Dialogs.cc:54
 #, c-format
@@ -710,67 +690,85 @@ msgstr[0] "بۇلارنىڭ بەزىلىرى تېخى تولۇق چۈشۈرۈل�
 msgid "_Delete"
 msgstr ""
 
-#: ../gtk/FileList.cc:581 ../gtk/Utils.cc:482
+#: ../gtk/EditTrackersDialog.ui:35 ../gtk/MessageLogWindow.cc:231
+msgid "_Save"
+msgstr ""
+
+#: ../gtk/EditTrackersDialog.ui:64
+msgid "Tracker Announce URLs"
+msgstr "ئىزچى ئېلان قىلغان URL لار"
+
+#: ../gtk/EditTrackersDialog.ui:88 ../gtk/MakeDialog.ui:313
+msgid ""
+"To add a backup URL, add it on the next line after a primary URL.\n"
+"To add a new primary URL, add it after a blank line."
+msgstr ""
+
+#: ../gtk/EditTrackersDialog.ui:123
+msgid "Also see Default Public Trackers in Edit > Preferences > Network"
+msgstr ""
+
+#: ../gtk/FileList.cc:588 ../gtk/Utils.cc:497
 msgid "High"
 msgstr "يۇقىرى"
 
-#: ../gtk/FileList.cc:585 ../gtk/Utils.cc:483
+#: ../gtk/FileList.cc:592 ../gtk/Utils.cc:498
 msgid "Normal"
 msgstr "نورمال"
 
-#: ../gtk/FileList.cc:589 ../gtk/Utils.cc:484
+#: ../gtk/FileList.cc:596 ../gtk/Utils.cc:499
 msgid "Low"
 msgstr "تۆۋەن"
 
-#: ../gtk/FileList.cc:768 ../gtk/Session.cc:623
+#: ../gtk/FileList.cc:775 ../gtk/Session.cc:623
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/FileList.cc:866 ../gtk/MessageLogWindow.cc:300
+#: ../gtk/FileList.cc:883 ../gtk/MessageLogWindow.cc:303
 msgid "Name"
 msgstr "ئاتى"
 
-#: ../gtk/FileList.cc:891
+#: ../gtk/FileList.cc:908
 msgid "Size"
 msgstr "چوڭلۇقى"
 
 #. add "progress" column
-#: ../gtk/FileList.cc:900
+#: ../gtk/FileList.cc:917
 msgid "Have"
 msgstr ""
 
 #. add "enabled" column
-#: ../gtk/FileList.cc:917
+#: ../gtk/FileList.cc:934
 msgid "Download"
 msgstr "چۈشۈرۈش"
 
 #. add priority column
-#: ../gtk/FileList.cc:934
+#: ../gtk/FileList.cc:951
 msgid "Priority"
 msgstr "مەرتىۋىسى"
 
-#: ../gtk/FilterBar.cc:283 ../gtk/FilterBar.cc:511
+#: ../gtk/FilterBar.cc:286 ../gtk/FilterBar.cc:513
 msgid "All"
 msgstr "ھەممىسى"
 
-#: ../gtk/FilterBar.cc:513
+#: ../gtk/FilterBar.cc:515
 msgid "Active"
 msgstr "ئاكتىپ"
 
-#: ../gtk/FilterBar.cc:518
+#: ../gtk/FilterBar.cc:520
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "تەكشۈرۈۋاتىدۇ"
 
-#: ../gtk/FilterBar.cc:519 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:436
+#: ../gtk/FilterBar.cc:521 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:449
 msgid "Error"
 msgstr "خاتالىق"
 
-#: ../gtk/FilterBar.cc:712
+#: ../gtk/FilterBar.cc:713 ../gtk/FilterBar.ui:14
 msgid "_Show:"
 msgstr "كۆرسەت(_S):"
 
-#: ../gtk/FilterBar.cc:713
+#: ../gtk/FilterBar.cc:714
 msgid "_Show {count:L} of:"
 msgstr ""
 
@@ -778,201 +776,237 @@ msgstr ""
 msgid "{disk_space} free"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:132
-msgid "Torrent"
-msgstr "توررېنتلار"
-
-#: ../gtk/MainWindow.cc:228
+#: ../gtk/MainWindow.cc:234
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:229
+#: ../gtk/MainWindow.cc:235
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:271
+#: ../gtk/MainWindow.cc:285
 msgid "Unlimited"
 msgstr "چەكسىز"
 
-#: ../gtk/MainWindow.cc:317
+#: ../gtk/MainWindow.cc:348
 msgid "Seed Forever"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:346
+#: ../gtk/MainWindow.cc:387
 msgid "Limit Download Speed"
 msgstr "چۈشۈرۈش تېزلىكىنىڭ چېكى"
 
-#: ../gtk/MainWindow.cc:350
+#: ../gtk/MainWindow.cc:388
 msgid "Limit Upload Speed"
 msgstr "يۈكلەش تېزلىكىنىڭ چېكى"
 
-#: ../gtk/MainWindow.cc:356
+#: ../gtk/MainWindow.cc:392
 msgid "Stop Seeding at Ratio"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:382
+#: ../gtk/MainWindow.cc:431
 msgid "Stop at Ratio ({ratio})"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:419
+#: ../gtk/MainWindow.cc:442
 msgid "Total Ratio"
 msgstr "جەمئىي نىسبەت"
 
-#: ../gtk/MainWindow.cc:420
+#: ../gtk/MainWindow.cc:443
 msgid "Session Ratio"
 msgstr "ئەڭگىمە نىسبىتى"
 
-#: ../gtk/MainWindow.cc:421
+#: ../gtk/MainWindow.cc:444
 msgid "Total Transfer"
 msgstr "جەمئىي يوللاش"
 
-#: ../gtk/MainWindow.cc:422
+#: ../gtk/MainWindow.cc:445
 msgid "Session Transfer"
 msgstr "ئەڭگىمە يوللىشى"
 
-#: ../gtk/MainWindow.cc:522 ../gtk/StatsDialog.cc:125
-msgid "Statistics"
-msgstr "ستاتىستىكا"
-
-#: ../gtk/MainWindow.cc:597 ../gtk/MainWindow.cc:618 ../gtk/TorrentCellRenderer.cc:182
+#: ../gtk/MainWindow.cc:595 ../gtk/MainWindow.cc:616 ../gtk/TorrentCellRenderer.cc:182
 msgid "Ratio: {ratio}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:603
+#: ../gtk/MainWindow.cc:601
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:611
+#: ../gtk/MainWindow.cc:609
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:644
+#: ../gtk/MainWindow.cc:642
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:647 ../gtk/TorrentCellRenderer.cc:140
+#: ../gtk/MainWindow.cc:645 ../gtk/TorrentCellRenderer.cc:140
 msgid "{upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:150
+#: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
+msgid "Open a torrent"
+msgstr "توررېنت ئاچىدۇ"
+
+#: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
+msgid "_Open"
+msgstr ""
+
+#: ../gtk/MainWindow.ui:37 ../gtk/transmission.ui:99 ../gtk/transmission.ui:368
+msgid "Start torrent"
+msgstr "توررېنتنى باشلايدۇ"
+
+#: ../gtk/MainWindow.ui:39 ../gtk/transmission.ui:97 ../gtk/transmission.ui:366
+msgid "_Start"
+msgstr "باشلا(_S)"
+
+#: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
+msgid "Pause torrent"
+msgstr "توررېنتنى ۋاقىتلىق توختىتىدۇ"
+
+#: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
+msgid "_Pause"
+msgstr "ۋاقىتلىق توختا(_P)"
+
+#: ../gtk/MainWindow.ui:68 ../gtk/transmission.ui:166 ../gtk/transmission.ui:435
+msgid "Remove torrent"
+msgstr "توررېنتنى چىقىرىۋېتىدۇ"
+
+#: ../gtk/MainWindow.ui:91 ../gtk/transmission.ui:84 ../gtk/transmission.ui:295
+msgid "Torrent properties"
+msgstr "توررېنت خاسلىقى"
+
+#: ../gtk/MainWindow.ui:94 ../gtk/transmission.ui:82 ../gtk/transmission.ui:293
+msgid "_Properties"
+msgstr ""
+
+#: ../gtk/MainWindow.ui:142
+msgid "Torrent"
+msgstr "توررېنتلار"
+
+#: ../gtk/MainWindow.ui:250 ../gtk/StatsDialog.ui:8
+msgid "Statistics"
+msgstr "ستاتىستىكا"
+
+#: ../gtk/MakeDialog.cc:151
 msgid "Creating '{path}'"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:163
+#: ../gtk/MakeDialog.cc:164
 msgid "Created '{path}'"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:169 ../libtransmission/file-posix.cc:275 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
+#: ../gtk/MakeDialog.cc:170 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
 msgid "Couldn't create '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:188
+#: ../gtk/MakeDialog.cc:189
 msgid "Scanned {file_size}"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:245 ../gtk/MakeDialog.cc:462
-msgid "New Torrent"
-msgstr "يېڭى توررېنت"
-
-#: ../gtk/MakeDialog.cc:262
-msgid "Creating torrent…"
-msgstr "توررېنت قۇرۇۋاتىدۇ…"
-
-#: ../gtk/MakeDialog.cc:357 ../gtk/MakeDialog.cc:507
+#: ../gtk/MakeDialog.cc:351 ../gtk/MakeDialog.cc:500 ../gtk/MakeDialog.ui:176
 msgid "No source selected"
 msgstr "مەنبە تاللانمىغان"
 
-#: ../gtk/MakeDialog.cc:476
+#: ../gtk/MakeDialog.ui:8 ../gtk/MakeProgressDialog.ui:8
+msgid "New Torrent"
+msgstr "يېڭى توررېنت"
+
+#: ../gtk/MakeDialog.ui:36
 msgid "_New"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:485
+#: ../gtk/MakeDialog.ui:91
 msgid "Sa_ve to:"
 msgstr "بۇ يەرگە ساقلا(_V):"
 
-#: ../gtk/MakeDialog.cc:489
+#: ../gtk/MakeDialog.ui:116
 msgid "Source F_older:"
 msgstr "مەنبە قىسقۇچ(_F):"
 
-#: ../gtk/MakeDialog.cc:498
+#: ../gtk/MakeDialog.ui:144
 msgid "Source _File:"
 msgstr "مەنبە ھۆججەت(_F):"
 
-#: ../gtk/MakeDialog.cc:514
+#: ../gtk/MakeDialog.ui:191
 msgid "Piece size:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:517
+#: ../gtk/MakeDialog.ui:242
 msgid "Properties"
 msgstr "خاسلىق"
 
-#: ../gtk/MakeDialog.cc:537
+#: ../gtk/MakeDialog.ui:268
 msgid "_Trackers:"
 msgstr "ئىزلىغۇچلار(_T):"
 
-#: ../gtk/MakeDialog.cc:539
+#: ../gtk/MakeDialog.ui:331
 msgid "Co_mment:"
 msgstr "ئىزاھات(_M):"
 
-#: ../gtk/MakeDialog.cc:546
+#: ../gtk/MakeDialog.ui:357
 msgid "_Source:"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:553
+#: ../gtk/MakeDialog.ui:383
 msgid "_Private torrent"
 msgstr "شەخسىي توررېنت(_P)"
 
-#: ../gtk/MessageLogWindow.cc:231
+#: ../gtk/MakeProgressDialog.ui:82
+msgid "Creating torrent…"
+msgstr "توررېنت قۇرۇۋاتىدۇ…"
+
+#: ../gtk/MessageLogWindow.cc:229
 msgid "Save Log"
 msgstr "خاتىرە ساقلاش"
 
-#: ../gtk/MessageLogWindow.cc:309
+#: ../gtk/MessageLogWindow.cc:312
 msgid "Message"
 msgstr "ئۇچۇر"
 
-#: ../gtk/MessageLogWindow.cc:318
+#: ../gtk/MessageLogWindow.cc:321
 msgid "Time"
 msgstr "ۋاقىت"
 
-#: ../gtk/MessageLogWindow.cc:435
+#: ../gtk/MessageLogWindow.cc:448
 msgid "Critical"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:437
+#: ../gtk/MessageLogWindow.cc:450
 msgid "Warning"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:439
+#: ../gtk/MessageLogWindow.cc:452
 msgid "Debug"
 msgstr "سازلاش"
 
-#: ../gtk/MessageLogWindow.cc:440
+#: ../gtk/MessageLogWindow.cc:453
 msgid "Trace"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:442
+#: ../gtk/MessageLogWindow.ui:7
 msgid "Message Log"
 msgstr "ئۇچۇر خاتىرىسى"
 
-#: ../gtk/MessageLogWindow.cc:460
+#: ../gtk/MessageLogWindow.ui:26
 msgid "Save _As"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:471
+#: ../gtk/MessageLogWindow.ui:41
 msgid "Clear"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:484
+#: ../gtk/MessageLogWindow.ui:66
 msgid "P_ause"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:493
+#: ../gtk/MessageLogWindow.ui:96
 msgid "Level"
 msgstr "دەرىجە"
 
@@ -996,403 +1030,333 @@ msgstr ""
 msgid "Torrent Added"
 msgstr "توررېنت قوشۇلدى"
 
-#: ../gtk/OptionsDialog.cc:180
+#: ../gtk/OptionsDialog.cc:215
 msgid "Torrent files"
 msgstr "توررېنت ھۆججەتلىرى"
 
-#: ../gtk/OptionsDialog.cc:185
+#: ../gtk/OptionsDialog.cc:220
 msgid "All files"
 msgstr "ھەممە ھۆججەتلەر"
 
-#: ../gtk/OptionsDialog.cc:208
-msgid "Torrent Options"
-msgstr "توررېنت تاللانمىسى"
-
-#: ../gtk/OptionsDialog.cc:227 ../gtk/OptionsDialog.cc:388 ../gtk/OptionsDialog.cc:448
-msgid "_Open"
-msgstr ""
-
-#: ../gtk/OptionsDialog.cc:241 ../gtk/PrefsDialog.cc:270
-msgid "Mo_ve torrent file to the trash"
-msgstr ""
-
-#: ../gtk/OptionsDialog.cc:242
-msgid "_Start when added"
-msgstr "قوشۇلغان ھامان باشلا(_S)"
-
-#. "torrent file" row
-#: ../gtk/OptionsDialog.cc:255
-msgid "_Torrent file:"
-msgstr "توررېنت ھۆججەت(_T):"
-
-#: ../gtk/OptionsDialog.cc:259
-msgid "Select Source File"
-msgstr "مەنبە ھۆججەت تاللاش"
-
-#: ../gtk/OptionsDialog.cc:268
-msgid "_Destination folder:"
-msgstr "نىشان قىسقۇچ(_D):"
-
-#: ../gtk/OptionsDialog.cc:273
-msgid "Select Destination Folder"
-msgstr "نىشان قىسقۇچ تاللاش"
-
-#: ../gtk/OptionsDialog.cc:383
+#: ../gtk/OptionsDialog.cc:357
 msgid "Open a Torrent"
 msgstr "توررېنت ئاچىدۇ"
 
-#: ../gtk/OptionsDialog.cc:399
+#: ../gtk/OptionsDialog.cc:373
 msgid "Show _options dialog"
 msgstr "تاللانما سۆزلەشكۈسىنى كۆرسەت(_O)"
 
-#: ../gtk/OptionsDialog.cc:443
-msgid "Open URL"
-msgstr "URL ئېچىش"
+#: ../gtk/OptionsDialog.ui:8
+msgid "Torrent Options"
+msgstr "توررېنت تاللانمىسى"
 
-#: ../gtk/OptionsDialog.cc:453
-msgid "Open torrent from URL"
-msgstr "توررېنتنى URL دىن ئاچىدۇ"
+#: ../gtk/OptionsDialog.ui:67
+msgid "_Torrent file:"
+msgstr "توررېنت ھۆججەت(_T):"
 
-#: ../gtk/OptionsDialog.cc:458
-msgid "_URL"
-msgstr "_URL"
+#: ../gtk/OptionsDialog.ui:82
+msgid "Select Source File"
+msgstr "مەنبە ھۆججەت تاللاش"
 
-#: ../gtk/PrefsDialog.cc:254
-msgctxt "Gerund"
-msgid "Adding"
-msgstr "قوشۇش"
+#: ../gtk/OptionsDialog.ui:93
+msgid "_Destination folder:"
+msgstr "نىشان قىسقۇچ(_D):"
 
-#: ../gtk/PrefsDialog.cc:257
-msgid "Automatically add torrent files _from:"
+#: ../gtk/OptionsDialog.ui:109
+msgid "Select Destination Folder"
+msgstr "نىشان قىسقۇچ تاللاش"
+
+#: ../gtk/OptionsDialog.ui:168
+msgid "_Start when added"
+msgstr "قوشۇلغان ھامان باشلا(_S)"
+
+#: ../gtk/OptionsDialog.ui:184 ../gtk/PrefsDialog.ui:471
+msgid "Mo_ve torrent file to the trash"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:264
-msgid "Show the Torrent Options _dialog"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:266
-msgid "_Start added torrents"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:272
-msgid "Save to _Location:"
-msgstr "ساقلايدىغان ئورۇن(_L):"
-
-#: ../gtk/PrefsDialog.cc:280
-msgid "Download Queue"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:282
-msgid "Ma_ximum active downloads:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:286
-msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:290
-msgid "Incomplete"
-msgstr "چالا"
-
-#: ../gtk/PrefsDialog.cc:294
-msgid "Append \"._part\" to incomplete files' names"
-msgstr "تاماملانمىغان ھۆججەتنىڭ ئاتىغا «._part» قوشۇلسۇن"
-
-#: ../gtk/PrefsDialog.cc:297
-msgid "Keep _incomplete torrents in:"
-msgstr "تاماملانمىغان توررېنتلارنى بۇ يەردە ساقلا(_I):"
-
-#: ../gtk/PrefsDialog.cc:305
-msgid "Call scrip_t when done downloading:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:324
-msgid "Limits"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:327
-msgid "Stop seeding at _ratio:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:335
-msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:343
-msgid "Call scrip_t when done seeding:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:362 ../gtk/PrefsDialog.cc:1188
-msgid "Desktop"
-msgstr "ئۈستەلئۈستى"
-
-#: ../gtk/PrefsDialog.cc:366
-msgid "_Inhibit hibernation when torrents are active"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:370
-msgid "Show Transmission icon in the _notification area"
-msgstr "ئۇقتۇرۇش رايونىدا Transmission سىنبەلگىسىنى كۆرسەتسۇن(_N)"
-
-#: ../gtk/PrefsDialog.cc:373
-msgid "Notification"
-msgstr "ئۇقتۇرۇش"
-
-#: ../gtk/PrefsDialog.cc:377
-msgid "Show a notification when torrents are a_dded"
-msgstr "توررېنتلار قوشۇلغاندا ئۇقتۇرۇش قىلسۇن(_A)"
-
-#: ../gtk/PrefsDialog.cc:381
-msgid "Show a notification when torrents _finish"
-msgstr "توررېنتلار تاماملانغاندا ئۇقتۇرۇش قىلسۇن(_F)"
-
-#: ../gtk/PrefsDialog.cc:385
-msgid "Play a _sound when torrents finish"
-msgstr "توررېنتلار تاماملانغاندا ئاۋاز چىقارسۇن(_S)"
-
-#: ../gtk/PrefsDialog.cc:416 ../gtk/PrefsDialog.cc:444
+#: ../gtk/PrefsDialog.cc:461 ../gtk/PrefsDialog.cc:489
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/PrefsDialog.cc:448
+#: ../gtk/PrefsDialog.cc:493
 msgid "Blocklist updated!"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:448
+#: ../gtk/PrefsDialog.cc:493
 msgid "Couldn't update blocklist"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:459
+#: ../gtk/PrefsDialog.cc:504
 msgid "Update Blocklist"
 msgstr "قارا تىزىمنى يېڭىلاش"
 
-#: ../gtk/PrefsDialog.cc:464
+#: ../gtk/PrefsDialog.cc:509
 msgid "Getting new blocklist…"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:486
+#: ../gtk/PrefsDialog.cc:532
 msgid "Allow encryption"
 msgstr "شىفىرلاشقا ئىجازەت"
 
-#: ../gtk/PrefsDialog.cc:487
+#: ../gtk/PrefsDialog.cc:533
 msgid "Prefer encryption"
 msgstr "ئامراق شىفىرلاش"
 
-#: ../gtk/PrefsDialog.cc:488
+#: ../gtk/PrefsDialog.cc:534
 msgid "Require encryption"
 msgstr "شىفىرلاشنى تەلەپ قىلىش"
 
-#: ../gtk/PrefsDialog.cc:505 ../gtk/PrefsDialog.cc:1186
-msgid "Privacy"
-msgstr "شەخسىيەت"
-
-#: ../gtk/PrefsDialog.cc:507
-msgid "_Encryption mode:"
-msgstr "شىفىرلاش ئۇسۇلى(_E):"
-
-#: ../gtk/PrefsDialog.cc:510
-msgid "Blocklist"
-msgstr "قارا تىزىم"
-
-#: ../gtk/PrefsDialog.cc:512
-msgid "Enable _blocklist:"
-msgstr "قارا تىزىمنى ئىناۋەتلىك قىل(_B):"
-
-#: ../gtk/PrefsDialog.cc:525
-msgid "_Update"
-msgstr "يېڭىلا(_U)"
-
-#: ../gtk/PrefsDialog.cc:536
-msgid "Enable _automatic updates"
-msgstr "ئاپتوماتىك يېڭىلاشنى ئىناۋەتلىك قىل(_A)"
-
-#: ../gtk/PrefsDialog.cc:691
-msgid "Remote Control"
-msgstr ""
-
-#. "enabled" checkbutton
-#: ../gtk/PrefsDialog.cc:694
-msgid "Allow _remote access"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:698
-msgid "_Open web client"
-msgstr "تور خېرىدارىنى ئاچ(_O)"
-
-#: ../gtk/PrefsDialog.cc:707
-msgid "HTTP _port:"
-msgstr "HTTP ئېغىزى(_P):"
-
-#. require authentication
-#: ../gtk/PrefsDialog.cc:710
-msgid "Use _authentication"
-msgstr "سالاھىيەت دەلىللىسۇن(_U)"
-
-#: ../gtk/PrefsDialog.cc:718
-msgid "_Username:"
-msgstr "ئىشلەتكۈچى ئاتى(_U):"
-
-#: ../gtk/PrefsDialog.cc:724
-msgid "Pass_word:"
-msgstr "ئىم(_W):"
-
-#. require authentication
-#: ../gtk/PrefsDialog.cc:727
-msgid "Only allow these IP a_ddresses:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:741
-msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr "IP لارنى مۇنداق يېزىشقا بولىدۇ 192.168.*.*"
-
-#: ../gtk/PrefsDialog.cc:759
-msgid "Addresses:"
-msgstr "ئادرېسلار:"
-
-#: ../gtk/PrefsDialog.cc:863
+#: ../gtk/PrefsDialog.cc:899
 msgid "Every Day"
 msgstr "ھەر كۈنى"
 
-#: ../gtk/PrefsDialog.cc:864
+#: ../gtk/PrefsDialog.cc:900
 msgid "Weekdays"
 msgstr "بىنەپتە كۈنلەر"
 
-#: ../gtk/PrefsDialog.cc:865
+#: ../gtk/PrefsDialog.cc:901
 msgid "Weekends"
 msgstr "ھەپتە ئاخىرى"
 
-#: ../gtk/PrefsDialog.cc:887
-msgid "Speed Limits"
-msgstr "تېزلىك چەكلىمىلىرى"
-
-#. checkbox to limit upload speed
-#: ../gtk/PrefsDialog.cc:892
-msgid "_Upload ({speed_units}):"
-msgstr ""
-
-#. checkbox to limit download speed
-#: ../gtk/PrefsDialog.cc:904
-msgid "_Download ({speed_units}):"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:917
-msgid "Alternative Speed Limits"
-msgstr "باشقا تېزلىك چەكلىمىلىرى"
-
-#: ../gtk/PrefsDialog.cc:928
-msgid "Override normal speed limits manually or at scheduled times"
-msgstr "قولدا ياكى پىلاندىكى ۋاقىت بويىچە تېزلىك چېكىنى قاپلاش"
-
-#. labels a spinbutton for alternate upload speed limits
-#: ../gtk/PrefsDialog.cc:938
-msgid "U_pload ({speed_units}):"
-msgstr ""
-
-#. labels a spinbutton for alternate download speed limits
-#: ../gtk/PrefsDialog.cc:944
-msgid "Do_wnload ({speed_units}):"
-msgstr ""
-
-#. label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
-#: ../gtk/PrefsDialog.cc:953
-msgid " _to "
-msgstr " _to "
-
-#: ../gtk/PrefsDialog.cc:960
-msgid "_Scheduled times:"
-msgstr "پىلان ۋاقىت(_S):"
-
-#: ../gtk/PrefsDialog.cc:967
-msgid "_On days:"
-msgstr "بۇ كۈنلەردە(_O):"
-
-#: ../gtk/PrefsDialog.cc:999 ../gtk/PrefsDialog.cc:1060 ../gtk/PrefsDialog.cc:1141
+#: ../gtk/PrefsDialog.cc:1019 ../gtk/PrefsDialog.ui:1250
 msgid "Status unknown"
 msgstr "ھالىتى نامەلۇم"
 
-#: ../gtk/PrefsDialog.cc:1021
+#: ../gtk/PrefsDialog.cc:1041
 msgid "Port is {markup_begin}closed{markup_end}"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1021
+#: ../gtk/PrefsDialog.cc:1041
 msgid "Port is {markup_begin}open{markup_end}"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1032
+#: ../gtk/PrefsDialog.cc:1052
 msgid "Testing TCP port…"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1054
+#: ../gtk/PrefsDialog.ui:8
+msgid "Transmission Preferences"
+msgstr "Transmission مايىللىقى"
+
+#: ../gtk/PrefsDialog.ui:23
+msgid "_Help"
+msgstr "ياردەم(_H)"
+
+#: ../gtk/PrefsDialog.ui:72
+msgid "Speed Limits"
+msgstr "تېزلىك چەكلىمىلىرى"
+
+#. Checkbox to limit upload speed
+#: ../gtk/PrefsDialog.ui:94
+msgid "_Upload ({speed_units}):"
+msgstr ""
+
+#. Checkbox to limit download speed
+#: ../gtk/PrefsDialog.ui:109
+msgid "_Download ({speed_units}):"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:172
+msgid "Alternative Speed Limits"
+msgstr "باشقا تېزلىك چەكلىمىلىرى"
+
+#: ../gtk/PrefsDialog.ui:216
+msgid "Override normal speed limits manually or at scheduled times"
+msgstr "قولدا ياكى پىلاندىكى ۋاقىت بويىچە تېزلىك چېكىنى قاپلاش"
+
+#. Labels a spinbutton for alternate upload speed limits
+#: ../gtk/PrefsDialog.ui:232
+msgid "U_pload ({speed_units}):"
+msgstr ""
+
+#. Labels a spinbutton for alternate download speed limits
+#: ../gtk/PrefsDialog.ui:246
+msgid "Do_wnload ({speed_units}):"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:258
+msgid "_Scheduled times:"
+msgstr "پىلان ۋاقىت(_S):"
+
+#: ../gtk/PrefsDialog.ui:275
+msgid "_On days:"
+msgstr "بۇ كۈنلەردە(_O):"
+
+#. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
+#: ../gtk/PrefsDialog.ui:330
+msgid "_to"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:400
+msgctxt "Gerund"
+msgid "Adding"
+msgstr "قوشۇش"
+
+#: ../gtk/PrefsDialog.ui:422
+msgid "Automatically add torrent files _from:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:437
+msgid "Show the Torrent Options _dialog"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:454
+msgid "_Start added torrents"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:490
+msgid "Save to _Location:"
+msgstr "ساقلايدىغان ئورۇن(_L):"
+
+#: ../gtk/PrefsDialog.ui:575
+msgid "Download Queue"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:599
+msgid "Ma_ximum active downloads:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:613
+msgid "Downloads sharing data in the last _N minutes are active:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:668
+msgid "Incomplete"
+msgstr "چالا"
+
+#: ../gtk/PrefsDialog.ui:690
+msgid "Append \"._part\" to incomplete files' names"
+msgstr "تاماملانمىغان ھۆججەتنىڭ ئاتىغا «._part» قوشۇلسۇن"
+
+#: ../gtk/PrefsDialog.ui:707
+msgid "Keep _incomplete torrents in:"
+msgstr "تاماملانمىغان توررېنتلارنى بۇ يەردە ساقلا(_I):"
+
+#: ../gtk/PrefsDialog.ui:722
+msgid "Call scrip_t when done downloading:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:776
+msgctxt "Gerund"
+msgid "Downloading"
+msgstr "چۈشۈۋاتقىنى"
+
+#: ../gtk/PrefsDialog.ui:794
+msgid "Limits"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:816
+msgid "Stop seeding at _ratio:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:831
+msgid "Stop seeding if idle for _N minutes:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:846
+msgid "Call scrip_t when done seeding:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:909
+msgctxt "Gerund"
+msgid "Seeding"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:927 ../gtk/PrefsDialog.ui:1131
+msgid "Privacy"
+msgstr "شەخسىيەت"
+
+#: ../gtk/PrefsDialog.ui:951
+msgid "_Encryption mode:"
+msgstr "شىفىرلاش ئۇسۇلى(_E):"
+
+#: ../gtk/PrefsDialog.ui:995
+msgid "Blocklist"
+msgstr "قارا تىزىم"
+
+#: ../gtk/PrefsDialog.ui:1017
+msgid "Enable _blocklist:"
+msgstr "قارا تىزىمنى ئىناۋەتلىك قىل(_B):"
+
+#: ../gtk/PrefsDialog.ui:1032
+msgid "Enable _automatic updates"
+msgstr "ئاپتوماتىك يېڭىلاشنى ئىناۋەتلىك قىل(_A)"
+
+#: ../gtk/PrefsDialog.ui:1084
+msgid "_Update"
+msgstr "يېڭىلا(_U)"
+
+#: ../gtk/PrefsDialog.ui:1149
 msgid "Listening Port"
 msgstr "تىڭشاش ئېغىزى"
 
-#: ../gtk/PrefsDialog.cc:1057
+#: ../gtk/PrefsDialog.ui:1173
 msgid "_Port used for incoming connections:"
 msgstr "كىرگەن باغلىنىش ئۈچۈن ئىشلىتىلىدىغان ئېغىز(_P):"
 
-#: ../gtk/PrefsDialog.cc:1064
-msgid "Te_st Port"
-msgstr "ئېغىز تەكشۈرۈش(_S)"
-
-#: ../gtk/PrefsDialog.cc:1073
+#: ../gtk/PrefsDialog.ui:1185
 msgid "Pick a _random port every time Transmission is started"
 msgstr "Transmission ھەر قېتىم قوزغالغاندا ئوخشىمىغان ئېغىز ئىشلەتسۇن(_R)"
 
-#: ../gtk/PrefsDialog.cc:1079
+#: ../gtk/PrefsDialog.ui:1202
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "مېنىڭ router دىكى UPnP ياكى NAT-PMP ئېغىز بۇراشنى ئىشلەتسۇن(_F)"
 
-#: ../gtk/PrefsDialog.cc:1082
+#: ../gtk/PrefsDialog.ui:1264
+msgid "Te_st Port"
+msgstr "ئېغىز تەكشۈرۈش(_S)"
+
+#: ../gtk/PrefsDialog.ui:1306
 msgid "Peer Limits"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1084
+#: ../gtk/PrefsDialog.ui:1330
 msgid "Maximum peers per _torrent:"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1085
+#: ../gtk/PrefsDialog.ui:1344
 msgid "Maximum peers _overall:"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1093
+#: ../gtk/PrefsDialog.ui:1421
 msgid "Enable _uTP for peer communication"
 msgstr "peer ئالاقىسى ئۈچۈن _uTP ئىشلەتسۇن"
 
-#: ../gtk/PrefsDialog.cc:1094
+#: ../gtk/PrefsDialog.ui:1425
 msgid "uTP is a tool for reducing network congestion."
 msgstr "uTP - تور قىستاڭچىلىقىنى ئازايتىدىغان قورالدۇر."
 
-#: ../gtk/PrefsDialog.cc:1098
+#: ../gtk/PrefsDialog.ui:1439
 msgid "Use PE_X to find more peers"
 msgstr "تېخىمۇ كوپ peer تېپىش ئۈچۈن PEX ئىشلەتسۇن(_X)"
 
-#: ../gtk/PrefsDialog.cc:1099
+#: ../gtk/PrefsDialog.ui:1443
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr "PEX بولسا سىز باغلانغان peer بىلەن peer تىزىمىنى ئالماشتۇرىدىغان قورالدۇر."
 
-#: ../gtk/PrefsDialog.cc:1102
+#: ../gtk/PrefsDialog.ui:1457
 msgid "Use _DHT to find more peers"
 msgstr "تېخىمۇ كوپ peer تېپىش ئۈچۈن DHT ئىشلەتسۇن(_D)"
 
-#: ../gtk/PrefsDialog.cc:1103
+#: ../gtk/PrefsDialog.ui:1461
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHT بولسا ئىزچى ئىشلەتمەي peer تاپىدىغان قورالدۇر."
 
-#: ../gtk/PrefsDialog.cc:1106
+#: ../gtk/PrefsDialog.ui:1475
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1107
+#: ../gtk/PrefsDialog.ui:1479
 msgid "LPD is a tool for finding peers on your local network."
 msgstr "DHT بولسا يەرلىك توردىكى peer لارنى تاپىدىغان قورالدۇر."
 
-#: ../gtk/PrefsDialog.cc:1111
+#: ../gtk/PrefsDialog.ui:1514
 msgid "Default Public Trackers"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1115
+#: ../gtk/PrefsDialog.ui:1546
 msgid ""
 "Trackers to use on all public torrents.\n"
 "\n"
@@ -1400,65 +1364,115 @@ msgid ""
 "To add a new primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1161
-msgid "Transmission Preferences"
-msgstr "Transmission مايىللىقى"
-
-#: ../gtk/PrefsDialog.cc:1175
-msgid "_Help"
-msgstr "ياردەم(_H)"
-
-#: ../gtk/PrefsDialog.cc:1184
-msgctxt "Gerund"
-msgid "Downloading"
-msgstr "چۈشۈۋاتقىنى"
-
-#: ../gtk/PrefsDialog.cc:1185
-msgctxt "Gerund"
-msgid "Seeding"
-msgstr ""
-
-#: ../gtk/PrefsDialog.cc:1187
+#: ../gtk/PrefsDialog.ui:1575
 msgid "Network"
 msgstr "تور"
 
-#: ../gtk/PrefsDialog.cc:1189
+#: ../gtk/PrefsDialog.ui:1593 ../gtk/PrefsDialog.ui:1757
+msgid "Desktop"
+msgstr "ئۈستەلئۈستى"
+
+#: ../gtk/PrefsDialog.ui:1615
+msgid "_Inhibit hibernation when torrents are active"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:1632
+msgid "Show Transmission icon in the _notification area"
+msgstr "ئۇقتۇرۇش رايونىدا Transmission سىنبەلگىسىنى كۆرسەتسۇن(_N)"
+
+#: ../gtk/PrefsDialog.ui:1670
+msgid "Notification"
+msgstr "ئۇقتۇرۇش"
+
+#: ../gtk/PrefsDialog.ui:1692
+msgid "Show a notification when torrents are a_dded"
+msgstr "توررېنتلار قوشۇلغاندا ئۇقتۇرۇش قىلسۇن(_A)"
+
+#: ../gtk/PrefsDialog.ui:1709
+msgid "Show a notification when torrents _finish"
+msgstr "توررېنتلار تاماملانغاندا ئۇقتۇرۇش قىلسۇن(_F)"
+
+#: ../gtk/PrefsDialog.ui:1726
+msgid "Play a _sound when torrents finish"
+msgstr "توررېنتلار تاماملانغاندا ئاۋاز چىقارسۇن(_S)"
+
+#: ../gtk/PrefsDialog.ui:1775
+msgid "Remote Control"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:1803
+msgid "Allow _remote access"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:1819
+msgid "_Open web client"
+msgstr "تور خېرىدارىنى ئاچ(_O)"
+
+#: ../gtk/PrefsDialog.ui:1843
+msgid "HTTP _port:"
+msgstr "HTTP ئېغىزى(_P):"
+
+#: ../gtk/PrefsDialog.ui:1855
+msgid "Use _authentication"
+msgstr "سالاھىيەت دەلىللىسۇن(_U)"
+
+#: ../gtk/PrefsDialog.ui:1874
+msgid "_Username:"
+msgstr "ئىشلەتكۈچى ئاتى(_U):"
+
+#: ../gtk/PrefsDialog.ui:1888
+msgid "Pass_word:"
+msgstr "ئىم(_W):"
+
+#: ../gtk/PrefsDialog.ui:1900
+msgid "Only allow these IP a_ddresses:"
+msgstr ""
+
+#: ../gtk/PrefsDialog.ui:1921
+msgid "Addresses:"
+msgstr "ئادرېسلار:"
+
+#: ../gtk/PrefsDialog.ui:2031
+msgid "IP addresses may use wildcards, such as 192.168.*.*"
+msgstr "IP لارنى مۇنداق يېزىشقا بولىدۇ 192.168.*.*"
+
+#: ../gtk/PrefsDialog.ui:2060
 msgid "Remote"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:77
+#: ../gtk/RelocateDialog.cc:80
 msgid "Moving '{torrent_name}'"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:87
+#: ../gtk/RelocateDialog.cc:90
 msgid "Couldn't move torrent"
 msgstr "توررېنتنى يۆتكىگىلى بولمىدى"
 
-#: ../gtk/RelocateDialog.cc:122
+#: ../gtk/RelocateDialog.cc:125
 msgid "This may take a moment…"
 msgstr "بۇنىڭغا ئازراق ۋاقىت كېتىشى مۇمكىن…"
 
-#: ../gtk/RelocateDialog.cc:155 ../gtk/RelocateDialog.cc:181
+#: ../gtk/RelocateDialog.ui:8
 msgid "Set Torrent Location"
 msgstr "توررېنت ئورنىنى بېكىتىش"
 
-#: ../gtk/RelocateDialog.cc:173
+#: ../gtk/RelocateDialog.ui:36
 msgid "_Apply"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:179
+#: ../gtk/RelocateDialog.ui:67
 msgid "Location"
 msgstr "ئورنى"
 
-#: ../gtk/RelocateDialog.cc:203
+#: ../gtk/RelocateDialog.ui:92
 msgid "Torrent _location:"
 msgstr "توررېنت ئورنى(_L):"
 
-#: ../gtk/RelocateDialog.cc:207
+#: ../gtk/RelocateDialog.ui:117
 msgid "_Move from the current folder"
 msgstr "نۆۋەتتىكى قىسقۇچتىن يۆتكىۋەت(_M)"
 
-#: ../gtk/RelocateDialog.cc:210
+#: ../gtk/RelocateDialog.ui:134
 msgid "Local data is _already there"
 msgstr "يەرلىك سانلىق-مەلۇمات بۇ يەردە(_A)"
 
@@ -1480,37 +1494,37 @@ msgstr ""
 msgid "Allowing desktop hibernation"
 msgstr "ئۈستەلئۈستى ئۈچەكىگە ئىجازەت"
 
-#: ../gtk/StatsDialog.cc:67
+#: ../gtk/StatsDialog.cc:66
 msgid "Started {count:L} time"
 msgid_plural "Started {count:L} times"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/StatsDialog.cc:99
+#: ../gtk/StatsDialog.cc:98
 msgid "Reset your statistics?"
 msgstr "ستاتىستىكىلارنى ئەسلىگە قايتۇرسۇنمۇ؟"
 
-#: ../gtk/StatsDialog.cc:101 ../gtk/StatsDialog.cc:138
+#: ../gtk/StatsDialog.cc:100 ../gtk/StatsDialog.ui:22
 msgid "_Reset"
 msgstr "ئەسلىگە قايتۇر(_R)"
 
-#: ../gtk/StatsDialog.cc:103
+#: ../gtk/StatsDialog.cc:102
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
 msgstr "بۇ ستاتىستىكىلار پەقەتلا بىر ئۇچۇردۇر. ئۇلارنى ئەسلىگە قايتۇرۇۋەتسىڭىز BitTorrent ئىزلىغۇچلىرى خاتىرىلىگەن ستاتىستىكىلارغا تەسىر قىلمايدۇ."
 
-#: ../gtk/StatsDialog.cc:143
+#: ../gtk/StatsDialog.ui:68
 msgid "Current Session"
 msgstr "نۆۋەتتىكى ئەڭگىمە"
 
-#: ../gtk/StatsDialog.cc:153 ../gtk/StatsDialog.cc:174
+#: ../gtk/StatsDialog.ui:142 ../gtk/StatsDialog.ui:300
 msgid "Ratio:"
 msgstr "نىسبەت:"
 
-#: ../gtk/StatsDialog.cc:156 ../gtk/StatsDialog.cc:177
+#: ../gtk/StatsDialog.ui:167 ../gtk/StatsDialog.ui:325
 msgid "Duration:"
 msgstr "ۋاقتى:"
 
-#: ../gtk/StatsDialog.cc:159
+#: ../gtk/StatsDialog.ui:212
 msgid "Total"
 msgstr "جەمئىي"
 
@@ -1557,7 +1571,7 @@ msgstr "توختىتىلدى"
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:194 ../libtransmission/torrent.cc:533
+#: ../gtk/TorrentCellRenderer.cc:194 ../libtransmission/torrent.cc:532
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
@@ -1600,172 +1614,184 @@ msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:40
+#: ../gtk/TorrentUrlChooserDialog.ui:8
+msgid "Open URL"
+msgstr "URL ئېچىش"
+
+#: ../gtk/TorrentUrlChooserDialog.ui:64
+msgid "Open torrent from URL"
+msgstr "توررېنتنى URL دىن ئاچىدۇ"
+
+#: ../gtk/TorrentUrlChooserDialog.ui:88
+msgid "_URL"
+msgstr "_URL"
+
+#: ../gtk/Utils.cc:39
 msgid "KiB"
 msgstr "KiB"
 
-#: ../gtk/Utils.cc:41
+#: ../gtk/Utils.cc:40
 msgid "MiB"
 msgstr "MiB"
 
-#: ../gtk/Utils.cc:42
+#: ../gtk/Utils.cc:41
 msgid "GiB"
 msgstr "GiB"
 
-#: ../gtk/Utils.cc:43
+#: ../gtk/Utils.cc:42
 msgid "TiB"
 msgstr "TiB"
 
-#: ../gtk/Utils.cc:46
+#: ../gtk/Utils.cc:45
 msgid "kB"
 msgstr "كىلوبايت"
 
-#: ../gtk/Utils.cc:47
+#: ../gtk/Utils.cc:46
 msgid "MB"
 msgstr "مېگابايت"
 
-#: ../gtk/Utils.cc:48
+#: ../gtk/Utils.cc:47
 msgid "GB"
 msgstr "گىگابايت"
 
-#: ../gtk/Utils.cc:49
+#: ../gtk/Utils.cc:48
 msgid "TB"
 msgstr "تېرابايت"
 
-#: ../gtk/Utils.cc:52
+#: ../gtk/Utils.cc:51
 msgid "kB/s"
 msgstr "كىلوبايت/سېكۇنت"
 
-#: ../gtk/Utils.cc:53
+#: ../gtk/Utils.cc:52
 msgid "MB/s"
 msgstr "مېگابايت/سېكۇنت"
 
-#: ../gtk/Utils.cc:54
+#: ../gtk/Utils.cc:53
 msgid "GB/s"
 msgstr "گىگابايت/سېكۇنت"
 
-#: ../gtk/Utils.cc:55
+#: ../gtk/Utils.cc:54
 msgid "TB/s"
 msgstr "تېرابايت/سېكۇنت"
 
-#: ../gtk/Utils.cc:100
+#: ../gtk/Utils.cc:99
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:107
+#: ../gtk/Utils.cc:106
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:114
+#: ../gtk/Utils.cc:113
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:121
+#: ../gtk/Utils.cc:120
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:125 ../gtk/Utils.cc:156 ../gtk/Utils.cc:183 ../gtk/Utils.cc:216
+#: ../gtk/Utils.cc:124 ../gtk/Utils.cc:155 ../gtk/Utils.cc:182 ../gtk/Utils.cc:215
 msgid "now"
 msgstr ""
 
-#: ../gtk/Utils.cc:132
+#: ../gtk/Utils.cc:131
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:138
+#: ../gtk/Utils.cc:137
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:145
+#: ../gtk/Utils.cc:144
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:152
+#: ../gtk/Utils.cc:151
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:165
+#: ../gtk/Utils.cc:164
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:170
+#: ../gtk/Utils.cc:169
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:175
+#: ../gtk/Utils.cc:174
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:180
+#: ../gtk/Utils.cc:179
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:191
+#: ../gtk/Utils.cc:190
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:198
+#: ../gtk/Utils.cc:197
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:205
+#: ../gtk/Utils.cc:204
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:212
+#: ../gtk/Utils.cc:211
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:252
+#: ../gtk/Utils.cc:251
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
 msgstr ""
 
-#: ../gtk/Utils.cc:263
+#: ../gtk/Utils.cc:262
 msgid "Couldn't open torrent"
 msgstr ""
 
-#: ../gtk/Utils.cc:546 ../libtransmission/announcer.cc:1203 ../libtransmission/announcer.cc:1435
+#: ../gtk/Utils.cc:574 ../libtransmission/announcer.cc:1203 ../libtransmission/announcer.cc:1435
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:552
+#: ../gtk/Utils.cc:580
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:557
+#: ../gtk/Utils.cc:585
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1823,6 +1849,182 @@ msgstr ""
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
 msgstr ""
+
+#: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
+msgid "Open _URL…"
+msgstr "_URL ئاچ…"
+
+#: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
+msgid "Open URL…"
+msgstr "URL ئا…"
+
+#: ../gtk/transmission.ui:27
+msgid "_New…"
+msgstr "يېڭى(_N)…"
+
+#: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
+msgid "_Start All"
+msgstr "ھەممىنى باشلا(_S)"
+
+#: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
+msgid "Start all torrents"
+msgstr "ھەممە توررېنتلارنى باشلايدۇ"
+
+#: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
+msgid "_Pause All"
+msgstr "ھەممىنى ۋاقىتلىق توختات(_P)"
+
+#: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
+msgid "Pause all torrents"
+msgstr "ھەممە توررېنتلارنى ۋاقىتلىق توختىتىدۇ"
+
+#: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
+msgid "_Quit"
+msgstr "چېكىن(_Q)"
+
+#: ../gtk/transmission.ui:59
+msgid "Select _All"
+msgstr "ھەممىنى تاللا(_A)"
+
+#: ../gtk/transmission.ui:64
+msgid "Dese_lect All"
+msgstr "ھەممىنى تاللىما(_L)"
+
+#: ../gtk/transmission.ui:72
+msgid "_Preferences"
+msgstr ""
+
+#: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
+msgid "Open Fold_er"
+msgstr "قىسقۇچ ئاچ(_E)"
+
+#: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
+msgid "Start _Now"
+msgstr "ھازىرلا باشلا(_N)"
+
+#: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
+msgid "Start torrent now"
+msgstr "توررېنتنى ھازىرلا باشلايدۇ"
+
+#: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
+msgid "Ask Tracker for _More Peers"
+msgstr "ئىزچىدىن تېخىمۇ كوپ Peer سورا(_M)"
+
+#: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
+msgid "Move to _Top"
+msgstr "ئۈستىگە يۆتكە(_T)"
+
+#: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
+msgid "Move _Up"
+msgstr "يۇقىرىغا(_U)"
+
+#: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
+msgid "Move _Down"
+msgstr "تۆۋەنگە(_D)"
+
+#: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
+msgid "Move to _Bottom"
+msgstr "ئاستىغا يۆتكە(_B)"
+
+#: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
+msgid "Set _Location…"
+msgstr "يەرلىك تەڭشەك…(_L)…"
+
+#: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
+msgid "_Verify Local Data"
+msgstr "يەرلىك سانلىق مەلۇماتلارنى تەكشۈر(_V)"
+
+#: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
+msgid "Copy _Magnet Link to Clipboard"
+msgstr "ماگنىتلىق ئۇلانما(Magnet Link)نى چاپلاش تاختىسىغا كۆچۈر(_M)"
+
+#: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
+msgid "_Delete Files and Remove"
+msgstr "ھۆججەتلەرنى ئۆچۈر ۋە چىقىرىۋەت(_D)"
+
+#: ../gtk/transmission.ui:182
+msgid "_Compact View"
+msgstr "ئىخچام كۆرۈنۈش(_C)"
+
+#: ../gtk/transmission.ui:189
+msgid "_Toolbar"
+msgstr "قورال بالداق(_T)"
+
+#: ../gtk/transmission.ui:193
+msgid "_Filterbar"
+msgstr "سۈزگۈچ بالدىقى(_F)"
+
+#: ../gtk/transmission.ui:197
+msgid "_Statusbar"
+msgstr "ھالەت بالداق(_S)"
+
+#: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
+msgid "Sort by _Activity"
+msgstr "پائالىيىتى بويىچە تەرتىپلە(_A)"
+
+#: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
+msgid "Sort by A_ge"
+msgstr "يېشى بويىچە تەرتىپلە (_G)"
+
+#: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
+msgid "Sort by _Name"
+msgstr "ئاتى بويىچە تەرتىپلە(_N)"
+
+#: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
+msgid "Sort by _Progress"
+msgstr "ئىلگىرىلىشى بويىچە تەرتىپلە(_P)"
+
+#: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
+msgid "Sort by _Queue"
+msgstr "قاتار بويىچە تەرتىپلە(_Q)"
+
+#: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
+msgid "Sort by Rati_o"
+msgstr "مۇناسىۋىتى بويىچە تەرتىپلە (_O)"
+
+#: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
+msgid "Sort by Si_ze"
+msgstr "چوڭلۇقى بويىچە تەرتىپلە (_G)"
+
+#: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
+msgid "Sort by Stat_e"
+msgstr "ھالىتى بويىچە تەرتىپلە (_Z)"
+
+#: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
+msgid "Sort by Time _Left"
+msgstr "قېلىپ قالغان ۋاقىت بويىچە تەرتىپلە (_L)"
+
+#: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
+msgid "Re_verse Sort Order"
+msgstr "تەرتىپلەش تەرتىپىنى تەتۈر قىل(_V)"
+
+#: ../gtk/transmission.ui:259
+msgid "Message _Log"
+msgstr "ئۇچۇر خاتىرىسى(_L)"
+
+#: ../gtk/transmission.ui:263
+msgid "_Statistics"
+msgstr "ستاتىستىكا(_S)"
+
+#: ../gtk/transmission.ui:269
+msgid "_Donate"
+msgstr "ئىئانە(_D)"
+
+#: ../gtk/transmission.ui:276
+msgid "_Contents"
+msgstr "مەزمۇنلار(_C)"
+
+#: ../gtk/transmission.ui:282
+msgid "_About"
+msgstr ""
+
+#: ../gtk/transmission.ui:451
+msgid "_Show Transmission"
+msgstr "Transmission نى كۆرسەت(_S)"
+
+#: ../gtk/transmission.ui:486
+msgid "Enable Alternative Speed _Limits"
+msgstr "باشقا تېزلىك لىمىتىنى ئىناۋەتلىك قىل(_L)"
 
 #: ../libtransmission/announcer-http.cc:291
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2003,35 +2205,35 @@ msgstr ""
 msgid "Added '{entry}' to host whitelist"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1068
+#: ../libtransmission/rpc-server.cc:1067
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1083
+#: ../libtransmission/rpc-server.cc:1082
 msgid "Serving RPC and Web requests on {address}"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1088
+#: ../libtransmission/rpc-server.cc:1087
 msgid "Whitelist enabled"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1093
+#: ../libtransmission/rpc-server.cc:1092
 msgid "Password required"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1099
+#: ../libtransmission/rpc-server.cc:1098
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1347
+#: ../libtransmission/rpcimpl.cc:1346
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1387
+#: ../libtransmission/rpcimpl.cc:1386
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1523
+#: ../libtransmission/rpcimpl.cc:1522
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr ""
 
@@ -2043,23 +2245,23 @@ msgstr ""
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr ""
 
-#: ../libtransmission/session.cc:750
+#: ../libtransmission/session.cc:749
 msgid "Transmission version {version} starting"
 msgstr ""
 
-#: ../libtransmission/session.cc:1517
+#: ../libtransmission/session.cc:1515
 msgid "Time to turn off turtle mode"
 msgstr ""
 
-#: ../libtransmission/session.cc:1517
+#: ../libtransmission/session.cc:1515
 msgid "Time to turn on turtle mode"
 msgstr ""
 
-#: ../libtransmission/session.cc:1907
+#: ../libtransmission/session.cc:1905
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:2013
+#: ../libtransmission/session.cc:2011
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
@@ -2075,27 +2277,27 @@ msgstr[1] ""
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:126
+#: ../libtransmission/torrent.cc:125
 msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:484
+#: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:491
+#: ../libtransmission/torrent.cc:490
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:633
+#: ../libtransmission/torrent.cc:632
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "سانلىق-مەلۇمات يوق! قوزغاتقۇچىڭىز چېتىلغانمۇ ياكى «ئورۇن بېكىتىش» نى ئىشلىتىڭ. قايتا چۈشۈرۈش ئۈچۈن، توررېنتنى چىقىرىۋېتىپ قايتا قوشۇڭ."
 
-#: ../libtransmission/torrent.cc:1428
+#: ../libtransmission/torrent.cc:1427
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1548
+#: ../libtransmission/torrent.cc:1547
 msgid "Pausing torrent"
 msgstr ""
 
@@ -2284,6 +2486,9 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 
+#~ msgid " _to "
+#~ msgstr " _to "
+
 #, c-format
 #~ msgid "%'d Torrent Properties"
 #~ msgstr "%'d توررېنت خاسلىقى"
@@ -2411,9 +2616,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>TCP ئېغىزىنى سىناۋاتىدۇ…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "ئىزچىدىن تېخىمۇ كوپ Peer سورا(_M)"
-
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
 #~ msgstr "قارا تىزىم «%s» دا %zu كىرگۈ بار"
@@ -2440,9 +2642,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "تولۇق"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "ماگنىتلىق ئۇلانما(Magnet Link)نى چاپلاش تاختىسىغا كۆچۈر(_M)"
 
 #~ msgid "Copyright (c) The Transmission Project"
 #~ msgstr "نەشر ھوقۇقى (c) Transmission قۇرۇلۇشىغا تەۋە"
@@ -2514,9 +2713,6 @@ msgstr[1] ""
 #~ msgid "Creating \"%s\""
 #~ msgstr "قۇرۇۋاتقىنى «%s»"
 
-#~ msgid "Dese_lect All"
-#~ msgstr "ھەممىنى تاللىما(_L)"
-
 #, c-format
 #~ msgid "Do_wnload (%s):"
 #~ msgstr "چۈشۈرۈش(_W) (%s):"
@@ -2527,9 +2723,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Down: %1$s, Up: %2$s"
 #~ msgstr "چۈشۈرگىنى: %1$s, يوللىغىنى: %2$s"
-
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "باشقا تېزلىك لىمىتىنى ئىناۋەتلىك قىل(_L)"
 
 #~ msgid "Error opening torrent"
 #~ msgstr "توررېنت ئېچىشتا خاتالىق كۆرۈلدى"
@@ -2595,26 +2788,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "يەرلىك ئادرېس «%s»"
 
-#~ msgid "Message _Log"
-#~ msgstr "ئۇچۇر خاتىرىسى(_L)"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr ".torrent ھۆججەتنى ئەخلەتخانىغا تاشلا(_V)"
 
 #~ msgid "Monday"
 #~ msgstr "دۈشەنبە"
-
-#~ msgid "Move _Down"
-#~ msgstr "تۆۋەنگە(_D)"
-
-#~ msgid "Move _Up"
-#~ msgstr "يۇقىرىغا(_U)"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "ئاستىغا يۆتكە(_B)"
-
-#~ msgid "Move to _Top"
-#~ msgstr "ئۈستىگە يۆتكە(_T)"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2622,24 +2800,6 @@ msgstr[1] ""
 
 #~ msgid "Not a regular file"
 #~ msgstr "ئادەتتىكى ھۆججەت ئەمەس"
-
-#~ msgid "Open Fold_er"
-#~ msgstr "قىسقۇچ ئاچ(_E)"
-
-#~ msgid "Open URL…"
-#~ msgstr "URL ئا…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "_URL ئاچ…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "توررېنت ئاچىدۇ"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "ھەممە توررېنتلارنى ۋاقىتلىق توختىتىدۇ"
-
-#~ msgid "Pause torrent"
-#~ msgstr "توررېنتنى ۋاقىتلىق توختىتىدۇ"
 
 #, c-format
 #~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
@@ -2682,12 +2842,6 @@ msgstr[1] ""
 #~ msgid "Ratio: %s"
 #~ msgstr "نىسبەت: %s"
 
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "تەرتىپلەش تەرتىپىنى تەتۈر قىل(_V)"
-
-#~ msgid "Remove torrent"
-#~ msgstr "توررېنتنى چىقىرىۋېتىدۇ"
-
 #~ msgid "Saturday"
 #~ msgstr "شەنبە"
 
@@ -2699,54 +2853,9 @@ msgstr[1] ""
 #~ msgid "Scanned %s"
 #~ msgstr "ئىزدەلگىنى %s"
 
-#~ msgid "Select _All"
-#~ msgstr "ھەممىنى تاللا(_A)"
-
-#~ msgid "Set _Location…"
-#~ msgstr "يەرلىك تەڭشەك…(_L)…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "نامەلۇم توررېنت «%s» نى ئۆتكۈزۈۋېتىش"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "يېشى بويىچە تەرتىپلە (_G)"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "مۇناسىۋىتى بويىچە تەرتىپلە (_O)"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "چوڭلۇقى بويىچە تەرتىپلە (_G)"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "ھالىتى بويىچە تەرتىپلە (_Z)"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "قېلىپ قالغان ۋاقىت بويىچە تەرتىپلە (_L)"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "پائالىيىتى بويىچە تەرتىپلە(_A)"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "ئاتى بويىچە تەرتىپلە(_N)"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "ئىلگىرىلىشى بويىچە تەرتىپلە(_P)"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "قاتار بويىچە تەرتىپلە(_Q)"
-
-#~ msgid "Start _Now"
-#~ msgstr "ھازىرلا باشلا(_N)"
-
-#~ msgid "Start all torrents"
-#~ msgstr "ھەممە توررېنتلارنى باشلايدۇ"
-
-#~ msgid "Start torrent"
-#~ msgstr "توررېنتنى باشلايدۇ"
-
-#~ msgid "Start torrent now"
-#~ msgstr "توررېنتنى ھازىرلا باشلايدۇ"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2796,9 +2905,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "توررېنت قۇرغۇچ ھۆججەت «%s» نى ئۆتكۈزۈۋەتتى: %s"
-
-#~ msgid "Torrent properties"
-#~ msgstr "توررېنت خاسلىقى"
 
 #, c-format
 #~ msgid "Tracker error: \"%s\""
@@ -2854,18 +2960,6 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "چارشەنبە"
 
-#~ msgid "_Compact View"
-#~ msgstr "ئىخچام كۆرۈنۈش(_C)"
-
-#~ msgid "_Contents"
-#~ msgstr "مەزمۇنلار(_C)"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "ھۆججەتلەرنى ئۆچۈر ۋە چىقىرىۋەت(_D)"
-
-#~ msgid "_Donate"
-#~ msgstr "ئىئانە(_D)"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "چۈشۈرۈش(_D) (%s):"
@@ -2873,44 +2967,11 @@ msgstr[1] ""
 #~ msgid "_File"
 #~ msgstr "ھۆججەت(_F)"
 
-#~ msgid "_Filterbar"
-#~ msgstr "سۈزگۈچ بالدىقى(_F)"
-
-#~ msgid "_New…"
-#~ msgstr "يېڭى(_N)…"
-
-#~ msgid "_Pause"
-#~ msgstr "ۋاقىتلىق توختا(_P)"
-
-#~ msgid "_Pause All"
-#~ msgstr "ھەممىنى ۋاقىتلىق توختات(_P)"
-
 #~ msgid "_Queue"
 #~ msgstr "قاتار(_Q)"
 
-#~ msgid "_Quit"
-#~ msgstr "چېكىن(_Q)"
-
-#~ msgid "_Show Transmission"
-#~ msgstr "Transmission نى كۆرسەت(_S)"
-
 #~ msgid "_Sort Torrents By"
 #~ msgstr "توررېنت بويىچە تەرتىپلە(_S)"
-
-#~ msgid "_Start"
-#~ msgstr "باشلا(_S)"
-
-#~ msgid "_Start All"
-#~ msgstr "ھەممىنى باشلا(_S)"
-
-#~ msgid "_Statistics"
-#~ msgstr "ستاتىستىكا(_S)"
-
-#~ msgid "_Statusbar"
-#~ msgstr "ھالەت بالداق(_S)"
-
-#~ msgid "_Toolbar"
-#~ msgstr "قورال بالداق(_T)"
 
 #~ msgid "_Torrent"
 #~ msgstr "توررېنت(_T)"
@@ -2918,9 +2979,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "يۈكلەش(_U) (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "يەرلىك سانلىق مەلۇماتلارنى تەكشۈر(_V)"
 
 #~ msgid "_View"
 #~ msgstr "كۆرۈنۈش(_V)"
