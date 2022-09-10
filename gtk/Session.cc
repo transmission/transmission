@@ -65,7 +65,7 @@ public:
         : model_(model)
     {
         model_.get_sort_column_id(sort_column_id_, sort_type_);
-        model_.set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, Gtk::SORT_ASCENDING);
+        model_.set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, TR_GTK_SORT_TYPE(ASCENDING));
     }
 
     ~ScopedModelSortBlocker()
@@ -78,7 +78,7 @@ public:
 private:
     Gtk::TreeSortable& model_;
     int sort_column_id_ = -1;
-    Gtk::SortType sort_type_ = Gtk::SORT_ASCENDING;
+    Gtk::SortType sort_type_ = TR_GTK_SORT_TYPE(ASCENDING);
 };
 
 } // namespace
@@ -146,7 +146,7 @@ private:
     void on_file_changed_in_watchdir(
         Glib::RefPtr<Gio::File> const& file,
         Glib::RefPtr<Gio::File> const& other_type,
-        Gio::FileMonitorEvent event_type);
+        IF_GLIBMM2_68(Gio::FileMonitor::Event, Gio::FileMonitorEvent) event_type);
 
     void on_pref_changed(tr_quark key);
 
@@ -544,7 +544,7 @@ void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
 {
     auto const& col = torrent_cols.torrent;
     Gtk::TreeSortable::SlotCompare sort_func;
-    auto type = is_reversed ? Gtk::SORT_ASCENDING : Gtk::SORT_DESCENDING;
+    auto type = is_reversed ? TR_GTK_SORT_TYPE(ASCENDING) : TR_GTK_SORT_TYPE(DESCENDING);
     auto const sortable = get_model();
 
     if (mode == "sort-by-activity")
@@ -582,7 +582,7 @@ void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
     else
     {
         sort_func = &compare_by_name;
-        type = is_reversed ? Gtk::SORT_DESCENDING : Gtk::SORT_ASCENDING;
+        type = is_reversed ? TR_GTK_SORT_TYPE(DESCENDING) : TR_GTK_SORT_TYPE(ASCENDING);
     }
 
     sortable->set_sort_func(col, sort_func);
@@ -708,9 +708,9 @@ void Session::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
 void Session::Impl::on_file_changed_in_watchdir(
     Glib::RefPtr<Gio::File> const& file,
     Glib::RefPtr<Gio::File> const& /*other_type*/,
-    Gio::FileMonitorEvent event_type)
+    IF_GLIBMM2_68(Gio::FileMonitor::Event, Gio::FileMonitorEvent) event_type)
 {
-    if (event_type == Gio::FILE_MONITOR_EVENT_CREATED)
+    if (event_type == TR_GIO_FILE_MONITOR_EVENT(CREATED))
     {
         watchdir_monitor_file(file);
     }
@@ -1437,7 +1437,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
 
     try
     {
-        auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
+        auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         auto response = connection->call_sync(
             SessionManagerObjectPath,
@@ -1471,7 +1471,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
 {
     try
     {
-        auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
+        auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         connection->call_sync(
             SessionManagerObjectPath,

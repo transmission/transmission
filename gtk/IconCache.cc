@@ -40,7 +40,7 @@ std::array<std::unique_ptr<IconCache>, 7> icon_cache;
 
 Glib::RefPtr<Gdk::Pixbuf> create_void_pixbuf(int width, int height)
 {
-    auto const p = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+    auto const p = Gdk::Pixbuf::create(TR_GDK_COLORSPACE(RGB), true, 8, width, height);
     p->fill(0xFFFFFF00);
     return p;
 }

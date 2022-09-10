@@ -136,13 +136,13 @@ void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 void gtr_notify_init()
 {
     Gio::DBus::Proxy::create_for_bus(
-        Gio::DBus::BUS_TYPE_SESSION,
+        TR_GIO_DBUS_BUS_TYPE(SESSION),
         NotificationsDbusName,
         NotificationsDbusCoreObject,
         NotificationsDbusCoreInterface,
         &dbus_proxy_ready_callback,
         {},
-        Gio::DBus::PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES);
+        TR_GIO_DBUS_PROXY_FLAGS(DO_NOT_LOAD_PROPERTIES));
 }
 
 namespace
@@ -172,7 +172,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
 
         try
         {
-            Glib::spawn_async({}, argv, Glib::SPAWN_SEARCH_PATH);
+            Glib::spawn_async({}, argv, TR_GLIB_SPAWN_FLAGS(SEARCH_PATH));
         }
         catch (Glib::SpawnError const&)
         {
