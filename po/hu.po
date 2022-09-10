@@ -4,12 +4,12 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
 # gyeben <gyonkibendeguz@gmail.com>, 2017
-# c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2020
 # Kristóf Korcsog <kristofkorcsog@gmail.com>, 2020
-# Béla Bajza, 2021
 # Balázs Meskó <meskobalazs@mailbox.org>, 2022
+# c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2022
+# Béla Bajza, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 02:53+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -901,7 +901,7 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
 msgid "Open a torrent"
-msgstr ""
+msgstr "Torrent megnyitása"
 
 #: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
 msgid "_Open"
@@ -909,31 +909,31 @@ msgstr "_Megnyitás"
 
 #: ../gtk/MainWindow.ui:37 ../gtk/transmission.ui:99 ../gtk/transmission.ui:368
 msgid "Start torrent"
-msgstr ""
+msgstr "Torrent indítása"
 
 #: ../gtk/MainWindow.ui:39 ../gtk/transmission.ui:97 ../gtk/transmission.ui:366
 msgid "_Start"
-msgstr ""
+msgstr "_Indítás"
 
 #: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
 msgid "Pause torrent"
-msgstr ""
+msgstr "Torrent megállítása"
 
 #: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
 msgid "_Pause"
-msgstr ""
+msgstr "_Megállítás"
 
 #: ../gtk/MainWindow.ui:68 ../gtk/transmission.ui:166 ../gtk/transmission.ui:435
 msgid "Remove torrent"
-msgstr ""
+msgstr "Torrent eltávolítása"
 
 #: ../gtk/MainWindow.ui:91 ../gtk/transmission.ui:84 ../gtk/transmission.ui:295
 msgid "Torrent properties"
-msgstr ""
+msgstr "Torrent tulajdonságai"
 
 #: ../gtk/MainWindow.ui:94 ../gtk/transmission.ui:82 ../gtk/transmission.ui:293
 msgid "_Properties"
-msgstr ""
+msgstr "_Tulajdonságok"
 
 #: ../gtk/MainWindow.ui:142
 msgid "Torrent"
@@ -1236,7 +1236,7 @@ msgstr "Ezen _napokon:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/PrefsDialog.ui:330
 msgid "_to"
-msgstr ""
+msgstr "–"
 
 #: ../gtk/PrefsDialog.ui:400
 msgctxt "Gerund"
@@ -1905,179 +1905,179 @@ msgstr "A Transmission indítása minimalizálva"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr ""
+msgstr "_URL megnyitása…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr ""
+msgstr "URL megnyitása…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "Ú_j…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "Összes in_dítása"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr ""
+msgstr "Összes torrent elindítása"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr ""
+msgstr "Összes _megállítása"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Összes torrent megállítása"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr ""
+msgstr "_Kilépés"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr ""
+msgstr "Összes _kijelölése"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr ""
+msgstr "Kije_lölések megszüntetése"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "_Beállítások"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
-msgstr ""
+msgstr "M_appa megnyitása"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
-msgstr ""
+msgstr "Indítás _most"
 
 #: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
 msgid "Start torrent now"
-msgstr ""
+msgstr "Torrent indítása most"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "Több partner kérése a kö_vetőtől"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr ""
+msgstr "Mozgatás l_egfelülre"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "Mozgatás _fel"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "Mozgatás _le"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "Mozgatás az _aljára"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr ""
+msgstr "He_ly megadása…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Helyi adatok ellenőrzése"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "_Mágnes link másolása a vágólapra"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "Fájlok törlése és eltáv_olítás"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
-msgstr ""
+msgstr "_Kompakt nézet"
 
 #: ../gtk/transmission.ui:189
 msgid "_Toolbar"
-msgstr ""
+msgstr "_Eszköztár"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr ""
+msgstr "_Szűrősor"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr ""
+msgstr "Á_llapotsor"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "_Aktivitás szerinti rendezés"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "_Kor szerinti rendezés"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr ""
+msgstr "_Név szerinti rendezés"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "_Haladás szerinti rendezés"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "_Sor szerinti rendezés"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Megosztási _arány szerinti rendezés"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "_Méret szerinti rendezés"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Álla_pot szerinti rendezés"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Hátralévő _idő szerinti rendezés"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "_Fordított rendezés"
 
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
-msgstr ""
+msgstr "Ü_zenetnapló"
 
 #: ../gtk/transmission.ui:263
 msgid "_Statistics"
-msgstr ""
+msgstr "_Statisztikák"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "_Támogatás"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr ""
+msgstr "_Tartalom"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "_Rólunk"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Transmission megjelenítése"
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "A_lternatív sebességkorlátok engedélyezése"
 
 #: ../libtransmission/announcer-http.cc:291
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2538,18 +2538,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid " _to "
-#~ msgstr " – "
-
-#~ msgid "Cancelled"
-#~ msgstr "Megszakítva"
-
-#~ msgid "Couldn't compute obfuscated info hash"
-#~ msgstr "Nem sikerült az obfuszkált információs ellenőrzőösszeg kiszámítása"
-
-#~ msgid "Couldn't scan '{path}': {error} ({error_code})"
-#~ msgstr "Nem sikerült a(z) „{path}” átvizsgálása: {error} ({error_code})"
-
-#~ msgid "Couldn't use invalid piece size {expected_size}; using {actual_size} instead"
-#~ msgstr "Nem sikerült az érvénytelen {expected_size}-os szeletméret használata; {actual_size}-os használata"

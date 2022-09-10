@@ -1376,7 +1376,7 @@
     <message>
         <location line="+1"/>
         <source>These torrents have not finished downloading.</source>
-        <translation>Estos torrent no han terminado su descarga.</translation>
+        <translation>Estos torrents no han terminado de descargar.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1401,12 +1401,12 @@
     <message>
         <location line="+10"/>
         <source>One of these torrents has not finished downloading.</source>
-        <translation>Uno de estos torrents no ha terminado su descarga.</translation>
+        <translation>Uno de estos torrents no ha terminado de descargar.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
-        <translation>Algunos de estos torrents no han terminado su descarga.</translation>
+        <translation>Algunos de estos torrents no han terminado de descargar.</translation>
     </message>
     <message>
         <location line="+69"/>

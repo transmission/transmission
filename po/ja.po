@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
-# MMP 0 <mmmmpp0@yahoo.co.jp>, 2020
+# MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
 # maboroshin, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 02:53+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: maboroshin, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Japanese (https://www.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -852,7 +852,7 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
 msgid "Open a torrent"
-msgstr ""
+msgstr "トレントを開く"
 
 #: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
 msgid "_Open"
@@ -860,31 +860,31 @@ msgstr "開く(_O)"
 
 #: ../gtk/MainWindow.ui:37 ../gtk/transmission.ui:99 ../gtk/transmission.ui:368
 msgid "Start torrent"
-msgstr ""
+msgstr "トレントを開始"
 
 #: ../gtk/MainWindow.ui:39 ../gtk/transmission.ui:97 ../gtk/transmission.ui:366
 msgid "_Start"
-msgstr ""
+msgstr "開始(_S)"
 
 #: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
 msgid "Pause torrent"
-msgstr ""
+msgstr "トレントを一時停止"
 
 #: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
 msgid "_Pause"
-msgstr ""
+msgstr "中断(_P)"
 
 #: ../gtk/MainWindow.ui:68 ../gtk/transmission.ui:166 ../gtk/transmission.ui:435
 msgid "Remove torrent"
-msgstr ""
+msgstr "トレントを削除"
 
 #: ../gtk/MainWindow.ui:91 ../gtk/transmission.ui:84 ../gtk/transmission.ui:295
 msgid "Torrent properties"
-msgstr ""
+msgstr "トレントのプロパティ"
 
 #: ../gtk/MainWindow.ui:94 ../gtk/transmission.ui:82 ../gtk/transmission.ui:293
 msgid "_Properties"
-msgstr ""
+msgstr "プロパティ(_P)"
 
 #: ../gtk/MainWindow.ui:142
 msgid "Torrent"
@@ -1186,7 +1186,7 @@ msgstr "日(_O):"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/PrefsDialog.ui:330
 msgid "_to"
-msgstr ""
+msgstr "から(_T)"
 
 #: ../gtk/PrefsDialog.ui:400
 msgctxt "Gerund"
@@ -1833,179 +1833,179 @@ msgstr "最小化して Transmission を起動"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr ""
+msgstr "URLを開く(_U)…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr ""
+msgstr "URLを開く…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "新規(_N)…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "すべてを開始(_S)"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr ""
+msgstr "すべてのトレントを開始"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr ""
+msgstr "すべて停止(_P)"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr ""
+msgstr "すべてのトレントを停止"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr ""
+msgstr "終了(_Q)"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr ""
+msgstr "すべて選択(_A)"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr ""
+msgstr "すべて選択解除(_L)"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "環境設定(_P)"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
-msgstr ""
+msgstr "フォルダを開く(_E)"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
-msgstr ""
+msgstr "すぐに開始(_N)"
 
 #: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
 msgid "Start torrent now"
-msgstr ""
+msgstr "トレントをすぐに開始する"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "トラッカーにピア増加を要求(_M)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr ""
+msgstr "先頭に移動(_T)"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "上に移動(_U)"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "下に移動(_D)"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "末尾に移動(_B)"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr ""
+msgstr "場所を設定する(_L)..."
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "ローカルデータを検証(_V)"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "マグネットリンクをコピー(_M)"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "ファイルの削除(_D)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
-msgstr ""
+msgstr "コンパクト表示(_C)"
 
 #: ../gtk/transmission.ui:189
 msgid "_Toolbar"
-msgstr ""
+msgstr "ツールバー(_T)"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr ""
+msgstr "フィルターバー(_F)"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr ""
+msgstr "ステータスバー(_S)"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "稼働順に並び替え(_A)"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "追加順に並び替え(_G)"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr ""
+msgstr "名前順に並び替え(_N)"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "進行率順に並び替え(_P)"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "処理待ち順に並び替え(_Q)"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "共有比順に並び替え(_O)"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "サイズ順に並び替え(_Z)"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "状態順に並び替え(_E)"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "残り時間順に並び替え(_L)"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "逆順に並び替え(_V)"
 
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
-msgstr ""
+msgstr "メッセージログ(_L)"
 
 #: ../gtk/transmission.ui:263
 msgid "_Statistics"
-msgstr ""
+msgstr "統計データ(_S)"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "寄付(_D)"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr ""
+msgstr "コンテンツ(_C)"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "バージョン情報(_A)"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
-msgstr ""
+msgstr "Transmission ウインドウを表示(_S)"
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "一時的な速度制限を有効化(_L)"
 
 #: ../libtransmission/announcer-http.cc:291
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2455,18 +2455,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgid " _to "
-#~ msgstr " から(_T) "
-
-#~ msgid "Cancelled"
-#~ msgstr "キャンセルしました"
-
-#~ msgid "Couldn't compute obfuscated info hash"
-#~ msgstr "難読化された情報ハッシュを計算できません"
-
-#~ msgid "Couldn't scan '{path}': {error} ({error_code})"
-#~ msgstr "スキャンできません「{path}」: {error} ({error_code})"
-
-#~ msgid "Couldn't use invalid piece size {expected_size}; using {actual_size} instead"
-#~ msgstr "無効なピースの大きさ {expected_size} は使用できません; 代わりに {actual_size} を使用"

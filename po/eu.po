@@ -4,13 +4,13 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
-# Xabier Aramendi <azpidatziak@gmail.com>, 2017
-# Sendoa Sojo <sendoasojo@gmail.com>, 2020
 # Xabier Martin <Iparra@iparra.eus>, 2020
-# Alexander Gabilondo <alexgabi@disroot.org>, 2021
-# Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2022
 # Iñigo Zendegi Urzelai, 2022
+# Alexander Gabilondo <alexgabi@disroot.org>, 2022
+# Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2022
+# Sendoa Sojo <sendoasojo@gmail.com>, 2022
+# Xabier Aramendi <azpidatziak@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 02:53+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Iñigo Zendegi Urzelai, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Basque (https://www.transifex.com/transmissionbt/teams/33778/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -879,7 +879,7 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
 msgid "Open a torrent"
-msgstr ""
+msgstr "Ireki torrent bat"
 
 #: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
 msgid "_Open"
@@ -887,31 +887,31 @@ msgstr "_Zabaldu"
 
 #: ../gtk/MainWindow.ui:37 ../gtk/transmission.ui:99 ../gtk/transmission.ui:368
 msgid "Start torrent"
-msgstr ""
+msgstr "Abiarazi torrenta"
 
 #: ../gtk/MainWindow.ui:39 ../gtk/transmission.ui:97 ../gtk/transmission.ui:366
 msgid "_Start"
-msgstr ""
+msgstr "_Abiarazi"
 
 #: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
 msgid "Pause torrent"
-msgstr ""
+msgstr "Pausatu torrenta"
 
 #: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
 msgid "_Pause"
-msgstr ""
+msgstr "_Pausatu"
 
 #: ../gtk/MainWindow.ui:68 ../gtk/transmission.ui:166 ../gtk/transmission.ui:435
 msgid "Remove torrent"
-msgstr ""
+msgstr "Kendu torrenta"
 
 #: ../gtk/MainWindow.ui:91 ../gtk/transmission.ui:84 ../gtk/transmission.ui:295
 msgid "Torrent properties"
-msgstr ""
+msgstr "Torrentaren ezaugarriak"
 
 #: ../gtk/MainWindow.ui:94 ../gtk/transmission.ui:82 ../gtk/transmission.ui:293
 msgid "_Properties"
-msgstr ""
+msgstr "_Ezaugarriak"
 
 #: ../gtk/MainWindow.ui:142
 msgid "Torrent"
@@ -1214,7 +1214,7 @@ msgstr "E_gun hauetan:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/PrefsDialog.ui:330
 msgid "_to"
-msgstr ""
+msgstr "_hona"
 
 #: ../gtk/PrefsDialog.ui:400
 msgctxt "Gerund"
@@ -1883,179 +1883,179 @@ msgstr "Abiarazi Transmission minimizatua"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr ""
+msgstr "Ireki _URL-a..."
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr ""
+msgstr "Ireki URL-a..."
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "_Berria..."
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "_Abiarazi Guztiak"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr ""
+msgstr "Abiarazi torrent guztiak"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr ""
+msgstr "_Pausatu Guztiak"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Pausatu torrent guztiak"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr ""
+msgstr "_Utzi"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr ""
+msgstr "Hautatu _Guztiak"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr ""
+msgstr "_Deshautatu Guztiak"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "_Hobespenak"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
-msgstr ""
+msgstr "Ireki karpe_ta"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
-msgstr ""
+msgstr "Abiarazi _Orain"
 
 #: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
 msgid "Start torrent now"
-msgstr ""
+msgstr "Abiarazi torrenta orain"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "Galdetu Aztarnariari _Pare Gehiagorako"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr ""
+msgstr "Mugitu _Goren"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "Mugitu G_ora"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "Mugitu _Behera"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "Mugitu Be_heren"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr ""
+msgstr "Ezarri _Kokalekua..."
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Egiaztatu tokiko datuak"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "Kopiatu _Magnet Lotura Gakora"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "_Ezabatu fitxategiak eta kendu"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
-msgstr ""
+msgstr "_Bista trinkoa"
 
 #: ../gtk/transmission.ui:189
 msgid "_Toolbar"
-msgstr ""
+msgstr "_Tresnabarra"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr ""
+msgstr "_Iragazki-barra"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr ""
+msgstr "_Egoera-barra"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "Ordenatu _aktibitatearen arabera"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "Ordenatu a_dinaren arabera"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr ""
+msgstr "Ordenatu _izenaren arabera"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "Ordenatu aurrera_penaren arabera"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "Ordenatu i_lararen arabera"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Ordenatu _tasaren arabera"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Ordenatu ta_mainaren arabera"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Ordenatu ego_eraren arabera"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Ordenatu _geratzen den denboraren arabera"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "Al_derantzikatu ordena"
 
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
-msgstr ""
+msgstr "Mezuen _egunkaria"
 
 #: ../gtk/transmission.ui:263
 msgid "_Statistics"
-msgstr ""
+msgstr "_Estatistikak"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "_Dirulaguntza"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr ""
+msgstr "_Edukiak"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "_Honi buruz"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Erakutsi Transmission"
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "Gaitu abiadura-muga a_lternatiboak"
 
 #: ../libtransmission/announcer-http.cc:291
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2516,18 +2516,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
-
-#~ msgid " _to "
-#~ msgstr " _hona "
-
-#~ msgid "Cancelled"
-#~ msgstr "Bertan behera utzi da"
-
-#~ msgid "Couldn't compute obfuscated info hash"
-#~ msgstr "Ezin izan da ezkutatutako informazioaren hash-a aztertu"
-
-#~ msgid "Couldn't scan '{path}': {error} ({error_code})"
-#~ msgstr "Ezin izan da '{path}' eskaneatu: {error} ({error_code})"
-
-#~ msgid "Couldn't use invalid piece size {expected_size}; using {actual_size} instead"
-#~ msgstr "Ezin izan da {expected_size} zatiaren tamaina baliogabea erabili; horren ordez {actual_size} erabiliko da"

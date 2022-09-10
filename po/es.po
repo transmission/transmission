@@ -6,8 +6,9 @@
 # Translators:
 # Alfredo Monclus <alfredomonclus@gmail.com>, 2017
 # Adolfo Jayme-Barrientos, 2021
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Julvenzor <adrlopgal@disroot.org>, 2022
 # picodotdev <pico.dev@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 02:53+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: picodotdev <pico.dev@gmail.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Spanish (https://www.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -768,7 +769,7 @@ msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "Aún no finaliza la descarga de este torrent."
 msgstr[1] "Aún no finaliza la descarga de estos torrents."
-msgstr[2] "Aún no finaliza la descarga de estos torrents."
+msgstr[2] "Aún no ha finalizado la descarga de estos torrents."
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
@@ -963,7 +964,7 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
 msgid "Open a torrent"
-msgstr ""
+msgstr "Abrir un torrent"
 
 #: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
 msgid "_Open"
@@ -971,31 +972,31 @@ msgstr "_Abrir"
 
 #: ../gtk/MainWindow.ui:37 ../gtk/transmission.ui:99 ../gtk/transmission.ui:368
 msgid "Start torrent"
-msgstr ""
+msgstr "Iniciar torrent"
 
 #: ../gtk/MainWindow.ui:39 ../gtk/transmission.ui:97 ../gtk/transmission.ui:366
 msgid "_Start"
-msgstr ""
+msgstr "_Iniciar"
 
 #: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
 msgid "Pause torrent"
-msgstr ""
+msgstr "Pausar torrent"
 
 #: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
 msgid "_Pause"
-msgstr ""
+msgstr "_Pausar"
 
 #: ../gtk/MainWindow.ui:68 ../gtk/transmission.ui:166 ../gtk/transmission.ui:435
 msgid "Remove torrent"
-msgstr ""
+msgstr "Eliminar el torrent"
 
 #: ../gtk/MainWindow.ui:91 ../gtk/transmission.ui:84 ../gtk/transmission.ui:295
 msgid "Torrent properties"
-msgstr ""
+msgstr "Propiedades del torrent"
 
 #: ../gtk/MainWindow.ui:94 ../gtk/transmission.ui:82 ../gtk/transmission.ui:293
 msgid "_Properties"
-msgstr ""
+msgstr "_Propiedades"
 
 #: ../gtk/MainWindow.ui:142
 msgid "Torrent"
@@ -1299,7 +1300,7 @@ msgstr "L_os días:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/PrefsDialog.ui:330
 msgid "_to"
-msgstr ""
+msgstr "_a"
 
 #: ../gtk/PrefsDialog.ui:400
 msgctxt "Gerund"
@@ -1990,179 +1991,179 @@ msgstr "Iniciar Transmission minimizado"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr ""
+msgstr "Abrir _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr ""
+msgstr "Abrir URL..."
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "_Nuevo..."
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "_Iniciar todo"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr ""
+msgstr "Iniciar todos los torrents"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr ""
+msgstr "_Detener todo"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Pausar todos los torrents"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr ""
+msgstr "_Salir"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr ""
+msgstr "Seleccionar _todo"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr ""
+msgstr "Dese_leccionar todo"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "_Preferencias"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
-msgstr ""
+msgstr "Abrir carp_eta"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
-msgstr ""
+msgstr "Iniciar _ahora"
 
 #: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
 msgid "Start torrent now"
-msgstr ""
+msgstr "Iniciar el torrent ahora"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "Solicitar _más pares al rastreador"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr ""
+msgstr "Mover al _principio"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "_Subir"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "_Bajar"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "Mover al _final"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr ""
+msgstr "Cambiar _ubicación..."
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Verificar datos locales"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "Copiar enlace _magnet al portapapeles"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "_Eliminar archivos y quitar el torrent"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
-msgstr ""
+msgstr "Vista _compacta"
 
 #: ../gtk/transmission.ui:189
 msgid "_Toolbar"
-msgstr ""
+msgstr "Barra de herramien_tas"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr ""
+msgstr "Barra de _filtros"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr ""
+msgstr "Barra de _estado"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "Ordenar por _actividad"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "Ordenar por ant_igüedad"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr ""
+msgstr "Ordenar por _nombre"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "Ordenar por p_rogreso"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "Ordenar por _cola"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Ordenar por pr_oporción"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Ordenar por _tamaño"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Ordenar por _estado"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Ordenar por tiempo re_stante"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "_Invertir el orden"
 
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
-msgstr ""
+msgstr "_Registro de mensajes"
 
 #: ../gtk/transmission.ui:263
 msgid "_Statistics"
-msgstr ""
+msgstr "E_stadísticas"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "_Donar"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr ""
+msgstr "_Contenido"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "_Acerca de"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
-msgstr ""
+msgstr "Mo_strar Transmission"
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "Activar _límites de velocidad alternativos"
 
 #: ../libtransmission/announcer-http.cc:291
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2414,7 +2415,7 @@ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pi
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} pieza"
 msgstr[1] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} piezas"
-msgstr[2] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} piezas"
+msgstr[2] "No se pudo analizar la metainformación del enlace magnético «{error}». Redescargando {piece_count} piezas"
 
 #: ../libtransmission/torrent-metainfo.cc:679
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
@@ -2634,18 +2635,3 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
-
-#~ msgid " _to "
-#~ msgstr " _a "
-
-#~ msgid "Cancelled"
-#~ msgstr "Cancelado"
-
-#~ msgid "Couldn't compute obfuscated info hash"
-#~ msgstr "No se pudo computar hash de info ofuscada"
-
-#~ msgid "Couldn't scan '{path}': {error} ({error_code})"
-#~ msgstr "No se pudo escanear «{path}»: {error} ({error_code})"
-
-#~ msgid "Couldn't use invalid piece size {expected_size}; using {actual_size} instead"
-#~ msgstr "No se pudo usar tamaño de pieza inválido {expected_size}; usando {actual_size} en su lugar"

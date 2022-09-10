@@ -2497,7 +2497,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>Hämtar metadata från %Ln jämlike (%1% färdigt)</numerusform>
+            <numerusform>Hämtar metadata från %Ln jämlike (%1% klart)</numerusform>
             <numerusform>Hämtar metadata från %Ln jämlikar (%1% klart)</numerusform>
         </translation>
     </message>
