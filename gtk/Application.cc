@@ -719,7 +719,7 @@ void Application::Impl::app_setup()
 
     if (!gtr_pref_flag_get(TR_KEY_user_has_given_informed_consent))
     {
-        Gtk::MessageDialog w(
+        auto w = std::make_shared<Gtk::MessageDialog>(
             *wind_,
             _("Transmission is a file sharing program. When you run a torrent, its data will be "
               "made available to others by means of upload. Any content you share is your sole responsibility."),
@@ -727,19 +727,24 @@ void Application::Impl::app_setup()
             TR_GTK_MESSAGE_TYPE(OTHER),
             TR_GTK_BUTTONS_TYPE(NONE),
             true);
-        w.add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(REJECT));
-        w.add_button(_("I _Agree"), TR_GTK_RESPONSE_TYPE(ACCEPT));
-        w.set_default_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
-
-        if (w.run() == TR_GTK_RESPONSE_TYPE(ACCEPT))
-        {
-            // only show it once
-            gtr_pref_flag_set(TR_KEY_user_has_given_informed_consent, true);
-        }
-        else
-        {
-            exit(0);
-        }
+        w->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(REJECT));
+        w->add_button(_("I _Agree"), TR_GTK_RESPONSE_TYPE(ACCEPT));
+        w->set_default_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
+        w->signal_response().connect(
+            [w](int response) mutable
+            {
+                if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
+                {
+                    // only show it once
+                    gtr_pref_flag_set(TR_KEY_user_has_given_informed_consent, true);
+                    w.reset();
+                }
+                else
+                {
+                    exit(0);
+                }
+            });
+        w->show();
     }
 }
 
@@ -959,9 +964,16 @@ void Application::Impl::show_torrent_errors(Glib::ustring const& primary, std::v
         s << leader << ' ' << f << '\n';
     }
 
-    Gtk::MessageDialog w(*wind_, primary, false, TR_GTK_MESSAGE_TYPE(ERROR), TR_GTK_BUTTONS_TYPE(CLOSE));
-    w.set_secondary_text(s.str());
-    w.run();
+    auto w = std::make_shared<Gtk::MessageDialog>(
+        *wind_,
+        primary,
+        false,
+        TR_GTK_MESSAGE_TYPE(ERROR),
+        TR_GTK_BUTTONS_TYPE(CLOSE),
+        true);
+    w->set_secondary_text(s.str());
+    w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
+    w->show();
 
     files.clear();
 }
@@ -1296,25 +1308,31 @@ void Application::Impl::show_about_dialog()
         "Mike Gelfand",
     });
 
-    Gtk::AboutDialog d;
-    d.set_authors(authors);
-    d.set_comments(_("A fast and easy BitTorrent client"));
-    d.set_copyright(_("Copyright © The Transmission Project"));
-    d.set_logo_icon_name(AppIconName);
-    d.set_name(Glib::get_application_name());
+    auto d = std::make_shared<Gtk::AboutDialog>();
+    d->set_authors(authors);
+    d->set_comments(_("A fast and easy BitTorrent client"));
+    d->set_copyright(_("Copyright © The Transmission Project"));
+    d->set_logo_icon_name(AppIconName);
+    d->set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
        to have it appear in the credits in the "About"
        dialog */
-    d.set_translator_credits(_("translator-credits"));
-    d.set_version(LONG_VERSION_STRING);
-    d.set_website(uri);
-    d.set_website_label(uri);
+    d->set_translator_credits(_("translator-credits"));
+    d->set_version(LONG_VERSION_STRING);
+    d->set_website(uri);
+    d->set_website_label(uri);
 #ifdef SHOW_LICENSE
-    d.set_license(LICENSE);
-    d.set_wrap_license(true);
+    d->set_license(LICENSE);
+    d->set_wrap_license(true);
 #endif
-    d.set_transient_for(*wind_);
-    d.run();
+    d->set_transient_for(*wind_);
+    d->set_modal(true);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    d->signal_close_request().connect_notify([d]() mutable { d.reset(); });
+#else
+    d->signal_delete_event().connect_notify([d](void* /*event*/) mutable { d.reset(); });
+#endif
+    d->show();
 }
 
 bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method)
