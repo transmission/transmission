@@ -131,9 +131,9 @@ static void canReadWrapper(tr_peerIo* io_in)
         while (!done && !err)
         {
             size_t piece = 0;
-            size_t const old_len = evbuffer_get_length(io->inbuf.get());
+            size_t const old_len = io->readBufferSize();
             int const ret = io->canRead(io.get(), io->userData, &piece);
-            size_t const used = old_len - evbuffer_get_length(io->inbuf.get());
+            size_t const used = old_len - io->readBufferSize();
             unsigned int const overhead = guessPacketOverhead(used);
 
             if (piece != 0 || piece != used)
@@ -157,7 +157,7 @@ static void canReadWrapper(tr_peerIo* io_in)
             switch (ret)
             {
             case READ_NOW:
-                if (evbuffer_get_length(io->inbuf.get()) != 0)
+                if (io->readBufferSize() != 0)
                 {
                     continue;
                 }
@@ -190,7 +190,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     io->pendingEvents &= ~EV_READ;
 
-    unsigned int const curlen = evbuffer_get_length(io->inbuf.get());
+    unsigned int const curlen = io->readBufferSize();
     unsigned int howmuch = curlen >= max ? 0 : max - curlen;
     howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
 
@@ -997,7 +997,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
         /* UTP_RBDrained notifies libutp that your read buffer is empty.
          * It opens up the congestion window by sending an ACK (soonish)
          * if one was not going to be sent. */
-        if (evbuffer_get_length(io->inbuf.get()) == 0)
+        if (io->readBufferSize() == 0)
         {
             utp_read_drained(io->socket.handle.utp);
         }
@@ -1012,7 +1012,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 
             tr_logAddTraceIo(io, fmt::format("read {} from peer ({})", res, res == -1 ? tr_net_strerror(e).c_str() : ""));
 
-            if (evbuffer_get_length(io->inbuf.get()) != 0)
+            if (io->readBufferSize() != 0)
             {
                 canReadWrapper(io);
             }
