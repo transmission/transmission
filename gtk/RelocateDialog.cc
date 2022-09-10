@@ -87,15 +87,23 @@ bool RelocateDialog::Impl::onTimer()
 {
     if (done_ == TR_LOC_ERROR)
     {
-        Gtk::MessageDialog(
+        auto d = std::make_shared<Gtk::MessageDialog>(
             *message_dialog_,
             _("Couldn't move torrent"),
             false,
             TR_GTK_MESSAGE_TYPE(ERROR),
             TR_GTK_BUTTONS_TYPE(CLOSE),
-            true)
-            .run();
-        message_dialog_.reset();
+            true);
+
+        timer_.block();
+        d->signal_response().connect(
+            [this, d](int /*response*/) mutable
+            {
+                timer_.unblock();
+                d.reset();
+            });
+
+        d->show();
     }
     else if (done_ == TR_LOC_DONE)
     {
