@@ -20,6 +20,7 @@ namespace libtransmission
 class Buffer
 {
 public:
+    Buffer() = default;
     Buffer(Buffer const&) = delete;
     Buffer& operator=(Buffer const&) = delete;
 
@@ -36,7 +37,7 @@ public:
             return nullptr;
         }
 
-        return evbuffer_pullup(buf_.get(), n_bytes);
+        return reinterpret_cast<T const*>(evbuffer_pullup(buf_.get(), n_bytes));
     }
 
     auto toBuf(void* tgt, size_t n_bytes)
