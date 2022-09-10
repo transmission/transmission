@@ -347,10 +347,10 @@
 "Downloading blocklist" = "Descargando lista de bloqueo";
 
 /* Torrent -> status string */
-"Downloading from %lu of %lu peers" = "Descargando de %1$lu de %2$lu clientes";
+"Downloading from %lu of %lu peers" = "Descargando de %1$lu de %2$lu pares";
 
 /* Torrent -> status string */
-"Downloading from %lu of 1 peer" = "Descargando de %lu de 1 peer";
+"Downloading from %lu of 1 peer" = "Descargando de %lu de 1 par";
 
 /* inspector -> peer table -> header tool tip */
 "Downloading From Peer" = "Descargando del cliente";
