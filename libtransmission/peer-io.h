@@ -133,17 +133,12 @@ public:
 
     [[nodiscard]] auto readBufferSize() const noexcept
     {
-        return evbuffer_get_length(inbuf.get());
+        return std::size(inbuf);
     }
 
     [[nodiscard]] std::byte const* peek(size_t n_bytes) const noexcept
     {
-        if (readBufferSize() < n_bytes)
-        {
-            return nullptr;
-        }
-
-        return reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf.get(), n_bytes));
+        return inbuf.peek<std::byte>(n_bytes);
     }
 
     void readBufferAdd(void const* data, size_t n_bytes);
@@ -248,7 +243,7 @@ public:
     tr_net_error_cb gotError = nullptr;
     void* userData = nullptr;
 
-    tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
+    libtransmission::Buffer inbuf;
     tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;

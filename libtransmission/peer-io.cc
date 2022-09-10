@@ -203,10 +203,8 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
         return;
     }
 
-    EVUTIL_SET_SOCKET_ERROR(0);
-    auto const res = evbuffer_read(io->inbuf.get(), fd, (int)howmuch);
-    int const e = EVUTIL_SOCKET_ERROR();
-
+    tr_error* error = nullptr;
+    auto const res = io->inbuf.fromSocket(fd, howmuch, &error);
     if (res > 0)
     {
         io->setEnabled(dir, true);
@@ -222,26 +220,28 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
         {
             what |= BEV_EVENT_EOF;
         }
-        else if (res == -1)
+        if (error != nullptr)
         {
-            if (e == EAGAIN || e == EINTR)
+            if (error->code == EAGAIN || error->code == EINTR)
             {
                 io->setEnabled(dir, true);
                 return;
             }
 
             what |= BEV_EVENT_ERROR;
-        }
 
-        tr_logAddDebugIo(
-            io,
-            fmt::format("event_read_cb err: res:{}, what:{}, errno:{} ({})", res, what, e, tr_net_strerror(e)));
+            tr_logAddDebugIo(
+                io,
+                fmt::format("event_read_cb err: res:{}, what:{}, errno:{} ({})", res, what, error->code, error->message));
+        }
 
         if (io->gotError != nullptr)
         {
             io->gotError(io, what, io->userData);
         }
     }
+
+    tr_error_clear(&error);
 }
 
 static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
@@ -348,12 +348,7 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 
 void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
-    if (auto const rc = evbuffer_add(inbuf.get(), data, n_bytes); rc < 0)
-    {
-        tr_logAddWarn(_("Couldn't write to peer"));
-        return;
-    }
-
+    inbuf.fromBuf(data, n_bytes);
     setEnabled(TR_DOWN, true);
     canReadWrapper(this);
 }
@@ -944,7 +939,7 @@ void tr_peerIo::readBytes(void* bytes, size_t byte_count)
 {
     TR_ASSERT(readBufferSize() >= byte_count);
 
-    evbuffer_remove(inbuf.get(), bytes, byte_count);
+    inbuf.toBuf(bytes, byte_count);
 
     if (isEncrypted())
     {
@@ -1006,31 +1001,38 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 
     case TR_PEER_SOCKET_TYPE_TCP:
         {
-            EVUTIL_SET_SOCKET_ERROR(0);
-            res = evbuffer_read(io->inbuf.get(), io->socket.handle.tcp, (int)howmuch);
-            int const e = EVUTIL_SOCKET_ERROR();
-
-            tr_logAddTraceIo(io, fmt::format("read {} from peer ({})", res, res == -1 ? tr_net_strerror(e).c_str() : ""));
+            tr_error* error = nullptr;
+            res = io->inbuf.fromSocket(io->socket.handle.tcp, howmuch, &error);
 
             if (io->readBufferSize() != 0)
             {
                 canReadWrapper(io);
             }
 
-            if (res <= 0 && io->gotError != nullptr && e != EAGAIN && e != EINTR && e != EINPROGRESS)
+            if (error != nullptr)
             {
-                short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
-
-                if (res == 0)
+                if (error->code != EAGAIN && error->code != EINTR && error->code != EINPROGRESS && io->gotError != nullptr)
                 {
-                    what |= BEV_EVENT_EOF;
+                    short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
+
+                    if (res == 0)
+                    {
+                        what |= BEV_EVENT_EOF;
+                    }
+
+                    tr_logAddTraceIo(
+                        io,
+                        fmt::format(
+                            "tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})",
+                            res,
+                            what,
+                            error->code,
+                            error->message));
+
+                    io->gotError(io, what, io->userData);
                 }
 
-                tr_logAddTraceIo(
-                    io,
-                    fmt::format("tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})", res, what, e, tr_net_strerror(e)));
-
-                io->gotError(io, what, io->userData);
+                tr_error_clear(&error);
             }
 
             break;
