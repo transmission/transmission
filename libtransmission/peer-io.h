@@ -31,6 +31,7 @@
 #include "peer-mse.h"
 #include "peer-socket.h"
 #include "tr-assert.h"
+#include "tr-buffer.h"
 
 class tr_peerIo;
 struct tr_bandwidth;
@@ -127,11 +128,6 @@ public:
     }
 
     std::string addrStr() const;
-
-    [[nodiscard]] auto readBuffer() noexcept
-    {
-        return inbuf.get();
-    }
 
     void readBufferDrain(size_t byte_count);
 
