@@ -1462,7 +1462,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else if (action_name == "donate")
     {
-        gtr_open_uri("https://transmissionbt.com/donate/");
+        gtr_open_uri("https://transmissionbt.com/donate");
     }
     else if (action_name == "pause-all-torrents")
     {
