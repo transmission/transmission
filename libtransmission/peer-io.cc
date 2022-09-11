@@ -246,12 +246,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
 static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
 {
-    EVUTIL_SET_SOCKET_ERROR(0);
-    int const n = evbuffer_write_atmost(io->outbuf.get(), fd, howmuch);
-    int const e = EVUTIL_SOCKET_ERROR();
-    tr_logAddTraceIo(io, fmt::format("wrote {} to peer ({})", n, (n == -1 ? tr_net_strerror(e).c_str() : "")));
-
-    return n;
+    return io->outbuf.toSocket(fd, howmuch);
 }
 
 static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
@@ -271,7 +266,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     /* Write as much as possible, since the socket is non-blocking, write() will
      * return if it can't write any more data without blocking */
-    size_t const howmuch = io->bandwidth().clamp(dir, evbuffer_get_length(io->outbuf.get()));
+    auto const howmuch = io->bandwidth().clamp(dir, std::size(io->outbuf));
 
     /* if we don't have any bandwidth left, stop writing */
     if (howmuch < 1)
@@ -305,7 +300,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
         goto FAIL;
     }
 
-    if (evbuffer_get_length(io->outbuf.get()) != 0)
+    if (!std::empty(io->outbuf))
     {
         io->setEnabled(dir, true);
     }
@@ -314,7 +309,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     return;
 
 RESCHEDULE:
-    if (evbuffer_get_length(io->outbuf.get()) != 0)
+    if (!std::empty(io->outbuf))
     {
         io->setEnabled(dir, true);
     }
@@ -361,14 +356,14 @@ static size_t utp_get_rb_size(tr_peerIo* const io)
     return UtpReadBufferSize - bytes;
 }
 
-static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
+static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes);
 
 static void utp_on_writable(tr_peerIo* io)
 {
     tr_logAddTraceIo(io, "libutp says this peer is ready to write");
 
     int const n = tr_peerIoTryWrite(io, SIZE_MAX);
-    io->setEnabled(TR_UP, n != 0 && evbuffer_get_length(io->outbuf.get()) != 0);
+    io->setEnabled(TR_UP, n != 0 && !std::empty(io->outbuf));
 }
 
 static void utp_on_state_change(tr_peerIo* const io, int const state)
@@ -827,7 +822,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
 size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
 {
     size_t const desired_len = getDesiredOutputBufferSize(this, now);
-    size_t const current_len = evbuffer_get_length(outbuf.get());
+    size_t const current_len = std::size(outbuf);
     return desired_len > current_len ? desired_len - current_len : 0U;
 }
 
@@ -835,58 +830,24 @@ size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
 ***
 **/
 
-static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset, size_t size)
-{
-    struct evbuffer_ptr pos;
-    struct evbuffer_iovec iovec;
-
-    evbuffer_ptr_set(buffer, &pos, offset, EVBUFFER_PTR_SET);
-
-    do
-    {
-        if (evbuffer_peek(buffer, size, &pos, &iovec, 1) <= 0)
-        {
-            break;
-        }
-
-        io.encrypt(iovec.iov_len, iovec.iov_base);
-
-        TR_ASSERT(size >= iovec.iov_len);
-        size -= iovec.iov_len;
-    } while (evbuffer_ptr_set(buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD) == 0);
-
-    TR_ASSERT(size == 0);
-}
-
 void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
 {
-    size_t const n_bytes = evbuffer_get_length(buf);
-
-    if (isEncrypted())
-    {
-        processBuffer(*this, buf, 0, n_bytes);
-    }
-
-    evbuffer_add_buffer(outbuf.get(), buf);
-    outbuf_info.emplace_back(n_bytes, is_piece_data);
+    auto const n_bytes = evbuffer_get_length(buf);
+    writeBytes(evbuffer_pullup(buf, n_bytes), n_bytes, is_piece_data);
 }
 
-void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)
+void tr_peerIo::writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data)
 {
-    struct evbuffer_iovec iovec;
-
-    evbuffer_reserve_space(outbuf.get(), writeme_len, &iovec, 1);
-    iovec.iov_len = writeme_len;
-    memcpy(iovec.iov_base, writeme, iovec.iov_len);
+    auto* const buf = outbuf.reserve(n_bytes);
+    memcpy(buf, bytes, n_bytes);
 
     if (isEncrypted())
     {
-        encrypt(iovec.iov_len, iovec.iov_base);
+        encrypt(n_bytes, buf);
     }
 
-    evbuffer_commit_space(outbuf.get(), &iovec, 1);
-
-    outbuf_info.emplace_back(writeme_len, is_piece_data);
+    outbuf.commit(n_bytes);
+    outbuf_info.emplace_back(n_bytes, is_piece_data);
 }
 
 /***
@@ -1045,14 +1006,13 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
     return res;
 }
 
-static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
+static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes)
 {
-    auto const old_len = size_t{ evbuffer_get_length(io->outbuf.get()) };
-
-    tr_logAddTraceIo(io, fmt::format("in tr_peerIoTryWrite {}", howmuch));
-    howmuch = std::min(howmuch, old_len);
-    howmuch = io->bandwidth().clamp(TR_UP, howmuch);
-    if (howmuch == 0)
+    tr_logAddTraceIo(io, fmt::format("in tr_peerIoTryWrite {}", n_bytes));
+    auto const old_len = std::size(io->outbuf);
+    n_bytes = std::min(n_bytes, old_len);
+    n_bytes = io->bandwidth().clamp(TR_UP, n_bytes);
+    if (n_bytes == 0)
     {
         return 0;
     }
@@ -1061,11 +1021,13 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     switch (io->socket.type)
     {
     case TR_PEER_SOCKET_TYPE_UTP:
-        n = utp_write(io->socket.handle.utp, evbuffer_pullup(io->outbuf.get(), howmuch), howmuch);
+        //  utp_write() doesn't modify its second argument,
+        //  but its declaration is missing a `const` anyway
+        n = utp_write(io->socket.handle.utp, const_cast<void*>(io->outbuf.peek<void>(n_bytes)), n_bytes);
 
         if (n > 0)
         {
-            evbuffer_drain(io->outbuf.get(), n);
+            io->outbuf.drain(n);
             didWriteWrapper(io, n);
         }
 
@@ -1074,7 +1036,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     case TR_PEER_SOCKET_TYPE_TCP:
         {
             EVUTIL_SET_SOCKET_ERROR(0);
-            n = tr_evbuffer_write(io, io->socket.handle.tcp, howmuch);
+            n = tr_evbuffer_write(io, io->socket.handle.tcp, n_bytes);
             int const e = EVUTIL_SOCKET_ERROR();
 
             if (n > 0)
@@ -1099,7 +1061,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
         tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
 
-    return n;
+    return n_bytes;
 }
 
 int tr_peerIo::flush(tr_direction dir, size_t limit)

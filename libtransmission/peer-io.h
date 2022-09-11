@@ -146,7 +146,7 @@ public:
     int flushOutgoingProtocolMsgs();
     int flush(tr_direction dir, size_t byte_limit);
 
-    void writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data);
+    void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
     void writeBuf(struct evbuffer* buf, bool is_piece_data);
     size_t getWriteBufferSpace(uint64_t now) const;
 
@@ -244,7 +244,7 @@ public:
     void* userData = nullptr;
 
     libtransmission::Buffer inbuf;
-    tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
+    libtransmission::Buffer outbuf;
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
 

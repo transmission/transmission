@@ -29,6 +29,11 @@ public:
         return evbuffer_get_length(buf_.get());
     }
 
+    [[nodiscard]] auto empty() const noexcept
+    {
+        return size() != 0U;
+    }
+
     template<typename T>
     [[nodiscard]] T const* peek(size_t n_bytes) const noexcept
     {
@@ -93,6 +98,21 @@ public:
     void fromBuf(void const* bytes, size_t n_bytes)
     {
         evbuffer_add(buf_.get(), bytes, n_bytes);
+    }
+
+    void* reserve(size_t n_bytes)
+    {
+        struct evbuffer_iovec vec
+        {
+        };
+        evbuffer_reserve_space(buf_.get(), static_cast<ev_ssize_t>(n_bytes), &vec, 1);
+        return vec.iov_base;
+    }
+
+    void commit(size_t n_bytes)
+    {
+        auto vec = evbuffer_iovec{ reserve(n_bytes), n_bytes };
+        evbuffer_commit_space(buf_.get(), &vec, 1);
     }
 
     void fromUint8(uint8_t uch)
