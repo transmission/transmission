@@ -10,8 +10,6 @@
 #include <memory>
 #include <vector>
 
-#include <iostream>
-
 #include <event2/buffer.h>
 
 #include "error.h"
@@ -37,19 +35,17 @@ public:
 
         [[nodiscard]] std::byte& operator*() noexcept
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " deref" << std::endl;
             return *reinterpret_cast<std::byte*>(iov_.iov_base);
         }
 
         [[nodiscard]] std::byte operator*() const noexcept
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " const deref" << std::endl;
             return *reinterpret_cast<std::byte*>(iov_.iov_base);
         }
 
         Iterator& operator++() noexcept
         {
-            if (iov_.iov_len > 0)
+            if (iov_.iov_len > 1)
             {
                 iov_.iov_base = reinterpret_cast<std::byte*>(iov_.iov_base) + 1;
                 --iov_.iov_len;
@@ -90,6 +86,12 @@ public:
     Buffer(Buffer const&) = delete;
     Buffer& operator=(Buffer const&) = delete;
 
+    template<typename T>
+    Buffer(T const& data)
+    {
+        add(std::data(data), std::size(data));
+    }
+
     [[nodiscard]] auto size() const noexcept
     {
         return evbuffer_get_length(buf_.get());
@@ -119,7 +121,7 @@ public:
 
     [[nodiscard]] auto end() noexcept
     {
-        return Iterator(buf_.get(), 0U);
+        return Iterator(buf_.get(), size());
     }
 
     [[nodiscard]] auto cbegin() const noexcept
@@ -129,14 +131,16 @@ public:
 
     [[nodiscard]] auto cend() const noexcept
     {
-        return Iterator(buf_.get(), 0U);
+        return Iterator(buf_.get(), size());
     }
 
     template<typename T>
     [[nodiscard]] bool startsWith(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
-        return n_bytes <= size() && std::equal(std::begin(needle), std::end(needle), cbegin());
+        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
+        auto const needle_end = needle_begin + n_bytes;
+        return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
     }
 
     auto toBuf(void* tgt, size_t n_bytes)

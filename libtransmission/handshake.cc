@@ -10,8 +10,6 @@
 #include <string_view>
 #include <utility>
 
-#include <event2/buffer.h>
-
 #include <fmt/format.h>
 
 #include "transmission.h"
