@@ -43,6 +43,11 @@ public:
             return *reinterpret_cast<std::byte*>(iov_.iov_base);
         }
 
+        [[nodiscard]] Iterator operator+(int n_bytes)
+        {
+            return Iterator(buf_, offset_ + n_bytes);
+        }
+
         Iterator& operator++() noexcept
         {
             if (iov_.iov_len > 1)
@@ -180,6 +185,11 @@ public:
         return res;
     }
 
+    void reserve(size_t n_bytes)
+    {
+        evbuffer_expand(buf_.get(), n_bytes - size());
+    }
+
     // -1 on error, 0 on eof, >0 for num bytes read
     ssize_t addSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
@@ -207,21 +217,6 @@ public:
     void add(T const& data)
     {
         add(std::data(data), std::size(data));
-    }
-
-    void* reserve(size_t n_bytes)
-    {
-        struct evbuffer_iovec vec
-        {
-        };
-        evbuffer_reserve_space(buf_.get(), static_cast<ev_ssize_t>(n_bytes), &vec, 1);
-        return vec.iov_base;
-    }
-
-    void commit(size_t n_bytes)
-    {
-        auto vec = evbuffer_iovec{ reserve(n_bytes), n_bytes };
-        evbuffer_commit_space(buf_.get(), &vec, 1);
     }
 
     void addUint8(uint8_t uch)

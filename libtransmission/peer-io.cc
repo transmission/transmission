@@ -851,15 +851,19 @@ void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
 
 void tr_peerIo::writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data)
 {
-    auto* const buf = outbuf.reserve(n_bytes);
-    memcpy(buf, bytes, n_bytes);
+    auto const old_size = std::size(outbuf);
+
+    outbuf.reserve(old_size + n_bytes);
+    outbuf.add(bytes, n_bytes);
 
     if (isEncrypted())
     {
-        encrypt(n_bytes, buf);
+        for (auto iter = std::begin(outbuf) + old_size, end = std::end(outbuf); iter != end; ++iter)
+        {
+            encrypt(1, &*iter);
+        }
     }
 
-    outbuf.commit(n_bytes);
     outbuf_info.emplace_back(n_bytes, is_piece_data);
 }
 
