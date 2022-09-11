@@ -136,9 +136,10 @@ public:
         return std::size(inbuf);
     }
 
-    [[nodiscard]] std::byte const* peek(size_t n_bytes) const noexcept
+    template<typename T>
+    [[nodiscard]] auto readBufferStartsWith(T const& t) const noexcept
     {
-        return inbuf.peek<std::byte>(n_bytes);
+        return inbuf.startsWith(t);
     }
 
     void readBufferAdd(void const* data, size_t n_bytes);
@@ -147,6 +148,9 @@ public:
     int flush(tr_direction dir, size_t byte_limit);
 
     void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
+
+    void write(libtransmission::Buffer&& buf, bool is_piece_data);
+
     void writeBuf(struct evbuffer* buf, bool is_piece_data);
     size_t getWriteBufferSpace(uint64_t now) const;
 

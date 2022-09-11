@@ -8,6 +8,8 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t
 
+#include <iostream>
+
 /**
  * This is a tiny and reusable implementation of alleged RC4 cipher.
  * https://en.wikipedia.org/wiki/RC4
@@ -44,6 +46,7 @@ public:
     {
         for (size_t i = 0; i < data_length; ++i)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " arc4 a byte" << std::endl;
             ((uint8_t*)dst_data)[i] = ((uint8_t const*)src_data)[i] ^ arc4_next();
         }
     }

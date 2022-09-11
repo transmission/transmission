@@ -204,7 +204,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
 
     tr_error* error = nullptr;
-    auto const res = io->inbuf.fromSocket(fd, howmuch, &error);
+    auto const res = io->inbuf.addSocket(fd, howmuch, &error);
     if (res > 0)
     {
         io->setEnabled(dir, true);
@@ -343,7 +343,7 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 
 void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
-    inbuf.fromBuf(data, n_bytes);
+    inbuf.add(data, n_bytes);
     setEnabled(TR_DOWN, true);
     canReadWrapper(this);
 }
@@ -830,6 +830,19 @@ size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
 ***
 **/
 
+void tr_peerIo::write(libtransmission::Buffer&& buf, bool is_piece_data)
+{
+    auto const n_bytes = std::size(buf);
+
+    for (auto& uch : buf)
+    {
+        encrypt(1, &uch);
+    }
+
+    outbuf.add(std::move(buf));
+    outbuf_info.emplace_back(n_bytes, is_piece_data);
+}
+
 void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
 {
     auto const n_bytes = evbuffer_get_length(buf);
@@ -963,7 +976,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
     case TR_PEER_SOCKET_TYPE_TCP:
         {
             tr_error* error = nullptr;
-            res = io->inbuf.fromSocket(io->socket.handle.tcp, howmuch, &error);
+            res = io->inbuf.addSocket(io->socket.handle.tcp, howmuch, &error);
 
             if (io->readBufferSize() != 0)
             {
@@ -1021,17 +1034,16 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes)
     switch (io->socket.type)
     {
     case TR_PEER_SOCKET_TYPE_UTP:
-        //  utp_write() doesn't modify its second argument,
-        //  but its declaration is missing a `const` anyway
-        n = utp_write(io->socket.handle.utp, const_cast<void*>(io->outbuf.peek<void>(n_bytes)), n_bytes);
-
-        if (n > 0)
         {
-            io->outbuf.drain(n);
-            didWriteWrapper(io, n);
+            auto iov = io->outbuf.vecs(n_bytes);
+            n = utp_writev(io->socket.handle.utp, reinterpret_cast<struct utp_iovec*>(std::data(iov)), std::size(iov));
+            if (n > 0)
+            {
+                io->outbuf.drain(n);
+                didWriteWrapper(io, n);
+            }
+            break;
         }
-
-        break;
 
     case TR_PEER_SOCKET_TYPE_TCP:
         {
