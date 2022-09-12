@@ -325,8 +325,8 @@ Gtk::CellRendererText* number_renderer_new()
 {
     auto* r = Gtk::make_managed<Gtk::CellRendererText>();
 
-    r->property_alignment() = Pango::ALIGN_RIGHT;
-    r->property_weight() = Pango::WEIGHT_ULTRALIGHT;
+    r->property_alignment() = TR_PANGO_ALIGNMENT(RIGHT);
+    r->property_weight() = TR_PANGO_WEIGHT(ULTRALIGHT);
     r->property_xalign() = 1.0;
     r->property_xpad() = GUI_PAD;
 

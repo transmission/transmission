@@ -33,8 +33,8 @@ void HigWorkarea::add_section_title_widget(guint& row, Gtk::Widget& w)
 void HigWorkarea::add_section_title(guint& row, Glib::ustring const& section_title)
 {
     auto* l = Gtk::make_managed<Gtk::Label>(gtr_sprintf("<b>%s</b>", section_title));
-    l->set_halign(Gtk::ALIGN_START);
-    l->set_valign(Gtk::ALIGN_CENTER);
+    l->set_halign(TR_GTK_ALIGN(START));
+    l->set_valign(TR_GTK_ALIGN(CENTER));
     l->set_use_markup(true);
     add_section_title_widget(row, *l);
 }
@@ -68,8 +68,8 @@ void HigWorkarea::add_label_w(guint row, Gtk::Widget& w)
 
     if (auto* label = dynamic_cast<Gtk::Label*>(&w); label != nullptr)
     {
-        label->set_halign(Gtk::ALIGN_START);
-        label->set_valign(Gtk::ALIGN_CENTER);
+        label->set_halign(TR_GTK_ALIGN(START));
+        label->set_valign(TR_GTK_ALIGN(CENTER));
         label->set_use_markup(true);
     }
 
@@ -80,8 +80,8 @@ void HigWorkarea::add_tall_control(guint row, Gtk::Widget& control)
 {
     if (auto* label = dynamic_cast<Gtk::Label*>(&control); label != nullptr)
     {
-        label->set_halign(Gtk::ALIGN_START);
-        label->set_valign(Gtk::ALIGN_CENTER);
+        label->set_halign(TR_GTK_ALIGN(START));
+        label->set_valign(TR_GTK_ALIGN(CENTER));
     }
 
     control.set_hexpand(true);
@@ -93,8 +93,8 @@ void HigWorkarea::add_control(guint row, Gtk::Widget& control)
 {
     if (auto* label = dynamic_cast<Gtk::Label*>(&control); label != nullptr)
     {
-        label->set_halign(Gtk::ALIGN_START);
-        label->set_valign(Gtk::ALIGN_CENTER);
+        label->set_halign(TR_GTK_ALIGN(START));
+        label->set_valign(TR_GTK_ALIGN(CENTER));
     }
 
     control.set_hexpand(true);
@@ -128,8 +128,8 @@ Gtk::Label* HigWorkarea::add_tall_row(
     Gtk::Widget* mnemonic)
 {
     auto* l = Gtk::make_managed<Gtk::Label>(mnemonic_string, true);
-    auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, 0);
-    auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 0);
+    auto* h = Gtk::make_managed<Gtk::Box>(TR_GTK_ORIENTATION(HORIZONTAL), 0);
+    auto* v = Gtk::make_managed<Gtk::Box>(TR_GTK_ORIENTATION(VERTICAL), 0);
     h->pack_start(*l, false, false, 0);
     v->pack_start(*h, false, false, GUI_PAD_SMALL);
 

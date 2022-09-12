@@ -95,21 +95,32 @@ void StatsDialog::Impl::dialogResponse(int response)
 {
     if (response == TR_RESPONSE_RESET)
     {
-        Gtk::MessageDialog w(dialog_, _("Reset your statistics?"), false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE, true);
-        w.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-        w.add_button(_("_Reset"), TR_RESPONSE_RESET);
-        w.set_secondary_text(
+        auto w = std::make_shared<Gtk::MessageDialog>(
+            dialog_,
+            _("Reset your statistics?"),
+            false,
+            TR_GTK_MESSAGE_TYPE(QUESTION),
+            TR_GTK_BUTTONS_TYPE(NONE),
+            true);
+        w->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(CANCEL));
+        w->add_button(_("_Reset"), TR_RESPONSE_RESET);
+        w->set_secondary_text(
             _("These statistics are for your information only. "
               "Resetting them doesn't affect the statistics logged by your BitTorrent trackers."));
-
-        if (w.run() == TR_RESPONSE_RESET)
-        {
-            tr_sessionClearStats(core_->get_session());
-            updateStats();
-        }
+        w->signal_response().connect(
+            [this, w](int inner_response) mutable
+            {
+                if (inner_response == TR_RESPONSE_RESET)
+                {
+                    tr_sessionClearStats(core_->get_session());
+                    updateStats();
+                }
+                w.reset();
+            });
+        w->show();
     }
 
-    if (response == Gtk::RESPONSE_CLOSE)
+    if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
         dialog_.hide();
     }
@@ -147,7 +158,7 @@ StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& b
     , all_time_lb_(gtr_get_widget<Gtk::Label>(builder, "total_duration_value_label"))
     , all_sessions_lb_(gtr_get_widget<Gtk::Label>(builder, "start_count_label"))
 {
-    dialog_.set_default_response(Gtk::RESPONSE_CLOSE);
+    dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(CLOSE));
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::dialogResponse));
 
     updateStats();

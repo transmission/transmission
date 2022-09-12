@@ -194,9 +194,9 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     progress_bar_->set_text(str);
 
     /* buttons */
-    set_response_sensitive(Gtk::RESPONSE_CANCEL, !is_done);
-    set_response_sensitive(Gtk::RESPONSE_CLOSE, is_done);
-    set_response_sensitive(Gtk::RESPONSE_ACCEPT, is_done && success);
+    set_response_sensitive(TR_GTK_RESPONSE_TYPE(CANCEL), !is_done);
+    set_response_sensitive(TR_GTK_RESPONSE_TYPE(CLOSE), is_done);
+    set_response_sensitive(TR_GTK_RESPONSE_TYPE(ACCEPT), is_done && success);
 
     success_ = success;
     return true;
@@ -219,16 +219,16 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
 {
     switch (response)
     {
-    case Gtk::RESPONSE_CANCEL:
+    case TR_GTK_RESPONSE_TYPE(CANCEL):
         builder_.cancelChecksums();
         hide();
         break;
 
-    case Gtk::RESPONSE_ACCEPT:
+    case TR_GTK_RESPONSE_TYPE(ACCEPT):
         addTorrent();
         [[fallthrough]];
 
-    case Gtk::RESPONSE_CLOSE:
+    case TR_GTK_RESPONSE_TYPE(CLOSE):
         hide();
         break;
 
@@ -288,7 +288,7 @@ void MakeDialog::Impl::makeProgressDialog(std::string_view target, std::future<t
 
 void MakeDialog::Impl::onResponse(int response)
 {
-    if (response == Gtk::RESPONSE_ACCEPT)
+    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
         if (builder_)
         {
@@ -320,7 +320,7 @@ void MakeDialog::Impl::onResponse(int response)
             makeProgressDialog(target, builder_->makeChecksums());
         }
     }
-    else if (response == Gtk::RESPONSE_CLOSE)
+    else if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
         dialog_.hide();
     }
@@ -427,14 +427,14 @@ void MakeDialog::Impl::on_drag_data_received(
         auto const& uri = uris.front();
         auto const filename = Glib::filename_from_uri(uri);
 
-        if (Glib::file_test(filename, Glib::FILE_TEST_IS_DIR))
+        if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_DIR)))
         {
             /* a directory was dragged onto the dialog... */
             folder_radio_->set_active(true);
             folder_chooser_->set_current_folder(filename);
             success = true;
         }
-        else if (Glib::file_test(filename, Glib::FILE_TEST_IS_REGULAR))
+        else if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_REGULAR)))
         {
             /* a file was dragged on to the dialog... */
             file_radio_->set_active(true);
@@ -484,7 +484,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
 {
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
-    destination_chooser_->set_current_folder(Glib::get_user_special_dir(Glib::USER_DIRECTORY_DESKTOP));
+    destination_chooser_->set_current_folder(Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP)));
 
     folder_radio_->set_active(false);
     folder_radio_->signal_toggled().connect([this]() { onSourceToggled2(folder_radio_, folder_chooser_); });
