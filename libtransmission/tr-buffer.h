@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <event2/buffer.h>
@@ -88,8 +89,10 @@ public:
     };
 
     Buffer() = default;
+    Buffer(Buffer&&) = default;
     Buffer(Buffer const&) = delete;
     Buffer& operator=(Buffer const&) = delete;
+    Buffer& operator=(Buffer&&) = default;
 
     template<typename T>
     Buffer(T const& data)
@@ -125,6 +128,16 @@ public:
     }
 
     [[nodiscard]] auto end() noexcept
+    {
+        return Iterator(buf_.get(), size());
+    }
+
+    [[nodiscard]] auto begin() const noexcept
+    {
+        return Iterator(buf_.get(), 0U);
+    }
+
+    [[nodiscard]] auto end() const noexcept
     {
         return Iterator(buf_.get(), size());
     }
@@ -192,6 +205,18 @@ public:
             tr_error_set(error, err, tr_net_strerror(err));
         }
         return res;
+    }
+
+    [[nodiscard]] Iovec alloc(size_t n_bytes)
+    {
+        auto iov = Iovec{};
+        evbuffer_reserve_space(buf_.get(), static_cast<ev_ssize_t>(n_bytes), &iov, 1);
+        return iov;
+    }
+
+    void commit(Iovec iov)
+    {
+        evbuffer_commit_space(buf_.get(), &iov, 1);
     }
 
     void reserve(size_t n_bytes)
@@ -271,8 +296,19 @@ public:
         addUint64(hll);
     }
 
+    [[nodiscard]] std::string toString() const
+    {
+        auto str = std::string{};
+        str.reserve(size());
+        for (auto const& by : *this)
+        {
+            str.push_back(*reinterpret_cast<char const*>(&by));
+        }
+        return str;
+    }
+
 private:
-    std::unique_ptr<evbuffer, void (*)(evbuffer*)> const buf_{ evbuffer_new(), evbuffer_free };
+    std::unique_ptr<evbuffer, void (*)(evbuffer*)> buf_{ evbuffer_new(), evbuffer_free };
 };
 
 } // namespace libtransmission
