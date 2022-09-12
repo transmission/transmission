@@ -429,19 +429,19 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
     /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
-    peer_io->write(std::move(outbuf), false);
+    peer_io->write(outbuf, false);
     peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, *info_hash);
 
-    auto out2 = libtransmission::Buffer{};
-    out2.add(VC);
-    out2.addUint32(handshake->cryptoProvide());
-    out2.addUint16(0);
+    TR_ASSERT(std::empty(outbuf));
+    outbuf.add(VC);
+    outbuf.addUint32(handshake->cryptoProvide());
+    outbuf.addUint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
     if (auto msg = std::array<uint8_t, HandshakeSize>{}; buildHandshakeMessage(handshake, std::data(msg)))
     {
-        out2.addUint16(std::size(msg));
-        out2.add(msg);
+        outbuf.addUint16(std::size(msg));
+        outbuf.add(msg);
         handshake->haveSentBitTorrentHandshake = true;
     }
     else
@@ -451,7 +451,7 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
 
     /* send it */
     setReadState(handshake, AWAITING_VC);
-    peer_io->write(std::move(out2), false);
+    peer_io->write(outbuf, false);
     return READ_NOW;
 }
 
@@ -874,7 +874,7 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
     }
 
     /* send it out */
-    peer_io->write(std::move(outbuf), false);
+    peer_io->write(outbuf, false);
 
     /* now await the handshake */
     setState(handshake, AWAITING_PAYLOAD_STREAM);

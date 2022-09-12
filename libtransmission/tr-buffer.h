@@ -104,7 +104,7 @@ public:
 
     [[nodiscard]] auto empty() const noexcept
     {
-        return size() != 0U;
+        return size() == 0U;
     }
 
     [[nodiscard]] auto vecs(size_t n_bytes) const
@@ -146,6 +146,15 @@ public:
         auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
         return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
+    }
+
+    [[nodiscard]] auto peek(size_t offset) const noexcept
+    {
+        auto ptr = evbuffer_ptr{};
+        evbuffer_ptr_set(buf_.get(), &ptr, offset, EVBUFFER_PTR_SET);
+        auto iov = Iovec{};
+        evbuffer_peek(buf_.get(), std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov, 1);
+        return iov;
     }
 
     auto toBuf(void* tgt, size_t n_bytes)
@@ -201,6 +210,11 @@ public:
             tr_error_set(error, err, tr_net_strerror(err));
         }
         return res;
+    }
+
+    void add(Buffer& that)
+    {
+        evbuffer_add_buffer(buf_.get(), that.buf_.get());
     }
 
     void add(Buffer&& that)
