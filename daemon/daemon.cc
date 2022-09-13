@@ -9,8 +9,6 @@
 #include <cstdlib> /* atoi */
 #include <iostream>
 #include <memory>
-#include <string>
-#include <string_view>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -26,21 +24,14 @@
 
 #include <fmt/core.h>
 
-#include <libtransmission/transmission.h>
+#include "daemon.h"
 
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/log.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
-
-#include "daemon.h"
 
 #ifdef USE_SYSTEMD
 
@@ -60,46 +51,7 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 
 #endif
 
-using namespace std::literals;
 using libtransmission::Watchdir;
-
-class Daemon
-{
-public:
-    struct event_base* ev_base_ = nullptr;
-    tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
-
-private:
-    bool seen_hup_ = false;
-    bool paused_ = false;
-    std::string config_dir_;
-    char const* log_file_name_ = nullptr;
-    tr_session* my_session_ = nullptr;
-    tr_variant settings_ = {};
-    tr_quark key_pidfile_ = tr_quark_new("pidfile"sv);
-    tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic"sv);
-
-public:
-    Daemon() = default;
-
-    ~Daemon()
-    {
-        tr_variantClear(&settings_);
-    }
-
-    bool init(int argc, char* argv[], bool* foreground, int* ret);
-    bool parseArgs(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code);
-    bool reopenLogFile(char const* filename);
-    int start(bool (*setupsigfn)(void*), bool foreground);
-    void periodicUpdate();
-    void reportStatus();
-    void reconfigure();
-    void stop();
-};
-
-/***
-****
-***/
 
 static char constexpr MyName[] = "transmission-daemon";
 static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
@@ -201,7 +153,7 @@ static auto constexpr Options = std::array<tr_option, 45>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-bool Daemon::reopenLogFile(char const* filename)
+bool tr_daemon::reopen_log_file(char const* filename)
 {
     tr_error* error = nullptr;
     tr_sys_file_t const old_log_file = logfile_;
@@ -426,7 +378,7 @@ static void pumpLogMessages(tr_sys_file_t file)
     tr_logFreeQueue(list);
 }
 
-void Daemon::reportStatus(void)
+void tr_daemon::report_status(void)
 {
     double const up = tr_sessionGetRawSpeed_KBps(my_session_, TR_UP);
     double const dn = tr_sessionGetRawSpeed_KBps(my_session_, TR_DOWN);
@@ -441,15 +393,15 @@ void Daemon::reportStatus(void)
     }
 }
 
-void Daemon::periodicUpdate(void)
+void tr_daemon::periodic_update(void)
 {
     pumpLogMessages(logfile_);
-    reportStatus();
+    report_status();
 }
 
-static void periodicUpdate(evutil_socket_t /*fd*/, short /*what*/, void* arg)
+static void periodic_update(evutil_socket_t /*fd*/, short /*what*/, void* arg)
 {
-    static_cast<Daemon*>(arg)->periodicUpdate();
+    static_cast<tr_daemon*>(arg)->periodic_update();
 }
 
 static tr_rpc_callback_status on_rpc_callback(
@@ -458,17 +410,14 @@ static tr_rpc_callback_status on_rpc_callback(
     tr_torrent* /*tor*/,
     void* arg)
 {
-    Daemon* daemon = static_cast<Daemon*>(arg);
-
     if (type == TR_RPC_SESSION_CLOSE)
     {
-        event_base_loopexit(daemon->ev_base_, nullptr);
+        static_cast<tr_daemon*>(arg)->stop();
     }
-
     return TR_RPC_OK;
 }
 
-bool Daemon::parseArgs(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code)
+bool tr_daemon::parse_args(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code)
 {
     int c;
     char const* optstr;
@@ -523,7 +472,7 @@ bool Daemon::parseArgs(int argc, char const** argv, bool* dump_settings, bool* f
             break;
 
         case 'e':
-            if (reopenLogFile(optstr))
+            if (reopen_log_file(optstr))
             {
                 log_file_name_ = optstr;
             }
@@ -687,12 +636,7 @@ bool Daemon::parseArgs(int argc, char const** argv, bool* dump_settings, bool* f
     return true;
 }
 
-static void daemon_reconfigure(void* arg)
-{
-    static_cast<Daemon*>(arg)->reconfigure();
-}
-
-void Daemon::reconfigure(void)
+void tr_daemon::reconfigure(void)
 {
     if (my_session_ == nullptr)
     {
@@ -707,7 +651,7 @@ void Daemon::reconfigure(void)
         /* reopen the logfile to allow for log rotation */
         if (log_file_name_ != nullptr)
         {
-            reopenLogFile(log_file_name_);
+            reopen_log_file(log_file_name_);
         }
 
         configDir = tr_sessionGetConfigDir(my_session_);
@@ -721,17 +665,12 @@ void Daemon::reconfigure(void)
     }
 }
 
-static void daemon_stop(void* arg)
-{
-    static_cast<Daemon*>(arg)->stop();
-}
-
-void Daemon::stop(void)
+void tr_daemon::stop(void)
 {
     event_base_loopexit(ev_base_, nullptr);
 }
 
-int Daemon::start(bool (*setupsigfn)(void*), bool foreground)
+int tr_daemon::start([[maybe_unused]] bool foreground)
 {
     bool boolVal;
     bool pidfile_created = false;
@@ -748,7 +687,7 @@ int Daemon::start(bool (*setupsigfn)(void*), bool foreground)
     /* setup event state */
     ev_base_ = event_base_new();
 
-    if (ev_base_ == nullptr || (setupsigfn ? setupsigfn(ev_base_) : true) == false)
+    if (ev_base_ == nullptr || setup_signals() == false)
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
@@ -809,7 +748,7 @@ int Daemon::start(bool (*setupsigfn)(void*), bool foreground)
     /* If we got a SIGHUP during startup, process that now. */
     if (seen_hup_)
     {
-        daemon_reconfigure(this);
+        reconfigure();
     }
 
     /* maybe add a watchdir */
@@ -860,7 +799,7 @@ int Daemon::start(bool (*setupsigfn)(void*), bool foreground)
     /* Create new timer event to report daemon status */
     {
         constexpr auto one_sec = timeval{ 1, 0 }; // 1 second
-        status_ev = event_new(ev_base_, -1, EV_PERSIST, &::periodicUpdate, this);
+        status_ev = event_new(ev_base_, -1, EV_PERSIST, &::periodic_update, this);
 
         if (status_ev == nullptr)
         {
@@ -937,12 +876,7 @@ CLEANUP:
     return 0;
 }
 
-static int daemon_start(void* varg, bool (*setupsigfn)(void*), bool foreground)
-{
-    return static_cast<Daemon*>(varg)->start(setupsigfn, foreground);
-}
-
-bool Daemon::init(int argc, char* argv[], bool* foreground, int* ret)
+bool tr_daemon::init(int argc, char* argv[], bool* foreground, int* ret)
 {
     config_dir_ = getConfigDir(argc, (char const* const*)argv);
 
@@ -956,7 +890,7 @@ bool Daemon::init(int argc, char* argv[], bool* foreground, int* ret)
     *ret = 0;
 
     /* overwrite settings from the command line */
-    if (!parseArgs(argc, (char const**)argv, &dumpSettings, foreground, ret))
+    if (!parse_args(argc, (char const**)argv, &dumpSettings, foreground, ret))
     {
         goto EXIT_EARLY;
     }
@@ -987,29 +921,27 @@ EXIT_EARLY:
     return false;
 }
 
+void tr_daemon::handle_error(tr_error* error)
+{
+    auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
+    printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+    tr_error_free(error);
+}
+
 int tr_main(int argc, char* argv[])
 {
-    Daemon daemon;
-    bool foreground;
     int ret;
+    tr_daemon daemon;
+    bool foreground;
+    tr_error* error = nullptr;
 
     if (!daemon.init(argc, argv, &foreground, &ret))
     {
         return ret;
     }
-
-    auto constexpr cb = dtr_callbacks{
-        &daemon_start,
-        &daemon_stop,
-        &daemon_reconfigure,
-    };
-
-    if (tr_error* error = nullptr; !dtr_daemon(&cb, &daemon, foreground, &ret, &error))
+    if (!daemon.spawn(foreground, &ret, &error))
     {
-        auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
-        printMessage(daemon.logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
-        tr_error_free(error);
+        daemon.handle_error(error);
     }
-
     return ret;
 }

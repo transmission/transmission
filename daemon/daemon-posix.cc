@@ -19,14 +19,7 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/utils.h>
-
 #include "daemon.h"
-
-static dtr_callbacks const* callbacks = nullptr;
-static void* callback_arg = nullptr;
 
 static void set_system_error(tr_error** error, int code, std::string_view message)
 {
@@ -35,41 +28,35 @@ static void set_system_error(tr_error** error, int code, std::string_view messag
 
 #ifdef HAVE_SYS_SIGNALFD_H
 
-static int sigfd = -1;
-
-static void handle_signal(int sig)
-{
-    switch (sig)
-    {
-    case SIGHUP:
-        callbacks->on_reconfigure(callback_arg);
-        break;
-
-    case SIGINT:
-    case SIGTERM:
-        callbacks->on_stop(callback_arg);
-        break;
-
-    default:
-        assert("Unexpected signal" && 0);
-    }
-}
-
-static void handle_signals(evutil_socket_t fd, short /*what*/, void* /*arg*/)
+static void handle_signals(evutil_socket_t fd, short /*what*/, void* arg)
 {
     struct signalfd_siginfo fdsi;
+    auto* const daemon = static_cast<tr_daemon*>(arg);
 
     if (read(fd, &fdsi, sizeof(fdsi)) != sizeof(fdsi))
         assert("Error reading signal descriptor" && 0);
     else
-        handle_signal(fdsi.ssi_signo);
+    {
+        switch (fdsi.ssi_signo)
+        {
+        case SIGHUP:
+            daemon->reconfigure();
+            break;
+        case SIGINT:
+        case SIGTERM:
+            daemon->stop();
+            break;
+        default:
+            assert("Unexpected signal" && 0);
+        }
+    }
 }
 
-static bool setup_signals(void* arg)
+bool tr_daemon::setup_signals()
 {
     sigset_t mask = {};
     struct event* sigev = nullptr;
-    struct event_base* base = static_cast<struct event_base*>(arg);
+    struct event_base* base = ev_base_;
 
     sigemptyset(&mask);
     sigaddset(&mask, SIGINT);
@@ -79,21 +66,21 @@ static bool setup_signals(void* arg)
     if (sigprocmask(SIG_BLOCK, &mask, nullptr) < 0)
         return false;
 
-    sigfd = signalfd(-1, &mask, 0);
-    if (sigfd < 0)
+    sigfd_ = signalfd(-1, &mask, 0);
+    if (sigfd_ < 0)
         return false;
 
-    sigev = event_new(base, sigfd, EV_READ | EV_PERSIST, handle_signals, nullptr);
+    sigev = event_new(base, sigfd_, EV_READ | EV_PERSIST, handle_signals, this);
     if (sigev == nullptr)
     {
-        close(sigfd);
+        close(sigfd_);
         return false;
     }
 
     if (event_add(sigev, nullptr) < 0)
     {
         event_del(sigev);
-        close(sigfd);
+        close(sigfd_);
         return false;
     }
 
@@ -102,19 +89,19 @@ static bool setup_signals(void* arg)
 
 #else /* no signalfd API, use evsignal */
 
-static void reconfigure(evutil_socket_t /*fd*/, short /*events*/, void* /*arg*/)
+static void reconfigureMarshall(evutil_socket_t /*fd*/, short /*events*/, void* arg)
 {
-    callbacks->on_reconfigure(callback_arg);
+    static_cast<tr_daemon*>(arg)->reconfigure();
 }
 
-static void stop(evutil_socket_t /*fd*/, short /*events*/, void* /*arg*/)
+static void stopMarshall(evutil_socket_t /*fd*/, short /*events*/, void* arg)
 {
-    callbacks->on_stop(callback_arg);
+    static_cast<tr_daemon*>(arg)->stop();
 }
 
-static bool setup_signal(struct event_base* base, int sig, void (*callback)(evutil_socket_t, short, void*))
+static bool setup_signal(struct event_base* base, int sig, void (*callback)(evutil_socket_t, short, void*), void* arg)
 {
-    struct event* sigev = evsignal_new(base, sig, callback, nullptr);
+    struct event* sigev = evsignal_new(base, sig, callback, arg);
 
     if (sigev == nullptr)
         return false;
@@ -128,20 +115,16 @@ static bool setup_signal(struct event_base* base, int sig, void (*callback)(evut
     return true;
 }
 
-static bool setup_signals(void* arg)
+bool tr_daemon::setup_signals()
 {
-    struct event_base* base = static_cast<struct event_base*>(arg);
-
-    return (setup_signal(base, SIGHUP, reconfigure) && setup_signal(base, SIGINT, stop) && setup_signal(base, SIGTERM, stop));
+    return setup_signal(ev_base_, SIGHUP, reconfigureMarshall, this) && setup_signal(ev_base_, SIGINT, stopMarshall, this) &&
+        setup_signal(ev_base_, SIGTERM, stopMarshall, this);
 }
 
 #endif /* HAVE_SYS_SIGNALFD_H */
 
-bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
+bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)
 {
-    callbacks = cb;
-    callback_arg = cb_arg;
-
     *exit_code = 1;
 
     if (!foreground)
@@ -198,7 +181,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
 #endif
     }
 
-    *exit_code = cb->on_start(cb_arg, setup_signals, foreground);
+    *exit_code = start(foreground);
 
     return true;
 }
