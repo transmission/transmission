@@ -56,9 +56,6 @@ bool Torrent::includesTracker(QString const& sitename) const
 
 int Torrent::compareSeedProgress(Torrent const& that) const
 {
-    auto const a_ratio = ratio();
-    auto const b_ratio = that.ratio();
-
     auto const a_ratio_limit = getSeedRatioLimit();
     auto const b_ratio_limit = that.getSeedRatioLimit();
 
@@ -66,6 +63,9 @@ int Torrent::compareSeedProgress(Torrent const& that) const
     {
         return compareRatio(that);
     }
+
+    auto const a_ratio = ratio();
+    auto const b_ratio = that.ratio();
 
     if (!a_ratio_limit)
     {
