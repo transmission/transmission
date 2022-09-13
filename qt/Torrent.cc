@@ -77,14 +77,19 @@ int Torrent::compareSeedProgress(Torrent const& that) const
         return a_ratio < *a_ratio_limit ? -1 : 1;
     }
 
-    if (*a_ratio_limit == 0 && *b_ratio_limit == 0)
+    if (!(*a_ratio_limit > 0) && !(*b_ratio_limit > 0))
     {
         return compareRatio(that);
     }
 
-    if (*a_ratio_limit == 0 || *b_ratio_limit == 0)
+    if (!(*a_ratio_limit > 0))
     {
-        return *a_ratio_limit ? -1 : 1;
+        return 1;
+    }
+
+    if (!(*b_ratio_limit > 0))
+    {
+        return -1;
     }
 
     double const a_progress = a_ratio / *a_ratio_limit;
