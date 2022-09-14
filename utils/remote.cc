@@ -87,6 +87,7 @@ struct Config
     std::string unix_socket_path;
 
     bool debug = false;
+    bool json = false;
     bool use_ssl = false;
 };
 
@@ -234,7 +235,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 97>{
+static auto constexpr Options = std::array<tr_option, 98>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -274,6 +275,7 @@ static auto constexpr Options = std::array<tr_option, 97>{
       { 941, "info-peers", "List the current torrent(s)' peers", "ip", false, nullptr },
       { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", false, nullptr },
       { 943, "info-trackers", "List the current torrent(s)' trackers", "it", false, nullptr },
+      { 'j', "json", "Return RPC response as a JSON string", "j", false, nullptr },
       { 920, "session-info", "Show the session's details", "si", false, nullptr },
       { 921, "session-stats", "Show the session's statistics", "st", false, nullptr },
       { 'l', "list", "List all torrents", "l", false, nullptr },
@@ -415,6 +417,7 @@ static int getOptMode(int val)
     case 'b': /* debug */
     case 'n': /* auth */
     case 968: /* Unix domain socket */
+    case 'j': /* JSON */
     case 810: /* authenv */
     case 'N': /* netrc */
     case 820: /* UseSSL */
@@ -2141,6 +2144,12 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
             TR_PRIsv_ARG(response));
     }
 
+    if (config.json)
+    {
+        printf("%" TR_PRIsv, TR_PRIsv_ARG(response));
+        return status;
+    }
+
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
     {
         tr_logAddWarn(fmt::format("Unable to parse response '{}'", response));
@@ -2455,6 +2464,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
             case 'b': /* debug */
                 config.debug = true;
+                break;
+
+            case 'j': /* return output as JSON */
+                config.json = true;
                 break;
 
             case 968: /* Unix domain socket */
