@@ -37,6 +37,7 @@ and
 .Op Fl if
 .Op Fl ip
 .Op Fl it
+.Op Fl j
 .Op Fl l
 .Op Fl m | M
 .Op Fl n Ar user:pass
@@ -187,6 +188,8 @@ List the specified torrent's peers
 List the specified torrent's pieces
 .It Fl it Fl -info-trackers
 List the specified torrent's trackers
+.It Fl j Fl -json
+Return the RPC response as JSON
 .It Fl si Fl -session-info
 List session information from the server
 .It Fl st Fl -session-stats
