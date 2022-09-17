@@ -313,8 +313,12 @@ namespace
 // COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
 // Also avoid these names followed immediately by an extension;
 // for example, NUL.txt is not recommended.
-[[nodiscard]] bool isReservedFile(std::string_view in) noexcept
+[[nodiscard]] bool isReservedFile([[maybe_unused]] std::string_view in) noexcept
 {
+#ifndef _WIN32
+    // Of course, on Unix-like platforms none of this applies.
+    return false;
+#else
     if (std::empty(in))
     {
         return false;
@@ -351,6 +355,7 @@ namespace
         std::begin(ReservedPrefixes),
         std::end(ReservedPrefixes),
         [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
+#endif
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
@@ -359,6 +364,9 @@ namespace
 // except for the following:
 [[nodiscard]] auto constexpr isReservedChar(char ch) noexcept
 {
+#if !defined(_WIN32)
+    return ch == '/';
+#else
     switch (ch)
     {
     case '"':
@@ -374,6 +382,7 @@ namespace
     default:
         return false;
     }
+#endif
 }
 
 void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
