@@ -107,7 +107,7 @@
         _fTitleAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
 
         _fStatusAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
-        _fStatusAttributes[NSFontAttributeName] = [NSFont messageFontOfSize:9.0];
+        _fStatusAttributes[NSFontAttributeName] = [NSFont messageFontOfSize:10.0];
         _fStatusAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
 
         _fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
