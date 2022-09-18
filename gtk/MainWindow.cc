@@ -181,8 +181,11 @@ void MainWindow::Impl::prefsChanged(tr_quark const key)
         renderer_->property_compact() = gtr_pref_flag_get(key);
         /* since the cell size has changed, we need gtktreeview to revalidate
          * its fixed-height mode values. Unfortunately there's not an API call
-         * for that, but it *does* revalidate when it thinks the style's been tweaked */
-        g_signal_emit_by_name(Glib::unwrap(view_), "style-updated", nullptr, nullptr);
+         * for that, but this seems to work for both GTK 3 and 4 */
+        view_->set_fixed_height_mode(false);
+        view_->set_row_separator_func({});
+        view_->unset_row_separator_func();
+        view_->set_fixed_height_mode(true);
         break;
 
     case TR_KEY_show_statusbar:
