@@ -497,7 +497,7 @@ public:
             session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
         }
 
-        void sendto(char const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
 
         [[nodiscard]] constexpr auto port() const noexcept
         {
