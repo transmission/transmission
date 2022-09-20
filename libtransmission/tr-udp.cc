@@ -406,7 +406,8 @@ void tr_session::tr_udp_core::sendto(char const* buf, size_t buflen, struct sock
         }
         else
         {
-            ret = -1, errno = EBADF;
+            ret = -1;
+            errno = EBADF;
         }
         if (ret == 1)
         {
