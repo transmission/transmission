@@ -516,7 +516,7 @@ public:
 
     private:
         tr_port udp_port_ = {};
-        tr_session* const session_;
+        tr_session& session_;
         struct event* udp_event_ = nullptr;
         struct event* udp6_event_ = nullptr;
         unsigned char* udp6_bound_ = nullptr;
