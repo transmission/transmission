@@ -482,7 +482,7 @@ public:
     class tr_udp_core
     {
     public:
-        tr_udp_core(tr_session* session)
+        tr_udp_core(tr_session& session)
             : session_{ session }
         {
         }
