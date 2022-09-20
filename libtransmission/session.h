@@ -493,8 +493,8 @@ public:
 
         void set_socket_tos()
         {
-            session_->setSocketTOS(udp_socket_, TR_AF_INET);
-            session_->setSocketTOS(udp6_socket_, TR_AF_INET6);
+            session_.setSocketTOS(udp_socket_, TR_AF_INET);
+            session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
         }
 
         void sendto(char const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
