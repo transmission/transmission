@@ -271,16 +271,18 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
 bool on_tree_view_button_pressed(
-    Gtk::TreeView* view,
-    GdkEventButton* event,
-    std::function<void(GdkEventButton*)> const& callback)
+    Gtk::TreeView& view,
+    double view_x,
+    double view_y,
+    bool context_menu_requested,
+    std::function<void(double, double)> const& callback)
 {
-    if (event->type == GDK_BUTTON_PRESS && event->button == 3)
+    if (context_menu_requested)
     {
         Gtk::TreeModel::Path path;
-        auto const selection = view->get_selection();
+        auto const selection = view.get_selection();
 
-        if (view->get_path_at_pos((int)event->x, (int)event->y, path) && !selection->is_selected(path))
+        if (view.get_path_at_pos((int)view_x, (int)view_y, path) && !selection->is_selected(path))
         {
             selection->unselect_all();
             selection->select(path);
@@ -288,7 +290,7 @@ bool on_tree_view_button_pressed(
 
         if (callback)
         {
-            callback(event);
+            callback(view_x, view_y);
         }
 
         return true;
@@ -299,14 +301,73 @@ bool on_tree_view_button_pressed(
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event)
+bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y)
 {
-    if (Gtk::TreeModel::Path path; !view->get_path_at_pos((int)event->x, (int)event->y, path))
+    if (Gtk::TreeModel::Path path; !view.get_path_at_pos((int)view_x, (int)view_y, path))
     {
-        view->get_selection()->unselect_all();
+        view.get_selection()->unselect_all();
     }
 
     return false;
+}
+
+void setup_tree_view_button_event_handling(
+    Gtk::TreeView& view,
+    std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
+    std::function<bool(double, double)> const& release_callback)
+{
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto controller = Gtk::GestureClick::create();
+    controller->set_button(0);
+    controller->set_propagation_phase(Gtk::PropagationPhase::CAPTURE);
+    if (press_callback)
+    {
+        controller->signal_pressed().connect(
+            [&view, press_callback, controller](int /*n_press*/, double event_x, double event_y)
+            {
+                auto* const sequence = controller->get_current_sequence();
+                auto const event = controller->get_last_event(sequence);
+                if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_PRESS) &&
+                    press_callback(
+                        event->get_button(),
+                        event->get_modifier_state(),
+                        event_x,
+                        event_y,
+                        event->triggers_context_menu()))
+                {
+                    controller->set_sequence_state(sequence, Gtk::EventSequenceState::CLAIMED);
+                }
+            },
+            false);
+    }
+    if (release_callback)
+    {
+        controller->signal_released().connect(
+            [&view, release_callback, controller](int /*n_press*/, double event_x, double event_y)
+            {
+                auto* const sequence = controller->get_current_sequence();
+                auto const event = controller->get_last_event(sequence);
+                if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_RELEASE) && release_callback(event_x, event_y))
+                {
+                    controller->set_sequence_state(sequence, Gtk::EventSequenceState::CLAIMED);
+                }
+            });
+    }
+    view.add_controller(controller);
+#else
+    if (press_callback)
+    {
+        view.signal_button_press_event().connect(
+            [press_callback](GdkEventButton* event)
+            { return press_callback(event->button, event->state, event->x, event->y, event->button == GDK_BUTTON_SECONDARY); },
+            false);
+    }
+    if (release_callback)
+    {
+        view.signal_button_release_event().connect([release_callback](GdkEventButton* event)
+                                                   { return release_callback(event->x, event->y); });
+    }
+#endif
 }
 
 bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)

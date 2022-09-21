@@ -79,7 +79,9 @@
 #define TR_GTK_TREE_VIEW_COLUMN_SIZING(Code) IF_GTKMM4(Gtk::TreeViewColumn::Sizing::Code, Gtk::TREE_VIEW_COLUMN_##Code)
 
 #define TR_GDK_COLORSPACE(Code) IF_GTKMM4(Gdk::Colorspace::Code, Gdk::COLORSPACE_##Code)
+#define TR_GDK_EVENT_TYPE(Code) IF_GTKMM4(Gdk::Event::Type::Code, GdkEventType::GDK_##Code)
 #define TR_GDK_DRAG_ACTION(Code) IF_GTKMM4(Gdk::DragAction::Code, Gdk::ACTION_##Code)
+#define TR_GDK_MODIFIED_TYPE(Code) IF_GTKMM4(Gdk::ModifierType::Code, GdkModifierType::GDK_##Code)
 
 #define TR_GLIB_FILE_TEST(Code) IF_GLIBMM2_68(Glib::FileTest::Code, Glib::FILE_TEST_##Code)
 #define TR_GLIB_NODE_TREE_TRAVERSE_FLAGS(Cls, Code) IF_GLIBMM2_68(Cls::TraverseFlags::Code, Cls::TRAVERSE_##Code)
@@ -182,12 +184,21 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& window_or_child, tr_torrent* dupl
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
 bool on_tree_view_button_pressed(
-    Gtk::TreeView* view,
-    GdkEventButton* event,
-    std::function<void(GdkEventButton*)> const& callback = {});
+    Gtk::TreeView& view,
+    double view_x,
+    double view_y,
+    bool context_menu_requested,
+    std::function<void(double, double)> const& callback = {});
 
 /* if the click didn't specify a row, clear the selection */
-bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event);
+bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y);
+
+using TrGdkModifierType = IF_GTKMM4(Gdk::ModifierType, GdkModifierType);
+
+void setup_tree_view_button_event_handling(
+    Gtk::TreeView& view,
+    std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
+    std::function<bool(double, double)> const& release_callback);
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
 bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);

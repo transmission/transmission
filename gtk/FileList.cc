@@ -99,13 +99,13 @@ private:
     void clearData();
     void refresh();
 
-    bool getAndSelectEventPath(GdkEventButton const* event, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path);
+    bool getAndSelectEventPath(double view_x, double view_y, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path);
 
     std::vector<tr_file_index_t> getActiveFilesForPath(Gtk::TreeModel::Path const& path) const;
     std::vector<tr_file_index_t> getSelectedFilesAndDescendants() const;
     std::vector<tr_file_index_t> getSubtree(Gtk::TreeModel::Path const& path) const;
 
-    bool onViewButtonPressed(GdkEventButton const* event);
+    bool onViewButtonPressed(guint button, TrGdkModifierType state, double view_x, double view_y);
     bool onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel::Path const& path);
     void onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeViewColumn* col);
     void cell_edited_callback(Glib::ustring const& path_string, Glib::ustring const& newname);
@@ -709,12 +709,12 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
 /**
  * @note 'col' and 'path' are assumed not to be nullptr.
  */
-bool FileList::Impl::getAndSelectEventPath(GdkEventButton const* event, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path)
+bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path)
 {
     int cell_x;
     int cell_y;
 
-    if (view_->get_path_at_pos(event->x, event->y, path, col, cell_x, cell_y))
+    if (view_->get_path_at_pos(view_x, view_y, path, col, cell_x, cell_y))
     {
         if (auto const sel = view_->get_selection(); !sel->is_selected(path))
         {
@@ -728,14 +728,15 @@ bool FileList::Impl::getAndSelectEventPath(GdkEventButton const* event, Gtk::Tre
     return false;
 }
 
-bool FileList::Impl::onViewButtonPressed(GdkEventButton const* event)
+bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, double view_x, double view_y)
 {
     Gtk::TreeViewColumn* col;
     Gtk::TreeModel::Path path;
     bool handled = false;
 
-    if (event->type == GDK_BUTTON_PRESS && event->button == 1 && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == 0 &&
-        getAndSelectEventPath(event, col, path))
+    if (button == GDK_BUTTON_PRIMARY &&
+        (state & (TR_GDK_MODIFIED_TYPE(SHIFT_MASK) | TR_GDK_MODIFIED_TYPE(CONTROL_MASK))) == TrGdkModifierType{} &&
+        getAndSelectEventPath(view_x, view_y, col, path))
     {
         handled = onViewPathToggled(col, path);
     }
@@ -865,10 +866,12 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
     , view_(view)
 {
     /* create the view */
-    view_->signal_button_press_event().connect(sigc::mem_fun(*this, &Impl::onViewButtonPressed), false);
     view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
-    view_->signal_button_release_event().connect([this](GdkEventButton* event)
-                                                 { return on_tree_view_button_released(view_, event); });
+    setup_tree_view_button_event_handling(
+        *view_,
+        [this](guint button, TrGdkModifierType state, double view_x, double view_y, bool /*context_menu_requested*/)
+        { return onViewButtonPressed(button, state, view_x, view_y); },
+        [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
 
     auto pango_font_description = view_->create_pango_context()->get_font_description();
     pango_font_description.set_size(pango_font_description.get_size() * 0.8);

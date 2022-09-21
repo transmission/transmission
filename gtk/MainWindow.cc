@@ -70,7 +70,7 @@ private:
 
     Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
-    void on_popup_menu(GdkEventButton* event);
+    void on_popup_menu(double view_x, double view_y);
 
     void onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled);
     void onSpeedSet(tr_direction dir, int KBps);
@@ -118,7 +118,7 @@ private:
 ****
 ***/
 
-void MainWindow::Impl::on_popup_menu(GdkEventButton* event)
+void MainWindow::Impl::on_popup_menu([[maybe_unused]] double view_x, [[maybe_unused]] double view_y)
 {
     if (popup_menu_ == nullptr)
     {
@@ -126,7 +126,7 @@ void MainWindow::Impl::on_popup_menu(GdkEventButton* event)
         popup_menu_->attach_to_widget(window_);
     }
 
-    popup_menu_->popup_at_pointer(reinterpret_cast<GdkEvent*>(event));
+    popup_menu_->popup_at_pointer(nullptr);
 }
 
 namespace
@@ -160,13 +160,19 @@ void MainWindow::Impl::init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeMode
     renderer_->property_xpad() = GUI_PAD_SMALL;
     renderer_->property_ypad() = GUI_PAD_SMALL;
 
-    view->signal_popup_menu().connect_notify([this]() { on_popup_menu(nullptr); });
-    view->signal_button_press_event().connect(
-        [this, view](GdkEventButton* event)
-        { return on_tree_view_button_pressed(view, event, sigc::mem_fun(*this, &Impl::on_popup_menu)); },
-        false);
-    view->signal_button_release_event().connect([view](GdkEventButton* event)
-                                                { return on_tree_view_button_released(view, event); });
+    view->signal_popup_menu().connect_notify([this]() { on_popup_menu(0, 0); });
+    setup_tree_view_button_event_handling(
+        *view,
+        [this, view](guint /*button*/, TrGdkModifierType /*state*/, double view_x, double view_y, bool context_menu_requested)
+        {
+            return on_tree_view_button_pressed(
+                *view,
+                view_x,
+                view_y,
+                context_menu_requested,
+                sigc::mem_fun(*this, &Impl::on_popup_menu));
+        },
+        [view](double view_x, double view_y) { return on_tree_view_button_released(*view, view_x, view_y); });
     view->signal_row_activated().connect([](auto const& /*path*/, auto* /*column*/)
                                          { gtr_action_activate("show-torrent-properties"); });
 

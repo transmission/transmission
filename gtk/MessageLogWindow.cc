@@ -493,8 +493,10 @@ MessageLogWindow::Impl::Impl(
     filter_->set_visible_func(sigc::mem_fun(*this, &Impl::isRowVisible));
 
     view_->set_model(sort_);
-    view_->signal_button_release_event().connect([this](GdkEventButton* event)
-                                                 { return on_tree_view_button_released(view_, event); });
+    setup_tree_view_button_event_handling(
+        *view_,
+        {},
+        [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
     appendColumn(view_, message_log_cols.sequence);
     appendColumn(view_, message_log_cols.name);
     appendColumn(view_, message_log_cols.message);
