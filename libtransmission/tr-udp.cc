@@ -400,7 +400,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     {
         if (udp_socket_ != TR_BAD_SOCKET)
         {
-            ret = ::sendto(udp_socket_, buf, buflen, 0, to, tolen);
+            ret = ::sendto(udp_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen);
         }
         else
         {
@@ -420,7 +420,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     {
         if (udp6_socket_ != TR_BAD_SOCKET)
         {
-            ret = ::sendto(udp6_socket_, buf, buflen, 0, to, tolen);
+            ret = ::sendto(udp6_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen);
         }
         else
         {
