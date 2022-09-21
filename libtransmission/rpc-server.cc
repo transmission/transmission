@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstring> /* memcpy */
+#include <cstring> /* for strcspn() */
 #include <ctime>
 #include <memory>
 #include <string>
