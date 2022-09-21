@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstdio>
 #include <map>
 #include <mutex>
