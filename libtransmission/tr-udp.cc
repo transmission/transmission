@@ -97,7 +97,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
 void tr_session::tr_udp_core::set_socket_buffers()
 {
-    bool const utp = session_->allowsUTP();
+    bool const utp = session_.allowsUTP();
 
     if (udp_socket_ != TR_BAD_SOCKET)
     {
@@ -115,7 +115,7 @@ void tr_session::tr_udp_core::set_socket_buffers()
 void tr_session::tr_udp_core::rebind_ipv6(bool force)
 {
     struct sockaddr_in6 sin6;
-    unsigned char const* ipv6 = tr_globalIPv6(session_);
+    unsigned char const* ipv6 = tr_globalIPv6(&session_);
     int rc = -1;
     int one = 1;
 
@@ -275,7 +275,7 @@ void tr_session::tr_udp_core::init()
     TR_ASSERT(udp_socket_ == TR_BAD_SOCKET);
     TR_ASSERT(udp6_socket_ == TR_BAD_SOCKET);
 
-    udp_port_ = session_->peerPort();
+    udp_port_ = session_.peerPort();
     if (std::empty(udp_port_))
     {
         return;
@@ -289,7 +289,7 @@ void tr_session::tr_udp_core::init()
     }
     else
     {
-        auto const [public_addr, is_default] = session_->publicAddress(TR_AF_INET);
+        auto const [public_addr, is_default] = session_.publicAddress(TR_AF_INET);
 
         auto sin = sockaddr_in{};
         sin.sin_family = AF_INET;
@@ -314,7 +314,7 @@ void tr_session::tr_udp_core::init()
         }
         else
         {
-            udp_event_ = event_new(session_->eventBase(), udp_socket_, EV_READ | EV_PERSIST, event_callback, session_);
+            udp_event_ = event_new(session_.eventBase(), udp_socket_, EV_READ | EV_PERSIST, event_callback, &session_);
 
             if (udp_event_ == nullptr)
             {
@@ -332,7 +332,7 @@ void tr_session::tr_udp_core::init()
 
     if (udp6_socket_ != TR_BAD_SOCKET)
     {
-        udp6_event_ = event_new(session_->eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, session_);
+        udp6_event_ = event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_);
 
         if (udp6_event_ == nullptr)
         {
@@ -343,9 +343,9 @@ void tr_session::tr_udp_core::init()
     set_socket_buffers();
     set_socket_tos();
 
-    if (session_->allowsDHT())
+    if (session_.allowsDHT())
     {
-        tr_dhtInit(session_);
+        tr_dhtInit(&session_);
     }
 
     if (udp_event_ != nullptr)
@@ -360,7 +360,7 @@ void tr_session::tr_udp_core::init()
 
 void tr_session::tr_udp_core::uninit()
 {
-    tr_dhtUninit(session_);
+    tr_dhtUninit(&session_);
 
     if (udp_socket_ != TR_BAD_SOCKET)
     {
@@ -393,7 +393,7 @@ void tr_session::tr_udp_core::uninit()
     }
 }
 
-void tr_session::tr_udp_core::sendto(char const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
+void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
     ssize_t ret = 0;
     std::array<char, std::max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN) + 1> peer = {};
