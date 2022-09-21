@@ -275,6 +275,9 @@ int tr_dhtInit(tr_session* ss)
     bool have_id = false;
     auto nodes = std::vector<uint8_t>{};
     auto nodes6 = std::vector<uint8_t>{};
+    auto udp_socket = ss->udp_core_->udp_socket();
+    auto udp6_socket = ss->udp_core_->udp6_socket();
+
     if (ok)
     {
         auto sv = std::string_view{};
@@ -286,13 +289,13 @@ int tr_dhtInit(tr_session* ss)
 
         size_t raw_len = 0U;
         uint8_t const* raw = nullptr;
-        if (ss->udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
+
+        if (udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
         {
             nodes.assign(raw, raw + raw_len);
         }
 
-        if (ss->udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &raw_len) &&
-            raw_len % 18 == 0)
+        if (udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
         {
             nodes6.assign(raw, raw + raw_len);
         }
@@ -312,7 +315,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(std::data(myid), std::size(myid));
     }
 
-    if (int const rc = dht_init(ss->udp_socket, ss->udp6_socket, std::data(myid), nullptr); rc < 0)
+    if (int const rc = dht_init(udp_socket, udp6_socket, std::data(myid), nullptr); rc < 0)
     {
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
@@ -456,9 +459,11 @@ static void getstatus(getstatus_closure* const closure)
 int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
 {
     auto closure = getstatus_closure{ af, -1, -1 };
+    auto udp_socket = session->udp_core_->udp_socket();
+    auto udp6_socket = session->udp_core_->udp6_socket();
 
-    if (!tr_dhtEnabled(session) || (af == AF_INET && session->udp_socket == TR_BAD_SOCKET) ||
-        (af == AF_INET6 && session->udp6_socket == TR_BAD_SOCKET))
+    if (!tr_dhtEnabled(session) || (af == AF_INET && udp_socket == TR_BAD_SOCKET) ||
+        (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
     {
         if (setme_node_count != nullptr)
         {
@@ -485,7 +490,7 @@ int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
 
 tr_port tr_dhtPort(tr_session const* ss)
 {
-    return tr_dhtEnabled(ss) ? ss->udp_port : tr_port{};
+    return tr_dhtEnabled(ss) ? ss->udp_core_->port() : tr_port{};
 }
 
 bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)

@@ -108,14 +108,7 @@ static void utp_send_to(
     struct sockaddr const* const to,
     socklen_t const tolen)
 {
-    if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
-    else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
+    ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
 #ifdef TR_UTP_TRACE

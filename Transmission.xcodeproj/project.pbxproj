@@ -191,7 +191,6 @@
 		A2725D5D0DE7507C003445E7 /* TrackerTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2725D5C0DE7507C003445E7 /* TrackerTableView.mm */; };
 		A27F0F330E19AD9800B2DB97 /* TorrentGroup.mm in Sources */ = {isa = PBXBuildFile; fileRef = A27F0F320E19AD9800B2DB97 /* TorrentGroup.mm */; };
 		A284214412DA663E00FBDDBB /* tr-udp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A284214212DA663E00FBDDBB /* tr-udp.cc */; };
-		A284214512DA663E00FBDDBB /* tr-udp.h in Headers */ = {isa = PBXBuildFile; fileRef = A284214312DA663E00FBDDBB /* tr-udp.h */; };
 		A28F4F770E085BDC003A3882 /* ColorTextField.mm in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.mm */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.cc */; };
 		A29304ED15D7465100B1F726 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
@@ -928,7 +927,6 @@
 		A28393FD10D54A79005C0240 /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A28393FF10D54A96005C0240 /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A284214212DA663E00FBDDBB /* tr-udp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-udp.cc"; sourceTree = "<group>"; };
-		A284214312DA663E00FBDDBB /* tr-udp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-udp.h"; sourceTree = "<group>"; };
 		A28B3A2D160E1BC900D4A2BC /* pt_PT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_PT; path = pt_PT.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ButtonToolbarItem.h; sourceTree = "<group>"; };
 		A28F4F750E085BDC003A3882 /* ColorTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorTextField.h; sourceTree = "<group>"; };
@@ -1720,7 +1718,6 @@
 				C1425B341EE9C5EA001DB85F /* tr-macros.h */,
 				888A256631B3DE536FEB8B01 /* tr-strbuf.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.cc */,
-				A284214312DA663E00FBDDBB /* tr-udp.h */,
 				A2679292130E00A000CB7464 /* tr-utp.cc */,
 				A2679293130E00A000CB7464 /* tr-utp.h */,
 				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
@@ -2208,7 +2205,6 @@
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
 				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
-				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
