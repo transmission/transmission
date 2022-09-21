@@ -580,7 +580,9 @@ void Application::Impl::on_startup()
 
     /* create main window now to be a parent to any error dialogs */
     wind_ = MainWindow::create(app_, actions, core_);
+    wind_->set_show_menubar(true);
     wind_->signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+
     app_.hold();
     app_setup();
     tr_sessionSetRPCCallback(session, &Impl::on_rpc_changed, this);
@@ -902,6 +904,8 @@ void Application::Impl::on_app_exit()
 
     auto* c = static_cast<Gtk::Container*>(wind_.get());
     c->remove(*static_cast<Gtk::Bin*>(c)->get_child());
+
+    wind_->set_show_menubar(false);
 
     auto* p = Gtk::make_managed<Gtk::Grid>();
     p->set_column_spacing(GUI_PAD_BIG);
