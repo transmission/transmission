@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cerrno> // for EINVAL
 #include <string>
 #include <string_view>
