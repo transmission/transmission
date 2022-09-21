@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype> // for isalpha()
+#include <cstring>
 #include <iterator> // for std::back_inserter
 #include <string>
 #include <string_view>

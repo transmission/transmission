@@ -13,6 +13,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <memory>
+#include <utility> // for std::move()
 #include <vector>
 
 #include "transmission.h"

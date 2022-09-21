@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <chrono>
 #include <iterator>
 #include <memory>
 #include <numeric> // std::accumulate()

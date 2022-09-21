@@ -5,6 +5,7 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
+#include <chrono>
 #include <set>
 
 #include "transmission.h"
