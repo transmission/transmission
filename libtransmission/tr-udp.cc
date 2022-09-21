@@ -10,10 +10,6 @@
 
 #ifdef _WIN32
 #include <io.h> /* dup2() */
-#ifdef _MSC_VER
-#include <BaseTsd.h>
-typedef SSIZE_T ssize_t; // VS quirk for POSIX ssize_t
-#endif // _MSC_VER
 #else
 #include <unistd.h> /* dup2() */
 #endif
@@ -393,21 +389,22 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
-    ssize_t ret = 0;
+    int error = 0;
     std::array<char, std::max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN) + 1> peer = {};
 
     if (to->sa_family == AF_INET)
     {
         if (udp_socket_ != TR_BAD_SOCKET)
         {
-            ret = ::sendto(udp_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen);
+            if (::sendto(udp_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
+                error = -1;
         }
         else
         {
-            ret = -1;
+            error = -1;
             errno = EBADF;
         }
-        if (ret == 1)
+        if (error == -1)
         {
             evutil_inet_ntop(
                 AF_INET,
@@ -420,13 +417,15 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     {
         if (udp6_socket_ != TR_BAD_SOCKET)
         {
-            ret = ::sendto(udp6_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen);
+            if (::sendto(udp6_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
+                error = -1;
         }
         else
         {
-            ret = -1, errno = EBADF;
+            error = -1;
+            errno = EBADF;
         }
-        if (ret == -1)
+        if (error == -1)
         {
             evutil_inet_ntop(
                 AF_INET6,
@@ -437,10 +436,11 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     }
     else
     {
-        ret = -1, errno = EAFNOSUPPORT;
+        error = -1;
+        errno = EAFNOSUPPORT;
     }
 
-    if (ret == -1)
+    if (error == -1)
     {
         tr_logAddWarn(fmt::format(
             "Couldn't send to {address}: {errno} ({error})",
