@@ -526,7 +526,7 @@ public:
         void rebind_ipv6(bool);
     };
 
-    tr_udp_core udp_core_{ this };
+    tr_udp_core udp_core_{ *this };
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
