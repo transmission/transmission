@@ -49,7 +49,7 @@ void BlocklistFile::ensureLoaded() const
         return;
     }
 
-    auto range = IPv4Range{};
+    auto range = AddressRange{};
     while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
     {
         rules_.emplace_back(range);
@@ -69,7 +69,7 @@ bool BlocklistFile::hasAddress(tr_address const& addr)
 {
     TR_ASSERT(tr_address_is_valid(&addr));
 
-    if (!is_enabled_ || !addr.isIPv4())
+    if (!is_enabled_)
     {
         return false;
     }
@@ -81,22 +81,45 @@ bool BlocklistFile::hasAddress(tr_address const& addr)
         return false;
     }
 
-    auto const needle = ntohl(addr.addr.addr4.s_addr);
+    if (addr.isIPv4())
+    {
+        auto const needle = ntohl(addr.addr.addr4.s_addr);
 
-    // std::binary_search works differently and requires a less-than comparison
-    // and two arguments of the same type. std::bsearch is the right choice.
-    auto const* range = static_cast<IPv4Range const*>(
-        std::bsearch(&needle, std::data(rules_), std::size(rules_), sizeof(IPv4Range), IPv4Range::compareAddressToRange));
+        // std::binary_search works differently and requires a less-than comparison
+        // and two arguments of the same type. std::bsearch is the right choice.
+        auto const* range = static_cast<AddressRange const*>(std::bsearch(
+            &needle,
+            std::data(rules_),
+            std::size(rules_),
+            sizeof(AddressRange),
+            AddressRange::compareIPv4AddressToRange));
 
-    return range != nullptr;
+        return range != nullptr;
+    }
+
+    if (addr.isIPv6())
+    {
+        auto const needle = addr.addr.addr6;
+
+        auto const* range = static_cast<AddressRange const*>(std::bsearch(
+            &needle,
+            std::data(rules_),
+            std::size(rules_),
+            sizeof(AddressRange),
+            AddressRange::compareIPv6AddressToRange));
+
+        return range != nullptr;
+    }
+
+    return false;
 }
 
 /*
- * P2P plaintext format: "comment:x.x.x.x-y.y.y.y"
- * http://wiki.phoenixlabs.org/wiki/P2P_Format
+ * P2P plaintext format: "comment:x.x.x.x-y.y.y.y" / "comment:x:x:x:x:x:x:x:x-x:x:x:x:x:x:x:x"
+ * https://web.archive.org/web/20100328075307/http://wiki.phoenixlabs.org/wiki/P2P_Format
  * https://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
-bool BlocklistFile::parseLine1(std::string_view line, struct IPv4Range* range)
+bool BlocklistFile::parseLine1(std::string_view line, struct AddressRange* range)
 {
     // remove leading "comment:"
     auto pos = line.find(':');
@@ -114,7 +137,14 @@ bool BlocklistFile::parseLine1(std::string_view line, struct IPv4Range* range)
     }
     if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
     {
-        range->begin_ = ntohl(addr->addr.addr4.s_addr);
+        if (addr->isIPv4())
+        {
+            range->begin_ = ntohl(addr->addr.addr4.s_addr);
+        }
+        else
+        {
+            range->begin6_ = addr->addr.addr6;
+        }
     }
     else
     {
@@ -125,7 +155,14 @@ bool BlocklistFile::parseLine1(std::string_view line, struct IPv4Range* range)
     // parse the trailing 'y.y.y.y'
     if (auto const addr = tr_address::fromString(line); addr)
     {
-        range->end_ = ntohl(addr->addr.addr4.s_addr);
+        if (addr->isIPv4())
+        {
+            range->end_ = ntohl(addr->addr.addr4.s_addr);
+        }
+        else
+        {
+            range->end6_ = addr->addr.addr6;
+        }
     }
     else
     {
@@ -139,7 +176,7 @@ bool BlocklistFile::parseLine1(std::string_view line, struct IPv4Range* range)
  * DAT / eMule format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"a
  * https://sourceforge.net/p/peerguardian/wiki/dev-blocklist-format-dat/
  */
-bool BlocklistFile::parseLine2(std::string_view line, struct IPv4Range* range)
+bool BlocklistFile::parseLine2(std::string_view line, struct AddressRange* range)
 {
     static auto constexpr Delim1 = std::string_view{ " - " };
     static auto constexpr Delim2 = std::string_view{ " , " };
@@ -179,10 +216,10 @@ bool BlocklistFile::parseLine2(std::string_view line, struct IPv4Range* range)
 }
 
 /*
- * CIDR notation: "0.0.0.0/8", IPv4 only
+ * CIDR notation: "0.0.0.0/8", "::/64"
  * https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation
  */
-bool BlocklistFile::parseLine3(char const* line, IPv4Range* range)
+bool BlocklistFile::parseLine3(char const* line, AddressRange* range)
 {
     auto ip = std::array<unsigned int, 4>{};
     unsigned int pflen = 0;
@@ -211,13 +248,19 @@ bool BlocklistFile::parseLine3(char const* line, IPv4Range* range)
     return true;
 }
 
-bool BlocklistFile::parseLine(char const* line, IPv4Range* range)
+bool BlocklistFile::parseLine(char const* line, AddressRange* range)
 {
     return parseLine1(line, range) || parseLine2(line, range) || parseLine3(line, range);
 }
 
-bool BlocklistFile::compareAddressRangesByFirstAddress(IPv4Range const& a, IPv4Range const& b)
+bool BlocklistFile::compareAddressRangesByFirstAddress(AddressRange const& a, AddressRange const& b)
 {
+    if (a.begin_ == 0 && a.end_ == 0)
+    {
+        // IPv6
+        return (memcmp(a.begin6_.s6_addr, b.begin6_.s6_addr, sizeof(a.begin6_.s6_addr)) < 0);
+    }
+
     return a.begin_ < b.begin_;
 }
 
@@ -241,18 +284,17 @@ size_t BlocklistFile::setContent(char const* filename)
 
     auto line = std::string{};
     auto line_number = size_t{ 0U };
-    auto ranges = std::vector<IPv4Range>{};
+    auto ranges = std::vector<AddressRange>{};
     while (std::getline(in, line))
     {
         ++line_number;
-        auto range = IPv4Range{};
+        auto range = AddressRange{};
         if (!parseLine(line.c_str(), &range))
         {
             /* don't try to display the actual lines - it causes issues */
             tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line_number)));
             continue;
         }
-
         ranges.push_back(range);
     }
     in.close();
@@ -269,13 +311,28 @@ size_t BlocklistFile::setContent(char const* filename)
     // merge
     for (auto const& range : ranges)
     {
-        if (ranges[keep].end_ < range.begin_)
+        if (range.begin_ == 0 && range.end_ == 0)
         {
-            ranges[++keep] = range;
+            // IPv6
+            if (memcmp(ranges[keep].end6_.s6_addr, range.begin6_.s6_addr, sizeof(range.begin6_.s6_addr)) < 0)
+            {
+                ranges[++keep] = range;
+            }
+            else if (memcmp(ranges[keep].end6_.s6_addr, range.end6_.s6_addr, sizeof(range.begin6_.s6_addr)) < 0)
+            {
+                ranges[keep].end6_ = range.end6_;
+            }
         }
-        else if (ranges[keep].end_ < range.end_)
+        else
         {
-            ranges[keep].end_ = range.end_;
+            if (ranges[keep].end_ < range.begin_)
+            {
+                ranges[++keep] = range;
+            }
+            else if (ranges[keep].end_ < range.end_)
+            {
+                ranges[keep].end_ = range.end_;
+            }
         }
     }
 
@@ -297,7 +354,7 @@ size_t BlocklistFile::setContent(char const* filename)
         return {};
     }
 
-    if (!out.write(reinterpret_cast<char const*>(ranges.data()), std::size(ranges) * sizeof(IPv4Range)))
+    if (!out.write(reinterpret_cast<char const*>(ranges.data()), std::size(ranges) * sizeof(AddressRange)))
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
@@ -321,7 +378,7 @@ size_t BlocklistFile::setContent(char const* filename)
 }
 
 #ifdef TR_ENABLE_ASSERTS
-void BlocklistFile::assertValidRules(std::vector<IPv4Range> const& ranges)
+void BlocklistFile::assertValidRules(std::vector<AddressRange> const& ranges)
 {
     for (auto const& r : ranges)
     {
