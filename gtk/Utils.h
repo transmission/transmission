@@ -193,7 +193,7 @@ bool on_tree_view_button_pressed(
 /* if the click didn't specify a row, clear the selection */
 bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y);
 
-using TrGdkModifierType = IF_GTKMM4(Gdk::ModifierType, GdkModifierType);
+using TrGdkModifierType = IF_GTKMM4(Gdk::ModifierType, guint);
 
 void setup_tree_view_button_event_handling(
     Gtk::TreeView& view,

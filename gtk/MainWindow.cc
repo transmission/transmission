@@ -111,7 +111,7 @@ private:
     TorrentCellRenderer* renderer_ = nullptr;
     Gtk::TreeViewColumn* column_ = nullptr;
     sigc::connection pref_handler_id_;
-    Gtk::Menu* popup_menu_ = nullptr;
+    IF_GTKMM4(Gtk::PopoverMenu*, Gtk::Menu*) popup_menu_ = nullptr;
 };
 
 /***
@@ -122,11 +122,26 @@ void MainWindow::Impl::on_popup_menu([[maybe_unused]] double view_x, [[maybe_unu
 {
     if (popup_menu_ == nullptr)
     {
-        popup_menu_ = Gtk::make_managed<Gtk::Menu>(gtr_action_get_object<Gio::Menu>("main-window-popup"));
+        auto const menu = gtr_action_get_object<Gio::Menu>("main-window-popup");
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        popup_menu_ = Gtk::make_managed<Gtk::PopoverMenu>(menu);
+        popup_menu_->set_parent(window_);
+#else
+        popup_menu_ = Gtk::make_managed<Gtk::Menu>(menu);
         popup_menu_->attach_to_widget(window_);
+#endif
     }
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    double window_x = 0;
+    double window_y = 0;
+    view_->translate_coordinates(window_, view_x, view_y, window_x, window_y);
+    popup_menu_->set_pointing_to(Gdk::Rectangle(window_x, window_y, 1, 1));
+    popup_menu_->popup();
+#else
     popup_menu_->popup_at_pointer(nullptr);
+#endif
 }
 
 namespace
@@ -160,7 +175,9 @@ void MainWindow::Impl::init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeMode
     renderer_->property_xpad() = GUI_PAD_SMALL;
     renderer_->property_ypad() = GUI_PAD_SMALL;
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     view->signal_popup_menu().connect_notify([this]() { on_popup_menu(0, 0); });
+#endif
     setup_tree_view_button_event_handling(
         *view,
         [this, view](guint /*button*/, TrGdkModifierType /*state*/, double view_x, double view_y, bool context_menu_requested)
