@@ -59,7 +59,7 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
 void tr_session::tau_sendto(struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen) const
 {
     tau_sockaddr_setport(ai->ai_addr, port);
-    udp_core_.sendto(reinterpret_cast<char const*>(buf), buflen, ai->ai_addr, ai->ai_addrlen);
+    udp_core_->sendto(buf, buflen, ai->ai_addr, ai->ai_addrlen);
 }
 
 static uint32_t announce_ip(tr_session const* session)

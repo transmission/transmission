@@ -275,8 +275,8 @@ int tr_dhtInit(tr_session* ss)
     bool have_id = false;
     auto nodes = std::vector<uint8_t>{};
     auto nodes6 = std::vector<uint8_t>{};
-    auto udp_socket = ss->udp_core_.udp_socket();
-    auto udp6_socket = ss->udp_core_.udp6_socket();
+    auto udp_socket = ss->udp_core_->udp_socket();
+    auto udp6_socket = ss->udp_core_->udp6_socket();
 
     if (ok)
     {
@@ -459,8 +459,8 @@ static void getstatus(getstatus_closure* const closure)
 int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
 {
     auto closure = getstatus_closure{ af, -1, -1 };
-    auto udp_socket = session->udp_core_.udp_socket();
-    auto udp6_socket = session->udp_core_.udp6_socket();
+    auto udp_socket = session->udp_core_->udp_socket();
+    auto udp6_socket = session->udp_core_->udp6_socket();
 
     if (!tr_dhtEnabled(session) || (af == AF_INET && udp_socket == TR_BAD_SOCKET) ||
         (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
@@ -490,7 +490,7 @@ int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
 
 tr_port tr_dhtPort(tr_session const* ss)
 {
-    return tr_dhtEnabled(ss) ? ss->udp_core_.port() : tr_port{};
+    return tr_dhtEnabled(ss) ? ss->udp_core_->port() : tr_port{};
 }
 
 bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)

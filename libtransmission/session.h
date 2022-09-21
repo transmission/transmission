@@ -482,13 +482,10 @@ public:
     class tr_udp_core
     {
     public:
-        tr_udp_core(tr_session& session)
-            : session_{ session }
-        {
-        }
+        tr_udp_core(tr_session& session);
 
-        void init();
-        void uninit();
+        ~tr_udp_core();
+
         void set_socket_buffers();
 
         void set_socket_tos()
@@ -526,7 +523,7 @@ public:
         void rebind_ipv6(bool);
     };
 
-    tr_udp_core udp_core_{ *this };
+    std::unique_ptr<tr_udp_core> udp_core_;
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;

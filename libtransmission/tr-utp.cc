@@ -108,7 +108,7 @@ static void utp_send_to(
     struct sockaddr const* const to,
     socklen_t const tolen)
 {
-    ss->udp_core_.sendto(reinterpret_cast<char const*>(buf), buflen, to, tolen);
+    ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
 #ifdef TR_UTP_TRACE

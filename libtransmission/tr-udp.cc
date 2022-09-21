@@ -270,11 +270,9 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     }
 }
 
-void tr_session::tr_udp_core::init()
+tr_session::tr_udp_core::tr_udp_core(tr_session& session)
+    : session_{ session }
 {
-    TR_ASSERT(udp_socket_ == TR_BAD_SOCKET);
-    TR_ASSERT(udp6_socket_ == TR_BAD_SOCKET);
-
     udp_port_ = session_.peerPort();
     if (std::empty(udp_port_))
     {
@@ -358,7 +356,7 @@ void tr_session::tr_udp_core::init()
     }
 }
 
-void tr_session::tr_udp_core::uninit()
+tr_session::tr_udp_core::~tr_udp_core()
 {
     tr_dhtUninit(&session_);
 

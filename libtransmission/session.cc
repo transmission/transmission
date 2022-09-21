@@ -747,7 +747,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_sessionSet(this, &settings);
 
-    this->udp_core_.init();
+    this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this);
 
     this->web = tr_web::create(this->web_mediator_);
 
@@ -1876,7 +1876,7 @@ void tr_session::closeImplFinish()
 
     /* we had to wait until UDP trackers were closed before closing these: */
     tr_tracker_udp_close(this);
-    this->udp_core_.uninit();
+    this->udp_core_.reset();
 
     stats().saveIfDirty();
     tr_peerMgrFree(peerMgr);
@@ -2078,9 +2078,9 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         session,
         [session, enabled]()
         {
-            session->udp_core_.uninit();
+            session->udp_core_.reset();
             session->is_dht_enabled_ = enabled;
-            session->udp_core_.init();
+            session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session);
         });
 }
 
@@ -2112,21 +2112,9 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
     {
         return;
     }
-    tr_runInEventThread(
-        session,
-        [session, enabled]()
-        {
-            session->is_utp_enabled_ = enabled;
-            session->udp_core_.set_socket_buffers();
-            session->udp_core_.set_socket_tos();
-            // But don't call tr_utpClose --
-            // see reset_timer in tr-utp.c for an explanation.
-        });
-}
 
-/***
-****
-***/
+    session->is_utp_enabled_ = enabled;
+}
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
