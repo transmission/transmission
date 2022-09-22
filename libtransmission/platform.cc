@@ -86,7 +86,7 @@ static std::string getHomeDir()
 
 #else
 
-    struct passwd pwent;
+    struct passwd pwent = {};
     struct passwd* pw = nullptr;
     auto buf = std::array<char, 4096>{};
     getpwuid_r(getuid(), &pwent, std::data(buf), std::size(buf), &pw);

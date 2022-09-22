@@ -717,7 +717,7 @@ protected:
     struct ByKey
     {
         std::string_view key;
-        size_t idx;
+        size_t idx = {};
     };
 
     void sort(std::vector<ByKey>& sortbuf)

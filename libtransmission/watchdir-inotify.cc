@@ -120,7 +120,7 @@ private:
 
     void handleInotifyEvent(struct bufferevent* event)
     {
-        struct inotify_event ev;
+        auto ev = inotify_event{};
         auto name = std::string{};
 
         // Read the size of the struct excluding name into buf.

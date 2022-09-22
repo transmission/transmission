@@ -109,7 +109,7 @@ void tr_session::tr_udp_core::set_socket_buffers()
 // TODO: remove goto, it prevents reducing scope of local variables
 void tr_session::tr_udp_core::rebind_ipv6(bool force)
 {
-    struct sockaddr_in6 sin6;
+    auto sin6 = sockaddr_in6{};
     auto const ipv6 = tr_globalIPv6(&session_);
     int rc = -1;
     int one = 1;
@@ -203,7 +203,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     TR_ASSERT(type == EV_READ);
 
     auto buf = std::array<unsigned char, 4096>{};
-    struct sockaddr_storage from;
+    auto from = sockaddr_storage{};
     auto* session = static_cast<tr_session*>(vsession);
 
     socklen_t fromlen = sizeof(from);

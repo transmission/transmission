@@ -288,9 +288,9 @@ struct tr_disk_space getquota(char const* device)
 static struct tr_disk_space getquota(char const* device)
 {
 #if defined(__DragonFly__)
-    struct ufs_dqblk dq;
+    struct ufs_dqblk dq = {};
 #else
-    struct dqblk dq;
+    struct dqblk dq = {};
 #endif
     struct tr_disk_space disk_space = { -1, -1 };
 
@@ -454,7 +454,7 @@ static struct tr_disk_space getDiskSpace(char const* path)
 
 #elif defined(HAVE_STATVFS)
 
-    struct statvfs buf;
+    struct statvfs buf = {};
     return statvfs(path, &buf) != 0 ?
         (struct tr_disk_space){ -1, -1 } :
         (struct tr_disk_space){ (int64_t)buf.f_bavail * (int64_t)buf.f_frsize, (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
