@@ -234,17 +234,17 @@ TEST_P(WatchDirTest, retry)
     };
     auto watchdir = createWatchDir(path, callback);
     auto constexpr FastRetryWaitTime = 20ms;
-    auto constexpr ThreeRetries = FastRetryWaitTime * 4;
+    auto constexpr SlowRetryWaitTime = 200ms;
     auto* const base_watchdir = dynamic_cast<impl::BaseWatchdir*>(watchdir.get());
     ASSERT_TRUE(base_watchdir != nullptr);
     base_watchdir->setRetryDuration(FastRetryWaitTime);
 
-    processEvents(ThreeRetries);
+    processEvents(SlowRetryWaitTime);
     EXPECT_EQ(0U, std::size(names));
 
     auto const test_file = "test.txt"sv;
     createFile(path, test_file);
-    processEvents(ThreeRetries);
+    processEvents(SlowRetryWaitTime);
     EXPECT_LE(2U, std::size(names));
     for (auto const& name : names)
     {
