@@ -24,7 +24,7 @@ TEST(Client, clientForId)
         std::string_view expected_client;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 40>{
+    auto constexpr Tests = std::array<LocalTest, 44>{
         { { "-ADB560-"sv, "Advanced Download Manager 11.5.6"sv },
           { "-AZ8421-"sv, "Azureus / Vuze 8.4.2.1"sv },
           { "-BC0241-"sv, "BitComet 2.41"sv }, // two major, two minor
@@ -33,11 +33,13 @@ TEST(Client, clientForId)
           { "-BN0001-"sv, "Baidu Netdisk"sv }, // Baidu Netdisk Client v5.5.4
           { "-BT791B-"sv, "BitTorrent 7.9.1 (Beta)"sv },
           { "-BT791\0-"sv, "BitTorrent 7.9.1"sv },
+          { "-BW1293-"sv, "BitTorrent Web 1.2.9"sv }, // BitTorrent Web 1.2.9.4938 (9924)
           { "-FC1013-"sv, "FileCroc 1.0.1.3"sv },
           { "-FC1013-"sv, "FileCroc 1.0.1.3"sv },
           { "-FD51@\xFF-"sv, "Free Download Manager 5.1.x"sv }, // Negative test case
           { "-FD51R\xFF-"sv, "Free Download Manager 5.1.27"sv },
           { "-FD51W\xFF-"sv, "Free Download Manager 5.1.32"sv },
+          { "-FD51\x5D\xC7-"sv, "Free Download Manager 5.1.x"sv }, // Free Download Manager 5.1.38.7312 (79f26aa)
           { "-FL51FF-"sv, "Folx 5.x"sv }, // Folx v5.2.1.13690
           { "-FW6830-"sv, "FrostWire 6.8.3"sv },
           { "-IIO\x10\x2D\x04-"sv, "-IIO%10-%04-"sv },
@@ -47,6 +49,7 @@ TEST(Client, clientForId)
           { "-MR1100-"sv, "Miro 1.1.0.0"sv },
           { "-PI0091-"sv, "PicoTorrent 0.09.1"sv },
           { "-PI0120-"sv, "PicoTorrent 0.12.0"sv },
+          { "-TB2137-"sv, "Torch Browser"sv }, // Torch Browser 55.0.0.12137
           { "-TR0006-"sv, "Transmission 0.6"sv },
           { "-TR0072-"sv, "Transmission 0.72"sv },
           { "-TR111Z-"sv, "Transmission 1.11+"sv },
@@ -60,6 +63,7 @@ TEST(Client, clientForId)
           { "-XF9992-"sv, "Xfplay 9.9.92"sv }, // Xfplay 9.9.92 to 9.9.94 uses "-XF9992-"
           { "A2-1-18-8-"sv, "aria2 1.18.8"sv },
           { "A2-1-2-0-"sv, "aria2 1.2.0"sv },
+          { "FD6k4SYy9BOU4U4rk3-J"sv, "Free Download Manager 6"sv }, // Free Download Manager 6.17.0.4792 (9a17ce2)
           { "S58B-----"sv, "Shad0w 5.8.11"sv },
           { "Q1-23-4-"sv, "Queen Bee 1.23.4"sv },
           { "TIX0193-"sv, "Tixati 1.93"sv },
