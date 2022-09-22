@@ -234,7 +234,7 @@ TEST_P(WatchDirTest, retry)
     };
     auto watchdir = createWatchDir(path, callback);
     auto constexpr FastRetryWaitTime = 20ms;
-    auto constexpr ThreeRetries = FastRetryWaitTime * 4;
+    auto constexpr ThreeRetries = FastRetryWaitTime * 5;
     auto* const base_watchdir = dynamic_cast<impl::BaseWatchdir*>(watchdir.get());
     ASSERT_TRUE(base_watchdir != nullptr);
     base_watchdir->setRetryDuration(FastRetryWaitTime);
