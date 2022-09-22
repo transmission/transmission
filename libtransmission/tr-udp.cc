@@ -22,8 +22,6 @@
 #include "net.h"
 #include "session.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
-#include "tr-utp.h"
 #include "utils.h"
 
 /* Since we use a single UDP socket in order to implement multiple
@@ -197,15 +195,18 @@ FAIL:
     udp6_bound_.reset();
 }
 
-static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
+static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* arg)
 {
-    TR_ASSERT(vsession != nullptr);
+    TR_ASSERT(arg != nullptr);
     TR_ASSERT(type == EV_READ);
 
+    static_cast<tr_session*>(arg)->udp_event_callback(s);
+}
+
+void tr_session::udp_event_callback(evutil_socket_t s)
+{
     auto buf = std::array<unsigned char, 4096>{};
     struct sockaddr_storage from;
-    auto* session = static_cast<tr_session*>(vsession);
-
     socklen_t fromlen = sizeof(from);
     int const
         rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
@@ -221,28 +222,30 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     {
         if (buf[0] == 'd')
         {
-            if (session->allowsDHT())
+            if (allowsDHT())
             {
                 buf[rc] = '\0'; /* required by the DHT code */
-                tr_dhtCallback(std::data(buf), rc, (struct sockaddr*)&from, fromlen, vsession);
+                dht_callback(std::data(buf), rc, (struct sockaddr*)&from, fromlen);
             }
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            if (!session->tau_handle_message(std::data(buf), rc))
+            if (!tau_handle_message(std::data(buf), rc))
             {
                 tr_logAddTrace("Couldn't parse UDP tracker packet.");
             }
         }
         else
         {
-            if (session->allowsUTP())
+#ifdef WITH_UTP
+            if (allowsUTP())
             {
-                if (!tr_utpPacket(std::data(buf), rc, (struct sockaddr*)&from, fromlen, session))
+                if (!utp_packet(std::data(buf), rc, (struct sockaddr*)&from, fromlen))
                 {
                     tr_logAddTrace("Unexpected UDP packet");
                 }
             }
+#endif // WITH_UTP
         }
     }
 }
@@ -320,7 +323,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session)
 
     if (session_.allowsDHT())
     {
-        tr_dhtInit(&session_);
+        session_.dht_init();
     }
 
     if (udp_event_ != nullptr)
@@ -335,7 +338,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session)
 
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    tr_dhtUninit(&session_);
+    session_.dht_uninit();
 
     if (udp_socket_ != TR_BAD_SOCKET)
     {

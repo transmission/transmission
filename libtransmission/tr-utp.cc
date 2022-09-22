@@ -19,7 +19,6 @@
 #include "peer-mgr.h"
 #include "peer-socket.h"
 #include "session.h"
-#include "tr-utp.h"
 #include "utils.h"
 
 using namespace std::literals;
@@ -42,16 +41,11 @@ ssize_t utp_write(UTPSocket* socket, void* buf, size_t count)
     return -1;
 }
 
-void tr_utpInit(tr_session* /*session*/)
+void tr_session::utp_init()
 {
 }
 
-bool tr_utpPacket(
-    unsigned char const* /*buf*/,
-    size_t /*buflen*/,
-    sockaddr const* /*from*/,
-    socklen_t /*fromlen*/,
-    tr_session* /*ss*/)
+bool tr_session::utp_packet(unsigned char const* /*buf*/, size_t /*buflen*/, sockaddr const* /*from*/, socklen_t /*fromlen*/)
 {
     return false;
 }
@@ -66,7 +60,7 @@ int utp_connect(UTPSocket* /*socket*/, sockaddr const* /*to*/, socklen_t /*tolen
     return -1;
 }
 
-void tr_utpClose(tr_session* /*session*/)
+void tr_session::utp_close()
 {
 }
 
@@ -125,7 +119,6 @@ static uint64 utp_callback(utp_callback_arguments* args)
     auto* const session = static_cast<tr_session*>(utp_context_get_userdata(args->context));
 
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(session->utp_context == args->context);
 
     switch (args->callback_type)
     {
@@ -149,12 +142,12 @@ static uint64 utp_callback(utp_callback_arguments* args)
     return 0;
 }
 
-static void reset_timer(tr_session* session)
+void tr_session::utp_reset_timer() const
 {
     auto interval = std::chrono::milliseconds{};
     auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
 
-    if (session->allowsUTP())
+    if (allowsUTP())
     {
         static auto constexpr MinInterval = UtpInterval * 0.5;
         static auto constexpr MaxInterval = UtpInterval * 1.5;
@@ -174,35 +167,33 @@ static void reset_timer(tr_session* session)
         interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
 
-    session->utp_timer->startSingleShot(interval);
+    utp_timer_->startSingleShot(interval);
 }
 
-static void timer_callback(void* vsession)
+void tr_session::utp_timer_callback() const
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
     /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(session->utp_context);
+    utp_issue_deferred_acks(utp_context_);
 
-    utp_check_timeouts(session->utp_context);
-    reset_timer(session);
+    utp_check_timeouts(utp_context_);
+    utp_reset_timer();
 }
 
-void tr_utpInit(tr_session* session)
+void tr_session::utp_init()
 {
-    if (session->utp_context != nullptr)
+    if (utp_context_ != nullptr)
     {
         return;
     }
 
-    auto* const ctx = utp_init(2);
+    auto* const ctx = ::utp_init(2);
 
     if (ctx == nullptr)
     {
         return;
     }
 
-    utp_context_set_userdata(ctx, session);
+    utp_context_set_userdata(ctx, this);
 
     utp_set_callback(ctx, UTP_ON_ACCEPT, &utp_callback);
     utp_set_callback(ctx, UTP_SENDTO, &utp_callback);
@@ -219,34 +210,34 @@ void tr_utpInit(tr_session* session)
 
 #endif
 
-    session->utp_context = ctx;
+    utp_context_ = ctx;
 }
 
-bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+bool tr_session::utp_packet(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen)
 {
-    if (!ss->isClosed() && !ss->utp_timer)
+    if (!isClosed() && !utp_timer_)
     {
-        ss->utp_timer = ss->timerMaker().create(timer_callback, ss);
-        reset_timer(ss);
+        utp_timer_ = timerMaker().create([this]() { utp_timer_callback(); });
+        utp_reset_timer();
     }
 
-    auto const ret = utp_process_udp(ss->utp_context, buf, buflen, from, fromlen);
+    auto const ret = utp_process_udp(utp_context_, buf, buflen, from, fromlen);
 
     /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(ss->utp_context);
+    utp_issue_deferred_acks(utp_context_);
 
     return ret != 0;
 }
 
-void tr_utpClose(tr_session* session)
+void tr_session::utp_uninit()
 {
-    session->utp_timer.reset();
+    utp_timer_.reset();
 
-    if (session->utp_context != nullptr)
+    if (utp_context_ != nullptr)
     {
-        utp_context_set_userdata(session->utp_context, nullptr);
-        utp_destroy(session->utp_context);
-        session->utp_context = nullptr;
+        utp_context_set_userdata(utp_context_, nullptr);
+        utp_destroy(utp_context_);
+        utp_context_ = nullptr;
     }
 }
 

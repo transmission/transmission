@@ -223,8 +223,6 @@ tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_a
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
-void tr_netClose(tr_session* session, tr_socket_t s);
-
 void tr_netCloseSocket(tr_socket_t fd);
 
 bool tr_net_hasIPv6(tr_port);

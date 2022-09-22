@@ -199,9 +199,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     torrent-metainfo.h
     torrent.h
     torrents.h
-    tr-dht.h
     tr-lpd.h
-    tr-utp.h
     trevent.h
     upnp.h
     variant-common.h

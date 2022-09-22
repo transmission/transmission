@@ -129,7 +129,6 @@
 		A22BAE281388040500FB022F /* NSMutableArrayAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22BAE271388040500FB022F /* NSMutableArrayAdditions.mm */; };
 		A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFB810FB66EF30009BD3E /* Carbon.framework */; };
 		A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCA60FC24ED80009BD3E /* tr-dht.cc */; };
-		A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */ = {isa = PBXBuildFile; fileRef = A22CFCA70FC24ED80009BD3E /* tr-dht.h */; };
 		A22CFCC20FC24F890009BD3E /* dht.h in Headers */ = {isa = PBXBuildFile; fileRef = A22CFCC00FC24F890009BD3E /* dht.h */; };
 		A22CFCC30FC24F890009BD3E /* dht.c in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCC10FC24F890009BD3E /* dht.c */; };
 		A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFCBA0FC24F710009BD3E /* libdht.a */; };
@@ -182,7 +181,6 @@
 		A2661D6112D0E8D9004F69D5 /* FilterBarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2661D3B12D0E51B004F69D5 /* FilterBarView.mm */; };
 		A267927C130DFF2700CB7464 /* libutp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E38544130DFEE3001F501B /* libutp.a */; };
 		A2679294130E00A000CB7464 /* tr-utp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2679292130E00A000CB7464 /* tr-utp.cc */; };
-		A2679295130E00A000CB7464 /* tr-utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2679293130E00A000CB7464 /* tr-utp.h */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.mm */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.mm */; };
@@ -840,7 +838,6 @@
 		A22CEF9E21CDC44400C5C1BA /* Transmission.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Transmission.entitlements; path = macosx/Transmission.entitlements; sourceTree = "<group>"; };
 		A22CFB810FB66EF30009BD3E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		A22CFCA60FC24ED80009BD3E /* tr-dht.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-dht.cc"; sourceTree = "<group>"; };
-		A22CFCA70FC24ED80009BD3E /* tr-dht.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-dht.h"; sourceTree = "<group>"; };
 		A22CFCBA0FC24F710009BD3E /* libdht.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdht.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A22CFCC00FC24F890009BD3E /* dht.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dht.h; sourceTree = "<group>"; };
 		A22CFCC10FC24F890009BD3E /* dht.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dht.c; sourceTree = "<group>"; };
@@ -906,7 +903,6 @@
 		A2661D3A12D0E51A004F69D5 /* FilterBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilterBarView.h; sourceTree = "<group>"; };
 		A2661D3B12D0E51B004F69D5 /* FilterBarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilterBarView.mm; sourceTree = "<group>"; };
 		A2679292130E00A000CB7464 /* tr-utp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-utp.cc"; sourceTree = "<group>"; };
-		A2679293130E00A000CB7464 /* tr-utp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-utp.h"; sourceTree = "<group>"; };
 		A26AF1050D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A26AF1070D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A26AF2180D2DA35A00FF7140 /* FileOutlineController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileOutlineController.h; sourceTree = "<group>"; };
@@ -1710,7 +1706,6 @@
 				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
 				E71A5564279C2DD600EBFA1E /* tr-assert.mm */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.cc */,
-				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				A25E03E10E4015380086C225 /* tr-getopt.cc */,
 				A25E03E00E4015380086C225 /* tr-getopt.h */,
 				A220EC59118C8A060022B4BE /* tr-lpd.cc */,
@@ -1719,7 +1714,6 @@
 				888A256631B3DE536FEB8B01 /* tr-strbuf.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.cc */,
 				A2679292130E00A000CB7464 /* tr-utp.cc */,
-				A2679293130E00A000CB7464 /* tr-utp.h */,
 				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
 				A24621360C769CF400088E81 /* trevent.cc */,
 				A24621350C769CF400088E81 /* trevent.h */,
@@ -2188,7 +2182,6 @@
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
-				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
 				0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */,
 				1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */,
 				A25964A7106D73A800453B31 /* announcer.h in Headers */,
@@ -2206,7 +2199,6 @@
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
 				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
-				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
 				A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */,
 				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,

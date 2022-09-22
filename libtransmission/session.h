@@ -23,6 +23,8 @@
 #include <utility> // std::pair
 #include <vector>
 
+#include <event2/event.h> // evutil_socket_t
+
 #include "transmission.h"
 
 #include "announce-list.h"
@@ -30,6 +32,7 @@
 #include "bitfield.h"
 #include "cache.h"
 #include "interned-string.h"
+#include "peer-socket.h" // tr_peer_socket
 #include "net.h" // tr_socket_t
 #include "open-files.h"
 #include "quark.h"
@@ -525,6 +528,9 @@ public:
 
     std::unique_ptr<tr_udp_core> udp_core_;
 
+    void udp_event_callback(evutil_socket_t s);
+    bool tau_handle_message(uint8_t const* msg, size_t msglen) const;
+
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
 
@@ -994,13 +1000,63 @@ private:
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
 
-public:
-    struct struct_utp_context* utp_context = nullptr;
-    std::unique_ptr<libtransmission::Timer> utp_timer;
+    // UTP
+    struct struct_utp_context* utp_context_ = nullptr;
+    std::unique_ptr<libtransmission::Timer> utp_timer_ = {};
 
-    // These UDP announcer quirks are tightly hooked with session
-    bool tau_handle_message(uint8_t const* msg, size_t msglen) const;
+    void utp_init();
+    void utp_uninit();
+    void utp_reset_timer() const;
+    void utp_timer_callback() const;
+    bool utp_packet(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen);
+
+    // DHT
+    bool dht_initialized_ = false;
+    std::array<unsigned char, 20> dhtid_ = {};
+    std::unique_ptr<libtransmission::Timer> dht_timer_ = {};
+
+    bool dht_init();
+    void dht_uninit();
+    void dht_upkeep() const;
+    int bootstrap_af() const;
+    bool bootstrap_done(int af) const;
+    void dht_boostrap_from_file() const;
+    void bootstrap_from_name(char const* name, tr_port port, int af) const;
+    void dht_bootstrap(std::vector<uint8_t> nodes, std::vector<uint8_t> nodes6) const;
+
+public:
+    enum
+    {
+        DHT_STOPPED = 0,
+        DHT_BROKEN = 1,
+        DHT_POOR = 2,
+        DHT_FIREWALLED = 3,
+        DHT_GOOD = 4
+    };
+
+    bool dht_enabled() const
+    {
+        return dht_initialized_;
+    }
+
+    tr_port dht_port() const
+    {
+        return dht_enabled() ? udp_core_->port() : tr_port{};
+    }
+
+    int dht_status(int af, int* setme_node_count) const;
+    bool dht_add_node(tr_address const* address, tr_port port, bool bootstrap) const;
+    void dht_callback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen);
+
+    // This UDP announcer quirk is tightly hooked with session
     void tau_sendto(struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen) const;
+
+    void close_socket(tr_socket_t sockfd);
+    void close_peer_socket(tr_peer_socket socket);
+    tr_socket_t create_socket(int domain, int type);
+    tr_socket_t incoming_socket(tr_socket_t listening_sockfd, tr_address* addr, tr_port* port);
+    struct tr_peer_socket open_peer_utp_socket(tr_address const* addr, tr_port port);
+    struct tr_peer_socket open_peer_socket(tr_address const* addr, tr_port port, bool is_seed);
 };
 
 constexpr bool tr_isPriority(tr_priority_t p)

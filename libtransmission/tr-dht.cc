@@ -44,7 +44,6 @@
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
 #include "tr-strbuf.h"
 #include "trevent.h"
 #include "variant.h"
@@ -52,19 +51,15 @@
 
 using namespace std::literals;
 
-static std::unique_ptr<libtransmission::Timer> dht_timer;
-static std::array<unsigned char, 20> myid;
-static tr_session* my_session = nullptr;
-
-static bool bootstrap_done(tr_session* session, int af)
+bool tr_session::bootstrap_done(int af) const
 {
     if (af == 0)
     {
-        return bootstrap_done(session, AF_INET) && bootstrap_done(session, AF_INET6);
+        return bootstrap_done(AF_INET) && bootstrap_done(AF_INET6);
     }
 
-    int const status = tr_dhtStatus(session, af, nullptr);
-    return status == TR_DHT_STOPPED || status >= TR_DHT_FIREWALLED;
+    int const status = dht_status(af, nullptr);
+    return status == DHT_STOPPED || status >= DHT_FIREWALLED;
 }
 
 static void nap(int roughly_sec)
@@ -74,14 +69,14 @@ static void nap(int roughly_sec)
     tr_wait_msec(msec);
 }
 
-static int bootstrap_af(tr_session* session)
+int tr_session::bootstrap_af() const
 {
-    if (bootstrap_done(session, AF_INET6))
+    if (bootstrap_done(AF_INET6))
     {
         return AF_INET;
     }
 
-    if (bootstrap_done(session, AF_INET))
+    if (bootstrap_done(AF_INET))
     {
         return AF_INET6;
     }
@@ -89,7 +84,7 @@ static int bootstrap_af(tr_session* session)
     return 0;
 }
 
-static void bootstrap_from_name(char const* name, tr_port port, int af)
+void tr_session::bootstrap_from_name(char const* name, tr_port port, int af) const
 {
     auto hints = addrinfo{};
     hints.ai_socktype = SOCK_DGRAM;
@@ -117,7 +112,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 
         nap(15);
 
-        if (bootstrap_done(my_session, af))
+        if (bootstrap_done(af))
         {
             break;
         }
@@ -128,15 +123,15 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     freeaddrinfo(info);
 }
 
-static void dht_boostrap_from_file(tr_session* session)
+void tr_session::dht_boostrap_from_file() const
 {
-    if (bootstrap_done(session, 0))
+    if (bootstrap_done(0))
     {
         return;
     }
 
     // check for a manual bootstrap file.
-    auto in = std::ifstream{ tr_pathbuf{ session->configDir(), "/dht.bootstrap"sv } };
+    auto in = std::ifstream{ tr_pathbuf{ configDir(), "/dht.bootstrap"sv } };
     if (!in.is_open())
     {
         return;
@@ -145,7 +140,7 @@ static void dht_boostrap_from_file(tr_session* session)
     // format is each line has address, a space char, and port number
     tr_logAddTrace("Attempting manual bootstrap");
     auto line = std::string{};
-    while (!bootstrap_done(session, 0) && std::getline(in, line))
+    while (!bootstrap_done(0) && std::getline(in, line))
     {
         auto line_stream = std::istringstream{ line };
         auto addrstr = std::string{};
@@ -158,18 +153,13 @@ static void dht_boostrap_from_file(tr_session* session)
         }
         else
         {
-            bootstrap_from_name(addrstr.c_str(), tr_port::fromHost(hport), bootstrap_af(my_session));
+            bootstrap_from_name(addrstr.c_str(), tr_port::fromHost(hport), bootstrap_af());
         }
     }
 }
 
-static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::vector<uint8_t> nodes6)
+void tr_session::dht_bootstrap(std::vector<uint8_t> nodes, std::vector<uint8_t> nodes6) const
 {
-    if (my_session != session)
-    {
-        return;
-    }
-
     auto const num = std::size(nodes) / 6;
     if (num > 0)
     {
@@ -184,24 +174,24 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
 
     for (size_t i = 0; i < std::max(num, num6); ++i)
     {
-        if (i < num && !bootstrap_done(session, AF_INET))
+        if (i < num && !bootstrap_done(AF_INET))
         {
             auto addr = tr_address{};
             memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET;
             memcpy(&addr.addr.addr4, &nodes[i * 6], 4);
             auto const [port, out] = tr_port::fromCompact(&nodes[i * 6 + 4]);
-            tr_dhtAddNode(session, &addr, port, true);
+            dht_add_node(&addr, port, true);
         }
 
-        if (i < num6 && !bootstrap_done(session, AF_INET6))
+        if (i < num6 && !bootstrap_done(AF_INET6))
         {
             auto addr = tr_address{};
             memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET6;
             memcpy(&addr.addr.addr6, &nodes6[i * 18], 16);
             auto const [port, out] = tr_port::fromCompact(&nodes6[i * 18 + 16]);
-            tr_dhtAddNode(session, &addr, port, true);
+            dht_add_node(&addr, port, true);
         }
 
         /* Our DHT code is able to take up to 9 nodes in a row without
@@ -216,18 +206,18 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
             nap(15);
         }
 
-        if (bootstrap_done(my_session, 0))
+        if (bootstrap_done(0))
         {
             break;
         }
     }
 
-    if (!bootstrap_done(session, 0))
+    if (!bootstrap_done(0))
     {
-        dht_boostrap_from_file(session);
+        dht_boostrap_from_file();
     }
 
-    if (!bootstrap_done(session, 0))
+    if (!bootstrap_done(0))
     {
         for (int i = 0; i < 6; ++i)
         {
@@ -237,7 +227,7 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
                node, for example because we've just been restarted. */
             nap(40);
 
-            if (bootstrap_done(session, 0))
+            if (bootstrap_done(0))
             {
                 break;
             }
@@ -247,18 +237,18 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
                 tr_logAddDebug("Attempting bootstrap from dht.transmissionbt.com");
             }
 
-            bootstrap_from_name("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_af(my_session));
+            bootstrap_from_name("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_af());
         }
     }
 
     tr_logAddTrace("Finished bootstrapping");
 }
 
-int tr_dhtInit(tr_session* ss)
+bool tr_session::dht_init()
 {
-    if (my_session != nullptr) /* already initialized */
+    if (dht_initialized_)
     {
-        return -1;
+        return false;
     }
 
     tr_logAddInfo(_("Initializing DHT"));
@@ -269,14 +259,14 @@ int tr_dhtInit(tr_session* ss)
     }
 
     auto benc = tr_variant{};
-    auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };
+    auto const dat_file = tr_pathbuf{ configDir(), "/dht.dat"sv };
     auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.sv());
 
     bool have_id = false;
     auto nodes = std::vector<uint8_t>{};
     auto nodes6 = std::vector<uint8_t>{};
-    auto udp_socket = ss->udp_core_->udp_socket();
-    auto udp6_socket = ss->udp_core_->udp6_socket();
+    auto udp_socket = udp_core_->udp_socket();
+    auto udp6_socket = udp_core_->udp6_socket();
 
     if (ok)
     {
@@ -284,7 +274,7 @@ int tr_dhtInit(tr_session* ss)
         have_id = tr_variantDictFindStrView(&benc, TR_KEY_id, &sv);
         if (have_id && std::size(sv) == 20)
         {
-            std::copy(std::begin(sv), std::end(sv), std::data(myid));
+            std::copy(std::begin(sv), std::end(sv), std::data(dhtid_));
         }
 
         size_t raw_len = 0U;
@@ -312,47 +302,45 @@ int tr_dhtInit(tr_session* ss)
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
         tr_logAddTrace("Generating new id");
-        tr_rand_buffer(std::data(myid), std::size(myid));
+        tr_rand_buffer(std::data(dhtid_), std::size(dhtid_));
     }
 
-    if (int const rc = dht_init(udp_socket, udp6_socket, std::data(myid), nullptr); rc < 0)
+    if (int const rc = ::dht_init(udp_socket, udp6_socket, std::data(dhtid_), nullptr); rc < 0)
     {
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
-        my_session = nullptr;
-        return -1;
+        return false;
     }
 
-    my_session = ss;
+    std::thread(&tr_session::dht_bootstrap, this, nodes, nodes6).detach();
 
-    std::thread(dht_bootstrap, my_session, nodes, nodes6).detach();
-
-    dht_timer = my_session->timerMaker().create([]() { tr_dhtCallback(nullptr, 0, nullptr, 0, my_session); });
+    dht_timer_ = timerMaker().create([this]() { dht_callback(nullptr, 0, nullptr, 0); });
     auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
     static auto constexpr MinInterval = 10ms;
     static auto constexpr MaxInterval = 1s;
     auto interval = MinInterval + random_percent * (MaxInterval - MinInterval);
-    dht_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    dht_timer_->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
 
+    dht_initialized_ = true;
     tr_logAddDebug("DHT initialized");
 
-    return 1;
+    return true;
 }
 
-void tr_dhtUninit(tr_session* ss)
+void tr_session::dht_uninit()
 {
-    if (my_session != ss)
+    if (!dht_initialized_)
     {
         return;
     }
 
     tr_logAddTrace("Uninitializing DHT");
 
-    dht_timer.reset();
+    dht_timer_.reset();
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
-    if (tr_dhtStatus(ss, AF_INET, nullptr) < TR_DHT_FIREWALLED && tr_dhtStatus(ss, AF_INET6, nullptr) < TR_DHT_FIREWALLED)
+    if (dht_status(AF_INET, nullptr) < DHT_FIREWALLED && dht_status(AF_INET6, nullptr) < DHT_FIREWALLED)
     {
         tr_logAddTrace("Not saving nodes, DHT not ready");
     }
@@ -374,7 +362,7 @@ void tr_dhtUninit(tr_session* ss)
 
         tr_variant benc;
         tr_variantInitDict(&benc, 3);
-        tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(myid), std::size(myid));
+        tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(dhtid_), std::size(dhtid_));
 
         if (num > 0)
         {
@@ -406,20 +394,14 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, std::data(compact6), out6 - std::data(compact6));
         }
 
-        auto const dat_file = tr_pathbuf{ ss->configDir(), "/dht.dat"sv };
+        auto const dat_file = tr_pathbuf{ configDir(), "/dht.dat"sv };
         tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.sv());
         tr_variantClear(&benc);
     }
 
-    dht_uninit();
+    ::dht_uninit();
+    dht_initialized_ = false;
     tr_logAddTrace("Done uninitializing DHT");
-
-    my_session = nullptr;
-}
-
-bool tr_dhtEnabled(tr_session const* ss)
-{
-    return ss != nullptr && ss == my_session;
 }
 
 struct getstatus_closure
@@ -440,40 +422,39 @@ static void getstatus(getstatus_closure* const closure)
 
     if (good < 4 || good + dubious <= 8)
     {
-        closure->status = TR_DHT_BROKEN;
+        closure->status = tr_session::DHT_BROKEN;
     }
     else if (good < 40)
     {
-        closure->status = TR_DHT_POOR;
+        closure->status = tr_session::DHT_POOR;
     }
     else if (incoming < 8)
     {
-        closure->status = TR_DHT_FIREWALLED;
+        closure->status = tr_session::DHT_FIREWALLED;
     }
     else
     {
-        closure->status = TR_DHT_GOOD;
+        closure->status = tr_session::DHT_GOOD;
     }
 }
 
-int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
+int tr_session::dht_status(int af, int* setme_node_count) const
 {
     auto closure = getstatus_closure{ af, -1, -1 };
-    auto udp_socket = session->udp_core_->udp_socket();
-    auto udp6_socket = session->udp_core_->udp6_socket();
+    auto udp_socket = udp_core_->udp_socket();
+    auto udp6_socket = udp_core_->udp6_socket();
 
-    if (!tr_dhtEnabled(session) || (af == AF_INET && udp_socket == TR_BAD_SOCKET) ||
-        (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
+    if (!dht_enabled() || (af == AF_INET && udp_socket == TR_BAD_SOCKET) || (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
     {
         if (setme_node_count != nullptr)
         {
             *setme_node_count = 0;
         }
 
-        return TR_DHT_STOPPED;
+        return tr_session::DHT_STOPPED;
     }
 
-    tr_runInEventThread(session, getstatus, &closure);
+    tr_runInEventThread(const_cast<tr_session*>(this), getstatus, &closure);
 
     while (closure.status < 0)
     {
@@ -488,16 +469,11 @@ int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
     return closure.status;
 }
 
-tr_port tr_dhtPort(tr_session const* ss)
-{
-    return tr_dhtEnabled(ss) ? ss->udp_core_->port() : tr_port{};
-}
-
-bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
+bool tr_session::dht_add_node(tr_address const* address, tr_port port, bool bootstrap) const
 {
     int const af = address->isIPv4() ? AF_INET : AF_INET6;
 
-    if (!tr_dhtEnabled(ss))
+    if (!dht_enabled())
     {
         return false;
     }
@@ -505,7 +481,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     /* Since we don't want to abuse our bootstrap nodes,
      * we don't ping them if the DHT is in a good state. */
 
-    if (bootstrap && (tr_dhtStatus(ss, af, nullptr) >= TR_DHT_FIREWALLED))
+    if (bootstrap && (dht_status(af, nullptr) >= DHT_FIREWALLED))
     {
         return false;
     }
@@ -535,23 +511,23 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     return false;
 }
 
-char const* tr_dhtPrintableStatus(int status)
+static char const* tr_dhtPrintableStatus(int status)
 {
     switch (status)
     {
-    case TR_DHT_STOPPED:
+    case tr_session::DHT_STOPPED:
         return "stopped";
 
-    case TR_DHT_BROKEN:
+    case tr_session::DHT_BROKEN:
         return "broken";
 
-    case TR_DHT_POOR:
+    case tr_session::DHT_POOR:
         return "poor";
 
-    case TR_DHT_FIREWALLED:
+    case tr_session::DHT_FIREWALLED:
         return "firewalled";
 
-    case TR_DHT_GOOD:
+    case tr_session::DHT_GOOD:
         return "good";
 
     default:
@@ -559,12 +535,13 @@ char const* tr_dhtPrintableStatus(int status)
     }
 }
 
-static void callback(void* /*ignore*/, int event, unsigned char const* info_hash, void const* data, size_t data_len)
+static void callback(void* sv, int event, unsigned char const* info_hash, void const* data, size_t data_len)
 {
     auto hash = tr_sha1_digest_t{};
+    auto session = static_cast<tr_session*>(sv);
     std::copy_n(reinterpret_cast<std::byte const*>(info_hash), std::size(hash), std::data(hash));
-    auto const lock = my_session->unique_lock();
-    auto* const tor = my_session->torrents().get(hash);
+    auto const lock = session->unique_lock();
+    auto* const tor = session->torrents().get(hash);
 
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
@@ -609,14 +586,15 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     }
 
     int numnodes = 0;
-    int const status = tr_dhtStatus(tor->session, af, &numnodes);
-    if (status == TR_DHT_STOPPED)
+    auto session = tor->session;
+    int const status = session->dht_status(af, &numnodes);
+    if (status == tr_session::DHT_STOPPED)
     {
         // let the caller believe everything is all right.
         return AnnounceResult::OK;
     }
 
-    if (status < TR_DHT_POOR)
+    if (status < tr_session::DHT_POOR)
     {
         tr_logAddTraceTor(
             tor,
@@ -629,8 +607,8 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     }
 
     auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(tor->infoHash()));
-    auto const hport = announce ? my_session->peerPort().host() : 0;
-    int const rc = dht_search(dht_hash, hport, af, callback, nullptr);
+    auto const hport = announce ? session->peerPort().host() : 0;
+    int const rc = dht_search(dht_hash, hport, af, callback, session);
     if (rc < 0)
     {
         auto const error_code = errno;
@@ -656,11 +634,11 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     return AnnounceResult::OK;
 }
 
-void tr_dhtUpkeep(tr_session* session)
+void tr_session::dht_upkeep() const
 {
     time_t const now = tr_time();
 
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents())
     {
         if (!tor->isRunning || !tor->allowsDht())
         {
@@ -685,17 +663,10 @@ void tr_dhtUpkeep(tr_session* session)
     }
 }
 
-void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen, void* sv)
+void tr_session::dht_callback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen)
 {
-    TR_ASSERT(sv != nullptr);
-
-    if (sv != my_session)
-    {
-        return;
-    }
-
     time_t tosleep = 0;
-    int const rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
+    int const rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, this);
 
     if (rc < 0)
     {
@@ -717,13 +688,12 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
         }
     }
 
-    /* Being slightly late is fine,
-       and has the added benefit of adding some jitter. */
+    // Being slightly late is fine, and has the added benefit of adding some jitter.
     auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
     auto const min_interval = std::chrono::seconds{ tosleep };
     auto const max_interval = std::chrono::seconds{ tosleep + 1 };
     auto const interval = min_interval + random_percent * (max_interval - min_interval);
-    dht_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    dht_timer_->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
 }
 
 /* This function should return true when a node is blacklisted.  We do

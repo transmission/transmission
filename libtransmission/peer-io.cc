@@ -13,9 +13,9 @@
 #include <event2/event.h>
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
-
+#ifdef WITH_UTP
 #include <libutp/utp.h>
-
+#endif
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -25,7 +25,6 @@
 #include "net.h"
 #include "peer-io.h"
 #include "tr-assert.h"
-#include "tr-utp.h"
 #include "utils.h"
 
 #ifdef _WIN32
@@ -39,9 +38,10 @@
 #define EPIPE WSAECONNRESET
 #endif
 
+#ifdef WITH_UTP
 /* The amount of read bufferring that we allow for uTP sockets. */
-
 static constexpr auto UtpReadBufferSize = 256 * 1024;
+#endif // WITH_UTP
 
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->addrStr())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->addrStr())
@@ -588,17 +588,17 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
     TR_ASSERT(utp || session->allowsTCP());
 
     auto socket = tr_peer_socket{};
-
+#ifdef WITH_UTP
     if (utp)
     {
-        socket = tr_netOpenPeerUTPSocket(session, addr, port, is_seed);
+        socket = session->open_peer_utp_socket(addr, port);
     }
-
+#endif // WITH_UTP
     if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
     {
-        socket = tr_netOpenPeerSocket(session, addr, port, is_seed);
+        socket = session->open_peer_socket(addr, port, is_seed);
         tr_logAddDebug(fmt::format(
-            "tr_netOpenPeerSocket returned {}",
+            "tr_session::open_peer_socket() returned {}",
             socket.type != TR_PEER_SOCKET_TYPE_NONE ? socket.handle.tcp : TR_BAD_SOCKET));
     }
 
@@ -717,7 +717,7 @@ static void io_close_socket(tr_peerIo* io)
         break;
 
     case TR_PEER_SOCKET_TYPE_TCP:
-        tr_netClose(io->session, io->socket.handle.tcp);
+        io->session->close_socket(io->socket.handle.tcp);
         break;
 
 #ifdef WITH_UTP
@@ -795,7 +795,7 @@ int tr_peerIo::reconnect()
     io_close_socket(this);
 
     auto const [addr, port] = this->socketAddress();
-    this->socket = tr_netOpenPeerSocket(session, &addr, port, this->isSeed());
+    this->socket = session->open_peer_socket(&addr, port, this->isSeed());
 
     if (this->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {
@@ -993,6 +993,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
     auto res = int{};
     switch (io->socket.type)
     {
+#ifdef WITH_UTP
     case TR_PEER_SOCKET_TYPE_UTP:
         /* UTP_RBDrained notifies libutp that your read buffer is empty.
          * It opens up the congestion window by sending an ACK (soonish)
@@ -1003,7 +1004,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
         }
 
         break;
-
+#endif // WITH_UTP
     case TR_PEER_SOCKET_TYPE_TCP:
         {
             EVUTIL_SET_SOCKET_ERROR(0);
@@ -1058,6 +1059,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     auto n = int{};
     switch (io->socket.type)
     {
+#ifdef WITH_UTP
     case TR_PEER_SOCKET_TYPE_UTP:
         n = utp_write(io->socket.handle.utp, evbuffer_pullup(io->outbuf.get(), howmuch), howmuch);
 
@@ -1066,8 +1068,8 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
             evbuffer_drain(io->outbuf.get(), n);
             didWriteWrapper(io, n);
         }
-
         break;
+#endif // WITH_UTP
 
     case TR_PEER_SOCKET_TYPE_TCP:
         {

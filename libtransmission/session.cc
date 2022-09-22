@@ -53,10 +53,8 @@
 #include "timer-ev.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
-#include "tr-utp.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
@@ -290,7 +288,7 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
 
     auto client_addr = tr_address{};
     auto client_port = tr_port{};
-    auto const client_socket = tr_netAccept(session, fd, &client_addr, &client_port);
+    auto const client_socket = session->incoming_socket(fd, &client_addr, &client_port);
 
     if (client_socket != TR_BAD_SOCKET)
     {
@@ -673,7 +671,7 @@ void tr_session::onNowTimer()
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
-    tr_dhtUpkeep(this);
+    dht_upkeep();
     if (turtle.isClockEnabled)
     {
         turtleCheckClock(this, &this->turtle);
@@ -756,7 +754,9 @@ void tr_session::initImpl(init_data& data)
         this->lpd_ = tr_lpd::create(lpd_mediator_, timerMaker(), eventBase());
     }
 
-    tr_utpInit(this);
+#ifdef WITH_UTP
+    utp_init();
+#endif
 
     /* cleanup */
     tr_variantClear(&settings);
@@ -1807,7 +1807,7 @@ void tr_session::closeImplStart()
 
     lpd_.reset();
 
-    tr_dhtUninit(this);
+    dht_uninit();
 
     save_timer_.reset();
     now_timer_.reset();
@@ -1880,7 +1880,9 @@ void tr_session::closeImplFinish()
 
     stats().saveIfDirty();
     tr_peerMgrFree(peerMgr);
-    tr_utpClose(this);
+#ifdef WITH_UTP
+    utp_uninit();
+#endif
     blocklists_.clear();
     openFiles().closeAll();
     is_closed_ = true;

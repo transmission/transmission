@@ -43,8 +43,6 @@
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
-#include "tr-utp.h"
 #include "utils.h"
 #include "webseed.h"
 
@@ -103,7 +101,7 @@ public:
 
     [[nodiscard]] bool isDHTEnabled() const override
     {
-        return tr_dhtEnabled(&session_);
+        return session_.dht_enabled();
     }
 
     [[nodiscard]] bool allowsTCP() const override
@@ -1246,11 +1244,11 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     if (session->addressIsBlocked(*addr))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr->readable(port)));
-        tr_netClosePeerSocket(session, socket);
+        session->close_peer_socket(socket);
     }
     else if (manager->incoming_handshakes.contains(*addr))
     {
-        tr_netClosePeerSocket(session, socket);
+        session->close_peer_socket(socket);
     }
     else /* we don't have a connection to them yet... */
     {

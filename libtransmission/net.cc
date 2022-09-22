@@ -24,9 +24,9 @@
 #include <event2/util.h>
 
 #include <fmt/core.h>
-
+#ifdef WITH_UTP
 #include <libutp/utp.h>
-
+#endif
 #include "transmission.h"
 
 #include "log.h"
@@ -35,7 +35,6 @@
 #include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
-#include "tr-utp.h"
 #include "utils.h"
 
 #ifndef IN_MULTICAST
@@ -232,10 +231,8 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
     return sizeof(struct sockaddr_in6);
 }
 
-static tr_socket_t createSocket(tr_session* session, int domain, int type)
+tr_socket_t tr_session::create_socket(int domain, int type)
 {
-    TR_ASSERT(session != nullptr);
-
     auto const sockfd = socket(domain, type, 0);
     if (sockfd == TR_BAD_SOCKET)
     {
@@ -250,9 +247,9 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
         return TR_BAD_SOCKET;
     }
 
-    if ((evutil_make_socket_nonblocking(sockfd) == -1) || !session->incPeerCount())
+    if ((evutil_make_socket_nonblocking(sockfd) == -1) || !incPeerCount())
     {
-        tr_netClose(session, sockfd);
+        close_socket(sockfd);
         return TR_BAD_SOCKET;
     }
 
@@ -280,11 +277,11 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
     return sockfd;
 }
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed)
+struct tr_peer_socket tr_session::open_peer_socket(tr_address const* addr, tr_port port, bool is_seed)
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    if (!session->allowsTCP())
+    if (!allowsTCP())
     {
         return {};
     }
@@ -295,14 +292,14 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     }
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(session, Domains[addr->type], SOCK_STREAM);
+    auto const s = create_socket(Domains[addr->type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
     }
 
     // seeds don't need a big read buffer, so make it smaller
-    if (client_is_seed)
+    if (is_seed)
     {
         int n = 8192;
 
@@ -316,7 +313,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
 
     // set source address
-    auto const [source_addr, is_default_addr] = session->publicAddress(addr->type);
+    auto const [source_addr, is_default_addr] = publicAddress(addr->type);
     struct sockaddr_storage source_sock;
     socklen_t const sourcelen = setup_sockaddr(&source_addr, {}, &source_sock);
 
@@ -328,7 +325,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
             fmt::arg("socket", s),
             fmt::arg("error", tr_net_strerror(sockerrno)),
             fmt::arg("error_code", sockerrno)));
-        tr_netClose(session, s);
+        close_socket(s);
         return {};
     }
 
@@ -350,7 +347,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
                 fmt::arg("error_code", tmperrno)));
         }
 
-        tr_netClose(session, s);
+        close_socket(s);
     }
     else
     {
@@ -362,19 +359,17 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     return ret;
 }
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(
-    tr_session* session,
-    tr_address const* addr,
-    tr_port port,
-    bool /*client_is_seed*/)
+#ifdef WITH_UTP
+
+struct tr_peer_socket tr_session::open_peer_utp_socket(tr_address const* addr, tr_port port)
 {
     auto ret = tr_peer_socket{};
 
-    if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
+    if (utp_context_ != nullptr && tr_address_is_valid_for_peers(addr, port))
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
-        auto* const socket = utp_create_socket(session->utp_context);
+        auto* const socket = utp_create_socket(utp_context_);
 
         if (socket != nullptr)
         {
@@ -392,7 +387,9 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
     return ret;
 }
 
-void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
+#endif // WITH_UTP
+
+void tr_session::close_peer_socket(tr_peer_socket socket)
 {
     switch (socket.type)
     {
@@ -400,7 +397,7 @@ void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
         break;
 
     case TR_PEER_SOCKET_TYPE_TCP:
-        tr_netClose(session, socket.handle.tcp);
+        close_socket(socket.handle.tcp);
         break;
 
 #ifdef WITH_UTP
@@ -539,9 +536,8 @@ bool tr_net_hasIPv6(tr_port port)
     return result;
 }
 
-tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_address* addr, tr_port* port)
+tr_socket_t tr_session::incoming_socket(tr_socket_t listening_sockfd, tr_address* addr, tr_port* port)
 {
-    TR_ASSERT(session != nullptr);
     TR_ASSERT(addr != nullptr);
     TR_ASSERT(port != nullptr);
 
@@ -557,10 +553,9 @@ tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_a
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    if (!tr_address_from_sockaddr_storage(addr, port, &sock) || evutil_make_socket_nonblocking(sockfd) == -1 ||
-        !session->incPeerCount())
+    if (!tr_address_from_sockaddr_storage(addr, port, &sock) || evutil_make_socket_nonblocking(sockfd) == -1 || !incPeerCount())
     {
-        tr_netCloseSocket(sockfd);
+        close_socket(sockfd);
         return TR_BAD_SOCKET;
     }
 
@@ -572,10 +567,10 @@ void tr_netCloseSocket(tr_socket_t sockfd)
     evutil_closesocket(sockfd);
 }
 
-void tr_netClose(tr_session* session, tr_socket_t sockfd)
+void tr_session::close_socket(tr_socket_t sockfd)
 {
     tr_netCloseSocket(sockfd);
-    session->decPeerCount();
+    decPeerCount();
 }
 
 /*
