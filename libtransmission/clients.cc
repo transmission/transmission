@@ -505,7 +505,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 129>{ {
+auto constexpr Clients = std::array<Client, 131>{ {
     { "-AD", "Advanced Download Manager", three_digit_formatter },
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -529,7 +529,7 @@ auto constexpr Clients = std::array<Client, 129>{ {
     { "-BR", "BitRocket", bitrocket_formatter },
     { "-BS", "BTSlave", four_digit_formatter },
     { "-BT", "BitTorrent", utorrent_formatter },
-    { "-BW", "BitWombat", four_digit_formatter },
+    { "-BW", "BitTorrent Web", utorrent_formatter },
     { "-BX", "BittorrentX", four_digit_formatter },
     { "-CD", "Enhanced CTorrent", two_major_two_minor_formatter },
     { "-CT", "CTorrent", ctorrent_formatter },
@@ -584,6 +584,7 @@ auto constexpr Clients = std::array<Client, 129>{ {
     { "-ST", "SymTorrent", four_digit_formatter },
     { "-SZ", "Shareaza", four_digit_formatter },
     { "-S~", "Shareaza", four_digit_formatter },
+    { "-TB", "Torch Browser", no_version_formatter },
     { "-TN", "Torrent .NET", four_digit_formatter },
     { "-TR", "Transmission", transmission_formatter },
     { "-TS", "Torrentstorm", four_digit_formatter },
@@ -618,6 +619,7 @@ auto constexpr Clients = std::array<Client, 129>{ {
     { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
     { "BLZ", "Blizzard Downloader", blizzard_formatter },
     { "DNA", "BitTorrent DNA", bittorrent_dna_formatter },
+    { "FD6", "Free Download Manager 6", no_version_formatter },
     { "LIME", "Limewire", no_version_formatter },
     { "M", "BitTorrent", mainline_formatter },
     { "Mbrst", "burst!", burst_formatter },
