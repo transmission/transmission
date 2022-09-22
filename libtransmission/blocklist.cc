@@ -395,7 +395,7 @@ void BlocklistFile::assertValidRules(std::vector<AddressRange> const& ranges)
     auto ranges_IPv6 = std::vector<AddressRange>{};
     auto ranges_IPv4 = std::vector<AddressRange>{};
 
-    for (size_t i = 1; i < std::size(ranges); ++i)
+    for (size_t i = 0; i < std::size(ranges); i++)
     {
         if (ranges[i].begin_ == 0 && ranges[i].end_ == 0)
         {
