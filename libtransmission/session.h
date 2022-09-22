@@ -516,7 +516,7 @@ public:
         tr_session& session_;
         struct event* udp_event_ = nullptr;
         struct event* udp6_event_ = nullptr;
-        unsigned char* udp6_bound_ = nullptr;
+        std::optional<in6_addr> udp6_bound_;
         tr_socket_t udp_socket_ = TR_BAD_SOCKET;
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
 

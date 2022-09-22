@@ -709,44 +709,43 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
 }
 
 /* Return our global IPv6 address, with caching. */
-unsigned char const* tr_globalIPv6(tr_session const* session)
+std::optional<in6_addr> tr_globalIPv6(tr_session const* session)
 {
-    static auto ipv6 = std::array<unsigned char, 16>{};
+    static auto ipv6 = in6_addr{};
     static time_t last_time = 0;
     static bool have_ipv6 = false;
 
     /* Re-check every half hour */
     if (auto const now = tr_time(); last_time < now - 1800)
     {
-        int addrlen = 16;
-        int const rc = tr_globalAddress(AF_INET6, std::data(ipv6), &addrlen);
-        have_ipv6 = rc >= 0 && addrlen == 16;
+        int addrlen = sizeof(ipv6);
+        int const rc = tr_globalAddress(AF_INET6, &ipv6, &addrlen);
+        have_ipv6 = rc >= 0 && addrlen == sizeof(ipv6);
         last_time = now;
     }
 
     if (!have_ipv6)
     {
-        return nullptr; /* No IPv6 address at all. */
+        return {}; // no IPv6 address at all
     }
 
-    /* Return the default address.
-     * This is useful for checking for connectivity in general. */
+    // Return the default address.
+    // This is useful for checking for connectivity in general.
     if (session == nullptr)
     {
-        return std::data(ipv6);
+        return ipv6;
     }
 
-    /* We have some sort of address, now make sure that we return
-       our bound address if non-default. */
-
+    // We have some sort of address.
+    // Now make sure that we return our bound address if non-default.
     auto const [ipv6_bindaddr, is_default] = session->publicAddress(TR_AF_INET6);
     if (!is_default)
     {
-        /* Explicitly bound. Return that address. */
-        memcpy(std::data(ipv6), ipv6_bindaddr.addr.addr6.s6_addr, 16);
+        // return this explicitly-bound address
+        ipv6 = ipv6_bindaddr.addr.addr6;
     }
 
-    return std::data(ipv6);
+    return ipv6;
 }
 
 /***
