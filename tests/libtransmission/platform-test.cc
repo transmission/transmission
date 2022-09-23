@@ -9,6 +9,7 @@
 #include "transmission.h"
 
 #include "file.h"
+#include "platform.h"
 #include "tr-strbuf.h"
 
 #include "test-fixtures.h"
