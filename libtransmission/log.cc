@@ -129,7 +129,7 @@ void logAddImpl(
 #else
     auto const szmsg = fmt::format("[{:s}:{:d}] {:s}", file, line, msg);
 #endif
-    __android_log_print(prio, "transmission", szmsg.c_str());
+    __android_log_write(prio, "transmission", szmsg.c_str());
 
 #else
 
