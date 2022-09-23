@@ -10,6 +10,7 @@ Checks: >
   -cert-err58-cpp,
   clang-analyzer-*,
   cppcoreguidelines-avoid-const-or-ref-data-members,
+  cppcoreguidelines-avoid-goto,
   cppcoreguidelines-init-variables,
   cppcoreguidelines-interfaces-global-init,
   cppcoreguidelines-no-malloc,

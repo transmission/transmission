@@ -53,8 +53,7 @@ static void set_system_error(tr_error** error, int code, std::string_view what)
 static bool tr_spawn_async_in_child(
     char const* const* cmd,
     std::map<std::string_view, std::string_view> const& env,
-    std::string_view work_dir,
-    int pipe_fd)
+    std::string_view work_dir)
 {
     auto key_sz = std::string{};
     auto val_sz = std::string{};
@@ -66,25 +65,21 @@ static bool tr_spawn_async_in_child(
 
         if (setenv(key_sz.c_str(), val_sz.c_str(), 1) != 0)
         {
-            goto FAIL;
+            return false;
         }
     }
 
     if (!std::empty(work_dir) && chdir(tr_pathbuf{ work_dir }) == -1)
     {
-        goto FAIL;
+        return false;
     }
 
     if (execvp(cmd[0], const_cast<char* const*>(cmd)) == -1)
     {
-        goto FAIL;
+        return false;
     }
 
     return true;
-
-FAIL:
-    (void)write(pipe_fd, &errno, sizeof(errno));
-    return false;
 }
 
 static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
@@ -168,8 +163,9 @@ bool tr_spawn_async(
     {
         close(pipe_fds[0]);
 
-        if (!tr_spawn_async_in_child(cmd, env, work_dir, pipe_fds[1]))
+        if (!tr_spawn_async_in_child(cmd, env, work_dir))
         {
+            (void)write(pipe_fds[1], &errno, sizeof(errno));
             _exit(0);
         }
     }
