@@ -4,11 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <stdio.h> /* fprintf() */
-#include <stdlib.h> /* EXIT_FAILURE */
+#include <cstdlib> // EXIT_FAILURE
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -98,7 +99,7 @@ static bool removeURL(tr_variant* metainfo, std::string_view url)
 
     if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && url == sv)
     {
-        printf("\tRemoved \"%" TR_PRIsv "\" from \"announce\"\n", TR_PRIsv_ARG(sv));
+        fmt::print(FMT_STRING("\tRemoved '{:s} from 'announce'\n"), sv);
         tr_variantDictRemove(metainfo, TR_KEY_announce);
         changed = true;
     }
@@ -116,7 +117,7 @@ static bool removeURL(tr_variant* metainfo, std::string_view url)
             {
                 if (tr_variantGetStrView(node, &sv) && url == sv)
                 {
-                    printf("\tRemoved \"%" TR_PRIsv "\" from \"announce-list\" tier #%d\n", TR_PRIsv_ARG(sv), tierIndex + 1);
+                    fmt::print(FMT_STRING("\tRemoved '{:s} from 'announce-list' tier #{:d}\n"), sv, tierIndex + 1);
                     tr_variantListRemove(tier, nodeIndex);
                     changed = true;
                 }
@@ -128,7 +129,7 @@ static bool removeURL(tr_variant* metainfo, std::string_view url)
 
             if (tr_variantListSize(tier) == 0)
             {
-                printf("\tNo URLs left in tier #%d... removing tier\n", tierIndex + 1);
+                fmt::print(FMT_STRING("\tNo URLs left in tier #{:d}... removing tier\n"), tierIndex + 1);
                 tr_variantListRemove(announce_list, tierIndex);
             }
             else
@@ -139,7 +140,7 @@ static bool removeURL(tr_variant* metainfo, std::string_view url)
 
         if (tr_variantListSize(announce_list) == 0)
         {
-            printf("\tNo tiers left... removing announce-list\n");
+            fmt::print(FMT_STRING("\tNo tiers left... removing announce-list\n"));
             tr_variantDictRemove(metainfo, TR_KEY_announce_list);
         }
     }
@@ -155,7 +156,7 @@ static bool removeURL(tr_variant* metainfo, std::string_view url)
             if ((node != nullptr) && tr_variantGetStrView(node, &sv))
             {
                 tr_variantDictAddStr(metainfo, TR_KEY_announce, sv);
-                printf("\tAdded \"%" TR_PRIsv "\" to announce\n", TR_PRIsv_ARG(sv));
+                fmt::print(FMT_STRING("\tAdded '{:s}' to announce\n"), sv);
             }
         }
     }
@@ -191,7 +192,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
     if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && tr_strvContains(sv, oldval))
     {
         auto const newstr = replaceSubstr(sv, oldval, newval);
-        printf("\tReplaced in \"announce\": \"%" TR_PRIsv "\" --> \"%s\"\n", TR_PRIsv_ARG(sv), newstr.c_str());
+        fmt::print(FMT_STRING("\tReplaced in 'announce': '{:s}' --> '{:s}'\n"), sv, newstr);
         tr_variantDictAddStr(metainfo, TR_KEY_announce, newstr);
         changed = true;
     }
@@ -211,11 +212,11 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
                 if (tr_variantGetStrView(node, &sv) && tr_strvContains(sv, oldval))
                 {
                     auto const newstr = replaceSubstr(sv, oldval, newval);
-                    printf(
-                        "\tReplaced in \"announce-list\" tier %d: \"%" TR_PRIsv "\" --> \"%s\"\n",
+                    fmt::print(
+                        FMT_STRING("\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n"),
                         tierCount + 1,
-                        TR_PRIsv_ARG(sv),
-                        newstr.c_str());
+                        sv,
+                        newstr);
                     tr_variantClear(node);
                     tr_variantInitStr(node, newstr);
                     changed = true;
@@ -269,7 +270,7 @@ static bool addURL(tr_variant* metainfo, char const* url)
     if (!had_announce && !had_announce_list)
     {
         /* this new tracker is the only one, so add it to "announce"... */
-        printf("\tAdded \"%s\" in \"announce\"\n", url);
+        fmt::print(FMT_STRING("\tAdded '{:s}' in 'announce'\n"), url);
         tr_variantDictAddStr(metainfo, TR_KEY_announce, url);
         changed = true;
     }
@@ -294,7 +295,7 @@ static bool addURL(tr_variant* metainfo, char const* url)
         {
             tr_variant* tier = tr_variantListAddList(announce_list, 1);
             tr_variantListAddStr(tier, url);
-            printf("\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_variantListSize(announce_list));
+            fmt::print(FMT_STRING("\tAdded '{:s}' to 'announce-list' tier #{:d}\n"), url, tr_variantListSize(announce_list));
             changed = true;
         }
     }
@@ -310,13 +311,13 @@ static bool setSource(tr_variant* metainfo, char const* source_value)
 
     if (!had_source)
     {
-        printf("\tAdded \"%s\" as source\n", source_value);
+        fmt::print(FMT_STRING("\tAdded '{:s}' as source\n"), source_value);
         tr_variantDictAddStr(metainfo, TR_KEY_source, source_value);
         changed = true;
     }
     else if (current_source.compare(source_value) != 0)
     {
-        printf("\tUpdated source: \"%s\" -> \"%s\"\n", current_source.data(), source_value);
+        fmt::print(FMT_STRING("\tUpdated source: '{:s}' -> '{:s}'\n"), current_source.data(), source_value);
         tr_variantDictAddStr(metainfo, TR_KEY_source, source_value);
         changed = true;
     }
@@ -338,23 +339,23 @@ int tr_main(int argc, char* argv[])
 
     if (options.show_version)
     {
-        fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
+        fmt::print(stderr, FMT_STRING("{:s} {:s}\n"), MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
     if (std::empty(options.files))
     {
-        fprintf(stderr, "ERROR: No torrent files specified.\n");
+        fmt::print(stderr, FMT_STRING("ERROR: No torrent files specified.\n"));
         tr_getopt_usage(MyName, Usage, std::data(Options));
-        fprintf(stderr, "\n");
+        fmt::print(stderr, "\n");
         return EXIT_FAILURE;
     }
 
     if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == nullptr && options.source == nullptr)
     {
-        fprintf(stderr, "ERROR: Must specify -a, -d, -r or -s\n");
+        fmt::print(stderr, "ERROR: Must specify -a, -d, -r or -s\n");
         tr_getopt_usage(MyName, Usage, std::data(Options));
-        fprintf(stderr, "\n");
+        fmt::print(stderr, "\n");
         return EXIT_FAILURE;
     }
 
@@ -364,11 +365,11 @@ int tr_main(int argc, char* argv[])
         bool changed = false;
         tr_error* error = nullptr;
 
-        printf("%" TR_PRIsv "\n", TR_PRIsv_ARG(filename));
+        fmt::print(FMT_STRING("{:s}\n"), filename);
 
         if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
         {
-            printf("\tError reading file: %s\n", error->message);
+            fmt::print(FMT_STRING("\tError reading file: {:s}\n"), error->message);
             tr_error_free(error);
             continue;
         }
@@ -402,7 +403,7 @@ int tr_main(int argc, char* argv[])
         tr_variantClear(&top);
     }
 
-    printf("Changed %d files\n", changedCount);
+    fmt::print(FMT_STRING("Changed {:d} files\n"), changedCount);
 
     return EXIT_SUCCESS;
 }
