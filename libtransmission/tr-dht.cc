@@ -512,7 +512,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
 
     if (address->isIPv4())
     {
-        struct sockaddr_in sin;
+        auto sin = sockaddr_in{};
         memset(&sin, 0, sizeof(sin));
         sin.sin_family = AF_INET;
         memcpy(&sin.sin_addr, &address->addr.addr4, 4);
@@ -523,7 +523,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
 
     if (address->isIPv6())
     {
-        struct sockaddr_in6 sin6;
+        auto sin6 = sockaddr_in6{};
         memset(&sin6, 0, sizeof(sin6));
         sin6.sin6_family = AF_INET6;
         memcpy(&sin6.sin6_addr, &address->addr.addr6, 16);

@@ -842,23 +842,23 @@ size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
 
 static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset, size_t size)
 {
-    struct evbuffer_ptr pos;
-    struct evbuffer_iovec iovec;
+    struct evbuffer_ptr pos = {};
+    auto iov = evbuffer_iovec{};
 
     evbuffer_ptr_set(buffer, &pos, offset, EVBUFFER_PTR_SET);
 
     do
     {
-        if (evbuffer_peek(buffer, size, &pos, &iovec, 1) <= 0)
+        if (evbuffer_peek(buffer, size, &pos, &iov, 1) <= 0)
         {
             break;
         }
 
-        io.encrypt(iovec.iov_len, iovec.iov_base);
+        io.encrypt(iov.iov_len, iov.iov_base);
 
-        TR_ASSERT(size >= iovec.iov_len);
-        size -= iovec.iov_len;
-    } while (evbuffer_ptr_set(buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD) == 0);
+        TR_ASSERT(size >= iov.iov_len);
+        size -= iov.iov_len;
+    } while (evbuffer_ptr_set(buffer, &pos, iov.iov_len, EVBUFFER_PTR_ADD) == 0);
 
     TR_ASSERT(size == 0);
 }
@@ -878,18 +878,17 @@ void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
 
 void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)
 {
-    struct evbuffer_iovec iovec;
-
-    evbuffer_reserve_space(outbuf.get(), writeme_len, &iovec, 1);
-    iovec.iov_len = writeme_len;
-    memcpy(iovec.iov_base, writeme, iovec.iov_len);
+    auto iov = evbuffer_iovec{};
+    evbuffer_reserve_space(outbuf.get(), writeme_len, &iov, 1);
+    iov.iov_len = writeme_len;
+    memcpy(iov.iov_base, writeme, iov.iov_len);
 
     if (isEncrypted())
     {
-        encrypt(iovec.iov_len, iovec.iov_base);
+        encrypt(iov.iov_len, iov.iov_base);
     }
 
-    evbuffer_commit_space(outbuf.get(), &iovec, 1);
+    evbuffer_commit_space(outbuf.get(), &iov, 1);
 
     outbuf_info.emplace_back(writeme_len, is_piece_data);
 }

@@ -928,8 +928,8 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
 
 struct announce_data
 {
-    int const tier_id;
-    time_t const time_sent;
+    int tier_id = 0;
+    time_t time_sent = {};
     tr_announce_event event = {};
     tr_session* session = nullptr;
 

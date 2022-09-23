@@ -623,7 +623,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
     /* if we don't have an address yet, try & get one now. */
     if (!closing && tracker->addr == nullptr && tracker->dns_request == nullptr)
     {
-        struct evutil_addrinfo hints;
+        struct evutil_addrinfo hints = {};
         memset(&hints, 0, sizeof(hints));
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_DGRAM;

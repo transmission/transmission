@@ -312,12 +312,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         }
     }
 
-    struct sockaddr_storage sock;
+    auto sock = sockaddr_storage{};
     socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
 
     // set source address
     auto const [source_addr, is_default_addr] = session->publicAddress(addr->type);
-    struct sockaddr_storage source_sock;
+    auto source_sock = sockaddr_storage{};
     socklen_t const sourcelen = setup_sockaddr(&source_addr, {}, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
@@ -372,7 +372,7 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
 
     if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
     {
-        struct sockaddr_storage ss;
+        auto ss = sockaddr_storage{};
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
         auto* const socket = utp_create_socket(session->utp_context);
 
@@ -420,7 +420,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     TR_ASSERT(tr_address_is_valid(addr));
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    struct sockaddr_storage sock;
+    auto sock = sockaddr_storage{};
 
     auto const fd = socket(Domains[addr->type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
@@ -546,7 +546,7 @@ tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_a
     TR_ASSERT(port != nullptr);
 
     // accept the incoming connection
-    struct sockaddr_storage sock;
+    auto sock = sockaddr_storage{};
     socklen_t len = sizeof(struct sockaddr_storage);
     auto const sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
     if (sockfd == TR_BAD_SOCKET)
@@ -638,10 +638,10 @@ static int global_unicast_address(struct sockaddr_storage* ss)
 
 static int tr_globalAddress(int af, void* addr, int* addr_len)
 {
-    struct sockaddr_storage ss;
+    auto ss = sockaddr_storage{};
     socklen_t sslen = sizeof(ss);
-    struct sockaddr_in sin;
-    struct sockaddr_in6 sin6;
+    auto sin = sockaddr_in{};
+    auto sin6 = sockaddr_in6{};
     struct sockaddr const* sa = nullptr;
     socklen_t salen = 0;
 
