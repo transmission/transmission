@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdio>
 #include <cstdlib> // bsearch()
+#include <filesystem>
 #include <fstream>
 #include <string_view>
 #include <vector>
@@ -49,10 +50,56 @@ void BlocklistFile::ensureLoaded() const
         return;
     }
 
-    auto range = AddressRange{};
-    while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
+    auto file_size = std::filesystem::file_size(filename_);
+    auto zeroes_count = 0;
+
+    if (file_size >= 40)
     {
-        rules_.emplace_back(range);
+        std::array<char, 40> first_struct;
+
+        in.read(reinterpret_cast<char*>(&first_struct), 40);
+        in.clear();
+        in.seekg(0, std::ios::beg);
+
+        for (auto const struct_byte : first_struct)
+        {
+            if (struct_byte == 0)
+            {
+                zeroes_count++;
+            }
+            else
+            {
+                zeroes_count = 0;
+            }
+        }
+    }
+
+    // Check for old blocklist file format
+    // Old struct size was 8 bytes (2 IPv4), new struct size is 40 bytes (2 IPv4, 2 IPv6)
+    //
+    // If we encounter less than 4 continuous bytes containing 0 we are using old file format
+    // (as the new format guarantees at least 2 empty IPv4 OR 2 empty IPv6)
+    // If we confirm using old style convert to new style and rewrite blocklist file
+    if ((file_size >= 40 && zeroes_count < 4) || (file_size % 8 == 0 && file_size % 40 != 0))
+    {
+        auto range = AddressRange{};
+        while (in.read(reinterpret_cast<char*>(&range), 8))
+        {
+            rules_.emplace_back(range);
+        }
+
+        tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
+
+        RewriteBlocklistFile();
+    }
+
+    else
+    {
+        auto range = AddressRange{};
+        while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
+        {
+            rules_.emplace_back(range);
+        }
     }
 
     tr_logAddInfo(fmt::format(
@@ -375,6 +422,32 @@ size_t BlocklistFile::setContent(char const* filename)
     close();
     ensureLoaded();
     return std::size(rules_);
+}
+
+void BlocklistFile::RewriteBlocklistFile() const
+{
+    auto out = std::ofstream{ filename_, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary };
+    if (!out.is_open())
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename_),
+            fmt::arg("error", tr_strerror(errno)),
+            fmt::arg("error_code", errno)));
+        return;
+    }
+
+    if (!out.write(reinterpret_cast<char const*>(rules_.data()), std::size(rules_) * sizeof(AddressRange)))
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename_),
+            fmt::arg("error", tr_strerror(errno)),
+            fmt::arg("error_code", errno)));
+    }
+
+    out.close();
+    ensureLoaded();
 }
 
 #ifdef TR_ENABLE_ASSERTS

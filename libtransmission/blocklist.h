@@ -126,6 +126,7 @@ private:
         }
     };
 
+    void RewriteBlocklistFile() const;
     void ensureLoaded() const;
     void load();
     void close();
