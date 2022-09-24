@@ -52,10 +52,11 @@ void BlocklistFile::ensureLoaded() const
 
     auto file_size = std::filesystem::file_size(filename_);
     auto zeroes_count = 0;
+    auto max_zeroes = 0;
 
     if (file_size >= 40)
     {
-        std::array<char, 40> first_struct;
+        std::array<char, 40> first_struct = {};
 
         in.read(reinterpret_cast<char*>(&first_struct), 40);
         in.clear();
@@ -69,8 +70,18 @@ void BlocklistFile::ensureLoaded() const
             }
             else
             {
+                if (zeroes_count > max_zeroes)
+                {
+                    max_zeroes = zeroes_count;
+                }
+
                 zeroes_count = 0;
             }
+        }
+
+        if (zeroes_count > max_zeroes)
+        {
+            max_zeroes = zeroes_count;
         }
     }
 
@@ -80,7 +91,7 @@ void BlocklistFile::ensureLoaded() const
     // If we encounter less than 4 continuous bytes containing 0 we are using old file format
     // (as the new format guarantees at least 2 empty IPv4 OR 2 empty IPv6)
     // If we confirm using old style convert to new style and rewrite blocklist file
-    if ((file_size >= 40 && zeroes_count < 4) || (file_size % 8 == 0 && file_size % 40 != 0))
+    if ((file_size >= 40 && max_zeroes < 4) || (file_size % 8 == 0 && file_size % 40 != 0))
     {
         auto range = AddressRange{};
         while (in.read(reinterpret_cast<char*>(&range), 8))
