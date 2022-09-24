@@ -1485,7 +1485,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Tamaño de pieza: </translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1540,7 +1540,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo crear «%1»: %2 (%3)</translation>
     </message>
 </context>
 <context>

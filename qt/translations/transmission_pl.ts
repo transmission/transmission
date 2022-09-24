@@ -1498,7 +1498,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Roz&amp;miar części:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1553,7 +1553,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można utworzyć „%1”: %2 (%3)</translation>
     </message>
 </context>
 <context>

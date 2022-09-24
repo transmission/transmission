@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Marek Adamski, 2022
 # Piotr Drąg <piotrdrag@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-24 16:26+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -171,6 +171,7 @@ msgstr "Copyright © Projekt Transmission"
 msgid "translator-credits"
 msgstr ""
 "Tomasz Dominikowski <dominikowski@gmail.com>, 2006, 2007\n"
+"Marek Adamski, 2022\n"
 "Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2022\n"
 "\n"
 "Launchpad Contributions:\n"
@@ -938,7 +939,7 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
 msgid "Open a torrent"
-msgstr "Otwiera plik torrent"
+msgstr "Otwiera torrent"
 
 #: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
 msgid "_Open"
@@ -1126,7 +1127,7 @@ msgstr "Wszystkie pliki"
 
 #: ../gtk/OptionsDialog.cc:357
 msgid "Open a Torrent"
-msgstr "Wybór torrenta"
+msgstr "Otwarcie torrenta"
 
 #: ../gtk/OptionsDialog.cc:373
 msgid "Show _options dialog"
@@ -1992,7 +1993,7 @@ msgstr "Otwórz adres _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Otwórz adres URL…"
+msgstr "Otwiera adres URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
@@ -2385,7 +2386,7 @@ msgstr "Nie można otworzyć pliku blokady sesji „{path}”: {error} ({error_c
 
 #: ../libtransmission/session.cc:312
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Nasłuchiwanie przychodzących połączeń z partnerami na {hostport}"
 
 #: ../libtransmission/session.cc:746
 msgid "Transmission version {version} starting"
@@ -2599,18 +2600,18 @@ msgstr "Uwaga: nieprawidłowe certyfikaty będą wyświetlane jako „Nie można
 #: ../utils/create.cc:225
 msgid "{:d} files, {:s}\n"
 msgid_plural "{:d} file, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{:d} plik, {:s}\n"
+msgstr[1] "{:d} pliki, {:s}\n"
+msgstr[2] "{:d} plików, {:s}\n"
+msgstr[3] "{:d} plików, {:s}\n"
 
 #: ../utils/create.cc:230
 msgid "{:d} pieces, {:s} each\n"
 msgid_plural "{:d} piece, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{:d} część, {:s}\n"
+msgstr[1] "{:d} części, {:s} każda\n"
+msgstr[2] "{:d} części, {:s} każda\n"
+msgstr[3] "{:d} części, {:s} każda\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"

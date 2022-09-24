@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos os Direitos Reservados ® The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Cliente</translation>
+        <translation>Cliente</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+134"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent adicionado</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -106,7 +106,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+ %2descartado após falha de checksum)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -227,12 +227,12 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar URL(s)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar URLs de anúncio do tracker, uma por linha:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -242,7 +242,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nenhuma URL nova encontrada</translation>
     </message>
     <message>
         <location line="-834"/>
@@ -427,7 +427,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Trackers</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -900,12 +900,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Opções</translation>
+        <translation>Opções</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Estatísticas</translation>
+        <translation>Estatísticas</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1512,7 +1512,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">Origem:</translation>
+        <translation>&amp;Fonte:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1740,7 +1740,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+159"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar Script &quot;Download de Torrent Feito&quot;</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1790,7 +1790,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar Script &quot;Semeadura de Torrent Feita&quot;</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -2001,17 +2001,17 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Lê conteúdo da área de transferência do usuário em busca de torrents</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Detecta novos torrents da área de transferência</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Executar &amp;script quando download estiver completo:</translation>
     </message>
     <message>
         <location line="+105"/>
@@ -2506,7 +2506,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Baixando de %1 de %Ln fonte conectadas</numerusform>
+            <numerusform>Baixando de %1 de %Ln fonte conectada</numerusform>
             <numerusform>Baixando de %1 de %Ln fontes conectadas</numerusform>
         </translation>
     </message>
@@ -2515,15 +2515,15 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;, notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>e %Ln semeador web</numerusform>
-            <numerusform>e %Ln semeadores web</numerusform>
+            <numerusform> e %Ln semeador web</numerusform>
+            <numerusform> e %Ln semeadores web</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+13"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
-            <numerusform>Semeando para %1 de %Ln fonte conectadas</numerusform>
+            <numerusform>Semeando para %1 de %Ln fonte conectada</numerusform>
             <numerusform>Semeando para %1 de %Ln fontes conectadas</numerusform>
         </translation>
     </message>
@@ -2631,7 +2631,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Editar Trackers</translation>
     </message>
     <message>
         <location line="+9"/>

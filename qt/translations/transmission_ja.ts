@@ -1472,7 +1472,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>ピースの大きさ(&amp;I):</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1527,7 +1527,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>以下を作成できません「%1」: %2 (%3)</translation>
     </message>
 </context>
 <context>

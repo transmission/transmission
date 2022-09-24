@@ -6,7 +6,7 @@
 # Translators:
 # Alfredo Monclus <alfredomonclus@gmail.com>, 2017
 # Adolfo Jayme-Barrientos, 2021
-# Julvenzor <adrlopgal@disroot.org>, 2022
+# GPL-advocate <adrlopgal@disroot.org>, 2022
 # picodotdev <pico.dev@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 #
@@ -2365,7 +2365,7 @@ msgstr "Contraseña requerida"
 
 #: ../libtransmission/rpc-server.cc:1098
 msgid "Serving RPC and Web requests from '{path}'"
-msgstr "Sirviendo peticiones RPC y Web desde {address}"
+msgstr "Sirviendo peticiones RPC y Web desde «{path}»"
 
 #: ../libtransmission/rpcimpl.cc:1346
 msgid "Couldn't test port: {error} ({error_code})"
@@ -2385,7 +2385,7 @@ msgstr "No se pudo abrir sesión de archivo cerradura «{path}»: {error} ({erro
 
 #: ../libtransmission/session.cc:312
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Escuchando conexiones entrantes de pares en {hostport}"
 
 #: ../libtransmission/session.cc:746
 msgid "Transmission version {version} starting"
@@ -2597,16 +2597,16 @@ msgstr "NB: certificados inválidos aparecerán como «No se pudo conectar al ra
 #: ../utils/create.cc:225
 msgid "{:d} files, {:s}\n"
 msgid_plural "{:d} file, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{:d} archivo, {:s}\n"
+msgstr[1] "{:d} archivos, {:s}\n"
+msgstr[2] "{:d} archivos, {:s}\n"
 
 #: ../utils/create.cc:230
 msgid "{:d} pieces, {:s} each\n"
 msgid_plural "{:d} piece, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{:d} pieza, {:s} cada una\n"
+msgstr[1] "{:d} piezas, {:s} cada una\n"
+msgstr[2] "{:d} piezas, {:s} cada una\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"

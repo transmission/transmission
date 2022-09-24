@@ -5,8 +5,8 @@
 #
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
-# maboroshin, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# maboroshin, 2022
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-24 16:26+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: maboroshin, 2022\n"
 "Language-Team: Japanese (https://www.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -2221,7 +2221,7 @@ msgstr "セッションのロックファイルを開けません「{path}」: {
 
 #: ../libtransmission/session.cc:312
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "以下で接続してくるピア接続を待ち受け{hostport}"
 
 #: ../libtransmission/session.cc:746
 msgid "Transmission version {version} starting"
@@ -2429,12 +2429,12 @@ msgstr "注: 無効な証明書では、多くのほかのエラーのように�
 #: ../utils/create.cc:225
 msgid "{:d} files, {:s}\n"
 msgid_plural "{:d} file, {:s}\n"
-msgstr[0] ""
+msgstr[0] "{:d} ファイル, {:s}\n"
 
 #: ../utils/create.cc:230
 msgid "{:d} pieces, {:s} each\n"
 msgid_plural "{:d} piece, {:s}\n"
-msgstr[0] ""
+msgstr[0] "{:d} ピース, {:s}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"

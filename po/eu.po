@@ -6,11 +6,11 @@
 # Translators:
 # Xabier Martin <Iparra@iparra.eus>, 2020
 # Iñigo Zendegi Urzelai, 2022
-# Alexander Gabilondo <alexgabi@disroot.org>, 2022
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2022
 # Sendoa Sojo <sendoasojo@gmail.com>, 2022
 # Xabier Aramendi <azpidatziak@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Alexander Gabilondo <alexgabi@disroot.org>, 2022
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-24 16:26+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2022\n"
 "Language-Team: Basque (https://www.transifex.com/transmissionbt/teams/33778/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -2274,7 +2274,7 @@ msgstr "Ezin da saioaren blokeatze-fitxategia ireki '{path}': {error} ({error_co
 
 #: ../libtransmission/session.cc:312
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Sarrerako kideen konexioak entzutea aktibatuta {hostport}-n"
 
 #: ../libtransmission/session.cc:746
 msgid "Transmission version {version} starting"
@@ -2484,14 +2484,14 @@ msgstr "NB: Ziurtagiri baliogabeak 'Ezin izan da aztarnariarekin konektatu' gisa
 #: ../utils/create.cc:225
 msgid "{:d} files, {:s}\n"
 msgid_plural "{:d} file, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{:d} fitxategi, {:s}\n"
+msgstr[1] "{:d} fitxategi, {:s}\n"
 
 #: ../utils/create.cc:230
 msgid "{:d} pieces, {:s} each\n"
 msgid_plural "{:d} piece, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{:d} zati, {:s} bakoitza\n"
+msgstr[1] "{:d} zati, {:s}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"

@@ -5,8 +5,10 @@
 #
 # Translators:
 # Clay Cheng <569735195@qq.com>, 2020
-# 玉堂白鹤 <yjwork@qq.com>, 2020
 # Lin Xue <iconteral@yahoo.com>, 2022
+# 依云 <lilydjwg@gmail.com>, 2022
+# 玉堂白鹤 <yjwork@qq.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Dingzhong Chen <wsxy162@gmail.com>, 2022
 #
 #, fuzzy
@@ -447,17 +449,17 @@ msgstr "Web 种子"
 #: ../gtk/DetailsDialog.cc:1770
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
+msgstr[0] "在 {time_span_ago}获得了载有 {markup_begin}{peer_count} 个用户{markup_end}的列表"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1782
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "用户列表请求{markup_begin}超时 {time_span_ago}{markup_end}，将重试"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1791
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "在 {time_span_ago}遇到错误“{markup_begin}{error}{markup_end}”"
 
 #: ../gtk/DetailsDialog.cc:1804
 msgid "No updates scheduled"
@@ -465,7 +467,7 @@ msgstr "无计划更新"
 
 #: ../gtk/DetailsDialog.cc:1811
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "将在 {time_span_from_now}请求更多用户"
 
 #: ../gtk/DetailsDialog.cc:1818
 msgid "Queued to ask for more peers"
@@ -474,12 +476,12 @@ msgstr "已准备请求更多用户"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1826
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "在 {markup_begin}{time_span_ago}{markup_end}请求了更多用户"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1849
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "在 {time_span_ago} Tracker 有 {markup_begin}{seeder_count} 个 {seeder_or_seeders}和 {leecher_count} 个{leecher_or_leechers}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:1851
 msgid "seeder"
@@ -494,11 +496,11 @@ msgstr[0] "下载用户"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1862
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "在 {time_span_ago}遇到抓取错误“{markup_begin}{error}{markup_end}”"
 
 #: ../gtk/DetailsDialog.cc:1879
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "将在 {time_span_from_now}询问用户数量"
 
 #: ../gtk/DetailsDialog.cc:1886
 msgid "Queued to ask for peer counts"
@@ -506,7 +508,7 @@ msgstr "已准备询问用户数量"
 
 #: ../gtk/DetailsDialog.cc:1893
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "在 {markup_begin}{time_span_ago}{markup_end}询问了用户数量"
 
 #: ../gtk/DetailsDialog.cc:2156
 msgid "{torrent_name} - Edit Trackers"
@@ -894,7 +896,7 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
 msgid "Open a torrent"
-msgstr ""
+msgstr "打开种子"
 
 #: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
 msgid "_Open"
@@ -902,31 +904,31 @@ msgstr "打开(_O)"
 
 #: ../gtk/MainWindow.ui:37 ../gtk/transmission.ui:99 ../gtk/transmission.ui:368
 msgid "Start torrent"
-msgstr ""
+msgstr "开始任务"
 
 #: ../gtk/MainWindow.ui:39 ../gtk/transmission.ui:97 ../gtk/transmission.ui:366
 msgid "_Start"
-msgstr ""
+msgstr "开始(_S)"
 
 #: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
 msgid "Pause torrent"
-msgstr ""
+msgstr "暂停任务"
 
 #: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
 msgid "_Pause"
-msgstr ""
+msgstr "暂停(_P)"
 
 #: ../gtk/MainWindow.ui:68 ../gtk/transmission.ui:166 ../gtk/transmission.ui:435
 msgid "Remove torrent"
-msgstr ""
+msgstr "移除种子"
 
 #: ../gtk/MainWindow.ui:91 ../gtk/transmission.ui:84 ../gtk/transmission.ui:295
 msgid "Torrent properties"
-msgstr ""
+msgstr "种子属性"
 
 #: ../gtk/MainWindow.ui:94 ../gtk/transmission.ui:82 ../gtk/transmission.ui:293
 msgid "_Properties"
-msgstr ""
+msgstr "属性(_P)"
 
 #: ../gtk/MainWindow.ui:142
 msgid "Torrent"
@@ -1228,7 +1230,7 @@ msgstr "重复(_O)："
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/PrefsDialog.ui:330
 msgid "_to"
-msgstr ""
+msgstr "至(_T)"
 
 #: ../gtk/PrefsDialog.ui:400
 msgctxt "Gerund"
@@ -1608,7 +1610,7 @@ msgstr "{download_speed} ▼  {upload_speed} ▲"
 
 #: ../gtk/TorrentCellRenderer.cc:145
 msgid "Stalled"
-msgstr "已暂停"
+msgstr "已停滞"
 
 #: ../gtk/TorrentCellRenderer.cc:174
 #, no-c-format
@@ -1631,7 +1633,7 @@ msgstr "本地错误：“{error}”"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
+msgstr[0] "正在从 {active_count} 个连接的用户中下载元数据（已完成 {percent_done}%）"
 
 #: ../gtk/TorrentCellRenderer.cc:239
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -1716,46 +1718,46 @@ msgstr "TB/s"
 #: ../gtk/Utils.cc:99
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
+msgstr[0] "{days_from_now:L} 天后"
 
 #: ../gtk/Utils.cc:106
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
+msgstr[0] "{hours_from_now:L} 小时后"
 
 #: ../gtk/Utils.cc:113
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
+msgstr[0] "{minutes_from_now:L} 分钟后"
 
 #: ../gtk/Utils.cc:120
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
+msgstr[0] "{seconds_from_now:L} 秒后"
 
 #: ../gtk/Utils.cc:124 ../gtk/Utils.cc:155 ../gtk/Utils.cc:182 ../gtk/Utils.cc:215
 msgid "now"
-msgstr ""
+msgstr "现在"
 
 #: ../gtk/Utils.cc:131
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
+msgstr[0] "{days_ago:L} 天前"
 
 #: ../gtk/Utils.cc:137
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
+msgstr[0] "{hours_ago:L} 小时前"
 
 #: ../gtk/Utils.cc:144
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
+msgstr[0] "{minutes_ago:L} 分钟前"
 
 #: ../gtk/Utils.cc:151
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
+msgstr[0] "{seconds_ago:L} 秒前"
 
 #: ../gtk/Utils.cc:164
 msgid "{days:L} day"
@@ -1765,37 +1767,37 @@ msgstr[0] "{days:L} 天"
 #: ../gtk/Utils.cc:169
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
+msgstr[0] "{hours:L} 小时"
 
 #: ../gtk/Utils.cc:174
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
+msgstr[0] "{minutes:L} 分"
 
 #: ../gtk/Utils.cc:179
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
+msgstr[0] "{seconds:L} 秒"
 
 #: ../gtk/Utils.cc:190
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
+msgstr[0] "剩 {days_left:L} 天"
 
 #: ../gtk/Utils.cc:197
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
+msgstr[0] "剩 {hours_left:L} 小时"
 
 #: ../gtk/Utils.cc:204
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
+msgstr[0] "剩 {minutes_left:L} 分"
 
 #: ../gtk/Utils.cc:211
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
+msgstr[0] "剩 {seconds_left:L} 秒"
 
 #: ../gtk/Utils.cc:251
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -1875,179 +1877,179 @@ msgstr "启动 Transmission 时最小化"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr ""
+msgstr "打开 _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr ""
+msgstr "打开 URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "新建(_N)…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "全部开始(_S)"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr ""
+msgstr "开始所有任务"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr ""
+msgstr "全部暂停(_P)"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr ""
+msgstr "暂停所有任务"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr ""
+msgstr "退出(_Q)"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr ""
+msgstr "全部选择(_A)"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr ""
+msgstr "取消选择(_L)"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "首选项(_P)"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
-msgstr ""
+msgstr "打开文件夹(_E)"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
-msgstr ""
+msgstr "立即开始(_N)"
 
 #: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
 msgid "Start torrent now"
-msgstr ""
+msgstr "立即开始任务"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "向 Traker 请求更多用户(_M)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr ""
+msgstr "移至顶部(_T)"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "向上移动(_U)"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "向下移动(_D)"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "移至底部(_B)"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr ""
+msgstr "设定位置(_L)…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "校验本地数据(_V)"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "复制磁力链接到剪贴板(_M)"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "移除并删除文件(_D)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
-msgstr ""
+msgstr "紧凑视图(_C)"
 
 #: ../gtk/transmission.ui:189
 msgid "_Toolbar"
-msgstr ""
+msgstr "工具栏(_T)"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr ""
+msgstr "筛选栏(_F)"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr ""
+msgstr "状态栏(_S)"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "按活跃度排列(_A)"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "按存在时间排列(_G)"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr ""
+msgstr "按名称排列(_N)"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "按进度排列(_P)"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "按队列排列(_Q)"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "按分享率排列(_O)"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "按大小排列(_Z)"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "按状态排列(_E)"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "按剩余时间排列(_L)"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "倒序排列(_V)"
 
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
-msgstr ""
+msgstr "消息日志(_L)"
 
 #: ../gtk/transmission.ui:263
 msgid "_Statistics"
-msgstr ""
+msgstr "统计信息(_S)"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "捐助(_D)"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr ""
+msgstr "目录(_C)"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "关于(_A)"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
-msgstr ""
+msgstr "显示 Transmission(_S)"
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "启用速度限制(_L)"
 
 #: ../libtransmission/announcer-http.cc:291
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2263,7 +2265,7 @@ msgstr "无法打开会话锁定文件“{path}”：{error}（{error_code}）"
 
 #: ../libtransmission/session.cc:312
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "正在监听 {hostport} 上的入站用户连接"
 
 #: ../libtransmission/session.cc:746
 msgid "Transmission version {version} starting"
@@ -2297,7 +2299,7 @@ msgstr "已从“{old_path}”迁移种子文件至“{path}”"
 
 #: ../libtransmission/torrent.cc:125
 msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "无法为 {magnet} 使用“{path}”的元信息：{error}（{error_code}）"
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2471,12 +2473,12 @@ msgstr "特别注意：无效证书会像其他很多错误一样显示为“无
 #: ../utils/create.cc:225
 msgid "{:d} files, {:s}\n"
 msgid_plural "{:d} file, {:s}\n"
-msgstr[0] ""
+msgstr[0] "{:d} 个文件，共 {:s}\n"
 
 #: ../utils/create.cc:230
 msgid "{:d} pieces, {:s} each\n"
 msgid_plural "{:d} piece, {:s}\n"
-msgstr[0] ""
+msgstr[0] "{:d} 个分片，每片 {:s}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2497,26 +2499,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid " _to "
-#~ msgstr " 至(_T) "
-
-#~ msgid "Cancelled"
-#~ msgstr "已取消"
-
-#~ msgid "Couldn't compute obfuscated info hash"
-#~ msgstr "无法计算混淆信息散列值"
-
-#~ msgid "Couldn't scan '{path}': {error} ({error_code})"
-#~ msgstr "无法扫描“{path}”：{error}（{error_code}）"
-
-#~ msgid "Couldn't use invalid piece size {expected_size}; using {actual_size} instead"
-#~ msgstr "无法使用无效的分片大小 {expected_size}；使用 {actual_size} 代替"
-
-#~ msgid "Couldn't write {expected_size} bytes to peer; wrote {actual_size}"
-#~ msgstr "无法将 {expected_size} 字节写入对等网络用户；已写入 {actual_size}"
-
-#, no-c-format
-#~ msgid "Downloading metadata from {active_count} connected peer ({percent_done:d}% done)"
-#~ msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)"
-#~ msgstr[0] "正在从 {active_count} 个连接的用户中下载元数据（已完成 {percent_done:d}%）"

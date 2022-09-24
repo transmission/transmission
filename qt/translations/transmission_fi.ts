@@ -1485,7 +1485,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Osan k&amp;oko:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1540,7 +1540,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei voitu luoda &quot;%1&quot;: %2 (%3)</translation>
     </message>
 </context>
 <context>

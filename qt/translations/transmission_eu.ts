@@ -1485,7 +1485,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatiaren tamaina</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1540,7 +1540,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezin izan da sortu &quot;%1&quot;: %2 (%3)</translation>
     </message>
 </context>
 <context>

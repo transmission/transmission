@@ -6,9 +6,9 @@
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
 # Josef Andersson <josef.andersson@fripost.org>, 2022
-# Jonatan Nyberg <jonatan@autistici.org>, 2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Jonatan Nyberg <jonatan@autistici.org>, 2022
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-24 16:26+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2022\n"
 "Language-Team: Swedish (https://www.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -124,7 +124,7 @@ msgstr "Mottog signalen %d; försöker stänga av rent. Gör det igen om det fas
 
 #: ../gtk/Application.cc:724
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr "Transmission är ett fildelningsprogram. När du kör en torrent görs dess data tillgänglig för andra genom att den skickas. Innehållet du delar är ditt eget ansvar."
+msgstr "Transmission är ett fildelningsprogram. När du kör en torrent kommer dess data att göras tillgängliga för andra genom att den skickas. Allt innehåll du delar är ditt eget ansvar."
 
 #: ../gtk/Application.cc:731
 msgid "I _Agree"
@@ -382,11 +382,11 @@ msgstr "%"
 
 #: ../gtk/DetailsDialog.cc:1597
 msgid "Dn Reqs"
-msgstr "Ner-förfrågningar"
+msgstr "Nerförfrågningar"
 
 #: ../gtk/DetailsDialog.cc:1604
 msgid "Up Reqs"
-msgstr "Upp-förfrågningar"
+msgstr "Uppförfrågningar"
 
 #: ../gtk/DetailsDialog.cc:1611
 msgid "Dn Blocks"
@@ -427,18 +427,18 @@ msgstr "Webbdistributioner"
 #: ../gtk/DetailsDialog.cc:1770
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] "Fick en lista över {markup_begin}{peer_count} jämlike{markup_end} {time_span_ago}"
-msgstr[1] "Fick en lista över {markup_begin}{peer_count} jämlikar{markup_end} {time_span_ago}"
+msgstr[0] "Fick en lista över {markup_begin}{peer_count} jämlike{markup_end} för {time_span_ago}"
+msgstr[1] "Fick en lista över {markup_begin}{peer_count} jämlikar{markup_end} för {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1782
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr "Förfrågan efter lista över jämlikar {markup_begin}tog för lång tid {time_span_ago}{markup_end}; kommer att försöka igen"
+msgstr "Förfrågan efter lista över jämlikar {markup_begin}tog för lång tid för {time_span_ago}{markup_end}; kommer att försöka igen"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1791
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "Fick ett fel '{markup_begin}{error}{markup_end}' {time_span_ago}"
+msgstr "Fick ett fel '{markup_begin}{error}{markup_end}' för {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1804
 msgid "No updates scheduled"
@@ -455,12 +455,12 @@ msgstr "I kö för att fråga efter fler jämlikar"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1826
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Frågade efter fler jämlikar {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Frågade efter fler jämlikar {markup_begin} för {time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1849
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "Spåraren hade {markup_begin}{seeder_count} {seeder_or_seeders} och {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
+msgstr "Spåraren hade {markup_begin}{seeder_count} {seeder_or_seeders} och {leecher_count} {leecher_or_leechers}{markup_end} för {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1851
 msgid "seeder"
@@ -477,7 +477,7 @@ msgstr[1] "reciprokörer"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1862
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "Fick ett skrapfel '{markup_begin}{error}{markup_end}' {time_span_ago}"
+msgstr "Fick ett skrapningsfel '{markup_begin}{error}{markup_end}' för {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1879
 msgid "Asking for peer counts in {time_span_from_now}"
@@ -489,7 +489,7 @@ msgstr "I kö för att fråga efter antal jämlikar"
 
 #: ../gtk/DetailsDialog.cc:1893
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Frågade efter antal jämlikar {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Frågade efter antal jämlikar {markup_begin} för {time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2156
 msgid "{torrent_name} - Edit Trackers"
@@ -513,7 +513,7 @@ msgstr "Spårare"
 
 #: ../gtk/DetailsDialog.cc:2558
 msgid "{torrent_name} Properties"
-msgstr "{torrent_name} egenskaper"
+msgstr "Egenskaper för {torrent_name}"
 
 #: ../gtk/DetailsDialog.cc:2567
 msgid "Properties - {torrent_count:L} Torrent"
@@ -631,7 +631,7 @@ msgstr "Hastighet"
 
 #: ../gtk/DetailsDialog.ui:857
 msgid "Honor global _limits"
-msgstr "Tillämpa allmänna _gränser"
+msgstr "Respektera globala _gränser"
 
 #: ../gtk/DetailsDialog.ui:873
 msgid "Limit _download speed ({speed_units}):"
@@ -663,7 +663,7 @@ msgstr "Jämlikeanslutningar"
 
 #: ../gtk/DetailsDialog.ui:1139
 msgid "_Maximum peers:"
-msgstr "_Högst antal jämlikar:"
+msgstr "_Maximalt antal jämlikar:"
 
 #: ../gtk/DetailsDialog.ui:1176 ../gtk/MainWindow.ui:168 ../gtk/PrefsDialog.ui:1399
 msgid "Options"
@@ -687,7 +687,7 @@ msgstr[1] "Ta bort hämtade filer för dessa %d torrenter?"
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "När den väl har tagits bort krävs torrentfilen eller magnetlänken för att fortsätta överföringen."
-msgstr[1] "När de väl har tagits bort kommer att fortsätta med överföringarna kräva torrentfilerna eller magnetlänkarna."
+msgstr[1] "När de väl har tagits bort krävs torrentfilerna eller magnetlänkarna för att fortsätta överföringarna."
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
@@ -901,7 +901,7 @@ msgstr "Sta_rta"
 
 #: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
 msgid "Pause torrent"
-msgstr "Pausa torrenten"
+msgstr "Pausa torrent"
 
 #: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
 msgid "_Pause"
@@ -1105,7 +1105,7 @@ msgstr "_Starta när den lagts till"
 
 #: ../gtk/OptionsDialog.ui:184 ../gtk/PrefsDialog.ui:471
 msgid "Mo_ve torrent file to the trash"
-msgstr "Fl_ytta torrentfilen till papperskorgen"
+msgstr "Fl_ytta torrentfil till papperskorgen"
 
 #: ../gtk/PrefsDialog.cc:461 ../gtk/PrefsDialog.cc:489
 msgid "Blocklist has {count:L} entry"
@@ -1123,11 +1123,11 @@ msgstr "Det gick inte att uppdatera blocklistan"
 
 #: ../gtk/PrefsDialog.cc:504
 msgid "Update Blocklist"
-msgstr "Uppdatera blockeringslista"
+msgstr "Uppdatera blocklista"
 
 #: ../gtk/PrefsDialog.cc:509
 msgid "Getting new blocklist…"
-msgstr "Hämtar ny blockeringslista…"
+msgstr "Hämtar ny blocklista…"
 
 #: ../gtk/PrefsDialog.cc:532
 msgid "Allow encryption"
@@ -1249,7 +1249,7 @@ msgstr "Hämtningskö"
 
 #: ../gtk/PrefsDialog.ui:599
 msgid "Ma_ximum active downloads:"
-msgstr "Hö_gst antal aktiva hämtningar:"
+msgstr "Ma&ximalt antal aktiva hämtningar:"
 
 #: ../gtk/PrefsDialog.ui:613
 msgid "Downloads sharing data in the last _N minutes are active:"
@@ -1269,7 +1269,7 @@ msgstr "Behåll _ofullständiga torrenter i:"
 
 #: ../gtk/PrefsDialog.ui:722
 msgid "Call scrip_t when done downloading:"
-msgstr "Anropa skrip&t när hämtningen är klar:"
+msgstr "Anropa skrip_t när hämtningen är klar:"
 
 #: ../gtk/PrefsDialog.ui:776
 msgctxt "Gerund"
@@ -1290,7 +1290,7 @@ msgstr "Stoppa distribuering om inaktiv i _N minuter:"
 
 #: ../gtk/PrefsDialog.ui:846
 msgid "Call scrip_t when done seeding:"
-msgstr "Anropa skrip&t när distributionen är klar:"
+msgstr "Anropa skrip_t när distributionen är klar:"
 
 #: ../gtk/PrefsDialog.ui:909
 msgctxt "Gerund"
@@ -1307,11 +1307,11 @@ msgstr "Kr_ypteringsläge:"
 
 #: ../gtk/PrefsDialog.ui:995
 msgid "Blocklist"
-msgstr "Blockeringslista"
+msgstr "Blocklista"
 
 #: ../gtk/PrefsDialog.ui:1017
 msgid "Enable _blocklist:"
-msgstr "Aktivera _blockeringslista:"
+msgstr "Aktivera _blocklista:"
 
 #: ../gtk/PrefsDialog.ui:1032
 msgid "Enable _automatic updates"
@@ -1327,7 +1327,7 @@ msgstr "Lyssningsport"
 
 #: ../gtk/PrefsDialog.ui:1173
 msgid "_Port used for incoming connections:"
-msgstr "_Port att använda för inkommande anslutningar:"
+msgstr "_Port som används för inkommande anslutningar:"
 
 #: ../gtk/PrefsDialog.ui:1185
 msgid "Pick a _random port every time Transmission is started"
@@ -1335,7 +1335,7 @@ msgstr "Välj en s_lumpmässig port varje gång Transmission startas"
 
 #: ../gtk/PrefsDialog.ui:1202
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "Använd vidarebefordring av port via UPnP eller NAT-PMP från min router"
+msgstr "Använd port_vidarebefordran via UPnP eller NAT-PMP från min router"
 
 #: ../gtk/PrefsDialog.ui:1264
 msgid "Te_st Port"
@@ -1347,11 +1347,11 @@ msgstr "Jämlikegränser"
 
 #: ../gtk/PrefsDialog.ui:1330
 msgid "Maximum peers per _torrent:"
-msgstr "Högst antal jämlikar per _torrent:"
+msgstr "Maximalt antal jämlikar per _torrent:"
 
 #: ../gtk/PrefsDialog.ui:1344
 msgid "Maximum peers _overall:"
-msgstr "Högst antal jämlikar t_otalt:"
+msgstr "Maximalt antal jämlikar t_otalt:"
 
 #: ../gtk/PrefsDialog.ui:1421
 msgid "Enable _uTP for peer communication"
@@ -1463,7 +1463,7 @@ msgstr "Lösen_ord:"
 
 #: ../gtk/PrefsDialog.ui:1900
 msgid "Only allow these IP a_ddresses:"
-msgstr "Tillåt endast de här IP-adresserna:"
+msgstr "Tillåt endast de här IP-a_dresserna:"
 
 #: ../gtk/PrefsDialog.ui:1921
 msgid "Addresses:"
@@ -1491,7 +1491,7 @@ msgstr "Det här kan ta en stund…"
 
 #: ../gtk/RelocateDialog.ui:8
 msgid "Set Torrent Location"
-msgstr "Ange torrentplats"
+msgstr "Ställ in torrentplats"
 
 #: ../gtk/RelocateDialog.ui:36
 msgid "_Apply"
@@ -1949,7 +1949,7 @@ msgstr "Fråga spårare efter f_ler jämlikar"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr "Flytta ö_verst"
+msgstr "Flytta längst _upp"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
@@ -1961,11 +1961,11 @@ msgstr "Flytta _ner"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr "Flytta ned_erst"
+msgstr "Flytta längst _ner"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Ange p_lats…"
+msgstr "Ställ in p_lats…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1989,11 +1989,11 @@ msgstr "_Verktygsfält"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr "_Filterrad"
+msgstr "_Filterfält"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr "_Statusrad"
+msgstr "_Statusfält"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
@@ -2017,7 +2017,7 @@ msgstr "Sortera efter _kö"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr "Sortera efter f_örhållande"
+msgstr "Sortera efter k_vot"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
@@ -2029,7 +2029,7 @@ msgstr "Sortera efter ti_llstånd"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr "Sortera efter tid kva_r"
+msgstr "Sortera efter återstående _tid"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
@@ -2069,7 +2069,7 @@ msgstr "Det gick inte att tolka meddelandesvar: {error} ({error_code})"
 
 #: ../libtransmission/announcer-http.cc:601
 msgid "Couldn't parse scrape response: {error} ({error_code})"
-msgstr "Det gick inte att tolka skrapsvar: {error} ({error_code})"
+msgstr "Det gick inte att tolka skrapningssvar: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:200 ../libtransmission/announcer-udp.cc:302
 msgid "Unknown error"
@@ -2150,7 +2150,7 @@ msgstr "Det gick inte att skapa socket: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:326
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
-msgstr "Det gick inte att ange källadressen {address} på {socket}: {error} ({error_code})"
+msgstr "Det gick inte att ställa in källadressen {address} på {socket}: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:345
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
@@ -2268,7 +2268,7 @@ msgstr "Det gick inte att testa port: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1386
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
-msgstr "Det gick inte att hämta blocklista: {error} ({error_code})"
+msgstr "Det gick inte att hämta blocklistan: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1522
 msgid "Couldn't fetch torrent: {error} ({error_code})"
@@ -2280,7 +2280,7 @@ msgstr "Det gick inte att öppna sessionslåsfilen '{path}': {error} ({error_cod
 
 #: ../libtransmission/session.cc:312
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Lyssnar på inkommande jämlikeanslutningar på {hostport}"
 
 #: ../libtransmission/session.cc:746
 msgid "Transmission version {version} starting"
@@ -2328,7 +2328,7 @@ msgstr "Distributionsinaktivitetsgräns nådd; pausar torrent"
 
 #: ../libtransmission/torrent.cc:632
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-msgstr "Inga data hittades! Försäkra dig om att dina enheter är anslutna eller använd \"Ange plats\". För att hämta igen, ta bort torrenten och lägg till den igen."
+msgstr "Inga data hittades! Försäkra dig om att dina enheter är anslutna eller använd \"Ställ in plats\". För att hämta igen, ta bort torrenten och lägg till den igen."
 
 #: ../libtransmission/torrent.cc:1427
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2408,7 +2408,7 @@ msgstr "Porten {port} vidarebefordras inte"
 
 #: ../libtransmission/upnp.cc:319
 msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr "Stoppar vidarebefordran av porten '{url}', tjänst '{type}'"
+msgstr "Stoppar portvidarebefordran genom '{url}', tjänst '{type}'"
 
 #: ../libtransmission/upnp.cc:351
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
@@ -2490,14 +2490,14 @@ msgstr "OBS: Ogiltiga certifikat kommer att visas som \"Det gick inte att anslut
 #: ../utils/create.cc:225
 msgid "{:d} files, {:s}\n"
 msgid_plural "{:d} file, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{:d} filer, {:s}\n"
+msgstr[1] "{:d} fil, {:s}\n"
 
 #: ../utils/create.cc:230
 msgid "{:d} pieces, {:s} each\n"
 msgid_plural "{:d} piece, {:s}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{:d} delar, {:s} var\n"
+msgstr[1] "{:d} del, {:s}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"

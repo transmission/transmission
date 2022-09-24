@@ -1472,7 +1472,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukuran &amp;pecahan:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1527,7 +1527,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak bisa membuat &quot;%1&quot;: %2 (%3)</translation>
     </message>
 </context>
 <context>
