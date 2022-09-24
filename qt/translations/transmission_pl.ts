@@ -2241,7 +2241,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Błąd podczas zmieniania nazwy ścieżki</translation>
     </message>
@@ -2381,7 +2381,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Sprawdzanie pobranych danych</translation>
     </message>

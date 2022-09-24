@@ -2207,7 +2207,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Galat Mengubah Nama Path</translation>
     </message>
@@ -2341,7 +2341,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Memeriksa data lokal</translation>
     </message>

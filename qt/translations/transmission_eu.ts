@@ -2224,7 +2224,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Akatsa Bidea Berrizendatzerakoan</translation>
     </message>
@@ -2361,7 +2361,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Datu lokalak egiaztatzen</translation>
     </message>

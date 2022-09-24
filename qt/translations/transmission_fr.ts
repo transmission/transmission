@@ -2224,7 +2224,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Erreur de renommage du chemin</translation>
     </message>
@@ -2361,7 +2361,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Vérification des données locales</translation>
     </message>

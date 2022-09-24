@@ -2224,7 +2224,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Virhe uudelleennimettäessä polkua</translation>
     </message>
@@ -2361,7 +2361,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Vahvistetaan paikallista dataa</translation>
     </message>

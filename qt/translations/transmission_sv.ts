@@ -2224,7 +2224,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Fel vid namnbyte av sökväg</translation>
     </message>
@@ -2361,7 +2361,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Verifierar lokala data</translation>
     </message>

@@ -2241,7 +2241,7 @@ Kako bi dodali novi glavni URL, dodajte ga nakon praznog retka.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Greška preimenovanja putanje</translation>
     </message>
@@ -2381,7 +2381,7 @@ Kako bi dodali novi glavni URL, dodajte ga nakon praznog retka.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Provjera lokalnih podataka</translation>
     </message>

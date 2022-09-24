@@ -2224,7 +2224,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Fehler beim Umbenennen des Pfades</translation>
     </message>
@@ -2361,7 +2361,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Überprüfe lokale Daten</translation>
     </message>
