@@ -558,7 +558,18 @@ MainWindow::Impl::Impl(
     /* gear */
     auto* gear_button = gtr_get_widget<Gtk::MenuButton>(builder, "gear_button");
     gear_button->set_menu_model(createOptionsMenu());
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    for (auto* child = gear_button->get_first_child(); child != nullptr; child = child->get_next_sibling())
+    {
+        if (auto* popover = dynamic_cast<Gtk::Popover*>(child); popover != nullptr)
+        {
+            popover->signal_show().connect([this]() { onOptionsClicked(); }, false);
+            break;
+        }
+    }
+#else
     gear_button->signal_clicked().connect([this]() { onOptionsClicked(); }, false);
+#endif
 
     /* turtle */
     alt_speed_button_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::alt_speed_toggled_cb));
