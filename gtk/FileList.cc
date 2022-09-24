@@ -61,7 +61,7 @@ public:
         add(enabled);
     }
 
-    Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> icon;
+    Gtk::TreeModelColumn<Glib::RefPtr<Gio::Icon>> icon;
     Gtk::TreeModelColumn<Glib::ustring> label;
     Gtk::TreeModelColumn<Glib::ustring> label_esc;
     Gtk::TreeModelColumn<int> prog;
@@ -452,7 +452,7 @@ void buildTree(FileRowNode& node, build_data& build)
     bool const isLeaf = node.child_count() == 0;
 
     auto const mime_type = isLeaf ? tr_get_mime_type_for_filename(child_data.name.raw()) : DirectoryMimeType;
-    auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *build.w);
+    auto const icon = gtr_get_mime_type_icon(mime_type);
     auto const file = isLeaf ? tr_torrentFile(build.tor, child_data.index) : tr_file_view{};
     int const priority = isLeaf ? file.priority : 0;
     bool const enabled = isLeaf ? file.wanted : true;
@@ -759,7 +759,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         {
             bool const isLeaf = iter->children().empty();
             auto const mime_type = isLeaf ? tr_get_mime_type_for_filename(newname.raw()) : DirectoryMimeType;
-            auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *view_);
+            auto const icon = gtr_get_mime_type_icon(mime_type);
 
             (*iter)[file_cols.label] = newname;
             (*iter)[file_cols.icon] = icon;
@@ -890,7 +890,12 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
         col->set_resizable(true);
         auto* icon_rend = Gtk::make_managed<Gtk::CellRendererPixbuf>();
         col->pack_start(*icon_rend, false);
-        col->add_attribute(icon_rend->property_pixbuf(), file_cols.icon);
+        col->add_attribute(icon_rend->property_gicon(), file_cols.icon);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        icon_rend->property_icon_size() = Gtk::IconSize::NORMAL;
+#else
+        icon_rend->property_stock_size() = Gtk::ICON_SIZE_MENU;
+#endif
         /* add text renderer */
         auto* text_rend = Gtk::make_managed<Gtk::CellRendererText>();
         text_rend->property_editable() = true;

@@ -36,8 +36,8 @@ namespace
 auto const DefaultBarHeight = 12;
 auto const CompactBarWidth = 50;
 auto const SmallScale = 0.9;
-auto const CompactIconSize = Gtk::ICON_SIZE_MENU;
-auto const FullIconSize = Gtk::ICON_SIZE_DND;
+auto const CompactIconSize = IF_GTKMM4(Gtk::IconSize::NORMAL, Gtk::ICON_SIZE_MENU);
+auto const FullIconSize = IF_GTKMM4(Gtk::IconSize::LARGE, Gtk::ICON_SIZE_DND);
 
 auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const* st)
 {
@@ -340,6 +340,12 @@ public:
     Glib::Property<bool> compact;
 
 private:
+    static void set_icon(
+        Gtk::CellRendererPixbuf& renderer,
+        Glib::RefPtr<Gio::Icon> const& icon,
+        IF_GTKMM4(Gtk::IconSize, Gtk::BuiltinIconSize) icon_size);
+
+private:
     TorrentCellRenderer& renderer_;
 
     Gtk::CellRendererText* text_renderer_ = nullptr;
@@ -354,7 +360,7 @@ private:
 namespace
 {
 
-Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
+Glib::RefPtr<Gio::Icon> get_icon(tr_torrent const* tor)
 {
     auto mime_type = std::string_view{};
 
@@ -373,7 +379,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
         mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : tr_get_mime_type_for_filename(name);
     }
 
-    return gtr_get_mime_type_icon(mime_type, icon_size, for_widget);
+    return gtr_get_mime_type_icon(mime_type);
 }
 
 } // namespace
@@ -381,6 +387,19 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
 /***
 ****
 ***/
+
+void TorrentCellRenderer::Impl::set_icon(
+    Gtk::CellRendererPixbuf& renderer,
+    Glib::RefPtr<Gio::Icon> const& icon,
+    IF_GTKMM4(Gtk::IconSize, Gtk::BuiltinIconSize) icon_size)
+{
+    renderer.property_gicon() = icon;
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    renderer.property_icon_size() = icon_size;
+#else
+    renderer.property_stock_size() = icon_size;
+#endif
+}
 
 void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width, int& height) const
 {
@@ -394,13 +413,13 @@ void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
 
-    auto const icon = get_icon(tor, CompactIconSize, widget);
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_stat = getShortStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, icon_size);
     text_renderer_->property_text() = name;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(NONE);
@@ -432,14 +451,14 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
     auto const* const st = tr_torrentStatCached(tor);
     auto const total_size = tr_torrentTotalSize(tor);
 
-    auto const icon = get_icon(tor, FullIconSize, widget);
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     auto const gstr_prog = getProgressString(tor, total_size, st);
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, icon_size);
     text_renderer_->property_text() = name;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(BOLD);
@@ -564,7 +583,7 @@ void TorrentCellRenderer::Impl::render_compact(
     auto const percentDone = get_percent_done(tor, st, &seed);
     bool const sensitive = active || st->error;
 
-    auto const icon = get_icon(tor, CompactIconSize, widget);
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_stat = getShortStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
@@ -577,7 +596,7 @@ void TorrentCellRenderer::Impl::render_compact(
     fill_area.set_height(fill_area.get_height() - ypad * 2);
 
     auto icon_area = fill_area;
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->get_preferred_width(widget, min_width, width);
     icon_area.set_width(width);
 
@@ -614,7 +633,7 @@ void TorrentCellRenderer::Impl::render_compact(
     *** RENDER
     **/
 
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->property_sensitive() = sensitive;
     icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
 
@@ -656,7 +675,7 @@ void TorrentCellRenderer::Impl::render_full(
     auto const percentDone = get_percent_done(tor, st, &seed);
     bool const sensitive = active || st->error;
 
-    auto const icon = get_icon(tor, FullIconSize, widget);
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_prog = getProgressString(tor, total_size, st);
     auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
@@ -665,7 +684,7 @@ void TorrentCellRenderer::Impl::render_full(
 
     /* get the idealized cell dimensions */
     Gdk::Rectangle icon_area;
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, size);
     icon_area.set_width(size.width);
     icon_area.set_height(size.height);
@@ -740,7 +759,7 @@ void TorrentCellRenderer::Impl::render_full(
     *** RENDER
     **/
 
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->property_sensitive() = sensitive;
     icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
 
