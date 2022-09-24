@@ -88,6 +88,8 @@
 #define TR_GLIB_SPAWN_FLAGS(Code) IF_GLIBMM2_68(Glib::SpawnFlags::Code, Glib::SPAWN_##Code)
 #define TR_GLIB_USER_DIRECTORY(Code) IF_GLIBMM2_68(Glib::UserDirectory::Code, Glib::USER_DIRECTORY_##Code)
 
+#define TR_GLIB_EXCEPTION_WHAT(Obj) IF_GLIBMM2_68((Obj).what(), (Obj).what().c_str())
+
 #define TR_GIO_APP_INFO_CREATE_FLAGS(Code) IF_GLIBMM2_68(Gio::AppInfo::CreateFlags::Code, Gio::APP_INFO_CREATE_##Code)
 #define TR_GIO_APPLICATION_FLAGS(Code) IF_GLIBMM2_68(Gio::Application::Flags::Code, Gio::APPLICATION_##Code)
 #define TR_GIO_DBUS_BUS_TYPE(Code) IF_GLIBMM2_68(Gio::DBus::BusType::Code, Gio::DBus::BUS_TYPE_##Code)

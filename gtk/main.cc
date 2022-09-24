@@ -77,7 +77,10 @@ int main(int argc, char** argv)
     }
     catch (Glib::OptionError const& e)
     {
-        g_print(_("%s\nRun '%s --help' to see a full list of available command line options.\n"), e.what().c_str(), argv[0]);
+        g_print(
+            _("%s\nRun '%s --help' to see a full list of available command line options.\n"),
+            TR_GLIB_EXCEPTION_WHAT(e),
+            argv[0]);
         return 1;
     }
 

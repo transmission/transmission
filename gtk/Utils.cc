@@ -387,8 +387,8 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to trash file \"%s\": %s", filename.c_str(), e.what().c_str());
-            tr_error_set(error, e.code(), e.what().raw());
+            g_message("Unable to trash file \"%s\": %s", filename.c_str(), TR_GLIB_EXCEPTION_WHAT(e));
+            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
         }
     }
 
@@ -400,9 +400,9 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to delete file \"%s\": %s", filename.c_str(), e.what().c_str());
+            g_message("Unable to delete file \"%s\": %s", filename.c_str(), TR_GLIB_EXCEPTION_WHAT(e));
             tr_error_clear(error);
-            tr_error_set(error, e.code(), e.what().raw());
+            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             result = false;
         }
     }
