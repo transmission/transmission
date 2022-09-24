@@ -30,7 +30,7 @@
 "82.title" = "Отменить";
 
 /* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
-"83.title" = "Создаю торрент-файл…";
+"83.title" = "Создание торрент-файла…";
 
 /* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
 "108.title" = "Трекеры будут объединены в списке общего уровня";

@@ -48,7 +48,7 @@
 "104.title" = "Все";
 
 /* Class = "NSButtonCell"; title = "None"; ObjectID = "105"; */
-"105.title" = "Ни одного";
+"105.title" = "Нет";
 
 /* Class = "NSSearchFieldCell"; placeholderString = "Filter"; ObjectID = "113"; */
 "113.placeholderString" = "Фильтр";

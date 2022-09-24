@@ -168,7 +168,7 @@
 "1281.title" = "до";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
-"1294.title" = "Показывать окно опций для новых раздач";
+"1294.title" = "Показывать диалоговое окно при открытии торрент-файла";
 
 /* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
 "1302.title" = "По завершении скачивания:";
@@ -192,19 +192,19 @@
 "1437.title" = "Обновить";
 
 /* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
-"1438.title" = "черный список скачан/не скачан";
+"1438.title" = "чёрный список загружен / не загружен";
 
 /* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
-"1439.title" = "Черный список:";
+"1439.title" = "Чёрный список:";
 
 /* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
-"1440.title" = "Не подключаться к пользователям из черного списка";
+"1440.title" = "Не подключаться к участникам из чёрного списка";
 
 /* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
 "1441.title" = "Некоторые роутеры будут «тормозить» если подключений очень много";
 
 /* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
-"1442.title" = "Использовать PEX для публичных торрентов";
+"1442.title" = "Использовать одноранговый обмен (PEX) для публичных торрентов";
 
 /* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
 "1443.title" = "Максимум подключений для новых раздач:";
@@ -339,7 +339,7 @@
 "1920.title" = "В воскресенье";
 
 /* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
-"1926.title" = "Использовать DHT для публичных торрентов";
+"1926.title" = "Использовать распределённую хеш-таблицу (DHT) для публичных торрентов";
 
 /* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
 "1931.title" = "Принимать магнет-ссылки:";
@@ -348,19 +348,19 @@
 "1933.title" = "Сделать программой по умолчанию";
 
 /* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
-"1940.title" = "Добавлять .part к недокачанным файлам";
+"1940.title" = "Добавлять .part к незавершенный файлам";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
-"1948.title" = "Показывать окно при открытии магнет-ссылки";
+"1948.title" = "Показывать диалоговое окно при открытии магнет-ссылки";
 
 /* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
-"1952.title" = "Искать местных пользователей для публичных торрентов";
+"1952.title" = "Использовать локальное обнаружение участников для публичных торрентов";
 
 /* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
 "1962.title" = "После неактивности в течение";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
-"1970.title" = "мин";
+"1970.title" = "мин.";
 
 /* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
 "1988.title" = "URL:";
@@ -378,7 +378,7 @@
 "2078.title" = "Использовать Micro Transport Protocol (µTP)";
 
 /* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
-"2082.title" = "Порт:";
+"2082.title" = "Порт прослушивания:";
 
 /* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
 "2087.title" = "Оповещения:";

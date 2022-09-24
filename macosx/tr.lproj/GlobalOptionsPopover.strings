@@ -1,6 +1,6 @@
 
 /* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
-"22.title" = "Besleme Limitleri";
+"22.title" = "Besleme Sınırları";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
 "23.title" = "Aktarım Bant Genişliği";
@@ -9,7 +9,7 @@
 "26.title" = "KB/sn";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Göndermeyi Sınırla:";
+"43.title" = "Karşıya Yüklemeyi Sınırla:";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
 "44.title" = "İndirmeyi Sınırla:";

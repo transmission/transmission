@@ -16,7 +16,7 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Быстрый и простой BitTorrent-клиент</translation>
+        <translation>Быстрый и простой клиент BitTorrent</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
@@ -171,7 +171,7 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation>Cкоро начнётся передача</translation>
+        <translation>Скоро начнётся передача</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -777,7 +777,7 @@
         <location line="-20"/>
         <location line="+10"/>
         <source>None</source>
-        <translation>Нет данных</translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location filename="../Formatter.h" line="+64"/>
@@ -1498,7 +1498,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Размер части:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1553,7 +1553,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось создать «%1»: %2 (%3)</translation>
     </message>
 </context>
 <context>
@@ -1630,7 +1630,7 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../PathButton.cc" line="+23"/>
         <location line="+71"/>
         <source>(None)</source>
-        <translation>(Не выбран)</translation>
+        <translation>(Нет)</translation>
     </message>
     <message>
         <location line="+86"/>
@@ -1819,7 +1819,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-663"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation>Автоматически добавлять файлы .torrent из:</translation>
+        <translation>Автоматически добавлять файлы .torrent &amp;из:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -1883,7 +1883,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+321"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>М&amp;аксимальное количество участников на торрент:</translation>
+        <translation>М&amp;аксимум участников на торрент:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -1973,7 +1973,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+505"/>
         <source>Remote Control</source>
-        <translation>Удалённый доступ</translation>
+        <translation>Удалённое управление</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -1983,7 +1983,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+20"/>
         <source>HTTP &amp;port:</source>
-        <translation>HTTP-порт:</translation>
+        <translation>П&amp;орт HTTP:</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2103,7 +2103,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+13"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>Ис&amp;пользовать LPD для обнаружения участников</translation>
+        <translation>Ис&amp;пользовать локальное обнаружение участников (LDP)</translation>
     </message>
     <message>
         <location line="-3"/>
@@ -2241,9 +2241,9 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
-        <translation>Ошибка переименования</translation>
+        <translation>Ошибка переименования пути</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2381,7 +2381,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Проверка локальных данных</translation>
     </message>
@@ -2620,16 +2620,16 @@ To add another primary URL, add it after a blank line.</source>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform> и%1 %Ln принимающий%2 %3 тому назад</numerusform>
-            <numerusform> и%1 %Ln принимающих%2 %3 тому назад</numerusform>
-            <numerusform> и%1 %Ln принимающих%2 %3 тому назад</numerusform>
+            <numerusform> и%1 %Ln скачивающий%2 %3 назад</numerusform>
+            <numerusform> и%1 %Ln скачивающих%2 %3 назад</numerusform>
+            <numerusform> и%1 %Ln скачивающих%2 %3 назад</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>От трекера %1не было информации%2 о количестве участников %3 назад</translation>
+        <translation>От трекера %1не было информации%2 о числе участников %3 назад</translation>
     </message>
     <message>
         <location line="-24"/>
@@ -2641,18 +2641,18 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+39"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Запрос количества участников через %1</translation>
+        <translation>Запрос числа участников через %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
-        <translation>Запрос количества участников поставлен в очередь</translation>
+        <translation>Запрос числа участников поставлен в очередь</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Запрос количества участников… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Сейчас запрашивается число участников… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
