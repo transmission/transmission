@@ -2013,8 +2013,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
 size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
 {
-    struct sessionLoadTorrentsData data;
-
+    auto data = sessionLoadTorrentsData{};
     data.session = session;
     data.ctor = ctor;
     data.done = false;

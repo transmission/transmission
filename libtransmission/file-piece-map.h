@@ -115,7 +115,11 @@ private:
 class tr_file_priorities
 {
 public:
-    explicit tr_file_priorities(tr_file_piece_map const* fpm);
+    explicit tr_file_priorities(tr_file_piece_map const* fpm) noexcept
+        : fpm_{ fpm }
+    {
+    }
+
     void reset(tr_file_piece_map const*);
     void set(tr_file_index_t file, tr_priority_t priority);
     void set(tr_file_index_t const* files, size_t n, tr_priority_t priority);

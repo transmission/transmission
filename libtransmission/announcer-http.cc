@@ -107,15 +107,14 @@ static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_annou
 
 static std::string format_ipv4_url_arg(tr_address const& ipv4_address)
 {
-    std::array<char, INET_ADDRSTRLEN> readable;
+    auto readable = std::array<char, INET_ADDRSTRLEN>{};
     evutil_inet_ntop(AF_INET, &ipv4_address.addr, readable.data(), readable.size());
-
     return "&ipv4="s + readable.data();
 }
 
 static std::string format_ipv6_url_arg(in6_addr const addr)
 {
-    std::array<char, INET6_ADDRSTRLEN> readable;
+    auto readable = std::array<char, INET6_ADDRSTRLEN>{};
     evutil_inet_ntop(AF_INET6, &addr, std::data(readable), std::size(readable));
 
     auto arg = "&ipv6="s;
@@ -299,15 +298,15 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
 struct http_announce_data
 {
-    tr_sha1_digest_t info_hash;
+    tr_sha1_digest_t info_hash = {};
     std::optional<tr_announce_response> previous_response;
 
-    tr_announce_response_func response_func;
-    void* response_func_user_data;
+    tr_announce_response_func response_func = nullptr;
+    void* response_func_user_data = nullptr;
     bool http_success = false;
 
-    uint8_t requests_sent_count;
-    uint8_t requests_answered_count;
+    uint8_t requests_sent_count = {};
+    uint8_t requests_answered_count = {};
 
     std::string log_name;
 };
@@ -609,9 +608,9 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
 struct scrape_data
 {
-    tr_scrape_response response;
-    tr_scrape_response_func response_func;
-    void* response_func_user_data;
+    tr_scrape_response response = {};
+    tr_scrape_response_func response_func = nullptr;
+    void* response_func_user_data = nullptr;
     std::string log_name;
 };
 

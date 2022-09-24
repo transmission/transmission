@@ -861,7 +861,7 @@ private:
     uint16_t peer_limit_ = 200;
     uint16_t peer_limit_per_torrent_ = 50;
 
-    uint16_t idle_limit_minutes_;
+    uint16_t idle_limit_minutes_ = 0;
 
     uint16_t upload_slots_per_torrent_ = 8;
 
@@ -985,7 +985,7 @@ private:
     tr_torrent_completeness_func completeness_func_ = nullptr;
     void* completeness_func_user_data_ = nullptr;
 
-    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
 

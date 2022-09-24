@@ -414,9 +414,9 @@ struct ParentState
 
 struct jsonWalk
 {
-    bool doIndent;
+    bool doIndent = false;
     std::deque<ParentState> parents;
-    evbuffer* out;
+    evbuffer* out = nullptr;
 };
 
 static void jsonIndent(struct jsonWalk* data)

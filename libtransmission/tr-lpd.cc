@@ -409,7 +409,7 @@ private:
         }
 
         // process announcement from foreign peer
-        struct sockaddr_in foreign_addr;
+        struct sockaddr_in foreign_addr = {};
         int addr_len = sizeof(foreign_addr);
         auto foreign_msg = std::array<char, MaxDatagramLength>{};
         auto const res = recvfrom(

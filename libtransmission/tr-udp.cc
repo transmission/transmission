@@ -104,15 +104,39 @@ void tr_session::tr_udp_core::set_socket_buffers()
     }
 }
 
+static tr_socket_t rebind_ipv6_impl(in6_addr sin6_addr, tr_port port)
+{
+    auto const sock = socket(PF_INET6, SOCK_DGRAM, 0);
+    if (sock == TR_BAD_SOCKET)
+    {
+        return TR_BAD_SOCKET;
+    }
+
+#ifdef IPV6_V6ONLY
+    /* Since we always open an IPv4 socket on the same port,
+     * this shouldn't matter.  But I'm superstitious. */
+    int one = 1;
+    (void)setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
+#endif
+
+    auto sin6 = sockaddr_in6{};
+    sin6.sin6_family = AF_INET6;
+    sin6.sin6_addr = sin6_addr;
+    sin6.sin6_port = port.network();
+    if (::bind(sock, reinterpret_cast<struct sockaddr*>(&sin6), sizeof(sin6)) == -1)
+    {
+        tr_netCloseSocket(sock);
+        return TR_BAD_SOCKET;
+    }
+
+    return sock;
+}
+
 /* BEP-32 has a rather nice explanation of why we need to bind to one
    IPv6 address, if I may say so myself. */
-// TODO: remove goto, it prevents reducing scope of local variables
 void tr_session::tr_udp_core::rebind_ipv6(bool force)
 {
-    struct sockaddr_in6 sin6;
     auto const ipv6 = tr_globalIPv6(&session_);
-    int rc = -1;
-    int one = 1;
 
     /* We currently have no way to enable or disable IPv6 after initialisation.
        No way to fix that without some surgery to the DHT code itself. */
@@ -127,74 +151,31 @@ void tr_session::tr_udp_core::rebind_ipv6(bool force)
         return;
     }
 
-    auto const s = socket(PF_INET6, SOCK_DGRAM, 0);
-
-    if (s == TR_BAD_SOCKET)
+    auto const sock = rebind_ipv6_impl(*ipv6, udp_port_);
+    if (sock == TR_BAD_SOCKET)
     {
-        goto FAIL;
+        /* Something went wrong.  It's difficult to recover, so let's
+         * simply set things up so that we try again next time. */
+        auto const error_code = errno;
+        auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
+        evutil_inet_ntop(AF_INET6, &*ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
+        tr_logAddWarn(fmt::format(
+            _("Couldn't rebind IPv6 socket {address}: {error} ({error_code})"),
+            fmt::arg("address", std::data(ipv6_readable)),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
+
+        udp6_bound_.reset();
+        return;
     }
 
-#ifdef IPV6_V6ONLY
-    /* Since we always open an IPv4 socket on the same port, this
-       shouldn't matter.  But I'm superstitious. */
-    (void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
-#endif
-
-    memset(&sin6, 0, sizeof(sin6));
-    sin6.sin6_family = AF_INET6;
-
-    if (ipv6)
+    if (udp6_socket_ != TR_BAD_SOCKET)
     {
-        sin6.sin6_addr = *ipv6;
+        tr_netCloseSocket(udp6_socket_);
     }
 
-    sin6.sin6_port = udp_port_.network();
-
-    rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
-
-    if (rc == -1)
-    {
-        goto FAIL;
-    }
-
-    if (udp6_socket_ == TR_BAD_SOCKET)
-    {
-        udp6_socket_ = s;
-    }
-    else
-    {
-        /* FIXME: dup2 doesn't work for sockets on Windows */
-        rc = dup2(s, udp6_socket_);
-
-        if (rc == -1)
-        {
-            goto FAIL;
-        }
-
-        tr_netCloseSocket(s);
-    }
-
+    udp6_socket_ = sock;
     udp6_bound_ = ipv6;
-    return;
-
-FAIL:
-    /* Something went wrong.  It's difficult to recover, so let's simply
-       set things up so that we try again next time. */
-    auto const error_code = errno;
-    auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
-    evutil_inet_ntop(AF_INET6, &*ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
-    tr_logAddWarn(fmt::format(
-        _("Couldn't rebind IPv6 socket {address}: {error} ({error_code})"),
-        fmt::arg("address", std::data(ipv6_readable)),
-        fmt::arg("error", tr_strerror(error_code)),
-        fmt::arg("error_code", error_code)));
-
-    if (s != TR_BAD_SOCKET)
-    {
-        tr_netCloseSocket(s);
-    }
-
-    udp6_bound_.reset();
 }
 
 static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
@@ -203,7 +184,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     TR_ASSERT(type == EV_READ);
 
     auto buf = std::array<unsigned char, 4096>{};
-    struct sockaddr_storage from;
+    auto from = sockaddr_storage{};
     auto* session = static_cast<tr_session*>(vsession);
 
     socklen_t fromlen = sizeof(from);
