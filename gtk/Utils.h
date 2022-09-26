@@ -10,6 +10,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -322,6 +323,29 @@ T* gtr_get_widget_derived(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustri
     T* widget = nullptr;
     builder->get_widget_derived(name, widget, std::forward<ArgTs>(args)...);
     return widget;
+}
+
+template<typename F>
+void gtr_window_on_close(Gtk::Window& widget, F&& callback)
+{
+    auto bool_callback = [callback]() mutable -> bool
+    {
+        if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(callback)>>)
+        {
+            callback();
+            return false;
+        }
+        else
+        {
+            return callback();
+        }
+    };
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    widget.signal_close_request().connect(bool_callback, false);
+#else
+    widget.signal_delete_event().connect(sigc::hide<0>(bool_callback), false);
+#endif
 }
 
 namespace Glib

@@ -121,7 +121,7 @@ private:
     void hideMainWindow();
     void toggleMainWindow();
 
-    bool winclose(GdkEventAny* event);
+    bool winclose();
     void rowChangedCB(Gtk::TreePath const& path, Gtk::TreeModel::iterator const& iter);
 
     void app_setup();
@@ -234,7 +234,7 @@ void Application::Impl::show_details_dialog_for_selected_torrents()
     {
         auto dialog = DetailsDialog::create(*wind_, core_);
         dialog->set_torrents(ids);
-        dialog->signal_hide().connect([this, key]() { details_.erase(key); });
+        gtr_window_on_close(*dialog, [this, key]() { details_.erase(key); });
         dialog_it = details_.try_emplace(key, std::move(dialog)).first;
         dialog_it->second->show();
     }
@@ -798,7 +798,7 @@ void Application::Impl::toggleMainWindow()
     }
 }
 
-bool Application::Impl::winclose(GdkEventAny* /*event*/)
+bool Application::Impl::winclose()
 {
     if (icon_ != nullptr)
     {
@@ -859,7 +859,7 @@ void Application::Impl::main_window_setup()
     refresh_actions_soon();
     auto const model = core_->get_model();
     model->signal_row_changed().connect(sigc::mem_fun(*this, &Impl::rowChangedCB));
-    wind_->signal_delete_event().connect(sigc::mem_fun(*this, &Impl::winclose));
+    gtr_window_on_close(*wind_, sigc::mem_fun(*this, &Impl::winclose));
     refresh_actions();
 
     /* register to handle URIs that get dragged onto our main window */
@@ -1036,7 +1036,7 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
     auto w = std::shared_ptr<OptionsDialog>(
         OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
-    w->signal_hide().connect([w]() mutable { w.reset(); });
+    gtr_window_on_close(*w, [w]() mutable { w.reset(); });
     w->signal_focus_in_event().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
 
     if (wind_ != nullptr)
@@ -1331,10 +1331,8 @@ void Application::Impl::show_about_dialog()
 #endif
     d->set_transient_for(*wind_);
     d->set_modal(true);
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    d->signal_close_request().connect_notify([d]() mutable { d.reset(); });
-#else
-    d->signal_delete_event().connect_notify([d](void* /*event*/) mutable { d.reset(); });
+    gtr_window_on_close(*d, [d]() mutable { d.reset(); });
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     d->signal_response().connect_notify([&dref = *d](int /*response*/) { dref.close(); });
 #endif
     d->show();
@@ -1450,19 +1448,19 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     if (action_name == "open-torrent-from-url")
     {
         auto w = std::shared_ptr<TorrentUrlChooserDialog>(TorrentUrlChooserDialog::create(*wind_, core_));
-        w->signal_hide().connect([w]() mutable { w.reset(); });
+        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
-        w->signal_hide().connect([w]() mutable { w.reset(); });
+        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "show-stats")
     {
         auto dialog = std::shared_ptr<StatsDialog>(StatsDialog::create(*wind_, core_));
-        dialog->signal_hide().connect([dialog]() mutable { dialog.reset(); });
+        gtr_window_on_close(*dialog, [dialog]() mutable { dialog.reset(); });
         dialog->show();
     }
     else if (action_name == "donate")
@@ -1493,7 +1491,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (!ids.empty())
         {
             auto w = std::shared_ptr<RelocateDialog>(RelocateDialog::create(*wind_, core_, ids));
-            w->signal_hide().connect([w]() mutable { w.reset(); });
+            gtr_window_on_close(*w, [w]() mutable { w.reset(); });
             w->show();
         }
     }
@@ -1516,7 +1514,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     else if (action_name == "new-torrent")
     {
         auto w = std::shared_ptr<MakeDialog>(MakeDialog::create(*wind_, core_));
-        w->signal_hide().connect([w]() mutable { w.reset(); });
+        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "remove-torrent")
@@ -1544,7 +1542,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (prefs_ == nullptr)
         {
             prefs_ = PrefsDialog::create(*wind_, core_);
-            prefs_->signal_hide().connect([this]() { prefs_.reset(); });
+            gtr_window_on_close(*prefs_, [this]() { prefs_.reset(); });
         }
 
         gtr_window_present(prefs_);
@@ -1554,12 +1552,20 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (msgwin_ == nullptr)
         {
             msgwin_ = MessageLogWindow::create(*wind_, core_);
-            msgwin_->signal_hide().connect([this]() { msgwin_.reset(); });
+            gtr_window_on_close(
+                *msgwin_,
+                [this]()
+                {
+                    gtr_action_set_toggled("toggle-message-log", false);
+                    msgwin_.reset();
+                });
+
+            gtr_action_set_toggled("toggle-message-log", true);
             msgwin_->show();
         }
         else
         {
-            msgwin_->hide();
+            msgwin_->close();
         }
     }
     else if (action_name == "show-about-dialog")

@@ -105,11 +105,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
 {
     if (tor_ != nullptr)
     {
-        if (response != TR_GTK_RESPONSE_TYPE(ACCEPT))
-        {
-            removeOldTorrent();
-        }
-        else
+        if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
         {
             tr_torrentSetPriority(tor_, gtr_priority_combo_get_value(*priority_combo_));
 
@@ -127,9 +123,13 @@ void OptionsDialog::Impl::addResponseCB(int response)
 
             gtr_save_recent_dir("download", core_, downloadDir_);
         }
+        else if (response == TR_GTK_RESPONSE_TYPE(CANCEL))
+        {
+            removeOldTorrent();
+        }
     }
 
-    dialog_.hide();
+    dialog_.close();
 }
 
 void OptionsDialog::Impl::updateTorrent()
@@ -343,7 +343,7 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
         core->add_files(files, do_start, do_prompt, do_notify);
     }
 
-    hide();
+    close();
 }
 
 std::unique_ptr<TorrentFileChooserDialog> TorrentFileChooserDialog::create(
@@ -385,7 +385,7 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, Gtk::Entry const& 
 
     if (response == TR_GTK_RESPONSE_TYPE(CANCEL))
     {
-        hide();
+        close();
     }
     else if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
@@ -398,7 +398,7 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, Gtk::Entry const& 
 
         if (core->add_from_url(url))
         {
-            hide();
+            close();
         }
         else
         {

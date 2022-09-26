@@ -2208,7 +2208,7 @@ void EditTrackersDialog::on_response(int response)
 
     if (do_destroy)
     {
-        hide();
+        close();
     }
 }
 
@@ -2219,7 +2219,7 @@ void DetailsDialog::Impl::on_edit_trackers()
     if (auto const* const tor = tracker_list_get_current_torrent(); tor != nullptr)
     {
         auto d = std::shared_ptr<EditTrackersDialog>(EditTrackersDialog::create(dialog_, core_, tor));
-        d->signal_hide().connect([d]() mutable { d.reset(); });
+        gtr_window_on_close(*d, [d]() mutable { d.reset(); });
         d->show();
     }
 }
@@ -2327,7 +2327,7 @@ void AddTrackerDialog::on_response(int response)
 
     if (destroy)
     {
-        hide();
+        close();
     }
 }
 
@@ -2338,7 +2338,7 @@ void DetailsDialog::Impl::on_tracker_list_add_button_clicked()
     if (auto const* const tor = tracker_list_get_current_torrent(); tor != nullptr)
     {
         auto d = std::shared_ptr<AddTrackerDialog>(AddTrackerDialog::create(dialog_, core_, tor));
-        d->signal_hide().connect([d]() mutable { d.reset(); });
+        gtr_window_on_close(*d, [d]() mutable { d.reset(); });
         d->show();
     }
 }
@@ -2520,7 +2520,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     dialog_.resize((int)gtr_pref_int_get(TR_KEY_details_window_width), (int)gtr_pref_int_get(TR_KEY_details_window_height));
     dialog_.signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
 
-    dialog_.signal_response().connect(sigc::hide<0>(sigc::mem_fun(dialog_, &DetailsDialog::hide)));
+    dialog_.signal_response().connect(sigc::hide<0>(sigc::mem_fun(dialog_, &DetailsDialog::close)));
 
     info_page_init(builder);
     peer_page_init(builder);

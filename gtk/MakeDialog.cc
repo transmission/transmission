@@ -221,7 +221,7 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
     {
     case TR_GTK_RESPONSE_TYPE(CANCEL):
         builder_.cancelChecksums();
-        hide();
+        close();
         break;
 
     case TR_GTK_RESPONSE_TYPE(ACCEPT):
@@ -229,7 +229,7 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
         [[fallthrough]];
 
     case TR_GTK_RESPONSE_TYPE(CLOSE):
-        hide();
+        close();
         break;
 
     default:
@@ -273,14 +273,15 @@ void MakeDialog::Impl::makeProgressDialog(std::string_view target, std::future<t
         std::move(future),
         target,
         core_));
-    progress_dialog_->signal_hide().connect(
+    gtr_window_on_close(
+        *progress_dialog_,
         [this]()
         {
             auto const success = progress_dialog_->success();
             progress_dialog_.reset();
             if (success)
             {
-                dialog_.hide();
+                dialog_.close();
             }
         });
     progress_dialog_->show();
@@ -322,7 +323,7 @@ void MakeDialog::Impl::onResponse(int response)
     }
     else if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
-        dialog_.hide();
+        dialog_.close();
     }
 }
 

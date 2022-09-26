@@ -508,15 +508,3 @@ MessageLogWindow::Impl::Impl(
     scroll_to_bottom();
     window_.show_all_children();
 }
-
-void MessageLogWindow::on_show()
-{
-    Gtk::Window::on_show();
-    gtr_action_set_toggled("toggle-message-log", true);
-}
-
-void MessageLogWindow::on_hide()
-{
-    Gtk::Window::on_hide();
-    gtr_action_set_toggled("toggle-message-log", false);
-}

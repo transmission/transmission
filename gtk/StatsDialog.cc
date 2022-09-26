@@ -122,7 +122,7 @@ void StatsDialog::Impl::dialogResponse(int response)
 
     if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
-        dialog_.hide();
+        dialog_.close();
     }
 }
 

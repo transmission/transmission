@@ -113,7 +113,7 @@ bool RelocateDialog::Impl::onTimer()
         }
         else
         {
-            dialog_.hide();
+            dialog_.close();
         }
     }
 
@@ -153,7 +153,7 @@ void RelocateDialog::Impl::onResponse(int response)
     }
     else
     {
-        dialog_.hide();
+        dialog_.close();
     }
 }
 
