@@ -102,6 +102,7 @@ set(${PROJECT_NAME}_SOURCES
     MessageLogWindow.cc
     Notify.cc
     OptionsDialog.cc
+    PathButton.cc
     Prefs.cc
     PrefsDialog.cc
     RelocateDialog.cc
@@ -129,6 +130,7 @@ set(${PROJECT_NAME}_HEADERS
     MessageLogWindow.h
     Notify.h
     OptionsDialog.h
+    PathButton.h
     Prefs.h
     PrefsDialog.h
     RelocateDialog.h

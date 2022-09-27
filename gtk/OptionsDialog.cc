@@ -15,6 +15,7 @@
 #include "FileList.h"
 #include "FreeSpaceLabel.h"
 #include "OptionsDialog.h"
+#include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -67,8 +68,8 @@ public:
     TR_DISABLE_COPY_MOVE(Impl)
 
 private:
-    void sourceChanged(Gtk::FileChooserButton* b);
-    void downloadDirChanged(Gtk::FileChooserButton* b);
+    void sourceChanged(PathButton* b);
+    void downloadDirChanged(PathButton* b);
 
     void removeOldTorrent();
     void updateTorrent();
@@ -158,7 +159,7 @@ void OptionsDialog::Impl::updateTorrent()
  * The `filename' tests here are to prevent us from losing the current
  * metadata when that happens.
  */
-void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
+void OptionsDialog::Impl::sourceChanged(PathButton* b)
 {
     auto const filename = b->get_filename();
 
@@ -193,7 +194,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
     }
 }
 
-void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
+void OptionsDialog::Impl::downloadDirChanged(PathButton* b)
 {
     auto const fname = b->get_filename();
 
@@ -209,7 +210,8 @@ void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
 namespace
 {
 
-void addTorrentFilters(Gtk::FileChooser* chooser)
+template<typename FileChooserT>
+void addTorrentFilters(FileChooserT* chooser)
 {
     auto filter = Gtk::FileFilter::create();
     filter->set_name(_("Torrent files"));
@@ -274,22 +276,13 @@ OptionsDialog::Impl::Impl(
     gtr_priority_combo_init(*priority_combo_);
     gtr_priority_combo_set_value(*priority_combo_, TR_PRI_NORMAL);
 
-    auto* source_chooser = gtr_get_widget<Gtk::FileChooserButton>(builder, "source_button");
+    auto* source_chooser = gtr_get_widget_derived<PathButton>(builder, "source_button");
     addTorrentFilters(source_chooser);
     source_chooser->signal_selection_changed().connect([this, source_chooser]() { sourceChanged(source_chooser); });
 
-    auto* destination_chooser = gtr_get_widget<Gtk::FileChooserButton>(builder, "destination_button");
-
-    if (!destination_chooser->set_current_folder(downloadDir_))
-    {
-        g_warning("couldn't select '%s'", downloadDir_.c_str());
-    }
-
-    for (auto const& folder : gtr_get_recent_dirs("download"))
-    {
-        destination_chooser->remove_shortcut_folder(folder);
-        destination_chooser->add_shortcut_folder(folder);
-    }
+    auto* destination_chooser = gtr_get_widget_derived<PathButton>(builder, "destination_button");
+    destination_chooser->set_filename(downloadDir_);
+    destination_chooser->set_shortcut_folders(gtr_get_recent_dirs("download"));
 
     destination_chooser->signal_selection_changed().connect([this, destination_chooser]()
                                                             { downloadDirChanged(destination_chooser); });

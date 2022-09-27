@@ -13,6 +13,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include "PathButton.h"
 #include "Prefs.h" /* gtr_pref_string_get */
 #include "RelocateDialog.h"
 #include "Session.h"
@@ -52,7 +53,7 @@ private:
     bool do_move_ = false;
     sigc::connection timer_;
     std::unique_ptr<Gtk::MessageDialog> message_dialog_;
-    Gtk::FileChooserButton* chooser_ = nullptr;
+    PathButton* chooser_ = nullptr;
     Gtk::RadioButton* move_tb_ = nullptr;
 };
 
@@ -189,7 +190,7 @@ RelocateDialog::Impl::Impl(
     : dialog_(dialog)
     , core_(core)
     , torrent_ids_(torrent_ids)
-    , chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "new_location_button"))
+    , chooser_(gtr_get_widget_derived<PathButton>(builder, "new_location_button"))
     , move_tb_(gtr_get_widget<Gtk::RadioButton>(builder, "move_data_radio"))
 {
     dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(CANCEL));
@@ -199,19 +200,15 @@ RelocateDialog::Impl::Impl(
     if (recent_dirs.empty())
     {
         /* default to download dir */
-        chooser_->set_current_folder(gtr_pref_string_get(TR_KEY_download_dir));
+        chooser_->set_filename(gtr_pref_string_get(TR_KEY_download_dir));
     }
     else
     {
         /* set last used as target */
-        chooser_->set_current_folder(recent_dirs.front());
+        chooser_->set_filename(recent_dirs.front());
         recent_dirs.pop_front();
 
         /* add remaining as shortcut */
-        for (auto const& folder : recent_dirs)
-        {
-            chooser_->remove_shortcut_folder(folder);
-            chooser_->add_shortcut_folder(folder);
-        }
+        chooser_->set_shortcut_folders(recent_dirs);
     }
 }

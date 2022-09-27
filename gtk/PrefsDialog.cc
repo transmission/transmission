@@ -18,6 +18,7 @@
 #include <libtransmission/web-utils.h>
 
 #include "FreeSpaceLabel.h"
+#include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -170,12 +171,12 @@ void init_text_view(Gtk::TextView& view, tr_quark const key, Glib::RefPtr<Sessio
         });
 }
 
-void chosen_cb(Gtk::FileChooser* w, tr_quark const key, Glib::RefPtr<Session> const& core)
+void chosen_cb(PathButton* w, tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     core->set_pref(key, w->get_filename());
 }
 
-void init_chooser_button(Gtk::FileChooserButton& button, tr_quark const key, Glib::RefPtr<Session> const& core)
+void init_chooser_button(PathButton& button, tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     if (auto const path = gtr_pref_string_get(key); !path.empty())
     {
@@ -248,7 +249,7 @@ DownloadingPage::DownloadingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "watch_dir_check");
         init_check_button(*l, TR_KEY_watch_dir_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "watch_dir_chooser");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "watch_dir_chooser");
         init_chooser_button(*w, TR_KEY_watch_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -266,7 +267,7 @@ DownloadingPage::DownloadingPage(
         TR_KEY_trash_original_torrent_files,
         core_);
 
-    init_chooser_button(*gtr_get_widget<Gtk::FileChooserButton>(builder, "download_dir_chooser"), TR_KEY_download_dir, core_);
+    init_chooser_button(*gtr_get_widget_derived<PathButton>(builder, "download_dir_chooser"), TR_KEY_download_dir, core_);
 
     init_spin_button(
         *gtr_get_widget<Gtk::SpinButton>(builder, "max_active_downloads_spin"),
@@ -292,7 +293,7 @@ DownloadingPage::DownloadingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "incomplete_dir_check");
         init_check_button(*l, TR_KEY_incomplete_dir_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "incomplete_dir_chooser");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "incomplete_dir_chooser");
         init_chooser_button(*w, TR_KEY_incomplete_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_incomplete_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -301,7 +302,7 @@ DownloadingPage::DownloadingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "download_done_script_check");
         init_check_button(*l, TR_KEY_script_torrent_done_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "download_done_script_chooser");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "download_done_script_chooser");
         init_chooser_button(*w, TR_KEY_script_torrent_done_filename, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -358,7 +359,7 @@ SeedingPage::SeedingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "seeding_done_script_check");
         init_check_button(*l, TR_KEY_script_torrent_done_seeding_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "seeding_done_script_choose");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "seeding_done_script_choose");
         init_chooser_button(*w, TR_KEY_script_torrent_done_seeding_filename, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_seeding_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });

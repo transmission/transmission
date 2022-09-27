@@ -41,6 +41,7 @@
 #include "MakeDialog.h"
 #include "MessageLogWindow.h"
 #include "OptionsDialog.h"
+#include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "RelocateDialog.h"
@@ -546,6 +547,7 @@ void Application::Impl::on_startup()
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     std::ignore = FilterBar();
+    std::ignore = PathButton();
 
     tr_session* session;
 

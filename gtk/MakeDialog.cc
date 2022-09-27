@@ -21,6 +21,7 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h> /* tr_formatter_mem_B() */
 
+#include "PathButton.h"
 #include "MakeDialog.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -81,8 +82,8 @@ public:
     TR_DISABLE_COPY_MOVE(Impl)
 
 private:
-    void onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserButton* chooser);
-    void onChooserChosen(Gtk::FileChooserButton* chooser);
+    void onSourceToggled2(Gtk::ToggleButton* tb, PathButton* chooser);
+    void onChooserChosen(PathButton* chooser);
     void onResponse(int response);
 
     void on_drag_data_received(
@@ -106,12 +107,12 @@ private:
     Glib::RefPtr<Session> const core_;
 
     Gtk::RadioButton* file_radio_ = nullptr;
-    Gtk::FileChooserButton* file_chooser_ = nullptr;
+    PathButton* file_chooser_ = nullptr;
     Gtk::RadioButton* folder_radio_ = nullptr;
-    Gtk::FileChooserButton* folder_chooser_ = nullptr;
+    PathButton* folder_chooser_ = nullptr;
     Gtk::Label* pieces_lb_ = nullptr;
     Gtk::Scale* piece_size_scale_ = nullptr;
-    Gtk::FileChooserButton* destination_chooser_ = nullptr;
+    PathButton* destination_chooser_ = nullptr;
     Gtk::CheckButton* comment_check_ = nullptr;
     Gtk::Entry* comment_entry_ = nullptr;
     Gtk::CheckButton* private_check_ = nullptr;
@@ -392,13 +393,13 @@ void MakeDialog::Impl::setFilename(std::string_view filename)
     updatePiecesLabel();
 }
 
-void MakeDialog::Impl::onChooserChosen(Gtk::FileChooserButton* chooser)
+void MakeDialog::Impl::onChooserChosen(PathButton* chooser)
 {
     chooser->set_data(FileChosenKey, GINT_TO_POINTER(true));
     setFilename(chooser->get_filename());
 }
 
-void MakeDialog::Impl::onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserButton* chooser)
+void MakeDialog::Impl::onSourceToggled2(Gtk::ToggleButton* tb, PathButton* chooser)
 {
     if (tb->get_active())
     {
@@ -432,7 +433,7 @@ void MakeDialog::Impl::on_drag_data_received(
         {
             /* a directory was dragged onto the dialog... */
             folder_radio_->set_active(true);
-            folder_chooser_->set_current_folder(filename);
+            folder_chooser_->set_filename(filename);
             success = true;
         }
         else if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_REGULAR)))
@@ -470,12 +471,12 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
     : dialog_(dialog)
     , core_(core)
     , file_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_file_radio"))
-    , file_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "source_file_button"))
+    , file_chooser_(gtr_get_widget_derived<PathButton>(builder, "source_file_button"))
     , folder_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_folder_radio"))
-    , folder_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "source_folder_button"))
+    , folder_chooser_(gtr_get_widget_derived<PathButton>(builder, "source_folder_button"))
     , pieces_lb_(gtr_get_widget<Gtk::Label>(builder, "source_size_label"))
     , piece_size_scale_(gtr_get_widget<Gtk::Scale>(builder, "piece_size_scale"))
-    , destination_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "destination_button"))
+    , destination_chooser_(gtr_get_widget_derived<PathButton>(builder, "destination_button"))
     , comment_check_(gtr_get_widget<Gtk::CheckButton>(builder, "comment_check"))
     , comment_entry_(gtr_get_widget<Gtk::Entry>(builder, "comment_entry"))
     , private_check_(gtr_get_widget<Gtk::CheckButton>(builder, "private_check"))
@@ -485,7 +486,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
 {
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
-    destination_chooser_->set_current_folder(Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP)));
+    destination_chooser_->set_filename(Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP)));
 
     folder_radio_->set_active(false);
     folder_radio_->signal_toggled().connect([this]() { onSourceToggled2(folder_radio_, folder_chooser_); });
