@@ -13,7 +13,7 @@
 #include "net.h" // tr_port
 
 int tr_dhtInit(tr_session*);
-void tr_dhtUninit(tr_session*);
+void tr_dhtUninit(tr_session const*);
 bool tr_dhtEnabled(tr_session const*);
 tr_port tr_dhtPort(tr_session const*);
 bool tr_dhtAddNode(tr_session*, tr_address const*, tr_port, bool bootstrap);
