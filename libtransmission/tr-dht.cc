@@ -5,10 +5,9 @@
 #include <algorithm>
 #include <cerrno>
 #include <chrono>
-#include <csignal> // for sig_atomic_t
 #include <cstdio>
 #include <cstdlib> // for abort()
-#include <cstring> // for memcpy(), memset()
+#include <cstring> // for memcpy()
 #include <ctime>
 #include <fstream>
 #include <memory>
@@ -341,7 +340,6 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> const
         if (i < num && !isBootstrapDone(session, AF_INET))
         {
             auto addr = tr_address{};
-            memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET;
             memcpy(&addr.addr.addr4, &nodes[i * 6], 4);
             auto const [port, out] = tr_port::fromCompact(&nodes[i * 6 + 4]);
@@ -351,7 +349,6 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> const
         if (i < num6 && !isBootstrapDone(session, AF_INET6))
         {
             auto addr = tr_address{};
-            memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET6;
             memcpy(&addr.addr.addr6, &nodes6[i * 18], 16);
             auto const [port, out] = tr_port::fromCompact(&nodes6[i * 18 + 16]);
@@ -594,9 +591,8 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     if (address->isIPv4())
     {
         auto sin = sockaddr_in{};
-        memset(&sin, 0, sizeof(sin));
         sin.sin_family = AF_INET;
-        memcpy(&sin.sin_addr, &address->addr.addr4, 4);
+        sin.sin_addr = address->addr.addr4;
         sin.sin_port = port.network();
         locked_dht::ping_node((struct sockaddr*)&sin, sizeof(sin));
         return true;
@@ -605,9 +601,8 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     if (address->isIPv6())
     {
         auto sin6 = sockaddr_in6{};
-        memset(&sin6, 0, sizeof(sin6));
         sin6.sin6_family = AF_INET6;
-        memcpy(&sin6.sin6_addr, &address->addr.addr6, 16);
+        sin6.sin6_addr = address->addr.addr6;
         sin6.sin6_port = port.network();
         locked_dht::ping_node((struct sockaddr*)&sin6, sizeof(sin6));
         return true;
