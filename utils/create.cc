@@ -131,6 +131,7 @@ std::string tr_getcwd()
 {
     tr_error* error = nullptr;
     auto cur = tr_sys_dir_get_current(&error);
+    if (error != nullptr)
     {
         fprintf(stderr, "getcwd error: \"%s\"", error->message);
         tr_error_free(error);
