@@ -6,12 +6,13 @@
 #include <cerrno>
 #include <chrono>
 #include <csignal> // for sig_atomic_t
-#include <cstdlib> // for abort()
 #include <cstdio>
+#include <cstdlib> // for abort()
 #include <cstring> // for memcpy(), memset()
 #include <ctime>
 #include <fstream>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -46,7 +47,6 @@
 #include "tr-assert.h"
 #include "tr-dht.h"
 #include "tr-strbuf.h"
-#include "trevent.h"
 #include "variant.h"
 #include "utils.h" // tr_time(), _()
 
@@ -55,6 +55,71 @@ using namespace std::literals;
 static std::unique_ptr<libtransmission::Timer> dht_timer;
 static std::array<unsigned char, 20> myid;
 static tr_session* my_session = nullptr;
+
+// mutex-locked wrapper around libdht's API
+namespace locked_dht
+{
+namespace
+{
+
+[[nodiscard]] auto unique_lock()
+{
+    static std::recursive_mutex dht_mutex;
+    return std::unique_lock(dht_mutex);
+}
+
+} // namespace
+
+auto getNodes(struct sockaddr_in* sin, int* num, struct sockaddr_in6* sin6, int* num6)
+{
+    auto lock = unique_lock();
+    return dht_get_nodes(sin, num, sin6, num6);
+}
+
+auto init(int s, int s6, unsigned char const* id, unsigned char const* v)
+{
+    auto lock = unique_lock();
+    return dht_init(s, s6, id, v);
+}
+
+auto nodes(int af, int* good_return, int* dubious_return, int* cached_return, int* incoming_return)
+{
+    auto lock = unique_lock();
+    return dht_nodes(af, good_return, dubious_return, cached_return, incoming_return);
+}
+
+auto periodic(
+    void const* buf,
+    size_t buflen,
+    struct sockaddr const* from,
+    int fromlen,
+    time_t* tosleep,
+    dht_callback_t* callback,
+    void* closure)
+{
+    auto lock = unique_lock();
+    return dht_periodic(buf, buflen, from, fromlen, tosleep, callback, closure);
+}
+
+auto ping_node(struct sockaddr const* sa, int salen)
+{
+    auto lock = unique_lock();
+    return dht_ping_node(sa, salen);
+}
+
+auto search(unsigned char const* id, int port, int af, dht_callback_t* callback, void* closure)
+{
+    auto lock = unique_lock();
+    return dht_search(id, port, af, callback, closure);
+}
+
+auto uninit()
+{
+    auto lock = unique_lock();
+    return dht_uninit();
+}
+
+} // namespace locked_dht
 
 enum
 {
@@ -94,43 +159,8 @@ bool tr_dhtEnabled(tr_session const* ss)
     return ss != nullptr && ss == my_session;
 }
 
-struct getstatus_closure
+static int tr_dhtStatus(tr_session* const session, int af, int* const setme_node_count)
 {
-    int af;
-    sig_atomic_t status;
-    sig_atomic_t count;
-};
-
-static void getstatus(getstatus_closure* const closure)
-{
-    int good = 0;
-    int dubious = 0;
-    int incoming = 0;
-    dht_nodes(closure->af, &good, &dubious, nullptr, &incoming);
-
-    closure->count = good + dubious;
-
-    if (good < 4 || good + dubious <= 8)
-    {
-        closure->status = TR_DHT_BROKEN;
-    }
-    else if (good < 40)
-    {
-        closure->status = TR_DHT_POOR;
-    }
-    else if (incoming < 8)
-    {
-        closure->status = TR_DHT_FIREWALLED;
-    }
-    else
-    {
-        closure->status = TR_DHT_GOOD;
-    }
-}
-
-static int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
-{
-    auto closure = getstatus_closure{ af, -1, -1 };
     auto udp_socket = session->udp_core_->udp_socket();
     auto udp6_socket = session->udp_core_->udp6_socket();
 
@@ -145,19 +175,32 @@ static int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
         return TR_DHT_STOPPED;
     }
 
-    tr_runInEventThread(session, getstatus, &closure);
-
-    while (closure.status < 0)
-    {
-        tr_wait_msec(50 /*msec*/);
-    }
+    int good = 0;
+    int dubious = 0;
+    int incoming = 0;
+    locked_dht::nodes(af, &good, &dubious, nullptr, &incoming);
 
     if (setme_node_count != nullptr)
     {
-        *setme_node_count = closure.count;
+        *setme_node_count = good + dubious;
     }
 
-    return closure.status;
+    if (good < 4 || good + dubious <= 8)
+    {
+        return TR_DHT_BROKEN;
+    }
+
+    if (good < 40)
+    {
+        return TR_DHT_POOR;
+    }
+
+    if (incoming < 8)
+    {
+        return TR_DHT_FIREWALLED;
+    }
+
+    return TR_DHT_GOOD;
 }
 
 static bool bootstrap_done(tr_session* session, int af)
@@ -217,7 +260,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     addrinfo* infop = info;
     while (infop != nullptr)
     {
-        dht_ping_node(infop->ai_addr, infop->ai_addrlen);
+        locked_dht::ping_node(infop->ai_addr, infop->ai_addrlen);
 
         nap(15);
 
@@ -419,7 +462,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(std::data(myid), std::size(myid));
     }
 
-    if (int const rc = dht_init(udp_socket, udp6_socket, std::data(myid), nullptr); rc < 0)
+    if (int const rc = locked_dht::init(udp_socket, udp6_socket, std::data(myid), nullptr); rc < 0)
     {
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
@@ -473,7 +516,7 @@ void tr_dhtUninit(tr_session* ss)
         auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
         int num = MaxNodes;
         int num6 = MaxNodes;
-        int const n = dht_get_nodes(std::data(sins), &num, std::data(sins6), &num6);
+        int const n = locked_dht::getNodes(std::data(sins), &num, std::data(sins6), &num6);
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num, num6));
 
         tr_variant benc;
@@ -515,7 +558,8 @@ void tr_dhtUninit(tr_session* ss)
         tr_variantClear(&benc);
     }
 
-    dht_uninit();
+    locked_dht::uninit();
+
     tr_logAddTrace("Done uninitializing DHT");
 
     my_session = nullptr;
@@ -550,7 +594,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         sin.sin_family = AF_INET;
         memcpy(&sin.sin_addr, &address->addr.addr4, 4);
         sin.sin_port = port.network();
-        dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
+        locked_dht::ping_node((struct sockaddr*)&sin, sizeof(sin));
         return true;
     }
 
@@ -561,7 +605,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         sin6.sin6_family = AF_INET6;
         memcpy(&sin6.sin6_addr, &address->addr.addr6, 16);
         sin6.sin6_port = port.network();
-        dht_ping_node((struct sockaddr*)&sin6, sizeof(sin6));
+        locked_dht::ping_node((struct sockaddr*)&sin6, sizeof(sin6));
         return true;
     }
 
@@ -639,7 +683,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 
     auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(tor->infoHash()));
     auto const hport = announce ? my_session->peerPort().host() : 0;
-    int const rc = dht_search(dht_hash, hport, af, callback, nullptr);
+    int const rc = locked_dht::search(dht_hash, hport, af, callback, nullptr);
     if (rc < 0)
     {
         auto const error_code = errno;
@@ -704,7 +748,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     }
 
     time_t tosleep = 0;
-    int const rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
+    int const rc = locked_dht::periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
 
     if (rc < 0)
     {
