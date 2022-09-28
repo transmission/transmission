@@ -716,7 +716,7 @@ void Application::Impl::app_setup()
     }
     else
     {
-        wind_->set_skip_taskbar_hint(icon_ != nullptr);
+        gtr_window_set_skip_taskbar_hint(*wind_, icon_ != nullptr);
         is_iconified_ = false; // ensure that the next toggle iconifies
         gtr_action_set_toggled("toggle-main-window", false);
     }
@@ -766,7 +766,7 @@ void Application::Impl::presentMainWindow()
     {
         is_iconified_ = false;
 
-        wind_->set_skip_taskbar_hint(false);
+        gtr_window_set_skip_taskbar_hint(*wind_, false);
     }
 
     if (!wind_->get_visible())
@@ -783,7 +783,7 @@ void Application::Impl::hideMainWindow()
 {
     gtr_action_set_toggled("toggle-main-window", false);
 
-    wind_->set_skip_taskbar_hint(true);
+    gtr_window_set_skip_taskbar_hint(*wind_, true);
     gtr_widget_set_visible(*wind_, false);
     is_iconified_ = true;
 }
@@ -1027,7 +1027,7 @@ bool Application::Impl::on_main_window_focus_in(GdkEventFocus* /*event*/)
 {
     if (wind_ != nullptr)
     {
-        wind_->set_urgency_hint(false);
+        gtr_window_set_urgency_hint(*wind_, false);
     }
 
     return false;
@@ -1043,7 +1043,7 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
 
     if (wind_ != nullptr)
     {
-        wind_->set_urgency_hint(true);
+        gtr_window_set_urgency_hint(*wind_, true);
     }
 
     w->show();

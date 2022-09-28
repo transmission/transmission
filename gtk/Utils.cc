@@ -14,6 +14,12 @@
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
 
+#include <gdk/gdk.h>
+#include <gtk/gtk.h>
+#if GTK_CHECK_VERSION(4, 0, 0) && defined(GDK_WINDOWING_X11)
+#include <gdk/x11/gdkx.h>
+#endif
+
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
@@ -618,6 +624,28 @@ void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content)
     auto* vbox = dialog.get_content_area();
     vbox->pack_start(content, true, true, 0);
     content.show_all();
+}
+
+void gtr_window_set_skip_taskbar_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
+{
+#if GTK_CHECK_VERSION(4, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+    gdk_x11_surface_set_skip_taskbar_hint(Glib::unwrap(window.get_surface()), value ? TRUE : FALSE);
+#endif
+#else
+    window.set_skip_taskbar_hint(value);
+#endif
+}
+
+void gtr_window_set_urgency_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
+{
+#if GTK_CHECK_VERSION(4, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+    gdk_x11_surface_set_urgency_hint(Glib::unwrap(window.get_surface()), value ? TRUE : FALSE);
+#endif
+#else
+    window.set_urgency_hint(value);
+#endif
 }
 
 /***
