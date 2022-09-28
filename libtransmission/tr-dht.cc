@@ -56,7 +56,7 @@ static std::unique_ptr<libtransmission::Timer> dht_timer;
 static std::array<unsigned char, 20> myid;
 static tr_session* my_session = nullptr;
 
-static std::string_view tr_dhtPrintableStatus(int status)
+static constexpr std::string_view tr_dhtPrintableStatus(int status)
 {
     switch (status)
     {
@@ -78,6 +78,77 @@ static std::string_view tr_dhtPrintableStatus(int status)
     default:
         return "???"sv;
     }
+}
+
+bool tr_dhtEnabled(tr_session const* ss)
+{
+    return ss != nullptr && ss == my_session;
+}
+
+struct getstatus_closure
+{
+    int af;
+    sig_atomic_t status;
+    sig_atomic_t count;
+};
+
+static void getstatus(getstatus_closure* const closure)
+{
+    int good = 0;
+    int dubious = 0;
+    int incoming = 0;
+    dht_nodes(closure->af, &good, &dubious, nullptr, &incoming);
+
+    closure->count = good + dubious;
+
+    if (good < 4 || good + dubious <= 8)
+    {
+        closure->status = TR_DHT_BROKEN;
+    }
+    else if (good < 40)
+    {
+        closure->status = TR_DHT_POOR;
+    }
+    else if (incoming < 8)
+    {
+        closure->status = TR_DHT_FIREWALLED;
+    }
+    else
+    {
+        closure->status = TR_DHT_GOOD;
+    }
+}
+
+static int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
+{
+    auto closure = getstatus_closure{ af, -1, -1 };
+    auto udp_socket = session->udp_core_->udp_socket();
+    auto udp6_socket = session->udp_core_->udp6_socket();
+
+    if (!tr_dhtEnabled(session) || (af == AF_INET && udp_socket == TR_BAD_SOCKET) ||
+        (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
+    {
+        if (setme_node_count != nullptr)
+        {
+            *setme_node_count = 0;
+        }
+
+        return TR_DHT_STOPPED;
+    }
+
+    tr_runInEventThread(session, getstatus, &closure);
+
+    while (closure.status < 0)
+    {
+        tr_wait_msec(50 /*msec*/);
+    }
+
+    if (setme_node_count != nullptr)
+    {
+        *setme_node_count = closure.count;
+    }
+
+    return closure.status;
 }
 
 static bool bootstrap_done(tr_session* session, int af)
@@ -439,77 +510,6 @@ void tr_dhtUninit(tr_session* ss)
     tr_logAddTrace("Done uninitializing DHT");
 
     my_session = nullptr;
-}
-
-bool tr_dhtEnabled(tr_session const* ss)
-{
-    return ss != nullptr && ss == my_session;
-}
-
-struct getstatus_closure
-{
-    int af;
-    sig_atomic_t status;
-    sig_atomic_t count;
-};
-
-static void getstatus(getstatus_closure* const closure)
-{
-    int good = 0;
-    int dubious = 0;
-    int incoming = 0;
-    dht_nodes(closure->af, &good, &dubious, nullptr, &incoming);
-
-    closure->count = good + dubious;
-
-    if (good < 4 || good + dubious <= 8)
-    {
-        closure->status = TR_DHT_BROKEN;
-    }
-    else if (good < 40)
-    {
-        closure->status = TR_DHT_POOR;
-    }
-    else if (incoming < 8)
-    {
-        closure->status = TR_DHT_FIREWALLED;
-    }
-    else
-    {
-        closure->status = TR_DHT_GOOD;
-    }
-}
-
-int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
-{
-    auto closure = getstatus_closure{ af, -1, -1 };
-    auto udp_socket = session->udp_core_->udp_socket();
-    auto udp6_socket = session->udp_core_->udp6_socket();
-
-    if (!tr_dhtEnabled(session) || (af == AF_INET && udp_socket == TR_BAD_SOCKET) ||
-        (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
-    {
-        if (setme_node_count != nullptr)
-        {
-            *setme_node_count = 0;
-        }
-
-        return TR_DHT_STOPPED;
-    }
-
-    tr_runInEventThread(session, getstatus, &closure);
-
-    while (closure.status < 0)
-    {
-        tr_wait_msec(50 /*msec*/);
-    }
-
-    if (setme_node_count != nullptr)
-    {
-        *setme_node_count = closure.count;
-    }
-
-    return closure.status;
 }
 
 tr_port tr_dhtPort(tr_session const* ss)
