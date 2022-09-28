@@ -319,7 +319,7 @@ static void bootstrapFromFile(tr_session const* const session)
     }
 }
 
-static void bootstrapStart(tr_session* const session, std::vector<uint8_t> const nodes, std::vector<uint8_t> const nodes6)
+static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes, std::vector<uint8_t> nodes6)
 {
     TR_ASSERT(tr_dhtEnabled(session));
 
@@ -478,7 +478,7 @@ int tr_dhtInit(tr_session* session)
 
     std::thread(bootstrapStart, session, nodes, nodes6).detach();
 
-    dht_timer = session->timerMaker().create([session]() { tr_dhtCallback(nullptr, 0, nullptr, 0, session); });
+    dht_timer = session->timerMaker().create([session]() { tr_dhtCallback(session, nullptr, 0, nullptr, 0); });
     auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
     static auto constexpr MinInterval = 10ms;
     static auto constexpr MaxInterval = 1s;
@@ -708,6 +708,8 @@ static AnnounceResult announceTorrent(tr_session const* const session, tr_torren
 
 void tr_dhtUpkeep(tr_session* session)
 {
+    TR_ASSERT(tr_dhtEnabled(session));
+
     auto lock = session->unique_lock();
     auto const now = tr_time();
 
@@ -736,9 +738,9 @@ void tr_dhtUpkeep(tr_session* session)
     }
 }
 
-void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen, void* vsession)
+void tr_dhtCallback(tr_session* session, unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen)
 {
-    TR_ASSERT(tr_dhtEnabled(static_cast<tr_session const*>(vsession)));
+    TR_ASSERT(tr_dhtEnabled(session));
 
     time_t tosleep = 0;
     int const rc = locked_dht::periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
