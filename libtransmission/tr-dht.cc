@@ -213,11 +213,11 @@ static auto isReady(tr_session* const session, int af)
     return isReady(getStatus(session, af));
 }
 
-static bool bootstrap_done(tr_session* session, int af)
+static bool isBootstrapDone(tr_session* session, int af)
 {
     if (af == 0)
     {
-        return bootstrap_done(session, AF_INET) && bootstrap_done(session, AF_INET6);
+        return isBootstrapDone(session, AF_INET) && isBootstrapDone(session, AF_INET6);
     }
 
     auto const status = getStatus(session, af, nullptr);
@@ -231,14 +231,14 @@ static void nap(int roughly_sec)
     tr_wait_msec(msec);
 }
 
-static int bootstrap_af(tr_session* session)
+static int getBootstrappedAF(tr_session* session)
 {
-    if (bootstrap_done(session, AF_INET6))
+    if (isBootstrapDone(session, AF_INET6))
     {
         return AF_INET;
     }
 
-    if (bootstrap_done(session, AF_INET))
+    if (isBootstrapDone(session, AF_INET))
     {
         return AF_INET6;
     }
@@ -246,7 +246,7 @@ static int bootstrap_af(tr_session* session)
     return 0;
 }
 
-static void bootstrap_from_name(char const* name, tr_port port, int af)
+static void bootstrapFromName(char const* name, tr_port port, int af)
 {
     auto hints = addrinfo{};
     hints.ai_socktype = SOCK_DGRAM;
@@ -274,7 +274,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 
         nap(15);
 
-        if (bootstrap_done(my_session, af))
+        if (isBootstrapDone(my_session, af))
         {
             break;
         }
@@ -285,9 +285,9 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     freeaddrinfo(info);
 }
 
-static void dht_boostrap_from_file(tr_session* session)
+static void bootstrapFromFile(tr_session* session)
 {
-    if (bootstrap_done(session, 0))
+    if (isBootstrapDone(session, 0))
     {
         return;
     }
@@ -302,7 +302,7 @@ static void dht_boostrap_from_file(tr_session* session)
     // format is each line has address, a space char, and port number
     tr_logAddTrace("Attempting manual bootstrap");
     auto line = std::string{};
-    while (!bootstrap_done(session, 0) && std::getline(in, line))
+    while (!isBootstrapDone(session, 0) && std::getline(in, line))
     {
         auto line_stream = std::istringstream{ line };
         auto addrstr = std::string{};
@@ -315,7 +315,7 @@ static void dht_boostrap_from_file(tr_session* session)
         }
         else
         {
-            bootstrap_from_name(addrstr.c_str(), tr_port::fromHost(hport), bootstrap_af(my_session));
+            bootstrapFromName(addrstr.c_str(), tr_port::fromHost(hport), getBootstrappedAF(my_session));
         }
     }
 }
@@ -341,7 +341,7 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
 
     for (size_t i = 0; i < std::max(num, num6); ++i)
     {
-        if (i < num && !bootstrap_done(session, AF_INET))
+        if (i < num && !isBootstrapDone(session, AF_INET))
         {
             auto addr = tr_address{};
             memset(&addr, 0, sizeof(addr));
@@ -351,7 +351,7 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
             tr_dhtAddNode(session, &addr, port, true);
         }
 
-        if (i < num6 && !bootstrap_done(session, AF_INET6))
+        if (i < num6 && !isBootstrapDone(session, AF_INET6))
         {
             auto addr = tr_address{};
             memset(&addr, 0, sizeof(addr));
@@ -373,18 +373,18 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
             nap(15);
         }
 
-        if (bootstrap_done(my_session, 0))
+        if (isBootstrapDone(my_session, 0))
         {
             break;
         }
     }
 
-    if (!bootstrap_done(session, 0))
+    if (!isBootstrapDone(session, 0))
     {
-        dht_boostrap_from_file(session);
+        bootstrapFromFile(session);
     }
 
-    if (!bootstrap_done(session, 0))
+    if (!isBootstrapDone(session, 0))
     {
         for (int i = 0; i < 6; ++i)
         {
@@ -394,7 +394,7 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
                node, for example because we've just been restarted. */
             nap(40);
 
-            if (bootstrap_done(session, 0))
+            if (isBootstrapDone(session, 0))
             {
                 break;
             }
@@ -404,7 +404,7 @@ static void dht_bootstrap(tr_session* session, std::vector<uint8_t> nodes, std::
                 tr_logAddDebug("Attempting bootstrap from dht.transmissionbt.com");
             }
 
-            bootstrap_from_name("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_af(my_session));
+            bootstrapFromName("dht.transmissionbt.com", tr_port::fromHost(6881), getBootstrappedAF(my_session));
         }
     }
 
