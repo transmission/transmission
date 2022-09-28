@@ -578,12 +578,19 @@ void Application::Impl::on_startup()
     ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));
     auto const actions = gtr_actions_init(ui_builder_, this);
 
-    app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
+    auto const main_menu = gtr_action_get_object<Gio::Menu>("main-window-menu");
+    app_.set_menubar(main_menu);
 
     /* create main window now to be a parent to any error dialogs */
     wind_ = MainWindow::create(app_, actions, core_);
     wind_->set_show_menubar(true);
     wind_->signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto const shortcut_controller = Gtk::ShortcutController::create(gtr_shortcuts_get_from_menu(main_menu));
+    shortcut_controller->set_scope(Gtk::ShortcutScope::GLOBAL);
+    wind_->add_controller(shortcut_controller);
+#endif
 
     app_.hold();
     app_setup();
