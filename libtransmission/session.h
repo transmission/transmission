@@ -486,8 +486,8 @@ public:
 
         ~tr_udp_core();
 
-        void dht_stop();
-        void dht_upkeep();
+        void dhtUninit();
+        void dhtUpkeep();
 
         void set_socket_buffers();
 

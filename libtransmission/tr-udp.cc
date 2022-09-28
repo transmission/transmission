@@ -314,7 +314,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session)
     }
 }
 
-void tr_session::tr_udp_core::dht_upkeep()
+void tr_session::tr_udp_core::dhtUpkeep()
 {
     if (tr_dhtEnabled(&session_))
     {
@@ -322,7 +322,7 @@ void tr_session::tr_udp_core::dht_upkeep()
     }
 }
 
-void tr_session::tr_udp_core::dht_stop()
+void tr_session::tr_udp_core::dhtUninit()
 {
     if (tr_dhtEnabled(&session_))
     {
@@ -332,7 +332,7 @@ void tr_session::tr_udp_core::dht_stop()
 
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    dht_stop();
+    dhtUninit();
 
     if (udp_socket_ != TR_BAD_SOCKET)
     {
