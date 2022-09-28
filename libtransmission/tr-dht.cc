@@ -56,6 +56,30 @@ static std::unique_ptr<libtransmission::Timer> dht_timer;
 static std::array<unsigned char, 20> myid;
 static tr_session* my_session = nullptr;
 
+static std::string_view tr_dhtPrintableStatus(int status)
+{
+    switch (status)
+    {
+    case TR_DHT_STOPPED:
+        return "stopped"sv;
+
+    case TR_DHT_BROKEN:
+        return "broken"sv;
+
+    case TR_DHT_POOR:
+        return "poor"sv;
+
+    case TR_DHT_FIREWALLED:
+        return "firewalled"sv;
+
+    case TR_DHT_GOOD:
+        return "good"sv;
+
+    default:
+        return "???"sv;
+    }
+}
+
 static bool bootstrap_done(tr_session* session, int af)
 {
     if (af == 0)
@@ -533,30 +557,6 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     }
 
     return false;
-}
-
-char const* tr_dhtPrintableStatus(int status)
-{
-    switch (status)
-    {
-    case TR_DHT_STOPPED:
-        return "stopped";
-
-    case TR_DHT_BROKEN:
-        return "broken";
-
-    case TR_DHT_POOR:
-        return "poor";
-
-    case TR_DHT_FIREWALLED:
-        return "firewalled";
-
-    case TR_DHT_GOOD:
-        return "good";
-
-    default:
-        return "???";
-    }
 }
 
 static void callback(void* /*ignore*/, int event, unsigned char const* info_hash, void const* data, size_t data_len)
