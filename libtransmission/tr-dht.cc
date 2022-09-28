@@ -56,32 +56,32 @@ static std::unique_ptr<libtransmission::Timer> dht_timer;
 static std::array<unsigned char, 20> myid;
 static tr_session* my_session = nullptr;
 
-enum
+enum class Status
 {
-    TR_DHT_STOPPED = 0,
-    TR_DHT_BROKEN = 1,
-    TR_DHT_POOR = 2,
-    TR_DHT_FIREWALLED = 3,
-    TR_DHT_GOOD = 4
+    Stopped,
+    Broken,
+    Poor,
+    Firewalled,
+    Good
 };
 
-static constexpr std::string_view tr_dhtPrintableStatus(int status)
+static constexpr std::string_view printableStatus(Status status)
 {
     switch (status)
     {
-    case TR_DHT_STOPPED:
+    case Status::Stopped:
         return "stopped"sv;
 
-    case TR_DHT_BROKEN:
+    case Status::Broken:
         return "broken"sv;
 
-    case TR_DHT_POOR:
+    case Status::Poor:
         return "poor"sv;
 
-    case TR_DHT_FIREWALLED:
+    case Status::Firewalled:
         return "firewalled"sv;
 
-    case TR_DHT_GOOD:
+    case Status::Good:
         return "good"sv;
 
     default:
@@ -94,70 +94,58 @@ bool tr_dhtEnabled(tr_session const* ss)
     return ss != nullptr && ss == my_session;
 }
 
-struct getstatus_closure
+struct StatusInfo
 {
-    int af;
-    sig_atomic_t status;
-    sig_atomic_t count;
+    Status status = Status::Stopped;
+    int count = 0;
 };
 
-static void getstatus(getstatus_closure* const closure)
+static void getStatus(int af, StatusInfo* info, bool* done)
 {
     int good = 0;
     int dubious = 0;
     int incoming = 0;
-    dht_nodes(closure->af, &good, &dubious, nullptr, &incoming);
+    dht_nodes(af, &good, &dubious, nullptr, &incoming);
 
-    closure->count = good + dubious;
+    info->count = good + dubious;
 
     if (good < 4 || good + dubious <= 8)
     {
-        closure->status = TR_DHT_BROKEN;
+        info->status = Status::Broken;
     }
     else if (good < 40)
     {
-        closure->status = TR_DHT_POOR;
+        info->status = Status::Poor;
     }
     else if (incoming < 8)
     {
-        closure->status = TR_DHT_FIREWALLED;
+        info->status = Status::Firewalled;
     }
     else
     {
-        closure->status = TR_DHT_GOOD;
+        info->status = Status::Good;
     }
+
+    *done = true;
 }
 
-static int tr_dhtStatus(tr_session* session, int af, int* setme_node_count)
+static StatusInfo tr_dhtStatus(tr_session* session, int af)
 {
-    auto closure = getstatus_closure{ af, -1, -1 };
-    auto udp_socket = session->udp_core_->udp_socket();
-    auto udp6_socket = session->udp_core_->udp6_socket();
+    auto status_info = StatusInfo{};
 
-    if (!tr_dhtEnabled(session) || (af == AF_INET && udp_socket == TR_BAD_SOCKET) ||
-        (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
+    if (tr_dhtEnabled(session) &&
+        ((af == AF_INET && session->udp_core_->udp_socket() != TR_BAD_SOCKET) ||
+         (af == AF_INET6 && session->udp_core_->udp6_socket() != TR_BAD_SOCKET)))
     {
-        if (setme_node_count != nullptr)
+        auto done = false;
+        tr_runInEventThread(session, getStatus, af, &status_info, &done);
+        while (!done)
         {
-            *setme_node_count = 0;
+            tr_wait_msec(50);
         }
-
-        return TR_DHT_STOPPED;
     }
 
-    tr_runInEventThread(session, getstatus, &closure);
-
-    while (closure.status < 0)
-    {
-        tr_wait_msec(50 /*msec*/);
-    }
-
-    if (setme_node_count != nullptr)
-    {
-        *setme_node_count = closure.count;
-    }
-
-    return closure.status;
+    return status_info;
 }
 
 static bool bootstrap_done(tr_session* session, int af)
@@ -167,8 +155,8 @@ static bool bootstrap_done(tr_session* session, int af)
         return bootstrap_done(session, AF_INET) && bootstrap_done(session, AF_INET6);
     }
 
-    int const status = tr_dhtStatus(session, af, nullptr);
-    return status == TR_DHT_STOPPED || status >= TR_DHT_FIREWALLED;
+    auto const status = tr_dhtStatus(session, af).status;
+    return status == Status::Stopped || status >= Status::Firewalled;
 }
 
 static void nap(int roughly_sec)
@@ -367,7 +355,7 @@ int tr_dhtInit(tr_session* ss)
 
     tr_logAddInfo(_("Initializing DHT"));
 
-    if (tr_env_key_exists("TR_DHT_VERBOSE"))
+    if (tr_env_key_exists("Status::Verbose"))
     {
         dht_debug = stderr;
     }
@@ -456,7 +444,7 @@ void tr_dhtUninit(tr_session* ss)
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
-    if (tr_dhtStatus(ss, AF_INET, nullptr) < TR_DHT_FIREWALLED && tr_dhtStatus(ss, AF_INET6, nullptr) < TR_DHT_FIREWALLED)
+    if (tr_dhtStatus(ss, AF_INET).status < Status::Firewalled && tr_dhtStatus(ss, AF_INET6).status < Status::Firewalled)
     {
         tr_logAddTrace("Not saving nodes, DHT not ready");
     }
@@ -538,7 +526,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     /* Since we don't want to abuse our bootstrap nodes,
      * we don't ping them if the DHT is in a good state. */
 
-    if (bootstrap && (tr_dhtStatus(ss, af, nullptr) >= TR_DHT_FIREWALLED))
+    if (bootstrap && (tr_dhtStatus(ss, af).status >= Status::Firewalled))
     {
         return false;
     }
@@ -617,22 +605,21 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         return AnnounceResult::INVALID;
     }
 
-    int numnodes = 0;
-    int const status = tr_dhtStatus(tor->session, af, &numnodes);
-    if (status == TR_DHT_STOPPED)
+    auto const [status, numnodes] = tr_dhtStatus(tor->session, af);
+    if (status == Status::Stopped)
     {
         // let the caller believe everything is all right.
         return AnnounceResult::OK;
     }
 
-    if (status < TR_DHT_POOR)
+    if (status < Status::Poor)
     {
         tr_logAddTraceTor(
             tor,
             fmt::format(
                 "{} DHT not ready ({}, {} nodes)",
                 af == AF_INET6 ? "IPv6" : "IPv4",
-                tr_dhtPrintableStatus(status),
+                printableStatus(status),
                 numnodes));
         return AnnounceResult::FAILED;
     }
@@ -648,7 +635,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
             fmt::format(
                 _("Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"),
                 fmt::arg("type", af == AF_INET6 ? "IPv6" : "IPv4"),
-                fmt::arg("state", tr_dhtPrintableStatus(status)),
+                fmt::arg("state", printableStatus(status)),
                 fmt::arg("error_code", error_code),
                 fmt::arg("error", tr_strerror(error_code))));
         return AnnounceResult::FAILED;
@@ -659,7 +646,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         fmt::format(
             "Starting {} DHT announce ({}, {} nodes)",
             af == AF_INET6 ? "IPv6" : "IPv4",
-            tr_dhtPrintableStatus(status),
+            printableStatus(status),
             numnodes));
 
     return AnnounceResult::OK;
