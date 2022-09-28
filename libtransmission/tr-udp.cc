@@ -5,7 +5,7 @@
 #include <array>
 #include <cerrno>
 #include <cstdint>
-#include <cstring> /* memcmp(), memcpy(), memset() */
+#include <cstring> /* memcmp(), memset() */
 
 #ifdef _WIN32
 #include <io.h> /* dup2() */
@@ -251,7 +251,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session)
         sin.sin_family = AF_INET;
         if (!is_default)
         {
-            memcpy(&sin.sin_addr, &public_addr.addr.addr4, sizeof(struct in_addr));
+            sin.sin_addr = public_addr.addr.addr4;
         }
 
         sin.sin_port = udp_port_.network();
