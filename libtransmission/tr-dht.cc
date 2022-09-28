@@ -56,6 +56,15 @@ static std::unique_ptr<libtransmission::Timer> dht_timer;
 static std::array<unsigned char, 20> myid;
 static tr_session* my_session = nullptr;
 
+enum
+{
+    TR_DHT_STOPPED = 0,
+    TR_DHT_BROKEN = 1,
+    TR_DHT_POOR = 2,
+    TR_DHT_FIREWALLED = 3,
+    TR_DHT_GOOD = 4
+};
+
 static constexpr std::string_view tr_dhtPrintableStatus(int status)
 {
     switch (status)
