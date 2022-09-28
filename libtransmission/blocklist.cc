@@ -54,34 +54,30 @@ void BlocklistFile::ensureLoaded() const
     auto zeroes_count = 0;
     auto max_zeroes = 0;
 
-    if (file_size >= 40)
+    static auto constexpr RangeSize = sizeof(AddressRange);
+    if (file_size >= RangeSize)
     {
         std::array<char, 40> first_struct = {};
 
-        in.read(reinterpret_cast<char*>(&first_struct), 40);
+        in.read(reinterpret_cast<char*>(&first_struct), std::size(first_struct));
         in.clear();
         in.seekg(0, std::ios::beg);
 
         for (auto const struct_byte : first_struct)
         {
-            if (struct_byte == 0)
+            if (struct_byte != 0)
             {
-                zeroes_count++;
+                zeroes_count = 0;
             }
             else
             {
+                ++zeroes_count;
+                
                 if (zeroes_count > max_zeroes)
                 {
                     max_zeroes = zeroes_count;
                 }
-
-                zeroes_count = 0;
             }
-        }
-
-        if (zeroes_count > max_zeroes)
-        {
-            max_zeroes = zeroes_count;
         }
     }
 
