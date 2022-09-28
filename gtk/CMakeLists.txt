@@ -94,7 +94,6 @@ set(${PROJECT_NAME}_SOURCES
     FileList.cc
     FilterBar.cc
     FreeSpaceLabel.cc
-    HigWorkarea.cc
     IconCache.cc
     main.cc
     MainWindow.cc
