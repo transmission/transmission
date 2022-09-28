@@ -121,7 +121,7 @@ auto uninit()
 
 } // namespace locked_dht
 
-enum
+enum Status
 {
     TR_DHT_STOPPED = 0,
     TR_DHT_BROKEN = 1,
@@ -130,7 +130,7 @@ enum
     TR_DHT_GOOD = 4
 };
 
-static constexpr std::string_view tr_dhtPrintableStatus(int status)
+static constexpr std::string_view printableStatus(Status status)
 {
     switch (status)
     {
@@ -159,7 +159,7 @@ bool tr_dhtEnabled(tr_session const* ss)
     return ss != nullptr && ss == my_session;
 }
 
-static int tr_dhtStatus(tr_session* const session, int af, int* const setme_node_count)
+static auto getStatus(tr_session* const session, int af, int* const setme_node_count = nullptr)
 {
     auto udp_socket = session->udp_core_->udp_socket();
     auto udp6_socket = session->udp_core_->udp6_socket();
@@ -203,6 +203,16 @@ static int tr_dhtStatus(tr_session* const session, int af, int* const setme_node
     return TR_DHT_GOOD;
 }
 
+static constexpr auto isReady(Status status)
+{
+    return status >= TR_DHT_FIREWALLED;
+}
+
+static auto isReady(tr_session* const session, int af)
+{
+    return isReady(getStatus(session, af));
+}
+
 static bool bootstrap_done(tr_session* session, int af)
 {
     if (af == 0)
@@ -210,8 +220,8 @@ static bool bootstrap_done(tr_session* session, int af)
         return bootstrap_done(session, AF_INET) && bootstrap_done(session, AF_INET6);
     }
 
-    int const status = tr_dhtStatus(session, af, nullptr);
-    return status == TR_DHT_STOPPED || status >= TR_DHT_FIREWALLED;
+    auto const status = getStatus(session, af, nullptr);
+    return status == TR_DHT_STOPPED || isReady(status);
 }
 
 static void nap(int roughly_sec)
@@ -497,9 +507,9 @@ void tr_dhtUninit(tr_session* ss)
 
     dht_timer.reset();
 
-    /* Since we only save known good nodes, avoid erasing older data if we
-       don't know enough nodes. */
-    if (tr_dhtStatus(ss, AF_INET, nullptr) < TR_DHT_FIREWALLED && tr_dhtStatus(ss, AF_INET6, nullptr) < TR_DHT_FIREWALLED)
+    /* Since we only save known good nodes,
+     * avoid erasing older data if we don't know enough nodes. */
+    if (!isReady(ss, AF_INET) && !isReady(ss, AF_INET6))
     {
         tr_logAddTrace("Not saving nodes, DHT not ready");
     }
@@ -582,7 +592,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     /* Since we don't want to abuse our bootstrap nodes,
      * we don't ping them if the DHT is in a good state. */
 
-    if (bootstrap && (tr_dhtStatus(ss, af, nullptr) >= TR_DHT_FIREWALLED))
+    if (bootstrap && isReady(ss, af))
     {
         return false;
     }
@@ -662,7 +672,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     }
 
     int numnodes = 0;
-    int const status = tr_dhtStatus(tor->session, af, &numnodes);
+    auto const status = getStatus(tor->session, af, &numnodes);
     if (status == TR_DHT_STOPPED)
     {
         // let the caller believe everything is all right.
@@ -676,7 +686,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
             fmt::format(
                 "{} DHT not ready ({}, {} nodes)",
                 af == AF_INET6 ? "IPv6" : "IPv4",
-                tr_dhtPrintableStatus(status),
+                printableStatus(status),
                 numnodes));
         return AnnounceResult::FAILED;
     }
@@ -692,7 +702,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
             fmt::format(
                 _("Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"),
                 fmt::arg("type", af == AF_INET6 ? "IPv6" : "IPv4"),
-                fmt::arg("state", tr_dhtPrintableStatus(status)),
+                fmt::arg("state", printableStatus(status)),
                 fmt::arg("error_code", error_code),
                 fmt::arg("error", tr_strerror(error_code))));
         return AnnounceResult::FAILED;
@@ -703,7 +713,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         fmt::format(
             "Starting {} DHT announce ({}, {} nodes)",
             af == AF_INET6 ? "IPv6" : "IPv4",
-            tr_dhtPrintableStatus(status),
+            printableStatus(status),
             numnodes));
 
     return AnnounceResult::OK;
