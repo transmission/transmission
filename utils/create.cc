@@ -131,6 +131,7 @@ std::string tr_getcwd()
 {
     tr_error* error = nullptr;
     auto cur = tr_sys_dir_get_current(&error);
+    if (error != nullptr)
     {
         fprintf(stderr, "getcwd error: \"%s\"", error->message);
         tr_error_free(error);
@@ -222,14 +223,14 @@ int tr_main(int argc, char* argv[])
     }
 
     fmt::print(
-        ngettext("{:d} files, {:s}\n", "{:d} file, {:s}\n", builder.fileCount()),
-        builder.fileCount(),
-        tr_formatter_size_B(builder.totalSize()));
+        ngettext("{file_count:L} files, {total_size}\n", "{file_count:L} file, {total_size}\n", builder.fileCount()),
+        fmt::arg("file_count", builder.fileCount()),
+        fmt::arg("total_size", tr_formatter_size_B(builder.totalSize())));
 
     fmt::print(
-        ngettext("{:d} pieces, {:s} each\n", "{:d} piece, {:s}\n", builder.pieceCount()),
-        builder.pieceCount(),
-        tr_formatter_size_B(builder.pieceSize()));
+        ngettext("{piece_count:L} pieces, {piece_size} each\n", "{piece_count:L} piece, {piece_size}\n", builder.pieceCount()),
+        fmt::arg("piece_count", builder.pieceCount()),
+        fmt::arg("piece_size", tr_formatter_size_B(builder.pieceSize())));
 
     if (!std::empty(options.comment))
     {
