@@ -158,13 +158,24 @@ bool tr_dhtEnabled(tr_session const* session)
     return session != nullptr && session == my_session;
 }
 
+static auto getUdpSocket(tr_session const* const session, int af)
+{
+    switch (af)
+    {
+    case AF_INET:
+        return session->udp_core_->udp_socket();
+
+    case AF_INET6:
+        return session->udp_core_->udp6_socket();
+
+    default:
+        return TR_BAD_SOCKET;
+    }
+}
+
 static auto getStatus(tr_session const* const session, int af, int* const setme_node_count = nullptr)
 {
-    auto udp_socket = session->udp_core_->udp_socket();
-    auto udp6_socket = session->udp_core_->udp6_socket();
-
-    if (!tr_dhtEnabled(session) || (af == AF_INET && udp_socket == TR_BAD_SOCKET) ||
-        (af == AF_INET6 && udp6_socket == TR_BAD_SOCKET))
+    if (!tr_dhtEnabled(session) || (getUdpSocket(session, af) == TR_BAD_SOCKET))
     {
         if (setme_node_count != nullptr)
         {
@@ -426,8 +437,6 @@ int tr_dhtInit(tr_session* session)
     bool have_id = false;
     auto nodes = std::vector<uint8_t>{};
     auto nodes6 = std::vector<uint8_t>{};
-    auto udp_socket = session->udp_core_->udp_socket();
-    auto udp6_socket = session->udp_core_->udp6_socket();
 
     if (ok)
     {
@@ -441,12 +450,12 @@ int tr_dhtInit(tr_session* session)
         size_t raw_len = 0U;
         uint8_t const* raw = nullptr;
 
-        if (udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
+        if (tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
         {
             nodes.assign(raw, raw + raw_len);
         }
 
-        if (udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
+        if (tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
         {
             nodes6.assign(raw, raw + raw_len);
         }
@@ -466,7 +475,7 @@ int tr_dhtInit(tr_session* session)
         tr_rand_buffer(std::data(myid), std::size(myid));
     }
 
-    if (int const rc = locked_dht::init(udp_socket, udp6_socket, std::data(myid), nullptr); rc < 0)
+    if (locked_dht::init(getUdpSocket(session, AF_INET), getUdpSocket(session, AF_INET6), std::data(myid), nullptr) < 0)
     {
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
@@ -566,9 +575,14 @@ void tr_dhtUninit(tr_session const* session)
     my_session = nullptr;
 }
 
-tr_port tr_dhtPort(tr_session const* ss)
+std::optional<tr_port> tr_dhtPort(tr_session const* session)
 {
-    return tr_dhtEnabled(ss) ? ss->udp_core_->port() : tr_port{};
+    if (!tr_dhtEnabled(session))
+    {
+        return {};
+    }
+
+    return session->udp_core_->port();
 }
 
 bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)

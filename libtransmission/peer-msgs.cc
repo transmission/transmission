@@ -281,12 +281,12 @@ public:
 
         tellPeerWhatWeHave(this);
 
-        if (tr_dhtEnabled(torrent->session) && io->supportsDHT())
+        if (auto const port = tr_dhtPort(torrent->session); port.has_value())
         {
-            /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
+            // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
             if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
             {
-                protocolSendPort(this, tr_dhtPort(torrent->session));
+                protocolSendPort(this, *port);
             }
         }
 
