@@ -121,32 +121,32 @@ auto uninit()
 
 } // namespace locked_dht
 
-enum Status
+enum class Status
 {
-    TR_DHT_STOPPED = 0,
-    TR_DHT_BROKEN = 1,
-    TR_DHT_POOR = 2,
-    TR_DHT_FIREWALLED = 3,
-    TR_DHT_GOOD = 4
+    Stopped,
+    Broken,
+    Poor,
+    Firewalled,
+    Good
 };
 
 static constexpr std::string_view printableStatus(Status status)
 {
     switch (status)
     {
-    case TR_DHT_STOPPED:
+    case Status::Stopped:
         return "stopped"sv;
 
-    case TR_DHT_BROKEN:
+    case Status::Broken:
         return "broken"sv;
 
-    case TR_DHT_POOR:
+    case Status::Poor:
         return "poor"sv;
 
-    case TR_DHT_FIREWALLED:
+    case Status::Firewalled:
         return "firewalled"sv;
 
-    case TR_DHT_GOOD:
+    case Status::Good:
         return "good"sv;
 
     default:
@@ -172,7 +172,7 @@ static auto getStatus(tr_session* const session, int af, int* const setme_node_c
             *setme_node_count = 0;
         }
 
-        return TR_DHT_STOPPED;
+        return Status::Stopped;
     }
 
     int good = 0;
@@ -187,25 +187,25 @@ static auto getStatus(tr_session* const session, int af, int* const setme_node_c
 
     if (good < 4 || good + dubious <= 8)
     {
-        return TR_DHT_BROKEN;
+        return Status::Broken;
     }
 
     if (good < 40)
     {
-        return TR_DHT_POOR;
+        return Status::Poor;
     }
 
     if (incoming < 8)
     {
-        return TR_DHT_FIREWALLED;
+        return Status::Firewalled;
     }
 
-    return TR_DHT_GOOD;
+    return Status::Good;
 }
 
 static constexpr auto isReady(Status status)
 {
-    return status >= TR_DHT_FIREWALLED;
+    return status >= Status::Firewalled;
 }
 
 static auto isReady(tr_session* const session, int af)
@@ -221,7 +221,7 @@ static bool bootstrap_done(tr_session* session, int af)
     }
 
     auto const status = getStatus(session, af, nullptr);
-    return status == TR_DHT_STOPPED || isReady(status);
+    return status == Status::Stopped || isReady(status);
 }
 
 static void nap(int roughly_sec)
@@ -420,7 +420,7 @@ int tr_dhtInit(tr_session* ss)
 
     tr_logAddInfo(_("Initializing DHT"));
 
-    if (tr_env_key_exists("TR_DHT_VERBOSE"))
+    if (tr_env_key_exists("Status::Verbose"))
     {
         dht_debug = stderr;
     }
@@ -664,22 +664,19 @@ enum class AnnounceResult
     FAILED
 };
 
-static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
+static AnnounceResult tr_dhtAnnounce(tr_torrent const* const tor, int af, bool announce)
 {
-    if (!tor->allowsDht())
-    {
-        return AnnounceResult::INVALID;
-    }
+    TR_ASSERT(tor->allowsDht());
 
     int numnodes = 0;
     auto const status = getStatus(tor->session, af, &numnodes);
-    if (status == TR_DHT_STOPPED)
+    if (status == Status::Stopped)
     {
         // let the caller believe everything is all right.
         return AnnounceResult::OK;
     }
 
-    if (status < TR_DHT_POOR)
+    if (status < Status::Poor)
     {
         tr_logAddTraceTor(
             tor,
@@ -721,7 +718,8 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 
 void tr_dhtUpkeep(tr_session* session)
 {
-    time_t const now = tr_time();
+    auto lock = session->unique_lock();
+    auto const now = tr_time();
 
     for (auto* const tor : session->torrents())
     {
