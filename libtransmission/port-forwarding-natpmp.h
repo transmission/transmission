@@ -35,7 +35,15 @@ public:
         return renew_time_;
     }
 
-    tr_port_forwarding_state pulse(tr_port port, bool is_enabled, tr_port* public_port, tr_port* real_private_port);
+    struct PulseResult
+    {
+        tr_port_forwarding_state state = TR_PORT_ERROR;
+
+        tr_port public_port = {};
+        tr_port private_port = {};
+    };
+
+    PulseResult pulse(tr_port port, bool is_enabled);
 
 private:
     enum class State

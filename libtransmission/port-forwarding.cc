@@ -187,8 +187,7 @@ private:
     void natPulse(bool do_check)
     {
         auto& session = session_;
-        tr_port const private_peer_port = session.private_peer_port;
-        bool const is_enabled = is_enabled_ && !is_shutting_down_;
+        auto const is_enabled = is_enabled_ && !is_shutting_down_;
 
         if (!natpmp_)
         {
@@ -202,21 +201,19 @@ private:
 
         auto const old_state = state();
 
-        auto public_peer_port = tr_port{};
-        auto received_private_port = tr_port{};
-        natpmp_state_ = natpmp_->pulse(private_peer_port, is_enabled, &public_peer_port, &received_private_port);
-
-        if (natpmp_state_ == TR_PORT_MAPPED)
+        auto const result = natpmp_->pulse(session.private_peer_port, is_enabled);
+        natpmp_state_ = result.state;
+        if (!std::empty(result.public_port) && !std::empty(result.private_port))
         {
-            session.public_peer_port = public_peer_port;
-            session.private_peer_port = received_private_port;
+            session.public_peer_port = result.public_port;
+            session.private_peer_port = result.private_port;
             tr_logAddInfo(fmt::format(
                 _("Mapped private port {private_port} to public port {public_port}"),
                 fmt::arg("public_port", session.public_peer_port.host()),
                 fmt::arg("private_port", session.private_peer_port.host())));
         }
 
-        upnp_state_ = tr_upnpPulse(upnp_, private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
+        upnp_state_ = tr_upnpPulse(upnp_, session.private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
 
         if (auto const new_state = state(); new_state != old_state)
         {
