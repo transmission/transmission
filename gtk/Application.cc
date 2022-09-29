@@ -1139,7 +1139,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
     case TR_KEY_show_notification_area_icon:
         if (bool const show = gtr_pref_flag_get(key); show && icon_ == nullptr)
         {
-            icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
+            icon_ = SystemTrayIcon::create(*wind_, core_);
         }
         else if (!show && icon_ != nullptr)
         {

@@ -22,6 +22,7 @@
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
+#include "SystemTrayIcon.h"
 #include "Utils.h"
 
 /**
@@ -398,10 +399,15 @@ DesktopPage::DesktopPage(
         TR_KEY_inhibit_desktop_hibernation,
         core_);
 
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "show_systray_icon_check"),
-        TR_KEY_show_notification_area_icon,
-        core_);
+    if (auto* const show_systray_icon_check = gtr_get_widget<Gtk::CheckButton>(builder, "show_systray_icon_check");
+        SystemTrayIcon::is_available())
+    {
+        init_check_button(*show_systray_icon_check, TR_KEY_show_notification_area_icon, core_);
+    }
+    else
+    {
+        show_systray_icon_check->hide();
+    }
 
     init_check_button(
         *gtr_get_widget<Gtk::CheckButton>(builder, "notify_on_torrent_add_check"),
