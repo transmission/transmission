@@ -52,6 +52,13 @@
 
 using namespace std::literals;
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+using FileListValue = Glib::Value<GSList*>;
+using FileListHandler = Glib::SListHandler<Glib::RefPtr<Gio::File>>;
+
+using StringValue = Glib::Value<Glib::ustring>;
+#endif
+
 #define SHOW_LICENSE
 
 namespace
@@ -107,6 +114,9 @@ private:
     void on_main_window_size_allocated(Gtk::Allocation& alloc);
     bool on_main_window_focus_in(GdkEventFocus* event);
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    bool on_drag_data_received(Glib::ValueBase const& value, double x, double y);
+#else
     void on_drag_data_received(
         Glib::RefPtr<Gdk::DragContext> const& drag_context,
         gint x,
@@ -114,6 +124,7 @@ private:
         Gtk::SelectionData const& selection_data,
         guint info,
         guint time_);
+#endif
 
     bool on_rpc_changed_idle(tr_rpc_callback_type type, tr_torrent_id_t torrent_id);
 
@@ -829,6 +840,32 @@ void Application::Impl::rowChangedCB(Gtk::TreePath const& path, Gtk::TreeModel::
     }
 }
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+bool Application::Impl::on_drag_data_received(Glib::ValueBase const& value, double /*x*/, double /*y*/)
+{
+    if (G_VALUE_HOLDS(value.gobj(), GDK_TYPE_FILE_LIST))
+    {
+        FileListValue files_value;
+        files_value.init(value.gobj());
+        open_files(FileListHandler::slist_to_vector(files_value.get(), Glib::OwnershipType::OWNERSHIP_NONE));
+        return true;
+    }
+    else if (G_VALUE_HOLDS(value.gobj(), StringValue::value_type()))
+    {
+        StringValue string_value;
+        string_value.init(value.gobj());
+        if (auto const text = gtr_str_strip(string_value.get()); !text.empty())
+        {
+            return core_->add_from_url(text);
+        }
+    }
+
+    return false;
+}
+
+#else
+
 void Application::Impl::on_drag_data_received(
     Glib::RefPtr<Gdk::DragContext> const& drag_context,
     gint /*x*/,
@@ -858,6 +895,8 @@ void Application::Impl::on_drag_data_received(
     drag_context->drag_finish(true, false, time_);
 }
 
+#endif
+
 void Application::Impl::main_window_setup()
 {
     // g_assert(nullptr == cbdata->wind);
@@ -872,10 +911,17 @@ void Application::Impl::main_window_setup()
     refresh_actions();
 
     /* register to handle URIs that get dragged onto our main window */
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto drop_controller = Gtk::DropTarget::create(G_TYPE_INVALID, Gdk::DragAction::COPY);
+    drop_controller->set_gtypes({ StringValue::value_type(), GDK_TYPE_FILE_LIST });
+    drop_controller->signal_drop().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received), false);
+    wind_->add_controller(drop_controller);
+#else
     wind_->drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     wind_->drag_dest_add_uri_targets();
     wind_->drag_dest_add_text_targets(); /* links dragged from browsers are text */
     wind_->signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
+#endif
 }
 
 bool Application::Impl::on_session_closed()

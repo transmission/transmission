@@ -29,6 +29,11 @@
 
 using namespace std::literals;
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+using FileListValue = Glib::Value<GSList*>;
+using FileListHandler = Glib::SListHandler<Glib::RefPtr<Gio::File>>;
+#endif
+
 namespace
 {
 
@@ -86,6 +91,9 @@ private:
     void onChooserChosen(PathButton* chooser);
     void onResponse(int response);
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    bool on_drag_data_received(Glib::ValueBase const& value, double x, double y);
+#else
     void on_drag_data_received(
         Glib::RefPtr<Gdk::DragContext> const& drag_context,
         int x,
@@ -93,6 +101,9 @@ private:
         Gtk::SelectionData const& selection_data,
         guint info,
         guint time_);
+#endif
+
+    bool set_dropped_source_path(std::string const& filename);
 
     void updatePiecesLabel();
 
@@ -414,6 +425,47 @@ void MakeDialog::Impl::onSourceToggled2(Gtk::ToggleButton* tb, PathButton* choos
     }
 }
 
+bool MakeDialog::Impl::set_dropped_source_path(std::string const& filename)
+{
+    if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_DIR)))
+    {
+        /* a directory was dragged onto the dialog... */
+        folder_radio_->set_active(true);
+        folder_chooser_->set_filename(filename);
+        return true;
+    }
+
+    if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_REGULAR)))
+    {
+        /* a file was dragged on to the dialog... */
+        file_radio_->set_active(true);
+        file_chooser_->set_filename(filename);
+        return true;
+    }
+
+    return false;
+}
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+bool MakeDialog::Impl::on_drag_data_received(Glib::ValueBase const& value, double /*x*/, double /*y*/)
+{
+    if (G_VALUE_HOLDS(value.gobj(), GDK_TYPE_FILE_LIST))
+    {
+        FileListValue files_value;
+        files_value.init(value.gobj());
+        if (auto const files = FileListHandler::slist_to_vector(files_value.get(), Glib::OwnershipType::OWNERSHIP_NONE);
+            !files.empty())
+        {
+            return set_dropped_source_path(files.front()->get_path());
+        }
+    }
+
+    return false;
+}
+
+#else
+
 void MakeDialog::Impl::on_drag_data_received(
     Glib::RefPtr<Gdk::DragContext> const& drag_context,
     int /*x*/,
@@ -426,27 +478,13 @@ void MakeDialog::Impl::on_drag_data_received(
 
     if (auto const uris = selection_data.get_uris(); !uris.empty())
     {
-        auto const& uri = uris.front();
-        auto const filename = Glib::filename_from_uri(uri);
-
-        if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_DIR)))
-        {
-            /* a directory was dragged onto the dialog... */
-            folder_radio_->set_active(true);
-            folder_chooser_->set_filename(filename);
-            success = true;
-        }
-        else if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_REGULAR)))
-        {
-            /* a file was dragged on to the dialog... */
-            file_radio_->set_active(true);
-            file_chooser_->set_filename(filename);
-            success = true;
-        }
+        success = set_dropped_source_path(Glib::filename_from_uri(uris.front()));
     }
 
     drag_context->drag_finish(success, false, time_);
 }
+
+#endif
 
 MakeDialog::MakeDialog(
     BaseObjectType* cast_item,
@@ -512,9 +550,15 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
     source_entry_->set_sensitive(false);
     source_check_->signal_toggled().connect([this]() { onSourceToggled(source_check_, source_entry_); });
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto drop_controller = Gtk::DropTarget::create(GDK_TYPE_FILE_LIST, Gdk::DragAction::COPY);
+    drop_controller->signal_drop().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received), false);
+    dialog_.add_controller(drop_controller);
+#else
     dialog_.drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     dialog_.drag_dest_add_uri_targets();
     dialog_.signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
+#endif
 }
 
 void MakeDialog::Impl::onPieceSizeUpdated()
