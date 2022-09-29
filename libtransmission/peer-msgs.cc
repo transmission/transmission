@@ -1692,7 +1692,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
-                tr_dhtAddNode(msgs->session, &msgs->io->address(), msgs->dht_port, false);
+                tr_dhtAddNode(msgs->session, msgs->io->address(), msgs->dht_port, false);
             }
         }
         break;

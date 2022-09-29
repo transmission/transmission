@@ -16,6 +16,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <tuple> // for std::tie()
 #include <vector>
 
 #ifdef _WIN32
@@ -330,14 +331,14 @@ static void bootstrapFromFile(tr_session const* const session)
     }
 }
 
-static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes, std::vector<uint8_t> nodes6)
+static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes4, std::vector<uint8_t> nodes6)
 {
     TR_ASSERT(tr_dhtEnabled(session));
 
-    auto const num = std::size(nodes) / 6;
-    if (num > 0)
+    auto const num4 = std::size(nodes4) / 6;
+    if (num4 > 0)
     {
-        tr_logAddDebug(fmt::format("Bootstrapping from {} IPv4 nodes", num));
+        tr_logAddDebug(fmt::format("Bootstrapping from {} IPv4 nodes", num4));
     }
 
     auto const num6 = std::size(nodes6) / 18;
@@ -346,24 +347,26 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes
         tr_logAddDebug(fmt::format("Bootstrapping from {} IPv6 nodes", num6));
     }
 
-    for (size_t i = 0; i < std::max(num, num6); ++i)
+    auto const* walk4 = std::data(nodes4);
+    auto const* walk6 = std::data(nodes6);
+    for (size_t i = 0; i < std::max(num4, num6); ++i)
     {
-        if (i < num && !isBootstrapDone(session, AF_INET))
+        if (i < num4 && !isBootstrapDone(session, AF_INET))
         {
             auto addr = tr_address{};
-            addr.type = TR_AF_INET;
-            memcpy(&addr.addr.addr4, &nodes[i * 6], 4);
-            auto const [port, out] = tr_port::fromCompact(&nodes[i * 6 + 4]);
-            tr_dhtAddNode(session, &addr, port, true);
+            auto port = tr_port{};
+            std::tie(addr, walk4) = tr_address::fromCompact4(walk4);
+            std::tie(port, walk4) = tr_port::fromCompact(walk4);
+            tr_dhtAddNode(session, addr, port, true);
         }
 
         if (i < num6 && !isBootstrapDone(session, AF_INET6))
         {
             auto addr = tr_address{};
-            addr.type = TR_AF_INET6;
-            memcpy(&addr.addr.addr6, &nodes6[i * 18], 16);
-            auto const [port, out] = tr_port::fromCompact(&nodes6[i * 18 + 16]);
-            tr_dhtAddNode(session, &addr, port, true);
+            auto port = tr_port{};
+            std::tie(addr, walk6) = tr_address::fromCompact6(walk6);
+            std::tie(port, walk6) = tr_port::fromCompact(walk6);
+            tr_dhtAddNode(session, addr, port, true);
         }
 
         /* Our DHT code is able to take up to 9 nodes in a row without
@@ -383,6 +386,8 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes
             break;
         }
     }
+    TR_ASSERT(walk4 = std::data(nodes4) + std::size(nodes4));
+    TR_ASSERT(walk6 = std::data(nodes6) + std::size(nodes6));
 
     if (!isBootstrapDone(session, 0))
     {
@@ -585,9 +590,9 @@ std::optional<tr_port> tr_dhtPort(tr_session const* session)
     return session->udp_core_->port();
 }
 
-bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
+bool tr_dhtAddNode(tr_session* ss, tr_address const& addr, tr_port port, bool bootstrap)
 {
-    int const af = address->isIPv4() ? AF_INET : AF_INET6;
+    int const af = addr.isIPv4() ? AF_INET : AF_INET6;
 
     if (!tr_dhtEnabled(ss))
     {
@@ -602,21 +607,21 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         return false;
     }
 
-    if (address->isIPv4())
+    if (addr.isIPv4())
     {
         auto sin = sockaddr_in{};
         sin.sin_family = AF_INET;
-        sin.sin_addr = address->addr.addr4;
+        sin.sin_addr = addr.addr.addr4;
         sin.sin_port = port.network();
         locked_dht::ping_node((struct sockaddr*)&sin, sizeof(sin));
         return true;
     }
 
-    if (address->isIPv6())
+    if (addr.isIPv6())
     {
         auto sin6 = sockaddr_in6{};
         sin6.sin6_family = AF_INET6;
-        sin6.sin6_addr = address->addr.addr6;
+        sin6.sin6_addr = addr.addr.addr6;
         sin6.sin6_port = port.network();
         locked_dht::ping_node((struct sockaddr*)&sin6, sizeof(sin6));
         return true;
