@@ -38,29 +38,29 @@ namespace
 
 enum class UpnpState
 {
-    IDLE,
-    FAILED,
-    WILL_DISCOVER, // next action is upnpDiscover()
-    DISCOVERING, // currently making blocking upnpDiscover() call in a worker thread
-    WILL_MAP, // next action is UPNP_AddPortMapping()
-    WILL_UNMAP // next action is UPNP_DeletePortMapping()
+    Idle,
+    Failed,
+    WillDiscover, // next action is upnpDiscover()
+    Discovering, // currently making blocking upnpDiscover() call in a worker thread
+    WillMap, // next action is UPNP_AddPortMapping()
+    WillUnmap // next action is UPNP_DeletePortMapping()
 };
 
 constexpr auto portFwdState(UpnpState upnp_state, bool is_mapped)
 {
     switch (upnp_state)
     {
-    case UpnpState::WILL_DISCOVER:
-    case UpnpState::DISCOVERING:
+    case UpnpState::WillDiscover:
+    case UpnpState::Discovering:
         return TR_PORT_UNMAPPED;
 
-    case UpnpState::WILL_MAP:
+    case UpnpState::WillMap:
         return TR_PORT_MAPPING;
 
-    case UpnpState::WILL_UNMAP:
+    case UpnpState::WillUnmap:
         return TR_PORT_UNMAPPING;
 
-    case UpnpState::IDLE:
+    case UpnpState::Idle:
         return is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
 
     default: // UpnpState::FAILED:
@@ -82,8 +82,8 @@ struct tr_upnp
     {
         TR_ASSERT(!isMapped);
         TR_ASSERT(
-            state == UpnpState::IDLE || state == UpnpState::FAILED || state == UpnpState::WILL_DISCOVER ||
-            state == UpnpState::DISCOVERING);
+            state == UpnpState::Idle || state == UpnpState::Failed || state == UpnpState::WillDiscover ||
+            state == UpnpState::Discovering);
 
         FreeUPNPUrls(&urls);
     }
@@ -94,7 +94,7 @@ struct tr_upnp
     tr_port port;
     std::string lanaddr;
     bool isMapped = false;
-    UpnpState state = UpnpState::WILL_DISCOVER;
+    UpnpState state = UpnpState::WillDiscover;
 
     // Used to return the results of upnpDiscover() from a worker thread
     // to be processed without blocking in tr_upnpPulse().
@@ -265,18 +265,18 @@ static bool isFutureReady(std::future<T> const& future)
 
 tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_enabled, bool do_port_check, std::string bindaddr)
 {
-    if (is_enabled && handle->state == UpnpState::WILL_DISCOVER)
+    if (is_enabled && handle->state == UpnpState::WillDiscover)
     {
         TR_ASSERT(!handle->discover_future);
 
         auto task = std::packaged_task<UPNPDev*(std::string)>{ discoverThreadfunc };
         handle->discover_future = task.get_future();
-        handle->state = UpnpState::DISCOVERING;
+        handle->state = UpnpState::Discovering;
 
         std::thread(std::move(task), std::move(bindaddr)).detach();
     }
 
-    if (is_enabled && handle->state == UpnpState::DISCOVERING && handle->discover_future &&
+    if (is_enabled && handle->state == UpnpState::Discovering && handle->discover_future &&
         isFutureReady(*handle->discover_future))
     {
         auto* const devlist = handle->discover_future->get();
@@ -289,13 +289,13 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         {
             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
             tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", std::data(handle->lanaddr))));
-            handle->state = UpnpState::IDLE;
+            handle->state = UpnpState::Idle;
             handle->hasDiscovered = true;
             handle->lanaddr = std::data(lanaddr);
         }
         else
         {
-            handle->state = UpnpState::FAILED;
+            handle->state = UpnpState::Failed;
             tr_logAddDebug(fmt::format("UPNP_GetValidIGD failed: {} ({})", tr_strerror(errno), errno));
             tr_logAddDebug("If your router supports UPnP, please make sure UPnP is enabled!");
         }
@@ -303,9 +303,9 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         freeUPNPDevlist(devlist);
     }
 
-    if ((handle->state == UpnpState::IDLE) && (handle->isMapped) && (!is_enabled || handle->port != port))
+    if ((handle->state == UpnpState::Idle) && (handle->isMapped) && (!is_enabled || handle->port != port))
     {
-        handle->state = UpnpState::WILL_UNMAP;
+        handle->state = UpnpState::WillUnmap;
     }
 
     if (is_enabled && handle->isMapped && do_port_check &&
@@ -316,7 +316,7 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         handle->isMapped = false;
     }
 
-    if (handle->state == UpnpState::WILL_UNMAP)
+    if (handle->state == UpnpState::WillUnmap)
     {
         tr_upnpDeletePortMapping(handle, "TCP", handle->port);
         tr_upnpDeletePortMapping(handle, "UDP", handle->port);
@@ -327,16 +327,16 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
             fmt::arg("type", handle->data.first.servicetype)));
 
         handle->isMapped = false;
-        handle->state = UpnpState::IDLE;
+        handle->state = UpnpState::Idle;
         handle->port = {};
     }
 
-    if ((handle->state == UpnpState::IDLE) && is_enabled && !handle->isMapped)
+    if ((handle->state == UpnpState::Idle) && is_enabled && !handle->isMapped)
     {
-        handle->state = UpnpState::WILL_MAP;
+        handle->state = UpnpState::WillMap;
     }
 
-    if (handle->state == UpnpState::WILL_MAP)
+    if (handle->state == UpnpState::WillMap)
     {
         errno = 0;
 
@@ -364,13 +364,13 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         {
             tr_logAddInfo(fmt::format(_("Port {port} is forwarded"), fmt::arg("port", port.host())));
             handle->port = port;
-            handle->state = UpnpState::IDLE;
+            handle->state = UpnpState::Idle;
         }
         else
         {
             tr_logAddInfo(_("If your router supports UPnP, please make sure UPnP is enabled!"));
             handle->port = {};
-            handle->state = UpnpState::FAILED;
+            handle->state = UpnpState::Failed;
         }
     }
 
