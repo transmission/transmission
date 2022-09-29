@@ -29,9 +29,8 @@
 #include "log.h"
 #include "port-forwarding-upnp.h"
 #include "port-forwarding.h"
-#include "session.h"
 #include "tr-assert.h"
-#include "utils.h"
+#include "utils.h" // for _(), tr_strerror()
 
 namespace
 {
@@ -346,7 +345,7 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         }
         else
         {
-            auto const desc = fmt::format(FMT_STRING("{:s} at {:d}"), TR_NAME, port.host());
+            auto const desc = fmt::format(FMT_STRING("Transmission at {:d}"), port.host());
             int const err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc.c_str());
             int const err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc.c_str());
 

@@ -20,7 +20,6 @@
 #include "transmission.h"
 
 #include "log.h"
-#include "net.h" /* tr_netCloseSocket */
 #include "port-forwarding-natpmp.h"
 #include "port-forwarding.h"
 #include "utils.h"

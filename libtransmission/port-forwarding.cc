@@ -15,7 +15,6 @@
 
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h"
 #include "port-forwarding-natpmp.h"
 #include "port-forwarding-upnp.h"
 #include "port-forwarding.h"
