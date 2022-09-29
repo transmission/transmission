@@ -430,7 +430,7 @@ int tr_dhtInit(tr_session* session)
 
     tr_logAddInfo(_("Initializing DHT"));
 
-    if (tr_env_key_exists("Status::Verbose"))
+    if (tr_env_key_exists("TR_DHT_VERBOSE"))
     {
         dht_debug = stderr;
     }
