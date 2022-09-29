@@ -53,7 +53,6 @@
 #include "timer-ev.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
 #include "tr-utp.h"
@@ -673,7 +672,7 @@ void tr_session::onNowTimer()
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
-    tr_dhtUpkeep(this);
+    udp_core_->dhtUpkeep();
     if (turtle.isClockEnabled)
     {
         turtleCheckClock(this, &this->turtle);
@@ -1807,7 +1806,7 @@ void tr_session::closeImplStart()
 
     lpd_.reset();
 
-    tr_dhtUninit(this);
+    udp_core_->dhtUninit();
 
     save_timer_.reset();
     now_timer_.reset();
