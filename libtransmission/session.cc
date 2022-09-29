@@ -731,7 +731,7 @@ void tr_session::initImpl(init_data& data)
 
     this->peerMgr = tr_peerMgrNew(this);
 
-    this->shared = tr_sharedInit(*this);
+    this->port_forwarding_ = tr_port_forwarding::create(*this);
 
     /**
     ***  Blocklist
@@ -1262,7 +1262,7 @@ static void peerPortChanged(tr_session* const session)
         open_incoming_peer_port(session);
     }
 
-    tr_sharedPortChanged(*session);
+    session->port_forwarding_->portChanged();
 
     for (auto* const tor : session->torrents())
     {
@@ -1316,7 +1316,7 @@ tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_sharedTraversalState(session->shared);
+    return session->port_forwarding_->state();
 }
 
 /***
@@ -1812,7 +1812,7 @@ void tr_session::closeImplStart()
     now_timer_.reset();
 
     verifier_.reset();
-    tr_sharedClose(*this);
+    port_forwarding_.reset();
 
     close_incoming_peer_port(this);
     this->rpc_server_.reset();
@@ -1910,17 +1910,17 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(10);
     }
 
-    /* "shared" and "tracker" have live sockets,
+    /* "port_forwarding" and "tracker" have live sockets,
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != nullptr || !session->web->isClosed() || session->announcer != nullptr ||
+    while ((session->port_forwarding_ || !session->web->isClosed() || session->announcer != nullptr ||
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
         tr_logAddTrace(fmt::format(
             "waiting on port unmap ({}) or announcer ({})... now {} deadline {}",
-            fmt::ptr(session->shared),
+            fmt::ptr(session->port_forwarding_.get()),
             fmt::ptr(session->announcer),
             time(nullptr),
             deadline));
@@ -2218,14 +2218,14 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    tr_runInEventThread(session, tr_sharedTraversalEnable, session->shared, enabled);
+    tr_runInEventThread(session, [session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_sharedTraversalIsEnabled(session->shared);
+    return session->port_forwarding_->isEnabled();
 }
 
 /***

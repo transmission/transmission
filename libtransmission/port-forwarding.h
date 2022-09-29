@@ -9,24 +9,28 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "transmission.h" // tr_port_forwarding_state
+#include <memory> // for std::unique_ptr
 
-#include "net.h" // tr_port
+#include "transmission.h" // for tr_port_forwarding_state
 
-struct tr_bindsockets;
+#include "net.h" // for tr_port
+
 struct tr_session;
-struct tr_shared;
 
-tr_shared* tr_sharedInit(tr_session&);
+class tr_port_forwarding
+{
+public:
+    virtual ~tr_port_forwarding() = default;
 
-void tr_sharedClose(tr_session&);
+    virtual void portChanged() = 0;
 
-void tr_sharedPortChanged(tr_session&);
+    [[nodiscard]] virtual tr_port peerPort() const = 0;
 
-void tr_sharedTraversalEnable(tr_shared*, bool is_enabled);
+    virtual void setEnabled(bool enabled) = 0;
 
-tr_port tr_sharedGetPeerPort(tr_shared const* s);
+    [[nodiscard]] virtual bool isEnabled() const = 0;
 
-bool tr_sharedTraversalIsEnabled(tr_shared const* s);
+    [[nodiscard]] virtual tr_port_forwarding_state state() const = 0;
 
-tr_port_forwarding_state tr_sharedTraversalState(tr_shared const*);
+    [[nodiscard]] static std::unique_ptr<tr_port_forwarding> create(tr_session&);
+};
