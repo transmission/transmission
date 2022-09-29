@@ -874,7 +874,14 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
         [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
 
     auto pango_font_description = view_->create_pango_context()->get_font_description();
-    pango_font_description.set_size(pango_font_description.get_size() * 0.8);
+    if (auto const new_size = pango_font_description.get_size() * 0.8; pango_font_description.get_size_is_absolute())
+    {
+        pango_font_description.set_absolute_size(new_size);
+    }
+    else
+    {
+        pango_font_description.set_size(new_size);
+    }
 
     /* set up view */
     auto const sel = view_->get_selection();
