@@ -72,6 +72,11 @@ private:
     sigc::connection torrent_model_row_inserted_tag_;
     sigc::connection torrent_model_row_deleted_cb_tag_;
 
+    sigc::connection filter_model_row_deleted_tag_;
+    sigc::connection filter_model_row_inserted_tag_;
+
+    sigc::connection update_count_label_tag_;
+
     Glib::ustring filter_text_;
 };
 
@@ -724,7 +729,7 @@ void FilterBar::Impl::update_count_label_idle()
     if (!pending)
     {
         show_lb_->set_data(DIRTY_KEY, GINT_TO_POINTER(1));
-        Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_count_label));
+        update_count_label_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_count_label));
     }
 }
 
@@ -787,9 +792,10 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     tracker_combo_box_init(tracker_, tmodel);
 
     filter_model_ = Gtk::TreeModelFilter::create(tmodel);
-    filter_model_->signal_row_deleted().connect([this](auto const& /*path*/) { update_count_label_idle(); });
-    filter_model_->signal_row_inserted().connect([this](auto const& /*path*/, auto const& /*iter*/)
-                                                 { update_count_label_idle(); });
+    filter_model_row_deleted_tag_ = filter_model_->signal_row_deleted().connect([this](auto const& /*path*/)
+                                                                                { update_count_label_idle(); });
+    filter_model_row_inserted_tag_ = filter_model_->signal_row_inserted().connect(
+        [this](auto const& /*path*/, auto const& /*iter*/) { update_count_label_idle(); });
 
     static_cast<Gtk::TreeStore*>(tracker_->get_model().get())->set_data(SESSION_KEY, session);
 
@@ -807,6 +813,14 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
 
 FilterBar::Impl::~Impl()
 {
+    if (update_count_label_tag_.connected())
+    {
+        update_count_label_tag_.disconnect();
+    }
+
+    filter_model_row_deleted_tag_.disconnect();
+    filter_model_row_inserted_tag_.disconnect();
+
     torrent_model_row_deleted_cb_tag_.disconnect();
     torrent_model_row_inserted_tag_.disconnect();
     torrent_model_row_changed_tag_.disconnect();
