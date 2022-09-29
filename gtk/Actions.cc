@@ -187,13 +187,6 @@ void gtr_action_set_toggled(Glib::ustring const& name, bool b)
     get_action(name)->set_state(Glib::Variant<bool>::create(b));
 }
 
-Gtk::Widget* gtr_action_get_widget(Glib::ustring const& name)
-{
-    Gtk::Widget* widget;
-    myBuilder->get_widget(name, widget);
-    return widget;
-}
-
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name)
 {
     return myBuilder->get_object(name);
