@@ -331,7 +331,17 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
         bool const do_prompt = tb->get_active();
         bool const do_notify = false;
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        auto files = std::vector<Glib::RefPtr<Gio::File>>();
+        auto files_model = get_files();
+        for (auto i = guint{ 0 }; i < files_model->get_n_items(); ++i)
+        {
+            files.push_back(gtr_ptr_dynamic_cast<Gio::File>(files_model->get_object(i)));
+        }
+#else
         auto const files = get_files();
+#endif
 
         core->add_files(files, do_start, do_prompt, do_notify);
     }

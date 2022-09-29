@@ -45,8 +45,16 @@ int main(int argc, char** argv)
     textdomain(AppTranslationDomainName);
 
     /* init glib/gtk */
+    Gio::init();
     Glib::init();
     Glib::set_application_name(_("Transmission"));
+
+    /* Workaround "..." */
+    Gio::File::create_for_path(".");
+    Glib::wrap_register(
+        g_type_from_name("GLocalFile"),
+        [](GObject* object) -> Glib::ObjectBase* { return new Gio::File((GFile*)object); });
+    g_type_ensure(Gio::File::get_type());
 
     /* default settings */
     std::string config_dir;
