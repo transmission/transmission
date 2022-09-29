@@ -38,16 +38,16 @@ public:
     tr_port_forwarding_state pulse(tr_port port, bool is_enabled, tr_port* public_port, tr_port* real_private_port);
 
 private:
-    enum tr_natpmp_state
+    enum class State
     {
-        TR_NATPMP_IDLE,
-        TR_NATPMP_ERR,
-        TR_NATPMP_DISCOVER,
-        TR_NATPMP_RECV_PUB,
-        TR_NATPMP_SEND_MAP,
-        TR_NATPMP_RECV_MAP,
-        TR_NATPMP_SEND_UNMAP,
-        TR_NATPMP_RECV_UNMAP
+        Idle,
+        Err,
+        Discover,
+        RecvPub,
+        SendMap,
+        RecvMap,
+        SendUnmap,
+        RecvUnmap
     };
 
     static constexpr auto LifetimeSecs = uint32_t{ 3600 };
@@ -64,7 +64,7 @@ private:
 
     time_t renew_time_ = 0;
     time_t command_time_ = 0;
-    tr_natpmp_state state_ = TR_NATPMP_DISCOVER;
+    State state_ = State::Discover;
 
     bool has_discovered_ = false;
     bool is_mapped_ = false;
