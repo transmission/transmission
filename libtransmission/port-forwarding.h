@@ -13,8 +13,6 @@
 
 #include "transmission.h" // for tr_port_forwarding_state
 
-#include "net.h" // for tr_port
-
 struct tr_session;
 
 class tr_port_forwarding
@@ -23,8 +21,6 @@ public:
     virtual ~tr_port_forwarding() = default;
 
     virtual void portChanged() = 0;
-
-    [[nodiscard]] virtual tr_port peerPort() const = 0;
 
     virtual void setEnabled(bool enabled) = 0;
 

@@ -58,11 +58,6 @@ public:
         startTimer();
     }
 
-    [[nodiscard]] tr_port peerPort() const override
-    {
-        return {};
-    }
-
     void setEnabled(bool enabled) override
     {
         if (enabled)
