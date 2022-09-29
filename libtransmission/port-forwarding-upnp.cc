@@ -22,12 +22,15 @@
 #include <miniupnp/upnpcommands.h>
 #endif
 
+#define LIBTRANSMISSION_PORT_FORWARDING_MODULE
+
 #include "transmission.h"
+
 #include "log.h"
+#include "port-forwarding-upnp.h"
 #include "port-forwarding.h"
 #include "session.h"
 #include "tr-assert.h"
-#include "upnp.h"
 #include "utils.h"
 
 namespace

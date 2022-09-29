@@ -9,17 +9,20 @@
 
 #include <fmt/core.h>
 
+#define LIBTRANSMISSION_PORT_FORWARDING_MODULE
+
+#include "transmission.h"
+
 #include "log.h"
-#include "natpmp_local.h"
 #include "net.h"
 #include "peer-mgr.h"
+#include "port-forwarding-natpmp.h"
+#include "port-forwarding-upnp.h"
 #include "port-forwarding.h"
 #include "session.h"
 #include "timer.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "transmission.h"
-#include "upnp.h"
 #include "utils.h" // for _()
 
 using namespace std::literals;

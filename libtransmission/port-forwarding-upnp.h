@@ -5,8 +5,8 @@
 
 #pragma once
 
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+#ifndef LIBTRANSMISSION_PORT_FORWARDING_MODULE
+#error only the libtransmission port forwarding module should #include this header.
 #endif
 
 /**
