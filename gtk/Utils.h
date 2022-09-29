@@ -69,6 +69,7 @@
 
 #define TR_GTK_ALIGN(Code) IF_GTKMM4(Gtk::Align::Code, Gtk::ALIGN_##Code)
 #define TR_GTK_BUTTONS_TYPE(Code) IF_GTKMM4(Gtk::ButtonsType::Code, Gtk::BUTTONS_##Code)
+#define TR_GTK_CELL_RENDERER_STATE(Code) IF_GTKMM4(Gtk::CellRendererState::Code, Gtk::CELL_RENDERER_##Code)
 #define TR_GTK_FILE_CHOOSER_ACTION(Code) IF_GTKMM4(Gtk::FileChooser::Action::Code, Gtk::FILE_CHOOSER_ACTION_##Code)
 #define TR_GTK_MESSAGE_TYPE(Code) IF_GTKMM4(Gtk::MessageType::Code, Gtk::MESSAGE_##Code)
 #define TR_GTK_ORIENTATION(Code) IF_GTKMM4(Gtk::Orientation::Code, Gtk::ORIENTATION_##Code)
