@@ -87,7 +87,7 @@ public:
     TR_DISABLE_COPY_MOVE(Impl)
 
 private:
-    void onSourceToggled2(Gtk::ToggleButton* tb, PathButton* chooser);
+    void onSourceToggled2(Gtk::CheckButton* tb, PathButton* chooser);
     void onChooserChosen(PathButton* chooser);
     void onResponse(int response);
 
@@ -117,9 +117,9 @@ private:
     MakeDialog& dialog_;
     Glib::RefPtr<Session> const core_;
 
-    Gtk::RadioButton* file_radio_ = nullptr;
+    Gtk::CheckButton* file_radio_ = nullptr;
     PathButton* file_chooser_ = nullptr;
-    Gtk::RadioButton* folder_radio_ = nullptr;
+    Gtk::CheckButton* folder_radio_ = nullptr;
     PathButton* folder_chooser_ = nullptr;
     Gtk::Label* pieces_lb_ = nullptr;
     Gtk::Scale* piece_size_scale_ = nullptr;
@@ -346,7 +346,7 @@ void MakeDialog::Impl::onResponse(int response)
 namespace
 {
 
-void onSourceToggled(Gtk::ToggleButton* tb, Gtk::Widget* widget)
+void onSourceToggled(Gtk::CheckButton* tb, Gtk::Widget* widget)
 {
     widget->set_sensitive(tb->get_active());
 }
@@ -410,7 +410,7 @@ void MakeDialog::Impl::onChooserChosen(PathButton* chooser)
     setFilename(chooser->get_filename());
 }
 
-void MakeDialog::Impl::onSourceToggled2(Gtk::ToggleButton* tb, PathButton* chooser)
+void MakeDialog::Impl::onSourceToggled2(Gtk::CheckButton* tb, PathButton* chooser)
 {
     if (tb->get_active())
     {
@@ -508,9 +508,9 @@ std::unique_ptr<MakeDialog> MakeDialog::create(Gtk::Window& parent, Glib::RefPtr
 MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
-    , file_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_file_radio"))
+    , file_radio_(gtr_get_widget<Gtk::CheckButton>(builder, "source_file_radio"))
     , file_chooser_(gtr_get_widget_derived<PathButton>(builder, "source_file_button"))
-    , folder_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_folder_radio"))
+    , folder_radio_(gtr_get_widget<Gtk::CheckButton>(builder, "source_folder_radio"))
     , folder_chooser_(gtr_get_widget_derived<PathButton>(builder, "source_folder_button"))
     , pieces_lb_(gtr_get_widget<Gtk::Label>(builder, "source_size_label"))
     , piece_size_scale_(gtr_get_widget<Gtk::Scale>(builder, "piece_size_scale"))

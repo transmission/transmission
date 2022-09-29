@@ -191,7 +191,7 @@ std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
 namespace
 {
 
-void set_togglebutton_if_different(Gtk::ToggleButton* toggle, sigc::connection& tag, bool value)
+void set_togglebutton_if_different(Gtk::CheckButton* toggle, sigc::connection& tag, bool value)
 {
     bool const currentValue = toggle->get_active();
 

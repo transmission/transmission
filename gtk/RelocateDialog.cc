@@ -54,7 +54,7 @@ private:
     sigc::connection timer_;
     std::unique_ptr<Gtk::MessageDialog> message_dialog_;
     PathButton* chooser_ = nullptr;
-    Gtk::RadioButton* move_tb_ = nullptr;
+    Gtk::CheckButton* move_tb_ = nullptr;
 };
 
 RelocateDialog::Impl::~Impl()
@@ -191,7 +191,7 @@ RelocateDialog::Impl::Impl(
     , core_(core)
     , torrent_ids_(torrent_ids)
     , chooser_(gtr_get_widget_derived<PathButton>(builder, "new_location_button"))
-    , move_tb_(gtr_get_widget<Gtk::RadioButton>(builder, "move_data_radio"))
+    , move_tb_(gtr_get_widget<Gtk::CheckButton>(builder, "move_data_radio"))
 {
     dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(CANCEL));
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));

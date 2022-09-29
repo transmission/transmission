@@ -186,7 +186,7 @@ void init_chooser_button(PathButton& button, tr_quark const key, Glib::RefPtr<Se
     button.signal_selection_changed().connect([&button, key, core]() { chosen_cb(&button, key, core); });
 }
 
-void target_cb(Gtk::ToggleButton* tb, Gtk::Widget* target)
+void target_cb(Gtk::CheckButton* tb, Gtk::Widget* target)
 {
     target->set_sensitive(tb->get_active());
 }
@@ -737,7 +737,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
 {
     /* "enabled" checkbutton */
     init_check_button(*rpc_tb_, TR_KEY_rpc_enabled, core_);
-    rpc_tb_->signal_clicked().connect([this]() { refreshRPCSensitivity(); });
+    rpc_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
     auto* const open_button = gtr_get_widget<Gtk::Button>(builder, "open_web_client_button");
     widgets_.push_back(open_button);
     open_button->signal_clicked().connect(&onLaunchClutchCB);
@@ -751,7 +751,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
     /* require authentication */
     init_check_button(*auth_tb_, TR_KEY_rpc_authentication_required, core_);
     widgets_.push_back(auth_tb_);
-    auth_tb_->signal_clicked().connect([this]() { refreshRPCSensitivity(); });
+    auth_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
     /* username */
     auto* username_entry = gtr_get_widget<Gtk::Entry>(builder, "rpc_username_entry");
@@ -768,7 +768,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
     /* require authentication */
     init_check_button(*whitelist_tb_, TR_KEY_rpc_whitelist_enabled, core_);
     widgets_.push_back(whitelist_tb_);
-    whitelist_tb_->signal_clicked().connect([this]() { refreshRPCSensitivity(); });
+    whitelist_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
     /* access control list */
     {
