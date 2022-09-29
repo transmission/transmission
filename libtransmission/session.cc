@@ -1312,11 +1312,11 @@ bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)
     return session->isPortRandom();
 }
 
-tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
+tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_port_forwarding(tr_sharedTraversalStatus(session->shared));
+    return tr_sharedTraversalState(session->shared);
 }
 
 /***

@@ -36,8 +36,8 @@ struct tr_shared
     bool isShuttingDown = false;
     bool doPortCheck = false;
 
-    tr_port_forwarding natpmpStatus = TR_PORT_UNMAPPED;
-    tr_port_forwarding upnpStatus = TR_PORT_UNMAPPED;
+    tr_port_forwarding_state natpmpState = TR_PORT_UNMAPPED;
+    tr_port_forwarding_state upnpState = TR_PORT_UNMAPPED;
 
     tr_upnp* upnp = nullptr;
     std::unique_ptr<tr_natpmp> natpmp;
@@ -86,13 +86,13 @@ static void natPulse(tr_shared* s, bool do_check)
         s->upnp = tr_upnpInit();
     }
 
-    auto const old_status = tr_sharedTraversalStatus(s);
+    auto const old_state = tr_sharedTraversalState(s);
 
     auto public_peer_port = tr_port{};
     auto received_private_port = tr_port{};
-    s->natpmpStatus = s->natpmp->pulse(private_peer_port, is_enabled, &public_peer_port, &received_private_port);
+    s->natpmpState = s->natpmp->pulse(private_peer_port, is_enabled, &public_peer_port, &received_private_port);
 
-    if (s->natpmpStatus == TR_PORT_MAPPED)
+    if (s->natpmpState == TR_PORT_MAPPED)
     {
         session.public_peer_port = public_peer_port;
         session.private_peer_port = received_private_port;
@@ -102,16 +102,14 @@ static void natPulse(tr_shared* s, bool do_check)
             fmt::arg("private_port", session.private_peer_port.host())));
     }
 
-    s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
+    s->upnpState = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
 
-    auto const new_status = tr_sharedTraversalStatus(s);
-
-    if (new_status != old_status)
+    if (auto const new_state = tr_sharedTraversalState(s); new_state != old_state)
     {
         tr_logAddInfo(fmt::format(
             _("State changed from '{old_state}' to '{state}'"),
-            fmt::arg("old_state", getNatStateStr(old_status)),
-            fmt::arg("state", getNatStateStr(new_status))));
+            fmt::arg("old_state", getNatStateStr(old_state)),
+            fmt::arg("state", getNatStateStr(new_state))));
     }
 }
 
@@ -124,7 +122,7 @@ static void restartTimer(tr_shared* s)
     }
 
     // when to wake up again
-    switch (tr_sharedTraversalStatus(s))
+    switch (tr_sharedTraversalState(s))
     {
     case TR_PORT_MAPPED:
         // if we're mapped, everything is fine... check back at `renew_time`
@@ -187,11 +185,11 @@ static void stop_forwarding(tr_shared* s)
     natPulse(s, false);
 
     s->natpmp.reset();
-    s->natpmpStatus = TR_PORT_UNMAPPED;
+    s->natpmpState = TR_PORT_UNMAPPED;
 
     tr_upnpClose(s->upnp);
     s->upnp = nullptr;
-    s->upnpStatus = TR_PORT_UNMAPPED;
+    s->upnpState = TR_PORT_UNMAPPED;
 
     stop_timer(s);
 }
@@ -243,7 +241,7 @@ bool tr_sharedTraversalIsEnabled(tr_shared const* s)
     return s->isEnabled;
 }
 
-int tr_sharedTraversalStatus(tr_shared const* s)
+tr_port_forwarding_state tr_sharedTraversalState(tr_shared const* s)
 {
-    return std::max(s->natpmpStatus, s->upnpStatus);
+    return std::max(s->natpmpState, s->upnpState);
 }

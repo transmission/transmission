@@ -12,7 +12,7 @@
 #include <ctime> // time_t
 #include <cstdint>
 
-#include "transmission.h" // tr_port_forwarding
+#include "transmission.h" // tr_port_forwarding_state
 
 #include "natpmp.h"
 #include "net.h" // tr_port
@@ -35,7 +35,7 @@ public:
         return renew_time_;
     }
 
-    tr_port_forwarding pulse(tr_port port, bool is_enabled, tr_port* public_port, tr_port* real_private_port);
+    tr_port_forwarding_state pulse(tr_port port, bool is_enabled, tr_port* public_port, tr_port* real_private_port);
 
 private:
     enum tr_natpmp_state

@@ -43,7 +43,7 @@ enum class UpnpState
     WILL_UNMAP // next action is UPNP_DeletePortMapping()
 };
 
-constexpr tr_port_forwarding portFwdState(UpnpState upnp_state, bool is_mapped)
+constexpr auto portFwdState(UpnpState upnp_state, bool is_mapped)
 {
     switch (upnp_state)
     {
@@ -257,7 +257,7 @@ static bool isFutureReady(std::future<T> const& future)
     return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 }
 
-tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_enabled, bool do_port_check, std::string bindaddr)
+tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_enabled, bool do_port_check, std::string bindaddr)
 {
     if (is_enabled && handle->state == UpnpState::WILL_DISCOVER)
     {

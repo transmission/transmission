@@ -55,7 +55,11 @@ void tr_natpmp::setCommandTime()
     command_time_ = tr_time() + CommandWaitSecs;
 }
 
-tr_port_forwarding tr_natpmp::pulse(tr_port private_port, bool is_enabled, tr_port* public_port, tr_port* real_private_port)
+tr_port_forwarding_state tr_natpmp::pulse(
+    tr_port private_port,
+    bool is_enabled,
+    tr_port* public_port,
+    tr_port* real_private_port)
 {
     if (is_enabled && state_ == TR_NATPMP_DISCOVER)
     {
