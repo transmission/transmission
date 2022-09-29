@@ -78,12 +78,12 @@ public:
         }
     }
 
-    [[nodiscard]] bool isEnabled() const override
+    [[nodiscard]] bool isEnabled() const noexcept override
     {
         return is_enabled_;
     }
 
-    [[nodiscard]] tr_port_forwarding_state state() const override
+    [[nodiscard]] tr_port_forwarding_state state() const noexcept override
     {
         return std::max(natpmp_state_, upnp_state_);
     }

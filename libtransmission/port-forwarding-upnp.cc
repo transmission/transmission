@@ -251,7 +251,10 @@ enum
 
 static auto* discoverThreadfunc(std::string bindaddr) // NOLINT performance-unnecessary-value-param
 {
-    return tr_upnpDiscover(2000, bindaddr.c_str());
+    // If multicastif is not NULL, it will be used instead of the default
+    // multicast interface for sending SSDP discover packets.
+    char const* multicastif = std::empty(bindaddr) ? nullptr : bindaddr.c_str();
+    return tr_upnpDiscover(2000, multicastif);
 }
 
 template<typename T>
