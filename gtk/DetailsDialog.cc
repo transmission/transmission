@@ -1761,10 +1761,12 @@ std::array<std::string_view, 3> const text_dir_mark = { ""sv, "\u200E"sv, "\u200
 
 void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
+    auto const dir_mark = text_dir_mark[static_cast<int>(direction)];
+
     if (tracker.hasAnnounced && tracker.announceState != TR_TRACKER_INACTIVE)
     {
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         auto const time_span_ago = tr_format_time_relative(now, tracker.lastAnnounceTime);
 
         if (tracker.lastAnnounceSucceeded)
@@ -1805,13 +1807,13 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
     {
     case TR_TRACKER_INACTIVE:
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         gstr << _("No updates scheduled");
         break;
 
     case TR_TRACKER_WAITING:
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         gstr << fmt::format(
             _("Asking for more peers {time_span_from_now}"),
             fmt::arg("time_span_from_now", tr_format_time_relative(now, tracker.nextAnnounceTime)));
@@ -1819,13 +1821,13 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
 
     case TR_TRACKER_QUEUED:
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         gstr << _("Queued to ask for more peers");
         break;
 
     case TR_TRACKER_ACTIVE:
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         gstr << fmt::format(
             // {markup_begin} and {markup_end} should surround time_span_ago
             _("Asked for more peers {markup_begin}{time_span_ago}{markup_end}"),
@@ -1841,10 +1843,12 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
 
 void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
+    auto const dir_mark = text_dir_mark[static_cast<int>(direction)];
+
     if (tracker.hasScraped)
     {
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         auto const time_span_ago = tr_format_time_relative(now, tracker.lastScrapeTime);
 
         if (tracker.lastScrapeSucceeded)
@@ -1879,7 +1883,7 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
 
     case TR_TRACKER_WAITING:
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         gstr << fmt::format(
             _("Asking for peer counts in {time_span_from_now}"),
             fmt::arg("time_span_from_now", tr_format_time_relative(now, tracker.nextScrapeTime)));
@@ -1887,13 +1891,13 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
 
     case TR_TRACKER_QUEUED:
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         gstr << _("Queued to ask for peer counts");
         break;
 
     case TR_TRACKER_ACTIVE:
         gstr << '\n';
-        gstr << text_dir_mark[direction];
+        gstr << dir_mark;
         gstr << fmt::format(
             _("Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"),
             fmt::arg("markup_begin", "<small>"),
@@ -1914,7 +1918,7 @@ void buildTrackerSummary(
     Gtk::TextDirection direction)
 {
     // hostname
-    gstr << text_dir_mark[direction];
+    gstr << text_dir_mark[static_cast<int>(direction)];
     gstr << (tracker.isBackup ? "<i>" : "<b>");
     gstr << Glib::Markup::escape_text(!key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host, key) : tracker.host);
     gstr << (tracker.isBackup ? "</i>" : "</b>");
