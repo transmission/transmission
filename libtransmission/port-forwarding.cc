@@ -26,23 +26,23 @@ using namespace std::literals;
 struct tr_shared
 {
     explicit tr_shared(tr_session& session_in)
-        : session{ session_in }
+        : session_{ session_in }
     {
     }
 
-    tr_session& session;
+    tr_session& session_;
 
-    bool isEnabled = false;
-    bool isShuttingDown = false;
-    bool doPortCheck = false;
+    bool is_enabled_ = false;
+    bool is_shutting_down_ = false;
+    bool do_port_check_ = false;
 
-    tr_port_forwarding_state natpmpState = TR_PORT_UNMAPPED;
-    tr_port_forwarding_state upnpState = TR_PORT_UNMAPPED;
+    tr_port_forwarding_state natpmp_state_ = TR_PORT_UNMAPPED;
+    tr_port_forwarding_state upnp_state_ = TR_PORT_UNMAPPED;
 
-    tr_upnp* upnp = nullptr;
-    std::unique_ptr<tr_natpmp> natpmp;
+    tr_upnp* upnp_ = nullptr;
+    std::unique_ptr<tr_natpmp> natpmp_;
 
-    std::unique_ptr<libtransmission::Timer> timer;
+    std::unique_ptr<libtransmission::Timer> timer_;
 };
 
 /***
@@ -72,27 +72,27 @@ static char const* getNatStateStr(int state)
 
 static void natPulse(tr_shared* s, bool do_check)
 {
-    auto& session = s->session;
+    auto& session = s->session_;
     tr_port const private_peer_port = session.private_peer_port;
-    bool const is_enabled = s->isEnabled && !s->isShuttingDown;
+    bool const is_enabled = s->is_enabled_ && !s->is_shutting_down_;
 
-    if (!s->natpmp)
+    if (!s->natpmp_)
     {
-        s->natpmp = std::make_unique<tr_natpmp>();
+        s->natpmp_ = std::make_unique<tr_natpmp>();
     }
 
-    if (s->upnp == nullptr)
+    if (s->upnp_ == nullptr)
     {
-        s->upnp = tr_upnpInit();
+        s->upnp_ = tr_upnpInit();
     }
 
     auto const old_state = tr_sharedTraversalState(s);
 
     auto public_peer_port = tr_port{};
     auto received_private_port = tr_port{};
-    s->natpmpState = s->natpmp->pulse(private_peer_port, is_enabled, &public_peer_port, &received_private_port);
+    s->natpmp_state_ = s->natpmp_->pulse(private_peer_port, is_enabled, &public_peer_port, &received_private_port);
 
-    if (s->natpmpState == TR_PORT_MAPPED)
+    if (s->natpmp_state_ == TR_PORT_MAPPED)
     {
         session.public_peer_port = public_peer_port;
         session.private_peer_port = received_private_port;
@@ -102,7 +102,7 @@ static void natPulse(tr_shared* s, bool do_check)
             fmt::arg("private_port", session.private_peer_port.host())));
     }
 
-    s->upnpState = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
+    s->upnp_state_ = tr_upnpPulse(s->upnp_, private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
 
     if (auto const new_state = tr_sharedTraversalState(s); new_state != old_state)
     {
@@ -115,7 +115,7 @@ static void natPulse(tr_shared* s, bool do_check)
 
 static void restartTimer(tr_shared* s)
 {
-    auto& timer = s->timer;
+    auto& timer = s->timer_;
     if (!timer)
     {
         return;
@@ -127,10 +127,10 @@ static void restartTimer(tr_shared* s)
     case TR_PORT_MAPPED:
         // if we're mapped, everything is fine... check back at `renew_time`
         // to renew the port forwarding if it's expired
-        s->doPortCheck = true;
-        if (auto const now = tr_time(); s->natpmp->renewTime() > now)
+        s->do_port_check_ = true;
+        if (auto const now = tr_time(); s->natpmp_->renewTime() > now)
         {
-            timer->startSingleShot(std::chrono::seconds{ s->natpmp->renewTime() - now });
+            timer->startSingleShot(std::chrono::seconds{ s->natpmp_->renewTime() - now });
         }
         else // ???
         {
@@ -155,11 +155,11 @@ static void onTimer(void* vshared)
     auto* s = static_cast<tr_shared*>(vshared);
 
     TR_ASSERT(s != nullptr);
-    TR_ASSERT(s->timer);
+    TR_ASSERT(s->timer_);
 
     /* do something */
-    natPulse(s, s->doPortCheck);
-    s->doPortCheck = false;
+    natPulse(s, s->do_port_check_);
+    s->do_port_check_ = false;
 
     /* set up the timer for the next pulse */
     restartTimer(s);
@@ -176,7 +176,7 @@ tr_shared* tr_sharedInit(tr_session& session)
 
 static void stop_timer(tr_shared* s)
 {
-    s->timer.reset();
+    s->timer_.reset();
 }
 
 static void stop_forwarding(tr_shared* s)
@@ -184,12 +184,12 @@ static void stop_forwarding(tr_shared* s)
     tr_logAddTrace("stopped");
     natPulse(s, false);
 
-    s->natpmp.reset();
-    s->natpmpState = TR_PORT_UNMAPPED;
+    s->natpmp_.reset();
+    s->natpmp_state_ = TR_PORT_UNMAPPED;
 
-    tr_upnpClose(s->upnp);
-    s->upnp = nullptr;
-    s->upnpState = TR_PORT_UNMAPPED;
+    tr_upnpClose(s->upnp_);
+    s->upnp_ = nullptr;
+    s->upnp_state_ = TR_PORT_UNMAPPED;
 
     stop_timer(s);
 }
@@ -198,15 +198,15 @@ void tr_sharedClose(tr_session& session)
 {
     tr_shared* shared = session.shared;
 
-    shared->isShuttingDown = true;
+    shared->is_shutting_down_ = true;
     stop_forwarding(shared);
-    shared->session.shared = nullptr;
+    shared->session_.shared = nullptr;
     delete shared;
 }
 
 static void start_timer(tr_shared* s)
 {
-    s->timer = s->session.timerMaker().create(onTimer, s);
+    s->timer_ = s->session_.timerMaker().create(onTimer, s);
     restartTimer(s);
 }
 
@@ -214,12 +214,12 @@ void tr_sharedTraversalEnable(tr_shared* s, bool is_enable)
 {
     if (is_enable)
     {
-        s->isEnabled = true;
+        s->is_enabled_ = true;
         start_timer(s);
     }
     else
     {
-        s->isEnabled = false;
+        s->is_enabled_ = false;
         stop_forwarding(s);
     }
 }
@@ -228,7 +228,7 @@ void tr_sharedPortChanged(tr_session& session)
 {
     auto* const s = session.shared;
 
-    if (s->isEnabled)
+    if (s->is_enabled_)
     {
         stop_timer(s);
         natPulse(s, false);
@@ -238,10 +238,10 @@ void tr_sharedPortChanged(tr_session& session)
 
 bool tr_sharedTraversalIsEnabled(tr_shared const* s)
 {
-    return s->isEnabled;
+    return s->is_enabled_;
 }
 
 tr_port_forwarding_state tr_sharedTraversalState(tr_shared const* s)
 {
-    return std::max(s->natpmpState, s->upnpState);
+    return std::max(s->natpmp_state_, s->upnp_state_);
 }
