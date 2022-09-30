@@ -15,6 +15,7 @@
 #include "handshake.h"
 #include "peer-io.h"
 #include "session.h" // tr_peerIdInit()
+#include "timer.h"
 
 #include "test-fixtures.h"
 

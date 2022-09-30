@@ -32,6 +32,7 @@
 #include "log.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "session.h"
+#include "timer.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"

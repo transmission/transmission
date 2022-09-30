@@ -36,7 +36,6 @@
 #include "quark.h"
 #include "session-id.h"
 #include "stats.h"
-#include "timer.h"
 #include "torrents.h"
 #include "tr-lpd.h"
 #include "verify.h"
@@ -62,6 +61,12 @@ struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
 struct tr_announcer_udp;
+
+namespace libtransmission
+{
+class Timer;
+class TimerMaker;
+} // namespace libtransmission
 
 namespace libtransmission::test
 {

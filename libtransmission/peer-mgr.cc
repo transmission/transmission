@@ -41,6 +41,7 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "session.h"
+#include "timer.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"

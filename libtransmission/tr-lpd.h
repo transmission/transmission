@@ -17,9 +17,13 @@
 #include "transmission.h"
 
 #include "net.h" // for tr_address, tr_port
-#include "timer.h"
 
 struct event_base;
+
+namespace libtransmission
+{
+class TimerMaker;
+}
 
 class tr_lpd
 {

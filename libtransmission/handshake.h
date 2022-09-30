@@ -17,10 +17,14 @@
 
 #include "net.h" // tr_address
 #include "peer-mse.h" // tr_message_stream_encryption::DH
-#include "timer.h"
 
 /** @addtogroup peers Peers
     @{ */
+
+namespace libtransmission
+{
+class Timer;
+}
 
 class tr_peerIo;
 

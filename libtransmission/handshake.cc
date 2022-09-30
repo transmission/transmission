@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <string_view>
 #include <utility>
 
@@ -20,6 +21,7 @@
 #include "handshake.h"
 #include "log.h"
 #include "peer-io.h"
+#include "timer.h"
 #include "tr-assert.h"
 #include "utils.h"
 

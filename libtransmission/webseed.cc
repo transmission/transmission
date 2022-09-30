@@ -23,8 +23,9 @@
 #include "cache.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
+#include "timer.h"
 #include "torrent.h"
-#include "trevent.h" /* tr_runInEventThread() */
+#include "trevent.h" // tr_runInEventThread()
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"
@@ -164,8 +165,8 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
-        , bandwidth_(&tor->bandwidth_)
-        , idle_timer(session->timerMaker().create([this]() { on_idle(this); }))
+        , bandwidth_{ &tor->bandwidth_ }
+        , idle_timer{ session->timerMaker().create([this]() { on_idle(this); }) }
     {
         idle_timer->startRepeating(IdleTimerInterval);
     }

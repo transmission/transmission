@@ -33,6 +33,7 @@
 #include "peer-msgs.h"
 #include "quark.h"
 #include "session.h"
+#include "timer.h"
 #include "torrent-magnet.h"
 #include "torrent.h"
 #include "tr-assert.h"

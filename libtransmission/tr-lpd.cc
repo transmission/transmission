@@ -28,6 +28,7 @@
 #include "crypto-utils.h" // for tr_rand_buffer()
 #include "log.h"
 #include "net.h"
+#include "timer.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h" // for tr_net_init()
