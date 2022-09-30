@@ -29,8 +29,9 @@ using namespace std::literals;
 class tr_port_forwarding_impl final : public tr_port_forwarding
 {
 public:
-    explicit tr_port_forwarding_impl(tr_session& session)
+    explicit tr_port_forwarding_impl(tr_session& session, Mediator& mediator)
         : session_{ session }
+        , mediator_{ mediator }
         , timer_maker_{ session.timerMaker() }
     {
     }
@@ -207,7 +208,12 @@ private:
                 fmt::arg("private_port", session.private_peer_port.host())));
         }
 
-        upnp_state_ = tr_upnpPulse(upnp_, session.private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
+        upnp_state_ = tr_upnpPulse(
+            upnp_,
+            session.private_peer_port,
+            is_enabled,
+            do_check,
+            mediator_.incomingPeerAddress().readable());
 
         if (auto const new_state = state(); new_state != old_state)
         {
@@ -219,6 +225,7 @@ private:
     }
 
     tr_session& session_;
+    Mediator& mediator_;
     libtransmission::TimerMaker& timer_maker_;
 
     bool is_enabled_ = false;
@@ -234,7 +241,7 @@ private:
     std::unique_ptr<libtransmission::Timer> timer_;
 };
 
-std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(tr_session& session)
+std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(tr_session& session, Mediator& mediator)
 {
-    return std::make_unique<tr_port_forwarding_impl>(session);
+    return std::make_unique<tr_port_forwarding_impl>(session, mediator);
 }

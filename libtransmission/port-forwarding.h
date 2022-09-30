@@ -10,14 +10,25 @@
 #endif
 
 #include <memory> // for std::unique_ptr
+#include <string>
 
 #include "transmission.h" // for tr_port_forwarding_state
+
+#include "net.h" // for tr_address
 
 struct tr_session;
 
 class tr_port_forwarding
 {
 public:
+    class Mediator
+    {
+    public:
+        virtual ~Mediator() = default;
+
+        [[nodiscard]] virtual tr_address incomingPeerAddress() const = 0;
+    };
+
     virtual ~tr_port_forwarding() = default;
 
     virtual void portChanged() = 0;
@@ -28,5 +39,5 @@ public:
 
     [[nodiscard]] virtual tr_port_forwarding_state state() const = 0;
 
-    [[nodiscard]] static std::unique_ptr<tr_port_forwarding> create(tr_session&);
+    [[nodiscard]] static std::unique_ptr<tr_port_forwarding> create(tr_session&, Mediator&);
 };

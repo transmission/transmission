@@ -32,14 +32,15 @@
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
+#include "port-forwarding.h"
 #include "quark.h"
 #include "session-id.h"
 #include "stats.h"
 #include "timer.h"
 #include "torrents.h"
 #include "tr-lpd.h"
-#include "web.h"
 #include "verify.h"
+#include "web.h"
 
 enum tr_auto_switch_state_t
 {
@@ -889,6 +890,25 @@ private:
     bool should_delete_source_torrents_ = false;
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
+
+    class PortForwardingMediator final : public tr_port_forwarding::Mediator
+    {
+    public:
+        explicit PortForwardingMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] tr_address incomingPeerAddress() const override
+        {
+            return session_.bind_ipv4.addr_;
+        }
+
+    private:
+        tr_session& session_;
+    };
+
+    PortForwardingMediator port_forwarding_mediator_{ *this };
 
     class WebMediator final : public tr_web::Mediator
     {
