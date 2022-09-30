@@ -56,6 +56,7 @@ struct evdns_base;
 class tr_rpc_server;
 class tr_web;
 class tr_lpd;
+class tr_port_forwarding;
 struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
@@ -550,7 +551,7 @@ public:
     }
 
     struct tr_peerMgr* peerMgr = nullptr;
-    struct tr_shared* shared = nullptr;
+    std::unique_ptr<tr_port_forwarding> port_forwarding_;
 
     std::unique_ptr<Cache> cache;
 
