@@ -738,7 +738,7 @@ void tr_session::initImpl(init_data& data)
     **/
 
     tr_sys_dir_create(tr_pathbuf{ configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    blocklists_.clear();
+    this->blocklists_.clear();
     this->blocklists_ = BlocklistFile::loadBlocklists(configDir(), useBlocklist());
 
     tr_announcerInit(this);
