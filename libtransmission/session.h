@@ -904,6 +904,11 @@ private:
             return session_.bind_ipv4.addr_;
         }
 
+        [[nodiscard]] tr_port privatePeerPort() const override
+        {
+            return session_.private_peer_port;
+        }
+
     private:
         tr_session& session_;
     };

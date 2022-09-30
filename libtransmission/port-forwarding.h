@@ -27,6 +27,7 @@ public:
         virtual ~Mediator() = default;
 
         [[nodiscard]] virtual tr_address incomingPeerAddress() const = 0;
+        [[nodiscard]] virtual tr_port privatePeerPort() const = 0;
     };
 
     virtual ~tr_port_forwarding() = default;
