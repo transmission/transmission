@@ -330,7 +330,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 tr_add_external_auto_library(DEFLATE libdeflate deflate)
 if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION 1.10)
+    set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
