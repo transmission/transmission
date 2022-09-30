@@ -15,6 +15,12 @@
 #include <string_view>
 #include <vector>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h>
+#endif
+
 #include "file.h" // for tr_sys_file_t
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -74,16 +80,18 @@ public:
     size_t setContent(char const* filename);
 
 private:
-    struct IPv4Range
+    struct AddressRange
     {
         uint32_t begin_ = 0;
         uint32_t end_ = 0;
+        in6_addr begin6_;
+        in6_addr end6_;
 
         /// @brief Used for std::bsearch of an IPv4 address
-        static int compareAddressToRange(void const* va, void const* vb)
+        static int compareIPv4AddressToRange(void const* va, void const* vb)
         {
             auto const* a = reinterpret_cast<uint32_t const*>(va);
-            auto const* b = reinterpret_cast<IPv4Range const*>(vb);
+            auto const* b = reinterpret_cast<AddressRange const*>(vb);
 
             if (*a < b->begin_)
             {
@@ -97,26 +105,46 @@ private:
 
             return 0;
         }
+
+        /// @brief Used for std::bsearch of an IPv6 address
+        static int compareIPv6AddressToRange(void const* va, void const* vb)
+        {
+            auto const* a = reinterpret_cast<in6_addr const*>(va);
+            auto const* b = reinterpret_cast<AddressRange const*>(vb);
+
+            if (memcmp(&a->s6_addr, &b->begin6_.s6_addr, sizeof(a->s6_addr)) < 0)
+            {
+                return -1;
+            }
+
+            if (memcmp(&a->s6_addr, &b->end6_.s6_addr, sizeof(a->s6_addr)) > 0)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
     };
 
+    void RewriteBlocklistFile() const;
     void ensureLoaded() const;
     void load();
     void close();
 
-    static bool parseLine(char const* line, IPv4Range* range);
-    static bool compareAddressRangesByFirstAddress(IPv4Range const& a, IPv4Range const& b);
+    static bool parseLine(char const* line, AddressRange* range);
+    static bool compareAddressRangesByFirstAddress(AddressRange const& a, AddressRange const& b);
 
-    static bool parseLine1(std::string_view line, struct IPv4Range* range);
-    static bool parseLine2(std::string_view line, struct IPv4Range* range);
-    static bool parseLine3(char const* line, IPv4Range* range);
+    static bool parseLine1(std::string_view line, struct AddressRange* range);
+    static bool parseLine2(std::string_view line, struct AddressRange* range);
+    static bool parseLine3(char const* line, AddressRange* range);
 
 #ifdef TR_ENABLE_ASSERTS
     /// @brief Sanity checks: make sure the rules are sorted in ascending order and don't overlap
-    static void assertValidRules(std::vector<IPv4Range> const& ranges);
+    static void assertValidRules(std::vector<AddressRange> const& ranges);
 #endif
 
     std::string const filename_;
 
     bool is_enabled_ = false;
-    mutable std::vector<IPv4Range> rules_;
+    mutable std::vector<AddressRange> rules_;
 };
