@@ -474,7 +474,7 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
 
-enum tr_port_forwarding
+enum tr_port_forwarding_state
 {
     TR_PORT_ERROR,
     TR_PORT_UNMAPPED,
@@ -483,7 +483,7 @@ enum tr_port_forwarding
     TR_PORT_MAPPED
 };
 
-tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session);
+tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
 
 enum tr_direction
 {
