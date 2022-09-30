@@ -120,9 +120,9 @@ set(CURL_MINIMUM            7.28.0)
 set(CYASSL_MINIMUM          3.0)
 set(DEFLATE_MINIMUM         1.10)
 set(EVENT2_MINIMUM          2.1.0)
-set(GIO_MINIMUM             2.26.0)
-set(GLIB_MINIMUM            2.50.1)
-set(GTK_MINIMUM             3.24.0)
+set(GIOMM_MINIMUM           2.26.0)
+set(GLIBMM_MINIMUM          2.50.1)
+set(GTKMM_MINIMUM           3.24.0)
 set(LIBAPPINDICATOR_MINIMUM 0.4.90)
 set(OPENSSL_MINIMUM         0.9.7)
 set(POLARSSL_MINIMUM        1.3)
@@ -223,9 +223,9 @@ if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
     pkg_check_modules(GTK ${GTK_IS_REQUIRED}
-        gtkmm-3.0>=${GTK_MINIMUM}
-        glibmm-2.4>=${GLIB_MINIMUM}
-        giomm-2.4>=${GIO_MINIMUM})
+        gtkmm-3.0>=${GTKMM_MINIMUM}
+        glibmm-2.4>=${GLIBMM_MINIMUM}
+        giomm-2.4>=${GIOMM_MINIMUM})
 
     tr_fixup_auto_option(ENABLE_GTK GTK_FOUND GTK_IS_REQUIRED)
 
