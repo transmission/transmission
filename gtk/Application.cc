@@ -111,7 +111,7 @@ private:
     bool refresh_actions();
     void refresh_actions_soon();
 
-    void on_main_window_size_allocated(Gtk::Allocation& alloc);
+    void on_main_window_size_allocated();
     bool on_main_window_focus_in(GdkEventFocus* event);
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
@@ -384,23 +384,34 @@ void ensure_magnet_handler_exists()
 
 } // namespace
 
-void Application::Impl::on_main_window_size_allocated(Gtk::Allocation& /*alloc*/)
+void Application::Impl::on_main_window_size_allocated()
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    bool const is_maximized = wind_->is_maximized();
+#else
     auto const gdk_window = wind_->get_window();
     bool const is_maximized = gdk_window != nullptr && (gdk_window->get_state() & Gdk::WINDOW_STATE_MAXIMIZED) != 0;
+#endif
 
     gtr_pref_int_set(TR_KEY_main_window_is_maximized, is_maximized);
 
     if (!is_maximized)
     {
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
         int x;
         int y;
-        int w;
-        int h;
         wind_->get_position(x, y);
-        wind_->get_size(w, h);
         gtr_pref_int_set(TR_KEY_main_window_x, x);
         gtr_pref_int_set(TR_KEY_main_window_y, y);
+#endif
+
+        int w;
+        int h;
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        wind_->get_default_size(w, h);
+#else
+        wind_->get_size(w, h);
+#endif
         gtr_pref_int_set(TR_KEY_main_window_width, w);
         gtr_pref_int_set(TR_KEY_main_window_height, h);
     }
@@ -595,7 +606,13 @@ void Application::Impl::on_startup()
     /* create main window now to be a parent to any error dialogs */
     wind_ = MainWindow::create(app_, actions, core_);
     wind_->set_show_menubar(true);
-    wind_->signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    wind_->property_maximized().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+    wind_->property_default_width().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+    wind_->property_default_height().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+#else
+    wind_->signal_size_allocate().connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated)));
+#endif
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     auto const shortcut_controller = Gtk::ShortcutController::create(gtr_shortcuts_get_from_menu(main_menu));
@@ -772,8 +789,12 @@ void Application::Impl::app_setup()
 
 void Application::Impl::placeWindowFromPrefs()
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    wind_->set_default_size((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
+#else
     wind_->resize((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
     wind_->move((int)gtr_pref_int_get(TR_KEY_main_window_x), (int)gtr_pref_int_get(TR_KEY_main_window_y));
+#endif
 }
 
 void Application::Impl::presentMainWindow()

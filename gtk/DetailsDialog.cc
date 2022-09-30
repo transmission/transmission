@@ -55,7 +55,7 @@ private:
     void tracker_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
     void options_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
 
-    void on_details_window_size_allocated(Gtk::Allocation& alloc);
+    void on_details_window_size_allocated();
 
     bool onPeerViewQueryTooltip(int x, int y, bool keyboard_tip, Glib::RefPtr<Gtk::Tooltip> const& tooltip);
     void onMorePeerInfoToggled();
@@ -2446,11 +2446,15 @@ void DetailsDialog::Impl::refresh()
     }
 }
 
-void DetailsDialog::Impl::on_details_window_size_allocated(Gtk::Allocation& /*alloc*/)
+void DetailsDialog::Impl::on_details_window_size_allocated()
 {
     int w = 0;
     int h = 0;
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    dialog_.get_default_size(w, h);
+#else
     dialog_.get_size(w, h);
+#endif
     gtr_pref_int_set(TR_KEY_details_window_width, w);
     gtr_pref_int_set(TR_KEY_details_window_height, h);
 }
@@ -2521,8 +2525,16 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     , file_label_(gtr_get_widget<Gtk::Label>(builder, "files_label"))
 {
     /* return saved window size */
-    dialog_.resize((int)gtr_pref_int_get(TR_KEY_details_window_width), (int)gtr_pref_int_get(TR_KEY_details_window_height));
-    dialog_.signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
+    auto const width = (int)gtr_pref_int_get(TR_KEY_details_window_width);
+    auto const height = (int)gtr_pref_int_get(TR_KEY_details_window_height);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    dialog_.set_default_size(width, height);
+    dialog_.property_default_width().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
+    dialog_.property_default_height().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
+#else
+    dialog_.resize(width, height);
+    dialog_.signal_size_allocate().connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated)));
+#endif
 
     dialog_.signal_response().connect(sigc::hide<0>(sigc::mem_fun(dialog_, &DetailsDialog::close)));
 

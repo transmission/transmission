@@ -542,7 +542,9 @@ MainWindow::Impl::Impl(
     /* make the window */
     window.set_title(Glib::get_application_name());
     window.set_default_size(gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     window.move(gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
+#endif
 
     if (gtr_pref_flag_get(TR_KEY_main_window_is_maximized))
     {
