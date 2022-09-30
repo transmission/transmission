@@ -386,8 +386,6 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes
             break;
         }
     }
-    TR_ASSERT(walk4 = std::data(nodes4) + std::size(nodes4));
-    TR_ASSERT(walk6 = std::data(nodes6) + std::size(nodes6));
 
     if (!isBootstrapDone(session, 0))
     {
@@ -759,7 +757,10 @@ void tr_dhtUpkeep(tr_session* session)
 
 void tr_dhtCallback(tr_session* session, unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen)
 {
-    TR_ASSERT(tr_dhtEnabled(session));
+    if (!tr_dhtEnabled(session))
+    {
+        return;
+    }
 
     time_t tosleep = 0;
     int const rc = locked_dht::periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
