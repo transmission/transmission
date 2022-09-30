@@ -909,6 +909,17 @@ private:
             return session_.private_peer_port;
         }
 
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        {
+            return session_.timerMaker();
+        }
+
+        void onPortForwarded(tr_port public_port, tr_port private_port) override
+        {
+            session_.public_peer_port = public_port;
+            session_.private_peer_port = private_port;
+        }
+
     private:
         tr_session& session_;
     };

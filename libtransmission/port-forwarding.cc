@@ -18,7 +18,6 @@
 #include "port-forwarding-natpmp.h"
 #include "port-forwarding-upnp.h"
 #include "port-forwarding.h"
-#include "session.h"
 #include "timer.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -29,10 +28,8 @@ using namespace std::literals;
 class tr_port_forwarding_impl final : public tr_port_forwarding
 {
 public:
-    explicit tr_port_forwarding_impl(tr_session& session, Mediator& mediator)
-        : session_{ session }
-        , mediator_{ mediator }
-        , timer_maker_{ session.timerMaker() }
+    explicit tr_port_forwarding_impl(Mediator& mediator)
+        : mediator_{ mediator }
     {
     }
 
@@ -106,7 +103,7 @@ private:
 
     void startTimer()
     {
-        timer_ = timer_maker_.create([this]() { this->onTimer(); });
+        timer_ = mediator_.timerMaker().create([this]() { this->onTimer(); });
         restartTimer();
     }
 
@@ -181,7 +178,6 @@ private:
 
     void natPulse(bool do_check)
     {
-        auto& session = session_;
         auto const is_enabled = is_enabled_ && !is_shutting_down_;
 
         if (!natpmp_)
@@ -202,8 +198,7 @@ private:
         if (!std::empty(result.public_port) && !std::empty(result.private_port))
         {
             private_peer_port = result.private_port;
-            session.public_peer_port = result.public_port;
-            session.private_peer_port = result.private_port;
+            mediator_.onPortForwarded(result.public_port, result.private_port);
             tr_logAddInfo(fmt::format(
                 _("Mapped private port {private_port} to public port {public_port}"),
                 fmt::arg("public_port", result.public_port.host()),
@@ -221,9 +216,7 @@ private:
         }
     }
 
-    tr_session& session_;
     Mediator& mediator_;
-    libtransmission::TimerMaker& timer_maker_;
 
     bool is_enabled_ = false;
     bool is_shutting_down_ = false;
@@ -238,7 +231,7 @@ private:
     std::unique_ptr<libtransmission::Timer> timer_;
 };
 
-std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(tr_session& session, Mediator& mediator)
+std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(Mediator& mediator)
 {
-    return std::make_unique<tr_port_forwarding_impl>(session, mediator);
+    return std::make_unique<tr_port_forwarding_impl>(mediator);
 }
