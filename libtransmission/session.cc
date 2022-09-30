@@ -738,7 +738,8 @@ void tr_session::initImpl(init_data& data)
     **/
 
     tr_sys_dir_create(tr_pathbuf{ configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    loadBlocklists();
+    blocklists_.clear();
+    this->blocklists_ = BlocklistFile::loadBlocklists(configDir(), useBlocklist());
 
     tr_announcerInit(this);
 
@@ -2232,86 +2233,6 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-void tr_session::loadBlocklists()
-{
-    auto loadme = std::unordered_set<std::string>{};
-    auto const is_enabled = useBlocklist();
-
-    /* walk the blocklist directory... */
-    auto const dirname = tr_pathbuf{ configDir(), "/blocklists"sv };
-    auto const odir = tr_sys_dir_open(dirname);
-
-    if (odir == TR_BAD_SYS_DIR)
-    {
-        return;
-    }
-
-    char const* name = nullptr;
-    while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-    {
-        auto load = std::string{};
-
-        if (name[0] == '.') /* ignore dotfiles */
-        {
-            continue;
-        }
-
-        if (auto const path = tr_pathbuf{ dirname, '/', name }; tr_strvEndsWith(path, ".bin"sv))
-        {
-            load = path;
-        }
-        else
-        {
-            auto const binname = tr_pathbuf{ dirname, '/', name, ".bin"sv };
-
-            if (auto const bininfo = tr_sys_path_get_info(binname); !bininfo)
-            {
-                // create it
-                auto b = BlocklistFile{ binname, is_enabled };
-                if (auto const n = b.setContent(path); n > 0)
-                {
-                    load = binname;
-                }
-            }
-            else if (auto const pathinfo = tr_sys_path_get_info(path);
-                     pathinfo && pathinfo->last_modified_at >= bininfo->last_modified_at)
-            {
-                // update it
-                auto const old = tr_pathbuf{ binname, ".old"sv };
-                tr_sys_path_remove(old);
-                tr_sys_path_rename(binname, old);
-
-                BlocklistFile b(binname, is_enabled);
-
-                if (b.setContent(path) > 0)
-                {
-                    tr_sys_path_remove(old);
-                }
-                else
-                {
-                    tr_sys_path_remove(binname);
-                    tr_sys_path_rename(old, binname);
-                }
-            }
-        }
-
-        if (!std::empty(load))
-        {
-            loadme.emplace(load);
-        }
-    }
-
-    blocklists_.clear();
-    std::transform(
-        std::begin(loadme),
-        std::end(loadme),
-        std::back_inserter(blocklists_),
-        [&is_enabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), is_enabled); });
-
-    /* cleanup */
-    tr_sys_dir_close(odir);
-}
-
 void tr_session::useBlocklist(bool enabled)
 {
     this->blocklist_enabled_ = enabled;
@@ -2333,7 +2254,7 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
 void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_.clear();
-    session->loadBlocklists();
+    session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
 
     tr_peerMgrOnBlocklistChanged(session->peerMgr);
 }

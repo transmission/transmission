@@ -8,7 +8,9 @@
 #include <cstdio>
 #include <cstdlib> // bsearch()
 #include <fstream>
+#include <memory>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 #include <fmt/core.h>
@@ -20,7 +22,10 @@
 #include "file.h"
 #include "log.h"
 #include "net.h"
+#include "tr-strbuf.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 /***
 ****  PRIVATE
@@ -117,6 +122,89 @@ void BlocklistFile::ensureLoaded() const
 /***
 ****  PACKAGE-VISIBLE
 ***/
+
+std::vector<std::unique_ptr<BlocklistFile>> BlocklistFile::loadBlocklists(
+    std::string_view const config_dir,
+    bool const is_enabled)
+{
+    auto loadme = std::unordered_set<std::string>{};
+    auto working_set = std::vector<std::unique_ptr<BlocklistFile>>{};
+
+    /* walk the blocklist directory... */
+    auto const dirname = tr_pathbuf{ config_dir, "/blocklists"sv };
+    auto const odir = tr_sys_dir_open(dirname);
+
+    if (odir == TR_BAD_SYS_DIR)
+    {
+        return working_set;
+    }
+
+    char const* name = nullptr;
+    while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+    {
+        auto load = std::string{};
+
+        if (name[0] == '.') /* ignore dotfiles */
+        {
+            continue;
+        }
+
+        if (auto const path = tr_pathbuf{ dirname, '/', name }; tr_strvEndsWith(path, ".bin"sv))
+        {
+            load = path;
+        }
+        else
+        {
+            auto const binname = tr_pathbuf{ dirname, '/', name, ".bin"sv };
+
+            if (auto const bininfo = tr_sys_path_get_info(binname); !bininfo)
+            {
+                // create it
+                auto b = BlocklistFile{ binname, is_enabled };
+                if (auto const n = b.setContent(path); n > 0)
+                {
+                    load = binname;
+                }
+            }
+            else if (auto const pathinfo = tr_sys_path_get_info(path);
+                     pathinfo && pathinfo->last_modified_at >= bininfo->last_modified_at)
+            {
+                // update it
+                auto const old = tr_pathbuf{ binname, ".old"sv };
+                tr_sys_path_remove(old);
+                tr_sys_path_rename(binname, old);
+
+                BlocklistFile b(binname, is_enabled);
+
+                if (b.setContent(path) > 0)
+                {
+                    tr_sys_path_remove(old);
+                }
+                else
+                {
+                    tr_sys_path_remove(binname);
+                    tr_sys_path_rename(old, binname);
+                }
+            }
+        }
+
+        if (!std::empty(load))
+        {
+            loadme.emplace(load);
+        }
+    }
+
+    std::transform(
+        std::begin(loadme),
+        std::end(loadme),
+        std::back_inserter(working_set),
+        [&is_enabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), is_enabled); });
+
+    /* cleanup */
+    tr_sys_dir_close(odir);
+
+    return working_set;
+}
 
 bool BlocklistFile::hasAddress(tr_address const& addr)
 {

@@ -11,6 +11,7 @@
 
 #include <cstddef> // for size_t
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -78,6 +79,8 @@ public:
 
     /// @brief Read the file of ranges, sort and merge, write to our own file, and reload from it
     size_t setContent(char const* filename);
+
+    static std::vector<std::unique_ptr<BlocklistFile>> loadBlocklists(std::string_view const config_dir, bool const is_enabled);
 
 private:
     struct AddressRange
