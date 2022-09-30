@@ -467,7 +467,7 @@ MessageLogWindow::Impl::Impl(
     action_group->add_action(clear_action);
 
     auto const pause_action = Gio::SimpleAction::create_bool("pause-message-log");
-    pause_action->signal_activate().connect([this, &action = *gtr_get_ptr(pause_action)](auto const& /*value*/)
+    pause_action->signal_activate().connect([this, &action = *pause_action.get()](auto const& /*value*/)
                                             { onPauseToggled(action); });
     action_group->add_action(pause_action);
 

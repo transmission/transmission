@@ -266,16 +266,6 @@ inline Glib::ustring gtr_sprintf(Glib::ustring const& fmt, Ts const&... args)
 #endif
 }
 
-template<typename T>
-inline T* gtr_get_ptr(Glib::RefPtr<T> const& ptr)
-{
-#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 56)
-    return ptr.operator->();
-#else
-    return ptr.get();
-#endif
-}
-
 template<typename T, typename U>
 inline Glib::RefPtr<T> gtr_ptr_static_cast(Glib::RefPtr<U> const& ptr)
 {
