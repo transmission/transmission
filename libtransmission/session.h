@@ -768,8 +768,6 @@ public:
 private:
     [[nodiscard]] tr_port randomPort() const;
 
-    void loadBlocklists();
-
     struct init_data;
     void initImpl(init_data&);
     void setImpl(init_data&);
