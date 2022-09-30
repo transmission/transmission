@@ -386,8 +386,6 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes
             break;
         }
     }
-    //TR_ASSERT(walk4 == std::data(nodes4) + std::size(nodes4));
-    //TR_ASSERT(walk6 == std::data(nodes6) + std::size(nodes6));
 
     if (!isBootstrapDone(session, 0))
     {
