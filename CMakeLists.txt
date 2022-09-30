@@ -25,6 +25,19 @@ include(ExternalProject)
 include(GNUInstallDirs)
 include(TrMacros)
 
+set(CURL_MINIMUM            7.28.0)
+set(CYASSL_MINIMUM          3.0)
+set(DEFLATE_MINIMUM         1.10)
+set(EVENT2_MINIMUM          2.1.0)
+set(GIOMM_MINIMUM           2.26.0)
+set(GLIBMM_MINIMUM          2.60.0)
+set(GTKMM_MINIMUM           3.24.0)
+set(LIBAPPINDICATOR_MINIMUM 0.4.90)
+set(OPENSSL_MINIMUM         0.9.7)
+set(POLARSSL_MINIMUM        1.3)
+set(PSL_MINIMUM             0.21.1)
+set(QT_MINIMUM              5.6)
+
         option(ENABLE_DAEMON        "Build daemon" ON)
 tr_auto_option(ENABLE_GTK           "Build GTK+ client" AUTO)
 tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
@@ -114,19 +127,6 @@ endif()
 string(SUBSTRING "${TR_VCS_REVISION}" 0 10 TR_VCS_REVISION)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-set(PSL_MINIMUM             0.21.1)
-set(CURL_MINIMUM            7.28.0)
-set(CYASSL_MINIMUM          3.0)
-set(DEFLATE_MINIMUM         1.10)
-set(EVENT2_MINIMUM          2.1.0)
-set(GIO_MINIMUM             2.26.0)
-set(GLIB_MINIMUM            2.50.1)
-set(GTK_MINIMUM             3.24.0)
-set(LIBAPPINDICATOR_MINIMUM 0.4.90)
-set(OPENSSL_MINIMUM         0.9.7)
-set(POLARSSL_MINIMUM        1.3)
-set(QT_MINIMUM              5.6)
 
 if(WIN32)
     foreach(L C CXX)
@@ -223,9 +223,9 @@ if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
     pkg_check_modules(GTK ${GTK_IS_REQUIRED}
-        gtkmm-3.0>=${GTK_MINIMUM}
-        glibmm-2.4>=${GLIB_MINIMUM}
-        giomm-2.4>=${GIO_MINIMUM})
+        gtkmm-3.0>=${GTKMM_MINIMUM}
+        glibmm-2.4>=${GLIBMM_MINIMUM}
+        giomm-2.4>=${GIOMM_MINIMUM})
 
     tr_fixup_auto_option(ENABLE_GTK GTK_FOUND GTK_IS_REQUIRED)
 
@@ -330,7 +330,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 tr_add_external_auto_library(DEFLATE libdeflate deflate)
 if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION 1.10)
+    set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
