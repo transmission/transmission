@@ -20,7 +20,11 @@ endif()
 
 find_program(APPSTREAM appstreamcli)
 
-set(UI_SUBDIR ui/gtk3)
+if(GTK_VERSION EQUAL 4)
+    set(UI_SUBDIR ui/gtk4)
+else()
+    set(UI_SUBDIR ui/gtk3)
+endif()
 
 set(${PROJECT_NAME}_UI_FILES
     ${UI_SUBDIR}/AddTrackerDialog.ui
