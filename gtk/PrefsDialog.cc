@@ -163,13 +163,19 @@ void init_text_view(Gtk::TextView& view, tr_quark const key, Glib::RefPtr<Sessio
     auto buffer = view.get_buffer();
     buffer->set_text(gtr_pref_string_get(key));
 
+    auto const save_buffer = [buffer, key, core]()
+    {
+        core->set_pref(key, buffer->get_text());
+    };
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto focus_controller = Gtk::EventControllerFocus::create();
+    focus_controller->signal_leave().connect(save_buffer);
+    view.add_controller(focus_controller);
+#else
     view.add_events(Gdk::FOCUS_CHANGE_MASK);
-    view.signal_focus_out_event().connect(
-        [buffer, key, core](GdkEventFocus* /*event*/)
-        {
-            core->set_pref(key, buffer->get_text());
-            return false;
-        });
+    view.signal_focus_out_event().connect_notify(sigc::hide<0>(save_buffer));
+#endif
 }
 
 void chosen_cb(PathButton* w, tr_quark const key, Glib::RefPtr<Session> const& core)

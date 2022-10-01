@@ -112,7 +112,7 @@ private:
     void refresh_actions_soon();
 
     void on_main_window_size_allocated();
-    bool on_main_window_focus_in(GdkEventFocus* event);
+    void on_main_window_focus_in();
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     bool on_drag_data_received(Glib::ValueBase const& value, double x, double y);
@@ -1097,14 +1097,12 @@ void Application::Impl::on_core_error(Session::ErrorCode code, Glib::ustring con
     }
 }
 
-bool Application::Impl::on_main_window_focus_in(GdkEventFocus* /*event*/)
+void Application::Impl::on_main_window_focus_in()
 {
     if (wind_ != nullptr)
     {
         gtr_window_set_urgency_hint(*wind_, false);
     }
-
-    return false;
 }
 
 void Application::Impl::on_add_torrent(tr_ctor* ctor)
@@ -1113,7 +1111,14 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
         OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
     gtr_window_on_close(*w, [w]() mutable { w.reset(); });
-    w->signal_focus_in_event().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto focus_controller = Gtk::EventControllerFocus::create();
+    focus_controller->signal_enter().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
+    w->add_controller(focus_controller);
+#else
+    w->signal_focus_in_event().connect_notify(sigc::hide<0>(sigc::mem_fun(*this, &Impl::on_main_window_focus_in)));
+#endif
 
     if (wind_ != nullptr)
     {
