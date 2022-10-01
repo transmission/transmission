@@ -685,16 +685,43 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
+    auto const process = [&entry](Glib::ustring const& text)
+    {
+        auto const sv = tr_strvStrip(text.raw());
+        if (!sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
+        {
+            entry.set_text(text);
+            return true;
+        }
+        return false;
+    };
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto const request = [](Glib::RefPtr<Gdk::Clipboard> const& clipboard, auto&& callback)
+    {
+        clipboard->read_text_async([clipboard, callback](Glib::RefPtr<Gio::AsyncResult>& result)
+                                   { callback(clipboard->read_text_finish(result)); });
+    };
+
+    request(
+        Gdk::Display::get_default()->get_primary_clipboard(),
+        [request, process](Glib::ustring const& text)
+        {
+            if (!process(text))
+            {
+                request(Gdk::Display::get_default()->get_clipboard(), process);
+            }
+        });
+#else
     for (auto const& str : { Gtk::Clipboard::get(GDK_SELECTION_PRIMARY)->wait_for_text(),
                              Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD)->wait_for_text() })
     {
-        auto const sv = tr_strvStrip(str.raw());
-        if (!sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
+        if (process(str))
         {
-            entry.set_text(str);
-            return;
+            break;
         }
     }
+#endif
 }
 
 /***

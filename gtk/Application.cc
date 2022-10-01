@@ -1503,18 +1503,13 @@ void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
 {
     auto const magnet = tr_torrentGetMagnetLink(tor);
     auto const display = wind_->get_display();
-    GdkAtom selection;
-    Glib::RefPtr<Gtk::Clipboard> clipboard;
 
     /* this is The Right Thing for copy/paste... */
-    selection = GDK_SELECTION_CLIPBOARD;
-    clipboard = Gtk::Clipboard::get_for_display(display, selection);
-    clipboard->set_text(magnet);
+    IF_GTKMM4(display->get_clipboard(), Gtk::Clipboard::get_for_display(display, GDK_SELECTION_CLIPBOARD))->set_text(magnet);
 
     /* ...but people using plain ol' X need this instead */
-    selection = GDK_SELECTION_PRIMARY;
-    clipboard = Gtk::Clipboard::get_for_display(display, selection);
-    clipboard->set_text(magnet);
+    IF_GTKMM4(display->get_primary_clipboard(), Gtk::Clipboard::get_for_display(display, GDK_SELECTION_PRIMARY))
+        ->set_text(magnet);
 }
 
 void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data)
