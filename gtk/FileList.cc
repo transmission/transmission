@@ -609,13 +609,14 @@ void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator 
 /* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
 std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const& iter)
 {
-    std::list<std::string> tokens;
+    std::vector<std::string> tokens;
     for (auto child = iter; child; child = child->parent())
     {
-        tokens.push_front(child->get_value(file_cols.label));
+        tokens.push_back(child->get_value(file_cols.label));
     }
 
-    tokens.emplace_front(tr_torrentGetCurrentDir(tor));
+    tokens.emplace_back(tr_torrentGetCurrentDir(tor));
+    std::reverse(tokens.begin(), tokens.end());
     return Glib::build_filename(tokens);
 }
 

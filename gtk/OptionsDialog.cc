@@ -28,6 +28,8 @@
 namespace
 {
 
+auto const ShowOptionsDialogChoice = Glib::ustring("show_options_dialog");
+
 std::string get_source_file(tr_ctor& ctor)
 {
     if (char const* source_file = tr_ctorGetSourceFile(&ctor); source_file != nullptr)
@@ -322,14 +324,13 @@ OptionsDialog::Impl::Impl(
 
 void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<Session> const& core)
 {
-    /* remember this folder the next time we use this dialog */
-    gtr_pref_string_set(TR_KEY_open_dialog_dir, get_current_folder());
-
     if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
-        auto const* const tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
+        /* remember this folder the next time we use this dialog */
+        gtr_pref_string_set(TR_KEY_open_dialog_dir, IF_GTKMM4(get_current_folder, get_current_folder_file)()->get_path());
+
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-        bool const do_prompt = tb->get_active();
+        bool const do_prompt = get_choice(ShowOptionsDialogChoice) == "true";
         bool const do_notify = false;
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
@@ -370,13 +371,11 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
 
     if (auto const folder = gtr_pref_string_get(TR_KEY_open_dialog_dir); !folder.empty())
     {
-        set_current_folder(folder);
+        IF_GTKMM4(set_current_folder, set_current_folder_file)(Gio::File::create_for_path(folder));
     }
 
-    auto* c = Gtk::make_managed<Gtk::CheckButton>(_("Show _options dialog"), true);
-    c->set_active(gtr_pref_flag_get(TR_KEY_show_options_window));
-    set_extra_widget(*c);
-    c->show();
+    add_choice(ShowOptionsDialogChoice, _("Show options dialog"));
+    set_choice(ShowOptionsDialogChoice, gtr_pref_flag_get(TR_KEY_show_options_window) ? "true" : "false");
 }
 
 /***

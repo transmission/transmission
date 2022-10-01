@@ -218,7 +218,7 @@ void MessageLogWindow::Impl::onSaveDialogResponse(std::shared_ptr<Gtk::FileChoos
 {
     if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
-        doSave(*d, d->get_filename());
+        doSave(*d, d->get_file()->get_path());
     }
 
     d.reset();
