@@ -902,7 +902,7 @@ auto SpeedPage::get_weekday_string(Glib::Date::Weekday weekday)
 {
     auto date = Glib::Date{};
     date.set_time_current();
-    date.add_days(weekday - date.get_weekday());
+    date.add_days(static_cast<int>(weekday) - static_cast<int>(date.get_weekday()));
     return date.format_string("%A");
 }
 

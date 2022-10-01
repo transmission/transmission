@@ -507,5 +507,4 @@ MessageLogWindow::Impl::Impl(
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     scroll_to_bottom();
-    window_.show_all_children();
 }

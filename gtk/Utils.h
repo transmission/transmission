@@ -168,6 +168,7 @@ void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content);
 
 void gtr_window_set_skip_taskbar_hint(Gtk::Window& window, bool value);
 void gtr_window_set_urgency_hint(Gtk::Window& window, bool value);
+void gtr_window_raise(Gtk::Window& window);
 
 /***
 ****
@@ -326,20 +327,28 @@ struct fmt::formatter<Glib::ustring> : formatter<std::string>
     }
 };
 
-template<typename T, typename... ArgTs>
-T* gtr_get_widget(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, ArgTs&&... args)
+template<typename T>
+T* gtr_get_widget(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name)
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    return builder->get_widget<T>(name);
+#else
     T* widget = nullptr;
-    builder->get_widget(name, widget, std::forward<ArgTs>(args)...);
+    builder->get_widget(name, widget);
     return widget;
+#endif
 }
 
 template<typename T, typename... ArgTs>
 T* gtr_get_widget_derived(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, ArgTs&&... args)
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    return Gtk::Builder::get_widget_derived<T>(builder, name, std::forward<ArgTs>(args)...);
+#else
     T* widget = nullptr;
     builder->get_widget_derived(name, widget, std::forward<ArgTs>(args)...);
     return widget;
+#endif
 }
 
 template<typename F>

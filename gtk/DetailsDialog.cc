@@ -1733,7 +1733,7 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
 
     peer_view_->set_model(m);
     peer_view_->set_has_tooltip(true);
-    peer_view_->signal_query_tooltip().connect(sigc::mem_fun(*this, &Impl::onPeerViewQueryTooltip));
+    peer_view_->signal_query_tooltip().connect(sigc::mem_fun(*this, &Impl::onPeerViewQueryTooltip), false);
     setup_tree_view_button_event_handling(
         *peer_view_,
         {},

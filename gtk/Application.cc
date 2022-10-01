@@ -201,7 +201,7 @@ namespace
 template<typename T>
 void gtr_window_present(T const& window)
 {
-    window->present(gtk_get_current_event_time());
+    window->present(GDK_CURRENT_TIME);
 }
 
 /***
@@ -564,8 +564,8 @@ void Application::Impl::on_startup()
     /* Add style provider to the window. */
     auto css_provider = Gtk::CssProvider::create();
     css_provider->load_from_resource(gtr_get_full_resource_path("transmission-ui.css"));
-    Gtk::StyleContext::add_provider_for_screen(
-        Gdk::Screen::get_default(),
+    Gtk::StyleContext::IF_GTKMM4(add_provider_for_display, add_provider_for_screen)(
+        IF_GTKMM4(Gdk::Display::get_default(), Gdk::Screen::get_default()),
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
@@ -816,7 +816,7 @@ void Application::Impl::presentMainWindow()
     }
 
     gtr_window_present(wind_);
-    wind_->get_window()->raise();
+    gtr_window_raise(*wind_);
 }
 
 void Application::Impl::hideMainWindow()
@@ -979,8 +979,10 @@ void Application::Impl::on_app_exit()
     /* stop the refresh-actions timer */
     refresh_actions_tag_.disconnect();
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     auto* c = static_cast<Gtk::Container*>(wind_.get());
     c->remove(*static_cast<Gtk::Bin*>(c)->get_child());
+#endif
 
     wind_->set_show_menubar(false);
 
@@ -988,7 +990,11 @@ void Application::Impl::on_app_exit()
     p->set_column_spacing(GUI_PAD_BIG);
     p->set_halign(TR_GTK_ALIGN(CENTER));
     p->set_valign(TR_GTK_ALIGN(CENTER));
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    wind_->set_child(*p);
+#else
     c->add(*p);
+#endif
 
     auto* icon = Gtk::make_managed<Gtk::Image>();
     icon->property_icon_name() = "network-workgroup";
@@ -1013,7 +1019,9 @@ void Application::Impl::on_app_exit()
     button->signal_clicked().connect([]() { ::exit(0); });
     p->attach(*button, 1, 2, 1, 1);
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     p->show_all();
+#endif
     button->grab_focus();
 
     /* clear the UI */
@@ -1083,7 +1091,7 @@ void Application::Impl::on_core_error(Session::ErrorCode code, Glib::ustring con
     switch (code)
     {
     case Session::ERR_ADD_TORRENT_ERR:
-        error_list_.push_back(Glib::path_get_basename(msg));
+        error_list_.push_back(Glib::path_get_basename(msg.raw()));
         break;
 
     case Session::ERR_ADD_TORRENT_DUP:

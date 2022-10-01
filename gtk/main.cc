@@ -76,7 +76,9 @@ int main(int argc, char** argv)
 
     Glib::OptionContext option_context(_("[torrent files or urls]"));
     option_context.set_main_group(main_group);
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     Gtk::Main::add_gtk_option_group(option_context);
+#endif
     option_context.set_translation_domain(GETTEXT_PACKAGE);
 
     try

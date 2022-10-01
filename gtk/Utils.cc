@@ -271,7 +271,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
         TR_GTK_BUTTONS_TYPE(CLOSE));
     w->set_secondary_text(secondary);
     w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
-    w->show_all();
+    w->show();
 }
 
 /* pop up the context menu if a user right-clicks.
@@ -645,6 +645,13 @@ void gtr_window_set_urgency_hint([[maybe_unused]] Gtk::Window& window, [[maybe_u
 #endif
 #else
     window.set_urgency_hint(value);
+#endif
+}
+
+void gtr_window_raise([[maybe_unused]] Gtk::Window& window)
+{
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
+    window.get_window()->raise();
 #endif
 }
 

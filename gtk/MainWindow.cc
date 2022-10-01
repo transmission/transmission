@@ -610,6 +610,7 @@ MainWindow::Impl::Impl(
 
     refresh();
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     /* prevent keyboard events being sent to the window first */
     window.signal_key_press_event().connect(
         [this](GdkEventKey* event) { return gtk_window_propagate_key_event(static_cast<Gtk::Window&>(window_).gobj(), event); },
@@ -617,6 +618,7 @@ MainWindow::Impl::Impl(
     window.signal_key_release_event().connect(
         [this](GdkEventKey* event) { return gtk_window_propagate_key_event(static_cast<Gtk::Window&>(window_).gobj(), event); },
         false);
+#endif
 }
 
 void MainWindow::Impl::updateStats()
@@ -711,10 +713,14 @@ void MainWindow::set_busy(bool isBusy)
 {
     if (get_realized())
     {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        auto const cursor = isBusy ? Gdk::Cursor::create("wait") : Glib::RefPtr<Gdk::Cursor>();
+        set_cursor(cursor);
+#else
         auto const display = get_display();
         auto const cursor = isBusy ? Gdk::Cursor::create(display, Gdk::WATCH) : Glib::RefPtr<Gdk::Cursor>();
-
         get_window()->set_cursor(cursor);
         display->flush();
+#endif
     }
 }

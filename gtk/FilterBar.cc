@@ -237,7 +237,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
         else
         {
             auto const sitename = iter->get_value(tracker_filter_cols.sitename);
-            int const cmp = sitename.compare(sites_v.at(i).sitename);
+            int const cmp = sitename.raw().compare(sites_v.at(i).sitename);
 
             if (cmp < 0)
             {
@@ -804,7 +804,11 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     tracker_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
     activity_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    entry_->signal_icon_release().connect([this](auto /*icon_position*/) { entry_->set_text({}); });
+#else
     entry_->signal_icon_release().connect([this](auto /*icon_position*/, auto const* /*event*/) { entry_->set_text({}); });
+#endif
     entry_->signal_changed().connect(sigc::mem_fun(*this, &Impl::filter_entry_changed));
 
     selection_changed_cb();
