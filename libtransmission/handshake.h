@@ -23,7 +23,7 @@
 
 namespace libtransmission
 {
-class Timer;
+class TimerMaker;
 }
 
 class tr_peerIo;
@@ -59,7 +59,7 @@ public:
 
     [[nodiscard]] virtual std::optional<torrent_info> torrentInfoFromObfuscated(tr_sha1_digest_t const& info_hash) const = 0;
 
-    [[nodiscard]] virtual std::unique_ptr<libtransmission::Timer> createTimer() = 0;
+    [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
 
     [[nodiscard]] virtual bool isDHTEnabled() const = 0;
 

@@ -753,7 +753,7 @@ void tr_session::initImpl(init_data& data)
 
     if (this->allowsLPD())
     {
-        this->lpd_ = tr_lpd::create(lpd_mediator_, timerMaker(), eventBase());
+        this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
     }
 
     tr_utpInit(this);
@@ -2132,7 +2132,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
             session->is_lpd_enabled_ = enabled;
             if (enabled)
             {
-                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->timerMaker(), session->eventBase());
+                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->eventBase());
             }
         });
 }

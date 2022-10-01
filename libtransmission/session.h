@@ -972,6 +972,11 @@ private:
             return session_.allowsLPD();
         }
 
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        {
+            return session_.timerMaker();
+        }
+
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
 
         bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;

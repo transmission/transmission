@@ -126,9 +126,9 @@ public:
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
-    [[nodiscard]] std::unique_ptr<libtransmission::Timer> createTimer() override
+    [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
     {
-        return session_.timerMaker().create();
+        return session_.timerMaker();
     }
 
     [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override

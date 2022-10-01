@@ -1121,8 +1121,7 @@ tr_handshake* tr_handshakeNew(
     auto* const handshake = new tr_handshake{ std::move(mediator), std::move(io), encryption_mode };
     handshake->done_func = done_func;
     handshake->done_func_user_data = done_func_user_data;
-    handshake->timeout_timer = handshake->mediator->createTimer();
-    handshake->timeout_timer->setCallback([handshake]() { tr_handshakeAbort(handshake); });
+    handshake->timeout_timer = handshake->mediator->timerMaker().create([handshake]() { tr_handshakeAbort(handshake); });
     handshake->timeout_timer->startSingleShot(HandshakeTimeoutSec);
 
     handshake->io->setCallbacks(canRead, nullptr, gotError, handshake);
