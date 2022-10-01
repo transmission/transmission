@@ -81,6 +81,7 @@
 #define TR_GTK_TREE_VIEW_COLUMN_SIZING(Code) IF_GTKMM4(Gtk::TreeViewColumn::Sizing::Code, Gtk::TREE_VIEW_COLUMN_##Code)
 
 #define TR_GTK_TREE_MODEL_CHILD_ITER(Obj) IF_GTKMM4((Obj).get_iter(), (Obj))
+#define TR_GTK_WIDGET_GET_ROOT(Obj) IF_GTKMM4((Obj).get_root(), (Obj).get_toplevel())
 
 #define TR_GDK_COLORSPACE(Code) IF_GTKMM4(Gdk::Colorspace::Code, Gdk::COLORSPACE_##Code)
 #define TR_GDK_EVENT_TYPE(Code) IF_GTKMM4(Gdk::Event::Type::Code, GdkEventType::GDK_##Code)

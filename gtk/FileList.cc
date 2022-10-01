@@ -773,7 +773,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
     else
     {
         auto w = std::make_shared<Gtk::MessageDialog>(
-            *static_cast<Gtk::Window*>(widget_.get_toplevel()),
+            *static_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(widget_)),
             fmt::format(
                 _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
                 fmt::arg("old_path", path_string),
