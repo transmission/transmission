@@ -39,7 +39,7 @@ set(PSL_MINIMUM             0.21.1)
 set(QT_MINIMUM              5.6)
 
         option(ENABLE_DAEMON        "Build daemon" ON)
-tr_auto_option(ENABLE_GTK           "Build GTK+ client" AUTO)
+tr_auto_option(ENABLE_GTK           "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_WEB           "Build Web client" OFF)
@@ -60,6 +60,7 @@ tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL       "Use system psl library" AUTO)
+tr_list_option(USE_GTK_VERSION      "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO ccrypto cyassl mbedtls openssl polarssl wolfssl)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
@@ -266,17 +267,34 @@ endif()
 if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
-    pkg_check_modules(GTK ${GTK_IS_REQUIRED}
-        gtkmm-3.0>=${GTKMM_MINIMUM}
-        glibmm-2.4>=${GLIBMM_MINIMUM}
-        giomm-2.4>=${GIOMM_MINIMUM})
+    if(USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 4)
+        pkg_check_modules(GTK
+            gtkmm-4.0>=${GTKMM_MINIMUM}
+            glibmm-2.68>=${GLIBMM_MINIMUM}
+            giomm-2.68>=${GIOMM_MINIMUM})
+        set(GTK_VERSION 4)
+    endif()
+
+    if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
+        pkg_check_modules(GTK ${GTK_IS_REQUIRED}
+            gtkmm-3.0>=${GTKMM_MINIMUM}
+            glibmm-2.4>=${GLIBMM_MINIMUM}
+            giomm-2.4>=${GIOMM_MINIMUM})
+        set(GTK_VERSION 3)
+    endif()
+
+    if(GTK_IS_REQUIRED AND NOT GTK_FOUND)
+        message(FATAL_ERROR "GTK is required but wasn't found")
+    endif()
 
     tr_fixup_auto_option(ENABLE_GTK GTK_FOUND GTK_IS_REQUIRED)
 
-    if(ENABLE_GTK AND WITH_LIBAPPINDICATOR)
+    if(ENABLE_GTK AND WITH_LIBAPPINDICATOR AND GTK_VERSION EQUAL 3)
         tr_get_required_flag(WITH_LIBAPPINDICATOR LIBAPPINDICATOR_IS_REQUIRED)
         pkg_check_modules(LIBAPPINDICATOR appindicator3-0.1>=${LIBAPPINDICATOR_MINIMUM})
         tr_fixup_auto_option(WITH_LIBAPPINDICATOR LIBAPPINDICATOR_FOUND LIBAPPINDICATOR_IS_REQUIRED)
+    else()
+        set(WITH_LIBAPPINDICATOR OFF)
     endif()
 else()
     set(WITH_LIBAPPINDICATOR OFF)

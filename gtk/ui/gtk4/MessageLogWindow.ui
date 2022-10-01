@@ -11,7 +11,8 @@
         <child>
           <object class="GtkBox" id="toolbar">
             <property name="valign">center</property>
-            <property name="css-classes">toolbar</property>
+            <property name="css-classes">toolbar
+horizontal</property>
             <child>
               <object class="GtkButton" id="save_as_button">
                 <property name="action-name">win.save-message-log</property>
