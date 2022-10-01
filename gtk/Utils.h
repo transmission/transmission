@@ -164,8 +164,6 @@ Glib::ustring gtr_get_help_uri();
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible(Gtk::Widget&, bool);
 
-void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content);
-
 void gtr_window_set_skip_taskbar_hint(Gtk::Window& window, bool value);
 void gtr_window_set_urgency_hint(Gtk::Window& window, bool value);
 void gtr_window_raise(Gtk::Window& window);

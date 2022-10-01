@@ -81,8 +81,6 @@ FileModelColumns const file_cols;
 class FileList::Impl
 {
 public:
-    Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
-    Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
     Impl(
         FileList& widget,
         Glib::RefPtr<Gtk::Builder> const& builder,
@@ -844,12 +842,6 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
         rename_data.release());
 }
 
-FileList::FileList(Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
-    : Gtk::ScrolledWindow()
-    , impl_(std::make_unique<Impl>(*this, core, tor_id))
-{
-}
-
 FileList::FileList(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
@@ -861,10 +853,15 @@ FileList::FileList(
 {
 }
 
-FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id)
+FileList::Impl::Impl(
+    FileList& widget,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& view_name,
+    Glib::RefPtr<Session> const& core,
+    tr_torrent_id_t torrent_id)
     : widget_(widget)
     , core_(core)
-    , view_(view)
+    , view_(gtr_get_widget<Gtk::TreeView>(builder, view_name))
 {
     /* create the view */
     view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
@@ -988,28 +985,6 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
     view_->set_tooltip_column(file_cols.label_esc.index());
 
     set_torrent(torrent_id);
-}
-
-FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id)
-    : Impl(widget, Gtk::make_managed<Gtk::TreeView>(), core, torrent_id)
-{
-    view_->set_border_width(GUI_PAD_BIG);
-
-    /* create the scrolled window and stick the view in it */
-    widget_.set_policy(TR_GTK_POLICY_TYPE(AUTOMATIC), TR_GTK_POLICY_TYPE(AUTOMATIC));
-    widget_.set_shadow_type(Gtk::SHADOW_IN);
-    widget_.add(*view_);
-    widget_.set_size_request(-1, 200);
-}
-
-FileList::Impl::Impl(
-    FileList& widget,
-    Glib::RefPtr<Gtk::Builder> const& builder,
-    Glib::ustring const& view_name,
-    Glib::RefPtr<Session> const& core,
-    tr_torrent_id_t torrent_id)
-    : Impl(widget, gtr_get_widget<Gtk::TreeView>(builder, view_name), core, torrent_id)
-{
 }
 
 FileList::~FileList() = default;

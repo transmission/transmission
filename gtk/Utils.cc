@@ -619,13 +619,6 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
     w.set_visible(b);
 }
 
-void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content)
-{
-    auto* vbox = dialog.get_content_area();
-    vbox->pack_start(content, true, true, 0);
-    content.show_all();
-}
-
 void gtr_window_set_skip_taskbar_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
 {
 #if GTK_CHECK_VERSION(4, 0, 0)
