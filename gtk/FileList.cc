@@ -276,9 +276,9 @@ void gtr_tree_model_foreach_postorder_subtree(
     Gtk::TreeModel::iterator const& parent,
     Gtk::TreeModel::SlotForeachIter const& func)
 {
-    for (auto const& child : parent->children())
+    for (auto& child : parent->children())
     {
-        gtr_tree_model_foreach_postorder_subtree(child, func);
+        gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(child), func);
     }
 
     if (parent)
@@ -289,9 +289,9 @@ void gtr_tree_model_foreach_postorder_subtree(
 
 void gtr_tree_model_foreach_postorder(Glib::RefPtr<Gtk::TreeModel> const& model, Gtk::TreeModel::SlotForeachIter const& func)
 {
-    for (auto const& iter : model->children())
+    for (auto& iter : model->children())
     {
-        gtr_tree_model_foreach_postorder_subtree(iter, func);
+        gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(iter), func);
     }
 }
 
@@ -573,14 +573,14 @@ void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
 namespace
 {
 
-void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::iterator const& iter)
+void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     auto const enabled = iter->get_value(file_cols.enabled);
     static_cast<Gtk::CellRendererToggle*>(renderer)->property_inconsistent() = enabled == MIXED;
     static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == true;
 }
 
-void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::iterator const& iter)
+void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     Glib::ustring text;
 

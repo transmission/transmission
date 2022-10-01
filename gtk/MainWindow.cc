@@ -151,7 +151,7 @@ bool tree_view_search_equal_func(
     Glib::RefPtr<Gtk::TreeModel> const& /*model*/,
     int /*column*/,
     Glib::ustring const& key,
-    Gtk::TreeModel::iterator const& iter)
+    Gtk::TreeModel::const_iterator const& iter)
 {
     auto const name = iter->get_value(torrent_cols.name_collated);
     return name.find(key.lowercase()) == Glib::ustring::npos;

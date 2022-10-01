@@ -505,7 +505,7 @@ void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo_box, int value)
     {
         if (row.get_value(column) == value)
         {
-            combo_box.set_active(row);
+            combo_box.set_active(TR_GTK_TREE_MODEL_CHILD_ITER(row));
             return;
         }
     }

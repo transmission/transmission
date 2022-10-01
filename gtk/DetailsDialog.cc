@@ -1150,7 +1150,11 @@ public:
 
 PeerModelColumns const peer_cols;
 
-void initPeerRow(Gtk::TreeIter const& iter, std::string_view key, std::string_view torrent_name, tr_peer_stat const* peer)
+void initPeerRow(
+    Gtk::TreeModel::iterator const& iter,
+    std::string_view key,
+    std::string_view torrent_name,
+    tr_peer_stat const* peer)
 {
     g_return_if_fail(peer != nullptr);
 
@@ -1173,7 +1177,7 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string_view key, std::string_vi
     (*iter)[peer_cols.torrent_name] = Glib::ustring{ std::data(torrent_name), std::size(torrent_name) };
 }
 
-void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
+void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* peer)
 {
     std::string up_speed;
     std::string down_speed;
@@ -1268,7 +1272,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     }
 
     /* step 2: mark all the peers in the list as not-updated */
-    for (auto const& row : store->children())
+    for (auto& row : store->children())
     {
         row[peer_cols.was_updated] = false;
     }
@@ -1347,7 +1351,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     };
 
     /* step 1: mark all webseeds as not-updated */
-    for (auto const& row : store->children())
+    for (auto& row : store->children())
     {
         row[webseed_cols.was_updated] = false;
     }
@@ -2036,7 +2040,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     }
 
     /* step 2: mark all the trackers in the list as not-updated */
-    for (auto const& row : store->children())
+    for (auto& row : store->children())
     {
         row[tracker_cols.was_updated] = false;
     }

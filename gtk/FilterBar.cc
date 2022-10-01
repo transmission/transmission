@@ -299,7 +299,7 @@ Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new(Glib::RefPtr<Gtk::TreeMode
     return store;
 }
 
-bool is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeIter const& iter)
+bool is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeModel::const_iterator const& iter)
 {
     return iter->get_value(tracker_filter_cols.type) == TRACKER_FILTER_TYPE_SEPARATOR;
 }
@@ -435,7 +435,7 @@ public:
 
 ActivityFilterModelColumns const activity_filter_cols;
 
-bool activity_is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeIter const& iter)
+bool activity_is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeModel::const_iterator const& iter)
 {
     return iter->get_value(activity_filter_cols.type) == ACTIVITY_FILTER_SEPARATOR;
 }
@@ -473,7 +473,7 @@ bool test_torrent_activity(tr_torrent* tor, int type)
     }
 }
 
-void status_model_update_count(Gtk::TreeIter const& iter, int n)
+void status_model_update_count(Gtk::TreeModel::iterator const& iter, int n)
 {
     if (n != iter->get_value(activity_filter_cols.count))
     {
@@ -500,7 +500,7 @@ bool activity_filter_model_update(Glib::RefPtr<Gtk::ListStore> const& activity_m
             }
         }
 
-        status_model_update_count(row, hits);
+        status_model_update_count(TR_GTK_TREE_MODEL_CHILD_ITER(row), hits);
     }
 
     return false;
@@ -544,7 +544,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
     return store;
 }
 
-void render_activity_pixbuf_func(Gtk::CellRendererPixbuf* cell_renderer, Gtk::TreeModel::iterator const& iter)
+void render_activity_pixbuf_func(Gtk::CellRendererPixbuf* cell_renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     auto const type = iter->get_value(activity_filter_cols.type);
     cell_renderer->property_width() = type == ACTIVITY_FILTER_ALL ? 0 : 20;
