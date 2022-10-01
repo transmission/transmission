@@ -20,51 +20,62 @@ endif()
 
 find_program(APPSTREAM appstreamcli)
 
+set(UI_SUBDIR ui/gtk3)
+
 set(${PROJECT_NAME}_UI_FILES
-    AddTrackerDialog.ui
-    DetailsDialog.ui
-    EditTrackersDialog.ui
-    FilterBar.ui
-    MainWindow.ui
-    MakeDialog.ui
-    MakeProgressDialog.ui
-    MessageLogWindow.ui
-    OptionsDialog.ui
-    PrefsDialog.ui
-    RelocateDialog.ui
-    StatsDialog.ui
-    TorrentUrlChooserDialog.ui
+    ${UI_SUBDIR}/AddTrackerDialog.ui
+    ${UI_SUBDIR}/DetailsDialog.ui
+    ${UI_SUBDIR}/EditTrackersDialog.ui
+    ${UI_SUBDIR}/FilterBar.ui
+    ${UI_SUBDIR}/MainWindow.ui
+    ${UI_SUBDIR}/MakeDialog.ui
+    ${UI_SUBDIR}/MakeProgressDialog.ui
+    ${UI_SUBDIR}/MessageLogWindow.ui
+    ${UI_SUBDIR}/OptionsDialog.ui
+    ${UI_SUBDIR}/PrefsDialog.ui
+    ${UI_SUBDIR}/RelocateDialog.ui
+    ${UI_SUBDIR}/StatsDialog.ui
+    ${UI_SUBDIR}/TorrentUrlChooserDialog.ui
 )
 
-add_custom_command(
-    OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
-        ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
-    COMMAND
-        ${GLIB_COMPILE_RESOURCES_EXECUTABLE}
-        --target=${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
-        --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}
-        --generate-source
-        --c-name transmission
-        transmission.gresource.xml
-    COMMAND
-        ${GLIB_COMPILE_RESOURCES_EXECUTABLE}
-        --target=${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
-        --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}
-        --generate-header
-        --c-name transmission
-        transmission.gresource.xml
-    DEPENDS
-        icons/hicolor_apps_scalable_transmission.svg
-        icons/lock.svg
-        icons/options-symbolic.svg
-        icons/ratio-symbolic.svg
-        icons/turtle-symbolic.svg
-        transmission-ui.xml
-        transmission.gresource.xml
-        ${${PROJECT_NAME}_UI_FILES}
-    WORKING_DIRECTORY
-        ${CMAKE_CURRENT_SOURCE_DIR}
+macro(gtr_compile_resources NAME INPUT_DIR INPUT_FILE OUTPUT_FILE_BASE)
+    add_custom_command(
+        OUTPUT
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
+        COMMAND
+            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "--sourcedir=${INPUT_DIR}"
+            --generate-source
+            --c-name "${NAME}"
+            "${INPUT_DIR}/${INPUT_FILE}"
+        COMMAND
+            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
+            "--sourcedir=${INPUT_DIR}"
+            --generate-header
+            --c-name "${NAME}"
+            "${INPUT_DIR}/${INPUT_FILE}"
+        DEPENDS
+            "${INPUT_DIR}/${INPUT_FILE}"
+            ${ARGN}
+        WORKING_DIRECTORY
+            "${INPUT_DIR}"
+    )
+endmacro()
+
+gtr_compile_resources(transmission ${CMAKE_CURRENT_SOURCE_DIR} transmission.gresource.xml transmission-resources
+    icons/hicolor_apps_scalable_transmission.svg
+    icons/lock.svg
+    icons/options-symbolic.svg
+    icons/ratio-symbolic.svg
+    icons/turtle-symbolic.svg
+    transmission-ui.css
+    transmission-ui.xml
+)
+gtr_compile_resources(transmission_ui ${CMAKE_CURRENT_SOURCE_DIR}/${UI_SUBDIR} transmission-ui.gresource.xml transmission-ui-resources
+    ${${PROJECT_NAME}_UI_FILES}
 )
 
 if(ENABLE_NLS)
@@ -111,6 +122,7 @@ set(${PROJECT_NAME}_SOURCES
     TorrentCellRenderer.cc
     Utils.cc
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
+    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.c
 )
 
 set(${PROJECT_NAME}_HEADERS
@@ -139,6 +151,7 @@ set(${PROJECT_NAME}_HEADERS
     TorrentCellRenderer.h
     Utils.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
+    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.h
 )
 
 include_directories(
