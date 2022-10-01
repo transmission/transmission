@@ -18,7 +18,6 @@
 #include "port-forwarding-natpmp.h"
 #include "port-forwarding-upnp.h"
 #include "port-forwarding.h"
-#include "session.h"
 #include "timer.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -29,9 +28,8 @@ using namespace std::literals;
 class tr_port_forwarding_impl final : public tr_port_forwarding
 {
 public:
-    explicit tr_port_forwarding_impl(tr_session& session)
-        : session_{ session }
-        , timer_maker_{ session.timerMaker() }
+    explicit tr_port_forwarding_impl(Mediator& mediator)
+        : mediator_{ mediator }
     {
     }
 
@@ -105,7 +103,7 @@ private:
 
     void startTimer()
     {
-        timer_ = timer_maker_.create([this]() { this->onTimer(); });
+        timer_ = mediator_.timerMaker().create([this]() { this->onTimer(); });
         restartTimer();
     }
 
@@ -180,7 +178,6 @@ private:
 
     void natPulse(bool do_check)
     {
-        auto& session = session_;
         auto const is_enabled = is_enabled_ && !is_shutting_down_;
 
         if (!natpmp_)
@@ -195,19 +192,23 @@ private:
 
         auto const old_state = state();
 
-        auto const result = natpmp_->pulse(session.private_peer_port, is_enabled);
+        auto const result = natpmp_->pulse(mediator_.privatePeerPort(), is_enabled);
         natpmp_state_ = result.state;
         if (!std::empty(result.public_port) && !std::empty(result.private_port))
         {
-            session.public_peer_port = result.public_port;
-            session.private_peer_port = result.private_port;
+            mediator_.onPortForwarded(result.public_port, result.private_port);
             tr_logAddInfo(fmt::format(
                 _("Mapped private port {private_port} to public port {public_port}"),
-                fmt::arg("public_port", session.public_peer_port.host()),
-                fmt::arg("private_port", session.private_peer_port.host())));
+                fmt::arg("public_port", result.public_port.host()),
+                fmt::arg("private_port", result.private_port.host())));
         }
 
-        upnp_state_ = tr_upnpPulse(upnp_, session.private_peer_port, is_enabled, do_check, session.bind_ipv4.readable());
+        upnp_state_ = tr_upnpPulse(
+            upnp_,
+            mediator_.privatePeerPort(),
+            is_enabled,
+            do_check,
+            mediator_.incomingPeerAddress().readable());
 
         if (auto const new_state = state(); new_state != old_state)
         {
@@ -218,8 +219,7 @@ private:
         }
     }
 
-    tr_session& session_;
-    libtransmission::TimerMaker& timer_maker_;
+    Mediator& mediator_;
 
     bool is_enabled_ = false;
     bool is_shutting_down_ = false;
@@ -234,7 +234,7 @@ private:
     std::unique_ptr<libtransmission::Timer> timer_;
 };
 
-std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(tr_session& session)
+std::unique_ptr<tr_port_forwarding> tr_port_forwarding::create(Mediator& mediator)
 {
-    return std::make_unique<tr_port_forwarding_impl>(session);
+    return std::make_unique<tr_port_forwarding_impl>(mediator);
 }

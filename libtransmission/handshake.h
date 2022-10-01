@@ -17,10 +17,14 @@
 
 #include "net.h" // tr_address
 #include "peer-mse.h" // tr_message_stream_encryption::DH
-#include "timer.h"
 
 /** @addtogroup peers Peers
     @{ */
+
+namespace libtransmission
+{
+class TimerMaker;
+}
 
 class tr_peerIo;
 
@@ -55,7 +59,7 @@ public:
 
     [[nodiscard]] virtual std::optional<torrent_info> torrentInfoFromObfuscated(tr_sha1_digest_t const& info_hash) const = 0;
 
-    [[nodiscard]] virtual std::unique_ptr<libtransmission::Timer> createTimer() = 0;
+    [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
 
     [[nodiscard]] virtual bool isDHTEnabled() const = 0;
 

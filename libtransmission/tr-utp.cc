@@ -12,13 +12,14 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_int_weak() */
+#include "crypto-utils.h" // tr_rand_int_weak()
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-socket.h"
 #include "session.h"
+#include "timer.h"
 #include "tr-utp.h"
 #include "utils.h"
 

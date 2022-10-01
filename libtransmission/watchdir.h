@@ -10,8 +10,6 @@
 #include <memory>
 #include <string_view>
 
-#include "timer.h"
-
 extern "C"
 {
     struct event_base;
@@ -19,6 +17,8 @@ extern "C"
 
 namespace libtransmission
 {
+
+class TimerMaker;
 
 class Watchdir
 {

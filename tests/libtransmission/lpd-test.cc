@@ -32,7 +32,11 @@ namespace
 class MyMediator final : public tr_lpd::Mediator
 {
 public:
-    MyMediator() = default;
+    explicit MyMediator(tr_session& session)
+        : session_{ session }
+    {
+    }
+
     ~MyMediator() override = default;
 
     [[nodiscard]] tr_port port() const override
@@ -48,6 +52,11 @@ public:
     [[nodiscard]] std::vector<TorrentInfo> torrents() const override
     {
         return torrents_;
+    }
+
+    [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+    {
+        return session_.timerMaker();
     }
 
     void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after) override
@@ -68,6 +77,7 @@ public:
         return found_returns_;
     }
 
+    tr_session& session_;
     tr_port port_ = tr_port::fromHost(51413);
     bool allows_lpd_ = true;
     std::vector<TorrentInfo> torrents_;
@@ -91,16 +101,16 @@ auto makeRandomHashString()
 
 TEST_F(LpdTest, HelloWorld)
 {
-    auto mediator = MyMediator{};
-    auto lpd = tr_lpd::create(mediator, session_->timerMaker(), session_->eventBase());
+    auto mediator = MyMediator{ *session_ };
+    auto lpd = tr_lpd::create(mediator, session_->eventBase());
     EXPECT_TRUE(lpd);
     EXPECT_EQ(0U, std::size(mediator.found_));
 }
 
 TEST_F(LpdTest, CanAnnounceAndRead)
 {
-    auto mediator_a = MyMediator{};
-    auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
+    auto mediator_a = MyMediator{ *session_ };
+    auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
     EXPECT_TRUE(lpd_a);
 
     auto const info_hash_str = makeRandomHashString();
@@ -110,9 +120,9 @@ TEST_F(LpdTest, CanAnnounceAndRead)
     info.allows_lpd = true;
     info.announce_after = 0; // never announced
 
-    auto mediator_b = MyMediator{};
+    auto mediator_b = MyMediator{ *session_ };
     mediator_b.torrents_.push_back(info);
-    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
+    auto lpd_b = tr_lpd::create(mediator_b, session_->eventBase());
 
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
     EXPECT_EQ(1U, mediator_a.found_.count(info_hash_str));
@@ -121,13 +131,13 @@ TEST_F(LpdTest, CanAnnounceAndRead)
 
 TEST_F(LpdTest, canMultiAnnounce)
 {
-    auto mediator_a = MyMediator{};
-    auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
+    auto mediator_a = MyMediator{ *session_ };
+    auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
     EXPECT_TRUE(lpd_a);
 
     auto info_hash_strings = std::array<std::string, 2>{};
     auto infos = std::array<tr_lpd::Mediator::TorrentInfo, 2>{};
-    auto mediator_b = MyMediator{};
+    auto mediator_b = MyMediator{ *session_ };
     for (size_t i = 0; i < std::size(info_hash_strings); ++i)
     {
         auto& info_hash_string = info_hash_strings[i];
@@ -146,7 +156,7 @@ TEST_F(LpdTest, canMultiAnnounce)
         mediator_b.torrents_.push_back(info);
     }
 
-    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
+    auto lpd_b = tr_lpd::create(mediator_b, session_->eventBase());
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
 
     for (auto const& info : infos)
@@ -157,14 +167,14 @@ TEST_F(LpdTest, canMultiAnnounce)
 
 TEST_F(LpdTest, DoesNotReannounceTooSoon)
 {
-    auto mediator_a = MyMediator{};
-    auto lpd_a = tr_lpd::create(mediator_a, session_->timerMaker(), session_->eventBase());
+    auto mediator_a = MyMediator{ *session_ };
+    auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
     EXPECT_TRUE(lpd_a);
 
     // similar to canMultiAnnounce...
     auto info_hash_strings = std::array<std::string, 2>{};
     auto infos = std::array<tr_lpd::Mediator::TorrentInfo, 2>{};
-    auto mediator_b = MyMediator{};
+    auto mediator_b = MyMediator{ *session_ };
     for (size_t i = 0; i < std::size(info_hash_strings); ++i)
     {
         auto& info_hash_string = info_hash_strings[i];
@@ -188,7 +198,7 @@ TEST_F(LpdTest, DoesNotReannounceTooSoon)
         mediator_b.torrents_.push_back(info);
     }
 
-    auto lpd_b = tr_lpd::create(mediator_b, session_->timerMaker(), session_->eventBase());
+    auto lpd_b = tr_lpd::create(mediator_b, session_->eventBase());
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
 
     for (auto& info : infos)

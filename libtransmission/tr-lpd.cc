@@ -28,6 +28,7 @@
 #include "crypto-utils.h" // for tr_rand_buffer()
 #include "log.h"
 #include "net.h"
+#include "timer.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h" // for tr_net_init()
@@ -203,10 +204,10 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
 class tr_lpd_impl final : public tr_lpd
 {
 public:
-    tr_lpd_impl(Mediator& mediator, libtransmission::TimerMaker& timer_maker, struct event_base* event_base)
+    tr_lpd_impl(Mediator& mediator, struct event_base* event_base)
         : mediator_{ mediator }
-        , announce_timer_{ timer_maker.create([this]() { announceUpkeep(); }) }
-        , dos_timer_{ timer_maker.create([this]() { dosUpkeep(); }) }
+        , announce_timer_{ mediator.timerMaker().create([this]() { announceUpkeep(); }) }
+        , dos_timer_{ mediator.timerMaker().create([this]() { dosUpkeep(); }) }
     {
         if (!init(event_base))
         {
@@ -598,10 +599,7 @@ private:
     static auto constexpr AnnounceScope = int{ TtlSameSubnet }; /**<the maximum scope for LPD datagrams */
 };
 
-std::unique_ptr<tr_lpd> tr_lpd::create(
-    Mediator& mediator,
-    libtransmission::TimerMaker& timer_maker,
-    struct event_base* event_base)
+std::unique_ptr<tr_lpd> tr_lpd::create(Mediator& mediator, struct event_base* event_base)
 {
-    return std::make_unique<tr_lpd_impl>(mediator, timer_maker, event_base);
+    return std::make_unique<tr_lpd_impl>(mediator, event_base);
 }

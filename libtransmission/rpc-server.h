@@ -17,12 +17,16 @@
 #include "transmission.h"
 
 #include "net.h"
-#include "timer.h"
 
 struct evhttp;
 struct tr_variant;
 struct tr_rpc_address;
 struct libdeflate_compressor;
+
+namespace libtransmission
+{
+class Timer;
+}
 
 class tr_rpc_server
 {

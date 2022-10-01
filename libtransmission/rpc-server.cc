@@ -42,6 +42,7 @@
 #include "rpcimpl.h"
 #include "session-id.h"
 #include "session.h"
+#include "timer.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "trevent.h"

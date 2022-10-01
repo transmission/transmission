@@ -3,10 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#define LIBTRANSMISSION_WATCHDIR_MODULE
-
 #include <chrono>
 #include <set>
+
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 
