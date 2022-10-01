@@ -557,7 +557,8 @@ void Application::on_startup()
 
 void Application::Impl::on_startup()
 {
-    Gtk::IconTheme::get_default()->add_resource_path(gtr_get_full_resource_path("icons"s));
+    IF_GTKMM4(Gtk::IconTheme::get_for_display(Gdk::Display::get_default()), Gtk::IconTheme::get_default())
+        ->add_resource_path(gtr_get_full_resource_path("icons"s));
     Gtk::Window::set_default_icon_name(AppIconName);
 
     /* Add style provider to the window. */
@@ -989,7 +990,9 @@ void Application::Impl::on_app_exit()
     p->set_valign(TR_GTK_ALIGN(CENTER));
     c->add(*p);
 
-    auto* icon = Gtk::make_managed<Gtk::Image>("network-workgroup", Gtk::ICON_SIZE_DIALOG);
+    auto* icon = Gtk::make_managed<Gtk::Image>();
+    icon->property_icon_name() = "network-workgroup";
+    icon->property_icon_size() = IF_GTKMM4(Gtk::IconSize::LARGE, Gtk::ICON_SIZE_DIALOG);
     p->attach(*icon, 0, 0, 1, 2);
 
     auto* top_label = Gtk::make_managed<Gtk::Label>();

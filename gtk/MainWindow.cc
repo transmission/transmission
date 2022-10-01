@@ -253,9 +253,6 @@ void MainWindow::Impl::syncAltSpeedButton()
 {
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
     alt_speed_button_->set_active(b);
-    alt_speed_image_->set_from_icon_name("turtle-symbolic", Gtk::BuiltinIconSize::ICON_SIZE_MENU);
-    alt_speed_button_->set_halign(TR_GTK_ALIGN(CENTER));
-    alt_speed_button_->set_valign(TR_GTK_ALIGN(CENTER));
     alt_speed_button_->set_tooltip_text(fmt::format(
         b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
             _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)"),
