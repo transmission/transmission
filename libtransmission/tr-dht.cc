@@ -53,9 +53,19 @@
 
 using namespace std::literals;
 
-static std::unique_ptr<libtransmission::Timer> dht_timer;
-static std::array<unsigned char, 20> myid;
-static tr_session* my_session = nullptr;
+namespace
+{
+struct Impl
+{
+    std::unique_ptr<libtransmission::Timer> timer;
+    std::array<unsigned char, 20> id = {};
+    tr_socket_t udp4_socket = TR_BAD_SOCKET;
+    tr_socket_t udp6_socket = TR_BAD_SOCKET;
+    tr_session* session = nullptr;
+};
+
+Impl impl = {};
+} // namespace
 
 // mutex-locked wrapper around libdht's API
 namespace locked_dht
@@ -157,7 +167,7 @@ static constexpr std::string_view printableStatus(Status status)
 
 bool tr_dhtEnabled(tr_session const* session)
 {
-    return session != nullptr && session == my_session;
+    return session != nullptr && session == impl.session;
 }
 
 static auto getUdpSocket(tr_session const* const session, int af)
@@ -422,7 +432,7 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes
 
 int tr_dhtInit(tr_session* session, tr_socket_t udp4_socket, tr_socket_t udp6_socket)
 {
-    if (my_session != nullptr) /* already initialized */
+    if (impl.session != nullptr) /* already initialized */
     {
         return -1;
     }
@@ -446,9 +456,9 @@ int tr_dhtInit(tr_session* session, tr_socket_t udp4_socket, tr_socket_t udp6_so
     {
         auto sv = std::string_view{};
         have_id = tr_variantDictFindStrView(&benc, TR_KEY_id, &sv);
-        if (have_id && std::size(sv) == 20)
+        if (have_id && std::size(sv) == std::size(impl.id))
         {
-            std::copy(std::begin(sv), std::end(sv), std::data(myid));
+            std::copy(std::begin(sv), std::end(sv), std::data(impl.id));
         }
 
         size_t raw_len = 0U;
@@ -476,27 +486,29 @@ int tr_dhtInit(tr_session* session, tr_socket_t udp4_socket, tr_socket_t udp6_so
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
         tr_logAddTrace("Generating new id");
-        tr_rand_buffer(std::data(myid), std::size(myid));
+        tr_rand_buffer(std::data(impl.id), std::size(impl.id));
     }
 
-    if (locked_dht::init(udp4_socket, udp6_socket, std::data(myid), nullptr) < 0)
+    if (locked_dht::init(udp4_socket, udp6_socket, std::data(impl.id), nullptr) < 0)
     {
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
-        my_session = nullptr;
+        impl = {};
         return -1;
     }
 
-    my_session = session;
+    impl.session = session;
+    impl.udp4_socket = udp4_socket;
+    impl.udp6_socket = udp4_socket;
 
     std::thread(bootstrapStart, session, nodes, nodes6).detach();
 
-    dht_timer = session->timerMaker().create([session]() { tr_dhtCallback(session, nullptr, 0, nullptr, 0); });
-    auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
     static auto constexpr MinInterval = 10ms;
     static auto constexpr MaxInterval = 1s;
+    auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
     auto interval = MinInterval + random_percent * (MaxInterval - MinInterval);
-    dht_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    impl.timer = session->timerMaker().create([session]() { tr_dhtCallback(session, nullptr, 0, nullptr, 0); });
+    impl.timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
 
     tr_logAddDebug("DHT initialized");
 
@@ -509,7 +521,7 @@ void tr_dhtUninit(tr_session const* session)
 
     tr_logAddTrace("Uninitializing DHT");
 
-    dht_timer.reset();
+    impl.timer.reset();
 
     /* Since we only save known good nodes,
      * avoid erasing older data if we don't know enough nodes. */
@@ -535,7 +547,7 @@ void tr_dhtUninit(tr_session const* session)
 
         tr_variant benc;
         tr_variantInitDict(&benc, 3);
-        tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(myid), std::size(myid));
+        tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(impl.id), std::size(impl.id));
 
         if (num > 0)
         {
@@ -576,7 +588,7 @@ void tr_dhtUninit(tr_session const* session)
 
     tr_logAddTrace("Done uninitializing DHT");
 
-    my_session = nullptr;
+    impl = {};
 }
 
 std::optional<tr_port> tr_dhtPort(tr_session const* session)
@@ -792,7 +804,7 @@ void tr_dhtCallback(tr_session* session, unsigned char* buf, int buflen, struct 
     auto const min_interval = std::chrono::seconds{ tosleep };
     auto const max_interval = std::chrono::seconds{ tosleep + 1 };
     auto const interval = min_interval + random_percent * (max_interval - min_interval);
-    dht_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    impl.timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
 }
 
 extern "C"
