@@ -32,7 +32,7 @@ public:
     [[nodiscard]] virtual tr_sha1_digest_t finish() = 0;
 
     template<typename... T>
-    [[nodiscard]] static tr_sha1_digest_t digest(T... args)
+    [[nodiscard]] static tr_sha1_digest_t digest(T const&... args)
     {
         auto context = tr_sha1::create();
         (context->add(std::data(args), std::size(args)), ...);
@@ -51,7 +51,7 @@ public:
     [[nodiscard]] virtual tr_sha256_digest_t finish() = 0;
 
     template<typename... T>
-    [[nodiscard]] static tr_sha256_digest_t digest(T... args)
+    [[nodiscard]] static tr_sha256_digest_t digest(T const&... args)
     {
         auto context = tr_sha256::create();
         (context->add(std::data(args), std::size(args)), ...);
