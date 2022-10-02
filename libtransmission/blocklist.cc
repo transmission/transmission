@@ -559,30 +559,30 @@ void BlocklistFile::assertValidRules(std::vector<AddressRange> const& ranges)
         }
     }
 
-    auto ranges_IPv6 = std::vector<AddressRange>{};
-    auto ranges_IPv4 = std::vector<AddressRange>{};
+    auto ranges_ipv4 = std::vector<AddressRange>{};
+    auto ranges_ipv6 = std::vector<AddressRange>{};
 
     for (size_t i = 0; i < std::size(ranges); i++)
     {
         if (ranges[i].begin_ == 0 && ranges[i].end_ == 0)
         {
-            ranges_IPv6.push_back(ranges[i]);
+            ranges_ipv6.emplace_back(ranges[i]);
         }
         else
         {
-            ranges_IPv4.push_back(ranges[i]);
+            ranges_ipv4.emplace_back(ranges[i]);
         }
     }
 
-    for (size_t i = 1; i < std::size(ranges_IPv4); ++i)
+    for (size_t i = 1; i < std::size(ranges_ipv4); ++i)
     {
-        TR_ASSERT(ranges_IPv4[i - 1].end_ < ranges_IPv4[i].begin_);
+        TR_ASSERT(ranges_ipv4[i - 1].end_ < ranges_ipv4[i].begin_);
     }
 
-    for (size_t i = 1; i < std::size(ranges_IPv6); ++i)
+    for (size_t i = 1; i < std::size(ranges_ipv6); ++i)
     {
-        auto last_end_address = ranges_IPv6[i - 1].end6_.s6_addr;
-        auto start_address = ranges_IPv6[i].begin6_.s6_addr;
+        auto last_end_address = ranges_ipv6[i - 1].end6_.s6_addr;
+        auto start_address = ranges_ipv6[i].begin6_.s6_addr;
 
         TR_ASSERT(memcmp(last_end_address, start_address, sizeof(&start_address)) > 0);
     }

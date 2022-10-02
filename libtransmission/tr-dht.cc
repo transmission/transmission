@@ -167,7 +167,7 @@ static constexpr std::string_view printableStatus(Status status)
 
 bool tr_dhtEnabled()
 {
-    return impl.session != nullptr && (impl.udp4_socket != TR_BAD_SOCKET || impl.udp4_socket != TR_BAD_SOCKET);
+    return impl.session != nullptr && (impl.udp4_socket != TR_BAD_SOCKET || impl.udp6_socket != TR_BAD_SOCKET);
 }
 
 static constexpr auto getUdpSocket(int af)
@@ -342,7 +342,7 @@ static void bootstrapFromFile(std::string_view config_dir)
     }
 }
 
-static void bootstrapStart(std::string config_dir, std::vector<uint8_t> nodes4, std::vector<uint8_t> nodes6)
+static void bootstrapStart(std::string_view config_dir, std::vector<uint8_t> nodes4, std::vector<uint8_t> nodes6)
 {
     TR_ASSERT(tr_dhtEnabled());
 
