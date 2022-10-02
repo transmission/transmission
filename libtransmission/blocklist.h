@@ -11,6 +11,7 @@
 
 #include <cstddef> // for size_t
 #include <cstdint>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <string_view>
