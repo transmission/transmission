@@ -493,8 +493,8 @@ public:
 
         ~tr_udp_core();
 
-        void dhtUninit();
-        void dhtUpkeep();
+        static void dhtUninit();
+        static void dhtUpkeep();
 
         void set_socket_buffers();
 
