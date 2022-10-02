@@ -420,7 +420,7 @@ static void bootstrapStart(tr_session* const session, std::vector<uint8_t> nodes
     tr_logAddTrace("Finished bootstrapping");
 }
 
-int tr_dhtInit(tr_session* session)
+int tr_dhtInit(tr_session* session, tr_socket_t udp4_socket, tr_socket_t udp6_socket)
 {
     if (my_session != nullptr) /* already initialized */
     {
@@ -479,7 +479,7 @@ int tr_dhtInit(tr_session* session)
         tr_rand_buffer(std::data(myid), std::size(myid));
     }
 
-    if (locked_dht::init(getUdpSocket(session, AF_INET), getUdpSocket(session, AF_INET6), std::data(myid), nullptr) < 0)
+    if (locked_dht::init(udp4_socket, udp6_socket, std::data(myid), nullptr) < 0)
     {
         auto const errcode = errno;
         tr_logAddDebug(fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));

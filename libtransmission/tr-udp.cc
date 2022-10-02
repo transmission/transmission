@@ -301,7 +301,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session)
 
     if (session_.allowsDHT())
     {
-        tr_dhtInit(&session_);
+        tr_dhtInit(&session_, udp_socket_, udp6_socket_);
     }
 
     if (udp_event_ != nullptr)

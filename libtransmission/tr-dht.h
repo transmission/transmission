@@ -14,7 +14,7 @@
 
 #include "net.h" // tr_port
 
-int tr_dhtInit(tr_session*);
+int tr_dhtInit(tr_session*, tr_socket_t udp4_socket, tr_socket_t udp6_socket);
 void tr_dhtUninit(tr_session const*);
 bool tr_dhtEnabled(tr_session const*);
 std::optional<tr_port> tr_dhtPort(tr_session const*);
