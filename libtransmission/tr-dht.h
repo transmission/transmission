@@ -9,15 +9,19 @@
 #endif
 
 #include <optional>
+#include <string_view>
 
 #include "transmission.h"
 
 #include "net.h" // tr_port
 
-int tr_dhtInit(tr_session*);
-void tr_dhtUninit(tr_session const*);
-bool tr_dhtEnabled(tr_session const*);
-std::optional<tr_port> tr_dhtPort(tr_session const*);
-bool tr_dhtAddNode(tr_session*, tr_address const&, tr_port, bool bootstrap);
-void tr_dhtUpkeep(tr_session*);
-void tr_dhtCallback(tr_session*, unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen);
+int tr_dhtInit(tr_session*, tr_socket_t udp4_socket, tr_socket_t udp6_socket);
+void tr_dhtUninit();
+
+bool tr_dhtEnabled();
+
+std::optional<tr_port> tr_dhtPort();
+
+bool tr_dhtAddNode(tr_address, tr_port, bool bootstrap);
+void tr_dhtUpkeep();
+void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen);

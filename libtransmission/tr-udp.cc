@@ -205,7 +205,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
             if (session->allowsDHT())
             {
                 buf[rc] = '\0'; /* required by the DHT code */
-                tr_dhtCallback(session, std::data(buf), rc, (struct sockaddr*)&from, fromlen);
+                tr_dhtCallback(std::data(buf), rc, (struct sockaddr*)&from, fromlen);
             }
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
@@ -301,7 +301,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session)
 
     if (session_.allowsDHT())
     {
-        tr_dhtInit(&session_);
+        tr_dhtInit(&session_, udp_socket_, udp6_socket_);
     }
 
     if (udp_event_ != nullptr)
@@ -316,17 +316,17 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session)
 
 void tr_session::tr_udp_core::dhtUpkeep()
 {
-    if (tr_dhtEnabled(&session_))
+    if (tr_dhtEnabled())
     {
-        tr_dhtUpkeep(&session_);
+        tr_dhtUpkeep();
     }
 }
 
 void tr_session::tr_udp_core::dhtUninit()
 {
-    if (tr_dhtEnabled(&session_))
+    if (tr_dhtEnabled())
     {
-        tr_dhtUninit(&session_);
+        tr_dhtUninit();
     }
 }
 
