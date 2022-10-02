@@ -282,7 +282,7 @@ public:
 
         tellPeerWhatWeHave(this);
 
-        if (auto const port = tr_dhtPort(torrent->session); io->supportsDHT() && port.has_value())
+        if (auto const port = tr_dhtPort(); io->supportsDHT() && port.has_value())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
             if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
@@ -1693,7 +1693,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
-                tr_dhtAddNode(msgs->session, msgs->io->address(), msgs->dht_port, false);
+                tr_dhtAddNode(msgs->io->address(), msgs->dht_port, false);
             }
         }
         break;

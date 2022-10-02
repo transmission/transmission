@@ -104,7 +104,7 @@ public:
 
     [[nodiscard]] bool isDHTEnabled() const override
     {
-        return tr_dhtEnabled(&session_);
+        return tr_dhtEnabled();
     }
 
     [[nodiscard]] bool allowsTCP() const override
