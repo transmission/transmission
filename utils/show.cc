@@ -345,8 +345,8 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         fflush(stdout);
 
         // execute the http scrape
-        curl_easy_setopt(curl, CURLOPT_URL, scrape_url.c_str());
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
+        (void)curl_easy_setopt(curl, CURLOPT_URL, scrape_url.c_str());
+        (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
         if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
         {
             fmt::print("error: {:s}\n", curl_easy_strerror(res));
