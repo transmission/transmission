@@ -24,7 +24,7 @@ TEST(Client, clientForId)
         std::string_view expected_client;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 46>{
+    auto constexpr Tests = std::array<LocalTest, 47>{
         { { "-ADB560-"sv, "Advanced Download Manager 11.5.6"sv },
           { "-AZ8421-"sv, "Azureus / Vuze 8.4.2.1"sv },
           { "-BC0241-"sv, "BitComet 2.41"sv }, // two major, two minor
@@ -55,6 +55,7 @@ TEST(Client, clientForId)
           { "-TR111Z-"sv, "Transmission 1.11 (Dev)"sv },
           { "-TR400X-"sv, "Transmission 4.0.0 (Beta)"sv },
           { "-TR4000-"sv, "Transmission 4.0.0"sv },
+          { "-TR4Az0-"sv, "Transmission 4.10.61"sv },
           { "-UT341\0-"sv, "\xc2\xb5Torrent 3.4.1"sv },
           { "-UT7a5\0-"sv, "\xc2\xb5Torrent 7.10.5"sv },
           { "-UW110Q-"sv, "\xc2\xb5Torrent Web 1.1.0"sv },
