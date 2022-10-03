@@ -69,17 +69,20 @@ tr_auto_option(WITH_SYSTEMD         "Add support for systemd startup notificatio
 
 set(TR_NAME ${PROJECT_NAME})
 
-# convention: -TR MAJOR MINOR MAINT STATUS - (each a single char)
-# STATUS: "X" for prerelease beta builds,
-#         "Z" for unsupported trunk builds,
-#         "0" for stable, supported releases
+# convention: -TR MAJOR MINOR PATCH TYPE - (each a single char)
+# MAJOR: https://semver.org/ major in https://en.wikipedia.org/wiki/Base62
+# MINOR: https://semver.org/ minor in https://en.wikipedia.org/wiki/Base62
+# PATCH: https://semver.org/ patch in https://en.wikipedia.org/wiki/Base62
+# TYPE: '0' for stable releases, X' for beta releases, 'Z' for dev builds
+#
 # these should be the only two lines you need to change
-set(TR_USER_AGENT_PREFIX "3.00+")
+set(TR_USER_AGENT_PREFIX "3.0.0+")
 set(TR_PEER_ID_PREFIX "-TR300Z-")
 
-string(REGEX MATCH "^([0-9]+)\\.([0-9]+).*" TR_VERSION "${TR_USER_AGENT_PREFIX}")
+string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*" TR_VERSION "${TR_USER_AGENT_PREFIX}")
 set(TR_VERSION_MAJOR "${CMAKE_MATCH_1}")
 set(TR_VERSION_MINOR "${CMAKE_MATCH_2}")
+set(TR_VERSION_PATCH "${CMAKE_MATCH_3}")
 
 if(TR_PEER_ID_PREFIX MATCHES "X-$")
     set(TR_BETA_RELEASE 1)

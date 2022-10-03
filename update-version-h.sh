@@ -17,7 +17,8 @@ user_agent_prefix=$(grep 'set[(]TR_USER_AGENT_PREFIX' CMakeLists.txt | cut -d \"
 peer_id_prefix=$(grep 'set[(]TR_PEER_ID_PREFIX' CMakeLists.txt | cut -d \" -f 2)
 
 major_version=$(echo "${user_agent_prefix}" | awk -F . '{print $1}')
-minor_version=$(echo "${user_agent_prefix}" | awk -F . '{print $2 + 0}')
+minor_version=$(echo "${user_agent_prefix}" | awk -F . '{print $2}')
+patch_version=$(echo "${user_agent_prefix}" | awk -F . '{print $3}')
 
 vcs_revision=
 vcs_revision_file=REVISION
@@ -51,9 +52,10 @@ cat > libtransmission/version.h.new << EOF
 #define SHORT_VERSION_STRING      "${user_agent_prefix}"
 #define LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
 #define VERSION_STRING_INFOPLIST  ${user_agent_prefix}
-#define BUILD_STRING_INFOPLIST    14714.${major_version}.${minor_version}
+#define BUILD_STRING_INFOPLIST    14714.${major_version}.${minor_version}.${patch_version}
 #define MAJOR_VERSION             ${major_version}
 #define MINOR_VERSION             ${minor_version}
+#define PATCH_VERSION             ${patch_version}
 EOF
 
 # Add a release definition
