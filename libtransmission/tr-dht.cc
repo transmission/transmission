@@ -167,7 +167,7 @@ static constexpr std::string_view printableStatus(Status status)
 
 bool tr_dhtEnabled()
 {
-    return impl.session != nullptr && (impl.udp4_socket != TR_BAD_SOCKET || impl.udp6_socket != TR_BAD_SOCKET);
+    return impl.session != nullptr;
 }
 
 static constexpr auto getUdpSocket(int af)
