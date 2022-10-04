@@ -191,6 +191,10 @@ struct tr_address
         return this->compare(that) > 0;
     }
 
+    //
+
+    [[nodiscard]] std::pair<sockaddr_storage, socklen_t> toSockaddr(tr_port port) const noexcept;
+
     tr_address_type type;
     union
     {
