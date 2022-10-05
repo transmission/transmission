@@ -418,26 +418,8 @@ constexpr void qvod_formatter(char* buf, size_t buflen, std::string_view name, t
     buf_append(buf, buflen, name, ' ', base62str(id[4]), '.', base62str(id[5]), '.', base62str(id[6]), '.', base62str(id[7]));
 }
 
-constexpr auto trSuffix(uint8_t ch)
-{
-    switch (ch)
-    {
-    case 'x':
-    case 'X':
-        return " (Beta)"sv;
-
-    case 'z':
-    case 'Z':
-        return " (Dev)"sv;
-
-    default:
-        return ""sv;
-    }
-}
-
 void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
 
     if (std::equal(&id[3], &id[6], "000")) // very old client style: -TR0006- is 0.6
@@ -450,12 +432,12 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_
     }
     else if (id[3] <= '3') // style up through 3.00: -TR111Z- is 1.11+
     {
-        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s}.{:02d}{:s}"), base62str(id[3]), strint(&id[4], 2), trSuffix(id[6]))
+        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s}.{:02d}{:s}"), base62str(id[3]), strint(&id[4], 2), utSuffix(id[6]))
              .out = '\0';
     }
     else // -TR400X- is 4.0.0 (Beta)"
     {
-        buf_append(buf, buflen, base62str(id[3]), '.', base62str(id[4]), '.', base62str(id[5]), trSuffix(id[6]));
+        buf_append(buf, buflen, base62str(id[3]), '.', base62str(id[4]), '.', base62str(id[5]), utSuffix(id[6]));
     }
 }
 

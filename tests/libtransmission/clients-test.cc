@@ -53,7 +53,7 @@ TEST(Client, clientForId)
           { "-TR0006-"sv, "Transmission 0.6"sv },
           { "-TR0072-"sv, "Transmission 0.72"sv },
           { "-TR111Z-"sv, "Transmission 1.11 (Dev)"sv },
-          { "-TR400X-"sv, "Transmission 4.0.0 (Beta)"sv },
+          { "-TR400B-"sv, "Transmission 4.0.0 (Beta)"sv },
           { "-TR4000-"sv, "Transmission 4.0.0"sv },
           { "-TR4Az0-"sv, "Transmission 4.10.61"sv },
           { "-UT341\0-"sv, "\xc2\xb5Torrent 3.4.1"sv },
