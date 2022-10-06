@@ -71,11 +71,11 @@ Some of the highlights include:
 
 - The codebase has been rewritten to be universal for Intel and Apple Silicon chips.
 - Updated interface for Big Sur and Monterey (macOS 12):
-  * Updated toolbar, main window, and preferences window to use SF Symbol icons
-  * Fix main table view styling
-  * Remove deprecated toolbar items and min/max item size
-  * Set an app accent color on macOS 11
-  * Parital adoption of auto-layout.
+  * Updated toolbar, main window, and preferences window to use SF Symbol icons.
+  * Fix main table view styling.
+  * Remove deprecated toolbar items and min/max item size.
+  * Set an app accent color on macOS 11.
+  * Partial adoption of auto-layout.
   * 'Groups' has been entirely rewritten to include native macOS colours and styling.
 
 ### Qt Client
