@@ -5,14 +5,13 @@ Downloads: [Linux(https://TODO), [macOS(https://TODO), [Windows(https://TODO)
 ## Highlights
 
 Welcome to the first beta release of Transmission 4.0.0!
-It's been in development for over a year and has a _huge_ list of changes.
+It's been in active development for over a year and has a _huge_ list of changes -- over 1,000 commits -- since Transmission 3.00.
 Some of the highlights include:
 
 - [**Resource Efficiency**](#resource-efficiency) - Use less memory, fewer CPU cycles
 - [**Better Community**](#community) - Pull requests welcomed and used
 - [**Code Modernization**](#code-modernization) - Rewritten in C++
 - [**New Features**](#newfFeatures) - What would a major release be without them?
-- [**Web Client Refresh**](#web-client) - With mobile support, dark mode, fullscreen. 68K gzipped.
 
 ### Resource Efficiency
 
@@ -26,39 +25,28 @@ Some of the highlights include:
 - The project is much more responsive to bug reports and code submissions than it has been in the past.
 - There is a new group of volunteer contributors who are working on Transmission!
 - Transmission 4.0.0-beta.1 includes over 300 new community commits (see [the Thank You section below](#Thank-You) for a list) and is welcoming new contributors.
+- Documentation has been moved into the `transmission/transmission` so that contributors can submit PRs to improve it
 
 ### Code Modernization
 
-- The entire codebase has been migrated from C to C++. In the process, we were able to remove thousands of lines of custom code and use standard C++ libraries instead. libtransmission's source code size has shrunk by 15% compared to Transmission 3.00.
+- The entire codebase has been migrated from C to C++. In the process, we've removed thousands of lines of custom code and used standard C++ tools instead. The core's code has shrunk by 18%. The core codebase has extensively refactored to be more testable and maintainable.
 - The GTK client has been ported to [gtkmm](http://www.gtkmm.org/en/).
-- The Web client no longer uses jQuery and uses modern JavaScript.
-- The unit tests have been ported to [Google Test](https://github.com/google/googletest). Many new tests, including fuzz testing, have been added. CI has been improved to run sanitizer builds when testing new code.
-- Transmission now uses Sonarcloud, Coverity, LGTM, and clang-tidy static analysis on new code. Hundreds of code warnings have been fixed compared to Transmission 3.00.
+- The Web client has been rewritten in modern JavaScript and no longer uses jQuery. The entire gzipped bundle is now 68K.
+- The unit tests have been expanded and ported to [Google Test](https://github.com/google/googletest). Clang sanitizer builds are run during CI.
+- The core library is now fuzz tested.
+- Transmission now uses Sonarcloud, Coverity, LGTM, and clang-tidy static analysis on new code. Several hundred code warnings have been fixed compared to Transmission 3.00.
 
 ### New Features
 
-- Transmission 4.0.0 now supports .torrent files that were created with the [BitTorrent v2 spec](http://bittorrent.org/beps/bep_0052.html). 4.0.0 users will be able to download and seed torrents created by both BitTorrent v1 and v2. Support for _creating_ v2 torrents is slated for the next major release of Transmission.
-- Support setting "default" trackers that can be used for announcing all public torrents
-- Newly-added seeds can start immediately and verify pieces as needed, instead of requiring a full verify before seeding can begin ([#2626](https://github.com/transmission/transmission/pull/2626))
-- Added `transmission-create` option to omit potentially-identifying information, such as User-Agent and date created, when creating torrents. ([#3452](https://github.com/transmission/transmission/pull/3452))
-- Dozens of other new features; too many to list here!
-
-### Web Client
-
-The web client has been given a major overhaul! User-visible highlights include:
-* Mobile is now fully supported.
-* Added fullscreen support on mobile.
-* Better support for dark mode.
-* Added mime icons to the torrent list.
-* Improved theme consistency across the app.
-
-Maintainer highlights include:
-* Updated code to use modern JavaScript.
-* No longer use jQuery UI.
-* No longer use jQuery.
-* Use Webpack to bundle the Javascript, CSS, and assets together -- the entire bundle size is now 68K gzipped.
-* Added eslint / prettier / stylelint tooling.
-* Uses torrent-get's 'table' mode for more efficient RPC calls.
+- Support for using [BitTorrent v2](http://bittorrent.org/beps/bep_0052.html) torrents and [hybrid](http://bittorrent.org/beps/bep_0052.html#upgrade-path) torrents. (Support for _creating_ v2 and hybrid torrents is slated for an upcoming release.)
+- Users can now set "default" trackers that can be used to announce all public torrents.
+- Newly-added seeds can start immediately and verify pieces on demand, instead of needing a full verify before seeding can begin. ([#2626](https://github.com/transmission/transmission/pull/2626))
+- There now an option to omit potentially-identifying information (e.g. User-Agent and date created) when creating new torrents. ([#3452](https://github.com/transmission/transmission/pull/3452))
+- The Web client has been rewritten and now supports mobile use.
+- When creating new torrents, users can now specify the piece size. ([#3768](https://github.com/transmission/transmission/pull/3768), [#3145](https://github.com/transmission/transmission/pull/3145), [#2805](https://github.com/transmission/transmission/pull/2805))
+- IPv6 blocklists are now supported. ([#3835](https://github.com/transmission/transmission/pull/3835))
+- Beginning with 4.0.0-beta.1, Transmission releases now use [semver](https://semver.org/) versioning.
+- Dozens of other new features -- too many to list here! We've been working on this for a year!
 
 ## Other Changes
 
@@ -147,9 +135,9 @@ Maintainer highlights include:
 
 ## Thank You
 
-Last but certainly not least, a big **Thank You** to the people who contributed to this release.
+Last but certainly not least, a big **Thank You** to the people who contributed to this release: acchang, A Cœur, Ali, Andrey, Antoine Cœur, Balázs Meskó, beizmos, Berbe, bexnoss, bkuhls, buckmelanoma, Carles Pastor Badosa, Charles Kerr, Chris Young, Chrool, Cœur, Colin B, Craig Andrews, C.W. Betts, Dachtire, Daniel Kamil Kozar, Dan Walters, David Beinder, David Miguel Susano Pinto, dependabot[bot], depler, Dinesh Manajipet, Dmitry Antipov, Dmitry Serov, Dmytro Lytovchenko, dubhater, Dzmitry Neviadomski, Esa Varemo, evils, ewtoombs, FallenWarrior2k, Federico Bond, FluxState, Frank Aurich, FX Coudert, Gary Elshaw, goldsteinn, Greg Hazel, Guido Cella, Guido Vranken, Hakjoon Sim, Han Shen, Harm133, Ilkka, Ilkka Kallioniemi, IMurzich, Isabella Skořepová, Jelle van der Waa, Johan, Jonas Malaco, JP-Ellis, kakuhen, Kirill Ovchinnikov, Kobaxidze256, Koro, L2501, LaserEyess, Lucas Clemente Vella, lucaxvi, Luukas Pörtfors, luzpaz, Mark Deepwell, Markus Amalthea Magnuson, Matan Ziv-Av, Matt Joiner, maxz, Max Zettlmeißl, Michael Lopez, Michal Kubiak, mickaelifs, Mike Gelfand, Mike Gilbert, Mitchell Livingston, Mitch Livingston, Nathan Benichou, Nicholas Guriev, Noobsai, Norbert Papke, Oleg Chashko, orbital-mango, OscarCunningham, Pavel Borzenkov, Pedro Scarapicchia Junior, Peter Bailey, Petrprogs, Pierre Carru, qu1ck, razaq, RobCrowston, Robert Palmer, Robin Seth Ekman, Rosen Penev, Sam Marcus, Sander van Kasteel, Sergey Fedoseev, sewe2000, shelvacu, Stefan Talpalaru, SweetPPro, Tomáš Kelemen, Tyler, Viacheslav Chimishuk, Vik, Vincent Vinel, Vitaly Potyarkin, vuori, wiz78, and Xist12gh!
 
-### Code Contributions
+### Notable Code Contributions
 
 #### `libtransmission` code contributions:
 
