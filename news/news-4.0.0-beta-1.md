@@ -1,7 +1,5 @@
 # [Transmission 4.0.0-beta.1](https://github.com/transmission/transmission/releases/tag/4.0.0-beta.1) (2022-08-06)
 
-Downloads: [Linux(https://TODO), [macOS(https://TODO), [Windows(https://TODO)
-
 ## Highlights
 
 Welcome to the first beta release of Transmission 4.0.0!
@@ -98,7 +96,7 @@ Some of the highlights include:
 - When creating new torrents, their piece size can be specified.
 - The File menu now incorporates normal quick key operations.
 - The Details dialog now includes the date a torrent was added.
-- The Details dialog now renders large file lists faster.
+- The Details dialog now renders large file lists faster. ([#2992](https://github.com/transmission/transmission/pull/2992], [#2993](https://github.com/transmission/transmission/pull/2993])
 - Better i18n of phrases for past, present, and future tense ([#3214](https://github.com/transmission/transmission/issues/3214#event-6809248892))
 
 ### Daemon
