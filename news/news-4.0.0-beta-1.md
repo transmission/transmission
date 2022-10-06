@@ -96,10 +96,10 @@ Some of the highlights include:
 
 - Ported to [GTKMM](https://gtkmm.org/en/index.html)
 - When creating new torrents, their piece size can be specified.
-- Internationalisation improvements for past, present, and future tense https://github.com/transmission/transmission/issues/3214#event-6809248892
 - The File menu now incorporates normal quick key operations.
 - The Details dialog now includes the date a torrent was added.
 - The Details dialog now renders large file lists faster.
+- Better i18n of phrases for past, present, and future tense ([#3214](https://github.com/transmission/transmission/issues/3214#event-6809248892))
 
 ### Daemon
 
@@ -135,11 +135,13 @@ Maintainer highlights include:
 
 ## Thank You
 
-Last but certainly not least, a big **Thank You** to the people who contributed to this release: acchang, A Cœur, Ali, Andrey, Antoine Cœur, Balázs Meskó, beizmos, Berbe, bexnoss, bkuhls, buckmelanoma, Carles Pastor Badosa, Charles Kerr, Chris Young, Chrool, Cœur, Colin B, Craig Andrews, C.W. Betts, Dachtire, Daniel Kamil Kozar, Dan Walters, David Beinder, David Miguel Susano Pinto, dependabot[bot], depler, Dinesh Manajipet, Dmitry Antipov, Dmitry Serov, Dmytro Lytovchenko, dubhater, Dzmitry Neviadomski, Esa Varemo, evils, ewtoombs, FallenWarrior2k, Federico Bond, FluxState, Frank Aurich, FX Coudert, Gary Elshaw, goldsteinn, Greg Hazel, Guido Cella, Guido Vranken, Hakjoon Sim, Han Shen, Harm133, Ilkka, Ilkka Kallioniemi, IMurzich, Isabella Skořepová, Jelle van der Waa, Johan, Jonas Malaco, JP-Ellis, kakuhen, Kirill Ovchinnikov, Kobaxidze256, Koro, L2501, LaserEyess, Lucas Clemente Vella, lucaxvi, Luukas Pörtfors, luzpaz, Mark Deepwell, Markus Amalthea Magnuson, Matan Ziv-Av, Matt Joiner, maxz, Max Zettlmeißl, Michael Lopez, Michal Kubiak, mickaelifs, Mike Gelfand, Mike Gilbert, Mitchell Livingston, Mitch Livingston, Nathan Benichou, Nicholas Guriev, Noobsai, Norbert Papke, Oleg Chashko, orbital-mango, OscarCunningham, Pavel Borzenkov, Pedro Scarapicchia Junior, Peter Bailey, Petrprogs, Pierre Carru, qu1ck, razaq, RobCrowston, Robert Palmer, Robin Seth Ekman, Rosen Penev, Sam Marcus, Sander van Kasteel, Sergey Fedoseev, sewe2000, shelvacu, Stefan Talpalaru, SweetPPro, Tomáš Kelemen, Tyler, Viacheslav Chimishuk, Vik, Vincent Vinel, Vitaly Potyarkin, vuori, wiz78, and Xist12gh!
+Last but certainly not least, a big **Thank You** to the people who contributed to this release: acchang, A Cœur, Ali, Andrey, Antoine Cœur, Balázs Meskó, beizmos, Berbe, bexnoss, bkuhls, buckmelanoma, Carles Pastor Badosa, Charles Kerr, Chris Young, Chrool, Cœur, Colin B, Craig Andrews, C.W. Betts, Dachtire, Daniel Kamil Kozar, Dan Walters, David Beinder, David Miguel Susano Pinto, dependabot[bot], depler, Dinesh Manajipet, Dmitry Antipov, Dmitry Serov, Dmytro Lytovchenko, dubhater, Dzmitry Neviadomski, Esa Varemo, evils, ewtoombs, FallenWarrior2k, Federico Bond, FluxState, Frank Aurich, FX Coudert, Gary Elshaw, goldsteinn, Greg Hazel, Guido Cella, Guido Vranken, Hakjoon Sim, Han Shen, Harm133, Ilkka, Ilkka Kallioniemi, IMurzich, Isabella Skořepová, Jelle van der Waa, Johan, Jonas Malaco, JP-Ellis, kakuhen, Kirill Ovchinnikov, Kobaxidze256, Koro, L2501, LaserEyess, Lucas Clemente Vella, lucaxvi, Luukas Pörtfors, luzpaz, Mark Deepwell, Markus Amalthea Magnuson, Matan Ziv-Av, Matt Joiner, maxz, Max Zettlmeißl, Michael Lopez, Michal Kubiak, mickaelifs, Mike Gelfand, Mike Gilbert, Mitchell Livingston, Mitch Livingston, Nathan Benichou, Nicholas Guriev, Noobsai, Norbert Papke, Oleg Chashko, orbital-mango, OscarCunningham, Pavel Borzenkov, Pedro Scarapicchia Junior, Peter Bailey, Petrprogs, Pierre Carru, qu1ck, razaq, RobCrowston, Robert Palmer, Robin Seth Ekman, Rosen Penev, Sam Marcus, Sander van Kasteel, Sergey Fedoseev, sewe2000, shelvacu, Simone Tellini, Stefan Talpalaru, SweetPPro, Tomáš Kelemen, Tyler, Viacheslav Chimishuk, Vik, Vincent Vinel, Vitaly Potyarkin, vuori, wiz78, and Xist12gh!
+
+These release notes were compiled manually. Since 4.0.0 has been in development for so long, this has been a time-consuming and error-prone process. If you contributed to Transmission and aren't listed here or below, we apologise in advance!
 
 ### Notable Code Contributions
 
-#### `libtransmission` code contributions:
+#### Core contributions (`libtransmission`):
 
 - [1100101](https://github.com/1100101) (Frank Aurich):
   - Fix overflow bugs on 32bit platforms with torrents larger than 4GB ([#2391](https://github.com/transmission/transmission/pull/2391), [#2378](https://github.com/transmission/transmission/pull/2378))
@@ -193,6 +195,8 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
   - Fix detection of PSL library ([#2812](https://github.com/transmission/transmission/pull/2812))
 - [kakuhen](https://github.com/kakuhen):
   - Clarify documentation on torrent-add result on duplicate torrents ([#2690](https://github.com/transmission/transmission/pull/2690))
+- [kvakvs](https://github.com/kvakvs) (Dmytro Lytovchenko):
+  - C++ migration ([#3108](https://github.com/transmission/transmission/pull/3108), [#2010](https://github.com/transmission/transmission/pull/2010), [#1927](https://github.com/transmission/transmission/pull/1927), [#1917](https://github.com/transmission/transmission/pull/1917), [#1914](https://github.com/transmission/transmission/pull/1914), [#1895](https://github.com/transmission/transmission/pull/1895))
 - [L2501](https://github.com/L2501):
   - Add recognition for more Peer IDs of other clients ([#3750](https://github.com/transmission/transmission/pull/3750), [#3838](https://github.com/transmission/transmission/pull/3838))
 - [lanzaa](https://github.com/lanzaa) (Colin B):
@@ -286,8 +290,6 @@ Last but certainly not least, a big **Thank You** to the people who contributed 
 - [GaryElshaw](https://github.com/GaryElshaw) (Gary Elshaw):
   - Icon updates ([#3178](https://github.com/transmission/transmission/pull/3178), [#3238](https://github.com/transmission/transmission/pull/3238), [#3130](https://github.com/transmission/transmission/pull/3130), [#31128](https://github.com/transmission/transmission/pull/31128), [#2779](https://github.com/transmission/transmission/pull/2779)), [#3239](https://github.com/transmission/transmission/pull/3239), [#3364](https://github.com/transmission/transmission/pull/3364), [#3348](https://github.com/transmission/transmission/pull/3348)
   - Font size changes ([#3571](https://github.com/transmission/transmission/pull/3571)
-- [kvakvs](https://github.com/kvakvs) (Dmytro Lytovchenko):
-  - C++ migration in libtransmission ([#3108](https://github.com/transmission/transmission/pull/3108), [#2010](https://github.com/transmission/transmission/pull/2010), [#1927](https://github.com/transmission/transmission/pull/1927), [#1917](https://github.com/transmission/transmission/pull/1917), [#1914](https://github.com/transmission/transmission/pull/1914), [#1895](https://github.com/transmission/transmission/pull/1895))
 - [MaddTheSane](https://github.com/MaddTheSane) (Charles W. Betts):
   - Move private interfaces to interface extensions ([#932](https://github.com/transmission/transmission/pull/932))
   - macOS: use SDK's libCurl. ([#1542](https://github.com/transmission/transmission/pull/1542))
