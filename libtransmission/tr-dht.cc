@@ -344,7 +344,10 @@ static void bootstrapFromFile(std::string_view config_dir)
 
 static void bootstrapStart(std::string_view config_dir, std::vector<uint8_t> nodes4, std::vector<uint8_t> nodes6)
 {
-    TR_ASSERT(tr_dhtEnabled());
+    if (!tr_dhtEnabled())
+    {
+        return;
+    }
 
     auto const num4 = std::size(nodes4) / 6;
     if (num4 > 0)
