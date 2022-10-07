@@ -44,9 +44,11 @@ The project is far more responsive to bug reports and code submissions than it h
 - Newly-added seeds can start immediately and verify pieces as needed, instead of requiring a full verify before seeding can begin ([#2626](https://github.com/transmission/transmission/pull/2626))
 - Added `transmission-create` option to omit potentially-identifying information, such as User-Agent and date created, when creating torrents. ([#3452](https://github.com/transmission/transmission/pull/3452))
 
-### Updated macOS UI
+### macOS
 
-- TODO
+- Transmission is now a Universal (Apple Silicon and Intel) app.
+- Refresh of the UI to better fit into modern macOS.
+- A new icon designed for Big Sur by Rodger Werner
 
 ### Web Client
 
@@ -82,25 +84,6 @@ TODO
  - Add configurable anti-brute force settings ([#1447](https://github.com/transmission/transmission/pull/1447))
  - Fetch metadata of stopped magnets ([#1080](https://github.com/transmission/transmission/pull/1080))
  - Stop logging excessive error messages after they repeat too many times. In some cases, repetitive messages had been spamming syslogs. ([#2756](https://github.com/transmission/transmission/pull/2756))
-
-### Mac Client
-
-- The codebase has been rewritten to be universal for Intel and Apple Silicon chips.
-- MacOS Big Sur (macOS 11) offered some standardisation opportunities for the icons in the GUI.
-- Here are some of the baseline interface changes that were made for Big Sur, and of course, Monterey (macOS 12).
-
-* Remove deprecated toolbar items
-* Updated toolbar icons (using SF Symbol)
-* Fix main table view styling
-* Remove deprecated min/max toolbar item size
-* Set an app accent color on macOS 11
-* Update the main window to use SF Symbols
-* Update the preferences window to use SF Symbols
-* A new icon designed for Big Sur by Rodger Werner
-
-In the last few months some of the last vestiges of the 'Aqua' era have also gone by the wayside. 'Groups' has been entirely rewritten to include native macOS colours and styling.
-
-Right now, work is being done to modernise and refactor, at the very least, the Main Menu into auto-layout.
 
 
 ### GTK Client
