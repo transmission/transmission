@@ -60,21 +60,16 @@ Some of the highlights include:
 ### All Platforms
 
  - Fix small scrape/announce packet size that could trip SYN flood detection on some systems ([#3236](https://github.com/transmission/transmission/pull/3236))
-- Remove the 1024 open files limit previously required by how libcurl was used ([#893](https://github.com/transmission/transmission/pull/893))
+ - Remove the 1024 open files limit previously required by how libcurl was used ([#893](https://github.com/transmission/transmission/pull/893))
  - Add configurable anti-brute force settings ([#1447](https://github.com/transmission/transmission/pull/1447))
  - Fetch metadata of stopped magnets ([#1080](https://github.com/transmission/transmission/pull/1080))
  - Stop logging excessive error messages after they repeat too many times. In some cases, repetitive messages had been spamming syslogs. ([#2756](https://github.com/transmission/transmission/pull/2756))
 
 ### macOS Client
 
-- The codebase has been rewritten to be universal for Intel and Apple Silicon chips.
-- Updated interface for Big Sur and Monterey (macOS 12):
-  * Updated toolbar, main window, and preferences window to use SF Symbol icons.
-  * Fix main table view styling.
-  * Remove deprecated toolbar items and min/max item size.
-  * Set an app accent color on macOS 11.
-  * Partial adoption of auto-layout.
-  * 'Groups' has been entirely rewritten to include native macOS colours and styling.
+- Transmission is now a Universal (Apple Silicon and Intel) app.
+- Refresh of the UI to better fit into modern macOS.
+- A new icon designed for Big Sur by Rodger Werner.
 
 ### Qt Client
 
