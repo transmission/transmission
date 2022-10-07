@@ -1331,6 +1331,7 @@ void Application::Impl::show_about_dialog()
     d->signal_close_request().connect_notify([d]() mutable { d.reset(); });
 #else
     d->signal_delete_event().connect_notify([d](void* /*event*/) mutable { d.reset(); });
+    d->signal_response().connect_notify([&dref = *d](int /*response*/) { dref.close(); });
 #endif
     d->show();
 }
