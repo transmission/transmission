@@ -2157,8 +2157,6 @@ EditTrackersDialog::EditTrackersDialog(
     set_transient_for(parent);
 
     urls_view_->get_buffer()->set_text(tr_torrentGetTrackerList(torrent));
-
-    signal_response().connect([this](int response) { on_response(response); });
 }
 
 std::unique_ptr<EditTrackersDialog> EditTrackersDialog::create(
@@ -2274,8 +2272,6 @@ AddTrackerDialog::AddTrackerDialog(
     set_transient_for(parent);
 
     gtr_paste_clipboard_url_into_entry(*url_entry_);
-
-    signal_response().connect([this](int response) { on_response(response); });
 }
 
 std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(
