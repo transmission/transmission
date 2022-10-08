@@ -199,8 +199,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
         URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
     if (!self.fLocation)
     {
-        //for 2.5 and earlier
-#warning we still store "CreatorLocation" in Defaults.plist, and not "CreatorLocationURL"
+        //Compatibility with Transmission 2.5 and earlier,
+        //when it was "CreatorLocation" and not "CreatorLocationURL"
         NSString* location = [self.fDefaults stringForKey:@"CreatorLocation"];
         self.fLocation = [[NSURL alloc]
             initFileURLWithPath:[location.stringByExpandingTildeInPath

@@ -109,7 +109,7 @@ enum tr_encryption_mode
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
- * @brief returns Transmisson's default download directory.
+ * @brief returns Transmission's default download directory.
  *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
@@ -421,7 +421,7 @@ struct tr_session_stats
     uint64_t downloadedBytes; /* total down */
     uint64_t filesAdded; /* number of files added */
     uint64_t sessionCount; /* program started N times */
-    uint64_t secondsActive; /* how long Transmisson's been running */
+    uint64_t secondsActive; /* how long Transmission's been running */
 };
 
 /** @brief Get bandwidth use statistics for the current session */

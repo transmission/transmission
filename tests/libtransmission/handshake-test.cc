@@ -239,7 +239,8 @@ TEST_F(HandshakeTest, incomingPlaintext)
     // implementations[.] Next comes the 20 byte sha1 hash of the bencoded
     // form of the info value from the metainfo file[.] After the download
     // hash comes the 20-byte peer id which is reported in tracker requests
-    // and contained in peer lists in tracker responses.
+    // and contained in peer lists in tracker responses."
+    // https://www.bittorrent.org/beps/bep_0052.html
     auto [io, sock] = createIncomingIo(session_);
     sendToClient(sock, PlaintextProtocolName);
     sendToClient(sock, ReservedBytesNoExtensions);

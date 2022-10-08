@@ -254,11 +254,11 @@ These release notes were compiled manually. Since 4.0.0 has been in development 
   - Added ability to filter on error status. ([#19](https://github.com/transmission/transmission/pull/19))
 - [azy5030](https://github.com/azy5030) (Ali):
   - Add ability to change piece size during torrent creation ([#2416](https://github.com/transmission/transmission/pull/2416))
-- [Coeur](https://github.com/Coeur) (A Cœur):
+- [Coeur](https://github.com/Coeur) (Cœur):
   - macOS client icon improvements ([#3250](https://github.com/transmission/transmission/pull/3250), [#3224](https://github.com/transmission/transmission/pull/3224), [#3094](https://github.com/transmission/transmission/pull/3094), [#3065](https://github.com/transmission/transmission/pull/3065))
   - Fix QuickLook ([#3001](https://github.com/transmission/transmission/pull/3001))
   - Support pasting multiple magnet links ([#3087](https://github.com/transmission/transmission/pull/3087), [#3086](https://github.com/transmission/transmission/pull/3086))
-  - Add "Verify Local Data" to context menu ([#3025](https://github.com/transmission/transmission/pull/3025))\
+  - Add "Verify Local Data" to context menu ([#3025](https://github.com/transmission/transmission/pull/3025))
   - Fix build warnings, code cleanup ([#3222](https://github.com/transmission/transmission/pull/3222), [#3051](https://github.com/transmission/transmission/pull/3051), [#3031](https://github.com/transmission/transmission/pull/3031), [#3042](https://github.com/transmission/transmission/pull/3042), [#3059](https://github.com/transmission/transmission/pull/3059), [#3052](https://github.com/transmission/transmission/pull/3052), [#3041](https://github.com/transmission/transmission/pull/3041), [#2973](https://github.com/transmission/transmission/pull/2973))
   - Adopt lightweight generics ([#2974](https://github.com/transmission/transmission/pull/2974))
   - Fix 3.00 bug where the display window was incorrectly enabled on start ([#3056](https://github.com/transmission/transmission/pull/3056))
@@ -322,7 +322,7 @@ These release notes were compiled manually. Since 4.0.0 has been in development 
   - Update macOS group indicators ([#3183](https://github.com/transmission/transmission/pull/3183))
   - Fullscreen mode fixes ([#195](https://github.com/transmission/transmission/pull/195))
   - Fix for editing magnet links' tracker lists ([#2793](https://github.com/transmission/transmission/pull/2793))
-  - Fix some window drawing issuex [#3278](https://github.com/transmission/transmission/pull/3278))
+  - Fix some window drawing issues [#3278](https://github.com/transmission/transmission/pull/3278))
   - Replace Groups indicators with dots. [#3268](https://github.com/transmission/transmission/pull/3268))
   - Fix a number of UI render issues in the torrent creator window [#3205](https://github.com/transmission/transmission/pull/3268))
   - Magnet link improvements ([#3205](https://github.com/transmission/transmission/pull/2654), [#2702](https://github.com/transmission/transmission/pull/2702))

@@ -5190,7 +5190,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         height = NSHeight(self.fTableView.enclosingScrollView.frame);
     }
 
-    //make sure we dont go bigger that the screen height
+    //make sure we don't go bigger than the screen height
     NSScreen* screen = self.fWindow.screen;
     if (screen)
     {
@@ -5207,7 +5207,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
     }
 
-    //make sure we dont have zero height
+    //make sure we don't have zero height
     if (height < minHeight)
     {
         height = minHeight;
