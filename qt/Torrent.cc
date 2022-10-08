@@ -54,27 +54,53 @@ bool Torrent::includesTracker(QString const& sitename) const
     return std::binary_search(std::begin(sitenames_), std::end(sitenames_), sitename);
 }
 
-int Torrent::compareSeedRatio(Torrent const& that) const
+int Torrent::compareSeedProgress(Torrent const& that) const
 {
-    auto const a = getSeedRatioLimit();
-    auto const b = that.getSeedRatioLimit();
+    auto const a_ratio_limit = getSeedRatioLimit();
+    auto const b_ratio_limit = that.getSeedRatioLimit();
 
-    if (!a && !b)
+    if (!a_ratio_limit && !b_ratio_limit)
     {
-        return 0;
+        return compareRatio(that);
     }
 
-    if (!a || !b)
+    auto const a_ratio = ratio();
+    auto const b_ratio = that.ratio();
+
+    if (!a_ratio_limit)
     {
-        return a ? -1 : 1;
+        return b_ratio < *b_ratio_limit ? 1 : -1;
     }
 
-    if (*a < *b)
+    if (!b_ratio_limit)
+    {
+        return a_ratio < *a_ratio_limit ? -1 : 1;
+    }
+
+    if (!(*a_ratio_limit > 0) && !(*b_ratio_limit > 0))
+    {
+        return compareRatio(that);
+    }
+
+    if (!(*a_ratio_limit > 0))
+    {
+        return 1;
+    }
+
+    if (!(*b_ratio_limit > 0))
     {
         return -1;
     }
 
-    if (*a > *b)
+    double const a_progress = a_ratio / *a_ratio_limit;
+    double const b_progress = b_ratio / *b_ratio_limit;
+
+    if (a_progress < b_progress)
+    {
+        return -1;
+    }
+
+    if (a_progress > b_progress)
     {
         return 1;
     }

@@ -33,7 +33,6 @@ set(PROJECT_FILES
   log.cc
   magnet-metainfo.cc
   makemeta.cc
-  natpmp.cc
   net.cc
   open-files.cc
   peer-io.cc
@@ -44,6 +43,8 @@ set(PROJECT_FILES
   peer-msgs.cc
   platform-quota.cc
   platform.cc
+  port-forwarding-natpmp.cc
+  port-forwarding-upnp.cc
   port-forwarding.cc
   quark.cc
   resume.cc
@@ -69,7 +70,6 @@ set(PROJECT_FILES
   tr-udp.cc
   tr-utp.cc
   trevent.cc
-  upnp.cc
   utils.cc
   variant-benc.cc
   variant-json.cc
@@ -175,7 +175,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     lru-cache.h
     magnet-metainfo.h
     mime-types.h
-    natpmp_local.h
     net.h
     open-files.h
     peer-common.h
@@ -188,6 +187,8 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     peer-socket.h
     platform-quota.h
     platform.h
+    port-forwarding-natpmp.h
+    port-forwarding-upnp.h
     port-forwarding.h
     resume.h
     rpc-server.h
@@ -201,10 +202,8 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     torrents.h
     tr-dht.h
     tr-lpd.h
-    tr-udp.h
     tr-utp.h
     trevent.h
-    upnp.h
     variant-common.h
     verify.h
     version.h

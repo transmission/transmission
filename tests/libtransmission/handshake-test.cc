@@ -15,6 +15,7 @@
 #include "handshake.h"
 #include "peer-io.h"
 #include "session.h" // tr_peerIdInit()
+#include "timer.h"
 
 #include "test-fixtures.h"
 
@@ -67,9 +68,9 @@ public:
             return {};
         }
 
-        [[nodiscard]] std::unique_ptr<libtransmission::Timer> createTimer() override
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
         {
-            return session_->timerMaker().create();
+            return session_->timerMaker();
         }
 
         [[nodiscard]] bool isDHTEnabled() const override

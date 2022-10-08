@@ -41,6 +41,7 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "session.h"
+#include "timer.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
@@ -103,7 +104,7 @@ public:
 
     [[nodiscard]] bool isDHTEnabled() const override
     {
-        return tr_dhtEnabled(&session_);
+        return tr_dhtEnabled();
     }
 
     [[nodiscard]] bool allowsTCP() const override
@@ -125,9 +126,9 @@ public:
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
-    [[nodiscard]] std::unique_ptr<libtransmission::Timer> createTimer() override
+    [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
     {
-        return session_.timerMaker().create();
+        return session_.timerMaker();
     }
 
     [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override

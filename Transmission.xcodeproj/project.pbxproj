@@ -158,7 +158,6 @@
 		A247A443114C701800547DFC /* InfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A247A442114C701800547DFC /* InfoViewController.h */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		A250EEB60E2ED87B00A688E6 /* web in Resources */ = {isa = PBXBuildFile; fileRef = A250EE800E2ED87B00A688E6 /* web */; };
 		A254853C0EB66CD4004539DA /* codelength.h in Headers */ = {isa = PBXBuildFile; fileRef = A25485390EB66CBB004539DA /* codelength.h */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.mm */; };
 		A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.mm */; };
@@ -189,9 +188,9 @@
 		A2710E770A86796000CE4F7D /* PrefsWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.mm */; };
 		A2725B6E0DE5C4F5003445E7 /* FileListNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2725B6D0DE5C4F5003445E7 /* FileListNode.mm */; };
 		A2725D5D0DE7507C003445E7 /* TrackerTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2725D5C0DE7507C003445E7 /* TrackerTableView.mm */; };
+		A2795C5928EFC6700002C8D9 /* public_html in Resources */ = {isa = PBXBuildFile; fileRef = A2795C5828EFC6700002C8D9 /* public_html */; };
 		A27F0F330E19AD9800B2DB97 /* TorrentGroup.mm in Sources */ = {isa = PBXBuildFile; fileRef = A27F0F320E19AD9800B2DB97 /* TorrentGroup.mm */; };
 		A284214412DA663E00FBDDBB /* tr-udp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A284214212DA663E00FBDDBB /* tr-udp.cc */; };
-		A284214512DA663E00FBDDBB /* tr-udp.h in Headers */ = {isa = PBXBuildFile; fileRef = A284214312DA663E00FBDDBB /* tr-udp.h */; };
 		A28F4F770E085BDC003A3882 /* ColorTextField.mm in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.mm */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.cc */; };
 		A29304ED15D7465100B1F726 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
@@ -252,7 +251,7 @@
 		A2EA52321686AC0D00180493 /* quark.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EA52301686AC0D00180493 /* quark.h */; };
 		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.mm */; };
-		A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* natpmp_local.h */; };
+		A2EE726F14DCCC950093C99A /* port-forwarding-natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* port-forwarding-natpmp.h */; };
 		A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */; };
 		A2F35BC815C5A0A100EBF632 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A2F35BC615C5A0A100EBF632 /* InfoPlist.strings */; };
 		A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.mm */; };
@@ -293,8 +292,8 @@
 		BEFC1E290C07861A00B0BB3C /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF00C07861A00B0BB3C /* version.h */; };
 		BEFC1E2A0C07861A00B0BB3C /* utils.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF10C07861A00B0BB3C /* utils.h */; };
 		BEFC1E2B0C07861A00B0BB3C /* utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF20C07861A00B0BB3C /* utils.cc */; };
-		BEFC1E2C0C07861A00B0BB3C /* upnp.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF30C07861A00B0BB3C /* upnp.h */; };
-		BEFC1E2D0C07861A00B0BB3C /* upnp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF40C07861A00B0BB3C /* upnp.cc */; };
+		BEFC1E2C0C07861A00B0BB3C /* port-forwarding-upnp.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF30C07861A00B0BB3C /* port-forwarding-upnp.h */; };
+		BEFC1E2D0C07861A00B0BB3C /* port-forwarding-upnp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF40C07861A00B0BB3C /* port-forwarding-upnp.cc */; };
 		BEFC1E2F0C07861A00B0BB3C /* session.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF60C07861A00B0BB3C /* session.cc */; };
 		BEFC1E320C07861A00B0BB3C /* torrent.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF90C07861A00B0BB3C /* torrent.cc */; };
 		BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */; };
@@ -303,7 +302,7 @@
 		BEFC1E3C0C07861A00B0BB3C /* platform.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E030C07861A00B0BB3C /* platform.cc */; };
 		BEFC1E450C07861A00B0BB3C /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0C0C07861A00B0BB3C /* net.h */; };
 		BEFC1E460C07861A00B0BB3C /* net.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0D0C07861A00B0BB3C /* net.cc */; };
-		BEFC1E480C07861A00B0BB3C /* natpmp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */; };
+		BEFC1E480C07861A00B0BB3C /* port-forwarding-natpmp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0F0C07861A00B0BB3C /* port-forwarding-natpmp.cc */; };
 		BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E140C07861A00B0BB3C /* session.h */; };
 		BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E150C07861A00B0BB3C /* inout.h */; };
 		BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E160C07861A00B0BB3C /* inout.cc */; };
@@ -874,7 +873,6 @@
 		A24621360C769CF400088E81 /* trevent.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = trevent.cc; sourceTree = "<group>"; };
 		A247A442114C701800547DFC /* InfoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoViewController.h; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
-		A250EE800E2ED87B00A688E6 /* web */ = {isa = PBXFileReference; lastKnownFileType = folder; name = web; path = ../web; sourceTree = "<group>"; };
 		A25485390EB66CBB004539DA /* codelength.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = codelength.h; sourceTree = "<group>"; };
 		A256588A0A9A695400E8A03B /* MessageWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessageWindowController.h; sourceTree = "<group>"; };
 		A256588B0A9A695400E8A03B /* MessageWindowController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MessageWindowController.mm; sourceTree = "<group>"; };
@@ -922,13 +920,13 @@
 		A2725D5C0DE7507C003445E7 /* TrackerTableView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TrackerTableView.mm; sourceTree = "<group>"; };
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2795C5828EFC6700002C8D9 /* public_html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = public_html; path = web/public_html; sourceTree = SOURCE_ROOT; };
 		A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentGroup.h; sourceTree = "<group>"; };
 		A27F0F320E19AD9800B2DB97 /* TorrentGroup.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentGroup.mm; sourceTree = "<group>"; };
 		A27F4483160B4AF50048CD4C /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A28393FD10D54A79005C0240 /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A28393FF10D54A96005C0240 /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A284214212DA663E00FBDDBB /* tr-udp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-udp.cc"; sourceTree = "<group>"; };
-		A284214312DA663E00FBDDBB /* tr-udp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-udp.h"; sourceTree = "<group>"; };
 		A28B3A2D160E1BC900D4A2BC /* pt_PT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_PT; path = pt_PT.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ButtonToolbarItem.h; sourceTree = "<group>"; };
 		A28F4F750E085BDC003A3882 /* ColorTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorTextField.h; sourceTree = "<group>"; };
@@ -1011,7 +1009,7 @@
 		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2ED7D8D0CEF431B00970975 /* FilterButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilterButton.h; sourceTree = "<group>"; };
 		A2ED7D8E0CEF431B00970975 /* FilterButton.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilterButton.mm; sourceTree = "<group>"; };
-		A2EE726E14DCCC950093C99A /* natpmp_local.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp_local.h; sourceTree = "<group>"; };
+		A2EE726E14DCCC950093C99A /* port-forwarding-natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "port-forwarding-natpmp.h"; sourceTree = "<group>"; };
 		A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuickLookPlugin.qlgenerator; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
@@ -1064,8 +1062,8 @@
 		BEFC1DF00C07861A00B0BB3C /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		BEFC1DF10C07861A00B0BB3C /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
 		BEFC1DF20C07861A00B0BB3C /* utils.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cc; sourceTree = "<group>"; };
-		BEFC1DF30C07861A00B0BB3C /* upnp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = upnp.h; sourceTree = "<group>"; };
-		BEFC1DF40C07861A00B0BB3C /* upnp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = upnp.cc; sourceTree = "<group>"; };
+		BEFC1DF30C07861A00B0BB3C /* port-forwarding-upnp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "port-forwarding-upnp.h"; sourceTree = "<group>"; };
+		BEFC1DF40C07861A00B0BB3C /* port-forwarding-upnp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "port-forwarding-upnp.cc"; sourceTree = "<group>"; };
 		BEFC1DF50C07861A00B0BB3C /* transmission.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transmission.h; sourceTree = "<group>"; };
 		BEFC1DF60C07861A00B0BB3C /* session.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = session.cc; sourceTree = "<group>"; };
 		BEFC1DF90C07861A00B0BB3C /* torrent.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = torrent.cc; sourceTree = "<group>"; };
@@ -1075,7 +1073,7 @@
 		BEFC1E030C07861A00B0BB3C /* platform.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = platform.cc; sourceTree = "<group>"; };
 		BEFC1E0C0C07861A00B0BB3C /* net.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
 		BEFC1E0D0C07861A00B0BB3C /* net.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = net.cc; sourceTree = "<group>"; };
-		BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = natpmp.cc; sourceTree = "<group>"; };
+		BEFC1E0F0C07861A00B0BB3C /* port-forwarding-natpmp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "port-forwarding-natpmp.cc"; sourceTree = "<group>"; };
 		BEFC1E140C07861A00B0BB3C /* session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = session.h; sourceTree = "<group>"; };
 		BEFC1E150C07861A00B0BB3C /* inout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inout.h; sourceTree = "<group>"; };
 		BEFC1E160C07861A00B0BB3C /* inout.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = inout.cc; sourceTree = "<group>"; };
@@ -1325,13 +1323,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C1A7516226ED03140038B90A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C3CEBBA427949CA000683BE0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1540,10 +1531,10 @@
 				A259316A0A73B2CC002F4FE7 /* TransmissionHelp */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2CB38AE0E1E6896002B514C /* COPYING */,
-				A250EE800E2ED87B00A688E6 /* web */,
 				4DE5CCCA0981D9BE00BE280E /* Defaults.plist */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				A22F1E540E7DA8030065DB9D /* sparkle_dsa_pub.pem */,
+				A2795C5828EFC6700002C8D9 /* public_html */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				A23F50000D1D99D7002FCB97 /* MainMenu.xib */,
 				A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */,
@@ -1652,8 +1643,8 @@
 				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.cc */,
 				A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */,
 				CAB35C62252F6F5E00552A55 /* mime-types.h */,
-				A2EE726E14DCCC950093C99A /* natpmp_local.h */,
-				BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */,
+				A2EE726E14DCCC950093C99A /* port-forwarding-natpmp.h */,
+				BEFC1E0F0C07861A00B0BB3C /* port-forwarding-natpmp.cc */,
 				BEFC1E0D0C07861A00B0BB3C /* net.cc */,
 				BEFC1E0C0C07861A00B0BB3C /* net.h */,
 				BEFC1E1A0C07861A00B0BB3C /* open-files.cc */,
@@ -1720,14 +1711,13 @@
 				C1425B341EE9C5EA001DB85F /* tr-macros.h */,
 				888A256631B3DE536FEB8B01 /* tr-strbuf.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.cc */,
-				A284214312DA663E00FBDDBB /* tr-udp.h */,
 				A2679292130E00A000CB7464 /* tr-utp.cc */,
 				A2679293130E00A000CB7464 /* tr-utp.h */,
 				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
 				A24621360C769CF400088E81 /* trevent.cc */,
 				A24621350C769CF400088E81 /* trevent.h */,
-				BEFC1DF40C07861A00B0BB3C /* upnp.cc */,
-				BEFC1DF30C07861A00B0BB3C /* upnp.h */,
+				BEFC1DF40C07861A00B0BB3C /* port-forwarding-upnp.cc */,
+				BEFC1DF30C07861A00B0BB3C /* port-forwarding-upnp.h */,
 				BEFC1DF20C07861A00B0BB3C /* utils.cc */,
 				BEFC1DF10C07861A00B0BB3C /* utils.h */,
 				A25BFD63167BED3B0039D1AA /* variant-benc.cc */,
@@ -2152,7 +2142,7 @@
 				C1077A51183EB29600634C22 /* file.h in Headers */,
 				BEFC1E290C07861A00B0BB3C /* version.h in Headers */,
 				BEFC1E2A0C07861A00B0BB3C /* utils.h in Headers */,
-				BEFC1E2C0C07861A00B0BB3C /* upnp.h in Headers */,
+				BEFC1E2C0C07861A00B0BB3C /* port-forwarding-upnp.h in Headers */,
 				A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */,
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
@@ -2208,11 +2198,10 @@
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
 				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
-				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
-				A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */,
+				A2EE726F14DCCC950093C99A /* port-forwarding-natpmp.h in Headers */,
 				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,
 				A2A7B32B164F87D400B98C65 /* jsonsl.h in Headers */,
 				A25BFD6A167BED3B0039D1AA /* variant-common.h in Headers */,
@@ -2362,7 +2351,6 @@
 			);
 			dependencies = (
 				C33E46A22794B3CC0090F2AA /* PBXTargetDependency */,
-				C1A751C826ED06390038B90A /* PBXTargetDependency */,
 				A226FDB10D0CDF6E005A7F71 /* PBXTargetDependency */,
 				BE1183760CE161040002D0F3 /* PBXTargetDependency */,
 				BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */,
@@ -2729,7 +2717,6 @@
 				A233BD690D8CF2C7007EE7B4 /* StatsWindow.xib in Resources */,
 				A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */,
 				A2CB38AF0E1E6896002B514C /* COPYING in Resources */,
-				A250EEB60E2ED87B00A688E6 /* web in Resources */,
 				A22F1E550E7DA8030065DB9D /* sparkle_dsa_pub.pem in Resources */,
 				A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */,
 				A209EAEC1142D294002B02D1 /* InfoActivityView.xib in Resources */,
@@ -2745,6 +2732,7 @@
 				A2E57B9C13109DC200A7DAB1 /* FilterBar.xib in Resources */,
 				A220AF7B13D7CC460035C512 /* GlobalOptionsPopover.xib in Resources */,
 				F63480631E1D7274005B9E09 /* Images.xcassets in Resources */,
+				A2795C5928EFC6700002C8D9 /* public_html in Resources */,
 				A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2877,7 +2865,7 @@
 			files = (
 				BEFC1E2B0C07861A00B0BB3C /* utils.cc in Sources */,
 				A2AAB65F0DE0CF6200E04DDA /* rpcimpl.cc in Sources */,
-				BEFC1E2D0C07861A00B0BB3C /* upnp.cc in Sources */,
+				BEFC1E2D0C07861A00B0BB3C /* port-forwarding-upnp.cc in Sources */,
 				A2AAB65C0DE0CF6200E04DDA /* rpc-server.cc in Sources */,
 				ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */,
 				BEFC1E2F0C07861A00B0BB3C /* session.cc in Sources */,
@@ -2888,7 +2876,7 @@
 				BEFC1E3C0C07861A00B0BB3C /* platform.cc in Sources */,
 				BEFC1E460C07861A00B0BB3C /* net.cc in Sources */,
 				C1033E091A3279B800EF44D8 /* crypto-utils.cc in Sources */,
-				BEFC1E480C07861A00B0BB3C /* natpmp.cc in Sources */,
+				BEFC1E480C07861A00B0BB3C /* port-forwarding-natpmp.cc in Sources */,
 				C1077A4E183EB29600634C22 /* error.cc in Sources */,
 				BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */,
 				BEFC1E530C07861A00B0BB3C /* open-files.cc in Sources */,
@@ -4428,30 +4416,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		C1A7516526ED03140038B90A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		C1A7516626ED03140038B90A /* Release - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Release - Debug";
-		};
-		C1A7516726ED03140038B90A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

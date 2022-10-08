@@ -102,12 +102,12 @@ std::unordered_map<Glib::ustring, Glib::RefPtr<Gio::SimpleAction>> key_to_action
 
 void gtr_actions_set_core(Glib::RefPtr<Session> const& core)
 {
-    myCore = gtr_get_ptr(core);
+    myCore = core.get();
 }
 
 Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, gpointer callback_user_data)
 {
-    myBuilder = gtr_get_ptr(builder);
+    myBuilder = builder.get();
 
     auto const action_group = Gio::SimpleActionGroup::create();
 
@@ -116,7 +116,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring("sort-torrents");
         auto const action = Gio::SimpleAction::create_radio_string(action_name, match);
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& value)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& value)
                                           { sort_changed_cb(*a, value, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
@@ -126,7 +126,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring(std::string(action_name_view));
         auto const action = Gio::SimpleAction::create_bool(action_name);
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
@@ -136,7 +136,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring(std::string(action_name_view));
         auto const action = Gio::SimpleAction::create_bool(action_name, gtr_pref_flag_get(tr_quark_new(action_name_view)));
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { toggle_pref_cb(*a, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
@@ -146,7 +146,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring(std::string(action_name_view));
         auto const action = Gio::SimpleAction::create(action_name);
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);

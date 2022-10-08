@@ -32,14 +32,14 @@
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
+#include "port-forwarding.h"
 #include "quark.h"
 #include "session-id.h"
 #include "stats.h"
-#include "timer.h"
 #include "torrents.h"
 #include "tr-lpd.h"
-#include "web.h"
 #include "verify.h"
+#include "web.h"
 
 enum tr_auto_switch_state_t
 {
@@ -56,10 +56,17 @@ struct evdns_base;
 class tr_rpc_server;
 class tr_web;
 class tr_lpd;
+class tr_port_forwarding;
 struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
 struct tr_announcer_udp;
+
+namespace libtransmission
+{
+class Timer;
+class TimerMaker;
+} // namespace libtransmission
 
 namespace libtransmission::test
 {
@@ -478,13 +485,55 @@ public:
 
     struct tr_event_handle* events = nullptr;
 
-    /* The UDP sockets used for the DHT and uTP. */
-    tr_port udp_port;
-    tr_socket_t udp_socket = TR_BAD_SOCKET;
-    tr_socket_t udp6_socket = TR_BAD_SOCKET;
-    unsigned char* udp6_bound = nullptr;
-    struct event* udp_event = nullptr;
-    struct event* udp6_event = nullptr;
+    // UDP connectivity used for the DHT and uTP
+    class tr_udp_core
+    {
+    public:
+        tr_udp_core(tr_session& session);
+
+        ~tr_udp_core();
+
+        static void dhtUninit();
+        static void dhtUpkeep();
+
+        void set_socket_buffers();
+
+        void set_socket_tos()
+        {
+            session_.setSocketTOS(udp_socket_, TR_AF_INET);
+            session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
+        }
+
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+
+        [[nodiscard]] constexpr auto port() const noexcept
+        {
+            return udp_port_;
+        }
+
+        [[nodiscard]] constexpr auto udp_socket() const noexcept
+        {
+            return udp_socket_;
+        }
+
+        [[nodiscard]] constexpr auto udp6_socket() const noexcept
+        {
+            return udp6_socket_;
+        }
+
+    private:
+        tr_port udp_port_ = {};
+        tr_session& session_;
+        struct event* udp_event_ = nullptr;
+        struct event* udp6_event_ = nullptr;
+        std::optional<in6_addr> udp6_bound_;
+        tr_socket_t udp_socket_ = TR_BAD_SOCKET;
+        tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
+
+        void rebind_ipv6(bool);
+    };
+
+    std::unique_ptr<tr_udp_core> udp_core_;
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
@@ -508,7 +557,7 @@ public:
     }
 
     struct tr_peerMgr* peerMgr = nullptr;
-    struct tr_shared* shared = nullptr;
+    std::unique_ptr<tr_port_forwarding> port_forwarding_;
 
     std::unique_ptr<Cache> cache;
 
@@ -725,8 +774,6 @@ public:
 private:
     [[nodiscard]] tr_port randomPort() const;
 
-    void loadBlocklists();
-
     struct init_data;
     void initImpl(init_data&);
     void setImpl(init_data&);
@@ -822,7 +869,7 @@ private:
     uint16_t peer_limit_ = 200;
     uint16_t peer_limit_per_torrent_ = 50;
 
-    uint16_t idle_limit_minutes_;
+    uint16_t idle_limit_minutes_ = 0;
 
     uint16_t upload_slots_per_torrent_ = 8;
 
@@ -848,6 +895,41 @@ private:
     bool should_delete_source_torrents_ = false;
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
+
+    class PortForwardingMediator final : public tr_port_forwarding::Mediator
+    {
+    public:
+        explicit PortForwardingMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] tr_address incomingPeerAddress() const override
+        {
+            return session_.bind_ipv4.addr_;
+        }
+
+        [[nodiscard]] tr_port privatePeerPort() const override
+        {
+            return session_.private_peer_port;
+        }
+
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        {
+            return session_.timerMaker();
+        }
+
+        void onPortForwarded(tr_port public_port, tr_port private_port) override
+        {
+            session_.public_peer_port = public_port;
+            session_.private_peer_port = private_port;
+        }
+
+    private:
+        tr_session& session_;
+    };
+
+    PortForwardingMediator port_forwarding_mediator_{ *this };
 
     class WebMediator final : public tr_web::Mediator
     {
@@ -888,6 +970,11 @@ private:
         [[nodiscard]] bool allowsLPD() const override
         {
             return session_.allowsLPD();
+        }
+
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        {
+            return session_.timerMaker();
         }
 
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
@@ -946,7 +1033,7 @@ private:
     tr_torrent_completeness_func completeness_func_ = nullptr;
     void* completeness_func_user_data_ = nullptr;
 
-    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
 
@@ -958,6 +1045,10 @@ private:
 public:
     struct struct_utp_context* utp_context = nullptr;
     std::unique_ptr<libtransmission::Timer> utp_timer;
+
+    // These UDP announcer quirks are tightly hooked with session
+    bool tau_handle_message(uint8_t const* msg, size_t msglen) const;
+    void tau_sendto(struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen) const;
 };
 
 constexpr bool tr_isPriority(tr_priority_t p)

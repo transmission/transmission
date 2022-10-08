@@ -31,7 +31,8 @@ protected:
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
         "Corel Corporation:216.21.157.192-216.21.157.223\n"
-        "Fox Speed Channel:216.79.131.192-216.79.131.223\n";
+        "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
+        "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n";
 
     static char const constexpr* const Contents2 =
         "10.5.6.7/8\n"
@@ -39,6 +40,7 @@ protected:
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
         "Corel Corporation:216.21.157.192-216.21.157.223\n"
         "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
+        "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n"
         "Evilcorp:216.88.88.0-216.88.88.255\n";
 
 #if 0
@@ -72,7 +74,7 @@ TEST_F(BlocklistTest, parsing)
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
-    EXPECT_EQ(size_t{ 5 }, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(size_t{ 6 }, tr_blocklistGetRuleCount(session_));
 
     // enable the blocklist
     EXPECT_FALSE(tr_blocklistIsEnabled(session_));
@@ -95,6 +97,13 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_FALSE(addressIsBlocked("216.16.1.153"));
     EXPECT_FALSE(addressIsBlocked("217.0.0.1"));
     EXPECT_FALSE(addressIsBlocked("255.0.0.1"));
+    // IPv6
+    EXPECT_TRUE(addressIsBlocked("2001:db8:dead:beef:dead:beef:dead:beef"));
+    EXPECT_TRUE(addressIsBlocked("2001:db8:ffff:ffff:ffff:ffff:ffff:fffe"));
+    EXPECT_FALSE(addressIsBlocked("fe80:1:1:1:1:1:1:1337"));
+    EXPECT_FALSE(addressIsBlocked("2a05:d012:8b5:6501:b6d2:c4fb:b11:5181"));
+    EXPECT_FALSE(addressIsBlocked("1::1"));
+    EXPECT_FALSE(addressIsBlocked("ffff::ffff"));
 }
 
 /***
@@ -112,22 +121,22 @@ TEST_F(BlocklistTest, updating)
     // test that updated source files will get loaded
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(5U, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
 
     // test that updated source files will get loaded
     createFileWithContents(path, Contents2);
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(7U, tr_blocklistGetRuleCount(session_));
 
     // test that updated source files will get loaded
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(5U, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
 
     // ensure that new files, if bad, get skipped
     createFileWithContents(path, "# nothing useful\n");
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(5U, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
 
     // cleanup
 }

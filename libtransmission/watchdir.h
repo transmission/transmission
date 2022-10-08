@@ -5,11 +5,10 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <string_view>
-
-#include "timer.h"
 
 extern "C"
 {
@@ -18,6 +17,8 @@ extern "C"
 
 namespace libtransmission
 {
+
+class TimerMaker;
 
 class Watchdir
 {

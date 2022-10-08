@@ -2224,7 +2224,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Fejl ved omdøbning af sti</translation>
     </message>
@@ -2361,7 +2361,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Verificerer lokale data</translation>
     </message>

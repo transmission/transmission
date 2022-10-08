@@ -449,7 +449,7 @@
 
 - (void)updatePortStatus
 {
-    tr_port_forwarding const fwd = tr_sessionGetPortForwarding(self.fHandle);
+    auto const fwd = tr_sessionGetPortForwarding(self.fHandle);
     int const port = tr_sessionGetPeerPort(self.fHandle);
     BOOL natStatusChanged = (self.fNatStatus != fwd);
     BOOL peerPortChanged = (self.fPeerPort != port);

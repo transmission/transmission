@@ -1,16 +1,10 @@
-/*
- * This file Copyright © Transmission authors and contributors.
- *
- * It may be used under the 3-Clause BSD License, the GNU Public License v2,
- * or v3, or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © Transmission authors and contributors.
+// It may be used under the 3-Clause BSD (SPDX: BSD-3-Clause),
+// GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-/*
- * This file defines the public API for the libtransmission library.
- * The other public API headers are variant.h and utils.h.
- * Most of the remaining headers in libtransmission are private.
- */
+// This file defines the public API for the libtransmission library.
 
 #pragma once
 
@@ -480,7 +474,7 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
 
-enum tr_port_forwarding
+enum tr_port_forwarding_state
 {
     TR_PORT_ERROR,
     TR_PORT_UNMAPPED,
@@ -489,7 +483,7 @@ enum tr_port_forwarding
     TR_PORT_MAPPED
 };
 
-tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session);
+tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
 
 enum tr_direction
 {

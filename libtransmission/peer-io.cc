@@ -261,73 +261,48 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
 
-    auto const dir = TR_UP;
-    auto res = int{ 0 };
-    auto what = short{ BEV_EVENT_WRITING };
-
     io->pendingEvents &= ~EV_WRITE;
 
     tr_logAddTraceIo(io, "libevent says this peer is ready to write");
 
-    /* Write as much as possible, since the socket is non-blocking, write() will
-     * return if it can't write any more data without blocking */
-    size_t const howmuch = io->bandwidth().clamp(dir, evbuffer_get_length(io->outbuf.get()));
+    // Write as much as possible. Since the socket is non-blocking, write()
+    // will return if it can't write any more data without blocking.
+    auto constexpr Dir = TR_UP;
+    size_t const howmuch = io->bandwidth().clamp(Dir, evbuffer_get_length(io->outbuf.get()));
 
-    /* if we don't have any bandwidth left, stop writing */
+    // if we don't have any bandwidth left, stop writing
     if (howmuch < 1)
     {
-        io->setEnabled(dir, false);
+        io->setEnabled(Dir, false);
         return;
     }
 
     EVUTIL_SET_SOCKET_ERROR(0);
-    res = tr_evbuffer_write(io, fd, howmuch);
-    int const e = EVUTIL_SOCKET_ERROR();
+    auto const n_written = tr_evbuffer_write(io, fd, howmuch); // -1 on err, 0 on EOF
+    auto const err = EVUTIL_SOCKET_ERROR();
+    auto const should_retry = n_written == -1 && (err == 0 || err == EAGAIN || err == EINTR || err == EINPROGRESS);
 
-    if (res == -1)
+    // schedule another write if we have more data to write & think future writes would succeed
+    if ((evbuffer_get_length(io->outbuf.get()) != 0) && (n_written > 0 || should_retry))
     {
-        if (e == 0 || e == EAGAIN || e == EINTR || e == EINPROGRESS)
+        io->setEnabled(Dir, true);
+    }
+
+    if (n_written > 0)
+    {
+        didWriteWrapper(io, n_written);
+    }
+    else
+    {
+        auto const what = n_written == -1 ? BEV_EVENT_WRITING | BEV_EVENT_ERROR : BEV_EVENT_WRITING | BEV_EVENT_EOF;
+        auto const errmsg = tr_net_strerror(err);
+        tr_logAddDebugIo(
+            io,
+            fmt::format("event_write_cb got an err. n_written:{}, what:{}, errno:{} ({})", n_written, what, err, errmsg));
+        if (io->gotError != nullptr)
         {
-            goto RESCHEDULE;
+            io->gotError(io, what, io->userData);
         }
-
-        /* error case */
-        what |= BEV_EVENT_ERROR;
-    }
-    else if (res == 0)
-    {
-        /* eof case */
-        what |= BEV_EVENT_EOF;
-    }
-
-    if (res <= 0)
-    {
-        goto FAIL;
-    }
-
-    if (evbuffer_get_length(io->outbuf.get()) != 0)
-    {
-        io->setEnabled(dir, true);
-    }
-
-    didWriteWrapper(io, res);
-    return;
-
-RESCHEDULE:
-    if (evbuffer_get_length(io->outbuf.get()) != 0)
-    {
-        io->setEnabled(dir, true);
-    }
-
-    return;
-
-FAIL:
-    auto const errmsg = tr_net_strerror(e);
-    tr_logAddDebugIo(io, fmt::format("event_write_cb got an err. res:{}, what:{}, errno:{} ({})", res, what, e, errmsg));
-
-    if (io->gotError != nullptr)
-    {
-        io->gotError(io, what, io->userData);
     }
 }
 
@@ -842,23 +817,23 @@ size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
 
 static inline void processBuffer(tr_peerIo& io, evbuffer* buffer, size_t offset, size_t size)
 {
-    struct evbuffer_ptr pos;
-    struct evbuffer_iovec iovec;
+    struct evbuffer_ptr pos = {};
+    auto iov = evbuffer_iovec{};
 
     evbuffer_ptr_set(buffer, &pos, offset, EVBUFFER_PTR_SET);
 
     do
     {
-        if (evbuffer_peek(buffer, size, &pos, &iovec, 1) <= 0)
+        if (evbuffer_peek(buffer, size, &pos, &iov, 1) <= 0)
         {
             break;
         }
 
-        io.encrypt(iovec.iov_len, iovec.iov_base);
+        io.encrypt(iov.iov_len, iov.iov_base);
 
-        TR_ASSERT(size >= iovec.iov_len);
-        size -= iovec.iov_len;
-    } while (evbuffer_ptr_set(buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD) == 0);
+        TR_ASSERT(size >= iov.iov_len);
+        size -= iov.iov_len;
+    } while (evbuffer_ptr_set(buffer, &pos, iov.iov_len, EVBUFFER_PTR_ADD) == 0);
 
     TR_ASSERT(size == 0);
 }
@@ -878,18 +853,17 @@ void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
 
 void tr_peerIo::writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data)
 {
-    struct evbuffer_iovec iovec;
-
-    evbuffer_reserve_space(outbuf.get(), writeme_len, &iovec, 1);
-    iovec.iov_len = writeme_len;
-    memcpy(iovec.iov_base, writeme, iovec.iov_len);
+    auto iov = evbuffer_iovec{};
+    evbuffer_reserve_space(outbuf.get(), writeme_len, &iov, 1);
+    iov.iov_len = writeme_len;
+    memcpy(iov.iov_base, writeme, iov.iov_len);
 
     if (isEncrypted())
     {
-        encrypt(iovec.iov_len, iovec.iov_base);
+        encrypt(iov.iov_len, iov.iov_base);
     }
 
-    evbuffer_commit_space(outbuf.get(), &iovec, 1);
+    evbuffer_commit_space(outbuf.get(), &iov, 1);
 
     outbuf_info.emplace_back(writeme_len, is_piece_data);
 }

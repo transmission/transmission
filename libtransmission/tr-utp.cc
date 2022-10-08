@@ -12,13 +12,14 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_int_weak() */
+#include "crypto-utils.h" // tr_rand_int_weak()
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-socket.h"
 #include "session.h"
+#include "timer.h"
 #include "tr-utp.h"
 #include "utils.h"
 
@@ -77,11 +78,11 @@ static auto constexpr UtpInterval = 50ms;
 
 static void utp_on_accept(tr_session* const session, UTPSocket* const s)
 {
-    struct sockaddr_storage from_storage;
+    auto from_storage = sockaddr_storage{};
     auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
-    tr_address addr;
-    tr_port port;
+    auto addr = tr_address{};
+    auto port = tr_port{};
 
     if (!session->allowsUTP())
     {
@@ -108,14 +109,7 @@ static void utp_send_to(
     struct sockaddr const* const to,
     socklen_t const tolen)
 {
-    if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
-    else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
+    ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
 #ifdef TR_UTP_TRACE

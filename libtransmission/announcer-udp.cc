@@ -31,7 +31,6 @@
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "session.h"
 #include "tr-assert.h"
-#include "tr-udp.h"
 #include "utils.h"
 #include "web-utils.h"
 
@@ -57,31 +56,10 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
     }
 }
 
-static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
+void tr_session::tau_sendto(struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen) const
 {
-    auto sockfd = tr_socket_t{};
-
-    if (ai->ai_addr->sa_family == AF_INET)
-    {
-        sockfd = session->udp_socket;
-    }
-    else if (ai->ai_addr->sa_family == AF_INET6)
-    {
-        sockfd = session->udp6_socket;
-    }
-    else
-    {
-        sockfd = TR_BAD_SOCKET;
-    }
-
-    if (sockfd == TR_BAD_SOCKET)
-    {
-        errno = EAFNOSUPPORT;
-        return -1;
-    }
-
     tau_sockaddr_setport(ai->ai_addr, port);
-    return sendto(sockfd, static_cast<char const*>(buf), buflen, 0, ai->ai_addr, ai->ai_addrlen);
+    udp_core_->sendto(buf, buflen, ai->ai_addr, ai->ai_addrlen);
 }
 
 static uint32_t announce_ip(tr_session const* session)
@@ -497,7 +475,7 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
     logdbg(tracker->key, fmt::format("sending request w/connection id {}", tracker->connection_id));
     evbuffer_add_hton_64(buf, tracker->connection_id);
     evbuffer_add_reference(buf, payload, payload_len, nullptr, nullptr);
-    (void)tau_sendto(tracker->session, tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+    tracker->session->tau_sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
     evbuffer_free(buf);
 }
 
@@ -645,7 +623,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
     /* if we don't have an address yet, try & get one now. */
     if (!closing && tracker->addr == nullptr && tracker->dns_request == nullptr)
     {
-        struct evutil_addrinfo hints;
+        struct evutil_addrinfo hints = {};
         memset(&hints, 0, sizeof(hints));
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_DGRAM;
@@ -681,12 +659,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        (void)tau_sendto(
-            tracker->session,
-            tracker->addr.get(),
-            tracker->port,
-            evbuffer_pullup(buf, -1),
-            evbuffer_get_length(buf));
+        tracker->session->tau_sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
         evbuffer_free(buf);
         return;
     }
@@ -825,9 +798,9 @@ void tr_tracker_udp_start_shutdown(tr_session* session)
 
 /* @brief process an incoming udp message if it's a tracker response.
  * @return true if msg was a tracker response; false otherwise */
-bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
+bool tr_session::tau_handle_message(uint8_t const* msg, size_t msglen) const
 {
-    if (session == nullptr || session->announcer_udp == nullptr)
+    if (announcer_udp == nullptr)
     {
         return false;
     }
@@ -849,10 +822,9 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     }
 
     /* extract the transaction_id and look for a match */
-    struct tr_announcer_udp* const tau = session->announcer_udp;
     tau_transaction_t const transaction_id = evbuffer_read_ntoh_32(buf);
 
-    for (auto& tracker : tau->trackers)
+    for (auto& tracker : announcer_udp->trackers)
     {
         // is it a connection response?
         if (tracker.connecting_at != 0 && transaction_id == tracker.connection_transaction_id)

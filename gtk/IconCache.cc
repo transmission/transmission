@@ -103,12 +103,12 @@ Glib::RefPtr<Gdk::Pixbuf> _get_icon_pixbuf(Glib::RefPtr<Gio::Icon> const& icon, 
         return {};
     }
 
-    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
+    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(icon.get()); ticon != nullptr)
     {
         return get_themed_icon_pixbuf(*ticon, size, theme);
     }
 
-    if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(gtr_get_ptr(icon)); ficon != nullptr)
+    if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(icon.get()); ficon != nullptr)
     {
         return get_file_icon_pixbuf(*ficon, size);
     }
@@ -127,7 +127,7 @@ Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, std::s
 
     auto mime_type_str = std::string{ mime_type };
     auto icon = Gio::content_type_get_icon(mime_type_str);
-    auto pixbuf = _get_icon_pixbuf(icon, icons.icon_size, *gtr_get_ptr(icons.icon_theme));
+    auto pixbuf = _get_icon_pixbuf(icon, icons.icon_size, *icons.icon_theme.get());
     if (pixbuf != nullptr)
     {
         cache.try_emplace(std::move(mime_type_str), pixbuf);

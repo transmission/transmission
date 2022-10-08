@@ -2224,7 +2224,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Fout Met Hernoem Van Pad</translation>
     </message>
@@ -2361,7 +2361,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Verifieer tans lokale data</translation>
     </message>

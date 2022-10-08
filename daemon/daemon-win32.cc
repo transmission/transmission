@@ -4,22 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <process.h> /* _beginthreadex() */
-
 #include <windows.h>
+
+#include <algorithm> /* std::max() */
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/log.h>
-#include <libtransmission/tr-macros.h>
-#include <libtransmission/utils.h>
-
 #include "daemon.h"
-
-/***
-****
-***/
 
 #ifndef SERVICE_ACCEPT_PRESHUTDOWN
 #define SERVICE_ACCEPT_PRESHUTDOWN 0x00000100
@@ -28,19 +19,16 @@
 #define SERVICE_CONTROL_PRESHUTDOWN 0x0000000F
 #endif
 
-static dtr_callbacks const* callbacks = nullptr;
-static void* callback_arg = nullptr;
-
 static LPCWSTR const service_name = L"TransmissionDaemon";
 
+// If we can get rid of this global variable...
+static tr_daemon* daemon;
+
+// ...these becomes a good candidates for being converted to 'class tr_daemon' members.
 static SERVICE_STATUS_HANDLE status_handle = nullptr;
 static DWORD current_state = SERVICE_STOPPED;
 static HANDLE service_thread = nullptr;
 static HANDLE service_stop_thread = nullptr;
-
-/***
-****
-***/
 
 static void set_system_error(tr_error** error, DWORD code, char const* message)
 {
@@ -51,12 +39,7 @@ static void set_system_error(tr_error** error, DWORD code, char const* message)
 static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
 {
     auto const system_message = tr_win32_format_message(code);
-    tr_logAddMessage(
-        file,
-        line,
-        level,
-        "dtr_daemon",
-        fmt::format("[dtr_daemon] {} ({:#x}): {}", message, code, system_message));
+    tr_logAddMessage(file, line, level, "tr_daemon", fmt::format("[tr_daemon] {} ({:#x}): {}", message, code, system_message));
 }
 
 #define log_system_error(level, code, message) \
@@ -70,13 +53,9 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
         } \
     } while (0)
 
-/***
-****
-***/
-
 static BOOL WINAPI handle_console_ctrl(DWORD /*control_type*/)
 {
-    callbacks->on_stop(callback_arg);
+    daemon->stop();
     return TRUE;
 }
 
@@ -108,11 +87,9 @@ static void update_service_status(
     }
 }
 
-#define TR_MAX(a, b) (((a) > (b)) ? (a) : (b))
-
 static unsigned int __stdcall service_stop_thread_main(void* param)
 {
-    callbacks->on_stop(callback_arg);
+    daemon->stop();
 
     DWORD const sleep_time = 500;
     DWORD wait_time = (DWORD)(UINT_PTR)param;
@@ -120,7 +97,7 @@ static unsigned int __stdcall service_stop_thread_main(void* param)
     for (DWORD checkpoint = 2; WaitForSingleObject(service_thread, sleep_time) == WAIT_TIMEOUT; ++checkpoint)
     {
         wait_time = wait_time >= sleep_time ? wait_time - sleep_time : 0;
-        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint, TR_MAX(wait_time, sleep_time * 2));
+        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint, std::max(wait_time, sleep_time * 2));
     }
 
     return 0;
@@ -158,7 +135,7 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD /*event_type*/
         return NO_ERROR;
 
     case SERVICE_CONTROL_PARAMCHANGE:
-        callbacks->on_reconfigure(callback_arg);
+        daemon->reconfigure();
         return NO_ERROR;
 
     case SERVICE_CONTROL_INTERROGATE:
@@ -171,7 +148,7 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD /*event_type*/
 
 static unsigned int __stdcall service_thread_main(void* /*context*/)
 {
-    return callbacks->on_start(callback_arg, nullptr, false);
+    return daemon->start(false);
 }
 
 static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
@@ -219,14 +196,14 @@ static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
     update_service_status(SERVICE_STOPPED, NO_ERROR, exit_code, 0, 0);
 }
 
-/***
-****
-***/
-
-bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
+bool tr_daemon::setup_signals()
 {
-    callbacks = cb;
-    callback_arg = cb_arg;
+    return true;
+}
+
+bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)
+{
+    daemon = this;
 
     *exit_code = 1;
 
@@ -238,7 +215,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
             return false;
         }
 
-        *exit_code = cb->on_start(cb_arg, nullptr, true);
+        *exit_code = start(true);
     }
     else
     {

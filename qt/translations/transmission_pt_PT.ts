@@ -2224,7 +2224,7 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+495"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Erro ao Renomear Caminho</translation>
     </message>
@@ -2361,7 +2361,7 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Verificar dados locais</translation>
     </message>

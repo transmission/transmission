@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
-#include <chrono>
 #include <cstring>
 #include <ctime>
 #include <iterator>
@@ -34,6 +33,7 @@
 #include "peer-msgs.h"
 #include "quark.h"
 #include "session.h"
+#include "timer.h"
 #include "torrent-magnet.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -282,12 +282,12 @@ public:
 
         tellPeerWhatWeHave(this);
 
-        if (tr_dhtEnabled(torrent->session) && io->supportsDHT())
+        if (auto const port = tr_dhtPort(); io->supportsDHT() && port.has_value())
         {
-            /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
-            if (io->address().isIPv4() || tr_globalIPv6(nullptr) != nullptr)
+            // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
+            if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
             {
-                protocolSendPort(this, tr_dhtPort(torrent->session));
+                protocolSendPort(this, *port);
             }
         }
 
@@ -916,7 +916,7 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
     evbuffer* const out = msgs->outMessages;
-    unsigned char const* ipv6 = tr_globalIPv6(msgs->io->session);
+    auto const ipv6 = tr_globalIPv6(msgs->io->session);
     static tr_quark version_quark = 0;
 
     if (msgs->clientSentLtepHandshake)
@@ -954,9 +954,9 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantInitDict(&val, 8);
     tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode() != TR_CLEAR_PREFERRED);
 
-    if (ipv6 != nullptr)
+    if (ipv6.has_value())
     {
-        tr_variantDictAddRaw(&val, TR_KEY_ipv6, ipv6, 16);
+        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &*ipv6, sizeof(*ipv6));
     }
 
     // http://bittorrent.org/beps/bep_0009.html
@@ -1693,7 +1693,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
-                tr_dhtAddNode(msgs->session, &msgs->io->address(), msgs->dht_port, false);
+                tr_dhtAddNode(msgs->io->address(), msgs->dht_port, false);
             }
         }
         break;
@@ -2088,7 +2088,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         if (msgs->isValidRequest(req) && msgs->torrent->hasPiece(req.index))
         {
             uint32_t const msglen = 4 + 1 + 4 + 4 + req.length;
-            struct evbuffer_iovec iovec = {};
+            auto iov = evbuffer_iovec{};
 
             auto* const out = evbuffer_new();
             evbuffer_expand(out, msglen);
@@ -2098,14 +2098,14 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer_add_uint32(out, req.index);
             evbuffer_add_uint32(out, req.offset);
 
-            evbuffer_reserve_space(out, req.length, &iovec, 1);
+            evbuffer_reserve_space(out, req.length, &iov, 1);
             bool err = msgs->session->cache->readBlock(
                            msgs->torrent,
                            msgs->torrent->pieceLoc(req.index, req.offset),
                            req.length,
-                           static_cast<uint8_t*>(iovec.iov_base)) != 0;
-            iovec.iov_len = req.length;
-            evbuffer_commit_space(out, &iovec, 1);
+                           static_cast<uint8_t*>(iov.iov_base)) != 0;
+            iov.iov_len = req.length;
+            evbuffer_commit_space(out, &iov, 1);
 
             /* check the piece if it needs checking... */
             if (!err)

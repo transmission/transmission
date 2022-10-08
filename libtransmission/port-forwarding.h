@@ -9,22 +9,37 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "net.h" // tr_port
+#include <memory> // for std::unique_ptr
 
-struct tr_bindsockets;
-struct tr_session;
-struct tr_shared;
+#include "transmission.h" // for tr_port_forwarding_state
 
-tr_shared* tr_sharedInit(tr_session&);
+#include "net.h"
 
-void tr_sharedClose(tr_session&);
+namespace libtransmission
+{
+class TimerMaker;
+}
 
-void tr_sharedPortChanged(tr_session&);
+class tr_port_forwarding
+{
+public:
+    class Mediator
+    {
+    public:
+        virtual ~Mediator() = default;
 
-void tr_sharedTraversalEnable(tr_shared*, bool is_enabled);
+        [[nodiscard]] virtual tr_port privatePeerPort() const = 0;
+        [[nodiscard]] virtual tr_address incomingPeerAddress() const = 0;
+        [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
+        virtual void onPortForwarded(tr_port public_port, tr_port private_port) = 0;
+    };
 
-tr_port tr_sharedGetPeerPort(tr_shared const* s);
+    [[nodiscard]] static std::unique_ptr<tr_port_forwarding> create(Mediator&);
+    virtual ~tr_port_forwarding() = default;
 
-bool tr_sharedTraversalIsEnabled(tr_shared const* s);
+    [[nodiscard]] virtual bool isEnabled() const = 0;
+    [[nodiscard]] virtual tr_port_forwarding_state state() const = 0;
 
-int tr_sharedTraversalStatus(tr_shared const*);
+    virtual void portChanged() = 0;
+    virtual void setEnabled(bool enabled) = 0;
+};

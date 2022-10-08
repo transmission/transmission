@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstring> /* memcpy */
+#include <cstring> /* for strcspn() */
 #include <ctime>
 #include <memory>
 #include <string>
@@ -42,6 +42,7 @@
 #include "rpcimpl.h"
 #include "session-id.h"
 #include "session.h"
+#include "timer.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "trevent.h"
@@ -170,27 +171,27 @@ static evbuffer* make_response(struct evhttp_request* req, tr_rpc_server const* 
     {
         auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor.get(), std::size(content));
 
-        struct evbuffer_iovec iovec;
-        evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), &iovec, 1);
+        auto iov = evbuffer_iovec{};
+        evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), &iov, 1);
 
         auto const compressed_len = libdeflate_gzip_compress(
             server->compressor.get(),
             std::data(content),
             std::size(content),
-            iovec.iov_base,
-            iovec.iov_len);
+            iov.iov_base,
+            iov.iov_len);
         if (0 < compressed_len && compressed_len < std::size(content))
         {
-            iovec.iov_len = compressed_len;
+            iov.iov_len = compressed_len;
             evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
         }
         else
         {
-            std::copy(std::begin(content), std::end(content), static_cast<char*>(iovec.iov_base));
-            iovec.iov_len = std::size(content);
+            std::copy(std::begin(content), std::end(content), static_cast<char*>(iov.iov_base));
+            iov.iov_len = std::size(content);
         }
 
-        evbuffer_commit_space(out, &iovec, 1);
+        evbuffer_commit_space(out, &iov, 1);
     }
 
     return out;
@@ -337,7 +338,7 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
 
 static bool isIPAddressWithOptionalPort(char const* host)
 {
-    struct sockaddr_storage address;
+    auto address = sockaddr_storage{};
     int address_len = sizeof(address);
 
     /* TODO: move to net.{c,h} */
@@ -621,7 +622,7 @@ static bool bindUnixSocket(
         fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address))));
     return false;
 #else
-    struct sockaddr_un addr;
+    auto addr = sockaddr_un{};
     addr.sun_family = AF_UNIX;
     tr_strlcpy(addr.sun_path, path + std::size(TrUnixSocketPrefix), sizeof(addr.sun_path));
 

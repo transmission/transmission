@@ -70,9 +70,6 @@
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
 
-#define TR_PRIsv "*.*s"
-#define TR_PRIsv_ARG(sv) TR_ARG_TUPLE(int(std::size(sv)), int(std::size(sv)), std::data(sv))
-
 // https://www.bittorrent.org/beps/bep_0003.html
 // A string of length 20 which this downloader uses as its id. Each
 // downloader generates its own id at random at the start of a new

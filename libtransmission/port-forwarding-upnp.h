@@ -5,8 +5,8 @@
 
 #pragma once
 
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+#ifndef LIBTRANSMISSION_PORT_FORWARDING_MODULE
+#error only the libtransmission port forwarding module should #include this header.
 #endif
 
 /**
@@ -26,6 +26,6 @@ tr_upnp* tr_upnpInit(void);
 
 void tr_upnpClose(tr_upnp*);
 
-tr_port_forwarding tr_upnpPulse(tr_upnp*, tr_port port, bool is_enabled, bool do_port_check, std::string);
+tr_port_forwarding_state tr_upnpPulse(tr_upnp*, tr_port port, bool is_enabled, bool do_port_check, std::string);
 
 /* @} */

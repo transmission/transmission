@@ -325,7 +325,7 @@ public:
         return failed_ever_;
     }
 
-    int compareSeedRatio(Torrent const&) const;
+    int compareSeedProgress(Torrent const&) const;
     int compareRatio(Torrent const&) const;
     int compareETA(Torrent const&) const;
 

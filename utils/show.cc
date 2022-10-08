@@ -5,8 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cinttypes> // PRIu64
-#include <cstdio>
 #include <ctime>
 #include <string>
 #include <string_view>
@@ -190,33 +188,33 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     **/
     if (opts.print_info)
     {
-        printf("GENERAL\n\n");
-        printf("  Name: %s\n", metainfo.name().c_str());
+        fmt::print("GENERAL\n\n");
+        fmt::print("  Name: {:s}\n", metainfo.name());
         if (metainfo.hasV1Metadata())
         {
-            printf("  Hash v1: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
+            fmt::print("  Hash v1: {:s}\n", metainfo.infoHashString());
         }
         if (metainfo.hasV2Metadata())
         {
-            printf("  Hash v2: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHash2String()));
+            fmt::print("  Hash v2: {:s}\n", metainfo.infoHash2String());
         }
-        printf("  Created by: %s\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator().c_str());
-        printf("  Created on: %s\n\n", toString(metainfo.dateCreated()).c_str());
+        fmt::print("  Created by: {:s}\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator());
+        fmt::print("  Created on: {:s}\n\n", toString(metainfo.dateCreated()));
 
         if (!std::empty(metainfo.comment()))
         {
-            printf("  Comment: %s\n", metainfo.comment().c_str());
+            fmt::print("  Comment: {:s}\n", metainfo.comment());
         }
 
         if (!std::empty(metainfo.source()))
         {
-            printf("  Source: %s\n", metainfo.source().c_str());
+            fmt::print("  Source: {:s}\n", metainfo.source());
         }
 
-        printf("  Piece Count: %" PRIu32 "\n", metainfo.pieceCount());
-        printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
-        printf("  Total Size: %s\n", tr_formatter_size_B(metainfo.totalSize()).c_str());
-        printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
+        fmt::print("  Piece Count: {:d}\n", metainfo.pieceCount());
+        fmt::print("  Piece Size: {:s}\n", tr_formatter_mem_B(metainfo.pieceSize()));
+        fmt::print("  Total Size: {:s}\n", tr_formatter_size_B(metainfo.totalSize()));
+        fmt::print("  Privacy: {:s}\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
     }
 
     /**
@@ -225,7 +223,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 
     if (opts.print_trackers)
     {
-        printf("\nTRACKERS\n");
+        fmt::print("\nTRACKERS\n");
         auto current_tier = std::optional<tr_tracker_tier_t>{};
         auto print_tier = size_t{ 1 };
         for (auto const& tracker : metainfo.announceList())
@@ -233,24 +231,24 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
             if (!current_tier || current_tier != tracker.tier)
             {
                 current_tier = tracker.tier;
-                printf("\n  Tier #%zu\n", print_tier);
+                fmt::print("\n  Tier #{:d}\n", print_tier);
                 ++print_tier;
             }
 
-            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.sv()));
+            fmt::print("  {:s}\n", tracker.announce.sv());
         }
 
         /**
-    ***
-    **/
+        ***
+        **/
 
         if (auto const n_webseeds = metainfo.webseedCount(); n_webseeds > 0)
         {
-            printf("\nWEBSEEDS\n\n");
+            fmt::print("\nWEBSEEDS\n\n");
 
             for (size_t i = 0; i < n_webseeds; ++i)
             {
-                printf("  %s\n", metainfo.webseed(i).c_str());
+                fmt::print("  {:s}\n", metainfo.webseed(i));
             }
         }
     }
@@ -263,7 +261,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     {
         if (!opts.show_bytesize)
         {
-            printf("\nFILES\n\n");
+            fmt::print("\nFILES\n\n");
         }
 
         auto filenames = std::vector<std::string>{};
@@ -301,7 +299,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 
         for (auto const& filename : filenames)
         {
-            printf("%s\n", filename.c_str());
+            fmt::print("{:s}\n", filename);
         }
     }
 }
@@ -343,15 +341,15 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
         scrape_url.append(delimiter, "info_hash=");
         tr_urlPercentEncode(std::back_inserter(scrape_url), metainfo.infoHash());
-        printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(scrape_url));
+        fmt::print("{:s} ... ", scrape_url);
         fflush(stdout);
 
         // execute the http scrape
-        curl_easy_setopt(curl, CURLOPT_URL, scrape_url.c_str());
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
+        (void)curl_easy_setopt(curl, CURLOPT_URL, scrape_url.c_str());
+        (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
         if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
         {
-            printf("error: %s\n", curl_easy_strerror(res));
+            fmt::print("error: {:s}\n", curl_easy_strerror(res));
             continue;
         }
 
@@ -360,7 +358,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
         if (response != 200 /*HTTP OK*/)
         {
-            printf("error: unexpected response %ld \"%s\"\n", response, tr_webGetResponseStr(response));
+            fmt::print("error: unexpected response {:d} '{:s}'\n", response, tr_webGetResponseStr(response));
             continue;
         }
 
@@ -370,7 +368,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
         if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
         {
-            printf("error parsing scrape response\n");
+            fmt::print("error parsing scrape response\n");
             continue;
         }
 
@@ -391,7 +389,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
                     auto i = int64_t{};
                     auto const seeders = tr_variantDictFindInt(val, TR_KEY_complete, &i) ? int(i) : -1;
                     auto const leechers = tr_variantDictFindInt(val, TR_KEY_incomplete, &i) ? int(i) : -1;
-                    printf("%d seeders, %d leechers\n", seeders, leechers);
+                    fmt::print("{:d} seeders, {:d} leechers\n", seeders, leechers);
                     matched = true;
                 }
 
@@ -403,7 +401,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
         if (!matched)
         {
-            printf("no match\n");
+            fmt::print("no match\n");
         }
     }
 
@@ -428,16 +426,16 @@ int tr_main(int argc, char* argv[])
 
     if (opts.show_version)
     {
-        fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
+        fmt::print(stderr, "{:s} {:s}\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
     /* make sure the user specified a filename */
     if (std::empty(opts.filename))
     {
-        fprintf(stderr, "ERROR: No torrent file specified.\n");
+        fmt::print(stderr, "ERROR: No torrent file specified.\n");
         tr_getopt_usage(MyName, Usage, std::data(options));
-        fprintf(stderr, "\n");
+        fmt::print(stderr, "\n");
         return EXIT_FAILURE;
     }
 
@@ -447,12 +445,7 @@ int tr_main(int argc, char* argv[])
     auto const parsed = metainfo.parseTorrentFile(opts.filename, nullptr, &error);
     if (error != nullptr)
     {
-        fprintf(
-            stderr,
-            "Error parsing torrent file \"%" TR_PRIsv "\": %s (%d)\n",
-            TR_PRIsv_ARG(opts.filename),
-            error->message,
-            error->code);
+        fmt::print(stderr, "Error parsing torrent file '{:s}': {:s} ({:d})\n", opts.filename, error->message, error->code);
         tr_error_clear(&error);
     }
     if (!parsed)
@@ -462,15 +455,15 @@ int tr_main(int argc, char* argv[])
 
     if (opts.show_magnet)
     {
-        printf("%s", metainfo.magnet().c_str());
+        fmt::print("{:s}", metainfo.magnet());
     }
     else
     {
         if (opts.print_header)
         {
-            printf("Name: %s\n", metainfo.name().c_str());
-            printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(opts.filename));
-            printf("\n");
+            fmt::print("Name: {:s}\n", metainfo.name());
+            fmt::print("File: {:s}\n", opts.filename);
+            fmt::print("\n");
             fflush(stdout);
         }
 

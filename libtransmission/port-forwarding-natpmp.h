@@ -5,14 +5,14 @@
 
 #pragma once
 
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+#ifndef LIBTRANSMISSION_PORT_FORWARDING_MODULE
+#error only the libtransmission port forwarding module should #include this header.
 #endif
 
 #include <ctime> // time_t
 #include <cstdint>
 
-#include "transmission.h" // tr_port_forwarding
+#include "transmission.h" // tr_port_forwarding_state
 
 #include "natpmp.h"
 #include "net.h" // tr_port
@@ -35,19 +35,27 @@ public:
         return renew_time_;
     }
 
-    tr_port_forwarding pulse(tr_port port, bool is_enabled, tr_port* public_port, tr_port* real_private_port);
+    struct PulseResult
+    {
+        tr_port_forwarding_state state = TR_PORT_ERROR;
+
+        tr_port public_port = {};
+        tr_port private_port = {};
+    };
+
+    PulseResult pulse(tr_port port, bool is_enabled);
 
 private:
-    enum tr_natpmp_state
+    enum class State
     {
-        TR_NATPMP_IDLE,
-        TR_NATPMP_ERR,
-        TR_NATPMP_DISCOVER,
-        TR_NATPMP_RECV_PUB,
-        TR_NATPMP_SEND_MAP,
-        TR_NATPMP_RECV_MAP,
-        TR_NATPMP_SEND_UNMAP,
-        TR_NATPMP_RECV_UNMAP
+        Idle,
+        Err,
+        Discover,
+        RecvPub,
+        SendMap,
+        RecvMap,
+        SendUnmap,
+        RecvUnmap
     };
 
     static constexpr auto LifetimeSecs = uint32_t{ 3600 };
@@ -64,7 +72,7 @@ private:
 
     time_t renew_time_ = 0;
     time_t command_time_ = 0;
-    tr_natpmp_state state_ = TR_NATPMP_DISCOVER;
+    State state_ = State::Discover;
 
     bool has_discovered_ = false;
     bool is_mapped_ = false;

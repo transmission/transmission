@@ -53,10 +53,8 @@
 #include "timer-ev.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
-#include "tr-udp.h"
 #include "tr-utp.h"
 #include "trevent.h"
 #include "utils.h"
@@ -632,8 +630,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     /* initialize the bare skeleton of the session object */
     auto* const session = new tr_session{ config_dir };
-    session->udp_socket = TR_BAD_SOCKET;
-    session->udp6_socket = TR_BAD_SOCKET;
     session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     bandwidthGroupRead(session, config_dir);
 
@@ -676,7 +672,7 @@ void tr_session::onNowTimer()
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
-    tr_dhtUpkeep(this);
+    udp_core_->dhtUpkeep();
     if (turtle.isClockEnabled)
     {
         turtleCheckClock(this, &this->turtle);
@@ -735,14 +731,15 @@ void tr_session::initImpl(init_data& data)
 
     this->peerMgr = tr_peerMgrNew(this);
 
-    this->shared = tr_sharedInit(*this);
+    this->port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
     /**
     ***  Blocklist
     **/
 
     tr_sys_dir_create(tr_pathbuf{ configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    loadBlocklists();
+    this->blocklists_.clear();
+    this->blocklists_ = BlocklistFile::loadBlocklists(configDir(), useBlocklist());
 
     tr_announcerInit(this);
 
@@ -750,13 +747,13 @@ void tr_session::initImpl(init_data& data)
 
     tr_sessionSet(this, &settings);
 
-    tr_udpInit(this);
+    this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this);
 
     this->web = tr_web::create(this->web_mediator_);
 
     if (this->allowsLPD())
     {
-        this->lpd_ = tr_lpd::create(lpd_mediator_, timerMaker(), eventBase());
+        this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
     }
 
     tr_utpInit(this);
@@ -1266,7 +1263,7 @@ static void peerPortChanged(tr_session* const session)
         open_incoming_peer_port(session);
     }
 
-    tr_sharedPortChanged(*session);
+    session->port_forwarding_->portChanged();
 
     for (auto* const tor : session->torrents())
     {
@@ -1316,11 +1313,11 @@ bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)
     return session->isPortRandom();
 }
 
-tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
+tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_port_forwarding(tr_sharedTraversalStatus(session->shared));
+    return session->port_forwarding_->state();
 }
 
 /***
@@ -1810,13 +1807,13 @@ void tr_session::closeImplStart()
 
     lpd_.reset();
 
-    tr_dhtUninit(this);
+    udp_core_->dhtUninit();
 
     save_timer_.reset();
     now_timer_.reset();
 
     verifier_.reset();
-    tr_sharedClose(*this);
+    port_forwarding_.reset();
 
     close_incoming_peer_port(this);
     this->rpc_server_.reset();
@@ -1879,7 +1876,7 @@ void tr_session::closeImplFinish()
 
     /* we had to wait until UDP trackers were closed before closing these: */
     tr_tracker_udp_close(this);
-    tr_udpUninit(this);
+    this->udp_core_.reset();
 
     stats().saveIfDirty();
     tr_peerMgrFree(peerMgr);
@@ -1914,17 +1911,17 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(10);
     }
 
-    /* "shared" and "tracker" have live sockets,
+    /* "port_forwarding" and "tracker" have live sockets,
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != nullptr || !session->web->isClosed() || session->announcer != nullptr ||
+    while ((session->port_forwarding_ || !session->web->isClosed() || session->announcer != nullptr ||
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
         tr_logAddTrace(fmt::format(
             "waiting on port unmap ({}) or announcer ({})... now {} deadline {}",
-            fmt::ptr(session->shared),
+            fmt::ptr(session->port_forwarding_.get()),
             fmt::ptr(session->announcer),
             time(nullptr),
             deadline));
@@ -2016,8 +2013,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
 size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
 {
-    struct sessionLoadTorrentsData data;
-
+    auto data = sessionLoadTorrentsData{};
     data.session = session;
     data.ctor = ctor;
     data.done = false;
@@ -2081,9 +2077,9 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         session,
         [session, enabled]()
         {
-            tr_udpUninit(session);
+            session->udp_core_.reset();
             session->is_dht_enabled_ = enabled;
-            tr_udpInit(session);
+            session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session);
         });
 }
 
@@ -2115,21 +2111,9 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
     {
         return;
     }
-    tr_runInEventThread(
-        session,
-        [session, enabled]()
-        {
-            session->is_utp_enabled_ = enabled;
-            tr_udpSetSocketBuffers(session);
-            tr_udpSetSocketTOS(session);
-            // But don't call tr_utpClose --
-            // see reset_timer in tr-utp.c for an explanation.
-        });
-}
 
-/***
-****
-***/
+    session->is_utp_enabled_ = enabled;
+}
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
@@ -2148,7 +2132,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
             session->is_lpd_enabled_ = enabled;
             if (enabled)
             {
-                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->timerMaker(), session->eventBase());
+                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->eventBase());
             }
         });
 }
@@ -2235,99 +2219,19 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    tr_runInEventThread(session, tr_sharedTraversalEnable, session->shared, enabled);
+    tr_runInEventThread(session, [session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_sharedTraversalIsEnabled(session->shared);
+    return session->port_forwarding_->isEnabled();
 }
 
 /***
 ****
 ***/
-
-void tr_session::loadBlocklists()
-{
-    auto loadme = std::unordered_set<std::string>{};
-    auto const is_enabled = useBlocklist();
-
-    /* walk the blocklist directory... */
-    auto const dirname = tr_pathbuf{ configDir(), "/blocklists"sv };
-    auto const odir = tr_sys_dir_open(dirname);
-
-    if (odir == TR_BAD_SYS_DIR)
-    {
-        return;
-    }
-
-    char const* name = nullptr;
-    while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-    {
-        auto load = std::string{};
-
-        if (name[0] == '.') /* ignore dotfiles */
-        {
-            continue;
-        }
-
-        if (auto const path = tr_pathbuf{ dirname, '/', name }; tr_strvEndsWith(path, ".bin"sv))
-        {
-            load = path;
-        }
-        else
-        {
-            auto const binname = tr_pathbuf{ dirname, '/', name, ".bin"sv };
-
-            if (auto const bininfo = tr_sys_path_get_info(binname); !bininfo)
-            {
-                // create it
-                auto b = BlocklistFile{ binname, is_enabled };
-                if (auto const n = b.setContent(path); n > 0)
-                {
-                    load = binname;
-                }
-            }
-            else if (auto const pathinfo = tr_sys_path_get_info(path);
-                     pathinfo && pathinfo->last_modified_at >= bininfo->last_modified_at)
-            {
-                // update it
-                auto const old = tr_pathbuf{ binname, ".old"sv };
-                tr_sys_path_remove(old);
-                tr_sys_path_rename(binname, old);
-
-                BlocklistFile b(binname, is_enabled);
-
-                if (b.setContent(path) > 0)
-                {
-                    tr_sys_path_remove(old);
-                }
-                else
-                {
-                    tr_sys_path_remove(binname);
-                    tr_sys_path_rename(old, binname);
-                }
-            }
-        }
-
-        if (!std::empty(load))
-        {
-            loadme.emplace(load);
-        }
-    }
-
-    blocklists_.clear();
-    std::transform(
-        std::begin(loadme),
-        std::end(loadme),
-        std::back_inserter(blocklists_),
-        [&is_enabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), is_enabled); });
-
-    /* cleanup */
-    tr_sys_dir_close(odir);
-}
 
 void tr_session::useBlocklist(bool enabled)
 {
@@ -2350,7 +2254,7 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
 void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_.clear();
-    session->loadBlocklists();
+    session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
 
     tr_peerMgrOnBlocklistChanged(session->peerMgr);
 }

@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <array>
 #include <cctype> // for isalpha()
+#include <cstring>
 #include <iterator> // for std::back_inserter
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -453,58 +455,54 @@ bool tr_sys_path_is_relative(std::string_view path)
     return true;
 }
 
+static std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path, tr_error** error)
+{
+    auto const wpath = path_to_native_path(path);
+    if (std::empty(wpath))
+    {
+        set_system_error_if_file_found(error, GetLastError());
+        return {};
+    }
+
+    auto const handle = CreateFileW(wpath.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        set_system_error_if_file_found(error, GetLastError());
+        return {};
+    }
+
+    // TODO: Use GetFileInformationByHandleEx on >= Server 2012
+    auto info = BY_HANDLE_FILE_INFORMATION{};
+    if (!GetFileInformationByHandle(handle, &info))
+    {
+        set_system_error_if_file_found(error, GetLastError());
+        CloseHandle(handle);
+        return {};
+    }
+
+    CloseHandle(handle);
+    return info;
+}
+
 bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
 {
     TR_ASSERT(path1 != nullptr);
     TR_ASSERT(path2 != nullptr);
 
-    bool ret = false;
-    HANDLE handle1 = INVALID_HANDLE_VALUE;
-    HANDLE handle2 = INVALID_HANDLE_VALUE;
-    BY_HANDLE_FILE_INFORMATION fi1, fi2;
-
-    auto const wide_path1 = path_to_native_path(path1);
-    auto const wide_path2 = path_to_native_path(path2);
-
-    if (std::empty(wide_path1) || std::empty(wide_path2))
+    auto const fi1 = get_file_info(path1, error);
+    if (!fi1)
     {
-        goto fail;
+        return false;
     }
 
-    handle1 = CreateFileW(wide_path1.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-
-    if (handle1 == INVALID_HANDLE_VALUE)
+    auto const fi2 = get_file_info(path2, error);
+    if (!fi2)
     {
-        goto fail;
+        return false;
     }
 
-    handle2 = CreateFileW(wide_path2.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-
-    if (handle2 == INVALID_HANDLE_VALUE)
-    {
-        goto fail;
-    }
-
-    /* TODO: Use GetFileInformationByHandleEx on >= Server 2012 */
-
-    if (!GetFileInformationByHandle(handle1, &fi1) || !GetFileInformationByHandle(handle2, &fi2))
-    {
-        goto fail;
-    }
-
-    ret = fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber && fi1.nFileIndexHigh == fi2.nFileIndexHigh &&
-        fi1.nFileIndexLow == fi2.nFileIndexLow;
-
-    goto cleanup;
-
-fail:
-    set_system_error_if_file_found(error, GetLastError());
-
-cleanup:
-    CloseHandle(handle2);
-    CloseHandle(handle1);
-
-    return ret;
+    return fi1->dwVolumeSerialNumber == fi2->dwVolumeSerialNumber && fi1->nFileIndexHigh == fi2->nFileIndexHigh &&
+        fi1->nFileIndexLow == fi2->nFileIndexLow;
 }
 
 std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
