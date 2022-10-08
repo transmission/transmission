@@ -1955,7 +1955,7 @@ static void printSessionStats(tr_variant* top)
             tr_variantDictFindInt(d, TR_KEY_downloadedBytes, &down) && tr_variantDictFindInt(d, TR_KEY_secondsActive, &secs))
         {
             fmt::print("\nTOTAL\n");
-            fmt::print("  Started %lu times\n", (unsigned long)sessions);
+            fmt::print("  Started {:d} times\n", sessions);
             fmt::print("  Uploaded:   {:s}\n", strlsize(up));
             fmt::print("  Downloaded: {:s}\n", strlsize(down));
             fmt::print("  Ratio:      {:s}\n", strlratio(up, down));
