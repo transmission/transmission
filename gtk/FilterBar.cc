@@ -72,6 +72,11 @@ private:
     sigc::connection torrent_model_row_inserted_tag_;
     sigc::connection torrent_model_row_deleted_cb_tag_;
 
+    sigc::connection filter_model_row_deleted_tag_;
+    sigc::connection filter_model_row_inserted_tag_;
+
+    sigc::connection update_count_label_tag_;
+
     Glib::ustring filter_text_;
 };
 
@@ -232,7 +237,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
         else
         {
             auto const sitename = iter->get_value(tracker_filter_cols.sitename);
-            int const cmp = sitename.compare(sites_v.at(i).sitename);
+            int const cmp = sitename.raw().compare(sites_v.at(i).sitename);
 
             if (cmp < 0)
             {
@@ -294,7 +299,7 @@ Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new(Glib::RefPtr<Gtk::TreeMode
     return store;
 }
 
-bool is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeIter const& iter)
+bool is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeModel::const_iterator const& iter)
 {
     return iter->get_value(tracker_filter_cols.type) == TRACKER_FILTER_TYPE_SEPARATOR;
 }
@@ -430,7 +435,7 @@ public:
 
 ActivityFilterModelColumns const activity_filter_cols;
 
-bool activity_is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeIter const& iter)
+bool activity_is_it_a_separator(Glib::RefPtr<Gtk::TreeModel> const& /*model*/, Gtk::TreeModel::const_iterator const& iter)
 {
     return iter->get_value(activity_filter_cols.type) == ACTIVITY_FILTER_SEPARATOR;
 }
@@ -468,7 +473,7 @@ bool test_torrent_activity(tr_torrent* tor, int type)
     }
 }
 
-void status_model_update_count(Gtk::TreeIter const& iter, int n)
+void status_model_update_count(Gtk::TreeModel::iterator const& iter, int n)
 {
     if (n != iter->get_value(activity_filter_cols.count))
     {
@@ -495,7 +500,7 @@ bool activity_filter_model_update(Glib::RefPtr<Gtk::ListStore> const& activity_m
             }
         }
 
-        status_model_update_count(row, hits);
+        status_model_update_count(TR_GTK_TREE_MODEL_CHILD_ITER(row), hits);
     }
 
     return false;
@@ -539,7 +544,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
     return store;
 }
 
-void render_activity_pixbuf_func(Gtk::CellRendererPixbuf* cell_renderer, Gtk::TreeModel::iterator const& iter)
+void render_activity_pixbuf_func(Gtk::CellRendererPixbuf* cell_renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     auto const type = iter->get_value(activity_filter_cols.type);
     cell_renderer->property_width() = type == ACTIVITY_FILTER_ALL ? 0 : 20;
@@ -724,7 +729,7 @@ void FilterBar::Impl::update_count_label_idle()
     if (!pending)
     {
         show_lb_->set_data(DIRTY_KEY, GINT_TO_POINTER(1));
-        Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_count_label));
+        update_count_label_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_count_label));
     }
 }
 
@@ -787,9 +792,10 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     tracker_combo_box_init(tracker_, tmodel);
 
     filter_model_ = Gtk::TreeModelFilter::create(tmodel);
-    filter_model_->signal_row_deleted().connect([this](auto const& /*path*/) { update_count_label_idle(); });
-    filter_model_->signal_row_inserted().connect([this](auto const& /*path*/, auto const& /*iter*/)
-                                                 { update_count_label_idle(); });
+    filter_model_row_deleted_tag_ = filter_model_->signal_row_deleted().connect([this](auto const& /*path*/)
+                                                                                { update_count_label_idle(); });
+    filter_model_row_inserted_tag_ = filter_model_->signal_row_inserted().connect(
+        [this](auto const& /*path*/, auto const& /*iter*/) { update_count_label_idle(); });
 
     static_cast<Gtk::TreeStore*>(tracker_->get_model().get())->set_data(SESSION_KEY, session);
 
@@ -798,7 +804,11 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     tracker_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
     activity_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    entry_->signal_icon_release().connect([this](auto /*icon_position*/) { entry_->set_text({}); });
+#else
     entry_->signal_icon_release().connect([this](auto /*icon_position*/, auto const* /*event*/) { entry_->set_text({}); });
+#endif
     entry_->signal_changed().connect(sigc::mem_fun(*this, &Impl::filter_entry_changed));
 
     selection_changed_cb();
@@ -807,6 +817,14 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
 
 FilterBar::Impl::~Impl()
 {
+    if (update_count_label_tag_.connected())
+    {
+        update_count_label_tag_.disconnect();
+    }
+
+    filter_model_row_deleted_tag_.disconnect();
+    filter_model_row_inserted_tag_.disconnect();
+
     torrent_model_row_deleted_cb_tag_.disconnect();
     torrent_model_row_inserted_tag_.disconnect();
     torrent_model_row_changed_tag_.disconnect();

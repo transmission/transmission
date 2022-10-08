@@ -402,12 +402,12 @@ int compare_time(time_t a, time_t b)
     return ret;
 }
 
-int compare_by_name(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_name(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     return a->get_value(torrent_cols.name_collated).compare(b->get_value(torrent_cols.name_collated));
 }
 
-int compare_by_queue(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_queue(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -415,7 +415,7 @@ int compare_by_queue(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
     return sb->queuePosition - sa->queuePosition;
 }
 
-int compare_by_ratio(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_ratio(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
 
@@ -435,7 +435,7 @@ int compare_by_ratio(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
     return ret;
 }
 
-int compare_by_activity(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
 
@@ -463,7 +463,7 @@ int compare_by_activity(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::itera
     return ret;
 }
 
-int compare_by_age(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
     auto* const tb = static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent));
@@ -477,7 +477,7 @@ int compare_by_age(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator c
     return ret;
 }
 
-int compare_by_size(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const size_b = tr_torrentTotalSize(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -491,7 +491,7 @@ int compare_by_size(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator 
     return ret;
 }
 
-int compare_by_progress(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -510,7 +510,7 @@ int compare_by_progress(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::itera
     return ret;
 }
 
-int compare_by_eta(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_eta(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -524,7 +524,7 @@ int compare_by_eta(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator c
     return ret;
 }
 
-int compare_by_state(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const sa = a->get_value(torrent_cols.activity);
     auto const sb = b->get_value(torrent_cols.activity);
@@ -820,8 +820,8 @@ Session::Impl::Impl(Session& core, tr_session* session)
 {
     raw_model_ = Gtk::ListStore::create(torrent_cols);
     sorted_model_ = Gtk::TreeModelSort::create(raw_model_);
-    sorted_model_->set_default_sort_func([](Gtk::TreeModel::iterator const& /*a*/, Gtk::TreeModel::iterator const& /*b*/)
-                                         { return 0; });
+    sorted_model_->set_default_sort_func(
+        [](Gtk::TreeModel::const_iterator const& /*a*/, Gtk::TreeModel::const_iterator const& /*b*/) { return 0; });
 
     /* init from prefs & listen to pref changes */
     on_pref_changed(TR_KEY_sort_mode);
@@ -900,11 +900,11 @@ struct metadata_callback_data
 
 Gtk::TreeModel::iterator find_row_from_torrent_id(Glib::RefPtr<Gtk::TreeModel> const& model, tr_torrent_id_t id)
 {
-    for (auto const& row : model->children())
+    for (auto& row : model->children())
     {
         if (id == row.get_value(torrent_cols.torrent_id))
         {
-            return row;
+            return TR_GTK_TREE_MODEL_CHILD_ITER(row);
         }
     }
 
@@ -1325,7 +1325,7 @@ int gtr_compare_double(double const a, double const b, int decimal_places)
     return 0;
 }
 
-void update_foreach(Gtk::TreeModel::Row const& row)
+void update_foreach(Gtk::TreeModel::Row& row)
 {
     /* get the old states */
     auto* const tor = static_cast<tr_torrent*>(row.get_value(torrent_cols.torrent));
@@ -1407,7 +1407,7 @@ void Session::start_now(tr_torrent_id_t id)
 void Session::Impl::update()
 {
     /* update the model */
-    for (auto const& row : raw_model_->children())
+    for (auto row : raw_model_->children())
     {
         update_foreach(row);
     }

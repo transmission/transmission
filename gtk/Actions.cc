@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -20,6 +21,8 @@
 #include "Utils.h"
 
 using namespace std::string_view_literals;
+
+using VariantString = Glib::Variant<Glib::ustring>;
 
 namespace
 {
@@ -184,14 +187,57 @@ void gtr_action_set_toggled(Glib::ustring const& name, bool b)
     get_action(name)->set_state(Glib::Variant<bool>::create(b));
 }
 
-Gtk::Widget* gtr_action_get_widget(Glib::ustring const& name)
-{
-    Gtk::Widget* widget;
-    myBuilder->get_widget(name, widget);
-    return widget;
-}
-
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name)
 {
     return myBuilder->get_object(name);
 }
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+Glib::RefPtr<Gio::ListModel> gtr_shortcuts_get_from_menu(Glib::RefPtr<Gio::MenuModel> const& menu)
+{
+    auto result = Gio::ListStore<Gtk::Shortcut>::create();
+
+    std::stack<Glib::RefPtr<Gio::MenuModel>> links;
+    links.push(menu);
+
+    while (!links.empty())
+    {
+        auto const link = links.top();
+        links.pop();
+
+        for (int i = 0; i < link->get_n_items(); ++i)
+        {
+            Glib::ustring action_name;
+            Glib::ustring action_accel;
+
+            for (auto it = link->iterate_item_attributes(i); it->next();)
+            {
+                if (auto const name = it->get_name(); name == "action")
+                {
+                    action_name = Glib::VariantBase::cast_dynamic<VariantString>(it->get_value()).get();
+                }
+                else if (name == "accel")
+                {
+                    action_accel = Glib::VariantBase::cast_dynamic<VariantString>(it->get_value()).get();
+                }
+            }
+
+            if (!action_name.empty() && !action_accel.empty())
+            {
+                result->append(Gtk::Shortcut::create(
+                    Gtk::ShortcutTrigger::parse_string(action_accel),
+                    Gtk::NamedAction::create(action_name)));
+            }
+
+            for (auto it = link->iterate_item_links(i); it->next();)
+            {
+                links.push(it->get_value());
+            }
+        }
+    }
+
+    return result;
+}
+
+#endif

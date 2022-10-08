@@ -18,9 +18,11 @@
 #include <libtransmission/web-utils.h>
 
 #include "FreeSpaceLabel.h"
+#include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
+#include "SystemTrayIcon.h"
 #include "Utils.h"
 
 /**
@@ -55,7 +57,7 @@ void PrefsDialog::Impl::response_cb(int response)
 
     if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
-        dialog_.hide();
+        dialog_.close();
     }
 }
 
@@ -161,21 +163,27 @@ void init_text_view(Gtk::TextView& view, tr_quark const key, Glib::RefPtr<Sessio
     auto buffer = view.get_buffer();
     buffer->set_text(gtr_pref_string_get(key));
 
+    auto const save_buffer = [buffer, key, core]()
+    {
+        core->set_pref(key, buffer->get_text());
+    };
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto focus_controller = Gtk::EventControllerFocus::create();
+    focus_controller->signal_leave().connect(save_buffer);
+    view.add_controller(focus_controller);
+#else
     view.add_events(Gdk::FOCUS_CHANGE_MASK);
-    view.signal_focus_out_event().connect(
-        [buffer, key, core](GdkEventFocus* /*event*/)
-        {
-            core->set_pref(key, buffer->get_text());
-            return false;
-        });
+    view.signal_focus_out_event().connect_notify(sigc::hide<0>(save_buffer));
+#endif
 }
 
-void chosen_cb(Gtk::FileChooser* w, tr_quark const key, Glib::RefPtr<Session> const& core)
+void chosen_cb(PathButton* w, tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     core->set_pref(key, w->get_filename());
 }
 
-void init_chooser_button(Gtk::FileChooserButton& button, tr_quark const key, Glib::RefPtr<Session> const& core)
+void init_chooser_button(PathButton& button, tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     if (auto const path = gtr_pref_string_get(key); !path.empty())
     {
@@ -185,7 +193,7 @@ void init_chooser_button(Gtk::FileChooserButton& button, tr_quark const key, Gli
     button.signal_selection_changed().connect([&button, key, core]() { chosen_cb(&button, key, core); });
 }
 
-void target_cb(Gtk::ToggleButton* tb, Gtk::Widget* target)
+void target_cb(Gtk::CheckButton* tb, Gtk::Widget* target)
 {
     target->set_sensitive(tb->get_active());
 }
@@ -248,7 +256,7 @@ DownloadingPage::DownloadingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "watch_dir_check");
         init_check_button(*l, TR_KEY_watch_dir_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "watch_dir_chooser");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "watch_dir_chooser");
         init_chooser_button(*w, TR_KEY_watch_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -266,7 +274,7 @@ DownloadingPage::DownloadingPage(
         TR_KEY_trash_original_torrent_files,
         core_);
 
-    init_chooser_button(*gtr_get_widget<Gtk::FileChooserButton>(builder, "download_dir_chooser"), TR_KEY_download_dir, core_);
+    init_chooser_button(*gtr_get_widget_derived<PathButton>(builder, "download_dir_chooser"), TR_KEY_download_dir, core_);
 
     init_spin_button(
         *gtr_get_widget<Gtk::SpinButton>(builder, "max_active_downloads_spin"),
@@ -292,7 +300,7 @@ DownloadingPage::DownloadingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "incomplete_dir_check");
         init_check_button(*l, TR_KEY_incomplete_dir_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "incomplete_dir_chooser");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "incomplete_dir_chooser");
         init_chooser_button(*w, TR_KEY_incomplete_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_incomplete_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -301,7 +309,7 @@ DownloadingPage::DownloadingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "download_done_script_check");
         init_check_button(*l, TR_KEY_script_torrent_done_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "download_done_script_chooser");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "download_done_script_chooser");
         init_chooser_button(*w, TR_KEY_script_torrent_done_filename, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -358,7 +366,7 @@ SeedingPage::SeedingPage(
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "seeding_done_script_check");
         init_check_button(*l, TR_KEY_script_torrent_done_seeding_enabled, core_);
-        auto* w = gtr_get_widget<Gtk::FileChooserButton>(builder, "seeding_done_script_choose");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "seeding_done_script_choose");
         init_chooser_button(*w, TR_KEY_script_torrent_done_seeding_filename, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_seeding_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -397,10 +405,15 @@ DesktopPage::DesktopPage(
         TR_KEY_inhibit_desktop_hibernation,
         core_);
 
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "show_systray_icon_check"),
-        TR_KEY_show_notification_area_icon,
-        core_);
+    if (auto* const show_systray_icon_check = gtr_get_widget<Gtk::CheckButton>(builder, "show_systray_icon_check");
+        SystemTrayIcon::is_available())
+    {
+        init_check_button(*show_systray_icon_check, TR_KEY_show_notification_area_icon, core_);
+    }
+    else
+    {
+        show_systray_icon_check->hide();
+    }
 
     init_check_button(
         *gtr_get_widget<Gtk::CheckButton>(builder, "notify_on_torrent_add_check"),
@@ -500,7 +513,7 @@ void PrivacyPage::onBlocklistUpdated(int n)
 void PrivacyPage::onBlocklistUpdate()
 {
     updateBlocklistDialog_ = std::make_unique<Gtk::MessageDialog>(
-        *static_cast<Gtk::Window*>(get_toplevel()),
+        *static_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(*this)),
         _("Update Blocklist"),
         false,
         TR_GTK_MESSAGE_TYPE(INFO),
@@ -736,7 +749,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
 {
     /* "enabled" checkbutton */
     init_check_button(*rpc_tb_, TR_KEY_rpc_enabled, core_);
-    rpc_tb_->signal_clicked().connect([this]() { refreshRPCSensitivity(); });
+    rpc_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
     auto* const open_button = gtr_get_widget<Gtk::Button>(builder, "open_web_client_button");
     widgets_.push_back(open_button);
     open_button->signal_clicked().connect(&onLaunchClutchCB);
@@ -750,7 +763,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
     /* require authentication */
     init_check_button(*auth_tb_, TR_KEY_rpc_authentication_required, core_);
     widgets_.push_back(auth_tb_);
-    auth_tb_->signal_clicked().connect([this]() { refreshRPCSensitivity(); });
+    auth_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
     /* username */
     auto* username_entry = gtr_get_widget<Gtk::Entry>(builder, "rpc_username_entry");
@@ -767,15 +780,17 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
     /* require authentication */
     init_check_button(*whitelist_tb_, TR_KEY_rpc_whitelist_enabled, core_);
     widgets_.push_back(whitelist_tb_);
-    whitelist_tb_->signal_clicked().connect([this]() { refreshRPCSensitivity(); });
+    whitelist_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
     /* access control list */
     {
         store_ = whitelist_tree_model_new(gtr_pref_string_get(TR_KEY_rpc_whitelist));
 
         view_->set_model(store_);
-        view_->signal_button_release_event().connect([this](GdkEventButton* event)
-                                                     { return on_tree_view_button_released(view_, event); });
+        setup_tree_view_button_event_handling(
+            *view_,
+            {},
+            [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
 
         whitelist_widgets_.push_back(view_);
         auto const sel = view_->get_selection();
@@ -887,7 +902,7 @@ auto SpeedPage::get_weekday_string(Glib::Date::Weekday weekday)
 {
     auto date = Glib::Date{};
     date.set_time_current();
-    date.add_days(weekday - date.get_weekday());
+    date.add_days(static_cast<int>(weekday) - static_cast<int>(date.get_weekday()));
     return date.format_string("%A");
 }
 

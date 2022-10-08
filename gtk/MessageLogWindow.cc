@@ -113,7 +113,7 @@ bool MessageLogWindow::Impl::is_pinned_to_new() const
 
             if (auto const iter = sort_->children()[row_count - 1]; iter)
             {
-                pinned_to_new = last_visible == sort_->get_path(iter);
+                pinned_to_new = last_visible == sort_->get_path(TR_GTK_TREE_MODEL_CHILD_ITER(iter));
             }
         }
     }
@@ -129,7 +129,7 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 
         if (auto const iter = sort_->children()[row_count - 1]; iter)
         {
-            view_->scroll_to_row(sort_->get_path(iter), 1);
+            view_->scroll_to_row(sort_->get_path(TR_GTK_TREE_MODEL_CHILD_ITER(iter)), 1);
         }
     }
 }
@@ -218,7 +218,7 @@ void MessageLogWindow::Impl::onSaveDialogResponse(std::shared_ptr<Gtk::FileChoos
 {
     if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
-        doSave(*d, d->get_filename());
+        doSave(*d, d->get_file()->get_path());
     }
 
     d.reset();
@@ -277,7 +277,7 @@ void setForegroundColor(Gtk::CellRendererText* renderer, tr_log_level level)
 
 void renderText(
     Gtk::CellRendererText* renderer,
-    Gtk::TreeModel::iterator const& iter,
+    Gtk::TreeModel::const_iterator const& iter,
     Gtk::TreeModelColumn<Glib::ustring> const& col)
 {
     auto const* const node = iter->get_value(message_log_cols.tr_msg);
@@ -286,7 +286,7 @@ void renderText(
     setForegroundColor(renderer, node->level);
 }
 
-void renderTime(Gtk::CellRendererText* renderer, Gtk::TreeModel::iterator const& iter)
+void renderTime(Gtk::CellRendererText* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     auto const* const node = iter->get_value(message_log_cols.tr_msg);
     renderer->property_text() = Glib::DateTime::create_now_local(node->when).format("%T");
@@ -356,7 +356,8 @@ tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_me
     {
         char const* name = !std::empty(i->name) ? i->name.c_str() : default_name.c_str();
 
-        auto const row = *store->prepend();
+        auto row_it = store->prepend();
+        auto& row = *row_it;
         row[message_log_cols.tr_msg] = i;
         row[message_log_cols.name] = name;
         row[message_log_cols.message] = i->message;
@@ -493,8 +494,10 @@ MessageLogWindow::Impl::Impl(
     filter_->set_visible_func(sigc::mem_fun(*this, &Impl::isRowVisible));
 
     view_->set_model(sort_);
-    view_->signal_button_release_event().connect([this](GdkEventButton* event)
-                                                 { return on_tree_view_button_released(view_, event); });
+    setup_tree_view_button_event_handling(
+        *view_,
+        {},
+        [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
     appendColumn(view_, message_log_cols.sequence);
     appendColumn(view_, message_log_cols.name);
     appendColumn(view_, message_log_cols.message);
@@ -504,17 +507,4 @@ MessageLogWindow::Impl::Impl(
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     scroll_to_bottom();
-    window_.show_all_children();
-}
-
-void MessageLogWindow::on_show()
-{
-    Gtk::Window::on_show();
-    gtr_action_set_toggled("toggle-message-log", true);
-}
-
-void MessageLogWindow::on_hide()
-{
-    Gtk::Window::on_hide();
-    gtr_action_set_toggled("toggle-message-log", false);
 }
