@@ -164,14 +164,17 @@ include_directories(
 )
 include_directories(
     SYSTEM
-    ${LIBAPPINDICATOR_INCLUDE_DIRS}
-    ${GTK_INCLUDE_DIRS}
+    ${GTK${GTK_VERSION}_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
 )
 
+if(WITH_LIBAPPINDICATOR)
+    include_directories(SYSTEM ${LIBAPPINDICATOR_INCLUDE_DIRS})
+endif()
+
 link_directories(
-    ${GTK_LIBRARY_DIRS}
+    ${GTK${GTK_VERSION}_LIBRARY_DIRS}
 )
 
 add_definitions(
@@ -191,7 +194,7 @@ add_definitions(
     -DGTKMM_DISABLE_DEPRECATED
     -DPANGOMM_DISABLE_DEPRECATED
     -DSIGCXX_DISABLE_DEPRECATED
-    ${GTK_CFLAGS_OTHER}
+    ${GTK${GTK_VERSION}_CFLAGS_OTHER}
 )
 
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
@@ -210,11 +213,14 @@ add_executable(${TR_NAME}-gtk WIN32
 
 target_link_libraries(${TR_NAME}-gtk
     ${TR_NAME}
-    ${LIBAPPINDICATOR_LIBRARIES}
-    ${GTK_LIBRARIES}
+    ${GTK${GTK_VERSION}_LIBRARIES}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
+
+if(WITH_LIBAPPINDICATOR)
+    target_link_libraries(${TR_NAME}-gtk ${LIBAPPINDICATOR_LIBRARIES})
+endif()
 
 if(NOT MSVC)
     target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-exit-time-destructors)
