@@ -110,10 +110,10 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         {
             FileListNode* parent = nil;
             NSUInteger previousIndex = !item.isFolder ?
-                [self.class findFileNode:item inList:self.fFileList
-                               atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, self.fFileList.count - currentIndex)]
-                           currentParent:nil
-                             finalParent:&parent] :
+                [self findFileNode:item inList:self.fFileList
+                         atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, self.fFileList.count - currentIndex)]
+                     currentParent:nil
+                       finalParent:&parent] :
                 NSNotFound;
 
             if (previousIndex == NSNotFound)
@@ -680,7 +680,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
     return menu;
 }
 
-+ (NSUInteger)findFileNode:(FileListNode*)node
+- (NSUInteger)findFileNode:(FileListNode*)node
                     inList:(NSArray<FileListNode*>*)list
                  atIndexes:(NSIndexSet*)indexes
              currentParent:(FileListNode*)currentParent
