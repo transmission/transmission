@@ -162,6 +162,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
 )
+
 include_directories(
     SYSTEM
     ${GTK${GTK_VERSION}_INCLUDE_DIRS}
