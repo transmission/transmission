@@ -2818,9 +2818,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSIndexSet* indexesOfNonFilteredTorrents = [self.fTorrents
         indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(Torrent* torrent, NSUInteger idx, BOOL* stop) {
             //check status
-            if (torrent.active && !torrent.checkingWaiting)
+            if (!torrent.paused && !torrent.checkingWaiting)
             {
-                BOOL const isActive = !torrent.stalled;
+                BOOL const isActive = torrent.active;
                 if (isActive)
                 {
                     std::atomic_fetch_add_explicit(activeRef, 1, std::memory_order_relaxed);

@@ -863,8 +863,8 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (BOOL)isActive
 {
-    return self.fStat->activity != TR_STATUS_STOPPED && self.fStat->activity != TR_STATUS_DOWNLOAD_WAIT &&
-        self.fStat->activity != TR_STATUS_SEED_WAIT;
+    return self.fStat->peersSendingToUs > 0 || self.fStat->peersGettingFromUs > 0 || self.fStat->webseedsSendingToUs > 0 ||
+        self.fStat->activity == TR_STATUS_CHECK;
 }
 
 - (BOOL)isPaused
