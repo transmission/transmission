@@ -867,6 +867,11 @@ bool trashDataFile(char const* filename, tr_error** error)
         self.fStat->activity != TR_STATUS_SEED_WAIT;
 }
 
+- (BOOL)isPaused
+{
+    return self.fStat->activity == TR_STATUS_STOPPED;
+}
+
 - (BOOL)isSeeding
 {
     return self.fStat->activity == TR_STATUS_SEED;

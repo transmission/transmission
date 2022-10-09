@@ -128,6 +128,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) CGFloat availableDesired;
 
 @property(nonatomic, getter=isActive, readonly) BOOL active;
+@property(nonatomic, getter=isPaused, readonly) BOOL paused;
 @property(nonatomic, getter=isSeeding, readonly) BOOL seeding;
 @property(nonatomic, getter=isChecking, readonly) BOOL checking;
 @property(nonatomic, getter=isCheckingWaiting, readonly) BOOL checkingWaiting;

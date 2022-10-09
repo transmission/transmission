@@ -4389,7 +4389,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         for (Torrent* torrent in self.fTorrents)
         {
-            if (torrent.active || torrent.waitingToStart)
+            if (!torrent.paused || torrent.waitingToStart)
             {
                 return YES;
             }
@@ -4402,7 +4402,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         for (Torrent* torrent in self.fTorrents)
         {
-            if (!torrent.active && !torrent.waitingToStart && !torrent.finishedSeeding)
+            if (torrent.paused && !torrent.waitingToStart && !torrent.finishedSeeding)
             {
                 return YES;
             }
@@ -4415,7 +4415,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
-            if (torrent.active || torrent.waitingToStart)
+            if (!torrent.paused || torrent.waitingToStart)
             {
                 return YES;
             }
@@ -4428,7 +4428,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
-            if (!torrent.active && !torrent.waitingToStart)
+            if (torrent.paused && !torrent.waitingToStart)
             {
                 return YES;
             }
@@ -4686,7 +4686,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         for (Torrent* torrent in self.fTorrents)
         {
-            if (torrent.active || torrent.waitingToStart)
+            if (!torrent.paused || torrent.waitingToStart)
             {
                 return YES;
             }
@@ -4699,7 +4699,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         for (Torrent* torrent in self.fTorrents)
         {
-            if (!torrent.active && !torrent.waitingToStart && !torrent.finishedSeeding)
+            if (torrent.paused && !torrent.waitingToStart && !torrent.finishedSeeding)
             {
                 return YES;
             }
@@ -4735,7 +4735,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
-            if (!torrent.active)
+            if (torrent.paused)
             {
                 return YES;
             }
@@ -4753,7 +4753,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
-            if (torrent.active || torrent.waitingToStart)
+            if (!torrent.paused || torrent.waitingToStart)
             {
                 return YES;
             }
@@ -4771,7 +4771,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
-            if (!torrent.active && !torrent.waitingToStart)
+            if (torrent.paused && !torrent.waitingToStart)
             {
                 return YES;
             }

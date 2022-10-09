@@ -580,7 +580,7 @@
 
     if (!NSIsEmptyRect(haveRect))
     {
-        if (torrent.active)
+        if (!torrent.paused)
         {
             if (torrent.checking)
             {
