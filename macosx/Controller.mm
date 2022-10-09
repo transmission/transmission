@@ -623,6 +623,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     toolbar.displayMode = NSToolbarDisplayModeIconOnly;
     self.fWindow.toolbar = toolbar;
 
+    if (@available(macOS 11.0, *))
+    {
+        self.fWindow.toolbarStyle = NSWindowToolbarStyleUnified;
+        self.fWindow.titleVisibility = NSWindowTitleHidden;
+    }
+
     self.fWindow.delegate = self; //do manually to avoid placement issue
 
     [self.fWindow makeFirstResponder:self.fTableView];
