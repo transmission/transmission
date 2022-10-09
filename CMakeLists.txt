@@ -268,19 +268,21 @@ if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
     if(USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 4)
-        pkg_check_modules(GTK
+        pkg_check_modules(GTK4
             gtkmm-4.0>=${GTKMM_MINIMUM}
             glibmm-2.68>=${GLIBMM_MINIMUM}
             giomm-2.68>=${GIOMM_MINIMUM})
         set(GTK_VERSION 4)
+        set(GTK_FOUND ${GTK4_FOUND})
     endif()
 
     if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
-        pkg_check_modules(GTK ${GTK_IS_REQUIRED}
+        pkg_check_modules(GTK3
             gtkmm-3.0>=${GTKMM_MINIMUM}
             glibmm-2.4>=${GLIBMM_MINIMUM}
             giomm-2.4>=${GIOMM_MINIMUM})
         set(GTK_VERSION 3)
+        set(GTK_FOUND ${GTK3_FOUND})
     endif()
 
     if(GTK_IS_REQUIRED AND NOT GTK_FOUND)
