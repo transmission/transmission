@@ -1,0 +1,27 @@
+name: Transmission issue report
+description: A bug, a suggestion, etc.
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is the issue?
+      description: |
+       For UI, attach a screenshot.
+       For crashes, attach a crash log.
+       For specific issues, attach a torrent or provide a magnet.
+  - type: dropdown
+    id: client
+    attributes:
+      label: Which application of Transmission?
+      options:
+        - macOS app
+        - GTK+ app on Linux, BSD, etc.
+        - Qt app on Linux, BSD, etc.
+        - Qt app on Windows
+        - Web client
+        - transmission-remote
+  - type: input
+    id: version
+    attributes:
+      label: Which version of Transmission?
+      description: Find it in "About Transmission" or specify which nightly build or specific commit
