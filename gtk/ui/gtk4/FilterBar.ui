@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="transmission-gtk">
+  <requires lib="gtk" version="4.0"/>
+  <template class="gtkmm__CustomObject_9FilterBar" parent="GtkBox">
+    <property name="spacing">3</property>
+    <child>
+      <object class="GtkLabel" id="show_label">
+        <property name="label" translatable="1">_Show:</property>
+        <property name="use-underline">1</property>
+        <property name="mnemonic-widget">activity_combo</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkComboBox" id="activity_combo">
+        <property name="hexpand">1</property>
+        <property name="margin-end">6</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkComboBox" id="tracker_combo">
+        <property name="hexpand">1</property>
+        <property name="width-request">170</property>
+        <property name="margin-end">6</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkEntry" id="text_entry">
+        <property name="hexpand">1</property>
+        <property name="focusable">1</property>
+        <property name="secondary-icon-name">edit-clear</property>
+      </object>
+    </child>
+  </template>
+</interface>

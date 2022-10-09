@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="transmission-gtk">
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkApplicationWindow" id="MainWindow">
+    <child>
+      <object class="GtkBox" id="window_layout">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkBox" id="toolbar">
+            <property name="css-classes">toolbar
+horizontal</property>
+            <property name="can-focus">1</property>
+            <child>
+              <object class="GtkButton" id="open_file_button">
+                <property name="focusable">1</property>
+                <property name="tooltip-text" translatable="1">Open a torrent</property>
+                <property name="action-name">win.open-torrent</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="halign">center</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="icon-name">document-open</property>
+                        <property name="icon_size">normal</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="1">_Open</property>
+                        <property name="single-line-mode">1</property>
+                        <property name="use-underline">1</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="start_torrent_button">
+                <property name="focusable">1</property>
+                <property name="tooltip-text" translatable="1">Start torrent</property>
+                <property name="action-name">win.torrent-start</property>
+                <property name="label" translatable="1">_Start</property>
+                <property name="use-underline">1</property>
+                <property name="icon-name">media-playback-start</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="pause_torrent_button">
+                <property name="focusable">1</property>
+                <property name="tooltip-text" translatable="1">Pause torrent</property>
+                <property name="action-name">win.torrent-stop</property>
+                <property name="label" translatable="1">_Pause</property>
+                <property name="use-underline">1</property>
+                <property name="icon-name">media-playback-pause</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="remove_torrent_button">
+                <property name="focusable">1</property>
+                <property name="action-name">win.remove-torrent</property>
+                <property name="label" translatable="1">Remove torrent</property>
+                <property name="use-underline">1</property>
+                <property name="icon-name">list-remove</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="orientation">vertical</property>
+                <property name="can-focus">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="torrent_properties_button">
+                <property name="focusable">1</property>
+                <property name="tooltip-text" translatable="1">Torrent properties</property>
+                <property name="action-name">win.show-torrent-properties</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="halign">center</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="icon-name">document-properties</property>
+                        <property name="icon_size">normal</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="1">_Properties</property>
+                        <property name="single-line-mode">1</property>
+                        <property name="use-underline">1</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="gtkmm__CustomObject_9FilterBar" id="filterbar">
+            <property name="can-focus">1</property>
+            <style>
+              <class name="tr-pad-small"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="torrents_view_scroll">
+            <property name="vexpand">1</property>
+            <property name="focusable">1</property>
+            <property name="hscrollbar-policy">never</property>
+            <property name="has-frame">1</property>
+            <property name="child">
+              <object class="GtkTreeView" id="torrents_view">
+                <property name="focusable">1</property>
+                <property name="headers-visible">0</property>
+                <property name="fixed-height-mode">1</property>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection" id="torrents_view_selection">
+                    <property name="mode">multiple</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="torrent_column">
+                    <property name="resizable">1</property>
+                    <property name="sizing">fixed</property>
+                    <property name="title" translatable="1">Torrent</property>
+                  </object>
+                </child>
+              </object>
+            </property>
+            <style>
+              <class name="tr-workarea"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="statusbar">
+            <property name="spacing">3</property>
+            <child>
+              <object class="GtkMenuButton" id="gear_button">
+                <property name="focusable">1</property>
+                <property name="has-frame">0</property>
+                <property name="receives-default">1</property>
+                <property name="tooltip-text" translatable="1">Options</property>
+                <child>
+                  <object class="GtkImage" id="gear_button_image">
+                    <property name="icon-name">options-symbolic</property>
+                    <property name="icon_size">normal</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="alt_speed_button">
+                <property name="focusable">1</property>
+                <property name="has-frame">0</property>
+                <property name="receives-default">1</property>
+                <child>
+                  <object class="GtkImage" id="alt_speed_button_image">
+                    <property name="icon-name">turtle-symbolic</property>
+                    <property name="icon_size">normal</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkFixed">
+                <property name="hexpand">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="download_speed_label">
+                <property name="margin-start">3</property>
+                <property name="label">...</property>
+                <property name="single-line-mode">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="upload_speed_label">
+                <property name="margin-start">3</property>
+                <property name="label">...</property>
+                <property name="single-line-mode">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="statistics_label">
+                <property name="margin-start">9</property>
+                <property name="margin-end">3</property>
+                <property name="label">...</property>
+                <property name="single-line-mode">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuButton" id="ratio_button">
+                <property name="focusable">1</property>
+                <property name="has-frame">0</property>
+                <property name="receives-default">1</property>
+                <property name="tooltip-text" translatable="1">Statistics</property>
+                <child>
+                  <object class="GtkImage" id="ratio_button_image">
+                    <property name="icon-name">ratio-symbolic</property>
+                    <property name="icon_size">normal</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <style>
+              <class name="tr-pad-small"/>
+            </style>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

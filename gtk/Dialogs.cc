@@ -129,5 +129,5 @@ void gtr_confirm_remove(
             d.reset();
         });
 
-    d->show_all();
+    d->show();
 }

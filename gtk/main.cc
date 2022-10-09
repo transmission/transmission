@@ -45,8 +45,16 @@ int main(int argc, char** argv)
     textdomain(AppTranslationDomainName);
 
     /* init glib/gtk */
+    Gio::init();
     Glib::init();
     Glib::set_application_name(_("Transmission"));
+
+    /* Workaround "..." */
+    Gio::File::create_for_path(".");
+    Glib::wrap_register(
+        g_type_from_name("GLocalFile"),
+        [](GObject* object) -> Glib::ObjectBase* { return new Gio::File((GFile*)object); });
+    g_type_ensure(Gio::File::get_type());
 
     /* default settings */
     std::string config_dir;
@@ -68,7 +76,9 @@ int main(int argc, char** argv)
 
     Glib::OptionContext option_context(_("[torrent files or urls]"));
     option_context.set_main_group(main_group);
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     Gtk::Main::add_gtk_option_group(option_context);
+#endif
     option_context.set_translation_domain(GETTEXT_PACKAGE);
 
     try
@@ -77,7 +87,10 @@ int main(int argc, char** argv)
     }
     catch (Glib::OptionError const& e)
     {
-        g_print(_("%s\nRun '%s --help' to see a full list of available command line options.\n"), e.what().c_str(), argv[0]);
+        g_print(
+            _("%s\nRun '%s --help' to see a full list of available command line options.\n"),
+            TR_GLIB_EXCEPTION_WHAT(e),
+            argv[0]);
         return 1;
     }
 

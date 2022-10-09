@@ -14,6 +14,12 @@
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
 
+#include <gdk/gdk.h>
+#include <gtk/gtk.h>
+#if GTK_CHECK_VERSION(4, 0, 0) && defined(GDK_WINDOWING_X11)
+#include <gdk/x11/gdkx.h>
+#endif
+
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
@@ -265,22 +271,24 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
         TR_GTK_BUTTONS_TYPE(CLOSE));
     w->set_secondary_text(secondary);
     w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
-    w->show_all();
+    w->show();
 }
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
 bool on_tree_view_button_pressed(
-    Gtk::TreeView* view,
-    GdkEventButton* event,
-    std::function<void(GdkEventButton*)> const& callback)
+    Gtk::TreeView& view,
+    double view_x,
+    double view_y,
+    bool context_menu_requested,
+    std::function<void(double, double)> const& callback)
 {
-    if (event->type == GDK_BUTTON_PRESS && event->button == 3)
+    if (context_menu_requested)
     {
         Gtk::TreeModel::Path path;
-        auto const selection = view->get_selection();
+        auto const selection = view.get_selection();
 
-        if (view->get_path_at_pos((int)event->x, (int)event->y, path) && !selection->is_selected(path))
+        if (view.get_path_at_pos((int)view_x, (int)view_y, path) && !selection->is_selected(path))
         {
             selection->unselect_all();
             selection->select(path);
@@ -288,7 +296,7 @@ bool on_tree_view_button_pressed(
 
         if (callback)
         {
-            callback(event);
+            callback(view_x, view_y);
         }
 
         return true;
@@ -299,14 +307,73 @@ bool on_tree_view_button_pressed(
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event)
+bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y)
 {
-    if (Gtk::TreeModel::Path path; !view->get_path_at_pos((int)event->x, (int)event->y, path))
+    if (Gtk::TreeModel::Path path; !view.get_path_at_pos((int)view_x, (int)view_y, path))
     {
-        view->get_selection()->unselect_all();
+        view.get_selection()->unselect_all();
     }
 
     return false;
+}
+
+void setup_tree_view_button_event_handling(
+    Gtk::TreeView& view,
+    std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
+    std::function<bool(double, double)> const& release_callback)
+{
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto controller = Gtk::GestureClick::create();
+    controller->set_button(0);
+    controller->set_propagation_phase(Gtk::PropagationPhase::CAPTURE);
+    if (press_callback)
+    {
+        controller->signal_pressed().connect(
+            [&view, press_callback, controller](int /*n_press*/, double event_x, double event_y)
+            {
+                auto* const sequence = controller->get_current_sequence();
+                auto const event = controller->get_last_event(sequence);
+                if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_PRESS) &&
+                    press_callback(
+                        event->get_button(),
+                        event->get_modifier_state(),
+                        event_x,
+                        event_y,
+                        event->triggers_context_menu()))
+                {
+                    controller->set_sequence_state(sequence, Gtk::EventSequenceState::CLAIMED);
+                }
+            },
+            false);
+    }
+    if (release_callback)
+    {
+        controller->signal_released().connect(
+            [&view, release_callback, controller](int /*n_press*/, double event_x, double event_y)
+            {
+                auto* const sequence = controller->get_current_sequence();
+                auto const event = controller->get_last_event(sequence);
+                if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_RELEASE) && release_callback(event_x, event_y))
+                {
+                    controller->set_sequence_state(sequence, Gtk::EventSequenceState::CLAIMED);
+                }
+            });
+    }
+    view.add_controller(controller);
+#else
+    if (press_callback)
+    {
+        view.signal_button_press_event().connect(
+            [press_callback](GdkEventButton* event)
+            { return press_callback(event->button, event->state, event->x, event->y, event->button == GDK_BUTTON_SECONDARY); },
+            false);
+    }
+    if (release_callback)
+    {
+        view.signal_button_release_event().connect([release_callback](GdkEventButton* event)
+                                                   { return release_callback(event->x, event->y); });
+    }
+#endif
 }
 
 bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
@@ -326,8 +393,8 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to trash file \"%s\": %s", filename.c_str(), e.what().c_str());
-            tr_error_set(error, e.code(), e.what().raw());
+            g_message("Unable to trash file \"%s\": %s", filename.c_str(), TR_GLIB_EXCEPTION_WHAT(e));
+            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
         }
     }
 
@@ -339,9 +406,9 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to delete file \"%s\": %s", filename.c_str(), e.what().c_str());
+            g_message("Unable to delete file \"%s\": %s", filename.c_str(), TR_GLIB_EXCEPTION_WHAT(e));
             tr_error_clear(error);
-            tr_error_set(error, e.code(), e.what().raw());
+            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             result = false;
         }
     }
@@ -438,7 +505,7 @@ void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo_box, int value)
     {
         if (row.get_value(column) == value)
         {
-            combo_box.set_active(row);
+            combo_box.set_active(TR_GTK_TREE_MODEL_CHILD_ITER(row));
             return;
         }
     }
@@ -552,11 +619,33 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
     w.set_visible(b);
 }
 
-void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content)
+void gtr_window_set_skip_taskbar_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
 {
-    auto* vbox = dialog.get_content_area();
-    vbox->pack_start(content, true, true, 0);
-    content.show_all();
+#if GTK_CHECK_VERSION(4, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+    gdk_x11_surface_set_skip_taskbar_hint(Glib::unwrap(window.get_surface()), value ? TRUE : FALSE);
+#endif
+#else
+    window.set_skip_taskbar_hint(value);
+#endif
+}
+
+void gtr_window_set_urgency_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
+{
+#if GTK_CHECK_VERSION(4, 0, 0)
+#if defined(GDK_WINDOWING_X11)
+    gdk_x11_surface_set_urgency_hint(Glib::unwrap(window.get_surface()), value ? TRUE : FALSE);
+#endif
+#else
+    window.set_urgency_hint(value);
+#endif
+}
+
+void gtr_window_raise([[maybe_unused]] Gtk::Window& window)
+{
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
+    window.get_window()->raise();
+#endif
 }
 
 /***
@@ -596,16 +685,43 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
+    auto const process = [&entry](Glib::ustring const& text)
+    {
+        auto const sv = tr_strvStrip(text.raw());
+        if (!sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
+        {
+            entry.set_text(text);
+            return true;
+        }
+        return false;
+    };
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto const request = [](Glib::RefPtr<Gdk::Clipboard> const& clipboard, auto&& callback)
+    {
+        clipboard->read_text_async([clipboard, callback](Glib::RefPtr<Gio::AsyncResult>& result)
+                                   { callback(clipboard->read_text_finish(result)); });
+    };
+
+    request(
+        Gdk::Display::get_default()->get_primary_clipboard(),
+        [request, process](Glib::ustring const& text)
+        {
+            if (!process(text))
+            {
+                request(Gdk::Display::get_default()->get_clipboard(), process);
+            }
+        });
+#else
     for (auto const& str : { Gtk::Clipboard::get(GDK_SELECTION_PRIMARY)->wait_for_text(),
                              Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD)->wait_for_text() })
     {
-        auto const sv = tr_strvStrip(str.raw());
-        if (!sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
+        if (process(str))
         {
-            entry.set_text(str);
-            return;
+            break;
         }
     }
+#endif
 }
 
 /***

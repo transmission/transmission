@@ -30,14 +30,17 @@
 ****
 ***/
 
+#define REQ_HEIGHT(Obj) IF_GTKMM4((Obj).get_height(), (Obj).height)
+#define REQ_WIDTH(Obj) IF_GTKMM4((Obj).get_width(), (Obj).width)
+
 namespace
 {
 
 auto const DefaultBarHeight = 12;
 auto const CompactBarWidth = 50;
 auto const SmallScale = 0.9;
-auto const CompactIconSize = Gtk::ICON_SIZE_MENU;
-auto const FullIconSize = Gtk::ICON_SIZE_DND;
+auto const CompactIconSize = IF_GTKMM4(Gtk::IconSize::NORMAL, Gtk::ICON_SIZE_MENU);
+auto const FullIconSize = IF_GTKMM4(Gtk::IconSize::LARGE, Gtk::ICON_SIZE_DND);
 
 auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const* st)
 {
@@ -280,9 +283,11 @@ std::string getStatusString(
     tr_torrent const* tor,
     tr_stat const* st,
     double const uploadSpeed_KBps,
-    double const downloadSpeed_KBps)
+    double const downloadSpeed_KBps,
+    bool ignore_errors = false)
 {
-    auto status_str = getErrorString(st).value_or(getActivityString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
+    auto status_str = (ignore_errors ? std::nullopt : getErrorString(st))
+                          .value_or(getActivityString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
 
     if (st->activity != TR_STATUS_CHECK_WAIT && st->activity != TR_STATUS_CHECK && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT && st->activity != TR_STATUS_STOPPED)
@@ -304,6 +309,9 @@ std::string getStatusString(
 
 class TorrentCellRenderer::Impl
 {
+    using ContextPtr = TorrentCellRenderer::ContextPtr;
+    using IconSize = IF_GTKMM4(Gtk::IconSize, Gtk::BuiltinIconSize);
+
 public:
     explicit Impl(TorrentCellRenderer& renderer);
     ~Impl();
@@ -314,12 +322,12 @@ public:
     void get_size_full(Gtk::Widget& widget, int& width, int& height) const;
 
     void render_compact(
-        Cairo::RefPtr<Cairo::Context> const& cr,
+        ContextPtr const& context,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
     void render_full(
-        Cairo::RefPtr<Cairo::Context> const& cr,
+        ContextPtr const& context,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
@@ -340,6 +348,9 @@ public:
     Glib::Property<bool> compact;
 
 private:
+    static void set_icon(Gtk::CellRendererPixbuf& renderer, Glib::RefPtr<Gio::Icon> const& icon, IconSize icon_size);
+
+private:
     TorrentCellRenderer& renderer_;
 
     Gtk::CellRendererText* text_renderer_ = nullptr;
@@ -354,7 +365,7 @@ private:
 namespace
 {
 
-Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
+Glib::RefPtr<Gio::Icon> get_icon(tr_torrent const* tor)
 {
     auto mime_type = std::string_view{};
 
@@ -373,7 +384,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
         mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : tr_get_mime_type_for_filename(name);
     }
 
-    return gtr_get_mime_type_icon(mime_type, icon_size, for_widget);
+    return gtr_get_mime_type_icon(mime_type);
 }
 
 } // namespace
@@ -381,6 +392,19 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
 /***
 ****
 ***/
+
+void TorrentCellRenderer::Impl::set_icon(
+    Gtk::CellRendererPixbuf& renderer,
+    Glib::RefPtr<Gio::Icon> const& icon,
+    IconSize icon_size)
+{
+    renderer.property_gicon() = icon;
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    renderer.property_icon_size() = icon_size;
+#else
+    renderer.property_stock_size() = icon_size;
+#endif
+}
 
 void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width, int& height) const
 {
@@ -394,13 +418,13 @@ void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
 
-    auto const icon = get_icon(tor, CompactIconSize, widget);
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_stat = getShortStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, icon_size);
     text_renderer_->property_text() = name;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(NONE);
@@ -414,8 +438,8 @@ void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width
     *** LAYOUT
     **/
 
-    width = xpad * 2 + icon_size.width + GUI_PAD + CompactBarWidth + GUI_PAD + stat_size.width;
-    height = ypad * 2 + std::max(name_size.height, bar_height.get_value());
+    width = xpad * 2 + REQ_WIDTH(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + REQ_WIDTH(stat_size);
+    height = ypad * 2 + std::max(REQ_HEIGHT(name_size), bar_height.get_value());
 }
 
 void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, int& height) const
@@ -432,14 +456,14 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
     auto const* const st = tr_torrentStatCached(tor);
     auto const total_size = tr_torrentTotalSize(tor);
 
-    auto const icon = get_icon(tor, FullIconSize, widget);
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
-    auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
+    auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value(), true);
     auto const gstr_prog = getProgressString(tor, total_size, st);
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, icon_size);
     text_renderer_->property_text() = name;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(BOLD);
@@ -457,9 +481,9 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
     *** LAYOUT
     **/
 
-    width = xpad * 2 + icon_size.width + GUI_PAD + std::max(prog_size.width, stat_size.width);
-    height = ypad * 2 + name_size.height + prog_size.height + GUI_PAD_SMALL + bar_height.get_value() + GUI_PAD_SMALL +
-        stat_size.height;
+    width = xpad * 2 + REQ_WIDTH(icon_size) + GUI_PAD + std::max(REQ_WIDTH(prog_size), REQ_WIDTH(stat_size));
+    height = ypad * 2 + REQ_HEIGHT(name_size) + REQ_HEIGHT(prog_size) + GUI_PAD_SMALL + bar_height.get_value() + GUI_PAD_SMALL +
+        REQ_HEIGHT(stat_size);
 }
 
 void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const
@@ -507,24 +531,6 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
 namespace
 {
 
-Gdk::RGBA get_text_color(Gtk::Widget& w, tr_stat const* st)
-{
-    static auto const red = Gdk::RGBA("red");
-
-    if (st->error != 0)
-    {
-        return red;
-    }
-    else if (st->activity == TR_STATUS_STOPPED)
-    {
-        return w.get_style_context()->get_color(Gtk::STATE_FLAG_INSENSITIVE);
-    }
-    else
-    {
-        return w.get_style_context()->get_color(Gtk::STATE_FLAG_NORMAL);
-    }
-}
-
 double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* seed)
 {
     double d;
@@ -543,10 +549,16 @@ double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* seed)
     return d;
 }
 
+template<typename... Ts>
+void render_impl(Gtk::CellRenderer& renderer, Ts&&... args)
+{
+    renderer.IF_GTKMM4(snapshot, render)(std::forward<Ts>(args)...);
+}
+
 } // namespace
 
 void TorrentCellRenderer::Impl::render_compact(
-    Cairo::RefPtr<Cairo::Context> const& cr,
+    ContextPtr const& context,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -564,11 +576,24 @@ void TorrentCellRenderer::Impl::render_compact(
     auto const percentDone = get_percent_done(tor, st, &seed);
     bool const sensitive = active || st->error;
 
-    auto const icon = get_icon(tor, CompactIconSize, widget);
+    if (st->activity == TR_STATUS_STOPPED)
+    {
+        flags |= TR_GTK_CELL_RENDERER_STATE(INSENSITIVE);
+    }
+
+    if (st->error != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
+    {
+        text_renderer_->property_foreground() = "red";
+    }
+    else
+    {
+        text_renderer_->property_foreground_set() = false;
+    }
+
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_stat = getShortStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
-    auto const text_color = get_text_color(widget, st);
 
     auto fill_area = background_area;
     fill_area.set_x(fill_area.get_x() + xpad);
@@ -577,7 +602,7 @@ void TorrentCellRenderer::Impl::render_compact(
     fill_area.set_height(fill_area.get_height() - ypad * 2);
 
     auto icon_area = fill_area;
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->get_preferred_width(widget, min_width, width);
     icon_area.set_width(width);
 
@@ -614,30 +639,28 @@ void TorrentCellRenderer::Impl::render_compact(
     *** RENDER
     **/
 
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->property_sensitive() = sensitive;
-    icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
+    render_impl(*icon_renderer_, context, widget, icon_area, icon_area, flags);
 
     auto const percent_done = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
-    progress_renderer_->render(cr, widget, prog_area, prog_area, flags);
+    render_impl(*progress_renderer_, context, widget, prog_area, prog_area, flags);
 
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
-    text_renderer_->property_foreground_rgba() = text_color;
-    text_renderer_->render(cr, widget, stat_area, stat_area, flags);
+    render_impl(*text_renderer_, context, widget, stat_area, stat_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
-    text_renderer_->property_foreground_rgba() = text_color;
-    text_renderer_->render(cr, widget, name_area, name_area, flags);
+    render_impl(*text_renderer_, context, widget, name_area, name_area, flags);
 }
 
 void TorrentCellRenderer::Impl::render_full(
-    Cairo::RefPtr<Cairo::Context> const& cr,
+    ContextPtr const& context,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -656,19 +679,32 @@ void TorrentCellRenderer::Impl::render_full(
     auto const percentDone = get_percent_done(tor, st, &seed);
     bool const sensitive = active || st->error;
 
-    auto const icon = get_icon(tor, FullIconSize, widget);
+    if (st->activity == TR_STATUS_STOPPED)
+    {
+        flags |= TR_GTK_CELL_RENDERER_STATE(INSENSITIVE);
+    }
+
+    if (st->error != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
+    {
+        text_renderer_->property_foreground() = "red";
+    }
+    else
+    {
+        text_renderer_->property_foreground_set() = false;
+    }
+
+    auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_prog = getProgressString(tor, total_size, st);
     auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
-    auto const text_color = get_text_color(widget, st);
 
     /* get the idealized cell dimensions */
     Gdk::Rectangle icon_area;
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, size);
-    icon_area.set_width(size.width);
-    icon_area.set_height(size.height);
+    icon_area.set_width(REQ_WIDTH(size));
+    icon_area.set_height(REQ_HEIGHT(size));
 
     Gdk::Rectangle name_area;
     text_renderer_->property_text() = name;
@@ -676,19 +712,19 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(NONE);
     text_renderer_->property_scale() = 1.0;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    name_area.set_height(size.height);
+    name_area.set_height(REQ_HEIGHT(size));
 
     Gdk::Rectangle prog_area;
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    prog_area.set_height(size.height);
+    prog_area.set_height(REQ_HEIGHT(size));
 
     Gdk::Rectangle stat_area;
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    stat_area.set_height(size.height);
+    stat_area.set_height(REQ_HEIGHT(size));
 
     Gdk::Rectangle prct_area;
 
@@ -740,34 +776,32 @@ void TorrentCellRenderer::Impl::render_full(
     *** RENDER
     **/
 
-    icon_renderer_->property_pixbuf() = icon;
+    set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->property_sensitive() = sensitive;
-    icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
+    render_impl(*icon_renderer_, context, widget, icon_area, icon_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
-    text_renderer_->property_foreground_rgba() = text_color;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(BOLD);
-    text_renderer_->render(cr, widget, name_area, name_area, flags);
+    render_impl(*text_renderer_, context, widget, name_area, name_area, flags);
 
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
-    text_renderer_->render(cr, widget, prog_area, prog_area, flags);
+    render_impl(*text_renderer_, context, widget, prog_area, prog_area, flags);
 
     progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
-    progress_renderer_->render(cr, widget, prct_area, prct_area, flags);
+    render_impl(*progress_renderer_, context, widget, prct_area, prct_area, flags);
 
     text_renderer_->property_text() = gstr_stat;
-    text_renderer_->property_foreground_rgba() = text_color;
-    text_renderer_->render(cr, widget, stat_area, stat_area, flags);
+    render_impl(*text_renderer_, context, widget, stat_area, stat_area, flags);
 }
 
-void TorrentCellRenderer::render_vfunc(
-    Cairo::RefPtr<Cairo::Context> const& cr,
+void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
+    ContextPtr const& context,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gdk::Rectangle const& /*cell_area*/,
@@ -782,11 +816,11 @@ void TorrentCellRenderer::render_vfunc(
     {
         if (impl_->compact.get_value())
         {
-            impl_->render_compact(cr, widget, background_area, flags);
+            impl_->render_compact(context, widget, background_area, flags);
         }
         else
         {
-            impl_->render_full(cr, widget, background_area, flags);
+            impl_->render_full(context, widget, background_area, flags);
         }
     }
 

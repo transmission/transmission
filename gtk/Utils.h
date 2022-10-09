@@ -10,6 +10,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -68,6 +69,7 @@
 
 #define TR_GTK_ALIGN(Code) IF_GTKMM4(Gtk::Align::Code, Gtk::ALIGN_##Code)
 #define TR_GTK_BUTTONS_TYPE(Code) IF_GTKMM4(Gtk::ButtonsType::Code, Gtk::BUTTONS_##Code)
+#define TR_GTK_CELL_RENDERER_STATE(Code) IF_GTKMM4(Gtk::CellRendererState::Code, Gtk::CELL_RENDERER_##Code)
 #define TR_GTK_FILE_CHOOSER_ACTION(Code) IF_GTKMM4(Gtk::FileChooser::Action::Code, Gtk::FILE_CHOOSER_ACTION_##Code)
 #define TR_GTK_MESSAGE_TYPE(Code) IF_GTKMM4(Gtk::MessageType::Code, Gtk::MESSAGE_##Code)
 #define TR_GTK_ORIENTATION(Code) IF_GTKMM4(Gtk::Orientation::Code, Gtk::ORIENTATION_##Code)
@@ -78,13 +80,20 @@
 #define TR_GTK_STATE_FLAGS(Code) IF_GTKMM4(Gtk::StateFlags::Code, Gtk::STATE_FLAG_##Code)
 #define TR_GTK_TREE_VIEW_COLUMN_SIZING(Code) IF_GTKMM4(Gtk::TreeViewColumn::Sizing::Code, Gtk::TREE_VIEW_COLUMN_##Code)
 
+#define TR_GTK_TREE_MODEL_CHILD_ITER(Obj) IF_GTKMM4((Obj).get_iter(), (Obj))
+#define TR_GTK_WIDGET_GET_ROOT(Obj) IF_GTKMM4((Obj).get_root(), (Obj).get_toplevel())
+
 #define TR_GDK_COLORSPACE(Code) IF_GTKMM4(Gdk::Colorspace::Code, Gdk::COLORSPACE_##Code)
+#define TR_GDK_EVENT_TYPE(Code) IF_GTKMM4(Gdk::Event::Type::Code, GdkEventType::GDK_##Code)
 #define TR_GDK_DRAG_ACTION(Code) IF_GTKMM4(Gdk::DragAction::Code, Gdk::ACTION_##Code)
+#define TR_GDK_MODIFIED_TYPE(Code) IF_GTKMM4(Gdk::ModifierType::Code, GdkModifierType::GDK_##Code)
 
 #define TR_GLIB_FILE_TEST(Code) IF_GLIBMM2_68(Glib::FileTest::Code, Glib::FILE_TEST_##Code)
 #define TR_GLIB_NODE_TREE_TRAVERSE_FLAGS(Cls, Code) IF_GLIBMM2_68(Cls::TraverseFlags::Code, Cls::TRAVERSE_##Code)
 #define TR_GLIB_SPAWN_FLAGS(Code) IF_GLIBMM2_68(Glib::SpawnFlags::Code, Glib::SPAWN_##Code)
 #define TR_GLIB_USER_DIRECTORY(Code) IF_GLIBMM2_68(Glib::UserDirectory::Code, Glib::USER_DIRECTORY_##Code)
+
+#define TR_GLIB_EXCEPTION_WHAT(Obj) IF_GLIBMM2_68((Obj).what(), (Obj).what().c_str())
 
 #define TR_GIO_APP_INFO_CREATE_FLAGS(Code) IF_GLIBMM2_68(Gio::AppInfo::CreateFlags::Code, Gio::APP_INFO_CREATE_##Code)
 #define TR_GIO_APPLICATION_FLAGS(Code) IF_GLIBMM2_68(Gio::Application::Flags::Code, Gio::APPLICATION_##Code)
@@ -155,7 +164,9 @@ Glib::ustring gtr_get_help_uri();
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible(Gtk::Widget&, bool);
 
-void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content);
+void gtr_window_set_skip_taskbar_hint(Gtk::Window& window, bool value);
+void gtr_window_set_urgency_hint(Gtk::Window& window, bool value);
+void gtr_window_raise(Gtk::Window& window);
 
 /***
 ****
@@ -182,12 +193,21 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& window_or_child, tr_torrent* dupl
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
 bool on_tree_view_button_pressed(
-    Gtk::TreeView* view,
-    GdkEventButton* event,
-    std::function<void(GdkEventButton*)> const& callback = {});
+    Gtk::TreeView& view,
+    double view_x,
+    double view_y,
+    bool context_menu_requested,
+    std::function<void(double, double)> const& callback = {});
 
 /* if the click didn't specify a row, clear the selection */
-bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event);
+bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y);
+
+using TrGdkModifierType = IF_GTKMM4(Gdk::ModifierType, guint);
+
+void setup_tree_view_button_event_handling(
+    Gtk::TreeView& view,
+    std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
+    std::function<bool(double, double)> const& release_callback);
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
 bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
@@ -276,6 +296,16 @@ inline Glib::RefPtr<T> gtr_ptr_static_cast(Glib::RefPtr<U> const& ptr)
 #endif
 }
 
+template<typename T, typename U>
+inline Glib::RefPtr<T> gtr_ptr_dynamic_cast(Glib::RefPtr<U> const& ptr)
+{
+#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 68)
+    return Glib::RefPtr<T>::cast_dynamic(ptr);
+#else
+    return std::dynamic_pointer_cast<T>(ptr);
+#endif
+}
+
 template<>
 struct std::hash<Glib::ustring>
 {
@@ -295,20 +325,51 @@ struct fmt::formatter<Glib::ustring> : formatter<std::string>
     }
 };
 
-template<typename T, typename... ArgTs>
-T* gtr_get_widget(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, ArgTs&&... args)
+template<typename T>
+T* gtr_get_widget(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name)
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    return builder->get_widget<T>(name);
+#else
     T* widget = nullptr;
-    builder->get_widget(name, widget, std::forward<ArgTs>(args)...);
+    builder->get_widget(name, widget);
     return widget;
+#endif
 }
 
 template<typename T, typename... ArgTs>
 T* gtr_get_widget_derived(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, ArgTs&&... args)
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    return Gtk::Builder::get_widget_derived<T>(builder, name, std::forward<ArgTs>(args)...);
+#else
     T* widget = nullptr;
     builder->get_widget_derived(name, widget, std::forward<ArgTs>(args)...);
     return widget;
+#endif
+}
+
+template<typename F>
+void gtr_window_on_close(Gtk::Window& widget, F&& callback)
+{
+    auto bool_callback = [callback]() mutable -> bool
+    {
+        if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(callback)>>)
+        {
+            callback();
+            return false;
+        }
+        else
+        {
+            return callback();
+        }
+    };
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    widget.signal_close_request().connect(bool_callback, false);
+#else
+    widget.signal_delete_event().connect(sigc::hide<0>(bool_callback), false);
+#endif
 }
 
 namespace Glib
