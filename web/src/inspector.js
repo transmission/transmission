@@ -87,7 +87,7 @@ export class Inspector extends EventTarget {
       setTextContent(lhs, text);
       root.append(lhs);
 
-      const rhs = document.createElement('label');
+      const rhs = document.createElement('span');
       root.append(rhs);
       return rhs;
     };

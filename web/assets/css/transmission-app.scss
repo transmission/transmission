@@ -3,7 +3,9 @@
 
 // Color palette recycled from GitHub Primer.
 // Please use those values if you need to add colors.
-// https://primer.style/css/support/color-system
+// OLD 404s: https://primer.style/css/support/color-system
+// NEW: https://primer.style/primitives/colors
+// Renaming and changing variables hasn't started yet.
 $blue-100: #dbedff;
 $blue-200: #c8e1ff;
 $blue-300: #79b8ff;
@@ -28,6 +30,9 @@ $white: #fff;
 $yellow-200: #fff5b1;
 $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
+
+$subtle-bt-red: rgb(255, 231, 229);
+$default-accent-color: #fff8c5;
 
 // Z-INDEX ENUM
 // $z-index-progressbar: 1;
@@ -95,6 +100,7 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
 /// GLOBAL
 
 :root {
+  color-scheme: light dark;
   --color-bg-even: #{$white};
   --color-bg-hover: #{$grey-100};
   --color-bg-menu: #{$grey-200};
@@ -109,12 +115,10 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
   @media (prefers-color-scheme: dark) {
-    --color-fg-primary: #{$grey-100};
     --color-fg-secondary: #{$grey-400};
     --color-fg-tertiary: #{$grey-500};
   }
   @media (prefers-color-scheme: light) {
-    --color-fg-primary: #{$grey-800};
     --color-fg-secondary: #{$grey-500};
     --color-fg-tertiary: #{$grey-400};
   }
@@ -124,7 +128,7 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
   --color-progressbar-verify-2: #{$pink-700};
   --color-progressbar-magnet-1: #{$yellow-300};
   --color-progressbar-magnet-2: #{$yellow-700};
-  --color-progressbar-magnet-paused-1: #{$yellow-200};
+  --color-progressbar-magnet-paused-1: #{$default-accent-color};
   --color-progressbar-magnet-paused-2: #{$grey-500};
   --color-progressbar-leech-paused-1: #{$blue-200};
   --color-progressbar-leech-paused-2: #{$grey-500};
@@ -142,12 +146,12 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
   --color-tab-deselected-2: #{$grey-400};
   --color-tab-selected-1: #{$purple-100};
   --color-tab-selected-2: #{$purple-000};
-  --color-toolbar-background: linear-gradient(#{$grey-300}, #{$grey-400});
+  --color-toolbar-background: #{$grey-200};
 }
 
 html,
 body {
-  color: var(--color-fg-primary);
+  color: auto;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   height: 100%;
   margin: 0;
@@ -195,7 +199,7 @@ a {
 
 /// TOOLBAR
 
-$toolbar-height-number: 36;
+$toolbar-height-number: 50;
 $toolbar-height: $toolbar-height-number * 1px;
 
 #mainwin-toolbar {
@@ -214,7 +218,7 @@ $toolbar-height: $toolbar-height-number * 1px;
     background-position: center;
     background-repeat: no-repeat;
     border: 0;
-    border-radius: 10px;
+    border-radius: 5px;
     cursor: pointer;
     height: $toolbar-height;
     margin-right: 6px;
@@ -243,24 +247,34 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 }
 
-#toolbar-open {
-  background-image: url('../img/toolbar-folder.png');
+#toolbar-open::before {
+  content: '\01F4C2';
+  font-size: 30px;
+  line-height: 0.6;
 }
 
-#toolbar-remove {
-  background-image: url('../img/toolbar-close.png');
+#toolbar-remove::before {
+  content: '\01F6AB';
+  font-size: 30px;
+  line-height: 0.6;
 }
 
-#toolbar-start {
-  background-image: url('../img/toolbar-start.png');
+#toolbar-start::before {
+  content: '\025B6';
+  font-size: 40px;
+  line-height: 0.6;
 }
 
-#toolbar-pause {
-  background-image: url('../img/toolbar-pause.png');
+#toolbar-pause::before {
+  content: '\023F8';
+  font-size: 40px;
+  line-height: 0.6;
 }
 
-#toolbar-inspector {
-  background-image: url('../img/toolbar-info.png');
+#toolbar-inspector::before {
+  content: '\02139';
+  font-size: 40px;
+  line-height: 0.6;
 }
 
 #toolbar-overflow {
@@ -280,8 +294,8 @@ $toolbar-height: $toolbar-height-number * 1px;
 
 /// FILTERBAR
 
-// $filterbar-height-number: 30;
-// $filterbar-height: $filterbar-height-number * 1px;
+$filterbar-height-number: 30;
+$filterbar-height: $filterbar-height-number * 1px;
 
 .mainwin-filterbar {
   align-items: center;
@@ -290,7 +304,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   display: flex;
   flex-direction: row;
   font-size: smaller;
-  // height: $filterbar-height;
+  height: $filterbar-height;
   width: 100%;
 
   @include for-phone-only {
@@ -499,7 +513,8 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     }
 
     &.selected {
-      background-color: var(--color-bg-selection-1);
+      accent-color: auto;
+      background-color: $default-accent-color;
     }
 
     &.selected .torrent-progress-details.error,
@@ -608,7 +623,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       background: progressbar-gradient($color1, $color2),
         progressbar-gradient(
           var(--color-progressbar-background-1),
-          var(--color-progressbar-background-2)
+          var(--color-progressbar-background-1)
         );
       background-repeat: no-repeat;
     }
@@ -616,63 +631,63 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     &.leech.paused {
       @include progressbar-background(
         var(--color-progressbar-leech-paused-1),
-        var(--color-progressbar-leech-paused-2)
+        var(--color-progressbar-leech-paused-1)
       );
     }
 
     &.leech.queued {
       @include progressbar-background(
         var(--color-progressbar-leech-queued-1),
-        var(--color-progressbar-leech-queued-2)
+        var(--color-progressbar-leech-queued-1)
       );
     }
 
     &.leech {
       @include progressbar-background(
         var(--color-progressbar-leech-1),
-        var(--color-progressbar-leech-2)
+        var(--color-progressbar-leech-1)
       );
     }
 
     &.magnet.paused {
       @include progressbar-background(
         var(--color-progressbar-magnet-paused-1),
-        var(--color-progressbar-magnet-paused-2)
+        var(--color-progressbar-magnet-paused-1)
       );
     }
 
     &.magnet {
       @include progressbar-background(
         var(--color-progressbar-magnet-1),
-        var(--color-progressbar-magnet-2)
+        var(--color-progressbar-magnet-1)
       );
     }
 
     &.seed.paused {
       @include progressbar-background(
         var(--color-progressbar-seed-paused-1),
-        var(--color-progressbar-seed-paused-2)
+        var(--color-progressbar-seed-paused-1)
       );
     }
 
     &.seed.queued {
       @include progressbar-background(
         var(--color-progressbar-seed-queued-1),
-        var(--color-progressbar-seed-queued-2)
+        var(--color-progressbar-seed-queued-1)
       );
     }
 
     &.seed {
       @include progressbar-background(
         var(--color-progressbar-seed-1),
-        var(--color-progressbar-seed-2)
+        var(--color-progressbar-seed-1)
       );
     }
 
     &.verify {
       @include progressbar-background(
         var(--color-progressbar-verify-1),
-        var(--color-progressbar-verify-2)
+        var(--color-progressbar-verify-1)
       );
     }
   }
@@ -746,7 +761,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     .section-label {
       font-weight: bold;
       grid-column: span 2;
-      margin-left: -20px;
+      // margin-left: -20px;
       padding-bottom: 5px;
 
       &:not(:first-of-type) {
@@ -960,11 +975,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   // can it be folded into a single set of rules?
 
   grid-column-gap: 8px;
-  grid-row-gap: 5px;
+  grid-row-gap: 8px;
   grid-template-columns: auto 1fr;
   margin: 20px;
   padding: 12px;
-
+  font-size: 14px;
   &:not(.hidden) {
     display: grid;
   }
@@ -972,12 +987,16 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   .section-label {
     font-weight: bold;
     grid-column: span 2;
-    margin-left: -20px;
     padding-bottom: 5px;
+    font-size: 16px;
 
     &:not(:first-of-type) {
       margin-top: 20px;
     }
+  }
+
+  label {
+    font-weight: 500;
   }
 
   :not(.section-label) {
@@ -1093,11 +1112,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     grid-column-gap: 8px;
     grid-row-gap: 4px;
     margin-top: 8px;
+    font-size: 12px;
   }
 
   .tier-list-torrent {
     color: var(--color-fg-primary);
-    font-size: larger;
     font-weight: bolder;
     margin-left: -12px;
     overflow-x: hidden;
@@ -1108,6 +1127,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .tier-list-tracker {
     font-weight: bolder;
+    font-size: 14px;
     grid-column: span 2;
     margin-top: 8px;
     padding-bottom: 4px;
@@ -1285,7 +1305,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .overflow-menu {
   background: linear-gradient(
     160deg,
-    #d21,
+    rgb(255, 231, 229),
     1%,
     var(--color-bg-hover),
     40%,
@@ -1470,11 +1490,10 @@ $logo-size: 64px;
 }
 @include for-tablet-portrait-up {
   .dialog-container {
-    left: 50%;
     min-width: 400px;
+    max-width: 75%;
     position: absolute;
     top: $popup-top * 2;
-    transform: translateX(-50%);
   }
 
   .dialog-heading {
@@ -1537,7 +1556,6 @@ $logo-size: 64px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   color: var(--color-fg-primary);
   display: block;
-  margin: 0;
   padding: 0;
   z-index: $z-index-popup;
 }
@@ -1561,7 +1579,14 @@ $logo-size: 64px;
 }
 
 .dialog-window {
-  background: linear-gradient(160deg, #d21, 1%, #f7f7f7, 40%, #ccc);
+  background: linear-gradient(
+    160deg,
+    var($subtle-bt-red),
+    1%,
+    #f7f7f7,
+    40%,
+    #ccc
+  );
   height: 100%;
   padding: $dialog-padding-number * 1px;
 }
@@ -1662,7 +1687,6 @@ $logo-size: 64px;
 
 #free-space-text {
   display: inline-block;
-  float: right;
   font-size: smaller;
   font-style: italic;
 }
