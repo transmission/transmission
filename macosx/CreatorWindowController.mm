@@ -671,7 +671,6 @@ NSMutableSet* creatorWindowControllerSet = nil;
     [self.fTimer invalidate];
     self.fTimer = nil;
 
-    auto success = false;
     tr_error* error = self.fFuture.get();
     if (error == nullptr)
     {

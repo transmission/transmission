@@ -1996,11 +1996,10 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     if (success)
     {
-        using WeakUpdateNodeAndChildrenForRename = void (^__block __weak)(FileListNode*);
-        using UpdateNodeAndChildrenForRename = void (^)(FileListNode*);
-
         NSString* oldName = oldPath.lastPathComponent;
-        WeakUpdateNodeAndChildrenForRename weakUpdateNodeAndChildrenForRename;
+
+        using UpdateNodeAndChildrenForRename = void (^)(FileListNode*);
+        __weak __block UpdateNodeAndChildrenForRename weakUpdateNodeAndChildrenForRename;
         UpdateNodeAndChildrenForRename updateNodeAndChildrenForRename;
         weakUpdateNodeAndChildrenForRename = updateNodeAndChildrenForRename = ^(FileListNode* node) {
             [node updateFromOldName:oldName toNewName:newName inPath:path];
