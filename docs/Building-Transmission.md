@@ -137,7 +137,7 @@ $ sudo make install
 $ cd Transmission/build
 $ make clean
 $ git pull --rebase --prune
-$ git submodule update
+$ git submodule update --recursive
 $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
 $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 $ make
