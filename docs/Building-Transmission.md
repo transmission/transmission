@@ -123,7 +123,7 @@ $ ./configure -q && make -s
 ```console
 $ git clone https://github.com/transmission/transmission Transmission
 $ cd Transmission
-$ git submodule update --init
+$ git submodule update --init --recursive
 $ mkdir build
 $ cd build
 $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
