@@ -312,19 +312,19 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
     auto const seed_ratio_limit = tor.getSeedRatioLimit();
     if ((seed_ratio_limit && tor.isSeeding()) || tor.isDownloading())
     {
-      if (tor.hasETA())
-      {
-        //: Second (optional) part of torrent progress string,
-        //: %1 is duration,
-        //: notice that leading space (before the dash) is included here
-        str += tr("    %1 left").arg(Formatter::get().timeToString(tor.getETA()));
-      }
-      else
-      {
-        //: Second (optional) part of torrent progress string,
-        //: notice that leading space (before the dash) is included here
-        str += tr("    Remaining time unknown");
-      }
+        if (tor.hasETA())
+        {
+            //: Second (optional) part of torrent progress string,
+            //: %1 is duration,
+            //: notice that leading space (before the dash) is included here
+            str += tr("    %1 left").arg(Formatter::get().timeToString(tor.getETA()));
+        }
+        else
+        {
+            //: Second (optional) part of torrent progress string,
+            //: notice that leading space (before the dash) is included here
+            str += tr("    Remaining time unknown");
+        }
     }
 
     return str.trimmed();
