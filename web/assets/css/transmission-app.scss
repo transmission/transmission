@@ -261,13 +261,14 @@ $toolbar-height: $toolbar-height-number * 1px;
 
 #toolbar-start::before {
   content: '\025B6';
-  font-size: 40px;
+  font-size: 33px;
   line-height: 0.6;
-}
+  top: 2px;
+  position: relative;}
 
 #toolbar-pause::before {
   content: '\023F8';
-  font-size: 40px;
+  font-size: 48px;
   line-height: 0.6;
 }
 
@@ -324,6 +325,7 @@ $filterbar-height: $filterbar-height-number * 1px;
 
   > * {
     padding: 0 5px;
+    margin-right: 5px;
   }
 }
 
