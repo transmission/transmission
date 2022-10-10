@@ -317,13 +317,15 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
             //: Second (optional) part of torrent progress string,
             //: %1 is duration,
             //: notice that leading space (before the dash) is included here
-            str += tr("    %1 left").arg(Formatter::get().timeToString(tor.getETA()));
+            str += QStringLiteral("    ");
+            str += tr("%1 left").arg(Formatter::get().timeToString(tor.getETA()));
         }
         else
         {
             //: Second (optional) part of torrent progress string,
             //: notice that leading space (before the dash) is included here
-            str += tr("    Remaining time unknown");
+            str += QStringLiteral("    ");
+            str += tr("Remaining time unknown");
         }
     }
 
