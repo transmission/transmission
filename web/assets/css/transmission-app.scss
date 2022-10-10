@@ -15,12 +15,11 @@ $green-200: #bef5cb;
 $green-300: #85e89d;
 $green-500: #28a745;
 $green-700: #176f2c;
-$grey-100: #f6f8fa;
-$grey-200: #e1e4e8;
 $grey-300: #d1d5da;
-$grey-400: #959da5;
-$grey-500: #6a737d;
-$grey-800: #2f363d;
+$grey-500: #828282;
+$grey-700: #373737;
+$grey-800: #292929;
+$grey-900: #191919;
 $pink-300: #f692ce;
 $pink-700: #b93a86;
 $purple-000: #f5f0ff;
@@ -31,9 +30,13 @@ $yellow-200: #fff5b1;
 $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
 
+$nice-grey: #f8f8f8;
+$dark-mode-black: #121212;
 $subtle-bt-red: rgb(255, 231, 229);
 $default-accent-color: #fff8c5;
-
+$default-accent-color-dark: #2e2e2e;
+$default-border-dark: #575757;
+$default-border-light: #575757;
 // Z-INDEX ENUM
 // $z-index-progressbar: 1;
 $z-index-popup: 2;
@@ -70,9 +73,6 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
     @content;
   }
 }
-// @mixin for-tablet-landscape-up {media (min-width: 900px) { @content; }}
-// @mixin for-desktop-up {@media (min-width: 1200px) { @content; }}
-// @mixin for-big-desktop-up {@media (min-width: 1800px) { @content; }}
 
 /// MIXINS
 
@@ -88,42 +88,66 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
   user-select: none;
 }
 
-@mixin rounded-box($radius) {
-  border-radius: $radius;
-}
-
-@mixin rounded-button($radius) {
-  @include button;
-  border-radius: $radius;
-}
-
 /// GLOBAL
 
 :root {
   color-scheme: light dark;
-  --color-bg-even: #{$white};
-  --color-bg-hover: #{$grey-100};
-  --color-bg-menu: #{$grey-200};
-  --color-bg-odd: #{$grey-100};
   --color-bg-selection-1: #{$purple-100};
   --color-bg-selection-2: #{$purple-000};
-  --color-border: #{$grey-400};
-  --color-fg-disabled: #{$grey-400};
   --color-fg-error: #{$red-500};
   --color-fg-name: #{$grey-800};
-  --color-fg-on-popup: #{$grey-800};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
   @media (prefers-color-scheme: dark) {
-    --color-fg-secondary: #{$grey-400};
+    --color-bg-hover: #{$nice-grey};
+    --color-fg-primary: #fff;
+    --color-bg-primary: #{$grey-800};
+    --color-bg-odd: #{$grey-900};
+    --color-bg-even: #{$grey-800};
+    --color-bg-menu: #{$grey-800};
+    --color-fg-secondary: #{$nice-grey};
+    --color-fg-on-popup: #{$nice-grey};
+    --color-fg-disabled: #{$nice-grey};
+    --color-bg-popup: #{$grey-800};
+    --color-bg-warn: #cf6679;
+    --color-fg-warn: #{$dark-mode-black};
+    --color-border: #{$nice-grey};
+    --color-border-selected: #d0d7de;
     --color-fg-tertiary: #{$grey-500};
+    --color-toolbar-background: #{$grey-800};
+    --color-inspector-background: #{$grey-800};
+    --color-inspector-tabs: #{$nice-grey};
+    --color-bg-selected: #{$default-accent-color-dark};
+    --color-bg-tabs: #{$grey-700};
+    --color-progressbar-background-1: #426389;
+    --color-default-border: #{$default-border-dark};
   }
   @media (prefers-color-scheme: light) {
+    --color-bg-hover: #{$nice-grey};
+    --color-fg-primary: #404040;
+    --color-bg-primary: #fff;
+    --color-bg-even: #{$white};
+    --color-bg-odd: #{$nice-grey};
+    --color-bg-menu: #{$nice-grey};
+    --color-fg-on-popup: #{$grey-900};
+    --color-bg-popup: #{$white};
     --color-fg-secondary: #{$grey-500};
-    --color-fg-tertiary: #{$grey-400};
+    --color-border: #{$grey-500};
+    --color-border-selected: #d0d7de;
+    --color-fg-tertiary: #{$grey-500};
+    --color-bg-warn: #e4606d5b;
+    --color-fg-warn: #cf212e;
+
+    --color-fg-disabled: #{$grey-500};
+    --color-toolbar-background: #{$nice-grey};
+    --color-inspector-background: #{$white};
+    --color-bg-tabs: #{$grey-500};
+    --color-inspector-tabs: #{$nice-grey};
+    --color-bg-selected: #{$default-accent-color};
+    --color-progressbar-background-1: #{$nice-grey};
+    --color-default-border: #{$default-border-light};
   }
-  --color-progressbar-background-1: #{$grey-100};
-  --color-progressbar-background-2: #{$grey-400};
+  --color-progressbar-background-2: #{$grey-500};
   --color-progressbar-verify-1: #{$pink-300};
   --color-progressbar-verify-2: #{$pink-700};
   --color-progressbar-magnet-1: #{$yellow-300};
@@ -142,17 +166,17 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
   --color-progressbar-seed-queued-2: #{$green-300};
   --color-progressbar-seed-1: #{$green-300};
   --color-progressbar-seed-2: #{$green-700};
-  --color-tab-deselected-1: #{$grey-100};
-  --color-tab-deselected-2: #{$grey-400};
+  --color-tab-deselected-1: #{$nice-grey};
+  --color-tab-deselected-2: #{$grey-500};
   --color-tab-selected-1: #{$purple-100};
   --color-tab-selected-2: #{$purple-000};
-  --color-toolbar-background: #{$grey-200};
 }
 
 html,
 body {
-  color: auto;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
+  color: var(--color-fg-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -164,6 +188,8 @@ img {
 
 a {
   outline: 0;
+  color: var(--color-fg-primary);
+  text-decoration: underline;
 }
 
 .hidden {
@@ -205,7 +231,7 @@ $toolbar-height: $toolbar-height-number * 1px;
 #mainwin-toolbar {
   align-items: center;
   background: var(--color-toolbar-background);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
   height: $toolbar-height;
@@ -225,10 +251,6 @@ $toolbar-height: $toolbar-height-number * 1px;
     user-select: none;
     width: $toolbar-height;
 
-    &:hover:not(:disabled) {
-      background-color: var(--color-bg-hover);
-    }
-
     &:disabled {
       cursor: default;
       opacity: 0.25;
@@ -236,7 +258,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 
   > .toolbar-separator {
-    border-left: 1px solid var(--color-border);
+    border-left: 1px solid var(--color-default-border);
     height: 25px;
     margin: 0 6px 0 0;
   }
@@ -264,7 +286,8 @@ $toolbar-height: $toolbar-height-number * 1px;
   font-size: 33px;
   line-height: 0.6;
   top: 2px;
-  position: relative;}
+  position: relative;
+}
 
 #toolbar-pause::before {
   content: '\023F8';
@@ -279,15 +302,16 @@ $toolbar-height: $toolbar-height-number * 1px;
 }
 
 #toolbar-overflow {
-  background-color: transparent;
-  background-image: url($image-overflow);
-  background-position: center;
-  background-size: 26px;
   margin-right: 4px;
-  width: 36px;
+
+  svg {
+    fill: var(--color-fg-primary);
+    width: 36px;
+    height: 36px;
+  }
 
   &.alt-speed-enabled {
-    background-image: url($image-alt-speed-enabled), url($image-overflow);
+    background-image: url($image-alt-speed-enabled);
     background-position: bottom left, center, center;
     background-size: 16px 9px, 26px, 26px;
   }
@@ -301,7 +325,7 @@ $filterbar-height: $filterbar-height-number * 1px;
 .mainwin-filterbar {
   align-items: center;
   background: var(--color-toolbar-background);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
   font-size: smaller;
@@ -355,7 +379,7 @@ $speed-icon-size: 12px;
 
 /// TORRENT CONTAINER
 
-$pauseresume-size-number: 14;
+$pauseresume-size-number: 20;
 $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border-number: 1;
 $progressbar-height-number: 14;
@@ -398,7 +422,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   width: 100%;
 
   .torrent {
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-default-border);
     color: var(--color-fg-secondary);
     user-select: none;
 
@@ -478,7 +502,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
         'icon progressbar progressbar'
         'icon progress-text progress-text';
       grid-template-columns: $icon-size auto 1fr;
-      padding: 2px 12px;
+      padding: 6px 12px;
 
       .icon {
         background-size: $icon-size, $icon-size-num * 0.5px;
@@ -488,6 +512,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       }
 
       .torrent-name {
+        color: var(--color-fg-secondary);
         grid-area: name;
       }
 
@@ -515,8 +540,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     }
 
     &.selected {
-      accent-color: auto;
-      background-color: $default-accent-color;
+      background-color: var(--color-bg-selected);
     }
 
     &.selected .torrent-progress-details.error,
@@ -597,6 +621,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   .torrent-progress-details,
   .torrent-peer-details {
     font-size: x-small;
+    color: var(--color-fg-primary);
   }
 
   .torrent-progress-bar {
@@ -699,33 +724,47 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 @mixin tab-image($image-url) {
   background-image: url($image-url),
-    linear-gradient(
-      var(--color-tab-deselected-1),
-      var(--color-tab-deselected-2)
-    );
+    linear-gradient(var(--color-bg-odd), var(--color-bg-odd));
 
   &:active,
   &:checked,
   &.selected {
     background-image: url($image-url),
-      linear-gradient(var(--color-tab-selected-1), var(--color-tab-selected-2));
+      linear-gradient(
+        var(--color-tab-deselected-2),
+        var(--color-tab-deselected-2)
+      );
+  }
+}
+
+@mixin tab-selection($image-url) {
+  font-size: 14px;
+  border: 1px solid transparent;
+  padding: 3px 8px;
+  &:active,
+  &:checked,
+  &.selected {
+    border: 1px solid var(--color-fg-primary);
+    border-radius: 6px;
+    font-weight: 500;
+    background-color: var(--color-bg-even);
   }
 }
 
 #inspector-tab-info {
-  @include tab-image($image-analytics);
+  @include tab-selection($image-analytics);
 }
 
 #inspector-tab-peers {
-  @include tab-image($image-peers);
+  @include tab-selection($image-peers);
 }
 
 #inspector-tab-tiers {
-  @include tab-image($image-tiers);
+  @include tab-selection($image-tiers);
 }
 
 #inspector-tab-files {
-  @include tab-image($image-files);
+  @include tab-selection($image-files);
 }
 
 #inspector,
@@ -734,14 +773,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     left: 0;
   }
   @include for-tablet-portrait-up {
-    border-left: 1px solid var(--color-fg-secondary);
+    border-left: 1px solid var(--color-default-border);
     width: 570px;
   }
 }
 
 #prefs-dialog {
-  $background-color: $white;
-
+  $background-color: var(--color-toolbar-background);
   background: $background-color;
   bottom: 0;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
@@ -838,7 +876,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     font-size: smaller;
     font-style: lighter;
     // nudge it up next to the section label
-    margin: -10px 0 10px -20px;
+    margin: -10px 0 10px 0;
   }
 }
 
@@ -858,6 +896,8 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     font-size: larger;
     font-weight: bold;
     padding-left: 0;
+    color: var(--color-fg-primary);
+    margin-bottom: 10px;
   }
 
   .row {
@@ -878,34 +918,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       }
     }
   }
-
-  .checkbox-row {
-    > input {
-      margin: 0;
-    }
-
-    > label {
-      margin-left: 5px;
-    }
-  }
-
-  #alternative-speed-limits-title {
-    background: transparent url($image-alt-speed-enabled) no-repeat;
-    padding-left: 18px;
-  }
-
-  #alternative-speed-limits-desc {
-    font-size: smaller;
-    padding-bottom: 4px;
-  }
 }
 
 /// TABS
 
 .tabs-container {
   align-items: stretch;
-  background: $white;
-  border-left: solid 1px var(--color-border);
+  background: var(--color-inspector-background);
   bottom: 0;
   display: flex;
   flex-direction: column;
@@ -924,28 +943,40 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .tabs-buttons {
   align-self: center;
   display: flex;
-  padding: 10px;
+  margin: 10px 0;
+  background-color: var(--color-bg-tabs);
+  border-radius: 6px;
+  border: 1px solid var(--color-border-selected);
 
   button {
     @include button;
     appearance: none;
-    padding: 3px;
+    border: none;
+    color: var(--color-fg-primary);
+    border: 1px solid transparent;
+    border-radius: 6px;
+
+    &:not(:last-child)::after {
+      background-color: var(--color-fg-secondary);
+      content: '';
+      position: absolute;
+      right: -2px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+    }
+  }
+
+  &:first-child {
+    margin-left: -1px;
+  }
+  &:last-child {
+    margin-right: -1px;
   }
 }
 
-.file-priority-radiobox,
-.tabs-buttons {
+.file-priority-radiobox {
   $radius: 8px;
-
-  :first-child {
-    border-bottom-left-radius: $radius;
-    border-top-left-radius: $radius;
-  }
-
-  :last-child {
-    border-bottom-right-radius: $radius;
-    border-top-right-radius: $radius;
-  }
 }
 
 .tabs-pages {
@@ -964,12 +995,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .tabs-button {
   background-position: center;
   background-repeat: no-repeat;
+  background-color: inherit;
 }
 
 /// INSPECTOR
 
 #inspector {
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px rgba(58, 58, 58, 0.7);
 }
 
 .inspector-info-page {
@@ -1010,8 +1042,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 .inspector-info-magnet {
   button {
-    background-color: transparent;
-    background-image: url($image-magnet);
+    background-color: var(--color-border);
+    mask: url($image-magnet) no-repeat center / 14px;
+    -webkit-mask: url($image-magnet) no-repeat center / 14px;
+
     background-position: top;
     background-repeat: no-repeat;
     border: 0;
@@ -1024,27 +1058,25 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 #inspector .tabs-button,
 #prefs-dialog .tabs-button {
-  background-size: 20px 20px, 40px 30px;
+  min-width: 40px;
   height: 30px;
   margin: 0;
-  padding: 0;
-  width: 40px;
 }
 
 #prefs-tab-torrent {
-  @include tab-image($image-upload-download);
+  @include tab-selection($image-upload-download);
 }
 
 #prefs-tab-speed {
-  @include tab-image($image-speed);
+  @include tab-selection($image-speed);
 }
 
 #prefs-tab-peers {
-  @include tab-image($image-peers);
+  @include tab-selection($image-peers);
 }
 
 #prefs-tab-network {
-  @include tab-image($image-network);
+  @include tab-selection($image-network);
 }
 
 #inspector-file-list {
@@ -1071,12 +1103,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .inspector-torrent-file-list-entry-name {
-    color: var(--color-fg-name);
+    color: var(--color-fg-primary);
     cursor: pointer;
     grid-area: name;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 14px;
   }
 
   .inspector-torrent-file-list-entry.skip
@@ -1087,6 +1120,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   .inspector-torrent-file-list-entry-progress {
     color: var(--color-fg-secondary);
     grid-area: info;
+    font-size: 12px;
   }
 
   .single-file .inspector-torrent-file-list-entry > .file-wanted-control,
@@ -1105,7 +1139,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 }
 
 #inspector-tiers-list {
-  color: var(--color-fg-secondary);
+  color: var(--color-fg-primary);
   margin: 0 10px;
   padding: 0 12px;
 
@@ -1151,7 +1185,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 // Peers Tab
 
 .peer-list {
-  $table-border-color: $grey-100;
+  $table-border-color: var(--default-border);
   $table-border: 1px solid $table-border-color;
 
   border: $table-border;
@@ -1185,12 +1219,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .encryption {
-    width: 16px;
-
     &[data-encrypted='true'] {
-      background: transparent url($image-lock-fill) center center no-repeat;
-      height: 16px;
-      width: 16px;
+      background-color: var(--color-border-selected);
+      width: 10px;
+      mask: url($image-lock-fill) no-repeat center / 14px;
+      -webkit-mask: url($image-lock-fill) no-repeat center / 14px;
     }
   }
 
@@ -1270,28 +1303,36 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 /// CONTEXT MENU
 
 .context-menu {
-  $background-color: var(--color-bg-menu);
+  background-color: var(--color-bg-primary);
   $disabled-color: var(--color-fg-disabled);
-
-  background: $background-color;
+  padding: 10px 5px;
+  border-radius: 5px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   color: var(--color-fg-on-popup);
   position: absolute;
-  z-index: $z-index-popup;
+  z-index: 9999;
 
   .context-menuitem {
     list-style: none;
-    padding: 5px 10px;
-
+    padding: 5px 15px;
+    margin-right: 10px;
+    font-weight: 400;
+    font-size: 13px;
     &:hover:not(:disabled),
     &:focus:not(:disabled) {
-      background-image: linear-gradient($white, var(--color-bg-menu));
+      background-color: var(--color-bg-hover);
+      font-weight: 500;
+      border-radius: 6px;
       cursor: pointer;
     }
 
     &:disabled {
       color: $disabled-color;
       cursor: none;
+    }
+    &.warning:hover {
+      color: var(--color-fg-warn);
+      background-color: var(--color-bg-warn);
     }
   }
 }
@@ -1305,58 +1346,52 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 /// OVERFLOW MENU
 
 .overflow-menu {
-  background: linear-gradient(
-    160deg,
-    rgb(255, 231, 229),
-    1%,
-    var(--color-bg-hover),
-    40%,
-    var(--color-bg-menu)
-  );
-  border-radius: 8px;
+  background: var(--color-bg-popup);
+  border-radius: 5px;
+  min-width: 220px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   color: var(--color-fg-on-popup);
-  padding: 20px;
+  padding: 10px;
   position: fixed;
-  width: 200px;
+  right: 20px;
   z-index: $z-index-popup;
 
   fieldset {
+    display: block;
     border: 0;
-    margin-bottom: 8px;
-    padding: 0;
+    margin: 8px 0;
   }
 
-  > .actions,
-  > .info,
-  > .links {
+  fieldset ul {
+    padding-left: 0;
+    margin: 0;
+    li {
+      list-style-type: none;
+    }
+    a {
+      cursor: pointer;
+    }
+  }
+
+  .table-row {
+    padding: 3px 0;
+    border-radius: 6px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
   }
 
   legend {
     font-weight: bolder;
-    margin-bottom: 4px;
-  }
-
-  legend ~ * {
-    margin-left: 12px;
+    color: var(--color-fg-primary);
+    margin: 12px 0px 4px;
   }
 
   a,
   button,
   label {
     font-size: 1em;
-
-    &:disabled {
-      color: var(--color-fg-disabled);
-      cursor: default;
-    }
-
-    &:focus:not(:disabled),
-    &:hover:not(:disabled) {
-      background-color: var(--color-bg-hover);
-    }
+    width: 100%;
+    display: inline-flex;
   }
 
   a,
@@ -1378,23 +1413,8 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   #display-options {
-    > * {
-      align-items: center;
-      display: inline-flex;
-      flex-direction: row;
-
-      > * {
-        margin: 4px;
-      }
-
-      :first-child {
-        margin-left: 0;
-      }
-
-      :last-child {
-        margin-right: 0;
-      }
-    }
+    display: flex;
+    flex-direction: column;
   }
 
   #speed-options {
@@ -1518,6 +1538,7 @@ $logo-size: 64px;
       'icon buttons';
     grid-template-columns: $logo-size 1fr;
     padding: 2px 12px;
+    background-color: var(--color-bg-popup);
   }
 }
 
@@ -1530,19 +1551,19 @@ $logo-size: 64px;
 
   button {
     appearance: none;
-    background: transparent;
-    border: 1px solid var(--color-border);
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-default-border);
     border-radius: 5px;
-    color: var(--color-fg-name);
+    color: var(--color-fg-primary);
     margin-left: 8px;
     padding: 8px;
     text-decoration: none;
   }
 
-  a:hover,
-  a:active {
-    background: linear-gradient($white, var(--color-bg-menu));
-  }
+  // a:hover,
+  // a:active {
+  //   background: linear-gradient($white, var(--color-bg-menu));
+  // }
 }
 
 .dialog-buttons-begin {
@@ -1589,7 +1610,6 @@ $logo-size: 64px;
     40%,
     #ccc
   );
-  height: 100%;
   padding: $dialog-padding-number * 1px;
 }
 

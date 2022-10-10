@@ -126,5 +126,6 @@ module.exports = {
     "unicorn/no-reduce": "off",
     "unicorn/no-unused-properties": "off",
     "unicorn/prevent-abbreviations": "off",
+    "unicorn/switch-case-braces": "off"
   }
 };

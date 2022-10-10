@@ -9,7 +9,7 @@ import { Torrent } from './torrent.js';
 import {
   OutsideClickListener,
   Utils,
-  createTabsContainer,
+  createTextualTabsContainer,
   setTextContent,
 } from './utils.js';
 
@@ -181,13 +181,13 @@ export class Inspector extends EventTarget {
       this._updateCurrentPage();
     };
 
-    const elements = createTabsContainer(
+    const elements = createTextualTabsContainer(
       'inspector',
       [
-        ['inspector-tab-info', pages.info.root],
-        ['inspector-tab-peers', pages.peers.root],
-        ['inspector-tab-tiers', pages.tiers.root],
-        ['inspector-tab-files', pages.files.root],
+        ['inspector-tab-info', pages.info.root, 'Info'],
+        ['inspector-tab-peers', pages.peers.root, 'Peers'],
+        ['inspector-tab-tiers', pages.tiers.root, 'Tiers'],
+        ['inspector-tab-files', pages.files.root, 'Files'],
       ],
       on_activated.bind(this)
     );
