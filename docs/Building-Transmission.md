@@ -1,5 +1,5 @@
 ## Getting the Source ##
-The source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download/).
+The source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download).
 
 ## On macOS ##
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode. Make sure you have this software:
