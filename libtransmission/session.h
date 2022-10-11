@@ -866,6 +866,8 @@ private:
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
 
+    void onNowTimer();
+
     void onPeerPortChanged();
     void setPeerPort(tr_port port);
 
@@ -925,6 +927,14 @@ private:
     std::string const config_dir_;
     std::string const resume_dir_;
     std::string const torrent_dir_;
+
+    std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+    std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
+    std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
+
+    std::unique_ptr<libtransmission::Timer> now_timer_;
+
+    std::unique_ptr<libtransmission::Timer> save_timer_;
 
     static std::recursive_mutex session_mutex_;
 
@@ -1000,15 +1010,6 @@ private:
     std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
 
     LpdMediator lpd_mediator_{ *this };
-
-    std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
-    std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
-    std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
-
-    void onNowTimer();
-    std::unique_ptr<libtransmission::Timer> now_timer_;
-
-    std::unique_ptr<libtransmission::Timer> save_timer_;
 
     tr_torrents torrents_;
 
