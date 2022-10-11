@@ -2814,7 +2814,10 @@ auto makeEventBase()
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : session_id_{ tr_time }
+    : config_dir_{ config_dir }
+    , resume_dir_{ makeResumeDir(config_dir) }
+    , torrent_dir_{ makeTorrentDir(config_dir) }
+    , session_id_{ tr_time }
     , event_base_{ makeEventBase() }
     , evdns_base_{ evdns_base_new(eventBase(), EVDNS_BASE_INITIALIZE_NAMESERVERS),
                    [](evdns_base* dns)
@@ -2823,9 +2826,6 @@ tr_session::tr_session(std::string_view config_dir)
                        evdns_base_free(dns, 0);
                    } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
-    , config_dir_{ config_dir }
-    , resume_dir_{ makeResumeDir(config_dir) }
-    , torrent_dir_{ makeTorrentDir(config_dir) }
     , session_stats_{ config_dir, time(nullptr) }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });

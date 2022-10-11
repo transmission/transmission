@@ -922,6 +922,10 @@ private:
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int bytes_per_second);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
+    std::string const config_dir_;
+    std::string const resume_dir_;
+    std::string const torrent_dir_;
+
     static std::recursive_mutex session_mutex_;
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
@@ -1012,9 +1016,6 @@ private:
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
-    std::string const config_dir_;
-    std::string const resume_dir_;
-    std::string const torrent_dir_;
     std::string download_dir_;
     std::string incomplete_dir_;
 
