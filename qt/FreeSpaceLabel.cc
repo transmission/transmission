@@ -49,7 +49,7 @@ void FreeSpaceLabel::setPath(QString const& path)
 {
     if (path_ != path)
     {
-        setText(tr("<i>Calculating Free Space...</i>"));
+        setText(tr("<i>Calculating Free Space…</i>"));
         path_ = path;
         onTimer();
     }

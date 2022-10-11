@@ -61,20 +61,20 @@
         <source>I &amp;Agree</source>
         <translation>Strinjam se</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>Torrent dokončan</numerusform>
-            <numerusform>Torrent dokončan</numerusform>
-            <numerusform>Torrent dokončan</numerusform>
-            <numerusform>Torrent dokončan</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -221,8 +221,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Soležnik je dohodna povezava</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+134"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -233,12 +238,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -282,12 +282,12 @@
         <translation>Ni na voljo</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Soležnik, povezan preko uTP</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+262"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>Visoko</translation>
     </message>
@@ -640,8 +640,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>Preimenuj...</translation>
+        <source>Rename…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -694,8 +694,8 @@
     </message>
     <message>
         <location line="+11"/>
-        <source>Search...</source>
-        <translation>Išči:</translation>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -834,8 +834,8 @@
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Izračunavam prostor. ki je na voljo...&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -884,12 +884,7 @@
         <translation>Datoteka</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>Novo</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Ustvari nov torrent</translation>
     </message>
@@ -925,8 +920,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>Odpri...</translation>
+        <source>&amp;Open…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -939,7 +934,12 @@
         <translation>Odpri torrent</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Odpri mapo</translation>
     </message>
@@ -1176,32 +1176,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>Zamenjaj sejo...</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Izberi sejo</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Izberi meso...</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Kopiraj povezavo Magnet na odložišče</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>Odpri URL</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>Prispevaj</translation>
     </message>
@@ -1763,7 +1763,12 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation>Vrata so &lt;b&gt;zaprta&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1793,16 +1798,6 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <source>Options</source>
         <translation>Možnosti</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Omogoči uTP za povezave s soležniki</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP je orodje za zmanjševanje zasičenosti omrežja.</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1831,7 +1826,7 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Samodejno dodaj .torrent datoteke iz:</translation>
     </message>
@@ -1905,23 +1900,8 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <source>Maximum peers &amp;overall:</source>
         <translation>Največ soležnikov v celoti:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Posodobitev uspešna!&lt;/b&gt;&lt;p&gt;Seznam blokad ima %Ln pravilo.</numerusform>
-            <numerusform>&lt;b&gt;Posodobitev uspešna!&lt;/b&gt;&lt;p&gt;Seznam blokad ima %Ln pravili.</numerusform>
-            <numerusform>&lt;b&gt;Posodobitev uspešna!&lt;/b&gt;&lt;p&gt;Seznam blokad ima %Ln pravila.</numerusform>
-            <numerusform>&lt;b&gt;Posodobitev uspešna!&lt;/b&gt;&lt;p&gt;Seznam blokad ima %Ln pravil.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Posodobi seznam blokad&lt;/b&gt;&lt;p&gt;Pridobivanje novega seznama blokad...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Seznam blokad</translation>
     </message>
@@ -1931,7 +1911,7 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation>Omogoči samodejne posodobitve</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Dovoli šifriranje</translation>
     </message>
@@ -2052,7 +2032,17 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2087,12 +2077,7 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation>Predvajaj zvok ob zaključku torrentov</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>Preverjam vrata TCP...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Omejitve soležnikov</translation>
     </message>
@@ -2132,7 +2117,7 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation>Šifriranje</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Izberi mapo za nedokončano</translation>
     </message>
@@ -2141,8 +2126,23 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <source>Select Watch Directory</source>
         <translation>Izberi mapo za opazovanje</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Izberi cilj</translation>
     </message>
@@ -2211,7 +2211,7 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Neveljavna možnost</translation>
     </message>
@@ -2626,13 +2626,13 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation>Načrtovana prošnja za več soležnikov</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Prosim za več soležnikov zdaj... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2666,7 +2666,13 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation>Napaka pri pridobivanju %1&quot;%2&quot;%3 pred %4</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Prosim za število soležnikov čez %1</translation>
@@ -2675,12 +2681,6 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>Načrtovana prošnja za število soležnikov</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Prosim za število soležnikov zdaj.. &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

@@ -1178,7 +1178,7 @@ void DetailsDialog::refreshUI()
                     break;
 
                 case 'T':
-                    txt = tr("Peer is connected over uTP");
+                    txt = tr("Peer is connected over µTP");
                     break;
 
                 default:
@@ -1343,7 +1343,7 @@ void DetailsDialog::onAddTrackerClicked()
 
     QString const text = QInputDialog::getMultiLineText(
         this,
-        tr("Add URL(s) "),
+        tr("Add URL(s)"),
         tr("Add tracker announce URLs, one per line:"),
         {},
         &ok);

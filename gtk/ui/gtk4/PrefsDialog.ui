@@ -975,9 +975,9 @@
                         <property name="column-spacing">12</property>
                         <child>
                           <object class="GtkCheckButton" id="enable_utp_check">
-                            <property name="label" translatable="1">Enable _uTP for peer communication</property>
+                            <property name="label" translatable="1">Enable µ_TP for peer communication</property>
                             <property name="focusable">1</property>
-                            <property name="tooltip-text" translatable="1">uTP is a tool for reducing network congestion.</property>
+                            <property name="tooltip-text" translatable="1">µTP is a tool for reducing network congestion.</property>
                             <property name="valign">center</property>
                             <property name="hexpand">1</property>
                             <property name="use-underline">1</property>

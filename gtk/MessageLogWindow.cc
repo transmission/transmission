@@ -446,12 +446,14 @@ MessageLogWindow::Impl::Impl(
     : window_(window)
     , core_(core)
     , view_(gtr_get_widget<Gtk::TreeView>(builder, "messages_view"))
-    , level_names_{ { { TR_LOG_CRITICAL, _("Critical") },
-                      { TR_LOG_ERROR, _("Error") },
-                      { TR_LOG_WARN, _("Warning") },
-                      { TR_LOG_INFO, _("Information") },
-                      { TR_LOG_DEBUG, _("Debug") },
-                      { TR_LOG_TRACE, _("Trace") } } }
+    , level_names_{ {
+          { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
+          { TR_LOG_ERROR, C_("Logging level", "Error") },
+          { TR_LOG_WARN, C_("Logging level", "Warning") },
+          { TR_LOG_INFO, C_("Logging level", "Information") },
+          { TR_LOG_DEBUG, C_("Logging level", "Debug") },
+          { TR_LOG_TRACE, C_("Logging level", "Trace") },
+      } }
 {
     /**
     ***  toolbar

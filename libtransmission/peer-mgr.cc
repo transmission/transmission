@@ -288,7 +288,7 @@ struct peer_atom
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
 
-    bool utp_failed = false; /* We recently failed to connect over uTP */
+    bool utp_failed = false; /* We recently failed to connect over µTP */
     bool is_connected = false;
 
 private:
@@ -1198,8 +1198,8 @@ static bool on_handshake_done(tr_handshake_result const& result)
             atom->flags2 &= ~MyflagUnreachable;
         }
 
-        /* In principle, this flag specifies whether the peer groks uTP,
-           not whether it's currently connected over uTP. */
+        /* In principle, this flag specifies whether the peer groks µTP,
+           not whether it's currently connected over µTP. */
         if (result.io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
         {
             atom->flags |= ADDED_F_UTP_FLAGS;
@@ -2819,9 +2819,9 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 
     if (atom.fromFirst == TR_PEER_FROM_PEX)
     {
-        /* PEX has explicit signalling for uTP support.  If an atom
-           originally came from PEX and doesn't have the uTP flag, skip the
-           uTP connection attempt.  Are we being optimistic here? */
+        /* PEX has explicit signalling for µTP support.  If an atom
+           originally came from PEX and doesn't have the µTP flag, skip the
+           µTP connection attempt.  Are we being optimistic here? */
         utp = utp && (atom.flags & ADDED_F_UTP_FLAGS) != 0;
     }
 

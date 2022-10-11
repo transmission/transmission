@@ -116,7 +116,7 @@ static void utp_send_to(
 
 static void utp_log(tr_session* const /*session*/, char const* const msg)
 {
-    fmt::print(stderr, FMT_STRING("[utp] {}\n"), msg);
+    fmt::print(stderr, FMT_STRING("[µTP] {}\n"), msg);
 }
 
 #endif
@@ -164,7 +164,7 @@ static void reset_timer(tr_session* session)
     }
     else
     {
-        /* If somebody has disabled uTP, then we still want to run
+        /* If somebody has disabled µTP, then we still want to run
            utp_check_timeouts, in order to let closed sockets finish
            gracefully and so on.  However, since we're not particularly
            interested in that happening in a timely manner, we might as
