@@ -1635,7 +1635,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (BOOL)isStalled
 {
-    return self.fStat->isStalled;
+    return self.fStat->peersGettingFromUs == 0 && self.fStat->peersSendingToUs == 0 && self.fStat->webseedsSendingToUs == 0 &&
+        self.fStat->activity != TR_STATUS_CHECK;
 }
 
 - (void)updateTimeMachineExclude
