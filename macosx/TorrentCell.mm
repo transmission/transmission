@@ -400,7 +400,7 @@
         }
 
         NSImage* controlImage;
-        if (torrent.active)
+        if (!torrent.paused)
         {
             controlImage = [NSImage imageNamed:[@"Pause" stringByAppendingString:controlImageSuffix]];
         }
@@ -627,7 +627,7 @@
         NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);
 
         //not-available section
-        if (torrent.active && !torrent.checking && torrent.availableDesired < 1.0 && [self.fDefaults boolForKey:@"DisplayProgressBarAvailable"])
+        if (!torrent.paused && !torrent.checking && torrent.availableDesired < 1.0 && [self.fDefaults boolForKey:@"DisplayProgressBarAvailable"])
         {
             NSRect unavailableRect;
             NSDivideRect(wantedRect, &wantedRect, &unavailableRect, round(NSWidth(wantedRect) * torrent.availableDesired), NSMinXEdge);
@@ -880,7 +880,7 @@
     else if (self.fMouseDownControlButton || (!self.fTracking && self.hoverControl))
     {
         Torrent* torrent = self.representedObject;
-        if (torrent.active)
+        if (!torrent.paused)
             return NSLocalizedString(@"Pause the transfer", "Torrent Table -> tooltip");
         else
         {

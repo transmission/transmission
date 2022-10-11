@@ -722,7 +722,7 @@
 
 - (void)toggleControlForTorrent:(Torrent*)torrent
 {
-    if (torrent.active)
+    if (!torrent.paused)
     {
         [self.fController stopTorrents:@[ torrent ]];
     }

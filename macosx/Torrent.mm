@@ -184,7 +184,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 {
     return @{
         @"TorrentHash" : self.hashString,
-        @"Active" : @(self.active),
+        @"Active" : @(!self.paused),
         @"WaitToStart" : @(self.waitingToStart),
         @"GroupValue" : @(self.groupValue),
         @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding)
@@ -262,12 +262,12 @@ bool trashDataFile(char const* filename, tr_error** error)
 - (void)update
 {
     //get previous stalled value before update
-    BOOL const wasStalled = self.fStat != NULL && self.stalled;
+    BOOL const wasActive = self.fStat != NULL && self.active;
 
     self.fStat = tr_torrentStat(self.fHandle);
 
-    //make sure the "active" filter is updated when stalled-ness changes
-    if (wasStalled != self.stalled)
+    //make sure the "active" filter is updated when activity changes
+    if (wasActive != self.active)
     {
         //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
         [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateQueue" object:self]
@@ -1179,7 +1179,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     //append even if error
-    if (self.active && !self.checking)
+    if (!self.paused && !self.checking)
     {
         if (self.fStat->activity == TR_STATUS_DOWNLOAD)
         {
@@ -1648,7 +1648,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSInteger)stateSortKey
 {
-    if (!self.active) //paused
+    if (self.paused) //paused
     {
         if (self.waitingToStart)
         {

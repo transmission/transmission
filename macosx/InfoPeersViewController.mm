@@ -152,7 +152,7 @@
             [self.fWebSeeds addObjectsFromArray:torrent.webSeeds];
         }
 
-        if (torrent.active)
+        if (!torrent.paused)
         {
             anyActive = YES;
             [self.fPeers addObjectsFromArray:torrent.peers];
