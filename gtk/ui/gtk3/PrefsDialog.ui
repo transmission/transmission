@@ -1418,11 +1418,11 @@
                     <property name="column-spacing">12</property>
                     <child>
                       <object class="GtkCheckButton" id="enable_utp_check">
-                        <property name="label" translatable="yes">Enable _uTP for peer communication</property>
+                        <property name="label" translatable="yes">Enable µ_TP for peer communication</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="tooltip-text" translatable="yes">uTP is a tool for reducing network congestion.</property>
+                        <property name="tooltip-text" translatable="yes">µTP is a tool for reducing network congestion.</property>
                         <property name="valign">center</property>
                         <property name="hexpand">True</property>
                         <property name="use-underline">True</property>

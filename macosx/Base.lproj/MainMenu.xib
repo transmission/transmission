@@ -207,7 +207,7 @@
             </connections>
             <point key="canvasLocation" x="138.5" y="125"/>
         </window>
-        <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
+        <menu systemMenu="main" id="29" userLabel="MainMenu">
             <items>
                 <menuItem title="Transmission" id="56">
                     <menu key="submenu" title="Transmission" systemMenu="apple" id="57">
