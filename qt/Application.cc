@@ -440,7 +440,7 @@ void Application::onTorrentsCompleted(torrent_ids_t const& torrent_ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
-        auto const title = tr("Torrent Completed", nullptr, static_cast<int>(std::size(torrent_ids)));
+        auto const title = tr("Torrent(s) Completed", nullptr, static_cast<int>(std::size(torrent_ids)));
         auto const body = getNames(torrent_ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }

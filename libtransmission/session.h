@@ -485,7 +485,7 @@ public:
 
     struct tr_event_handle* events = nullptr;
 
-    // UDP connectivity used for the DHT and uTP
+    // UDP connectivity used for the DHT and µTP
     class tr_udp_core
     {
     public:

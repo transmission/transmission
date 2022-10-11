@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>&amp;ვეთანხმები</translation>
     </message>
-    <message>
-        <location line="+134"/>
-        <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -215,8 +215,13 @@
         <source>Peer is an incoming connection</source>
         <translation>პირი შემომავალი კავშირია</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+134"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -225,12 +230,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -274,12 +274,12 @@
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>პირი დაკავშირებულია uTP-ს გამოყენებით</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+262"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>მაღალი</translation>
     </message>
@@ -632,8 +632,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>გადარქმევა...</translation>
+        <source>Rename…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -686,8 +686,8 @@
     </message>
     <message>
         <location line="+11"/>
-        <source>Search...</source>
-        <translation>ძიება...</translation>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;თავისუფალი ადგილის გამოთვლა...&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -868,12 +868,7 @@
         <translation>&amp;ფაილი</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;ახალი...</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>ახალი ტორენტის შექმნა</translation>
     </message>
@@ -909,8 +904,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;გახსნა...</translation>
+        <source>&amp;Open…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -923,7 +918,12 @@
         <translation>ტორენტის გახსნა</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>სა&amp;ქაღალდის გახსნა</translation>
     </message>
@@ -1160,32 +1160,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>სესიის &amp;შეცვლა...</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>სესიის არჩევა</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>&amp;მდებარეობის დაყენება...</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>მაგნიტური ბმულის ა&amp;სლი ბუფერში</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>&amp;URL-ს გახსნა...</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>შე&amp;წირვა</translation>
     </message>
@@ -1742,7 +1742,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>პორტი &lt;b&gt;დახურულია&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1772,16 +1777,6 @@ To add another primary URL, add it after a blank line.</source>
         <source>Options</source>
         <translation>პარამეტრები</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>uTP-ს ჩართვა &amp;პირებთან კავშირებისთვის</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP ქსელის უსაძრაობის შესამცირებელი ხელსაწყოა</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1806,7 +1801,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>.torrent ფაილების ავტომატური დამატება &amp;საქაღალდიდან:</translation>
     </message>
@@ -1878,21 +1873,8 @@ To add another primary URL, add it after a blank line.</source>
         <source>Maximum peers &amp;overall:</source>
         <translation>მაქსიმალური პირები &amp;მთლიანობაში:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;წარმატებით განახლდა!&lt;/b&gt;&lt;p&gt;შავი სია ახლა შეიცავს %Ln წესს.</numerusform>
-            <numerusform>&lt;b&gt;წარმატებით განახლდა!&lt;/b&gt;&lt;p&gt;შავი სია ახლა შეიცავს %Ln წესს.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;სიის განახლება&lt;/b&gt;&lt;p&gt;ახალი შავი სიის მიღება...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>შავი სია</translation>
     </message>
@@ -1902,7 +1884,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;ავტომატური განახლებების ჩართვა</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>დაშიფვრის დაშვება</translation>
     </message>
@@ -2023,7 +2005,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2058,12 +2050,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;ხმის დაკვრა ტორენტის დასრულებისას</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>მოწმდება TCP პორტი...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>პირის შეზღუდვები</translation>
     </message>
@@ -2103,7 +2090,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>დაშიფვრა</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>შეარჩიეთ არასრულის დირექტორია</translation>
     </message>
@@ -2112,8 +2099,21 @@ To add another primary URL, add it after a blank line.</source>
         <source>Select Watch Directory</source>
         <translation>შეარჩიეთ დასაკვირვებელი დირექტორია</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>აირჩიეთ დანიშნულების ადგილი</translation>
     </message>
@@ -2182,7 +2182,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>არასწორი პარამეტრი</translation>
     </message>
@@ -2577,13 +2577,13 @@ To add another primary URL, add it after a blank line.</source>
         <translation>იმყოფება მეტი პირის მოთხოვნის რიგში</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>მეტი პირის მოთხოვნა ახლა... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2613,7 +2613,13 @@ To add another primary URL, add it after a blank line.</source>
         <translation>მიღებული იქნა სქრეიფის შეცდომა %1&quot;%2&quot;%3 %4ს წინ</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>პირების რაოდენობის მოთხოვნა %1ში</translation>
@@ -2622,12 +2628,6 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>პირების რაოდენობის მოთხოვნის რიგში</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>პირების მოთხოვნა ხდება ახლა... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

@@ -27,7 +27,7 @@
 #include "utils.h"
 
 /* Since we use a single UDP socket in order to implement multiple
-   uTP sockets, try to set up huge buffers. */
+   µTP sockets, try to set up huge buffers. */
 
 static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
 static auto constexpr SendBufferSize = 1 * 1024 * 1024;
@@ -191,12 +191,12 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     int const
         rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
 
-    /* Since most packets we receive here are ÂµTP, make quick inline
+    /* Since most packets we receive here are µTP, make quick inline
        checks for the other protocols. The logic is as follows:
        - all DHT packets start with 'd'
        - all UDP tracker packets start with a 32-bit (!) "action", which
          is between 0 and 3
-       - the above cannot be ÂµTP packets, since these start with a 4-bit
+       - the above cannot be µTP packets, since these start with a 4-bit
          version number (1). */
     if (rc > 0)
     {

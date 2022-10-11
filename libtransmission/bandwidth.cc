@@ -177,7 +177,7 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction di
     {
         int const i = tr_rand_int_weak(n); /* pick a peer at random */
 
-        /* value of 3000 bytes chosen so that when using uTP we'll send a full-size
+        /* value of 3000 bytes chosen so that when using µTP we'll send a full-size
          * frame right away and leave enough buffered data for the next frame to go
          * out in a timely manner. */
         size_t const increment = 3000;

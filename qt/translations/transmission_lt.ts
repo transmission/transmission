@@ -61,19 +61,19 @@
         <source>I &amp;Agree</source>
         <translation>Aš &amp;sutinku</translation>
     </message>
-    <message>
-        <location line="+134"/>
-        <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -218,8 +218,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Siuntėjas yra įeinantis ryšys</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+134"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -229,12 +234,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -278,12 +278,12 @@
         <translation>N/D</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Siuntėjas naudoja µTP</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+262"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>aukštas</translation>
     </message>
@@ -636,8 +636,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>Pervadinti...</translation>
+        <source>Rename…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -690,8 +690,8 @@
     </message>
     <message>
         <location line="+11"/>
-        <source>Search...</source>
-        <translation>Paieška...</translation>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -826,8 +826,8 @@
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Apskaičiuojama laisva vieta...&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -876,12 +876,7 @@
         <translation>&amp;Failas</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Naujas…</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Sukurti naują torentą</translation>
     </message>
@@ -917,8 +912,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;Atverti…</translation>
+        <source>&amp;Open…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -931,7 +926,12 @@
         <translation>Atverti torentą</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>&amp;Atverti aplanką</translation>
     </message>
@@ -1168,32 +1168,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>&amp;Keisti seansą…</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Pasirinkite seansą</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Nurodyti &amp;vietą…</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Kopijuoti &amp;magnet nuorodą į iškarpinę</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>Atverti &amp;URL…</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Paaukoti</translation>
     </message>
@@ -1751,7 +1751,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Prievadas yra &lt;b&gt;užvertas&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1781,16 +1786,6 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <source>Options</source>
         <translation>Nuostatos</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Ryšiams su &amp;siuntėjais naudoti µTP</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>µTP – tai priemonė, padedanti mažinti tinklo apkrovas.</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1817,7 +1812,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Automatiškai pridėti .torrent &amp;failus iš:</translation>
     </message>
@@ -1890,22 +1885,8 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <source>Maximum peers &amp;overall:</source>
         <translation>&amp;Daugiausiai galimų siuntėjų iš viso:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklė.</numerusform>
-            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklės.</numerusform>
-            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklių.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Blokavimo sąrašo naujinimas&lt;/b&gt;&lt;p&gt;Gaunamas naujas blokavimo sąrašas…</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Blokavimo sąrašas</translation>
     </message>
@@ -1915,7 +1896,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Įjungti &amp;automatinius naujinimus</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>leisti šifravimą</translation>
     </message>
@@ -2036,7 +2017,17 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2071,12 +2062,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Groti gar&amp;są, kai torentai yra užbaigiami</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>Tikrinamas TCP prievadas…</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Ryšių ribojimai</translation>
     </message>
@@ -2116,7 +2102,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šifravimas</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Parinkite nebaigtų torentų aplanką</translation>
     </message>
@@ -2125,8 +2111,22 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <source>Select Watch Directory</source>
         <translation>Parinkite stebimą aplanką</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Parinkite paskirties aplanką</translation>
     </message>
@@ -2195,7 +2195,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Netinkamas parametras</translation>
     </message>
@@ -2600,13 +2600,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Suplanuota paprašyti daugiau siuntėjų</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Dabar prašoma daugiau siuntėjų… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2638,7 +2638,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Prieš %4 gauta klaida %1„%2“%3</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Bus užklausta siuntėjų skaičiaus po %1</translation>
@@ -2647,12 +2653,6 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>Suplanuota užklausti siuntėjų skaičiaus</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Dabar užklausiama siuntėjų skaičiaus… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

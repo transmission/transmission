@@ -345,7 +345,7 @@
 "1931.title" = "Mıknatıs bağlantılar için:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
-"1933.title" = "Varsayılan Uygulamayı Belirle";
+"1933.title" = "Saptanmış Uygulamayı Belirle";
 
 /* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
 "1940.title" = ".part parçacıklarını bitmemiş dosyalara iliştir";

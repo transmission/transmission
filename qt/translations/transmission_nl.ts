@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>Ik ga &amp;akkoord</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>Torrent voltooid</numerusform>
-            <numerusform>Torrent voltooid</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -215,8 +215,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Peer is een inkomende verbinding</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+134"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -225,12 +230,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -274,12 +274,12 @@
         <translation>n.v.t.</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Peer is via uTP verbonden</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+262"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>Hoog</translation>
     </message>
@@ -632,8 +632,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>Hernoemen…</translation>
+        <source>Rename…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -686,8 +686,8 @@
     </message>
     <message>
         <location line="+11"/>
-        <source>Search...</source>
-        <translation>Zoeken…</translation>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Vrije ruimte berekenen…&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -868,12 +868,7 @@
         <translation>&amp;Bestand</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Nieuw…</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Nieuwe torrent aanmaken</translation>
     </message>
@@ -909,8 +904,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;Openen…</translation>
+        <source>&amp;Open…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -923,7 +918,12 @@
         <translation>Torrent openen</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Map op&amp;enen</translation>
     </message>
@@ -1160,32 +1160,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>Sessie wijzi&amp;gen…</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Sessie kiezen</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>&amp;Locatie instellen…</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Magnetkoppeling &amp;kopiëren naar klembord</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>&amp;URL openen…</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Doneren</translation>
     </message>
@@ -1738,7 +1738,12 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Poort is &lt;b&gt;gesloten&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1768,16 +1773,6 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <source>Options</source>
         <translation>Opties</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Zet &amp;uTP voor peerverbindingen aan</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP is een hulpmiddel om netwerkopstoppingen te verminderen</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1802,7 +1797,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Voeg .torrent-bestanden automatisch toe van:</translation>
     </message>
@@ -1874,21 +1869,8 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <source>Maximum peers &amp;overall:</source>
         <translation>Maximum aantal peers in het algemeen:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Update geslaagd!&lt;/b&gt;&lt;p&gt;Blokkadelijst heeft nu %Ln regel.</numerusform>
-            <numerusform>&lt;b&gt;Update geslaagd!&lt;/b&gt;&lt;p&gt;Blokkadelijst heeft nu %Ln regels.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Blokkadelijst updaten&lt;/b&gt;&lt;p&gt;Nieuwe blokkadelijst ontvangen...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Blokkadelijst</translation>
     </message>
@@ -1898,7 +1880,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Ontvang &amp;automatische updates</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Sta versleuteling toe</translation>
     </message>
@@ -2019,7 +2001,17 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2054,12 +2046,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>&amp;Speel een geluid af als torrents klaar zijn</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>TCP-poort testen...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Peerlimieten</translation>
     </message>
@@ -2099,7 +2086,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Versleuteling</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Selecteer map voor onvoltooide torrents</translation>
     </message>
@@ -2108,8 +2095,21 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <source>Select Watch Directory</source>
         <translation>Selecteer een map om in de gaten te houden</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Selecteer bestemming</translation>
     </message>
@@ -2178,7 +2178,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Ongeldige optie</translation>
     </message>
@@ -2573,13 +2573,13 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>In de wachtrij gezet om naar meer peers te vragen</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Vraagt nu om meer peers... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2609,7 +2609,13 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Scrape-foutmelding %1‘%2%3’ %4 geleden</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Om peeraantallen vragen over %1</translation>
@@ -2618,12 +2624,6 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>In de wachtrij gezet om naar peeraantallen te vragen</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Vraagt nu om peeraantallen... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

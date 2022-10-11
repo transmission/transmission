@@ -44,7 +44,7 @@ enum
     ADDED_F_ENCRYPTION_FLAG = 1,
     /* true if the peer is a seed or partial seed */
     ADDED_F_SEED_FLAG = 2,
-    /* true if the peer supports uTP */
+    /* true if the peer supports µTP */
     ADDED_F_UTP_FLAGS = 4,
     /* true if the peer has holepunch support */
     ADDED_F_HOLEPUNCH = 8,
