@@ -122,7 +122,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     if (error != nullptr)
     {
         tor->setLocalError(fmt::format(
-            _("Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"),
+            _("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"),
             fmt::arg("path", filename),
             fmt::arg("magnet", tor->magnet()),
             fmt::arg("error", error->message),

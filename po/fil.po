@@ -2361,7 +2361,7 @@ msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
 #: ../libtransmission/torrent.cc:125
-msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
+msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr ""
 
 #: ../libtransmission/torrent.cc:483

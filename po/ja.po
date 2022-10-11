@@ -2328,8 +2328,8 @@ msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "トレントファイルを移行「{old_path}」から「{path}」へ"
 
 #: ../libtransmission/torrent.cc:125
-msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr "以下からのメタ情報を使用できません「{path}」。「{magnet}」用のメタ情報です: {error} ({error_code})"
+msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
+msgstr ""
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2501,6 +2501,9 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
+
+#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
+#~ msgstr "以下からのメタ情報を使用できません「{path}」。「{magnet}」用のメタ情報です: {error} ({error_code})"
 
 #~ msgid "Critical"
 #~ msgstr "致命的"

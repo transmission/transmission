@@ -2405,8 +2405,8 @@ msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "A torrentfájl átköltöztetve innen: „{old_path}”, ide: „{path}”"
 
 #: ../libtransmission/torrent.cc:125
-msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr "A(z) „{magnet}” metainformációi nem kérhetők le a(z) „{path}” helyről: {error} ({error_code})"
+msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
+msgstr ""
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2584,6 +2584,9 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
+
+#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
+#~ msgstr "A(z) „{magnet}” metainformációi nem kérhetők le a(z) „{path}” helyről: {error} ({error_code})"
 
 #~ msgid "Critical"
 #~ msgstr "Kritikus"

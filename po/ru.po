@@ -2462,8 +2462,8 @@ msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Торрент-файл перенесен из \"{old_path}\" в \"{path}\""
 
 #: ../libtransmission/torrent.cc:125
-msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr "Не удалось использовать метаинформацию из «{path}» для «{magnet}»: {error} ({error_code})"
+msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
+msgstr ""
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2653,6 +2653,9 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
+
+#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
+#~ msgstr "Не удалось использовать метаинформацию из «{path}» для «{magnet}»: {error} ({error_code})"
 
 #~ msgid "Critical"
 #~ msgstr "Критический"

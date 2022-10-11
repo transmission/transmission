@@ -2383,8 +2383,8 @@ msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Torrent-fitxategia '{old_path}' bidetik '{path}' bidera migratu da"
 
 #: ../libtransmission/torrent.cc:125
-msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr "Ezin izan dira  '{path}'(e)ko metadatuak '{magnet}'(e)rako erabili: {error} ({error_code})"
+msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
+msgstr ""
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2562,6 +2562,9 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
+
+#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
+#~ msgstr "Ezin izan dira  '{path}'(e)ko metadatuak '{magnet}'(e)rako erabili: {error} ({error_code})"
 
 #~ msgid "Critical"
 #~ msgstr "Kritikoa"

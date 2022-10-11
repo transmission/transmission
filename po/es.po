@@ -2496,8 +2496,8 @@ msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Migrado archivo torrent de «{old_path}» a «{path}»"
 
 #: ../libtransmission/torrent.cc:125
-msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr "No se pudo usar metainfo desde «{path}» para «{magnet}»: {error} ({error_code})"
+msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
+msgstr ""
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2681,6 +2681,9 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
+
+#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
+#~ msgstr "No se pudo usar metainfo desde «{path}» para «{magnet}»: {error} ({error_code})"
 
 #~ msgid "Critical"
 #~ msgstr "Crítico"
