@@ -920,8 +920,6 @@ public:
 
     struct tr_peerMgr* peerMgr = nullptr;
 
-    std::unique_ptr<tr_lpd> lpd_;
-
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
@@ -1045,6 +1043,8 @@ private:
     std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
 
     LpdMediator lpd_mediator_{ *this };
+
+    std::unique_ptr<tr_lpd> lpd_;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
