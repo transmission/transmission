@@ -1756,12 +1756,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+59"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+95"/>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>Виберіть сценарій «Завантаження торрента завершено».</translation>
     </message>
@@ -1890,17 +1885,8 @@ To add another primary URL, add it after a blank line.</source>
         <source>Maximum peers &amp;overall:</source>
         <translation>Макс. кількість вузлів &amp;взагалі:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;список блокувань тепер містить %Ln правило.</numerusform>
-            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;список блокувань тепер містить %Ln правила.</numerusform>
-            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;список блокувань тепер містить %Ln правил.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Список блокувань</translation>
     </message>
@@ -1910,7 +1896,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Увімкнути &amp;автоматичне оновлення</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+26"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Дозволити шифрування</translation>
     </message>
@@ -2125,8 +2111,22 @@ To add another primary URL, add it after a blank line.</source>
         <source>Select Watch Directory</source>
         <translation>Обрати теку для спостереження</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Виберіть призначення</translation>
     </message>

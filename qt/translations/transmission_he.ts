@@ -1743,12 +1743,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+59"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+95"/>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>בחירת סקריפט „סיום הורדת טורנט”</translation>
     </message>
@@ -1874,16 +1869,8 @@ To add another primary URL, add it after a blank line.</source>
         <source>Maximum peers &amp;overall:</source>
         <translation>כמות עמיתים &amp;כוללת:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;העדכון צלח!&lt;/b&gt;&lt;p&gt;ברשימת החסימה יש כעת כלל אחד.</numerusform>
-            <numerusform>&lt;b&gt;העדכונים צלחו!12&lt;/b&gt; &lt;p&gt;ברשימת החסימה יש כעת %Ln כללים.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>רשימת חסימה</translation>
     </message>
@@ -1893,7 +1880,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הפעלת עדכונים &amp;אוטומטיים</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+26"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>אפשור הצפנה</translation>
     </message>
@@ -2108,8 +2095,21 @@ To add another primary URL, add it after a blank line.</source>
         <source>Select Watch Directory</source>
         <translation>בחירת מחיצת מעקב</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>בחירת יעד</translation>
     </message>

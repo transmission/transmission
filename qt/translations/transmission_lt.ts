@@ -1756,12 +1756,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+59"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+95"/>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1890,17 +1885,8 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <source>Maximum peers &amp;overall:</source>
         <translation>&amp;Daugiausiai galimų siuntėjų iš viso:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklė.</numerusform>
-            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklės.</numerusform>
-            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklių.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Blokavimo sąrašas</translation>
     </message>
@@ -1910,7 +1896,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Įjungti &amp;automatinius naujinimus</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+26"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>leisti šifravimą</translation>
     </message>
@@ -2125,8 +2111,22 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <source>Select Watch Directory</source>
         <translation>Parinkite stebimą aplanką</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Parinkite paskirties aplanką</translation>
     </message>

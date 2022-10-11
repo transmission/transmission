@@ -1743,12 +1743,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+59"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+95"/>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>Valitse &quot;Torrentin lataus valmis&quot; -komentosarja</translation>
     </message>
@@ -1874,16 +1869,8 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <source>Maximum peers &amp;overall:</source>
         <translation>Enimmäismäärä &amp;vertaisille:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Päivitys valmistui!&lt;/b&gt;&lt;p&gt;Estolista sisältää nyt %Ln säännön.</numerusform>
-            <numerusform>&lt;b&gt;Päivitys onnistui!&lt;/b&gt;&lt;p&gt;Estolista sisältää nyt %Ln sääntöä.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Estolista</translation>
     </message>
@@ -1893,7 +1880,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Ota &amp;automaattiset päivitykset käyttöön</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+26"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Salli salaus</translation>
     </message>
@@ -2108,8 +2095,21 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <source>Select Watch Directory</source>
         <translation>Valitse tarkkailtava kansio</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Valitse kohde</translation>
     </message>
