@@ -632,8 +632,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>Nimeä uudelleen...</translation>
+        <source>Rename…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -686,8 +686,8 @@
     </message>
     <message>
         <location line="+11"/>
-        <source>Search...</source>
-        <translation>Etsi...</translation>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Lasketaan vapaata tilaa...&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -868,12 +868,7 @@
         <translation>&amp;Tiedosto</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Uusi...</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Luo uusi torrent</translation>
     </message>
@@ -909,8 +904,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;Avaa...</translation>
+        <source>&amp;Open…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -923,7 +918,12 @@
         <translation>Avaa torrent</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Avaa hake&amp;misto</translation>
     </message>
@@ -1160,32 +1160,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>&amp;Vaihda istuntoa...</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Valitse istunto</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Aseta &amp;sijainti...</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>&amp;Kopioi Magnet-linkki leikepöydälle</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>Avaa &amp;URL...</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Lahjoita</translation>
     </message>
@@ -1738,7 +1738,17 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Portti on &lt;b&gt;kiinni&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+59"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+95"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>Valitse &quot;Torrentin lataus valmis&quot; -komentosarja</translation>
     </message>
@@ -1873,11 +1883,6 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         </translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Päivitä estolista&lt;/b&gt;&lt;p&gt;Noudetaan uutta estolistaa...</translation>
-    </message>
-    <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
         <source>Blocklist</source>
         <translation>Estolista</translation>
@@ -1888,7 +1893,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Ota &amp;automaattiset päivitykset käyttöön</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="+26"/>
         <source>Allow encryption</source>
         <translation>Salli salaus</translation>
     </message>
@@ -2054,12 +2059,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Toista &amp;ääni, kun torrent valmistuu</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>Testataan TCP-porttia...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Vertaisten rajoitukset</translation>
     </message>
@@ -2099,7 +2099,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Salaus</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Valitse keskeneräisten kansio</translation>
     </message>
@@ -2573,13 +2573,13 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Laitettu jonoon lisävertaisten kysymistä varten</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Kysytään lisää vertaisia nyt... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2609,7 +2609,13 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <translation>Sai tähtäinvirheen %1&quot;%2&quot;%3 %4 sitten</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Vertaismäärien pyytäminen %1</translation>
@@ -2618,12 +2624,6 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>Jonossa vertaismäärien pyytämiseksi</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Kysytään vertaislukumäärää nyt... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

@@ -636,8 +636,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>Zmień nazwę…</translation>
+        <source>Rename…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -690,8 +690,8 @@
     </message>
     <message>
         <location line="+11"/>
-        <source>Search...</source>
-        <translation>Wyszukaj…</translation>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -826,8 +826,8 @@
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Obliczanie wolnego miejsca…&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -876,12 +876,7 @@
         <translation>&amp;Plik</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Nowy…</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Tworzy nowy torrent</translation>
     </message>
@@ -917,8 +912,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;Otwórz…</translation>
+        <source>&amp;Open…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -931,7 +926,12 @@
         <translation>Otwiera torrent</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Otwórz &amp;katalog</translation>
     </message>
@@ -1168,32 +1168,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>&amp;Zmień sesję…</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Wybierz sesję</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Ustaw p&amp;ołożenie…</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Skopiuj odnośnik &amp;magnet do schowka</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>Otwórz adres &amp;URL…</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Wsparcie finansowe</translation>
     </message>
@@ -1751,7 +1751,17 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Port jest &lt;b&gt;zamknięty&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+59"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+95"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>Wybór skryptu „Ukończono pobieranie torrenta”</translation>
     </message>
@@ -1890,11 +1900,6 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         </translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Aktualizacja listy blokowania&lt;/b&gt;&lt;p&gt;Pobieranie nowej listy blokowania…</translation>
-    </message>
-    <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
         <source>Blocklist</source>
         <translation>Lista blokowania</translation>
@@ -1905,7 +1910,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>&amp;Automatyczne aktualizowanie</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="+26"/>
         <source>Allow encryption</source>
         <translation>Zezwolenie</translation>
     </message>
@@ -2071,12 +2076,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>&amp;Dźwięk po ukończeniu torrenta</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>Testowanie portu TCP…</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Ograniczenia partnerów</translation>
     </message>
@@ -2116,7 +2116,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Szyfrowanie</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Wybór katalogu na nieukończone torrenty</translation>
     </message>
@@ -2600,13 +2600,13 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>W&#xa0;kolejce do wysłania zapytania o&#xa0;więcej partnerów</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Wysyłanie zapytania o&#xa0;więcej partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2638,7 +2638,13 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Otrzymano błąd „scrape” %1„%2”%3 %4 temu</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Wysyłanie zapytania o&#xa0;liczbę partnerów za %1</translation>
@@ -2647,12 +2653,6 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>W&#xa0;kolejce do wysłania zapytania o&#xa0;liczbę partnerów</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Wysyłanie zapytania o&#xa0;liczbę partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

@@ -252,7 +252,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
         case TR_TRACKER_ACTIVE:
             str += QStringLiteral("<br/>\n");
             //: %1 is duration
-            str += tr("Asking for more peers now... <small>%1</small>").arg(time_since(inf.st.last_announce_start_time));
+            str += tr("Asking for more peers now… <small>%1</small>").arg(time_since(inf.st.last_announce_start_time));
             break;
         }
 
@@ -319,7 +319,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
         case TR_TRACKER_ACTIVE:
             str += QStringLiteral("<br/>\n");
             //: %1 is duration
-            str += tr("Asking for peer counts now... <small>%1</small>").arg(time_since(inf.st.last_scrape_start_time));
+            str += tr("Asking for peer counts now… <small>%1</small>").arg(time_since(inf.st.last_scrape_start_time));
             break;
         }
     }
