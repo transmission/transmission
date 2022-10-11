@@ -543,38 +543,10 @@ public:
         void rebind_ipv6(bool);
     };
 
-    std::unique_ptr<tr_udp_core> udp_core_;
-
-    /* The open port on the local machine for incoming peer requests */
-    tr_port private_peer_port;
-
-    /**
-     * The open port on the public device for incoming peer requests.
-     * This is usually the same as private_peer_port but can differ
-     * if the public device is a router and it decides to use a different
-     * port than the one requested by Transmission.
-     */
-    tr_port public_peer_port;
-
     [[nodiscard]] constexpr auto peerPort() const noexcept
     {
         return public_peer_port;
     }
-
-    struct tr_peerMgr* peerMgr = nullptr;
-
-    std::unique_ptr<tr_lpd> lpd_;
-
-    struct tr_announcer* announcer = nullptr;
-    struct tr_announcer_udp* announcer_udp = nullptr;
-
-    // monitors the "global pool" speeds
-    tr_bandwidth top_bandwidth_;
-
-    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
-    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
-    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
@@ -932,6 +904,38 @@ private:
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int bytes_per_second);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
+public:
+    std::unique_ptr<tr_udp_core> udp_core_;
+
+    /* The open port on the local machine for incoming peer requests */
+    tr_port private_peer_port;
+
+    /**
+     * The open port on the public device for incoming peer requests.
+     * This is usually the same as private_peer_port but can differ
+     * if the public device is a router and it decides to use a different
+     * port than the one requested by Transmission.
+     */
+    tr_port public_peer_port;
+
+    struct tr_peerMgr* peerMgr = nullptr;
+
+    std::unique_ptr<tr_lpd> lpd_;
+
+    struct tr_announcer* announcer = nullptr;
+    struct tr_announcer_udp* announcer_udp = nullptr;
+
+    // monitors the "global pool" speeds
+    tr_bandwidth top_bandwidth_;
+
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
+
+    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
+    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
+
+private:
+    /// const fields
+
     std::string const config_dir_;
     std::string const resume_dir_;
     std::string const torrent_dir_;
@@ -940,19 +944,7 @@ private:
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    std::unique_ptr<libtransmission::Timer> now_timer_;
-
-    std::unique_ptr<libtransmission::Timer> save_timer_;
-
-    static std::recursive_mutex session_mutex_;
-
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
-
-    std::unique_ptr<tr_rpc_server> rpc_server_;
-
-    tr_announce_list default_trackers_;
-
-    tr_session_id session_id_;
+    /// trivial fields
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
@@ -1011,21 +1003,11 @@ private:
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
 
-    PortForwardingMediator port_forwarding_mediator_{ *this };
-    std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
+    /// fields that are nontrivial but don't have dependencies
 
-    WebMediator web_mediator_{ this };
-    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
+    std::unique_ptr<libtransmission::Timer> now_timer_;
 
-    LpdMediator lpd_mediator_{ *this };
-
-    tr_torrents torrents_;
-
-    std::unique_ptr<Cache> cache_ = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
-
-    std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
-
-    std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
+    std::unique_ptr<libtransmission::Timer> save_timer_;
 
     std::string download_dir_;
     std::string incomplete_dir_;
@@ -1034,9 +1016,39 @@ private:
     std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
 
+    static std::recursive_mutex session_mutex_;
+
+    tr_announce_list default_trackers_;
+
     tr_stats session_stats_{ config_dir_, time(nullptr) };
 
     std::optional<tr_address> external_ip_;
+
+    tr_session_id session_id_;
+
+    ///
+
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+
+    tr_torrents torrents_;
+
+    tr_open_files open_files_;
+
+    std::unique_ptr<Cache> cache_ = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
+
+    std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
+
+    PortForwardingMediator port_forwarding_mediator_{ *this };
+    std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
+
+    WebMediator web_mediator_{ this };
+    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
+
+    LpdMediator lpd_mediator_{ *this };
+
+    std::unique_ptr<tr_rpc_server> rpc_server_;
+
+    std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
     queue_start_callback_t queue_start_callback_ = nullptr;
     void* queue_start_user_data_ = nullptr;
@@ -1056,8 +1068,6 @@ private:
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
-
-    tr_open_files open_files_;
 
     std::string announce_ip_;
     bool announce_ip_enabled_ = false;
