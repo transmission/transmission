@@ -230,12 +230,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation>Lisää yksi tai useampi URL-osoite</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>Lisää jäljitin ilmoittamaan URL-osoitteet, yksi riviä kohti:</translation>
     </message>
@@ -279,7 +274,12 @@
         <translation>Ei saatavilla</translation>
     </message>
     <message>
-        <location line="+488"/>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+97"/>
         <source>High</source>
         <translation>Korkea</translation>
     </message>

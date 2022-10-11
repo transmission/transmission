@@ -230,12 +230,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation>Ajouter une ou des URL</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>Ajouter une URL d’annonce de traceur, une par ligne&#xa0;:</translation>
     </message>
@@ -279,7 +274,12 @@
         <translation>N/D</translation>
     </message>
     <message>
-        <location line="+488"/>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+97"/>
         <source>High</source>
         <translation>Élevée</translation>
     </message>

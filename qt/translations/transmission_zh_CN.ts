@@ -226,12 +226,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation>添加链接 </translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>添加 Tracker 通告链接，每个一行:</translation>
     </message>
@@ -275,7 +270,12 @@
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="+488"/>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+97"/>
         <source>High</source>
         <translation>高</translation>
     </message>

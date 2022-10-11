@@ -1343,7 +1343,7 @@ void DetailsDialog::onAddTrackerClicked()
 
     QString const text = QInputDialog::getMultiLineText(
         this,
-        tr("Add URL(s) "),
+        tr("Add URL(s)"),
         tr("Add tracker announce URLs, one per line:"),
         {},
         &ok);
