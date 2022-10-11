@@ -580,7 +580,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "検証中"
 
-#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:450
+#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52
 msgid "Error"
 msgstr "エラー"
 
@@ -710,25 +710,35 @@ msgstr "メッセージ"
 msgid "Time"
 msgstr "時間"
 
-#: ../gtk/MessageLogWindow.cc:449
+#: ../gtk/MessageLogWindow.cc:450
+msgctxt "Logging level"
 msgid "Critical"
-msgstr "致命的"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:451
-msgid "Warning"
-msgstr "警告"
+msgctxt "Logging level"
+msgid "Error"
+msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:452 ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
-msgid "Information"
-msgstr "情報"
+#: ../gtk/MessageLogWindow.cc:452
+msgctxt "Logging level"
+msgid "Warning"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:453
-msgid "Debug"
-msgstr "デバッグ"
+msgctxt "Logging level"
+msgid "Information"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:454
+msgctxt "Logging level"
+msgid "Debug"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:455
+msgctxt "Logging level"
 msgid "Trace"
-msgstr "トレース"
+msgstr ""
 
 #: ../gtk/Notify.cc:199
 msgid "Open File"
@@ -1494,6 +1504,10 @@ msgstr "追加日時:"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
 msgstr "コメント:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
+msgid "Information"
+msgstr "情報"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
 msgid "Show _more details"
@@ -2488,8 +2502,20 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
 
+#~ msgid "Critical"
+#~ msgstr "致命的"
+
+#~ msgid "Debug"
+#~ msgstr "デバッグ"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "オプション・ダイアログを表示(_O)"
+
+#~ msgid "Trace"
+#~ msgstr "トレース"
+
+#~ msgid "Warning"
+#~ msgstr "警告"
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

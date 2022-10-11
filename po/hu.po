@@ -629,7 +629,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Ellenőrzés"
 
-#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:450
+#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52
 msgid "Error"
 msgstr "Hiba"
 
@@ -759,25 +759,35 @@ msgstr "Üzenet"
 msgid "Time"
 msgstr "Idő"
 
-#: ../gtk/MessageLogWindow.cc:449
+#: ../gtk/MessageLogWindow.cc:450
+msgctxt "Logging level"
 msgid "Critical"
-msgstr "Kritikus"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:451
-msgid "Warning"
-msgstr "Figyelmeztetés"
+msgctxt "Logging level"
+msgid "Error"
+msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:452 ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
-msgid "Information"
-msgstr "Információ"
+#: ../gtk/MessageLogWindow.cc:452
+msgctxt "Logging level"
+msgid "Warning"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:453
-msgid "Debug"
-msgstr "Hibakeresés"
+msgctxt "Logging level"
+msgid "Information"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:454
+msgctxt "Logging level"
+msgid "Debug"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:455
+msgctxt "Logging level"
 msgid "Trace"
-msgstr "Nyomkövetés"
+msgstr ""
 
 #: ../gtk/Notify.cc:199
 msgid "Open File"
@@ -1566,6 +1576,10 @@ msgstr "Hozzáadva:"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
 msgstr "Megjegyzés:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
+msgid "Information"
+msgstr "Információ"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
 msgid "Show _more details"
@@ -2571,5 +2585,17 @@ msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
 
+#~ msgid "Critical"
+#~ msgstr "Kritikus"
+
+#~ msgid "Debug"
+#~ msgstr "Hibakeresés"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "_Beállítások ablak megjelenítése"
+
+#~ msgid "Trace"
+#~ msgstr "Nyomkövetés"
+
+#~ msgid "Warning"
+#~ msgstr "Figyelmeztetés"

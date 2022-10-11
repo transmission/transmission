@@ -618,7 +618,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Tarkistetaan"
 
-#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:450
+#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52
 msgid "Error"
 msgstr "Virhe"
 
@@ -748,25 +748,35 @@ msgstr "Viesti"
 msgid "Time"
 msgstr "Aika"
 
-#: ../gtk/MessageLogWindow.cc:449
+#: ../gtk/MessageLogWindow.cc:450
+msgctxt "Logging level"
 msgid "Critical"
-msgstr "Kriittinen"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:451
-msgid "Warning"
-msgstr "Varoitus"
+msgctxt "Logging level"
+msgid "Error"
+msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:452 ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
-msgid "Information"
-msgstr "Tiedot"
+#: ../gtk/MessageLogWindow.cc:452
+msgctxt "Logging level"
+msgid "Warning"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:453
-msgid "Debug"
-msgstr "Virheenkorjaus"
+msgctxt "Logging level"
+msgid "Information"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:454
+msgctxt "Logging level"
+msgid "Debug"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:455
+msgctxt "Logging level"
 msgid "Trace"
-msgstr "Jäljitä"
+msgstr ""
 
 #: ../gtk/Notify.cc:199
 msgid "Open File"
@@ -1555,6 +1565,10 @@ msgstr "Lisätty:"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
 msgstr "Kommentti:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
+msgid "Information"
+msgstr "Tiedot"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
 msgid "Show _more details"
@@ -2560,8 +2574,20 @@ msgid_plural "days"
 msgstr[0] "päivä"
 msgstr[1] "päivää"
 
+#~ msgid "Critical"
+#~ msgstr "Kriittinen"
+
+#~ msgid "Debug"
+#~ msgstr "Virheenkorjaus"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "Näytä _asetukset-valintaikkuna"
+
+#~ msgid "Trace"
+#~ msgstr "Jäljitä"
+
+#~ msgid "Warning"
+#~ msgstr "Varoitus"
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

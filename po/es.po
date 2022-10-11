@@ -692,7 +692,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Verificado"
 
-#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:450
+#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52
 msgid "Error"
 msgstr "Error"
 
@@ -822,25 +822,35 @@ msgstr "Mensaje"
 msgid "Time"
 msgstr "Hora"
 
-#: ../gtk/MessageLogWindow.cc:449
+#: ../gtk/MessageLogWindow.cc:450
+msgctxt "Logging level"
 msgid "Critical"
-msgstr "Crítico"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:451
-msgid "Warning"
-msgstr "Advertencia"
+msgctxt "Logging level"
+msgid "Error"
+msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:452 ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
-msgid "Information"
-msgstr "Información"
+#: ../gtk/MessageLogWindow.cc:452
+msgctxt "Logging level"
+msgid "Warning"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:453
-msgid "Debug"
-msgstr "Depuración"
+msgctxt "Logging level"
+msgid "Information"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:454
+msgctxt "Logging level"
+msgid "Debug"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:455
+msgctxt "Logging level"
 msgid "Trace"
-msgstr "Traza"
+msgstr ""
 
 #: ../gtk/Notify.cc:199
 msgid "Open File"
@@ -1652,6 +1662,10 @@ msgstr "Añadidos:"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
 msgstr "Comentario:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
+msgid "Information"
+msgstr "Información"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
 msgid "Show _more details"
@@ -2668,8 +2682,20 @@ msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
 
+#~ msgid "Critical"
+#~ msgstr "Crítico"
+
+#~ msgid "Debug"
+#~ msgstr "Depuración"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "Mostrar el diálogo de _opciones"
+
+#~ msgid "Trace"
+#~ msgstr "Traza"
+
+#~ msgid "Warning"
+#~ msgstr "Advertencia"
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

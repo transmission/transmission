@@ -667,7 +667,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Sprawdzanie"
 
-#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:450
+#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52
 msgid "Error"
 msgstr "Błąd"
 
@@ -797,25 +797,35 @@ msgstr "Komunikat"
 msgid "Time"
 msgstr "Czas"
 
-#: ../gtk/MessageLogWindow.cc:449
+#: ../gtk/MessageLogWindow.cc:450
+msgctxt "Logging level"
 msgid "Critical"
-msgstr "Krytyczne"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:451
-msgid "Warning"
-msgstr "Ostrzeżenie"
+msgctxt "Logging level"
+msgid "Error"
+msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:452 ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
-msgid "Information"
-msgstr "Informacje"
+#: ../gtk/MessageLogWindow.cc:452
+msgctxt "Logging level"
+msgid "Warning"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:453
-msgid "Debug"
-msgstr "Debugowanie"
+msgctxt "Logging level"
+msgid "Information"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:454
+msgctxt "Logging level"
+msgid "Debug"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:455
+msgctxt "Logging level"
 msgid "Trace"
-msgstr "Śledzenie"
+msgstr ""
 
 #: ../gtk/Notify.cc:199
 msgid "Open File"
@@ -1650,6 +1660,10 @@ msgstr "Dodano:"
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
 msgstr "Komentarz:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
+msgid "Information"
+msgstr "Informacje"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
 msgid "Show _more details"
@@ -2677,8 +2691,20 @@ msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
 
+#~ msgid "Critical"
+#~ msgstr "Krytyczne"
+
+#~ msgid "Debug"
+#~ msgstr "Debugowanie"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "_Okno opcji"
+
+#~ msgid "Trace"
+#~ msgstr "Śledzenie"
+
+#~ msgid "Warning"
+#~ msgstr "Ostrzeżenie"
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"
