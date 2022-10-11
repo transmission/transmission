@@ -1939,12 +1939,12 @@ msgid "Maximum peers _overall:"
 msgstr "Μέγιστος αριθμός ομότιμων χρηστών _συνολικά:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Ενεργοποίηση _uTP για την επικοινωνία χρηστών"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "Το uTP είναι ένα εργαλείο για τη μείωση της συμφόρησης του δικτύου."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2899,6 +2899,9 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Λήψη μεταδεδομένων από %1$'d %2$s (έγινε %3$d%%)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Ενεργοποίηση _uTP για την επικοινωνία χρηστών"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Σφάλμα κατά το άνοιγμα του torrent"
 
@@ -3192,6 +3195,9 @@ msgstr[1] ""
 
 #~ msgid "sparse"
 #~ msgstr "sparse"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "Το uTP είναι ένα εργαλείο για τη μείωση της συμφόρησης του δικτύου."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

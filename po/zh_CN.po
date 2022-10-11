@@ -1918,12 +1918,12 @@ msgid "Maximum peers _overall:"
 msgstr "全局最大用户数(_O)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "为用户通信启用 µTP"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "µTP 是一个用于减少网络拥堵的工具。"
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2552,6 +2552,9 @@ msgstr[0] "天"
 #~ msgid "Debug"
 #~ msgstr "调试"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "为用户通信启用 µTP"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "显示选项对话框(_O)"
 
@@ -2560,6 +2563,9 @@ msgstr[0] "天"
 
 #~ msgid "Warning"
 #~ msgstr "警告"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "µTP 是一个用于减少网络拥堵的工具。"
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

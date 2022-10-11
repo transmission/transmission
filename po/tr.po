@@ -1910,12 +1910,12 @@ msgid "Maximum peers _overall:"
 msgstr "_Genel azami eş sayısı:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Eş iletişimi için _uTP'yi etkinleştir"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP, ağ tıkanıklığını azaltmaya yarayan araçtır."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2870,6 +2870,9 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Üstveri %1$'d %2$s üzerinden indiriliyor (%3$d%% tamamlandı)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Eş iletişimi için _uTP'yi etkinleştir"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Torrenti açmada hata"
 
@@ -3163,6 +3166,9 @@ msgstr[1] ""
 
 #~ msgid "sparse"
 #~ msgstr "seyrek"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP, ağ tıkanıklığını azaltmaya yarayan araçtır."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

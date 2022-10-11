@@ -1924,12 +1924,12 @@ msgid "Maximum peers _overall:"
 msgstr "Gehienezko kide-kopurua _guztira:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Gaitu _µTP kideen komunikaziorako"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "µTP sarearen buxadura murrizteko tresna bat da."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2569,6 +2569,9 @@ msgstr[1] "egun"
 #~ msgid "Debug"
 #~ msgstr "Araztu"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Gaitu _µTP kideen komunikaziorako"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "Erakutsi au_keren koadroa"
 
@@ -2577,6 +2580,9 @@ msgstr[1] "egun"
 
 #~ msgid "Warning"
 #~ msgstr "Oharra"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "µTP sarearen buxadura murrizteko tresna bat da."
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

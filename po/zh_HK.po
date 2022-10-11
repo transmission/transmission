@@ -1873,12 +1873,12 @@ msgid "Maximum peers _overall:"
 msgstr "總共最大連接用戶數(_O)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "啟用 _uTP 作為用戶溝通之用"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP 是個用來降低網絡壅塞的工具。"
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2755,6 +2755,9 @@ msgstr[0] ""
 #~ msgid "Down: %1$s, Up: %2$s"
 #~ msgstr "下載：%1$s，上傳：%2$s"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "啟用 _uTP 作為用戶溝通之用"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "開啟 torrent 時發生錯誤"
 
@@ -3034,3 +3037,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "大小|下載：%1$s，上傳：%2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP 是個用來降低網絡壅塞的工具。"

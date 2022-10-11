@@ -1930,12 +1930,12 @@ msgid "Maximum peers _overall:"
 msgstr "Maximalt antal jämlikar t_otalt:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Aktivera _uTP för jämlikeanslutningar"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP är ett verktyg för att minska trafikstockning i nätverk."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2575,6 +2575,9 @@ msgstr[1] "dagar"
 #~ msgid "Debug"
 #~ msgstr "Felsökning"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Aktivera _uTP för jämlikeanslutningar"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "Visa dialog för _alternativ"
 
@@ -2583,6 +2586,9 @@ msgstr[1] "dagar"
 
 #~ msgid "Warning"
 #~ msgstr "Varning"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP är ett verktyg för att minska trafikstockning i nätverk."
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

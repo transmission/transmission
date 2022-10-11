@@ -1913,12 +1913,12 @@ msgid "Maximum peers _overall:"
 msgstr "সামগ্রিক সর্বোচ্চ পিয়ার (_o):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "পিয়ার যোগাযোগের জন্য uTP সক্রিয় করুন (_u):"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP নেটওয়ার্ক পূর্ণতা কমানোর জন্য একটি টুল।"
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2816,6 +2816,9 @@ msgstr[1] ""
 #~ msgid "Down: %1$s, Up: %2$s"
 #~ msgstr "নিচে: %1$s, উপরে: %2$s"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "পিয়ার যোগাযোগের জন্য uTP সক্রিয় করুন (_u):"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "টরেন্ট খোলার সময় ত্রুটি হচ্ছে"
 
@@ -3097,3 +3100,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "আকার|নিচে: %1$s, উপরে: %2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP নেটওয়ার্ক পূর্ণতা কমানোর জন্য একটি টুল।"

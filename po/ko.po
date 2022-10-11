@@ -1886,12 +1886,12 @@ msgid "Maximum peers _overall:"
 msgstr "전체 최대 피어(_O):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "피어와 통신하는데 uTP를 사용(_U)"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP는 네트워크 혼잡을 줄여주는 도구입니다."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2826,6 +2826,9 @@ msgstr[0] ""
 #~ msgid "Down: %1$s, Up: %2$s"
 #~ msgstr "다운로드: %1$s, 업로드: %2$s"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "피어와 통신하는데 uTP를 사용(_U)"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "토렌트를 여는 중 오류"
 
@@ -3155,6 +3158,9 @@ msgstr[0] ""
 
 #~ msgid "sparse"
 #~ msgstr "부족"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP는 네트워크 혼잡을 줄여주는 도구입니다."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

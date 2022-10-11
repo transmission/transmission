@@ -1913,12 +1913,12 @@ msgid "Maximum peers _overall:"
 msgstr "कुल अधिकतम पीयर (_o):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "पीयर कनेक्शन हेतु uTP सक्रिय करें (_u)"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP - नेटवर्क संकुलन कम करने हेतु एक साधन है"
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2893,6 +2893,9 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "%1$'d %2$s से मेटाडाटा डाउनलोड जारी (%3$d%% पूर्ण)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "पीयर कनेक्शन हेतु uTP सक्रिय करें (_u)"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "टोरेंट खोलने में त्रुटि"
 
@@ -3198,6 +3201,9 @@ msgstr[1] ""
 
 #~ msgid "sparse"
 #~ msgstr "अल्प"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP - नेटवर्क संकुलन कम करने हेतु एक साधन है"
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

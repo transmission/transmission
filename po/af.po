@@ -1912,12 +1912,12 @@ msgid "Maximum peers _overall:"
 msgstr "_Algehele maksimum eweknieë:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Aktiveer _uTP vir ewekniekommunikasie"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP is ’n nutsmiddel wat netwerkophoping verminder."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2904,6 +2904,9 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Laai tans metadata af van %1$'d %2$s (%3$d%% klaar)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Aktiveer _uTP vir ewekniekommunikasie"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Fout met oopmaak van torrent"
 
@@ -3252,6 +3255,9 @@ msgstr[1] ""
 
 #~ msgid "sparse"
 #~ msgstr "yl"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP is ’n nutsmiddel wat netwerkophoping verminder."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

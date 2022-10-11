@@ -215,8 +215,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Likemann er en innkommende tilkobling</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+134"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -274,12 +279,7 @@
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Likemann tilkoblet over µTP</translation>
-    </message>
-    <message>
-        <location line="+262"/>
+        <location line="+488"/>
         <source>High</source>
         <translation>Høy</translation>
     </message>
@@ -1768,16 +1768,6 @@ For å legge til en primær URL, legg den til etter en tom linje.</translation>
         <source>Options</source>
         <translation>Alternativer</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Skru på &amp;uTP for likemannstilkoblinger</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP er et verktøy for å redusere overbelastning på nettverket.</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1802,7 +1792,7 @@ For å legge til en primær URL, legg den til etter en tom linje.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Automatisk legg til .torrent-filer &amp;fra:</translation>
     </message>
@@ -2019,7 +2009,17 @@ For å legge til en primær URL, legg den til etter en tom linje.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation type="unfinished"></translation>
     </message>

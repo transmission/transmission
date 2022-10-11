@@ -1874,12 +1874,12 @@ msgid "Maximum peers _overall:"
 msgstr "全体での最大ピア数(_O):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "ピア通信用の uTPを有効化(_U)"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP はネットワークの混雑を軽減するツールです。"
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2508,6 +2508,9 @@ msgstr[0] "日"
 #~ msgid "Debug"
 #~ msgstr "デバッグ"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "ピア通信用の uTPを有効化(_U)"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "オプション・ダイアログを表示(_O)"
 
@@ -2516,6 +2519,9 @@ msgstr[0] "日"
 
 #~ msgid "Warning"
 #~ msgstr "警告"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP はネットワークの混雑を軽減するツールです。"
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

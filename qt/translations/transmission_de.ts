@@ -215,8 +215,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Peer ist eine eingehende Verbindung</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+134"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -274,12 +279,7 @@
         <translation>Nicht verfügbar</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Peer ist über uTP verbunden</translation>
-    </message>
-    <message>
-        <location line="+262"/>
+        <location line="+488"/>
         <source>High</source>
         <translation>Hoch</translation>
     </message>
@@ -1768,16 +1768,6 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <source>Options</source>
         <translation>Optionen</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Aktiviere &amp;uTP für Peer-Verbindungen</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>Mit uTP lässt sich die Netzwerkauslastung reduzieren.</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1802,7 +1792,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Füge .Torrent-Dateien automatisch hinzu von:</translation>
     </message>
@@ -2019,7 +2009,17 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>Skrip&amp;t ausführen, wenn Torrent-Verteilung abgeschlossen ist:</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation>Standard öffentliche Tracker</translation>
     </message>

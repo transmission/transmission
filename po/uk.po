@@ -2013,12 +2013,12 @@ msgid "Maximum peers _overall:"
 msgstr "Макс. кількість вузлів _взагалі:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Увімкнути обмін д_аними за µTP"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "µTP — інструмент для запобігання перевантаженню мережі"
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2680,6 +2680,9 @@ msgstr[3] "дня"
 #~ msgid "Debug"
 #~ msgstr "Діагностика"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Увімкнути обмін д_аними за µTP"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "Показати вікно п_араметрів"
 
@@ -2688,3 +2691,6 @@ msgstr[3] "дня"
 
 #~ msgid "Warning"
 #~ msgstr "Попередження"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "µTP — інструмент для запобігання перевантаженню мережі"

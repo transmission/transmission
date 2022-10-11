@@ -1869,12 +1869,12 @@ msgid "Maximum peers _overall:"
 msgstr "Kese_luruhan rakan maksimum:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Benarkan _UTP untuk komunikasi rakan"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP ialah alat untuk mengurangkan kesesakan rangkaian."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2704,6 +2704,9 @@ msgstr[0] ""
 #~ msgid "Down: %1$s, Up: %2$s"
 #~ msgstr "Muat Turun: %1$s, Naik: %2$s"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Benarkan _UTP untuk komunikasi rakan"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Ralat membuka torrent"
 
@@ -2973,3 +2976,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "saiz|Muat Turun: %1$s, Muat Naik: %2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP ialah alat untuk mengurangkan kesesakan rangkaian."

@@ -2030,12 +2030,12 @@ msgid "Maximum peers _overall:"
 msgstr "_Maksymalna liczba partnerów:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Kom_unikacja z partnerami przez µTP"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "µTP umożliwia zmniejszenie przeciążenia sieci"
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2697,6 +2697,9 @@ msgstr[3] "dni"
 #~ msgid "Debug"
 #~ msgstr "Debugowanie"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Kom_unikacja z partnerami przez µTP"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "_Okno opcji"
 
@@ -2705,6 +2708,9 @@ msgstr[3] "dni"
 
 #~ msgid "Warning"
 #~ msgstr "Ostrzeżenie"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "µTP umożliwia zmniejszenie przeciążenia sieci"
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

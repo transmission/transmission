@@ -1935,12 +1935,12 @@ msgid "Maximum peers _overall:"
 msgstr "Enimmäismäärä _vertaisille:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Käytä _uTP:tä vertaisliikenteeseen"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP on työkalu, jonka avulla vähennetään verkon ruuhkaa."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2580,6 +2580,9 @@ msgstr[1] "päivää"
 #~ msgid "Debug"
 #~ msgstr "Virheenkorjaus"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Käytä _uTP:tä vertaisliikenteeseen"
+
 #~ msgid "Show _options dialog"
 #~ msgstr "Näytä _asetukset-valintaikkuna"
 
@@ -2588,6 +2591,9 @@ msgstr[1] "päivää"
 
 #~ msgid "Warning"
 #~ msgstr "Varoitus"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP on työkalu, jonka avulla vähennetään verkon ruuhkaa."
 
 #~ msgid "{:d} files, {:s}\n"
 #~ msgid_plural "{:d} file, {:s}\n"

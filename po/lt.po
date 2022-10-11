@@ -1996,12 +1996,12 @@ msgid "Maximum peers _overall:"
 msgstr "_Daugiausiai galimų siuntėjų iš viso:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Ryšiams su _siuntėjais naudoti µTP"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "µTP – tai priemonė, padedanti mažinti tinklo apkrovas."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2991,6 +2991,9 @@ msgstr[3] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Atsiunčiami metaduomenys iš %1$'d %2$s (%3$d%% atlikta)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Ryšiams su _siuntėjais naudoti µTP"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Klaida atveriant torentą"
 
@@ -3303,6 +3306,9 @@ msgstr[3] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "Ats.: %1$s, išs.: %2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "µTP – tai priemonė, padedanti mažinti tinklo apkrovas."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

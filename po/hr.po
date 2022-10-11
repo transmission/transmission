@@ -1953,12 +1953,12 @@ msgid "Maximum peers _overall:"
 msgstr "_Ukupno najviše točaka:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Omogući _uTP za povezivanje s točkama"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP je alat za smanjenje zagušenja mrežnog prometa."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2938,6 +2938,9 @@ msgstr[2] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Preuzimanje metapodataka s %1$'d %2$s (%3$d%% završeno)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Omogući _uTP za povezivanje s točkama"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Greška pri otvaranju torrenta"
 
@@ -3238,6 +3241,9 @@ msgstr[2] ""
 
 #~ msgid "sparse"
 #~ msgstr "djelomično"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP je alat za smanjenje zagušenja mrežnog prometa."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

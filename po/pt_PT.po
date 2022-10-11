@@ -1948,12 +1948,12 @@ msgid "Maximum peers _overall:"
 msgstr "Máximo _total de pares:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Ativar _uTP para comunicação de pares"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "O uTP é uma ferramenta para reduzir o congestionamento na rede."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2929,6 +2929,9 @@ msgstr[2] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "A descarregar metadados de %1$'d %2$s (%3$d%% feito)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Ativar _uTP para comunicação de pares"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Erro ao abrir o torrent"
 
@@ -3225,6 +3228,9 @@ msgstr[2] ""
 
 #~ msgid "sparse"
 #~ msgstr "escasso"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "O uTP é uma ferramenta para reduzir o congestionamento na rede."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

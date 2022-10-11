@@ -1920,12 +1920,12 @@ msgid "Maximum peers _overall:"
 msgstr "N_ombre màxim de clients:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Habilita _uTP per a la comunicació dels clients"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP és una eina per reduir la congestió de xarxa."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2900,6 +2900,9 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "S'estan baixant les metadades de %1$'d %2$s (%3$d%% fet)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Habilita _uTP per a la comunicació dels clients"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Error en obrir el torrent"
 
@@ -3218,6 +3221,9 @@ msgstr[1] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "Baixada: %1$s, Pujada: %2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP és una eina per reduir la congestió de xarxa."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

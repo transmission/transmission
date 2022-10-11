@@ -1953,12 +1953,12 @@ msgid "Maximum peers _overall:"
 msgstr "Највише парњака на _вези:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Омогући _u-ТП за комуницирање парњака"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "u-ТП је алат за смањење загушења мреже."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2966,6 +2966,9 @@ msgstr[2] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Преузимам мета-податке од %1$'d %2$s (%3$d%% завршено)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Омогући _u-ТП за комуницирање парњака"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Грешка отварања торента"
 
@@ -3317,6 +3320,9 @@ msgstr[2] ""
 
 #~ msgid "sparse"
 #~ msgstr "проређен"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "u-ТП је алат за смањење загушења мреже."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

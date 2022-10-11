@@ -1909,12 +1909,12 @@ msgid "Maximum peers _overall:"
 msgstr "టోరెంట్ల మొత్తానికి అత్యధిక పీర్ల సంఖ్య(_o):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "తోటివారితో అనుసంధానాల కోసం _uTP చేతనపరచండి"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP అనేది నెట్వర్క్ రద్దీ తగ్గించడానికి వాడే సాధనం."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2811,6 +2811,9 @@ msgstr[1] ""
 #~ msgid "Down: %1$s, Up: %2$s"
 #~ msgstr "క్రిందికి: %1$s, పైకి: %2$s"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "తోటివారితో అనుసంధానాల కోసం _uTP చేతనపరచండి"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "టోరెంటు తెరుచుటలో దోషం"
 
@@ -3077,3 +3080,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "పరిమాణం|కిందికి: %1$s, పైకి: %2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP అనేది నెట్వర్క్ రద్దీ తగ్గించడానికి వాడే సాధనం."

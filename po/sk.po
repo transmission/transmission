@@ -1995,12 +1995,12 @@ msgid "Maximum peers _overall:"
 msgstr "Maximálny počet _všetkých partnerov:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Povoliť _uTP pro komunikáciu s partnermi"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP je nástroj znižujúci zahltenie siete."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2946,6 +2946,9 @@ msgstr[3] ""
 #~ msgid "Down: %1$s, Up: %2$s"
 #~ msgstr "Stiahnuté: %1$s, Odoslané: %2$s"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Povoliť _uTP pro komunikáciu s partnermi"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Chyba pri otváraní torrentu"
 
@@ -3231,3 +3234,6 @@ msgstr[3] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "Prevzaté: %1$s, Odovzdané: %2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP je nástroj znižujúci zahltenie siete."

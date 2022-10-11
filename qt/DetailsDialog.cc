@@ -1178,7 +1178,7 @@ void DetailsDialog::refreshUI()
                     break;
 
                 case 'T':
-                    txt = tr("Peer is connected over uTP");
+                    txt = tr("Peer is connected over µTP");
                     break;
 
                 default:

@@ -1063,12 +1063,12 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 
     if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)
     {
-        // the peer probably doesn't speak uTP.
+        // the peer probably doesn't speak µTP.
 
         auto const hash = io->torrentHash();
         auto const info = hash ? handshake->mediator->torrentInfo(*hash) : std::nullopt;
 
-        /* Don't mark a peer as non-uTP unless it's really a connect failure. */
+        /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
         {
             handshake->mediator->setUTPFailed(*hash, io->address());

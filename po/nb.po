@@ -1923,12 +1923,12 @@ msgid "Maximum peers _overall:"
 msgstr "_Maksimalt antall nedlastere totalt:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Slå på _µTP for likemann-kommunikasjon"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "µTP er et verktøy som reduserer overbelastning på nettverket."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2915,6 +2915,9 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Laster ned metadata fra %1$'d %2$s (%3$d%% ferdig)"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Slå på _µTP for likemann-kommunikasjon"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Feil under åpning av torrent"
 
@@ -3263,6 +3266,9 @@ msgstr[1] ""
 
 #~ msgid "sparse"
 #~ msgstr "sparse"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "µTP er et verktøy som reduserer overbelastning på nettverket."
 
 #~ msgid "web seed"
 #~ msgid_plural "web seeds"

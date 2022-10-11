@@ -1875,12 +1875,12 @@ msgid "Maximum peers _overall:"
 msgstr "_Tổng số peer tối đa:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
-msgid "Enable _uTP for peer communication"
-msgstr "Bật _uTP cho phép các peer giao tiếp với nhau"
+msgid "Enable µ_TP for peer communication"
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP là một công cụ chống nghẽn mạng."
+msgid "µTP is a tool for reducing network congestion."
+msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
 msgid "Use PE_X to find more peers"
@@ -2737,6 +2737,9 @@ msgstr[0] ""
 #~ msgid "Done"
 #~ msgstr "Xong"
 
+#~ msgid "Enable _uTP for peer communication"
+#~ msgstr "Bật _uTP cho phép các peer giao tiếp với nhau"
+
 #~ msgid "Error opening torrent"
 #~ msgstr "Lỗi khi mở torrent"
 
@@ -3009,3 +3012,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
 #~ msgstr "cỡ|Xuống: %1$s, Lên: %2$s"
+
+#~ msgid "uTP is a tool for reducing network congestion."
+#~ msgstr "uTP là một công cụ chống nghẽn mạng."
