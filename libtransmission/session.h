@@ -551,13 +551,7 @@ public:
         return public_peer_port;
     }
 
-    constexpr auto setPeerPort(tr_port port) noexcept
-    {
-        public_peer_port = port;
-    }
-
     struct tr_peerMgr* peerMgr = nullptr;
-    std::unique_ptr<tr_port_forwarding> port_forwarding_;
 
     std::unique_ptr<Cache> cache;
 
@@ -872,9 +866,14 @@ private:
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
 
+    void onPeerPortChanged();
+    void setPeerPort(tr_port port);
+
     friend class libtransmission::test::SessionTest;
+
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
+    friend bool tr_sessionIsPortForwardingEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
     friend char const* tr_sessionGetRPCPassword(tr_session const* session);
@@ -883,6 +882,7 @@ private:
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
+    friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
@@ -903,8 +903,10 @@ private:
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
+    friend void tr_sessionSetPeerPort(tr_session* session, uint16_t hport);
     friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
@@ -988,6 +990,7 @@ private:
     bool is_incomplete_file_naming_enabled_ = false;
 
     PortForwardingMediator port_forwarding_mediator_{ *this };
+    std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);

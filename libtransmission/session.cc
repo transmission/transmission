@@ -731,8 +731,6 @@ void tr_session::initImpl(init_data& data)
 
     this->peerMgr = tr_peerMgrNew(this);
 
-    this->port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
-
     /**
     ***  Blocklist
     **/
@@ -762,7 +760,6 @@ void tr_session::initImpl(init_data& data)
 }
 
 static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
-static void setPeerPort(tr_session* session, tr_port port);
 
 void tr_session::setImpl(init_data& data)
 {
@@ -1001,7 +998,7 @@ void tr_session::setImpl(init_data& data)
             peer_port.setHost(static_cast<uint16_t>(port));
         }
 
-        ::setPeerPort(this, isPortRandom() ? randomPort() : peer_port);
+        setPeerPort(isPortRandom() ? randomPort() : peer_port);
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &val))
@@ -1250,38 +1247,36 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 ****  Peer Port
 ***/
 
-static void peerPortChanged(tr_session* const session)
+void tr_session::onPeerPortChanged()
 {
-    TR_ASSERT(session != nullptr);
+    close_incoming_peer_port(this);
 
-    close_incoming_peer_port(session);
-
-    if (session->allowsTCP())
+    if (allowsTCP())
     {
-        open_incoming_peer_port(session);
+        open_incoming_peer_port(this);
     }
 
-    session->port_forwarding_->portChanged();
+    port_forwarding_->portChanged();
 
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents())
     {
         tr_torrentChangeMyPort(tor);
     }
 }
 
-static void setPeerPort(tr_session* session, tr_port port)
+void tr_session::setPeerPort(tr_port port)
 {
-    session->private_peer_port = port;
-    session->public_peer_port = port;
+    this->private_peer_port = port;
+    this->public_peer_port = port;
 
-    tr_runInEventThread(session, peerPortChanged, session);
+    tr_runInEventThread(this, [this]() { onPeerPortChanged(); });
 }
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
     if (auto const port = tr_port::fromHost(hport); session != nullptr && session->private_peer_port != port)
     {
-        setPeerPort(session, port);
+        session->setPeerPort(port);
     }
 }
 
