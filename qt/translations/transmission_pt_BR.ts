@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>&amp;Aceito</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation>Torrent adicionado</translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>Torrent Concluído</numerusform>
-            <numerusform>Torrent Concluído</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2178,7 +2178,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Opção inválida</translation>
     </message>

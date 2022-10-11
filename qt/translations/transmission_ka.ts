@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>&amp;ვეთანხმები</translation>
     </message>
-    <message>
-        <location line="+134"/>
-        <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2182,7 +2182,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>არასწორი პარამეტრი</translation>
     </message>

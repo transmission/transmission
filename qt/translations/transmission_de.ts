@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>Ich &amp;stimme zu</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation>Torrent hinzugefügt</translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>Torrent abgeschlossen</numerusform>
-            <numerusform>Torrents abgeschlossen</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2178,7 +2178,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Ungültige Option</translation>
     </message>

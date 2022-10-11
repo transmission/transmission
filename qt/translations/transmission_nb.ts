@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>Jeg godtar</translation>
     </message>
-    <message>
-        <location line="+134"/>
-        <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2178,7 +2178,7 @@ For å legge til en primær URL, legg den til etter en tom linje.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Ugyldig valg</translation>
     </message>

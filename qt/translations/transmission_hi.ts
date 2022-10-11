@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>मुझे स्वीकार है (&amp;A)</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation>टोरेंट जोड़ा गया</translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>पूर्ण टोरेंट</numerusform>
-            <numerusform>पूर्ण टोरेंट</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2178,7 +2178,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>अमान्य विकल्प</translation>
     </message>

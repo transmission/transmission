@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>&amp;Accetto</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>Torrent completato</numerusform>
-            <numerusform>Torrent completato</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2180,7 +2180,7 @@ una riga vuota.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Opzione non valida</translation>
     </message>

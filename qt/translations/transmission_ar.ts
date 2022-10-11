@@ -61,22 +61,22 @@
         <source>I &amp;Agree</source>
         <translation>أعي ذلك</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>أكتمل التورنت</numerusform>
-            <numerusform>أكتمل التورنت</numerusform>
-            <numerusform>أكتمل ملفي تورنت</numerusform>
-            <numerusform>أكتمل %1 ملفات تورنت</numerusform>
-            <numerusform>أكتمل %1 ملف تورنت</numerusform>
-            <numerusform>أكتمل %1 ملف تورنت</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2246,7 +2246,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>اختيار غير صالح</translation>
     </message>

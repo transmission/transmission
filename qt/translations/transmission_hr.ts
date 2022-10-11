@@ -61,19 +61,19 @@
         <source>I &amp;Agree</source>
         <translation>Slažem &amp;se</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>Torrent preuzet</numerusform>
-            <numerusform>Torrenti preuzeti</numerusform>
-            <numerusform>Torrenti preuzeti</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2195,7 +2195,7 @@ Kako bi dodali novi glavni URL, dodajte ga nakon praznog retka.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Nevaljana mogućnost</translation>
     </message>

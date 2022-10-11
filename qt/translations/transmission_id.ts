@@ -61,17 +61,17 @@
         <source>I &amp;Agree</source>
         <translation>S&amp;aya Setuju</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+134"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation>Torrent Ditambahkan</translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>Torrent Selesai</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2161,7 +2161,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-279"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Opsi tidak sah</translation>
     </message>
