@@ -242,7 +242,7 @@ void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchRes
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
 {
-    session->web->fetch(std::move(options));
+    session->fetch(std::move(options));
 }
 
 /***
@@ -748,8 +748,6 @@ void tr_session::initImpl(init_data& data)
     tr_sessionSet(this, &settings);
 
     this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this);
-
-    this->web = tr_web::create(this->web_mediator_);
 
     if (this->allowsLPD())
     {
@@ -1846,7 +1844,7 @@ void tr_session::closeImplStart()
 
     /* and this goes *after* announcer close so that
        it won't be idle until the announce events are sent... */
-    this->web->closeSoon();
+    this->web_->closeSoon();
 
     this->cache.reset();
 
@@ -1915,7 +1913,7 @@ void tr_sessionClose(tr_session* session)
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->port_forwarding_ || !session->web->isClosed() || session->announcer != nullptr ||
+    while ((session->port_forwarding_ || !session->web_->isClosed() || session->announcer != nullptr ||
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
@@ -1928,7 +1926,7 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(50);
     }
 
-    session->web.reset();
+    session->web_.reset();
 
     /* close the libtransmission thread */
     tr_eventClose(session);

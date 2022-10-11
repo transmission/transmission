@@ -525,7 +525,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     options.range = fmt::format(FMT_STRING("{:d}-{:d}"), file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor->id();
     options.buffer = task->content();
-    tor->session->web->fetch(std::move(options));
+    tor->session->fetch(std::move(options));
 }
 
 } // namespace

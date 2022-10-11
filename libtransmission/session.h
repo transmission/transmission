@@ -561,7 +561,6 @@ public:
 
     std::unique_ptr<Cache> cache;
 
-    std::unique_ptr<tr_web> web;
     std::unique_ptr<tr_lpd> lpd_;
 
     struct tr_announcer* announcer = nullptr;
@@ -769,6 +768,11 @@ public:
         {
             verifier_->add(tor);
         }
+    }
+
+    void fetch(tr_web::FetchOptions options) const
+    {
+        web_->fetch(std::move(options));
     }
 
 private:
@@ -986,6 +990,7 @@ private:
     PortForwardingMediator port_forwarding_mediator_{ *this };
 
     WebMediator web_mediator_{ this };
+    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
 
     LpdMediator lpd_mediator_{ *this };
 
