@@ -6,7 +6,7 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>על אודות ‏Transmission</translation>
+        <translation>על Transmission</translation>
     </message>
     <message>
         <location line="+39"/>

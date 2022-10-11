@@ -392,7 +392,7 @@
     <message>
         <location line="+26"/>
         <source>Running time:</source>
-        <translation>Drifttid:</translation>
+        <translation>Driftstid:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -1361,12 +1361,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>När den väl har tagits bort krävs torrentfilen eller magnetlänken för att fortsätta överföringen.</translation>
+        <translation>När den har tagits bort kommer torrentfilen eller magnetlänken att krävas för att fortsätta överföringen.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>När de väl har tagits bort krävs torrentfilerna eller magnetlänkarna för att fortsätta överföringarna.</translation>
+        <translation>När de har tagits bort kommer torrentfilerna eller magnetlänkarna att krävas för att fortsätta överföringarna.</translation>
     </message>
     <message>
         <location line="+4"/>

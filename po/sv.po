@@ -526,8 +526,8 @@ msgstr[1] "Ta bort hämtade filer för dessa %d torrenter?"
 #: ../gtk/Dialogs.cc:62
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] "När den väl har tagits bort krävs torrentfilen eller magnetlänken för att fortsätta överföringen."
-msgstr[1] "När de väl har tagits bort krävs torrentfilerna eller magnetlänkarna för att fortsätta överföringarna."
+msgstr[0] "När den har tagits bort kommer torrentfilen eller magnetlänken att krävas för att fortsätta överföringen."
+msgstr[1] "När de har tagits bort kommer torrentfilerna eller magnetlänkarna att krävas för att fortsätta överföringarna."
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
@@ -1509,7 +1509,7 @@ msgstr "Tillstånd:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:140 ../gtk/ui/gtk4/DetailsDialog.ui:89
 msgid "Running time:"
-msgstr "Drifttid:"
+msgstr "Driftstid:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:152 ../gtk/ui/gtk4/DetailsDialog.ui:99
 msgid "Remaining time:"
