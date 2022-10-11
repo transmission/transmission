@@ -171,6 +171,16 @@ public:
         return torrents_;
     }
 
+    [[nodiscard]] auto& cache()
+    {
+        return *cache_;
+    }
+
+    [[nodiscard]] auto const& cache() const
+    {
+        return *cache_;
+    }
+
     [[nodiscard]] auto unique_lock() const
     {
         return std::unique_lock(session_mutex_);
@@ -552,8 +562,6 @@ public:
     }
 
     struct tr_peerMgr* peerMgr = nullptr;
-
-    std::unique_ptr<Cache> cache;
 
     std::unique_ptr<tr_lpd> lpd_;
 
@@ -1012,6 +1020,8 @@ private:
     LpdMediator lpd_mediator_{ *this };
 
     tr_torrents torrents_;
+
+    std::unique_ptr<Cache> cache_ = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
 

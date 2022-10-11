@@ -630,7 +630,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     /* initialize the bare skeleton of the session object */
     auto* const session = new tr_session{ config_dir };
-    session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
@@ -1841,7 +1840,7 @@ void tr_session::closeImplStart()
        it won't be idle until the announce events are sent... */
     this->web_->closeSoon();
 
-    this->cache.reset();
+    this->cache_.reset();
 
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
     TR_ASSERT(!save_timer_);
@@ -2145,14 +2144,14 @@ void tr_sessionSetCacheLimit_MB(tr_session* session, int mb)
 {
     TR_ASSERT(session != nullptr);
 
-    session->cache->setLimit(tr_toMemBytes(mb));
+    session->cache().setLimit(tr_toMemBytes(mb));
 }
 
 int tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_toMemMB(session->cache->getLimit());
+    return tr_toMemMB(session->cache().getLimit());
 }
 
 /***
@@ -2728,13 +2727,13 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
 
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
-    this->cache->flushTorrent(tor);
+    this->cache().flushTorrent(tor);
     openFiles().closeTorrent(tor->id());
 }
 
 void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept
 {
-    this->cache->flushFile(tor, file_num);
+    this->cache().flushFile(tor, file_num);
     openFiles().closeFile(tor->id(), file_num);
 }
 
