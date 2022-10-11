@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-24 16:26+0100\n"
+"POT-Creation-Date: 2022-10-11 13:28+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Telugu (https://www.transifex.com/transmissionbt/teams/33778/te/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.cc:105 ../gtk/Utils.cc:88 ../libtransmission/utils.cc:641
+#: ../cli/cli.cc:105 ../gtk/Utils.cc:94 ../libtransmission/utils.cc:641
 msgid "None"
 msgstr "ఏదీకాదు"
 
@@ -29,11 +29,11 @@ msgstr "ఏదీకాదు"
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:232 ../gtk/Session.cc:1138 ../libtransmission/blocklist.cc:45 ../libtransmission/blocklist.cc:235 ../libtransmission/blocklist.cc:293 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:78 ../libtransmission/utils.cc:98 ../libtransmission/utils.cc:110 ../libtransmission/watchdir.cc:121 ../libtransmission/watchdir.cc:148
+#: ../daemon/daemon.cc:232 ../gtk/Session.cc:1138 ../libtransmission/blocklist.cc:50 ../libtransmission/blocklist.cc:419 ../libtransmission/blocklist.cc:491 ../libtransmission/blocklist.cc:527 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:78 ../libtransmission/utils.cc:98 ../libtransmission/utils.cc:110 ../libtransmission/watchdir.cc:121 ../libtransmission/watchdir.cc:148
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:258 ../gtk/Session.cc:1190 ../gtk/Utils.cc:257 ../libtransmission/watchdir.cc:97
+#: ../daemon/daemon.cc:258 ../gtk/Session.cc:1190 ../gtk/Utils.cc:263 ../libtransmission/watchdir.cc:97
 msgid "Couldn't add torrent file '{path}'"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgstr ""
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:733 ../gtk/MessageLogWindow.cc:189 ../libtransmission/blocklist.cc:303 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1431 ../libtransmission/torrent.cc:810 ../libtransmission/torrent.cc:2032 ../libtransmission/variant.cc:1146
+#: ../daemon/daemon.cc:733 ../gtk/MessageLogWindow.cc:189 ../libtransmission/blocklist.cc:501 ../libtransmission/blocklist.cc:537 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1431 ../libtransmission/torrent.cc:810 ../libtransmission/torrent.cc:2032 ../libtransmission/variant.cc:1146
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -93,75 +93,63 @@ msgstr ""
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/AddTrackerDialog.ui:21 ../gtk/Application.cc:730 ../gtk/Dialogs.cc:114 ../gtk/EditTrackersDialog.ui:21 ../gtk/MakeProgressDialog.ui:22 ../gtk/MessageLogWindow.cc:230 ../gtk/OptionsDialog.cc:361 ../gtk/OptionsDialog.ui:21 ../gtk/RelocateDialog.ui:21 ../gtk/StatsDialog.cc:105 ../gtk/TorrentUrlChooserDialog.ui:21
-msgid "_Cancel"
-msgstr ""
-
-#: ../gtk/AddTrackerDialog.ui:35 ../gtk/DetailsDialog.ui:666 ../gtk/MakeProgressDialog.ui:52 ../gtk/PrefsDialog.ui:1985
-msgid "_Add"
-msgstr "జతచేయి (_A)"
-
-#: ../gtk/AddTrackerDialog.ui:64
-msgid "Tracker"
-msgstr "జాడకం"
-
-#: ../gtk/AddTrackerDialog.ui:88
-msgid "_Announce URL:"
-msgstr "URL ప్రకటించు(_A):"
-
-#: ../gtk/Application.cc:357
+#: ../gtk/Application.cc:369
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:516
+#: ../gtk/Application.cc:539
 #, c-format
 msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr "%d సూచన అందింది; సమస్యల్లేకుండా ఆపివేయడానికి ప్రయత్నిస్తున్నాను. మధ్యలో ఆగిపోతే మళ్ళీ ప్రయత్నించండి."
 
-#: ../gtk/Application.cc:724
+#: ../gtk/Application.cc:764
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr ""
 
-#: ../gtk/Application.cc:731
+#: ../gtk/Application.cc:770 ../gtk/Dialogs.cc:114 ../gtk/MessageLogWindow.cc:230 ../gtk/OptionsDialog.cc:365 ../gtk/PathButton.cc:137 ../gtk/StatsDialog.cc:105 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
+msgid "_Cancel"
+msgstr ""
+
+#: ../gtk/Application.cc:771
 msgid "I _Agree"
 msgstr ""
 
-#: ../gtk/Application.cc:916
+#: ../gtk/Application.cc:1005
 msgid "Closing Connections…"
 msgstr ""
 
-#: ../gtk/Application.cc:921
+#: ../gtk/Application.cc:1010
 msgid "Sending upload/download totals to tracker…"
 msgstr "ఎక్కించిన/దింపుకున్న మొత్తాలను జాడకానికి పంపుతోంది..."
 
-#: ../gtk/Application.cc:926
+#: ../gtk/Application.cc:1015
 msgid "_Quit Now"
 msgstr "ఇపుడు నిష్క్రమించు(_Q)"
 
-#: ../gtk/Application.cc:986
+#: ../gtk/Application.cc:1077
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "పాడయిన ప్రవాహాన్ని చేర్చలేక పోతోంది"
 msgstr[1] "పాడయిన ప్రవాహాలను చేర్చలేక పోతోంది"
 
-#: ../gtk/Application.cc:993
+#: ../gtk/Application.cc:1084
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "నకిలీ టోరెంటును జతచేయుట వీలుకాదు"
 msgstr[1] "నకిలీ టోరెంట్లను జతచేయుట వీలుకాదు"
 
-#: ../gtk/Application.cc:1313
+#: ../gtk/Application.cc:1409
 msgid "A fast and easy BitTorrent client"
 msgstr "ఒక వేగవంతమైన & సులభమైన బిట్ టోరెంట్ క్లైంట్"
 
-#: ../gtk/Application.cc:1314
+#: ../gtk/Application.cc:1410
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1320
+#: ../gtk/Application.cc:1416
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -192,7 +180,7 @@ msgstr "క్రియాశీలతకి సంబంధం లేకుం�
 msgid "Stop seeding if idle for N minutes:"
 msgstr "N నిముషాలు కనుక వాడుకలో లేకుంటే ఎగుమతి ఆపుము:"
 
-#: ../gtk/DetailsDialog.cc:535 ../gtk/TorrentCellRenderer.cc:163
+#: ../gtk/DetailsDialog.cc:535 ../gtk/TorrentCellRenderer.cc:166
 msgid "Queued for verification"
 msgstr "తనిఖీచేయుటకు వరుసలో చేర్చబడింది"
 
@@ -200,29 +188,29 @@ msgstr "తనిఖీచేయుటకు వరుసలో చేర్చ�
 msgid "Verifying local data"
 msgstr "స్థానిక సమాచారం తనిఖీ చేయబడుతోంది"
 
-#: ../gtk/DetailsDialog.cc:541 ../gtk/TorrentCellRenderer.cc:166
+#: ../gtk/DetailsDialog.cc:541 ../gtk/TorrentCellRenderer.cc:169
 msgid "Queued for download"
 msgstr "దింపుకొనుటకు వరుసలో చేర్చబడింది"
 
-#: ../gtk/DetailsDialog.cc:544 ../gtk/FilterBar.cc:516
+#: ../gtk/DetailsDialog.cc:544 ../gtk/FilterBar.cc:521
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "దింపుకుంటున్నది"
 
-#: ../gtk/DetailsDialog.cc:547 ../gtk/TorrentCellRenderer.cc:169
+#: ../gtk/DetailsDialog.cc:547 ../gtk/TorrentCellRenderer.cc:172
 msgid "Queued for seeding"
 msgstr "సీడింగు కొరకు వరుసలో చేర్చబడింది"
 
-#: ../gtk/DetailsDialog.cc:550 ../gtk/FilterBar.cc:517
+#: ../gtk/DetailsDialog.cc:550 ../gtk/FilterBar.cc:522
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "సీడింగు చేస్తున్నది"
 
-#: ../gtk/DetailsDialog.cc:553 ../gtk/FilterBar.cc:519 ../gtk/TorrentCellRenderer.cc:160
+#: ../gtk/DetailsDialog.cc:553 ../gtk/FilterBar.cc:524 ../gtk/TorrentCellRenderer.cc:163
 msgid "Finished"
 msgstr "పూర్తయింది"
 
-#: ../gtk/DetailsDialog.cc:553 ../gtk/FilterBar.cc:518 ../gtk/TorrentCellRenderer.cc:160
+#: ../gtk/DetailsDialog.cc:553 ../gtk/FilterBar.cc:523 ../gtk/TorrentCellRenderer.cc:163
 msgid "Paused"
 msgstr "నిలిపివేయబడింది"
 
@@ -230,7 +218,7 @@ msgstr "నిలిపివేయబడింది"
 msgid "N/A"
 msgstr "వర్తించదు"
 
-#: ../gtk/DetailsDialog.cc:588 ../gtk/FileList.cc:602
+#: ../gtk/DetailsDialog.cc:588 ../gtk/FileList.cc:600
 msgid "Mixed"
 msgstr "మిశ్రమ"
 
@@ -262,13 +250,13 @@ msgstr ""
 msgid "Unknown"
 msgstr "తెలియదు"
 
-#: ../gtk/DetailsDialog.cc:840 ../gtk/MakeDialog.cc:357
+#: ../gtk/DetailsDialog.cc:840 ../gtk/MakeDialog.cc:370
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:855 ../gtk/MakeDialog.cc:363
+#: ../gtk/DetailsDialog.cc:855 ../gtk/MakeDialog.cc:376
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
@@ -308,351 +296,203 @@ msgstr "ఎప్పటికీకాదు"
 msgid "Active now"
 msgstr "ఇపుడు క్రియాశీలమైనది"
 
-#: ../gtk/DetailsDialog.cc:1443
+#: ../gtk/DetailsDialog.cc:1447
 msgid "Optimistic unchoke"
 msgstr "వీరు ఎగుమతి చేయకున్నా పోనీలెమ్మని దిగుమతి చేస్కోనిస్తున్నాం"
 
-#: ../gtk/DetailsDialog.cc:1447
+#: ../gtk/DetailsDialog.cc:1451
 msgid "Downloading from this peer"
 msgstr "ఈ పీర్ నుండి దింపుకుంటున్నది"
 
-#: ../gtk/DetailsDialog.cc:1451
+#: ../gtk/DetailsDialog.cc:1455
 msgid "We would download from this peer if they would let us"
 msgstr "వారు అనుమతి ఇస్తే ఈ పీర్ నుండి దింపుకుంటాము"
 
-#: ../gtk/DetailsDialog.cc:1455
+#: ../gtk/DetailsDialog.cc:1459
 msgid "Uploading to peer"
 msgstr "పీర్‌కి ఎక్కిస్తోంది"
 
-#: ../gtk/DetailsDialog.cc:1459
+#: ../gtk/DetailsDialog.cc:1463
 msgid "We would upload to this peer if they asked"
 msgstr "ఈ సరిసమానుడు కోరితే అతడికి ఎగుమతి చేస్తాం"
 
-#: ../gtk/DetailsDialog.cc:1463
+#: ../gtk/DetailsDialog.cc:1467
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "వీరు మనల్ని దిగుమతి చేసుకోనిచ్చారు, కాని మనకి ఆసక్తి లేదు"
 
-#: ../gtk/DetailsDialog.cc:1467
+#: ../gtk/DetailsDialog.cc:1471
 msgid "We unchoked this peer, but they're not interested"
 msgstr "వీరిని దిగుమతి చేసుకోనిస్తున్నాం, కాని వారికి ఆసక్తి లేదు"
 
-#: ../gtk/DetailsDialog.cc:1471
+#: ../gtk/DetailsDialog.cc:1475
 msgid "Encrypted connection"
 msgstr "ఎన్క్రిప్టెడ్ అనుసంధానం"
 
-#: ../gtk/DetailsDialog.cc:1475
+#: ../gtk/DetailsDialog.cc:1479
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "పీర్ ఎక్స్చేంజ్ ద్వారా పీర్ కనుగొనబడింది (PEX)"
 
-#: ../gtk/DetailsDialog.cc:1479
+#: ../gtk/DetailsDialog.cc:1483
 msgid "Peer was found through DHT"
 msgstr "పీర్ DHT ద్వారా కనుగొనబడింది"
 
-#: ../gtk/DetailsDialog.cc:1483
+#: ../gtk/DetailsDialog.cc:1487
 msgid "Peer is an incoming connection"
 msgstr "పీర్ అనేది లోపలికి వచ్చే అనుసంధానం"
 
-#: ../gtk/DetailsDialog.cc:1487
+#: ../gtk/DetailsDialog.cc:1491
 msgid "Peer is connected over µTP"
 msgstr "పీరు µTP ద్వారా అనుసంధానమైంది"
 
-#: ../gtk/DetailsDialog.cc:1573
+#: ../gtk/DetailsDialog.cc:1577
 msgid "Address"
 msgstr "చిరునామా"
 
 #. % is percent done
-#: ../gtk/DetailsDialog.cc:1581
+#: ../gtk/DetailsDialog.cc:1585
 msgid "%"
 msgstr "%"
 
-#: ../gtk/DetailsDialog.cc:1597
+#: ../gtk/DetailsDialog.cc:1601
 msgid "Dn Reqs"
 msgstr "దిగుమతి విన్నపాలు"
 
-#: ../gtk/DetailsDialog.cc:1604
+#: ../gtk/DetailsDialog.cc:1608
 msgid "Up Reqs"
 msgstr "ఎగుమతి విన్నపాలు"
 
-#: ../gtk/DetailsDialog.cc:1611
+#: ../gtk/DetailsDialog.cc:1615
 msgid "Dn Blocks"
 msgstr "దిగుమతి బ్లాకులు"
 
-#: ../gtk/DetailsDialog.cc:1618
+#: ../gtk/DetailsDialog.cc:1622
 msgid "Up Blocks"
 msgstr "ఎగుమతి బ్లాకులు"
 
-#: ../gtk/DetailsDialog.cc:1625
+#: ../gtk/DetailsDialog.cc:1629
 msgid "We Cancelled"
 msgstr "మనం రద్దుచేశాం"
 
-#: ../gtk/DetailsDialog.cc:1632
+#: ../gtk/DetailsDialog.cc:1636
 msgid "They Cancelled"
 msgstr "వారు రద్దుచేశారు"
 
-#: ../gtk/DetailsDialog.cc:1640 ../gtk/DetailsDialog.cc:1715
+#: ../gtk/DetailsDialog.cc:1644 ../gtk/DetailsDialog.cc:1722
 msgid "Down"
 msgstr "కిందికి"
 
-#: ../gtk/DetailsDialog.cc:1648
+#: ../gtk/DetailsDialog.cc:1652
 msgid "Up"
 msgstr "పైకి"
 
-#: ../gtk/DetailsDialog.cc:1655
+#: ../gtk/DetailsDialog.cc:1659
 msgid "Client"
 msgstr "క్లైంటు"
 
-#: ../gtk/DetailsDialog.cc:1661
+#: ../gtk/DetailsDialog.cc:1665
 msgid "Flags"
 msgstr "కేతనాలు"
 
-#: ../gtk/DetailsDialog.cc:1706
+#: ../gtk/DetailsDialog.cc:1713
 msgid "Web Seeds"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1770
+#: ../gtk/DetailsDialog.cc:1781
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1782
+#: ../gtk/DetailsDialog.cc:1793
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the error
-#: ../gtk/DetailsDialog.cc:1791
+#: ../gtk/DetailsDialog.cc:1802
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1804
+#: ../gtk/DetailsDialog.cc:1815
 msgid "No updates scheduled"
 msgstr "ఎటువంటి నవీకరణాల జాబితాలు లేవు"
 
-#: ../gtk/DetailsDialog.cc:1811
+#: ../gtk/DetailsDialog.cc:1822
 msgid "Asking for more peers {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1818
+#: ../gtk/DetailsDialog.cc:1829
 msgid "Queued to ask for more peers"
 msgstr "మరిన్ని పీర్ల కోసం వరుసలో చేర్చబడింది"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
-#: ../gtk/DetailsDialog.cc:1826
+#: ../gtk/DetailsDialog.cc:1837
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
-#: ../gtk/DetailsDialog.cc:1849
+#: ../gtk/DetailsDialog.cc:1862
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1851
+#: ../gtk/DetailsDialog.cc:1864
 msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:1853
+#: ../gtk/DetailsDialog.cc:1866
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the error text
-#: ../gtk/DetailsDialog.cc:1862
+#: ../gtk/DetailsDialog.cc:1875
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1879
+#: ../gtk/DetailsDialog.cc:1892
 msgid "Asking for peer counts in {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1886
+#: ../gtk/DetailsDialog.cc:1899
 msgid "Queued to ask for peer counts"
 msgstr "మరిన్ని పీర్ల సంఖ్యల కోసం వరుసలో చేర్చబడింది"
 
-#: ../gtk/DetailsDialog.cc:1893
+#: ../gtk/DetailsDialog.cc:1906
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2156
+#: ../gtk/DetailsDialog.cc:2169
 msgid "{torrent_name} - Edit Trackers"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2192
+#: ../gtk/DetailsDialog.cc:2203
 msgid "List contains invalid URLs"
 msgstr "జాబితా చెల్లని URLs కలిగిఉన్నది"
 
-#: ../gtk/DetailsDialog.cc:2197 ../gtk/FileList.cc:786
+#: ../gtk/DetailsDialog.cc:2208 ../gtk/FileList.cc:786
 msgid "Please correct the errors and try again."
 msgstr "దయచేసి దోషాలను సరిచేసి మరలా ప్రయత్నించుము."
 
-#: ../gtk/DetailsDialog.cc:2273
+#: ../gtk/DetailsDialog.cc:2284
 msgid "{torrent_name} - Add Tracker"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2391 ../gtk/DetailsDialog.ui:761
+#: ../gtk/DetailsDialog.cc:2401 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
 msgid "Trackers"
 msgstr "జాడకాలు"
 
-#: ../gtk/DetailsDialog.cc:2558
+#: ../gtk/DetailsDialog.cc:2580
 msgid "{torrent_name} Properties"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2567
+#: ../gtk/DetailsDialog.cc:2589
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] ""
 msgstr[1] ""
-
-#: ../gtk/DetailsDialog.ui:21 ../gtk/MakeDialog.ui:21 ../gtk/MakeProgressDialog.ui:37 ../gtk/PrefsDialog.ui:38 ../gtk/StatsDialog.ui:37
-msgid "_Close"
-msgstr ""
-
-#: ../gtk/DetailsDialog.ui:56
-msgid "Activity"
-msgstr "క్రియాశీలత"
-
-#: ../gtk/DetailsDialog.ui:80
-msgid "Torrent size:"
-msgstr "టోరెంట్ పరిమాణం:"
-
-#: ../gtk/DetailsDialog.ui:92
-msgid "Have:"
-msgstr "ఉన్నది:"
-
-#: ../gtk/DetailsDialog.ui:104 ../gtk/StatsDialog.ui:92 ../gtk/StatsDialog.ui:250
-msgid "Uploaded:"
-msgstr "ఎగుమతి చేసింది:"
-
-#: ../gtk/DetailsDialog.ui:116 ../gtk/StatsDialog.ui:117 ../gtk/StatsDialog.ui:275
-msgid "Downloaded:"
-msgstr "దిగుమతి చేసుకున్నది:"
-
-#: ../gtk/DetailsDialog.ui:128
-msgid "State:"
-msgstr "స్థితి:"
-
-#: ../gtk/DetailsDialog.ui:140
-msgid "Running time:"
-msgstr "నడుస్తున్న సమయం:"
-
-#: ../gtk/DetailsDialog.ui:152
-msgid "Remaining time:"
-msgstr "మిగిలిన సమయం:"
-
-#: ../gtk/DetailsDialog.ui:164
-msgid "Last activity:"
-msgstr "చివరి క్రియాశీలత:"
-
-#: ../gtk/DetailsDialog.ui:176
-msgid "Error:"
-msgstr "దోషం:"
-
-#: ../gtk/DetailsDialog.ui:330
-msgid "Details"
-msgstr "వివరాలు"
-
-#: ../gtk/DetailsDialog.ui:354
-msgid "Location:"
-msgstr "ప్రదేశం:"
-
-#: ../gtk/DetailsDialog.ui:366
-msgid "Hash:"
-msgstr "హాష్:"
-
-#: ../gtk/DetailsDialog.ui:378
-msgid "Privacy:"
-msgstr "అంతరంగికత:"
-
-#: ../gtk/DetailsDialog.ui:390
-msgid "Origin:"
-msgstr "పుట్టుక:"
-
-#: ../gtk/DetailsDialog.ui:402
-msgid "Added:"
-msgstr ""
-
-#: ../gtk/DetailsDialog.ui:416
-msgid "Comment:"
-msgstr "వ్యాఖ్య"
-
-#: ../gtk/DetailsDialog.ui:527 ../gtk/MessageLogWindow.cc:451
-msgid "Information"
-msgstr "సమాచారం"
-
-#: ../gtk/DetailsDialog.ui:594 ../gtk/DetailsDialog.ui:722
-msgid "Show _more details"
-msgstr "మరిన్ని వివరాలను చూపించు(_m)"
-
-#: ../gtk/DetailsDialog.ui:617
-msgid "Peers"
-msgstr "పీర్లు"
-
-#: ../gtk/DetailsDialog.ui:680
-msgid "_Edit"
-msgstr "సవరణ (_E)"
-
-#: ../gtk/DetailsDialog.ui:694 ../gtk/Dialogs.cc:115 ../gtk/PrefsDialog.ui:2000
-msgid "_Remove"
-msgstr "తీసివేయి (_R)"
-
-#: ../gtk/DetailsDialog.ui:738
-msgid "Show _backup trackers"
-msgstr "ప్రత్యామ్నాయ జాడకాలను చూపించు(_b)"
-
-#: ../gtk/DetailsDialog.ui:799
-msgid "File listing not available for combined torrent properties"
-msgstr "దస్త్రాల జాబితా మిళిత టోరెంట్ లక్షణాలు కొరకు లభ్యం కాదు"
-
-#: ../gtk/DetailsDialog.ui:816 ../gtk/MakeDialog.ui:67
-msgid "Files"
-msgstr "దస్త్రాలు"
-
-#: ../gtk/DetailsDialog.ui:835 ../gtk/PrefsDialog.ui:383
-msgid "Speed"
-msgstr "వేగం"
-
-#: ../gtk/DetailsDialog.ui:857
-msgid "Honor global _limits"
-msgstr "సార్వత్రిక పరిమితులను గౌరవించు (_l)"
-
-#: ../gtk/DetailsDialog.ui:873
-msgid "Limit _download speed ({speed_units}):"
-msgstr ""
-
-#: ../gtk/DetailsDialog.ui:888
-msgid "Limit _upload speed ({speed_units}):"
-msgstr ""
-
-#: ../gtk/DetailsDialog.ui:905 ../gtk/OptionsDialog.ui:145
-msgid "Torrent _priority:"
-msgstr "టోరెంట్ ప్రాధాన్యత(_p):"
-
-#: ../gtk/DetailsDialog.ui:972
-msgid "Seeding Limits"
-msgstr "సీడింగ్ పరిమితులు"
-
-#: ../gtk/DetailsDialog.ui:996
-msgid "_Ratio:"
-msgstr "నిష్పత్తి(_R):"
-
-#: ../gtk/DetailsDialog.ui:1010
-msgid "_Idle:"
-msgstr "జడం (_I):"
-
-#: ../gtk/DetailsDialog.ui:1115
-msgid "Peer Connections"
-msgstr "పీర్ల అనుసంధానాలు"
-
-#: ../gtk/DetailsDialog.ui:1139
-msgid "_Maximum peers:"
-msgstr "గరిష్ట పీర్లు(_M)"
-
-#: ../gtk/DetailsDialog.ui:1176 ../gtk/MainWindow.ui:168 ../gtk/PrefsDialog.ui:1399
-msgid "Options"
-msgstr "ఐచ్చికాలు"
 
 #: ../gtk/Dialogs.cc:54
 #, c-format
@@ -702,33 +542,19 @@ msgstr[1] "ఈ టోరెంట్లలో కొన్ని దింపు
 msgid "_Delete"
 msgstr ""
 
-#: ../gtk/EditTrackersDialog.ui:35 ../gtk/MessageLogWindow.cc:231
-msgid "_Save"
-msgstr ""
+#: ../gtk/Dialogs.cc:115 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2000 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1399
+msgid "_Remove"
+msgstr "తీసివేయి (_R)"
 
-#: ../gtk/EditTrackersDialog.ui:64
-msgid "Tracker Announce URLs"
-msgstr "ట్రాకర్ URLs ప్రకటించు"
-
-#: ../gtk/EditTrackersDialog.ui:88 ../gtk/MakeDialog.ui:313
-msgid ""
-"To add a backup URL, add it on the next line after a primary URL.\n"
-"To add a new primary URL, add it after a blank line."
-msgstr ""
-
-#: ../gtk/EditTrackersDialog.ui:123
-msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
-
-#: ../gtk/FileList.cc:590 ../gtk/Utils.cc:497
+#: ../gtk/FileList.cc:588 ../gtk/Utils.cc:564
 msgid "High"
 msgstr "ఎక్కువ"
 
-#: ../gtk/FileList.cc:594 ../gtk/Utils.cc:498
+#: ../gtk/FileList.cc:592 ../gtk/Utils.cc:565
 msgid "Normal"
 msgstr "సాధారణం"
 
-#: ../gtk/FileList.cc:598 ../gtk/Utils.cc:499
+#: ../gtk/FileList.cc:596 ../gtk/Utils.cc:566
 msgid "Low"
 msgstr "తక్కువ"
 
@@ -736,51 +562,51 @@ msgstr "తక్కువ"
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/FileList.cc:886 ../gtk/MessageLogWindow.cc:303
+#: ../gtk/FileList.cc:894 ../gtk/MessageLogWindow.cc:303
 msgid "Name"
 msgstr "పేరు"
 
-#: ../gtk/FileList.cc:911
+#: ../gtk/FileList.cc:924
 msgid "Size"
 msgstr "పరిమాణం"
 
 #. add "progress" column
-#: ../gtk/FileList.cc:920
+#: ../gtk/FileList.cc:933
 msgid "Have"
 msgstr "అయినది"
 
 #. add "enabled" column
-#: ../gtk/FileList.cc:937
+#: ../gtk/FileList.cc:950
 msgid "Download"
 msgstr "దింపుకొను"
 
 #. add priority column
-#: ../gtk/FileList.cc:954
+#: ../gtk/FileList.cc:967
 msgid "Priority"
 msgstr "ప్రాధాన్యత"
 
-#: ../gtk/FilterBar.cc:286 ../gtk/FilterBar.cc:513
+#: ../gtk/FilterBar.cc:291 ../gtk/FilterBar.cc:518
 msgid "All"
 msgstr "అన్నీ"
 
-#: ../gtk/FilterBar.cc:515
+#: ../gtk/FilterBar.cc:520
 msgid "Active"
 msgstr "క్రియాశీల"
 
-#: ../gtk/FilterBar.cc:520
+#: ../gtk/FilterBar.cc:525
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "సరిచూస్తోంది"
 
-#: ../gtk/FilterBar.cc:521 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:449
+#: ../gtk/FilterBar.cc:526 ../gtk/FreeSpaceLabel.cc:52 ../gtk/MessageLogWindow.cc:450
 msgid "Error"
 msgstr "దోషం"
 
-#: ../gtk/FilterBar.cc:713 ../gtk/FilterBar.ui:14
+#: ../gtk/FilterBar.cc:718 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
 msgstr "చూపించు(_S):"
 
-#: ../gtk/FilterBar.cc:714
+#: ../gtk/FilterBar.cc:719
 msgid "_Show {count:L} of:"
 msgstr ""
 
@@ -788,195 +614,107 @@ msgstr ""
 msgid "{disk_space} free"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:234
+#: ../gtk/MainWindow.cc:257
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:235
+#: ../gtk/MainWindow.cc:258
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:285
+#: ../gtk/MainWindow.cc:308
 msgid "Unlimited"
 msgstr "అపరిమితం"
 
-#: ../gtk/MainWindow.cc:348
+#: ../gtk/MainWindow.cc:371
 msgid "Seed Forever"
 msgstr "ఎల్లప్పటికీ సీడు చేయి"
 
-#: ../gtk/MainWindow.cc:387
+#: ../gtk/MainWindow.cc:410
 msgid "Limit Download Speed"
 msgstr "దింపుకోలు వేగాన్ని పరిమితంచేయి"
 
-#: ../gtk/MainWindow.cc:388
+#: ../gtk/MainWindow.cc:411
 msgid "Limit Upload Speed"
 msgstr "ఎక్కించు వేగాన్ని పరిమితంచేయి"
 
-#: ../gtk/MainWindow.cc:392
+#: ../gtk/MainWindow.cc:415
 msgid "Stop Seeding at Ratio"
 msgstr "ఈ నిష్పత్తి వద్ద సీడింగు ఆపుము"
 
-#: ../gtk/MainWindow.cc:431
+#: ../gtk/MainWindow.cc:454
 msgid "Stop at Ratio ({ratio})"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:442
+#: ../gtk/MainWindow.cc:465
 msgid "Total Ratio"
 msgstr "మొత్తం నిష్పత్తి"
 
-#: ../gtk/MainWindow.cc:443
+#: ../gtk/MainWindow.cc:466
 msgid "Session Ratio"
 msgstr "చర్యాకాలపు నిష్పత్తి"
 
-#: ../gtk/MainWindow.cc:444
+#: ../gtk/MainWindow.cc:467
 msgid "Total Transfer"
 msgstr "మొత్తం బదిలీ"
 
-#: ../gtk/MainWindow.cc:445
+#: ../gtk/MainWindow.cc:468
 msgid "Session Transfer"
 msgstr "చర్యాకాలపు బదిలీ"
 
-#: ../gtk/MainWindow.cc:595 ../gtk/MainWindow.cc:616 ../gtk/TorrentCellRenderer.cc:182
+#: ../gtk/MainWindow.cc:633 ../gtk/MainWindow.cc:654 ../gtk/TorrentCellRenderer.cc:185
 msgid "Ratio: {ratio}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:601
+#: ../gtk/MainWindow.cc:639
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:609
+#: ../gtk/MainWindow.cc:647
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:642
+#: ../gtk/MainWindow.cc:680
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:645 ../gtk/TorrentCellRenderer.cc:140
+#: ../gtk/MainWindow.cc:683 ../gtk/TorrentCellRenderer.cc:143
 msgid "{upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/MainWindow.ui:21 ../gtk/transmission.ui:14 ../gtk/transmission.ui:459
-msgid "Open a torrent"
-msgstr "ఒక టోరెంట్ను తెరువు"
-
-#: ../gtk/MainWindow.ui:24 ../gtk/OptionsDialog.cc:362 ../gtk/OptionsDialog.ui:36 ../gtk/TorrentUrlChooserDialog.ui:35 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458
-msgid "_Open"
-msgstr ""
-
-#: ../gtk/MainWindow.ui:37 ../gtk/transmission.ui:99 ../gtk/transmission.ui:368
-msgid "Start torrent"
-msgstr "టోరెంటును ప్రారంభించు"
-
-#: ../gtk/MainWindow.ui:39 ../gtk/transmission.ui:97 ../gtk/transmission.ui:366
-msgid "_Start"
-msgstr "ప్రారంభించు (_S)"
-
-#: ../gtk/MainWindow.ui:52 ../gtk/transmission.ui:143 ../gtk/transmission.ui:412
-msgid "Pause torrent"
-msgstr "టోరెంటును నిలుపు"
-
-#: ../gtk/MainWindow.ui:54 ../gtk/transmission.ui:141 ../gtk/transmission.ui:410
-msgid "_Pause"
-msgstr "నిలుపు(_P)"
-
-#: ../gtk/MainWindow.ui:68 ../gtk/transmission.ui:166 ../gtk/transmission.ui:435
-msgid "Remove torrent"
-msgstr "టోరెంటును తీసివేయి"
-
-#: ../gtk/MainWindow.ui:91 ../gtk/transmission.ui:84 ../gtk/transmission.ui:295
-msgid "Torrent properties"
-msgstr "టోరెంట్ లక్షణాలు"
-
-#: ../gtk/MainWindow.ui:94 ../gtk/transmission.ui:82 ../gtk/transmission.ui:293
-msgid "_Properties"
-msgstr ""
-
-#: ../gtk/MainWindow.ui:142
-msgid "Torrent"
-msgstr "టోరెంటు"
-
-#: ../gtk/MainWindow.ui:250 ../gtk/StatsDialog.ui:8
-msgid "Statistics"
-msgstr "గణాంకాలు"
-
-#: ../gtk/MakeDialog.cc:151
+#: ../gtk/MakeDialog.cc:163
 msgid "Creating '{path}'"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:164
+#: ../gtk/MakeDialog.cc:176
 msgid "Created '{path}'"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:170 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
+#: ../gtk/MakeDialog.cc:182 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
 msgid "Couldn't create '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:189
+#: ../gtk/MakeDialog.cc:201
 msgid "Scanned {file_size}"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:351 ../gtk/MakeDialog.cc:500 ../gtk/MakeDialog.ui:176
+#: ../gtk/MakeDialog.cc:364 ../gtk/MakeDialog.cc:540 ../gtk/ui/gtk3/MakeDialog.ui:176 ../gtk/ui/gtk4/MakeDialog.ui:100
 msgid "No source selected"
 msgstr "ఏ మూలాన్ని ఎంచుకోలేదు"
-
-#: ../gtk/MakeDialog.ui:8 ../gtk/MakeProgressDialog.ui:8
-msgid "New Torrent"
-msgstr "క్రొత్త టోరెంట్"
-
-#: ../gtk/MakeDialog.ui:36
-msgid "_New"
-msgstr ""
-
-#: ../gtk/MakeDialog.ui:91
-msgid "Sa_ve to:"
-msgstr "దీనికి దాచు(_v)"
-
-#: ../gtk/MakeDialog.ui:116
-msgid "Source F_older:"
-msgstr "మూల సంచయం(_o):"
-
-#: ../gtk/MakeDialog.ui:144
-msgid "Source _File:"
-msgstr "దస్త్ర మూలము (_F):"
-
-#: ../gtk/MakeDialog.ui:191
-msgid "Piece size:"
-msgstr ""
-
-#: ../gtk/MakeDialog.ui:242
-msgid "Properties"
-msgstr "లక్షణాలు"
-
-#: ../gtk/MakeDialog.ui:268
-msgid "_Trackers:"
-msgstr "జాడకాలు (_T):"
-
-#: ../gtk/MakeDialog.ui:331
-msgid "Co_mment:"
-msgstr "వ్యాఖ్య(_m):"
-
-#: ../gtk/MakeDialog.ui:357
-msgid "_Source:"
-msgstr ""
-
-#: ../gtk/MakeDialog.ui:383
-msgid "_Private torrent"
-msgstr "రహస్య టోరెంట్(_P)"
-
-#: ../gtk/MakeProgressDialog.ui:82
-msgid "Creating torrent…"
-msgstr "టోరెంటును సృష్టిస్తోంది..."
 
 #: ../gtk/MessageLogWindow.cc:229
 msgid "Save Log"
 msgstr "చిట్టాను భద్రపరుచు"
+
+#: ../gtk/MessageLogWindow.cc:231 ../gtk/ui/gtk3/EditTrackersDialog.ui:35 ../gtk/ui/gtk4/EditTrackersDialog.ui:92
+msgid "_Save"
+msgstr ""
 
 #: ../gtk/MessageLogWindow.cc:312
 msgid "Message"
@@ -986,41 +724,25 @@ msgstr "సందేశం"
 msgid "Time"
 msgstr "సమయం"
 
-#: ../gtk/MessageLogWindow.cc:448
+#: ../gtk/MessageLogWindow.cc:449
 msgid "Critical"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:450
+#: ../gtk/MessageLogWindow.cc:451
 msgid "Warning"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:452
+#: ../gtk/MessageLogWindow.cc:452 ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
+msgid "Information"
+msgstr "సమాచారం"
+
+#: ../gtk/MessageLogWindow.cc:453
 msgid "Debug"
 msgstr "దోషశోధన"
 
-#: ../gtk/MessageLogWindow.cc:453
+#: ../gtk/MessageLogWindow.cc:454
 msgid "Trace"
 msgstr ""
-
-#: ../gtk/MessageLogWindow.ui:7
-msgid "Message Log"
-msgstr "సందేశాల చిట్టా"
-
-#: ../gtk/MessageLogWindow.ui:26
-msgid "Save _As"
-msgstr ""
-
-#: ../gtk/MessageLogWindow.ui:41
-msgid "Clear"
-msgstr ""
-
-#: ../gtk/MessageLogWindow.ui:66
-msgid "P_ause"
-msgstr ""
-
-#: ../gtk/MessageLogWindow.ui:96
-msgid "Level"
-msgstr "స్థాయి"
 
 #: ../gtk/Notify.cc:199
 msgid "Open File"
@@ -1042,451 +764,107 @@ msgstr ""
 msgid "Torrent Added"
 msgstr "టోరెంట్ జతచేయబడింది"
 
-#: ../gtk/OptionsDialog.cc:215
+#: ../gtk/OptionsDialog.cc:219
 msgid "Torrent files"
 msgstr "టోరెంట్ దస్త్రాలు"
 
-#: ../gtk/OptionsDialog.cc:220
+#: ../gtk/OptionsDialog.cc:224
 msgid "All files"
 msgstr "అన్ని దస్త్రాలు"
 
-#: ../gtk/OptionsDialog.cc:357
+#: ../gtk/OptionsDialog.cc:361
 msgid "Open a Torrent"
 msgstr "ఒక టోరెంట్ని తెరువు"
 
-#: ../gtk/OptionsDialog.cc:373
-msgid "Show _options dialog"
-msgstr "ఐచ్ఛికాల సంవాదాన్ని చూపించు (_o)"
-
-#: ../gtk/OptionsDialog.ui:8
-msgid "Torrent Options"
-msgstr "టోరెంట్ ఐచ్చికాలు"
-
-#: ../gtk/OptionsDialog.ui:67
-msgid "_Torrent file:"
-msgstr "టోరెంట్ దస్త్రం (_T):"
-
-#: ../gtk/OptionsDialog.ui:82
-msgid "Select Source File"
-msgstr "మూల దస్త్రాన్ని ఎంచుకోండి"
-
-#: ../gtk/OptionsDialog.ui:93
-msgid "_Destination folder:"
-msgstr "గమ్య సంచయం (_D):"
-
-#: ../gtk/OptionsDialog.ui:109
-msgid "Select Destination Folder"
-msgstr "గమ్య సంచయాన్ని ఎంచుకోండి"
-
-#: ../gtk/OptionsDialog.ui:168
-msgid "_Start when added"
-msgstr "కలుపగానే ప్రారంభించు(_S)"
-
-#: ../gtk/OptionsDialog.ui:184 ../gtk/PrefsDialog.ui:471
-msgid "Mo_ve torrent file to the trash"
+#: ../gtk/OptionsDialog.cc:366 ../gtk/PathButton.cc:138 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:24 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
+msgid "_Open"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:461 ../gtk/PrefsDialog.cc:489
+#: ../gtk/OptionsDialog.cc:377
+msgid "Show options dialog"
+msgstr ""
+
+#: ../gtk/PathButton.cc:135
+msgid "Select a File"
+msgstr ""
+
+#: ../gtk/PathButton.cc:192
+msgid "(None)"
+msgstr ""
+
+#: ../gtk/PrefsDialog.cc:474 ../gtk/PrefsDialog.cc:502
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/PrefsDialog.cc:493
+#: ../gtk/PrefsDialog.cc:506
 msgid "Blocklist updated!"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:493
+#: ../gtk/PrefsDialog.cc:506
 msgid "Couldn't update blocklist"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:504
+#: ../gtk/PrefsDialog.cc:517
 msgid "Update Blocklist"
 msgstr "బ్లాకుజాబితాను నవీకరించు"
 
-#: ../gtk/PrefsDialog.cc:509
+#: ../gtk/PrefsDialog.cc:522
 msgid "Getting new blocklist…"
 msgstr "కొత్త నిషిద్దపట్టిక పొందుతోంది..."
 
-#: ../gtk/PrefsDialog.cc:532
+#: ../gtk/PrefsDialog.cc:545
 msgid "Allow encryption"
 msgstr "ఎన్క్రిప్షను అనుమతించు"
 
-#: ../gtk/PrefsDialog.cc:533
+#: ../gtk/PrefsDialog.cc:546
 msgid "Prefer encryption"
 msgstr "ఎన్క్రిప్షనుకి ప్రాధాణ్యతయివ్వు"
 
-#: ../gtk/PrefsDialog.cc:534
+#: ../gtk/PrefsDialog.cc:547
 msgid "Require encryption"
 msgstr "ఎన్క్రిప్షను అవసరం"
 
-#: ../gtk/PrefsDialog.cc:899
+#: ../gtk/PrefsDialog.cc:914
 msgid "Every Day"
 msgstr "ప్రతీ దినం"
 
-#: ../gtk/PrefsDialog.cc:900
+#: ../gtk/PrefsDialog.cc:915
 msgid "Weekdays"
 msgstr "పనిదినాలు"
 
-#: ../gtk/PrefsDialog.cc:901
+#: ../gtk/PrefsDialog.cc:916
 msgid "Weekends"
 msgstr "వారాంతపు రోజులు"
 
-#: ../gtk/PrefsDialog.cc:1019 ../gtk/PrefsDialog.ui:1250
+#: ../gtk/PrefsDialog.cc:1034 ../gtk/ui/gtk3/PrefsDialog.ui:1250 ../gtk/ui/gtk4/PrefsDialog.ui:869
 msgid "Status unknown"
 msgstr "స్థితి తెలియదు"
 
-#: ../gtk/PrefsDialog.cc:1041
+#: ../gtk/PrefsDialog.cc:1056
 msgid "Port is {markup_begin}closed{markup_end}"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1041
+#: ../gtk/PrefsDialog.cc:1056
 msgid "Port is {markup_begin}open{markup_end}"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:1052
+#: ../gtk/PrefsDialog.cc:1067
 msgid "Testing TCP port…"
 msgstr ""
 
-#: ../gtk/PrefsDialog.ui:8
-msgid "Transmission Preferences"
-msgstr "ట్రాన్స్​మిషన్ అభిరుచులు"
-
-#: ../gtk/PrefsDialog.ui:23
-msgid "_Help"
-msgstr "సహాయం(_H)"
-
-#: ../gtk/PrefsDialog.ui:72
-msgid "Speed Limits"
-msgstr "వేగ పరిమితులు"
-
-#. Checkbox to limit upload speed
-#: ../gtk/PrefsDialog.ui:94
-msgid "_Upload ({speed_units}):"
-msgstr ""
-
-#. Checkbox to limit download speed
-#: ../gtk/PrefsDialog.ui:109
-msgid "_Download ({speed_units}):"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:172
-msgid "Alternative Speed Limits"
-msgstr "ప్రత్యామ్నాయ వేగ పరిమితులు"
-
-#: ../gtk/PrefsDialog.ui:216
-msgid "Override normal speed limits manually or at scheduled times"
-msgstr "సాదారణ వేగ పరిమితులని స్వయంగానో, కాలపట్టికతోనో తోసిపుచ్చండి"
-
-#. Labels a spinbutton for alternate upload speed limits
-#: ../gtk/PrefsDialog.ui:232
-msgid "U_pload ({speed_units}):"
-msgstr ""
-
-#. Labels a spinbutton for alternate download speed limits
-#: ../gtk/PrefsDialog.ui:246
-msgid "Do_wnload ({speed_units}):"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:258
-msgid "_Scheduled times:"
-msgstr "ప్రణాళికా సమయాలు (_S):"
-
-#: ../gtk/PrefsDialog.ui:275
-msgid "_On days:"
-msgstr "ఈ దినాలలో(_O):"
-
-#. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
-#: ../gtk/PrefsDialog.ui:330
-msgid "_to"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:400
-msgctxt "Gerund"
-msgid "Adding"
-msgstr "జతచేస్తోంది"
-
-#: ../gtk/PrefsDialog.ui:422
-msgid "Automatically add torrent files _from:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:437
-msgid "Show the Torrent Options _dialog"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:454
-msgid "_Start added torrents"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:490
-msgid "Save to _Location:"
-msgstr "ఈ ప్రదేశంలో దాచుము(_L):"
-
-#: ../gtk/PrefsDialog.ui:575
-msgid "Download Queue"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:599
-msgid "Ma_ximum active downloads:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:613
-msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:668
-msgid "Incomplete"
-msgstr "అసంపూర్ణం"
-
-#: ../gtk/PrefsDialog.ui:690
-msgid "Append \"._part\" to incomplete files' names"
-msgstr "అసంపూర్ణ దస్త్రాల పేర్లకు \"._part\" జోడించు(_p)"
-
-#: ../gtk/PrefsDialog.ui:707
-msgid "Keep _incomplete torrents in:"
-msgstr "అసంపూర్ణ టోరెంట్లను ఇందులో ఉంచుము(_i):"
-
-#: ../gtk/PrefsDialog.ui:722
-msgid "Call scrip_t when done downloading:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:776
-msgctxt "Gerund"
-msgid "Downloading"
-msgstr "దింపుకుంటున్నది"
-
-#: ../gtk/PrefsDialog.ui:794
-msgid "Limits"
-msgstr "పరిమితులు"
-
-#: ../gtk/PrefsDialog.ui:816
-msgid "Stop seeding at _ratio:"
-msgstr "ఈ నిష్పత్తి వద్ద సీడింగ్ ఆపుము (_r):"
-
-#: ../gtk/PrefsDialog.ui:831
-msgid "Stop seeding if idle for _N minutes:"
-msgstr "N నిముషాలు కనుక వాడుకలో లేకుంటే సీడింగ్ ఆపుము:(_N)"
-
-#: ../gtk/PrefsDialog.ui:846
-msgid "Call scrip_t when done seeding:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:909
-msgctxt "Gerund"
-msgid "Seeding"
-msgstr "సీడింగు చేస్తున్నది"
-
-#: ../gtk/PrefsDialog.ui:927 ../gtk/PrefsDialog.ui:1131
-msgid "Privacy"
-msgstr "గోప్యత"
-
-#: ../gtk/PrefsDialog.ui:951
-msgid "_Encryption mode:"
-msgstr "ఎన్క్రిప్షను విధము:(_E)"
-
-#: ../gtk/PrefsDialog.ui:995
-msgid "Blocklist"
-msgstr "బ్లాకుజాబితా"
-
-#: ../gtk/PrefsDialog.ui:1017
-msgid "Enable _blocklist:"
-msgstr "బ్లాకుజాబితాను చేతనపరుచు:(_b)"
-
-#: ../gtk/PrefsDialog.ui:1032
-msgid "Enable _automatic updates"
-msgstr "స్వయంచాలక నవీకరణలను చేతనపరుచు(_a)"
-
-#: ../gtk/PrefsDialog.ui:1084
-msgid "_Update"
-msgstr "నవీకరించు(_U)"
-
-#: ../gtk/PrefsDialog.ui:1149
-msgid "Listening Port"
-msgstr "వినియోగించాల్సిన పోర్టు"
-
-#: ../gtk/PrefsDialog.ui:1173
-msgid "_Port used for incoming connections:"
-msgstr "వచ్చే అనుసంధానాలకు ఈ పోర్టు వాడు(_P)"
-
-#: ../gtk/PrefsDialog.ui:1185
-msgid "Pick a _random port every time Transmission is started"
-msgstr "ప్రతీసారి ట్రాన్స్ మిషన్ ప్రారంభించబడినపుడు ఒక యాదృచ్ఛిక మార్గాన్ని  ఎన్నుకొను(_r)"
-
-#: ../gtk/PrefsDialog.ui:1202
-msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "నా రౌటర్నుంచి UPnP లేదా NAT-PMP పోర్టు ఫార్వార్డింగ్(_f) వాడు"
-
-#: ../gtk/PrefsDialog.ui:1264
-msgid "Te_st Port"
-msgstr "మార్గాన్ని పరీక్షించు(_s)"
-
-#: ../gtk/PrefsDialog.ui:1306
-msgid "Peer Limits"
-msgstr "పీర్ పరిమితులు"
-
-#: ../gtk/PrefsDialog.ui:1330
-msgid "Maximum peers per _torrent:"
-msgstr "టోరెంట్ ఒక్కోదానికి అత్యధిక పీర్ల సంఖ్య(_t):"
-
-#: ../gtk/PrefsDialog.ui:1344
-msgid "Maximum peers _overall:"
-msgstr "టోరెంట్ల మొత్తానికి అత్యధిక పీర్ల సంఖ్య(_o):"
-
-#: ../gtk/PrefsDialog.ui:1421
-msgid "Enable _uTP for peer communication"
-msgstr "తోటివారితో అనుసంధానాల కోసం _uTP చేతనపరచండి"
-
-#: ../gtk/PrefsDialog.ui:1425
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP అనేది నెట్వర్క్ రద్దీ తగ్గించడానికి వాడే సాధనం."
-
-#: ../gtk/PrefsDialog.ui:1439
-msgid "Use PE_X to find more peers"
-msgstr "మరిన్ని పీర్లను కనుగొనుటకు PEX వాడు(_X)"
-
-#: ../gtk/PrefsDialog.ui:1443
-msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr "పీరు జాబితాలు మార్పిడికోసం PEX అనేది ఒక సాధనం మీరు అనుసంధానమయిన పీర్లను దీని ద్వారా మార్చవచ్చు."
-
-#: ../gtk/PrefsDialog.ui:1457
-msgid "Use _DHT to find more peers"
-msgstr "మరిన్ని పీర్లను కనుగొనుటకు DHT వాడు(_D)"
-
-#: ../gtk/PrefsDialog.ui:1461
-msgid "DHT is a tool for finding peers without a tracker."
-msgstr "ట్రాకరు లేకుండా పీర్లను కనుగొనుట కొరకు DHT అనేది ఒక సాధనం."
-
-#: ../gtk/PrefsDialog.ui:1475
-msgid "Use _Local Peer Discovery to find more peers"
-msgstr "మరిన్ని పీర్లను కనుగొనుటకు Local Peer Discovery ని వాడు(_L)"
-
-#: ../gtk/PrefsDialog.ui:1479
-msgid "LPD is a tool for finding peers on your local network."
-msgstr "మీ స్థానిక నెట్వర్కు నందు పీర్లను కనుగొనుట కొరకు LPD అనేది ఒక సాధనం."
-
-#: ../gtk/PrefsDialog.ui:1514
-msgid "Default Public Trackers"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:1546
-msgid ""
-"Trackers to use on all public torrents.\n"
-"\n"
-"To add a backup URL, add it on the next line after a primary URL.\n"
-"To add a new primary URL, add it after a blank line."
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:1575
-msgid "Network"
-msgstr "నెట్‌వర్క్"
-
-#: ../gtk/PrefsDialog.ui:1593 ../gtk/PrefsDialog.ui:1757
-msgid "Desktop"
-msgstr "డెస్క్‍టాప్"
-
-#: ../gtk/PrefsDialog.ui:1615
-msgid "_Inhibit hibernation when torrents are active"
-msgstr "టోరెంట్లు నడుస్తున్నప్పుడు కంప్యూటర్ని సుప్తావస్థలోకి వెళ్ళనియ్యకు(_I)"
-
-#: ../gtk/PrefsDialog.ui:1632
-msgid "Show Transmission icon in the _notification area"
-msgstr "గమనికల ప్రాంతంలో ట్రాన్స్ మిషన్ ఐకాన్ను చూపించు(_n)"
-
-#: ../gtk/PrefsDialog.ui:1670
-msgid "Notification"
-msgstr "గమనిక"
-
-#: ../gtk/PrefsDialog.ui:1692
-msgid "Show a notification when torrents are a_dded"
-msgstr "టోరెంట్లను జతచేసినపుడు గమనికను చూపించు (_d)"
-
-#: ../gtk/PrefsDialog.ui:1709
-msgid "Show a notification when torrents _finish"
-msgstr "టోరెంట్లు పూర్తయినపుడు గమనికను చూపించు (_f)"
-
-#: ../gtk/PrefsDialog.ui:1726
-msgid "Play a _sound when torrents finish"
-msgstr "టోరెంట్లు పూర్తయినపుడు శబ్దాన్ని ఆడించు (_s)"
-
-#: ../gtk/PrefsDialog.ui:1775
-msgid "Remote Control"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:1803
-msgid "Allow _remote access"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:1819
-msgid "_Open web client"
-msgstr "వెబ్ క్లైంటు తెరుచు(_O)"
-
-#: ../gtk/PrefsDialog.ui:1843
-msgid "HTTP _port:"
-msgstr "HTTP పోర్టు (_p):"
-
-#: ../gtk/PrefsDialog.ui:1855
-msgid "Use _authentication"
-msgstr "ధ్రువీకరణ వాడు(_a)"
-
-#: ../gtk/PrefsDialog.ui:1874
-msgid "_Username:"
-msgstr "వాడుకరి పేరు(_U):"
-
-#: ../gtk/PrefsDialog.ui:1888
-msgid "Pass_word:"
-msgstr "సంకేతపదం(_w):"
-
-#: ../gtk/PrefsDialog.ui:1900
-msgid "Only allow these IP a_ddresses:"
-msgstr ""
-
-#: ../gtk/PrefsDialog.ui:1921
-msgid "Addresses:"
-msgstr "చిరునామాలు:"
-
-#: ../gtk/PrefsDialog.ui:2031
-msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr "IP చిరునామాలు వైల్డ్ కార్డులను వాడవచ్చు, ఎలాగంటే 192.168.*.*"
-
-#: ../gtk/PrefsDialog.ui:2060
-msgid "Remote"
-msgstr ""
-
-#: ../gtk/RelocateDialog.cc:80
+#: ../gtk/RelocateDialog.cc:81
 msgid "Moving '{torrent_name}'"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:92
+#: ../gtk/RelocateDialog.cc:93
 msgid "Couldn't move torrent"
 msgstr "టోరెంట్ తరలించుట వీలుపడదు"
 
-#: ../gtk/RelocateDialog.cc:139
+#: ../gtk/RelocateDialog.cc:140
 msgid "This may take a moment…"
 msgstr "ఇందుకు కొంత సమయం పట్టవచ్చు..."
-
-#: ../gtk/RelocateDialog.ui:8
-msgid "Set Torrent Location"
-msgstr "టోరెంట్ ప్రదేశాన్ని నిర్దేశించు"
-
-#: ../gtk/RelocateDialog.ui:36
-msgid "_Apply"
-msgstr ""
-
-#: ../gtk/RelocateDialog.ui:67
-msgid "Location"
-msgstr "ప్రదేశం"
-
-#: ../gtk/RelocateDialog.ui:92
-msgid "Torrent _location:"
-msgstr "టోరెంట్ ప్రదేశం(_L):"
-
-#: ../gtk/RelocateDialog.ui:117
-msgid "_Move from the current folder"
-msgstr "ప్రస్థుత సంచయం నుండి తరలించు(_M)"
-
-#: ../gtk/RelocateDialog.ui:134
-msgid "Local data is _already there"
-msgstr "స్థానిక సమాచారం ఇంతకు ముందే అక్కడ ఉంది(_a)"
 
 #: ../gtk/Session.cc:1123 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -1516,7 +894,7 @@ msgstr[1] ""
 msgid "Reset your statistics?"
 msgstr "మీ గణాంకాలను తిరిగి అమర్చు?"
 
-#: ../gtk/StatsDialog.cc:106 ../gtk/StatsDialog.ui:22
+#: ../gtk/StatsDialog.cc:106 ../gtk/ui/gtk3/StatsDialog.ui:22 ../gtk/ui/gtk4/StatsDialog.ui:245
 msgid "_Reset"
 msgstr "తిరిగిఅమర్చు (_R)"
 
@@ -1524,315 +902,287 @@ msgstr "తిరిగిఅమర్చు (_R)"
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
 msgstr "ఈ గణాంకాలు మీ యొక్క సమాచారం అందించటానికి మాత్రమే.  వాటిని పున:నిర్ణయించడం వల్ల మీ బిట్ టోరెంట్ ట్రాకర్ల గణాంకాల నమోదును ఏ విధంగాను ప్రభావితం చేయదు."
 
-#: ../gtk/StatsDialog.ui:68
-msgid "Current Session"
-msgstr "ప్రస్తుత చర్యాకాలం"
-
-#: ../gtk/StatsDialog.ui:142 ../gtk/StatsDialog.ui:300
-msgid "Ratio:"
-msgstr "నిష్పత్తి:"
-
-#: ../gtk/StatsDialog.ui:167 ../gtk/StatsDialog.ui:325
-msgid "Duration:"
-msgstr "నిడివి:"
-
-#: ../gtk/StatsDialog.ui:212
-msgid "Total"
-msgstr "మొత్తం"
-
-#: ../gtk/SystemTrayIcon.cc:165
+#: ../gtk/SystemTrayIcon.cc:205
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:56
+#: ../gtk/TorrentCellRenderer.cc:59
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:66
+#: ../gtk/TorrentCellRenderer.cc:69
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:78
+#: ../gtk/TorrentCellRenderer.cc:81
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:88
+#: ../gtk/TorrentCellRenderer.cc:91
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:97
+#: ../gtk/TorrentCellRenderer.cc:100
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:111
+#: ../gtk/TorrentCellRenderer.cc:114
 msgid "Remaining time unknown"
 msgstr "మిగిలిన సమయం తెలియదు"
 
-#: ../gtk/TorrentCellRenderer.cc:133
+#: ../gtk/TorrentCellRenderer.cc:136
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:145
+#: ../gtk/TorrentCellRenderer.cc:148
 msgid "Stalled"
 msgstr "నిలిచిపోయింది"
 
-#: ../gtk/TorrentCellRenderer.cc:174
+#: ../gtk/TorrentCellRenderer.cc:177
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:194 ../libtransmission/torrent.cc:532
+#: ../gtk/TorrentCellRenderer.cc:197 ../libtransmission/torrent.cc:532
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:197
+#: ../gtk/TorrentCellRenderer.cc:200
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:200
+#: ../gtk/TorrentCellRenderer.cc:203
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:228
+#: ../gtk/TorrentCellRenderer.cc:231
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:239
+#: ../gtk/TorrentCellRenderer.cc:242
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:250
+#: ../gtk/TorrentCellRenderer.cc:253
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:258
+#: ../gtk/TorrentCellRenderer.cc:261
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:267
+#: ../gtk/TorrentCellRenderer.cc:270
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentUrlChooserDialog.ui:8
-msgid "Open URL"
-msgstr "URL తెరువు"
-
-#: ../gtk/TorrentUrlChooserDialog.ui:64
-msgid "Open torrent from URL"
-msgstr "URL నుండి టోరెంట్ తెరువు"
-
-#: ../gtk/TorrentUrlChooserDialog.ui:88
-msgid "_URL"
-msgstr "URL(_U)"
-
-#: ../gtk/Utils.cc:39
+#: ../gtk/Utils.cc:45
 msgid "KiB"
 msgstr "కిబై"
 
-#: ../gtk/Utils.cc:40
+#: ../gtk/Utils.cc:46
 msgid "MiB"
 msgstr "మెబై"
 
-#: ../gtk/Utils.cc:41
+#: ../gtk/Utils.cc:47
 msgid "GiB"
 msgstr "గిబై"
 
-#: ../gtk/Utils.cc:42
+#: ../gtk/Utils.cc:48
 msgid "TiB"
 msgstr "టెబై"
 
-#: ../gtk/Utils.cc:45
+#: ../gtk/Utils.cc:51
 msgid "kB"
 msgstr "కిబై"
 
-#: ../gtk/Utils.cc:46
+#: ../gtk/Utils.cc:52
 msgid "MB"
 msgstr "మెబై"
 
-#: ../gtk/Utils.cc:47
+#: ../gtk/Utils.cc:53
 msgid "GB"
 msgstr "గిబై"
 
-#: ../gtk/Utils.cc:48
+#: ../gtk/Utils.cc:54
 msgid "TB"
 msgstr "టెబై"
 
-#: ../gtk/Utils.cc:51
+#: ../gtk/Utils.cc:57
 msgid "kB/s"
 msgstr "కిబై/సె"
 
-#: ../gtk/Utils.cc:52
+#: ../gtk/Utils.cc:58
 msgid "MB/s"
 msgstr "మెబై/సె"
 
-#: ../gtk/Utils.cc:53
+#: ../gtk/Utils.cc:59
 msgid "GB/s"
 msgstr "గిబై/సె"
 
-#: ../gtk/Utils.cc:54
+#: ../gtk/Utils.cc:60
 msgid "TB/s"
 msgstr "టెబై/సె"
 
-#: ../gtk/Utils.cc:99
+#: ../gtk/Utils.cc:105
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:106
+#: ../gtk/Utils.cc:112
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:113
+#: ../gtk/Utils.cc:119
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:120
+#: ../gtk/Utils.cc:126
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:124 ../gtk/Utils.cc:155 ../gtk/Utils.cc:182 ../gtk/Utils.cc:215
+#: ../gtk/Utils.cc:130 ../gtk/Utils.cc:161 ../gtk/Utils.cc:188 ../gtk/Utils.cc:221
 msgid "now"
 msgstr ""
 
-#: ../gtk/Utils.cc:131
+#: ../gtk/Utils.cc:137
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:137
+#: ../gtk/Utils.cc:143
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:144
+#: ../gtk/Utils.cc:150
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:151
+#: ../gtk/Utils.cc:157
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:164
+#: ../gtk/Utils.cc:170
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:169
+#: ../gtk/Utils.cc:175
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:174
+#: ../gtk/Utils.cc:180
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:179
+#: ../gtk/Utils.cc:185
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:190
+#: ../gtk/Utils.cc:196
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:197
+#: ../gtk/Utils.cc:203
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:204
+#: ../gtk/Utils.cc:210
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:211
+#: ../gtk/Utils.cc:217
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:251
+#: ../gtk/Utils.cc:257
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
 msgstr ""
 
-#: ../gtk/Utils.cc:262
+#: ../gtk/Utils.cc:268
 msgid "Couldn't open torrent"
 msgstr ""
 
-#: ../gtk/Utils.cc:574 ../libtransmission/announcer.cc:1203 ../libtransmission/announcer.cc:1435
+#: ../gtk/Utils.cc:663 ../libtransmission/announcer.cc:1204 ../libtransmission/announcer.cc:1436
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:580
+#: ../gtk/Utils.cc:669
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:585
+#: ../gtk/Utils.cc:674
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
-#: ../gtk/main.cc:49 ../gtk/transmission-gtk.desktop.in:3
+#: ../gtk/main.cc:50 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
 msgstr "ట్రాన్స్‍మిషన్"
 
 #. parse the command line
-#: ../gtk/main.cc:58
+#: ../gtk/main.cc:66
 msgid "Where to look for configuration files"
 msgstr "స్వరూపణ దస్త్రాల కోసం ఎక్కడ చూడాలి"
 
-#: ../gtk/main.cc:59
+#: ../gtk/main.cc:67
 msgid "Start with all torrents paused"
 msgstr "అనువర్తనం నడిపినపుడు టోరెంట్లన్నీ నిలిపివేసి ప్రారంభించు"
 
-#: ../gtk/main.cc:60
+#: ../gtk/main.cc:68
 msgid "Start minimized in notification area"
 msgstr "గమనికల ప్రాంతంలో కనిష్టీకరించి ప్రారంభించు"
 
-#: ../gtk/main.cc:61
+#: ../gtk/main.cc:69
 msgid "Show version number and exit"
 msgstr "వెర్షన్ సంఖ్యను చూపించు మరియు నిష్క్రమించు"
 
-#: ../gtk/main.cc:69
+#: ../gtk/main.cc:77
 msgid "[torrent files or urls]"
 msgstr "[టోరెంట్ దస్త్రాలు లేదా urls]"
 
-#: ../gtk/main.cc:80
+#: ../gtk/main.cc:91
 #, c-format
 msgid ""
 "%s\n"
@@ -1861,6 +1211,14 @@ msgstr ""
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
 msgstr ""
+
+#: ../gtk/transmission.ui:7
+msgid "_File"
+msgstr "దస్త్రం (_F)"
+
+#: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
+msgid "Open a torrent"
+msgstr "ఒక టోరెంట్ను తెరువు"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
@@ -1894,6 +1252,10 @@ msgstr "అన్ని టోరెంట్లను నిలుపు"
 msgid "_Quit"
 msgstr "నిష్క్రమించు (_Q)"
 
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:680 ../gtk/ui/gtk4/DetailsDialog.ui:508
+msgid "_Edit"
+msgstr "సవరణ (_E)"
+
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
 msgstr "అన్నీ ఎంపికచేయి (_A)"
@@ -1906,9 +1268,29 @@ msgstr "ఏదీ ఎంపికచేయవద్దు(_l)"
 msgid "_Preferences"
 msgstr ""
 
+#: ../gtk/transmission.ui:77
+msgid "_Torrent"
+msgstr "టోరెంట్ (_T)"
+
+#: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:94 ../gtk/ui/gtk4/MainWindow.ui:91
+msgid "_Properties"
+msgstr ""
+
+#: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:91 ../gtk/ui/gtk4/MainWindow.ui:77
+msgid "Torrent properties"
+msgstr "టోరెంట్ లక్షణాలు"
+
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
 msgstr "సంచయాన్ని తెరువు (_O)"
+
+#: ../gtk/transmission.ui:97 ../gtk/transmission.ui:366 ../gtk/ui/gtk3/MainWindow.ui:39 ../gtk/ui/gtk4/MainWindow.ui:44
+msgid "_Start"
+msgstr "ప్రారంభించు (_S)"
+
+#: ../gtk/transmission.ui:99 ../gtk/transmission.ui:368 ../gtk/ui/gtk3/MainWindow.ui:37 ../gtk/ui/gtk4/MainWindow.ui:42
+msgid "Start torrent"
+msgstr "టోరెంటును ప్రారంభించు"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
@@ -1921,6 +1303,10 @@ msgstr "టోరెంటును ఇప్పుడే ప్రారంభ�
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
 msgstr "ఇంకొంతమంది తోటివాళ్ళ కోసం జాడకాన్ని అడుగు (_M)"
+
+#: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
+msgid "_Queue"
+msgstr "వరుస (_Q)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1938,6 +1324,14 @@ msgstr "క్రిందకి జరుపు (_D)"
 msgid "Move to _Bottom"
 msgstr "అన్నిటికంటే క్రిందికి జరుపు (_B)"
 
+#: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:54 ../gtk/ui/gtk4/MainWindow.ui:54
+msgid "_Pause"
+msgstr "నిలుపు(_P)"
+
+#: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:52 ../gtk/ui/gtk4/MainWindow.ui:52
+msgid "Pause torrent"
+msgstr "టోరెంటును నిలుపు"
+
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
 msgstr "స్థానాన్ని అమర్చండి...(_L)"
@@ -1950,9 +1344,17 @@ msgstr "స్థానిక సమాచారాన్ని తనిఖీ 
 msgid "Copy _Magnet Link to Clipboard"
 msgstr "అయస్కాంత లంకెను క్లిప్ బోర్డ్ కు నకలుతీయి(_M)"
 
+#: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:68 ../gtk/ui/gtk4/MainWindow.ui:63
+msgid "Remove torrent"
+msgstr "టోరెంటును తీసివేయి"
+
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
 msgstr "దస్త్రాలను తొలగించు మరియు తీసివేయి (_D)"
+
+#: ../gtk/transmission.ui:178
+msgid "_View"
+msgstr "వీక్షణం (_V)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -2010,6 +1412,10 @@ msgstr "మిగిలివున్న సమయాన్ని బట్ట�
 msgid "Re_verse Sort Order"
 msgstr "క్రమాన్ని తలక్రిందులుగా మార్చు(_v)"
 
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1457
+msgid "_Help"
+msgstr "సహాయం(_H)"
+
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
 msgstr "సందేశాల చిట్టా (_L)"
@@ -2030,6 +1436,10 @@ msgstr "దత్తాంశాలు"
 msgid "_About"
 msgstr ""
 
+#: ../gtk/transmission.ui:306
+msgid "_Sort Torrents By"
+msgstr "టోరెంట్లను ఇలా క్రమబద్దీకరించు(_S)"
+
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
 msgstr "ట్రాన్స్​మిషన్ను చూపించు (_S)"
@@ -2037,6 +1447,624 @@ msgstr "ట్రాన్స్​మిషన్ను చూపించు (
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
 msgstr "ప్రత్యామ్నాయ వేగ పరిమితులను చేతనపరుచు(_L)"
+
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:1985 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1391
+msgid "_Add"
+msgstr "జతచేయి (_A)"
+
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/AddTrackerDialog.ui:18
+msgid "Tracker"
+msgstr "జాడకం"
+
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:88 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
+msgid "_Announce URL:"
+msgstr "URL ప్రకటించు(_A):"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:840 ../gtk/ui/gtk4/MakeDialog.ui:277 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1470 ../gtk/ui/gtk4/StatsDialog.ui:253
+msgid "_Close"
+msgstr ""
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:56 ../gtk/ui/gtk4/DetailsDialog.ui:25
+msgid "Activity"
+msgstr "క్రియాశీలత"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:80 ../gtk/ui/gtk4/DetailsDialog.ui:39
+msgid "Torrent size:"
+msgstr "టోరెంట్ పరిమాణం:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:92 ../gtk/ui/gtk4/DetailsDialog.ui:49
+msgid "Have:"
+msgstr "ఉన్నది:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:104 ../gtk/ui/gtk3/StatsDialog.ui:92 ../gtk/ui/gtk3/StatsDialog.ui:250 ../gtk/ui/gtk4/DetailsDialog.ui:59 ../gtk/ui/gtk4/StatsDialog.ui:33 ../gtk/ui/gtk4/StatsDialog.ui:151
+msgid "Uploaded:"
+msgstr "ఎగుమతి చేసింది:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:116 ../gtk/ui/gtk3/StatsDialog.ui:117 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:69 ../gtk/ui/gtk4/StatsDialog.ui:54 ../gtk/ui/gtk4/StatsDialog.ui:172
+msgid "Downloaded:"
+msgstr "దిగుమతి చేసుకున్నది:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:128 ../gtk/ui/gtk4/DetailsDialog.ui:79
+msgid "State:"
+msgstr "స్థితి:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:140 ../gtk/ui/gtk4/DetailsDialog.ui:89
+msgid "Running time:"
+msgstr "నడుస్తున్న సమయం:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:152 ../gtk/ui/gtk4/DetailsDialog.ui:99
+msgid "Remaining time:"
+msgstr "మిగిలిన సమయం:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:164 ../gtk/ui/gtk4/DetailsDialog.ui:109
+msgid "Last activity:"
+msgstr "చివరి క్రియాశీలత:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:176 ../gtk/ui/gtk4/DetailsDialog.ui:119
+msgid "Error:"
+msgstr "దోషం:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:330 ../gtk/ui/gtk4/DetailsDialog.ui:242
+msgid "Details"
+msgstr "వివరాలు"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:354 ../gtk/ui/gtk4/DetailsDialog.ui:256
+msgid "Location:"
+msgstr "ప్రదేశం:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:366 ../gtk/ui/gtk4/DetailsDialog.ui:266
+msgid "Hash:"
+msgstr "హాష్:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:378 ../gtk/ui/gtk4/DetailsDialog.ui:276
+msgid "Privacy:"
+msgstr "అంతరంగికత:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:390 ../gtk/ui/gtk4/DetailsDialog.ui:286
+msgid "Origin:"
+msgstr "పుట్టుక:"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:402 ../gtk/ui/gtk4/DetailsDialog.ui:296
+msgid "Added:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
+msgid "Comment:"
+msgstr "వ్యాఖ్య"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
+msgid "Show _more details"
+msgstr "మరిన్ని వివరాలను చూపించు(_m)"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:617 ../gtk/ui/gtk4/DetailsDialog.ui:461
+msgid "Peers"
+msgstr "పీర్లు"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:738 ../gtk/ui/gtk4/DetailsDialog.ui:536
+msgid "Show _backup trackers"
+msgstr "ప్రత్యామ్నాయ జాడకాలను చూపించు(_b)"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:799 ../gtk/ui/gtk4/DetailsDialog.ui:576
+msgid "File listing not available for combined torrent properties"
+msgstr "దస్త్రాల జాబితా మిళిత టోరెంట్ లక్షణాలు కొరకు లభ్యం కాదు"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:816 ../gtk/ui/gtk3/MakeDialog.ui:67 ../gtk/ui/gtk4/DetailsDialog.ui:583 ../gtk/ui/gtk4/MakeDialog.ui:19
+msgid "Files"
+msgstr "దస్త్రాలు"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:383 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:238
+msgid "Speed"
+msgstr "వేగం"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:857 ../gtk/ui/gtk4/DetailsDialog.ui:613
+msgid "Honor global _limits"
+msgstr "సార్వత్రిక పరిమితులను గౌరవించు (_l)"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:873 ../gtk/ui/gtk4/DetailsDialog.ui:626
+msgid "Limit _download speed ({speed_units}):"
+msgstr ""
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:888 ../gtk/ui/gtk4/DetailsDialog.ui:638
+msgid "Limit _upload speed ({speed_units}):"
+msgstr ""
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:905 ../gtk/ui/gtk3/OptionsDialog.ui:145 ../gtk/ui/gtk4/DetailsDialog.ui:650 ../gtk/ui/gtk4/OptionsDialog.ui:87
+msgid "Torrent _priority:"
+msgstr "టోరెంట్ ప్రాధాన్యత(_p):"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:972 ../gtk/ui/gtk4/DetailsDialog.ui:699
+msgid "Seeding Limits"
+msgstr "సీడింగ్ పరిమితులు"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:996 ../gtk/ui/gtk4/DetailsDialog.ui:713
+msgid "_Ratio:"
+msgstr "నిష్పత్తి(_R):"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1010 ../gtk/ui/gtk4/DetailsDialog.ui:725
+msgid "_Idle:"
+msgstr "జడం (_I):"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1115 ../gtk/ui/gtk4/DetailsDialog.ui:785
+msgid "Peer Connections"
+msgstr "పీర్ల అనుసంధానాలు"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1139 ../gtk/ui/gtk4/DetailsDialog.ui:799
+msgid "_Maximum peers:"
+msgstr "గరిష్ట పీర్లు(_M)"
+
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1176 ../gtk/ui/gtk3/MainWindow.ui:168 ../gtk/ui/gtk3/PrefsDialog.ui:1399 ../gtk/ui/gtk4/DetailsDialog.ui:825 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:964
+msgid "Options"
+msgstr "ఐచ్చికాలు"
+
+#: ../gtk/ui/gtk3/EditTrackersDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:18
+msgid "Tracker Announce URLs"
+msgstr "ట్రాకర్ URLs ప్రకటించు"
+
+#: ../gtk/ui/gtk3/EditTrackersDialog.ui:88 ../gtk/ui/gtk3/MakeDialog.ui:313 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:197
+msgid ""
+"To add a backup URL, add it on the next line after a primary URL.\n"
+"To add a new primary URL, add it after a blank line."
+msgstr ""
+
+#: ../gtk/ui/gtk3/EditTrackersDialog.ui:123 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
+msgid "Also see Default Public Trackers in Edit > Preferences > Network"
+msgstr ""
+
+#: ../gtk/ui/gtk3/MainWindow.ui:142 ../gtk/ui/gtk4/MainWindow.ui:130
+msgid "Torrent"
+msgstr "టోరెంటు"
+
+#: ../gtk/ui/gtk3/MainWindow.ui:250 ../gtk/ui/gtk3/StatsDialog.ui:8 ../gtk/ui/gtk4/MainWindow.ui:202 ../gtk/ui/gtk4/StatsDialog.ui:5
+msgid "Statistics"
+msgstr "గణాంకాలు"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:8 ../gtk/ui/gtk3/MakeProgressDialog.ui:8 ../gtk/ui/gtk4/MakeDialog.ui:5 ../gtk/ui/gtk4/MakeProgressDialog.ui:5
+msgid "New Torrent"
+msgstr "క్రొత్త టోరెంట్"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:36 ../gtk/ui/gtk4/MakeDialog.ui:285
+msgid "_New"
+msgstr ""
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:91 ../gtk/ui/gtk4/MakeDialog.ui:33
+msgid "Sa_ve to:"
+msgstr "దీనికి దాచు(_v)"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:116 ../gtk/ui/gtk4/MakeDialog.ui:55
+msgid "Source F_older:"
+msgstr "మూల సంచయం(_o):"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:144 ../gtk/ui/gtk4/MakeDialog.ui:76
+msgid "Source _File:"
+msgstr "దస్త్ర మూలము (_F):"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:191 ../gtk/ui/gtk4/MakeDialog.ui:113
+msgid "Piece size:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:242 ../gtk/ui/gtk4/MakeDialog.ui:148
+msgid "Properties"
+msgstr "లక్షణాలు"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:268 ../gtk/ui/gtk4/MakeDialog.ui:163
+msgid "_Trackers:"
+msgstr "జాడకాలు (_T):"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:331 ../gtk/ui/gtk4/MakeDialog.ui:210
+msgid "Co_mment:"
+msgstr "వ్యాఖ్య(_m):"
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:357 ../gtk/ui/gtk4/MakeDialog.ui:232
+msgid "_Source:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/MakeDialog.ui:383 ../gtk/ui/gtk4/MakeDialog.ui:254
+msgid "_Private torrent"
+msgstr "రహస్య టోరెంట్(_P)"
+
+#: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
+msgid "Creating torrent…"
+msgstr "టోరెంటును సృష్టిస్తోంది..."
+
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
+msgid "Message Log"
+msgstr "సందేశాల చిట్టా"
+
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:26 ../gtk/ui/gtk4/MessageLogWindow.ui:31
+msgid "Save _As"
+msgstr ""
+
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:41 ../gtk/ui/gtk4/MessageLogWindow.ui:55
+msgid "Clear"
+msgstr ""
+
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:66 ../gtk/ui/gtk4/MessageLogWindow.ui:84
+msgid "P_ause"
+msgstr ""
+
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:96 ../gtk/ui/gtk4/MessageLogWindow.ui:100
+msgid "Level"
+msgstr "స్థాయి"
+
+#: ../gtk/ui/gtk3/OptionsDialog.ui:8 ../gtk/ui/gtk4/OptionsDialog.ui:5
+msgid "Torrent Options"
+msgstr "టోరెంట్ ఐచ్చికాలు"
+
+#: ../gtk/ui/gtk3/OptionsDialog.ui:67 ../gtk/ui/gtk4/OptionsDialog.ui:19
+msgid "_Torrent file:"
+msgstr "టోరెంట్ దస్త్రం (_T):"
+
+#: ../gtk/ui/gtk3/OptionsDialog.ui:82 ../gtk/ui/gtk4/OptionsDialog.ui:32
+msgid "Select Source File"
+msgstr "మూల దస్త్రాన్ని ఎంచుకోండి"
+
+#: ../gtk/ui/gtk3/OptionsDialog.ui:93 ../gtk/ui/gtk4/OptionsDialog.ui:41
+msgid "_Destination folder:"
+msgstr "గమ్య సంచయం (_D):"
+
+#: ../gtk/ui/gtk3/OptionsDialog.ui:109 ../gtk/ui/gtk4/OptionsDialog.ui:55
+msgid "Select Destination Folder"
+msgstr "గమ్య సంచయాన్ని ఎంచుకోండి"
+
+#: ../gtk/ui/gtk3/OptionsDialog.ui:168 ../gtk/ui/gtk4/OptionsDialog.ui:108
+msgid "_Start when added"
+msgstr "కలుపగానే ప్రారంభించు(_S)"
+
+#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:471 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:307
+msgid "Mo_ve torrent file to the trash"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:8 ../gtk/ui/gtk4/PrefsDialog.ui:5
+msgid "Transmission Preferences"
+msgstr "ట్రాన్స్​మిషన్ అభిరుచులు"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:72 ../gtk/ui/gtk4/PrefsDialog.ui:26
+msgid "Speed Limits"
+msgstr "వేగ పరిమితులు"
+
+#. Checkbox to limit upload speed
+#: ../gtk/ui/gtk3/PrefsDialog.ui:94 ../gtk/ui/gtk4/PrefsDialog.ui:40
+msgid "_Upload ({speed_units}):"
+msgstr ""
+
+#. Checkbox to limit download speed
+#: ../gtk/ui/gtk3/PrefsDialog.ui:109 ../gtk/ui/gtk4/PrefsDialog.ui:52
+msgid "_Download ({speed_units}):"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:172 ../gtk/ui/gtk4/PrefsDialog.ui:94
+msgid "Alternative Speed Limits"
+msgstr "ప్రత్యామ్నాయ వేగ పరిమితులు"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:216 ../gtk/ui/gtk4/PrefsDialog.ui:116
+msgid "Override normal speed limits manually or at scheduled times"
+msgstr "సాదారణ వేగ పరిమితులని స్వయంగానో, కాలపట్టికతోనో తోసిపుచ్చండి"
+
+#. Labels a spinbutton for alternate upload speed limits
+#: ../gtk/ui/gtk3/PrefsDialog.ui:232 ../gtk/ui/gtk4/PrefsDialog.ui:130
+msgid "U_pload ({speed_units}):"
+msgstr ""
+
+#. Labels a spinbutton for alternate download speed limits
+#: ../gtk/ui/gtk3/PrefsDialog.ui:246 ../gtk/ui/gtk4/PrefsDialog.ui:142
+msgid "Do_wnload ({speed_units}):"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:258 ../gtk/ui/gtk4/PrefsDialog.ui:154
+msgid "_Scheduled times:"
+msgstr "ప్రణాళికా సమయాలు (_S):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:275 ../gtk/ui/gtk4/PrefsDialog.ui:166
+msgid "_On days:"
+msgstr "ఈ దినాలలో(_O):"
+
+#. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
+#: ../gtk/ui/gtk3/PrefsDialog.ui:330 ../gtk/ui/gtk4/PrefsDialog.ui:207
+msgid "_to"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:400 ../gtk/ui/gtk4/PrefsDialog.ui:253
+msgctxt "Gerund"
+msgid "Adding"
+msgstr "జతచేస్తోంది"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:422 ../gtk/ui/gtk4/PrefsDialog.ui:267
+msgid "Automatically add torrent files _from:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:437 ../gtk/ui/gtk4/PrefsDialog.ui:279
+msgid "Show the Torrent Options _dialog"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:454 ../gtk/ui/gtk4/PrefsDialog.ui:293
+msgid "_Start added torrents"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:490 ../gtk/ui/gtk4/PrefsDialog.ui:321
+msgid "Save to _Location:"
+msgstr "ఈ ప్రదేశంలో దాచుము(_L):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:575 ../gtk/ui/gtk4/PrefsDialog.ui:384
+msgid "Download Queue"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:398
+msgid "Ma_ximum active downloads:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:613 ../gtk/ui/gtk4/PrefsDialog.ui:410
+msgid "Downloads sharing data in the last _N minutes are active:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:668 ../gtk/ui/gtk4/PrefsDialog.ui:449
+msgid "Incomplete"
+msgstr "అసంపూర్ణం"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:690 ../gtk/ui/gtk4/PrefsDialog.ui:463
+msgid "Append \"._part\" to incomplete files' names"
+msgstr "అసంపూర్ణ దస్త్రాల పేర్లకు \"._part\" జోడించు(_p)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:707 ../gtk/ui/gtk4/PrefsDialog.ui:477
+msgid "Keep _incomplete torrents in:"
+msgstr "అసంపూర్ణ టోరెంట్లను ఇందులో ఉంచుము(_i):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:722 ../gtk/ui/gtk4/PrefsDialog.ui:489
+msgid "Call scrip_t when done downloading:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:776 ../gtk/ui/gtk4/PrefsDialog.ui:526
+msgctxt "Gerund"
+msgid "Downloading"
+msgstr "దింపుకుంటున్నది"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:794 ../gtk/ui/gtk4/PrefsDialog.ui:541
+msgid "Limits"
+msgstr "పరిమితులు"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:816 ../gtk/ui/gtk4/PrefsDialog.ui:555
+msgid "Stop seeding at _ratio:"
+msgstr "ఈ నిష్పత్తి వద్ద సీడింగ్ ఆపుము (_r):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:831 ../gtk/ui/gtk4/PrefsDialog.ui:567
+msgid "Stop seeding if idle for _N minutes:"
+msgstr "N నిముషాలు కనుక వాడుకలో లేకుంటే సీడింగ్ ఆపుము:(_N)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:846 ../gtk/ui/gtk4/PrefsDialog.ui:579
+msgid "Call scrip_t when done seeding:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:909 ../gtk/ui/gtk4/PrefsDialog.ui:625
+msgctxt "Gerund"
+msgid "Seeding"
+msgstr "సీడింగు చేస్తున్నది"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:927 ../gtk/ui/gtk3/PrefsDialog.ui:1131 ../gtk/ui/gtk4/PrefsDialog.ui:640 ../gtk/ui/gtk4/PrefsDialog.ui:775
+msgid "Privacy"
+msgstr "గోప్యత"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:951 ../gtk/ui/gtk4/PrefsDialog.ui:654
+msgid "_Encryption mode:"
+msgstr "ఎన్క్రిప్షను విధము:(_E)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:995 ../gtk/ui/gtk4/PrefsDialog.ui:682
+msgid "Blocklist"
+msgstr "బ్లాకుజాబితా"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1017 ../gtk/ui/gtk4/PrefsDialog.ui:696
+msgid "Enable _blocklist:"
+msgstr "బ్లాకుజాబితాను చేతనపరుచు:(_b)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1032 ../gtk/ui/gtk4/PrefsDialog.ui:708
+msgid "Enable _automatic updates"
+msgstr "స్వయంచాలక నవీకరణలను చేతనపరుచు(_a)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1084 ../gtk/ui/gtk4/PrefsDialog.ui:747
+msgid "_Update"
+msgstr "నవీకరించు(_U)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1149 ../gtk/ui/gtk4/PrefsDialog.ui:790
+msgid "Listening Port"
+msgstr "వినియోగించాల్సిన పోర్టు"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1173 ../gtk/ui/gtk4/PrefsDialog.ui:804
+msgid "_Port used for incoming connections:"
+msgstr "వచ్చే అనుసంధానాలకు ఈ పోర్టు వాడు(_P)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1185 ../gtk/ui/gtk4/PrefsDialog.ui:816
+msgid "Pick a _random port every time Transmission is started"
+msgstr "ప్రతీసారి ట్రాన్స్ మిషన్ ప్రారంభించబడినపుడు ఒక యాదృచ్ఛిక మార్గాన్ని  ఎన్నుకొను(_r)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1202 ../gtk/ui/gtk4/PrefsDialog.ui:830
+msgid "Use UPnP or NAT-PMP port _forwarding from my router"
+msgstr "నా రౌటర్నుంచి UPnP లేదా NAT-PMP పోర్టు ఫార్వార్డింగ్(_f) వాడు"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1264 ../gtk/ui/gtk4/PrefsDialog.ui:878
+msgid "Te_st Port"
+msgstr "మార్గాన్ని పరీక్షించు(_s)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1306 ../gtk/ui/gtk4/PrefsDialog.ui:899
+msgid "Peer Limits"
+msgstr "పీర్ పరిమితులు"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1330 ../gtk/ui/gtk4/PrefsDialog.ui:913
+msgid "Maximum peers per _torrent:"
+msgstr "టోరెంట్ ఒక్కోదానికి అత్యధిక పీర్ల సంఖ్య(_t):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1344 ../gtk/ui/gtk4/PrefsDialog.ui:925
+msgid "Maximum peers _overall:"
+msgstr "టోరెంట్ల మొత్తానికి అత్యధిక పీర్ల సంఖ్య(_o):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1421 ../gtk/ui/gtk4/PrefsDialog.ui:978
+msgid "Enable _uTP for peer communication"
+msgstr "తోటివారితో అనుసంధానాల కోసం _uTP చేతనపరచండి"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1425 ../gtk/ui/gtk4/PrefsDialog.ui:980
+msgid "uTP is a tool for reducing network congestion."
+msgstr "uTP అనేది నెట్వర్క్ రద్దీ తగ్గించడానికి వాడే సాధనం."
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:993
+msgid "Use PE_X to find more peers"
+msgstr "మరిన్ని పీర్లను కనుగొనుటకు PEX వాడు(_X)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:995
+msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
+msgstr "పీరు జాబితాలు మార్పిడికోసం PEX అనేది ఒక సాధనం మీరు అనుసంధానమయిన పీర్లను దీని ద్వారా మార్చవచ్చు."
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1008
+msgid "Use _DHT to find more peers"
+msgstr "మరిన్ని పీర్లను కనుగొనుటకు DHT వాడు(_D)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1461 ../gtk/ui/gtk4/PrefsDialog.ui:1010
+msgid "DHT is a tool for finding peers without a tracker."
+msgstr "ట్రాకరు లేకుండా పీర్లను కనుగొనుట కొరకు DHT అనేది ఒక సాధనం."
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1475 ../gtk/ui/gtk4/PrefsDialog.ui:1023
+msgid "Use _Local Peer Discovery to find more peers"
+msgstr "మరిన్ని పీర్లను కనుగొనుటకు Local Peer Discovery ని వాడు(_L)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1479 ../gtk/ui/gtk4/PrefsDialog.ui:1025
+msgid "LPD is a tool for finding peers on your local network."
+msgstr "మీ స్థానిక నెట్వర్కు నందు పీర్లను కనుగొనుట కొరకు LPD అనేది ఒక సాధనం."
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1514 ../gtk/ui/gtk4/PrefsDialog.ui:1045
+msgid "Default Public Trackers"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1546 ../gtk/ui/gtk4/PrefsDialog.ui:1068
+msgid ""
+"Trackers to use on all public torrents.\n"
+"\n"
+"To add a backup URL, add it on the next line after a primary URL.\n"
+"To add a new primary URL, add it after a blank line."
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1575 ../gtk/ui/gtk4/PrefsDialog.ui:1087
+msgid "Network"
+msgstr "నెట్‌వర్క్"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1593 ../gtk/ui/gtk3/PrefsDialog.ui:1757 ../gtk/ui/gtk4/PrefsDialog.ui:1102 ../gtk/ui/gtk4/PrefsDialog.ui:1211
+msgid "Desktop"
+msgstr "డెస్క్‍టాప్"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1615 ../gtk/ui/gtk4/PrefsDialog.ui:1116
+msgid "_Inhibit hibernation when torrents are active"
+msgstr "టోరెంట్లు నడుస్తున్నప్పుడు కంప్యూటర్ని సుప్తావస్థలోకి వెళ్ళనియ్యకు(_I)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1632 ../gtk/ui/gtk4/PrefsDialog.ui:1130
+msgid "Show Transmission icon in the _notification area"
+msgstr "గమనికల ప్రాంతంలో ట్రాన్స్ మిషన్ ఐకాన్ను చూపించు(_n)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1670 ../gtk/ui/gtk4/PrefsDialog.ui:1151
+msgid "Notification"
+msgstr "గమనిక"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1692 ../gtk/ui/gtk4/PrefsDialog.ui:1165
+msgid "Show a notification when torrents are a_dded"
+msgstr "టోరెంట్లను జతచేసినపుడు గమనికను చూపించు (_d)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1709 ../gtk/ui/gtk4/PrefsDialog.ui:1179
+msgid "Show a notification when torrents _finish"
+msgstr "టోరెంట్లు పూర్తయినపుడు గమనికను చూపించు (_f)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1726 ../gtk/ui/gtk4/PrefsDialog.ui:1193
+msgid "Play a _sound when torrents finish"
+msgstr "టోరెంట్లు పూర్తయినపుడు శబ్దాన్ని ఆడించు (_s)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1775 ../gtk/ui/gtk4/PrefsDialog.ui:1226
+msgid "Remote Control"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1803 ../gtk/ui/gtk4/PrefsDialog.ui:1245
+msgid "Allow _remote access"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1819 ../gtk/ui/gtk4/PrefsDialog.ui:1253
+msgid "_Open web client"
+msgstr "వెబ్ క్లైంటు తెరుచు(_O)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1843 ../gtk/ui/gtk4/PrefsDialog.ui:1268
+msgid "HTTP _port:"
+msgstr "HTTP పోర్టు (_p):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1855 ../gtk/ui/gtk4/PrefsDialog.ui:1280
+msgid "Use _authentication"
+msgstr "ధ్రువీకరణ వాడు(_a)"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1874 ../gtk/ui/gtk4/PrefsDialog.ui:1294
+msgid "_Username:"
+msgstr "వాడుకరి పేరు(_U):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1888 ../gtk/ui/gtk4/PrefsDialog.ui:1306
+msgid "Pass_word:"
+msgstr "సంకేతపదం(_w):"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1900 ../gtk/ui/gtk4/PrefsDialog.ui:1318
+msgid "Only allow these IP a_ddresses:"
+msgstr ""
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1921 ../gtk/ui/gtk4/PrefsDialog.ui:1334
+msgid "Addresses:"
+msgstr "చిరునామాలు:"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2031 ../gtk/ui/gtk4/PrefsDialog.ui:1421
+msgid "IP addresses may use wildcards, such as 192.168.*.*"
+msgstr "IP చిరునామాలు వైల్డ్ కార్డులను వాడవచ్చు, ఎలాగంటే 192.168.*.*"
+
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2060 ../gtk/ui/gtk4/PrefsDialog.ui:1440
+msgid "Remote"
+msgstr ""
+
+#: ../gtk/ui/gtk3/RelocateDialog.ui:8 ../gtk/ui/gtk4/RelocateDialog.ui:5
+msgid "Set Torrent Location"
+msgstr "టోరెంట్ ప్రదేశాన్ని నిర్దేశించు"
+
+#: ../gtk/ui/gtk3/RelocateDialog.ui:36 ../gtk/ui/gtk4/RelocateDialog.ui:101
+msgid "_Apply"
+msgstr ""
+
+#: ../gtk/ui/gtk3/RelocateDialog.ui:67 ../gtk/ui/gtk4/RelocateDialog.ui:19
+msgid "Location"
+msgstr "ప్రదేశం"
+
+#: ../gtk/ui/gtk3/RelocateDialog.ui:92 ../gtk/ui/gtk4/RelocateDialog.ui:34
+msgid "Torrent _location:"
+msgstr "టోరెంట్ ప్రదేశం(_L):"
+
+#: ../gtk/ui/gtk3/RelocateDialog.ui:117 ../gtk/ui/gtk4/RelocateDialog.ui:57
+msgid "_Move from the current folder"
+msgstr "ప్రస్థుత సంచయం నుండి తరలించు(_M)"
+
+#: ../gtk/ui/gtk3/RelocateDialog.ui:134 ../gtk/ui/gtk4/RelocateDialog.ui:70
+msgid "Local data is _already there"
+msgstr "స్థానిక సమాచారం ఇంతకు ముందే అక్కడ ఉంది(_a)"
+
+#: ../gtk/ui/gtk3/StatsDialog.ui:68 ../gtk/ui/gtk4/StatsDialog.ui:19
+msgid "Current Session"
+msgstr "ప్రస్తుత చర్యాకాలం"
+
+#: ../gtk/ui/gtk3/StatsDialog.ui:142 ../gtk/ui/gtk3/StatsDialog.ui:300 ../gtk/ui/gtk4/StatsDialog.ui:75 ../gtk/ui/gtk4/StatsDialog.ui:193
+msgid "Ratio:"
+msgstr "నిష్పత్తి:"
+
+#: ../gtk/ui/gtk3/StatsDialog.ui:167 ../gtk/ui/gtk3/StatsDialog.ui:325 ../gtk/ui/gtk4/StatsDialog.ui:96 ../gtk/ui/gtk4/StatsDialog.ui:214
+msgid "Duration:"
+msgstr "నిడివి:"
+
+#: ../gtk/ui/gtk3/StatsDialog.ui:212 ../gtk/ui/gtk4/StatsDialog.ui:125
+msgid "Total"
+msgstr "మొత్తం"
+
+#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:8 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
+msgid "Open URL"
+msgstr "URL తెరువు"
+
+#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:64 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:18
+msgid "Open torrent from URL"
+msgstr "URL నుండి టోరెంట్ తెరువు"
+
+#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:88 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:32
+msgid "_URL"
+msgstr "URL(_U)"
 
 #: ../libtransmission/announcer-http.cc:291
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2058,36 +2086,40 @@ msgstr ""
 msgid "Connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:966
+#: ../libtransmission/announcer.cc:967
 msgid "Announce error: {error}"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:976
+#: ../libtransmission/announcer.cc:977
 msgid "Announce error: {error} (Retrying in {count} second)"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1038 ../libtransmission/announcer.cc:1366
+#: ../libtransmission/announcer.cc:1039 ../libtransmission/announcer.cc:1367
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1042 ../libtransmission/announcer.cc:1370
+#: ../libtransmission/announcer.cc:1043 ../libtransmission/announcer.cc:1371
 msgid "Tracker did not respond"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1103
+#: ../libtransmission/announcer.cc:1104
 msgid "Success"
 msgstr ""
 
-#: ../libtransmission/blocklist.cc:59 ../libtransmission/blocklist.cc:311
+#: ../libtransmission/blocklist.cc:102
+msgid "Rewriting old blocklist file format to new format"
+msgstr ""
+
+#: ../libtransmission/blocklist.cc:117 ../libtransmission/blocklist.cc:509
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] ""
 msgstr[1] ""
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.cc:252 ../libtransmission/tr-dht.cc:157
+#: ../libtransmission/blocklist.cc:436 ../libtransmission/tr-dht.cc:336
 msgid "Couldn't parse line: '{line}'"
 msgstr ""
 
@@ -2107,35 +2139,23 @@ msgstr ""
 msgid "Skipping '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/natpmp.cc:81
-msgid "Found public address '{address}'"
-msgstr ""
-
-#: ../libtransmission/natpmp.cc:113
-msgid "Port {port} is no longer forwarded"
-msgstr ""
-
-#: ../libtransmission/natpmp.cc:167
-msgid "Port {port} forwarded successfully"
-msgstr ""
-
-#: ../libtransmission/net.cc:245
+#: ../libtransmission/net.cc:243
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:326
+#: ../libtransmission/net.cc:322
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:345
+#: ../libtransmission/net.cc:341
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:466
+#: ../libtransmission/net.cc:460
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr ""
 
-#: ../libtransmission/net.cc:467
+#: ../libtransmission/net.cc:461
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr ""
 
@@ -2159,81 +2179,121 @@ msgstr ""
 msgid "Unknown state: {state}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding.cc:57
+#: ../libtransmission/port-forwarding-natpmp.cc:83
+msgid "Found public address '{address}'"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-natpmp.cc:115
+msgid "Port {port} is no longer forwarded"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-natpmp.cc:169
+msgid "Port {port} forwarded successfully"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-upnp.cc:290
+msgid "Found Internet Gateway Device '{url}'"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-upnp.cc:291
+msgid "Local Address is '{address}'"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-upnp.cc:315
+msgid "Port {port} is not forwarded"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-upnp.cc:325
+msgid "Stopping port forwarding through '{url}', service '{type}'"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-upnp.cc:357
+msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-upnp.cc:365
+msgid "Port {port} is forwarded"
+msgstr ""
+
+#: ../libtransmission/port-forwarding-upnp.cc:371
+msgid "If your router supports UPnP, please make sure UPnP is enabled!"
+msgstr ""
+
+#: ../libtransmission/port-forwarding.cc:163
 msgid "Starting"
 msgstr "ప్రారంభించబడుతోంది"
 
-#: ../libtransmission/port-forwarding.cc:60
+#: ../libtransmission/port-forwarding.cc:166
 msgid "Forwarded"
 msgstr ""
 
-#: ../libtransmission/port-forwarding.cc:63
+#: ../libtransmission/port-forwarding.cc:169
 msgid "Stopping"
 msgstr "ఆపివేయబడుతోంది"
 
-#: ../libtransmission/port-forwarding.cc:66
+#: ../libtransmission/port-forwarding.cc:172
 msgid "Not forwarded"
 msgstr ""
 
-#: ../libtransmission/port-forwarding.cc:100
+#: ../libtransmission/port-forwarding.cc:201
 msgid "Mapped private port {private_port} to public port {public_port}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding.cc:112
+#: ../libtransmission/port-forwarding.cc:216
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:586
+#: ../libtransmission/rpc-server.cc:587
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:620
+#: ../libtransmission/rpc-server.cc:621
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:647
+#: ../libtransmission/rpc-server.cc:648
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:710
+#: ../libtransmission/rpc-server.cc:711
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/rpc-server.cc:721
+#: ../libtransmission/rpc-server.cc:722
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:751
+#: ../libtransmission/rpc-server.cc:752
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:818
+#: ../libtransmission/rpc-server.cc:819
 msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:823
+#: ../libtransmission/rpc-server.cc:824
 msgid "Added '{entry}' to host whitelist"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1067
+#: ../libtransmission/rpc-server.cc:1068
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1082
+#: ../libtransmission/rpc-server.cc:1083
 msgid "Serving RPC and Web requests on {address}"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1087
+#: ../libtransmission/rpc-server.cc:1088
 msgid "Whitelist enabled"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1092
+#: ../libtransmission/rpc-server.cc:1093
 msgid "Password required"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:1098
+#: ../libtransmission/rpc-server.cc:1099
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr ""
 
@@ -2253,7 +2313,7 @@ msgstr ""
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/session.cc:312
+#: ../libtransmission/session.cc:311
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr ""
 
@@ -2329,19 +2389,19 @@ msgstr ""
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-dht.cc:105
+#: ../libtransmission/tr-dht.cc:284
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-dht.cc:264
+#: ../libtransmission/tr-dht.cc:443
 msgid "Initializing DHT"
 msgstr ""
 
-#: ../libtransmission/tr-dht.cc:640
+#: ../libtransmission/tr-dht.cc:713
 msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
 msgstr ""
 
-#: ../libtransmission/tr-lpd.cc:261
+#: ../libtransmission/tr-lpd.cc:262
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr ""
 
@@ -2365,36 +2425,8 @@ msgstr ""
 msgid "Couldn't allocate IPv6 event"
 msgstr ""
 
-#: ../libtransmission/tr-utp.cc:96
+#: ../libtransmission/tr-utp.cc:97
 msgid "Unknown socket family"
-msgstr ""
-
-#: ../libtransmission/upnp.cc:284
-msgid "Found Internet Gateway Device '{url}'"
-msgstr ""
-
-#: ../libtransmission/upnp.cc:285
-msgid "Local Address is '{address}'"
-msgstr ""
-
-#: ../libtransmission/upnp.cc:309
-msgid "Port {port} is not forwarded"
-msgstr ""
-
-#: ../libtransmission/upnp.cc:319
-msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr ""
-
-#: ../libtransmission/upnp.cc:351
-msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
-msgstr ""
-
-#: ../libtransmission/upnp.cc:359
-msgid "Port {port} is forwarded"
-msgstr ""
-
-#: ../libtransmission/upnp.cc:365
-msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr ""
 
 #: ../libtransmission/utils.cc:88
@@ -2462,15 +2494,15 @@ msgstr ""
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../utils/create.cc:225
-msgid "{:d} files, {:s}\n"
-msgid_plural "{:d} file, {:s}\n"
+#: ../utils/create.cc:226
+msgid "{file_count:L} files, {total_size}\n"
+msgid_plural "{file_count:L} file, {total_size}\n"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/create.cc:230
-msgid "{:d} pieces, {:s} each\n"
-msgid_plural "{:d} piece, {:s}\n"
+#: ../utils/create.cc:231
+msgid "{piece_count:L} pieces, {piece_size} each\n"
+msgid_plural "{piece_count:L} piece, {piece_size}\n"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2898,6 +2930,9 @@ msgstr[1] ""
 #~ msgstr[0] "%2$'d కి గాను %1$'d తోటివానికి ఎగుమతి చేస్తోంది"
 #~ msgstr[1] "%2$'d కి గాను %1$'d మంది తోటివారికి ఎగుమతి చేస్తోంది"
 
+#~ msgid "Show _options dialog"
+#~ msgstr "ఐచ్ఛికాల సంవాదాన్ని చూపించు (_o)"
+
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "తెలియని టోరెంటు \"%s\" ను దాటవేస్తుంది"
@@ -3010,24 +3045,9 @@ msgstr[1] ""
 #~ msgid "_Download (%s):"
 #~ msgstr "దింపుకోలు (%s) (_D):"
 
-#~ msgid "_File"
-#~ msgstr "దస్త్రం (_F)"
-
-#~ msgid "_Queue"
-#~ msgstr "వరుస (_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "టోరెంట్లను ఇలా క్రమబద్దీకరించు(_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "టోరెంట్ (_T)"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "ఎక్కింపు (%s) (_U):"
-
-#~ msgid "_View"
-#~ msgstr "వీక్షణం (_V)"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
