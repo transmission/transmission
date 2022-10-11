@@ -1023,7 +1023,7 @@ private:
     std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
 
-    tr_stats session_stats_;
+    tr_stats session_stats_{ config_dir_, time(nullptr) };
 
     std::optional<tr_address> external_ip_;
 
