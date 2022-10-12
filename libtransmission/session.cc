@@ -303,13 +303,13 @@ void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
 {
     TR_ASSERT(session->allowsTCP());
 
-    socket_ = tr_netBindTCP(&addr_, session->private_peer_port, false);
+    socket_ = tr_netBindTCP(&addr_, session->private_peer_port_, false);
 
     if (socket_ != TR_BAD_SOCKET)
     {
         tr_logAddInfo(fmt::format(
             _("Listening to incoming peer connections on {hostport}"),
-            fmt::arg("hostport", addr_.readable(session->private_peer_port))));
+            fmt::arg("hostport", addr_.readable(session->private_peer_port_))));
         ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, acceptIncomingPeer, session);
         event_add(ev_, nullptr);
     }
@@ -321,15 +321,15 @@ static void close_incoming_peer_port(tr_session* session)
     session->bind_ipv6.close();
 }
 
-static void open_incoming_peer_port(tr_session* session)
+void tr_session::openIncomingPeerPort()
 {
-    TR_ASSERT(session->allowsTCP());
+    TR_ASSERT(allowsTCP());
 
-    session->bind_ipv4.bindAndListenForIncomingPeers(session);
+    bind_ipv4.bindAndListenForIncomingPeers(this);
 
-    if (tr_net_hasIPv6(session->private_peer_port))
+    if (tr_net_hasIPv6(private_peer_port_))
     {
-        session->bind_ipv6.bindAndListenForIncomingPeers(session);
+        bind_ipv6.bindAndListenForIncomingPeers(this);
     }
 }
 
@@ -990,7 +990,7 @@ void tr_session::setImpl(init_data& data)
     }
 
     {
-        auto peer_port = this->private_peer_port;
+        auto peer_port = this->private_peer_port_;
 
         if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
         {
@@ -1252,7 +1252,7 @@ void tr_session::onPeerPortChanged()
 
     if (allowsTCP())
     {
-        open_incoming_peer_port(this);
+        openIncomingPeerPort();
     }
 
     port_forwarding_->portChanged();
@@ -1265,15 +1265,15 @@ void tr_session::onPeerPortChanged()
 
 void tr_session::setPeerPort(tr_port port)
 {
-    this->private_peer_port = port;
-    this->public_peer_port = port;
+    this->private_peer_port_ = port;
+    this->public_peer_port_ = port;
 
     tr_runInEventThread(this, [this]() { onPeerPortChanged(); });
 }
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
-    if (auto const port = tr_port::fromHost(hport); session != nullptr && session->private_peer_port != port)
+    if (auto const port = tr_port::fromHost(hport); session != nullptr && session->private_peer_port_ != port)
     {
         session->setPeerPort(port);
     }
@@ -1281,7 +1281,7 @@ void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 
 uint16_t tr_sessionGetPeerPort(tr_session const* session)
 {
-    return session != nullptr ? session->public_peer_port.host() : 0U;
+    return session != nullptr ? session->public_peer_port_.host() : 0U;
 }
 
 uint16_t tr_sessionSetPeerPortRandom(tr_session* session)

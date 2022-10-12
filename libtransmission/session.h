@@ -545,7 +545,7 @@ public:
 
     [[nodiscard]] constexpr auto peerPort() const noexcept
     {
-        return public_peer_port;
+        return public_peer_port_;
     }
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
@@ -765,7 +765,7 @@ private:
 
         [[nodiscard]] tr_port privatePeerPort() const override
         {
-            return session_.private_peer_port;
+            return session_.private_peer_port_;
         }
 
         [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
@@ -775,8 +775,8 @@ private:
 
         void onPortForwarded(tr_port public_port, tr_port private_port) override
         {
-            session_.public_peer_port = public_port;
-            session_.private_peer_port = private_port;
+            session_.public_peer_port_ = public_port;
+            session_.private_peer_port_ = private_port;
         }
 
     private:
@@ -848,10 +848,12 @@ private:
 
     void onNowTimer();
 
+    void openIncomingPeerPort();
     void onPeerPortChanged();
     void setPeerPort(tr_port port);
 
     friend class libtransmission::test::SessionTest;
+    friend struct tr_bindinfo;
 
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
@@ -866,6 +868,7 @@ private:
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
@@ -906,17 +909,6 @@ private:
 
 public:
     std::unique_ptr<tr_udp_core> udp_core_;
-
-    /* The open port on the local machine for incoming peer requests */
-    tr_port private_peer_port;
-
-    /**
-     * The open port on the public device for incoming peer requests.
-     * This is usually the same as private_peer_port but can differ
-     * if the public device is a router and it decides to use a different
-     * port than the one requested by Transmission.
-     */
-    tr_port public_peer_port;
 
     struct tr_peerMgr* peerMgr = nullptr;
 
@@ -969,6 +961,15 @@ private:
 
     tr_port random_port_low_;
     tr_port random_port_high_;
+
+    // the open port on the local machine for incoming peer requests
+    tr_port private_peer_port_;
+
+    // The open port on the public device for incoming peer requests.
+    // This is usually the same as private_peer_port but can differ
+    // if the public device is a router and it decides to use a different
+    // port than the one requested by Transmission.
+    tr_port public_peer_port_;
 
     uint16_t peer_count_ = 0;
     uint16_t peer_limit_ = 200;
