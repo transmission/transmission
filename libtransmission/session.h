@@ -931,8 +931,6 @@ public:
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
-    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
 private:
     /// const fields
 
@@ -945,6 +943,21 @@ private:
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
     /// trivial fields
+
+    queue_start_callback_t queue_start_callback_ = nullptr;
+    void* queue_start_user_data_ = nullptr;
+
+    tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
+    void* idle_limit_hit_user_data_ = nullptr;
+
+    tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
+    void* ratio_limit_hit_user_data_ = nullptr;
+
+    tr_session_metadata_func got_metadata_cb_ = nullptr;
+    void* got_metadata_user_data_ = nullptr;
+
+    tr_torrent_completeness_func completeness_func_ = nullptr;
+    void* completeness_func_user_data_ = nullptr;
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
@@ -1012,11 +1025,15 @@ private:
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
 
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
+    bool blocklist_enabled_ = false;
+    bool incomplete_dir_enabled_ = false;
+
+    bool announce_ip_enabled_ = false;
+
     /// fields that are nontrivial but don't have dependencies
 
-    std::unique_ptr<libtransmission::Timer> now_timer_;
-
-    std::unique_ptr<libtransmission::Timer> save_timer_;
+    std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
     std::string download_dir_;
     std::string incomplete_dir_;
@@ -1024,6 +1041,8 @@ private:
     std::string blocklist_url_;
     std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
+
+    std::string announce_ip_;
 
     static std::recursive_mutex session_mutex_;
 
@@ -1033,15 +1052,21 @@ private:
 
     std::optional<tr_address> external_ip_;
 
+    ///
+
+    std::unique_ptr<libtransmission::Timer> now_timer_;
+
+    std::unique_ptr<libtransmission::Timer> save_timer_;
+
     tr_session_id session_id_;
 
     tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
 
-    ///
-
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
+
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
 
@@ -1060,34 +1085,9 @@ private:
     std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
 
     LpdMediator lpd_mediator_{ *this };
-
     std::unique_ptr<tr_lpd> lpd_;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
-
-    std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
-
-    queue_start_callback_t queue_start_callback_ = nullptr;
-    void* queue_start_user_data_ = nullptr;
-
-    tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
-    void* idle_limit_hit_user_data_ = nullptr;
-
-    tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
-    void* ratio_limit_hit_user_data_ = nullptr;
-
-    tr_session_metadata_func got_metadata_cb_ = nullptr;
-    void* got_metadata_user_data_ = nullptr;
-
-    tr_torrent_completeness_func completeness_func_ = nullptr;
-    void* completeness_func_user_data_ = nullptr;
-
-    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
-    bool blocklist_enabled_ = false;
-    bool incomplete_dir_enabled_ = false;
-
-    std::string announce_ip_;
-    bool announce_ip_enabled_ = false;
 
 public:
     struct struct_utp_context* utp_context = nullptr;
