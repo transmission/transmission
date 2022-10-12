@@ -53,14 +53,15 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 struct evdns_base;
 
-class tr_rpc_server;
-class tr_web;
 class tr_lpd;
 class tr_port_forwarding;
+class tr_rpc_server;
+class tr_web;
 struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
 struct tr_announcer_udp;
+struct tr_peerMgr;
 
 namespace libtransmission
 {
@@ -759,6 +760,15 @@ public:
         web_->fetch(std::move(options));
     }
 
+    void addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
+
+    void addTorrent(tr_torrent* tor);
+
+    [[nodiscard]] auto const& bandwidthGroups() const noexcept
+    {
+        return bandwidth_groups_;
+    }
+
 private:
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
     {
@@ -926,8 +936,6 @@ private:
 public:
     std::unique_ptr<tr_udp_core> udp_core_;
 
-    struct tr_peerMgr* peerMgr = nullptr;
-
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
@@ -1077,6 +1085,8 @@ private:
     std::unique_ptr<Cache> cache_ = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
+
+    std::shared_ptr<tr_peerMgr> peer_mgr_;
 
     PortForwardingMediator port_forwarding_mediator_{ *this };
     std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);

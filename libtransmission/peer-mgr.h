@@ -11,6 +11,7 @@
 
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint64_t
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -105,9 +106,7 @@ constexpr bool tr_isPex(tr_pex const* pex)
     return pex && tr_address_is_valid(&pex->addr);
 }
 
-[[nodiscard]] tr_peerMgr* tr_peerMgrNew(tr_session* session);
-
-void tr_peerMgrFree(tr_peerMgr* manager);
+[[nodiscard]] std::shared_ptr<tr_peerMgr> tr_peerMgrNew(tr_session* session);
 
 void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr);
 
@@ -121,7 +120,7 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
 
 [[nodiscard]] size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket);
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
 
 [[nodiscard]] std::vector<tr_pex> tr_peerMgrCompactToPex(
     void const* compact,

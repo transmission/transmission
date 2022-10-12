@@ -295,7 +295,7 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
     {
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", client_socket, client_addr.readable(client_port)));
 
-        tr_peerMgrAddIncoming(session->peerMgr, &client_addr, client_port, tr_peer_socket_tcp_create(client_socket));
+        session->addIncoming(client_addr, client_port, tr_peer_socket_tcp_create(client_socket));
     }
 }
 
@@ -721,8 +721,6 @@ void tr_session::initImpl(init_data& data)
 #endif
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
-
-    this->peerMgr = tr_peerMgrNew(this);
 
     /**
     ***  Blocklist
@@ -1865,8 +1863,8 @@ void tr_session::closeImplFinish()
     this->udp_core_.reset();
 
     stats().saveIfDirty();
-    tr_peerMgrFree(peerMgr);
     tr_utpClose(this);
+    peer_mgr_.reset();
     blocklists_.clear();
     openFiles().closeAll();
     is_closed_ = true;
@@ -2242,7 +2240,7 @@ void tr_sessionReloadBlocklists(tr_session* session)
     session->blocklists_.clear();
     session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
 
-    tr_peerMgrOnBlocklistChanged(session->peerMgr);
+    tr_peerMgrOnBlocklistChanged(session->peer_mgr_.get());
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)
@@ -2693,7 +2691,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
-    auto const& groups = session->bandwidth_groups_;
+    auto const& groups = session->bandwidthGroups();
 
     auto groups_dict = tr_variant{};
     tr_variantInitDict(&groups_dict, std::size(groups));
@@ -2819,6 +2817,7 @@ tr_session::tr_session(std::string_view config_dir)
                    } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , session_id_{ tr_time }
+    , peer_mgr_{ tr_peerMgrNew(this) }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->startRepeating(1s);
@@ -2839,4 +2838,18 @@ tr_session::tr_session(std::string_view config_dir)
     save_timer_->startRepeating(SaveIntervalSecs);
 
     verifier_->addCallback(tr_torrentOnVerifyDone);
+}
+
+void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
+{
+    tr_peerMgrAddIncoming(peer_mgr_.get(), addr, port, socket);
+}
+
+void tr_session::addTorrent(tr_torrent* tor)
+{
+    TR_ASSERT(tor->unique_id_ == 0);
+
+    tor->unique_id_ = torrents().add(tor);
+
+    tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
 }
