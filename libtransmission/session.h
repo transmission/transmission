@@ -770,7 +770,7 @@ private:
 
         [[nodiscard]] tr_address incomingPeerAddress() const override
         {
-            return session_.bind_ipv4.addr_;
+            return session_.bind_ipv4_.addr_;
         }
 
         [[nodiscard]] tr_port privatePeerPort() const override
@@ -862,6 +862,12 @@ private:
     void onPeerPortChanged();
     void setPeerPort(tr_port port);
 
+    void closePeerPort()
+    {
+        bind_ipv4_.close();
+        bind_ipv6_.close();
+    }
+
     friend class libtransmission::test::SessionTest;
     friend struct tr_bindinfo;
 
@@ -926,9 +932,6 @@ public:
     struct tr_announcer_udp* announcer_udp = nullptr;
 
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
-    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
-    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
 private:
     /// const fields
@@ -1031,6 +1034,9 @@ private:
     std::optional<tr_address> external_ip_;
 
     tr_session_id session_id_;
+
+    tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
+    tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
 
     ///
 
