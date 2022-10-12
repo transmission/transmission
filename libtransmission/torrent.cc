@@ -704,7 +704,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         tor->incomplete_dir = dir;
     }
-    tor->bandwidth_.setParent(&session->top_bandwidth_);
+    tor->bandwidth_.setParent(&session->bandwidth());
     tor->bandwidth_.setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
@@ -1872,7 +1872,7 @@ void tr_torrent::setBandwidthGroup(std::string_view group_name) noexcept
     if (std::empty(group_name))
     {
         this->bandwidth_group_ = tr_interned_string{};
-        this->bandwidth_.setParent(&this->session->top_bandwidth_);
+        this->bandwidth_.setParent(&this->session->bandwidth());
     }
     else
     {

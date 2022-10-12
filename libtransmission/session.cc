@@ -714,7 +714,7 @@ void tr_session::initImpl(init_data& data)
     tr_variant const* const client_settings = data.client_settings;
     TR_ASSERT(tr_variantIsDict(client_settings));
 
-    tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
+    tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&bandwidth())));
 
     auto settings = tr_variant{};
     tr_variantInitDict(&settings, 0);
@@ -1403,12 +1403,12 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
 {
     if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
     {
-        session->top_bandwidth_.setLimited(dir, *limit_bytes_per_second > 0U);
-        session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, *limit_bytes_per_second);
+        session->bandwidth().setLimited(dir, *limit_bytes_per_second > 0U);
+        session->bandwidth().setDesiredSpeedBytesPerSecond(dir, *limit_bytes_per_second);
     }
     else
     {
-        session->top_bandwidth_.setLimited(dir, false);
+        session->bandwidth().setLimited(dir, false);
     }
 }
 
@@ -1785,7 +1785,7 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 
 static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
+    return session != nullptr ? session->bandwidth().getRawSpeedBytesPerSecond(0, dir) : 0;
 }
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
@@ -2201,7 +2201,7 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
         }
     }
 
-    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<tr_bandwidth>(new tr_bandwidth(&top_bandwidth_)));
+    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<tr_bandwidth>(new tr_bandwidth(&bandwidth())));
     return *group;
 }
 

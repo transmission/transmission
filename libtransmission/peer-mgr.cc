@@ -1257,7 +1257,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     {
         auto* const handshake = tr_handshakeNew(
             std::make_unique<tr_handshake_mediator_impl>(*session),
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket),
+            tr_peerIo::newIncoming(session, &session->bandwidth(), addr, port, tr_time(), socket),
             session->encryptionMode(),
             on_handshake_done,
             manager);
@@ -2569,8 +2569,8 @@ void tr_peerMgr::bandwidthPulse()
 
     /* allocate bandwidth to the peers */
     auto const msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
-    session->top_bandwidth_.allocate(TR_UP, msec);
-    session->top_bandwidth_.allocate(TR_DOWN, msec);
+    session->bandwidth().allocate(TR_UP, msec);
+    session->bandwidth().allocate(TR_DOWN, msec);
 
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
@@ -2834,7 +2834,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 
     auto io = tr_peerIo::newOutgoing(
         mgr->session,
-        &mgr->session->top_bandwidth_,
+        &mgr->session->bandwidth(),
         &atom.addr,
         atom.port,
         tr_time(),

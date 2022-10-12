@@ -181,6 +181,16 @@ public:
         return *cache_;
     }
 
+    [[nodiscard]] constexpr auto& bandwidth()
+    {
+        return top_bandwidth_;
+    }
+
+    [[nodiscard]] constexpr auto const& bandwidth() const
+    {
+        return top_bandwidth_;
+    }
+
     [[nodiscard]] auto unique_lock() const
     {
         return std::unique_lock(session_mutex_);
@@ -698,7 +708,7 @@ public:
 
     [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
     {
-        return top_bandwidth_.getPieceSpeedBytesPerSecond(0, dir);
+        return bandwidth().getPieceSpeedBytesPerSecond(0, dir);
     }
 
     [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
@@ -915,9 +925,6 @@ public:
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
-    // monitors the "global pool" speeds
-    tr_bandwidth top_bandwidth_;
-
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
@@ -1026,6 +1033,9 @@ private:
     tr_session_id session_id_;
 
     ///
+
+    // monitors the "global pool" speeds
+    tr_bandwidth top_bandwidth_;
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
 
