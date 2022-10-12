@@ -1097,7 +1097,7 @@ private:
     std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
     WebMediator web_mediator_{ this };
-    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
+    std::unique_ptr<tr_web> const web_ = tr_web::create(web_mediator_);
 
     LpdMediator lpd_mediator_{ *this };
     std::unique_ptr<tr_lpd> lpd_;

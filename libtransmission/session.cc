@@ -1912,8 +1912,6 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(50);
     }
 
-    session->web_.reset();
-
     /* close the libtransmission thread */
     tr_eventClose(session);
 
