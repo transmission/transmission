@@ -220,7 +220,7 @@ void tr_eventInit(tr_session* session)
     events->thread_id = thread.get_id();
     thread.detach();
     // wait until the libevent thread is running
-    events->work_queue_cv.wait(lock, [session] { return session->events != nullptr; });
+    events->work_queue_cv.wait(lock, [session] { return session->hasEventLoop(); });
 }
 
 void tr_eventClose(tr_session* session)
@@ -245,7 +245,7 @@ void tr_eventClose(tr_session* session)
 bool tr_amInEventThread(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(session->events != nullptr);
+    TR_ASSERT(session->hasEventLoop());
 
     return std::this_thread::get_id() == session->events->thread_id;
 }

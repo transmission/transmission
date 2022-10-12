@@ -635,7 +635,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     /* start the libtransmission thread */
     tr_net_init(); /* must go before tr_eventInit */
     tr_eventInit(session);
-    TR_ASSERT(session->events != nullptr);
+    TR_ASSERT(session->hasEventLoop());
 
     auto data = tr_session::init_data{};
     data.config_dir = config_dir;
@@ -1917,7 +1917,7 @@ void tr_sessionClose(tr_session* session)
     /* close the libtransmission thread */
     tr_eventClose(session);
 
-    while (session->events != nullptr)
+    while (session->hasEventLoop())
     {
         static bool forced = false;
         tr_logAddTrace(

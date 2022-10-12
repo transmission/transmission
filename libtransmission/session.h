@@ -769,6 +769,11 @@ public:
         return bandwidth_groups_;
     }
 
+    [[nodiscard]] auto hasEventLoop() const noexcept
+    {
+        return events != nullptr;
+    }
+
 private:
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
     {
