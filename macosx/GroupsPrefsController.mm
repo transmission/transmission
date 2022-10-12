@@ -295,7 +295,6 @@
 
 - (IBAction)cancelRules:(id)sender
 {
-    [self.groupRulesSheetWindow orderOut:nil];
     [self.fTableView.window endSheet:self.groupRulesSheetWindow];
 
     NSInteger index = [GroupsController.groups indexForRow:self.fTableView.selectedRow];
@@ -309,7 +308,6 @@
 
 - (IBAction)saveRules:(id)sender
 {
-    [self.groupRulesSheetWindow orderOut:nil];
     [self.fTableView.window endSheet:self.groupRulesSheetWindow];
 
     NSInteger index = [GroupsController.groups indexForRow:self.fTableView.selectedRow];

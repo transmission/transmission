@@ -91,7 +91,6 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 - (void)setFinished
 {
     [self.fPrefsController.window endSheet:self.fStatusWindow];
-    [self.fStatusWindow orderOut:self];
 
     fBLViewController = nil;
 }
@@ -99,7 +98,6 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 - (void)setFailed:(NSString*)error
 {
     [self.fPrefsController.window endSheet:self.fStatusWindow];
-    [self.fStatusWindow orderOut:self];
 
     NSAlert* alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Blocklist -> button")];
