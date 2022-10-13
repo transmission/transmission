@@ -2689,7 +2689,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
-    auto const& groups = session->bandwidth_groups_;
+    auto const& groups = session->bandwidthGroups();
 
     auto groups_dict = tr_variant{};
     tr_variantInitDict(&groups_dict, std::size(groups));

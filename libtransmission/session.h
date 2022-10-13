@@ -816,6 +816,11 @@ public:
         web_->fetch(std::move(options));
     }
 
+    [[nodiscard]] auto const& bandwidthGroups() const noexcept
+    {
+        return bandwidth_groups_;
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -1059,9 +1064,9 @@ public:
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
 
+private:
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
-private:
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;

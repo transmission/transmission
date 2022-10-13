@@ -1708,7 +1708,7 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
     }
 
     auto* const list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
-    for (auto const& [name, group] : s->bandwidth_groups_)
+    for (auto const& [name, group] : s->bandwidthGroups())
     {
         if (names.empty() || names.count(name.sv()) > 0)
         {
