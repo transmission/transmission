@@ -106,7 +106,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
 
             if (tr_variantGetInt(node, &id))
             {
-                tor = tr_torrentFindFromId(session, id);
+                tor = tr_torrentFindFromId(session, static_cast<tr_torrent_id_t>(id));
             }
             else if (tr_variantGetStrView(node, &sv))
             {
@@ -121,7 +121,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     }
     else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
     {
-        if (auto* const tor = tr_torrentFindFromId(session, id); tor != nullptr)
+        if (auto* const tor = tr_torrentFindFromId(session, static_cast<tr_torrent_id_t>(id)); tor != nullptr)
         {
             torrents.push_back(tor);
         }
@@ -428,12 +428,12 @@ static void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
 
 static void addPeers(tr_torrent const* tor, tr_variant* list)
 {
-    auto peer_count = int{};
+    auto peer_count = size_t{};
     tr_peer_stat* peers = tr_torrentPeers(tor, &peer_count);
 
     tr_variantInitList(list, peer_count);
 
-    for (int i = 0; i < peer_count; ++i)
+    for (size_t i = 0; i < peer_count; ++i)
     {
         tr_variant* d = tr_variantListAddDict(list, 16);
         tr_peer_stat const* peer = peers + i;
@@ -1102,12 +1102,12 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
     {
         for (size_t i = 0; i < n_items; ++i)
         {
-            auto tmp = int64_t{};
-            if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
+            auto file_index = int64_t{};
+            if (tr_variantGetInt(tr_variantListChild(list, i), &file_index))
             {
-                if (0 <= tmp && tmp < n_files)
+                if (0 <= file_index && file_index < n_files)
                 {
-                    files.push_back(tmp);
+                    files.push_back(static_cast<tr_file_index_t>(file_index));
                 }
                 else
                 {
@@ -1165,7 +1165,7 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
         if (tr_variantGetInt(tr_variantListChild(urls, i), &id) &&
             tr_variantGetStrView(tr_variantListChild(urls, i + 1), &newval))
         {
-            changed |= tor->announceList().replace(id, newval);
+            changed |= tor->announceList().replace(static_cast<tr_tracker_id_t>(id), newval);
         }
     }
 
@@ -1192,7 +1192,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
             continue;
         }
 
-        tor->announceList().remove(id);
+        tor->announceList().remove(static_cast<tr_tracker_id_t>(id));
     }
 
     if (tor->trackerCount() == old_size)
@@ -1296,7 +1296,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tr_torrentSetIdleLimit(tor, (uint16_t)tmp);
+            tr_torrentSetIdleLimit(tor, static_cast<uint16_t>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
@@ -1316,7 +1316,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
         {
-            tr_torrentSetQueuePosition(tor, (int)tmp);
+            tr_torrentSetQueuePosition(tor, static_cast<ssize_t>(tmp));
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))
@@ -1636,7 +1636,7 @@ static auto fileListFromList(tr_variant* list)
     {
         if (tr_variantGetInt(tr_variantListChild(list, i), &file_index))
         {
-            files.push_back(file_index);
+            files.push_back(static_cast<tr_file_index_t>(file_index));
         }
     }
 
@@ -1838,12 +1838,12 @@ static char const* groupSet(
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
     {
-        limits.down_limit_KBps = limit;
+        limits.down_limit_KBps = static_cast<tr_speed_t>(limit);
     }
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
     {
-        limits.up_limit_KBps = limit;
+        limits.up_limit_KBps = static_cast<tr_speed_t>(limit);
     }
 
     group.setLimits(&limits);
@@ -1906,12 +1906,12 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_begin, &i))
     {
-        tr_sessionSetAltSpeedBegin(session, i);
+        tr_sessionSetAltSpeedBegin(session, static_cast<time_t>(i));
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_end, &i))
     {
-        tr_sessionSetAltSpeedEnd(session, i);
+        tr_sessionSetAltSpeedEnd(session, static_cast<time_t>(i));
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_day, &i))
@@ -1941,7 +1941,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_queue_stalled_minutes, &i))
     {
-        tr_sessionSetQueueStalledMinutes(session, i);
+        tr_sessionSetQueueStalledMinutes(session, static_cast<int>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_queue_stalled_enabled, &val))
@@ -2079,7 +2079,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, i);
+        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, static_cast<tr_speed_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &val))
@@ -2089,7 +2089,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_UP, i);
+        tr_sessionSetSpeedLimit_KBps(session, TR_UP, static_cast<tr_speed_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &val))

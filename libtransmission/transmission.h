@@ -24,15 +24,16 @@
 
 #include "tr-macros.h"
 
-using tr_file_index_t = uint32_t;
+using tr_file_index_t = size_t;
 using tr_piece_index_t = uint32_t;
 /* Assuming a 16 KiB block (tr_block_info::BlockSize), a 32-bit block index gives us a maximum torrent size of 64 TiB.
  * When we ever need to grow past that, change tr_block_index_t and  tr_piece_index_t to uint64_t. */
 using tr_block_index_t = uint32_t;
+using tr_byte_index_t = uint64_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
-using tr_byte_index_t = uint64_t;
 using tr_torrent_id_t = int;
+using tr_speed_t = size_t;
 
 struct tr_block_span_t
 {
@@ -450,8 +451,8 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool);
 bool tr_sessionIsLPDEnabled(tr_session const* session);
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
 
-void tr_sessionSetCacheLimit_MB(tr_session* session, int mb);
-int tr_sessionGetCacheLimit_MB(tr_session const* session);
+void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
+size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
 
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -501,9 +502,9 @@ enum tr_direction
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int bytes_per_second);
-void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, unsigned int kilo_per_second);
-unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
+void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, tr_speed_t bytes_per_second);
+void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, tr_speed_t kilo_per_second);
+tr_speed_t tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
 
 void tr_sessionLimitSpeed(tr_session*, tr_direction, bool);
 bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
@@ -512,8 +513,8 @@ bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, unsigned int kilo_per_second);
-unsigned int tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
+void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, tr_speed_t kilo_per_second);
+tr_speed_t tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
 
 void tr_sessionUseAltSpeed(tr_session*, bool);
 bool tr_sessionUsesAltSpeed(tr_session const*);
@@ -521,11 +522,11 @@ bool tr_sessionUsesAltSpeed(tr_session const*);
 void tr_sessionUseAltSpeedTime(tr_session*, bool);
 bool tr_sessionUsesAltSpeedTime(tr_session const*);
 
-void tr_sessionSetAltSpeedBegin(tr_session*, int minutes_since_midnight);
-int tr_sessionGetAltSpeedBegin(tr_session const*);
+void tr_sessionSetAltSpeedBegin(tr_session*, time_t minutes_since_midnight);
+time_t tr_sessionGetAltSpeedBegin(tr_session const*);
 
-void tr_sessionSetAltSpeedEnd(tr_session*, int minutes_since_midnight);
-int tr_sessionGetAltSpeedEnd(tr_session const*);
+void tr_sessionSetAltSpeedEnd(tr_session*, time_t minutes_since_midnight);
+time_t tr_sessionGetAltSpeedEnd(tr_session const*);
 
 enum tr_sched_day
 {
@@ -613,11 +614,11 @@ bool tr_sessionGetAntiBruteForceEnabled(tr_session const*);
 void tr_torrentStartNow(tr_torrent*);
 
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */
-int tr_torrentGetQueuePosition(tr_torrent const*);
+ssize_t tr_torrentGetQueuePosition(tr_torrent const*);
 
 /** @brief Set the queued torrent's position in the queue it's in.
  * Special cases: pos <= 0 moves to the front; pos >= queue length moves to the back */
-void tr_torrentSetQueuePosition(tr_torrent*, int queue_position);
+void tr_torrentSetQueuePosition(tr_torrent*, ssize_t queue_position);
 
 /**
 **/
@@ -638,10 +639,10 @@ void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_coun
 **/
 
 /** @brief Set the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
-void tr_sessionSetQueueSize(tr_session*, tr_direction, int max_simultaneous_seed_torrents);
+void tr_sessionSetQueueSize(tr_session*, tr_direction, ssize_t max_simultaneous_seed_torrents);
 
 /** @brief Return the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
-int tr_sessionGetQueueSize(tr_session const*, tr_direction);
+ssize_t tr_sessionGetQueueSize(tr_session const*, tr_direction);
 
 /** @brief Set whether or not to limit how many torrents can download (TR_DOWN) or seed (TR_UP) at the same time  */
 void tr_sessionSetQueueEnabled(tr_session*, tr_direction, bool do_limit_simultaneous_seed_torrents);
@@ -970,7 +971,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
  */
 tr_torrent_id_t tr_torrentId(tr_torrent const* torrent);
 
-tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
+tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session*, tr_torrent_metainfo const*);
 
@@ -1009,8 +1010,8 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
 ****
 ***/
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, unsigned int kilo_per_second);
-unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const*, tr_direction);
+void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, tr_speed_t kilo_per_second);
+tr_speed_t tr_torrentGetSpeedLimit_KBps(tr_torrent const*, tr_direction);
 
 void tr_torrentUseSpeedLimit(tr_torrent*, tr_direction, bool);
 bool tr_torrentUsesSpeedLimit(tr_torrent const*, tr_direction);
@@ -1284,15 +1285,15 @@ struct tr_peer_stat
     uint32_t cancelsToClient;
 
     /* how many requests the peer has made that we haven't responded to yet */
-    int activeReqsToClient;
+    size_t activeReqsToClient;
 
     /* how many requests we've made and are currently awaiting a response for */
-    int activeReqsToPeer;
+    size_t activeReqsToPeer;
 };
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, int* peer_count);
+tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);
 
-void tr_torrentPeersFree(tr_peer_stat* peerStats, int peerCount);
+void tr_torrentPeersFree(tr_peer_stat* peerStats, size_t peerCount);
 
 /***
 ****  tr_tracker_stat
@@ -1396,7 +1397,7 @@ struct tr_webseed_view
 {
     char const* url; // the url to download from
     bool is_downloading; // can be true even if speed is 0, e.g. slow download
-    unsigned download_bytes_per_second; // current download speed
+    tr_speed_t download_bytes_per_second; // current download speed
 };
 
 struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);

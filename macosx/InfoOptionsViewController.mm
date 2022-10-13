@@ -246,7 +246,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     self.fUploadLimitField.enabled = uploadUseSpeedLimit == NSControlStateValueOn;
     if (uploadSpeedLimit != kInvalidValue)
     {
-        self.fUploadLimitField.intValue = uploadSpeedLimit;
+        self.fUploadLimitField.integerValue = uploadSpeedLimit;
     }
     else
     {
@@ -261,7 +261,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     self.fDownloadLimitField.enabled = downloadUseSpeedLimit == NSControlStateValueOn;
     if (downloadSpeedLimit != kInvalidValue)
     {
-        self.fDownloadLimitField.intValue = downloadSpeedLimit;
+        self.fDownloadLimitField.integerValue = downloadSpeedLimit;
     }
     else
     {
@@ -436,7 +436,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     self.fPeersConnectLabel.enabled = YES;
     if (maxPeers != kInvalidValue)
     {
-        self.fPeersConnectField.intValue = maxPeers;
+        self.fPeersConnectField.integerValue = maxPeers;
     }
     else
     {

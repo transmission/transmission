@@ -328,26 +328,24 @@ extern uint64_t tr_size_K; /* unused? */
 
 void tr_formatter_get_units(void* dict);
 
-[[nodiscard]] static inline unsigned int tr_toSpeedBytes(unsigned int KBps)
+[[nodiscard]] static inline size_t tr_toSpeedBytes(size_t KBps)
 {
     return KBps * tr_speed_K;
 }
 
-[[nodiscard]] static inline auto tr_toSpeedKBps(unsigned int Bps)
+[[nodiscard]] static inline auto tr_toSpeedKBps(size_t Bps)
 {
     return Bps / double(tr_speed_K);
 }
 
-[[nodiscard]] static inline auto tr_toMemBytes(unsigned int MB)
+[[nodiscard]] static inline auto tr_toMemBytes(size_t MB)
 {
-    auto B = uint64_t(tr_mem_K) * tr_mem_K;
-    B *= MB;
-    return B;
+    return uint64_t(tr_mem_K) * tr_mem_K * MB;
 }
 
 [[nodiscard]] static inline auto tr_toMemMB(uint64_t B)
 {
-    return int(B / (tr_mem_K * tr_mem_K));
+    return size_t(B / (tr_mem_K * tr_mem_K));
 }
 
 /***

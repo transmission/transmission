@@ -235,11 +235,11 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self updateLimitFields];
 
     //set speed limit
-    self.fSpeedLimitUploadField.intValue = [self.fDefaults integerForKey:@"SpeedLimitUploadLimit"];
-    self.fSpeedLimitDownloadField.intValue = [self.fDefaults integerForKey:@"SpeedLimitDownloadLimit"];
+    self.fSpeedLimitUploadField.integerValue = [self.fDefaults integerForKey:@"SpeedLimitUploadLimit"];
+    self.fSpeedLimitDownloadField.integerValue = [self.fDefaults integerForKey:@"SpeedLimitDownloadLimit"];
 
     //set port
-    self.fPortField.intValue = [self.fDefaults integerForKey:@"BindPort"];
+    self.fPortField.intValue = static_cast<int>([self.fDefaults integerForKey:@"BindPort"]);
     self.fNatStatus = -1;
 
     [self updatePortStatus];
@@ -248,13 +248,13 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
                                                             repeats:YES];
 
     //set peer connections
-    self.fPeersGlobalField.intValue = [self.fDefaults integerForKey:@"PeersTotal"];
-    self.fPeersTorrentField.intValue = [self.fDefaults integerForKey:@"PeersTorrent"];
+    self.fPeersGlobalField.integerValue = [self.fDefaults integerForKey:@"PeersTotal"];
+    self.fPeersTorrentField.integerValue = [self.fDefaults integerForKey:@"PeersTorrent"];
 
     //set queue values
-    self.fQueueDownloadField.intValue = [self.fDefaults integerForKey:@"QueueDownloadNumber"];
-    self.fQueueSeedField.intValue = [self.fDefaults integerForKey:@"QueueSeedNumber"];
-    self.fStalledField.intValue = [self.fDefaults integerForKey:@"StalledMinutes"];
+    self.fQueueDownloadField.integerValue = [self.fDefaults integerForKey:@"QueueDownloadNumber"];
+    self.fQueueSeedField.integerValue = [self.fDefaults integerForKey:@"QueueSeedNumber"];
+    self.fStalledField.integerValue = [self.fDefaults integerForKey:@"StalledMinutes"];
 
     //set blocklist
     NSString* blocklistURL = [self.fDefaults stringForKey:@"BlocklistURL"];
@@ -286,7 +286,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
                                              object:self.fBlocklistURLField];
 
     //set rpc port
-    self.fRPCPortField.intValue = [self.fDefaults integerForKey:@"RPCPort"];
+    self.fRPCPortField.intValue = static_cast<int>([self.fDefaults integerForKey:@"RPCPort"]);
 
     //set rpc password
     if (self.fRPCPassword)
@@ -752,8 +752,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         return;
     }
 
-    self.fUploadField.intValue = [self.fDefaults integerForKey:@"UploadLimit"];
-    self.fDownloadField.intValue = [self.fDefaults integerForKey:@"DownloadLimit"];
+    self.fUploadField.integerValue = [self.fDefaults integerForKey:@"UploadLimit"];
+    self.fDownloadField.integerValue = [self.fDefaults integerForKey:@"DownloadLimit"];
 }
 
 - (void)setGlobalLimit:(id)sender
@@ -1168,7 +1168,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 {
     if ([self.fDefaults boolForKey:@"RPC"] && [self.fDefaults boolForKey:@"RPCWebDiscovery"])
     {
-        [BonjourController.defaultController startWithPort:[self.fDefaults integerForKey:@"RPCPort"]];
+        [BonjourController.defaultController startWithPort:static_cast<int>([self.fDefaults integerForKey:@"RPCPort"])];
     }
     else
     {
@@ -1385,14 +1385,14 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const downLimitEnabled = tr_sessionIsSpeedLimited(self.fHandle, TR_DOWN);
     [self.fDefaults setBool:downLimitEnabled forKey:@"CheckDownload"];
 
-    int const downLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_DOWN);
+    tr_speed_t const downLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_DOWN);
     [self.fDefaults setInteger:downLimit forKey:@"DownloadLimit"];
 
     //speed limit - up
     BOOL const upLimitEnabled = tr_sessionIsSpeedLimited(self.fHandle, TR_UP);
     [self.fDefaults setBool:upLimitEnabled forKey:@"CheckUpload"];
 
-    int const upLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_UP);
+    tr_speed_t const upLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_UP);
     [self.fDefaults setInteger:upLimit forKey:@"UploadLimit"];
 
     //alt speed limit enabled
@@ -1400,11 +1400,11 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fDefaults setBool:useAltSpeed forKey:@"SpeedLimit"];
 
     //alt speed limit - down
-    int const downLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_DOWN);
+    tr_speed_t const downLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_DOWN);
     [self.fDefaults setInteger:downLimitAlt forKey:@"SpeedLimitDownloadLimit"];
 
     //alt speed limit - up
-    int const upLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_UP);
+    tr_speed_t const upLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_UP);
     [self.fDefaults setInteger:upLimitAlt forKey:@"SpeedLimitUploadLimit"];
 
     //alt speed limit schedule
@@ -1445,13 +1445,13 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const downloadQueue = tr_sessionGetQueueEnabled(self.fHandle, TR_DOWN);
     [self.fDefaults setBool:downloadQueue forKey:@"Queue"];
 
-    int const downloadQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_DOWN);
+    ssize_t const downloadQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_DOWN);
     [self.fDefaults setInteger:downloadQueueNum forKey:@"QueueDownloadNumber"];
 
     BOOL const seedQueue = tr_sessionGetQueueEnabled(self.fHandle, TR_UP);
     [self.fDefaults setBool:seedQueue forKey:@"QueueSeed"];
 
-    int const seedQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_UP);
+    ssize_t const seedQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_UP);
     [self.fDefaults setInteger:seedQueueNum forKey:@"QueueSeedNumber"];
 
     BOOL const checkStalled = tr_sessionGetQueueStalledEnabled(self.fHandle);
@@ -1490,14 +1490,14 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         //random port handled by bindings
 
         //limit check handled by bindings
-        self.fDownloadField.intValue = downLimit;
+        self.fDownloadField.integerValue = downLimit;
 
         //limit check handled by bindings
-        self.fUploadField.intValue = upLimit;
+        self.fUploadField.integerValue = upLimit;
 
-        self.fSpeedLimitDownloadField.intValue = downLimitAlt;
+        self.fSpeedLimitDownloadField.integerValue = downLimitAlt;
 
-        self.fSpeedLimitUploadField.intValue = upLimitAlt;
+        self.fSpeedLimitUploadField.integerValue = upLimitAlt;
 
         //speed limit schedule handled by bindings
 
@@ -1514,8 +1514,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         self.fIdleStopField.integerValue = idleLimitMin;
 
         //queues enabled handled by bindings
-        self.fQueueDownloadField.intValue = downloadQueueNum;
-        self.fQueueSeedField.intValue = seedQueueNum;
+        self.fQueueDownloadField.integerValue = downloadQueueNum;
+        self.fQueueSeedField.integerValue = seedQueueNum;
 
         //check stalled handled by bindings
         self.fStalledField.intValue = stalledMinutes;

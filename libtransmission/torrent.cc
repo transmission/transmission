@@ -76,7 +76,7 @@ tr_torrent_id_t tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->id() : -1;
 }
 
-tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
+tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id)
 {
     return session->torrents().get(id);
 }
@@ -188,7 +188,7 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 ****  PER-TORRENT UL / DL SPEEDS
 ***/
 
-void tr_torrent::setSpeedLimitBps(tr_direction dir, unsigned int bytes_per_second)
+void tr_torrent::setSpeedLimitBps(tr_direction dir, tr_speed_t bytes_per_second)
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -198,19 +198,19 @@ void tr_torrent::setSpeedLimitBps(tr_direction dir, unsigned int bytes_per_secon
     }
 }
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, unsigned int kilo_per_second)
+void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_speed_t kilo_per_second)
 {
     tor->setSpeedLimitBps(dir, tr_toSpeedBytes(kilo_per_second));
 }
 
-unsigned int tr_torrent::speedLimitBps(tr_direction dir) const
+tr_speed_t tr_torrent::speedLimitBps(tr_direction dir) const
 {
     TR_ASSERT(tr_isDirection(dir));
 
     return this->bandwidth_.getDesiredSpeedBytesPerSecond(dir);
 }
 
-unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
+tr_speed_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
@@ -1255,14 +1255,14 @@ size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
 ****
 ***/
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peer_count)
+tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, size_t* peer_count)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     return tr_peerMgrPeerStats(tor, peer_count);
 }
 
-void tr_torrentPeersFree(tr_peer_stat* peers, int /*peerCount*/)
+void tr_torrentPeersFree(tr_peer_stat* peers, size_t /*peerCount*/)
 {
     delete[] peers;
 }
@@ -2391,7 +2391,7 @@ static bool queueIsSequenced(tr_session const* session)
     /* test them */
     bool is_sequenced = true;
 
-    for (int i = 0, n = std::size(torrents); is_sequenced && i < n; ++i)
+    for (size_t i = 0, n = std::size(torrents); is_sequenced && i < n; ++i)
     {
         is_sequenced = torrents[i]->queuePosition == i;
     }
@@ -2401,15 +2401,15 @@ static bool queueIsSequenced(tr_session const* session)
 
 #endif
 
-int tr_torrentGetQueuePosition(tr_torrent const* tor)
+ssize_t tr_torrentGetQueuePosition(tr_torrent const* tor)
 {
     return tor->queuePosition;
 }
 
-void tr_torrentSetQueuePosition(tr_torrent* tor, int queue_position)
+void tr_torrentSetQueuePosition(tr_torrent* tor, ssize_t queue_position)
 {
-    int back = -1;
-    int const old_pos = tor->queuePosition;
+    ssize_t back = -1;
+    ssize_t const old_pos = tor->queuePosition;
 
     if (queue_position < 0)
     {

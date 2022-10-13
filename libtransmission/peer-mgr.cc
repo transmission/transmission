@@ -630,9 +630,9 @@ private:
 *** tr_peer virtual functions
 **/
 
-unsigned int tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction)
+tr_speed_t tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction)
 {
-    unsigned int bytes_per_second = 0;
+    tr_speed_t bytes_per_second = 0;
     peer->isTransferringPieces(now, direction, &bytes_per_second);
     return bytes_per_second;
 }
@@ -1651,7 +1651,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (auto const* const peer : s->peers)
     {
-        for (size_t j = 0; j < n_pieces; ++j)
+        for (tr_piece_index_t j = 0; j < n_pieces; ++j)
         {
             if (peer->hasPiece(j))
             {
@@ -1660,7 +1660,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         }
     }
 
-    for (size_t i = 0; i < n_pieces; ++i)
+    for (tr_piece_index_t i = 0; i < n_pieces; ++i)
     {
         if (tor->pieceIsWanted(i) && have.at(i))
         {
@@ -1784,7 +1784,7 @@ namespace peer_stat_helpers
 
 } // namespace peer_stat_helpers
 
-tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count)
+tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
 {
     using namespace peer_stat_helpers;
 
@@ -2059,8 +2059,8 @@ void rechokeDownloads(tr_swarm* s)
         return false;
     }
 
-    unsigned int const got = b.getPieceSpeedBytesPerSecond(now_msec, dir);
-    unsigned int const want = b.getDesiredSpeedBytesPerSecond(dir);
+    tr_speed_t const got = b.getPieceSpeedBytesPerSecond(now_msec, dir);
+    tr_speed_t const want = b.getDesiredSpeedBytesPerSecond(dir);
     return got >= want;
 }
 
@@ -2311,7 +2311,7 @@ auto constexpr MinUploadIdleSecs = int{ 60 };
 // when few peers are available, keep idle ones this long
 auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
 
-[[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, int peer_count, time_t const now)
+[[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, size_t peer_count, time_t const now)
 {
     /* if it's marked for purging, close it */
     if (peer->do_purge)

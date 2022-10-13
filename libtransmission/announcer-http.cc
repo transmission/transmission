@@ -203,23 +203,23 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             if (auto const key = currentKey(); key == "interval")
             {
-                response_.interval = value;
+                response_.interval = static_cast<int>(value);
             }
             else if (key == "min interval"sv)
             {
-                response_.min_interval = value;
+                response_.min_interval = static_cast<int>(value);
             }
             else if (key == "complete"sv)
             {
-                response_.seeders = value;
+                response_.seeders = static_cast<int>(value);
             }
             else if (key == "incomplete"sv)
             {
-                response_.leechers = value;
+                response_.leechers = static_cast<int>(value);
             }
             else if (key == "downloaded"sv)
             {
-                response_.downloads = value;
+                response_.downloads = static_cast<int>(value);
             }
             else if (key == "port"sv)
             {
@@ -549,23 +549,23 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         {
             if (auto const key = currentKey(); row_ && key == "complete"sv)
             {
-                response_.rows[*row_].seeders = value;
+                response_.rows[*row_].seeders = static_cast<int>(value);
             }
             else if (row_ && key == "downloaded"sv)
             {
-                response_.rows[*row_].downloads = value;
+                response_.rows[*row_].downloads = static_cast<int>(value);
             }
             else if (row_ && key == "incomplete"sv)
             {
-                response_.rows[*row_].leechers = value;
+                response_.rows[*row_].leechers = static_cast<int>(value);
             }
             else if (row_ && key == "downloaders"sv)
             {
-                response_.rows[*row_].downloaders = value;
+                response_.rows[*row_].downloaders = static_cast<int>(value);
             }
             else if (key == "min_request_interval"sv)
             {
-                response_.min_request_interval = value;
+                response_.min_request_interval = static_cast<int>(value);
             }
             else
             {

@@ -931,12 +931,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (NSArray<NSDictionary*>*)peers
 {
-    int totalPeers;
+    size_t totalPeers;
     tr_peer_stat* peers = tr_torrentPeers(self.fHandle, &totalPeers);
 
     NSMutableArray* peerDicts = [NSMutableArray arrayWithCapacity:totalPeers];
 
-    for (int i = 0; i < totalPeers; i++)
+    for (size_t i = 0; i < totalPeers; i++)
     {
         tr_peer_stat* peer = &peers[i];
         NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity:12];

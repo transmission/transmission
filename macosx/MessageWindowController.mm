@@ -257,7 +257,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
         NSString* name = !std::empty(currentMessage->name) ? @(currentMessage->name.c_str()) : NSProcessInfo.processInfo.processName;
 
         auto const file_string = std::string{ currentMessage->file };
-        NSString* file = [(@(file_string.c_str())).lastPathComponent stringByAppendingFormat:@":%d", currentMessage->line];
+        NSString* file = [(@(file_string.c_str())).lastPathComponent stringByAppendingFormat:@":%ld", currentMessage->line];
 
         NSDictionary* message = @{
             @"Message" : @(currentMessage->message.c_str()),

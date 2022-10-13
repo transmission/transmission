@@ -22,7 +22,7 @@
 ****
 ***/
 
-unsigned int tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
+tr_speed_t tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
@@ -49,7 +49,7 @@ unsigned int tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int i
             }
         }
 
-        r.cache_val_ = unsigned(bytes * 1000U / interval_msec);
+        r.cache_val_ = tr_speed_t(bytes * 1000U / interval_msec);
         r.cache_time_ = now;
     }
 
