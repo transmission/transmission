@@ -710,7 +710,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->peerMgr = tr_peerMgrNew(this);
+    this->peer_mgr_ = tr_peerMgrNew(this);
 
     this->port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
@@ -1861,7 +1861,7 @@ void tr_session::closeImplFinish()
     this->udp_core_.reset();
 
     stats().saveIfDirty();
-    tr_peerMgrFree(peerMgr);
+    tr_peerMgrFree(peer_mgr_);
     tr_utpClose(this);
     blocklists_.clear();
     openFiles().closeAll();
@@ -2238,7 +2238,7 @@ void tr_sessionReloadBlocklists(tr_session* session)
     session->blocklists_.clear();
     session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
 
-    tr_peerMgrOnBlocklistChanged(session->peerMgr);
+    tr_peerMgrOnBlocklistChanged(session->peer_mgr_);
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)
@@ -2839,12 +2839,12 @@ tr_session::tr_session(std::string_view config_dir)
 
 void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
 {
-    tr_peerMgrAddIncoming(peerMgr, addr, port, socket);
+    tr_peerMgrAddIncoming(peer_mgr_, addr, port, socket);
 }
 
 void tr_session::addTorrent(tr_torrent* tor)
 {
     tor->unique_id_ = torrents().add(tor);
 
-    tr_peerMgrAddTorrent(peerMgr, tor);
+    tr_peerMgrAddTorrent(peer_mgr_, tor);
 }

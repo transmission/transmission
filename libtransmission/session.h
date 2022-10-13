@@ -1047,9 +1047,9 @@ public:
 
     std::unique_ptr<tr_udp_core> udp_core_;
 
-    struct tr_peerMgr* peerMgr = nullptr;
-
 private:
+    struct tr_peerMgr* peer_mgr_ = nullptr;
+
     std::unique_ptr<tr_port_forwarding> port_forwarding_;
 
     tr_torrents torrents_;
