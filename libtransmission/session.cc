@@ -630,7 +630,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     /* initialize the bare skeleton of the session object */
     auto* const session = new tr_session{ config_dir };
-    session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
@@ -2833,7 +2832,6 @@ tr_session::tr_session(std::string_view config_dir)
                    } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , session_id_{ tr_time }
-    , session_stats_{ config_dir, time(nullptr) }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->startRepeating(1s);

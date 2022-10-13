@@ -874,9 +874,9 @@ private:
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int bytes_per_second);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
-public:
     /// constexpr fields
 
+public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
           { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
@@ -885,9 +885,9 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-private:
     /// const fields
 
+private:
     std::string const config_dir_;
     std::string const resume_dir_;
     std::string const torrent_dir_;
@@ -896,10 +896,9 @@ private:
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    /// trivial fields
+    /// trivial type fields
 
-    tr_rpc_func rpc_func_ = nullptr;
-    void* rpc_func_user_data_ = nullptr;
+    std::optional<tr_address> external_ip_;
 
     queue_start_callback_t queue_start_callback_ = nullptr;
     void* queue_start_user_data_ = nullptr;
@@ -915,6 +914,9 @@ private:
 
     tr_torrent_completeness_func completeness_func_ = nullptr;
     void* completeness_func_user_data_ = nullptr;
+
+    tr_rpc_func rpc_func_ = nullptr;
+    void* rpc_func_user_data_ = nullptr;
 
     float desired_ratio_ = 2.0F;
 
@@ -937,7 +939,7 @@ private:
     tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
 
 public:
-    // the open port on the local machine for incoming peer requests
+    // The open port on the local machine for incoming peer requests
     tr_port private_peer_port;
 
     // The open port on the public device for incoming peer requests.
@@ -987,9 +989,10 @@ private:
 
     bool announce_ip_enabled_ = false;
 
-    /// nontrivial fields that do not have interdependencies
+    /// fields that aren't trivial,
+    /// but are self-contained / have no interdependencies
 
-    std::optional<tr_address> external_ip_;
+    tr_stats session_stats_{ config_dir_, time(nullptr) };
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
@@ -1004,26 +1007,38 @@ private:
 
     tr_announce_list default_trackers_;
 
-public:
-    struct tr_turtle_info turtle;
-
     tr_session_id session_id_;
 
+public:
     tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
+    struct tr_turtle_info turtle;
+
     /// other fields
 
+private:
+    static std::recursive_mutex session_mutex_;
+
+public:
     struct tr_event_handle* events = nullptr;
 
     std::unique_ptr<tr_udp_core> udp_core_;
 
     struct tr_peerMgr* peerMgr = nullptr;
+
     std::unique_ptr<tr_port_forwarding> port_forwarding_;
 
-    std::unique_ptr<Cache> cache;
+private:
+    tr_torrents torrents_;
+
+    tr_open_files open_files_;
+
+public:
+    std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
     std::unique_ptr<tr_web> web;
+
     std::unique_ptr<tr_lpd> lpd_;
 
     struct tr_announcer* announcer = nullptr;
@@ -1035,8 +1050,6 @@ public:
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
 private:
-    static std::recursive_mutex session_mutex_;
-
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
@@ -1051,13 +1064,7 @@ private:
 
     std::unique_ptr<libtransmission::Timer> save_timer_;
 
-    tr_torrents torrents_;
-
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
-
-    tr_stats session_stats_;
-
-    tr_open_files open_files_;
 
 public:
     struct struct_utp_context* utp_context = nullptr;
