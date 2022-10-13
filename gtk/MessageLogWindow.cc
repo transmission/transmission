@@ -123,14 +123,15 @@ bool MessageLogWindow::Impl::is_pinned_to_new() const
 
 void MessageLogWindow::Impl::scroll_to_bottom()
 {
-    if (sort_ != nullptr)
+    auto const row_count = sort_->children().size();
+    if (row_count == 0)
     {
-        auto const row_count = sort_->children().size();
+        return;
+    }
 
-        if (auto const iter = sort_->children()[row_count - 1]; iter)
-        {
-            view_->scroll_to_row(sort_->get_path(TR_GTK_TREE_MODEL_CHILD_ITER(iter)), 1);
-        }
+    if (auto const iter = sort_->children()[row_count - 1]; iter)
+    {
+        view_->scroll_to_row(sort_->get_path(TR_GTK_TREE_MODEL_CHILD_ITER(iter)), 1);
     }
 }
 
