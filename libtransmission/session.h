@@ -824,6 +824,8 @@ private:
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
 
+    void onNowTimer();
+
     friend class libtransmission::test::SessionTest;
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
@@ -894,66 +896,33 @@ private:
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    /// other fields
+    /// trivial fields
 
-public:
-    struct tr_turtle_info turtle;
+    tr_rpc_func rpc_func_ = nullptr;
+    void* rpc_func_user_data_ = nullptr;
 
-    struct tr_event_handle* events = nullptr;
+    queue_start_callback_t queue_start_callback_ = nullptr;
+    void* queue_start_user_data_ = nullptr;
 
-    std::unique_ptr<tr_udp_core> udp_core_;
+    tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
+    void* idle_limit_hit_user_data_ = nullptr;
 
-    /* The open port on the local machine for incoming peer requests */
-    tr_port private_peer_port;
+    tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
+    void* ratio_limit_hit_user_data_ = nullptr;
 
-    /**
-     * The open port on the public device for incoming peer requests.
-     * This is usually the same as private_peer_port but can differ
-     * if the public device is a router and it decides to use a different
-     * port than the one requested by Transmission.
-     */
-    tr_port public_peer_port;
+    tr_session_metadata_func got_metadata_cb_ = nullptr;
+    void* got_metadata_user_data_ = nullptr;
 
-    struct tr_peerMgr* peerMgr = nullptr;
-    std::unique_ptr<tr_port_forwarding> port_forwarding_;
+    tr_torrent_completeness_func completeness_func_ = nullptr;
+    void* completeness_func_user_data_ = nullptr;
 
-    std::unique_ptr<Cache> cache;
-
-    std::unique_ptr<tr_web> web;
-    std::unique_ptr<tr_lpd> lpd_;
-
-    struct tr_announcer* announcer = nullptr;
-    struct tr_announcer_udp* announcer_udp = nullptr;
-
-    // monitors the "global pool" speeds
-    tr_bandwidth top_bandwidth_;
-
-    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
-    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
-    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
-
-private:
-    static std::recursive_mutex session_mutex_;
-
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
-
-    std::unique_ptr<tr_rpc_server> rpc_server_;
-
-    tr_announce_list default_trackers_;
-
-    tr_session_id session_id_;
+    float desired_ratio_ = 2.0F;
 
     std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
     std::array<bool, 2> queue_enabled_ = { false, false };
     std::array<int, 2> queue_size_ = { 0, 0 };
-
-    tr_rpc_func rpc_func_ = nullptr;
-    void* rpc_func_user_data_ = nullptr;
-
-    float desired_ratio_ = 2.0F;
 
     int umask_ = 022;
 
@@ -967,6 +936,17 @@ private:
 
     tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
 
+public:
+    // the open port on the local machine for incoming peer requests
+    tr_port private_peer_port;
+
+    // The open port on the public device for incoming peer requests.
+    // This is usually the same as private_peer_port but can differ
+    // if the public device is a router and it decides to use a different
+    // port than the one requested by Transmission.
+    tr_port public_peer_port;
+
+private:
     tr_port random_port_low_;
     tr_port random_port_high_;
 
@@ -1001,20 +981,15 @@ private:
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
 
-    PortForwardingMediator port_forwarding_mediator_{ *this };
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
+    bool blocklist_enabled_ = false;
+    bool incomplete_dir_enabled_ = false;
 
-    WebMediator web_mediator_{ this };
+    bool announce_ip_enabled_ = false;
 
-    LpdMediator lpd_mediator_{ *this };
+    /// nontrivial fields that do not have interdependencies
 
-    void onNowTimer();
-    std::unique_ptr<libtransmission::Timer> now_timer_;
-
-    std::unique_ptr<libtransmission::Timer> save_timer_;
-
-    tr_torrents torrents_;
-
-    std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
+    std::optional<tr_address> external_ip_;
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
@@ -1025,33 +1000,64 @@ private:
     std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
 
+    std::string announce_ip_;
+
+    tr_announce_list default_trackers_;
+
+public:
+    struct tr_turtle_info turtle;
+
+    tr_session_id session_id_;
+
+    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
+    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
+
+    /// other fields
+
+    struct tr_event_handle* events = nullptr;
+
+    std::unique_ptr<tr_udp_core> udp_core_;
+
+    struct tr_peerMgr* peerMgr = nullptr;
+    std::unique_ptr<tr_port_forwarding> port_forwarding_;
+
+    std::unique_ptr<Cache> cache;
+
+    std::unique_ptr<tr_web> web;
+    std::unique_ptr<tr_lpd> lpd_;
+
+    struct tr_announcer* announcer = nullptr;
+    struct tr_announcer_udp* announcer_udp = nullptr;
+
+    // monitors the "global pool" speeds
+    tr_bandwidth top_bandwidth_;
+
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
+
+private:
+    static std::recursive_mutex session_mutex_;
+
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+
+    std::unique_ptr<tr_rpc_server> rpc_server_;
+
+    PortForwardingMediator port_forwarding_mediator_{ *this };
+
+    WebMediator web_mediator_{ this };
+
+    LpdMediator lpd_mediator_{ *this };
+
+    std::unique_ptr<libtransmission::Timer> now_timer_;
+
+    std::unique_ptr<libtransmission::Timer> save_timer_;
+
+    tr_torrents torrents_;
+
+    std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
+
     tr_stats session_stats_;
 
-    std::optional<tr_address> external_ip_;
-
-    queue_start_callback_t queue_start_callback_ = nullptr;
-    void* queue_start_user_data_ = nullptr;
-
-    tr_session_idle_limit_hit_func idle_limit_hit_callback_ = nullptr;
-    void* idle_limit_hit_user_data_ = nullptr;
-
-    tr_session_ratio_limit_hit_func ratio_limit_hit_cb_ = nullptr;
-    void* ratio_limit_hit_user_data_ = nullptr;
-
-    tr_session_metadata_func got_metadata_cb_ = nullptr;
-    void* got_metadata_user_data_ = nullptr;
-
-    tr_torrent_completeness_func completeness_func_ = nullptr;
-    void* completeness_func_user_data_ = nullptr;
-
-    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
-    bool blocklist_enabled_ = false;
-    bool incomplete_dir_enabled_ = false;
-
     tr_open_files open_files_;
-
-    std::string announce_ip_;
-    bool announce_ip_enabled_ = false;
 
 public:
     struct struct_utp_context* utp_context = nullptr;
