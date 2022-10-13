@@ -1497,7 +1497,7 @@ To add a new primary URL, add it after a blank line.</property>
       <widget name="max_total_peers_label"/>
     </widgets>
   </object>
-  <object class="GtkSizeGroup" id="privary_page_labels_width_group">
+  <object class="GtkSizeGroup" id="privacy_page_labels_width_group">
     <widgets>
       <widget name="encryption_mode_label"/>
       <widget name="blocklist_check"/>
