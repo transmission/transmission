@@ -138,6 +138,142 @@ struct tr_turtle_info
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+private:
+    class PortForwardingMediator final : public tr_port_forwarding::Mediator
+    {
+    public:
+        explicit PortForwardingMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] tr_address incomingPeerAddress() const override
+        {
+            return session_.bind_ipv4.addr_;
+        }
+
+        [[nodiscard]] tr_port privatePeerPort() const override
+        {
+            return session_.private_peer_port;
+        }
+
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        {
+            return session_.timerMaker();
+        }
+
+        void onPortForwarded(tr_port public_port, tr_port private_port) override
+        {
+            session_.public_peer_port = public_port;
+            session_.private_peer_port = private_port;
+        }
+
+    private:
+        tr_session& session_;
+    };
+
+    class WebMediator final : public tr_web::Mediator
+    {
+    public:
+        explicit WebMediator(tr_session* session)
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] std::optional<std::string> cookieFile() const override;
+        [[nodiscard]] std::optional<std::string> publicAddressV4() const override;
+        [[nodiscard]] std::optional<std::string> publicAddressV6() const override;
+        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
+        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
+        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
+        // runs the tr_web::fetch response callback in the libtransmission thread
+        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
+
+    private:
+        tr_session* const session_;
+    };
+
+    class LpdMediator final : public tr_lpd::Mediator
+    {
+    public:
+        explicit LpdMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] tr_port port() const override
+        {
+            return session_.peerPort();
+        }
+
+        [[nodiscard]] bool allowsLPD() const override
+        {
+            return session_.allowsLPD();
+        }
+
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        {
+            return session_.timerMaker();
+        }
+
+        [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
+
+        bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;
+
+        void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after) override;
+
+    private:
+        tr_session& session_;
+    };
+
+    // UDP connectivity used for the DHT and µTP
+    class tr_udp_core
+    {
+    public:
+        tr_udp_core(tr_session& session);
+
+        ~tr_udp_core();
+
+        static void dhtUninit();
+        static void dhtUpkeep();
+
+        void set_socket_buffers();
+
+        void set_socket_tos()
+        {
+            session_.setSocketTOS(udp_socket_, TR_AF_INET);
+            session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
+        }
+
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+
+        [[nodiscard]] constexpr auto port() const noexcept
+        {
+            return udp_port_;
+        }
+
+        [[nodiscard]] constexpr auto udp_socket() const noexcept
+        {
+            return udp_socket_;
+        }
+
+        [[nodiscard]] constexpr auto udp6_socket() const noexcept
+        {
+            return udp6_socket_;
+        }
+
+    private:
+        tr_port udp_port_ = {};
+        tr_session& session_;
+        struct event* udp_event_ = nullptr;
+        struct event* udp6_event_ = nullptr;
+        std::optional<in6_addr> udp6_bound_;
+        tr_socket_t udp_socket_ = TR_BAD_SOCKET;
+        tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
+
+        void rebind_ipv6(bool);
+    };
+
 public:
     explicit tr_session(std::string_view config_dir);
 
@@ -156,7 +292,7 @@ public:
         return evdns_base_.get();
     }
 
-    [[nodiscard]] auto& timerMaker() noexcept
+    [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept
     {
         return *timer_maker_;
     }
@@ -485,54 +621,6 @@ public:
 
     struct tr_event_handle* events = nullptr;
 
-    // UDP connectivity used for the DHT and µTP
-    class tr_udp_core
-    {
-    public:
-        tr_udp_core(tr_session& session);
-
-        ~tr_udp_core();
-
-        static void dhtUninit();
-        static void dhtUpkeep();
-
-        void set_socket_buffers();
-
-        void set_socket_tos()
-        {
-            session_.setSocketTOS(udp_socket_, TR_AF_INET);
-            session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
-        }
-
-        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
-
-        [[nodiscard]] constexpr auto port() const noexcept
-        {
-            return udp_port_;
-        }
-
-        [[nodiscard]] constexpr auto udp_socket() const noexcept
-        {
-            return udp_socket_;
-        }
-
-        [[nodiscard]] constexpr auto udp6_socket() const noexcept
-        {
-            return udp6_socket_;
-        }
-
-    private:
-        tr_port udp_port_ = {};
-        tr_session& session_;
-        struct event* udp_event_ = nullptr;
-        struct event* udp6_event_ = nullptr;
-        std::optional<in6_addr> udp6_bound_;
-        tr_socket_t udp_socket_ = TR_BAD_SOCKET;
-        tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
-
-        void rebind_ipv6(bool);
-    };
-
     std::unique_ptr<tr_udp_core> udp_core_;
 
     /* The open port on the local machine for incoming peer requests */
@@ -546,7 +634,7 @@ public:
      */
     tr_port public_peer_port;
 
-    [[nodiscard]] constexpr auto peerPort() const noexcept
+    [[nodiscard]] constexpr tr_port peerPort() const noexcept
     {
         return public_peer_port;
     }
@@ -650,7 +738,7 @@ public:
         return is_dht_enabled_;
     }
 
-    [[nodiscard]] constexpr auto allowsLPD() const noexcept
+    [[nodiscard]] constexpr bool allowsLPD() const noexcept
     {
         return is_lpd_enabled_;
     }
@@ -896,96 +984,9 @@ private:
     bool should_scrape_paused_torrents_ = false;
     bool is_incomplete_file_naming_enabled_ = false;
 
-    class PortForwardingMediator final : public tr_port_forwarding::Mediator
-    {
-    public:
-        explicit PortForwardingMediator(tr_session& session)
-            : session_{ session }
-        {
-        }
-
-        [[nodiscard]] tr_address incomingPeerAddress() const override
-        {
-            return session_.bind_ipv4.addr_;
-        }
-
-        [[nodiscard]] tr_port privatePeerPort() const override
-        {
-            return session_.private_peer_port;
-        }
-
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
-        {
-            return session_.timerMaker();
-        }
-
-        void onPortForwarded(tr_port public_port, tr_port private_port) override
-        {
-            session_.public_peer_port = public_port;
-            session_.private_peer_port = private_port;
-        }
-
-    private:
-        tr_session& session_;
-    };
-
     PortForwardingMediator port_forwarding_mediator_{ *this };
 
-    class WebMediator final : public tr_web::Mediator
-    {
-    public:
-        explicit WebMediator(tr_session* session)
-            : session_{ session }
-        {
-        }
-
-        [[nodiscard]] std::optional<std::string> cookieFile() const override;
-        [[nodiscard]] std::optional<std::string> publicAddressV4() const override;
-        [[nodiscard]] std::optional<std::string> publicAddressV6() const override;
-        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
-        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
-        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
-        // runs the tr_web::fetch response callback in the libtransmission thread
-        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
-
-    private:
-        tr_session* const session_;
-    };
-
     WebMediator web_mediator_{ this };
-
-    class LpdMediator final : public tr_lpd::Mediator
-    {
-    public:
-        explicit LpdMediator(tr_session& session)
-            : session_{ session }
-        {
-        }
-
-        [[nodiscard]] tr_port port() const override
-        {
-            return session_.peerPort();
-        }
-
-        [[nodiscard]] bool allowsLPD() const override
-        {
-            return session_.allowsLPD();
-        }
-
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
-        {
-            return session_.timerMaker();
-        }
-
-        [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
-
-        bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;
-
-        void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after) override;
-
-    private:
-        tr_session& session_;
-    };
 
     LpdMediator lpd_mediator_{ *this };
 
