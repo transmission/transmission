@@ -630,7 +630,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     /* initialize the bare skeleton of the session object */
     auto* const session = new tr_session{ config_dir };
-    session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
@@ -2821,7 +2820,9 @@ auto makeEventBase()
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : session_id_{ tr_time }
+    : config_dir_{ config_dir }
+    , resume_dir_{ makeResumeDir(config_dir) }
+    , torrent_dir_{ makeTorrentDir(config_dir) }
     , event_base_{ makeEventBase() }
     , evdns_base_{ evdns_base_new(eventBase(), EVDNS_BASE_INITIALIZE_NAMESERVERS),
                    [](evdns_base* dns)
@@ -2830,10 +2831,7 @@ tr_session::tr_session(std::string_view config_dir)
                        evdns_base_free(dns, 0);
                    } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
-    , config_dir_{ config_dir }
-    , resume_dir_{ makeResumeDir(config_dir) }
-    , torrent_dir_{ makeTorrentDir(config_dir) }
-    , session_stats_{ config_dir, time(nullptr) }
+    , session_id_{ tr_time }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->startRepeating(1s);
