@@ -873,6 +873,8 @@ private:
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
 public:
+    /// constexpr fields
+
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
           { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
@@ -881,6 +883,20 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
+private:
+    /// const fields
+
+    std::string const config_dir_;
+    std::string const resume_dir_;
+    std::string const torrent_dir_;
+
+    std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+    std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
+    std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
+
+    /// other fields
+
+public:
     struct tr_turtle_info turtle;
 
     struct tr_event_handle* events = nullptr;
@@ -991,10 +1007,6 @@ private:
 
     LpdMediator lpd_mediator_{ *this };
 
-    std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
-    std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
-    std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
-
     void onNowTimer();
     std::unique_ptr<libtransmission::Timer> now_timer_;
 
@@ -1006,9 +1018,6 @@ private:
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
-    std::string const config_dir_;
-    std::string const resume_dir_;
-    std::string const torrent_dir_;
     std::string download_dir_;
     std::string incomplete_dir_;
 
