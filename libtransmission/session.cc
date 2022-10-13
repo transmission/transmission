@@ -295,7 +295,7 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
     {
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", client_socket, client_addr.readable(client_port)));
 
-        tr_peerMgrAddIncoming(session->peerMgr, &client_addr, client_port, tr_peer_socket_tcp_create(client_socket));
+        session->addIncoming(client_addr, client_port, tr_peer_socket_tcp_create(client_socket));
     }
 }
 
@@ -2835,4 +2835,9 @@ tr_session::tr_session(std::string_view config_dir)
     save_timer_->startRepeating(SaveIntervalSecs);
 
     verifier_->addCallback(tr_torrentOnVerifyDone);
+}
+
+void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
+{
+    tr_peerMgrAddIncoming(peerMgr, addr, port, socket);
 }

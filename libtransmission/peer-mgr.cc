@@ -1237,19 +1237,19 @@ static bool on_handshake_done(tr_handshake_result const& result)
     return success;
 }
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket)
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
 
     tr_session* session = manager->session;
 
-    if (session->addressIsBlocked(*addr))
+    if (session->addressIsBlocked(addr))
     {
-        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr->readable(port)));
+        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr.readable(port)));
         tr_netClosePeerSocket(session, socket);
     }
-    else if (manager->incoming_handshakes.contains(*addr))
+    else if (manager->incoming_handshakes.contains(addr))
     {
         tr_netClosePeerSocket(session, socket);
     }
@@ -1257,11 +1257,11 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     {
         auto* const handshake = tr_handshakeNew(
             std::make_unique<tr_handshake_mediator_impl>(*session),
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket),
+            tr_peerIo::newIncoming(session, &session->top_bandwidth_, &addr, port, tr_time(), socket),
             session->encryptionMode(),
             on_handshake_done,
             manager);
-        manager->incoming_handshakes.add(*addr, handshake);
+        manager->incoming_handshakes.add(addr, handshake);
     }
 }
 

@@ -821,6 +821,8 @@ public:
         return bandwidth_groups_;
     }
 
+    void addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
