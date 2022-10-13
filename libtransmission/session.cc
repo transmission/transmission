@@ -2841,3 +2841,10 @@ void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_pee
 {
     tr_peerMgrAddIncoming(peerMgr, addr, port, socket);
 }
+
+void tr_session::addTorrent(tr_torrent* tor)
+{
+    tor->unique_id_ = torrents().add(tor);
+
+    tr_peerMgrAddTorrent(peerMgr, tor);
+}

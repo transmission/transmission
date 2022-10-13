@@ -823,6 +823,8 @@ public:
 
     void addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
 
+    void addTorrent(tr_torrent* tor);
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
