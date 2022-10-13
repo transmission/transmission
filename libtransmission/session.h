@@ -75,27 +75,6 @@ class SessionTest;
 
 } // namespace libtransmission::test
 
-struct tr_bindinfo
-{
-    explicit tr_bindinfo(tr_address addr)
-        : addr_{ std::move(addr) }
-    {
-    }
-
-    void bindAndListenForIncomingPeers(tr_session* session);
-
-    void close();
-
-    [[nodiscard]] auto readable() const
-    {
-        return addr_.readable();
-    }
-
-    tr_address addr_;
-    struct event* ev_ = nullptr;
-    tr_socket_t socket_ = TR_BAD_SOCKET;
-};
-
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
@@ -139,6 +118,27 @@ struct tr_turtle_info
 struct tr_session
 {
 private:
+    struct tr_bindinfo
+    {
+        explicit tr_bindinfo(tr_address addr)
+            : addr_{ std::move(addr) }
+        {
+        }
+
+        void bindAndListenForIncomingPeers(tr_session* session);
+
+        void close();
+
+        [[nodiscard]] auto readable() const
+        {
+            return addr_.readable();
+        }
+
+        tr_address addr_;
+        struct event* ev_ = nullptr;
+        tr_socket_t socket_ = TR_BAD_SOCKET;
+    };
+
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
     {
     public:
@@ -149,7 +149,7 @@ private:
 
         [[nodiscard]] tr_address incomingPeerAddress() const override
         {
-            return session_.bind_ipv4.addr_;
+            return session_.bind_ipv4_.addr_;
         }
 
         [[nodiscard]] tr_port privatePeerPort() const override
@@ -819,6 +819,12 @@ public:
 private:
     [[nodiscard]] tr_port randomPort() const;
 
+    void closePeerPort()
+    {
+        bind_ipv4_.close();
+        bind_ipv6_.close();
+    }
+
     struct init_data;
     void initImpl(init_data&);
     void setImpl(init_data&);
@@ -1013,10 +1019,10 @@ private:
 
     tr_session_id session_id_;
 
-public:
-    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
-    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
+    tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
+    tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
 
+public:
     struct tr_turtle_info turtle;
 
     /// other fields

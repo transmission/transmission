@@ -268,7 +268,7 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 ****
 ***/
 
-void tr_bindinfo::close()
+void tr_session::tr_bindinfo::close()
 {
     if (ev_ != nullptr)
     {
@@ -299,7 +299,7 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
     }
 }
 
-void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
+void tr_session::tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
 {
     TR_ASSERT(session->allowsTCP());
 
@@ -315,21 +315,15 @@ void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
     }
 }
 
-static void close_incoming_peer_port(tr_session* session)
-{
-    session->bind_ipv4.close();
-    session->bind_ipv6.close();
-}
-
 tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) const noexcept
 {
     switch (type)
     {
     case TR_AF_INET:
-        return { bind_ipv4.addr_, bind_ipv4.addr_.readable() == DefaultBindAddressIpv4 };
+        return { bind_ipv4_.addr_, bind_ipv4_.addr_.readable() == DefaultBindAddressIpv4 };
 
     case TR_AF_INET6:
-        return { bind_ipv6.addr_, bind_ipv6.addr_.readable() == DefaultBindAddressIpv6 };
+        return { bind_ipv6_.addr_, bind_ipv6_.addr_.readable() == DefaultBindAddressIpv6 };
 
     default:
         TR_ASSERT_MSG(false, "invalid type");
@@ -498,8 +492,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask_));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent());
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4_.readable());
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6_.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !s->shouldPauseAddedTorrents());
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
@@ -939,7 +933,7 @@ void tr_session::setImpl(init_data& data)
 
     /* public addresses */
 
-    close_incoming_peer_port(this);
+    closePeerPort();
 
     auto address = tr_inaddr_any;
 
@@ -951,7 +945,7 @@ void tr_session::setImpl(init_data& data)
         }
     }
 
-    this->bind_ipv4 = tr_bindinfo{ address };
+    this->bind_ipv4_ = tr_bindinfo{ address };
 
     address = tr_in6addr_any;
 
@@ -963,7 +957,7 @@ void tr_session::setImpl(init_data& data)
         }
     }
 
-    this->bind_ipv6 = tr_bindinfo{ address };
+    this->bind_ipv6_ = tr_bindinfo{ address };
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
@@ -1245,15 +1239,15 @@ void tr_session::setPeerPort(tr_port port_in)
         private_peer_port_ = port;
         public_peer_port_ = port;
 
-        close_incoming_peer_port(this);
+        closePeerPort();
 
         if (allowsTCP())
         {
-            bind_ipv4.bindAndListenForIncomingPeers(this);
+            bind_ipv4_.bindAndListenForIncomingPeers(this);
 
             if (tr_net_hasIPv6(private_peer_port_))
             {
-                bind_ipv6.bindAndListenForIncomingPeers(this);
+                bind_ipv6_.bindAndListenForIncomingPeers(this);
             }
         }
 
@@ -1803,7 +1797,7 @@ void tr_session::closeImplStart()
     verifier_.reset();
     port_forwarding_.reset();
 
-    close_incoming_peer_port(this);
+    closePeerPort();
     this->rpc_server_.reset();
 
     /* Close the torrents. Get the most active ones first so that
