@@ -2403,7 +2403,7 @@ struct ComparePeerByActivity
         return 0;
     }
 
-    [[nodiscard]] constexpr bool operator()(tr_peer const* a, tr_peer const* b) const // less then
+    [[nodiscard]] constexpr bool operator()(tr_peer const* a, tr_peer const* b) const // less than
     {
         return compare(a, b) < 0;
     }

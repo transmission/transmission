@@ -59,7 +59,8 @@ static auto constexpr CryptoProvideCrypto = int{ 2 };
 
 // "VC is a verification constant that is used to verify whether the
 // other side knows S and SKEY and thus defeats replay attacks of the
-// SKEY hash. As of this version VC is a String of 8 bytes set to 0x00.
+// SKEY hash. As of this version VC is a String of 8 bytes set to 0x00."
+// https://wiki.vuze.com/w/Message_Stream_Encryption
 using vc_t = std::array<std::byte, 8>;
 static auto constexpr VC = vc_t{};
 
