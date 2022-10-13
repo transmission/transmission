@@ -811,6 +811,11 @@ public:
         }
     }
 
+    void fetch(tr_web::FetchOptions options) const
+    {
+        web_->fetch(std::move(options));
+    }
+
 private:
     [[nodiscard]] tr_port randomPort() const;
 
@@ -1036,8 +1041,10 @@ private:
 public:
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
-    std::unique_ptr<tr_web> web;
+private:
+    std::unique_ptr<tr_web> web_;
 
+public:
     std::unique_ptr<tr_lpd> lpd_;
 
     struct tr_announcer* announcer = nullptr;
