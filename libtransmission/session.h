@@ -608,32 +608,6 @@ public:
         session_stats_.addFileCreated();
     }
 
-public:
-    static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
-        { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
-          { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
-          { TR_KEY_script_torrent_done_seeding_enabled,
-            TR_KEY_script_torrent_done_seeding_filename,
-            TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
-    };
-
-    struct tr_turtle_info turtle;
-
-    struct tr_event_handle* events = nullptr;
-
-    std::unique_ptr<tr_udp_core> udp_core_;
-
-    /* The open port on the local machine for incoming peer requests */
-    tr_port private_peer_port;
-
-    /**
-     * The open port on the public device for incoming peer requests.
-     * This is usually the same as private_peer_port but can differ
-     * if the public device is a router and it decides to use a different
-     * port than the one requested by Transmission.
-     */
-    tr_port public_peer_port;
-
     [[nodiscard]] constexpr tr_port peerPort() const noexcept
     {
         return public_peer_port;
@@ -643,25 +617,6 @@ public:
     {
         public_peer_port = port;
     }
-
-    struct tr_peerMgr* peerMgr = nullptr;
-    std::unique_ptr<tr_port_forwarding> port_forwarding_;
-
-    std::unique_ptr<Cache> cache;
-
-    std::unique_ptr<tr_web> web;
-    std::unique_ptr<tr_lpd> lpd_;
-
-    struct tr_announcer* announcer = nullptr;
-    struct tr_announcer_udp* announcer_udp = nullptr;
-
-    // monitors the "global pool" speeds
-    tr_bandwidth top_bandwidth_;
-
-    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
-    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
-    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
@@ -917,6 +872,52 @@ private:
     friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int bytes_per_second);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
+public:
+    static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
+        { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
+          { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
+          { TR_KEY_script_torrent_done_seeding_enabled,
+            TR_KEY_script_torrent_done_seeding_filename,
+            TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
+    };
+
+    struct tr_turtle_info turtle;
+
+    struct tr_event_handle* events = nullptr;
+
+    std::unique_ptr<tr_udp_core> udp_core_;
+
+    /* The open port on the local machine for incoming peer requests */
+    tr_port private_peer_port;
+
+    /**
+     * The open port on the public device for incoming peer requests.
+     * This is usually the same as private_peer_port but can differ
+     * if the public device is a router and it decides to use a different
+     * port than the one requested by Transmission.
+     */
+    tr_port public_peer_port;
+
+    struct tr_peerMgr* peerMgr = nullptr;
+    std::unique_ptr<tr_port_forwarding> port_forwarding_;
+
+    std::unique_ptr<Cache> cache;
+
+    std::unique_ptr<tr_web> web;
+    std::unique_ptr<tr_lpd> lpd_;
+
+    struct tr_announcer* announcer = nullptr;
+    struct tr_announcer_udp* announcer_udp = nullptr;
+
+    // monitors the "global pool" speeds
+    tr_bandwidth top_bandwidth_;
+
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
+
+    tr_bindinfo bind_ipv4 = tr_bindinfo{ tr_inaddr_any };
+    tr_bindinfo bind_ipv6 = tr_bindinfo{ tr_in6addr_any };
+
+private:
     static std::recursive_mutex session_mutex_;
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
