@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, NSImageSymbolScale) {
 
 typedef NS_ENUM(NSInteger, NSWindowToolbarStyle) {
     NSWindowToolbarStylePreference = 2,
+    NSWindowToolbarStyleUnified = 3,
 } API_AVAILABLE(macos(11.0));
 
 @interface NSWindow ()

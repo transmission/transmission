@@ -687,7 +687,6 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
         alert.informativeText = [NSString stringWithFormat:@"%s (%d)", error->message, error->code];
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
-            [alert.window orderOut:nil];
             [self.window close];
         }];
         tr_error_free(error);

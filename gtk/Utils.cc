@@ -623,7 +623,10 @@ void gtr_window_set_skip_taskbar_hint([[maybe_unused]] Gtk::Window& window, [[ma
 {
 #if GTK_CHECK_VERSION(4, 0, 0)
 #if defined(GDK_WINDOWING_X11)
-    gdk_x11_surface_set_skip_taskbar_hint(Glib::unwrap(window.get_surface()), value ? TRUE : FALSE);
+    if (auto* const surface = Glib::unwrap(window.get_surface()); GDK_IS_X11_SURFACE(surface))
+    {
+        gdk_x11_surface_set_skip_taskbar_hint(surface, value ? TRUE : FALSE);
+    }
 #endif
 #else
     window.set_skip_taskbar_hint(value);
@@ -634,7 +637,10 @@ void gtr_window_set_urgency_hint([[maybe_unused]] Gtk::Window& window, [[maybe_u
 {
 #if GTK_CHECK_VERSION(4, 0, 0)
 #if defined(GDK_WINDOWING_X11)
-    gdk_x11_surface_set_urgency_hint(Glib::unwrap(window.get_surface()), value ? TRUE : FALSE);
+    if (auto* const surface = Glib::unwrap(window.get_surface()); GDK_IS_X11_SURFACE(surface))
+    {
+        gdk_x11_surface_set_urgency_hint(surface, value ? TRUE : FALSE);
+    }
 #endif
 #else
     window.set_urgency_hint(value);
