@@ -154,7 +154,7 @@ private:
 
         [[nodiscard]] tr_port privatePeerPort() const override
         {
-            return session_.private_peer_port;
+            return session_.private_peer_port_;
         }
 
         [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
@@ -164,8 +164,8 @@ private:
 
         void onPortForwarded(tr_port public_port, tr_port private_port) override
         {
-            session_.public_peer_port = public_port;
-            session_.private_peer_port = private_port;
+            session_.public_peer_port_ = public_port;
+            session_.private_peer_port_ = private_port;
         }
 
     private:
@@ -610,13 +610,10 @@ public:
 
     [[nodiscard]] constexpr tr_port peerPort() const noexcept
     {
-        return public_peer_port;
+        return public_peer_port_;
     }
 
-    constexpr auto setPeerPort(tr_port port) noexcept
-    {
-        public_peer_port = port;
-    }
+    void setPeerPort(tr_port port);
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
@@ -827,6 +824,8 @@ private:
     void onNowTimer();
 
     friend class libtransmission::test::SessionTest;
+    friend struct tr_bindinfo;
+
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
@@ -838,6 +837,7 @@ private:
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
+    friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session);
@@ -857,6 +857,7 @@ private:
     friend void tr_sessionSetPaused(tr_session* session, bool is_paused);
     friend void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers);
     friend void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
+    friend void tr_sessionSetPeerPort(tr_session* session, uint16_t hport);
     friend void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
@@ -938,17 +939,15 @@ private:
 
     tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
 
-public:
     // The open port on the local machine for incoming peer requests
-    tr_port private_peer_port;
+    tr_port private_peer_port_;
 
     // The open port on the public device for incoming peer requests.
     // This is usually the same as private_peer_port but can differ
     // if the public device is a router and it decides to use a different
     // port than the one requested by Transmission.
-    tr_port public_peer_port;
+    tr_port public_peer_port_;
 
-private:
     tr_port random_port_low_;
     tr_port random_port_high_;
 
