@@ -613,8 +613,6 @@ public:
         return public_peer_port_;
     }
 
-    void setPeerPort(tr_port port);
-
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
         return queue_enabled_[dir];
@@ -827,6 +825,8 @@ public:
 
 private:
     [[nodiscard]] tr_port randomPort() const;
+
+    void setPeerPort(tr_port port);
 
     void closePeerPort()
     {
