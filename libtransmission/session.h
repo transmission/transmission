@@ -1044,9 +1044,9 @@ public:
 private:
     std::unique_ptr<tr_web> web_;
 
-public:
     std::unique_ptr<tr_lpd> lpd_;
 
+public:
     struct tr_announcer* announcer = nullptr;
     struct tr_announcer_udp* announcer_udp = nullptr;
 
