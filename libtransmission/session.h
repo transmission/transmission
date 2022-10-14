@@ -613,6 +613,12 @@ public:
         return public_peer_port_;
     }
 
+    [[nodiscard]] constexpr tr_port udpPort() const noexcept
+    {
+        // uses the same port number that's used for incoming TCP connections
+        return public_peer_port_;
+    }
+
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
         return queue_enabled_[dir];

@@ -265,7 +265,7 @@ public:
     {
         if (torrent->allowsPex())
         {
-            pex_timer_ = torrent->session->timerMaker().create([this]() { sendPex(); });
+            pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
             pex_timer_->startRepeating(SendPexInterval);
         }
 
@@ -282,12 +282,12 @@ public:
 
         tellPeerWhatWeHave(this);
 
-        if (auto const port = tr_dhtPort(); io->supportsDHT() && port.has_value())
+        if (session->allowsDHT() && io->supportsDHT())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
             if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
             {
-                protocolSendPort(this, *port);
+                protocolSendPort(this, session->udpPort());
             }
         }
 

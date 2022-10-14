@@ -593,16 +593,6 @@ void tr_dhtUninit()
     impl = {};
 }
 
-std::optional<tr_port> tr_dhtPort()
-{
-    if (impl.session == nullptr)
-    {
-        return {};
-    }
-
-    return impl.session->udp_core_->port();
-}
-
 bool tr_dhtAddNode(tr_address addr, tr_port port, bool bootstrap)
 {
     if (!tr_dhtEnabled())
