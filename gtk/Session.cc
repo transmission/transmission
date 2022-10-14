@@ -198,7 +198,7 @@ TorrentModelColumns const torrent_cols;
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
 {
     core_.reference();
-    return Glib::RefPtr<Session>(&core_);
+    return Glib::make_refptr_for_instance(&core_);
 }
 
 /***
