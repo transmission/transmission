@@ -712,9 +712,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     auto const& labels = tr_ctorGetLabels(ctor);
     tor->setLabels(labels);
 
-    tor->unique_id_ = session->torrents().add(tor);
-
-    tr_peerMgrAddTorrent(session->peerMgr, tor);
+    session->addTorrent(tor);
 
     TR_ASSERT(tor->downloadedCur == 0);
     TR_ASSERT(tor->uploadedCur == 0);

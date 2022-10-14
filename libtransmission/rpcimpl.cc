@@ -1363,7 +1363,7 @@ static char const* portTest(
 {
     auto const port = session->peerPort();
     auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
-    session->web->fetch({ url, onPortTested, idle_data });
+    session->fetch({ url, onPortTested, idle_data });
     return nullptr;
 }
 
@@ -1449,7 +1449,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    session->web->fetch({ session->blocklistUrl(), onBlocklistFetched, idle_data });
+    session->fetch({ session->blocklistUrl(), onBlocklistFetched, idle_data });
     return nullptr;
 }
 
@@ -1654,7 +1654,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         auto* const d = new add_torrent_idle_data{ idle_data, ctor };
         auto options = tr_web::FetchOptions{ filename, onMetadataFetched, d };
         options.cookies = cookies;
-        session->web->fetch(std::move(options));
+        session->fetch(std::move(options));
     }
     else
     {
@@ -1708,7 +1708,7 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
     }
 
     auto* const list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
-    for (auto const& [name, group] : s->bandwidth_groups_)
+    for (auto const& [name, group] : s->bandwidthGroups())
     {
         if (names.empty() || names.count(name.sv()) > 0)
         {
