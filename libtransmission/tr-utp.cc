@@ -76,30 +76,30 @@ void tr_utpClose(tr_session* /*session*/)
 /* Greg says 50ms works for them. */
 static auto constexpr UtpInterval = 50ms;
 
-static void utp_on_accept(tr_session* const session, UTPSocket* const s)
+static void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 {
     auto from_storage = sockaddr_storage{};
     auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
-    auto addr = tr_address{};
-    auto port = tr_port{};
 
     if (!session->allowsUTP())
     {
-        utp_close(s);
+        utp_close(utp_sock);
         return;
     }
 
-    utp_getpeername(s, from, &fromlen);
+    utp_getpeername(utp_sock, from, &fromlen);
 
-    if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
+    if (auto addrport = tr_address::fromSockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
+    {
+        auto const [addr, port] = *addrport;
+        session->addIncoming(addr, port, tr_peer_socket_utp_create(utp_sock));
+    }
+    else
     {
         tr_logAddWarn(_("Unknown socket family"));
-        utp_close(s);
-        return;
+        utp_close(utp_sock);
     }
-
-    session->addIncoming(addr, port, tr_peer_socket_utp_create(s));
 }
 
 static void utp_send_to(
