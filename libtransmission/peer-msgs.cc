@@ -37,7 +37,6 @@
 #include "torrent-magnet.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
@@ -1693,7 +1692,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
-                tr_dhtAddNode(msgs->io->address(), msgs->dht_port, false);
+                msgs->session->addDhtNode(msgs->io->address(), msgs->dht_port);
             }
         }
         break;

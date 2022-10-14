@@ -262,6 +262,8 @@ private:
             return udp6_socket_;
         }
 
+        void addDhtNode(tr_address const& addr, tr_port port);
+
     private:
         tr_port udp_port_ = {};
         tr_session& session_;
@@ -828,6 +830,14 @@ public:
     void addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
 
     void addTorrent(tr_torrent* tor);
+
+    void addDhtNode(tr_address const& addr, tr_port port)
+    {
+        if (udp_core_)
+        {
+            udp_core_->addDhtNode(addr, port);
+        }
+    }
 
 private:
     [[nodiscard]] tr_port randomPort() const;

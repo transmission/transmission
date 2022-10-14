@@ -90,6 +90,11 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     }
 }
 
+void tr_session::tr_udp_core::addDhtNode(tr_address const& addr, tr_port port)
+{
+    tr_dhtAddNode(addr, port, false);
+}
+
 void tr_session::tr_udp_core::set_socket_buffers()
 {
     bool const utp = session_.allowsUTP();
