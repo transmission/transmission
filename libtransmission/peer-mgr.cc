@@ -44,7 +44,6 @@
 #include "timer.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
 #include "tr-utp.h"
 #include "utils.h"
 #include "webseed.h"
@@ -102,9 +101,9 @@ public:
         return torrentInfo(tr_torrentFindFromObfuscatedHash(&session_, obfuscated_info_hash));
     }
 
-    [[nodiscard]] bool isDHTEnabled() const override
+    [[nodiscard]] bool allowsDHT() const override
     {
-        return tr_dhtEnabled();
+        return session_.allowsDHT();
     }
 
     [[nodiscard]] bool allowsTCP() const override

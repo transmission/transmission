@@ -61,7 +61,7 @@ public:
 
     [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
 
-    [[nodiscard]] virtual bool isDHTEnabled() const = 0;
+    [[nodiscard]] virtual bool allowsDHT() const = 0;
 
     [[nodiscard]] virtual bool allowsTCP() const = 0;
 

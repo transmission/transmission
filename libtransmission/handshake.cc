@@ -237,7 +237,7 @@ static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* 
     /* Note that this doesn't depend on whether the torrent is private.
      * We don't accept DHT peers for a private torrent,
      * but we participate in the DHT regardless. */
-    if (handshake->mediator->isDHTEnabled())
+    if (handshake->mediator->allowsDHT())
     {
         HANDSHAKE_SET_DHT(walk);
     }
