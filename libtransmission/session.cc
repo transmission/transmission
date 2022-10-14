@@ -287,15 +287,11 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    auto client_addr = tr_address{};
-    auto client_port = tr_port{};
-    auto const client_socket = tr_netAccept(session, fd, &client_addr, &client_port);
-
-    if (client_socket != TR_BAD_SOCKET)
+    if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", client_socket, client_addr.readable(client_port)));
-
-        session->addIncoming(client_addr, client_port, tr_peer_socket_tcp_create(client_socket));
+        auto const [addr, port, sock] = *incoming_info;
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
+        session->addIncoming(addr, port, tr_peer_socket_tcp_create(sock));
     }
 }
 
