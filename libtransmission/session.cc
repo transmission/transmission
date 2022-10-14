@@ -1785,7 +1785,7 @@ void tr_session::closeImplStart()
 
     lpd_.reset();
 
-    udp_core_->dhtUninit();
+    udp_core_->startShutdown();
 
     save_timer_.reset();
     now_timer_.reset();

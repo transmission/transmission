@@ -234,7 +234,7 @@ private:
 
         ~tr_udp_core();
 
-        static void dhtUninit();
+        static void startShutdown();
         static void dhtUpkeep();
 
         void set_socket_buffers();

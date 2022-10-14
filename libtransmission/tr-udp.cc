@@ -327,7 +327,7 @@ void tr_session::tr_udp_core::dhtUpkeep()
     }
 }
 
-void tr_session::tr_udp_core::dhtUninit()
+void tr_session::tr_udp_core::startShutdown()
 {
     if (tr_dhtEnabled())
     {
@@ -337,7 +337,7 @@ void tr_session::tr_udp_core::dhtUninit()
 
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    dhtUninit();
+    startShutdown();
 
     if (udp_socket_ != TR_BAD_SOCKET)
     {
