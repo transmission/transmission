@@ -1261,13 +1261,13 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
 
     /* step 1: get all the peers */
     std::vector<tr_peer_stat*> peers;
-    std::vector<int> peerCount;
+    std::vector<size_t> peerCount;
 
     peers.reserve(torrents.size());
     peerCount.reserve(torrents.size());
     for (auto const* const torrent : torrents)
     {
-        int count = 0;
+        size_t count = 0;
         peers.push_back(tr_torrentPeers(torrent, &count));
         peerCount.push_back(count);
     }
@@ -1288,7 +1288,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     {
         auto const* tor = torrents.at(i);
 
-        for (int j = 0; j < peerCount[i]; ++j)
+        for (size_t j = 0; j < peerCount[i]; ++j)
         {
             auto const* s = &peers.at(i)[j];
             auto const key = make_key(tor, s);
