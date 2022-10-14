@@ -724,7 +724,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_sessionSet(this, &settings);
 
-    this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this);
+    this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
 
     this->web_ = tr_web::create(this->web_mediator_);
 
@@ -2057,7 +2057,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         {
             session->udp_core_.reset();
             session->is_dht_enabled_ = enabled;
-            session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session);
+            session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session, session->udpPort());
         });
 }
 

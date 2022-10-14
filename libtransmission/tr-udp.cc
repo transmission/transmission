@@ -233,10 +233,10 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     }
 }
 
-tr_session::tr_udp_core::tr_udp_core(tr_session& session)
-    : session_{ session }
+tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
+    : udp_port_{ udp_port }
+    , session_{ session }
 {
-    udp_port_ = session_.peerPort();
     if (std::empty(udp_port_))
     {
         return;
