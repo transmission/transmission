@@ -733,7 +733,7 @@ void RemotePage::refreshRPCSensitivity()
 
 void onLaunchClutchCB()
 {
-    gtr_open_uri(gtr_sprintf("http://localhost:%d/", (int)gtr_pref_int_get(TR_KEY_rpc_port)));
+    gtr_open_uri(fmt::format("http://localhost:{}/", gtr_pref_int_get(TR_KEY_rpc_port)));
 }
 
 } // namespace
@@ -879,7 +879,7 @@ void SpeedPage::init_time_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> cons
     {
         auto const iter = store->append();
         (*iter)[time_cols.offset] = i;
-        (*iter)[time_cols.title] = gtr_sprintf("%02d:%02d", i / 60, i % 60);
+        (*iter)[time_cols.title] = fmt::format("{:02}:{:02}", i / 60, i % 60);
     }
 
     /* build the widget */

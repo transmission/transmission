@@ -12,6 +12,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include "FaviconCache.h" // gtr_get_favicon()
 #include "FilterBar.h"
 #include "HigWorkarea.h" // GUI_PAD
@@ -323,7 +325,7 @@ void render_pixbuf_func(Gtk::CellRendererPixbuf* cell_renderer, Gtk::TreeModel::
 void render_number_func(Gtk::CellRendererText* cell_renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     auto const count = iter->get_value(tracker_filter_cols.count);
-    cell_renderer->property_text() = count >= 0 ? gtr_sprintf("%'d", count) : "";
+    cell_renderer->property_text() = count >= 0 ? fmt::format("{:L}", count) : "";
 }
 
 Gtk::CellRendererText* number_renderer_new()

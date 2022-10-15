@@ -208,7 +208,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
             auto const it = level_names_.find(node->level);
             auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
 
-            fprintf(fp, "%s\t%s\t%s\t%s\n", date.c_str(), level_str, node->name.c_str(), node->message.c_str());
+            fmt::print(fp, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }
 
         fclose(fp);
