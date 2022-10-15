@@ -1,6 +1,6 @@
 
 /* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
-"15.title" = "Sauver dans :";
+"15.title" = "Enregistrer dans :";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
 "16.title" = "Modifier...";

@@ -2263,19 +2263,19 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Дубльований торент</numerusform>
-            <numerusform>Дубльовані торенти</numerusform>
-            <numerusform>Дубльовані торенти</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Не вдається додати %n дубльований(х) торент(ів)</numerusform>
-            <numerusform>Не вдається додати %n дубльований(х) торент(ів)</numerusform>
-            <numerusform>Не вдається додати %n дубльований(х) торент(ів)</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

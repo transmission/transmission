@@ -5,8 +5,8 @@
 #
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
-# Josef Andersson <josef.andersson@fripost.org>, 2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
+# Josef Andersson <josef.andersson@fripost.org>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Jonatan Nyberg <jonatan@autistici.org>, 2022
 #
@@ -138,8 +138,8 @@ msgstr[1] "Det gick inte att lägga till skadade torrenter"
 #: ../gtk/Application.cc:1081
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "Det gick inte att lägga till dubblett av torrent"
-msgstr[1] "Det gick inte att lägga till dubbletter av torrenter"
+msgstr[0] "Det gick inte att lägga till torrentdubblett"
+msgstr[1] "Det gick inte att lägga till torrentdubbletter"
 
 #: ../gtk/Application.cc:1404
 msgid "A fast and easy BitTorrent client"
@@ -154,25 +154,7 @@ msgstr "Copyright © The Transmission Project"
 #. dialog
 #: ../gtk/Application.cc:1411
 msgid "translator-credits"
-msgstr ""
-"Anders Pamdal https://launchpad.net/~anders-pamdal\n"
-"Daniel Nylander https://launchpad.net/~yeager\n"
-"Joakim Lundvall https://launchpad.net/~jocke-lundvall\n"
-"Josef Andersson https://launchpad.net/~northar\n"
-"Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
-"Leopold Augustsson https://launchpad.net/~leopold-augustsson\n"
-"Martin Josefsson https://launchpad.net/~josefsson-martin\n"
-"Michael Dundee https://launchpad.net/~dundee-michael\n"
-"Mikael Olofsson https://launchpad.net/~michlos\n"
-"Oscar Carlsson https://launchpad.net/~oscar-carlsson\n"
-"Per Söderkvist https://launchpad.net/~sodper\n"
-"Sebastian https://launchpad.net/~slovdahl\n"
-"Simba https://launchpad.net/~the-funnyboy\n"
-"Simon https://launchpad.net/~kattassen\n"
-"Teodor Jönsson https://launchpad.net/~teodor-jonsson-sogeti-deactivatedaccount\n"
-"Viktor Ljungström https://launchpad.net/~viktor-ljungstrom\n"
-"jstfaking https://launchpad.net/~jstfaking\n"
-"och flera"
+msgstr "Transifex-bidragsgivare https://www.transifex.com/transmissionbt/transmissionbt"
 
 #: ../gtk/DetailsDialog.cc:484 ../gtk/DetailsDialog.cc:502
 msgid "Use global settings"
@@ -745,32 +727,32 @@ msgstr "Tid"
 #: ../gtk/MessageLogWindow.cc:451
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Kritisk"
 
 #: ../gtk/MessageLogWindow.cc:452
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Fel"
 
 #: ../gtk/MessageLogWindow.cc:453
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Varning"
 
 #: ../gtk/MessageLogWindow.cc:454
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 #: ../gtk/MessageLogWindow.cc:455
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Felsök"
 
 #: ../gtk/MessageLogWindow.cc:456
 msgctxt "Logging level"
 msgid "Trace"
-msgstr ""
+msgstr "Spåra"
 
 #: ../gtk/Notify.cc:128
 msgid "Couldn't create proxy for '{bus}'"
@@ -814,15 +796,15 @@ msgstr "_Öppna"
 
 #: ../gtk/OptionsDialog.cc:377
 msgid "Show options dialog"
-msgstr ""
+msgstr "Visa alternativdialogruta"
 
 #: ../gtk/PathButton.cc:135
 msgid "Select a File"
-msgstr ""
+msgstr "Välj en fil"
 
 #: ../gtk/PathButton.cc:192
 msgid "(None)"
-msgstr ""
+msgstr "(Ingen)"
 
 #: ../gtk/PrefsDialog.cc:474 ../gtk/PrefsDialog.cc:502
 msgid "Blocklist has {count:L} entry"
@@ -1921,11 +1903,11 @@ msgstr "Maximalt antal jämlikar t_otalt:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Aktivera µ_TP för jämlikeanslutningar"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP är ett verktyg för att minska nätverksöverbelastning."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439
 msgid "Use PE_X to find more peers"
@@ -2139,7 +2121,7 @@ msgstr "Lyckades"
 
 #: ../libtransmission/blocklist.cc:102
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Skriver om gammalt blocklistfilformat till nytt format"
 
 #: ../libtransmission/blocklist.cc:117 ../libtransmission/blocklist.cc:509
 msgid "Blocklist '{path}' has {count} entry"
@@ -2380,7 +2362,7 @@ msgstr "Migrerade torrentfil från '{old_path}' till '{path}'"
 
 #: ../libtransmission/torrent.cc:125
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Det gick inte att använda metainfo från '{path}' for '{magnet}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2526,14 +2508,14 @@ msgstr "OBS: Ogiltiga certifikat kommer att visas som \"Det gick inte att anslut
 #: ../utils/create.cc:226
 msgid "{file_count:L} files, {total_size}\n"
 msgid_plural "{file_count:L} file, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} filer, {total_size}\n"
+msgstr[1] "{file_count:L} fil, {total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} pieces, {piece_size} each\n"
 msgid_plural "{piece_count:L} piece, {piece_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} delar, {piece_size} var\n"
+msgstr[1] "{piece_count:L} del, {piece_size}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2567,40 +2549,21 @@ msgstr[1] "dagar"
 #~ "%s\n"
 #~ "Kör \"%s --help\" för att se en komplett lista över tillgängliga kommandoradsflaggor.\n"
 
-#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-#~ msgstr "Det gick inte att använda metainfo från '{path}' för '{magnet}': {error} ({error_code})"
-
-#~ msgid "Critical"
-#~ msgstr "Kritisk"
-
-#~ msgid "Debug"
-#~ msgstr "Felsökning"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Aktivera _uTP för jämlikeanslutningar"
-
 #, c-format
 #~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 #~ msgstr "Mottog signalen %d; försöker stänga av rent. Gör det igen om det fastnar."
 
-#~ msgid "Show _options dialog"
-#~ msgstr "Visa dialog för _alternativ"
+#~ msgid "_File"
+#~ msgstr "_Arkiv"
 
-#~ msgid "Trace"
-#~ msgstr "Spåra"
+#~ msgid "_Queue"
+#~ msgstr "_Kö"
 
-#~ msgid "Warning"
-#~ msgstr "Varning"
+#~ msgid "_Sort Torrents By"
+#~ msgstr "_Sortera torrenter efter"
 
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP är ett verktyg för att minska trafikstockning i nätverk."
+#~ msgid "_Torrent"
+#~ msgstr "_Torrent"
 
-#~ msgid "{:d} files, {:s}\n"
-#~ msgid_plural "{:d} file, {:s}\n"
-#~ msgstr[0] "{:d} filer, {:s}\n"
-#~ msgstr[1] "{:d} fil, {:s}\n"
-
-#~ msgid "{:d} pieces, {:s} each\n"
-#~ msgid_plural "{:d} piece, {:s}\n"
-#~ msgstr[0] "{:d} delar, {:s} var\n"
-#~ msgstr[1] "{:d} del, {:s}\n"
+#~ msgid "_View"
+#~ msgstr "_Visa"

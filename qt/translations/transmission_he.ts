@@ -1086,7 +1086,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>מיון לפי &amp;גשש</translation>
+        <translation>מיון לפי &amp;עוקב</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2247,15 +2247,15 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>טורנט כפול</numerusform>
-            <numerusform>טורנטים כפולים</numerusform>
+            <numerusform>שכפול טורנט</numerusform>
+            <numerusform>שכפול טורנטים</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>לא ניתן להוסיף טורנט כפול %n</numerusform>
+            <numerusform>לא ניתן להוסיף טורנט כפול</numerusform>
             <numerusform>לא ניתן להוסיף %n טורנטים כפולים</numerusform>
         </translation>
     </message>

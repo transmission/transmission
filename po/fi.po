@@ -6,8 +6,8 @@
 # Translators:
 # Otto Koskelah <otto@nise.fi>, 2017
 # Kimmo Kujansuu <mrkujansuu@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-15 17:15+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Finnish (https://www.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -2572,40 +2572,21 @@ msgstr[1] "päivää"
 #~ "%s\n"
 #~ "Suorita ”%s --help” nähdäksesi täyden luettelon komentorivivalitsimista.\n"
 
-#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-#~ msgstr "Ei voitu käyttää metatietoa '{path}' kohteesta '{magnet}': {error} ({error_code})"
-
-#~ msgid "Critical"
-#~ msgstr "Kriittinen"
-
-#~ msgid "Debug"
-#~ msgstr "Virheenkorjaus"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Käytä _uTP:tä vertaisliikenteeseen"
-
 #, c-format
 #~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 #~ msgstr "Vastaanotettiin signaali %d; yritetään sammuttamista siististi. Yritä uudelleen jos tämä ei valmistu."
 
-#~ msgid "Show _options dialog"
-#~ msgstr "Näytä _asetukset-valintaikkuna"
+#~ msgid "_File"
+#~ msgstr "_Tiedosto"
 
-#~ msgid "Trace"
-#~ msgstr "Jäljitä"
+#~ msgid "_Queue"
+#~ msgstr "_Jono"
 
-#~ msgid "Warning"
-#~ msgstr "Varoitus"
+#~ msgid "_Sort Torrents By"
+#~ msgstr "Järje_stä torrentit"
 
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP on työkalu, jonka avulla vähennetään verkon ruuhkaa."
+#~ msgid "_Torrent"
+#~ msgstr "_Torrent"
 
-#~ msgid "{:d} files, {:s}\n"
-#~ msgid_plural "{:d} file, {:s}\n"
-#~ msgstr[0] "{:d} tiedostoa, {:s}\n"
-#~ msgstr[1] "{:d} tiedosto, {:s}\n"
-
-#~ msgid "{:d} pieces, {:s} each\n"
-#~ msgid_plural "{:d} piece, {:s}\n"
-#~ msgstr[0] "{:d} osaa, {:s} jokainen\n"
-#~ msgstr[1] "{:d} osa, {:s}\n"
+#~ msgid "_View"
+#~ msgstr "_Näytä"

@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
+# Piotr Drąg <piotrdrag@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Marek Adamski, 2022
-# Piotr Drąg <piotrdrag@gmail.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-15 17:15+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2022\n"
+"Last-Translator: Marek Adamski, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -799,32 +799,32 @@ msgstr "Czas"
 #: ../gtk/MessageLogWindow.cc:451
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Krytyczne"
 
 #: ../gtk/MessageLogWindow.cc:452
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Błąd"
 
 #: ../gtk/MessageLogWindow.cc:453
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Ostrzeżenie"
 
 #: ../gtk/MessageLogWindow.cc:454
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Informacje"
 
 #: ../gtk/MessageLogWindow.cc:455
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Debugowanie"
 
 #: ../gtk/MessageLogWindow.cc:456
 msgctxt "Logging level"
 msgid "Trace"
-msgstr ""
+msgstr "Śledzenie"
 
 #: ../gtk/Notify.cc:128
 msgid "Couldn't create proxy for '{bus}'"
@@ -868,15 +868,15 @@ msgstr "_Otwórz"
 
 #: ../gtk/OptionsDialog.cc:377
 msgid "Show options dialog"
-msgstr ""
+msgstr "Pokaż _okno opcji"
 
 #: ../gtk/PathButton.cc:135
 msgid "Select a File"
-msgstr ""
+msgstr "Wybierz plik"
 
 #: ../gtk/PathButton.cc:192
 msgid "(None)"
-msgstr ""
+msgstr "(Brak)"
 
 #: ../gtk/PrefsDialog.cc:474 ../gtk/PrefsDialog.cc:502
 msgid "Blocklist has {count:L} entry"
@@ -2021,11 +2021,11 @@ msgstr "_Maksymalna liczba partnerów:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Włącz µ_TP do komunikacji równorzędnej"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP to narzędzie do zmniejszania przeciążenia sieci."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439
 msgid "Use PE_X to find more peers"
@@ -2241,7 +2241,7 @@ msgstr "Powodzenie"
 
 #: ../libtransmission/blocklist.cc:102
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Przepisywanie starego formatu pliku listy blokowania na nowy format"
 
 #: ../libtransmission/blocklist.cc:117 ../libtransmission/blocklist.cc:509
 msgid "Blocklist '{path}' has {count} entry"
@@ -2490,7 +2490,7 @@ msgstr "Przeniesiono plik torrent z „{old_path}” do „{path}”"
 
 #: ../libtransmission/torrent.cc:125
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Nie można użyć metainformacji z „{path}” dla „{magnet}”: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2636,18 +2636,18 @@ msgstr "Uwaga: nieprawidłowe certyfikaty będą wyświetlane jako „Nie można
 #: ../utils/create.cc:226
 msgid "{file_count:L} files, {total_size}\n"
 msgid_plural "{file_count:L} file, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{file_count:L} pliki, {total_size}\n"
+msgstr[1] "{file_count:L} pliki, {total_size}\n"
+msgstr[2] "{file_count:L} plików, {total_size}\n"
+msgstr[3] "{file_count:L} plik, {total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} pieces, {piece_size} each\n"
 msgid_plural "{piece_count:L} piece, {piece_size}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{piece_count:L} części, {piece_size} każda\n"
+msgstr[1] "{piece_count:L} części, {piece_size} each\n"
+msgstr[2] "{piece_count:L} części, {piece_size} each\n"
+msgstr[3] "{piece_count:L} część, {piece_size}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2689,44 +2689,21 @@ msgstr[3] "dni"
 #~ "%s\n"
 #~ "Polecenie „%s --help” wyświetli pełną listę dostępnych opcji wiersza poleceń.\n"
 
-#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-#~ msgstr "Nie można użyć metainformacji z „{path}” dla „{magnet}”: {error} ({error_code})"
-
-#~ msgid "Critical"
-#~ msgstr "Krytyczne"
-
-#~ msgid "Debug"
-#~ msgstr "Debugowanie"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Kom_unikacja z partnerami przez µTP"
-
 #, c-format
 #~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 #~ msgstr "Otrzymano sygnał %d. Próbowanie czystego wyłączenia. Proszę to zrobić ponownie, jeśli się zatnie."
 
-#~ msgid "Show _options dialog"
-#~ msgstr "_Okno opcji"
+#~ msgid "_File"
+#~ msgstr "_Plik"
 
-#~ msgid "Trace"
-#~ msgstr "Śledzenie"
+#~ msgid "_Queue"
+#~ msgstr "_Kolejka"
 
-#~ msgid "Warning"
-#~ msgstr "Ostrzeżenie"
+#~ msgid "_Sort Torrents By"
+#~ msgstr "_Porządkowanie torrentów"
 
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "µTP umożliwia zmniejszenie przeciążenia sieci"
+#~ msgid "_Torrent"
+#~ msgstr "_Torrent"
 
-#~ msgid "{:d} files, {:s}\n"
-#~ msgid_plural "{:d} file, {:s}\n"
-#~ msgstr[0] "{:d} plik, {:s}\n"
-#~ msgstr[1] "{:d} pliki, {:s}\n"
-#~ msgstr[2] "{:d} plików, {:s}\n"
-#~ msgstr[3] "{:d} plików, {:s}\n"
-
-#~ msgid "{:d} pieces, {:s} each\n"
-#~ msgid_plural "{:d} piece, {:s}\n"
-#~ msgstr[0] "{:d} część, {:s}\n"
-#~ msgstr[1] "{:d} części, {:s} każda\n"
-#~ msgstr[2] "{:d} części, {:s} każda\n"
-#~ msgstr[3] "{:d} części, {:s} każda\n"
+#~ msgid "_View"
+#~ msgstr "_Widok"

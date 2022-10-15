@@ -2229,15 +2229,15 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Torrent(ek) duplikálása</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Nem sikerült hozzáadni %n ismétlődő torrentet</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

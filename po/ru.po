@@ -6,11 +6,11 @@
 # Translators:
 # Валерий Дмиртиевич Степанов <valera1111@yandex.ru>, 2017
 # Stas Solovey <whats_up@tut.by>, 2022
-# Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
 # hlm hlmfn, 2022
+# Виктор, 2022
+# Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Andrei Stepanov, 2022
-# Виктор, 2022
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-15 17:15+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Виктор, 2022\n"
+"Last-Translator: Andrei Stepanov, 2022\n"
 "Language-Team: Russian (https://www.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -762,32 +762,32 @@ msgstr "Время"
 #: ../gtk/MessageLogWindow.cc:451
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Критический"
 
 #: ../gtk/MessageLogWindow.cc:452
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Ошибка"
 
 #: ../gtk/MessageLogWindow.cc:453
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Предупреждение"
 
 #: ../gtk/MessageLogWindow.cc:454
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Сведения"
 
 #: ../gtk/MessageLogWindow.cc:455
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Отладочный"
 
 #: ../gtk/MessageLogWindow.cc:456
 msgctxt "Logging level"
 msgid "Trace"
-msgstr ""
+msgstr "Отслеживающий"
 
 #: ../gtk/Notify.cc:128
 msgid "Couldn't create proxy for '{bus}'"
@@ -831,15 +831,15 @@ msgstr "_Открыть"
 
 #: ../gtk/OptionsDialog.cc:377
 msgid "Show options dialog"
-msgstr ""
+msgstr "Показать окно настроек"
 
 #: ../gtk/PathButton.cc:135
 msgid "Select a File"
-msgstr ""
+msgstr "Выберите файл"
 
 #: ../gtk/PathButton.cc:192
 msgid "(None)"
-msgstr ""
+msgstr "(Нет)"
 
 #: ../gtk/PrefsDialog.cc:474 ../gtk/PrefsDialog.cc:502
 msgid "Blocklist has {count:L} entry"
@@ -1984,11 +1984,11 @@ msgstr "Об_щий максимум участников:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Ис_пользовать µTP для связи с другими участниками"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP — это инструмент для снижения нагрузки на сеть."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439
 msgid "Use PE_X to find more peers"
@@ -2204,7 +2204,7 @@ msgstr "Успешно"
 
 #: ../libtransmission/blocklist.cc:102
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Перезапись старого формата файла списка блокировок в новый формат"
 
 #: ../libtransmission/blocklist.cc:117 ../libtransmission/blocklist.cc:509
 msgid "Blocklist '{path}' has {count} entry"
@@ -2453,7 +2453,7 @@ msgstr "Торрент-файл перенесен из \"{old_path}\" в \"{pat
 
 #: ../libtransmission/torrent.cc:125
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось использовать метаинформацию из «{path}» для «{magnet}»: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2599,18 +2599,18 @@ msgstr "NB: Недействительные сертификаты будут �
 #: ../utils/create.cc:226
 msgid "{file_count:L} files, {total_size}\n"
 msgid_plural "{file_count:L} file, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{file_count:L} файл, {total_size}\n"
+msgstr[1] "{file_count:L} файла, {total_size}\n"
+msgstr[2] "{file_count:L} файлов, {total_size}\n"
+msgstr[3] "{file_count:L} файлов, {total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} pieces, {piece_size} each\n"
 msgid_plural "{piece_count:L} piece, {piece_size}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{piece_count:L} часть, {piece_size} каждая\n"
+msgstr[1] "{piece_count:L} части, {piece_size} каждая\n"
+msgstr[2] "{piece_count:L} частей, {piece_size} каждая\n"
+msgstr[3] "{piece_count:L} частей, {piece_size}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2652,44 +2652,21 @@ msgstr[3] "дней"
 #~ "%s\n"
 #~ "Выполните «%s --help», чтобы увидеть список всех доступных команд командной строки.\n"
 
-#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-#~ msgstr "Не удалось использовать метаинформацию из «{path}» для «{magnet}»: {error} ({error_code})"
-
-#~ msgid "Critical"
-#~ msgstr "Критический"
-
-#~ msgid "Debug"
-#~ msgstr "Отладочный"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Использовать _uTP для связи с другими участниками"
-
 #, c-format
 #~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 #~ msgstr "Получен сигнал %d; при попытке выключения. При необходимости повторите."
 
-#~ msgid "Show _options dialog"
-#~ msgstr "Показывать диалоговое окно _настроек"
+#~ msgid "_File"
+#~ msgstr "_Файл"
 
-#~ msgid "Trace"
-#~ msgstr "Отслеживающий"
+#~ msgid "_Queue"
+#~ msgstr "По_ложение в очереди"
 
-#~ msgid "Warning"
-#~ msgstr "Предупреждение"
+#~ msgid "_Sort Torrents By"
+#~ msgstr "Со_ртировать торренты по"
 
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP — это инструмент для снижения нагрузки на сеть."
+#~ msgid "_Torrent"
+#~ msgstr "_Торрент"
 
-#~ msgid "{:d} files, {:s}\n"
-#~ msgid_plural "{:d} file, {:s}\n"
-#~ msgstr[0] "{:d} файл, {:s}\n"
-#~ msgstr[1] "{:d} файла, {:s}\n"
-#~ msgstr[2] "{:d} файлов, {:s}\n"
-#~ msgstr[3] "{:d} файлов, {:s}\n"
-
-#~ msgid "{:d} pieces, {:s} each\n"
-#~ msgid_plural "{:d} piece, {:s}\n"
-#~ msgstr[0] "{:d} частей, {:s} каждой\n"
-#~ msgstr[1] "{:d} часть, {:s}\n"
-#~ msgstr[2] "{:d} часть, {:s}\n"
-#~ msgstr[3] "{:d} часть, {:s}\n"
+#~ msgid "_View"
+#~ msgstr "_Вид"

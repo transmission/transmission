@@ -64,9 +64,9 @@
     <message numerus="yes">
         <location line="+105"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent slutförd</numerusform>
+            <numerusform>Torrenter slutförda</numerusform>
         </translation>
     </message>
     <message>
@@ -218,7 +218,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Jämlike är ansluten via µTP</translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -276,7 +276,7 @@
     <message>
         <location line="+391"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till webbadresser</translation>
     </message>
     <message>
         <location line="+97"/>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Byt namn…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Sök…</translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Beräknar ledigt utrymme…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Öppna…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ny…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1161,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Byt session…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Ställ in &amp;plats…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Öppna &amp;webbadress…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1293,7 +1293,7 @@
     <message>
         <location line="+6"/>
         <source>Show &amp;options dialog</source>
-        <translation>Visa &amp;alternativdialogrutan</translation>
+        <translation>Visa &amp;alternativdialogruta</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -1740,7 +1740,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>Testar TCP-port…</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2003,12 +2003,12 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP är ett verktyg för att minska nätverksöverbelastning.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera µ&amp;TP för jämlikeanslutningar</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2098,15 +2098,15 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message numerus="yes">
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blocklistan har nu %Ln regel.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blocklistan har nu %Ln regler.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Uppdatera blocklista&lt;/b&gt;&lt;p&gt;Hämtar ny blocklista…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2231,7 +2231,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Fel när &quot;%1&quot; döptes om till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Rätta till felen och försök igen.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Det går inte att byta namn på &quot;%1&quot; till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Rätta till felen och försök igen.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+528"/>
@@ -2247,16 +2247,16 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Dubblett av torrent</numerusform>
-            <numerusform>Dubbletter av torrenter</numerusform>
+            <numerusform>Duplicera torrent</numerusform>
+            <numerusform>Duplicera torrenter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>Det gick inte att lägga till %n dubblett av torrent</numerusform>
-            <numerusform>Det gick inte att lägga till %n dubbletter av torrenter</numerusform>
+            <numerusform>Det går inte att lägga till %n torrentdubblett</numerusform>
+            <numerusform>Det går inte att lägga till %n torrentdubbletter</numerusform>
         </translation>
     </message>
 </context>
@@ -2576,7 +2576,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Frågar efter antal jämlikar nu… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2612,7 +2612,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Frågar efter fler jämlikar nu… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>

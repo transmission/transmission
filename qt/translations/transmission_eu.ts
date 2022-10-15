@@ -2246,17 +2246,17 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Bikoiztu Torrenta(k)</numerusform>
-            <numerusform>Bikoiztu Torrenta(k)</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Ezin izan da %n bikoiztutako Torrent-a gehitu</numerusform>
-            <numerusform>Ezin izan da %n bikoiztutako Torrent gehitu</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

@@ -2229,15 +2229,15 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Torrent Duplikat</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Tak bisa menambahkan %n torrent duplikat</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

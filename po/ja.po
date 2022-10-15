@@ -2500,38 +2500,21 @@ msgstr[0] "日"
 #~ "%s\n"
 #~ "'%s --help' で利用できるすべてのコマンドラインのオプションが表示されます。\n"
 
-#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-#~ msgstr "以下からのメタ情報を使用できません「{path}」。「{magnet}」用のメタ情報です: {error} ({error_code})"
-
-#~ msgid "Critical"
-#~ msgstr "致命的"
-
-#~ msgid "Debug"
-#~ msgstr "デバッグ"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "ピア通信用の uTPを有効化(_U)"
-
 #, c-format
 #~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 #~ msgstr "シグナル %d を取得; すみやかなシャットダウンを試行します。もし固まった場合、再度お試しください。"
 
-#~ msgid "Show _options dialog"
-#~ msgstr "オプション・ダイアログを表示(_O)"
+#~ msgid "_File"
+#~ msgstr "ファイル(_F)"
 
-#~ msgid "Trace"
-#~ msgstr "トレース"
+#~ msgid "_Queue"
+#~ msgstr "待ち行列(_Q)"
 
-#~ msgid "Warning"
-#~ msgstr "警告"
+#~ msgid "_Sort Torrents By"
+#~ msgstr "トレントの並べ替え(_S)"
 
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP はネットワークの混雑を軽減するツールです。"
+#~ msgid "_Torrent"
+#~ msgstr "トレント(_T)"
 
-#~ msgid "{:d} files, {:s}\n"
-#~ msgid_plural "{:d} file, {:s}\n"
-#~ msgstr[0] "{:d} ファイル, {:s}\n"
-
-#~ msgid "{:d} pieces, {:s} each\n"
-#~ msgid_plural "{:d} piece, {:s}\n"
-#~ msgstr[0] "{:d} ピース, {:s}\n"
+#~ msgid "_View"
+#~ msgstr "表示(_V)"

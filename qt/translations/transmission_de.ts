@@ -64,9 +64,9 @@
     <message numerus="yes">
         <location line="+105"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent abgeschlossen</numerusform>
+            <numerusform>Torrents abgeschlossen</numerusform>
         </translation>
     </message>
     <message>
@@ -218,7 +218,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Peer ist über uTP verbunden</translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -276,7 +276,7 @@
     <message>
         <location line="+391"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>URL(s) hinzufügen</translation>
     </message>
     <message>
         <location line="+97"/>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Umbenennen...</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche ...</translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Berechne freien Platz ...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Öffne ...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2246,17 +2246,17 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Torrent verdoppeln</numerusform>
-            <numerusform>Torrents verdoppeln</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>%n doppelte Torrentdateie konnte nicht hinzugefügt werden</numerusform>
-            <numerusform>%n doppelte Torrentdateien konnten nicht hinzugefügt werden</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

@@ -64,10 +64,10 @@
     <message numerus="yes">
         <location line="+105"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ukończono torrent</numerusform>
+            <numerusform>Ukończono torrenty</numerusform>
+            <numerusform>Ukończono torrenty</numerusform>
         </translation>
     </message>
     <message>
@@ -221,7 +221,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Partner jest połączony przez µTP</translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -280,7 +280,7 @@
     <message>
         <location line="+391"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj adres(y) URL</translation>
     </message>
     <message>
         <location line="+97"/>
@@ -637,7 +637,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień nazwę…</translation>
     </message>
 </context>
 <context>
@@ -691,7 +691,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyszukaj…</translation>
     </message>
 </context>
 <context>
@@ -827,7 +827,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Obliczanie wolnego miejsca…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -913,7 +913,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Otwórz…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -928,7 +928,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nowy…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1169,17 +1169,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Zmień sesję…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustaw p_ołożenie…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz adres &amp;URL…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1753,7 +1753,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>Testowanie portu TCP…</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2019,12 +2019,12 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP to narzędzie do zmniejszania przeciążenia sieci.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz µ&amp;TP do komunikacji równorzędnej</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2114,16 +2114,16 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message numerus="yes">
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln regułę.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguły.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguł.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Aktualizacja listy blokowania&lt;/b&gt;&lt;p&gt;Pobieranie nowej listy blokowania…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2264,18 +2264,18 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Podwójny torrent</numerusform>
-            <numerusform>Podwójne torrenty</numerusform>
-            <numerusform>Podwójne torrenty</numerusform>
+            <numerusform>Zduplikowany torrent</numerusform>
+            <numerusform>Zduplikowane torrenty</numerusform>
+            <numerusform>Zduplikowane torrenty</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>Nie można dodać %n podwójnego torrenta</numerusform>
-            <numerusform>Nie można dodać %n podwójnych torrentów</numerusform>
-            <numerusform>Nie można dodać %n podwójnych torrentów</numerusform>
+            <numerusform>Nie można dodać %n zduplikowanego torrenta</numerusform>
+            <numerusform>Nie można dodać %n zduplikowanych torrentów</numerusform>
+            <numerusform>Nie można dodać %n zduplikowanych torrentów</numerusform>
         </translation>
     </message>
 </context>
@@ -2603,7 +2603,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Wysyłanie zapytania o&#xa0;liczbę partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2641,7 +2641,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Wysyłanie zapytania o&#xa0;więcej partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>

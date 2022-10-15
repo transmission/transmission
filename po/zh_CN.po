@@ -8,8 +8,9 @@
 # Lin Xue <iconteral@yahoo.com>, 2022
 # 依云 <lilydjwg@gmail.com>, 2022
 # 玉堂白鹤 <yjwork@qq.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Dingzhong Chen <wsxy162@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
+# pluwen <pluwen@gmail.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -18,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-15 17:15+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Dingzhong Chen <wsxy162@gmail.com>, 2022\n"
+"Last-Translator: pluwen <pluwen@gmail.com>, 2022\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -756,32 +757,32 @@ msgstr "时间"
 #: ../gtk/MessageLogWindow.cc:451
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "严重"
 
 #: ../gtk/MessageLogWindow.cc:452
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "出错"
 
 #: ../gtk/MessageLogWindow.cc:453
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: ../gtk/MessageLogWindow.cc:454
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "信息"
 
 #: ../gtk/MessageLogWindow.cc:455
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "调试"
 
 #: ../gtk/MessageLogWindow.cc:456
 msgctxt "Logging level"
 msgid "Trace"
-msgstr ""
+msgstr "跟踪"
 
 #: ../gtk/Notify.cc:128
 msgid "Couldn't create proxy for '{bus}'"
@@ -825,15 +826,15 @@ msgstr "打开(_O)"
 
 #: ../gtk/OptionsDialog.cc:377
 msgid "Show options dialog"
-msgstr ""
+msgstr "显示选项对话框"
 
 #: ../gtk/PathButton.cc:135
 msgid "Select a File"
-msgstr ""
+msgstr "选择文件"
 
 #: ../gtk/PathButton.cc:192
 msgid "(None)"
-msgstr ""
+msgstr "（无）"
 
 #: ../gtk/PrefsDialog.cc:474 ../gtk/PrefsDialog.cc:502
 msgid "Blocklist has {count:L} entry"
@@ -1909,11 +1910,11 @@ msgstr "全局最大用户数(_O)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1421
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "为用户通信启用 µ_TP"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1425
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP 是一个用于减少网络拥堵的工具。"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439
 msgid "Use PE_X to find more peers"
@@ -2126,7 +2127,7 @@ msgstr "成功"
 
 #: ../libtransmission/blocklist.cc:102
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "将旧的黑名单文件格式重写为新的格式"
 
 #: ../libtransmission/blocklist.cc:117 ../libtransmission/blocklist.cc:509
 msgid "Blocklist '{path}' has {count} entry"
@@ -2363,7 +2364,7 @@ msgstr "已从“{old_path}”迁移种子文件至“{path}”"
 
 #: ../libtransmission/torrent.cc:125
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "无法为 {magnet} 使用“{path}”的元信息：{error}（{error_code}）"
 
 #: ../libtransmission/torrent.cc:483
 msgid "Seed ratio reached; pausing torrent"
@@ -2509,12 +2510,12 @@ msgstr "特别注意：无效证书会像其他很多错误一样显示为“无
 #: ../utils/create.cc:226
 msgid "{file_count:L} files, {total_size}\n"
 msgid_plural "{file_count:L} file, {total_size}\n"
-msgstr[0] ""
+msgstr[0] "{file_count:L} 个文件，{total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} pieces, {piece_size} each\n"
 msgid_plural "{piece_count:L} piece, {piece_size}\n"
-msgstr[0] ""
+msgstr[0] "{piece_count:L} 个分片，{piece_size}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2544,38 +2545,21 @@ msgstr[0] "天"
 #~ "%s\n"
 #~ "运行 %s --help 查看可以命令行选项的完整列表。\n"
 
-#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-#~ msgstr "无法为 {magnet} 使用“{path}”的元信息：{error}（{error_code}）"
-
-#~ msgid "Critical"
-#~ msgstr "严重"
-
-#~ msgid "Debug"
-#~ msgstr "调试"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "为用户通信启用 µTP"
-
 #, c-format
 #~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 #~ msgstr "收到信号 %d，尝试进行正常退出。如果没有成功关闭则请重试。"
 
-#~ msgid "Show _options dialog"
-#~ msgstr "显示选项对话框(_O)"
+#~ msgid "_File"
+#~ msgstr "文件(_F)"
 
-#~ msgid "Trace"
-#~ msgstr "跟踪"
+#~ msgid "_Queue"
+#~ msgstr "队列(_Q)"
 
-#~ msgid "Warning"
-#~ msgstr "警告"
+#~ msgid "_Sort Torrents By"
+#~ msgstr "排列种子(_S)"
 
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "µTP 是一个用于减少网络拥堵的工具。"
+#~ msgid "_Torrent"
+#~ msgstr "种子(_T)"
 
-#~ msgid "{:d} files, {:s}\n"
-#~ msgid_plural "{:d} file, {:s}\n"
-#~ msgstr[0] "{:d} 个文件，共 {:s}\n"
-
-#~ msgid "{:d} pieces, {:s} each\n"
-#~ msgid_plural "{:d} piece, {:s}\n"
-#~ msgstr[0] "{:d} 个分片，每片 {:s}\n"
+#~ msgid "_View"
+#~ msgstr "查看(_V)"

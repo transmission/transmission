@@ -2246,17 +2246,17 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Torrent dupliqué</numerusform>
-            <numerusform>Torrents dupliqués</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Impossible d’ajouter %n torrent dupliqué</numerusform>
-            <numerusform>Impossible d’ajouter %n torrents dupliqués</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

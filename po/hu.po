@@ -2583,30 +2583,21 @@ msgstr[1] "nap"
 #~ "%s\n"
 #~ "A parancssori kapcsolók teljes listájáért adja ki a „%s --help” parancsot.\n"
 
-#~ msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
-#~ msgstr "A(z) „{magnet}” metainformációi nem kérhetők le a(z) „{path}” helyről: {error} ({error_code})"
-
-#~ msgid "Critical"
-#~ msgstr "Kritikus"
-
-#~ msgid "Debug"
-#~ msgstr "Hibakeresés"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "_uTP engedélyezése a partnerkommunikációhoz"
-
 #, c-format
 #~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 #~ msgstr "A következő szignál érkezett: %d; kísérlet a leállítására. Ha elakad, próbálja újra."
 
-#~ msgid "Show _options dialog"
-#~ msgstr "_Beállítások ablak megjelenítése"
+#~ msgid "_File"
+#~ msgstr "_Fájl"
 
-#~ msgid "Trace"
-#~ msgstr "Nyomkövetés"
+#~ msgid "_Queue"
+#~ msgstr "_Sor"
 
-#~ msgid "Warning"
-#~ msgstr "Figyelmeztetés"
+#~ msgid "_Sort Torrents By"
+#~ msgstr "T_orrentek rendezése:"
 
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "Az uTP protokoll megpróbálja csökkenteni a hálózati torlódást."
+#~ msgid "_Torrent"
+#~ msgstr "_Torrent"
+
+#~ msgid "_View"
+#~ msgstr "_Nézet"
