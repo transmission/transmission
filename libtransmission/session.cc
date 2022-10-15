@@ -1787,6 +1787,7 @@ void tr_session::closeImplStart()
     lpd_.reset();
 
     udp_core_->startShutdown();
+    announcer_udp_->startShutdown();
 
     save_timer_.reset();
     now_timer_.reset();
@@ -1839,9 +1840,9 @@ void tr_session::closeImplWaitForIdleUdp()
 {
     /* gotta keep udp running long enough to send out all
        the &event=stopped UDP tracker messages */
-    if (!tr_tracker_udp_is_idle(this))
+    if (announcer_udp_ && !announcer_udp_->isIdle())
     {
-        tr_tracker_udp_upkeep(this);
+        announcer_udp_->upkeep();
         save_timer_->start(100ms);
         return;
     }
@@ -1854,7 +1855,7 @@ void tr_session::closeImplFinish()
     save_timer_.reset();
 
     /* we had to wait until UDP trackers were closed before closing these: */
-    tr_tracker_udp_close(this);
+    this->announcer_udp_.reset();
     this->udp_core_.reset();
 
     stats().saveIfDirty();
@@ -1894,9 +1895,9 @@ void tr_sessionClose(tr_session* session)
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->port_forwarding_ || !session->web_->isClosed() || session->announcer != nullptr ||
-            session->announcer_udp != nullptr) &&
-           !deadlineReached(deadline))
+    while (
+        (session->port_forwarding_ || !session->web_->isClosed() || session->announcer != nullptr || session->announcer_udp_) &&
+        !deadlineReached(deadline))
     {
         tr_logAddTrace(fmt::format(
             "waiting on port unmap ({}) or announcer ({})... now {} deadline {}",

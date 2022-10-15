@@ -26,6 +26,7 @@
 #include "transmission.h"
 
 #include "announce-list.h"
+#include "announcer.h"
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "cache.h"
@@ -54,14 +55,13 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 struct evdns_base;
 
-class tr_rpc_server;
-class tr_web;
 class tr_lpd;
 class tr_port_forwarding;
+class tr_rpc_server;
+class tr_web;
 struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
-struct tr_announcer_udp;
 
 namespace libtransmission
 {
@@ -139,6 +139,40 @@ private:
         tr_address addr_;
         struct event* ev_ = nullptr;
         tr_socket_t socket_ = TR_BAD_SOCKET;
+    };
+
+    class AnnouncerUdpMediator final : public tr_announcer_udp::Mediator
+    {
+    public:
+        AnnouncerUdpMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+
+        ~AnnouncerUdpMediator() noexcept = default;
+
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* addr, size_t addrlen) override
+        {
+            session_.udp_core_->sendto(buf, buflen, addr, addrlen);
+        }
+
+        [[nodiscard]] evdns_base* evdnsBase() const override
+        {
+            return session_.evdnsBase();
+        }
+
+        [[nodiscard]] std::optional<tr_address> announceIP() const override
+        {
+            if (!session_.useAnnounceIP())
+            {
+                return {};
+            }
+
+            return tr_address::fromString(session_.announceIP());
+        }
+
+    private:
+        tr_session& session_;
     };
 
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
@@ -476,7 +510,7 @@ public:
 
     // announce ip
 
-    [[nodiscard]] constexpr auto const& announceIP() const noexcept
+    [[nodiscard]] constexpr std::string const& announceIP() const noexcept
     {
         return announce_ip_;
     }
@@ -486,7 +520,7 @@ public:
         announce_ip_ = ip;
     }
 
-    [[nodiscard]] constexpr auto useAnnounceIP() const noexcept
+    [[nodiscard]] constexpr bool useAnnounceIP() const noexcept
     {
         return announce_ip_enabled_;
     }
@@ -1070,10 +1104,16 @@ private:
 
 public:
     struct tr_announcer* announcer = nullptr;
-    struct tr_announcer_udp* announcer_udp = nullptr;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
+
+private:
+    // relies on: udp_core_
+    AnnouncerUdpMediator announcer_udp_mediator_{ *this };
+
+public:
+    std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
 private:
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
@@ -1097,10 +1137,6 @@ private:
 public:
     struct struct_utp_context* utp_context = nullptr;
     std::unique_ptr<libtransmission::Timer> utp_timer;
-
-    // These UDP announcer quirks are tightly hooked with session
-    bool tau_handle_message(uint8_t const* msg, size_t msglen) const;
-    void tau_sendto(struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen) const;
 };
 
 constexpr bool tr_isPriority(tr_priority_t p)

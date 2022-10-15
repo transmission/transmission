@@ -23,8 +23,8 @@
 
 #include "transmission.h"
 
-#include "announcer-common.h"
 #include "announcer.h"
+#include "announcer-common.h"
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
 #include "peer-io.h"
@@ -44,36 +44,41 @@ using namespace std::literals;
 *****
 ****/
 
-static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
+#if 0
+class TauMediator final : public tau::Mediator
 {
-    if (sa->sa_family == AF_INET)
+public:
+    TauMediator(tr_session& session)
+        : session_{ session }
     {
-        reinterpret_cast<sockaddr_in*>(sa)->sin_port = port.network();
-    }
-    else if (sa->sa_family == AF_INET6)
-    {
-        reinterpret_cast<sockaddr_in6*>(sa)->sin6_port = port.network();
-    }
-}
-
-void tr_session::tau_sendto(struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen) const
-{
-    tau_sockaddr_setport(ai->ai_addr, port);
-    udp_core_->sendto(buf, buflen, ai->ai_addr, ai->ai_addrlen);
-}
-
-static uint32_t announce_ip(tr_session const* session)
-{
-    if (!session->useAnnounceIP())
-    {
-        return 0;
     }
 
-    // Since size of IP field is only 4 bytes long we can announce
-    // only IPv4 addresses.
-    auto const addr = tr_address::fromString(session->announceIP());
-    return addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
-}
+    ~TauMediator() noexcept = default;
+
+    void sendto(void const* buf, size_t buflen, struct sockaddr const* addr, size_t addrlen) override
+    {
+        session_.udp_core_->sendto(buf, buflen, addr, addrlen);
+    }
+
+    [[nodiscard]] evdns_base* evdnsBase() const override
+    {
+        return session_.evdnsBase();
+    }
+
+    [[nodiscard]] std::optional<tr_address> announceIP() const override
+    {
+        if (!session_.useAnnounceIP())
+        {
+            return {};
+        }
+
+        return tr_address::fromString(session_.announceIP());
+    }
+
+private:
+    tr_session& session_;
+};
+#endif
 
 /****
 *****
@@ -214,7 +219,7 @@ struct tau_scrape_request
 };
 
 static tau_scrape_request make_tau_scrape_request(
-    tr_scrape_request const* in,
+    tr_scrape_request const& in,
     tr_scrape_response_func callback,
     void* user_data)
 {
@@ -224,9 +229,9 @@ static tau_scrape_request make_tau_scrape_request(
     auto* buf = evbuffer_new();
     evbuffer_add_hton_32(buf, TAU_ACTION_SCRAPE);
     evbuffer_add_hton_32(buf, transaction_id);
-    for (int i = 0; i < in->info_hash_count; ++i)
+    for (int i = 0; i < in.info_hash_count; ++i)
     {
-        evbuffer_add(buf, std::data(in->info_hash[i]), std::size(in->info_hash[i]));
+        evbuffer_add(buf, std::data(in.info_hash[i]), std::size(in.info_hash[i]));
     }
     auto const* const payload_begin = evbuffer_pullup(buf, -1);
     auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
@@ -239,8 +244,8 @@ static tau_scrape_request make_tau_scrape_request(
     req.transaction_id = transaction_id;
     req.callback = callback;
     req.user_data = user_data;
-    req.response.scrape_url = in->scrape_url;
-    req.response.row_count = in->info_hash_count;
+    req.response.scrape_url = in.scrape_url;
+    req.response.row_count = in.info_hash_count;
     req.payload.assign(payload_begin, payload_end);
 
     for (int i = 0; i < req.response.row_count; ++i)
@@ -248,7 +253,7 @@ static tau_scrape_request make_tau_scrape_request(
         req.response.rows[i].seeders = -1;
         req.response.rows[i].leechers = -1;
         req.response.rows[i].downloads = -1;
-        req.response.rows[i].info_hash = in->info_hash[i];
+        req.response.rows[i].info_hash = in.info_hash[i];
     }
 
     /* cleanup */
@@ -344,8 +349,8 @@ static tau_announce_event get_tau_announce_event(tr_announce_event e)
 }
 
 static tau_announce_request make_tau_announce_request(
-    tr_session const* session,
-    tr_announce_request const* in,
+    uint32_t announce_ip,
+    tr_announce_request const& in,
     tr_announce_response_func callback,
     void* user_data)
 {
@@ -355,16 +360,16 @@ static tau_announce_request make_tau_announce_request(
     auto* buf = evbuffer_new();
     evbuffer_add_hton_32(buf, TAU_ACTION_ANNOUNCE);
     evbuffer_add_hton_32(buf, transaction_id);
-    evbuffer_add(buf, std::data(in->info_hash), std::size(in->info_hash));
-    evbuffer_add(buf, std::data(in->peer_id), std::size(in->peer_id));
-    evbuffer_add_hton_64(buf, in->down);
-    evbuffer_add_hton_64(buf, in->leftUntilComplete);
-    evbuffer_add_hton_64(buf, in->up);
-    evbuffer_add_hton_32(buf, get_tau_announce_event(in->event));
-    evbuffer_add_hton_32(buf, announce_ip(session));
-    evbuffer_add_hton_32(buf, in->key);
-    evbuffer_add_hton_32(buf, in->numwant);
-    evbuffer_add_hton_16(buf, in->port.host());
+    evbuffer_add(buf, std::data(in.info_hash), std::size(in.info_hash));
+    evbuffer_add(buf, std::data(in.peer_id), std::size(in.peer_id));
+    evbuffer_add_hton_64(buf, in.down);
+    evbuffer_add_hton_64(buf, in.leftUntilComplete);
+    evbuffer_add_hton_64(buf, in.up);
+    evbuffer_add_hton_32(buf, get_tau_announce_event(in.event));
+    evbuffer_add_hton_32(buf, announce_ip);
+    evbuffer_add_hton_32(buf, in.key);
+    evbuffer_add_hton_32(buf, in.numwant);
+    evbuffer_add_hton_16(buf, in.port.host());
     auto const* const payload_begin = evbuffer_pullup(buf, -1);
     auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
 
@@ -378,7 +383,7 @@ static tau_announce_request make_tau_announce_request(
     req.response.seeders = -1;
     req.response.leechers = -1;
     req.response.downloads = -1;
-    req.response.info_hash = in->info_hash;
+    req.response.info_hash = in.info_hash;
 
     evbuffer_free(buf);
     return req;
@@ -392,6 +397,16 @@ static tau_announce_request make_tau_announce_request(
 
 struct tau_tracker
 {
+    using Mediator = tr_announcer_udp::Mediator;
+
+    tau_tracker(Mediator& mediator, tr_interned_string key_in, tr_interned_string host_in, tr_port port_in)
+        : mediator_{ mediator }
+        , key{ key_in }
+        , host{ host_in }
+        , port{ port_in }
+    {
+    }
+
     [[nodiscard]] auto isIdle() const
     {
         return std::empty(announces) && std::empty(scrapes) && dns_request == nullptr;
@@ -413,7 +428,24 @@ struct tau_tracker
         this->announces.clear();
     }
 
-    tr_session* const session;
+    void sendto(struct evutil_addrinfo const* const ai, tr_port dst_port, void const* buf, size_t buflen)
+    {
+        auto ss = sockaddr_storage{};
+        memcpy(&ss, ai->ai_addr, ai->ai_addrlen);
+
+        if (ai->ai_family == AF_INET)
+        {
+            reinterpret_cast<sockaddr_in*>(&ss)->sin_port = dst_port.network();
+        }
+        else if (ai->ai_family == AF_INET6)
+        {
+            reinterpret_cast<sockaddr_in6*>(&ss)->sin6_port = dst_port.network();
+        }
+
+        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr*>(&ss), ai->ai_addrlen);
+    }
+
+    Mediator& mediator_;
 
     tr_interned_string const key;
     tr_interned_string const host;
@@ -432,14 +464,6 @@ struct tau_tracker
 
     std::list<tau_announce_request> announces;
     std::list<tau_scrape_request> scrapes;
-
-    tau_tracker(tr_session* session_in, tr_interned_string key_in, tr_interned_string host_in, tr_port port_in)
-        : session{ session_in }
-        , key{ key_in }
-        , host{ host_in }
-        , port{ port_in }
-    {
-    }
 };
 
 static void tau_tracker_upkeep(struct tau_tracker* /*tracker*/);
@@ -475,7 +499,7 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
     logdbg(tracker->key, fmt::format("sending request w/connection id {}", tracker->connection_id));
     evbuffer_add_hton_64(buf, tracker->connection_id);
     evbuffer_add_reference(buf, payload, payload_len, nullptr, nullptr);
-    tracker->session->tau_sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+    tracker->sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
     evbuffer_free(buf);
 }
 
@@ -520,18 +544,18 @@ static void tau_tracker_send_reqs(tau_tracker* tracker)
     tau_tracker_send_requests(tracker, tracker->scrapes);
 }
 
-static void on_tracker_connection_response(struct tau_tracker* tracker, tau_action_t action, struct evbuffer* buf)
+static void on_tracker_connection_response(struct tau_tracker& tracker, tau_action_t action, struct evbuffer* buf)
 {
     time_t const now = tr_time();
 
-    tracker->connecting_at = 0;
-    tracker->connection_transaction_id = 0;
+    tracker.connecting_at = 0;
+    tracker.connection_transaction_id = 0;
 
     if (action == TAU_ACTION_CONNECT)
     {
-        tracker->connection_id = evbuffer_read_ntoh_64(buf);
-        tracker->connection_expiration_time = now + TauConnectionTtlSecs;
-        logdbg(tracker->key, fmt::format("Got a new connection ID from tracker: {}", tracker->connection_id));
+        tracker.connection_id = evbuffer_read_ntoh_64(buf);
+        tracker.connection_expiration_time = now + TauConnectionTtlSecs;
+        logdbg(tracker.key, fmt::format("Got a new connection ID from tracker: {}", tracker.connection_id));
     }
     else
     {
@@ -541,11 +565,11 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
             std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
             std::string_view{ _("Connection failed") };
 
-        logdbg(tracker->key, errmsg);
-        tracker->failAll(true, false, errmsg);
+        logdbg(tracker.key, errmsg);
+        tracker.failAll(true, false, errmsg);
     }
 
-    tau_tracker_upkeep(tracker);
+    tau_tracker_upkeep(&tracker);
 }
 
 static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
@@ -555,7 +579,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
     if (tracker->connecting_at != 0 && tracker->connecting_at + TauRequestTtl < now)
     {
-        on_tracker_connection_response(tracker, TAU_ACTION_ERROR, nullptr);
+        on_tracker_connection_response(*tracker, TAU_ACTION_ERROR, nullptr);
     }
 
     if (auto& reqs = tracker->announces; !std::empty(reqs))
@@ -630,7 +654,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         hints.ai_protocol = IPPROTO_UDP;
         logtrace(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
-            tracker->session->evdnsBase(),
+            tracker->mediator_.evdnsBase(),
             tr_strlower(tracker->host.sv()).c_str(),
             nullptr,
             &hints,
@@ -659,7 +683,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        tracker->session->tau_sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+        tracker->sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
         evbuffer_free(buf);
         return;
     }
@@ -686,105 +710,66 @@ static void tau_tracker_upkeep(struct tau_tracker* tracker)
 *****
 ****/
 
-struct tr_announcer_udp
+class tr_announcer_udp_impl final : public tr_announcer_udp
 {
-    explicit tr_announcer_udp(tr_session* session_in)
-        : session{ session_in }
+public:
+    explicit tr_announcer_udp_impl(Mediator& mediator)
+        : mediator_{ mediator }
     {
     }
 
-    std::list<tau_tracker> trackers;
+    ~tr_announcer_udp_impl() = default;
 
-    tr_session* const session;
-};
-
-static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
-{
-    if (session->announcer_udp != nullptr)
+    void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) override
     {
-        return session->announcer_udp;
-    }
-
-    auto* const tau = new tr_announcer_udp(session);
-    session->announcer_udp = tau;
-    return tau;
-}
-
-/* Finds the tau_tracker struct that corresponds to this url.
-   If it doesn't exist yet, create one. */
-static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_interned_string announce_url)
-{
-    // build a lookup key for this tracker
-    auto const parsed = tr_urlParseTracker(announce_url);
-    TR_ASSERT(parsed);
-    if (!parsed)
-    {
-        return nullptr;
-    }
-
-    // see if we already have it
-    auto const key = tr_announcerGetKey(*parsed);
-    for (auto& tracker : tau->trackers)
-    {
-        if (tracker.key == key)
+        auto* const tracker = getTrackerFromUrl(request.announce_url);
+        if (tracker == nullptr)
         {
-            return &tracker;
+            return;
         }
+
+        // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
+        auto const addr = mediator_.announceIP();
+        uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
+        tracker->announces.push_back(make_tau_announce_request(announce_ip, request, response_func, user_data));
+        tau_tracker_upkeep_ex(tracker, false);
     }
 
-    // we don't have it -- build a new one
-    tau->trackers.emplace_back(tau->session, key, tr_interned_string(parsed->host), tr_port::fromHost(parsed->port));
-    auto* const tracker = &tau->trackers.back();
-    logtrace(tracker->key, "New tau_tracker created");
-    return tracker;
-}
-
-/****
-*****
-*****  PUBLIC API
-*****
-****/
-
-void tr_tracker_udp_upkeep(tr_session* session)
-{
-    if (auto* const tau = session->announcer_udp; tau != nullptr)
+    void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) override
     {
-        for (auto& tracker : tau->trackers)
+        auto* const tracker = getTrackerFromUrl(request.scrape_url);
+        if (tracker == nullptr)
+        {
+            return;
+        }
+
+        tracker->scrapes.push_back(make_tau_scrape_request(request, response_func, user_data));
+        tau_tracker_upkeep_ex(tracker, false);
+    }
+
+    void upkeep() override
+    {
+        for (auto& tracker : trackers_)
         {
             tau_tracker_upkeep(&tracker);
         }
     }
-}
 
-bool tr_tracker_udp_is_idle(tr_session const* session)
-{
-    auto const* tau = session->announcer_udp;
-
-    return tau == nullptr ||
-        std::all_of(std::begin(tau->trackers), std::end(tau->trackers), [](auto const& tracker) { return tracker.isIdle(); });
-}
-
-/* drop dead now. */
-void tr_tracker_udp_close(tr_session* session)
-{
-    if (auto* const tau = session->announcer_udp; tau != nullptr)
+    [[nodiscard]] bool isIdle() const noexcept override
     {
-        session->announcer_udp = nullptr;
-        delete tau;
+        return std::all_of(std::begin(trackers_), std::end(trackers_), [](auto const& tracker) { return tracker.isIdle(); });
     }
-}
 
-/* start shutting down.
-   This doesn't destroy everything if there are requests,
-   but sets a deadline on how much longer to wait for the remaining ones */
-void tr_tracker_udp_start_shutdown(tr_session* session)
-{
-    time_t const now = time(nullptr);
-
-    if (auto* const tau = session->announcer_udp; tau != nullptr)
+    // Start shutting down.
+    // This doesn't destroy everything if there are requests,
+    // but sets a deadline on how much longer to wait for the remaining ones.
+    void startShutdown() override
     {
-        for (auto& tracker : tau->trackers)
+        auto const now = time(nullptr);
+
+        for (auto& tracker : trackers_)
         {
+            // if there's a pending DNS request, cancel it
             if (tracker.dns_request != nullptr)
             {
                 evdns_getaddrinfo_cancel(tracker.dns_request);
@@ -794,119 +779,119 @@ void tr_tracker_udp_start_shutdown(tr_session* session)
             tau_tracker_upkeep(&tracker);
         }
     }
-}
 
-/* @brief process an incoming udp message if it's a tracker response.
- * @return true if msg was a tracker response; false otherwise */
-bool tr_session::tau_handle_message(uint8_t const* msg, size_t msglen) const
-{
-    if (announcer_udp == nullptr)
+    // @brief process an incoming udp message if it's a tracker response.
+    // @return true if msg was a tracker response; false otherwise
+    bool handleMessage(uint8_t const* msg, size_t msglen) override
     {
-        return false;
-    }
+        if (msglen < sizeof(uint32_t) * 2)
+        {
+            return false;
+        }
 
-    if (msglen < sizeof(uint32_t) * 2)
-    {
-        return false;
-    }
+        // extract the action_id and see if it makes sense
+        auto* const buf = evbuffer_new();
+        evbuffer_add_reference(buf, msg, msglen, nullptr, nullptr);
+        auto const action_id = tau_action_t(evbuffer_read_ntoh_32(buf));
 
-    /* extract the action_id and see if it makes sense */
-    auto* const buf = evbuffer_new();
-    evbuffer_add_reference(buf, msg, msglen, nullptr, nullptr);
-    auto const action_id = tau_action_t(evbuffer_read_ntoh_32(buf));
+        if (!is_tau_response_message(action_id, msglen))
+        {
+            evbuffer_free(buf);
+            return false;
+        }
 
-    if (!is_tau_response_message(action_id, msglen))
-    {
+        /* extract the transaction_id and look for a match */
+        tau_transaction_t const transaction_id = evbuffer_read_ntoh_32(buf);
+
+        for (auto& tracker : trackers_)
+        {
+            // is it a connection response?
+            if (tracker.connecting_at != 0 && transaction_id == tracker.connection_transaction_id)
+            {
+                logtrace(tracker.key, fmt::format("{} is my connection request!", transaction_id));
+                on_tracker_connection_response(tracker, action_id, buf);
+                evbuffer_free(buf);
+                return true;
+            }
+
+            // is it a response to one of this tracker's announces?
+            if (auto& reqs = tracker.announces; !std::empty(reqs))
+            {
+                auto it = std::find_if(
+                    std::begin(reqs),
+                    std::end(reqs),
+                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                if (it != std::end(reqs))
+                {
+                    logtrace(tracker.key, fmt::format("{} is an announce request!", transaction_id));
+                    auto req = *it;
+                    it = reqs.erase(it);
+                    req.onResponse(action_id, buf);
+                    evbuffer_free(buf);
+                    return true;
+                }
+            }
+
+            // is it a response to one of this tracker's scrapes?
+            if (auto& reqs = tracker.scrapes; !std::empty(reqs))
+            {
+                auto it = std::find_if(
+                    std::begin(reqs),
+                    std::end(reqs),
+                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                if (it != std::end(reqs))
+                {
+                    logtrace(tracker.key, fmt::format("{} is a scrape request!", transaction_id));
+                    auto req = *it;
+                    it = reqs.erase(it);
+                    req.onResponse(action_id, buf);
+                    evbuffer_free(buf);
+                    return true;
+                }
+            }
+        }
+
+        /* no match... */
         evbuffer_free(buf);
         return false;
     }
 
-    /* extract the transaction_id and look for a match */
-    tau_transaction_t const transaction_id = evbuffer_read_ntoh_32(buf);
-
-    for (auto& tracker : announcer_udp->trackers)
+private:
+    // Finds the tau_tracker struct that corresponds to this url.
+    // If it doesn't exist yet, create one.
+    tau_tracker* getTrackerFromUrl(tr_interned_string announce_url)
     {
-        // is it a connection response?
-        if (tracker.connecting_at != 0 && transaction_id == tracker.connection_transaction_id)
+        // build a lookup key for this tracker
+        auto const parsed = tr_urlParseTracker(announce_url);
+        TR_ASSERT(parsed);
+        if (!parsed)
         {
-            logtrace(tracker.key, fmt::format("{} is my connection request!", transaction_id));
-            on_tracker_connection_response(&tracker, action_id, buf);
-            evbuffer_free(buf);
-            return true;
+            return nullptr;
         }
 
-        // is it a response to one of this tracker's announces?
-        if (auto& reqs = tracker.announces; !std::empty(reqs))
+        // see if we already have it
+        auto const key = tr_announcerGetKey(*parsed);
+        for (auto& tracker : trackers_)
         {
-            auto it = std::find_if(
-                std::begin(reqs),
-                std::end(reqs),
-                [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-            if (it != std::end(reqs))
+            if (tracker.key == key)
             {
-                logtrace(tracker.key, fmt::format("{} is an announce request!", transaction_id));
-                auto req = *it;
-                it = reqs.erase(it);
-                req.onResponse(action_id, buf);
-                evbuffer_free(buf);
-                return true;
+                return &tracker;
             }
         }
 
-        // is it a response to one of this tracker's scrapes?
-        if (auto& reqs = tracker.scrapes; !std::empty(reqs))
-        {
-            auto it = std::find_if(
-                std::begin(reqs),
-                std::end(reqs),
-                [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-            if (it != std::end(reqs))
-            {
-                logtrace(tracker.key, fmt::format("{} is a scrape request!", transaction_id));
-                auto req = *it;
-                it = reqs.erase(it);
-                req.onResponse(action_id, buf);
-                evbuffer_free(buf);
-                return true;
-            }
-        }
+        // we don't have it -- build a new one
+        trackers_.emplace_back(mediator_, key, tr_interned_string(parsed->host), tr_port::fromHost(parsed->port));
+        auto* const tracker = &trackers_.back();
+        logtrace(tracker->key, "New tau_tracker created");
+        return tracker;
     }
 
-    /* no match... */
-    evbuffer_free(buf);
-    return false;
-}
+    std::list<tau_tracker> trackers_;
 
-void tr_tracker_udp_announce(
-    tr_session* session,
-    tr_announce_request const* request,
-    tr_announce_response_func response_func,
-    void* user_data)
+    Mediator& mediator_;
+};
+
+std::unique_ptr<tr_announcer_udp> tr_announcer_udp::create(Mediator& mediator)
 {
-    tr_announcer_udp* tau = announcer_udp_get(session);
-    tau_tracker* tracker = tau_session_get_tracker(tau, request->announce_url);
-    if (tracker == nullptr)
-    {
-        return;
-    }
-
-    tracker->announces.push_back(make_tau_announce_request(session, request, response_func, user_data));
-    tau_tracker_upkeep_ex(tracker, false);
-}
-
-void tr_tracker_udp_scrape(
-    tr_session* session,
-    tr_scrape_request const* request,
-    tr_scrape_response_func response_func,
-    void* user_data)
-{
-    tr_announcer_udp* tau = announcer_udp_get(session);
-    tau_tracker* tracker = tau_session_get_tracker(tau, request->scrape_url);
-    if (tracker == nullptr)
-    {
-        return;
-    }
-
-    tracker->scrapes.push_back(make_tau_scrape_request(request, response_func, user_data));
-    tau_tracker_upkeep_ex(tracker, false);
+    return std::make_unique<tr_announcer_udp_impl>(mediator);
 }
