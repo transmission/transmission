@@ -393,7 +393,14 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to trash file \"%s\": %s", filename.c_str(), TR_GLIB_EXCEPTION_WHAT(e));
+            g_message(
+                "%s",
+                fmt::format(
+                    _("Couldn't move '{path}' to trash: {error} ({error_code})"),
+                    fmt::arg("path", filename),
+                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                    fmt::arg("error_code", e.code()))
+                    .c_str());
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
         }
     }
@@ -406,7 +413,14 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to delete file \"%s\": %s", filename.c_str(), TR_GLIB_EXCEPTION_WHAT(e));
+            g_message(
+                "%s",
+                fmt::format(
+                    _("Couldn't remove '{path}': {error} ({error_code})"),
+                    fmt::arg("path", filename),
+                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                    fmt::arg("error_code", e.code()))
+                    .c_str());
             tr_error_clear(error);
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             result = false;
@@ -418,7 +432,7 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
 
 Glib::ustring gtr_get_help_uri()
 {
-    static auto const uri = gtr_sprintf("https://transmissionbt.com/help/gtk/%d.%dx", MAJOR_VERSION, MINOR_VERSION / 10);
+    static auto const uri = fmt::format("https://transmissionbt.com/help/gtk/{}.{}x", MAJOR_VERSION, MINOR_VERSION / 10);
     return uri;
 }
 
@@ -458,7 +472,7 @@ void gtr_open_uri(Glib::ustring const& uri)
 
         if (!opened)
         {
-            g_message("Unable to open \"%s\"", uri.c_str());
+            g_message("%s", fmt::format(_("Couldn't open '{url}'"), fmt::arg("url", uri)).c_str());
         }
     }
 }
@@ -760,9 +774,9 @@ std::list<std::string> gtr_get_recent_dirs(std::string const& pref)
 
     for (size_t i = 0; i < max_recent_dirs; ++i)
     {
-        auto const key = gtr_sprintf("recent-%s-dir-%d", pref, i + 1);
+        auto const key = fmt::format("recent-{}-dir-{}", pref, i + 1);
 
-        if (auto const val = gtr_pref_string_get(tr_quark_new({ key.c_str(), key.size() })); !val.empty())
+        if (auto const val = gtr_pref_string_get(tr_quark_new(key)); !val.empty())
         {
             list.push_back(val);
         }
@@ -791,8 +805,8 @@ void gtr_save_recent_dir(std::string const& pref, Glib::RefPtr<Session> const& c
     int i = 0;
     for (auto const& d : list)
     {
-        auto const key = gtr_sprintf("recent-%s-dir-%d", pref, ++i);
-        gtr_pref_string_set(tr_quark_new({ key.c_str(), key.size() }), d);
+        auto const key = fmt::format("recent-{}-dir-{}", pref, ++i);
+        gtr_pref_string_set(tr_quark_new(key), d);
     }
 
     gtr_pref_save(core->get_session());

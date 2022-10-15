@@ -611,7 +611,7 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     if (info != nullptr)
     {
         auto const old_name = info->get_attribute_as_string(G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
-        auto const new_name = gtr_sprintf("%s.added", old_name);
+        auto const new_name = fmt::format("{}.added", old_name);
 
         try
         {
@@ -889,7 +889,7 @@ namespace
 
 Glib::ustring get_collated_name(tr_torrent const* tor)
 {
-    return gtr_sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentView(tor).hash_string);
+    return fmt::format("{}\t{}", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentView(tor).hash_string);
 }
 
 struct metadata_callback_data
@@ -1600,7 +1600,7 @@ bool core_read_rpc_response_idle(TrVariantPtr const& response)
         }
         else
         {
-            g_warning("Pending RPC request for tag %" PRId64 " not found", tag);
+            g_warning("%s", fmt::format(_("Couldn't find pending RPC request for tag {tag}"), fmt::arg("tag", tag)).c_str());
         }
     }
 
@@ -1631,12 +1631,7 @@ void Session::Impl::send_rpc_request(
 
         /* make the request */
 #ifdef DEBUG_RPC
-        {
-            struct evbuffer* buf = tr_variantToBuf(request, TR_VARIANT_FMT_JSON_LEAN);
-            size_t const buf_len = evbuffer_get_length(buf);
-            g_message("request: [%*.*s]", TR_ARG_TUPLE((int)buf_len, (int)buf_len, evbuffer_pullup(buf, -1)));
-            evbuffer_free(buf);
-        }
+        g_message("%s", fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)).c_str());
 #endif
 
         tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);

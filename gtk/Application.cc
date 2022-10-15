@@ -22,6 +22,9 @@
 
 #include <giomm.h>
 #include <glib/gmessages.h>
+#ifdef G_OS_UNIX
+#include <glib-unix.h>
+#endif
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
@@ -524,22 +527,16 @@ tr_rpc_callback_status Application::Impl::on_rpc_changed(
 namespace
 {
 
-sig_atomic_t global_sigcount = 0;
-gpointer sighandler_cbdata = nullptr;
+#ifdef G_OS_UNIX
 
-void signal_handler(int sig)
+gboolean signal_handler(gpointer user_data)
 {
-    if (++global_sigcount > 1)
-    {
-        signal(sig, SIG_DFL);
-        raise(sig);
-    }
-    else if (sig == SIGINT || sig == SIGTERM)
-    {
-        g_message(_("Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."), sig);
-        gtr_actions_handler("quit", sighandler_cbdata);
-    }
+    g_message(_("Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."));
+    gtr_actions_handler("quit", user_data);
+    return G_SOURCE_REMOVE;
 }
+
+#endif
 
 } // namespace
 
@@ -574,10 +571,10 @@ void Application::Impl::on_startup()
 
     tr_session* session;
 
-    ::signal(SIGINT, signal_handler);
-    ::signal(SIGTERM, signal_handler);
-
-    sighandler_cbdata = this;
+#ifdef G_OS_UNIX
+    g_unix_signal_add(SIGINT, &signal_handler, this);
+    g_unix_signal_add(SIGTERM, &signal_handler, this);
+#endif
 
     /* ensure the directories are created */
     if (auto const str = gtr_pref_string_get(TR_KEY_download_dir); !str.empty())
@@ -1385,14 +1382,12 @@ void Application::Impl::update_model_soon()
 
 bool Application::Impl::update_model_loop()
 {
-    bool const done = global_sigcount != 0;
-
-    if (!done)
+    if (!is_closing_)
     {
         update_model_once();
     }
 
-    return !done;
+    return !is_closing_;
 }
 
 void Application::Impl::show_about_dialog()
@@ -1673,7 +1668,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else
     {
-        g_error("Unhandled action: %s", action_name.c_str());
+        g_error("%s", fmt::format("Unhandled action: {}", action_name).c_str());
     }
 
     if (changed)

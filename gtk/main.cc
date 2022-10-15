@@ -9,6 +9,8 @@
 #include <glibmm/i18n.h>
 #include <gtkmm.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -87,17 +89,18 @@ int main(int argc, char** argv)
     }
     catch (Glib::OptionError const& e)
     {
-        g_print(
-            _("%s\nRun '%s --help' to see a full list of available command line options.\n"),
-            TR_GLIB_EXCEPTION_WHAT(e),
-            argv[0]);
+        fmt::print(stderr, "{}\n", TR_GLIB_EXCEPTION_WHAT(e));
+        fmt::print(
+            stderr,
+            _("Run '{program} --help' to see a full list of available command line options.\n"),
+            fmt::arg("program", argv[0]));
         return 1;
     }
 
     /* handle the trivial "version" option */
     if (show_version)
     {
-        fprintf(stderr, "%s %s\n", AppName, LONG_VERSION_STRING);
+        fmt::print(stderr, "{} {}\n", AppName, LONG_VERSION_STRING);
         return 0;
     }
 

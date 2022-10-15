@@ -8,6 +8,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
 #include "Dialogs.h"
@@ -49,11 +51,11 @@ void gtr_confirm_remove(
         }
     }
 
-    auto const primary_text = gtr_sprintf(
+    auto const primary_text = fmt::format(
         !delete_files ?
-            ngettext("Remove torrent?", "Remove %d torrents?", count) :
-            ngettext("Delete this torrent's downloaded files?", "Delete these %d torrents' downloaded files?", count),
-        count);
+            ngettext("Remove torrent?", "Remove {count:L} torrents?", count) :
+            ngettext("Delete this torrent's downloaded files?", "Delete these {count:L} torrents' downloaded files?", count),
+        fmt::arg("count", count));
 
     Glib::ustring secondary_text;
     if (incomplete == 0 && connected == 0)
@@ -100,7 +102,7 @@ void gtr_confirm_remove(
 
     auto d = std::make_shared<Gtk::MessageDialog>(
         parent,
-        gtr_sprintf("<big><b>%s</b></big>", primary_text),
+        fmt::format("<big><b>{}</b></big>", primary_text),
         true /*use_markup*/,
         TR_GTK_MESSAGE_TYPE(WARNING),
         TR_GTK_BUTTONS_TYPE(NONE),

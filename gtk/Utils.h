@@ -262,30 +262,6 @@ inline char const* sprintify(std::string const& arg)
 
 } // namespace gtr_detail
 
-template<typename... Ts>
-inline Glib::ustring gtr_sprintf(char const* fmt, Ts const&... args)
-{
-#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 62)
-    auto* const c_str = g_strdup_printf(fmt, gtr_detail::sprintify(args)...);
-    Glib::ustring ustr(c_str);
-    g_free(c_str);
-
-    return ustr;
-#else
-    return Glib::ustring::sprintf(fmt, args...);
-#endif
-}
-
-template<typename... Ts>
-inline Glib::ustring gtr_sprintf(Glib::ustring const& fmt, Ts const&... args)
-{
-#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 62)
-    return gtr_sprintf(fmt.c_str(), args...);
-#else
-    return Glib::ustring::sprintf(fmt, args...);
-#endif
-}
-
 template<typename T, typename U>
 inline Glib::RefPtr<T> gtr_ptr_static_cast(Glib::RefPtr<U> const& ptr)
 {
