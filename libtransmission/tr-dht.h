@@ -8,7 +8,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <optional>
 #include <string_view>
 
 #include "transmission.h"
@@ -19,8 +18,6 @@ int tr_dhtInit(tr_session*, tr_socket_t udp4_socket, tr_socket_t udp6_socket);
 void tr_dhtUninit();
 
 bool tr_dhtEnabled();
-
-std::optional<tr_port> tr_dhtPort();
 
 bool tr_dhtAddNode(tr_address, tr_port, bool bootstrap);
 void tr_dhtUpkeep();

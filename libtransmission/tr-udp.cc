@@ -90,6 +90,11 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     }
 }
 
+void tr_session::tr_udp_core::addDhtNode(tr_address const& addr, tr_port port)
+{
+    tr_dhtAddNode(addr, port, false);
+}
+
 void tr_session::tr_udp_core::set_socket_buffers()
 {
     bool const utp = session_.allowsUTP();
@@ -228,10 +233,10 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     }
 }
 
-tr_session::tr_udp_core::tr_udp_core(tr_session& session)
-    : session_{ session }
+tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
+    : udp_port_{ udp_port }
+    , session_{ session }
 {
-    udp_port_ = session_.peerPort();
     if (std::empty(udp_port_))
     {
         return;
@@ -322,7 +327,7 @@ void tr_session::tr_udp_core::dhtUpkeep()
     }
 }
 
-void tr_session::tr_udp_core::dhtUninit()
+void tr_session::tr_udp_core::startShutdown()
 {
     if (tr_dhtEnabled())
     {
@@ -332,7 +337,7 @@ void tr_session::tr_udp_core::dhtUninit()
 
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    dhtUninit();
+    startShutdown();
 
     if (udp_socket_ != TR_BAD_SOCKET)
     {

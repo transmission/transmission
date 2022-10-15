@@ -73,7 +73,7 @@ public:
             return session_->timerMaker();
         }
 
-        [[nodiscard]] bool isDHTEnabled() const override
+        [[nodiscard]] bool allowsDHT() const override
         {
             return false;
         }

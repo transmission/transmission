@@ -230,11 +230,11 @@ private:
     class tr_udp_core
     {
     public:
-        tr_udp_core(tr_session& session);
+        tr_udp_core(tr_session& session, tr_port udp_port);
 
         ~tr_udp_core();
 
-        static void dhtUninit();
+        static void startShutdown();
         static void dhtUpkeep();
 
         void set_socket_buffers();
@@ -247,23 +247,10 @@ private:
 
         void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
 
-        [[nodiscard]] constexpr auto port() const noexcept
-        {
-            return udp_port_;
-        }
-
-        [[nodiscard]] constexpr auto udp_socket() const noexcept
-        {
-            return udp_socket_;
-        }
-
-        [[nodiscard]] constexpr auto udp6_socket() const noexcept
-        {
-            return udp6_socket_;
-        }
+        void addDhtNode(tr_address const& addr, tr_port port);
 
     private:
-        tr_port udp_port_ = {};
+        tr_port const udp_port_;
         tr_session& session_;
         struct event* udp_event_ = nullptr;
         struct event* udp6_event_ = nullptr;
@@ -613,6 +600,12 @@ public:
         return public_peer_port_;
     }
 
+    [[nodiscard]] constexpr tr_port udpPort() const noexcept
+    {
+        // uses the same port number that's used for incoming TCP connections
+        return public_peer_port_;
+    }
+
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
         return queue_enabled_[dir];
@@ -822,6 +815,14 @@ public:
     void addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
 
     void addTorrent(tr_torrent* tor);
+
+    void addDhtNode(tr_address const& addr, tr_port port)
+    {
+        if (udp_core_)
+        {
+            udp_core_->addDhtNode(addr, port);
+        }
+    }
 
 private:
     [[nodiscard]] tr_port randomPort() const;
