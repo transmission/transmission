@@ -4,8 +4,7 @@
 
 #import "PortChecker.h"
 
-#define CHECKER_URL(port) [NSString stringWithFormat:@"https://portcheck.transmissionbt.com/%ld", port]
-#define CHECK_FIRE 3.0
+static NSTimeInterval const kCheckFireInterval = 3.0;
 
 @interface PortChecker ()
 
@@ -33,7 +32,7 @@
 
         _fStatus = PORT_STATUS_CHECKING;
 
-        _fTimer = [NSTimer scheduledTimerWithTimeInterval:CHECK_FIRE target:self selector:@selector(startProbe:)
+        _fTimer = [NSTimer scheduledTimerWithTimeInterval:kCheckFireInterval target:self selector:@selector(startProbe:)
                                                  userInfo:@(portNumber)
                                                   repeats:NO];
         if (!delay)
@@ -113,7 +112,8 @@
 {
     self.fTimer = nil;
 
-    NSURLRequest* portProbeRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:CHECKER_URL([[timer userInfo] integerValue])]
+    NSString* urlString = [NSString stringWithFormat:@"https://portcheck.transmissionbt.com/%ld", [timer.userInfo integerValue]];
+    NSURLRequest* portProbeRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]
                                                       cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
                                                   timeoutInterval:15.0];
 

@@ -19,8 +19,10 @@
 #import "Controller.h"
 #import "NSStringAdditions.h"
 
-#define TRACKER_ADD_TAG 0
-#define TRACKER_REMOVE_TAG 1
+typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
+    TrackerSegmentTagAdd = 0,
+    TrackerSegmentTagRemove = 1,
+};
 
 @interface CreatorWindowController ()
 
@@ -390,7 +392,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         return;
     }
 
-    if ([[sender cell] tagForSegment:[sender selectedSegment]] == TRACKER_REMOVE_TAG)
+    if ([[sender cell] tagForSegment:[sender selectedSegment]] == TrackerSegmentTagRemove)
     {
         [self.fTrackers removeObjectsAtIndexes:self.fTrackerTable.selectedRowIndexes];
 
@@ -438,7 +440,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (void)tableViewSelectionDidChange:(NSNotification*)notification
 {
-    [self.fTrackerAddRemoveControl setEnabled:self.fTrackerTable.numberOfSelectedRows > 0 forSegment:TRACKER_REMOVE_TAG];
+    [self.fTrackerAddRemoveControl setEnabled:self.fTrackerTable.numberOfSelectedRows > 0 forSegment:TrackerSegmentTagRemove];
 }
 
 - (void)copy:(id)sender

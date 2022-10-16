@@ -4,8 +4,8 @@
 
 #import "DragOverlayView.h"
 
-#define PADDING 10.0
-#define ICON_WIDTH 64.0
+static CGFloat const kPadding = 10.0;
+static CGFloat const kIconWidth = 64.0;
 
 @interface DragOverlayView ()
 
@@ -62,7 +62,7 @@
     [bp fill];
 
     //place icon
-    [icon drawInRect:NSMakeRect(PADDING, (NSHeight(badgeRect) - ICON_WIDTH) * 0.5, ICON_WIDTH, ICON_WIDTH) fromRect:NSZeroRect
+    [icon drawInRect:NSMakeRect(kPadding, (NSHeight(badgeRect) - kIconWidth) * 0.5, kIconWidth, kIconWidth) fromRect:NSZeroRect
            operation:NSCompositingOperationSourceOver
             fraction:1.0];
 
@@ -71,9 +71,9 @@
     NSSize const subLineSize = [subLine sizeWithAttributes:self.fSubLineAttributes];
 
     NSRect lineRect = NSMakeRect(
-        PADDING + ICON_WIDTH + 5.0,
+        kPadding + kIconWidth + 5.0,
         (NSHeight(badgeRect) + (subLineSize.height + 2.0 - mainLineSize.height)) * 0.5,
-        NSWidth(badgeRect) - (PADDING + ICON_WIDTH + 2.0) - PADDING,
+        NSWidth(badgeRect) - (kPadding + kIconWidth + 2.0) - kPadding,
         mainLineSize.height);
     [mainLine drawInRect:lineRect withAttributes:self.fMainLineAttributes];
 

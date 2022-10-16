@@ -9,16 +9,16 @@
 
 @implementation NSImage (NSImageAdditions)
 
-#define ICON_WIDTH 16.0
-#define BORDER_WIDTH 1.25
+static CGFloat const kIconSize = 16.0;
+static CGFloat const kBorderWidth = 1.25;
 
 + (NSImage*)discIconWithColor:(NSColor*)color insetFactor:(CGFloat)insetFactor
 {
-    return [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+    return [NSImage imageWithSize:NSMakeSize(kIconSize, kIconSize) flipped:NO drawingHandler:^BOOL(NSRect rect) {
         //shape
-        rect = NSInsetRect(rect, BORDER_WIDTH / 2 + rect.size.width * insetFactor / 2, BORDER_WIDTH / 2 + rect.size.height * insetFactor / 2);
+        rect = NSInsetRect(rect, kBorderWidth / 2 + rect.size.width * insetFactor / 2, kBorderWidth / 2 + rect.size.height * insetFactor / 2);
         NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
-        bp.lineWidth = BORDER_WIDTH;
+        bp.lineWidth = kBorderWidth;
 
         //border
         CGFloat fractionOfBlendedColor = NSApp.darkMode ? 0.15 : 0.3;

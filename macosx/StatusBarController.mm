@@ -5,10 +5,15 @@
 #import "StatusBarController.h"
 #import "NSStringAdditions.h"
 
-#define STATUS_RATIO_TOTAL @"RatioTotal"
-#define STATUS_RATIO_SESSION @"RatioSession"
-#define STATUS_TRANSFER_TOTAL @"TransferTotal"
-#define STATUS_TRANSFER_SESSION @"TransferSession"
+typedef NSString* StatusRatioType NS_TYPED_EXTENSIBLE_ENUM;
+
+static StatusRatioType const StatusRatioTypeTotal = @"RatioTotal";
+static StatusRatioType const StatusRatioTypeSession = @"RatioSession";
+
+typedef NSString* StatusTransferType NS_TYPED_EXTENSIBLE_ENUM;
+
+static StatusTransferType const StatusTransferTypeTotal = @"TransferTotal";
+static StatusTransferType const StatusTransferTypeSession = @"TransferSession";
 
 typedef NS_ENUM(unsigned int, statusTag) {
     STATUS_RATIO_TOTAL_TAG = 0,
@@ -91,16 +96,16 @@ typedef NS_ENUM(unsigned int, statusTag) {
     //set status button text
     NSString *statusLabel = [NSUserDefaults.standardUserDefaults stringForKey:@"StatusLabel"], *statusString;
     BOOL total;
-    if ((total = [statusLabel isEqualToString:STATUS_RATIO_TOTAL]) || [statusLabel isEqualToString:STATUS_RATIO_SESSION])
+    if ((total = [statusLabel isEqualToString:StatusRatioTypeTotal]) || [statusLabel isEqualToString:StatusRatioTypeSession])
     {
         auto const stats = total ? tr_sessionGetCumulativeStats(self.fLib) : tr_sessionGetStats(self.fLib);
 
         statusString = [NSLocalizedString(@"Ratio", "status bar -> status label")
             stringByAppendingFormat:@": %@", [NSString stringForRatio:stats.ratio]];
     }
-    else //STATUS_TRANSFER_TOTAL or STATUS_TRANSFER_SESSION
+    else //StatusTransferTypeTotal or StatusTransferTypeSession
     {
-        total = [statusLabel isEqualToString:STATUS_TRANSFER_TOTAL];
+        total = [statusLabel isEqualToString:StatusTransferTypeTotal];
 
         auto const stats = total ? tr_sessionGetCumulativeStats(self.fLib) : tr_sessionGetStats(self.fLib);
 
@@ -123,16 +128,16 @@ typedef NS_ENUM(unsigned int, statusTag) {
     switch ([sender tag])
     {
     case STATUS_RATIO_TOTAL_TAG:
-        statusLabel = STATUS_RATIO_TOTAL;
+        statusLabel = StatusRatioTypeTotal;
         break;
     case STATUS_RATIO_SESSION_TAG:
-        statusLabel = STATUS_RATIO_SESSION;
+        statusLabel = StatusRatioTypeSession;
         break;
     case STATUS_TRANSFER_TOTAL_TAG:
-        statusLabel = STATUS_TRANSFER_TOTAL;
+        statusLabel = StatusTransferTypeTotal;
         break;
     case STATUS_TRANSFER_SESSION_TAG:
-        statusLabel = STATUS_TRANSFER_SESSION;
+        statusLabel = StatusTransferTypeSession;
         break;
     default:
         NSAssert1(NO, @"Unknown status label tag received: %ld", [sender tag]);
@@ -198,20 +203,20 @@ typedef NS_ENUM(unsigned int, statusTag) {
         switch (menuItem.tag)
         {
         case STATUS_RATIO_TOTAL_TAG:
-            statusLabel = STATUS_RATIO_TOTAL;
+            statusLabel = StatusRatioTypeTotal;
             break;
         case STATUS_RATIO_SESSION_TAG:
-            statusLabel = STATUS_RATIO_SESSION;
+            statusLabel = StatusRatioTypeSession;
             break;
         case STATUS_TRANSFER_TOTAL_TAG:
-            statusLabel = STATUS_TRANSFER_TOTAL;
+            statusLabel = StatusTransferTypeTotal;
             break;
         case STATUS_TRANSFER_SESSION_TAG:
-            statusLabel = STATUS_TRANSFER_SESSION;
+            statusLabel = StatusTransferTypeSession;
             break;
         default:
             NSAssert1(NO, @"Unknown status label tag received: %ld", menuItem.tag);
-            statusLabel = STATUS_RATIO_TOTAL;
+            statusLabel = StatusRatioTypeTotal;
         }
 
         menuItem.state = [statusLabel isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:@"StatusLabel"]] ?

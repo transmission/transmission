@@ -13,18 +13,24 @@
 #import "TorrentCell.h"
 #import "TorrentGroup.h"
 
-#define MAX_GROUP 999999
+CGFloat const kGroupSeparatorHeight = 18.0;
+
+static NSInteger const kMaxGroup = 999999;
 
 //eliminate when Lion-only
-#define ACTION_MENU_GLOBAL_TAG 101
-#define ACTION_MENU_UNLIMITED_TAG 102
-#define ACTION_MENU_LIMIT_TAG 103
+typedef NS_ENUM(NSUInteger, ActionMenuTag) {
+    ActionMenuTagGlobal = 101,
+    ActionMenuTagUnlimited = 102,
+    ActionMenuTagLimit = 103,
+};
 
-#define ACTION_MENU_PRIORITY_HIGH_TAG 101
-#define ACTION_MENU_PRIORITY_NORMAL_TAG 102
-#define ACTION_MENU_PRIORITY_LOW_TAG 103
+typedef NS_ENUM(NSUInteger, ActionMenuPriorityTag) {
+    ActionMenuPriorityTagHigh = 101,
+    ActionMenuPriorityTagNormal = 102,
+    ActionMenuPriorityTagLow = 103,
+};
 
-#define TOGGLE_PROGRESS_SECONDS 0.175
+static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 @interface TorrentTableView ()
 
@@ -124,7 +130,7 @@
 {
     if (value == -1)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     return [self.fCollapsedGroups containsIndex:value];
@@ -134,7 +140,7 @@
 {
     if (value == -1)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     [self.fCollapsedGroups removeIndex:value];
@@ -157,7 +163,7 @@
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
 {
-    return [item isKindOfClass:[Torrent class]] ? self.rowHeight : GROUP_SEPARATOR_HEIGHT;
+    return [item isKindOfClass:[Torrent class]] ? self.rowHeight : kGroupSeparatorHeight;
 }
 
 - (NSCell*)outlineView:(NSOutlineView*)outlineView dataCellForTableColumn:(NSTableColumn*)tableColumn item:(id)item
@@ -425,7 +431,7 @@
     NSInteger value = group.groupIndex;
     if (value < 0)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     if ([self.fCollapsedGroups containsIndex:value])
@@ -441,7 +447,7 @@
     NSInteger value = group.groupIndex;
     if (value < 0)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     [self.fCollapsedGroups addIndex:value];
@@ -832,12 +838,12 @@
         BOOL const upload = menu == self.fUploadMenu;
         BOOL const limit = [self.fMenuTorrent usesSpeedLimit:upload];
 
-        item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
+        item = [menu itemWithTag:ActionMenuTagLimit];
         item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
                                                 [self.fMenuTorrent speedLimit:upload]];
 
-        item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
+        item = [menu itemWithTag:ActionMenuTagUnlimited];
         item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == self.fRatioMenu)
@@ -860,28 +866,28 @@
 
         tr_ratiolimit const mode = self.fMenuTorrent.ratioSetting;
 
-        item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
+        item = [menu itemWithTag:ActionMenuTagLimit];
         item.state = mode == TR_RATIOLIMIT_SINGLE ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
                                                          self.fMenuTorrent.ratioLimit];
 
-        item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
+        item = [menu itemWithTag:ActionMenuTagUnlimited];
         item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSControlStateValueOn : NSControlStateValueOff;
 
-        item = [menu itemWithTag:ACTION_MENU_GLOBAL_TAG];
+        item = [menu itemWithTag:ActionMenuTagGlobal];
         item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == self.fPriorityMenu)
     {
         tr_priority_t const priority = self.fMenuTorrent.priority;
 
-        NSMenuItem* item = [menu itemWithTag:ACTION_MENU_PRIORITY_HIGH_TAG];
+        NSMenuItem* item = [menu itemWithTag:ActionMenuPriorityTagHigh];
         item.state = priority == TR_PRI_HIGH ? NSControlStateValueOn : NSControlStateValueOff;
 
-        item = [menu itemWithTag:ACTION_MENU_PRIORITY_NORMAL_TAG];
+        item = [menu itemWithTag:ActionMenuPriorityTagNormal];
         item.state = priority == TR_PRI_NORMAL ? NSControlStateValueOn : NSControlStateValueOff;
 
-        item = [menu itemWithTag:ACTION_MENU_PRIORITY_LOW_TAG];
+        item = [menu itemWithTag:ActionMenuPriorityTagLow];
         item.state = priority == TR_PRI_LOW ? NSControlStateValueOn : NSControlStateValueOff;
     }
 }
@@ -889,7 +895,7 @@
 //the following methods might not be needed when Lion-only
 - (void)setQuickLimitMode:(id)sender
 {
-    BOOL const limit = [sender tag] == ACTION_MENU_LIMIT_TAG;
+    BOOL const limit = [sender tag] == ActionMenuTagLimit;
     [self.fMenuTorrent setUseSpeedLimit:limit upload:[sender menu] == self.fUploadMenu];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -916,13 +922,13 @@
     tr_ratiolimit mode;
     switch ([sender tag])
     {
-    case ACTION_MENU_UNLIMITED_TAG:
+    case ActionMenuTagUnlimited:
         mode = TR_RATIOLIMIT_UNLIMITED;
         break;
-    case ACTION_MENU_LIMIT_TAG:
+    case ActionMenuTagLimit:
         mode = TR_RATIOLIMIT_SINGLE;
         break;
-    case ACTION_MENU_GLOBAL_TAG:
+    case ActionMenuTagGlobal:
         mode = TR_RATIOLIMIT_GLOBAL;
         break;
     default:
@@ -947,13 +953,13 @@
     tr_priority_t priority;
     switch ([sender tag])
     {
-    case ACTION_MENU_PRIORITY_HIGH_TAG:
+    case ActionMenuPriorityTagHigh:
         priority = TR_PRI_HIGH;
         break;
-    case ACTION_MENU_PRIORITY_NORMAL_TAG:
+    case ActionMenuPriorityTagNormal:
         priority = TR_PRI_NORMAL;
         break;
-    case ACTION_MENU_PRIORITY_LOW_TAG:
+    case ActionMenuPriorityTagLow:
         priority = TR_PRI_LOW;
         break;
     default:
@@ -975,7 +981,7 @@
     }
 
     //this stops a previous animation
-    self.fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration:TOGGLE_PROGRESS_SECONDS animationCurve:NSAnimationEaseIn];
+    self.fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration:kToggleProgressSeconds animationCurve:NSAnimationEaseIn];
     self.fPiecesBarAnimation.animationBlockingMode = NSAnimationNonblocking;
     self.fPiecesBarAnimation.progressMarks = progressMarks;
     self.fPiecesBarAnimation.delegate = self;

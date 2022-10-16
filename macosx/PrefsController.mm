@@ -16,24 +16,30 @@
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
 
-#define DOWNLOAD_FOLDER 0
-#define DOWNLOAD_TORRENT 2
+typedef NS_ENUM(NSUInteger, DownloadPopupIndex) {
+    DownloadPopupIndexFolder = 0,
+    DownloadPopupIndexTorrent = 2,
+};
 
-#define RPC_IP_ADD_TAG 0
-#define RPC_IP_REMOVE_TAG 1
+typedef NS_ENUM(NSUInteger, RPCIPTag) {
+    RPCIPTagAdd = 0,
+    RPCIPTagRemove = 1,
+};
 
-#define TOOLBAR_GENERAL @"TOOLBAR_GENERAL"
-#define TOOLBAR_TRANSFERS @"TOOLBAR_TRANSFERS"
-#define TOOLBAR_GROUPS @"TOOLBAR_GROUPS"
-#define TOOLBAR_BANDWIDTH @"TOOLBAR_BANDWIDTH"
-#define TOOLBAR_PEERS @"TOOLBAR_PEERS"
-#define TOOLBAR_NETWORK @"TOOLBAR_NETWORK"
-#define TOOLBAR_REMOTE @"TOOLBAR_REMOTE"
+typedef NSString* ToolbarTab NS_TYPED_EXTENSIBLE_ENUM;
 
-#define RPC_KEYCHAIN_SERVICE "Transmission:Remote"
-#define RPC_KEYCHAIN_NAME "Remote"
+static ToolbarTab const ToolbarTabGeneral = @"TOOLBAR_GENERAL";
+static ToolbarTab const ToolbarTabTransfers = @"TOOLBAR_TRANSFERS";
+static ToolbarTab const ToolbarTabGroups = @"TOOLBAR_GROUPS";
+static ToolbarTab const ToolbarTabBandwidth = @"TOOLBAR_BANDWIDTH";
+static ToolbarTab const ToolbarTabPeers = @"TOOLBAR_PEERS";
+static ToolbarTab const ToolbarTabNetwork = @"TOOLBAR_NETWORK";
+static ToolbarTab const ToolbarTabRemote = @"TOOLBAR_REMOTE";
 
-#define WEBUI_URL @"http://localhost:%ld/"
+static char* const kRPCKeychainService = "Transmission:Remote";
+static char* const kRPCKeychainName = "Remote";
+
+static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 @interface PrefsController ()
 
@@ -206,7 +212,7 @@
     toolbar.allowsUserCustomization = NO;
     toolbar.displayMode = NSToolbarDisplayModeIconAndLabel;
     toolbar.sizeMode = NSToolbarSizeModeRegular;
-    toolbar.selectedItemIdentifier = TOOLBAR_GENERAL;
+    toolbar.selectedItemIdentifier = ToolbarTabGeneral;
     self.window.toolbar = toolbar;
 
     [self setWindowSize];
@@ -216,7 +222,8 @@
     [self updateShowAddMagnetWindowField];
 
     //set download folder
-    [self.fFolderPopUp selectItemAtIndex:[self.fDefaults boolForKey:@"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
+    [self.fFolderPopUp selectItemAtIndex:[self.fDefaults boolForKey:@"DownloadLocationConstant"] ? DownloadPopupIndexFolder :
+                                                                                                   DownloadPopupIndexTorrent];
 
     //set stop ratio
     self.fRatioStopField.floatValue = [self.fDefaults floatForKey:@"RatioLimit"];
@@ -295,7 +302,7 @@
 {
     NSToolbarItem* item = [[NSToolbarItem alloc] initWithItemIdentifier:ident];
 
-    if ([ident isEqualToString:TOOLBAR_GENERAL])
+    if ([ident isEqualToString:ToolbarTabGeneral])
     {
         item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
         item.image = [NSImage systemSymbol:@"gearshape" withFallback:NSImageNamePreferencesGeneral];
@@ -303,7 +310,7 @@
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString:TOOLBAR_TRANSFERS])
+    else if ([ident isEqualToString:ToolbarTabTransfers])
     {
         item.label = NSLocalizedString(@"Transfers", "Preferences -> toolbar item title");
         item.image = [NSImage systemSymbol:@"arrow.up.arrow.down" withFallback:@"Transfers"];
@@ -311,7 +318,7 @@
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString:TOOLBAR_GROUPS])
+    else if ([ident isEqualToString:ToolbarTabGroups])
     {
         item.label = NSLocalizedString(@"Groups", "Preferences -> toolbar item title");
         item.image = [NSImage systemSymbol:@"pin" withFallback:@"Groups"];
@@ -319,7 +326,7 @@
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString:TOOLBAR_BANDWIDTH])
+    else if ([ident isEqualToString:ToolbarTabBandwidth])
     {
         item.label = NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title");
         item.image = [NSImage systemSymbol:@"speedometer" withFallback:@"Bandwidth"];
@@ -327,7 +334,7 @@
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString:TOOLBAR_PEERS])
+    else if ([ident isEqualToString:ToolbarTabPeers])
     {
         item.label = NSLocalizedString(@"Peers", "Preferences -> toolbar item title");
         item.image = [NSImage systemSymbol:@"person.2" withFallback:NSImageNameUserGroup];
@@ -335,7 +342,7 @@
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString:TOOLBAR_NETWORK])
+    else if ([ident isEqualToString:ToolbarTabNetwork])
     {
         item.label = NSLocalizedString(@"Network", "Preferences -> toolbar item title");
         item.image = [NSImage systemSymbol:@"network" withFallback:NSImageNameNetwork];
@@ -343,7 +350,7 @@
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString:TOOLBAR_REMOTE])
+    else if ([ident isEqualToString:ToolbarTabRemote])
     {
         item.label = NSLocalizedString(@"Remote", "Preferences -> toolbar item title");
         item.image = [NSImage systemSymbol:@"antenna.radiowaves.left.and.right" withFallback:@"Remote"];
@@ -362,13 +369,13 @@
 - (NSArray*)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
     return @[
-        TOOLBAR_GENERAL,
-        TOOLBAR_TRANSFERS,
-        TOOLBAR_GROUPS,
-        TOOLBAR_BANDWIDTH,
-        TOOLBAR_PEERS,
-        TOOLBAR_NETWORK,
-        TOOLBAR_REMOTE
+        ToolbarTabGeneral,
+        ToolbarTabTransfers,
+        ToolbarTabGroups,
+        ToolbarTabBandwidth,
+        ToolbarTabPeers,
+        ToolbarTabNetwork,
+        ToolbarTabRemote
     ];
 }
 
@@ -887,7 +894,7 @@
 
 - (void)setDownloadLocation:(id)sender
 {
-    [self.fDefaults setBool:self.fFolderPopUp.indexOfSelectedItem == DOWNLOAD_FOLDER forKey:@"DownloadLocationConstant"];
+    [self.fDefaults setBool:self.fFolderPopUp.indexOfSelectedItem == DownloadPopupIndexFolder forKey:@"DownloadLocationConstant"];
     [self updateShowAddMagnetWindowField];
 }
 
@@ -904,7 +911,7 @@
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
         if (result == NSModalResponseOK)
         {
-            [self.fFolderPopUp selectItemAtIndex:DOWNLOAD_FOLDER];
+            [self.fFolderPopUp selectItemAtIndex:DownloadPopupIndexFolder];
 
             NSString* folder = panel.URLs[0].path;
             [self.fDefaults setObject:folder forKey:@"DownloadFolder"];
@@ -917,7 +924,8 @@
         else
         {
             //reset if cancelled
-            [self.fFolderPopUp selectItemAtIndex:[self.fDefaults boolForKey:@"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
+            [self.fFolderPopUp selectItemAtIndex:[self.fDefaults boolForKey:@"DownloadLocationConstant"] ? DownloadPopupIndexFolder :
+                                                                                                           DownloadPopupIndexTorrent];
         }
     }];
 }
@@ -1086,7 +1094,7 @@
 
 - (void)linkWebUI:(id)sender
 {
-    NSString* urlString = [NSString stringWithFormat:WEBUI_URL, [self.fDefaults integerForKey:@"RPCPort"]];
+    NSString* urlString = [NSString stringWithFormat:kWebUIURLFormat, [self.fDefaults integerForKey:@"RPCPort"]];
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:urlString]];
 }
 
@@ -1105,7 +1113,7 @@
     self.fRPCPassword = [sender stringValue];
 
     char const* password = [sender stringValue].UTF8String;
-    [self setKeychainPassword:password forService:RPC_KEYCHAIN_SERVICE username:RPC_KEYCHAIN_NAME];
+    [self setKeychainPassword:password forService:kRPCKeychainService username:kRPCKeychainName];
 
     tr_sessionSetRPCPassword(self.fHandle, password);
 }
@@ -1116,10 +1124,10 @@
     char const* password = nil;
     SecKeychainFindGenericPassword(
         NULL,
-        strlen(RPC_KEYCHAIN_SERVICE),
-        RPC_KEYCHAIN_SERVICE,
-        strlen(RPC_KEYCHAIN_NAME),
-        RPC_KEYCHAIN_NAME,
+        strlen(kRPCKeychainService),
+        kRPCKeychainService,
+        strlen(kRPCKeychainName),
+        kRPCKeychainName,
         &passwordLength,
         (void**)&password,
         NULL);
@@ -1185,7 +1193,7 @@
         return;
     }
 
-    if ([[sender cell] tagForSegment:[sender selectedSegment]] == RPC_IP_REMOVE_TAG)
+    if ([[sender cell] tagForSegment:[sender selectedSegment]] == RPCIPTagRemove)
     {
         [self.fRPCWhitelistArray removeObjectsAtIndexes:self.fRPCWhitelistTable.selectedRowIndexes];
         [self.fRPCWhitelistTable deselectAll:self];
@@ -1285,7 +1293,7 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification*)notification
 {
-    [self.fRPCAddRemoveControl setEnabled:self.fRPCWhitelistTable.numberOfSelectedRows > 0 forSegment:RPC_IP_REMOVE_TAG];
+    [self.fRPCAddRemoveControl setEnabled:self.fRPCWhitelistTable.numberOfSelectedRows > 0 forSegment:RPCIPTagRemove];
 }
 
 - (void)helpForScript:(id)sender
@@ -1535,33 +1543,33 @@
     }
 
     NSView* view;
-    if ([identifier isEqualToString:TOOLBAR_TRANSFERS])
+    if ([identifier isEqualToString:ToolbarTabTransfers])
     {
         view = self.fTransfersView;
     }
-    else if ([identifier isEqualToString:TOOLBAR_GROUPS])
+    else if ([identifier isEqualToString:ToolbarTabGroups])
     {
         view = self.fGroupsView;
     }
-    else if ([identifier isEqualToString:TOOLBAR_BANDWIDTH])
+    else if ([identifier isEqualToString:ToolbarTabBandwidth])
     {
         view = self.fBandwidthView;
     }
-    else if ([identifier isEqualToString:TOOLBAR_PEERS])
+    else if ([identifier isEqualToString:ToolbarTabPeers])
     {
         view = self.fPeersView;
     }
-    else if ([identifier isEqualToString:TOOLBAR_NETWORK])
+    else if ([identifier isEqualToString:ToolbarTabNetwork])
     {
         view = self.fNetworkView;
     }
-    else if ([identifier isEqualToString:TOOLBAR_REMOTE])
+    else if ([identifier isEqualToString:ToolbarTabRemote])
     {
         view = self.fRemoteView;
     }
     else
     {
-        identifier = TOOLBAR_GENERAL; //general view is the default selected
+        identifier = ToolbarTabGeneral; //general view is the default selected
         view = self.fGeneralView;
     }
 

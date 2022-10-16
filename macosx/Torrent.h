@@ -14,7 +14,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
     TorrentDeterminationUserSpecified
 };
 
-#define kTorrentDidChangeGroupNotification @"TorrentDidChangeGroup"
+extern NSString* const kTorrentDidChangeGroupNotification;
 
 @interface Torrent : NSObject<NSCopying, QLPreviewItem>
 
