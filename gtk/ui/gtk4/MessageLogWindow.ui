@@ -3,7 +3,7 @@
   <requires lib="gtk" version="4.0"/>
   <object class="GtkWindow" id="MessageLogWindow">
     <property name="title" translatable="1">Message Log</property>
-    <property name="default-width">560</property>
+    <property name="default-width">750</property>
     <property name="default-height">350</property>
     <property name="child">
       <object class="GtkBox" id="window_layout">
