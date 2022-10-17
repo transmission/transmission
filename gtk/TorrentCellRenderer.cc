@@ -309,7 +309,7 @@ std::string getStatusString(
 
 class TorrentCellRenderer::Impl
 {
-    using ContextPtr = TorrentCellRenderer::ContextPtr;
+    using SnapshotPtr = TorrentCellRenderer::SnapshotPtr;
     using IconSize = IF_GTKMM4(Gtk::IconSize, Gtk::BuiltinIconSize);
 
 public:
@@ -322,12 +322,12 @@ public:
     void get_size_full(Gtk::Widget& widget, int& width, int& height) const;
 
     void render_compact(
-        ContextPtr const& context,
+        SnapshotPtr const& snapshot,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
     void render_full(
-        ContextPtr const& context,
+        SnapshotPtr const& snapshot,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
@@ -558,7 +558,7 @@ void render_impl(Gtk::CellRenderer& renderer, Ts&&... args)
 } // namespace
 
 void TorrentCellRenderer::Impl::render_compact(
-    ContextPtr const& context,
+    SnapshotPtr const& snapshot,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -641,26 +641,26 @@ void TorrentCellRenderer::Impl::render_compact(
 
     set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->property_sensitive() = sensitive;
-    render_impl(*icon_renderer_, context, widget, icon_area, icon_area, flags);
+    render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
 
     auto const percent_done = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
-    render_impl(*progress_renderer_, context, widget, prog_area, prog_area, flags);
+    render_impl(*progress_renderer_, snapshot, widget, prog_area, prog_area, flags);
 
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
-    render_impl(*text_renderer_, context, widget, stat_area, stat_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, stat_area, stat_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
-    render_impl(*text_renderer_, context, widget, name_area, name_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, name_area, name_area, flags);
 }
 
 void TorrentCellRenderer::Impl::render_full(
-    ContextPtr const& context,
+    SnapshotPtr const& snapshot,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -778,30 +778,30 @@ void TorrentCellRenderer::Impl::render_full(
 
     set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->property_sensitive() = sensitive;
-    render_impl(*icon_renderer_, context, widget, icon_area, icon_area, flags);
+    render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(BOLD);
-    render_impl(*text_renderer_, context, widget, name_area, name_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, name_area, name_area, flags);
 
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
-    render_impl(*text_renderer_, context, widget, prog_area, prog_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, prog_area, prog_area, flags);
 
     progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
-    render_impl(*progress_renderer_, context, widget, prct_area, prct_area, flags);
+    render_impl(*progress_renderer_, snapshot, widget, prct_area, prct_area, flags);
 
     text_renderer_->property_text() = gstr_stat;
-    render_impl(*text_renderer_, context, widget, stat_area, stat_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, stat_area, stat_area, flags);
 }
 
 void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
-    ContextPtr const& context,
+    SnapshotPtr const& snapshot,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gdk::Rectangle const& /*cell_area*/,
@@ -816,11 +816,11 @@ void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
     {
         if (impl_->compact.get_value())
         {
-            impl_->render_compact(context, widget, background_area, flags);
+            impl_->render_compact(snapshot, widget, background_area, flags);
         }
         else
         {
-            impl_->render_full(context, widget, background_area, flags);
+            impl_->render_full(snapshot, widget, background_area, flags);
         }
     }
 
