@@ -39,6 +39,7 @@
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
+#include "dns-ev.h"
 #include "error-types.h"
 #include "error.h"
 #include "file.h"
@@ -2810,6 +2811,7 @@ tr_session::tr_session(std::string_view config_dir)
                        evdns_base_free(dns, 0);
                    } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
+    , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
     , session_id_{ tr_time }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });

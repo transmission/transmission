@@ -133,6 +133,8 @@ endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
     ${PROJECT_BINARY_DIR}/version.h
+    dns-ev.h
+    dns.h
     error-types.h
     error.h
     file.h
@@ -141,8 +143,8 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     quark.h
     rpcimpl.h
     session-id.h
-    timer.h
     timer-ev.h
+    timer.h
     tr-assert.h
     tr-getopt.h
     tr-macros.h
