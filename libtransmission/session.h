@@ -29,6 +29,7 @@
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "cache.h"
+#include "dns.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
@@ -64,6 +65,7 @@ struct tr_announcer_udp;
 
 namespace libtransmission
 {
+class Dns;
 class Timer;
 class TimerMaker;
 } // namespace libtransmission
@@ -920,6 +922,7 @@ private:
     std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
+    std::unique_ptr<libtransmission::Dns> const dns_;
 
     /// trivial type fields
 
