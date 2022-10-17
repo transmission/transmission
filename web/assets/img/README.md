@@ -13,20 +13,30 @@ https://material.io/resources/icons/
 - play-circle-idle.svg (play-circle-filled.svg)
 - router.svg
 
+## Feather Icons
+
+https://github.com/feathericons/feather
+license: MIT
+
+- index.html nav button svg
+- chevron-down.svg
+- chevron-up.svg
+
+## Inspector 'i' icon
+
+- Created in OmniGraffle by https://github.com/dareiff
+
 ## Bootstrap Icons
 
 https://github.com/twbs/icons
 https://icons.getbootstrap.com/icons/
 license: MIT
 
-- chevron-down.svg
-- chevron-up.svg
 - files.svg
 - gear-fill.svg
 - lock-fill.svg
 - magnet.svg
 - search.svg
-- three-dots-vertical.svg
 
 ## Adwaita Icons
 
@@ -47,21 +57,17 @@ https://www.svgrepo.com/
 license: CC0
 
 - checkered-flag.svg
-- cloud-networking.svg
-- globa-server.svg
-- team.svg
-- top-speed.svg (license: MIT)
 - up-and-down-arrows.svg
 
 ## Custom Icons
 
 license: MIT
 
-- blue-turtle.png
 - logo.png
 - toolbar-close.png
 - toolbar-folder.png
 - toolbar-info.png
 - toolbar-pause.png
 - toolbar-start.png
-- turtle.png
+- modern-tortoise.png
+- modern-tortoise-blue.png
