@@ -41,7 +41,10 @@ protected:
         ::testing::Test::TearDown();
     }
 
-    bool waitFor(struct event_base* evb, std::function<bool()> const& test, std::chrono::milliseconds msec = DefaultTimeout)
+    static bool waitFor(
+        struct event_base* evb,
+        std::function<bool()> const& test,
+        std::chrono::milliseconds msec = DefaultTimeout)
     {
         auto const deadline = std::chrono::steady_clock::now() + msec;
 
