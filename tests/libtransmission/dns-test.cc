@@ -107,8 +107,44 @@ TEST_F(EvDnsTest, canRequestWhilePending)
             std::cout << __FILE__ << ':' << __LINE__ << ' ' << ai << ' ' << ailen << std::endl;
         });
 
+    // wait for both callbacks to be called
     waitFor(event_base_, [&n_done]() { return n_done >= 2U; });
-    EXPECT_EQ(2, n_done);
+    EXPECT_EQ(2U, n_done);
+}
+
+TEST_F(EvDnsTest, canCancel)
+{
+    auto dns = EvDns{ event_base_ };
+    auto n_done = size_t{ 0 };
+
+    auto tag = dns.lookup(
+        "example.com",
+        time(nullptr),
+        [&n_done](struct sockaddr const* ai, int ailen)
+        {
+            ++n_done;
+            // we cancelled this req, so `ai` and `ailen` should be zeroed out
+            EXPECT_EQ(nullptr, ai);
+            EXPECT_EQ(0, ailen);
+        });
+
+    dns.lookup(
+        "example.com",
+        time(nullptr),
+        [&n_done](struct sockaddr const* ai, int ailen)
+        {
+            ++n_done;
+
+            // this one did _not_ get cancelled so it should be OK
+            EXPECT_NE(nullptr, ai);
+            EXPECT_GT(ailen, 0);
+        });
+
+    dns.cancel(tag);
+
+    // wait for both callbacks to be called
+    waitFor(event_base_, [&n_done]() { return n_done >= 2U; });
+    EXPECT_EQ(2U, n_done);
 }
 
 } // namespace libtransmission::test

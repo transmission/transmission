@@ -40,10 +40,23 @@ private:
         EvDns* self;
     };
 
-    struct Pending
+    struct Request
     {
         evdns_getaddrinfo_request* request;
-        std::list<Callback> callbacks;
+
+        struct CallbackInfo
+        {
+            CallbackInfo(Tag tag, Callback callback)
+                : tag_{ tag }
+                , callback_{ std::move(callback) }
+            {
+            }
+
+            Tag tag_;
+            Callback callback_;
+        };
+
+        std::list<CallbackInfo> callbacks;
     };
 
 public:
@@ -59,14 +72,14 @@ public:
 
     ~EvDns() override
     {
-        for (auto& [key, pending] : pending_)
+        for (auto& [key, request] : requests_)
         {
-            fmt::print("cancel {}\n", key.first);
-            evdns_getaddrinfo_cancel(pending.request);
+            fmt::print("cancel {:s}\n", key.first);
+            evdns_getaddrinfo_cancel(request.request);
         }
     }
 
-    void lookup(std::string_view address, time_t now, Callback&& callback, Hints hints = {}) override
+    Tag lookup(std::string_view address, time_t now, Callback&& callback, Hints hints = {}) override
     {
         auto const key = std::make_pair(tr_strlower(address), hints);
 
@@ -78,17 +91,17 @@ public:
             {
                 fmt::print("cached {}\n", key.first);
                 callback(reinterpret_cast<struct sockaddr const*>(&entry.ss), entry.sslen);
-                return;
+                return {};
             }
 
             fmt::print("expired {}\n", key.first);
             cache_.erase(iter); // expired
         }
 
-        auto& pending = pending_[key];
-        ;
-        pending.callbacks.push_back(std::move(callback));
-        if (pending.request == nullptr)
+        auto& request = requests_[key];
+        auto const tag = next_tag_++;
+        request.callbacks.emplace_back(tag, std::move(callback));
+        if (request.request == nullptr)
         {
             fmt::print("requesting {}\n", key.first);
             auto evhints = evutil_addrinfo{};
@@ -97,7 +110,40 @@ public:
             evhints.ai_protocol = hints.ai_protocol;
             void* const arg = new CallbackArg{ key, this };
             fmt::print("pending {}\n", key.first);
-            pending.request = evdns_getaddrinfo(evdns_base_.get(), key.first.c_str(), nullptr, &evhints, evcallback, arg);
+            request.request = evdns_getaddrinfo(evdns_base_.get(), key.first.c_str(), nullptr, &evhints, evcallback, arg);
+        }
+
+        return tag;
+    }
+
+    void cancel(Tag tag) override
+    {
+        fmt::print("cancel {}\n", tag);
+        for (auto& [key, request] : requests_)
+        {
+            for (auto iter = std::begin(request.callbacks), end = std::end(request.callbacks); iter != end; ++iter)
+            {
+                if (iter->tag_ != tag)
+                {
+                    continue;
+                }
+
+                fmt::print("cancel {} key {}\n", tag, key.first);
+                iter->callback_(nullptr, 0);
+
+                request.callbacks.erase(iter);
+
+                // if this was the last pending request for `key`, cancel the evdns request
+                if (std::empty(request.callbacks))
+                {
+                    fmt::print("no requests left; cancelling evdns request for {}\n", key.first);
+                    evdns_getaddrinfo_cancel(request.request);
+                    requests_.erase(key);
+                }
+
+                fmt::print("cancel returning\n");
+                return;
+            }
         }
     }
 
@@ -119,12 +165,12 @@ private:
         }
 
         fmt::print("salen {}\n", salen);
-        if (auto entry = self->pending_.extract(key); entry)
+        if (auto entry = self->requests_.extract(key); entry)
         {
             for (auto& callback : entry.mapped().callbacks)
             {
                 fmt::print("calling callback salen {}\n", salen);
-                callback(sa, salen);
+                callback.callback_(sa, salen);
             }
         }
 
@@ -136,7 +182,8 @@ private:
 
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::map<Key, CacheEntry> cache_;
-    std::map<Key, Pending> pending_;
+    std::map<Key, Request> requests_;
+    unsigned int next_tag_ = 1;
 };
 
 } // namespace libtransmission

@@ -23,6 +23,7 @@ public:
     virtual ~Dns() = default;
 
     using Callback = std::function<void(struct sockaddr const*, int salen)>;
+    using Tag = unsigned int;
 
     class Hints
     {
@@ -60,7 +61,9 @@ public:
         }
     };
 
-    virtual void lookup(std::string_view address, time_t now, Callback&& callback, Hints hints = {}) = 0;
+    virtual Tag lookup(std::string_view address, time_t now, Callback&& callback, Hints hints = {}) = 0;
+
+    virtual void cancel(Tag) = 0;
 };
 
 } // namespace libtransmission
