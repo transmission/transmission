@@ -67,13 +67,12 @@ protected:
 
 TEST_F(EvDnsTest, canLookup)
 {
-    auto dns = EvDns{ event_base_ };
+    auto dns = EvDns{ event_base_, tr_time };
     auto done = false;
 
     dns.lookup(
         "example.com",
-        time(nullptr),
-        [&done](struct sockaddr const* ai, int ailen)
+        [&done](struct sockaddr const* ai, socklen_t ailen)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
@@ -86,13 +85,12 @@ TEST_F(EvDnsTest, canLookup)
 
 TEST_F(EvDnsTest, canRequestWhilePending)
 {
-    auto dns = EvDns{ event_base_ };
+    auto dns = EvDns{ event_base_, tr_time };
     auto n_done = size_t{ 0 };
 
     dns.lookup(
         "example.com",
-        time(nullptr),
-        [&n_done](struct sockaddr const* ai, int ailen)
+        [&n_done](struct sockaddr const* ai, socklen_t ailen)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
@@ -101,8 +99,7 @@ TEST_F(EvDnsTest, canRequestWhilePending)
 
     dns.lookup(
         "example.com",
-        time(nullptr),
-        [&n_done](struct sockaddr const* ai, int ailen)
+        [&n_done](struct sockaddr const* ai, socklen_t ailen)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
@@ -116,13 +113,12 @@ TEST_F(EvDnsTest, canRequestWhilePending)
 
 TEST_F(EvDnsTest, canCancel)
 {
-    auto dns = EvDns{ event_base_ };
+    auto dns = EvDns{ event_base_, tr_time };
     auto n_done = size_t{ 0 };
 
     auto tag = dns.lookup(
         "example.com",
-        time(nullptr),
-        [&n_done](struct sockaddr const* ai, int ailen)
+        [&n_done](struct sockaddr const* ai, socklen_t ailen)
         {
             ++n_done;
             // we cancelled this req, so `ai` and `ailen` should be zeroed out
@@ -132,8 +128,7 @@ TEST_F(EvDnsTest, canCancel)
 
     dns.lookup(
         "example.com",
-        time(nullptr),
-        [&n_done](struct sockaddr const* ai, int ailen)
+        [&n_done](struct sockaddr const* ai, socklen_t ailen)
         {
             ++n_done;
 
@@ -147,6 +142,40 @@ TEST_F(EvDnsTest, canCancel)
     // wait for both callbacks to be called
     waitFor(event_base_, [&n_done]() { return n_done >= 2U; });
     EXPECT_EQ(2U, n_done);
+}
+
+TEST_F(EvDnsTest, doesCacheEntries)
+{
+    auto dns = EvDns{ event_base_, tr_time };
+
+    struct sockaddr const* ai_addr = nullptr;
+
+    dns.lookup(
+        "example.com",
+        [&ai_addr](struct sockaddr const* ai, socklen_t ailen)
+        {
+            EXPECT_NE(nullptr, ai);
+            EXPECT_GT(ailen, 0);
+            ai_addr = ai;
+        });
+
+    // wait for the lookup
+    waitFor(event_base_, [&ai_addr]() { return ai_addr != nullptr; });
+    ASSERT_NE(nullptr, ai_addr);
+
+    auto second_callback_called = false;
+    dns.lookup(
+        "example.com",
+        [&ai_addr, &second_callback_called](struct sockaddr const* ai, socklen_t ailen)
+        {
+            EXPECT_NE(nullptr, ai);
+            EXPECT_GT(ailen, 0);
+            EXPECT_EQ(ai_addr, ai);
+            second_callback_called = true;
+        });
+    // since it's cached, the callback should have been invoked
+    // without waiting for the event loop
+    EXPECT_TRUE(second_callback_called);
 }
 
 } // namespace libtransmission::test

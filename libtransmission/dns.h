@@ -5,9 +5,7 @@
 
 #pragma once
 
-#include <chrono>
 #include <functional>
-#include <memory>
 #include <string_view>
 
 #include "transmission.h"
@@ -22,7 +20,7 @@ class Dns
 public:
     virtual ~Dns() = default;
 
-    using Callback = std::function<void(struct sockaddr const*, int salen)>;
+    using Callback = std::function<void(struct sockaddr const*, socklen_t salen)>;
     using Tag = unsigned int;
 
     class Hints
@@ -31,6 +29,7 @@ public:
         Hints()
         {
         }
+
         int ai_family = AF_UNSPEC;
         int ai_socktype = SOCK_DGRAM;
         int ai_protocol = IPPROTO_UDP;
@@ -61,7 +60,7 @@ public:
         }
     };
 
-    virtual Tag lookup(std::string_view address, time_t now, Callback&& callback, Hints hints = {}) = 0;
+    virtual Tag lookup(std::string_view address, Callback&& callback, Hints hints = {}) = 0;
 
     virtual void cancel(Tag) = 0;
 };

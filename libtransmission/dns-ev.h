@@ -3,7 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <chrono>
+#include <cstring> // for std::memcpy()
+#include <ctime>
 #include <list>
 #include <map>
 #include <memory>
@@ -27,9 +28,9 @@ private:
 
     struct CacheEntry
     {
-        time_t expiration_time;
-        sockaddr_storage ss;
-        size_t sslen;
+        sockaddr_storage ss_ = {};
+        socklen_t sslen_ = {};
+        time_t expires_at_ = {};
     };
 
     struct CallbackArg
@@ -58,8 +59,11 @@ private:
     };
 
 public:
-    EvDns(struct event_base* event_base)
-        : evdns_base_{ evdns_base_new(event_base, EVDNS_BASE_INITIALIZE_NAMESERVERS),
+    using TimeFunc = time_t (*)();
+
+    EvDns(struct event_base* event_base, TimeFunc time_func)
+        : time_func_{ time_func }
+        , evdns_base_{ evdns_base_new(event_base, EVDNS_BASE_INITIALIZE_NAMESERVERS),
                        [](evdns_base* dns)
                        {
                            // if zero, active requests will be aborted
@@ -76,17 +80,18 @@ public:
         }
     }
 
-    Tag lookup(std::string_view address, time_t now, Callback&& callback, Hints hints = {}) override
+    Tag lookup(std::string_view address, Callback&& callback, Hints hints = {}) override
     {
         auto const key = std::make_pair(tr_strlower(address), hints);
+        auto const now = time_func_();
 
         if (auto iter = cache_.find(key); iter != std::end(cache_))
         {
             auto const& entry = iter->second;
 
-            if (entry.expiration_time > now)
+            if (entry.expires_at_ > now)
             {
-                callback(reinterpret_cast<struct sockaddr const*>(&entry.ss), entry.sslen);
+                callback(reinterpret_cast<struct sockaddr const*>(&entry.ss_), entry.sslen_);
                 return {};
             }
 
@@ -143,29 +148,27 @@ private:
         auto [key, self] = *arg;
         delete arg;
 
-        struct sockaddr const* sa = nullptr;
-        socklen_t salen = 0;
+        auto& cache_entry = self->cache_[key];
 
         if (res != nullptr)
         {
-            sa = res->ai_addr;
-            salen = res->ai_addrlen;
-        }
-
-        if (auto entry = self->requests_.extract(key); entry)
-        {
-            for (auto& callback : entry.mapped().callbacks)
-            {
-                callback.callback_(sa, salen);
-            }
-        }
-
-        if (res != nullptr)
-        {
+            cache_entry.expires_at_ = self->time_func_() + CacheTtlSecs;
+            cache_entry.sslen_ = res->ai_addrlen;
+            std::memcpy(&cache_entry.ss_, res->ai_addr, res->ai_addrlen);
             evutil_freeaddrinfo(res);
+        }
+
+        if (auto request_entry = self->requests_.extract(key); request_entry)
+        {
+            for (auto& callback : request_entry.mapped().callbacks)
+            {
+                callback.callback_(reinterpret_cast<sockaddr const*>(&cache_entry.ss_), cache_entry.sslen_);
+            }
         }
     }
 
+    TimeFunc const time_func_;
+    static time_t constexpr CacheTtlSecs = 3600U;
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::map<Key, CacheEntry> cache_;
     std::map<Key, Request> requests_;
