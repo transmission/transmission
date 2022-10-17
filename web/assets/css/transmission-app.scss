@@ -1,8 +1,7 @@
 @use 'sass:color';
 @use 'sass:math';
 
-// NEW: https://primer.style/primitives/colors
-// Renaming and changing variables hasn't started yet.
+// Colors related to torrent status
 $blue-100: #dbedff;
 $blue-200: #c8e1ff;
 $blue-300: #79b8ff;
@@ -26,7 +25,6 @@ $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
 
 $nice-grey: #f8f8f8;
-//make nice-grey slightly darker for light mode
 $nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
 $subtle-bt-red: rgb(255, 231, 229);
@@ -52,6 +50,8 @@ $image-pause-circle-idle: '../img/pause-circle-idle.svg';
 $image-play-circle-active: '../img/play-circle-active.svg';
 $image-play-circle-idle: '../img/play-circle-idle.svg';
 
+/// MIXINS
+
 @mixin for-phone-only {
   @media (max-width: 599px) {
     @content;
@@ -61,12 +61,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   @media (min-width: 600px) {
     @content;
   }
-}
-
-/// MIXINS
-
-@mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
-  background-image: url($src), linear-gradient($topColor, $bottomColor);
 }
 
 @mixin button {
@@ -81,10 +75,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
 
 :root {
   color-scheme: light dark;
-  --color-bg-selection-1: #{$purple-100};
-  --color-bg-selection-2: #{$purple-000};
   --color-fg-error: #{$red-500};
-  --color-fg-name: #{$grey-800};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
   @media (prefers-color-scheme: dark) {
@@ -126,11 +117,10 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-fg-tertiary: #{$grey-500};
     --color-bg-warn: #e4606d5b;
     --color-fg-warn: #cf212e;
-
     --color-fg-disabled: #{$grey-500};
     --color-toolbar-background: #{$nice-grey};
     --color-inspector-background: #{$white};
-    --color-bg-tabs: #{$grey-500};
+    --color-bg-tabs: #{$nice-grey-darker};
     --color-inspector-tabs: #{$nice-grey};
     --color-bg-selected: #{$default-accent-color};
     --color-progressbar-background-1: #{$nice-grey};
@@ -155,10 +145,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --color-progressbar-seed-queued-2: #{$green-300};
   --color-progressbar-seed-1: #{$green-300};
   --color-progressbar-seed-2: #{$green-700};
-  --color-tab-deselected-1: #{$nice-grey};
-  --color-tab-deselected-2: #{$grey-500};
-  --color-tab-selected-1: #{$purple-100};
-  --color-tab-selected-2: #{$purple-000};
 }
 
 html,
