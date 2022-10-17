@@ -88,18 +88,24 @@ public:
 
     std::optional<std::pair<sockaddr const*, socklen_t>> cached(std::string_view address, Hints hints = {}) const override
     {
-        return cached(makeKey(address, hints));
+        if (auto const* entry = cached(makeKey(address, hints)); entry != nullptr)
+        {
+            return std::make_pair(reinterpret_cast<sockaddr const*>(&entry->ss_), entry->sslen_);
+        }
+
+        return {};
     }
 
     Tag lookup(std::string_view address, Callback&& callback, Hints hints = {}) override
     {
-        if (auto const item = cached(address, hints); item)
+        auto const key = makeKey(address, hints);
+
+        if (auto const* entry = cached(key); entry)
         {
-            callback(item->first, item->second);
+            callback(reinterpret_cast<sockaddr const*>(&entry->ss_), entry->sslen_, entry->expires_at_);
             return {};
         }
 
-        auto const key = std::make_pair(tr_strlower(address), hints);
         auto& request = requests_[key];
         auto const tag = next_tag_++;
         request.callbacks.emplace_back(tag, std::move(callback));
@@ -127,7 +133,7 @@ public:
                     continue;
                 }
 
-                iter->callback_(nullptr, 0);
+                iter->callback_(nullptr, 0, 0);
 
                 request.callbacks.erase(iter);
 
@@ -149,7 +155,7 @@ private:
         return Key{ tr_strlower(address), hints };
     }
 
-    [[nodiscard]] std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(Key const& key) const
+    [[nodiscard]] CacheEntry const* cached(Key const& key) const
     {
         if (auto iter = cache_.find(key); iter != std::end(cache_))
         {
@@ -157,13 +163,13 @@ private:
 
             if (auto const now = time_func_(); entry.expires_at_ > now)
             {
-                return std::make_pair(reinterpret_cast<struct sockaddr const*>(&entry.ss_), entry.sslen_);
+                return &entry;
             }
 
             cache_.erase(iter); // expired
         }
 
-        return {};
+        return nullptr;
     }
 
     static void evcallback(int /*result*/, struct evutil_addrinfo* res, void* varg)
@@ -186,7 +192,10 @@ private:
         {
             for (auto& callback : request_entry.mapped().callbacks)
             {
-                callback.callback_(reinterpret_cast<sockaddr const*>(&cache_entry.ss_), cache_entry.sslen_);
+                callback.callback_(
+                    reinterpret_cast<sockaddr const*>(&cache_entry.ss_),
+                    cache_entry.sslen_,
+                    cache_entry.expires_at_);
             }
         }
     }

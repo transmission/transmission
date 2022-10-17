@@ -20,7 +20,7 @@ class Dns
 public:
     virtual ~Dns() = default;
 
-    using Callback = std::function<void(struct sockaddr const*, socklen_t salen)>;
+    using Callback = std::function<void(struct sockaddr const*, socklen_t salen, time_t expires_at)>;
     using Tag = unsigned int;
 
     class Hints
