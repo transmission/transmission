@@ -3,6 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#pragma once
+
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #include <cstring> // for std::memcpy()
 #include <ctime>
 #include <list>
