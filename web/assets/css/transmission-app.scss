@@ -1,9 +1,6 @@
 @use 'sass:color';
 @use 'sass:math';
 
-// Color palette recycled from GitHub Primer.
-// Please use those values if you need to add colors.
-// OLD 404s: https://primer.style/css/support/color-system
 // NEW: https://primer.style/primitives/colors
 // Renaming and changing variables hasn't started yet.
 $blue-100: #dbedff;
@@ -15,7 +12,6 @@ $green-200: #bef5cb;
 $green-300: #85e89d;
 $green-500: #28a745;
 $green-700: #176f2c;
-$grey-300: #d1d5da;
 $grey-500: #828282;
 $grey-700: #373737;
 $grey-800: #292929;
@@ -26,11 +22,12 @@ $purple-000: #f5f0ff;
 $purple-100: #e6dcfd;
 $red-500: #d73a49;
 $white: #fff;
-$yellow-200: #fff5b1;
 $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
 
 $nice-grey: #f8f8f8;
+//make nice-grey slightly darker for light mode
+$nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
 $subtle-bt-red: rgb(255, 231, 229);
 $default-accent-color: #fff8c5;
@@ -43,25 +40,17 @@ $z-index-popup: 2;
 
 // ICONS -- see assets/img/README.md for sources and license details
 // Are you a designer? New icon PRs welcomed!
-$image-alt-speed-disabled: '../img/turtle.png';
-$image-alt-speed-enabled: '../img/blue-turtle.png';
-$image-analytics: '../img/analytics.svg';
+$image-alt-speed-disabled: '../img/modern-tortoise.png';
+$image-alt-speed-enabled: '../img/modern-tortoise-blue.png';
 $image-baseline: '../img/horizontal-rule.svg';
 $image-chevron-dn: '../img/chevron-down.svg';
 $image-chevron-up: '../img/chevron-up.svg';
-$image-files: '../img/files.svg';
 $image-lock-fill: '../img/lock-fill.svg';
 $image-magnet: '../img/magnet.svg';
-$image-network: '../img/router.svg';
-$image-overflow: '../img/three-dots-vertical.svg';
 $image-pause-circle-active: '../img/pause-circle-active.svg';
 $image-pause-circle-idle: '../img/pause-circle-idle.svg';
-$image-peers: '../img/team.svg';
 $image-play-circle-active: '../img/play-circle-active.svg';
 $image-play-circle-idle: '../img/play-circle-idle.svg';
-$image-speed: '../img/checkered-flag.svg';
-$image-tiers: '../img/diagram-3-fill.svg';
-$image-upload-download: '../img/up-and-down-arrows.svg';
 
 @mixin for-phone-only {
   @media (max-width: 599px) {
