@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
-#include <iostream>
 #include <memory>
 
 #include <event2/event.h>
@@ -76,8 +75,9 @@ TEST_F(EvDnsTest, canLookup)
         time(nullptr),
         [&done](struct sockaddr const* ai, int ailen)
         {
+            EXPECT_NE(nullptr, ai);
+            EXPECT_GT(ailen, 0);
             done = true;
-            std::cout << __FILE__ << ':' << __LINE__ << ' ' << ai << ' ' << ailen << std::endl;
         });
 
     waitFor(event_base_, [&done]() { return done; });
@@ -94,8 +94,9 @@ TEST_F(EvDnsTest, canRequestWhilePending)
         time(nullptr),
         [&n_done](struct sockaddr const* ai, int ailen)
         {
+            EXPECT_NE(nullptr, ai);
+            EXPECT_GT(ailen, 0);
             ++n_done;
-            std::cout << __FILE__ << ':' << __LINE__ << ' ' << ai << ' ' << ailen << std::endl;
         });
 
     dns.lookup(
@@ -103,8 +104,9 @@ TEST_F(EvDnsTest, canRequestWhilePending)
         time(nullptr),
         [&n_done](struct sockaddr const* ai, int ailen)
         {
+            EXPECT_NE(nullptr, ai);
+            EXPECT_GT(ailen, 0);
             ++n_done;
-            std::cout << __FILE__ << ':' << __LINE__ << ' ' << ai << ' ' << ailen << std::endl;
         });
 
     // wait for both callbacks to be called
