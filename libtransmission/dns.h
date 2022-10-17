@@ -60,6 +60,10 @@ public:
         }
     };
 
+    [[nodiscard]] virtual std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(
+        std::string_view address,
+        Hints hints = {}) const = 0;
+
     virtual Tag lookup(std::string_view address, Callback&& callback, Hints hints = {}) = 0;
 
     virtual void cancel(Tag) = 0;

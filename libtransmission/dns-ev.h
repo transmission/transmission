@@ -86,24 +86,20 @@ public:
         }
     }
 
+    std::optional<std::pair<sockaddr const*, socklen_t>> cached(std::string_view address, Hints hints = {}) const override
+    {
+        return cached(makeKey(address, hints));
+    }
+
     Tag lookup(std::string_view address, Callback&& callback, Hints hints = {}) override
     {
-        auto const key = std::make_pair(tr_strlower(address), hints);
-        auto const now = time_func_();
-
-        if (auto iter = cache_.find(key); iter != std::end(cache_))
+        if (auto const item = cached(address, hints); item)
         {
-            auto const& entry = iter->second;
-
-            if (entry.expires_at_ > now)
-            {
-                callback(reinterpret_cast<struct sockaddr const*>(&entry.ss_), entry.sslen_);
-                return {};
-            }
-
-            cache_.erase(iter); // expired
+            callback(item->first, item->second);
+            return {};
         }
 
+        auto const key = std::make_pair(tr_strlower(address), hints);
         auto& request = requests_[key];
         auto const tag = next_tag_++;
         request.callbacks.emplace_back(tag, std::move(callback));
@@ -148,6 +144,28 @@ public:
     }
 
 private:
+    [[nodiscard]] static Key makeKey(std::string_view address, Hints hints)
+    {
+        return Key{ tr_strlower(address), hints };
+    }
+
+    [[nodiscard]] std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(Key const& key) const
+    {
+        if (auto iter = cache_.find(key); iter != std::end(cache_))
+        {
+            auto const& entry = iter->second;
+
+            if (auto const now = time_func_(); entry.expires_at_ > now)
+            {
+                return std::make_pair(reinterpret_cast<struct sockaddr const*>(&entry.ss_), entry.sslen_);
+            }
+
+            cache_.erase(iter); // expired
+        }
+
+        return {};
+    }
+
     static void evcallback(int /*result*/, struct evutil_addrinfo* res, void* varg)
     {
         auto* const arg = static_cast<CallbackArg*>(varg);
@@ -176,7 +194,7 @@ private:
     TimeFunc const time_func_;
     static time_t constexpr CacheTtlSecs = 3600U;
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
-    std::map<Key, CacheEntry> cache_;
+    mutable std::map<Key, CacheEntry> cache_;
     std::map<Key, Request> requests_;
     unsigned int next_tag_ = 1;
 };

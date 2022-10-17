@@ -147,11 +147,12 @@ TEST_F(EvDnsTest, canCancel)
 TEST_F(EvDnsTest, doesCacheEntries)
 {
     auto dns = EvDns{ event_base_, tr_time };
+    static auto constexpr Name = "example.com"sv;
 
     struct sockaddr const* ai_addr = nullptr;
 
     dns.lookup(
-        "example.com",
+        Name,
         [&ai_addr](struct sockaddr const* ai, socklen_t ailen)
         {
             EXPECT_NE(nullptr, ai);
@@ -165,7 +166,7 @@ TEST_F(EvDnsTest, doesCacheEntries)
 
     auto second_callback_called = false;
     dns.lookup(
-        "example.com",
+        Name,
         [&ai_addr, &second_callback_called](struct sockaddr const* ai, socklen_t ailen)
         {
             EXPECT_NE(nullptr, ai);
@@ -176,6 +177,12 @@ TEST_F(EvDnsTest, doesCacheEntries)
     // since it's cached, the callback should have been invoked
     // without waiting for the event loop
     EXPECT_TRUE(second_callback_called);
+
+    // confirm that `cached()` returns the cached value immediately
+    auto res = dns.cached(Name);
+    EXPECT_TRUE(res);
+    EXPECT_EQ(ai_addr, res->first);
+    EXPECT_GT(res->second, 0);
 }
 
 } // namespace libtransmission::test
