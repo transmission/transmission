@@ -269,36 +269,15 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 }
 
-#toolbar-open::before {
-  content: '\01F4C2';
-  font-size: 30px;
-  line-height: 0.6;
-}
-
-#toolbar-remove::before {
-  content: '\01F6AB';
-  font-size: 30px;
-  line-height: 0.6;
-}
-
-#toolbar-start::before {
-  content: '\025B6';
-  font-size: 33px;
-  line-height: 0.6;
-  top: 2px;
-  position: relative;
-}
-
-#toolbar-pause::before {
-  content: '\023F8';
-  font-size: 48px;
-  line-height: 0.6;
+.toolbar-icon {
+  stroke: var(--color-fg-primary);
 }
 
 #toolbar-inspector::before {
   content: '\02139';
-  font-size: 40px;
-  line-height: 0.6;
+  font-size: 38px;
+  position: relative;
+  top: -5px;
 }
 
 #toolbar-overflow {
