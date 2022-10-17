@@ -37,7 +37,6 @@
 #include "torrent-magnet.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
@@ -265,7 +264,7 @@ public:
     {
         if (torrent->allowsPex())
         {
-            pex_timer_ = torrent->session->timerMaker().create([this]() { sendPex(); });
+            pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
             pex_timer_->startRepeating(SendPexInterval);
         }
 
@@ -282,12 +281,12 @@ public:
 
         tellPeerWhatWeHave(this);
 
-        if (auto const port = tr_dhtPort(); io->supportsDHT() && port.has_value())
+        if (session->allowsDHT() && io->supportsDHT())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
             if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
             {
-                protocolSendPort(this, *port);
+                protocolSendPort(this, session->udpPort());
             }
         }
 
@@ -1693,7 +1692,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
-                tr_dhtAddNode(msgs->io->address(), msgs->dht_port, false);
+                msgs->session->addDhtNode(msgs->io->address(), msgs->dht_port);
             }
         }
         break;

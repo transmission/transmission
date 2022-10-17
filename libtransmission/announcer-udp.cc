@@ -48,11 +48,11 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
 {
     if (sa->sa_family == AF_INET)
     {
-        TR_DISCARD_ALIGN(sa, struct sockaddr_in*)->sin_port = port.network();
+        reinterpret_cast<sockaddr_in*>(sa)->sin_port = port.network();
     }
     else if (sa->sa_family == AF_INET6)
     {
-        TR_DISCARD_ALIGN(sa, struct sockaddr_in6*)->sin6_port = port.network();
+        reinterpret_cast<sockaddr_in6*>(sa)->sin6_port = port.network();
     }
 }
 

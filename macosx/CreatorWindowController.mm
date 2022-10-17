@@ -199,8 +199,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
         URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
     if (!self.fLocation)
     {
-        //for 2.5 and earlier
-#warning we still store "CreatorLocation" in Defaults.plist, and not "CreatorLocationURL"
+        //Compatibility with Transmission 2.5 and earlier,
+        //when it was "CreatorLocation" and not "CreatorLocationURL"
         NSString* location = [self.fDefaults stringForKey:@"CreatorLocation"];
         self.fLocation = [[NSURL alloc]
             initFileURLWithPath:[location.stringByExpandingTildeInPath
@@ -671,7 +671,6 @@ NSMutableSet* creatorWindowControllerSet = nil;
     [self.fTimer invalidate];
     self.fTimer = nil;
 
-    auto success = false;
     tr_error* error = self.fFuture.get();
     if (error == nullptr)
     {
@@ -688,7 +687,6 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
         alert.informativeText = [NSString stringWithFormat:@"%s (%d)", error->message, error->code];
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
-            [alert.window orderOut:nil];
             [self.window close];
         }];
         tr_error_free(error);

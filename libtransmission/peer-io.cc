@@ -39,7 +39,7 @@
 #define EPIPE WSAECONNRESET
 #endif
 
-/* The amount of read bufferring that we allow for uTP sockets. */
+/* The amount of read bufferring that we allow for µTP sockets. */
 
 static constexpr auto UtpReadBufferSize = 256 * 1024;
 
@@ -82,7 +82,7 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
         auto& [n_bytes_left, is_piece_data] = io->outbuf_info.front();
 
         unsigned int const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
-        /* For uTP sockets, the overhead is computed in utp_on_overhead. */
+        /* For µTP sockets, the overhead is computed in utp_on_overhead. */
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
@@ -319,7 +319,7 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 }
 
 #ifdef WITH_UTP
-/* UTP callbacks */
+/* µTP callbacks */
 
 void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
@@ -414,7 +414,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
         {
             fmt::print(
                 stderr,
-                FMT_STRING("[utp] [{}:{}] [{}] io is null! buf={}, len={}, flags={}, send/error_code/state={}, type={}\n"),
+                FMT_STRING("[µTP] [{}:{}] [{}] io is null! buf={}, len={}, flags={}, send/error_code/state={}, type={}\n"),
                 fmt::ptr(args->context),
                 fmt::ptr(args->socket),
                 utp_callback_names[args->callback_type],
@@ -506,7 +506,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 #ifdef WITH_UTP
 
     case TR_PEER_SOCKET_TYPE_UTP:
-        tr_logAddTraceIo(io, fmt::format("socket (utp) is {}", fmt::ptr(socket.handle.utp)));
+        tr_logAddTraceIo(io, fmt::format("socket (µTP) is {}", fmt::ptr(socket.handle.utp)));
         utp_set_userdata(socket.handle.utp, io.get());
         break;
 

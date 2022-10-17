@@ -655,7 +655,7 @@ jsonsl_feed(jsonsl_t jsn, const jsonsl_char_t *bytes, size_t nbytes)
             state->nelem = 0;
             jsn->can_insert = 1;
             if (CUR_CHAR == '{') {
-                /* If we're a hash, we expect a key first, which is quouted */
+                /* If we're a hash, we expect a key first, which is quoted */
                 jsn->expecting = '"';
             }
             if (CUR_CHAR == JSONSL_T_OBJECT) {

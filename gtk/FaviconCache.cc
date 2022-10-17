@@ -10,6 +10,8 @@
 
 #include <glib/gstdio.h> /* g_remove() */
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
 #include <libtransmission/web-utils.h>
@@ -33,7 +35,7 @@ struct favicon_data
 
 Glib::ustring get_url(std::string const& host, size_t image_type)
 {
-    return gtr_sprintf("http://%s/favicon.%s", host, image_types[image_type]);
+    return fmt::format("http://{}/favicon.{}", host, image_types[image_type]);
 }
 
 std::string favicon_get_cache_dir()

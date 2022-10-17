@@ -125,8 +125,10 @@ void MainWindow::Impl::on_popup_menu([[maybe_unused]] double view_x, [[maybe_unu
         auto const menu = gtr_action_get_object<Gio::Menu>("main-window-popup");
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
-        popup_menu_ = Gtk::make_managed<Gtk::PopoverMenu>(menu);
+        popup_menu_ = Gtk::make_managed<Gtk::PopoverMenu>(menu, Gtk::PopoverMenu::Flags::NESTED);
         popup_menu_->set_parent(window_);
+        popup_menu_->set_has_arrow(false);
+        popup_menu_->set_halign(window_.get_direction() == Gtk::TextDirection::RTL ? Gtk::Align::END : Gtk::Align::START);
 #else
         popup_menu_ = Gtk::make_managed<Gtk::Menu>(menu);
         popup_menu_->attach_to_widget(window_);

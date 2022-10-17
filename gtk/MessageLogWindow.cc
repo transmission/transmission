@@ -123,14 +123,15 @@ bool MessageLogWindow::Impl::is_pinned_to_new() const
 
 void MessageLogWindow::Impl::scroll_to_bottom()
 {
-    if (sort_ != nullptr)
+    auto const row_count = sort_->children().size();
+    if (row_count == 0)
     {
-        auto const row_count = sort_->children().size();
+        return;
+    }
 
-        if (auto const iter = sort_->children()[row_count - 1]; iter)
-        {
-            view_->scroll_to_row(sort_->get_path(TR_GTK_TREE_MODEL_CHILD_ITER(iter)), 1);
-        }
+    if (auto const iter = sort_->children()[row_count - 1]; iter)
+    {
+        view_->scroll_to_row(sort_->get_path(TR_GTK_TREE_MODEL_CHILD_ITER(iter)), 1);
     }
 }
 
@@ -207,7 +208,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
             auto const it = level_names_.find(node->level);
             auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
 
-            fprintf(fp, "%s\t%s\t%s\t%s\n", date.c_str(), level_str, node->name.c_str(), node->message.c_str());
+            fmt::print(fp, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }
 
         fclose(fp);
@@ -446,12 +447,14 @@ MessageLogWindow::Impl::Impl(
     : window_(window)
     , core_(core)
     , view_(gtr_get_widget<Gtk::TreeView>(builder, "messages_view"))
-    , level_names_{ { { TR_LOG_CRITICAL, _("Critical") },
-                      { TR_LOG_ERROR, _("Error") },
-                      { TR_LOG_WARN, _("Warning") },
-                      { TR_LOG_INFO, _("Information") },
-                      { TR_LOG_DEBUG, _("Debug") },
-                      { TR_LOG_TRACE, _("Trace") } } }
+    , level_names_{ {
+          { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
+          { TR_LOG_ERROR, C_("Logging level", "Error") },
+          { TR_LOG_WARN, C_("Logging level", "Warning") },
+          { TR_LOG_INFO, C_("Logging level", "Information") },
+          { TR_LOG_DEBUG, C_("Logging level", "Debug") },
+          { TR_LOG_TRACE, C_("Logging level", "Trace") },
+      } }
 {
     /**
     ***  toolbar

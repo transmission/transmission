@@ -59,7 +59,8 @@ static auto constexpr CryptoProvideCrypto = int{ 2 };
 
 // "VC is a verification constant that is used to verify whether the
 // other side knows S and SKEY and thus defeats replay attacks of the
-// SKEY hash. As of this version VC is a String of 8 bytes set to 0x00.
+// SKEY hash. As of this version VC is a String of 8 bytes set to 0x00."
+// https://wiki.vuze.com/w/Message_Stream_Encryption
 using vc_t = std::array<std::byte, 8>;
 static auto constexpr VC = vc_t{};
 
@@ -236,7 +237,7 @@ static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* 
     /* Note that this doesn't depend on whether the torrent is private.
      * We don't accept DHT peers for a private torrent,
      * but we participate in the DHT regardless. */
-    if (handshake->mediator->isDHTEnabled())
+    if (handshake->mediator->allowsDHT())
     {
         HANDSHAKE_SET_DHT(walk);
     }
@@ -1063,12 +1064,12 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 
     if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)
     {
-        // the peer probably doesn't speak uTP.
+        // the peer probably doesn't speak µTP.
 
         auto const hash = io->torrentHash();
         auto const info = hash ? handshake->mediator->torrentInfo(*hash) : std::nullopt;
 
-        /* Don't mark a peer as non-uTP unless it's really a connect failure. */
+        /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
         {
             handshake->mediator->setUTPFailed(*hash, io->address());

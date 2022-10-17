@@ -10,6 +10,8 @@
 #include <giomm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include "Notify.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -123,7 +125,7 @@ void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 
     if (proxy == nullptr)
     {
-        g_warning("Failed to create proxy for %s", NotificationsDbusName.c_str());
+        g_warning("%s", fmt::format(_("Couldn't create proxy for '{bus}'"), fmt::arg("bus", NotificationsDbusName)).c_str());
         return;
     }
 

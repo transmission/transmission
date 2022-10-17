@@ -14,6 +14,7 @@
           <object class="GtkToolbar" id="toolbar">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="show-arrow">False</property>
             <child>
               <object class="GtkToolButton" id="open_file_button">
                 <property name="visible">True</property>

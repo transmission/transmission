@@ -27,7 +27,7 @@
 #include "utils.h"
 
 /* Since we use a single UDP socket in order to implement multiple
-   uTP sockets, try to set up huge buffers. */
+   µTP sockets, try to set up huge buffers. */
 
 static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
 static auto constexpr SendBufferSize = 1 * 1024 * 1024;
@@ -88,6 +88,11 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 #endif
         }
     }
+}
+
+void tr_session::tr_udp_core::addDhtNode(tr_address const& addr, tr_port port)
+{
+    tr_dhtAddNode(addr, port, false);
 }
 
 void tr_session::tr_udp_core::set_socket_buffers()
@@ -191,12 +196,12 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     int const
         rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
 
-    /* Since most packets we receive here are ÂµTP, make quick inline
+    /* Since most packets we receive here are µTP, make quick inline
        checks for the other protocols. The logic is as follows:
        - all DHT packets start with 'd'
        - all UDP tracker packets start with a 32-bit (!) "action", which
          is between 0 and 3
-       - the above cannot be ÂµTP packets, since these start with a 4-bit
+       - the above cannot be µTP packets, since these start with a 4-bit
          version number (1). */
     if (rc > 0)
     {
@@ -228,10 +233,10 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     }
 }
 
-tr_session::tr_udp_core::tr_udp_core(tr_session& session)
-    : session_{ session }
+tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
+    : udp_port_{ udp_port }
+    , session_{ session }
 {
-    udp_port_ = session_.peerPort();
     if (std::empty(udp_port_))
     {
         return;
@@ -322,7 +327,7 @@ void tr_session::tr_udp_core::dhtUpkeep()
     }
 }
 
-void tr_session::tr_udp_core::dhtUninit()
+void tr_session::tr_udp_core::startShutdown()
 {
     if (tr_dhtEnabled())
     {
@@ -332,7 +337,7 @@ void tr_session::tr_udp_core::dhtUninit()
 
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    dhtUninit();
+    startShutdown();
 
     if (udp_socket_ != TR_BAD_SOCKET)
     {

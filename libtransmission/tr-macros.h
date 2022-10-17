@@ -60,9 +60,6 @@
 
 #define TR_PATH_DELIMITER '/'
 
-/* Only use this macro to suppress false-positive alignment warnings */
-#define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
-
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_ADDRSTRLEN 64
