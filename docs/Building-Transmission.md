@@ -2,14 +2,39 @@
 The source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download/).
 
 ## On macOS ##
-Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode. Make sure you have this software:
+Software prerequisites:
  * macOS 10.14.4 or newer
  * Xcode 11.3.1 or newer
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
+```console
+git clone --recurse-submodules https://github.com/transmission/transmission Transmission
+```
 
 If building from source is too daunting for you, check out the [nightly builds](https://build.transmissionbt.com/job/trunk-mac/).
 (Note: These are untested snapshots. Use them with care.)
+
+### Building the native app with Xcode ###
+Transmission has an Xcode project file for building in Xcode. 
+- Open Transmission.xcodeproj
+- Run the Transmission scheme
+
+### Building the native app with ninja ###
+Build the app:
+```console
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+ninja -C build transmission-mac
+open ./build/macosx/Transmission.app
+```
+
+### Building the GTK app with ninja ###
+Install GTK and build the app:
+```console
+brew install gtk4 gtkmm4
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_GTK=ON -DENABLE_MAC=OFF
+ninja -C build transmission-gtk
+./build/gtk/transmission-gtk
+```
 
 ## On Unix ##
 ### Prerequisites ###
