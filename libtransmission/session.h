@@ -53,7 +53,6 @@ enum tr_auto_switch_state_t
 tr_peer_id_t tr_peerIdInit();
 
 struct event_base;
-struct evdns_base;
 
 class tr_lpd;
 class tr_port_forwarding;
@@ -156,11 +155,6 @@ private:
             session_.udp_core_->sendto(buf, buflen, addr, addrlen);
         }
 
-        [[nodiscard]] evdns_base* evdnsBase() const override
-        {
-            return session_.evdnsBase();
-        }
-
         [[nodiscard]] std::optional<tr_address> announceIP() const override
         {
             if (!session_.useAnnounceIP())
@@ -169,6 +163,11 @@ private:
             }
 
             return tr_address::fromString(session_.announceIP());
+        }
+
+        [[nodiscard]] libtransmission::Dns& dns() override
+        {
+            return *session_.dns_.get();
         }
 
     private:
@@ -308,11 +307,6 @@ public:
     [[nodiscard]] event_base* eventBase() noexcept
     {
         return event_base_.get();
-    }
-
-    [[nodiscard]] evdns_base* evdnsBase() noexcept
-    {
-        return evdns_base_.get();
     }
 
     [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept
@@ -954,8 +948,11 @@ private:
     std::string const torrent_dir_;
 
     std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
-    std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
+
+    // depends on: event_base_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
+
+    // depends on: event_base_
     std::unique_ptr<libtransmission::Dns> const dns_;
 
     /// trivial type fields
@@ -1109,7 +1106,7 @@ public:
     tr_bandwidth top_bandwidth_;
 
 private:
-    // relies on: udp_core_
+    // relies on: dns_, udp_core_
     AnnouncerUdpMediator announcer_udp_mediator_{ *this };
 
 public:

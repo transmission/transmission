@@ -2805,12 +2805,6 @@ tr_session::tr_session(std::string_view config_dir)
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , event_base_{ makeEventBase() }
-    , evdns_base_{ evdns_base_new(eventBase(), EVDNS_BASE_INITIALIZE_NAMESERVERS),
-                   [](evdns_base* dns)
-                   {
-                       // if zero, active requests will be aborted
-                       evdns_base_free(dns, 0);
-                   } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
     , session_id_{ tr_time }
