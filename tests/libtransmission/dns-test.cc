@@ -66,7 +66,7 @@ protected:
     struct event_base* event_base_ = nullptr;
 };
 
-TEST_F(EvDnsTest, hello)
+TEST_F(EvDnsTest, canLookup)
 {
     auto dns = EvDns{ event_base_ };
     auto done = false;
@@ -80,8 +80,35 @@ TEST_F(EvDnsTest, hello)
             std::cout << __FILE__ << ':' << __LINE__ << ' ' << ai << ' ' << ailen << std::endl;
         });
 
-    waitFor(event_base_, [&done](){ return done; });
+    waitFor(event_base_, [&done]() { return done; });
     EXPECT_TRUE(done);
+}
+
+TEST_F(EvDnsTest, canRequestWhilePending)
+{
+    auto dns = EvDns{ event_base_ };
+    auto n_done = size_t{ 0 };
+
+    dns.lookup(
+        "example.com",
+        time(nullptr),
+        [&n_done](struct sockaddr const* ai, int ailen)
+        {
+            ++n_done;
+            std::cout << __FILE__ << ':' << __LINE__ << ' ' << ai << ' ' << ailen << std::endl;
+        });
+
+    dns.lookup(
+        "example.com",
+        time(nullptr),
+        [&n_done](struct sockaddr const* ai, int ailen)
+        {
+            ++n_done;
+            std::cout << __FILE__ << ':' << __LINE__ << ' ' << ai << ' ' << ailen << std::endl;
+        });
+
+    waitFor(event_base_, [&n_done]() { return n_done >= 2U; });
+    EXPECT_EQ(2, n_done);
 }
 
 } // namespace libtransmission::test

@@ -27,7 +27,9 @@ public:
     class Hints
     {
     public:
-        Hints() {}
+        Hints()
+        {
+        }
         int ai_family = AF_UNSPEC;
         int ai_socktype = SOCK_DGRAM;
         int ai_protocol = IPPROTO_UDP;
@@ -52,7 +54,7 @@ public:
             return 0;
         }
 
-        [[nodiscard]] constexpr bool operator< (Hints const& that) const noexcept
+        [[nodiscard]] constexpr bool operator<(Hints const& that) const noexcept
         {
             return compare(that) < 0;
         }

@@ -49,12 +49,13 @@ private:
 public:
     EvDns(struct event_base* event_base)
         : evdns_base_{ evdns_base_new(event_base, EVDNS_BASE_INITIALIZE_NAMESERVERS),
-                   [](evdns_base* dns)
-                   {
-                       // if zero, active requests will be aborted
-                       evdns_base_free(dns, 0);
-                   } }
-    { }
+                       [](evdns_base* dns)
+                       {
+                           // if zero, active requests will be aborted
+                           evdns_base_free(dns, 0);
+                       } }
+    {
+    }
 
     ~EvDns() override
     {
@@ -84,7 +85,8 @@ public:
             cache_.erase(iter); // expired
         }
 
-        auto& pending = pending_[key];;
+        auto& pending = pending_[key];
+        ;
         pending.callbacks.push_back(std::move(callback));
         if (pending.request == nullptr)
         {
@@ -100,7 +102,7 @@ public:
     }
 
 private:
-    static void evcallback(int /*result*/, struct evutil_addrinfo *res, void *varg)
+    static void evcallback(int /*result*/, struct evutil_addrinfo* res, void* varg)
     {
         auto* const arg = static_cast<CallbackArg*>(varg);
         auto [key, self] = *arg;
@@ -132,7 +134,7 @@ private:
         }
     }
 
-    std::unique_ptr<evdns_base, void(*)(evdns_base*)> const evdns_base_;
+    std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
     std::map<Key, CacheEntry> cache_;
     std::map<Key, Pending> pending_;
 };
