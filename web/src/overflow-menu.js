@@ -248,6 +248,7 @@ export class OverflowMenu extends EventTarget {
     // fullscreen
 
     div = document.createElement('div');
+    div.classList.add('table-row');
     options.append(div);
 
     check = document.createElement('input');
