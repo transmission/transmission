@@ -2136,7 +2136,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
 
     if (config.json)
     {
-        fmt::print(response);
+        fmt::print("{:s}\n", response);
         return status;
     }
 
