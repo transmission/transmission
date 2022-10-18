@@ -577,7 +577,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             break;
 
         case '"':
-            out.append(R"(")"sv);
+            out.append(R"(\")"sv);
             break;
 
         case '\\':
