@@ -33,10 +33,10 @@
 "1204.title" = "Dock simgesinde göster:";
 
 /* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
-"1205.title" = "Toplam indirme oranı";
+"1205.title" = "Toplam indirme hızı";
 
 /* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
-"1206.title" = "Toplam gönderme oranı";
+"1206.title" = "Toplam karşıya yükleme hızı";
 
 /* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
 "1207.title" = "Yalnızca aktarımlar indirilirken";
@@ -90,7 +90,7 @@
 "1232.title" = "Şu oranda beslemeyi durdur:";
 
 /* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
-"1234.title" = "Limitler:";
+"1234.title" = "Sınırlar:";
 
 /* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
 "1235.title" = "Karşıya yüklemeler ve indirmelerin birbirlerine bölümü oranı verir";
@@ -129,10 +129,10 @@
 "1255.title" = "Sistem uykusu:";
 
 /* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
-"1265.title" = "Gönderme oranı:";
+"1265.title" = "Karşıya yükleme hızı:";
 
 /* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
-"1267.title" = "İndirme oranı:";
+"1267.title" = "İndirme hızı:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
 "1268.title" = "KB/sn";
@@ -141,7 +141,7 @@
 "1269.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
-"1270.title" = "Genel bant genişliği limitleri:";
+"1270.title" = "Genel bant genişliği sınırları:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
 "1273.title" = "KB/sn";
@@ -150,19 +150,19 @@
 "1274.title" = "KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
-"1275.title" = "Hız Limiti Kipi:";
+"1275.title" = "Hız Sınırı Kipi:";
 
 /* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
-"1276.title" = "Gönderme oranı:";
+"1276.title" = "Karşıya yükleme hızı:";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
 "1277.title" = "İndirme oranı:";
 
 /* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
-"1278.title" = "Hız Limiti Genel Bant Genişliğini etkisiz kılar";
+"1278.title" = "Hız Sınırı, Genel Bant Genişliğini etkisiz kılar";
 
 /* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
-"1280.title" = "Hız Limitini düzenli kıl:";
+"1280.title" = "Hız Sınırını düzenli kıl:";
 
 /* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
 "1281.title" = "arası";
@@ -186,7 +186,7 @@
 "1338.title" = "Pencere ekle:";
 
 /* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
-"1340.title" = "Yalnızca birden çok dosya var ise";
+"1340.title" = "Yalnızca birden çok dosya varsa";
 
 /* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
 "1437.title" = "Güncelle";
@@ -201,7 +201,7 @@
 "1440.title" = "Kara dizelgedeki kullanıcıların bağlanmasına izin verme";
 
 /* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
-"1441.title" = "Yüksek bağlantı limitleri sistem başarımını önemli ölçüde etkiler";
+"1441.title" = "Yüksek bağlantı sınırları, sistem başarımını önemli ölçüde etkiler";
 
 /* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
 "1442.title" = "Genel torrentler için kullanıcı değişimi (PEX) kullan";
@@ -228,10 +228,10 @@
 "1453.title" = "Şifreleme:";
 
 /* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
-"1454.title" = "Şifrelemesiz kullanıcıları yoksay ";
+"1454.title" = "Şifrelemesiz kullanıcıları yok say ";
 
 /* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
-"1477.title" = "Yalnızca el ile eklerken";
+"1477.title" = "Yalnızca elle eklerken";
 
 /* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
 "1493.title" = "Dinleme kapısı:";
@@ -345,7 +345,7 @@
 "1931.title" = "Mıknatıs bağlantılar için:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
-"1933.title" = "Varsayılan Uygulamayı Belirle";
+"1933.title" = "Saptanmış Uygulamayı Belirle";
 
 /* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
 "1940.title" = ".part parçacıklarını bitmemiş dosyalara iliştir";

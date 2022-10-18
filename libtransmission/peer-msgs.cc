@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
-#include <chrono>
 #include <cstring>
 #include <ctime>
 #include <iterator>
@@ -24,8 +23,8 @@
 #include "transmission.h"
 
 #include "cache.h"
-#include "crypto-utils.h"
 #include "completion.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
 #include "peer-io.h"
@@ -33,6 +32,7 @@
 #include "peer-msgs.h"
 #include "quark.h"
 #include "session.h"
+#include "timer.h"
 #include "torrent-magnet.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -264,7 +264,7 @@ public:
     {
         if (torrent->allowsPex())
         {
-            pex_timer_ = torrent->session->timerMaker().create([this]() { sendPex(); });
+            pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
             pex_timer_->startRepeating(SendPexInterval);
         }
 
@@ -281,12 +281,12 @@ public:
 
         tellPeerWhatWeHave(this);
 
-        if (tr_dhtEnabled(torrent->session) && io->supportsDHT())
+        if (session->allowsDHT() && io->supportsDHT())
         {
-            /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
-            if (io->address().isIPv4() || tr_globalIPv6(nullptr) != nullptr)
+            // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
+            if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
             {
-                protocolSendPort(this, tr_dhtPort(torrent->session));
+                protocolSendPort(this, session->udpPort());
             }
         }
 
@@ -913,7 +913,7 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
     auto& out = msgs->outMessages;
-    unsigned char const* ipv6 = tr_globalIPv6(msgs->io->session);
+    auto const ipv6 = tr_globalIPv6(msgs->io->session);
     static tr_quark version_quark = 0;
 
     if (msgs->clientSentLtepHandshake)
@@ -951,9 +951,9 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantInitDict(&val, 8);
     tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode() != TR_CLEAR_PREFERRED);
 
-    if (ipv6 != nullptr)
+    if (ipv6.has_value())
     {
-        tr_variantDictAddRaw(&val, TR_KEY_ipv6, ipv6, 16);
+        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &*ipv6, sizeof(*ipv6));
     }
 
     // http://bittorrent.org/beps/bep_0009.html
@@ -1688,7 +1688,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
             if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
-                tr_dhtAddNode(msgs->session, &msgs->io->address(), msgs->dht_port, false);
+                msgs->session->addDhtNode(msgs->io->address(), msgs->dht_port);
             }
         }
         break;

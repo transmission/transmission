@@ -623,6 +623,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     toolbar.displayMode = NSToolbarDisplayModeIconOnly;
     self.fWindow.toolbar = toolbar;
 
+    if (@available(macOS 11.0, *))
+    {
+        self.fWindow.toolbarStyle = NSWindowToolbarStyleUnified;
+        self.fWindow.titleVisibility = NSWindowTitleHidden;
+    }
+
     self.fWindow.delegate = self; //do manually to avoid placement issue
 
     [self.fWindow makeFirstResponder:self.fTableView];
@@ -2658,8 +2664,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else if ([sortType isEqualToString:SORT_ACTIVITY])
     {
-        NSSortDescriptor* rateDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"totalRate" ascending:!asc];
-        NSSortDescriptor* activityDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"dateActivityOrAdd" ascending:!asc];
+        NSSortDescriptor* rateDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"totalRate" ascending:asc];
+        NSSortDescriptor* activityDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"dateActivityOrAdd" ascending:asc];
 
         descriptors = @[ rateDescriptor, activityDescriptor, nameDescriptor ];
     }
@@ -5184,7 +5190,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         height = NSHeight(self.fTableView.enclosingScrollView.frame);
     }
 
-    //make sure we dont go bigger that the screen height
+    //make sure we don't go bigger than the screen height
     NSScreen* screen = self.fWindow.screen;
     if (screen)
     {
@@ -5201,7 +5207,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
     }
 
-    //make sure we dont have zero height
+    //make sure we don't have zero height
     if (height < minHeight)
     {
         height = minHeight;

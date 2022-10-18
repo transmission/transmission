@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="transmission-gtk">
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow" id="MessageLogWindow">
+    <property name="title" translatable="1">Message Log</property>
+    <property name="default-width">750</property>
+    <property name="default-height">350</property>
+    <property name="child">
+      <object class="GtkBox" id="window_layout">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkBox" id="toolbar">
+            <property name="valign">center</property>
+            <property name="css-classes">toolbar
+horizontal</property>
+            <child>
+              <object class="GtkButton" id="save_as_button">
+                <property name="action-name">win.save-message-log</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="halign">center</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="icon-name">document-save-as</property>
+                        <property name="icon_size">normal</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="1">Save _As</property>
+                        <property name="single-line-mode">1</property>
+                        <property name="use-underline">1</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="clear_button">
+                <property name="action-name">win.clear-message-log</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="halign">center</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="icon-name">edit-clear</property>
+                        <property name="icon_size">normal</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="1">Clear</property>
+                        <property name="single-line-mode">1</property>
+                        <property name="use-underline">1</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="orientation">vertical</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="pause_button">
+                <property name="action-name">win.pause-message-log</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="halign">center</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="icon-name">media-playback-pause</property>
+                        <property name="icon_size">normal</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="1">P_ause</property>
+                        <property name="single-line-mode">1</property>
+                        <property name="use-underline">1</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="orientation">vertical</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="level_label">
+                <property name="label" translatable="1">Level</property>
+                <property name="use-underline">1</property>
+                <property name="mnemonic-widget">level_combo</property>
+                <property name="css-classes">tr-pad-normal</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkComboBox" id="level_combo">
+                <child>
+                  <object class="GtkCellRendererText" id="level_combo_renderer"/>
+                  <attributes>
+                    <attribute name="text">1</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="messages_view_scroll">
+            <property name="vexpand">1</property>
+            <property name="focusable">1</property>
+            <property name="has-frame">1</property>
+            <property name="child">
+              <object class="GtkTreeView" id="messages_view">
+                <property name="focusable">1</property>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection" id="messages_view_selection"/>
+                </child>
+              </object>
+            </property>
+            <style>
+              <class name="tr-message-log"/>
+            </style>
+          </object>
+        </child>
+      </object>
+    </property>
+  </object>
+</interface>

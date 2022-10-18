@@ -61,7 +61,7 @@ public:
         add(enabled);
     }
 
-    Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> icon;
+    Gtk::TreeModelColumn<Glib::RefPtr<Gio::Icon>> icon;
     Gtk::TreeModelColumn<Glib::ustring> label;
     Gtk::TreeModelColumn<Glib::ustring> label_esc;
     Gtk::TreeModelColumn<int> prog;
@@ -81,8 +81,6 @@ FileModelColumns const file_cols;
 class FileList::Impl
 {
 public:
-    Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
-    Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
     Impl(
         FileList& widget,
         Glib::RefPtr<Gtk::Builder> const& builder,
@@ -99,13 +97,13 @@ private:
     void clearData();
     void refresh();
 
-    bool getAndSelectEventPath(GdkEventButton const* event, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path);
+    bool getAndSelectEventPath(double view_x, double view_y, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path);
 
     std::vector<tr_file_index_t> getActiveFilesForPath(Gtk::TreeModel::Path const& path) const;
     std::vector<tr_file_index_t> getSelectedFilesAndDescendants() const;
     std::vector<tr_file_index_t> getSubtree(Gtk::TreeModel::Path const& path) const;
 
-    bool onViewButtonPressed(GdkEventButton const* event);
+    bool onViewButtonPressed(guint button, TrGdkModifierType state, double view_x, double view_y);
     bool onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel::Path const& path);
     void onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeViewColumn* col);
     void cell_edited_callback(Glib::ustring const& path_string, Glib::ustring const& newname);
@@ -238,7 +236,7 @@ bool refreshFilesForeach(
         {
             refresh_data.resort_needed = true;
 
-            store->set_sort_column(GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, Gtk::SORT_ASCENDING);
+            store->set_sort_column(GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, TR_GTK_SORT_TYPE(ASCENDING));
         }
     }
 
@@ -276,9 +274,9 @@ void gtr_tree_model_foreach_postorder_subtree(
     Gtk::TreeModel::iterator const& parent,
     Gtk::TreeModel::SlotForeachIter const& func)
 {
-    for (auto const& child : parent->children())
+    for (auto& child : parent->children())
     {
-        gtr_tree_model_foreach_postorder_subtree(child, func);
+        gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(child), func);
     }
 
     if (parent)
@@ -289,9 +287,9 @@ void gtr_tree_model_foreach_postorder_subtree(
 
 void gtr_tree_model_foreach_postorder(Glib::RefPtr<Gtk::TreeModel> const& model, Gtk::TreeModel::SlotForeachIter const& func)
 {
-    for (auto const& iter : model->children())
+    for (auto& iter : model->children())
     {
-        gtr_tree_model_foreach_postorder_subtree(iter, func);
+        gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(iter), func);
     }
 }
 
@@ -452,7 +450,7 @@ void buildTree(FileRowNode& node, build_data& build)
     bool const isLeaf = node.child_count() == 0;
 
     auto const mime_type = isLeaf ? tr_get_mime_type_for_filename(child_data.name.raw()) : DirectoryMimeType;
-    auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *build.w);
+    auto const icon = gtr_get_mime_type_icon(mime_type);
     auto const file = isLeaf ? tr_torrentFile(build.tor, child_data.index) : tr_file_view{};
     int const priority = isLeaf ? file.priority : 0;
     bool const enabled = isLeaf ? file.wanted : true;
@@ -472,7 +470,7 @@ void buildTree(FileRowNode& node, build_data& build)
     {
         build_data b = build;
         b.iter = child_iter;
-        node.foreach ([&b](auto& child_node) { buildTree(child_node, b); }, FileRowNode::TRAVERSE_ALL);
+        node.foreach ([&b](auto& child_node) { buildTree(child_node, b); }, TR_GLIB_NODE_TREE_TRAVERSE_FLAGS(FileRowNode, ALL));
     }
 }
 
@@ -546,7 +544,9 @@ void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
             build.w = &widget_;
             build.tor = tor;
             build.store = store_;
-            root.foreach ([&build](auto& child_node) { buildTree(child_node, build); }, FileRowNode::TRAVERSE_ALL);
+            root.foreach (
+                [&build](auto& child_node) { buildTree(child_node, build); },
+                TR_GLIB_NODE_TREE_TRAVERSE_FLAGS(FileRowNode, ALL));
         }
 
         refresh();
@@ -558,7 +558,7 @@ void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
     view_->set_model(store_);
 
     /* set default sort by label */
-    store_->set_sort_column(file_cols.label, Gtk::SORT_ASCENDING);
+    store_->set_sort_column(file_cols.label, TR_GTK_SORT_TYPE(ASCENDING));
 
     view_->expand_row(Gtk::TreeModel::Path("0"), false);
     // view_->expand_all();
@@ -571,14 +571,14 @@ void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
 namespace
 {
 
-void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::iterator const& iter)
+void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     auto const enabled = iter->get_value(file_cols.enabled);
     static_cast<Gtk::CellRendererToggle*>(renderer)->property_inconsistent() = enabled == MIXED;
     static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == true;
 }
 
-void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::iterator const& iter)
+void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     Glib::ustring text;
 
@@ -607,13 +607,14 @@ void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::iterator const&
 /* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
 std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const& iter)
 {
-    std::list<std::string> tokens;
+    std::vector<std::string> tokens;
     for (auto child = iter; child; child = child->parent())
     {
-        tokens.push_front(child->get_value(file_cols.label));
+        tokens.push_back(child->get_value(file_cols.label));
     }
 
-    tokens.emplace_front(tr_torrentGetCurrentDir(tor));
+    tokens.emplace_back(tr_torrentGetCurrentDir(tor));
+    std::reverse(tokens.begin(), tokens.end());
     return Glib::build_filename(tokens);
 }
 
@@ -632,12 +633,12 @@ void FileList::Impl::onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeV
 
             /* if the file's not done, walk up the directory tree until we find
              * an ancestor that exists, and open that instead */
-            if (!filename.empty() && (prog < 100 || !Glib::file_test(filename, Glib::FILE_TEST_EXISTS)))
+            if (!filename.empty() && (prog < 100 || !Glib::file_test(filename, TR_GLIB_FILE_TEST(EXISTS))))
             {
                 do
                 {
                     filename = Glib::path_get_dirname(filename);
-                } while (!filename.empty() && !Glib::file_test(filename, Glib::FILE_TEST_EXISTS));
+                } while (!filename.empty() && !Glib::file_test(filename, TR_GLIB_FILE_TEST(EXISTS)));
             }
 
             if (handled = !filename.empty(); handled)
@@ -707,12 +708,12 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
 /**
  * @note 'col' and 'path' are assumed not to be nullptr.
  */
-bool FileList::Impl::getAndSelectEventPath(GdkEventButton const* event, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path)
+bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path)
 {
     int cell_x;
     int cell_y;
 
-    if (view_->get_path_at_pos(event->x, event->y, path, col, cell_x, cell_y))
+    if (view_->get_path_at_pos(view_x, view_y, path, col, cell_x, cell_y))
     {
         if (auto const sel = view_->get_selection(); !sel->is_selected(path))
         {
@@ -726,14 +727,15 @@ bool FileList::Impl::getAndSelectEventPath(GdkEventButton const* event, Gtk::Tre
     return false;
 }
 
-bool FileList::Impl::onViewButtonPressed(GdkEventButton const* event)
+bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, double view_x, double view_y)
 {
     Gtk::TreeViewColumn* col;
     Gtk::TreeModel::Path path;
     bool handled = false;
 
-    if (event->type == GDK_BUTTON_PRESS && event->button == 1 && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == 0 &&
-        getAndSelectEventPath(event, col, path))
+    if (button == GDK_BUTTON_PRIMARY &&
+        (state & (TR_GDK_MODIFIED_TYPE(SHIFT_MASK) | TR_GDK_MODIFIED_TYPE(CONTROL_MASK))) == TrGdkModifierType{} &&
+        getAndSelectEventPath(view_x, view_y, col, path))
     {
         handled = onViewPathToggled(col, path);
     }
@@ -756,7 +758,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         {
             bool const isLeaf = iter->children().empty();
             auto const mime_type = isLeaf ? tr_get_mime_type_for_filename(newname.raw()) : DirectoryMimeType;
-            auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *view_);
+            auto const icon = gtr_get_mime_type_icon(mime_type);
 
             (*iter)[file_cols.label] = newname;
             (*iter)[file_cols.icon] = icon;
@@ -769,8 +771,8 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
     }
     else
     {
-        Gtk::MessageDialog w(
-            *static_cast<Gtk::Window*>(widget_.get_toplevel()),
+        auto w = std::make_shared<Gtk::MessageDialog>(
+            *static_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(widget_)),
             fmt::format(
                 _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
                 fmt::arg("old_path", path_string),
@@ -778,11 +780,12 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
                 fmt::arg("error", tr_strerror(error)),
                 fmt::arg("error_code", error)),
             false,
-            Gtk::MESSAGE_ERROR,
-            Gtk::BUTTONS_CLOSE,
+            TR_GTK_MESSAGE_TYPE(ERROR),
+            TR_GTK_BUTTONS_TYPE(CLOSE),
             true);
-        w.set_secondary_text(_("Please correct the errors and try again."));
-        w.run();
+        w->set_secondary_text(_("Please correct the errors and try again."));
+        w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
+        w->show();
     }
 
     return false;
@@ -839,12 +842,6 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
         rename_data.release());
 }
 
-FileList::FileList(Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
-    : Gtk::ScrolledWindow()
-    , impl_(std::make_unique<Impl>(*this, core, tor_id))
-{
-}
-
 FileList::FileList(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
@@ -856,23 +853,37 @@ FileList::FileList(
 {
 }
 
-FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id)
+FileList::Impl::Impl(
+    FileList& widget,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& view_name,
+    Glib::RefPtr<Session> const& core,
+    tr_torrent_id_t torrent_id)
     : widget_(widget)
     , core_(core)
-    , view_(view)
+    , view_(gtr_get_widget<Gtk::TreeView>(builder, view_name))
 {
     /* create the view */
-    view_->signal_button_press_event().connect(sigc::mem_fun(*this, &Impl::onViewButtonPressed), false);
     view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
-    view_->signal_button_release_event().connect([this](GdkEventButton* event)
-                                                 { return on_tree_view_button_released(view_, event); });
+    setup_tree_view_button_event_handling(
+        *view_,
+        [this](guint button, TrGdkModifierType state, double view_x, double view_y, bool /*context_menu_requested*/)
+        { return onViewButtonPressed(button, state, view_x, view_y); },
+        [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
 
     auto pango_font_description = view_->create_pango_context()->get_font_description();
-    pango_font_description.set_size(pango_font_description.get_size() * 0.8);
+    if (auto const new_size = pango_font_description.get_size() * 0.8; pango_font_description.get_size_is_absolute())
+    {
+        pango_font_description.set_absolute_size(new_size);
+    }
+    else
+    {
+        pango_font_description.set_size(new_size);
+    }
 
     /* set up view */
     auto const sel = view_->get_selection();
-    sel->set_mode(Gtk::SELECTION_MULTIPLE);
+    sel->set_mode(TR_GTK_SELECTION_MODE(MULTIPLE));
     view_->expand_all();
     view_->set_search_column(file_cols.label);
 
@@ -884,11 +895,16 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
         col->set_resizable(true);
         auto* icon_rend = Gtk::make_managed<Gtk::CellRendererPixbuf>();
         col->pack_start(*icon_rend, false);
-        col->add_attribute(icon_rend->property_pixbuf(), file_cols.icon);
+        col->add_attribute(icon_rend->property_gicon(), file_cols.icon);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        icon_rend->property_icon_size() = Gtk::IconSize::NORMAL;
+#else
+        icon_rend->property_stock_size() = Gtk::ICON_SIZE_MENU;
+#endif
         /* add text renderer */
         auto* text_rend = Gtk::make_managed<Gtk::CellRendererText>();
         text_rend->property_editable() = true;
-        text_rend->property_ellipsize() = Pango::ELLIPSIZE_END;
+        text_rend->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
         text_rend->property_font_desc() = pango_font_description;
         text_rend->signal_edited().connect(sigc::mem_fun(*this, &Impl::cell_edited_callback));
         col->pack_start(*text_rend, true);
@@ -900,13 +916,13 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
     {
         /* add "size" column */
         auto* rend = Gtk::make_managed<Gtk::CellRendererText>();
-        rend->property_alignment() = Pango::ALIGN_RIGHT;
+        rend->property_alignment() = TR_PANGO_ALIGNMENT(RIGHT);
         rend->property_font_desc() = pango_font_description;
         rend->property_xpad() = GUI_PAD;
         rend->property_xalign() = 1.0F;
         rend->property_yalign() = 0.5F;
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(_("Size"), *rend);
-        col->set_sizing(Gtk::TREE_VIEW_COLUMN_GROW_ONLY);
+        col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(GROW_ONLY));
         col->set_sort_column(file_cols.size);
         col->add_attribute(rend->property_text(), file_cols.size_str);
         view_->append_column(*col);
@@ -924,7 +940,7 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
         col->add_attribute(rend->property_text(), file_cols.prog_str);
         col->add_attribute(rend->property_value(), file_cols.prog);
         col->set_fixed_width(width);
-        col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+        col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_sort_column(file_cols.prog);
         view_->append_column(*col);
     }
@@ -940,7 +956,7 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
         col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.enabled.index()));
         col->set_fixed_width(width);
-        col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+        col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_cell_data_func(*rend, sigc::ptr_fun(&renderDownload));
         col->set_sort_column(file_cols.enabled);
         view_->append_column(*col);
@@ -959,7 +975,7 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
         col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.priority.index()));
         col->set_fixed_width(width);
-        col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+        col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_sort_column(file_cols.priority);
         col->set_cell_data_func(*rend, sigc::ptr_fun(&renderPriority));
         view_->append_column(*col);
@@ -969,28 +985,6 @@ FileList::Impl::Impl(FileList& widget, Gtk::TreeView* view, Glib::RefPtr<Session
     view_->set_tooltip_column(file_cols.label_esc.index());
 
     set_torrent(torrent_id);
-}
-
-FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id)
-    : Impl(widget, Gtk::make_managed<Gtk::TreeView>(), core, torrent_id)
-{
-    view_->set_border_width(GUI_PAD_BIG);
-
-    /* create the scrolled window and stick the view in it */
-    widget_.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    widget_.set_shadow_type(Gtk::SHADOW_IN);
-    widget_.add(*view_);
-    widget_.set_size_request(-1, 200);
-}
-
-FileList::Impl::Impl(
-    FileList& widget,
-    Glib::RefPtr<Gtk::Builder> const& builder,
-    Glib::ustring const& view_name,
-    Glib::RefPtr<Session> const& core,
-    tr_torrent_id_t torrent_id)
-    : Impl(widget, gtr_get_widget<Gtk::TreeView>(builder, view_name), core, torrent_id)
-{
 }
 
 FileList::~FileList() = default;

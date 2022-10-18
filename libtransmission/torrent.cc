@@ -122,7 +122,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     if (error != nullptr)
     {
         tor->setLocalError(fmt::format(
-            _("Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"),
+            _("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"),
             fmt::arg("path", filename),
             fmt::arg("magnet", tor->magnet()),
             fmt::arg("error", error->message),
@@ -712,9 +712,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     auto const& labels = tr_ctorGetLabels(ctor);
     tor->setLabels(labels);
 
-    tor->unique_id_ = session->torrents().add(tor);
-
-    tr_peerMgrAddTorrent(session->peerMgr, tor);
+    session->addTorrent(tor);
 
     TR_ASSERT(tor->downloadedCur == 0);
     TR_ASSERT(tor->uploadedCur == 0);

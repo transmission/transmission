@@ -68,13 +68,11 @@ NSString* urlString = nil;
 
 - (void)openURLEndSheet:(id)sender
 {
-    [self.window orderOut:sender];
     [NSApp endSheet:self.window returnCode:1];
 }
 
 - (void)openURLCancelEndSheet:(id)sender
 {
-    [self.window orderOut:sender];
     [NSApp endSheet:self.window returnCode:0];
 }
 

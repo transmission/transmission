@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <chrono>
 #include <iterator>
 #include <memory>
 #include <numeric> // std::accumulate()
@@ -24,8 +23,9 @@
 #include "cache.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
+#include "timer.h"
 #include "torrent.h"
-#include "trevent.h" /* tr_runInEventThread() */
+#include "trevent.h" // tr_runInEventThread()
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"
@@ -165,8 +165,8 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
-        , bandwidth_(&tor->bandwidth_)
-        , idle_timer(session->timerMaker().create([this]() { on_idle(this); }))
+        , bandwidth_{ &tor->bandwidth_ }
+        , idle_timer{ session->timerMaker().create([this]() { on_idle(this); }) }
     {
         idle_timer->startRepeating(IdleTimerInterval);
     }
@@ -525,7 +525,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     options.range = fmt::format(FMT_STRING("{:d}-{:d}"), file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor->id();
     options.buffer = task->content();
-    tor->session->web->fetch(std::move(options));
+    tor->session->fetch(std::move(options));
 }
 
 } // namespace

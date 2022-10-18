@@ -60,18 +60,12 @@
 
 #define TR_PATH_DELIMITER '/'
 
-/* Only use this macro to suppress false-positive alignment warnings */
-#define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
-
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_ADDRSTRLEN 64
 
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
-
-#define TR_PRIsv "*.*s"
-#define TR_PRIsv_ARG(sv) TR_ARG_TUPLE(int(std::size(sv)), int(std::size(sv)), std::data(sv))
 
 // https://www.bittorrent.org/beps/bep_0003.html
 // A string of length 20 which this downloader uses as its id. Each

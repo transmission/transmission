@@ -14,4 +14,4 @@
 extern std::string_view const DirectoryMimeType;
 extern std::string_view const UnknownMimeType;
 
-Glib::RefPtr<Gdk::Pixbuf> gtr_get_mime_type_icon(std::string_view mime_type, Gtk::IconSize icon_size, Gtk::Widget& for_widget);
+Glib::RefPtr<Gio::Icon> gtr_get_mime_type_icon(std::string_view mime_type);

@@ -3,6 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#ifndef LIBTRANSMISSION_WATCHDIR_MODULE
+#error only the wathcdir module should #include this header.
+#endif
+
 #pragma once
 
 #include <algorithm>

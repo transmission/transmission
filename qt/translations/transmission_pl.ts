@@ -61,19 +61,19 @@
         <source>I &amp;Agree</source>
         <translation>&amp;Zgadzam się</translation>
     </message>
-    <message>
-        <location line="+132"/>
-        <source>Torrent Added</source>
-        <translation>Dodano torrent</translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Ukończono torrent</numerusform>
             <numerusform>Ukończono torrenty</numerusform>
             <numerusform>Ukończono torrenty</numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation>Dodano torrent</translation>
     </message>
 </context>
 <context>
@@ -218,8 +218,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Partner jest połączeniem przychodzącym</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation>Partner jest połączony przez µTP</translation>
+    </message>
     <message numerus="yes">
-        <location line="+132"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -229,12 +234,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation>Dodaj adresy URL</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>Dodanie adresów URL ogłoszenia serwera śledzącego, jeden na wiersz:</translation>
     </message>
@@ -249,7 +249,7 @@
         <translation>Nie odnaleziono nowych adresów URL.</translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-834"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -278,12 +278,12 @@
         <translation>Nie dotyczy</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Partner jest połączony przez µTP</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation>Dodaj adres(y) URL</translation>
     </message>
     <message>
-        <location line="+260"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>Wysoki</translation>
     </message>
@@ -636,7 +636,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
+        <source>Rename…</source>
         <translation>Zmień nazwę…</translation>
     </message>
 </context>
@@ -689,8 +689,8 @@
         <translation>Wyświetlanie:</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Search...</source>
+        <location line="+11"/>
+        <source>Search…</source>
         <translation>Wyszukaj…</translation>
     </message>
 </context>
@@ -780,13 +780,13 @@
         <translation>Brak</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location filename="../Formatter.h" line="+64"/>
         <location line="+7"/>
         <source>%1 %2</source>
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+21"/>
+        <location filename="../Formatter.cc" line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln dzień</numerusform>
@@ -795,7 +795,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-5"/>
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln godzina</numerusform>
@@ -804,7 +804,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln minuta</numerusform>
@@ -813,7 +813,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln sekunda</numerusform>
@@ -821,19 +821,12 @@
             <numerusform>%Ln sekund</numerusform>
         </translation>
     </message>
-    <message>
-        <location line="+12"/>
-        <location line="+11"/>
-        <location line="+11"/>
-        <source>%1, %2</source>
-        <translation>%1, %2</translation>
-    </message>
 </context>
 <context>
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
         <translation>&lt;i&gt;Obliczanie wolnego miejsca…&lt;/i&gt;</translation>
     </message>
     <message>
@@ -883,12 +876,7 @@
         <translation>&amp;Plik</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Nowy…</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Tworzy nowy torrent</translation>
     </message>
@@ -924,7 +912,7 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
+        <source>&amp;Open…</source>
         <translation>&amp;Otwórz…</translation>
     </message>
     <message>
@@ -938,7 +926,12 @@
         <translation>Otwiera torrent</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation>&amp;Nowy…</translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Otwórz &amp;katalog</translation>
     </message>
@@ -1175,32 +1168,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
+        <source>&amp;Change Session…</source>
         <translation>&amp;Zmień sesję…</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation>Ustaw p_ołożenie…</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation>Otwórz adres &amp;URL…</translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Wybierz sesję</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Ustaw p&amp;ołożenie…</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Skopiuj odnośnik &amp;magnet do schowka</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>Otwórz adres &amp;URL…</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Wsparcie finansowe</translation>
     </message>
@@ -1455,12 +1448,12 @@
         <translation>Nowy torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+227"/>
+        <location filename="../MakeDialog.cc" line="+304"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Nie wybrano źródła&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+5"/>
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln plik</numerusform>
@@ -1503,7 +1496,12 @@
         <translation>&amp;Plik źródłowy:</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+36"/>
+        <source>Piece s&amp;ize:</source>
+        <translation>Roz&amp;miar części:</translation>
+    </message>
+    <message>
+        <location line="+31"/>
         <source>Properties</source>
         <translation>Właściwości</translation>
     </message>
@@ -1543,7 +1541,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Nowy torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-106"/>
+        <location filename="../MakeDialog.cc" line="-184"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>Tworzenie „%1”</translation>
     </message>
@@ -1555,23 +1553,23 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można utworzyć „%1”: %2 (%3)</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+63"/>
+        <location filename="../OptionsDialog.cc" line="+52"/>
         <source>Open Torrent</source>
         <translation>Otwarcie torrenta</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-10"/>
         <source>Open Torrent from File</source>
         <translation>Otwarcie torrenta z&#xa0;pliku</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
         <translation>Otwarcie torrenta z&#xa0;adresu URL lub odnośnika magnet</translation>
     </message>
@@ -1586,7 +1584,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Katalog &amp;docelowy:</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
         <translation>Wysoki</translation>
     </message>
@@ -1753,7 +1751,12 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Port jest &lt;b&gt;zamknięty&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation>Testowanie portu TCP…</translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>Wybór skryptu „Ukończono pobieranie torrenta”</translation>
     </message>
@@ -1783,16 +1786,6 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <source>Options</source>
         <translation>Opcje</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Kom&amp;unikacja z&#xa0;partnerami przez µTP</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>µTP umożliwia zmniejszenie przeciążenia sieci</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1819,7 +1812,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>&amp;Automatyczne dodawanie plików .torrent z:</translation>
     </message>
@@ -1892,22 +1885,8 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <source>Maximum peers &amp;overall:</source>
         <translation>&amp;Maksymalna liczba partnerów:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Zaktualizowano.&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln regułę.</numerusform>
-            <numerusform>&lt;b&gt;Zaktualizowano.&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguły.</numerusform>
-            <numerusform>&lt;b&gt;Zaktualizowano.&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguł.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Aktualizacja listy blokowania&lt;/b&gt;&lt;p&gt;Pobieranie nowej listy blokowania…</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Lista blokowania</translation>
     </message>
@@ -1917,7 +1896,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>&amp;Automatyczne aktualizowanie</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Zezwolenie</translation>
     </message>
@@ -2038,7 +2017,17 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Wywołanie &amp;skryptu po ukończeniu wysyłania:</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation>µTP to narzędzie do zmniejszania przeciążenia sieci.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation>Włącz µ&amp;TP do komunikacji równorzędnej</translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation>Domyślne publiczne serwery śledzące</translation>
     </message>
@@ -2073,12 +2062,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>&amp;Dźwięk po ukończeniu torrenta</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>Testowanie portu TCP…</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Ograniczenia partnerów</translation>
     </message>
@@ -2118,7 +2102,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Szyfrowanie</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Wybór katalogu na nieukończone torrenty</translation>
     </message>
@@ -2127,8 +2111,22 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <source>Select Watch Directory</source>
         <translation>Wybór obserwowanego katalogu</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation>
+            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln regułę.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguły.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguł.&lt;/p&gt;</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation>&lt;b&gt;Aktualizacja listy blokowania&lt;/b&gt;&lt;p&gt;Pobieranie nowej listy blokowania…&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Wybór miejsca docelowego</translation>
     </message>
@@ -2197,12 +2195,12 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-277"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Nieprawidłowa opcja</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+307"/>
         <source>Start Now</source>
         <translation>Rozpocznij teraz</translation>
     </message>
@@ -2243,7 +2241,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+499"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Błąd podczas zmieniania nazwy ścieżki</translation>
     </message>
@@ -2266,18 +2264,18 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Podwójny torrent</numerusform>
-            <numerusform>Podwójne torrenty</numerusform>
-            <numerusform>Podwójne torrenty</numerusform>
+            <numerusform>Zduplikowany torrent</numerusform>
+            <numerusform>Zduplikowane torrenty</numerusform>
+            <numerusform>Zduplikowane torrenty</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>Nie można dodać %n podwójnego torrenta</numerusform>
-            <numerusform>Nie można dodać %n podwójnych torrentów</numerusform>
-            <numerusform>Nie można dodać %n podwójnych torrentów</numerusform>
+            <numerusform>Nie można dodać %n zduplikowanego torrenta</numerusform>
+            <numerusform>Nie można dodać %n zduplikowanych torrentów</numerusform>
+            <numerusform>Nie można dodać %n zduplikowanych torrentów</numerusform>
         </translation>
     </message>
 </context>
@@ -2383,7 +2381,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Sprawdzanie pobranych danych</translation>
     </message>
@@ -2602,13 +2600,13 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>W&#xa0;kolejce do wysłania zapytania o&#xa0;więcej partnerów</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Wysyłanie zapytania o&#xa0;więcej partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Wysyłanie zapytania o&#xa0;liczbę partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2640,7 +2638,13 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>Otrzymano błąd „scrape” %1„%2”%3 %4 temu</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation>Wysyłanie zapytania o&#xa0;więcej partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Wysyłanie zapytania o&#xa0;liczbę partnerów za %1</translation>
@@ -2649,12 +2653,6 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>W&#xa0;kolejce do wysłania zapytania o&#xa0;liczbę partnerów</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Wysyłanie zapytania o&#xa0;liczbę partnerów… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

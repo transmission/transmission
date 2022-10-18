@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstdio>
 #include <map>
 #include <mutex>
@@ -124,10 +125,11 @@ void logAddImpl(
     }
 
 #ifdef NDEBUG
-    __android_log_print(prio, "transmission", "%" TR_PRIsv, TR_PRIsv_ARG(msg));
+    auto const szmsg = fmt::format("{:s}", msg);
 #else
-    __android_log_print(prio, "transmission", "[%s:%d] %" TR_PRIsv, file, line, TR_PRIsv_ARG(msg));
+    auto const szmsg = fmt::format("[{:s}:{:d}] {:s}", file, line, msg);
 #endif
+    __android_log_write(prio, "transmission", szmsg.c_str());
 
 #else
 

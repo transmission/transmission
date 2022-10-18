@@ -39,7 +39,7 @@
 #define EPIPE WSAECONNRESET
 #endif
 
-/* The amount of read bufferring that we allow for uTP sockets. */
+/* The amount of read bufferring that we allow for µTP sockets. */
 
 static constexpr auto UtpReadBufferSize = 256 * 1024;
 
@@ -82,7 +82,7 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
         auto& [n_bytes_left, is_piece_data] = io->outbuf_info.front();
 
         unsigned int const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
-        /* For uTP sockets, the overhead is computed in utp_on_overhead. */
+        /* For µTP sockets, the overhead is computed in utp_on_overhead. */
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
@@ -256,73 +256,48 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
 
-    auto const dir = TR_UP;
-    auto res = int{ 0 };
-    auto what = short{ BEV_EVENT_WRITING };
-
     io->pendingEvents &= ~EV_WRITE;
 
     tr_logAddTraceIo(io, "libevent says this peer is ready to write");
 
     /* Write as much as possible, since the socket is non-blocking, write() will
      * return if it can't write any more data without blocking */
-    auto const howmuch = io->bandwidth().clamp(dir, std::size(io->outbuf));
+    auto constexpr Dir = TR_UP;
+    auto const howmuch = io->bandwidth().clamp(Dir, std::size(io->outbuf));
 
-    /* if we don't have any bandwidth left, stop writing */
+    // if we don't have any bandwidth left, stop writing
     if (howmuch < 1)
     {
-        io->setEnabled(dir, false);
+        io->setEnabled(Dir, false);
         return;
     }
 
     EVUTIL_SET_SOCKET_ERROR(0);
-    res = tr_evbuffer_write(io, fd, howmuch);
-    int const e = EVUTIL_SOCKET_ERROR();
+    auto const n_written = tr_evbuffer_write(io, fd, howmuch); // -1 on err, 0 on EOF
+    auto const err = EVUTIL_SOCKET_ERROR();
+    auto const should_retry = n_written == -1 && (err == 0 || err == EAGAIN || err == EINTR || err == EINPROGRESS);
 
-    if (res == -1)
+    // schedule another write if we have more data to write & think future writes would succeed
+    if (!std::empty(io->outbuf) && (n_written > 0 || should_retry))
     {
-        if (e == 0 || e == EAGAIN || e == EINTR || e == EINPROGRESS)
+        io->setEnabled(Dir, true);
+    }
+
+    if (n_written > 0)
+    {
+        didWriteWrapper(io, n_written);
+    }
+    else
+    {
+        auto const what = n_written == -1 ? BEV_EVENT_WRITING | BEV_EVENT_ERROR : BEV_EVENT_WRITING | BEV_EVENT_EOF;
+        auto const errmsg = tr_net_strerror(err);
+        tr_logAddDebugIo(
+            io,
+            fmt::format("event_write_cb got an err. n_written:{}, what:{}, errno:{} ({})", n_written, what, err, errmsg));
+        if (io->gotError != nullptr)
         {
-            goto RESCHEDULE;
+            io->gotError(io, what, io->userData);
         }
-
-        /* error case */
-        what |= BEV_EVENT_ERROR;
-    }
-    else if (res == 0)
-    {
-        /* eof case */
-        what |= BEV_EVENT_EOF;
-    }
-
-    if (res <= 0)
-    {
-        goto FAIL;
-    }
-
-    if (!std::empty(io->outbuf))
-    {
-        io->setEnabled(dir, true);
-    }
-
-    didWriteWrapper(io, res);
-    return;
-
-RESCHEDULE:
-    if (!std::empty(io->outbuf))
-    {
-        io->setEnabled(dir, true);
-    }
-
-    return;
-
-FAIL:
-    auto const errmsg = tr_net_strerror(e);
-    tr_logAddDebugIo(io, fmt::format("event_write_cb got an err. res:{}, what:{}, errno:{} ({})", res, what, e, errmsg));
-
-    if (io->gotError != nullptr)
-    {
-        io->gotError(io, what, io->userData);
     }
 }
 
@@ -339,7 +314,7 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& a
 }
 
 #ifdef WITH_UTP
-/* UTP callbacks */
+/* µTP callbacks */
 
 void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
@@ -429,7 +404,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
         {
             fmt::print(
                 stderr,
-                FMT_STRING("[utp] [{}:{}] [{}] io is null! buf={}, len={}, flags={}, send/error_code/state={}, type={}\n"),
+                FMT_STRING("[µTP] [{}:{}] [{}] io is null! buf={}, len={}, flags={}, send/error_code/state={}, type={}\n"),
                 fmt::ptr(args->context),
                 fmt::ptr(args->socket),
                 utp_callback_names[args->callback_type],
@@ -521,7 +496,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 #ifdef WITH_UTP
 
     case TR_PEER_SOCKET_TYPE_UTP:
-        tr_logAddTraceIo(io, fmt::format("socket (utp) is {}", fmt::ptr(socket.handle.utp)));
+        tr_logAddTraceIo(io, fmt::format("socket (µTP) is {}", fmt::ptr(socket.handle.utp)));
         utp_set_userdata(socket.handle.utp, io.get());
         break;
 

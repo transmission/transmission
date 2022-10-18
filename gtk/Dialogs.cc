@@ -8,6 +8,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
 #include "Dialogs.h"
@@ -49,11 +51,11 @@ void gtr_confirm_remove(
         }
     }
 
-    auto const primary_text = gtr_sprintf(
+    auto const primary_text = fmt::format(
         !delete_files ?
-            ngettext("Remove torrent?", "Remove %d torrents?", count) :
-            ngettext("Delete this torrent's downloaded files?", "Delete these %d torrents' downloaded files?", count),
-        count);
+            ngettext("Remove torrent?", "Remove {count:L} torrents?", count) :
+            ngettext("Delete this torrent's downloaded files?", "Delete these {count:L} torrents' downloaded files?", count),
+        fmt::arg("count", count));
 
     Glib::ustring secondary_text;
     if (incomplete == 0 && connected == 0)
@@ -100,10 +102,10 @@ void gtr_confirm_remove(
 
     auto d = std::make_shared<Gtk::MessageDialog>(
         parent,
-        gtr_sprintf("<big><b>%s</b></big>", primary_text),
+        fmt::format("<big><b>{}</b></big>", primary_text),
         true /*use_markup*/,
-        Gtk::MESSAGE_QUESTION,
-        Gtk::BUTTONS_NONE,
+        TR_GTK_MESSAGE_TYPE(WARNING),
+        TR_GTK_BUTTONS_TYPE(NONE),
         true /*modal*/);
 
     if (!secondary_text.empty())
@@ -111,14 +113,14 @@ void gtr_confirm_remove(
         d->set_secondary_text(secondary_text, true);
     }
 
-    d->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-    d->add_button(delete_files ? _("_Delete") : _("_Remove"), Gtk::RESPONSE_ACCEPT);
-    d->set_default_response(Gtk::RESPONSE_CANCEL);
+    d->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(CANCEL));
+    d->add_button(delete_files ? _("_Delete") : _("_Remove"), TR_GTK_RESPONSE_TYPE(ACCEPT));
+    d->set_default_response(TR_GTK_RESPONSE_TYPE(CANCEL));
 
     d->signal_response().connect(
         [d, core, torrent_ids, delete_files](int response) mutable
         {
-            if (response == Gtk::RESPONSE_ACCEPT)
+            if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
             {
                 for (auto const id : torrent_ids)
                 {
@@ -129,5 +131,5 @@ void gtr_confirm_remove(
             d.reset();
         });
 
-    d->show_all();
+    d->show();
 }

@@ -8,9 +8,8 @@
 #include <stack>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
-
-#include <iostream>
 
 #ifdef _WIN32
 #include <share.h>
@@ -716,7 +715,7 @@ protected:
     struct ByKey
     {
         std::string_view key;
-        size_t idx;
+        size_t idx = {};
     };
 
     void sort(std::vector<ByKey>& sortbuf)

@@ -54,25 +54,25 @@
     <message>
         <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>När du kör en torrent kommer du även göra dess data tillgängligt till andra genom delning. Allt innehåll du delar är på eget bevåg.</translation>
+        <translation>När du kör en torrent kommer dess data att göras tillgängliga för andra genom att den skickas. Allt innehåll du delar är ditt eget ansvar.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
         <translation>Jag &amp;accepterar</translation>
     </message>
-    <message>
-        <location line="+132"/>
-        <source>Torrent Added</source>
-        <translation>Torrent tillagd</translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent slutförd</numerusform>
             <numerusform>Torrenter slutförda</numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation>Torrent tillagd</translation>
     </message>
 </context>
 <context>
@@ -215,8 +215,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Jämlike är en inkommande anslutning</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation>Jämlike är ansluten via µTP</translation>
+    </message>
     <message numerus="yes">
-        <location line="+132"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -225,12 +230,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation>Lägg till webbadresser</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>Lägg till webbadresser för spårningsannonser, en per rad:</translation>
     </message>
@@ -245,7 +245,7 @@
         <translation>Inga nya webbadresser hittades.</translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-834"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -274,12 +274,12 @@
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Jämlike är ansluten över uTP</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation>Lägg till webbadresser</translation>
     </message>
     <message>
-        <location line="+260"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>Hög</translation>
     </message>
@@ -352,7 +352,7 @@
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Torrentegenskaper</translation>
+        <translation>Egenskaper för torrent</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -392,7 +392,7 @@
     <message>
         <location line="+26"/>
         <source>Running time:</source>
-        <translation>Drifttid:</translation>
+        <translation>Driftstid:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -542,7 +542,7 @@
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Högst antal jämlikar:</translation>
+        <translation>&amp;Maximalt antal jämlikar:</translation>
     </message>
 </context>
 <context>
@@ -632,8 +632,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>Byt namn...</translation>
+        <source>Rename…</source>
+        <translation>Byt namn…</translation>
     </message>
 </context>
 <context>
@@ -685,9 +685,9 @@
         <translation>Visa:</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Search...</source>
-        <translation>Sök...</translation>
+        <location line="+11"/>
+        <source>Search…</source>
+        <translation>Sök…</translation>
     </message>
 </context>
 <context>
@@ -776,13 +776,13 @@
         <translation>Ingen</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location filename="../Formatter.h" line="+64"/>
         <location line="+7"/>
         <source>%1 %2</source>
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+21"/>
+        <location filename="../Formatter.cc" line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln dag</numerusform>
@@ -790,7 +790,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-5"/>
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln timme</numerusform>
@@ -798,7 +798,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln minut</numerusform>
@@ -806,27 +806,20 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln sekund</numerusform>
             <numerusform>%Ln sekunder</numerusform>
         </translation>
     </message>
-    <message>
-        <location line="+12"/>
-        <location line="+11"/>
-        <location line="+11"/>
-        <source>%1, %2</source>
-        <translation>%1, %2</translation>
-    </message>
 </context>
 <context>
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Beräknar ledigt utrymme...&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation>&lt;i&gt;Beräknar ledigt utrymme…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -875,12 +868,7 @@
         <translation>&amp;Arkiv</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Ny...</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Skapa en ny torrent</translation>
     </message>
@@ -916,8 +904,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;Öppna...</translation>
+        <source>&amp;Open…</source>
+        <translation>&amp;Öppna…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -930,7 +918,12 @@
         <translation>Öppna en torrent</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation>&amp;Ny…</translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Öppna &amp;mapp</translation>
     </message>
@@ -1063,7 +1056,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>Sortera efter tid &amp;kvar</translation>
+        <translation>Sortera efter återstående &amp;tid</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1093,7 +1086,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>Sortera efter t&amp;racker</translation>
+        <translation>Sortera efter s&amp;pårare</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1167,32 +1160,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>&amp;Byt session...</translation>
+        <source>&amp;Change Session…</source>
+        <translation>&amp;Byt session…</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation>Ställ in &amp;plats…</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation>Öppna &amp;webbadress…</translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Välj session</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Ställ in &amp;plats...</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>&amp;Kopiera magnetlänk till urklipp</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>Öppna &amp;webbadress...</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Donera</translation>
     </message>
@@ -1209,7 +1202,7 @@
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>Flytta &amp;längst fram</translation>
+        <translation>Flytta &amp;längst upp</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1224,7 +1217,7 @@
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>Flytta &amp;längst bak</translation>
+        <translation>Flytta &amp;längst ner</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1300,7 +1293,7 @@
     <message>
         <location line="+6"/>
         <source>Show &amp;options dialog</source>
-        <translation>Visa &amp;alternativdialogrutan</translation>
+        <translation>Visa &amp;alternativdialogruta</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -1346,7 +1339,7 @@
         <source>Remove %Ln torrent(s)?</source>
         <translation>
             <numerusform>Ta bort %Ln torrent?</numerusform>
-            <numerusform>Ta bort alla %Ln torrenter?</numerusform>
+            <numerusform>Ta bort %Ln torrenter?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1368,12 +1361,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>När den väl har tagits bort krävs torrentfilen eller magnetlänken för att fortsätta överföringen.</translation>
+        <translation>När den har tagits bort kommer torrentfilen eller magnetlänken att krävas för att fortsätta överföringen.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>När de väl har tagits bort kommer att fortsätta med överföringarna kräva torrentfilerna eller magnetlänkarna.</translation>
+        <translation>När de har tagits bort kommer torrentfilerna eller magnetlänkarna att krävas för att fortsätta överföringarna.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1444,12 +1437,12 @@
         <translation>Ny torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+227"/>
+        <location filename="../MakeDialog.cc" line="+304"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Ingen källa vald&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+5"/>
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln Fil</numerusform>
@@ -1490,7 +1483,12 @@
         <translation>Käll&amp;fil:</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+36"/>
+        <source>Piece s&amp;ize:</source>
+        <translation>Dels&amp;torlek:</translation>
+    </message>
+    <message>
+        <location line="+31"/>
         <source>Properties</source>
         <translation>Egenskaper</translation>
     </message>
@@ -1530,7 +1528,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>Ny torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-106"/>
+        <location filename="../MakeDialog.cc" line="-184"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>Skapar &quot;%1&quot;</translation>
     </message>
@@ -1542,23 +1540,23 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Det gick inte att skapa &quot;%1&quot;: %2 (%3)</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+63"/>
+        <location filename="../OptionsDialog.cc" line="+52"/>
         <source>Open Torrent</source>
         <translation>Öppna torrent</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-10"/>
         <source>Open Torrent from File</source>
         <translation>Öppna torrent från fil</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
         <translation>Öppna torrent från webbadress eller magnetlänk</translation>
     </message>
@@ -1573,7 +1571,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>&amp;Desinationsmapp:</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
         <translation>Hög</translation>
     </message>
@@ -1740,7 +1738,12 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>Porten är &lt;b&gt;stängd&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation>Testar TCP-port…</translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>Välj skriptet &quot;Torrenthämtning klar&quot;.</translation>
     </message>
@@ -1770,16 +1773,6 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <source>Options</source>
         <translation>Alternativ</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Aktivera &amp;uTP för jämlikeanslutningar</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP är ett verktyg för att minska överbelastning på nätet.</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1804,7 +1797,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Lägg automatiskt till .torrent-filer &amp;från:</translation>
     </message>
@@ -1831,7 +1824,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>Hö&amp;gst antal aktiva hämtningar:</translation>
+        <translation>Ma&amp;ximalt antal aktiva hämtningar:</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1852,8 +1845,8 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location filename="../PrefsDialog.cc" line="+168"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
-            <numerusform>&lt;i&gt;Blockeringslistan innehåller %Ln regel&lt;/i&gt;</numerusform>
-            <numerusform>&lt;i&gt;Blockeringslistan innehåller %Ln regler&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Blocklistan innehåller %Ln regel&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Blocklistan innehåller %Ln regler&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1869,30 +1862,17 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+321"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>Högst antal jämlikar per &amp;torrent:</translation>
+        <translation>Maximalt antal jämlikar per &amp;torrent:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>Högst antal jämlikar &amp;totalt:</translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blockeringslistan har nu %Ln regel.</numerusform>
-            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blockeringslistan har nu %Ln regler.</numerusform>
-        </translation>
+        <translation>Maximalt antal jämlikar &amp;totalt:</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Uppdaterar blockeringslista&lt;/b&gt;&lt;p&gt;Hämtar ny blockeringslista...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
-        <translation>Blockeringslista</translation>
+        <translation>Blocklista</translation>
     </message>
     <message>
         <location line="+42"/>
@@ -1900,7 +1880,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>Aktivera &amp;automatiska uppdateringar</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Tillåt kryptering</translation>
     </message>
@@ -1943,7 +1923,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="-101"/>
         <source>Enable &amp;blocklist:</source>
-        <translation>Aktivera &amp;blockeringslista:</translation>
+        <translation>Aktivera &amp;blocklista:</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -2021,7 +2001,17 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>Anropa skrip&amp;t när distributionen är klar:</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation>µTP är ett verktyg för att minska nätverksöverbelastning.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation>Aktivera µ&amp;TP för jämlikeanslutningar</translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation>Publika spårare som standard</translation>
     </message>
@@ -2056,12 +2046,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>Spela ett &amp;ljud när torrenter slutförs</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>Testar TCP-port...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Jämlikegränser</translation>
     </message>
@@ -2101,7 +2086,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>Kryptering</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Välj mapp för ofullständiga</translation>
     </message>
@@ -2110,8 +2095,21 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <source>Select Watch Directory</source>
         <translation>Välj mapp för övervakning</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation>
+            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blocklistan har nu %Ln regel.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blocklistan har nu %Ln regler.&lt;/p&gt;</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation>&lt;b&gt;Uppdatera blocklista&lt;/b&gt;&lt;p&gt;Hämtar ny blocklista…&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Välj destination</translation>
     </message>
@@ -2159,7 +2157,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="-567"/>
         <source>Transmission Preferences</source>
-        <translation>Transmission-inställningar</translation>
+        <translation>Inställningar för Transmission</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2180,12 +2178,12 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-277"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Ogiltigt alternativ</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+307"/>
         <source>Start Now</source>
         <translation>Starta nu</translation>
     </message>
@@ -2200,7 +2198,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location filename="../RelocateDialog.ui" line="+14"/>
         <source>Set Torrent Location</source>
-        <translation>Välj torrentplats</translation>
+        <translation>Ställ in torrentplats</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2226,14 +2224,14 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+499"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Fel vid namnbyte av sökväg</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Fel när &quot;%1&quot; döptes om till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Rätta till felen och försök igen.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Det går inte att byta namn på &quot;%1&quot; till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Rätta till felen och försök igen.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+528"/>
@@ -2249,16 +2247,16 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Dubblett av torrent</numerusform>
-            <numerusform>Dubbletter av torrenter</numerusform>
+            <numerusform>Duplicera torrent</numerusform>
+            <numerusform>Duplicera torrenter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>Det gick inte att lägga till %n dubblett av torrent</numerusform>
-            <numerusform>Det gick inte att lägga till %n dubbletter av torrenter</numerusform>
+            <numerusform>Det går inte att lägga till %n torrentdubblett</numerusform>
+            <numerusform>Det går inte att lägga till %n torrentdubbletter</numerusform>
         </translation>
     </message>
 </context>
@@ -2363,7 +2361,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Verifierar lokala data</translation>
     </message>
@@ -2499,7 +2497,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>Hämtar metadata från %Ln jämlike (%1% färdigt)</numerusform>
+            <numerusform>Hämtar metadata från %Ln jämlike (%1% klart)</numerusform>
             <numerusform>Hämtar metadata från %Ln jämlikar (%1% klart)</numerusform>
         </translation>
     </message>
@@ -2542,21 +2540,21 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>Fick en lista på%1 %Ln jämlike%2 %3 sedan</numerusform>
-            <numerusform>Fick en lista på%1 %Ln jämlikar%2 %3 sedan</numerusform>
+            <numerusform>Fick en lista på%1 %Ln jämlike%2 för %3 sedan</numerusform>
+            <numerusform>Fick en lista på%1 %Ln jämlikar%2 för %3 sedan</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Förfrågan efter lista över jämlikar %1tog för lång tid%2 %3 sedan; försöker igen</translation>
+        <translation>Förfrågan efter lista över jämlikar %1tog för lång tid%2 för %3 sedan; kommer att försöka igen</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Fick ett fel %1&quot;%2&quot;%3 %4 sedan</translation>
+        <translation>Fick ett fel %1&quot;%2&quot;%3 för %4 sedan</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2575,17 +2573,17 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>I kö för att fråga efter fler jämlikar</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Frågar efter fler jämlikar nu... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Frågar efter antal jämlikar nu… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform>Spårare hade%1 %Ln distribuerare%2</numerusform>
+            <numerusform>Spårare hade%1 %Ln distributörer%2</numerusform>
             <numerusform>Spårare hade%1 %Ln distributörer%2</numerusform>
         </translation>
     </message>
@@ -2594,24 +2592,30 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform> och%1 %Ln hämtare%2 %3 sedan</numerusform>
-            <numerusform> och%1 %Ln reciprokörer%2 %3 sedan</numerusform>
+            <numerusform> och%1 %Ln hämtare%2 för %3 sedan</numerusform>
+            <numerusform> och%1 %Ln reciprokörer%2 för %3 sedan</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Spåraren hade %1ingen information%2 om antal jämlikar %3 sedan</translation>
+        <translation>Spåraren hade %1ingen information%2 om antal jämlikar för %3 sedan</translation>
     </message>
     <message>
         <location line="-24"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Fick ett fel vid skrapning %1&quot;%2&quot;%3 %4 sedan</translation>
+        <translation>Fick ett skrapning %1&quot;%2&quot;%3 för %4 sedan</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation>Frågar efter fler jämlikar nu… &lt;small&gt;%1&lt;/small&gt;</translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Frågar efter antal jämlikar om %1</translation>
@@ -2620,12 +2624,6 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>I kö för att fråga efter antal jämlikar</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Frågar efter antal jämlikar nu... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

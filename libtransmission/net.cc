@@ -186,50 +186,53 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 #endif
 }
 
-bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_port, struct sockaddr_storage const* from)
+std::optional<std::pair<tr_address, tr_port>> tr_address::fromSockaddr(struct sockaddr const* from)
 {
-    if (from->ss_family == AF_INET)
+    if (from == nullptr)
     {
-        auto const* const sin = (struct sockaddr_in const*)from;
-        setme_addr->type = TR_AF_INET;
-        setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
-        *setme_port = tr_port::fromNetwork(sin->sin_port);
-        return true;
+        return {};
     }
 
-    if (from->ss_family == AF_INET6)
+    if (from->sa_family == AF_INET)
     {
-        auto const* const sin6 = (struct sockaddr_in6 const*)from;
-        setme_addr->type = TR_AF_INET6;
-        setme_addr->addr.addr6 = sin6->sin6_addr;
-        *setme_port = tr_port::fromNetwork(sin6->sin6_port);
-        return true;
+        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET;
+        addr.addr.addr4 = sin->sin_addr;
+        return std::make_pair(addr, tr_port::fromNetwork(sin->sin_port));
     }
 
-    return false;
+    if (from->sa_family == AF_INET6)
+    {
+        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET6;
+        addr.addr.addr6 = sin6->sin6_addr;
+        return std::make_pair(addr, tr_port::fromNetwork(sin6->sin6_port));
+    }
+
+    return {};
 }
 
-static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct sockaddr_storage* sockaddr)
+std::pair<sockaddr_storage, socklen_t> tr_address::toSockaddr(tr_port port) const noexcept
 {
-    TR_ASSERT(tr_address_is_valid(addr));
+    auto ss = sockaddr_storage{};
 
-    if (addr->isIPv4())
+    if (isIPv4())
     {
-        sockaddr_in sock4 = {};
-        sock4.sin_family = AF_INET;
-        sock4.sin_addr.s_addr = addr->addr.addr4.s_addr;
-        sock4.sin_port = port.network();
-        memcpy(sockaddr, &sock4, sizeof(sock4));
-        return sizeof(struct sockaddr_in);
+        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
+        ss4->sin_addr = addr.addr4;
+        ss4->sin_family = AF_INET;
+        ss4->sin_port = port.network();
+        return { ss, sizeof(sockaddr_in) };
     }
 
-    sockaddr_in6 sock6 = {};
-    sock6.sin6_family = AF_INET6;
-    sock6.sin6_port = port.network();
-    sock6.sin6_flowinfo = 0;
-    sock6.sin6_addr = addr->addr.addr6;
-    memcpy(sockaddr, &sock6, sizeof(sock6));
-    return sizeof(struct sockaddr_in6);
+    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
+    ss6->sin6_addr = addr.addr6;
+    ss6->sin6_family = AF_INET6;
+    ss6->sin6_flowinfo = 0;
+    ss6->sin6_port = port.network();
+    return { ss, sizeof(sockaddr_in6) };
 }
 
 static tr_socket_t createSocket(tr_session* session, int domain, int type)
@@ -312,13 +315,11 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         }
     }
 
-    struct sockaddr_storage sock;
-    socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
+    auto const [sock, addrlen] = addr->toSockaddr(port);
 
     // set source address
     auto const [source_addr, is_default_addr] = session->publicAddress(addr->type);
-    struct sockaddr_storage source_sock;
-    socklen_t const sourcelen = setup_sockaddr(&source_addr, {}, &source_sock);
+    auto const [source_sock, sourcelen] = source_addr.toSockaddr({});
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
@@ -372,13 +373,12 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
 
     if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
     {
-        struct sockaddr_storage ss;
-        socklen_t const sslen = setup_sockaddr(addr, port, &ss);
+        auto const [ss, sslen] = addr->toSockaddr(port);
         auto* const socket = utp_create_socket(session->utp_context);
 
         if (socket != nullptr)
         {
-            if (utp_connect(socket, reinterpret_cast<sockaddr*>(&ss), sslen) != -1)
+            if (utp_connect(socket, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
             {
                 ret = tr_peer_socket_utp_create(socket);
             }
@@ -420,7 +420,6 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     TR_ASSERT(tr_address_is_valid(addr));
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    struct sockaddr_storage sock;
 
     auto const fd = socket(Domains[addr->type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
@@ -453,7 +452,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    int const addrlen = setup_sockaddr(addr, port, &sock);
+    auto const [sock, addrlen] = addr->toSockaddr(port);
 
     if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
     {
@@ -539,32 +538,30 @@ bool tr_net_hasIPv6(tr_port port)
     return result;
 }
 
-tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_address* addr, tr_port* port)
+std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(addr != nullptr);
-    TR_ASSERT(port != nullptr);
 
     // accept the incoming connection
-    struct sockaddr_storage sock;
+    auto sock = sockaddr_storage{};
     socklen_t len = sizeof(struct sockaddr_storage);
     auto const sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
     if (sockfd == TR_BAD_SOCKET)
     {
-        return TR_BAD_SOCKET;
+        return {};
     }
 
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    if (!tr_address_from_sockaddr_storage(addr, port, &sock) || evutil_make_socket_nonblocking(sockfd) == -1 ||
-        !session->incPeerCount())
+    auto const addrport = tr_address::fromSockaddr(reinterpret_cast<struct sockaddr*>(&sock));
+    if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || !session->incPeerCount())
     {
         tr_netCloseSocket(sockfd);
-        return TR_BAD_SOCKET;
+        return {};
     }
 
-    return sockfd;
+    return std::make_tuple(addrport->first, addrport->second, sockfd);
 }
 
 void tr_netCloseSocket(tr_socket_t sockfd)
@@ -638,10 +635,10 @@ static int global_unicast_address(struct sockaddr_storage* ss)
 
 static int tr_globalAddress(int af, void* addr, int* addr_len)
 {
-    struct sockaddr_storage ss;
+    auto ss = sockaddr_storage{};
     socklen_t sslen = sizeof(ss);
-    struct sockaddr_in sin;
-    struct sockaddr_in6 sin6;
+    auto sin = sockaddr_in{};
+    auto sin6 = sockaddr_in6{};
     struct sockaddr const* sa = nullptr;
     socklen_t salen = 0;
 
@@ -709,44 +706,43 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
 }
 
 /* Return our global IPv6 address, with caching. */
-unsigned char const* tr_globalIPv6(tr_session const* session)
+std::optional<in6_addr> tr_globalIPv6(tr_session const* session)
 {
-    static auto ipv6 = std::array<unsigned char, 16>{};
+    static auto ipv6 = in6_addr{};
     static time_t last_time = 0;
     static bool have_ipv6 = false;
 
     /* Re-check every half hour */
     if (auto const now = tr_time(); last_time < now - 1800)
     {
-        int addrlen = 16;
-        int const rc = tr_globalAddress(AF_INET6, std::data(ipv6), &addrlen);
-        have_ipv6 = rc >= 0 && addrlen == 16;
+        int addrlen = sizeof(ipv6);
+        int const rc = tr_globalAddress(AF_INET6, &ipv6, &addrlen);
+        have_ipv6 = rc >= 0 && addrlen == sizeof(ipv6);
         last_time = now;
     }
 
     if (!have_ipv6)
     {
-        return nullptr; /* No IPv6 address at all. */
+        return {}; // no IPv6 address at all
     }
 
-    /* Return the default address.
-     * This is useful for checking for connectivity in general. */
+    // Return the default address.
+    // This is useful for checking for connectivity in general.
     if (session == nullptr)
     {
-        return std::data(ipv6);
+        return ipv6;
     }
 
-    /* We have some sort of address, now make sure that we return
-       our bound address if non-default. */
-
+    // We have some sort of address.
+    // Now make sure that we return our bound address if non-default.
     auto const [ipv6_bindaddr, is_default] = session->publicAddress(TR_AF_INET6);
     if (!is_default)
     {
-        /* Explicitly bound. Return that address. */
-        memcpy(std::data(ipv6), ipv6_bindaddr.addr.addr6.s6_addr, 16);
+        // return this explicitly-bound address
+        ipv6 = ipv6_bindaddr.addr.addr6;
     }
 
-    return std::data(ipv6);
+    return ipv6;
 }
 
 /***

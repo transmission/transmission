@@ -71,7 +71,7 @@
 "%lu Torrent Files" = "%lu торрент-файлов";
 
 /* Inspector -> selected torrents */
-"%lu Torrents Selected" = "%lu разд.";
+"%lu Torrents Selected" = "%lu торрентов выбрано";
 
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu от трекера";

@@ -13,6 +13,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include "PathButton.h"
 #include "Prefs.h" /* gtr_pref_string_get */
 #include "RelocateDialog.h"
 #include "Session.h"
@@ -52,8 +53,8 @@ private:
     bool do_move_ = false;
     sigc::connection timer_;
     std::unique_ptr<Gtk::MessageDialog> message_dialog_;
-    Gtk::FileChooserButton* chooser_ = nullptr;
-    Gtk::RadioButton* move_tb_ = nullptr;
+    PathButton* chooser_ = nullptr;
+    Gtk::CheckButton* move_tb_ = nullptr;
 };
 
 RelocateDialog::Impl::~Impl()
@@ -87,9 +88,23 @@ bool RelocateDialog::Impl::onTimer()
 {
     if (done_ == TR_LOC_ERROR)
     {
-        Gtk::MessageDialog(*message_dialog_, _("Couldn't move torrent"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true)
-            .run();
-        message_dialog_.reset();
+        auto d = std::make_shared<Gtk::MessageDialog>(
+            *message_dialog_,
+            _("Couldn't move torrent"),
+            false,
+            TR_GTK_MESSAGE_TYPE(ERROR),
+            TR_GTK_BUTTONS_TYPE(CLOSE),
+            true);
+
+        timer_.block();
+        d->signal_response().connect(
+            [this, d](int /*response*/) mutable
+            {
+                timer_.unblock();
+                d.reset();
+            });
+
+        d->show();
     }
     else if (done_ == TR_LOC_DONE)
     {
@@ -99,7 +114,7 @@ bool RelocateDialog::Impl::onTimer()
         }
         else
         {
-            dialog_.hide();
+            dialog_.close();
         }
     }
 
@@ -108,7 +123,7 @@ bool RelocateDialog::Impl::onTimer()
 
 void RelocateDialog::Impl::onResponse(int response)
 {
-    if (response == Gtk::RESPONSE_APPLY)
+    if (response == TR_GTK_RESPONSE_TYPE(APPLY))
     {
         auto const location = chooser_->get_filename();
 
@@ -119,11 +134,11 @@ void RelocateDialog::Impl::onResponse(int response)
             dialog_,
             Glib::ustring(),
             false,
-            Gtk::MESSAGE_INFO,
-            Gtk::BUTTONS_CLOSE,
+            TR_GTK_MESSAGE_TYPE(INFO),
+            TR_GTK_BUTTONS_TYPE(CLOSE),
             true);
         message_dialog_->set_secondary_text(_("This may take a moment…"));
-        message_dialog_->set_response_sensitive(Gtk::RESPONSE_CLOSE, false);
+        message_dialog_->set_response_sensitive(TR_GTK_RESPONSE_TYPE(CLOSE), false);
         message_dialog_->show();
 
         /* remember this location for the next torrent */
@@ -139,7 +154,7 @@ void RelocateDialog::Impl::onResponse(int response)
     }
     else
     {
-        dialog_.hide();
+        dialog_.close();
     }
 }
 
@@ -175,29 +190,25 @@ RelocateDialog::Impl::Impl(
     : dialog_(dialog)
     , core_(core)
     , torrent_ids_(torrent_ids)
-    , chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "new_location_button"))
-    , move_tb_(gtr_get_widget<Gtk::RadioButton>(builder, "move_data_radio"))
+    , chooser_(gtr_get_widget_derived<PathButton>(builder, "new_location_button"))
+    , move_tb_(gtr_get_widget<Gtk::CheckButton>(builder, "move_data_radio"))
 {
-    dialog_.set_default_response(Gtk::RESPONSE_CANCEL);
+    dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(CANCEL));
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
     auto recent_dirs = gtr_get_recent_dirs("relocate");
     if (recent_dirs.empty())
     {
         /* default to download dir */
-        chooser_->set_current_folder(gtr_pref_string_get(TR_KEY_download_dir));
+        chooser_->set_filename(gtr_pref_string_get(TR_KEY_download_dir));
     }
     else
     {
         /* set last used as target */
-        chooser_->set_current_folder(recent_dirs.front());
+        chooser_->set_filename(recent_dirs.front());
         recent_dirs.pop_front();
 
         /* add remaining as shortcut */
-        for (auto const& folder : recent_dirs)
-        {
-            chooser_->remove_shortcut_folder(folder);
-            chooser_->add_shortcut_folder(folder);
-        }
+        chooser_->set_shortcut_folders(recent_dirs);
     }
 }

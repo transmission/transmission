@@ -15,6 +15,7 @@
 #include "FileList.h"
 #include "FreeSpaceLabel.h"
 #include "OptionsDialog.h"
+#include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -26,6 +27,8 @@
 
 namespace
 {
+
+auto const ShowOptionsDialogChoice = Glib::ustring("show_options_dialog");
 
 std::string get_source_file(tr_ctor& ctor)
 {
@@ -67,8 +70,8 @@ public:
     TR_DISABLE_COPY_MOVE(Impl)
 
 private:
-    void sourceChanged(Gtk::FileChooserButton* b);
-    void downloadDirChanged(Gtk::FileChooserButton* b);
+    void sourceChanged(PathButton* b);
+    void downloadDirChanged(PathButton* b);
 
     void removeOldTorrent();
     void updateTorrent();
@@ -105,11 +108,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
 {
     if (tor_ != nullptr)
     {
-        if (response != Gtk::RESPONSE_ACCEPT)
-        {
-            removeOldTorrent();
-        }
-        else
+        if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
         {
             tr_torrentSetPriority(tor_, gtr_priority_combo_get_value(*priority_combo_));
 
@@ -127,9 +126,13 @@ void OptionsDialog::Impl::addResponseCB(int response)
 
             gtr_save_recent_dir("download", core_, downloadDir_);
         }
+        else if (response == TR_GTK_RESPONSE_TYPE(CANCEL))
+        {
+            removeOldTorrent();
+        }
     }
 
-    dialog_.hide();
+    dialog_.close();
 }
 
 void OptionsDialog::Impl::updateTorrent()
@@ -158,7 +161,7 @@ void OptionsDialog::Impl::updateTorrent()
  * The `filename' tests here are to prevent us from losing the current
  * metadata when that happens.
  */
-void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
+void OptionsDialog::Impl::sourceChanged(PathButton* b)
 {
     auto const filename = b->get_filename();
 
@@ -193,7 +196,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
     }
 }
 
-void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
+void OptionsDialog::Impl::downloadDirChanged(PathButton* b)
 {
     auto const fname = b->get_filename();
 
@@ -209,7 +212,8 @@ void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
 namespace
 {
 
-void addTorrentFilters(Gtk::FileChooser* chooser)
+template<typename FileChooserT>
+void addTorrentFilters(FileChooserT* chooser)
 {
     auto filter = Gtk::FileFilter::create();
     filter->set_name(_("Torrent files"));
@@ -268,28 +272,19 @@ OptionsDialog::Impl::Impl(
     , priority_combo_(gtr_get_widget<Gtk::ComboBox>(builder, "priority_combo"))
     , freespace_label_(gtr_get_widget_derived<FreeSpaceLabel>(builder, "free_space_label", core_, downloadDir_))
 {
-    dialog_.set_default_response(Gtk::RESPONSE_ACCEPT);
+    dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
     dialog.signal_response().connect(sigc::mem_fun(*this, &Impl::addResponseCB));
 
     gtr_priority_combo_init(*priority_combo_);
     gtr_priority_combo_set_value(*priority_combo_, TR_PRI_NORMAL);
 
-    auto* source_chooser = gtr_get_widget<Gtk::FileChooserButton>(builder, "source_button");
+    auto* source_chooser = gtr_get_widget_derived<PathButton>(builder, "source_button");
     addTorrentFilters(source_chooser);
     source_chooser->signal_selection_changed().connect([this, source_chooser]() { sourceChanged(source_chooser); });
 
-    auto* destination_chooser = gtr_get_widget<Gtk::FileChooserButton>(builder, "destination_button");
-
-    if (!destination_chooser->set_current_folder(downloadDir_))
-    {
-        g_warning("couldn't select '%s'", downloadDir_.c_str());
-    }
-
-    for (auto const& folder : gtr_get_recent_dirs("download"))
-    {
-        destination_chooser->remove_shortcut_folder(folder);
-        destination_chooser->add_shortcut_folder(folder);
-    }
+    auto* destination_chooser = gtr_get_widget_derived<PathButton>(builder, "destination_button");
+    destination_chooser->set_filename(downloadDir_);
+    destination_chooser->set_shortcut_folders(gtr_get_recent_dirs("download"));
 
     destination_chooser->signal_selection_changed().connect([this, destination_chooser]()
                                                             { downloadDirChanged(destination_chooser); });
@@ -320,7 +315,7 @@ OptionsDialog::Impl::Impl(
         sourceChanged(source_chooser);
     }
 
-    dialog_.get_widget_for_response(Gtk::RESPONSE_ACCEPT)->grab_focus();
+    dialog_.get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT))->grab_focus();
 }
 
 /****
@@ -329,21 +324,30 @@ OptionsDialog::Impl::Impl(
 
 void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<Session> const& core)
 {
-    /* remember this folder the next time we use this dialog */
-    gtr_pref_string_set(TR_KEY_open_dialog_dir, get_current_folder());
-
-    if (response == Gtk::RESPONSE_ACCEPT)
+    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
-        auto const* const tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
+        /* remember this folder the next time we use this dialog */
+        gtr_pref_string_set(TR_KEY_open_dialog_dir, IF_GTKMM4(get_current_folder, get_current_folder_file)()->get_path());
+
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-        bool const do_prompt = tb->get_active();
+        bool const do_prompt = get_choice(ShowOptionsDialogChoice) == "true";
         bool const do_notify = false;
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        auto files = std::vector<Glib::RefPtr<Gio::File>>();
+        auto files_model = get_files();
+        for (auto i = guint{ 0 }; i < files_model->get_n_items(); ++i)
+        {
+            files.push_back(gtr_ptr_dynamic_cast<Gio::File>(files_model->get_object(i)));
+        }
+#else
         auto const files = get_files();
+#endif
 
         core->add_files(files, do_start, do_prompt, do_notify);
     }
 
-    hide();
+    close();
 }
 
 std::unique_ptr<TorrentFileChooserDialog> TorrentFileChooserDialog::create(
@@ -354,12 +358,12 @@ std::unique_ptr<TorrentFileChooserDialog> TorrentFileChooserDialog::create(
 }
 
 TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
-    : Gtk::FileChooserDialog(parent, _("Open a Torrent"), Gtk::FILE_CHOOSER_ACTION_OPEN)
+    : Gtk::FileChooserDialog(parent, _("Open a Torrent"), TR_GTK_FILE_CHOOSER_ACTION(OPEN))
 {
     set_modal(true);
 
-    add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-    add_button(_("_Open"), Gtk::RESPONSE_ACCEPT);
+    add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(CANCEL));
+    add_button(_("_Open"), TR_GTK_RESPONSE_TYPE(ACCEPT));
 
     set_select_multiple(true);
     addTorrentFilters(this);
@@ -367,13 +371,11 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
 
     if (auto const folder = gtr_pref_string_get(TR_KEY_open_dialog_dir); !folder.empty())
     {
-        set_current_folder(folder);
+        IF_GTKMM4(set_current_folder, set_current_folder_file)(Gio::File::create_for_path(folder));
     }
 
-    auto* c = Gtk::make_managed<Gtk::CheckButton>(_("Show _options dialog"), true);
-    c->set_active(gtr_pref_flag_get(TR_KEY_show_options_window));
-    set_extra_widget(*c);
-    c->show();
+    add_choice(ShowOptionsDialogChoice, _("Show options dialog"));
+    set_choice(ShowOptionsDialogChoice, gtr_pref_flag_get(TR_KEY_show_options_window) ? "true" : "false");
 }
 
 /***
@@ -383,11 +385,11 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
 void TorrentUrlChooserDialog::onOpenURLResponse(int response, Gtk::Entry const& entry, Glib::RefPtr<Session> const& core)
 {
 
-    if (response == Gtk::RESPONSE_CANCEL)
+    if (response == TR_GTK_RESPONSE_TYPE(CANCEL))
     {
-        hide();
+        close();
     }
-    else if (response == Gtk::RESPONSE_ACCEPT)
+    else if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
         auto const url = gtr_str_strip(entry.get_text());
 
@@ -398,7 +400,7 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, Gtk::Entry const& 
 
         if (core->add_from_url(url))
         {
-            hide();
+            close();
         }
         else
         {
@@ -434,6 +436,6 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     }
     else
     {
-        get_widget_for_response(Gtk::RESPONSE_ACCEPT)->grab_focus();
+        get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT))->grab_focus();
     }
 }

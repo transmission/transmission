@@ -15,6 +15,7 @@
 #include "handshake.h"
 #include "peer-io.h"
 #include "session.h" // tr_peerIdInit()
+#include "timer.h"
 
 #include "test-fixtures.h"
 
@@ -67,12 +68,12 @@ public:
             return {};
         }
 
-        [[nodiscard]] std::unique_ptr<libtransmission::Timer> createTimer() override
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
         {
-            return session_->timerMaker().create();
+            return session_->timerMaker();
         }
 
-        [[nodiscard]] bool isDHTEnabled() const override
+        [[nodiscard]] bool allowsDHT() const override
         {
             return false;
         }
@@ -238,7 +239,8 @@ TEST_F(HandshakeTest, incomingPlaintext)
     // implementations[.] Next comes the 20 byte sha1 hash of the bencoded
     // form of the info value from the metainfo file[.] After the download
     // hash comes the 20-byte peer id which is reported in tracker requests
-    // and contained in peer lists in tracker responses.
+    // and contained in peer lists in tracker responses."
+    // https://www.bittorrent.org/beps/bep_0052.html
     auto [io, sock] = createIncomingIo(session_);
     sendToClient(sock, PlaintextProtocolName);
     sendToClient(sock, ReservedBytesNoExtensions);

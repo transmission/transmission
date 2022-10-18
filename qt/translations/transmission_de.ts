@@ -6,12 +6,12 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>Über Transmission</translation>
+        <translation>Info zu Transmission</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © Das Transmission Projekt</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Client</translation>
+        <translation>Client</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>Ich &amp;stimme zu</translation>
     </message>
-    <message>
-        <location line="+132"/>
-        <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent abgeschlossen</numerusform>
             <numerusform>Torrents abgeschlossen</numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation>Torrent hinzugefügt</translation>
     </message>
 </context>
 <context>
@@ -106,7 +106,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 verworfen aufgrund Prüfsummenfehler)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -215,8 +215,13 @@
         <source>Peer is an incoming connection</source>
         <translation>Peer ist eine eingehende Verbindung</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation>Peer ist über uTP verbunden</translation>
+    </message>
     <message numerus="yes">
-        <location line="+132"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -225,14 +230,9 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tracker Announce URL hinzufügen, eine pro Zeile:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -242,10 +242,10 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine neuen URLs gefunden.</translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-834"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -274,12 +274,12 @@
         <translation>Nicht verfügbar</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>Peer ist über uTP verbunden</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation>URL(s) hinzufügen</translation>
     </message>
     <message>
-        <location line="+260"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>Hoch</translation>
     </message>
@@ -427,7 +427,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Tracker bearbeiten</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -447,7 +447,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinzugefügt:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -632,7 +632,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
+        <source>Rename…</source>
         <translation>Umbenennen...</translation>
     </message>
 </context>
@@ -685,8 +685,8 @@
         <translation>Zeige:</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Search...</source>
+        <location line="+11"/>
+        <source>Search…</source>
         <translation>Suche ...</translation>
     </message>
 </context>
@@ -776,13 +776,13 @@
         <translation>Keine</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location filename="../Formatter.h" line="+64"/>
         <location line="+7"/>
         <source>%1 %2</source>
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+21"/>
+        <location filename="../Formatter.cc" line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln Tag</numerusform>
@@ -790,7 +790,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-5"/>
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln Stunde</numerusform>
@@ -798,7 +798,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln Minute</numerusform>
@@ -806,26 +806,19 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln Sekunde</numerusform>
             <numerusform>%Ln Sekunden</numerusform>
         </translation>
     </message>
-    <message>
-        <location line="+12"/>
-        <location line="+11"/>
-        <location line="+11"/>
-        <source>%1, %2</source>
-        <translation>%1, %2</translation>
-    </message>
 </context>
 <context>
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
         <translation>&lt;i&gt;Berechne freien Platz ...&lt;/i&gt;</translation>
     </message>
     <message>
@@ -875,12 +868,7 @@
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Neu</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Erstelle einen neuen Torrent</translation>
     </message>
@@ -907,16 +895,16 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Optionen</translation>
+        <translation>Optionen</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistiken</translation>
+        <translation>Statistiken</translation>
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
+        <source>&amp;Open…</source>
         <translation>&amp;Öffne ...</translation>
     </message>
     <message>
@@ -930,7 +918,12 @@
         <translation>Öffne einen Torrent</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Öffne Ordn&amp;er</translation>
     </message>
@@ -1167,32 +1160,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>Sitzung we&amp;chseln...</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Wähle Sitzung aus</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Ort fest&amp;legen</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Magnet-Link in die Zwis&amp;chenablage kopieren</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>Öffne &amp;URL ...</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Spende</translation>
     </message>
@@ -1444,12 +1437,12 @@
         <translation>Neuer Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+227"/>
+        <location filename="../MakeDialog.cc" line="+304"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Keine Quelle ausgewählt&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+5"/>
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln Datei</numerusform>
@@ -1490,7 +1483,12 @@
         <translation>Quellen-D&amp;atei:</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+36"/>
+        <source>Piece s&amp;ize:</source>
+        <translation>Stück&amp;größe:</translation>
+    </message>
+    <message>
+        <location line="+31"/>
         <source>Properties</source>
         <translation>Eigenschaften</translation>
     </message>
@@ -1514,7 +1512,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Quelle:</translation>
+        <translation>&amp;Quelle:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1530,7 +1528,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>Neuer Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-106"/>
+        <location filename="../MakeDialog.cc" line="-184"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>Erstelle &quot;%1&quot;</translation>
     </message>
@@ -1542,23 +1540,23 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; konnte nicht erstellt werden: %2 (%3)</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+63"/>
+        <location filename="../OptionsDialog.cc" line="+52"/>
         <source>Open Torrent</source>
         <translation>Öffne Torrent</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-10"/>
         <source>Open Torrent from File</source>
         <translation>Öffne Torrent aus Datei</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
         <translation>Öffne Torrent von URL oder Magnetischem Link</translation>
     </message>
@@ -1573,7 +1571,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>&amp;Zielordner:</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
         <translation>Hoch</translation>
     </message>
@@ -1740,9 +1738,14 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>Port ist &lt;b&gt;geschlossen&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
-        <source>Select &quot;Torrent Done Downloading&quot; Script</source>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+154"/>
+        <source>Select &quot;Torrent Done Downloading&quot; Script</source>
+        <translation>&quot;Torrent fertig heruntergeladen&quot;-Skript auswählen</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1770,16 +1773,6 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <source>Options</source>
         <translation>Optionen</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Aktiviere &amp;uTP für Peer-Verbindungen</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>Mit uTP lässt sich die Netzwerkauslastung reduzieren.</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1792,7 +1785,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Torrent fertig verteilt&quot;-Skript auswählen</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -1804,7 +1797,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Füge .Torrent-Dateien automatisch hinzu von:</translation>
     </message>
@@ -1876,21 +1869,8 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <source>Maximum peers &amp;overall:</source>
         <translation>Maximale Peers &amp;gesamt:</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Aktualisierung erfolgreich!&lt;/b&gt;&lt;p&gt;Die Sperrliste hat nun %Ln Regel.</numerusform>
-            <numerusform>&lt;b&gt;Aktualisierung erfolgreich!&lt;/b&gt;&lt;p&gt;Die Sperrliste hat nun %Ln Regeln.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Aktualisiere Sperrliste&lt;/b&gt;&lt;p&gt;Hole neue Sperrliste...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Sperrliste</translation>
     </message>
@@ -1900,7 +1880,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>&amp;Automatische Aktualisierungen aktivieren</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Erlaube Verschlüsselung</translation>
     </message>
@@ -2003,32 +1983,42 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwischenablage auslesen für Torrents</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Torrents aus Zwischenablage erkennen</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrip&amp;t ausführen, wenn Torrent-Download abgeschlossen ist:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
+        <translation>Skrip&amp;t ausführen, wenn Torrent-Verteilung abgeschlossen ist:</translation>
+    </message>
+    <message>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+406"/>
-        <source>Default Public Trackers</source>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
+        <source>Default Public Trackers</source>
+        <translation>Standard öffentliche Tracker</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers die für alle öffentlichen Torrents benutzt werden.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Eine Backup-URL kann in der Zeile nach einer Primär-URL eingefügt werden.&lt;/p&gt;&lt;p&gt;Eine neue Primär-URL kann nach einer Leer-Zeile eingefügt werden.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2056,12 +2046,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>Ton ab&amp;spielen wenn Torrents abgeschlossen sind</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>Überprüfe TCP Port...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Peer-Beschränkungen</translation>
     </message>
@@ -2101,7 +2086,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>Verschlüsselung</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Verzeichnis für unvollständige Dateien wählen</translation>
     </message>
@@ -2110,8 +2095,21 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <source>Select Watch Directory</source>
         <translation>Zu überwachendes Verzeichnis wählen</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Ziel auswählen</translation>
     </message>
@@ -2180,14 +2178,14 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-277"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Ungültige Option</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+307"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Jetzt starten</translation>
     </message>
 </context>
 <context>
@@ -2226,7 +2224,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+499"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Fehler beim Umbenennen des Pfades</translation>
     </message>
@@ -2243,7 +2241,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Kopie von %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
@@ -2363,7 +2361,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Überprüfe lokale Daten</translation>
     </message>
@@ -2575,13 +2573,13 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <translation>Anfrage für mehr Peers eingereiht</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Frage jetzt nach mehr Peers... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2608,10 +2606,16 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <location line="-24"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>»Scrape«-Fehler %1»%2«%3 erhalten vor %4</translation>
+        <translation>&quot;Scrape&quot;-Fehler %1»%2«%3 erhalten vor %4</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Frage nach Anzahl der Peers in %1</translation>
@@ -2621,39 +2625,33 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <source>Queued to ask for peer counts</source>
         <translation>Anfragen nach der Anzahl der Peers eingereiht</translation>
     </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Fordere jetzt Anzahl an Peers an... &lt;small&gt;%1&lt;/small&gt;</translation>
-    </message>
 </context>
 <context>
     <name>TrackersDialog</name>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Tracker bearbeiten</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tracker Announce URLs</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine neue Primär-URL kann nach einer Leer-Zeile eingefügt werden.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Eine Backup-URL kann in der Zeile nach einer Primär-URL eingefügt werden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Siehe auch Standard öffentliche Tracker in Editieren &gt; Eigenschaften &gt; Netzwerk</translation>
     </message>
 </context>
 </TS>

@@ -229,7 +229,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     h->addStretch();
 
     line_edit_->setClearButtonEnabled(true);
-    line_edit_->setPlaceholderText(tr("Search..."));
+    line_edit_->setPlaceholderText(tr("Search…"));
     line_edit_->setMaximumWidth(250);
     h->addWidget(line_edit_, 1);
     connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);

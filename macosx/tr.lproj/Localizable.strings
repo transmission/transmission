@@ -4,7 +4,7 @@
 "%@ of %@" = "%1$@ - %2$@";
 
 /* Torrent -> progress string */
-"%@ of torrent metadata retrieved" = "%@ torrent üstverisi alındı";
+"%@ of torrent metadata retrieved" = "%@ torrent üst verisi alındı";
 
 /* Add torrent -> info
    Inspector -> Activity tab -> progress
@@ -65,7 +65,7 @@
 "%lu PEX" = "%lu PEX";
 
 /* Dock item - Seeding */
-"%lu Seeding" = "%lu Gönderiliyor";
+"%lu Seeding" = "%lu Besleniyor";
 
 /* Drag overlay -> torrents */
 "%lu Torrent Files" = "%lu Torrent Dosyası";
@@ -132,7 +132,7 @@
 "A torrent file with this name and directory cannot be created." = "Bu ad ve dizin ile bir torrent dosyası oluşturulamaz.";
 
 /* Create torrent -> blank address -> message */
-"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Herhangi bir izleyici adresi olmayan ve özel olarak imlenmiş bir aktarım eşlere bağlanamayacaktır. Torrent dosyası ancak dosyayı sizin için adreslendirme yapacak bir izleyicinin web sayfasına yüklerseniz yararlı olabilir.";
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Herhangi bir izleyici adresi olmayan ve özel olarak imlenmiş bir aktarım eşlere bağlanamayacaktır. Torrent dosyası; ancak dosyayı sizin için adreslendirme yapacak bir izleyicinin web sayfasına karşıya yüklerseniz yararlı olabilir.";
 
 /* Open duplicate alert -> title
    Open duplicate magnet alert -> title */
@@ -280,7 +280,7 @@
 "Currently downloading (interested and not choked)" = "Şu an indiriliyor (ilgili ve izinli)";
 
 /* Inspector -> peer -> status */
-"Currently uploading (interested and not choked)" = "Şu an gönderiliyor (ilgili ve izinli)";
+"Currently uploading (interested and not choked)" = "Şu anda karşıya yükleniyor (ilgili ve izinli)";
 
 /* Message window -> table column */
 "Date" = "Tarih";
@@ -414,10 +414,10 @@
 "General Info" = "Genel Bilgi";
 
 /* Status Bar -> speed tooltip */
-"Global download limit" = "Genel indirme limiti";
+"Global download limit" = "Genel indirme sınırı";
 
 /* Status Bar -> speed tooltip */
-"Global upload limit" = "Genel gönderme limiti";
+"Global upload limit" = "Genel karşıya yükleme sınırı";
 
 /* Tracker last announce */
 "got %lu peers" = "%lu eş bulundu";
@@ -499,7 +499,7 @@
 "License" = "Lisans";
 
 /* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limit (%ld KB/sn)";
+"Limit (%ld KB/s)" = "Sınır (%ld KB/sn)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Günlük Kaydedilemedi";
@@ -671,10 +671,10 @@
 "Paused" = "Duraklatıldı";
 
 /* Inspector -> peer -> status */
-"Peer is unchoking you, but you are not interested" = "Karşıdaki eş size izin veriyor, ancak siz ilgili değilsiniz";
+"Peer is unchoking you, but you are not interested" = "Karşıdaki eş size izin veriyor; ancak siz ilgili değilsiniz";
 
 /* Inspector -> peer -> status */
-"Peer wants you to upload, but you do not want to (interested and choked)" = "Karşıdaki eş sizin yükleme yapmanızı istiyor, ancak siz istemiyorsunuz (ilgili ve izinli)";
+"Peer wants you to upload, but you do not want to (interested and choked)" = "Karşıdaki eş sizin yükleme yapmanızı istiyor; ancak siz istemiyorsunuz (ilgili ve izinli)";
 
 /* Inspector -> tab
    Inspector view -> title
@@ -891,16 +891,16 @@
 
 /* Dock item
    Status Bar -> speed tooltip */
-"Speed Limit" = "Hız Limiti";
+"Speed Limit" = "Hız Sınırı";
 
 /* notification title */
-"Speed Limit Auto Disabled" = "Hız Limiti Etkin Değil";
+"Speed Limit Auto Disabled" = "Hız Sınırı Etkin Değil";
 
 /* notification title */
-"Speed Limit Auto Enabled" = "Hız Limiti Etkin";
+"Speed Limit Auto Enabled" = "Hız Sınırı Etkin";
 
 /* Main window -> 2nd bottom left button (turtle) tooltip */
-"Speed Limit overrides the total bandwidth limits with its own limits." = "Hız Limiti bant genişliği limitlerini kendi limitleri ile değiştirir.";
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Hız Sınırı, bant genişliği sınırlarını kendi sınırları ile değiştirir.";
 
 /* Torrent -> status string */
 "Stalled" = "Etkin Olmayanlar";
@@ -924,7 +924,7 @@
 "TB/s" = "TB/sn";
 
 /* Create torrent -> directory doesn't exist warning -> title */
-"The chosen torrent file location does not exist." = "Seçili torrent dosyası konumu mevcut değil.";
+"The chosen torrent file location does not exist." = "Seçili torrent dosyası konumu yok.";
 
 /* Add torrent -> same name -> title */
 "The destination directory and root data directory have the same name." = "Hedef dizin ve kök veri dizini aynı ada sahip.";
@@ -1028,7 +1028,7 @@
 "Torrent Inspector" = "Torrent Denetçisi";
 
 /* Torrent -> progress string */
-"torrent metadata needed" = "torrent üstbilgisi gerekli";
+"torrent metadata needed" = "torrent üst bilgisi gerekli";
 
 /* stats total */
 "Total N/A" = "Veri yok";
@@ -1080,16 +1080,16 @@
 /* inspector -> peer table -> header
    status bar -> status label
    Torrent -> status string */
-"UL" = "GN";
+"UL" = "KY";
 
 /* Inspector -> Peers tab -> peers */
-"UL to %lu" = "%lu için GN";
+"UL to %lu" = "%lu için KY";
 
 /* File Outline -> Menu */
 "Uncheck Selected" = "Seçilinin İmini Kaldır";
 
 /* Status Bar -> speed tooltip */
-"unlimited" = "limitsiz";
+"unlimited" = "sınırsız";
 
 /* Torrent -> error string unreadable */
 "unreadable error" = "okunamayan hata";
@@ -1098,16 +1098,16 @@
 "untitled" = "adsız";
 
 /* Torrent table -> group row -> tooltip */
-"Upload speed" = "Gönderme hızı";
+"Upload speed" = "Karşıya yükleme hızı";
 
 /* Stats window -> label */
-"Uploaded" = "Gönderildi";
+"Uploaded" = "Karşıya yüklenen";
 
 /* Torrent -> progress string */
-"uploaded %@ (Ratio: %@)" = "%1$@ gönderildi (oran: %2$@)";
+"uploaded %@ (Ratio: %@)" = "%1$@ karşıya yüklendi (oran: %2$@)";
 
 /* inspector -> peer table -> header tool tip */
-"Uploading To Peer" = "Eşe Gönderiliyor";
+"Uploading To Peer" = "Karşıdaki Eşe Yükleniyor";
 
 /* Torrent -> status string */
 "Waiting to check existing data" = "Var olan veriyi denetlemek için bekleniyor";
@@ -1138,8 +1138,8 @@
 "Yellow" = "Sarı";
 
 /* Inspector -> peer -> status */
-"You unchoked the peer, but the peer is not interested" = "Karşıdaki eşe izin verdiniz, ancak eş ilgilenmiyor";
+"You unchoked the peer, but the peer is not interested" = "Karşıdaki eşe izin verdiniz; ancak eş ilgilenmiyor";
 
 /* Inspector -> peer -> status */
-"You want to download, but peer does not want to send (interested and choked)" = "Siz indirmek istiyorsunuz ancak karşıdaki eş göndermek istemiyor (ilgili ve izinsiz)";
+"You want to download, but peer does not want to send (interested and choked)" = "Siz indirmek istiyorsunuz; ancak karşıdaki eş göndermek istemiyor (ilgili ve izinsiz)";
 

@@ -6,7 +6,7 @@
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Message Log</property>
     <property name="role">message-log</property>
-    <property name="default-width">560</property>
+    <property name="default-width">750</property>
     <property name="default-height">350</property>
     <child>
       <object class="GtkBox" id="window_layout">
@@ -17,6 +17,7 @@
           <object class="GtkToolbar" id="toolbar">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="show-arrow">False</property>
             <child>
               <object class="GtkToolButton" id="save_as_button">
                 <property name="visible">True</property>

@@ -39,6 +39,7 @@
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
+#include "dns-ev.h"
 #include "error-types.h"
 #include "error.h"
 #include "file.h"
@@ -53,10 +54,8 @@
 #include "timer-ev.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
-#include "tr-udp.h"
 #include "tr-utp.h"
 #include "trevent.h"
 #include "utils.h"
@@ -244,7 +243,7 @@ void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchRes
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
 {
-    session->web->fetch(std::move(options));
+    session->fetch(std::move(options));
 }
 
 /***
@@ -270,7 +269,7 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 ****
 ***/
 
-void tr_bindinfo::close()
+void tr_session::tr_bindinfo::close()
 {
     if (ev_ != nullptr)
     {
@@ -289,49 +288,27 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    auto client_addr = tr_address{};
-    auto client_port = tr_port{};
-    auto const client_socket = tr_netAccept(session, fd, &client_addr, &client_port);
-
-    if (client_socket != TR_BAD_SOCKET)
+    if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", client_socket, client_addr.readable(client_port)));
-
-        tr_peerMgrAddIncoming(session->peerMgr, &client_addr, client_port, tr_peer_socket_tcp_create(client_socket));
+        auto const [addr, port, sock] = *incoming_info;
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
+        session->addIncoming(addr, port, tr_peer_socket_tcp_create(sock));
     }
 }
 
-void tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
+void tr_session::tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
 {
     TR_ASSERT(session->allowsTCP());
 
-    socket_ = tr_netBindTCP(&addr_, session->private_peer_port, false);
+    socket_ = tr_netBindTCP(&addr_, session->private_peer_port_, false);
 
     if (socket_ != TR_BAD_SOCKET)
     {
         tr_logAddInfo(fmt::format(
             _("Listening to incoming peer connections on {hostport}"),
-            fmt::arg("hostport", addr_.readable(session->private_peer_port))));
+            fmt::arg("hostport", addr_.readable(session->private_peer_port_))));
         ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, acceptIncomingPeer, session);
         event_add(ev_, nullptr);
-    }
-}
-
-static void close_incoming_peer_port(tr_session* session)
-{
-    session->bind_ipv4.close();
-    session->bind_ipv6.close();
-}
-
-static void open_incoming_peer_port(tr_session* session)
-{
-    TR_ASSERT(session->allowsTCP());
-
-    session->bind_ipv4.bindAndListenForIncomingPeers(session);
-
-    if (tr_net_hasIPv6(session->private_peer_port))
-    {
-        session->bind_ipv6.bindAndListenForIncomingPeers(session);
     }
 }
 
@@ -340,10 +317,10 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
     switch (type)
     {
     case TR_AF_INET:
-        return { bind_ipv4.addr_, bind_ipv4.addr_.readable() == DefaultBindAddressIpv4 };
+        return { bind_ipv4_.addr_, bind_ipv4_.addr_.readable() == DefaultBindAddressIpv4 };
 
     case TR_AF_INET6:
-        return { bind_ipv6.addr_, bind_ipv6.addr_.readable() == DefaultBindAddressIpv6 };
+        return { bind_ipv6_.addr_, bind_ipv6_.addr_.readable() == DefaultBindAddressIpv6 };
 
     default:
         TR_ASSERT_MSG(false, "invalid type");
@@ -512,8 +489,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask_));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent());
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4.readable());
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6.readable());
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4_.readable());
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6_.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !s->shouldPauseAddedTorrents());
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
@@ -632,9 +609,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     /* initialize the bare skeleton of the session object */
     auto* const session = new tr_session{ config_dir };
-    session->udp_socket = TR_BAD_SOCKET;
-    session->udp6_socket = TR_BAD_SOCKET;
-    session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
@@ -676,7 +650,7 @@ void tr_session::onNowTimer()
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
-    tr_dhtUpkeep(this);
+    udp_core_->dhtUpkeep();
     if (turtle.isClockEnabled)
     {
         turtleCheckClock(this, &this->turtle);
@@ -733,16 +707,17 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->peerMgr = tr_peerMgrNew(this);
+    this->peer_mgr_ = tr_peerMgrNew(this);
 
-    this->shared = tr_sharedInit(*this);
+    this->port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
     /**
     ***  Blocklist
     **/
 
     tr_sys_dir_create(tr_pathbuf{ configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
-    loadBlocklists();
+    this->blocklists_.clear();
+    this->blocklists_ = BlocklistFile::loadBlocklists(configDir(), useBlocklist());
 
     tr_announcerInit(this);
 
@@ -750,13 +725,13 @@ void tr_session::initImpl(init_data& data)
 
     tr_sessionSet(this, &settings);
 
-    tr_udpInit(this);
+    this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
 
-    this->web = tr_web::create(this->web_mediator_);
+    this->web_ = tr_web::create(this->web_mediator_);
 
     if (this->allowsLPD())
     {
-        this->lpd_ = tr_lpd::create(lpd_mediator_, timerMaker(), eventBase());
+        this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
     }
 
     tr_utpInit(this);
@@ -767,7 +742,6 @@ void tr_session::initImpl(init_data& data)
 }
 
 static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
-static void setPeerPort(tr_session* session, tr_port port);
 
 void tr_session::setImpl(init_data& data)
 {
@@ -956,7 +930,7 @@ void tr_session::setImpl(init_data& data)
 
     /* public addresses */
 
-    close_incoming_peer_port(this);
+    closePeerPort();
 
     auto address = tr_inaddr_any;
 
@@ -968,7 +942,7 @@ void tr_session::setImpl(init_data& data)
         }
     }
 
-    this->bind_ipv4 = tr_bindinfo{ address };
+    this->bind_ipv4_ = tr_bindinfo{ address };
 
     address = tr_in6addr_any;
 
@@ -980,7 +954,7 @@ void tr_session::setImpl(init_data& data)
         }
     }
 
-    this->bind_ipv6 = tr_bindinfo{ address };
+    this->bind_ipv6_ = tr_bindinfo{ address };
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
@@ -999,14 +973,14 @@ void tr_session::setImpl(init_data& data)
     }
 
     {
-        auto peer_port = this->private_peer_port;
+        auto peer_port = this->private_peer_port_;
 
         if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
         {
             peer_port.setHost(static_cast<uint16_t>(port));
         }
 
-        ::setPeerPort(this, isPortRandom() ? randomPort() : peer_port);
+        setPeerPort(isPortRandom() ? randomPort() : peer_port);
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &val))
@@ -1255,44 +1229,46 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 ****  Peer Port
 ***/
 
-static void peerPortChanged(tr_session* const session)
+void tr_session::setPeerPort(tr_port port_in)
 {
-    TR_ASSERT(session != nullptr);
-
-    close_incoming_peer_port(session);
-
-    if (session->allowsTCP())
+    auto const in_session_thread = [this](tr_port port)
     {
-        open_incoming_peer_port(session);
-    }
+        private_peer_port_ = port;
+        public_peer_port_ = port;
 
-    tr_sharedPortChanged(*session);
+        closePeerPort();
 
-    for (auto* const tor : session->torrents())
-    {
-        tr_torrentChangeMyPort(tor);
-    }
-}
+        if (allowsTCP())
+        {
+            bind_ipv4_.bindAndListenForIncomingPeers(this);
 
-static void setPeerPort(tr_session* session, tr_port port)
-{
-    session->private_peer_port = port;
-    session->public_peer_port = port;
+            if (tr_net_hasIPv6(private_peer_port_))
+            {
+                bind_ipv6_.bindAndListenForIncomingPeers(this);
+            }
+        }
 
-    tr_runInEventThread(session, peerPortChanged, session);
+        port_forwarding_->portChanged();
+
+        for (auto* const tor : torrents())
+        {
+            tr_torrentChangeMyPort(tor);
+        }
+    };
+
+    tr_runInEventThread(this, in_session_thread, port_in);
 }
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
-    if (auto const port = tr_port::fromHost(hport); session != nullptr && session->private_peer_port != port)
-    {
-        setPeerPort(session, port);
-    }
+    TR_ASSERT(session != nullptr);
+
+    session->setPeerPort(tr_port::fromHost(hport));
 }
 
 uint16_t tr_sessionGetPeerPort(tr_session const* session)
 {
-    return session != nullptr ? session->public_peer_port.host() : 0U;
+    return session != nullptr ? session->public_peer_port_.host() : 0U;
 }
 
 uint16_t tr_sessionSetPeerPortRandom(tr_session* session)
@@ -1316,11 +1292,11 @@ bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)
     return session->isPortRandom();
 }
 
-tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
+tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_port_forwarding(tr_sharedTraversalStatus(session->shared));
+    return session->port_forwarding_->state();
 }
 
 /***
@@ -1810,15 +1786,15 @@ void tr_session::closeImplStart()
 
     lpd_.reset();
 
-    tr_dhtUninit(this);
+    udp_core_->startShutdown();
 
     save_timer_.reset();
     now_timer_.reset();
 
     verifier_.reset();
-    tr_sharedClose(*this);
+    port_forwarding_.reset();
 
-    close_incoming_peer_port(this);
+    closePeerPort();
     this->rpc_server_.reset();
 
     /* Close the torrents. Get the most active ones first so that
@@ -1849,7 +1825,7 @@ void tr_session::closeImplStart()
 
     /* and this goes *after* announcer close so that
        it won't be idle until the announce events are sent... */
-    this->web->closeSoon();
+    this->web_->closeSoon();
 
     this->cache.reset();
 
@@ -1879,10 +1855,10 @@ void tr_session::closeImplFinish()
 
     /* we had to wait until UDP trackers were closed before closing these: */
     tr_tracker_udp_close(this);
-    tr_udpUninit(this);
+    this->udp_core_.reset();
 
     stats().saveIfDirty();
-    tr_peerMgrFree(peerMgr);
+    tr_peerMgrFree(peer_mgr_);
     tr_utpClose(this);
     blocklists_.clear();
     openFiles().closeAll();
@@ -1914,24 +1890,24 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(10);
     }
 
-    /* "shared" and "tracker" have live sockets,
+    /* "port_forwarding" and "tracker" have live sockets,
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != nullptr || !session->web->isClosed() || session->announcer != nullptr ||
+    while ((session->port_forwarding_ || !session->web_->isClosed() || session->announcer != nullptr ||
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
         tr_logAddTrace(fmt::format(
             "waiting on port unmap ({}) or announcer ({})... now {} deadline {}",
-            fmt::ptr(session->shared),
+            fmt::ptr(session->port_forwarding_.get()),
             fmt::ptr(session->announcer),
             time(nullptr),
             deadline));
         tr_wait_msec(50);
     }
 
-    session->web.reset();
+    session->web_.reset();
 
     /* close the libtransmission thread */
     tr_eventClose(session);
@@ -2016,8 +1992,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
 size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
 {
-    struct sessionLoadTorrentsData data;
-
+    auto data = sessionLoadTorrentsData{};
     data.session = session;
     data.ctor = ctor;
     data.done = false;
@@ -2081,9 +2056,9 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         session,
         [session, enabled]()
         {
-            tr_udpUninit(session);
+            session->udp_core_.reset();
             session->is_dht_enabled_ = enabled;
-            tr_udpInit(session);
+            session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session, session->udpPort());
         });
 }
 
@@ -2115,21 +2090,9 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
     {
         return;
     }
-    tr_runInEventThread(
-        session,
-        [session, enabled]()
-        {
-            session->is_utp_enabled_ = enabled;
-            tr_udpSetSocketBuffers(session);
-            tr_udpSetSocketTOS(session);
-            // But don't call tr_utpClose --
-            // see reset_timer in tr-utp.c for an explanation.
-        });
-}
 
-/***
-****
-***/
+    session->is_utp_enabled_ = enabled;
+}
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
@@ -2148,7 +2111,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
             session->is_lpd_enabled_ = enabled;
             if (enabled)
             {
-                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->timerMaker(), session->eventBase());
+                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->eventBase());
             }
         });
 }
@@ -2235,99 +2198,19 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    tr_runInEventThread(session, tr_sharedTraversalEnable, session->shared, enabled);
+    tr_runInEventThread(session, [session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_sharedTraversalIsEnabled(session->shared);
+    return session->port_forwarding_->isEnabled();
 }
 
 /***
 ****
 ***/
-
-void tr_session::loadBlocklists()
-{
-    auto loadme = std::unordered_set<std::string>{};
-    auto const is_enabled = useBlocklist();
-
-    /* walk the blocklist directory... */
-    auto const dirname = tr_pathbuf{ configDir(), "/blocklists"sv };
-    auto const odir = tr_sys_dir_open(dirname);
-
-    if (odir == TR_BAD_SYS_DIR)
-    {
-        return;
-    }
-
-    char const* name = nullptr;
-    while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-    {
-        auto load = std::string{};
-
-        if (name[0] == '.') /* ignore dotfiles */
-        {
-            continue;
-        }
-
-        if (auto const path = tr_pathbuf{ dirname, '/', name }; tr_strvEndsWith(path, ".bin"sv))
-        {
-            load = path;
-        }
-        else
-        {
-            auto const binname = tr_pathbuf{ dirname, '/', name, ".bin"sv };
-
-            if (auto const bininfo = tr_sys_path_get_info(binname); !bininfo)
-            {
-                // create it
-                auto b = BlocklistFile{ binname, is_enabled };
-                if (auto const n = b.setContent(path); n > 0)
-                {
-                    load = binname;
-                }
-            }
-            else if (auto const pathinfo = tr_sys_path_get_info(path);
-                     pathinfo && pathinfo->last_modified_at >= bininfo->last_modified_at)
-            {
-                // update it
-                auto const old = tr_pathbuf{ binname, ".old"sv };
-                tr_sys_path_remove(old);
-                tr_sys_path_rename(binname, old);
-
-                BlocklistFile b(binname, is_enabled);
-
-                if (b.setContent(path) > 0)
-                {
-                    tr_sys_path_remove(old);
-                }
-                else
-                {
-                    tr_sys_path_remove(binname);
-                    tr_sys_path_rename(old, binname);
-                }
-            }
-        }
-
-        if (!std::empty(load))
-        {
-            loadme.emplace(load);
-        }
-    }
-
-    blocklists_.clear();
-    std::transform(
-        std::begin(loadme),
-        std::end(loadme),
-        std::back_inserter(blocklists_),
-        [&is_enabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), is_enabled); });
-
-    /* cleanup */
-    tr_sys_dir_close(odir);
-}
 
 void tr_session::useBlocklist(bool enabled)
 {
@@ -2350,9 +2233,9 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
 void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_.clear();
-    session->loadBlocklists();
+    session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
 
-    tr_peerMgrOnBlocklistChanged(session->peerMgr);
+    tr_peerMgrOnBlocklistChanged(session->peer_mgr_);
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)
@@ -2803,7 +2686,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
-    auto const& groups = session->bandwidth_groups_;
+    auto const& groups = session->bandwidthGroups();
 
     auto groups_dict = tr_variant{};
     tr_variantInitDict(&groups_dict, std::size(groups));
@@ -2917,7 +2800,9 @@ auto makeEventBase()
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir)
-    : session_id_{ tr_time }
+    : config_dir_{ config_dir }
+    , resume_dir_{ makeResumeDir(config_dir) }
+    , torrent_dir_{ makeTorrentDir(config_dir) }
     , event_base_{ makeEventBase() }
     , evdns_base_{ evdns_base_new(eventBase(), EVDNS_BASE_INITIALIZE_NAMESERVERS),
                    [](evdns_base* dns)
@@ -2926,10 +2811,8 @@ tr_session::tr_session(std::string_view config_dir)
                        evdns_base_free(dns, 0);
                    } }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
-    , config_dir_{ config_dir }
-    , resume_dir_{ makeResumeDir(config_dir) }
-    , torrent_dir_{ makeTorrentDir(config_dir) }
-    , session_stats_{ config_dir, time(nullptr) }
+    , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
+    , session_id_{ tr_time }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->startRepeating(1s);
@@ -2950,4 +2833,16 @@ tr_session::tr_session(std::string_view config_dir)
     save_timer_->startRepeating(SaveIntervalSecs);
 
     verifier_->addCallback(tr_torrentOnVerifyDone);
+}
+
+void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
+{
+    tr_peerMgrAddIncoming(peer_mgr_, addr, port, socket);
+}
+
+void tr_session::addTorrent(tr_torrent* tor)
+{
+    tor->unique_id_ = torrents().add(tor);
+
+    tr_peerMgrAddTorrent(peer_mgr_, tor);
 }

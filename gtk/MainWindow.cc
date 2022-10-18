@@ -70,7 +70,7 @@ private:
 
     Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
-    void on_popup_menu(GdkEventButton* event);
+    void on_popup_menu(double view_x, double view_y);
 
     void onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled);
     void onSpeedSet(tr_direction dir, int KBps);
@@ -111,22 +111,39 @@ private:
     TorrentCellRenderer* renderer_ = nullptr;
     Gtk::TreeViewColumn* column_ = nullptr;
     sigc::connection pref_handler_id_;
-    Gtk::Menu* popup_menu_ = nullptr;
+    IF_GTKMM4(Gtk::PopoverMenu*, Gtk::Menu*) popup_menu_ = nullptr;
 };
 
 /***
 ****
 ***/
 
-void MainWindow::Impl::on_popup_menu(GdkEventButton* event)
+void MainWindow::Impl::on_popup_menu([[maybe_unused]] double view_x, [[maybe_unused]] double view_y)
 {
     if (popup_menu_ == nullptr)
     {
-        popup_menu_ = Gtk::make_managed<Gtk::Menu>(gtr_action_get_object<Gio::Menu>("main-window-popup"));
+        auto const menu = gtr_action_get_object<Gio::Menu>("main-window-popup");
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        popup_menu_ = Gtk::make_managed<Gtk::PopoverMenu>(menu, Gtk::PopoverMenu::Flags::NESTED);
+        popup_menu_->set_parent(window_);
+        popup_menu_->set_has_arrow(false);
+        popup_menu_->set_halign(window_.get_direction() == Gtk::TextDirection::RTL ? Gtk::Align::END : Gtk::Align::START);
+#else
+        popup_menu_ = Gtk::make_managed<Gtk::Menu>(menu);
         popup_menu_->attach_to_widget(window_);
+#endif
     }
 
-    popup_menu_->popup_at_pointer(reinterpret_cast<GdkEvent*>(event));
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    double window_x = 0;
+    double window_y = 0;
+    view_->translate_coordinates(window_, view_x, view_y, window_x, window_y);
+    popup_menu_->set_pointing_to(Gdk::Rectangle(window_x, window_y, 1, 1));
+    popup_menu_->popup();
+#else
+    popup_menu_->popup_at_pointer(nullptr);
+#endif
 }
 
 namespace
@@ -136,7 +153,7 @@ bool tree_view_search_equal_func(
     Glib::RefPtr<Gtk::TreeModel> const& /*model*/,
     int /*column*/,
     Glib::ustring const& key,
-    Gtk::TreeModel::iterator const& iter)
+    Gtk::TreeModel::const_iterator const& iter)
 {
     auto const name = iter->get_value(torrent_cols.name_collated);
     return name.find(key.lowercase()) == Glib::ustring::npos;
@@ -160,13 +177,21 @@ void MainWindow::Impl::init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeMode
     renderer_->property_xpad() = GUI_PAD_SMALL;
     renderer_->property_ypad() = GUI_PAD_SMALL;
 
-    view->signal_popup_menu().connect_notify([this]() { on_popup_menu(nullptr); });
-    view->signal_button_press_event().connect(
-        [this, view](GdkEventButton* event)
-        { return on_tree_view_button_pressed(view, event, sigc::mem_fun(*this, &Impl::on_popup_menu)); },
-        false);
-    view->signal_button_release_event().connect([view](GdkEventButton* event)
-                                                { return on_tree_view_button_released(view, event); });
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
+    view->signal_popup_menu().connect_notify([this]() { on_popup_menu(0, 0); });
+#endif
+    setup_tree_view_button_event_handling(
+        *view,
+        [this, view](guint /*button*/, TrGdkModifierType /*state*/, double view_x, double view_y, bool context_menu_requested)
+        {
+            return on_tree_view_button_pressed(
+                *view,
+                view_x,
+                view_y,
+                context_menu_requested,
+                sigc::mem_fun(*this, &Impl::on_popup_menu));
+        },
+        [view](double view_x, double view_y) { return on_tree_view_button_released(*view, view_x, view_y); });
     view->signal_row_activated().connect([](auto const& /*path*/, auto* /*column*/)
                                          { gtr_action_activate("show-torrent-properties"); });
 
@@ -181,8 +206,11 @@ void MainWindow::Impl::prefsChanged(tr_quark const key)
         renderer_->property_compact() = gtr_pref_flag_get(key);
         /* since the cell size has changed, we need gtktreeview to revalidate
          * its fixed-height mode values. Unfortunately there's not an API call
-         * for that, but it *does* revalidate when it thinks the style's been tweaked */
-        g_signal_emit_by_name(Glib::unwrap(view_), "style-updated", nullptr, nullptr);
+         * for that, but this seems to work for both GTK 3 and 4 */
+        view_->set_fixed_height_mode(false);
+        view_->set_row_separator_func({});
+        view_->unset_row_separator_func();
+        view_->set_fixed_height_mode(true);
         break;
 
     case TR_KEY_show_statusbar:
@@ -227,9 +255,6 @@ void MainWindow::Impl::syncAltSpeedButton()
 {
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
     alt_speed_button_->set_active(b);
-    alt_speed_image_->set_from_icon_name("turtle-symbolic", Gtk::BuiltinIconSize::ICON_SIZE_MENU);
-    alt_speed_button_->set_halign(Gtk::ALIGN_CENTER);
-    alt_speed_button_->set_valign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_tooltip_text(fmt::format(
         b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
             _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)"),
@@ -516,7 +541,9 @@ MainWindow::Impl::Impl(
     /* make the window */
     window.set_title(Glib::get_application_name());
     window.set_default_size(gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     window.move(gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
+#endif
 
     if (gtr_pref_flag_get(TR_KEY_main_window_is_maximized))
     {
@@ -532,7 +559,18 @@ MainWindow::Impl::Impl(
     /* gear */
     auto* gear_button = gtr_get_widget<Gtk::MenuButton>(builder, "gear_button");
     gear_button->set_menu_model(createOptionsMenu());
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    for (auto* child = gear_button->get_first_child(); child != nullptr; child = child->get_next_sibling())
+    {
+        if (auto* popover = dynamic_cast<Gtk::Popover*>(child); popover != nullptr)
+        {
+            popover->signal_show().connect([this]() { onOptionsClicked(); }, false);
+            break;
+        }
+    }
+#else
     gear_button->signal_clicked().connect([this]() { onOptionsClicked(); }, false);
+#endif
 
     /* turtle */
     alt_speed_button_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::alt_speed_toggled_cb));
@@ -574,6 +612,7 @@ MainWindow::Impl::Impl(
 
     refresh();
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     /* prevent keyboard events being sent to the window first */
     window.signal_key_press_event().connect(
         [this](GdkEventKey* event) { return gtk_window_propagate_key_event(static_cast<Gtk::Window&>(window_).gobj(), event); },
@@ -581,6 +620,7 @@ MainWindow::Impl::Impl(
     window.signal_key_release_event().connect(
         [this](GdkEventKey* event) { return gtk_window_propagate_key_event(static_cast<Gtk::Window&>(window_).gobj(), event); },
         false);
+#endif
 }
 
 void MainWindow::Impl::updateStats()
@@ -675,10 +715,14 @@ void MainWindow::set_busy(bool isBusy)
 {
     if (get_realized())
     {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        auto const cursor = isBusy ? Gdk::Cursor::create("wait") : Glib::RefPtr<Gdk::Cursor>();
+        set_cursor(cursor);
+#else
         auto const display = get_display();
         auto const cursor = isBusy ? Gdk::Cursor::create(display, Gdk::WATCH) : Glib::RefPtr<Gdk::Cursor>();
-
         get_window()->set_cursor(cursor);
         display->flush();
+#endif
     }
 }

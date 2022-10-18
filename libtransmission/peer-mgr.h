@@ -44,7 +44,7 @@ enum
     ADDED_F_ENCRYPTION_FLAG = 1,
     /* true if the peer is a seed or partial seed */
     ADDED_F_SEED_FLAG = 2,
-    /* true if the peer supports uTP */
+    /* true if the peer supports µTP */
     ADDED_F_UTP_FLAGS = 4,
     /* true if the peer has holepunch support */
     ADDED_F_HOLEPUNCH = 8,
@@ -121,7 +121,7 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
 
 [[nodiscard]] size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket);
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
 
 [[nodiscard]] std::vector<tr_pex> tr_peerMgrCompactToPex(
     void const* compact,

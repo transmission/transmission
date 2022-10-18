@@ -71,7 +71,7 @@ The remaining bits are reserved for future use.
 
 The initiating peer A should provide all methods he supports in the bitfield,
 but he may choose only to provide higher encryption levels e.g. if  plaintext
-isn't sufficient for it's security needs.
+isn't sufficient for its security needs.
 The responding peer B should set a bit corresponding to the single method
 which he selected from the provided ones.
 

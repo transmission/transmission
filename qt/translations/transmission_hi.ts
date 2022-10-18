@@ -61,18 +61,18 @@
         <source>I &amp;Agree</source>
         <translation>मुझे स्वीकार है (&amp;A)</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+132"/>
+        <location line="+29"/>
         <source>Torrent Added</source>
         <translation>टोरेंट जोड़ा गया</translation>
-    </message>
-    <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
-        <translation>
-            <numerusform>पूर्ण टोरेंट</numerusform>
-            <numerusform>पूर्ण टोरेंट</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -215,8 +215,13 @@
         <source>Peer is an incoming connection</source>
         <translation>पीयर एक आवक कनेक्शन है</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+132"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -225,12 +230,7 @@
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation>यूआरएल जोड़ें</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>ट्रैकर अनुरोध यूआरएल जोड़ें, एक ट्रैकर प्रति पंक्ति :</translation>
     </message>
@@ -245,7 +245,7 @@
         <translation>कोई नवीन यूआरएल प्राप्त नहीं हुए।</translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-834"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -274,12 +274,12 @@
         <translation>अनुपलब्ध</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>uTP द्वारा कनेक्ट पीयर</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+260"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>उच्च</translation>
     </message>
@@ -632,8 +632,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>नाम बदलें...</translation>
+        <source>Rename…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -685,9 +685,9 @@
         <translation>दिखाएँ :</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Search...</source>
-        <translation>खोजें...</translation>
+        <location line="+11"/>
+        <source>Search…</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -776,13 +776,13 @@
         <translation>कोई नहीं</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location filename="../Formatter.h" line="+64"/>
         <location line="+7"/>
         <source>%1 %2</source>
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+21"/>
+        <location filename="../Formatter.cc" line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln दिन</numerusform>
@@ -790,7 +790,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-5"/>
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln घंटा</numerusform>
@@ -798,7 +798,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln मिनट</numerusform>
@@ -806,27 +806,20 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln सेकंड</numerusform>
             <numerusform>%Ln सेकंड</numerusform>
         </translation>
     </message>
-    <message>
-        <location line="+12"/>
-        <location line="+11"/>
-        <location line="+11"/>
-        <source>%1, %2</source>
-        <translation>%1, %2</translation>
-    </message>
 </context>
 <context>
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;अप्रयुक्त स्पेस की गणना जारी...&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -875,12 +868,7 @@
         <translation>फाइल (&amp;F)</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>नया (&amp;N)...</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>नया टोरेंट बनाएँ</translation>
     </message>
@@ -916,8 +904,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>खोलें (&amp;O)...</translation>
+        <source>&amp;Open…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -930,7 +918,12 @@
         <translation>टोरेंट खोलें</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>फोल्डर खोलें (&amp;e)</translation>
     </message>
@@ -1167,32 +1160,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>सत्र बदलें (&amp;C)...</translation>
+        <source>&amp;Change Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>सत्र चुनें</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>फोल्डर सेट करें (&amp;L)...</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>मैग्नेट लिंक क्लिपबोर्ड पर कॉपी करें (&amp;C)</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>यूआरएल खोलें (&amp;U)...</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>दान दें (&amp;D)</translation>
     </message>
@@ -1444,12 +1437,12 @@
         <translation>नया टोरेंट</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+227"/>
+        <location filename="../MakeDialog.cc" line="+304"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;कोई स्रोत चयनित नहीं&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+5"/>
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln फाइल</numerusform>
@@ -1490,7 +1483,12 @@
         <translation>स्रोत फाइल (&amp;f):</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+36"/>
+        <source>Piece s&amp;ize:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+31"/>
         <source>Properties</source>
         <translation>विशेषताएँ</translation>
     </message>
@@ -1530,7 +1528,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>नया टोरेंट</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-106"/>
+        <location filename="../MakeDialog.cc" line="-184"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>&quot;%1&quot; बनाना जारी</translation>
     </message>
@@ -1548,17 +1546,17 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+63"/>
+        <location filename="../OptionsDialog.cc" line="+52"/>
         <source>Open Torrent</source>
         <translation>टोरेंट खोलें</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-10"/>
         <source>Open Torrent from File</source>
         <translation>फाइल से टोरेंट खोलें</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
         <translation>यूआरएल या मैग्नेट लिंक से टोरेंट खोलें</translation>
     </message>
@@ -1573,7 +1571,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>लक्षित फोल्डर (&amp;D):</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
         <translation>उच्च</translation>
     </message>
@@ -1740,7 +1738,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>पोर्ट &lt;b&gt;बंद&lt;/b&gt; है</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>&quot;टोरेंट डाउनलोड पूर्ण&quot; स्क्रिप्ट चुनें</translation>
     </message>
@@ -1770,16 +1773,6 @@ To add another primary URL, add it after a blank line.</source>
         <source>Options</source>
         <translation>विकल्प</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>पीयर कनेक्शन हेतु uTP सक्रिय करें (&amp;u)</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP - नेटवर्क संकुलन कम करने हेतु एक साधन है।</translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
@@ -1804,7 +1797,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>यहाँ से स्वतः ही टोरेंट फाइलें जोड़ें (&amp;f):</translation>
     </message>
@@ -1876,21 +1869,8 @@ To add another primary URL, add it after a blank line.</source>
         <source>Maximum peers &amp;overall:</source>
         <translation>कुल अधिकतम पीयर (&amp;o):</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;अपडेट सफल!&lt;/b&gt;&lt;p&gt;अवरुद्ध सूची में अब %Ln नियम है।</numerusform>
-            <numerusform>&lt;b&gt;अपडेट सफल!&lt;/b&gt;&lt;p&gt;अवरुद्ध सूची में अब %Ln नियम हैं।</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;अवरुद्ध सूची अपडेट&lt;/b&gt;&lt;p&gt;नई अवरुद्ध सूची प्राप्त हो रही है ...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>अवरुद्ध सूची</translation>
     </message>
@@ -1900,7 +1880,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>स्वतः अपडेट सक्रिय करें (&amp;a)</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>एन्क्रिप्शन स्वीकार्य</translation>
     </message>
@@ -2021,7 +2001,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>सीड प्रक्रिया पूर्ण होने पर यह स्क्रिप्ट निष्पादित करें (&amp;t):</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation>डिफ़ॉल्ट सार्वजानिक ट्रैकर</translation>
     </message>
@@ -2056,12 +2046,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>टोरेंट पूर्ण होने पर ध्वनि द्वारा सूचित करें (&amp;s)</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>टीसीपी पोर्ट जाँच जारी...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>पीयर सीमाएँ</translation>
     </message>
@@ -2101,7 +2086,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>एन्क्रिप्शन</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>अपूर्ण डायरेक्टरी चुनें</translation>
     </message>
@@ -2110,8 +2095,21 @@ To add another primary URL, add it after a blank line.</source>
         <source>Select Watch Directory</source>
         <translation>कार्यरत डायरेक्टरी चुनें</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>लक्षित डायरेक्टरी चुनें</translation>
     </message>
@@ -2180,12 +2178,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-277"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>अमान्य विकल्प</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+307"/>
         <source>Start Now</source>
         <translation>अभी आरंभ करें</translation>
     </message>
@@ -2226,7 +2224,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+499"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>पथ नाम बदलने में त्रुटि</translation>
     </message>
@@ -2248,17 +2246,17 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>प्रतिलिपि टोरेंट</numerusform>
-            <numerusform>प्रतिलिपि टोरेंट</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>%n प्रतिलिपि टोरेंट जोड़ना विफल</numerusform>
-            <numerusform>%n प्रतिलिपि टोरेंट जोड़ना विफल</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2363,7 +2361,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+297"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>लोकल डाटा प्रमाणीकरण जारी</translation>
     </message>
@@ -2575,13 +2573,13 @@ To add another primary URL, add it after a blank line.</source>
         <translation>अधिक पीयर अनुरोध हेतु पंक्तिबद्ध</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>अधिक पीयर हेतु अनुरोध जारी... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2611,7 +2609,13 @@ To add another primary URL, add it after a blank line.</source>
         <translation>%1&quot;%2&quot;%3 %4 पूर्व अनुरोध त्रुटि प्राप्त</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>%1 उपरांत पीयर संख्या हेतु अनुरोध</translation>
@@ -2620,12 +2624,6 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>अधिक पीयर संख्या अनुरोध हेतु पंक्तिबद्ध</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>पीयर संख्या हेतु अनुरोध जारी... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

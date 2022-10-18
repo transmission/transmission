@@ -39,11 +39,11 @@ void gtr_pref_init(std::string_view config_dir)
  */
 static void tr_prefs_init_defaults(tr_variant* d)
 {
-    auto dir = Glib::get_user_special_dir(Glib::USER_DIRECTORY_DOWNLOAD);
+    auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD));
 
     if (dir.empty())
     {
-        dir = Glib::get_user_special_dir(Glib::USER_DIRECTORY_DESKTOP);
+        dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP));
     }
 
     if (dir.empty())

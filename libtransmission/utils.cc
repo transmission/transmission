@@ -5,6 +5,7 @@
 
 #include <algorithm> // for std::sort, std::transform
 #include <array> // std::array
+#include <cctype>
 #include <cerrno>
 #include <cfloat> // DBL_DIG
 #include <chrono>
@@ -253,7 +254,7 @@ void tr_wait_msec(long int delay_milliseconds)
 
 #else
 
-    struct timespec ts;
+    struct timespec ts = {};
     ts.tv_sec = delay_milliseconds / 1000;
     ts.tv_nsec = (delay_milliseconds % 1000) * 1000000;
     nanosleep(&ts, nullptr);
@@ -724,7 +725,7 @@ uint64_t tr_htonll(uint64_t x)
     {
         std::array<uint32_t, 2> lx;
         uint64_t llx;
-    } u;
+    } u = {};
     u.lx[0] = htonl(x >> 32);
     u.lx[1] = htonl(x & 0xFFFFFFFFULL);
     return u.llx;
@@ -745,7 +746,7 @@ uint64_t tr_ntohll(uint64_t x)
     {
         std::array<uint32_t, 2> lx;
         uint64_t llx;
-    } u;
+    } u = {};
     u.llx = x;
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 

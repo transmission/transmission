@@ -25,8 +25,21 @@ include(ExternalProject)
 include(GNUInstallDirs)
 include(TrMacros)
 
+set(CURL_MINIMUM            7.28.0)
+set(CYASSL_MINIMUM          3.0)
+set(DEFLATE_MINIMUM         1.10)
+set(EVENT2_MINIMUM          2.1.0)
+set(GIOMM_MINIMUM           2.26.0)
+set(GLIBMM_MINIMUM          2.60.0)
+set(GTKMM_MINIMUM           3.24.0)
+set(LIBAPPINDICATOR_MINIMUM 0.4.90)
+set(OPENSSL_MINIMUM         0.9.7)
+set(POLARSSL_MINIMUM        1.3)
+set(PSL_MINIMUM             0.21.1)
+set(QT_MINIMUM              5.6)
+
         option(ENABLE_DAEMON        "Build daemon" ON)
-tr_auto_option(ENABLE_GTK           "Build GTK+ client" AUTO)
+tr_auto_option(ENABLE_GTK           "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_WEB           "Build Web client" OFF)
@@ -47,6 +60,7 @@ tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL       "Use system psl library" AUTO)
+tr_list_option(USE_GTK_VERSION      "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO ccrypto cyassl mbedtls openssl polarssl wolfssl)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
@@ -56,25 +70,69 @@ tr_auto_option(WITH_SYSTEMD         "Add support for systemd startup notificatio
 
 set(TR_NAME ${PROJECT_NAME})
 
-# convention: -TR MAJOR MINOR MAINT STATUS - (each a single char)
-# STATUS: "X" for prerelease beta builds,
-#         "Z" for unsupported trunk builds,
-#         "0" for stable, supported releases
-# these should be the only two lines you need to change
-set(TR_USER_AGENT_PREFIX "3.00+")
-set(TR_PEER_ID_PREFIX "-TR300Z-")
+# major.minor.patch[-[beta.N.]dev]+commit_hash
+# dev builds come between releases, e.g. autobuilds from CI
 
-string(REGEX MATCH "^([0-9]+)\\.([0-9]+).*" TR_VERSION "${TR_USER_AGENT_PREFIX}")
-set(TR_VERSION_MAJOR "${CMAKE_MATCH_1}")
-set(TR_VERSION_MINOR "${CMAKE_MATCH_2}")
 
-if(TR_PEER_ID_PREFIX MATCHES "X-$")
-    set(TR_BETA_RELEASE 1)
-elseif(TR_PEER_ID_PREFIX MATCHES "Z-$")
+# these should be the only five lines you need to change
+set(TR_VERSION_MAJOR "4")
+set(TR_VERSION_MINOR "0")
+set(TR_VERSION_PATCH "0")
+set(TR_VERSION_BETA_NUMBER "1") # empty string for not beta
+set(TR_VERSION_DEV TRUE)
+
+# derived from above: release type
+if (TR_VERSION_DEV)
     set(TR_NIGHTLY_RELEASE 1)
+elseif (NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+    set(TR_BETA_RELEASE 1)
 else()
     set(TR_STABLE_RELEASE 1)
 endif()
+
+# derived from above: semver version string. https://semver.org/
+# '4.0.0-beta.1'
+# '4.0.0-beta.1.dev' (a dev release between beta 1 and 2)
+# '4.0.0-beta.2'
+# '4.0.0'
+set(TR_SEMVER "${TR_VERSION_MAJOR}.${TR_VERSION_MINOR}.${TR_VERSION_PATCH}")
+if (TR_VERSION_DEV OR NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+    string(APPEND TR_SEMVER "-")
+    if (NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+        string(APPEND TR_SEMVER "beta.${TR_VERSION_BETA_NUMBER}")
+    endif()
+    if (TR_VERSION_DEV AND NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+        string(APPEND TR_SEMVER ".")
+    endif()
+    if (TR_VERSION_DEV)
+        string(APPEND TR_SEMVER "dev")
+    endif()
+endif()
+set(TR_USER_AGENT_PREFIX "${TR_SEMVER}")
+
+# derived from above: peer-id prefix. https://www.bittorrent.org/beps/bep_0020.html
+# chars 4, 5, 6 are major, minor, patch in https://en.wikipedia.org/wiki/Base62
+# char 7 is '0' for a stable release, 'B' for a beta release, or 'Z' for a dev build
+# '-TR400B-' (4.0.0 Beta)
+# '-TR400Z-' (4.0.0 Dev)
+# '-TR4000-' (4.0.0)
+set(TR_PEER_ID_PREFIX "-TR")
+set(BASE62 "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+string(SUBSTRING "${BASE62}" "${TR_VERSION_MAJOR}" 1 TMPSTR)
+string(APPEND TR_PEER_ID_PREFIX "${TMPSTR}")
+string(SUBSTRING "${BASE62}" "${TR_VERSION_MINOR}" 1 TMPSTR)
+string(APPEND TR_PEER_ID_PREFIX "${TMPSTR}")
+string(SUBSTRING "${BASE62}" "${TR_VERSION_PATCH}" 1 TMPSTR)
+string(APPEND TR_PEER_ID_PREFIX "${TMPSTR}")
+if (TR_VERSION_DEV)
+    string(APPEND TR_PEER_ID_PREFIX "Z")
+elseif (NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+    string(APPEND TR_PEER_ID_PREFIX "B")
+else()
+    string(APPEND TR_PEER_ID_PREFIX "0")
+endif()
+string(APPEND TR_PEER_ID_PREFIX "-")
+
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
@@ -114,19 +172,6 @@ endif()
 string(SUBSTRING "${TR_VCS_REVISION}" 0 10 TR_VCS_REVISION)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-set(PSL_MINIMUM             0.21.1)
-set(CURL_MINIMUM            7.28.0)
-set(CYASSL_MINIMUM          3.0)
-set(DEFLATE_MINIMUM         1.10)
-set(EVENT2_MINIMUM          2.1.0)
-set(GIO_MINIMUM             2.26.0)
-set(GLIB_MINIMUM            2.50.1)
-set(GTK_MINIMUM             3.24.0)
-set(LIBAPPINDICATOR_MINIMUM 0.4.90)
-set(OPENSSL_MINIMUM         0.9.7)
-set(POLARSSL_MINIMUM        1.3)
-set(QT_MINIMUM              5.6)
 
 if(WIN32)
     foreach(L C CXX)
@@ -222,17 +267,36 @@ endif()
 if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
-    pkg_check_modules(GTK ${GTK_IS_REQUIRED}
-        gtkmm-3.0>=${GTK_MINIMUM}
-        glibmm-2.4>=${GLIB_MINIMUM}
-        giomm-2.4>=${GIO_MINIMUM})
+    if(USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 4)
+        pkg_check_modules(GTK4
+            gtkmm-4.0>=${GTKMM_MINIMUM}
+            glibmm-2.68>=${GLIBMM_MINIMUM}
+            giomm-2.68>=${GIOMM_MINIMUM})
+        set(GTK_VERSION 4)
+        set(GTK_FOUND ${GTK4_FOUND})
+    endif()
+
+    if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
+        pkg_check_modules(GTK3
+            gtkmm-3.0>=${GTKMM_MINIMUM}
+            glibmm-2.4>=${GLIBMM_MINIMUM}
+            giomm-2.4>=${GIOMM_MINIMUM})
+        set(GTK_VERSION 3)
+        set(GTK_FOUND ${GTK3_FOUND})
+    endif()
+
+    if(GTK_IS_REQUIRED AND NOT GTK_FOUND)
+        message(FATAL_ERROR "GTK is required but wasn't found")
+    endif()
 
     tr_fixup_auto_option(ENABLE_GTK GTK_FOUND GTK_IS_REQUIRED)
 
-    if(ENABLE_GTK AND WITH_LIBAPPINDICATOR)
+    if(ENABLE_GTK AND WITH_LIBAPPINDICATOR AND GTK_VERSION EQUAL 3)
         tr_get_required_flag(WITH_LIBAPPINDICATOR LIBAPPINDICATOR_IS_REQUIRED)
         pkg_check_modules(LIBAPPINDICATOR appindicator3-0.1>=${LIBAPPINDICATOR_MINIMUM})
         tr_fixup_auto_option(WITH_LIBAPPINDICATOR LIBAPPINDICATOR_FOUND LIBAPPINDICATOR_IS_REQUIRED)
+    else()
+        set(WITH_LIBAPPINDICATOR OFF)
     endif()
 else()
     set(WITH_LIBAPPINDICATOR OFF)
@@ -330,7 +394,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 tr_add_external_auto_library(DEFLATE libdeflate deflate)
 if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION 1.10)
+    set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
@@ -692,9 +756,14 @@ if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUA
 endif()
 
 set(CPACK_SOURCE_GENERATOR TXZ)
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
-if(NOT TR_STABLE_RELEASE)
-    string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "-r${TR_VCS_REVISION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_SEMVER}")
+if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
+    # https://semver.org/#spec-item-11
+    # Build metadata MAY be denoted by appending a plus sign and a series of dot
+    # separated identifiers immediately following the patch or pre-release version.
+    # Identifiers MUST comprise only ASCII alphanumerics and hyphens [0-9A-Za-z-].
+    # Identifiers MUST NOT be empty.
+    string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "+r${TR_VCS_REVISION}")
 endif()
 list(APPEND CPACK_SOURCE_IGNORE_FILES
     "${CMAKE_BINARY_DIR}"

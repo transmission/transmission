@@ -12,13 +12,14 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_int_weak() */
+#include "crypto-utils.h" // tr_rand_int_weak()
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-socket.h"
 #include "session.h"
+#include "timer.h"
 #include "tr-utp.h"
 #include "utils.h"
 
@@ -75,30 +76,30 @@ void tr_utpClose(tr_session* /*session*/)
 /* Greg says 50ms works for them. */
 static auto constexpr UtpInterval = 50ms;
 
-static void utp_on_accept(tr_session* const session, UTPSocket* const s)
+static void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 {
-    struct sockaddr_storage from_storage;
+    auto from_storage = sockaddr_storage{};
     auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
-    tr_address addr;
-    tr_port port;
 
     if (!session->allowsUTP())
     {
-        utp_close(s);
+        utp_close(utp_sock);
         return;
     }
 
-    utp_getpeername(s, from, &fromlen);
+    utp_getpeername(utp_sock, from, &fromlen);
 
-    if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
+    if (auto addrport = tr_address::fromSockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
+    {
+        auto const [addr, port] = *addrport;
+        session->addIncoming(addr, port, tr_peer_socket_utp_create(utp_sock));
+    }
+    else
     {
         tr_logAddWarn(_("Unknown socket family"));
-        utp_close(s);
-        return;
+        utp_close(utp_sock);
     }
-
-    tr_peerMgrAddIncoming(session->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
 }
 
 static void utp_send_to(
@@ -108,21 +109,14 @@ static void utp_send_to(
     struct sockaddr const* const to,
     socklen_t const tolen)
 {
-    if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
-    else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
+    ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
 #ifdef TR_UTP_TRACE
 
 static void utp_log(tr_session* const /*session*/, char const* const msg)
 {
-    fmt::print(stderr, FMT_STRING("[utp] {}\n"), msg);
+    fmt::print(stderr, FMT_STRING("[µTP] {}\n"), msg);
 }
 
 #endif
@@ -170,7 +164,7 @@ static void reset_timer(tr_session* session)
     }
     else
     {
-        /* If somebody has disabled uTP, then we still want to run
+        /* If somebody has disabled µTP, then we still want to run
            utp_check_timeouts, in order to let closed sockets finish
            gracefully and so on.  However, since we're not particularly
            interested in that happening in a timely manner, we might as

@@ -2,9 +2,6 @@
 /* Class = "NSWindow"; title = "Transmission"; ObjectID = "21"; */
 "21.title" = "Transmission";
 
-/* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
-"29.title" = "Главное меню";
-
 /* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
 "56.title" = "Transmission";
 

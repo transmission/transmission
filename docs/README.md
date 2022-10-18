@@ -29,7 +29,7 @@ Much of this documentation is out-of-date or could be improved. Pull requests ar
  * [Blocklists](./Blocklists.md)
  * [How to build Transmission](Building-Transmission.md)
  * [RPC protocol specification](rpc-spec.md)
- * [Transmisson's Peer ID and User-Agent headers](Peer-ID-and-User-Agent.md)
+ * [Transmission's Peer ID and User-Agent headers](Peer-ID-and-User-Agent.md)
  * [Peer status text explained](Peer-Status-Text.md)
 
 # 3. Report a problem / request a feature #

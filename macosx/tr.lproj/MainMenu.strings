@@ -2,9 +2,6 @@
 /* Class = "NSWindow"; title = "Transmission"; ObjectID = "21"; */
 "21.title" = "Transmission";
 
-/* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
-"29.title" = "Ana Menü";
-
 /* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
 "56.title" = "Transmission";
 
@@ -273,28 +270,28 @@
 "1936.title" = "Menü";
 
 /* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
-"1944.title" = "İndirme Bant Genişliği Limiti";
+"1944.title" = "İndirme Bant Genişliği Sınırı";
 
 /* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
-"1945.title" = "İndirme Bant Genişliği Limiti";
+"1945.title" = "İndirme Bant Genişliği Sınırı";
 
 /* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
-"1946.title" = "Limitsiz";
+"1946.title" = "Sınırsız";
 
 /* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Gönderme Bant Genişliği Limiti";
+"1950.title" = "Karşıya Yükleme Bant Genişliği Sınırı";
 
 /* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Gönderme Bant Genişliği Limiti";
+"1951.title" = "Karşıya Yükleme Bant Genişliği Sınırı";
 
 /* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
-"1960.title" = "limit";
+"1960.title" = "sınır";
 
 /* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
-"1963.title" = "Limitsiz";
+"1963.title" = "Sınırsız";
 
 /* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
-"1964.title" = "limit";
+"1964.title" = "sınır";
 
 /* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
 "2017.title" = "Beslemenin Duracağı Oran";
@@ -348,7 +345,7 @@
 "3126.headerCell.title" = "İN Hızı";
 
 /* Class = "NSTableColumn"; headerCell.title = "UL Speed"; ObjectID = "3135"; */
-"3135.headerCell.title" = "GN Hızı";
+"3135.headerCell.title" = "KY Hızı";
 
 /* Class = "NSTableColumn"; headerCell.title = "Group"; ObjectID = "3140"; */
 "3140.headerCell.title" = "Öbek";
@@ -390,7 +387,7 @@
 "3216.title" = "Mıknatıs Bağlantıyı Panoya Kopyala";
 
 /* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3218"; */
-"3218.title" = "Mıknatıslı Bağlantıyı Panoya Kopyala";
+"3218.title" = "Mıknatıs Bağlantıyı Panoya Kopyala";
 
 /* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "3221"; */
 "3221.title" = "Yerel Veriyi Doğrula";

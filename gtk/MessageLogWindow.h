@@ -27,10 +27,6 @@ public:
 
     static std::unique_ptr<MessageLogWindow> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
-protected:
-    void on_show() override;
-    void on_hide() override;
-
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;

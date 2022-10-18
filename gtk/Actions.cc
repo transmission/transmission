@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -20,6 +21,8 @@
 #include "Utils.h"
 
 using namespace std::string_view_literals;
+
+using VariantString = Glib::Variant<Glib::ustring>;
 
 namespace
 {
@@ -102,12 +105,12 @@ std::unordered_map<Glib::ustring, Glib::RefPtr<Gio::SimpleAction>> key_to_action
 
 void gtr_actions_set_core(Glib::RefPtr<Session> const& core)
 {
-    myCore = gtr_get_ptr(core);
+    myCore = core.get();
 }
 
 Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, gpointer callback_user_data)
 {
-    myBuilder = gtr_get_ptr(builder);
+    myBuilder = builder.get();
 
     auto const action_group = Gio::SimpleActionGroup::create();
 
@@ -116,7 +119,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring("sort-torrents");
         auto const action = Gio::SimpleAction::create_radio_string(action_name, match);
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& value)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& value)
                                           { sort_changed_cb(*a, value, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
@@ -126,7 +129,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring(std::string(action_name_view));
         auto const action = Gio::SimpleAction::create_bool(action_name);
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
@@ -136,7 +139,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring(std::string(action_name_view));
         auto const action = Gio::SimpleAction::create_bool(action_name, gtr_pref_flag_get(tr_quark_new(action_name_view)));
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { toggle_pref_cb(*a, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
@@ -146,7 +149,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
     {
         auto const action_name = Glib::ustring(std::string(action_name_view));
         auto const action = Gio::SimpleAction::create(action_name);
-        action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
+        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
@@ -184,14 +187,57 @@ void gtr_action_set_toggled(Glib::ustring const& name, bool b)
     get_action(name)->set_state(Glib::Variant<bool>::create(b));
 }
 
-Gtk::Widget* gtr_action_get_widget(Glib::ustring const& name)
-{
-    Gtk::Widget* widget;
-    myBuilder->get_widget(name, widget);
-    return widget;
-}
-
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name)
 {
     return myBuilder->get_object(name);
 }
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+Glib::RefPtr<Gio::ListModel> gtr_shortcuts_get_from_menu(Glib::RefPtr<Gio::MenuModel> const& menu)
+{
+    auto result = Gio::ListStore<Gtk::Shortcut>::create();
+
+    std::stack<Glib::RefPtr<Gio::MenuModel>> links;
+    links.push(menu);
+
+    while (!links.empty())
+    {
+        auto const link = links.top();
+        links.pop();
+
+        for (int i = 0; i < link->get_n_items(); ++i)
+        {
+            Glib::ustring action_name;
+            Glib::ustring action_accel;
+
+            for (auto it = link->iterate_item_attributes(i); it->next();)
+            {
+                if (auto const name = it->get_name(); name == "action")
+                {
+                    action_name = Glib::VariantBase::cast_dynamic<VariantString>(it->get_value()).get();
+                }
+                else if (name == "accel")
+                {
+                    action_accel = Glib::VariantBase::cast_dynamic<VariantString>(it->get_value()).get();
+                }
+            }
+
+            if (!action_name.empty() && !action_accel.empty())
+            {
+                result->append(Gtk::Shortcut::create(
+                    Gtk::ShortcutTrigger::parse_string(action_accel),
+                    Gtk::NamedAction::create(action_name)));
+            }
+
+            for (auto it = link->iterate_item_links(i); it->next();)
+            {
+                links.push(it->get_value());
+            }
+        }
+    }
+
+    return result;
+}
+
+#endif

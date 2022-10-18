@@ -18,14 +18,11 @@ void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data);
 void gtr_action_activate(Glib::ustring const& action_name);
 void gtr_action_set_sensitive(Glib::ustring const& action_name, bool is_sensitive);
 void gtr_action_set_toggled(Glib::ustring const& action_name, bool is_toggled);
-Gtk::Widget* gtr_action_get_widget(Glib::ustring const& name);
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name);
 
-template<typename T>
-inline T* gtr_action_get_widget(Glib::ustring const& name)
-{
-    return static_cast<T*>(gtr_action_get_widget(name));
-}
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+Glib::RefPtr<Gio::ListModel> gtr_shortcuts_get_from_menu(Glib::RefPtr<Gio::MenuModel> const& menu);
+#endif
 
 template<typename T>
 inline Glib::RefPtr<T> gtr_action_get_object(Glib::ustring const& name)

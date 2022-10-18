@@ -12,6 +12,7 @@ add_executable(libtransmission-test
     crypto-test-ref.h
     crypto-test.cc
     error-test.cc
+    dns-test.cc
     file-piece-map-test.cc
     file-test.cc
     getopt-test.cc
@@ -22,6 +23,7 @@ add_executable(libtransmission-test
     magnet-metainfo-test.cc
     makemeta-test.cc
     move-test.cc
+    net-test.cc
     open-files-test.cc
     peer-mgr-active-requests-test.cc
     peer-mgr-wishlist-test.cc

@@ -8,25 +8,17 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string_view>
+
 #include "transmission.h"
 
 #include "net.h" // tr_port
 
-enum
-{
-    TR_DHT_STOPPED = 0,
-    TR_DHT_BROKEN = 1,
-    TR_DHT_POOR = 2,
-    TR_DHT_FIREWALLED = 3,
-    TR_DHT_GOOD = 4
-};
+int tr_dhtInit(tr_session*, tr_socket_t udp4_socket, tr_socket_t udp6_socket);
+void tr_dhtUninit();
 
-int tr_dhtInit(tr_session*);
-void tr_dhtUninit(tr_session*);
-bool tr_dhtEnabled(tr_session const*);
-tr_port tr_dhtPort(tr_session const*);
-int tr_dhtStatus(tr_session*, int af, int* setme_node_count);
-char const* tr_dhtPrintableStatus(int status);
-bool tr_dhtAddNode(tr_session*, tr_address const*, tr_port, bool bootstrap);
-void tr_dhtUpkeep(tr_session*);
-void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen, void* sv);
+bool tr_dhtEnabled();
+
+bool tr_dhtAddNode(tr_address, tr_port, bool bootstrap);
+void tr_dhtUpkeep();
+void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen);

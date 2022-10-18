@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/transmissionbt/transmission">
+    <file compressed="true" preprocess="xml-stripblanks">AddTrackerDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">DetailsDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">EditTrackersDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">FilterBar.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">MainWindow.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">MakeDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">MakeProgressDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">MessageLogWindow.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">OptionsDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">PrefsDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">RelocateDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">StatsDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">TorrentUrlChooserDialog.ui</file>
+  </gresource>
+</gresources>

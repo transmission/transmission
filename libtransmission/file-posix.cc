@@ -12,7 +12,6 @@
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
 #include <cstdio>
-#include <cstring>
 #include <string_view>
 #include <string>
 #include <vector>
@@ -212,8 +211,8 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     TR_ASSERT(path2 != nullptr);
 
     bool ret = false;
-    struct stat sb1;
-    struct stat sb2;
+    struct stat sb1 = {};
+    struct stat sb2 = {};
 
     if (stat(path1, &sb1) != -1 && stat(path2, &sb2) != -1)
     {

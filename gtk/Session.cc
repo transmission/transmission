@@ -65,7 +65,7 @@ public:
         : model_(model)
     {
         model_.get_sort_column_id(sort_column_id_, sort_type_);
-        model_.set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, Gtk::SORT_ASCENDING);
+        model_.set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, TR_GTK_SORT_TYPE(ASCENDING));
     }
 
     ~ScopedModelSortBlocker()
@@ -78,7 +78,7 @@ public:
 private:
     Gtk::TreeSortable& model_;
     int sort_column_id_ = -1;
-    Gtk::SortType sort_type_ = Gtk::SORT_ASCENDING;
+    Gtk::SortType sort_type_ = TR_GTK_SORT_TYPE(ASCENDING);
 };
 
 } // namespace
@@ -146,7 +146,7 @@ private:
     void on_file_changed_in_watchdir(
         Glib::RefPtr<Gio::File> const& file,
         Glib::RefPtr<Gio::File> const& other_type,
-        Gio::FileMonitorEvent event_type);
+        IF_GLIBMM2_68(Gio::FileMonitor::Event, Gio::FileMonitorEvent) event_type);
 
     void on_pref_changed(tr_quark key);
 
@@ -198,7 +198,7 @@ TorrentModelColumns const torrent_cols;
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
 {
     core_.reference();
-    return Glib::RefPtr<Session>(&core_);
+    return Glib::make_refptr_for_instance(&core_);
 }
 
 /***
@@ -402,12 +402,12 @@ int compare_time(time_t a, time_t b)
     return ret;
 }
 
-int compare_by_name(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_name(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     return a->get_value(torrent_cols.name_collated).compare(b->get_value(torrent_cols.name_collated));
 }
 
-int compare_by_queue(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_queue(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -415,7 +415,7 @@ int compare_by_queue(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
     return sb->queuePosition - sa->queuePosition;
 }
 
-int compare_by_ratio(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_ratio(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
 
@@ -435,7 +435,7 @@ int compare_by_ratio(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
     return ret;
 }
 
-int compare_by_activity(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
 
@@ -463,7 +463,7 @@ int compare_by_activity(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::itera
     return ret;
 }
 
-int compare_by_age(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
     auto* const tb = static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent));
@@ -477,7 +477,7 @@ int compare_by_age(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator c
     return ret;
 }
 
-int compare_by_size(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const size_b = tr_torrentTotalSize(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -491,7 +491,7 @@ int compare_by_size(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator 
     return ret;
 }
 
-int compare_by_progress(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -510,7 +510,7 @@ int compare_by_progress(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::itera
     return ret;
 }
 
-int compare_by_eta(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_eta(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
@@ -524,7 +524,7 @@ int compare_by_eta(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator c
     return ret;
 }
 
-int compare_by_state(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
+int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const sa = a->get_value(torrent_cols.activity);
     auto const sb = b->get_value(torrent_cols.activity);
@@ -544,7 +544,7 @@ void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
 {
     auto const& col = torrent_cols.torrent;
     Gtk::TreeSortable::SlotCompare sort_func;
-    auto type = is_reversed ? Gtk::SORT_ASCENDING : Gtk::SORT_DESCENDING;
+    auto type = is_reversed ? TR_GTK_SORT_TYPE(ASCENDING) : TR_GTK_SORT_TYPE(DESCENDING);
     auto const sortable = get_model();
 
     if (mode == "sort-by-activity")
@@ -582,7 +582,7 @@ void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
     else
     {
         sort_func = &compare_by_name;
-        type = is_reversed ? Gtk::SORT_DESCENDING : Gtk::SORT_ASCENDING;
+        type = is_reversed ? TR_GTK_SORT_TYPE(DESCENDING) : TR_GTK_SORT_TYPE(ASCENDING);
     }
 
     sortable->set_sort_func(col, sort_func);
@@ -611,7 +611,7 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     if (info != nullptr)
     {
         auto const old_name = info->get_attribute_as_string(G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
-        auto const new_name = gtr_sprintf("%s.added", old_name);
+        auto const new_name = fmt::format("{}.added", old_name);
 
         try
         {
@@ -708,9 +708,9 @@ void Session::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
 void Session::Impl::on_file_changed_in_watchdir(
     Glib::RefPtr<Gio::File> const& file,
     Glib::RefPtr<Gio::File> const& /*other_type*/,
-    Gio::FileMonitorEvent event_type)
+    IF_GLIBMM2_68(Gio::FileMonitor::Event, Gio::FileMonitorEvent) event_type)
 {
-    if (event_type == Gio::FILE_MONITOR_EVENT_CREATED)
+    if (event_type == TR_GIO_FILE_MONITOR_EVENT(CREATED))
     {
         watchdir_monitor_file(file);
     }
@@ -820,8 +820,8 @@ Session::Impl::Impl(Session& core, tr_session* session)
 {
     raw_model_ = Gtk::ListStore::create(torrent_cols);
     sorted_model_ = Gtk::TreeModelSort::create(raw_model_);
-    sorted_model_->set_default_sort_func([](Gtk::TreeModel::iterator const& /*a*/, Gtk::TreeModel::iterator const& /*b*/)
-                                         { return 0; });
+    sorted_model_->set_default_sort_func(
+        [](Gtk::TreeModel::const_iterator const& /*a*/, Gtk::TreeModel::const_iterator const& /*b*/) { return 0; });
 
     /* init from prefs & listen to pref changes */
     on_pref_changed(TR_KEY_sort_mode);
@@ -889,7 +889,7 @@ namespace
 
 Glib::ustring get_collated_name(tr_torrent const* tor)
 {
-    return gtr_sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentView(tor).hash_string);
+    return fmt::format("{}\t{}", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentView(tor).hash_string);
 }
 
 struct metadata_callback_data
@@ -900,11 +900,11 @@ struct metadata_callback_data
 
 Gtk::TreeModel::iterator find_row_from_torrent_id(Glib::RefPtr<Gtk::TreeModel> const& model, tr_torrent_id_t id)
 {
-    for (auto const& row : model->children())
+    for (auto& row : model->children())
     {
         if (id == row.get_value(torrent_cols.torrent_id))
         {
-            return row;
+            return TR_GTK_TREE_MODEL_CHILD_ITER(row);
         }
     }
 
@@ -966,7 +966,7 @@ bool is_torrent_active(tr_stat const* st)
 
 void Session::add_torrent(tr_torrent* tor, bool do_notify)
 {
-    ScopedModelSortBlocker disable_sort(*gtr_get_ptr(impl_->get_model()));
+    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
     impl_->add_torrent(tor, do_notify);
 }
 
@@ -1056,7 +1056,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 
     if (!do_prompt)
     {
-        ScopedModelSortBlocker disable_sort(*gtr_get_ptr(sorted_model_));
+        ScopedModelSortBlocker disable_sort(*sorted_model_.get());
         add_torrent(create_new_torrent(ctor), do_notify);
         tr_ctorFree(ctor);
         return 0;
@@ -1284,7 +1284,7 @@ void Session::load(bool force_paused)
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
     tr_ctorFree(ctor);
 
-    ScopedModelSortBlocker disable_sort(*gtr_get_ptr(impl_->get_model()));
+    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
 
     auto torrents = std::vector<tr_torrent*>{};
     torrents.resize(n_torrents);
@@ -1325,7 +1325,7 @@ int gtr_compare_double(double const a, double const b, int decimal_places)
     return 0;
 }
 
-void update_foreach(Gtk::TreeModel::Row const& row)
+void update_foreach(Gtk::TreeModel::Row& row)
 {
     /* get the old states */
     auto* const tor = static_cast<tr_torrent*>(row.get_value(torrent_cols.torrent));
@@ -1407,7 +1407,7 @@ void Session::start_now(tr_torrent_id_t id)
 void Session::Impl::update()
 {
     /* update the model */
-    for (auto const& row : raw_model_->children())
+    for (auto row : raw_model_->children())
     {
         update_foreach(row);
     }
@@ -1437,7 +1437,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
 
     try
     {
-        auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
+        auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         auto response = connection->call_sync(
             SessionManagerObjectPath,
@@ -1471,7 +1471,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
 {
     try
     {
-        auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
+        auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         connection->call_sync(
             SessionManagerObjectPath,
@@ -1600,7 +1600,7 @@ bool core_read_rpc_response_idle(TrVariantPtr const& response)
         }
         else
         {
-            g_warning("Pending RPC request for tag %" PRId64 " not found", tag);
+            g_warning("%s", fmt::format(_("Couldn't find pending RPC request for tag {tag}"), fmt::arg("tag", tag)).c_str());
         }
     }
 
@@ -1631,12 +1631,7 @@ void Session::Impl::send_rpc_request(
 
         /* make the request */
 #ifdef DEBUG_RPC
-        {
-            struct evbuffer* buf = tr_variantToBuf(request, TR_VARIANT_FMT_JSON_LEAN);
-            size_t const buf_len = evbuffer_get_length(buf);
-            g_message("request: [%*.*s]", TR_ARG_TUPLE((int)buf_len, (int)buf_len, evbuffer_pullup(buf, -1)));
-            evbuffer_free(buf);
-        }
+        g_message("%s", fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)).c_str());
 #endif
 
         tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);

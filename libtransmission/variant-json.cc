@@ -29,6 +29,7 @@
 #include "log.h"
 #include "quark.h"
 #include "tr-assert.h"
+#include "tr-buffer.h"
 #include "utils.h"
 #include "variant-common.h"
 #include "variant.h"

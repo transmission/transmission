@@ -17,9 +17,13 @@
 #include "transmission.h"
 
 #include "net.h" // for tr_address, tr_port
-#include "timer.h"
 
 struct event_base;
+
+namespace libtransmission
+{
+class TimerMaker;
+}
 
 class tr_lpd
 {
@@ -43,6 +47,8 @@ public:
 
         [[nodiscard]] virtual std::vector<TorrentInfo> torrents() const = 0;
 
+        [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
+
         virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
 
         // returns true if info was used
@@ -50,5 +56,5 @@ public:
     };
 
     virtual ~tr_lpd() = default;
-    static std::unique_ptr<tr_lpd> create(Mediator& mediator, libtransmission::TimerMaker&, event_base* event_base);
+    static std::unique_ptr<tr_lpd> create(Mediator& mediator, event_base* event_base);
 };

@@ -22,6 +22,9 @@
 
 #include <giomm.h>
 #include <glib/gmessages.h>
+#ifdef G_OS_UNIX
+#include <glib-unix.h>
+#endif
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
@@ -41,6 +44,7 @@
 #include "MakeDialog.h"
 #include "MessageLogWindow.h"
 #include "OptionsDialog.h"
+#include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "RelocateDialog.h"
@@ -50,6 +54,13 @@
 #include "Utils.h"
 
 using namespace std::literals;
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+using FileListValue = Glib::Value<GSList*>;
+using FileListHandler = Glib::SListHandler<Glib::RefPtr<Gio::File>>;
+
+using StringValue = Glib::Value<Glib::ustring>;
+#endif
 
 #define SHOW_LICENSE
 
@@ -103,9 +114,12 @@ private:
     bool refresh_actions();
     void refresh_actions_soon();
 
-    void on_main_window_size_allocated(Gtk::Allocation& alloc);
-    bool on_main_window_focus_in(GdkEventFocus* event);
+    void on_main_window_size_allocated();
+    void on_main_window_focus_in();
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    bool on_drag_data_received(Glib::ValueBase const& value, double x, double y);
+#else
     void on_drag_data_received(
         Glib::RefPtr<Gdk::DragContext> const& drag_context,
         gint x,
@@ -113,6 +127,7 @@ private:
         Gtk::SelectionData const& selection_data,
         guint info,
         guint time_);
+#endif
 
     bool on_rpc_changed_idle(tr_rpc_callback_type type, tr_torrent_id_t torrent_id);
 
@@ -121,7 +136,7 @@ private:
     void hideMainWindow();
     void toggleMainWindow();
 
-    bool winclose(GdkEventAny* event);
+    bool winclose();
     void rowChangedCB(Gtk::TreePath const& path, Gtk::TreeModel::iterator const& iter);
 
     void app_setup();
@@ -189,7 +204,7 @@ namespace
 template<typename T>
 void gtr_window_present(T const& window)
 {
-    window->present(gtk_get_current_event_time());
+    window->present(GDK_CURRENT_TIME);
 }
 
 /***
@@ -234,7 +249,7 @@ void Application::Impl::show_details_dialog_for_selected_torrents()
     {
         auto dialog = DetailsDialog::create(*wind_, core_);
         dialog->set_torrents(ids);
-        dialog->signal_hide().connect([this, key]() { details_.erase(key); });
+        gtr_window_on_close(*dialog, [this, key]() { details_.erase(key); });
         dialog_it = details_.try_emplace(key, std::move(dialog)).first;
         dialog_it->second->show();
     }
@@ -348,7 +363,7 @@ void register_magnet_link_handler()
         auto const app = Gio::AppInfo::create_from_commandline(
             "transmission-gtk",
             "transmission-gtk",
-            Gio::APP_INFO_CREATE_SUPPORTS_URIS);
+            TR_GIO_APP_INFO_CREATE_FLAGS(SUPPORTS_URIS));
         app->set_as_default_for_type(content_type);
     }
     catch (Gio::Error const& e)
@@ -372,23 +387,34 @@ void ensure_magnet_handler_exists()
 
 } // namespace
 
-void Application::Impl::on_main_window_size_allocated(Gtk::Allocation& /*alloc*/)
+void Application::Impl::on_main_window_size_allocated()
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    bool const is_maximized = wind_->is_maximized();
+#else
     auto const gdk_window = wind_->get_window();
     bool const is_maximized = gdk_window != nullptr && (gdk_window->get_state() & Gdk::WINDOW_STATE_MAXIMIZED) != 0;
+#endif
 
     gtr_pref_int_set(TR_KEY_main_window_is_maximized, is_maximized);
 
     if (!is_maximized)
     {
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
         int x;
         int y;
-        int w;
-        int h;
         wind_->get_position(x, y);
-        wind_->get_size(w, h);
         gtr_pref_int_set(TR_KEY_main_window_x, x);
         gtr_pref_int_set(TR_KEY_main_window_y, y);
+#endif
+
+        int w;
+        int h;
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        wind_->get_default_size(w, h);
+#else
+        wind_->get_size(w, h);
+#endif
         gtr_pref_int_set(TR_KEY_main_window_width, w);
         gtr_pref_int_set(TR_KEY_main_window_height, h);
     }
@@ -501,22 +527,16 @@ tr_rpc_callback_status Application::Impl::on_rpc_changed(
 namespace
 {
 
-sig_atomic_t global_sigcount = 0;
-gpointer sighandler_cbdata = nullptr;
+#ifdef G_OS_UNIX
 
-void signal_handler(int sig)
+gboolean signal_handler(gpointer user_data)
 {
-    if (++global_sigcount > 1)
-    {
-        signal(sig, SIG_DFL);
-        raise(sig);
-    }
-    else if (sig == SIGINT || sig == SIGTERM)
-    {
-        g_message(_("Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."), sig);
-        gtr_actions_handler("quit", sighandler_cbdata);
-    }
+    g_message(_("Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."));
+    gtr_actions_handler("quit", user_data);
+    return G_SOURCE_REMOVE;
 }
+
+#endif
 
 } // namespace
 
@@ -534,25 +554,27 @@ void Application::on_startup()
 
 void Application::Impl::on_startup()
 {
-    Gtk::IconTheme::get_default()->add_resource_path(gtr_get_full_resource_path("icons"s));
+    IF_GTKMM4(Gtk::IconTheme::get_for_display(Gdk::Display::get_default()), Gtk::IconTheme::get_default())
+        ->add_resource_path(gtr_get_full_resource_path("icons"s));
     Gtk::Window::set_default_icon_name(AppIconName);
 
     /* Add style provider to the window. */
     auto css_provider = Gtk::CssProvider::create();
     css_provider->load_from_resource(gtr_get_full_resource_path("transmission-ui.css"));
-    Gtk::StyleContext::add_provider_for_screen(
-        Gdk::Screen::get_default(),
+    Gtk::StyleContext::IF_GTKMM4(add_provider_for_display, add_provider_for_screen)(
+        IF_GTKMM4(Gdk::Display::get_default(), Gdk::Screen::get_default()),
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     std::ignore = FilterBar();
+    std::ignore = PathButton();
 
     tr_session* session;
 
-    ::signal(SIGINT, signal_handler);
-    ::signal(SIGTERM, signal_handler);
-
-    sighandler_cbdata = this;
+#ifdef G_OS_UNIX
+    g_unix_signal_add(SIGINT, &signal_handler, this);
+    g_unix_signal_add(SIGTERM, &signal_handler, this);
+#endif
 
     /* ensure the directories are created */
     if (auto const str = gtr_pref_string_get(TR_KEY_download_dir); !str.empty())
@@ -576,11 +598,26 @@ void Application::Impl::on_startup()
     ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));
     auto const actions = gtr_actions_init(ui_builder_, this);
 
-    app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
+    auto const main_menu = gtr_action_get_object<Gio::Menu>("main-window-menu");
+    app_.set_menubar(main_menu);
 
     /* create main window now to be a parent to any error dialogs */
     wind_ = MainWindow::create(app_, actions, core_);
-    wind_->signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+    wind_->set_show_menubar(true);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    wind_->property_maximized().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+    wind_->property_default_width().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+    wind_->property_default_height().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
+#else
+    wind_->signal_size_allocate().connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated)));
+#endif
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto const shortcut_controller = Gtk::ShortcutController::create(gtr_shortcuts_get_from_menu(main_menu));
+    shortcut_controller->set_scope(Gtk::ShortcutScope::GLOBAL);
+    wind_->add_controller(shortcut_controller);
+#endif
+
     app_.hold();
     app_setup();
     tr_sessionSetRPCCallback(session, &Impl::on_rpc_changed, this);
@@ -653,7 +690,7 @@ std::string get_application_id(std::string const& config_dir)
 } // namespace
 
 Application::Application(std::string const& config_dir, bool start_paused, bool is_iconified)
-    : Gtk::Application(get_application_id(config_dir), Gio::APPLICATION_HANDLES_OPEN)
+    : Gtk::Application(get_application_id(config_dir), TR_GIO_APPLICATION_FLAGS(HANDLES_OPEN))
     , impl_(std::make_unique<Impl>(*this, config_dir, start_paused, is_iconified))
 {
 }
@@ -712,41 +749,50 @@ void Application::Impl::app_setup()
     }
     else
     {
-        wind_->set_skip_taskbar_hint(icon_ != nullptr);
+        gtr_window_set_skip_taskbar_hint(*wind_, icon_ != nullptr);
         is_iconified_ = false; // ensure that the next toggle iconifies
         gtr_action_set_toggled("toggle-main-window", false);
     }
 
     if (!gtr_pref_flag_get(TR_KEY_user_has_given_informed_consent))
     {
-        Gtk::MessageDialog w(
+        auto w = std::make_shared<Gtk::MessageDialog>(
             *wind_,
             _("Transmission is a file sharing program. When you run a torrent, its data will be "
               "made available to others by means of upload. Any content you share is your sole responsibility."),
             false,
-            Gtk::MESSAGE_OTHER,
-            Gtk::BUTTONS_NONE,
+            TR_GTK_MESSAGE_TYPE(OTHER),
+            TR_GTK_BUTTONS_TYPE(NONE),
             true);
-        w.add_button(_("_Cancel"), Gtk::RESPONSE_REJECT);
-        w.add_button(_("I _Agree"), Gtk::RESPONSE_ACCEPT);
-        w.set_default_response(Gtk::RESPONSE_ACCEPT);
-
-        if (w.run() == Gtk::RESPONSE_ACCEPT)
-        {
-            // only show it once
-            gtr_pref_flag_set(TR_KEY_user_has_given_informed_consent, true);
-        }
-        else
-        {
-            exit(0);
-        }
+        w->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(REJECT));
+        w->add_button(_("I _Agree"), TR_GTK_RESPONSE_TYPE(ACCEPT));
+        w->set_default_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
+        w->signal_response().connect(
+            [w](int response) mutable
+            {
+                if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
+                {
+                    // only show it once
+                    gtr_pref_flag_set(TR_KEY_user_has_given_informed_consent, true);
+                    w.reset();
+                }
+                else
+                {
+                    exit(0);
+                }
+            });
+        w->show();
     }
 }
 
 void Application::Impl::placeWindowFromPrefs()
 {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    wind_->set_default_size((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
+#else
     wind_->resize((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
     wind_->move((int)gtr_pref_int_get(TR_KEY_main_window_x), (int)gtr_pref_int_get(TR_KEY_main_window_y));
+#endif
 }
 
 void Application::Impl::presentMainWindow()
@@ -757,7 +803,7 @@ void Application::Impl::presentMainWindow()
     {
         is_iconified_ = false;
 
-        wind_->set_skip_taskbar_hint(false);
+        gtr_window_set_skip_taskbar_hint(*wind_, false);
     }
 
     if (!wind_->get_visible())
@@ -767,14 +813,14 @@ void Application::Impl::presentMainWindow()
     }
 
     gtr_window_present(wind_);
-    wind_->get_window()->raise();
+    gtr_window_raise(*wind_);
 }
 
 void Application::Impl::hideMainWindow()
 {
     gtr_action_set_toggled("toggle-main-window", false);
 
-    wind_->set_skip_taskbar_hint(true);
+    gtr_window_set_skip_taskbar_hint(*wind_, true);
     gtr_widget_set_visible(*wind_, false);
     is_iconified_ = true;
 }
@@ -791,7 +837,7 @@ void Application::Impl::toggleMainWindow()
     }
 }
 
-bool Application::Impl::winclose(GdkEventAny* /*event*/)
+bool Application::Impl::winclose()
 {
     if (icon_ != nullptr)
     {
@@ -812,6 +858,32 @@ void Application::Impl::rowChangedCB(Gtk::TreePath const& path, Gtk::TreeModel::
         refresh_actions_soon();
     }
 }
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+bool Application::Impl::on_drag_data_received(Glib::ValueBase const& value, double /*x*/, double /*y*/)
+{
+    if (G_VALUE_HOLDS(value.gobj(), GDK_TYPE_FILE_LIST))
+    {
+        FileListValue files_value;
+        files_value.init(value.gobj());
+        open_files(FileListHandler::slist_to_vector(files_value.get(), Glib::OwnershipType::OWNERSHIP_NONE));
+        return true;
+    }
+    else if (G_VALUE_HOLDS(value.gobj(), StringValue::value_type()))
+    {
+        StringValue string_value;
+        string_value.init(value.gobj());
+        if (auto const text = gtr_str_strip(string_value.get()); !text.empty())
+        {
+            return core_->add_from_url(text);
+        }
+    }
+
+    return false;
+}
+
+#else
 
 void Application::Impl::on_drag_data_received(
     Glib::RefPtr<Gdk::DragContext> const& drag_context,
@@ -842,6 +914,8 @@ void Application::Impl::on_drag_data_received(
     drag_context->drag_finish(true, false, time_);
 }
 
+#endif
+
 void Application::Impl::main_window_setup()
 {
     // g_assert(nullptr == cbdata->wind);
@@ -852,14 +926,21 @@ void Application::Impl::main_window_setup()
     refresh_actions_soon();
     auto const model = core_->get_model();
     model->signal_row_changed().connect(sigc::mem_fun(*this, &Impl::rowChangedCB));
-    wind_->signal_delete_event().connect(sigc::mem_fun(*this, &Impl::winclose));
+    gtr_window_on_close(*wind_, sigc::mem_fun(*this, &Impl::winclose));
     refresh_actions();
 
     /* register to handle URIs that get dragged onto our main window */
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto drop_controller = Gtk::DropTarget::create(G_TYPE_INVALID, Gdk::DragAction::COPY);
+    drop_controller->set_gtypes({ StringValue::value_type(), GDK_TYPE_FILE_LIST });
+    drop_controller->signal_drop().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received), false);
+    wind_->add_controller(drop_controller);
+#else
     wind_->drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     wind_->drag_dest_add_uri_targets();
     wind_->drag_dest_add_text_targets(); /* links dragged from browsers are text */
     wind_->signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
+#endif
 }
 
 bool Application::Impl::on_session_closed()
@@ -895,37 +976,49 @@ void Application::Impl::on_app_exit()
     /* stop the refresh-actions timer */
     refresh_actions_tag_.disconnect();
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     auto* c = static_cast<Gtk::Container*>(wind_.get());
     c->remove(*static_cast<Gtk::Bin*>(c)->get_child());
+#endif
+
+    wind_->set_show_menubar(false);
 
     auto* p = Gtk::make_managed<Gtk::Grid>();
     p->set_column_spacing(GUI_PAD_BIG);
-    p->set_halign(Gtk::ALIGN_CENTER);
-    p->set_valign(Gtk::ALIGN_CENTER);
+    p->set_halign(TR_GTK_ALIGN(CENTER));
+    p->set_valign(TR_GTK_ALIGN(CENTER));
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    wind_->set_child(*p);
+#else
     c->add(*p);
+#endif
 
-    auto* icon = Gtk::make_managed<Gtk::Image>("network-workgroup", Gtk::ICON_SIZE_DIALOG);
+    auto* icon = Gtk::make_managed<Gtk::Image>();
+    icon->property_icon_name() = "network-workgroup";
+    icon->property_icon_size() = IF_GTKMM4(Gtk::IconSize::LARGE, Gtk::ICON_SIZE_DIALOG);
     p->attach(*icon, 0, 0, 1, 2);
 
     auto* top_label = Gtk::make_managed<Gtk::Label>();
     top_label->set_markup(fmt::format(FMT_STRING("<b>{:s}</b>"), _("Closing Connections…")));
-    top_label->set_halign(Gtk::ALIGN_START);
-    top_label->set_valign(Gtk::ALIGN_CENTER);
+    top_label->set_halign(TR_GTK_ALIGN(START));
+    top_label->set_valign(TR_GTK_ALIGN(CENTER));
     p->attach(*top_label, 1, 0, 1, 1);
 
     auto* bottom_label = Gtk::make_managed<Gtk::Label>(_("Sending upload/download totals to tracker…"));
-    bottom_label->set_halign(Gtk::ALIGN_START);
-    bottom_label->set_valign(Gtk::ALIGN_CENTER);
+    bottom_label->set_halign(TR_GTK_ALIGN(START));
+    bottom_label->set_valign(TR_GTK_ALIGN(CENTER));
     p->attach(*bottom_label, 1, 1, 1, 1);
 
     auto* button = Gtk::make_managed<Gtk::Button>(_("_Quit Now"), true);
     button->set_margin_top(GUI_PAD);
-    button->set_halign(Gtk::ALIGN_START);
-    button->set_valign(Gtk::ALIGN_END);
+    button->set_halign(TR_GTK_ALIGN(START));
+    button->set_valign(TR_GTK_ALIGN(END));
     button->signal_clicked().connect([]() { ::exit(0); });
     p->attach(*button, 1, 2, 1, 1);
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     p->show_all();
+#endif
     button->grab_focus();
 
     /* clear the UI */
@@ -959,9 +1052,16 @@ void Application::Impl::show_torrent_errors(Glib::ustring const& primary, std::v
         s << leader << ' ' << f << '\n';
     }
 
-    Gtk::MessageDialog w(*wind_, primary, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
-    w.set_secondary_text(s.str());
-    w.run();
+    auto w = std::make_shared<Gtk::MessageDialog>(
+        *wind_,
+        primary,
+        false,
+        TR_GTK_MESSAGE_TYPE(ERROR),
+        TR_GTK_BUTTONS_TYPE(CLOSE),
+        true);
+    w->set_secondary_text(s.str());
+    w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
+    w->show();
 
     files.clear();
 }
@@ -988,7 +1088,7 @@ void Application::Impl::on_core_error(Session::ErrorCode code, Glib::ustring con
     switch (code)
     {
     case Session::ERR_ADD_TORRENT_ERR:
-        error_list_.push_back(Glib::path_get_basename(msg));
+        error_list_.push_back(Glib::path_get_basename(msg.raw()));
         break;
 
     case Session::ERR_ADD_TORRENT_DUP:
@@ -1005,14 +1105,12 @@ void Application::Impl::on_core_error(Session::ErrorCode code, Glib::ustring con
     }
 }
 
-bool Application::Impl::on_main_window_focus_in(GdkEventFocus* /*event*/)
+void Application::Impl::on_main_window_focus_in()
 {
     if (wind_ != nullptr)
     {
-        wind_->set_urgency_hint(false);
+        gtr_window_set_urgency_hint(*wind_, false);
     }
-
-    return false;
 }
 
 void Application::Impl::on_add_torrent(tr_ctor* ctor)
@@ -1020,12 +1118,19 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
     auto w = std::shared_ptr<OptionsDialog>(
         OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
-    w->signal_hide().connect([w]() mutable { w.reset(); });
-    w->signal_focus_in_event().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
+    gtr_window_on_close(*w, [w]() mutable { w.reset(); });
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto focus_controller = Gtk::EventControllerFocus::create();
+    focus_controller->signal_enter().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
+    w->add_controller(focus_controller);
+#else
+    w->signal_focus_in_event().connect_notify(sigc::hide<0>(sigc::mem_fun(*this, &Impl::on_main_window_focus_in)));
+#endif
 
     if (wind_ != nullptr)
     {
-        wind_->set_urgency_hint(true);
+        gtr_window_set_urgency_hint(*wind_, true);
     }
 
     w->show();
@@ -1068,7 +1173,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
     case TR_KEY_show_notification_area_icon:
         if (bool const show = gtr_pref_flag_get(key); show && icon_ == nullptr)
         {
-            icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
+            icon_ = SystemTrayIcon::create(*wind_, core_);
         }
         else if (!show && icon_ != nullptr)
         {
@@ -1277,14 +1382,12 @@ void Application::Impl::update_model_soon()
 
 bool Application::Impl::update_model_loop()
 {
-    bool const done = global_sigcount != 0;
-
-    if (!done)
+    if (!is_closing_)
     {
         update_model_once();
     }
 
-    return !done;
+    return !is_closing_;
 }
 
 void Application::Impl::show_about_dialog()
@@ -1296,25 +1399,30 @@ void Application::Impl::show_about_dialog()
         "Mike Gelfand",
     });
 
-    Gtk::AboutDialog d;
-    d.set_authors(authors);
-    d.set_comments(_("A fast and easy BitTorrent client"));
-    d.set_copyright(_("Copyright © The Transmission Project"));
-    d.set_logo_icon_name(AppIconName);
-    d.set_name(Glib::get_application_name());
+    auto d = std::make_shared<Gtk::AboutDialog>();
+    d->set_authors(authors);
+    d->set_comments(_("A fast and easy BitTorrent client"));
+    d->set_copyright(_("Copyright © The Transmission Project"));
+    d->set_logo_icon_name(AppIconName);
+    d->set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
        to have it appear in the credits in the "About"
        dialog */
-    d.set_translator_credits(_("translator-credits"));
-    d.set_version(LONG_VERSION_STRING);
-    d.set_website(uri);
-    d.set_website_label(uri);
+    d->set_translator_credits(_("translator-credits"));
+    d->set_version(LONG_VERSION_STRING);
+    d->set_website(uri);
+    d->set_website_label(uri);
 #ifdef SHOW_LICENSE
-    d.set_license(LICENSE);
-    d.set_wrap_license(true);
+    d->set_license(LICENSE);
+    d->set_wrap_license(true);
 #endif
-    d.set_transient_for(*wind_);
-    d.run();
+    d->set_transient_for(*wind_);
+    d->set_modal(true);
+    gtr_window_on_close(*d, [d]() mutable { d.reset(); });
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
+    d->signal_response().connect_notify([&dref = *d](int /*response*/) { dref.close(); });
+#endif
+    d->show();
 }
 
 bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method)
@@ -1401,18 +1509,13 @@ void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
 {
     auto const magnet = tr_torrentGetMagnetLink(tor);
     auto const display = wind_->get_display();
-    GdkAtom selection;
-    Glib::RefPtr<Gtk::Clipboard> clipboard;
 
     /* this is The Right Thing for copy/paste... */
-    selection = GDK_SELECTION_CLIPBOARD;
-    clipboard = Gtk::Clipboard::get_for_display(display, selection);
-    clipboard->set_text(magnet);
+    IF_GTKMM4(display->get_clipboard(), Gtk::Clipboard::get_for_display(display, GDK_SELECTION_CLIPBOARD))->set_text(magnet);
 
     /* ...but people using plain ol' X need this instead */
-    selection = GDK_SELECTION_PRIMARY;
-    clipboard = Gtk::Clipboard::get_for_display(display, selection);
-    clipboard->set_text(magnet);
+    IF_GTKMM4(display->get_primary_clipboard(), Gtk::Clipboard::get_for_display(display, GDK_SELECTION_PRIMARY))
+        ->set_text(magnet);
 }
 
 void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data)
@@ -1427,19 +1530,19 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     if (action_name == "open-torrent-from-url")
     {
         auto w = std::shared_ptr<TorrentUrlChooserDialog>(TorrentUrlChooserDialog::create(*wind_, core_));
-        w->signal_hide().connect([w]() mutable { w.reset(); });
+        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
-        w->signal_hide().connect([w]() mutable { w.reset(); });
+        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "show-stats")
     {
         auto dialog = std::shared_ptr<StatsDialog>(StatsDialog::create(*wind_, core_));
-        dialog->signal_hide().connect([dialog]() mutable { dialog.reset(); });
+        gtr_window_on_close(*dialog, [dialog]() mutable { dialog.reset(); });
         dialog->show();
     }
     else if (action_name == "donate")
@@ -1470,7 +1573,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (!ids.empty())
         {
             auto w = std::shared_ptr<RelocateDialog>(RelocateDialog::create(*wind_, core_, ids));
-            w->signal_hide().connect([w]() mutable { w.reset(); });
+            gtr_window_on_close(*w, [w]() mutable { w.reset(); });
             w->show();
         }
     }
@@ -1493,7 +1596,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     else if (action_name == "new-torrent")
     {
         auto w = std::shared_ptr<MakeDialog>(MakeDialog::create(*wind_, core_));
-        w->signal_hide().connect([w]() mutable { w.reset(); });
+        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "remove-torrent")
@@ -1521,7 +1624,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (prefs_ == nullptr)
         {
             prefs_ = PrefsDialog::create(*wind_, core_);
-            prefs_->signal_hide().connect([this]() { prefs_.reset(); });
+            gtr_window_on_close(*prefs_, [this]() { prefs_.reset(); });
         }
 
         gtr_window_present(prefs_);
@@ -1531,12 +1634,20 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (msgwin_ == nullptr)
         {
             msgwin_ = MessageLogWindow::create(*wind_, core_);
-            msgwin_->signal_hide().connect([this]() { msgwin_.reset(); });
+            gtr_window_on_close(
+                *msgwin_,
+                [this]()
+                {
+                    gtr_action_set_toggled("toggle-message-log", false);
+                    msgwin_.reset();
+                });
+
+            gtr_action_set_toggled("toggle-message-log", true);
             msgwin_->show();
         }
         else
         {
-            msgwin_->hide();
+            msgwin_->close();
         }
     }
     else if (action_name == "show-about-dialog")
@@ -1557,7 +1668,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else
     {
-        g_error("Unhandled action: %s", action_name.c_str());
+        g_error("%s", fmt::format("Unhandled action: {}", action_name).c_str());
     }
 
     if (changed)

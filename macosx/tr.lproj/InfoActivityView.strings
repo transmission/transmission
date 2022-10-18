@@ -6,7 +6,7 @@
 "31.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
-"32.title" = "Gönderildi:";
+"32.title" = "Karşıya yüklendi:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
 "33.placeholderString" = "Erişilemiyor";

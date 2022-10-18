@@ -159,8 +159,6 @@ tr_session* fLib = NULL;
     alert.showsSuppressionButton = YES;
 
     [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
-        [alert.window orderOut:nil];
-
         if (alert.suppressionButton.state == NSControlStateValueOn)
         {
             [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningResetStats"];

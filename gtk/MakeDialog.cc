@@ -21,12 +21,18 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h> /* tr_formatter_mem_B() */
 
+#include "PathButton.h"
 #include "MakeDialog.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
 
 using namespace std::literals;
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+using FileListValue = Glib::Value<GSList*>;
+using FileListHandler = Glib::SListHandler<Glib::RefPtr<Gio::File>>;
+#endif
 
 namespace
 {
@@ -81,10 +87,13 @@ public:
     TR_DISABLE_COPY_MOVE(Impl)
 
 private:
-    void onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserButton* chooser);
-    void onChooserChosen(Gtk::FileChooserButton* chooser);
+    void onSourceToggled2(Gtk::CheckButton* tb, PathButton* chooser);
+    void onChooserChosen(PathButton* chooser);
     void onResponse(int response);
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    bool on_drag_data_received(Glib::ValueBase const& value, double x, double y);
+#else
     void on_drag_data_received(
         Glib::RefPtr<Gdk::DragContext> const& drag_context,
         int x,
@@ -92,6 +101,9 @@ private:
         Gtk::SelectionData const& selection_data,
         guint info,
         guint time_);
+#endif
+
+    bool set_dropped_source_path(std::string const& filename);
 
     void updatePiecesLabel();
 
@@ -105,13 +117,13 @@ private:
     MakeDialog& dialog_;
     Glib::RefPtr<Session> const core_;
 
-    Gtk::RadioButton* file_radio_ = nullptr;
-    Gtk::FileChooserButton* file_chooser_ = nullptr;
-    Gtk::RadioButton* folder_radio_ = nullptr;
-    Gtk::FileChooserButton* folder_chooser_ = nullptr;
+    Gtk::CheckButton* file_radio_ = nullptr;
+    PathButton* file_chooser_ = nullptr;
+    Gtk::CheckButton* folder_radio_ = nullptr;
+    PathButton* folder_chooser_ = nullptr;
     Gtk::Label* pieces_lb_ = nullptr;
     Gtk::Scale* piece_size_scale_ = nullptr;
-    Gtk::FileChooserButton* destination_chooser_ = nullptr;
+    PathButton* destination_chooser_ = nullptr;
     Gtk::CheckButton* comment_check_ = nullptr;
     Gtk::Entry* comment_entry_ = nullptr;
     Gtk::CheckButton* private_check_ = nullptr;
@@ -194,9 +206,9 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     progress_bar_->set_text(str);
 
     /* buttons */
-    set_response_sensitive(Gtk::RESPONSE_CANCEL, !is_done);
-    set_response_sensitive(Gtk::RESPONSE_CLOSE, is_done);
-    set_response_sensitive(Gtk::RESPONSE_ACCEPT, is_done && success);
+    set_response_sensitive(TR_GTK_RESPONSE_TYPE(CANCEL), !is_done);
+    set_response_sensitive(TR_GTK_RESPONSE_TYPE(CLOSE), is_done);
+    set_response_sensitive(TR_GTK_RESPONSE_TYPE(ACCEPT), is_done && success);
 
     success_ = success;
     return true;
@@ -219,17 +231,17 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
 {
     switch (response)
     {
-    case Gtk::RESPONSE_CANCEL:
+    case TR_GTK_RESPONSE_TYPE(CANCEL):
         builder_.cancelChecksums();
-        hide();
+        close();
         break;
 
-    case Gtk::RESPONSE_ACCEPT:
+    case TR_GTK_RESPONSE_TYPE(ACCEPT):
         addTorrent();
         [[fallthrough]];
 
-    case Gtk::RESPONSE_CLOSE:
-        hide();
+    case TR_GTK_RESPONSE_TYPE(CLOSE):
+        close();
         break;
 
     default:
@@ -273,14 +285,15 @@ void MakeDialog::Impl::makeProgressDialog(std::string_view target, std::future<t
         std::move(future),
         target,
         core_));
-    progress_dialog_->signal_hide().connect(
+    gtr_window_on_close(
+        *progress_dialog_,
         [this]()
         {
             auto const success = progress_dialog_->success();
             progress_dialog_.reset();
             if (success)
             {
-                dialog_.hide();
+                dialog_.close();
             }
         });
     progress_dialog_->show();
@@ -288,7 +301,7 @@ void MakeDialog::Impl::makeProgressDialog(std::string_view target, std::future<t
 
 void MakeDialog::Impl::onResponse(int response)
 {
-    if (response == Gtk::RESPONSE_ACCEPT)
+    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
         if (builder_)
         {
@@ -320,9 +333,9 @@ void MakeDialog::Impl::onResponse(int response)
             makeProgressDialog(target, builder_->makeChecksums());
         }
     }
-    else if (response == Gtk::RESPONSE_CLOSE)
+    else if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
-        dialog_.hide();
+        dialog_.close();
     }
 }
 
@@ -333,7 +346,7 @@ void MakeDialog::Impl::onResponse(int response)
 namespace
 {
 
-void onSourceToggled(Gtk::ToggleButton* tb, Gtk::Widget* widget)
+void onSourceToggled(Gtk::CheckButton* tb, Gtk::Widget* widget)
 {
     widget->set_sensitive(tb->get_active());
 }
@@ -391,13 +404,13 @@ void MakeDialog::Impl::setFilename(std::string_view filename)
     updatePiecesLabel();
 }
 
-void MakeDialog::Impl::onChooserChosen(Gtk::FileChooserButton* chooser)
+void MakeDialog::Impl::onChooserChosen(PathButton* chooser)
 {
     chooser->set_data(FileChosenKey, GINT_TO_POINTER(true));
     setFilename(chooser->get_filename());
 }
 
-void MakeDialog::Impl::onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserButton* chooser)
+void MakeDialog::Impl::onSourceToggled2(Gtk::CheckButton* tb, PathButton* chooser)
 {
     if (tb->get_active())
     {
@@ -412,6 +425,47 @@ void MakeDialog::Impl::onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserB
     }
 }
 
+bool MakeDialog::Impl::set_dropped_source_path(std::string const& filename)
+{
+    if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_DIR)))
+    {
+        /* a directory was dragged onto the dialog... */
+        folder_radio_->set_active(true);
+        folder_chooser_->set_filename(filename);
+        return true;
+    }
+
+    if (Glib::file_test(filename, TR_GLIB_FILE_TEST(IS_REGULAR)))
+    {
+        /* a file was dragged on to the dialog... */
+        file_radio_->set_active(true);
+        file_chooser_->set_filename(filename);
+        return true;
+    }
+
+    return false;
+}
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+bool MakeDialog::Impl::on_drag_data_received(Glib::ValueBase const& value, double /*x*/, double /*y*/)
+{
+    if (G_VALUE_HOLDS(value.gobj(), GDK_TYPE_FILE_LIST))
+    {
+        FileListValue files_value;
+        files_value.init(value.gobj());
+        if (auto const files = FileListHandler::slist_to_vector(files_value.get(), Glib::OwnershipType::OWNERSHIP_NONE);
+            !files.empty())
+        {
+            return set_dropped_source_path(files.front()->get_path());
+        }
+    }
+
+    return false;
+}
+
+#else
+
 void MakeDialog::Impl::on_drag_data_received(
     Glib::RefPtr<Gdk::DragContext> const& drag_context,
     int /*x*/,
@@ -424,27 +478,13 @@ void MakeDialog::Impl::on_drag_data_received(
 
     if (auto const uris = selection_data.get_uris(); !uris.empty())
     {
-        auto const& uri = uris.front();
-        auto const filename = Glib::filename_from_uri(uri);
-
-        if (Glib::file_test(filename, Glib::FILE_TEST_IS_DIR))
-        {
-            /* a directory was dragged onto the dialog... */
-            folder_radio_->set_active(true);
-            folder_chooser_->set_current_folder(filename);
-            success = true;
-        }
-        else if (Glib::file_test(filename, Glib::FILE_TEST_IS_REGULAR))
-        {
-            /* a file was dragged on to the dialog... */
-            file_radio_->set_active(true);
-            file_chooser_->set_filename(filename);
-            success = true;
-        }
+        success = set_dropped_source_path(Glib::filename_from_uri(uris.front()));
     }
 
     drag_context->drag_finish(success, false, time_);
 }
+
+#endif
 
 MakeDialog::MakeDialog(
     BaseObjectType* cast_item,
@@ -468,13 +508,13 @@ std::unique_ptr<MakeDialog> MakeDialog::create(Gtk::Window& parent, Glib::RefPtr
 MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
-    , file_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_file_radio"))
-    , file_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "source_file_button"))
-    , folder_radio_(gtr_get_widget<Gtk::RadioButton>(builder, "source_folder_radio"))
-    , folder_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "source_folder_button"))
+    , file_radio_(gtr_get_widget<Gtk::CheckButton>(builder, "source_file_radio"))
+    , file_chooser_(gtr_get_widget_derived<PathButton>(builder, "source_file_button"))
+    , folder_radio_(gtr_get_widget<Gtk::CheckButton>(builder, "source_folder_radio"))
+    , folder_chooser_(gtr_get_widget_derived<PathButton>(builder, "source_folder_button"))
     , pieces_lb_(gtr_get_widget<Gtk::Label>(builder, "source_size_label"))
     , piece_size_scale_(gtr_get_widget<Gtk::Scale>(builder, "piece_size_scale"))
-    , destination_chooser_(gtr_get_widget<Gtk::FileChooserButton>(builder, "destination_button"))
+    , destination_chooser_(gtr_get_widget_derived<PathButton>(builder, "destination_button"))
     , comment_check_(gtr_get_widget<Gtk::CheckButton>(builder, "comment_check"))
     , comment_entry_(gtr_get_widget<Gtk::Entry>(builder, "comment_entry"))
     , private_check_(gtr_get_widget<Gtk::CheckButton>(builder, "private_check"))
@@ -484,7 +524,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
 {
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
-    destination_chooser_->set_current_folder(Glib::get_user_special_dir(Glib::USER_DIRECTORY_DESKTOP));
+    destination_chooser_->set_filename(Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP)));
 
     folder_radio_->set_active(false);
     folder_radio_->signal_toggled().connect([this]() { onSourceToggled2(folder_radio_, folder_chooser_); });
@@ -510,9 +550,15 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
     source_entry_->set_sensitive(false);
     source_check_->signal_toggled().connect([this]() { onSourceToggled(source_check_, source_entry_); });
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto drop_controller = Gtk::DropTarget::create(GDK_TYPE_FILE_LIST, Gdk::DragAction::COPY);
+    drop_controller->signal_drop().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received), false);
+    dialog_.add_controller(drop_controller);
+#else
     dialog_.drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     dialog_.drag_dest_add_uri_targets();
     dialog_.signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
+#endif
 }
 
 void MakeDialog::Impl::onPieceSizeUpdated()

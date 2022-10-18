@@ -1,6 +1,6 @@
 
 /* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
-"22.title" = "Besleme Limitleri";
+"22.title" = "Besleme Sınırları";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
 "23.title" = "Aktarım Bant Genişliği";
@@ -24,7 +24,7 @@
 "35.title" = "eş";
 
 /* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "40"; */
-"40.title" = "Limitsiz";
+"40.title" = "Sınırsız";
 
 /* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "41"; */
 "41.title" = "Genel Ayar";
@@ -33,13 +33,13 @@
 "42.title" = "Oranda Dur";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
-"43.title" = "Gönderme Limiti:";
+"43.title" = "Karşıya Yükleme Sınırı:";
 
 /* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
-"44.title" = "İndirme Limiti:";
+"44.title" = "İndirme Sınırı:";
 
 /* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
-"45.title" = "Genel bant genişliği limitlerine uy";
+"45.title" = "Genel bant genişliği sınırlarına uy";
 
 /* Class = "NSTextFieldCell"; title = "Priority"; ObjectID = "46"; */
 "46.title" = "Öncelik";
@@ -63,7 +63,7 @@
 "87.title" = "Genel Ayar";
 
 /* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "88"; */
-"88.title" = "Limitsiz";
+"88.title" = "Sınırsız";
 
 /* Class = "NSTextFieldCell"; title = "Inactivity:"; ObjectID = "89"; */
 "89.title" = "Boşta:";
@@ -72,4 +72,4 @@
 "98.title" = "dakika";
 
 /* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "114"; */
-"114.title" = "Besleme bittiği zaman aktarım dizelgesinden kaldır";
+"114.title" = "Besleme bittiğinde aktarım dizelgesinden kaldır";

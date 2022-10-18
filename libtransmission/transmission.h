@@ -1,16 +1,10 @@
-/*
- * This file Copyright © Transmission authors and contributors.
- *
- * It may be used under the 3-Clause BSD License, the GNU Public License v2,
- * or v3, or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © Transmission authors and contributors.
+// It may be used under the 3-Clause BSD (SPDX: BSD-3-Clause),
+// GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-/*
- * This file defines the public API for the libtransmission library.
- * The other public API headers are variant.h and utils.h.
- * Most of the remaining headers in libtransmission are private.
- */
+// This file defines the public API for the libtransmission library.
 
 #pragma once
 
@@ -115,7 +109,7 @@ enum tr_encryption_mode
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
- * @brief returns Transmisson's default download directory.
+ * @brief returns Transmission's default download directory.
  *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
@@ -427,7 +421,7 @@ struct tr_session_stats
     uint64_t downloadedBytes; /* total down */
     uint64_t filesAdded; /* number of files added */
     uint64_t sessionCount; /* program started N times */
-    uint64_t secondsActive; /* how long Transmisson's been running */
+    uint64_t secondsActive; /* how long Transmission's been running */
 };
 
 /** @brief Get bandwidth use statistics for the current session */
@@ -480,7 +474,7 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
 
-enum tr_port_forwarding
+enum tr_port_forwarding_state
 {
     TR_PORT_ERROR,
     TR_PORT_UNMAPPED,
@@ -489,7 +483,7 @@ enum tr_port_forwarding
     TR_PORT_MAPPED
 };
 
-tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session);
+tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
 
 enum tr_direction
 {
