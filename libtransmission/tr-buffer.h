@@ -203,7 +203,7 @@ public:
     auto toSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
-        int const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
+        auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
         auto const err = EVUTIL_SOCKET_ERROR();
         if (res == -1)
         {
@@ -230,11 +230,11 @@ public:
     }
 
     // -1 on error, 0 on eof, >0 for num bytes read
-    ssize_t addSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    auto addSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
         auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
-        int const err = EVUTIL_SOCKET_ERROR();
+        auto const err = EVUTIL_SOCKET_ERROR();
         if (res == -1)
         {
             tr_error_set(error, err, tr_net_strerror(err));
