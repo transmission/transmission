@@ -20,7 +20,7 @@ class Dns
 public:
     virtual ~Dns() = default;
 
-    using Callback = std::function<void(struct sockaddr const*, socklen_t salen)>;
+    using Callback = std::function<void(struct sockaddr const*, socklen_t salen, time_t expires_at)>;
     using Tag = unsigned int;
 
     class Hints
@@ -59,6 +59,10 @@ public:
             return compare(that) < 0;
         }
     };
+
+    [[nodiscard]] virtual std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(
+        std::string_view address,
+        Hints hints = {}) const = 0;
 
     virtual Tag lookup(std::string_view address, Callback&& callback, Hints hints = {}) = 0;
 
