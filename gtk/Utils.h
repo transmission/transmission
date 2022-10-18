@@ -101,6 +101,9 @@
 #define TR_GIO_DBUS_PROXY_FLAGS(Code) IF_GLIBMM2_68(Gio::DBus::ProxyFlags::Code, Gio::DBus::PROXY_FLAGS_##Code)
 #define TR_GIO_FILE_MONITOR_EVENT(Code) IF_GLIBMM2_68(Gio::FileMonitor::Event::Code, Gio::FILE_MONITOR_EVENT_##Code)
 
+#define TR_CAIRO_SURFACE_FORMAT(Code) IF_GTKMM4(Cairo::Surface::Format::Code, Cairo::FORMAT_##Code)
+#define TR_CAIRO_CONTEXT_OPERATOR(Code) IF_GTKMM4(Cairo::Context::Operator::Code, Cairo::OPERATOR_##Code)
+
 #define TR_PANGO_ALIGNMENT(Code) IF_PANGOMM2_48(Pango::Alignment::Code, Pango::ALIGN_##Code)
 #define TR_PANGO_ELLIPSIZE_MODE(Code) IF_PANGOMM2_48(Pango::EllipsizeMode::Code, Pango::ELLIPSIZE_##Code)
 #define TR_PANGO_WEIGHT(Code) IF_PANGOMM2_48(Pango::Weight::Code, Pango::WEIGHT_##Code)
