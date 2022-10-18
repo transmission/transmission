@@ -125,6 +125,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-selected: #{$default-accent-color};
     --color-progressbar-background-1: #{$nice-grey};
     --color-default-border: #{$default-border-light};
+    --color-dialog-border: #{$nice-grey};
   }
   --color-progressbar-background-2: #{$grey-500};
   --color-progressbar-verify-1: #{$pink-300};
@@ -345,16 +346,34 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   background-color: $white;
 }
 
-.torrent-list {
-  $app-image: '../img/application-x-executable.png';
-  $audio-image: '../img/audio-x-generic.png';
-  $folder-image: '../img/folder.png';
-  $font-image: '../img/font-x-generic.png';
-  $image-image: '../img/image-x-generic.png';
-  $package-image: '../img/package-x-generic.png';
-  $text-image: '../img/text-x-generic.png';
-  $video-image: '../img/video-x-generic.png';
+$app-image: '../img/box.svg';
+$audio-image: '../img/music.svg';
+$folder-image: '../img/folder.svg';
+$font-image: '../img/type.svg';
+$image-image: '../img/image.svg';
+$package-image: '../img/package.svg';
+$text-image: '../img/file-text.svg';
+$video-image: '../img/film.svg';
 
+@mixin mime-icon-compact($mime-icon) {
+  &[data-icon-multifile='true'] {
+    background-image: url($folder-image);
+    background-size: 16px;
+    background-position: center;
+  }
+}
+
+@mixin mime-icon($mime-icon) {
+  background-image: url($mime-icon);
+
+  &[data-icon-multifile='true'] {
+    background-image: url($mime-icon), url($folder-image);
+    background-size: 16px, 16px;
+    background-position: top left, bottom right;
+  }
+}
+
+.torrent-list {
   cursor: pointer;
   list-style-type: none;
   margin: 0;
@@ -369,40 +388,32 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     .icon {
       background-position: center, top left;
 
-      @mixin mime-icon-compact($mime-icon) {
-        background-image: url($mime-icon);
-
-        &[data-icon-multifile='true'] {
-          background-image: url($mime-icon), url($folder-image);
-        }
-      }
-
       &[data-icon-mime-type='audio'] {
-        @include mime-icon-compact($audio-image);
+        @include mime-icon($audio-image);
       }
 
       &[data-icon-mime-type='application'] {
-        @include mime-icon-compact($app-image);
+        @include mime-icon($app-image);
       }
 
       &[data-icon-mime-type='font'] {
-        @include mime-icon-compact($font-image);
+        @include mime-icon($font-image);
       }
 
       &[data-icon-mime-type='image'] {
-        @include mime-icon-compact($image-image);
+        @include mime-icon($image-image);
       }
 
       &[data-icon-mime-type='model'] {
-        @include mime-icon-compact($package-image);
+        @include mime-icon($package-image);
       }
 
       &[data-icon-mime-type='text'] {
-        @include mime-icon-compact($text-image);
+        @include mime-icon($text-image);
       }
 
       &[data-icon-mime-type='video'] {
-        @include mime-icon-compact($video-image);
+        @include mime-icon($video-image);
       }
     }
 
@@ -419,10 +430,14 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
         flex-shrink: 0;
         height: $icon-size;
         width: $icon-size;
+
+        &[data-icon-multifile='true'] {
+          @include mime-icon($folder-image);
+        }
       }
 
       > * {
-        margin: 4px 5px;
+        margin: 5px;
       }
     }
 
@@ -694,7 +709,9 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   $background-color: var(--color-toolbar-background);
   background: $background-color;
   bottom: 0;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
+  border: 0;
   position: absolute;
   right: 0;
   top: $popup-top;
@@ -1242,7 +1259,8 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   background: var(--color-bg-popup);
   border-radius: 5px;
   min-width: 220px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
   padding: 10px;
   position: absolute;
@@ -1419,7 +1437,6 @@ $logo-size: 64px;
 @include for-tablet-portrait-up {
   .dialog-container {
     min-width: 400px;
-    max-width: 75%;
     position: absolute;
     top: $popup-top * 2;
   }
@@ -1465,11 +1482,6 @@ $logo-size: 64px;
     padding: 8px;
     text-decoration: none;
   }
-
-  // a:hover,
-  // a:active {
-  //   background: linear-gradient($white, var(--color-bg-menu));
-  // }
 }
 
 .dialog-buttons-begin {
@@ -1480,13 +1492,23 @@ $logo-size: 64px;
   display: none;
 }
 
+dialog {
+  border: none;
+}
+
 .dialog-container {
-  border: 0;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   color: var(--color-fg-primary);
   display: block;
   padding: 0;
   z-index: $z-index-popup;
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
+
+  @include for-tablet-portrait-up() {
+    border-radius: 8px;
+    border: 0;
+    max-width: 50%;
+  }
 }
 
 .dialog-heading {
@@ -1508,8 +1530,9 @@ $logo-size: 64px;
 }
 
 .dialog-window {
-  background: linear-gradient(160deg, #f7f7f7 1%, #f7f7f7, 40%, #ccc);
+  background: var(--color-bg-primary);
   padding: $dialog-padding-number * 1px;
+  border-radius: 8px;
 }
 
 .dialog-workarea {

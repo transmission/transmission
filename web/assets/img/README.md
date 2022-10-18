@@ -56,7 +56,6 @@ license: CC-BY-SA 3.0
 https://www.svgrepo.com/
 license: CC0
 
-- checkered-flag.svg
 - up-and-down-arrows.svg
 
 ## Custom Icons
