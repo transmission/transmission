@@ -29,6 +29,7 @@ public:
     class Iterator
     {
     public:
+        using difference_type = long;
         using value_type = std::byte;
         using pointer = value_type*;
         using reference = value_type&;
