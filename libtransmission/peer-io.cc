@@ -819,12 +819,6 @@ void tr_peerIo::write(libtransmission::Buffer& buf, bool is_piece_data)
     outbuf_info.emplace_back(n_bytes, is_piece_data);
 }
 
-void tr_peerIo::writeBuf(struct evbuffer* buf, bool is_piece_data)
-{
-    auto const n_bytes = evbuffer_get_length(buf);
-    writeBytes(evbuffer_pullup(buf, n_bytes), n_bytes, is_piece_data);
-}
-
 void tr_peerIo::writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data)
 {
     auto const old_size = std::size(outbuf);
