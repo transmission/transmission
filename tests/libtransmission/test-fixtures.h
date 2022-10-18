@@ -15,6 +15,8 @@
 #include <string_view>
 #include <thread>
 
+#include <event2/event.h>
+
 #include "crypto-utils.h" // tr_base64_decode()
 #include "error.h"
 #include "file.h" // tr_sys_file_*()
@@ -94,6 +96,29 @@ inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds
 inline bool waitFor(std::function<bool()> const& test, int msec)
 {
     return waitFor(test, std::chrono::milliseconds{ msec });
+}
+
+inline bool waitFor(
+    struct event_base* evb,
+    std::function<bool()> const& test,
+    std::chrono::milliseconds msec = std::chrono::seconds{ 5 })
+{
+    auto const deadline = std::chrono::steady_clock::now() + msec;
+
+    for (;;)
+    {
+        if (test())
+        {
+            return true;
+        }
+
+        if (std::chrono::steady_clock::now() > deadline)
+        {
+            return false;
+        }
+
+        event_base_loop(evb, EVLOOP_ONCE);
+    }
 }
 
 class Sandbox
