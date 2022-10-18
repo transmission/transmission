@@ -412,8 +412,9 @@ struct ParentState
 
 struct JsonWalk
 {
-    explicit JsonWalk(std::string& out_in)
+    JsonWalk(std::string& out_in, bool do_indent)
         : out{ out_in }
+        , doIndent{ do_indent }
     {
     }
 
@@ -675,8 +676,7 @@ static struct VariantWalkFuncs const walk_funcs = {
 std::string tr_variantToStrJson(tr_variant const* top, bool lean)
 {
     auto str = std::string{};
-    auto data = JsonWalk{ str };
-    data.doIndent = !lean;
+    auto data = JsonWalk{ str, !lean };
 
     tr_variantWalk(top, &walk_funcs, &data, true);
 
