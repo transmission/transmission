@@ -199,6 +199,11 @@ public:
         evbuffer_drain(buf_.get(), n_bytes);
     }
 
+    void clear()
+    {
+        drain(size());
+    }
+
     // -1 on error, 0 on eof, >0 on n bytes written
     auto toSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {

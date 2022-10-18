@@ -857,10 +857,11 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
     outbuf.addUint16(0);
 
     /* maybe de-encrypt our connection */
-    //if (crypto_select == CryptoProvidePlaintext)
-    //{
-    // peer_io->write(std::move(outbuf), false);
-    //}
+    if (crypto_select == CryptoProvidePlaintext)
+    {
+        peer_io->write(outbuf, false);
+        outbuf.clear();
+    }
 
     tr_logAddTraceHand(handshake, "sending handshake");
 
