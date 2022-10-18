@@ -11,6 +11,7 @@ add_executable(libtransmission-test
     crypto-test-ref.h
     crypto-test.cc
     error-test.cc
+    dns-test.cc
     file-piece-map-test.cc
     file-test.cc
     getopt-test.cc
