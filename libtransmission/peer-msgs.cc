@@ -2394,7 +2394,7 @@ void tr_peerMsgsImpl::sendPex()
 
     /* write the pex message */
     auto payload = tr_variantToStr(&val, TR_VARIANT_FMT_BENC);
-    out.addUint32(sizeof(uint8_t) + std::size(payload));
+    out.addUint32(2 * sizeof(uint8_t) + std::size(payload));
     out.addUint8(BtPeerMsgs::Ltep);
     out.addUint8(this->ut_pex_id);
     out.add(payload);
