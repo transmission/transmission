@@ -17,6 +17,12 @@
 #include "net.h" // tr_socket_t
 #include "utils.h"
 
+/** @brief Portability wrapper for htonll() that uses the system implementation if available */
+[[nodiscard]] uint64_t tr_htonll(uint64_t);
+
+/** @brief Portability wrapper for htonll() that uses the system implementation if available */
+[[nodiscard]] uint64_t tr_ntohll(uint64_t);
+
 namespace libtransmission
 {
 
@@ -161,15 +167,6 @@ public:
         return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
     }
 
-    [[nodiscard]] auto peek(size_t offset) const noexcept
-    {
-        auto ptr = evbuffer_ptr{};
-        evbuffer_ptr_set(buf_.get(), &ptr, offset, EVBUFFER_PTR_SET);
-        auto iov = Iovec{};
-        evbuffer_peek(buf_.get(), std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov, 1);
-        return iov;
-    }
-
     auto toBuf(void* tgt, size_t n_bytes)
     {
         return evbuffer_remove(buf_.get(), tgt, n_bytes);
@@ -187,6 +184,13 @@ public:
         auto tmp = uint32_t{};
         toBuf(&tmp, sizeof(tmp));
         return ntohl(tmp);
+    }
+
+    [[nodiscard]] uint64_t toUint64()
+    {
+        auto tmp = uint64_t{};
+        toBuf(&tmp, sizeof(tmp));
+        return tr_ntohll(tmp);
     }
 
     void drain(size_t n_bytes)
