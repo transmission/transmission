@@ -17,12 +17,6 @@
 #include "net.h" // tr_socket_t
 #include "utils.h"
 
-/** @brief Portability wrapper for htonll() that uses the system implementation if available */
-[[nodiscard]] uint64_t tr_htonll(uint64_t);
-
-/** @brief Portability wrapper for htonll() that uses the system implementation if available */
-[[nodiscard]] uint64_t tr_ntohll(uint64_t);
-
 namespace libtransmission
 {
 
