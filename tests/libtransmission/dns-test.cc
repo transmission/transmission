@@ -41,7 +41,10 @@ protected:
         ::testing::Test::TearDown();
     }
 
-    bool waitFor(struct event_base* evb, std::function<bool()> const& test, std::chrono::milliseconds msec = DefaultTimeout)
+    static bool waitFor(
+        struct event_base* evb,
+        std::function<bool()> const& test,
+        std::chrono::milliseconds msec = DefaultTimeout)
     {
         auto const deadline = std::chrono::steady_clock::now() + msec;
 
@@ -72,10 +75,11 @@ TEST_F(EvDnsTest, canLookup)
 
     dns.lookup(
         "example.com",
-        [&done](struct sockaddr const* ai, socklen_t ailen)
+        [&done](struct sockaddr const* ai, socklen_t ailen, time_t expires_at)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
+            EXPECT_GT(expires_at, tr_time());
             done = true;
         });
 
@@ -90,19 +94,21 @@ TEST_F(EvDnsTest, canRequestWhilePending)
 
     dns.lookup(
         "example.com",
-        [&n_done](struct sockaddr const* ai, socklen_t ailen)
+        [&n_done](struct sockaddr const* ai, socklen_t ailen, time_t expires_at)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
+            EXPECT_GT(expires_at, tr_time());
             ++n_done;
         });
 
     dns.lookup(
         "example.com",
-        [&n_done](struct sockaddr const* ai, socklen_t ailen)
+        [&n_done](struct sockaddr const* ai, socklen_t ailen, time_t expires_at)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
+            EXPECT_GT(expires_at, tr_time());
             ++n_done;
         });
 
@@ -115,26 +121,29 @@ TEST_F(EvDnsTest, canCancel)
 {
     auto dns = EvDns{ event_base_, tr_time };
     auto n_done = size_t{ 0 };
+    static auto constexpr Name = "example.com"sv;
 
     auto tag = dns.lookup(
-        "example.com",
-        [&n_done](struct sockaddr const* ai, socklen_t ailen)
+        Name,
+        [&n_done](struct sockaddr const* ai, socklen_t ailen, time_t expires_at)
         {
             ++n_done;
             // we cancelled this req, so `ai` and `ailen` should be zeroed out
             EXPECT_EQ(nullptr, ai);
             EXPECT_EQ(0, ailen);
+            EXPECT_EQ(0, expires_at);
         });
 
     dns.lookup(
-        "example.com",
-        [&n_done](struct sockaddr const* ai, socklen_t ailen)
+        Name,
+        [&n_done](struct sockaddr const* ai, socklen_t ailen, time_t expires_at)
         {
             ++n_done;
 
             // this one did _not_ get cancelled so it should be OK
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
+            EXPECT_GT(expires_at, tr_time());
         });
 
     dns.cancel(tag);
@@ -147,15 +156,17 @@ TEST_F(EvDnsTest, canCancel)
 TEST_F(EvDnsTest, doesCacheEntries)
 {
     auto dns = EvDns{ event_base_, tr_time };
+    static auto constexpr Name = "example.com"sv;
 
     struct sockaddr const* ai_addr = nullptr;
 
     dns.lookup(
-        "example.com",
-        [&ai_addr](struct sockaddr const* ai, socklen_t ailen)
+        Name,
+        [&ai_addr](struct sockaddr const* ai, socklen_t ailen, time_t expires_at)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
+            EXPECT_GT(expires_at, tr_time());
             ai_addr = ai;
         });
 
@@ -165,17 +176,24 @@ TEST_F(EvDnsTest, doesCacheEntries)
 
     auto second_callback_called = false;
     dns.lookup(
-        "example.com",
-        [&ai_addr, &second_callback_called](struct sockaddr const* ai, socklen_t ailen)
+        Name,
+        [&ai_addr, &second_callback_called](struct sockaddr const* ai, socklen_t ailen, time_t expires_at)
         {
             EXPECT_NE(nullptr, ai);
             EXPECT_GT(ailen, 0);
             EXPECT_EQ(ai_addr, ai);
+            EXPECT_GT(expires_at, tr_time());
             second_callback_called = true;
         });
     // since it's cached, the callback should have been invoked
     // without waiting for the event loop
     EXPECT_TRUE(second_callback_called);
+
+    // confirm that `cached()` returns the cached value immediately
+    auto res = dns.cached(Name);
+    EXPECT_TRUE(res);
+    EXPECT_EQ(ai_addr, res->first);
+    EXPECT_GT(res->second, 0);
 }
 
 } // namespace libtransmission::test

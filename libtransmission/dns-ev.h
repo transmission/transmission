@@ -86,22 +86,24 @@ public:
         }
     }
 
+    std::optional<std::pair<sockaddr const*, socklen_t>> cached(std::string_view address, Hints hints = {}) const override
+    {
+        if (auto const* entry = cached(makeKey(address, hints)); entry != nullptr)
+        {
+            return std::make_pair(reinterpret_cast<sockaddr const*>(&entry->ss_), entry->sslen_);
+        }
+
+        return {};
+    }
+
     Tag lookup(std::string_view address, Callback&& callback, Hints hints = {}) override
     {
-        auto const key = std::make_pair(tr_strlower(address), hints);
-        auto const now = time_func_();
+        auto const key = makeKey(address, hints);
 
-        if (auto iter = cache_.find(key); iter != std::end(cache_))
+        if (auto const* entry = cached(key); entry)
         {
-            auto const& entry = iter->second;
-
-            if (entry.expires_at_ > now)
-            {
-                callback(reinterpret_cast<struct sockaddr const*>(&entry.ss_), entry.sslen_);
-                return {};
-            }
-
-            cache_.erase(iter); // expired
+            callback(reinterpret_cast<sockaddr const*>(&entry->ss_), entry->sslen_, entry->expires_at_);
+            return {};
         }
 
         auto& request = requests_[key];
@@ -131,7 +133,7 @@ public:
                     continue;
                 }
 
-                iter->callback_(nullptr, 0);
+                iter->callback_(nullptr, 0, 0);
 
                 request.callbacks.erase(iter);
 
@@ -148,6 +150,28 @@ public:
     }
 
 private:
+    [[nodiscard]] static Key makeKey(std::string_view address, Hints hints)
+    {
+        return Key{ tr_strlower(address), hints };
+    }
+
+    [[nodiscard]] CacheEntry const* cached(Key const& key) const
+    {
+        if (auto iter = cache_.find(key); iter != std::end(cache_))
+        {
+            auto const& entry = iter->second;
+
+            if (auto const now = time_func_(); entry.expires_at_ > now)
+            {
+                return &entry;
+            }
+
+            cache_.erase(iter); // expired
+        }
+
+        return nullptr;
+    }
+
     static void evcallback(int /*result*/, struct evutil_addrinfo* res, void* varg)
     {
         auto* const arg = static_cast<CallbackArg*>(varg);
@@ -168,7 +192,10 @@ private:
         {
             for (auto& callback : request_entry.mapped().callbacks)
             {
-                callback.callback_(reinterpret_cast<sockaddr const*>(&cache_entry.ss_), cache_entry.sslen_);
+                callback.callback_(
+                    reinterpret_cast<sockaddr const*>(&cache_entry.ss_),
+                    cache_entry.sslen_,
+                    cache_entry.expires_at_);
             }
         }
     }
@@ -176,7 +203,7 @@ private:
     TimeFunc const time_func_;
     static time_t constexpr CacheTtlSecs = 3600U;
     std::unique_ptr<evdns_base, void (*)(evdns_base*)> const evdns_base_;
-    std::map<Key, CacheEntry> cache_;
+    mutable std::map<Key, CacheEntry> cache_;
     std::map<Key, Request> requests_;
     unsigned int next_tag_ = 1;
 };
