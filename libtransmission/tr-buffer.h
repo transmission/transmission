@@ -247,6 +247,8 @@ public:
         return res;
     }
 
+    // Move all data from one buffer into another.
+    // This is a destructive add: the source buffer is empty after this call.
     void add(Buffer& that)
     {
         evbuffer_add_buffer(buf_.get(), that.buf_.get());

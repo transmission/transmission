@@ -860,7 +860,7 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
     if (crypto_select == CryptoProvidePlaintext)
     {
         peer_io->write(outbuf, false);
-        outbuf.clear();
+        TR_ASSERT(std::empty(outbuf));
     }
 
     tr_logAddTraceHand(handshake, "sending handshake");

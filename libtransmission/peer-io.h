@@ -149,6 +149,8 @@ public:
 
     void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
+    // Write all the data from `buf`.
+    // This is a destructive add: `buf` is empty after this call.
     void write(libtransmission::Buffer& buf, bool is_piece_data);
 
     void writeBuf(struct evbuffer* buf, bool is_piece_data);

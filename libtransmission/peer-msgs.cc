@@ -2002,7 +2002,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         /* flush the protocol messages */
         logtrace(msgs, fmt::format(FMT_STRING("flushing outMessages... to {:p} (length is {:d})"), fmt::ptr(msgs->io), len));
         msgs->io->write(msgs->outMessages, false);
-        msgs->outMessages.clear();
+        TR_ASSERT(std::empty(msgs->outMessages));
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
         msgs->outMessagesBatchPeriod = LowPriorityIntervalSecs;
