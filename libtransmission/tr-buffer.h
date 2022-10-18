@@ -28,20 +28,22 @@ public:
     class Iterator
     {
     public:
+        using value_type = std::byte;
+
         Iterator(evbuffer* buf, size_t offset)
             : buf_{ buf }
         {
             setOffset(offset);
         }
 
-        [[nodiscard]] std::byte& operator*() noexcept
+        [[nodiscard]] value_type& operator*() noexcept
         {
-            return *reinterpret_cast<std::byte*>(iov_.iov_base);
+            return *reinterpret_cast<value_type*>(iov_.iov_base);
         }
 
-        [[nodiscard]] std::byte operator*() const noexcept
+        [[nodiscard]] value_type operator*() const noexcept
         {
-            return *reinterpret_cast<std::byte*>(iov_.iov_base);
+            return *reinterpret_cast<value_type*>(iov_.iov_base);
         }
 
         [[nodiscard]] Iterator operator+(int n_bytes)
@@ -53,7 +55,7 @@ public:
         {
             if (iov_.iov_len > 1)
             {
-                iov_.iov_base = reinterpret_cast<std::byte*>(iov_.iov_base) + 1;
+                iov_.iov_base = reinterpret_cast<value_type*>(iov_.iov_base) + 1;
                 --iov_.iov_len;
                 ++offset_;
             }
