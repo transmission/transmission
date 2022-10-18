@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <string>
@@ -29,6 +30,9 @@ public:
     {
     public:
         using value_type = std::byte;
+        using pointer = value_type*;
+        using reference = value_type&;
+        using iterator_category = std::random_access_iterator_tag;
 
         Iterator(evbuffer* buf, size_t offset)
             : buf_{ buf }
