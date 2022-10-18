@@ -200,11 +200,11 @@ public:
     }
 
     // -1 on error, 0 on eof, >0 on n bytes written
-    ssize_t toSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    auto toSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
         int const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
-        int const err = EVUTIL_SOCKET_ERROR();
+        auto const err = EVUTIL_SOCKET_ERROR();
         if (res == -1)
         {
             tr_error_set(error, err, tr_net_strerror(err));
