@@ -13,8 +13,6 @@
 #include <vector>
 
 #include <event2/buffer.h>
-#include <event2/dns.h>
-#include <event2/util.h>
 
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -39,50 +37,6 @@
 #define logtrace(interned, msg) tr_logAddTrace(msg, (interned).sv())
 
 using namespace std::literals;
-
-/****
-*****
-****/
-
-#if 0
-class TauMediator final : public tau::Mediator
-{
-public:
-    TauMediator(tr_session& session)
-        : session_{ session }
-    {
-    }
-
-    ~TauMediator() noexcept = default;
-
-    void sendto(void const* buf, size_t buflen, struct sockaddr const* addr, size_t addrlen) override
-    {
-        session_.udp_core_->sendto(buf, buflen, addr, addrlen);
-    }
-
-    [[nodiscard]] evdns_base* evdnsBase() const override
-    {
-        return session_.evdnsBase();
-    }
-
-    [[nodiscard]] std::optional<tr_address> announceIP() const override
-    {
-        if (!session_.useAnnounceIP())
-        {
-            return {};
-        }
-
-        return tr_address::fromString(session_.announceIP());
-    }
-
-private:
-    tr_session& session_;
-};
-#endif
-
-/****
-*****
-****/
 
 static uint32_t evbuffer_read_ntoh_32(struct evbuffer* buf)
 {
@@ -409,7 +363,7 @@ struct tau_tracker
 
     [[nodiscard]] auto isIdle() const
     {
-        return std::empty(announces) && std::empty(scrapes) && dns_request == nullptr;
+        return std::empty(announces) && std::empty(scrapes) && dns_request_;
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -428,21 +382,20 @@ struct tau_tracker
         this->announces.clear();
     }
 
-    void sendto(struct evutil_addrinfo const* const ai, tr_port dst_port, void const* buf, size_t buflen)
+    void sendto(void const* buf, size_t buflen)
     {
-        auto ss = sockaddr_storage{};
-        memcpy(&ss, ai->ai_addr, ai->ai_addrlen);
+        auto [ss, sslen] = *addr_;
 
-        if (ai->ai_family == AF_INET)
+        if (ss.ss_family == AF_INET)
         {
-            reinterpret_cast<sockaddr_in*>(&ss)->sin_port = dst_port.network();
+            reinterpret_cast<sockaddr_in*>(&ss)->sin_port = port.network();
         }
-        else if (ai->ai_family == AF_INET6)
+        else if (ss.ss_family == AF_INET6)
         {
-            reinterpret_cast<sockaddr_in6*>(&ss)->sin6_port = dst_port.network();
+            reinterpret_cast<sockaddr_in6*>(&ss)->sin6_port = port.network();
         }
 
-        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr*>(&ss), ai->ai_addrlen);
+        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr*>(&ss), sslen);
     }
 
     Mediator& mediator_;
@@ -451,9 +404,9 @@ struct tau_tracker
     tr_interned_string const host;
     tr_port const port;
 
-    evdns_getaddrinfo_request* dns_request = nullptr;
-    std::shared_ptr<evutil_addrinfo> addr;
-    time_t addr_expiration_time = 0;
+    libtransmission::Dns::Tag dns_request_ = {};
+    std::optional<std::pair<sockaddr_storage, socklen_t>> addr_;
+    time_t addr_expires_at_ = 0;
 
     time_t connecting_at = 0;
     time_t connection_expiration_time = 0;
@@ -462,33 +415,32 @@ struct tau_tracker
 
     time_t close_at = 0;
 
+    static time_t constexpr DnsRetryIntervalSecs = 60 * 60;
+
     std::list<tau_announce_request> announces;
     std::list<tau_scrape_request> scrapes;
 };
 
 static void tau_tracker_upkeep(struct tau_tracker* /*tracker*/);
 
-static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* vtracker)
+static void tau_tracker_on_dns(tau_tracker* const tracker, sockaddr const* sa, socklen_t salen, time_t expires_at)
 {
-    auto* tracker = static_cast<struct tau_tracker*>(vtracker);
+    tracker->dns_request_ = {};
 
-    tracker->dns_request = nullptr;
-    tracker->addr_expiration_time = tr_time() + 60 * 60; /* one hour */
-
-    if (errcode != 0)
+    if (sa == nullptr)
     {
-        auto const errmsg = fmt::format(
-            _("Couldn't find address of tracker '{host}': {error} ({error_code})"),
-            fmt::arg("host", tracker->host),
-            fmt::arg("error", evutil_gai_strerror(errcode)),
-            fmt::arg("error_code", errcode));
+        auto const errmsg = fmt::format(_("Couldn't find address of tracker '{host}'"), fmt::arg("host", tracker->host));
         logwarn(tracker->key, errmsg);
         tracker->failAll(false, false, errmsg.c_str());
+        tracker->addr_expires_at_ = tr_time() + tracker->DnsRetryIntervalSecs;
     }
     else
     {
         logdbg(tracker->key, "DNS lookup succeeded");
-        tracker->addr.reset(addr, evutil_freeaddrinfo);
+        auto ss = sockaddr_storage{};
+        memcpy(&ss, sa, salen);
+        tracker->addr_.emplace(ss, salen);
+        tracker->addr_expires_at_ = expires_at;
         tau_tracker_upkeep(tracker);
     }
 }
@@ -499,7 +451,7 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
     logdbg(tracker->key, fmt::format("sending request w/connection id {}", tracker->connection_id));
     evbuffer_add_hton_64(buf, tracker->connection_id);
     evbuffer_add_reference(buf, payload, payload_len, nullptr, nullptr);
-    tracker->sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+    tracker->sendto(evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
     evbuffer_free(buf);
 }
 
@@ -535,9 +487,9 @@ static void tau_tracker_send_requests(tau_tracker* tracker, std::list<T>& reqs)
 
 static void tau_tracker_send_reqs(tau_tracker* tracker)
 {
-    TR_ASSERT(tracker->dns_request == nullptr);
+    TR_ASSERT(!tracker->dns_request_);
+    TR_ASSERT(tracker->addr_);
     TR_ASSERT(tracker->connecting_at == 0);
-    TR_ASSERT(tracker->addr != nullptr);
     TR_ASSERT(tracker->connection_expiration_time > tr_time());
 
     tau_tracker_send_requests(tracker, tracker->announces);
@@ -625,11 +577,11 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
     bool const closing = tracker->close_at != 0;
 
     /* if the address info is too old, expire it */
-    if (tracker->addr != nullptr && (closing || tracker->addr_expiration_time <= now))
+    if (tracker->addr_ && (closing || tracker->addr_expires_at_ <= now))
     {
         logtrace(tracker->host, "Expiring old DNS result");
-        tracker->addr.reset();
-        tracker->addr_expiration_time = 0;
+        tracker->addr_.reset();
+        tracker->addr_expires_at_ = 0;
     }
 
     /* are there any requests pending? */
@@ -639,42 +591,38 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
     }
 
     // if DNS lookup *recently* failed for this host, do nothing
-    if (tracker->addr == nullptr && now < tracker->addr_expiration_time)
+    if (!tracker->addr_ && now < tracker->addr_expires_at_)
     {
         return;
     }
 
     /* if we don't have an address yet, try & get one now. */
-    if (!closing && tracker->addr == nullptr && tracker->dns_request == nullptr)
+    if (!closing && !tracker->addr_ && !tracker->dns_request_)
     {
-        struct evutil_addrinfo hints = {};
-        memset(&hints, 0, sizeof(hints));
+        auto hints = libtransmission::Dns::Hints{};
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_protocol = IPPROTO_UDP;
         logtrace(tracker->host, "Trying a new DNS lookup");
-        tracker->dns_request = evdns_getaddrinfo(
-            tracker->mediator_.evdnsBase(),
-            tr_strlower(tracker->host.sv()).c_str(),
-            nullptr,
-            &hints,
-            tau_tracker_on_dns,
-            tracker);
+        tracker->dns_request_ = tracker->mediator_.dns().lookup(
+            tracker->host.sv(),
+            [tracker](sockaddr const* sa, socklen_t len, time_t expires_at)
+            { tau_tracker_on_dns(tracker, sa, len, expires_at); },
+            hints);
         return;
     }
 
     logtrace(
         tracker->key,
         fmt::format(
-            "addr {} -- connected {} ({} {}) -- connecting_at {}",
-            fmt::ptr(tracker->addr),
+            "connected {} ({} {}) -- connecting_at {}",
             tracker->connection_expiration_time > now,
             tracker->connection_expiration_time,
             now,
             tracker->connecting_at));
 
     /* also need a valid connection ID... */
-    if (tracker->addr != nullptr && tracker->connection_expiration_time <= now && tracker->connecting_at == 0)
+    if (tracker->addr_ && tracker->connection_expiration_time <= now && tracker->connecting_at == 0)
     {
         struct evbuffer* buf = evbuffer_new();
         tracker->connecting_at = now;
@@ -683,7 +631,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        tracker->sendto(tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+        tracker->sendto(evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
         evbuffer_free(buf);
         return;
     }
@@ -693,7 +641,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         tau_tracker_timeout_reqs(tracker);
     }
 
-    if (tracker->addr != nullptr && tracker->connection_expiration_time > now)
+    if (tracker->addr_ && tracker->connection_expiration_time > now)
     {
         tau_tracker_send_reqs(tracker);
     }
@@ -770,9 +718,9 @@ public:
         for (auto& tracker : trackers_)
         {
             // if there's a pending DNS request, cancel it
-            if (tracker.dns_request != nullptr)
+            if (tracker.dns_request_)
             {
-                evdns_getaddrinfo_cancel(tracker.dns_request);
+                mediator_.dns().cancel(tracker.dns_request_);
             }
 
             tracker.close_at = now + 3;

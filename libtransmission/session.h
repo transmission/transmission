@@ -150,7 +150,7 @@ private:
 
         ~AnnouncerUdpMediator() noexcept = default;
 
-        void sendto(void const* buf, size_t buflen, struct sockaddr const* addr, size_t addrlen) override
+        void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) override
         {
             session_.udp_core_->sendto(buf, buflen, addr, addrlen);
         }

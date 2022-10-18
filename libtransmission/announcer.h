@@ -300,7 +300,7 @@ public:
     {
     public:
         virtual ~Mediator() noexcept = default;
-        virtual void sendto(void const* buf, size_t buflen, struct sockaddr const* addr, size_t addrlen) = 0;
+        virtual void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) = 0;
         [[nodiscard]] virtual libtransmission::Dns& dns() = 0;
         [[nodiscard]] virtual std::optional<tr_address> announceIP() const = 0;
     };

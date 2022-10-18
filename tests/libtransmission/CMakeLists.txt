@@ -1,6 +1,7 @@
 add_executable(libtransmission-test
     announce-list-test.cc
     announcer-test.cc
+    announcer-udp-test.cc
     benc-test.cc
     bitfield-test.cc
     block-info-test.cc
