@@ -1998,18 +1998,16 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     }
     else if (have_messages && now - msgs->outMessagesBatchedAt >= msgs->outMessagesBatchPeriod)
     {
-        auto const n_bytes = std::size(msgs->outMessages);
+        auto const len = std::size(msgs->outMessages);
         /* flush the protocol messages */
-        logtrace(
-            msgs,
-            fmt::format(FMT_STRING("flushing outMessages... to {:p} (length is {:d})"), fmt::ptr(msgs->io), n_bytes));
+        logtrace(msgs, fmt::format(FMT_STRING("flushing outMessages... to {:p} (length is {:d})"), fmt::ptr(msgs->io), len));
         // FIXME(ckerr) inefficient
         msgs->io->write(msgs->outMessages, false);
-        msgs->outMessages.drain(n_bytes);
+        msgs->outMessages.drain(len);
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
         msgs->outMessagesBatchPeriod = LowPriorityIntervalSecs;
-        bytes_written += n_bytes;
+        bytes_written += len;
     }
 
     /**

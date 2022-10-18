@@ -331,7 +331,7 @@ static size_t utp_get_rb_size(tr_peerIo* const io)
     return UtpReadBufferSize - bytes;
 }
 
-static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes);
+static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
 
 static void utp_on_writable(tr_peerIo* io)
 {
@@ -996,13 +996,14 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
     return res;
 }
 
-static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes)
+static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 {
-    tr_logAddTraceIo(io, fmt::format("in tr_peerIoTryWrite {}", n_bytes));
     auto const old_len = std::size(io->outbuf);
-    n_bytes = std::min(n_bytes, old_len);
-    n_bytes = io->bandwidth().clamp(TR_UP, n_bytes);
-    if (n_bytes == 0)
+
+    tr_logAddTraceIo(io, fmt::format("in tr_peerIoTryWrite {}", howmuch));
+    howmuch = std::min(howmuch, old_len);
+    howmuch = io->bandwidth().clamp(TR_UP, howmuch);
+    if (howmuch == 0)
     {
         return 0;
     }
@@ -1012,7 +1013,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes)
     {
     case TR_PEER_SOCKET_TYPE_UTP:
         {
-            auto iov = io->outbuf.vecs(n_bytes);
+            auto iov = io->outbuf.vecs(howmuch);
             n = utp_writev(io->socket.handle.utp, reinterpret_cast<struct utp_iovec*>(std::data(iov)), std::size(iov));
             if (n > 0)
             {
@@ -1025,7 +1026,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes)
     case TR_PEER_SOCKET_TYPE_TCP:
         {
             EVUTIL_SET_SOCKET_ERROR(0);
-            n = tr_evbuffer_write(io, io->socket.handle.tcp, n_bytes);
+            n = tr_evbuffer_write(io, io->socket.handle.tcp, howmuch);
             int const e = EVUTIL_SOCKET_ERROR();
 
             if (n > 0)
@@ -1050,7 +1051,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t n_bytes)
         tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
 
-    return n_bytes;
+    return n;
 }
 
 int tr_peerIo::flush(tr_direction dir, size_t limit)
