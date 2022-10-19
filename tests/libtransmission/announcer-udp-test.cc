@@ -187,6 +187,20 @@ protected:
         return buf;
     }
 
+    [[nodiscard]] static bool sendError(tr_announcer_udp& announcer, uint32_t transaction_id, std::string_view errmsg)
+    {
+        auto buf = libtransmission::Buffer{};
+        buf.addUint32(ErrorAction);
+        buf.addUint32(transaction_id);
+        buf.add(errmsg);
+
+        auto const response_size = std::size(buf);
+        auto arr = std::array<uint8_t, 256>{};
+        buf.toBuf(std::data(arr), response_size);
+
+        return announcer.handleMessage(std::data(arr), response_size);
+    }
+
     // https://www.bittorrent.org/beps/bep_0015.html
     static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
     static auto constexpr ConnectAction = uint32_t{ 0 };
@@ -346,14 +360,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     sent.toBuf(std::data(tmp_hash), std::size(tmp_hash));
     EXPECT_EQ(request.info_hash[0], tmp_hash);
 
-    // send a scrape response
-    buf.clear();
-    buf.addUint32(ErrorAction);
-    buf.addUint32(transaction_id);
-    buf.add(expected_response.errmsg);
-    response_size = std::size(buf);
-    buf.toBuf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+    EXPECT_TRUE(sendError(*announcer, transaction_id, expected_response.errmsg));
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response);
@@ -404,15 +411,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto transaction_id = parseConnectionRequest(sent);
 
-    // send a connection response
-    auto buf = libtransmission::Buffer{};
-    buf.addUint32(ErrorAction);
-    buf.addUint32(transaction_id);
-    buf.add(expected_response.errmsg);
-    auto response_size = std::size(buf);
-    auto arr = std::array<uint8_t, 128>{};
-    buf.toBuf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+    EXPECT_TRUE(sendError(*announcer, transaction_id, expected_response.errmsg));
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response);
