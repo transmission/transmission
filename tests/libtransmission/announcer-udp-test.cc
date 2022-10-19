@@ -277,7 +277,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto connect_transaction_id = parseConnectionRequest(sent);
 
-    // send a connection response
+    // Have the tracker respond to the request
     auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id);
 
     // The announcer should have sent a UDP scrape request.
@@ -286,7 +286,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
     expectEqual(request, info_hashes);
 
-    // send a scrape response
+    // Have the tracker respond to the request
     auto buf = libtransmission::Buffer{};
     buf.addUint32(ScrapeAction);
     buf.addUint32(scrape_transaction_id);
@@ -341,7 +341,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto connect_transaction_id = parseConnectionRequest(sent);
 
-    // have the tracker send a connection response
+    // Have the tracker respond to the request
     auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id);
 
     // The announcer should have sent a UDP scrape request.
@@ -349,7 +349,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     sent = waitForAnnouncerToSendMessage(mediator);
     auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
 
-    // have the tracker send an "unable to scrape" error response
+    // Have the tracker respond to the request with an "unable to scrape" error
     EXPECT_TRUE(sendError(*announcer, scrape_transaction_id, expected_response.errmsg));
 
     // confirm that announcer processed the response
@@ -392,10 +392,10 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto transaction_id = parseConnectionRequest(sent);
 
-    // have the tracker send an "unable to connect" error response
+    // Have the tracker respond to the request with an "unable to connect" error
     EXPECT_TRUE(sendError(*announcer, transaction_id, expected_response.errmsg));
 
-    // confirm that announcer processed the response
+    // Confirm that announcer processed the response
     EXPECT_TRUE(response);
     expectEqual(expected_response, *response);
 }
