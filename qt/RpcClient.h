@@ -31,7 +31,6 @@ Q_DECLARE_METATYPE(TrVariantPtr)
 
 extern "C"
 {
-    struct evbuffer;
     struct tr_session;
 }
 

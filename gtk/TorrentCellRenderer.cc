@@ -309,7 +309,7 @@ std::string getStatusString(
 
 class TorrentCellRenderer::Impl
 {
-    using ContextPtr = TorrentCellRenderer::ContextPtr;
+    using SnapshotPtr = TorrentCellRenderer::SnapshotPtr;
     using IconSize = IF_GTKMM4(Gtk::IconSize, Gtk::BuiltinIconSize);
 
 public:
@@ -322,12 +322,12 @@ public:
     void get_size_full(Gtk::Widget& widget, int& width, int& height) const;
 
     void render_compact(
-        ContextPtr const& context,
+        SnapshotPtr const& snapshot,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
     void render_full(
-        ContextPtr const& context,
+        SnapshotPtr const& snapshot,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
@@ -348,7 +348,21 @@ public:
     Glib::Property<bool> compact;
 
 private:
+    void render_progress_bar(
+        SnapshotPtr const& snapshot,
+        Gtk::Widget& widget,
+        Gdk::Rectangle const& area,
+        Gtk::CellRendererState flags,
+        Gdk::RGBA const& color);
+
     static void set_icon(Gtk::CellRendererPixbuf& renderer, Glib::RefPtr<Gio::Icon> const& icon, IconSize icon_size);
+    static void adjust_progress_bar_hue(
+        Cairo::RefPtr<Cairo::Surface> const& bg_surface,
+        Cairo::RefPtr<Cairo::Context> const& context,
+        Gdk::RGBA const& color,
+        Gdk::Rectangle const& area,
+        double bg_x,
+        double bg_y);
 
 private:
     TorrentCellRenderer& renderer_;
@@ -549,6 +563,32 @@ double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* seed)
     return d;
 }
 
+Gdk::RGBA const& get_progress_bar_color(tr_stat const& st)
+{
+    static auto const steelblue_color = Gdk::RGBA("steelblue");
+    static auto const forestgreen_color = Gdk::RGBA("forestgreen");
+    static auto const silver_color = Gdk::RGBA("silver");
+
+    return st.activity == TR_STATUS_DOWNLOAD ? steelblue_color :
+                                               (st.activity == TR_STATUS_SEED ? forestgreen_color : silver_color);
+}
+
+Cairo::RefPtr<Cairo::Surface> get_mask_surface(Cairo::RefPtr<Cairo::Surface> const& surface, Gdk::Rectangle const& area)
+{
+    auto const mask_surface = Cairo::ImageSurface::create(TR_CAIRO_SURFACE_FORMAT(A8), area.get_width(), area.get_height());
+    auto const mask_context = Cairo::Context::create(mask_surface);
+
+    mask_context->set_source_rgb(0, 0, 0);
+    mask_context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
+    mask_context->fill();
+
+    mask_context->set_operator(TR_CAIRO_CONTEXT_OPERATOR(CLEAR));
+    mask_context->mask(surface, area.get_x(), area.get_y());
+    mask_context->fill();
+
+    return mask_surface;
+}
+
 template<typename... Ts>
 void render_impl(Gtk::CellRenderer& renderer, Ts&&... args)
 {
@@ -557,8 +597,88 @@ void render_impl(Gtk::CellRenderer& renderer, Ts&&... args)
 
 } // namespace
 
+void TorrentCellRenderer::Impl::adjust_progress_bar_hue(
+    Cairo::RefPtr<Cairo::Surface> const& bg_surface,
+    Cairo::RefPtr<Cairo::Context> const& context,
+    Gdk::RGBA const& color,
+    Gdk::Rectangle const& area,
+    double bg_x,
+    double bg_y)
+{
+    using TrCairoContextOperator = IF_GTKMM4(Cairo::Context::Operator, Cairo::Operator);
+
+    auto const mask_surface = get_mask_surface(context->get_target(), area);
+
+    // Add background under the progress bar, for better results around the transparent areas
+    context->set_source(bg_surface, bg_x, bg_y);
+    context->set_operator(TR_CAIRO_CONTEXT_OPERATOR(DEST_OVER));
+    context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
+    context->fill();
+
+    // Adjust surface color
+    context->set_source_rgb(color.get_red(), color.get_green(), color.get_blue());
+    context->set_operator(static_cast<TrCairoContextOperator>(CAIRO_OPERATOR_HSL_COLOR));
+    context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
+    context->fill();
+
+    // Clear out masked (fully transparent) areas
+    context->set_operator(TR_CAIRO_CONTEXT_OPERATOR(CLEAR));
+    context->mask(mask_surface, area.get_x(), area.get_y());
+    context->fill();
+}
+
+void TorrentCellRenderer::Impl::render_progress_bar(
+    SnapshotPtr const& snapshot,
+    Gtk::Widget& widget,
+    Gdk::Rectangle const& area,
+    Gtk::CellRendererState flags,
+    Gdk::RGBA const& color)
+{
+    auto const temp_area = Gdk::Rectangle(0, 0, area.get_width(), area.get_height());
+    auto const temp_surface = Cairo::ImageSurface::create(TR_CAIRO_SURFACE_FORMAT(ARGB32), area.get_width(), area.get_height());
+    auto const temp_context = Cairo::Context::create(temp_surface);
+
+    {
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        auto const temp_snapshot = Gtk::Snapshot::create();
+#endif
+
+        render_impl(*progress_renderer_, IF_GTKMM4(temp_snapshot, temp_context), widget, temp_area, temp_area, flags);
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        temp_snapshot->reference();
+        auto const render_node = std::unique_ptr<GskRenderNode, void (*)(GskRenderNode*)>(
+            gtk_snapshot_free_to_node(Glib::unwrap(temp_snapshot)),
+            [](GskRenderNode* p) { gsk_render_node_unref(p); });
+        gsk_render_node_draw(render_node.get(), temp_context->cobj());
+#endif
+    }
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto const context = snapshot->append_cairo(area);
+    auto const surface = context->get_target();
+#else
+    auto const context = snapshot;
+    auto const surface = Cairo::Surface::create(
+        context->get_target(),
+        area.get_x(),
+        area.get_y(),
+        area.get_width(),
+        area.get_height());
+#endif
+
+    double dx = 0, dy = 0;
+    context->device_to_user(dx, dy);
+
+    adjust_progress_bar_hue(surface, temp_context, color, temp_area, dx - area.get_x(), dy - area.get_y());
+
+    context->set_source(temp_context->get_target(), area.get_x(), area.get_y());
+    context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
+    context->fill();
+}
+
 void TorrentCellRenderer::Impl::render_compact(
-    ContextPtr const& context,
+    SnapshotPtr const& snapshot,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -592,6 +712,7 @@ void TorrentCellRenderer::Impl::render_compact(
 
     auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
+    auto const& progress_color = get_progress_bar_color(*st);
     auto const gstr_stat = getShortStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
 
@@ -641,26 +762,26 @@ void TorrentCellRenderer::Impl::render_compact(
 
     set_icon(*icon_renderer_, icon, CompactIconSize);
     icon_renderer_->property_sensitive() = sensitive;
-    render_impl(*icon_renderer_, context, widget, icon_area, icon_area, flags);
+    render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
 
     auto const percent_done = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
-    render_impl(*progress_renderer_, context, widget, prog_area, prog_area, flags);
+    render_progress_bar(snapshot, widget, prog_area, flags, progress_color);
 
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
-    render_impl(*text_renderer_, context, widget, stat_area, stat_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, stat_area, stat_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
-    render_impl(*text_renderer_, context, widget, name_area, name_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, name_area, name_area, flags);
 }
 
 void TorrentCellRenderer::Impl::render_full(
-    ContextPtr const& context,
+    SnapshotPtr const& snapshot,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -695,6 +816,7 @@ void TorrentCellRenderer::Impl::render_full(
 
     auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
+    auto const& progress_color = get_progress_bar_color(*st);
     auto const gstr_prog = getProgressString(tor, total_size, st);
     auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
@@ -778,30 +900,30 @@ void TorrentCellRenderer::Impl::render_full(
 
     set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->property_sensitive() = sensitive;
-    render_impl(*icon_renderer_, context, widget, icon_area, icon_area, flags);
+    render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(BOLD);
-    render_impl(*text_renderer_, context, widget, name_area, name_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, name_area, name_area, flags);
 
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
-    render_impl(*text_renderer_, context, widget, prog_area, prog_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, prog_area, prog_area, flags);
 
     progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
-    render_impl(*progress_renderer_, context, widget, prct_area, prct_area, flags);
+    render_progress_bar(snapshot, widget, prct_area, flags, progress_color);
 
     text_renderer_->property_text() = gstr_stat;
-    render_impl(*text_renderer_, context, widget, stat_area, stat_area, flags);
+    render_impl(*text_renderer_, snapshot, widget, stat_area, stat_area, flags);
 }
 
 void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
-    ContextPtr const& context,
+    SnapshotPtr const& snapshot,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gdk::Rectangle const& /*cell_area*/,
@@ -816,11 +938,11 @@ void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
     {
         if (impl_->compact.get_value())
         {
-            impl_->render_compact(context, widget, background_area, flags);
+            impl_->render_compact(snapshot, widget, background_area, flags);
         }
         else
         {
-            impl_->render_full(context, widget, background_area, flags);
+            impl_->render_full(snapshot, widget, background_area, flags);
         }
     }
 

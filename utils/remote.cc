@@ -2136,7 +2136,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
 
     if (config.json)
     {
-        fmt::print(response);
+        fmt::print("{:s}\n", response);
         return status;
     }
 
@@ -2406,8 +2406,6 @@ static tr_variant* ensure_tset(tr_variant* tset)
     return tr_variantDictAddDict(tset, Arguments, 1);
 }
 
-static char rename_from[4096];
-
 static int processArgs(char const* rpcurl, int argc, char const* const* argv, Config& config)
 {
     int status = EXIT_SUCCESS;
@@ -2415,6 +2413,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
     auto sset = tr_variant{};
     auto tset = tr_variant{};
     auto tadd = tr_variant{};
+    std::string rename_from;
 
     for (;;)
     {
@@ -3167,18 +3166,19 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
                 {
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
-                    tr_variantDictAddStr(&top, TR_KEY_method, "rename");
+                    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-rename-path"sv);
                     auto* args = tr_variantDictAddDict(&top, Arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_path, rename_from);
                     tr_variantDictAddStr(args, TR_KEY_name, optarg);
                     addIdArg(args, config);
                     status |= flush(rpcurl, &top, config);
+                    rename_from.clear();
                     break;
                 }
 
             case 965:
                 {
-                    tr_strlcpy(rename_from, optarg, sizeof(rename_from));
+                    rename_from = optarg;
                     break;
                 }
 
