@@ -128,6 +128,15 @@ protected:
         }
     }
 
+    void expectEqual(tr_scrape_request const& expected, std::vector<tr_sha1_digest_t> const& actual)
+    {
+        EXPECT_EQ(expected.info_hash_count, std::size(actual));
+        for (size_t i = 0; i < std::min(size_t(expected.info_hash_count), std::size(actual)); ++i)
+        {
+            EXPECT_EQ(expected.info_hash[i], actual[i]);
+        }
+    }
+
     [[nodiscard]] static auto createConnectionId()
     {
         auto connection_id = uint64_t{};
@@ -154,6 +163,21 @@ protected:
         return request;
     }
 
+    [[nodiscard]] auto parseScrapeRequest(libtransmission::Buffer& buf, uint64_t expected_connection_id)
+    {
+        EXPECT_EQ(expected_connection_id, buf.toUint64());
+        EXPECT_EQ(ScrapeAction, buf.toUint32());
+        auto const transaction_id = buf.toUint32();
+        auto info_hashes = std::vector<tr_sha1_digest_t>{};
+        while (!std::empty(buf))
+        {
+            auto tmp = tr_sha1_digest_t{};
+            buf.toBuf(std::data(tmp), std::size(tmp));
+            info_hashes.emplace_back(tmp);
+        }
+        return std::make_pair(transaction_id, info_hashes);
+    }
+
     // https://www.bittorrent.org/beps/bep_0015.html
     static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
     static auto constexpr ConnectAction = uint32_t{ 0 };
@@ -172,7 +196,6 @@ TEST_F(AnnouncerUdpTest, canInstantiate)
 TEST_F(AnnouncerUdpTest, canScrape)
 {
     static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
-    // static auto constexpr LogName = "test";
 
     tr_timeUpdate(time(nullptr));
 
@@ -211,7 +234,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // announcer should be attempting to send a connect request.
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
+    auto connect_transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
     mediator.sent_.pop_front();
 
     auto const connection_id = createConnectionId();
@@ -219,7 +242,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // send a connection response
     auto buf = libtransmission::Buffer{};
     buf.addUint32(ConnectAction);
-    buf.addUint32(transaction_id);
+    buf.addUint32(connect_transaction_id);
     buf.addUint64(connection_id);
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 128>{};
@@ -229,18 +252,13 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // announcer should now send a scrape request.
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto* sent = &mediator.sent_.front();
-    EXPECT_EQ(connection_id, sent->buf_.toUint64());
-    EXPECT_EQ(ScrapeAction, sent->buf_.toUint32());
-    transaction_id = sent->buf_.toUint32();
-    auto tmp_hash = tr_sha1_digest_t{};
-    sent->buf_.toBuf(std::data(tmp_hash), std::size(tmp_hash));
-    EXPECT_EQ(request.info_hash[0], tmp_hash);
+    auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(mediator.sent_.front().buf_, connection_id);
+    expectEqual(request, info_hashes);
 
     // send a scrape response
     buf.clear();
     buf.addUint32(ScrapeAction);
-    buf.addUint32(transaction_id);
+    buf.addUint32(scrape_transaction_id);
     buf.addUint32(expected_response.rows[0].seeders);
     buf.addUint32(expected_response.rows[0].downloads);
     buf.addUint32(expected_response.rows[0].leechers);
@@ -256,33 +274,28 @@ TEST_F(AnnouncerUdpTest, canScrape)
 TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 {
     static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
-    static auto constexpr LogName = "test";
 
     tr_timeUpdate(time(nullptr));
 
     auto info_hash = tr_sha1_digest_t{};
     tr_rand_buffer(std::data(info_hash), std::size(info_hash));
 
-    // build the request
-    auto request = tr_scrape_request{};
-    request.scrape_url = ScrapeUrl;
-    tr_strlcpy(request.log_name, LogName, sizeof(request.log_name));
-    request.info_hash[0] = info_hash;
-    request.info_hash_count = 1;
-
     // build the expected reponse
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = request.info_hash[0];
+    expected_response.rows[0].info_hash = info_hash;
     expected_response.rows[0].seeders = -1;
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
     expected_response.rows[0].downloaders = 0;
-    expected_response.scrape_url = request.scrape_url;
+    expected_response.scrape_url = ScrapeUrl;
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unrecognized info-hash";
+
+    // build the request
+    auto request = buildScrapeRequestFromResponse(expected_response);
 
     // build the announcer
     auto mediator = MockMediator{};
@@ -344,33 +357,28 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 TEST_F(AnnouncerUdpTest, canHandleConnectError)
 {
     static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
-    static auto constexpr LogName = "test";
 
     tr_timeUpdate(time(nullptr));
 
     auto info_hash = tr_sha1_digest_t{};
     tr_rand_buffer(std::data(info_hash), std::size(info_hash));
 
-    // build the request
-    auto request = tr_scrape_request{};
-    request.scrape_url = ScrapeUrl;
-    tr_strlcpy(request.log_name, LogName, sizeof(request.log_name));
-    request.info_hash[0] = info_hash;
-    request.info_hash_count = 1;
-
     // build the expected reponse
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = request.info_hash[0];
+    expected_response.rows[0].info_hash = info_hash;
     expected_response.rows[0].seeders = -1;
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
     expected_response.rows[0].downloaders = 0;
-    expected_response.scrape_url = request.scrape_url;
+    expected_response.scrape_url = ScrapeUrl;
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unable to Connect";
+
+    // build the request
+    auto request = buildScrapeRequestFromResponse(expected_response);
 
     // build the announcer
     auto mediator = MockMediator{};
