@@ -433,8 +433,6 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
      * standard practice at this time is for it to be zero-length */
     peer_io->write(outbuf, false);
     peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, *info_hash);
-
-    TR_ASSERT(std::empty(outbuf));
     outbuf.add(VC);
     outbuf.addUint32(handshake->cryptoProvide());
     outbuf.addUint16(0);
@@ -838,6 +836,7 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
 
     /* send crypto_select */
     uint32_t const crypto_select = getCryptoSelect(handshake->encryption_mode, handshake->crypto_provide);
+
     if (crypto_select != 0)
     {
         tr_logAddTraceHand(handshake, fmt::format("selecting crypto mode '{}'", crypto_select));
