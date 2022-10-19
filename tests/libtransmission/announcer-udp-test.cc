@@ -23,6 +23,13 @@ using namespace std::literals;
 
 class AnnouncerUdpTest : public ::testing::Test
 {
+private:
+    void SetUp() override
+    {
+        ::testing::Test::SetUp();
+        tr_timeUpdate(time(nullptr));
+    }
+
 protected:
     class MockDns final : public libtransmission::Dns
     {
@@ -137,11 +144,12 @@ protected:
         }
     }
 
-    [[nodiscard]] static auto createConnectionId()
+    template<typename T>
+    [[nodiscard]] static auto randomFilled()
     {
-        auto connection_id = uint64_t{};
-        tr_rand_buffer(&connection_id, sizeof(connection_id));
-        return connection_id;
+        auto tmp = T{};
+        tr_rand_buffer(&tmp, sizeof(tmp));
+        return tmp;
     }
 
     [[nodiscard]] static uint32_t parseConnectionRequest(libtransmission::Buffer& buf)
@@ -220,17 +228,12 @@ TEST_F(AnnouncerUdpTest, canScrape)
 {
     static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
 
-    tr_timeUpdate(time(nullptr));
-
-    auto info_hash = tr_sha1_digest_t{};
-    tr_rand_buffer(std::data(info_hash), std::size(info_hash));
-
     // build the expected reponse
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = info_hash;
+    expected_response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
     expected_response.rows[0].seeders = 1;
     expected_response.rows[0].leechers = 2;
     expected_response.rows[0].downloads = 3;
@@ -259,9 +262,8 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto connect_transaction_id = parseConnectionRequest(sent);
 
-    auto const connection_id = createConnectionId();
-
     // send a connection response
+    auto const connection_id = randomFilled<uint64_t>();
     auto buf = libtransmission::Buffer{};
     buf.addUint32(ConnectAction);
     buf.addUint32(connect_transaction_id);
@@ -297,17 +299,12 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 {
     static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
 
-    tr_timeUpdate(time(nullptr));
-
-    auto info_hash = tr_sha1_digest_t{};
-    tr_rand_buffer(std::data(info_hash), std::size(info_hash));
-
     // build the expected reponse
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = info_hash;
+    expected_response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
     expected_response.rows[0].seeders = -1;
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
@@ -337,9 +334,8 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto transaction_id = parseConnectionRequest(sent);
 
-    auto const connection_id = createConnectionId();
-
     // send a connection response
+    auto const connection_id = randomFilled<uint64_t>();
     auto buf = libtransmission::Buffer{};
     buf.addUint32(ConnectAction);
     buf.addUint32(transaction_id);
@@ -360,6 +356,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     sent.toBuf(std::data(tmp_hash), std::size(tmp_hash));
     EXPECT_EQ(request.info_hash[0], tmp_hash);
 
+    // have the tracker send an "unable to scrape" error response
     EXPECT_TRUE(sendError(*announcer, transaction_id, expected_response.errmsg));
 
     // confirm that announcer processed the response
@@ -371,18 +368,13 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
 {
     static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
 
-    tr_timeUpdate(time(nullptr));
-
-    auto info_hash = tr_sha1_digest_t{};
-    tr_rand_buffer(std::data(info_hash), std::size(info_hash));
-
-    // build the expected reponse
+    // build the response we'd expect for a connect failre:
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = info_hash;
-    expected_response.rows[0].seeders = -1;
+    expected_response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
+    expected_response.rows[0].seeders = -1; // -1 here & on next lines means error
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
     expected_response.rows[0].downloaders = 0;
@@ -390,18 +382,15 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unable to Connect";
 
-    // build the request
-    auto request = buildScrapeRequestFromResponse(expected_response);
-
     // build the announcer
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
     EXPECT_TRUE(announcer);
 
-    // tell announcer to scrape
+    // give the announcer a scripe task
     auto response = std::optional<tr_scrape_response>{};
     announcer->scrape(
-        request,
+        buildScrapeRequestFromResponse(expected_response),
         [](tr_scrape_response const* resp, void* vresponse)
         { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
         &response);
@@ -411,6 +400,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto transaction_id = parseConnectionRequest(sent);
 
+    // have the tracker send an "unable to connect" error response
     EXPECT_TRUE(sendError(*announcer, transaction_id, expected_response.errmsg));
 
     // confirm that announcer processed the response
