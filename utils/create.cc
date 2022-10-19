@@ -223,7 +223,7 @@ int tr_main(int argc, char* argv[])
     }
 
     fmt::print(
-        ngettext("{file_count:L} files, {total_size}\n", "{file_count:L} file, {total_size}\n", builder.fileCount()),
+        ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.fileCount()),
         fmt::arg("file_count", builder.fileCount()),
         fmt::arg("total_size", tr_formatter_size_B(builder.totalSize())));
 
