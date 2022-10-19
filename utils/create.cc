@@ -228,7 +228,7 @@ int tr_main(int argc, char* argv[])
         fmt::arg("total_size", tr_formatter_size_B(builder.totalSize())));
 
     fmt::print(
-        ngettext("{piece_count:L} piece, {piece_size} each\n", "{piece_count:L} pieces, {piece_size}\n", builder.pieceCount()),
+        ngettext("{piece_count:L} piece, {piece_size}\n", "{piece_count:L} pieces, {piece_size} each\n", builder.pieceCount()),
         fmt::arg("piece_count", builder.pieceCount()),
         fmt::arg("piece_size", tr_formatter_size_B(builder.pieceSize())));
 
