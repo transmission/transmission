@@ -112,7 +112,7 @@ static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
 static auto constexpr ConnectAction = uint32_t{ 0 };
 // static auto constexpr AnnounceAction = uint32_t{ 1 };
 static auto constexpr ScrapeAction = uint32_t{ 2 };
-// static auto constexpr ErrorAction = uint32_t{ 3 };
+static auto constexpr ErrorAction = uint32_t{ 3 };
 
 TEST_F(AnnouncerUdpTest, canInstantiate)
 {
@@ -208,6 +208,111 @@ TEST_F(AnnouncerUdpTest, canScrape)
     buf.addUint32(expected_response.rows[0].leechers);
     response_size = std::size(buf);
     EXPECT_EQ(20, response_size);
+    buf.toBuf(std::data(arr), response_size);
+    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+
+    // confirm that announcer processed the response
+    EXPECT_TRUE(response);
+    EXPECT_EQ(expected_response.did_connect, response->did_connect);
+    EXPECT_EQ(expected_response.did_timeout, response->did_timeout);
+    EXPECT_EQ(expected_response.row_count, response->row_count);
+    EXPECT_EQ(expected_response.scrape_url, response->scrape_url);
+    EXPECT_EQ(expected_response.min_request_interval, response->min_request_interval);
+    for (size_t i = 0; i < std::min(expected_response.row_count, response->row_count); ++i)
+    {
+        EXPECT_EQ(expected_response.rows[i].info_hash, response->rows[i].info_hash);
+        EXPECT_EQ(expected_response.rows[i].seeders, response->rows[i].seeders);
+        EXPECT_EQ(expected_response.rows[i].leechers, response->rows[i].leechers);
+        EXPECT_EQ(expected_response.rows[i].downloads, response->rows[i].downloads);
+        EXPECT_EQ(expected_response.rows[i].downloaders, response->rows[i].downloaders);
+    }
+}
+
+TEST_F(AnnouncerUdpTest, canHandleScrapeError)
+{
+    static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
+    static auto constexpr LogName = "test";
+
+    tr_timeUpdate(time(nullptr));
+
+    auto info_hash = tr_sha1_digest_t{};
+    tr_rand_buffer(std::data(info_hash), std::size(info_hash));
+
+    // build the request
+    auto request = tr_scrape_request{};
+    request.scrape_url = ScrapeUrl;
+    tr_strlcpy(request.log_name, LogName, sizeof(request.log_name));
+    request.info_hash[0] = info_hash;
+    request.info_hash_count = 1;
+
+    // build the expected reponse
+    auto expected_response = tr_scrape_response{};
+    expected_response.did_connect = true;
+    expected_response.did_timeout = false;
+    expected_response.row_count = 1;
+    expected_response.rows[0].info_hash = request.info_hash[0];
+    expected_response.rows[0].seeders = -1;
+    expected_response.rows[0].leechers = -1;
+    expected_response.rows[0].downloads = -1;
+    expected_response.rows[0].downloaders = 0;
+    expected_response.scrape_url = request.scrape_url;
+    expected_response.min_request_interval = 0;
+    expected_response.errmsg = "Unrecognized info-hash";
+
+    // build the announcer
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+    EXPECT_TRUE(announcer);
+
+    // tell announcer to scrape
+    auto response = std::optional<tr_scrape_response>{};
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
+
+    // announcer should be attempting to send a connect request.
+    // inspect it for validity.
+    libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
+    auto* sent = &mediator.sent_.front();
+    EXPECT_EQ(16, std::size(sent->buf_));
+    EXPECT_EQ(ProtocolId, sent->buf_.toUint64());
+    EXPECT_EQ(ConnectAction, sent->buf_.toUint32());
+    auto transaction_id = sent->buf_.toUint32();
+    mediator.sent_.pop_front();
+
+    auto connection_id = uint64_t{};
+    tr_rand_buffer(&connection_id, sizeof(connection_id));
+
+    // send a connection response
+    auto buf = libtransmission::Buffer{};
+    buf.addUint32(ConnectAction);
+    buf.addUint32(transaction_id);
+    buf.addUint64(connection_id);
+    auto response_size = std::size(buf);
+    EXPECT_EQ(16, response_size);
+    auto arr = std::array<uint8_t, 128>{};
+    buf.toBuf(std::data(arr), response_size);
+    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+
+    // announcer should now send a scrape request.
+    // inspect it for validity.
+    libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
+    sent = &mediator.sent_.front();
+    EXPECT_EQ(connection_id, sent->buf_.toUint64());
+    EXPECT_EQ(ScrapeAction, sent->buf_.toUint32());
+    transaction_id = sent->buf_.toUint32();
+    auto tmp_hash = tr_sha1_digest_t{};
+    sent->buf_.toBuf(std::data(tmp_hash), std::size(tmp_hash));
+    EXPECT_EQ(request.info_hash[0], tmp_hash);
+
+    // send a scrape response
+    buf.clear();
+    buf.addUint32(ErrorAction);
+    buf.addUint32(transaction_id);
+    buf.add(expected_response.errmsg);
+    response_size = std::size(buf);
     buf.toBuf(std::data(arr), response_size);
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
