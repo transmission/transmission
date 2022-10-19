@@ -12,10 +12,10 @@
 #import "InfoWindowController.h"
 #import "NSApplicationAdditions.h"
 
-#define MAX_ACROSS 18
-#define BETWEEN 1.0
+static NSInteger const kMaxAcross = 18;
+static CGFloat const kBetweenPadding = 1.0;
 
-#define HIGH_PEERS 30
+static int8_t const kHighPeers = 10;
 
 enum
 {
@@ -69,12 +69,12 @@ enum
     if (_torrent)
     {
         //determine relevant values
-        _fNumPieces = MIN(_torrent.pieceCount, MAX_ACROSS * MAX_ACROSS);
+        _fNumPieces = MIN(_torrent.pieceCount, kMaxAcross * kMaxAcross);
         _fAcross = ceil(sqrt(_fNumPieces));
 
         CGFloat const width = self.bounds.size.width;
-        _fWidth = (width - (_fAcross + 1) * BETWEEN) / _fAcross;
-        _fExtraBorder = (width - ((_fWidth + BETWEEN) * _fAcross + BETWEEN)) / 2;
+        _fWidth = (width - (_fAcross + 1) * kBetweenPadding) / _fAcross;
+        _fExtraBorder = (width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2;
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
@@ -154,7 +154,7 @@ enum
                 self.fPieces[index] = PIECE_NONE;
             }
         }
-        else if (showAvailability && pieces[index] >= HIGH_PEERS)
+        else if (showAvailability && pieces[index] >= kHighPeers)
         {
             if (first || self.fPieces[index] != PIECE_HIGH_PEERS)
             {
@@ -165,7 +165,7 @@ enum
         else
         {
             //always redraw "mixed"
-            CGFloat percent = showAvailability ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
+            CGFloat percent = showAvailability ? (CGFloat)pieces[index] / kHighPeers : piecesPercent[index];
             NSColor* fullColor = showAvailability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
             pieceColor = [defaultColor blendedColorWithFraction:percent ofColor:fullColor];
             self.fPieces[index] = PIECE_SOME;
@@ -176,8 +176,8 @@ enum
             NSInteger const across = index % self.fAcross;
             NSInteger const down = index / self.fAcross;
             fillRects[usedCount] = NSMakeRect(
-                across * (self.fWidth + BETWEEN) + BETWEEN + self.fExtraBorder,
-                image.size.width - (down + 1) * (self.fWidth + BETWEEN) - self.fExtraBorder,
+                across * (self.fWidth + kBetweenPadding) + kBetweenPadding + self.fExtraBorder,
+                image.size.width - (down + 1) * (self.fWidth + kBetweenPadding) - self.fExtraBorder,
                 self.fWidth,
                 self.fWidth);
             fillColors[usedCount] = pieceColor;

@@ -19,7 +19,9 @@
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
 
-#define ETA_IDLE_DISPLAY_SEC (2 * 60)
+NSString* const kTorrentDidChangeGroupNotification = @"TorrentDidChangeGroup";
+
+static int const kETAIdleDisplaySec = 2 * 60;
 
 @interface Torrent ()
 
@@ -2055,7 +2057,7 @@ bool trashDataFile(char const* filename, tr_error** error)
         }
 
         //idle: show only if remaining time is less than cap
-        if (self.fStat->etaIdle != TR_ETA_NOT_AVAIL && self.fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
+        if (self.fStat->etaIdle != TR_ETA_NOT_AVAIL && self.fStat->etaIdle < kETAIdleDisplaySec)
         {
             return YES;
         }
@@ -2074,7 +2076,7 @@ bool trashDataFile(char const* filename, tr_error** error)
         eta = self.fStat->eta;
         fromIdle = NO;
     }
-    else if (self.fStat->etaIdle != TR_ETA_NOT_AVAIL && self.fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
+    else if (self.fStat->etaIdle != TR_ETA_NOT_AVAIL && self.fStat->etaIdle < kETAIdleDisplaySec)
     {
         eta = self.fStat->etaIdle;
         fromIdle = YES;

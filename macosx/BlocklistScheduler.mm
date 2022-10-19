@@ -6,10 +6,10 @@
 #import "BlocklistDownloader.h"
 
 //thirty second delay before running after option is changed
-#define SMALL_DELAY 30
+static NSTimeInterval const kSmallDelay = 30;
 
 //update one week after previous update
-#define FULL_WAIT (60 * 60 * 24 * 7)
+static NSTimeInterval const kFullWait = 60 * 60 * 24 * 7;
 
 @interface BlocklistScheduler ()
 
@@ -51,9 +51,9 @@ BlocklistScheduler* fScheduler = nil;
     NSDate* lastUpdateDate = [NSUserDefaults.standardUserDefaults objectForKey:@"BlocklistNewLastUpdate"];
     if (lastUpdateDate)
     {
-        lastUpdateDate = [lastUpdateDate dateByAddingTimeInterval:FULL_WAIT];
+        lastUpdateDate = [lastUpdateDate dateByAddingTimeInterval:kFullWait];
     }
-    NSDate* closeDate = [NSDate dateWithTimeIntervalSinceNow:SMALL_DELAY];
+    NSDate* closeDate = [NSDate dateWithTimeIntervalSinceNow:kSmallDelay];
 
     NSDate* useDate = lastUpdateDate ? [lastUpdateDate laterDate:closeDate] : closeDate;
 

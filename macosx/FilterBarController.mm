@@ -7,8 +7,22 @@
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
 
-#define FILTER_TYPE_TAG_NAME 401
-#define FILTER_TYPE_TAG_TRACKER 402
+FilterType const FilterTypeNone = @"None";
+FilterType const FilterTypeActive = @"Active";
+FilterType const FilterTypeDownload = @"Download";
+FilterType const FilterTypeSeed = @"Seed";
+FilterType const FilterTypePause = @"Pause";
+FilterType const FilterTypeError = @"Error";
+
+FilterSearchType const FilterSearchTypeName = @"Name";
+FilterSearchType const FilterSearchTypeTracker = @"Tracker";
+
+NSInteger const kGroupFilterAllTag = -2;
+
+typedef NS_ENUM(NSInteger, FilterTypeTag) {
+    FilterTypeTagName = 401,
+    FilterTypeTagTracker = 402,
+};
 
 @interface FilterBarController ()
 
@@ -53,41 +67,41 @@
     self.fPauseFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     self.fErrorFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
 
-    [self.fSearchField.searchMenuTemplate itemWithTag:FILTER_TYPE_TAG_NAME].title = NSLocalizedString(@"Name", "Filter Bar -> filter menu");
-    [self.fSearchField.searchMenuTemplate itemWithTag:FILTER_TYPE_TAG_TRACKER].title = NSLocalizedString(@"Tracker", "Filter Bar -> filter menu");
+    [self.fSearchField.searchMenuTemplate itemWithTag:FilterTypeTagName].title = NSLocalizedString(@"Name", "Filter Bar -> filter menu");
+    [self.fSearchField.searchMenuTemplate itemWithTag:FilterTypeTagTracker].title = NSLocalizedString(@"Tracker", "Filter Bar -> filter menu");
 
-    [self.fGroupsButton.menu itemWithTag:GROUP_FILTER_ALL_TAG].title = NSLocalizedString(@"All Groups", "Filter Bar -> group filter menu");
+    [self.fGroupsButton.menu itemWithTag:kGroupFilterAllTag].title = NSLocalizedString(@"All Groups", "Filter Bar -> group filter menu");
 
     //set current filter
     NSString* filterType = [NSUserDefaults.standardUserDefaults stringForKey:@"Filter"];
 
     NSButton* currentFilterButton;
-    if ([filterType isEqualToString:FILTER_ACTIVE])
+    if ([filterType isEqualToString:FilterTypeActive])
     {
         currentFilterButton = self.fActiveFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_PAUSE])
+    else if ([filterType isEqualToString:FilterTypePause])
     {
         currentFilterButton = self.fPauseFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_SEED])
+    else if ([filterType isEqualToString:FilterTypeSeed])
     {
         currentFilterButton = self.fSeedFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_DOWNLOAD])
+    else if ([filterType isEqualToString:FilterTypeDownload])
     {
         currentFilterButton = self.fDownloadFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_ERROR])
+    else if ([filterType isEqualToString:FilterTypeError])
     {
         currentFilterButton = self.fErrorFilterButton;
     }
     else
     {
         //safety
-        if (![filterType isEqualToString:FILTER_NONE])
+        if (![filterType isEqualToString:FilterTypeNone])
         {
-            [NSUserDefaults.standardUserDefaults setObject:FILTER_NONE forKey:@"Filter"];
+            [NSUserDefaults.standardUserDefaults setObject:FilterTypeNone forKey:@"Filter"];
         }
         currentFilterButton = self.fNoFilterButton;
     }
@@ -98,18 +112,18 @@
 
     NSMenu* filterSearchMenu = self.fSearchField.searchMenuTemplate;
     NSString* filterSearchTypeTitle;
-    if ([filterSearchType isEqualToString:FILTER_TYPE_TRACKER])
+    if ([filterSearchType isEqualToString:FilterSearchTypeTracker])
     {
-        filterSearchTypeTitle = [filterSearchMenu itemWithTag:FILTER_TYPE_TAG_TRACKER].title;
+        filterSearchTypeTitle = [filterSearchMenu itemWithTag:FilterTypeTagTracker].title;
     }
     else
     {
         //safety
-        if (![filterType isEqualToString:FILTER_TYPE_NAME])
+        if (![filterType isEqualToString:FilterSearchTypeName])
         {
-            [NSUserDefaults.standardUserDefaults setObject:FILTER_TYPE_NAME forKey:@"FilterSearchType"];
+            [NSUserDefaults.standardUserDefaults setObject:FilterSearchTypeName forKey:@"FilterSearchType"];
         }
-        filterSearchTypeTitle = [filterSearchMenu itemWithTag:FILTER_TYPE_TAG_NAME].title;
+        filterSearchTypeTitle = [filterSearchMenu itemWithTag:FilterTypeTagName].title;
     }
     self.fSearchField.placeholderString = filterSearchTypeTitle;
 
@@ -135,23 +149,23 @@
     NSString* oldFilterType = [NSUserDefaults.standardUserDefaults stringForKey:@"Filter"];
 
     NSButton* prevFilterButton;
-    if ([oldFilterType isEqualToString:FILTER_PAUSE])
+    if ([oldFilterType isEqualToString:FilterTypePause])
     {
         prevFilterButton = self.fPauseFilterButton;
     }
-    else if ([oldFilterType isEqualToString:FILTER_ACTIVE])
+    else if ([oldFilterType isEqualToString:FilterTypeActive])
     {
         prevFilterButton = self.fActiveFilterButton;
     }
-    else if ([oldFilterType isEqualToString:FILTER_SEED])
+    else if ([oldFilterType isEqualToString:FilterTypeSeed])
     {
         prevFilterButton = self.fSeedFilterButton;
     }
-    else if ([oldFilterType isEqualToString:FILTER_DOWNLOAD])
+    else if ([oldFilterType isEqualToString:FilterTypeDownload])
     {
         prevFilterButton = self.fDownloadFilterButton;
     }
-    else if ([oldFilterType isEqualToString:FILTER_ERROR])
+    else if ([oldFilterType isEqualToString:FilterTypeError])
     {
         prevFilterButton = self.fErrorFilterButton;
     }
@@ -165,30 +179,30 @@
         prevFilterButton.state = NSControlStateValueOff;
         [sender setState:NSControlStateValueOn];
 
-        NSString* filterType;
+        FilterType filterType;
         if (sender == self.fActiveFilterButton)
         {
-            filterType = FILTER_ACTIVE;
+            filterType = FilterTypeActive;
         }
         else if (sender == self.fDownloadFilterButton)
         {
-            filterType = FILTER_DOWNLOAD;
+            filterType = FilterTypeDownload;
         }
         else if (sender == self.fPauseFilterButton)
         {
-            filterType = FILTER_PAUSE;
+            filterType = FilterTypePause;
         }
         else if (sender == self.fSeedFilterButton)
         {
-            filterType = FILTER_SEED;
+            filterType = FilterTypeSeed;
         }
         else if (sender == self.fErrorFilterButton)
         {
-            filterType = FILTER_ERROR;
+            filterType = FilterTypeError;
         }
         else
         {
-            filterType = FILTER_NONE;
+            filterType = FilterTypeNone;
         }
 
         [NSUserDefaults.standardUserDefaults setObject:filterType forKey:@"Filter"];
@@ -206,27 +220,27 @@
     NSString* filterType = [NSUserDefaults.standardUserDefaults stringForKey:@"Filter"];
 
     NSButton* button;
-    if ([filterType isEqualToString:FILTER_NONE])
+    if ([filterType isEqualToString:FilterTypeNone])
     {
         button = right ? self.fActiveFilterButton : self.fErrorFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_ACTIVE])
+    else if ([filterType isEqualToString:FilterTypeActive])
     {
         button = right ? self.fDownloadFilterButton : self.fNoFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_DOWNLOAD])
+    else if ([filterType isEqualToString:FilterTypeDownload])
     {
         button = right ? self.fSeedFilterButton : self.fActiveFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_SEED])
+    else if ([filterType isEqualToString:FilterTypeSeed])
     {
         button = right ? self.fPauseFilterButton : self.fDownloadFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_PAUSE])
+    else if ([filterType isEqualToString:FilterTypePause])
     {
         button = right ? self.fErrorFilterButton : self.fSeedFilterButton;
     }
-    else if ([filterType isEqualToString:FILTER_ERROR])
+    else if ([filterType isEqualToString:FilterTypeError])
     {
         button = right ? self.fNoFilterButton : self.fPauseFilterButton;
     }
@@ -254,25 +268,25 @@
     NSString* oldFilterType = [NSUserDefaults.standardUserDefaults stringForKey:@"FilterSearchType"];
 
     NSInteger prevTag, currentTag = [sender tag];
-    if ([oldFilterType isEqualToString:FILTER_TYPE_TRACKER])
+    if ([oldFilterType isEqualToString:FilterSearchTypeTracker])
     {
-        prevTag = FILTER_TYPE_TAG_TRACKER;
+        prevTag = FilterTypeTagTracker;
     }
     else
     {
-        prevTag = FILTER_TYPE_TAG_NAME;
+        prevTag = FilterTypeTagName;
     }
 
     if (currentTag != prevTag)
     {
-        NSString* filterType;
-        if (currentTag == FILTER_TYPE_TAG_TRACKER)
+        FilterSearchType filterType;
+        if (currentTag == FilterTypeTagTracker)
         {
-            filterType = FILTER_TYPE_TRACKER;
+            filterType = FilterSearchTypeTracker;
         }
         else
         {
-            filterType = FILTER_TYPE_NAME;
+            filterType = FilterSearchTypeName;
         }
 
         [NSUserDefaults.standardUserDefaults setObject:filterType forKey:@"FilterSearchType"];
@@ -293,7 +307,7 @@
 
 - (void)reset:(BOOL)updateUI
 {
-    [NSUserDefaults.standardUserDefaults setInteger:GROUP_FILTER_ALL_TAG forKey:@"FilterGroup"];
+    [NSUserDefaults.standardUserDefaults setInteger:kGroupFilterAllTag forKey:@"FilterGroup"];
 
     if (updateUI)
     {
@@ -306,7 +320,7 @@
     }
     else
     {
-        [NSUserDefaults.standardUserDefaults setObject:FILTER_NONE forKey:@"Filter"];
+        [NSUserDefaults.standardUserDefaults setObject:FilterTypeNone forKey:@"Filter"];
         [NSUserDefaults.standardUserDefaults removeObjectForKey:@"FilterSearchString"];
     }
 }
@@ -362,13 +376,13 @@
         NSString* filterType = [NSUserDefaults.standardUserDefaults stringForKey:@"FilterSearchType"];
 
         BOOL state;
-        if (menuItem.tag == FILTER_TYPE_TAG_TRACKER)
+        if (menuItem.tag == FilterTypeTagTracker)
         {
-            state = [filterType isEqualToString:FILTER_TYPE_TRACKER];
+            state = [filterType isEqualToString:FilterSearchTypeTracker];
         }
         else
         {
-            state = [filterType isEqualToString:FILTER_TYPE_NAME];
+            state = [filterType isEqualToString:FilterSearchTypeName];
         }
 
         menuItem.state = state ? NSControlStateValueOn : NSControlStateValueOff;
@@ -393,7 +407,7 @@
 
     NSImage* icon;
     NSString* toolTip;
-    if (groupIndex == GROUP_FILTER_ALL_TAG)
+    if (groupIndex == kGroupFilterAllTag)
     {
         icon = [NSImage imageNamed:@"PinTemplate"];
         toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");

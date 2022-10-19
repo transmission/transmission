@@ -4,14 +4,14 @@
 
 #import "PriorityPopUpButtonCell.h"
 
-#define FRAME_INSET 2.0
+static CGFloat const kFrameInset = 2.0;
 
 @implementation PriorityPopUpButtonCell
 
 - (void)drawTitleWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     NSRect textFrame = cellFrame;
-    textFrame.origin.x += 2 * FRAME_INSET;
+    textFrame.origin.x += 2 * kFrameInset;
 
     [super drawTitleWithFrame:textFrame inView:controlView];
 }

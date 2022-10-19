@@ -11,14 +11,14 @@
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
 
-#define PADDING_HORIZONTAL 2.0
-#define IMAGE_FOLDER_SIZE 16.0
-#define IMAGE_ICON_SIZE 32.0
-#define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0
-#define PADDING_ABOVE_TITLE_FILE 2.0
-#define PADDING_BELOW_STATUS_FILE 2.0
-#define PADDING_BETWEEN_NAME_AND_FOLDER_STATUS 4.0
-#define PADDING_EXPANSION_FRAME 2.0
+static CGFloat const kPaddingHorizontal = 2.0;
+static CGFloat const kImageFolderSize = 16.0;
+static CGFloat const kImageIconSize = 32.0;
+static CGFloat const kPaddingBetweenImageAndTitle = 4.0;
+static CGFloat const kPaddingAboveTitleFile = 2.0;
+static CGFloat const kPaddingBelowStatusFile = 2.0;
+static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
+static CGFloat const kPaddingExpansionFrame = 2.0;
 
 @interface FileNameCell ()
 
@@ -73,9 +73,9 @@
 {
     NSRect result = bounds;
 
-    result.origin.x += PADDING_HORIZONTAL;
+    result.origin.x += kPaddingHorizontal;
 
-    CGFloat const IMAGE_SIZE = ((FileListNode*)self.objectValue).isFolder ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
+    CGFloat const IMAGE_SIZE = ((FileListNode*)self.objectValue).isFolder ? kImageFolderSize : kImageIconSize;
     result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5;
     result.size = NSMakeSize(IMAGE_SIZE, IMAGE_SIZE);
 
@@ -129,7 +129,7 @@
         NSMouseInRect([view convertPoint:view.window.mouseLocationOutsideOfEventStream fromView:nil], realRect, view.flipped))
     {
         realRect.size.width = [titleString size].width;
-        return NSInsetRect(realRect, -PADDING_EXPANSION_FRAME, -PADDING_EXPANSION_FRAME);
+        return NSInsetRect(realRect, -kPaddingExpansionFrame, -kPaddingExpansionFrame);
     }
 
     return NSZeroRect;
@@ -137,8 +137,8 @@
 
 - (void)drawWithExpansionFrame:(NSRect)cellFrame inView:(NSView*)view
 {
-    cellFrame.origin.x += PADDING_EXPANSION_FRAME;
-    cellFrame.origin.y += PADDING_EXPANSION_FRAME;
+    cellFrame.origin.x += kPaddingExpansionFrame;
+    cellFrame.origin.y += kPaddingExpansionFrame;
 
     self.fTitleAttributes[NSForegroundColorAttributeName] = NSColor.controlTextColor;
     NSAttributedString* titleString = self.attributedTitle;
@@ -155,13 +155,13 @@
     NSRect result;
     if (!((FileListNode*)self.objectValue).isFolder)
     {
-        result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
-        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE_FILE;
+        result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kImageIconSize + kPaddingBetweenImageAndTitle;
+        result.origin.y = NSMinY(bounds) + kPaddingAboveTitleFile;
         result.size.width = NSMaxX(bounds) - NSMinX(result);
     }
     else
     {
-        result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kImageFolderSize + kPaddingBetweenImageAndTitle;
         result.origin.y = NSMidY(bounds) - titleSize.height * 0.5;
         result.size.width = MIN(titleSize.width, NSMaxX(bounds) - NSMinX(result));
     }
@@ -178,12 +178,12 @@
     if (!((FileListNode*)self.objectValue).isFolder)
     {
         result.origin.x = NSMinX(titleRect);
-        result.origin.y = NSMaxY(bounds) - PADDING_BELOW_STATUS_FILE - statusSize.height;
+        result.origin.y = NSMaxY(bounds) - kPaddingBelowStatusFile - statusSize.height;
         result.size.width = NSWidth(titleRect);
     }
     else
     {
-        result.origin.x = NSMaxX(titleRect) + PADDING_BETWEEN_NAME_AND_FOLDER_STATUS;
+        result.origin.x = NSMaxX(titleRect) + kPaddingBetweenNameAndFolderStatus;
         result.origin.y = NSMaxY(titleRect) - statusSize.height - 1.0;
         result.size.width = NSMaxX(bounds) - NSMaxX(titleRect);
     }
