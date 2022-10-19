@@ -18,7 +18,7 @@ struct tr_torrent;
 
 class TorrentCellRenderer : public Gtk::CellRenderer
 {
-    using ContextPtr = IF_GTKMM4(Glib::RefPtr<Gtk::Snapshot>, Cairo::RefPtr<Cairo::Context>);
+    using SnapshotPtr = IF_GTKMM4(Glib::RefPtr<Gtk::Snapshot>, Cairo::RefPtr<Cairo::Context>);
 
 public:
     TorrentCellRenderer();
@@ -36,7 +36,7 @@ protected:
     void get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const override;
     void get_preferred_height_vfunc(Gtk::Widget& widget, int& minimum_height, int& natural_height) const override;
     void IF_GTKMM4(snapshot_vfunc, render_vfunc)(
-        ContextPtr const& context,
+        SnapshotPtr const& snapshot,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gdk::Rectangle const& cell_area,
