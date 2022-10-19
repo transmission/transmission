@@ -128,6 +128,13 @@ protected:
         }
     }
 
+    [[nodiscard]] uint32_t parseConnectionRequest(libtransmission::Buffer& buf)
+    {
+        EXPECT_EQ(ProtocolId, buf.toUint64());
+        EXPECT_EQ(ConnectAction, buf.toUint32());
+        return buf.toUint32();
+    }
+
     [[nodiscard]] auto buildScrapeRequestFromResponse(tr_scrape_response const& response)
     {
         auto request = tr_scrape_request{};
@@ -197,10 +204,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // announcer should be attempting to send a connect request.
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto* sent = &mediator.sent_.front();
-    EXPECT_EQ(ProtocolId, sent->buf_.toUint64());
-    EXPECT_EQ(ConnectAction, sent->buf_.toUint32());
-    auto transaction_id = sent->buf_.toUint32();
+    auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
     mediator.sent_.pop_front();
 
     auto connection_id = uint64_t{};
@@ -219,7 +223,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // announcer should now send a scrape request.
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    sent = &mediator.sent_.front();
+    auto* sent = &mediator.sent_.front();
     EXPECT_EQ(connection_id, sent->buf_.toUint64());
     EXPECT_EQ(ScrapeAction, sent->buf_.toUint32());
     transaction_id = sent->buf_.toUint32();
@@ -290,11 +294,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     // announcer should be attempting to send a connect request.
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto* sent = &mediator.sent_.front();
-    EXPECT_EQ(16, std::size(sent->buf_));
-    EXPECT_EQ(ProtocolId, sent->buf_.toUint64());
-    EXPECT_EQ(ConnectAction, sent->buf_.toUint32());
-    auto transaction_id = sent->buf_.toUint32();
+    auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
     mediator.sent_.pop_front();
 
     auto connection_id = uint64_t{};
@@ -314,7 +314,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     // announcer should now send a scrape request.
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    sent = &mediator.sent_.front();
+    auto* sent = &mediator.sent_.front();
     EXPECT_EQ(connection_id, sent->buf_.toUint64());
     EXPECT_EQ(ScrapeAction, sent->buf_.toUint32());
     transaction_id = sent->buf_.toUint32();
@@ -383,11 +383,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     // announcer should be attempting to send a connect request.
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto* sent = &mediator.sent_.front();
-    EXPECT_EQ(16, std::size(sent->buf_));
-    EXPECT_EQ(ProtocolId, sent->buf_.toUint64());
-    EXPECT_EQ(ConnectAction, sent->buf_.toUint32());
-    auto transaction_id = sent->buf_.toUint32();
+    auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
     mediator.sent_.pop_front();
 
     auto connection_id = uint64_t{};
