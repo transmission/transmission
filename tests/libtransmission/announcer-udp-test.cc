@@ -128,6 +128,13 @@ protected:
         }
     }
 
+    [[nodiscard]] static auto createConnectionId()
+    {
+        auto connection_id = uint64_t{};
+        tr_rand_buffer(&connection_id, sizeof(connection_id));
+        return connection_id;
+    }
+
     [[nodiscard]] uint32_t parseConnectionRequest(libtransmission::Buffer& buf)
     {
         EXPECT_EQ(ProtocolId, buf.toUint64());
@@ -207,8 +214,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
     mediator.sent_.pop_front();
 
-    auto connection_id = uint64_t{};
-    tr_rand_buffer(&connection_id, sizeof(connection_id));
+    auto const connection_id = createConnectionId();
 
     // send a connection response
     auto buf = libtransmission::Buffer{};
@@ -297,8 +303,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
     mediator.sent_.pop_front();
 
-    auto connection_id = uint64_t{};
-    tr_rand_buffer(&connection_id, sizeof(connection_id));
+    auto const connection_id = createConnectionId();
 
     // send a connection response
     auto buf = libtransmission::Buffer{};
@@ -385,9 +390,6 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
     auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
     mediator.sent_.pop_front();
-
-    auto connection_id = uint64_t{};
-    tr_rand_buffer(&connection_id, sizeof(connection_id));
 
     // send a connection response
     auto buf = libtransmission::Buffer{};
