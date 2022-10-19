@@ -20,99 +20,133 @@
 #include "test-fixtures.h"
 
 using namespace std::literals;
-using AnnouncerUdpTest = ::testing::Test;
 
-class MockDns final : public libtransmission::Dns
+class AnnouncerUdpTest : public ::testing::Test
 {
-public:
-    ~MockDns() = default;
-
-    [[nodiscard]] std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(
-        std::string_view /*address*/,
-        Hints /*hints*/ = {}) const override
+protected:
+    class MockDns final : public libtransmission::Dns
     {
-        return {};
-    }
+    public:
+        ~MockDns() = default;
 
-    Tag lookup(std::string_view address, Callback&& callback, Hints /*hints*/) override
-    {
-        auto const addr = tr_address::fromString(address); // mock has no actual DNS, just parsing e.g. inet_pton
-        auto [ss, sslen] = addr->toSockaddr(Port);
-        callback(reinterpret_cast<sockaddr const*>(&ss), sslen, tr_time() + 3600); // 1hr ttl
-        return {};
-    }
-
-    void cancel(Tag /*tag*/) override
-    {
-    }
-
-    static auto constexpr Port = tr_port::fromHost(443);
-};
-
-class MockMediator final : public tr_announcer_udp::Mediator
-{
-public:
-    MockMediator()
-        : event_base_{ event_base_new(), event_base_free }
-    // , dns_{ event_base_.get(), tr_time }
-    {
-    }
-
-    void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
-    {
-        auto target = tr_address::fromSockaddr(sa);
-        ASSERT_TRUE(target);
-        // auto const [addr, port] = *target;
-        // fmt::print("sending {:d} bytes to {:s}\n", buflen, addr.readable(port));
-        sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
-    }
-
-    [[nodiscard]] auto* eventBase()
-    {
-        return event_base_.get();
-    }
-
-    [[nodiscard]] libtransmission::Dns& dns() override
-    {
-        return dns_;
-    }
-
-    [[nodiscard]] std::optional<tr_address> announceIP() const override
-    {
-        return {};
-    }
-
-    struct Sent
-    {
-        Sent() = default;
-
-        Sent(char const* buf, size_t buflen, sockaddr const* sa, socklen_t salen)
-            : sslen_{ salen }
+        [[nodiscard]] std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(
+            std::string_view /*address*/,
+            Hints /*hints*/ = {}) const override
         {
-            buf_.add(buf, buflen);
-            std::memcpy(&ss_, sa, salen);
+            return {};
         }
 
-        libtransmission::Buffer buf_;
-        sockaddr_storage ss_;
-        socklen_t sslen_ = {};
+        Tag lookup(std::string_view address, Callback&& callback, Hints /*hints*/) override
+        {
+            auto const addr = tr_address::fromString(address); // mock has no actual DNS, just parsing e.g. inet_pton
+            auto [ss, sslen] = addr->toSockaddr(Port);
+            callback(reinterpret_cast<sockaddr const*>(&ss), sslen, tr_time() + 3600); // 1hr ttl
+            return {};
+        }
+
+        void cancel(Tag /*tag*/) override
+        {
+        }
+
+        static auto constexpr Port = tr_port::fromHost(443);
     };
 
-    std::deque<Sent> sent_;
+    class MockMediator final : public tr_announcer_udp::Mediator
+    {
+    public:
+        MockMediator()
+            : event_base_{ event_base_new(), event_base_free }
+        // , dns_{ event_base_.get(), tr_time }
+        {
+        }
 
-    std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+        void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
+        {
+            auto target = tr_address::fromSockaddr(sa);
+            ASSERT_TRUE(target);
+            // auto const [addr, port] = *target;
+            // fmt::print("sending {:d} bytes to {:s}\n", buflen, addr.readable(port));
+            sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
+        }
 
-    MockDns dns_;
-    // depends-on: event_base_
-    // libtransmission::EvDns dns_;
+        [[nodiscard]] auto* eventBase()
+        {
+            return event_base_.get();
+        }
+
+        [[nodiscard]] libtransmission::Dns& dns() override
+        {
+            return dns_;
+        }
+
+        [[nodiscard]] std::optional<tr_address> announceIP() const override
+        {
+            return {};
+        }
+
+        struct Sent
+        {
+            Sent() = default;
+
+            Sent(char const* buf, size_t buflen, sockaddr const* sa, socklen_t salen)
+                : sslen_{ salen }
+            {
+                buf_.add(buf, buflen);
+                std::memcpy(&ss_, sa, salen);
+            }
+
+            libtransmission::Buffer buf_;
+            sockaddr_storage ss_;
+            socklen_t sslen_ = {};
+        };
+
+        std::deque<Sent> sent_;
+
+        std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+
+        MockDns dns_;
+        // depends-on: event_base_
+        // libtransmission::EvDns dns_;
+    };
+
+    void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)
+    {
+        EXPECT_EQ(expected.did_connect, actual.did_connect);
+        EXPECT_EQ(expected.did_timeout, actual.did_timeout);
+        EXPECT_EQ(expected.errmsg, actual.errmsg);
+        EXPECT_EQ(expected.min_request_interval, actual.min_request_interval);
+        EXPECT_EQ(expected.scrape_url, actual.scrape_url);
+
+        EXPECT_EQ(expected.row_count, actual.row_count);
+        for (size_t i = 0; i < std::min(expected.row_count, actual.row_count); ++i)
+        {
+            EXPECT_EQ(expected.rows[i].info_hash, actual.rows[i].info_hash);
+            EXPECT_EQ(expected.rows[i].seeders, actual.rows[i].seeders);
+            EXPECT_EQ(expected.rows[i].leechers, actual.rows[i].leechers);
+            EXPECT_EQ(expected.rows[i].downloads, actual.rows[i].downloads);
+            EXPECT_EQ(expected.rows[i].downloaders, actual.rows[i].downloaders);
+        }
+    }
+
+    [[nodiscard]] auto buildScrapeRequestFromResponse(tr_scrape_response const& response)
+    {
+        auto request = tr_scrape_request{};
+        request.scrape_url = response.scrape_url;
+        request.info_hash_count = response.row_count;
+        for (size_t i = 0; i < request.info_hash_count; ++i)
+        {
+            request.info_hash[i] = response.rows[i].info_hash;
+        }
+        return request;
+    }
+
+    // https://www.bittorrent.org/beps/bep_0015.html
+    static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
+    static auto constexpr ConnectAction = uint32_t{ 0 };
+    // static auto constexpr AnnounceAction = uint32_t{ 1 };
+    static auto constexpr ScrapeAction = uint32_t{ 2 };
+    static auto constexpr ErrorAction = uint32_t{ 3 };
 };
-
-// https://www.bittorrent.org/beps/bep_0015.html
-static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
-static auto constexpr ConnectAction = uint32_t{ 0 };
-// static auto constexpr AnnounceAction = uint32_t{ 1 };
-static auto constexpr ScrapeAction = uint32_t{ 2 };
-static auto constexpr ErrorAction = uint32_t{ 3 };
 
 TEST_F(AnnouncerUdpTest, canInstantiate)
 {
@@ -124,32 +158,28 @@ TEST_F(AnnouncerUdpTest, canInstantiate)
 TEST_F(AnnouncerUdpTest, canScrape)
 {
     static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
-    static auto constexpr LogName = "test";
+    // static auto constexpr LogName = "test";
 
     tr_timeUpdate(time(nullptr));
 
     auto info_hash = tr_sha1_digest_t{};
     tr_rand_buffer(std::data(info_hash), std::size(info_hash));
 
-    // build the request
-    auto request = tr_scrape_request{};
-    request.scrape_url = ScrapeUrl;
-    tr_strlcpy(request.log_name, LogName, sizeof(request.log_name));
-    request.info_hash[0] = info_hash;
-    request.info_hash_count = 1;
-
     // build the expected reponse
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = request.info_hash[0];
+    expected_response.rows[0].info_hash = info_hash;
     expected_response.rows[0].seeders = 1;
     expected_response.rows[0].leechers = 2;
     expected_response.rows[0].downloads = 3;
     expected_response.rows[0].downloaders = 0;
-    expected_response.scrape_url = request.scrape_url;
+    expected_response.scrape_url = ScrapeUrl;
     expected_response.min_request_interval = 0;
+
+    // build the request
+    auto request = buildScrapeRequestFromResponse(expected_response);
 
     // build the announcer
     auto mediator = MockMediator{};
@@ -168,7 +198,6 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // inspect it for validity.
     libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
     auto* sent = &mediator.sent_.front();
-    EXPECT_EQ(16, std::size(sent->buf_));
     EXPECT_EQ(ProtocolId, sent->buf_.toUint64());
     EXPECT_EQ(ConnectAction, sent->buf_.toUint32());
     auto transaction_id = sent->buf_.toUint32();
@@ -183,7 +212,6 @@ TEST_F(AnnouncerUdpTest, canScrape)
     buf.addUint32(transaction_id);
     buf.addUint64(connection_id);
     auto response_size = std::size(buf);
-    EXPECT_EQ(16, response_size);
     auto arr = std::array<uint8_t, 128>{};
     buf.toBuf(std::data(arr), response_size);
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
@@ -207,25 +235,12 @@ TEST_F(AnnouncerUdpTest, canScrape)
     buf.addUint32(expected_response.rows[0].downloads);
     buf.addUint32(expected_response.rows[0].leechers);
     response_size = std::size(buf);
-    EXPECT_EQ(20, response_size);
     buf.toBuf(std::data(arr), response_size);
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response);
-    EXPECT_EQ(expected_response.did_connect, response->did_connect);
-    EXPECT_EQ(expected_response.did_timeout, response->did_timeout);
-    EXPECT_EQ(expected_response.row_count, response->row_count);
-    EXPECT_EQ(expected_response.scrape_url, response->scrape_url);
-    EXPECT_EQ(expected_response.min_request_interval, response->min_request_interval);
-    for (size_t i = 0; i < std::min(expected_response.row_count, response->row_count); ++i)
-    {
-        EXPECT_EQ(expected_response.rows[i].info_hash, response->rows[i].info_hash);
-        EXPECT_EQ(expected_response.rows[i].seeders, response->rows[i].seeders);
-        EXPECT_EQ(expected_response.rows[i].leechers, response->rows[i].leechers);
-        EXPECT_EQ(expected_response.rows[i].downloads, response->rows[i].downloads);
-        EXPECT_EQ(expected_response.rows[i].downloaders, response->rows[i].downloaders);
-    }
+    expectEqual(expected_response, *response);
 }
 
 TEST_F(AnnouncerUdpTest, canHandleScrapeError)
@@ -318,19 +333,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response);
-    EXPECT_EQ(expected_response.did_connect, response->did_connect);
-    EXPECT_EQ(expected_response.did_timeout, response->did_timeout);
-    EXPECT_EQ(expected_response.row_count, response->row_count);
-    EXPECT_EQ(expected_response.scrape_url, response->scrape_url);
-    EXPECT_EQ(expected_response.min_request_interval, response->min_request_interval);
-    for (size_t i = 0; i < std::min(expected_response.row_count, response->row_count); ++i)
-    {
-        EXPECT_EQ(expected_response.rows[i].info_hash, response->rows[i].info_hash);
-        EXPECT_EQ(expected_response.rows[i].seeders, response->rows[i].seeders);
-        EXPECT_EQ(expected_response.rows[i].leechers, response->rows[i].leechers);
-        EXPECT_EQ(expected_response.rows[i].downloads, response->rows[i].downloads);
-        EXPECT_EQ(expected_response.rows[i].downloaders, response->rows[i].downloaders);
-    }
+    expectEqual(expected_response, *response);
 }
 
 TEST_F(AnnouncerUdpTest, canHandleConnectError)
@@ -402,19 +405,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response);
-    EXPECT_EQ(expected_response.did_connect, response->did_connect);
-    EXPECT_EQ(expected_response.did_timeout, response->did_timeout);
-    EXPECT_EQ(expected_response.row_count, response->row_count);
-    EXPECT_EQ(expected_response.scrape_url, response->scrape_url);
-    EXPECT_EQ(expected_response.min_request_interval, response->min_request_interval);
-    for (size_t i = 0; i < std::min(expected_response.row_count, response->row_count); ++i)
-    {
-        EXPECT_EQ(expected_response.rows[i].info_hash, response->rows[i].info_hash);
-        EXPECT_EQ(expected_response.rows[i].seeders, response->rows[i].seeders);
-        EXPECT_EQ(expected_response.rows[i].leechers, response->rows[i].leechers);
-        EXPECT_EQ(expected_response.rows[i].downloads, response->rows[i].downloads);
-        EXPECT_EQ(expected_response.rows[i].downloaders, response->rows[i].downloaders);
-    }
+    expectEqual(expected_response, *response);
 }
 
 #if 0
