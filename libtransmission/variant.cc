@@ -15,8 +15,6 @@
 #include <share.h>
 #endif
 
-#include <event2/buffer.h>
-
 #include <fmt/core.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
@@ -1098,39 +1096,22 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 ****
 ***/
 
-struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
+std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 {
-    struct evbuffer* buf = evbuffer_new();
-
-    evbuffer_expand(buf, 4096); /* alloc a little memory to start off with */
-
     switch (fmt)
     {
-    case TR_VARIANT_FMT_BENC:
-        tr_variantToBufBenc(v, buf);
-        break;
-
     case TR_VARIANT_FMT_JSON:
-        tr_variantToBufJson(v, buf, false);
+        return tr_variantToStrJson(v, false);
         break;
 
     case TR_VARIANT_FMT_JSON_LEAN:
-        tr_variantToBufJson(v, buf, true);
+        return tr_variantToStrJson(v, true);
+        break;
+
+    default: // TR_VARIANT_FMT_BENC:
+        return tr_variantToStrBenc(v);
         break;
     }
-
-    return buf;
-}
-
-std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
-{
-    auto* const buf = tr_variantToBuf(v, fmt);
-    auto const n = evbuffer_get_length(buf);
-    auto str = std::string{};
-    str.resize(n);
-    evbuffer_copyout(buf, std::data(str), n);
-    evbuffer_free(buf);
-    return str;
 }
 
 int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)

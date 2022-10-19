@@ -149,6 +149,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     tr-getopt.h
     tr-macros.h
     tr-strbuf.h
+    tr-buffer.h
     transmission.h
     utils.h
     variant.h

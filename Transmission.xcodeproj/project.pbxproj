@@ -184,6 +184,7 @@
 		A267927C130DFF2700CB7464 /* libutp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E38544130DFEE3001F501B /* libutp.a */; };
 		A2679294130E00A000CB7464 /* tr-utp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2679292130E00A000CB7464 /* tr-utp.cc */; };
 		A2679295130E00A000CB7464 /* tr-utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2679293130E00A000CB7464 /* tr-utp.h */; };
+		A263C6B1F6718E2486DB20E0 /* tr-buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A263C6B1F6718E2486DB20E1 /* tr-buffer.h */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.mm */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.mm */; };
@@ -909,6 +910,7 @@
 		A2661D3B12D0E51B004F69D5 /* FilterBarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilterBarView.mm; sourceTree = "<group>"; };
 		A2679292130E00A000CB7464 /* tr-utp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-utp.cc"; sourceTree = "<group>"; };
 		A2679293130E00A000CB7464 /* tr-utp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-utp.h"; sourceTree = "<group>"; };
+		A263C6B1F6718E2486DB20E1 /* tr-buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-buffer.h"; sourceTree = "<group>"; };
 		A26AF1050D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A26AF1070D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A26AF2180D2DA35A00FF7140 /* FileOutlineController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileOutlineController.h; sourceTree = "<group>"; };
@@ -1717,6 +1719,7 @@
 				A284214212DA663E00FBDDBB /* tr-udp.cc */,
 				A2679292130E00A000CB7464 /* tr-utp.cc */,
 				A2679293130E00A000CB7464 /* tr-utp.h */,
+				A263C6B1F6718E2486DB20E1 /* tr-buffer.h */,
 				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
 				A24621360C769CF400088E81 /* trevent.cc */,
 				A24621350C769CF400088E81 /* trevent.h */,
@@ -2204,6 +2207,7 @@
 				11524394C75E57E52CD9ADF2 /* dns-ev.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
+				A2679295130E00A000CB7464 /* tr-buffer.h in Headers */,
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
 				A2EE726F14DCCC950093C99A /* port-forwarding-natpmp.h in Headers */,
 				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,

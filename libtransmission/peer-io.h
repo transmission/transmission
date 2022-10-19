@@ -31,6 +31,7 @@
 #include "peer-mse.h"
 #include "peer-socket.h"
 #include "tr-assert.h"
+#include "tr-buffer.h"
 
 class tr_peerIo;
 struct tr_bandwidth;
@@ -128,26 +129,17 @@ public:
 
     std::string addrStr() const;
 
-    [[nodiscard]] auto readBuffer() noexcept
-    {
-        return inbuf.get();
-    }
-
     void readBufferDrain(size_t byte_count);
 
     [[nodiscard]] auto readBufferSize() const noexcept
     {
-        return evbuffer_get_length(inbuf.get());
+        return std::size(inbuf);
     }
 
-    [[nodiscard]] std::byte const* peek(size_t n_bytes) const noexcept
+    template<typename T>
+    [[nodiscard]] auto readBufferStartsWith(T const& t) const noexcept
     {
-        if (readBufferSize() < n_bytes)
-        {
-            return nullptr;
-        }
-
-        return reinterpret_cast<std::byte const*>(evbuffer_pullup(inbuf.get(), n_bytes));
+        return inbuf.startsWith(t);
     }
 
     void readBufferAdd(void const* data, size_t n_bytes);
@@ -155,8 +147,12 @@ public:
     int flushOutgoingProtocolMsgs();
     int flush(tr_direction dir, size_t byte_limit);
 
-    void writeBytes(void const* writeme, size_t writeme_len, bool is_piece_data);
-    void writeBuf(struct evbuffer* buf, bool is_piece_data);
+    void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
+
+    // Write all the data from `buf`.
+    // This is a destructive add: `buf` is empty after this call.
+    void write(libtransmission::Buffer& buf, bool is_piece_data);
+
     size_t getWriteBufferSpace(uint64_t now) const;
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
@@ -252,8 +248,8 @@ public:
     tr_net_error_cb gotError = nullptr;
     void* userData = nullptr;
 
-    tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
-    tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
+    libtransmission::Buffer inbuf;
+    libtransmission::Buffer outbuf;
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
 
