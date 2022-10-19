@@ -17,8 +17,9 @@
 #include "transmission.h"
 
 #include "benc.h"
-#include "tr-assert.h"
 #include "quark.h"
+#include "tr-assert.h"
+#include "tr-buffer.h"
 #include "utils.h"
 #include "variant-common.h"
 #include "variant.h"
@@ -272,32 +273,34 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
 *****
 ****/
 
+using Buffer = libtransmission::Buffer;
+
 static void saveIntFunc(tr_variant const* val, void* vout)
 {
     auto buf = std::array<char, 64>{};
     auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
-    static_cast<std::string*>(vout)->append(std::data(buf), static_cast<size_t>(out - std::data(buf)));
+    static_cast<Buffer*>(vout)->add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
 }
 
 static void saveBoolFunc(tr_variant const* val, void* vout)
 {
-    static_cast<std::string*>(vout)->append(val->val.b ? "i1e"sv : "i0e"sv);
+    static_cast<Buffer*>(vout)->add(val->val.b ? "i1e"sv : "i0e"sv);
 }
 
-static void saveStringImpl(std::string* tgt, std::string_view sv)
+static void saveStringImpl(Buffer* tgt, std::string_view sv)
 {
     // `${sv.size()}:${sv}`
     auto prefix = std::array<char, 32>{};
     auto out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
-    tgt->append(std::data(prefix), out - std::data(prefix));
-    tgt->append(sv);
+    tgt->add(std::data(prefix), out - std::data(prefix));
+    tgt->add(sv);
 }
 
 static void saveStringFunc(tr_variant const* v, void* vout)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
-    saveStringImpl(static_cast<std::string*>(vout), sv);
+    saveStringImpl(static_cast<Buffer*>(vout), sv);
 }
 
 static void saveRealFunc(tr_variant const* val, void* vout)
@@ -306,22 +309,22 @@ static void saveRealFunc(tr_variant const* val, void* vout)
 
     auto buf = std::array<char, 64>{};
     auto out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
-    saveStringImpl(static_cast<std::string*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
+    saveStringImpl(static_cast<Buffer*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
 static void saveDictBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<std::string*>(vbuf)->append("d"sv);
+    static_cast<Buffer*>(vbuf)->push_back('d');
 }
 
 static void saveListBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<std::string*>(vbuf)->append("l"sv);
+    static_cast<Buffer*>(vbuf)->push_back('l');
 }
 
 static void saveContainerEndFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<std::string*>(vbuf)->append("e"sv);
+    static_cast<Buffer*>(vbuf)->push_back('e');
 }
 
 static struct VariantWalkFuncs const walk_funcs = {
@@ -336,7 +339,7 @@ static struct VariantWalkFuncs const walk_funcs = {
 
 std::string tr_variantToStrBenc(tr_variant const* top)
 {
-    auto str = std::string{};
-    tr_variantWalk(top, &walk_funcs, &str, true);
-    return str;
+    auto buf = libtransmission::Buffer{};
+    tr_variantWalk(top, &walk_funcs, &buf, true);
+    return buf.toString();
 }
