@@ -270,6 +270,15 @@ public:
         add(std::data(data), std::size(data));
     }
 
+    template<
+        typename T,
+        typename std::enable_if_t<
+            std::is_same_v<T, char> || std::is_same_v<T, unsigned char> || std::is_same_v<T, std::byte>>* = nullptr>
+    void push_back(T ch)
+    {
+        add(&ch, 1);
+    }
+
     void addUint8(uint8_t uch)
     {
         add(&uch, 1);

@@ -412,14 +412,13 @@ struct ParentState
 
 struct JsonWalk
 {
-    JsonWalk(std::string& out_in, bool do_indent)
-        : out{ out_in }
-        , doIndent{ do_indent }
+    JsonWalk(bool do_indent)
+        : doIndent{ do_indent }
     {
     }
 
     std::deque<ParentState> parents;
-    std::string& out;
+    Buffer out;
     bool doIndent;
 };
 
@@ -435,7 +434,7 @@ static void jsonIndent(struct JsonWalk* data)
 
     if (data->doIndent)
     {
-        data->out.append(std::data(buf), std::size(data->parents) * 4 + 1);
+        data->out.add(std::data(buf), std::size(data->parents) * 4 + 1);
     }
 }
 
@@ -454,14 +453,14 @@ static void jsonChildFunc(struct JsonWalk* data)
 
                 if (i % 2 == 0)
                 {
-                    data->out.append(data->doIndent ? ": "sv : ":"sv);
+                    data->out.add(data->doIndent ? ": "sv : ":"sv);
                 }
                 else
                 {
                     bool const is_last = pstate.childIndex == pstate.childCount;
                     if (!is_last)
                     {
-                        data->out.append(","sv);
+                        data->out.push_back(',');
                         jsonIndent(data);
                     }
                 }
@@ -473,7 +472,7 @@ static void jsonChildFunc(struct JsonWalk* data)
             ++pstate.childIndex;
             if (bool const is_last = pstate.childIndex == pstate.childCount; !is_last)
             {
-                data->out.append(","sv);
+                data->out.push_back(',');
                 jsonIndent(data);
             }
 
@@ -501,7 +500,7 @@ static void jsonIntFunc(tr_variant const* val, void* vdata)
     auto buf = std::array<char, 64>{};
     auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
     auto* const data = static_cast<JsonWalk*>(vdata);
-    data->out.append(std::data(buf), static_cast<size_t>(out - std::data(buf)));
+    data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     jsonChildFunc(data);
 }
 
@@ -511,11 +510,11 @@ static void jsonBoolFunc(tr_variant const* val, void* vdata)
 
     if (val->val.b)
     {
-        data->out.append("true"sv);
+        data->out.add("true"sv);
     }
     else
     {
-        data->out.append("false"sv);
+        data->out.add("false"sv);
     }
 
     jsonChildFunc(data);
@@ -529,13 +528,13 @@ static void jsonRealFunc(tr_variant const* val, void* vdata)
     {
         auto buf = std::array<char, 64>{};
         auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
-        data->out.append(std::data(buf), static_cast<size_t>(out - std::data(buf)));
+        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
     else
     {
         auto buf = std::array<char, 64>{};
         auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
-        data->out.append(std::data(buf), static_cast<size_t>(out - std::data(buf)));
+        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
 
     jsonChildFunc(data);
@@ -557,31 +556,31 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
         switch (sv.front())
         {
         case '\b':
-            out.append(R"(\b)"sv);
+            out.add(R"(\b)"sv);
             break;
 
         case '\f':
-            out.append(R"(\f)"sv);
+            out.add(R"(\f)"sv);
             break;
 
         case '\n':
-            out.append(R"(\n)"sv);
+            out.add(R"(\n)"sv);
             break;
 
         case '\r':
-            out.append(R"(\r)"sv);
+            out.add(R"(\r)"sv);
             break;
 
         case '\t':
-            out.append(R"(\t)"sv);
+            out.add(R"(\t)"sv);
             break;
 
         case '"':
-            out.append(R"(\")"sv);
+            out.add(R"(\")"sv);
             break;
 
         case '\\':
-            out.append(R"(\\)"sv);
+            out.add(R"(\\)"sv);
             break;
 
         default:
@@ -599,12 +598,12 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
                     auto const* walk8 = begin8;
                     auto const uch32 = utf8::next(walk8, end8);
                     auto const result = fmt::format_to_n(std::data(arr), std::size(arr), FMT_COMPILE("\\u{:04x}"), uch32);
-                    out.append(std::data(arr), result.size);
+                    out.add(std::data(arr), result.size);
                     sv.remove_prefix(walk8 - begin8 - 1);
                 }
                 catch (utf8::exception const&)
                 {
-                    out.append("?"sv);
+                    out.push_back('?');
                 }
             }
             break;
@@ -675,14 +674,14 @@ static struct VariantWalkFuncs const walk_funcs = {
 
 std::string tr_variantToStrJson(tr_variant const* top, bool lean)
 {
-    auto str = std::string{};
-    auto data = JsonWalk{ str, !lean };
+    auto data = JsonWalk{ !lean };
 
     tr_variantWalk(top, &walk_funcs, &data, true);
 
-    if (!std::empty(str))
+    auto& buf = data.out;
+    if (!std::empty(buf))
     {
-        str.push_back('\n');
+        buf.push_back('\n');
     }
-    return str;
+    return buf.toString();
 }
