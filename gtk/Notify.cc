@@ -50,7 +50,16 @@ Glib::VariantContainerBase make_variant_tuple(Ts&&... args)
 
 void get_capabilities_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 {
-    auto result = proxy->call_finish(res);
+    auto result = Glib::VariantContainerBase();
+
+    try
+    {
+        result = proxy->call_finish(res);
+    }
+    catch (Glib::Error const&)
+    {
+        return;
+    }
 
     if (!result || result.get_n_children() != 1 || !result.get_child(0).is_of_type(StringListVariantType::variant_type()))
     {
@@ -121,11 +130,20 @@ void g_signal_callback(
 
 void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 {
-    proxy = Gio::DBus::Proxy::create_for_bus_finish(res);
-
-    if (proxy == nullptr)
+    try
     {
-        g_warning("%s", fmt::format(_("Couldn't create proxy for '{bus}'"), fmt::arg("bus", NotificationsDbusName)).c_str());
+        proxy = Gio::DBus::Proxy::create_for_bus_finish(res);
+    }
+    catch (Glib::Error const& e)
+    {
+        g_warning(
+            "%s",
+            fmt::format(
+                _("Couldn't create proxy for '{bus}': {error} ({error_code})"),
+                fmt::arg("bus", NotificationsDbusName),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code()))
+                .c_str());
         return;
     }
 
@@ -152,7 +170,16 @@ namespace
 
 void notify_callback(Glib::RefPtr<Gio::AsyncResult>& res, TrNotification const& n)
 {
-    auto result = proxy->call_finish(res);
+    auto result = Glib::VariantContainerBase();
+
+    try
+    {
+        result = proxy->call_finish(res);
+    }
+    catch (Glib::Error const&)
+    {
+        return;
+    }
 
     if (!result || result.get_n_children() != 1 || !result.get_child(0).is_of_type(UInt32VariantType::variant_type()))
     {
