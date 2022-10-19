@@ -14,16 +14,18 @@
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 
-#define TAB_INFO_IDENT @"Info"
-#define TAB_ACTIVITY_IDENT @"Activity"
-#define TAB_TRACKER_IDENT @"Tracker"
-#define TAB_PEERS_IDENT @"Peers"
-#define TAB_FILES_IDENT @"Files"
-#define TAB_OPTIONS_IDENT @"Options"
+typedef NSString* TabIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
-#define TAB_MIN_HEIGHT 250
+static TabIdentifier const TabIdentifierInfo = @"Info";
+static TabIdentifier const TabIdentifierActivity = @"Activity";
+static TabIdentifier const TabIdentifierTracker = @"Tracker";
+static TabIdentifier const TabIdentifierPeers = @"Peers";
+static TabIdentifier const TabIdentifierFiles = @"Files";
+static TabIdentifier const TabIdentifierOptions = @"Options";
 
-#define INVALID -99
+static CGFloat const kTabMinHeight = 250;
+
+static NSInteger const kInvalidTag = -99;
 
 typedef NS_ENUM(unsigned int, tabTag) {
     TAB_GENERAL_TAG = 0,
@@ -112,36 +114,36 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fTabs setImage:[NSImage systemSymbol:@"gearshape" withFallback:@"InfoOptions"] forSegment:TAB_OPTIONS_TAG];
 
     //set selected tab
-    self.fCurrentTabTag = INVALID;
+    self.fCurrentTabTag = kInvalidTag;
     NSString* identifier = [NSUserDefaults.standardUserDefaults stringForKey:@"InspectorSelected"];
     NSInteger tag;
-    if ([identifier isEqualToString:TAB_INFO_IDENT])
+    if ([identifier isEqualToString:TabIdentifierInfo])
     {
         tag = TAB_GENERAL_TAG;
     }
-    else if ([identifier isEqualToString:TAB_ACTIVITY_IDENT])
+    else if ([identifier isEqualToString:TabIdentifierActivity])
     {
         tag = TAB_ACTIVITY_TAG;
     }
-    else if ([identifier isEqualToString:TAB_TRACKER_IDENT])
+    else if ([identifier isEqualToString:TabIdentifierTracker])
     {
         tag = TAB_TRACKERS_TAG;
     }
-    else if ([identifier isEqualToString:TAB_PEERS_IDENT])
+    else if ([identifier isEqualToString:TabIdentifierPeers])
     {
         tag = TAB_PEERS_TAG;
     }
-    else if ([identifier isEqualToString:TAB_FILES_IDENT])
+    else if ([identifier isEqualToString:TabIdentifierFiles])
     {
         tag = TAB_FILE_TAG;
     }
-    else if ([identifier isEqualToString:TAB_OPTIONS_IDENT])
+    else if ([identifier isEqualToString:TabIdentifierOptions])
     {
         tag = TAB_OPTIONS_TAG;
     }
     else //safety
     {
-        [NSUserDefaults.standardUserDefaults setObject:TAB_INFO_IDENT forKey:@"InspectorSelected"];
+        [NSUserDefaults.standardUserDefaults setObject:TabIdentifierInfo forKey:@"InspectorSelected"];
         tag = TAB_GENERAL_TAG;
     }
 
@@ -227,7 +229,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
     //take care of old view
     CGFloat oldHeight = 0;
-    if (oldTabTag != INVALID)
+    if (oldTabTag != kInvalidTag)
     {
         if ([self.fViewController respondsToSelector:@selector(saveViewSize)])
         {
@@ -247,7 +249,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     }
 
     //set new tab item
-    NSString* identifier;
+    TabIdentifier identifier;
     switch (self.fCurrentTabTag)
     {
     case TAB_GENERAL_TAG:
@@ -258,7 +260,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         }
 
         self.fViewController = self.fGeneralViewController;
-        identifier = TAB_INFO_IDENT;
+        identifier = TabIdentifierInfo;
         break;
     case TAB_ACTIVITY_TAG:
         if (!self.fActivityViewController)
@@ -268,7 +270,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         }
 
         self.fViewController = self.fActivityViewController;
-        identifier = TAB_ACTIVITY_IDENT;
+        identifier = TabIdentifierActivity;
         break;
     case TAB_TRACKERS_TAG:
         if (!self.fTrackersViewController)
@@ -278,7 +280,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         }
 
         self.fViewController = self.fTrackersViewController;
-        identifier = TAB_TRACKER_IDENT;
+        identifier = TabIdentifierTracker;
         break;
     case TAB_PEERS_TAG:
         if (!self.fPeersViewController)
@@ -288,7 +290,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         }
 
         self.fViewController = self.fPeersViewController;
-        identifier = TAB_PEERS_IDENT;
+        identifier = TabIdentifierPeers;
         break;
     case TAB_FILE_TAG:
         if (!self.fFileViewController)
@@ -298,7 +300,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         }
 
         self.fViewController = self.fFileViewController;
-        identifier = TAB_FILES_IDENT;
+        identifier = TabIdentifierFiles;
         break;
     case TAB_OPTIONS_TAG:
         if (!self.fOptionsViewController)
@@ -308,7 +310,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         }
 
         self.fViewController = self.fOptionsViewController;
-        identifier = TAB_OPTIONS_IDENT;
+        identifier = TabIdentifierOptions;
         break;
     default:
         NSAssert1(NO, @"Unknown info tab selected: %ld", self.fCurrentTabTag);
@@ -361,7 +363,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
             }
         }
 
-        window.minSize = NSMakeSize(minWindowWidth, NSHeight(windowRect) - NSHeight(viewRect) + TAB_MIN_HEIGHT);
+        window.minSize = NSMakeSize(minWindowWidth, NSHeight(windowRect) - NSHeight(viewRect) + kTabMinHeight);
         window.maxSize = NSMakeSize(FLT_MAX, FLT_MAX);
     }
     else
@@ -393,7 +395,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     }
     else
     {
-        [window setFrame:windowRect display:YES animate:oldTabTag != INVALID];
+        [window setFrame:windowRect display:YES animate:oldTabTag != kInvalidTag];
     }
 
     [window.contentView addSubview:view];

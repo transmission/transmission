@@ -8,7 +8,7 @@
 
 @class Torrent;
 
-#define GROUP_SEPARATOR_HEIGHT 18.0
+extern const CGFloat kGroupSeparatorHeight;
 
 @interface TorrentTableView : NSOutlineView<NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
 

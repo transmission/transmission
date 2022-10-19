@@ -10,12 +10,14 @@
 #import "PiecesView.h"
 #import "Torrent.h"
 
-#define PIECES_CONTROL_PROGRESS 0
-#define PIECES_CONTROL_AVAILABLE 1
+typedef NS_ENUM(NSUInteger, PiecesControlSegment) {
+    PiecesControlSegmentProgress = 0,
+    PiecesControlSegmentAvailable = 1,
+};
 
-#define STACKVIEW_INSET 12.0
-#define STACKVIEW_HORIZONTAL_SPACING 20.0
-#define STACKVIEW_VERTICAL_SPACING 8.0
+static CGFloat const kStackViewInset = 12.0;
+static CGFloat const kStackViewHorizontalSpacing = 20.0;
+static CGFloat const kStackViewVerticalSpacing = 8.0;
 
 @interface InfoActivityViewController ()
 
@@ -172,17 +174,17 @@
 
 - (CGFloat)horizLayoutHeight
 {
-    return NSHeight(self.fTransferView.frame) + 2 * STACKVIEW_INSET;
+    return NSHeight(self.fTransferView.frame) + 2 * kStackViewInset;
 }
 
 - (CGFloat)horizLayoutWidth
 {
-    return NSWidth(self.fTransferView.frame) + NSWidth(self.fDatesView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_HORIZONTAL_SPACING;
+    return NSWidth(self.fTransferView.frame) + NSWidth(self.fDatesView.frame) + (2 * kStackViewInset) + kStackViewHorizontalSpacing;
 }
 
 - (CGFloat)vertLayoutHeight
 {
-    return NSHeight(self.fTransferView.frame) + NSHeight(self.fDatesView.frame) + (2 * STACKVIEW_INSET) + STACKVIEW_VERTICAL_SPACING;
+    return NSHeight(self.fTransferView.frame) + NSHeight(self.fDatesView.frame) + (2 * kStackViewInset) + kStackViewVerticalSpacing;
 }
 
 - (CGFloat)changeInWindowHeight
@@ -194,14 +196,14 @@
         self.fActivityStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
 
         //add some padding between views in horizontal layout
-        self.fActivityStackView.spacing = STACKVIEW_HORIZONTAL_SPACING;
+        self.fActivityStackView.spacing = kStackViewHorizontalSpacing;
 
         difference = NSHeight(self.view.frame) - self.horizLayoutHeight;
     }
     else
     {
         self.fActivityStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
-        self.fActivityStackView.spacing = STACKVIEW_VERTICAL_SPACING;
+        self.fActivityStackView.spacing = kStackViewVerticalSpacing;
 
         difference = NSHeight(self.view.frame) - self.vertLayoutHeight;
     }
@@ -352,7 +354,7 @@
 
 - (void)setPiecesView:(id)sender
 {
-    BOOL const availability = [sender selectedSegment] == PIECES_CONTROL_AVAILABLE;
+    BOOL const availability = [sender selectedSegment] == PiecesControlSegmentAvailable;
     [NSUserDefaults.standardUserDefaults setBool:availability forKey:@"PiecesViewShowAvailability"];
     [self updatePiecesView:nil];
 }
@@ -361,8 +363,8 @@
 {
     BOOL const piecesAvailableSegment = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
 
-    [self.fPiecesControl setSelected:piecesAvailableSegment forSegment:PIECES_CONTROL_AVAILABLE];
-    [self.fPiecesControl setSelected:!piecesAvailableSegment forSegment:PIECES_CONTROL_PROGRESS];
+    [self.fPiecesControl setSelected:piecesAvailableSegment forSegment:PiecesControlSegmentAvailable];
+    [self.fPiecesControl setSelected:!piecesAvailableSegment forSegment:PiecesControlSegmentProgress];
 
     [self.fPiecesView updateView];
 }
@@ -401,8 +403,8 @@
         self.fDownloadTimeField.stringValue = @"";
         self.fSeedTimeField.stringValue = @"";
 
-        [self.fPiecesControl setSelected:NO forSegment:PIECES_CONTROL_AVAILABLE];
-        [self.fPiecesControl setSelected:NO forSegment:PIECES_CONTROL_PROGRESS];
+        [self.fPiecesControl setSelected:NO forSegment:PiecesControlSegmentAvailable];
+        [self.fPiecesControl setSelected:NO forSegment:PiecesControlSegmentProgress];
         self.fPiecesControl.enabled = NO;
         self.fPiecesView.torrent = nil;
     }
@@ -411,8 +413,8 @@
         Torrent* torrent = self.fTorrents[0];
 
         BOOL const piecesAvailableSegment = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
-        [self.fPiecesControl setSelected:piecesAvailableSegment forSegment:PIECES_CONTROL_AVAILABLE];
-        [self.fPiecesControl setSelected:!piecesAvailableSegment forSegment:PIECES_CONTROL_PROGRESS];
+        [self.fPiecesControl setSelected:piecesAvailableSegment forSegment:PiecesControlSegmentAvailable];
+        [self.fPiecesControl setSelected:!piecesAvailableSegment forSegment:PiecesControlSegmentProgress];
         self.fPiecesControl.enabled = YES;
 
         self.fPiecesView.torrent = torrent;

@@ -10,43 +10,42 @@
 #import "Torrent.h"
 #import "TorrentTableView.h"
 
-#define BAR_HEIGHT 12.0
+static CGFloat const kBarHeight = 12.0;
 
-#define IMAGE_SIZE_REG 32.0
-#define IMAGE_SIZE_MIN 16.0
-#define ERROR_IMAGE_SIZE 20.0
+static CGFloat const kImageSizeRegular = 32.0;
+static CGFloat const kImageSizeMin = 16.0;
+static CGFloat const kErrorImageSize = 20.0;
 
-#define GROUP_IMAGE_SIZE_REG 10.0
-#define GROUP_IMAGE_SIZE_MIN 6.0
-#define GROUP_PADDING_REG 22.0
-#define GROUP_PADDING_MIN 14.0
+static CGFloat const kGroupImageSizeRegular = 10.0;
+static CGFloat const kGroupImageSizeMin = 6.0;
+static CGFloat const kGroupPaddingRegular = 22.0;
+static CGFloat const kGroupPaddingMin = 14.0;
 
-#define NORMAL_BUTTON_WIDTH 14.0
-#define ACTION_BUTTON_WIDTH 16.0
+static CGFloat const kNormalButtonWidth = 14.0;
+static CGFloat const kActionButtonWidth = 16.0;
 
-#define PRIORITY_ICON_WIDTH 12.0
-#define PRIORITY_ICON_HEIGHT 12.0
+static CGFloat const kPriorityIconSize = 12.0;
 
 //ends up being larger than font height
-#define HEIGHT_TITLE 16.0
-#define HEIGHT_STATUS 12.0
+static CGFloat const kHeightTitle = 16.0;
+static CGFloat const kHeightStatus = 12.0;
 
-#define PADDING_HORIZONTAL 5.0
-#define PADDING_BETWEEN_BUTTONS 3.0
-#define PADDING_BETWEEN_IMAGE_AND_TITLE (PADDING_HORIZONTAL + 1.0)
-#define PADDING_BETWEEN_IMAGE_AND_BAR PADDING_HORIZONTAL
-#define PADDING_BETWEEN_TITLE_AND_PRIORITY 6.0
-#define PADDING_ABOVE_TITLE 4.0
-#define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 3.0
-#define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
-#define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
-#define PADDING_BETWEEN_BAR_AND_STATUS 2.0
-#define PADDING_BETWEEN_BAR_AND_EDGE_MIN 3.0
-#define PADDING_EXPANSION_FRAME 2.0
+static CGFloat const kPaddingHorizontal = 5.0;
+static CGFloat const kPaddingBetweenButtons = 3.0;
+static CGFloat const kPaddingBetweenImageAndTitle = kPaddingHorizontal + 1.0;
+static CGFloat const kPaddingBetweenImageAndBar = kPaddingHorizontal;
+static CGFloat const kPaddingBetweenTitleAndPriority = 6.0;
+static CGFloat const kPaddingAboveTitle = 4.0;
+static CGFloat const kPaddingBetweenTitleAndMinStatus = 3.0;
+static CGFloat const kPaddingBetweenTitleAndProgress = 1.0;
+static CGFloat const kPaddingBetweenProgressAndBar = 2.0;
+static CGFloat const kPaddingBetweenBarAndStatus = 2.0;
+static CGFloat const kPaddingBetweenBarAndEdgeMin = 3.0;
+static CGFloat const kPaddingExpansionFrame = 2.0;
 
-#define PIECES_TOTAL_PERCENT 0.6
+static CGFloat const kPiecesTotalPercent = 0.6;
 
-#define MAX_PIECES (18 * 18)
+static NSInteger const kMaxPieces = 18 * 18;
 
 @interface TorrentCell ()
 
@@ -127,10 +126,10 @@
 - (NSRect)iconRectForBounds:(NSRect)bounds
 {
     BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
-    CGFloat const imageSize = minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
-    CGFloat const padding = minimal ? GROUP_PADDING_MIN : GROUP_PADDING_REG;
+    CGFloat const imageSize = minimal ? kImageSizeMin : kImageSizeRegular;
+    CGFloat const padding = minimal ? kGroupPaddingMin : kGroupPaddingRegular;
 
-    return NSMakeRect(NSMinX(bounds) + (padding * 0.5) + PADDING_HORIZONTAL, ceil(NSMidY(bounds) - imageSize * 0.5), imageSize, imageSize);
+    return NSMakeRect(NSMinX(bounds) + (padding * 0.5) + kPaddingHorizontal, ceil(NSMidY(bounds) - imageSize * 0.5), imageSize, imageSize);
 }
 
 - (NSRect)actionRectForBounds:(NSRect)bounds
@@ -337,7 +336,7 @@
     if (error && !minimal)
     {
         NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
-        NSRect const errorRect = NSMakeRect(NSMaxX(iconRect) - ERROR_IMAGE_SIZE, NSMaxY(iconRect) - ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
+        NSRect const errorRect = NSMakeRect(NSMaxX(iconRect) - kErrorImageSize, NSMaxY(iconRect) - kErrorImageSize, kErrorImageSize, kErrorImageSize);
         [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
                 respectFlipped:YES
                          hints:nil];
@@ -473,10 +472,10 @@
     if (torrent.priority != TR_PRI_NORMAL)
     {
         NSRect const priorityRect = NSMakeRect(
-            NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
-            NSMidY(titleRect) - PRIORITY_ICON_HEIGHT * 0.5,
-            PRIORITY_ICON_WIDTH,
-            PRIORITY_ICON_HEIGHT);
+            NSMaxX(titleRect) + kPaddingBetweenTitleAndPriority,
+            NSMidY(titleRect) - kPriorityIconSize * 0.5,
+            kPriorityIconSize,
+            kPriorityIconSize);
 
         NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor : NSColor.labelColor;
 
@@ -528,7 +527,7 @@
         NSMouseInRect([view convertPoint:view.window.mouseLocationOutsideOfEventStream fromView:nil], realRect, view.flipped))
     {
         realRect.size.width = [titleString size].width;
-        return NSInsetRect(realRect, -PADDING_EXPANSION_FRAME, -PADDING_EXPANSION_FRAME);
+        return NSInsetRect(realRect, -kPaddingExpansionFrame, -kPaddingExpansionFrame);
     }
 
     return NSZeroRect;
@@ -536,8 +535,8 @@
 
 - (void)drawWithExpansionFrame:(NSRect)cellFrame inView:(NSView*)view
 {
-    cellFrame.origin.x += PADDING_EXPANSION_FRAME;
-    cellFrame.origin.y += PADDING_EXPANSION_FRAME;
+    cellFrame.origin.x += kPaddingExpansionFrame;
+    cellFrame.origin.y += kPaddingExpansionFrame;
 
     self.fTitleAttributes[NSForegroundColorAttributeName] = NSColor.labelColor;
     NSAttributedString* titleString = self.attributedTitle;
@@ -554,7 +553,7 @@
     if (piecesBarPercent > 0.0)
     {
         NSRect piecesBarRect, regularBarRect;
-        NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floor(NSHeight(barRect) * PIECES_TOTAL_PERCENT * piecesBarPercent), NSMaxYEdge);
+        NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floor(NSHeight(barRect) * kPiecesTotalPercent * piecesBarPercent), NSMaxYEdge);
 
         [self drawRegularBar:regularBarRect];
         [self drawPiecesBar:piecesBarRect];
@@ -665,7 +664,7 @@
         return;
     }
 
-    NSInteger pieceCount = MIN(torrent.pieceCount, MAX_PIECES);
+    NSInteger pieceCount = MIN(torrent.pieceCount, kMaxPieces);
     float* piecesPercent = static_cast<float*>(malloc(pieceCount * sizeof(float)));
     [torrent getAmountFinished:piecesPercent size:pieceCount];
 
@@ -720,7 +719,7 @@
     NSRect result;
     result.size = [string size];
 
-    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NSWidth(result));
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + NSWidth(result));
     result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
 
     return result;
@@ -732,25 +731,25 @@
                          minimal:(BOOL)minimal
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
-    result.size.height = HEIGHT_TITLE;
+    result.origin.x = NSMinX(bounds) + kPaddingHorizontal + (minimal ? kImageSizeMin : kImageSizeRegular) + kPaddingBetweenImageAndTitle;
+    result.size.height = kHeightTitle;
 
     if (minimal)
     {
-        result.origin.x += GROUP_PADDING_MIN;
+        result.origin.x += kGroupPaddingMin;
         result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
-        result.size.width = rightBound - NSMinX(result) - PADDING_BETWEEN_TITLE_AND_MIN_STATUS;
+        result.size.width = rightBound - NSMinX(result) - kPaddingBetweenTitleAndMinStatus;
     }
     else
     {
-        result.origin.x += GROUP_PADDING_REG;
-        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
-        result.size.width = rightBound - NSMinX(result) - PADDING_HORIZONTAL;
+        result.origin.x += kGroupPaddingRegular;
+        result.origin.y = NSMinY(bounds) + kPaddingAboveTitle;
+        result.size.width = rightBound - NSMinX(result) - kPaddingHorizontal;
     }
 
     if (((Torrent*)self.representedObject).priority != TR_PRI_NORMAL)
     {
-        result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
+        result.size.width -= kPriorityIconSize + kPaddingBetweenTitleAndPriority;
     }
     result.size.width = MIN(NSWidth(result), [string size].width);
 
@@ -760,11 +759,11 @@
 - (NSRect)rectForProgressWithStringInBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + GROUP_PADDING_REG + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle + kPaddingBetweenTitleAndProgress;
+    result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kGroupPaddingRegular + kImageSizeRegular + kPaddingBetweenImageAndTitle;
 
-    result.size.height = HEIGHT_STATUS;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    result.size.height = kHeightStatus;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal;
 
     return result;
 }
@@ -772,12 +771,12 @@
 - (NSRect)rectForStatusWithStringInBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS +
-        PADDING_BETWEEN_PROGRESS_AND_BAR + BAR_HEIGHT + PADDING_BETWEEN_BAR_AND_STATUS;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + GROUP_PADDING_REG + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle + kPaddingBetweenTitleAndProgress + kHeightStatus +
+        kPaddingBetweenProgressAndBar + kBarHeight + kPaddingBetweenBarAndStatus;
+    result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kGroupPaddingRegular + kImageSizeRegular + kPaddingBetweenImageAndTitle;
 
-    result.size.height = HEIGHT_STATUS;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    result.size.height = kHeightStatus;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal;
 
     return result;
 }
@@ -785,12 +784,12 @@
 - (NSRect)barRectRegForBounds:(NSRect)bounds
 {
     NSRect result;
-    result.size.height = BAR_HEIGHT;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + GROUP_PADDING_REG + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_BAR;
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS +
-        PADDING_BETWEEN_PROGRESS_AND_BAR;
+    result.size.height = kBarHeight;
+    result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kGroupPaddingRegular + kImageSizeRegular + kPaddingBetweenImageAndBar;
+    result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle + kPaddingBetweenTitleAndProgress + kHeightStatus +
+        kPaddingBetweenProgressAndBar;
 
-    result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL - 2.0 * (PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH));
+    result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal - 2.0 * (kPaddingBetweenButtons + kNormalButtonWidth));
 
     return result;
 }
@@ -798,10 +797,10 @@
 - (NSRect)barRectMinForBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_MIN + GROUP_PADDING_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
-    result.origin.y = NSMinY(bounds) + PADDING_BETWEEN_BAR_AND_EDGE_MIN;
-    result.size.height = NSHeight(bounds) - 2.0 * PADDING_BETWEEN_BAR_AND_EDGE_MIN;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_BETWEEN_BAR_AND_EDGE_MIN;
+    result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kImageSizeMin + kGroupPaddingMin + kPaddingBetweenImageAndBar;
+    result.origin.y = NSMinY(bounds) + kPaddingBetweenBarAndEdgeMin;
+    result.size.height = NSHeight(bounds) - 2.0 * kPaddingBetweenBarAndEdgeMin;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingBetweenBarAndEdgeMin;
 
     return result;
 }
@@ -809,14 +808,14 @@
 - (NSRect)controlButtonRectForBounds:(NSRect)bounds
 {
     NSRect result;
-    result.size.height = NORMAL_BUTTON_WIDTH;
-    result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH + PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH);
+    result.size.height = kNormalButtonWidth;
+    result.size.width = kNormalButtonWidth;
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth + kPaddingBetweenButtons + kNormalButtonWidth);
 
     if (![self.fDefaults boolForKey:@"SmallView"])
     {
-        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5 +
-            PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+        result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle - (kNormalButtonWidth - kBarHeight) * 0.5 +
+            kPaddingBetweenTitleAndProgress + kHeightStatus + kPaddingBetweenProgressAndBar;
     }
     else
     {
@@ -829,14 +828,14 @@
 - (NSRect)revealButtonRectForBounds:(NSRect)bounds
 {
     NSRect result;
-    result.size.height = NORMAL_BUTTON_WIDTH;
-    result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    result.size.height = kNormalButtonWidth;
+    result.size.width = kNormalButtonWidth;
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth);
 
     if (![self.fDefaults boolForKey:@"SmallView"])
     {
-        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5 +
-            PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+        result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle - (kNormalButtonWidth - kBarHeight) * 0.5 +
+            kPaddingBetweenTitleAndProgress + kHeightStatus + kPaddingBetweenProgressAndBar;
     }
     else
     {
@@ -848,14 +847,14 @@
 
 - (NSRect)actionButtonRectForBounds:(NSRect)bounds
 {
-    return NSMakeRect(NSMidX(bounds) - ACTION_BUTTON_WIDTH * 0.5, NSMidY(bounds) - ACTION_BUTTON_WIDTH * 0.5, ACTION_BUTTON_WIDTH, ACTION_BUTTON_WIDTH);
+    return NSMakeRect(NSMidX(bounds) - kActionButtonWidth * 0.5, NSMidY(bounds) - kActionButtonWidth * 0.5, kActionButtonWidth, kActionButtonWidth);
 }
 
 - (NSRect)groupIconRectForBounds:(NSRect)bounds
 {
     BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
-    CGFloat const imageSize = minimal ? GROUP_IMAGE_SIZE_MIN : GROUP_IMAGE_SIZE_REG;
-    CGFloat const padding = minimal ? GROUP_PADDING_MIN + 2 : GROUP_PADDING_REG + 1.5;
+    CGFloat const imageSize = minimal ? kGroupImageSizeMin : kGroupImageSizeRegular;
+    CGFloat const padding = minimal ? kGroupPaddingMin + 2 : kGroupPaddingRegular + 1.5;
 
     return NSMakeRect(NSMinX(bounds) - padding * 0.5, NSMidY(bounds) - imageSize * 0.5, imageSize, imageSize);
 }

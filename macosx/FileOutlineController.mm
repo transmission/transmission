@@ -11,7 +11,7 @@
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 
-#define ROW_SMALL_HEIGHT 18.0
+static CGFloat const kRowSmallHeight = 18.0;
 
 typedef NS_ENUM(unsigned int, fileCheckMenuTag) { //
     FILE_CHECK_TAG,
@@ -346,7 +346,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     if (((FileListNode*)item).isFolder)
     {
-        return ROW_SMALL_HEIGHT;
+        return kRowSmallHeight;
     }
     else
     {

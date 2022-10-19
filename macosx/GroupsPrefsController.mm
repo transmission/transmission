@@ -7,10 +7,12 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 
-#define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
+static NSString* const kGroupTableViewDataType = @"GroupTableViewDataType";
 
-#define ADD_TAG 0
-#define REMOVE_TAG 1
+typedef NS_ENUM(NSInteger, SegmentTag) {
+    SegmentTagAdd = 0,
+    SegmentTagRemove = 1,
+};
 
 @interface GroupsPrefsController ()
 
@@ -38,7 +40,7 @@
 
 - (void)awakeFromNib
 {
-    [self.fTableView registerForDraggedTypes:@[ GROUP_TABLE_VIEW_DATA_TYPE ]];
+    [self.fTableView registerForDraggedTypes:@[ kGroupTableViewDataType ]];
 
     [self.fSelectedColorView addObserver:self forKeyPath:@"color" options:0 context:NULL];
 
@@ -93,8 +95,8 @@
 
 - (BOOL)tableView:(NSTableView*)tableView writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard
 {
-    [pboard declareTypes:@[ GROUP_TABLE_VIEW_DATA_TYPE ] owner:self];
-    [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes] forType:GROUP_TABLE_VIEW_DATA_TYPE];
+    [pboard declareTypes:@[ kGroupTableViewDataType ] owner:self];
+    [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes] forType:kGroupTableViewDataType];
     return YES;
 }
 
@@ -104,7 +106,7 @@
        proposedDropOperation:(NSTableViewDropOperation)operation
 {
     NSPasteboard* pasteboard = info.draggingPasteboard;
-    if ([pasteboard.types containsObject:GROUP_TABLE_VIEW_DATA_TYPE])
+    if ([pasteboard.types containsObject:kGroupTableViewDataType])
     {
         [self.fTableView setDropRow:row dropOperation:NSTableViewDropAbove];
         return NSDragOperationGeneric;
@@ -119,9 +121,9 @@
     dropOperation:(NSTableViewDropOperation)operation
 {
     NSPasteboard* pasteboard = info.draggingPasteboard;
-    if ([pasteboard.types containsObject:GROUP_TABLE_VIEW_DATA_TYPE])
+    if ([pasteboard.types containsObject:kGroupTableViewDataType])
     {
-        NSIndexSet* indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:GROUP_TABLE_VIEW_DATA_TYPE]
+        NSIndexSet* indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:kGroupTableViewDataType]
                                                                    error:nil];
         NSInteger oldRow = indexes.firstIndex;
 
@@ -152,7 +154,7 @@
 
     switch ([[sender cell] tagForSegment:[sender selectedSegment]])
     {
-    case ADD_TAG:
+    case SegmentTagAdd:
         [self.fTableView beginUpdates];
 
         [GroupsController.groups addNewGroup];
@@ -169,7 +171,7 @@
 
         break;
 
-    case REMOVE_TAG:
+    case SegmentTagRemove:
         row = self.fTableView.selectedRow;
 
         [self.fTableView beginUpdates];
@@ -338,7 +340,7 @@
 
 - (void)updateSelectedGroup
 {
-    [self.fAddRemoveControl setEnabled:self.fTableView.numberOfSelectedRows > 0 forSegment:REMOVE_TAG];
+    [self.fAddRemoveControl setEnabled:self.fTableView.numberOfSelectedRows > 0 forSegment:SegmentTagRemove];
     if (self.fTableView.numberOfSelectedRows == 1)
     {
         NSInteger const index = [GroupsController.groups indexForRow:self.fTableView.selectedRow];

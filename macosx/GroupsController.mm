@@ -6,9 +6,9 @@
 #import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
 
-#define ICON_WIDTH 16.0
-#define BORDER_WIDTH 1.25
-#define ICON_WIDTH_SMALL 12.0
+static CGFloat const kIconWidth = 16.0;
+static CGFloat const kBorderWidth = 1.25;
+static CGFloat const kIconWidthSmall = 12.0;
 
 @interface GroupsController ()
 
@@ -298,7 +298,7 @@ GroupsController* fGroupsInstance = nil;
     if (small)
     {
         icon = [icon copy];
-        icon.size = NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL);
+        icon.size = NSMakeSize(kIconWidthSmall, kIconWidthSmall);
 
         item.image = icon;
     }
@@ -320,7 +320,7 @@ GroupsController* fGroupsInstance = nil;
         if (small)
         {
             icon = [icon copy];
-            icon.size = NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL);
+            icon.size = NSMakeSize(kIconWidthSmall, kIconWidthSmall);
 
             item.image = icon;
         }
@@ -372,11 +372,11 @@ GroupsController* fGroupsInstance = nil;
         return icon;
     }
 
-    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+    icon = [NSImage imageWithSize:NSMakeSize(kIconWidth, kIconWidth) flipped:NO drawingHandler:^BOOL(NSRect rect) {
         //shape
-        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
+        rect = NSInsetRect(rect, kBorderWidth / 2, kBorderWidth / 2);
         NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
-        bp.lineWidth = BORDER_WIDTH;
+        bp.lineWidth = kBorderWidth;
 
         //border
         // code reference for dashed style
