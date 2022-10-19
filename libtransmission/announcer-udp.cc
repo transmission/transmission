@@ -363,7 +363,7 @@ struct tau_tracker
 
     [[nodiscard]] auto isIdle() const
     {
-        return std::empty(announces) && std::empty(scrapes) && dns_request_;
+        return std::empty(announces) && std::empty(scrapes) && (dns_request_ != 0U);
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -432,7 +432,7 @@ static void tau_tracker_on_dns(tau_tracker* const tracker, sockaddr const* sa, s
         auto const errmsg = fmt::format(_("Couldn't find address of tracker '{host}'"), fmt::arg("host", tracker->host));
         logwarn(tracker->key, errmsg);
         tracker->failAll(false, false, errmsg.c_str());
-        tracker->addr_expires_at_ = tr_time() + tracker->DnsRetryIntervalSecs;
+        tracker->addr_expires_at_ = tr_time() + tau_tracker::DnsRetryIntervalSecs;
     }
     else
     {
@@ -597,7 +597,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
     }
 
     /* if we don't have an address yet, try & get one now. */
-    if (!closing && !tracker->addr_ && !tracker->dns_request_)
+    if (!closing && !tracker->addr_ && (tracker->dns_request_ == 0U))
     {
         auto hints = libtransmission::Dns::Hints{};
         hints.ai_family = AF_UNSPEC;
@@ -666,8 +666,6 @@ public:
     {
     }
 
-    ~tr_announcer_udp_impl() = default;
-
     void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) override
     {
         auto* const tracker = getTrackerFromUrl(request.announce_url);
@@ -718,7 +716,7 @@ public:
         for (auto& tracker : trackers_)
         {
             // if there's a pending DNS request, cancel it
-            if (tracker.dns_request_)
+            if (tracker.dns_request_ != 0U)
             {
                 mediator_.dns().cancel(tracker.dns_request_);
             }

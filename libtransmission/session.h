@@ -148,7 +148,7 @@ private:
         {
         }
 
-        ~AnnouncerUdpMediator() noexcept = default;
+        ~AnnouncerUdpMediator() noexcept override = default;
 
         void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) override
         {

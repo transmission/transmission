@@ -27,7 +27,7 @@ protected:
     class MockDns final : public libtransmission::Dns
     {
     public:
-        ~MockDns() = default;
+        ~MockDns() override = default;
 
         [[nodiscard]] std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(
             std::string_view /*address*/,
@@ -91,12 +91,12 @@ protected:
             Sent(char const* buf, size_t buflen, sockaddr const* sa, socklen_t salen)
                 : sslen_{ salen }
             {
-                buf_.add(buf, buflen);
+                buf_.insert(std::end(buf_), buf, buf + buflen);
                 std::memcpy(&ss_, sa, salen);
             }
 
-            libtransmission::Buffer buf_;
-            sockaddr_storage ss_;
+            std::vector<char> buf_;
+            sockaddr_storage ss_ = {};
             socklen_t sslen_ = {};
         };
 
@@ -109,7 +109,7 @@ protected:
         // libtransmission::EvDns dns_;
     };
 
-    void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)
+    static void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)
     {
         EXPECT_EQ(expected.did_connect, actual.did_connect);
         EXPECT_EQ(expected.did_timeout, actual.did_timeout);
@@ -128,7 +128,7 @@ protected:
         }
     }
 
-    void expectEqual(tr_scrape_request const& expected, std::vector<tr_sha1_digest_t> const& actual)
+    static void expectEqual(tr_scrape_request const& expected, std::vector<tr_sha1_digest_t> const& actual)
     {
         EXPECT_EQ(expected.info_hash_count, std::size(actual));
         for (size_t i = 0; i < std::min(size_t(expected.info_hash_count), std::size(actual)); ++i)
@@ -144,14 +144,14 @@ protected:
         return connection_id;
     }
 
-    [[nodiscard]] uint32_t parseConnectionRequest(libtransmission::Buffer& buf)
+    [[nodiscard]] static uint32_t parseConnectionRequest(libtransmission::Buffer& buf)
     {
         EXPECT_EQ(ProtocolId, buf.toUint64());
         EXPECT_EQ(ConnectAction, buf.toUint32());
         return buf.toUint32();
     }
 
-    [[nodiscard]] auto buildScrapeRequestFromResponse(tr_scrape_response const& response)
+    [[nodiscard]] static auto buildScrapeRequestFromResponse(tr_scrape_response const& response)
     {
         auto request = tr_scrape_request{};
         request.scrape_url = response.scrape_url;
@@ -163,7 +163,7 @@ protected:
         return request;
     }
 
-    [[nodiscard]] auto parseScrapeRequest(libtransmission::Buffer& buf, uint64_t expected_connection_id)
+    [[nodiscard]] static auto parseScrapeRequest(libtransmission::Buffer& buf, uint64_t expected_connection_id)
     {
         EXPECT_EQ(expected_connection_id, buf.toUint64());
         EXPECT_EQ(ScrapeAction, buf.toUint32());
@@ -176,6 +176,15 @@ protected:
             info_hashes.emplace_back(tmp);
         }
         return std::make_pair(transaction_id, info_hashes);
+    }
+
+    [[nodiscard]] static auto waitForAnnouncerToSendMessage(MockMediator& mediator)
+    {
+        EXPECT_FALSE(std::empty(mediator.sent_));
+        libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
+        auto buf = libtransmission::Buffer(mediator.sent_.back().buf_);
+        mediator.sent_.pop_back();
+        return buf;
     }
 
     // https://www.bittorrent.org/beps/bep_0015.html
@@ -233,9 +242,8 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
     // announcer should be attempting to send a connect request.
     // inspect it for validity.
-    libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto connect_transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
-    mediator.sent_.pop_front();
+    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto connect_transaction_id = parseConnectionRequest(sent);
 
     auto const connection_id = createConnectionId();
 
@@ -251,8 +259,8 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
     // announcer should now send a scrape request.
     // inspect it for validity.
-    libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(mediator.sent_.front().buf_, connection_id);
+    sent = waitForAnnouncerToSendMessage(mediator);
+    auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
     expectEqual(request, info_hashes);
 
     // send a scrape response
@@ -312,9 +320,8 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 
     // announcer should be attempting to send a connect request.
     // inspect it for validity.
-    libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
-    mediator.sent_.pop_front();
+    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto transaction_id = parseConnectionRequest(sent);
 
     auto const connection_id = createConnectionId();
 
@@ -331,13 +338,12 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 
     // announcer should now send a scrape request.
     // inspect it for validity.
-    libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto* sent = &mediator.sent_.front();
-    EXPECT_EQ(connection_id, sent->buf_.toUint64());
-    EXPECT_EQ(ScrapeAction, sent->buf_.toUint32());
-    transaction_id = sent->buf_.toUint32();
+    sent = waitForAnnouncerToSendMessage(mediator);
+    EXPECT_EQ(connection_id, sent.toUint64());
+    EXPECT_EQ(ScrapeAction, sent.toUint32());
+    transaction_id = sent.toUint32();
     auto tmp_hash = tr_sha1_digest_t{};
-    sent->buf_.toBuf(std::data(tmp_hash), std::size(tmp_hash));
+    sent.toBuf(std::data(tmp_hash), std::size(tmp_hash));
     EXPECT_EQ(request.info_hash[0], tmp_hash);
 
     // send a scrape response
@@ -395,9 +401,8 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
 
     // announcer should be attempting to send a connect request.
     // inspect it for validity.
-    libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-    auto transaction_id = parseConnectionRequest(mediator.sent_.front().buf_);
-    mediator.sent_.pop_front();
+    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto transaction_id = parseConnectionRequest(sent);
 
     // send a connection response
     auto buf = libtransmission::Buffer{};

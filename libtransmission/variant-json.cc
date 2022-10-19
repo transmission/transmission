@@ -412,7 +412,7 @@ struct ParentState
 
 struct JsonWalk
 {
-    JsonWalk(bool do_indent)
+    explicit JsonWalk(bool do_indent)
         : doIndent{ do_indent }
     {
     }
