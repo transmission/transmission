@@ -838,48 +838,6 @@ void tr_peerIo::writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data
 ****
 ***/
 
-void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme)
-{
-    evbuffer_add(outbuf, &addme, 1);
-}
-
-void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t addme_hs)
-{
-    uint16_t const ns = htons(addme_hs);
-    evbuffer_add(outbuf, &ns, sizeof(ns));
-}
-
-void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t addme_hl)
-{
-    uint32_t const nl = htonl(addme_hl);
-    evbuffer_add(outbuf, &nl, sizeof(nl));
-}
-
-void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t addme_hll)
-{
-    uint64_t const nll = tr_htonll(addme_hll);
-    evbuffer_add(outbuf, &nll, sizeof(nll));
-}
-
-void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
-{
-    evbuffer_add_uint16(buf, val);
-}
-
-void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
-{
-    evbuffer_add_uint32(buf, val);
-}
-
-void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
-{
-    evbuffer_add_uint64(buf, val);
-}
-
-/***
-****
-***/
-
 void tr_peerIo::readBytes(void* bytes, size_t byte_count)
 {
     TR_ASSERT(readBufferSize() >= byte_count);
