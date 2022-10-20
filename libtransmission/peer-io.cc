@@ -11,7 +11,6 @@
 #include <string>
 
 #include <event2/event.h>
-#include <event2/buffer.h>
 #include <event2/bufferevent.h>
 
 #include <libutp/utp.h>
@@ -244,11 +243,6 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     tr_error_clear(&error);
 }
 
-static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
-{
-    return io->outbuf.toSocket(fd, howmuch);
-}
-
 static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
     auto* io = static_cast<tr_peerIo*>(vio);
@@ -273,7 +267,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
 
     EVUTIL_SET_SOCKET_ERROR(0);
-    auto const n_written = tr_evbuffer_write(io, fd, howmuch); // -1 on err, 0 on EOF
+    auto const n_written = io->outbuf.toSocket(fd, howmuch); // -1 on err, 0 on EOF
     auto const err = EVUTIL_SOCKET_ERROR();
     auto const should_retry = n_written == -1 && (err == 0 || err == EAGAIN || err == EINTR || err == EINPROGRESS);
 
@@ -978,7 +972,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     case TR_PEER_SOCKET_TYPE_TCP:
         {
             EVUTIL_SET_SOCKET_ERROR(0);
-            n = tr_evbuffer_write(io, io->socket.handle.tcp, howmuch);
+            n = io->outbuf.toSocket(io->socket.handle.tcp, howmuch);
             int const e = EVUTIL_SOCKET_ERROR();
 
             if (n > 0)
