@@ -394,6 +394,30 @@ TEST_F(AnnouncerUdpTest, canScrape)
     expectEqual(request, info_hashes);
 }
 
+TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
+{
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+
+    // tell announcer to scrape
+    auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
+    auto response = std::optional<tr_scrape_response>{};
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
+
+    // The announcer should have sent a UDP connection request.
+    // Inspect that request for validity.
+    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto const connect_transaction_id = parseConnectionRequest(sent);
+    EXPECT_NE(0, connect_transaction_id);
+
+    // now just end the test before responding to the request.
+    // the announcer and mediator will go out-of-scope & be destroyed.
+}
+
 TEST_F(AnnouncerUdpTest, canMultiScrape)
 {
     auto mediator = MockMediator{};
