@@ -1106,7 +1106,7 @@ public:
     tr_bandwidth top_bandwidth_;
 
 private:
-    // relies on: dns_, udp_core_
+    // depends-on: dns_, udp_core_
     AnnouncerUdpMediator announcer_udp_mediator_{ *this };
 
 public:

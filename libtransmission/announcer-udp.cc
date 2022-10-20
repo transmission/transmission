@@ -58,7 +58,7 @@ enum tau_action_t
     TAU_ACTION_ERROR = 3
 };
 
-static constexpr bool is_tau_response_message(uint32_t action, size_t msglen)
+static bool is_tau_response_message(tau_action_t action, size_t msglen)
 {
     if (action == TAU_ACTION_CONNECT)
     {
