@@ -13,9 +13,10 @@
 #include "transmission.h"
 
 #include "announcer.h"
-#include "tr-buffer.h"
-#include "dns.h"
 #include "crypto-utils.h"
+#include "dns.h"
+#include "peer-mgr.h" // for tr_pex
+#include "tr-buffer.h"
 
 #include "test-fixtures.h"
 
@@ -242,10 +243,83 @@ protected:
         return connection_id;
     }
 
+    struct UdpAnnounceReq
+    {
+        uint64_t connection_id = 0;
+        uint32_t action = 0; // 1: announce
+        uint32_t transaction_id = 0;
+        tr_sha1_digest_t info_hash = {};
+        tr_peer_id_t peer_id = {};
+        uint64_t downloaded = 0;
+        uint64_t left = 0;
+        uint64_t uploaded = 0;
+        uint32_t event = 0; // 0: none; 1: completed; 2: started; 3: stopped
+        uint32_t ip_address = 0;
+        uint32_t key;
+        uint32_t num_want = -1; // default
+        uint16_t port;
+    };
+
+    static void expectEqual(tr_announce_request const& expected, UdpAnnounceReq const& actual)
+    {
+        EXPECT_EQ(AnnounceAction, actual.action);
+        EXPECT_EQ(expected.info_hash, actual.info_hash);
+        EXPECT_EQ(expected.peer_id, actual.peer_id);
+        EXPECT_EQ(expected.down, actual.downloaded);
+        EXPECT_EQ(expected.leftUntilComplete, actual.left);
+        EXPECT_EQ(expected.up, actual.uploaded);
+        // EXPECT_EQ(foo, actual.event); ; // 0: none; 1: completed; 2: started; 3: stopped // FIXME
+        // EXPECT_EQ(foo, actual.ip_address); // FIXME
+        EXPECT_EQ(expected.key, actual.key);
+        EXPECT_EQ(expected.numwant, actual.num_want);
+        EXPECT_EQ(expected.port.host(), actual.port);
+    }
+
+    static void expectEqual(tr_announce_response const& expected, tr_announce_response const& actual)
+    {
+        EXPECT_EQ(actual.info_hash, expected.info_hash);
+        EXPECT_EQ(actual.did_connect, expected.did_connect);
+        EXPECT_EQ(actual.did_timeout, expected.did_timeout);
+        EXPECT_EQ(actual.interval, expected.interval);
+        EXPECT_EQ(actual.min_interval, expected.min_interval);
+        EXPECT_EQ(actual.seeders, expected.seeders);
+        EXPECT_EQ(actual.leechers, expected.leechers);
+        EXPECT_EQ(actual.downloads, expected.downloads);
+        EXPECT_EQ(actual.pex, expected.pex);
+        EXPECT_EQ(actual.pex6, expected.pex6);
+        EXPECT_EQ(actual.errmsg, expected.errmsg);
+        EXPECT_EQ(actual.warning, expected.warning);
+        EXPECT_EQ(actual.tracker_id, expected.tracker_id);
+        EXPECT_EQ(actual.external_ip, expected.external_ip);
+    }
+
+    [[nodiscard]] static auto parseAnnounceRequest(libtransmission::Buffer& buf, uint64_t connection_id)
+    {
+        auto req = UdpAnnounceReq{};
+        req.connection_id = buf.toUint64();
+        req.action = buf.toUint32();
+        req.transaction_id = buf.toUint32();
+        buf.toBuf(std::data(req.info_hash), std::size(req.info_hash));
+        buf.toBuf(std::data(req.peer_id), std::size(req.peer_id));
+        req.downloaded = buf.toUint64();
+        req.left = buf.toUint64();
+        req.uploaded = buf.toUint64();
+        req.event = buf.toUint32();
+        req.ip_address = buf.toUint32();
+        req.key = buf.toUint32();
+        req.num_want = buf.toUint32();
+        req.port = buf.toUint16();
+
+        EXPECT_EQ(AnnounceAction, req.action);
+        EXPECT_EQ(connection_id, req.connection_id);
+
+        return req;
+    }
+
     // https://www.bittorrent.org/beps/bep_0015.html
     static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
     static auto constexpr ConnectAction = uint32_t{ 0 };
-    // static auto constexpr AnnounceAction = uint32_t{ 1 };
+    static auto constexpr AnnounceAction = uint32_t{ 1 };
     static auto constexpr ScrapeAction = uint32_t{ 2 };
     static auto constexpr ErrorAction = uint32_t{ 3 };
 
@@ -518,155 +592,93 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
 
 TEST_F(AnnouncerUdpTest, canAnnounce)
 {
+    static auto constexpr Interval = uint32_t{ 3600 };
+    static auto constexpr Leechers = uint32_t{ 10 };
+    static auto constexpr Seeders = uint32_t{ 20 };
+    auto const addresses = std::array<std::pair<tr_address, tr_port>, 3>{
+        std::make_pair(tr_address::fromString("10.10.10.5").value_or(tr_address{}), tr_port::fromHost(128)),
+        std::make_pair(tr_address::fromString("192.168.1.2").value_or(tr_address{}), tr_port::fromHost(2021)),
+        std::make_pair(tr_address::fromString("192.168.1.3").value_or(tr_address{}), tr_port::fromHost(2022)),
+    };
 
-#if 0
-Offset  Size    Name    Value
-0       64-bit integer  connection_id
-8       32-bit integer  action          1 // announce
-12      32-bit integer  transaction_id
-16      20-byte string  info_hash
-36      20-byte string  peer_id
-56      64-bit integer  downloaded
-64      64-bit integer  left
-72      64-bit integer  uploaded
-80      32-bit integer  event           0 // 0: none; 1: completed; 2: started; 3: stopped
-84      32-bit integer  IP address      0 // default
-88      32-bit integer  key
-92      32-bit integer  num_want        -1 // default
-96      16-bit integer  port
-98
-#endif
+    auto request = tr_announce_request{};
+    request.event = TR_ANNOUNCE_EVENT_STARTED;
+    request.port = tr_port::fromHost(80);
+    request.key = 0xCAFE;
+    request.numwant = 20;
+    request.up = 1;
+    request.down = 2;
+    request.corrupt = 3;
+    request.leftUntilComplete = 100;
+    request.announce_url = "https://127.0.0.1/announce";
+    request.tracker_id = "fnord";
+    request.peer_id = tr_peerIdInit();
+    request.info_hash = randomFilled<tr_sha1_digest_t>();
+
+    auto expected_response = tr_announce_response{};
+    expected_response.info_hash = request.info_hash;
+    expected_response.did_connect = true;
+    expected_response.did_timeout = false;
+    expected_response.interval = Interval;
+    expected_response.min_interval = 0; // not specified in UDP announce
+    expected_response.seeders = Seeders;
+    expected_response.leechers = Leechers;
+    expected_response.downloads = -1; // not specified in UDP anounce
+    expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0].first, addresses[0].second },
+                                                 tr_pex{ addresses[1].first, addresses[1].second },
+                                                 tr_pex{ addresses[2].first, addresses[2].second } };
+    expected_response.pex6 = {};
+    expected_response.errmsg = {};
+    expected_response.warning = {};
+    expected_response.tracker_id = {}; // not specified in UDP announce
+    expected_response.external_ip = {};
+
+    // build the announcer
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+
+    auto response = std::optional<tr_announce_response>{};
+    announcer->announce(
+        request,
+        [](tr_announce_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_announce_response>*>(vresponse) = *resp; },
+        &response);
+
+    // Announcer will request a connection. Verify and grant the request
+    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto connect_transaction_id = parseConnectionRequest(sent);
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id);
+
+    // The announcer should have sent a UDP announce request.
+    // Inspect that request for validity.
+    sent = waitForAnnouncerToSendMessage(mediator);
+    auto udp_ann_req = parseAnnounceRequest(sent, connection_id);
+    expectEqual(request, udp_ann_req);
+
+    // Have the tracker respond to the request
+    auto buf = libtransmission::Buffer{};
+    buf.addUint32(AnnounceAction);
+    buf.addUint32(udp_ann_req.transaction_id);
+    buf.addUint32(expected_response.interval);
+    buf.addUint32(expected_response.leechers);
+    buf.addUint32(expected_response.seeders);
+    for (auto const& [addr, port] : addresses)
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
+        buf.add(&addr.addr.addr4.s_addr, sizeof(addr.addr.addr4.s_addr));
+        buf.addUint16(port.host());
+    }
+
+    auto response_size = std::size(buf);
+    auto arr = std::array<uint8_t, 512>{};
+    buf.toBuf(std::data(arr), response_size);
+    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+
+    // Confirm that announcer processed the response
+    EXPECT_TRUE(response);
+    expectEqual(expected_response, *response);
 }
 
 TEST_F(AnnouncerUdpTest, announceUsesIPAddress)
 {
 }
-
-#if 0
-class tr_announcer_udp
-{
-public:
-    class Mediator
-    {
-    public:
-        virtual ~Mediator() noexcept = default;
-        virtual void sendto(void const* buf, size_t buflen, struct sockaddr const* addr, size_t addrlen) = 0;
-        [[nodiscard]] virtual libtransmission::Dns& dns() = 0;
-        [[nodiscard]] virtual std::optional<tr_address> announceIP() const = 0;
-    };
-
-    virtual ~tr_announcer_udp() noexcept = default;
-
-    [[nodiscard]] static std::unique_ptr<tr_announcer_udp> create(Mediator&);
-
-    [[nodiscard]] virtual bool isIdle() const noexcept = 0;
-
-    virtual void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) = 0;
-
-    virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) = 0;
-
-    virtual void upkeep() = 0;
-
-    virtual void startShutdown() = 0;
-
-    // @brief process an incoming udp message if it's a tracker response.
-    // @return true if msg was a tracker response; false otherwise
-    virtual bool handleMessage(uint8_t const* msg, size_t msglen) = 0;
-};
-
-
-struct tr_announce_request
-{
-    tr_announce_event event = {};
-    bool partial_seed = false;
-
-    /* the port we listen for incoming peers on */
-    tr_port port;
-
-    /* per-session key */
-    int key = 0;
-
-    /* the number of peers we'd like to get back in the response */
-    int numwant = 0;
-
-    /* the number of bytes we uploaded since the last 'started' event */
-    uint64_t up = 0;
-
-    /* the number of good bytes we downloaded since the last 'started' event */
-    uint64_t down = 0;
-
-    /* the number of bad bytes we downloaded since the last 'started' event */
-    uint64_t corrupt = 0;
-
-    /* the total size of the torrent minus the number of bytes completed */
-    uint64_t leftUntilComplete = 0;
-
-    /* the tracker's announce URL */
-    tr_interned_string announce_url;
-
-    /* key generated by and returned from an http tracker.
-     * see tr_announce_response.tracker_id_str */
-    std::string tracker_id;
-
-    /* the torrent's peer id.
-     * this changes when a torrent is stopped -> restarted. */
-    tr_peer_id_t peer_id;
-
-    /* the torrent's info_hash */
-    tr_sha1_digest_t info_hash;
-
-    /* the name to use when deep logging is enabled */
-    char log_name[128];
-};
-
-struct tr_announce_response
-{
-    /* the torrent's info hash */
-    tr_sha1_digest_t info_hash = {};
-
-    /* whether or not we managed to connect to the tracker */
-    bool did_connect = false;
-
-    /* whether or not the scrape timed out */
-    bool did_timeout = false;
-
-    /* preferred interval between announces.
-     * transmission treats this as the interval for periodic announces */
-    int interval = 0;
-
-    /* minimum interval between announces. (optional)
-     * transmission treats this as the min interval for manual announces */
-    int min_interval = 0;
-
-    /* how many peers are seeding this torrent */
-    int seeders = -1;
-
-    /* how many peers are downloading this torrent */
-    int leechers = -1;
-
-    /* how many times this torrent has been downloaded */
-    int downloads = -1;
-
-    /* IPv4 peers that we acquired from the tracker */
-    std::vector<tr_pex> pex;
-
-    /* IPv6 peers that we acquired from the tracker */
-    std::vector<tr_pex> pex6;
-
-    /* human-readable error string on failure, or nullptr */
-    std::string errmsg;
-
-    /* human-readable warning string or nullptr */
-    std::string warning;
-
-    /* key generated by and returned from an http tracker.
-     * if this is provided, subsequent http announces must include this. */
-    std::string tracker_id;
-
-    /* tracker extension that returns the client's public IP address.
-     * https://www.bittorrent.org/beps/bep_0024.html */
-    std::optional<tr_address> external_ip;
-};
-
-using tr_announce_response_func = void (*)(tr_announce_response const* response, void* userdata);
-#endif
