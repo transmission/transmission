@@ -755,10 +755,10 @@ export class PrefsDialog extends EventTarget {
     };
 
     const elements = createTextualTabsContainer('prefs-dialog', [
-      ['prefs-tab-torrent', pages.torrents.root, "Torrents"],
-      ['prefs-tab-speed', pages.speed.root, "Speed"],
-      ['prefs-tab-peers', pages.peers.root, "Peers"],
-      ['prefs-tab-network', pages.network.root, "Network"],
+      ['prefs-tab-torrent', pages.torrents.root, 'Torrents'],
+      ['prefs-tab-speed', pages.speed.root, 'Speed'],
+      ['prefs-tab-peers', pages.peers.root, 'Peers'],
+      ['prefs-tab-network', pages.network.root, 'Network'],
     ]);
 
     return { ...elements, ...pages };
