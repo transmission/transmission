@@ -231,6 +231,8 @@ protected:
     // static auto constexpr AnnounceAction = uint32_t{ 1 };
     static auto constexpr ScrapeAction = uint32_t{ 2 };
     static auto constexpr ErrorAction = uint32_t{ 3 };
+
+    static auto constexpr DefaultScrapeUrl = "https://127.0.0.1/scrape"sv;
 };
 
 TEST_F(AnnouncerUdpTest, canInstantiate)
@@ -242,8 +244,6 @@ TEST_F(AnnouncerUdpTest, canInstantiate)
 
 TEST_F(AnnouncerUdpTest, canScrape)
 {
-    static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
-
     // build the expected reponse
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
@@ -254,7 +254,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     expected_response.rows[0].leechers = 2;
     expected_response.rows[0].downloads = 3;
     expected_response.rows[0].downloaders = 0;
-    expected_response.scrape_url = ScrapeUrl;
+    expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
 
     // build the request
@@ -305,8 +305,6 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
 TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 {
-    static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
-
     // build the expected reponse
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
@@ -317,7 +315,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
     expected_response.rows[0].downloaders = 0;
-    expected_response.scrape_url = ScrapeUrl;
+    expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unrecognized info-hash";
 
@@ -359,8 +357,6 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 
 TEST_F(AnnouncerUdpTest, canHandleConnectError)
 {
-    static auto constexpr ScrapeUrl = "https://127.0.0.1/scrape"sv;
-
     // build the response we'd expect for a connect failure
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
@@ -371,7 +367,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
     expected_response.rows[0].downloaders = 0;
-    expected_response.scrape_url = ScrapeUrl;
+    expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unable to Connect";
 
@@ -398,6 +394,72 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     // Confirm that announcer processed the response
     EXPECT_TRUE(response);
     expectEqual(expected_response, *response);
+}
+
+TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
+{
+    // build a simple scrape request
+    auto request = tr_scrape_request{};
+    request.scrape_url = DefaultScrapeUrl;
+    request.info_hash_count = 1;
+    request.info_hash[0] = randomFilled<tr_sha1_digest_t>();
+
+    // build the announcer
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+
+    // tell the announcer to scrape
+    auto response = std::optional<tr_scrape_response>{};
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
+
+    // The announcer should have sent a UDP connection request.
+    // Inspect that request for validity.
+    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto transaction_id = parseConnectionRequest(sent);
+
+    // send a connection response but with an *invalid* transaction id
+    auto buf = libtransmission::Buffer{};
+    buf.addUint32(ConnectAction);
+    buf.addUint32(transaction_id + 1);
+    buf.addUint64(randomFilled<uint64_t>());
+    auto response_size = std::size(buf);
+    auto arr = std::array<uint8_t, 256>{};
+    buf.toBuf(std::data(arr), response_size);
+    EXPECT_FALSE(announcer->handleMessage(std::data(arr), response_size));
+
+    // send a connection response but with an *invalid* action
+    buf.clear();
+    buf.addUint32(ScrapeAction);
+    buf.addUint32(transaction_id);
+    buf.addUint64(randomFilled<uint64_t>());
+    response_size = std::size(buf);
+    buf.toBuf(std::data(arr), response_size);
+    EXPECT_FALSE(announcer->handleMessage(std::data(arr), response_size));
+
+    // but after discarding invalid messages,
+    // a valid connection response should still work
+    auto const connection_id = sendConnectionResponse(*announcer, transaction_id);
+    EXPECT_NE(0,  connection_id);
+}
+
+TEST_F(AnnouncerUdpTest, remembersConnectionId)
+{
+}
+
+TEST_F(AnnouncerUdpTest, canMultiScrape)
+{
+}
+
+TEST_F(AnnouncerUdpTest, canAnnounce)
+{
+}
+
+TEST_F(AnnouncerUdpTest, announceUsesIPAddress)
+{
 }
 
 #if 0
