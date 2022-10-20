@@ -113,7 +113,7 @@ public:
             evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov_, 1);
         }
 
-        evbuffer* const buf_;
+        evbuffer* buf_;
         Iovec iov_ = {};
         size_t offset_ = 0;
     };
