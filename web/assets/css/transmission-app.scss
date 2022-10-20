@@ -17,8 +17,6 @@ $grey-800: #292929;
 $grey-900: #191919;
 $pink-300: #f692ce;
 $pink-700: #b93a86;
-$purple-000: #f5f0ff;
-$purple-100: #e6dcfd;
 $red-500: #d73a49;
 $white: #fff;
 $yellow-300: #ffea7f;
@@ -27,11 +25,10 @@ $yellow-700: #dbab09;
 $nice-grey: #f8f8f8;
 $nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
-$subtle-bt-red: rgb(255, 231, 229);
 $default-accent-color: #fff8c5;
 $default-accent-color-dark: #2e2e2e;
 $default-border-dark: #575757;
-$default-border-light: #575757;
+$default-border-light: #aeaeae;
 // Z-INDEX ENUM
 // $z-index-progressbar: 1;
 $z-index-popup: 2;
@@ -74,10 +71,29 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
 /// GLOBAL
 
 :root {
-  color-scheme: light dark;
   --color-fg-error: #{$red-500};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
+  --color-progressbar-background-2: #{$grey-500};
+  --color-progressbar-verify-1: #{$pink-300};
+  --color-progressbar-verify-2: #{$pink-700};
+  --color-progressbar-magnet-1: #{$yellow-300};
+  --color-progressbar-magnet-2: #{$yellow-700};
+  --color-progressbar-magnet-paused-1: #{$default-accent-color};
+  --color-progressbar-magnet-paused-2: #{$grey-500};
+  --color-progressbar-leech-paused-1: #{$blue-200};
+  --color-progressbar-leech-paused-2: #{$grey-500};
+  --color-progressbar-leech-queued-1: #{$blue-100};
+  --color-progressbar-leech-queued-2: #{$blue-300};
+  --color-progressbar-leech-1: #{$blue-300};
+  --color-progressbar-leech-2: #{$blue-700};
+  --color-progressbar-seed-paused-1: #{$green-200};
+  --color-progressbar-seed-paused-2: #{$grey-500};
+  --color-progressbar-seed-queued-1: #{$green-100};
+  --color-progressbar-seed-queued-2: #{$green-300};
+  --color-progressbar-seed-1: #{$green-300};
+  --color-progressbar-seed-2: #{$green-700};
+  color-scheme: light dark;
   @media (prefers-color-scheme: dark) {
     --color-bg-hover: #{$nice-grey};
     --color-fg-primary: #fff;
@@ -127,25 +143,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-default-border: #{$default-border-light};
     --color-dialog-border: #{$nice-grey};
   }
-  --color-progressbar-background-2: #{$grey-500};
-  --color-progressbar-verify-1: #{$pink-300};
-  --color-progressbar-verify-2: #{$pink-700};
-  --color-progressbar-magnet-1: #{$yellow-300};
-  --color-progressbar-magnet-2: #{$yellow-700};
-  --color-progressbar-magnet-paused-1: #{$default-accent-color};
-  --color-progressbar-magnet-paused-2: #{$grey-500};
-  --color-progressbar-leech-paused-1: #{$blue-200};
-  --color-progressbar-leech-paused-2: #{$grey-500};
-  --color-progressbar-leech-queued-1: #{$blue-100};
-  --color-progressbar-leech-queued-2: #{$blue-300};
-  --color-progressbar-leech-1: #{$blue-300};
-  --color-progressbar-leech-2: #{$blue-700};
-  --color-progressbar-seed-paused-1: #{$green-200};
-  --color-progressbar-seed-paused-2: #{$grey-500};
-  --color-progressbar-seed-queued-1: #{$green-100};
-  --color-progressbar-seed-queued-2: #{$green-300};
-  --color-progressbar-seed-1: #{$green-300};
-  --color-progressbar-seed-2: #{$green-700};
 }
 
 html,
@@ -225,6 +222,7 @@ $toolbar-height: $toolbar-height-number * 1px;
     margin-right: 6px;
     user-select: none;
     width: $toolbar-height;
+
     svg {
       stroke: var(--color-fg-primary); // ios only? idk yet
     }
@@ -262,8 +260,8 @@ $toolbar-height: $toolbar-height-number * 1px;
 
   svg {
     fill: var(--color-fg-primary);
-    width: 36px;
     height: 36px;
+    width: 36px;
   }
 
   &.alt-speed-enabled {
@@ -282,16 +280,12 @@ $toolbar-height: $toolbar-height-number * 1px;
   display: flex;
   flex-direction: row;
   height: 30px;
-  width: 100%;
   padding: 5px;
-
-  > * {
-    padding: 0 5px;
-    margin-right: 5px;
-  }
+  width: 100%;
 
   @include for-phone-only {
     padding: 5px 10px;
+
     :not(select):not(input) {
       display: none;
     }
@@ -299,6 +293,11 @@ $toolbar-height: $toolbar-height-number * 1px;
     #torrent-search {
       padding: 5px;
     }
+  }
+
+  > * {
+    margin-right: 5px;
+    padding: 0 5px;
   }
 }
 
@@ -358,18 +357,22 @@ $video-image: '../img/film.svg';
 @mixin mime-icon-compact($mime-icon) {
   &[data-icon-multifile='true'] {
     background-image: url($folder-image);
-    background-size: 16px;
     background-position: center;
+    background-size: 16px;
   }
 }
 
 @mixin mime-icon($mime-icon) {
-  background-image: url($mime-icon);
+  // background-image: url($mime-icon);
+  background-color: var(--color-fg-primary);
+  mask-image: url($mime-icon);
+  mask-repeat: no-repeat;
 
   &[data-icon-multifile='true'] {
-    background-image: url($mime-icon), url($folder-image);
-    background-size: 16px, 16px;
-    background-position: top left, bottom right;
+    mask-image: url($mime-icon), url($folder-image);
+    mask-position: top left, bottom right;
+    mask-repeat: no-repeat, no-repeat;
+    mask-size: 16px, 16px;
   }
 }
 
@@ -386,6 +389,8 @@ $video-image: '../img/film.svg';
     user-select: none;
 
     .icon {
+      // color the background svg fill
+      background-color: var(--color-fg-primary);
       background-position: center, top left;
 
       &[data-icon-mime-type='audio'] {
@@ -426,9 +431,9 @@ $video-image: '../img/film.svg';
       flex-direction: row-reverse;
 
       .icon {
-        background-size: $icon-size, $icon-size-num * 0.5px;
         flex-shrink: 0;
         height: $icon-size;
+        mask-size: $icon-size, $icon-size-num * 0.5px;
         width: $icon-size;
 
         &[data-icon-multifile='true'] {
@@ -463,7 +468,7 @@ $video-image: '../img/film.svg';
       }
 
       .torrent-name {
-        color: var(--color-fg-name);
+        color: var(--color-fg-primary);
         grid-area: name;
 
         &.paused {
@@ -554,7 +559,7 @@ $video-image: '../img/film.svg';
     }
 
     &:not(.paused) {
-      color: var(--color-fg-name);
+      color: var(--color-fg-primary);
     }
   }
 
@@ -575,12 +580,13 @@ $video-image: '../img/film.svg';
 
   .torrent-progress-details,
   .torrent-peer-details {
-    font-size: x-small;
     color: var(--color-fg-primary);
+    font-size: x-small;
   }
 
   .torrent-progress-bar {
     background-repeat: no-repeat;
+    border-color: var(--color-border-selected);
     border-radius: 3px;
     border-style: solid;
     border-width: 1px;
@@ -682,6 +688,7 @@ $video-image: '../img/film.svg';
   body {
     overflow: hidden;
   }
+
   input,
   select {
     // font-size: 25px;
@@ -708,10 +715,10 @@ $video-image: '../img/film.svg';
 #prefs-dialog {
   $background-color: var(--color-toolbar-background);
   background: $background-color;
+  border: 0;
   bottom: 0;
   box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
-  border: 0;
   position: absolute;
   right: 0;
   top: $popup-top;
@@ -741,10 +748,10 @@ $video-image: '../img/film.svg';
 
   .alt-speed-section-label {
     background: transparent url($image-alt-speed-enabled) no-repeat;
-    background-size: 20px;
-    padding-left: 22px;
     background-position: left;
     background-position-y: 4px;
+    background-size: 20px;
+    padding-left: 22px;
   }
 
   :disabled,
@@ -824,11 +831,11 @@ $video-image: '../img/film.svg';
   }
 
   .title {
+    color: var(--color-fg-primary);
     font-size: larger;
     font-weight: bold;
-    padding-left: 0;
-    color: var(--color-fg-primary);
     margin-bottom: 10px;
+    padding-left: 0;
   }
 
   .row {
@@ -873,18 +880,17 @@ $video-image: '../img/film.svg';
 
 .tabs-buttons {
   align-self: center;
+  background-color: var(--color-bg-tabs);
+  border: 1px solid var(--color-border-selected);
+  border-radius: 6px;
   display: flex;
   margin: 10px 0;
-  background-color: var(--color-bg-tabs);
-  border-radius: 6px;
-  border: 1px solid var(--color-border-selected);
 
   button {
     appearance: none;
-    border: none;
-    color: var(--color-fg-primary);
     border: 1px solid transparent;
     border-radius: 6px;
+    color: var(--color-fg-primary);
   }
 }
 
@@ -903,17 +909,17 @@ $video-image: '../img/film.svg';
 
 .tabs-button {
   background-color: var(--color-bg-tabs);
-  font-size: 14px;
   border: 1px solid transparent;
+  font-size: 14px;
   padding: 3px 8px;
 
   &:active,
   &:checked,
   &.selected {
+    background-color: var(--color-bg-even);
     border: 1px solid var(--color-fg-primary);
     border-radius: 6px;
     font-weight: 500;
-    background-color: var(--color-bg-even);
   }
 }
 
@@ -924,6 +930,7 @@ $video-image: '../img/film.svg';
 }
 
 .inspector-info-page {
+  font-size: 14px;
   // TODO: this is (mostly) copied from prefs-dialog.
   // can it be folded into a single set of rules?
 
@@ -932,16 +939,16 @@ $video-image: '../img/film.svg';
   grid-template-columns: auto 1fr;
   margin: 20px;
   padding: 12px;
-  font-size: 14px;
+
   &:not(.hidden) {
     display: grid;
   }
 
   .section-label {
+    font-size: 16px;
     font-weight: bold;
     grid-column: span 2;
     padding-bottom: 5px;
-    font-size: 16px;
 
     &:not(:first-of-type) {
       margin-top: 20px;
@@ -962,14 +969,13 @@ $video-image: '../img/film.svg';
 .inspector-info-magnet {
   button {
     background-color: var(--color-border);
-    mask: url($image-magnet) no-repeat center / 14px;
-    -webkit-mask: url($image-magnet) no-repeat center / 14px;
 
     background-position: top;
     background-repeat: no-repeat;
     border: 0;
     cursor: pointer;
     height: 1rem;
+    mask: url($image-magnet) no-repeat center / 14px;
     vertical-align: middle;
     width: 1rem;
   }
@@ -977,9 +983,9 @@ $video-image: '../img/film.svg';
 
 #inspector .tabs-button,
 #prefs-dialog .tabs-button {
-  min-width: 40px;
   height: 30px;
   margin: 0;
+  min-width: 40px;
 }
 
 #inspector-file-list {
@@ -1008,11 +1014,11 @@ $video-image: '../img/film.svg';
   .inspector-torrent-file-list-entry-name {
     color: var(--color-fg-primary);
     cursor: pointer;
+    font-size: 14px;
     grid-area: name;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 14px;
   }
 
   .inspector-torrent-file-list-entry.skip
@@ -1022,8 +1028,8 @@ $video-image: '../img/film.svg';
 
   .inspector-torrent-file-list-entry-progress {
     color: var(--color-fg-secondary);
-    grid-area: info;
     font-size: 12px;
+    grid-area: info;
   }
 
   .single-file .inspector-torrent-file-list-entry > .file-wanted-control,
@@ -1048,10 +1054,10 @@ $video-image: '../img/film.svg';
 
   .tier-list-row {
     display: grid;
+    font-size: 12px;
     grid-column-gap: 8px;
     grid-row-gap: 4px;
     margin-top: 8px;
-    font-size: 12px;
   }
 
   .tier-list-torrent {
@@ -1065,8 +1071,8 @@ $video-image: '../img/film.svg';
   }
 
   .tier-list-tracker {
-    font-weight: bolder;
     font-size: 14px;
+    font-weight: bolder;
     grid-column: span 2;
     margin-top: 8px;
     padding-bottom: 4px;
@@ -1088,8 +1094,7 @@ $video-image: '../img/film.svg';
 // Peers Tab
 
 .peer-list {
-  $table-border-color: var(--default-border);
-  $table-border: 1px solid $table-border-color;
+  $table-border: 1px solid var(--color-default-border);
 
   border: $table-border;
   border-collapse: collapse;
@@ -1111,7 +1116,7 @@ $video-image: '../img/film.svg';
   }
 
   .torrent-row td {
-    background: $table-border-color;
+    background: var(--color-default-border);
     color: var(--color-fg-primary);
     font-size: normal;
     font-weight: bolder;
@@ -1124,7 +1129,6 @@ $video-image: '../img/film.svg';
   .encryption {
     &[data-encrypted='true'] {
       background-color: var(--color-border-selected);
-      -webkit-mask: url($image-lock-fill) no-repeat center / 14px;
       mask: url($image-lock-fill) no-repeat center / 14px;
       width: 10px;
     }
@@ -1178,15 +1182,15 @@ $video-image: '../img/film.svg';
 
   > * {
     appearance: none;
+    background-color: var(--color-bg-primary);
     background-position: center;
     background-repeat: no-repeat;
     background-size: $halfsize, $size;
+    border: 1px solid var(--color-border);
     height: $size;
     margin: 0;
     padding: 0;
     width: $size;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-primary);
   }
 
   > .low {
@@ -1212,27 +1216,28 @@ $video-image: '../img/film.svg';
 /// CONTEXT MENU
 
 .context-menu {
-  background-color: var(--color-bg-primary);
   $disabled-color: var(--color-fg-disabled);
-  padding: 10px 5px;
+  background-color: var(--color-bg-primary);
   border-radius: 5px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   color: var(--color-fg-on-popup);
+  padding: 10px 5px;
   position: absolute;
   z-index: 9999;
 
   .context-menuitem {
-    list-style: none;
-    padding: 5px 15px;
-    margin-right: 10px;
     font-size: 13px;
     font-weight: 400;
+    list-style: none;
+    margin-right: 10px;
+    padding: 5px 15px;
+
     &:hover:not(:disabled),
     &:focus:not(:disabled) {
       background-color: var(--color-bg-hover);
-      font-weight: 500;
       border-radius: 6px;
       cursor: pointer;
+      font-weight: 500;
     }
 
     &:disabled {
@@ -1241,8 +1246,8 @@ $video-image: '../img/film.svg';
     }
 
     &.warning:hover {
-      color: var(--color-fg-warn);
       background-color: var(--color-bg-warn);
+      color: var(--color-fg-warn);
     }
   }
 }
@@ -1258,28 +1263,39 @@ $video-image: '../img/film.svg';
 .overflow-menu {
   background: var(--color-bg-popup);
   border-radius: 5px;
-  min-width: 220px;
   box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
+  min-width: 220px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
   padding: 10px;
   position: absolute;
 
   right: 20px;
   top: 50px;
   z-index: $z-index-popup;
-  overflow: scroll;
-  -webkit-overflow-scrolling: touch;
+
+  @include for-phone-only() {
+    height: 80vh;
+  }
+  // hide the fullscreen button unless we're on mobile
+  @include for-tablet-portrait-up {
+    #display-fullscreen-check,
+    #display-fullscreen-label {
+      display: none;
+    }
+  }
 
   fieldset {
-    display: block;
     border: 0;
+    display: block;
     margin: 8px 0;
   }
 
   fieldset ul {
-    padding-left: 0;
     margin: 0;
+    padding-left: 0;
 
     li {
       list-style-type: none;
@@ -1291,25 +1307,25 @@ $video-image: '../img/film.svg';
   }
 
   .table-row {
-    padding: 3px 0;
+    align-items: center;
     border-radius: 6px;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    padding: 3px 0;
   }
 
   legend {
-    font-weight: bolder;
     color: var(--color-fg-primary);
-    margin: 12px 0px 4px;
+    font-weight: bolder;
+    margin: 12px 0 4px;
   }
 
   a,
   button,
   label {
+    display: inline-flex;
     font-size: 1em;
     width: 100%;
-    display: inline-flex;
   }
 
   a,
@@ -1368,13 +1384,13 @@ $video-image: '../img/film.svg';
 
       &:checked ~ #alt-speed-image {
         background-image: url($image-alt-speed-enabled);
-        background-size: 22px;
         background-position: left;
+        background-size: 22px;
       }
 
       &:not(:checked) ~ #alt-speed-image {
-        background-size: 22px;
         background-image: url($image-alt-speed-disabled);
+        background-size: 22px;
       }
     }
 
@@ -1391,17 +1407,6 @@ $video-image: '../img/film.svg';
     #alt-speed-values-label {
       font-size: small;
       grid-area: values;
-    }
-  }
-
-  @include for-phone-only() {
-    height: 80vh;
-  }
-  // hide the fullscreen button unless we're on mobile
-  @include for-tablet-portrait-up {
-    #display-fullscreen-check,
-    #display-fullscreen-label {
-      display: none;
     }
   }
 }
@@ -1451,6 +1456,7 @@ $logo-size: 64px;
   }
 
   .dialog-window {
+    background-color: var(--color-bg-popup);
     color: var(--color-fg-on-popup);
     display: grid;
     grid-column-gap: 12px;
@@ -1461,7 +1467,6 @@ $logo-size: 64px;
       'icon buttons';
     grid-template-columns: $logo-size 1fr;
     padding: 2px 12px;
-    background-color: var(--color-bg-popup);
   }
 }
 
@@ -1493,20 +1498,20 @@ $logo-size: 64px;
 }
 
 dialog {
-  border: none;
+  border: 0;
 }
 
 .dialog-container {
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
   color: var(--color-fg-primary);
   display: block;
   padding: 0;
   z-index: $z-index-popup;
-  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
-    0 9px 28px 8px #0000000d;
 
   @include for-tablet-portrait-up() {
-    border-radius: 8px;
     border: 0;
+    border-radius: 8px;
     max-width: 50%;
   }
 }
@@ -1531,8 +1536,8 @@ dialog {
 
 .dialog-window {
   background: var(--color-bg-primary);
-  padding: $dialog-padding-number * 1px;
   border-radius: 8px;
+  padding: $dialog-padding-number * 1px;
 }
 
 .dialog-workarea {
