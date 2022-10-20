@@ -5,7 +5,7 @@
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 
-#define BETWEEN_PADDING 2.0
+static CGFloat const kBetweenPadding = 2.0;
 
 @interface BadgeView ()
 
@@ -61,7 +61,7 @@
 
         if (download)
         {
-            bottom += uploadBadge.size.height + BETWEEN_PADDING; //download rate above upload rate
+            bottom += uploadBadge.size.height + kBetweenPadding; //download rate above upload rate
         }
     }
     if (download)

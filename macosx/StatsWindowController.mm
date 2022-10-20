@@ -6,7 +6,7 @@
 #import "Controller.h"
 #import "NSStringAdditions.h"
 
-#define UPDATE_SECONDS 1.0
+static NSTimeInterval const kUpdateSeconds = 1.0;
 
 @interface StatsWindowController ()
 
@@ -59,7 +59,7 @@ tr_session* fLib = NULL;
 {
     [self updateStats];
 
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateStats)
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateStats)
                                                  userInfo:nil
                                                   repeats:YES];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];

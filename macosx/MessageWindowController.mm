@@ -11,13 +11,15 @@
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 
-#define LEVEL_ERROR 0
-#define LEVEL_WARN 1
-#define LEVEL_INFO 2
-#define LEVEL_DEBUG 3
-#define LEVEL_TRACE 4
+typedef NS_ENUM(NSUInteger, LevelButtonLevel) {
+    LevelButtonLevelError = 0,
+    LevelButtonLevelWarn = 1,
+    LevelButtonLevelInfo = 2,
+    LevelButtonLevelDebug = 3,
+    LevelButtonLevelTrace = 4,
+};
 
-#define UPDATE_SECONDS 0.75
+static NSTimeInterval const kUpdateSeconds = 0.75;
 
 @interface MessageWindowController ()
 
@@ -70,16 +72,16 @@
     window.collectionBehavior = NSWindowCollectionBehaviorFullScreenNone;
 
     //set images and text for popup button items
-    [self.fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");
-    [self.fLevelButton itemAtIndex:LEVEL_WARN].title = NSLocalizedString(@"Warning", "Message window -> level string");
-    [self.fLevelButton itemAtIndex:LEVEL_INFO].title = NSLocalizedString(@"Info", "Message window -> level string");
-    [self.fLevelButton itemAtIndex:LEVEL_DEBUG].title = NSLocalizedString(@"Debug", "Message window -> level string");
-    [self.fLevelButton itemAtIndex:LEVEL_TRACE].title = NSLocalizedString(@"Trace", "Message window -> level string");
-    [self.fLevelButton itemAtIndex:LEVEL_ERROR].image = [self.class iconForLevel:TR_LOG_ERROR];
-    [self.fLevelButton itemAtIndex:LEVEL_WARN].image = [self.class iconForLevel:TR_LOG_WARN];
-    [self.fLevelButton itemAtIndex:LEVEL_INFO].image = [self.class iconForLevel:TR_LOG_INFO];
-    [self.fLevelButton itemAtIndex:LEVEL_DEBUG].image = [self.class iconForLevel:TR_LOG_DEBUG];
-    [self.fLevelButton itemAtIndex:LEVEL_TRACE].image = [self.class iconForLevel:TR_LOG_TRACE];
+    [self.fLevelButton itemAtIndex:LevelButtonLevelError].title = NSLocalizedString(@"Error", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LevelButtonLevelWarn].title = NSLocalizedString(@"Warning", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LevelButtonLevelInfo].title = NSLocalizedString(@"Info", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LevelButtonLevelDebug].title = NSLocalizedString(@"Debug", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LevelButtonLevelTrace].title = NSLocalizedString(@"Trace", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LevelButtonLevelError].image = [self.class iconForLevel:TR_LOG_ERROR];
+    [self.fLevelButton itemAtIndex:LevelButtonLevelWarn].image = [self.class iconForLevel:TR_LOG_WARN];
+    [self.fLevelButton itemAtIndex:LevelButtonLevelInfo].image = [self.class iconForLevel:TR_LOG_INFO];
+    [self.fLevelButton itemAtIndex:LevelButtonLevelDebug].image = [self.class iconForLevel:TR_LOG_DEBUG];
+    [self.fLevelButton itemAtIndex:LevelButtonLevelTrace].image = [self.class iconForLevel:TR_LOG_TRACE];
 
     CGFloat const levelButtonOldWidth = NSWidth(self.fLevelButton.frame);
     [self.fLevelButton sizeToFit];
@@ -121,23 +123,23 @@
     switch ([NSUserDefaults.standardUserDefaults integerForKey:@"MessageLevel"])
     {
     case TR_LOG_ERROR:
-        [self.fLevelButton selectItemAtIndex:LEVEL_ERROR];
+        [self.fLevelButton selectItemAtIndex:LevelButtonLevelError];
         break;
     case TR_LOG_WARN:
-        [self.fLevelButton selectItemAtIndex:LEVEL_WARN];
+        [self.fLevelButton selectItemAtIndex:LevelButtonLevelWarn];
         break;
     case TR_LOG_INFO:
-        [self.fLevelButton selectItemAtIndex:LEVEL_INFO];
+        [self.fLevelButton selectItemAtIndex:LevelButtonLevelInfo];
         break;
     case TR_LOG_DEBUG:
-        [self.fLevelButton selectItemAtIndex:LEVEL_DEBUG];
+        [self.fLevelButton selectItemAtIndex:LevelButtonLevelDebug];
         break;
     case TR_LOG_TRACE:
-        [self.fLevelButton selectItemAtIndex:LEVEL_TRACE];
+        [self.fLevelButton selectItemAtIndex:LevelButtonLevelTrace];
         break;
     default: //safety
         [NSUserDefaults.standardUserDefaults setInteger:TR_LOG_ERROR forKey:@"MessageLevel"];
-        [self.fLevelButton selectItemAtIndex:LEVEL_ERROR];
+        [self.fLevelButton selectItemAtIndex:LevelButtonLevelError];
     }
 
     self.fMessages = [[NSMutableArray alloc] init];
@@ -156,7 +158,7 @@
 {
     if (!self.fTimer)
     {
-        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:)
+        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateLog:)
                                                      userInfo:nil
                                                       repeats:YES];
         [self updateLog:nil];
@@ -182,7 +184,7 @@
 - (void)window:(NSWindow*)window didDecodeRestorableState:(NSCoder*)coder
 {
     [self.fTimer invalidate];
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:) userInfo:nil
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateLog:) userInfo:nil
                                                   repeats:YES];
     [self updateLog:nil];
 }
@@ -392,19 +394,19 @@
     NSInteger level;
     switch (self.fLevelButton.indexOfSelectedItem)
     {
-    case LEVEL_ERROR:
+    case LevelButtonLevelError:
         level = TR_LOG_ERROR;
         break;
-    case LEVEL_WARN:
+    case LevelButtonLevelWarn:
         level = TR_LOG_WARN;
         break;
-    case LEVEL_INFO:
+    case LevelButtonLevelInfo:
         level = TR_LOG_INFO;
         break;
-    case LEVEL_DEBUG:
+    case LevelButtonLevelDebug:
         level = TR_LOG_DEBUG;
         break;
-    case LEVEL_TRACE:
+    case LevelButtonLevelTrace:
         level = TR_LOG_TRACE;
         break;
     default:

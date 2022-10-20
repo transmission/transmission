@@ -32,9 +32,9 @@ struct VariantWalkFuncs
 
 void tr_variantWalk(tr_variant const* top, VariantWalkFuncs const* walk_funcs, void* user_data, bool sort_dicts);
 
-void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean);
+std::string tr_variantToStrJson(tr_variant const* top, bool lean);
 
-void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf);
+std::string tr_variantToStrBenc(tr_variant const* top);
 
 void tr_variantInit(tr_variant* v, char type);
 

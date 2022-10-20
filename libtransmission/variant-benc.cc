@@ -9,8 +9,6 @@
 #include <string_view>
 #include <optional>
 
-#include <event2/buffer.h>
-
 #include <fmt/compile.h>
 #include <fmt/format.h>
 
@@ -19,8 +17,9 @@
 #include "transmission.h"
 
 #include "benc.h"
-#include "tr-assert.h"
 #include "quark.h"
+#include "tr-assert.h"
+#include "tr-buffer.h"
 #include "utils.h"
 #include "variant-common.h"
 #include "variant.h"
@@ -274,70 +273,58 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
 *****
 ****/
 
-static void saveIntFunc(tr_variant const* val, void* vevbuf)
+using Buffer = libtransmission::Buffer;
+
+static void saveIntFunc(tr_variant const* val, void* vout)
 {
     auto buf = std::array<char, 64>{};
     auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, std::data(buf), static_cast<size_t>(out - std::data(buf)));
+    static_cast<Buffer*>(vout)->add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
 }
 
-static void saveBoolFunc(tr_variant const* val, void* vevbuf)
+static void saveBoolFunc(tr_variant const* val, void* vout)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    if (val->val.b)
-    {
-        evbuffer_add(evbuf, "i1e", 3);
-    }
-    else
-    {
-        evbuffer_add(evbuf, "i0e", 3);
-    }
+    static_cast<Buffer*>(vout)->add(val->val.b ? "i1e"sv : "i0e"sv);
 }
 
-static void saveStringImpl(evbuffer* evbuf, std::string_view sv)
+static void saveStringImpl(Buffer* tgt, std::string_view sv)
 {
     // `${sv.size()}:${sv}`
     auto prefix = std::array<char, 32>{};
     auto out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
-    evbuffer_add(evbuf, std::data(prefix), out - std::data(prefix));
-    evbuffer_add(evbuf, std::data(sv), std::size(sv));
+    tgt->add(std::data(prefix), out - std::data(prefix));
+    tgt->add(sv);
 }
 
-static void saveStringFunc(tr_variant const* v, void* vevbuf)
+static void saveStringFunc(tr_variant const* v, void* vout)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    saveStringImpl(evbuf, sv);
+    saveStringImpl(static_cast<Buffer*>(vout), sv);
 }
 
-static void saveRealFunc(tr_variant const* val, void* vevbuf)
+static void saveRealFunc(tr_variant const* val, void* vout)
 {
     // the benc spec doesn't handle floats; save it as a string.
 
     auto buf = std::array<char, 64>{};
     auto out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    saveStringImpl(evbuf, { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
+    saveStringImpl(static_cast<Buffer*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
-static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
+static void saveDictBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, "d", 1);
+    static_cast<Buffer*>(vbuf)->push_back('d');
 }
 
-static void saveListBeginFunc(tr_variant const* /*val*/, void* vevbuf)
+static void saveListBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, "l", 1);
+    static_cast<Buffer*>(vbuf)->push_back('l');
 }
 
-static void saveContainerEndFunc(tr_variant const* /*val*/, void* vevbuf)
+static void saveContainerEndFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, "e", 1);
+    static_cast<Buffer*>(vbuf)->push_back('e');
 }
 
 static struct VariantWalkFuncs const walk_funcs = {
@@ -350,7 +337,9 @@ static struct VariantWalkFuncs const walk_funcs = {
     saveContainerEndFunc, //
 };
 
-void tr_variantToBufBenc(tr_variant const* top, evbuffer* buf)
+std::string tr_variantToStrBenc(tr_variant const* top)
 {
-    tr_variantWalk(top, &walk_funcs, buf, true);
+    auto buf = libtransmission::Buffer{};
+    tr_variantWalk(top, &walk_funcs, &buf, true);
+    return buf.toString();
 }

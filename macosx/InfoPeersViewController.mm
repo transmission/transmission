@@ -12,8 +12,8 @@
 #import "WebSeedTableView.h"
 #import "NSImageAdditions.h"
 
-#define ANIMATION_ID_KEY @"animationId"
-#define WEB_SEED_ANIMATION_ID @"webSeed"
+static NSString* const kAnimationIdKey = @"animationId";
+static NSString* const kWebSeedAnimationId = @"webSeed";
 
 @interface InfoPeersViewController ()<CAAnimationDelegate>
 
@@ -89,7 +89,7 @@
     webSeedTableAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
     webSeedTableAnimation.duration = 0.125;
     webSeedTableAnimation.delegate = self;
-    [webSeedTableAnimation setValue:WEB_SEED_ANIMATION_ID forKey:ANIMATION_ID_KEY];
+    [webSeedTableAnimation setValue:kWebSeedAnimationId forKey:kAnimationIdKey];
     self.fWebSeedTableTopConstraint.animations = @{ @"constant" : webSeedTableAnimation };
 
     [self setWebSeedTableHidden:YES animate:NO];
@@ -515,7 +515,7 @@
 
 - (void)animationDidStart:(CAAnimation*)animation
 {
-    if (![[animation valueForKey:ANIMATION_ID_KEY] isEqualToString:WEB_SEED_ANIMATION_ID])
+    if (![[animation valueForKey:kAnimationIdKey] isEqualToString:kWebSeedAnimationId])
     {
         return;
     }
@@ -525,7 +525,7 @@
 
 - (void)animationDidStop:(CAAnimation*)animation finished:(BOOL)finished
 {
-    if (![[animation valueForKey:ANIMATION_ID_KEY] isEqualToString:WEB_SEED_ANIMATION_ID])
+    if (![[animation valueForKey:kAnimationIdKey] isEqualToString:kWebSeedAnimationId])
     {
         return;
     }
