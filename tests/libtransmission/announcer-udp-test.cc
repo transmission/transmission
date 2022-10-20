@@ -320,6 +320,59 @@ TEST_F(AnnouncerUdpTest, canScrape)
     expectEqual(request, info_hashes);
 }
 
+TEST_F(AnnouncerUdpTest, canMultiScrape)
+{
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+
+    auto expected_response = tr_scrape_response{};
+    expected_response.did_connect = true;
+    expected_response.did_timeout = false;
+    expected_response.row_count = 2;
+    expected_response.rows[0] = { randomFilled<tr_sha1_digest_t>(), 1, 2, 3, 0 };
+    expected_response.rows[1] = { randomFilled<tr_sha1_digest_t>(), 4, 5, 6, 0 };
+    expected_response.scrape_url = DefaultScrapeUrl;
+    expected_response.min_request_interval = 0;
+
+    auto request = buildScrapeRequestFromResponse(expected_response);
+    auto response = std::optional<tr_scrape_response>{};
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
+
+    // Announcer will request a connection. Verify and grant the request
+    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto connect_transaction_id = parseConnectionRequest(sent);
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id);
+
+    // The announcer should have sent a UDP scrape request.
+    // Inspect that request for validity.
+    sent = waitForAnnouncerToSendMessage(mediator);
+    auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
+    expectEqual(request, info_hashes);
+
+    // Have the tracker respond to the request
+    auto buf = libtransmission::Buffer{};
+    buf.addUint32(ScrapeAction);
+    buf.addUint32(scrape_transaction_id);
+    for (size_t i = 0; i < expected_response.row_count; ++i)
+    {
+        buf.addUint32(expected_response.rows[i].seeders);
+        buf.addUint32(expected_response.rows[i].downloads);
+        buf.addUint32(expected_response.rows[i].leechers);
+    }
+    auto response_size = std::size(buf);
+    auto arr = std::array<uint8_t, 256>{};
+    buf.toBuf(std::data(arr), response_size);
+    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+
+    // Confirm that announcer processed the response
+    EXPECT_TRUE(response);
+    expectEqual(expected_response, *response);
+}
+
 TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 {
     // build the expected reponse
@@ -463,12 +516,26 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     EXPECT_NE(0, connection_id);
 }
 
-TEST_F(AnnouncerUdpTest, canMultiScrape)
-{
-}
-
 TEST_F(AnnouncerUdpTest, canAnnounce)
 {
+
+#if 0
+Offset  Size    Name    Value
+0       64-bit integer  connection_id
+8       32-bit integer  action          1 // announce
+12      32-bit integer  transaction_id
+16      20-byte string  info_hash
+36      20-byte string  peer_id
+56      64-bit integer  downloaded
+64      64-bit integer  left
+72      64-bit integer  uploaded
+80      32-bit integer  event           0 // 0: none; 1: completed; 2: started; 3: stopped
+84      32-bit integer  IP address      0 // default
+88      32-bit integer  key
+92      32-bit integer  num_want        -1 // default
+96      16-bit integer  port
+98
+#endif
 }
 
 TEST_F(AnnouncerUdpTest, announceUsesIPAddress)
@@ -507,77 +574,99 @@ public:
     virtual bool handleMessage(uint8_t const* msg, size_t msglen) = 0;
 };
 
-/* pick a number small enough for common tracker software:
- *  - ocelot has no upper bound
- *  - opentracker has an upper bound of 64
- *  - udp protocol has an upper bound of 74
- *  - xbtt has no upper bound
- *
- * This is only an upper bound: if the tracker complains about
- * length, announcer will incrementally lower the batch size.
- */
-auto inline constexpr TR_MULTISCRAPE_MAX = 60;
 
-struct tr_scrape_request
+struct tr_announce_request
 {
-    /* the scrape URL */
-    tr_interned_string scrape_url;
+    tr_announce_event event = {};
+    bool partial_seed = false;
 
-    /* the name to use when deep logging is enabled */
-    char log_name[128];
+    /* the port we listen for incoming peers on */
+    tr_port port;
 
-    /* info hashes of the torrents to scrape */
-    std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
+    /* per-session key */
+    int key = 0;
 
-    /* how many hashes to use in the info_hash field */
-    int info_hash_count = 0;
-};
+    /* the number of peers we'd like to get back in the response */
+    int numwant = 0;
 
-struct tr_scrape_response_row
-{
+    /* the number of bytes we uploaded since the last 'started' event */
+    uint64_t up = 0;
+
+    /* the number of good bytes we downloaded since the last 'started' event */
+    uint64_t down = 0;
+
+    /* the number of bad bytes we downloaded since the last 'started' event */
+    uint64_t corrupt = 0;
+
+    /* the total size of the torrent minus the number of bytes completed */
+    uint64_t leftUntilComplete = 0;
+
+    /* the tracker's announce URL */
+    tr_interned_string announce_url;
+
+    /* key generated by and returned from an http tracker.
+     * see tr_announce_response.tracker_id_str */
+    std::string tracker_id;
+
+    /* the torrent's peer id.
+     * this changes when a torrent is stopped -> restarted. */
+    tr_peer_id_t peer_id;
+
     /* the torrent's info_hash */
     tr_sha1_digest_t info_hash;
 
-    /* how many peers are seeding this torrent */
-    int seeders = 0;
-
-    /* how many peers are downloading this torrent */
-    int leechers = 0;
-
-    /* how many times this torrent has been downloaded */
-    int downloads = 0;
-
-    /* the number of active downloaders in the swarm.
-     * this is a BEP 21 extension that some trackers won't support.
-     * http://www.bittorrent.org/beps/bep_0021.html#tracker-scrapes  */
-    int downloaders = 0;
+    /* the name to use when deep logging is enabled */
+    char log_name[128];
 };
 
-struct tr_scrape_response
+struct tr_announce_response
 {
+    /* the torrent's info hash */
+    tr_sha1_digest_t info_hash = {};
+
     /* whether or not we managed to connect to the tracker */
     bool did_connect = false;
 
     /* whether or not the scrape timed out */
     bool did_timeout = false;
 
-    /* how many info hashes are in the 'rows' field */
-    int row_count;
+    /* preferred interval between announces.
+     * transmission treats this as the interval for periodic announces */
+    int interval = 0;
 
-    /* the individual torrents' scrape results */
-    std::array<tr_scrape_response_row, TR_MULTISCRAPE_MAX> rows;
+    /* minimum interval between announces. (optional)
+     * transmission treats this as the min interval for manual announces */
+    int min_interval = 0;
 
-    /* the raw scrape url */
-    tr_interned_string scrape_url;
+    /* how many peers are seeding this torrent */
+    int seeders = -1;
+
+    /* how many peers are downloading this torrent */
+    int leechers = -1;
+
+    /* how many times this torrent has been downloaded */
+    int downloads = -1;
+
+    /* IPv4 peers that we acquired from the tracker */
+    std::vector<tr_pex> pex;
+
+    /* IPv6 peers that we acquired from the tracker */
+    std::vector<tr_pex> pex6;
 
     /* human-readable error string on failure, or nullptr */
     std::string errmsg;
 
-    /* minimum interval (in seconds) allowed between scrapes.
-     * this is an unofficial extension that some trackers won't support. */
-    int min_request_interval;
+    /* human-readable warning string or nullptr */
+    std::string warning;
+
+    /* key generated by and returned from an http tracker.
+     * if this is provided, subsequent http announces must include this. */
+    std::string tracker_id;
+
+    /* tracker extension that returns the client's public IP address.
+     * https://www.bittorrent.org/beps/bep_0024.html */
+    std::optional<tr_address> external_ip;
 };
 
-using tr_scrape_response_func = void (*)(tr_scrape_response const* response, void* user_data);
-
+using tr_announce_response_func = void (*)(tr_announce_response const* response, void* userdata);
 #endif
