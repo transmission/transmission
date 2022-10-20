@@ -678,7 +678,3 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     EXPECT_TRUE(response);
     expectEqual(expected_response, *response);
 }
-
-TEST_F(AnnouncerUdpTest, announceUsesIPAddress)
-{
-}
