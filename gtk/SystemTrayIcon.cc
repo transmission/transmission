@@ -13,8 +13,12 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
-#ifdef HAVE_LIBAPPINDICATOR
+#ifdef HAVE_APPINDICATOR
+#ifdef APPINDICATOR_IS_AYATANA
+#include <libayatana-appindicator/app-indicator.h>
+#else
 #include <libappindicator/app-indicator.h>
+#endif
 #endif
 
 #include <libtransmission/transmission.h>
@@ -29,7 +33,7 @@
 #define TR_SYS_TRAY_IMPL_APPINDICATOR 1
 #define TR_SYS_TRAY_IMPL_STATUS_ICON 2
 
-#ifdef HAVE_LIBAPPINDICATOR
+#ifdef HAVE_APPINDICATOR
 #define TR_SYS_TRAY_IMPL TR_SYS_TRAY_IMPL_APPINDICATOR
 #elif !GTKMM_CHECK_VERSION(4, 0, 0)
 #define TR_SYS_TRAY_IMPL TR_SYS_TRAY_IMPL_STATUS_ICON
