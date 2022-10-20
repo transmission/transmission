@@ -12,8 +12,6 @@
 #include <string_view>
 #include <vector>
 
-#include <event2/buffer.h>
-
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -421,12 +419,14 @@ static void tau_tracker_on_dns(tau_tracker* const tracker, sockaddr const* sa, s
 
 static void tau_tracker_send_request(struct tau_tracker* tracker, void const* payload, size_t payload_len)
 {
-    struct evbuffer* buf = evbuffer_new();
     logdbg(tracker->key, fmt::format("sending request w/connection id {}", tracker->connection_id));
-    evbuffer_add_hton_64(buf, tracker->connection_id);
-    evbuffer_add_reference(buf, payload, payload_len, nullptr, nullptr);
-    tracker->sendto(evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
-    evbuffer_free(buf);
+
+    auto buf = libtransmission::Buffer{};
+    buf.addUint64(tracker->connection_id);
+    buf.add(payload, payload_len);
+
+    auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
+    tracker->sendto(std::data(contiguous), std::size(contiguous));
 }
 
 template<typename T>
@@ -592,15 +592,18 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
     /* also need a valid connection ID... */
     if (tracker->addr_ && tracker->connection_expiration_time <= now && tracker->connecting_at == 0)
     {
-        struct evbuffer* buf = evbuffer_new();
         tracker->connecting_at = now;
         tracker->connection_transaction_id = tau_transaction_new();
         logtrace(tracker->key, fmt::format("Trying to connect. Transaction ID is {}", tracker->connection_transaction_id));
-        evbuffer_add_hton_64(buf, 0x41727101980LL);
-        evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
-        evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        tracker->sendto(evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
-        evbuffer_free(buf);
+
+        auto buf = libtransmission::Buffer{};
+        buf.addUint64(0x41727101980LL);
+        buf.addUint32(TAU_ACTION_CONNECT);
+        buf.addUint32(tracker->connection_transaction_id);
+
+        auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
+        tracker->sendto(std::data(contiguous), std::size(contiguous));
+
         return;
     }
 
