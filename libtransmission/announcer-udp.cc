@@ -29,6 +29,7 @@
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "session.h"
 #include "tr-assert.h"
+#include "tr-buffer.h"
 #include "utils.h"
 #include "web-utils.h"
 
@@ -38,29 +39,10 @@
 
 using namespace std::literals;
 
-static uint32_t evbuffer_read_ntoh_32(struct evbuffer* buf)
-{
-    auto val = uint32_t{};
-    evbuffer_remove(buf, &val, sizeof(uint32_t));
-    return ntohl(val);
-}
-
-static uint64_t evbuffer_read_ntoh_64(struct evbuffer* buf)
-{
-    auto val = uint64_t{};
-    evbuffer_remove(buf, &val, sizeof(uint64_t));
-    return tr_ntohll(val);
-}
-
-/****
-*****
-****/
-
 using tau_connection_t = uint64_t;
+using tau_transaction_t = uint32_t;
 
 static auto constexpr TauConnectionTtlSecs = int{ 60 };
-
-using tau_transaction_t = uint32_t;
 
 static tau_transaction_t tau_transaction_new()
 {
@@ -78,7 +60,7 @@ enum tau_action_t
     TAU_ACTION_ERROR = 3
 };
 
-static bool is_tau_response_message(tau_action_t action, size_t msglen)
+static constexpr bool is_tau_response_message(uint32_t action, size_t msglen)
 {
     if (action == TAU_ACTION_CONNECT)
     {
@@ -129,7 +111,7 @@ struct tau_scrape_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, evbuffer* buf)
+    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
@@ -138,25 +120,22 @@ struct tau_scrape_request
         {
             for (int i = 0; i < response.row_count; ++i)
             {
-                if (evbuffer_get_length(buf) < sizeof(uint32_t) * 3)
+                if (std::size(buf) < sizeof(uint32_t) * 3)
                 {
                     break;
                 }
 
                 auto& row = response.rows[i];
-                row.seeders = evbuffer_read_ntoh_32(buf);
-                row.downloads = evbuffer_read_ntoh_32(buf);
-                row.leechers = evbuffer_read_ntoh_32(buf);
+                row.seeders = buf.toUint32();
+                row.downloads = buf.toUint32();
+                row.leechers = buf.toUint32();
             }
 
             requestFinished();
         }
         else
         {
-            size_t const buflen = evbuffer_get_length(buf);
-            auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
-                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
-                _("Unknown error");
+            std::string const errmsg = action == TAU_ACTION_ERROR && !std::empty(buf) ? buf.toString() : _("Unknown error");
             fail(true, false, errmsg);
         }
     }
@@ -239,26 +218,28 @@ struct tau_announce_request
         this->requestFinished();
     }
 
-    void onResponse(tau_action_t action, struct evbuffer* buf)
+    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
     {
-        size_t const buflen = evbuffer_get_length(buf);
+        auto const buflen = std::size(buf);
 
         this->response.did_connect = true;
         this->response.did_timeout = false;
 
         if (action == TAU_ACTION_ANNOUNCE && buflen >= 3 * sizeof(uint32_t))
         {
-            response.interval = evbuffer_read_ntoh_32(buf);
-            response.leechers = evbuffer_read_ntoh_32(buf);
-            response.seeders = evbuffer_read_ntoh_32(buf);
-            response.pex = tr_peerMgrCompactToPex(evbuffer_pullup(buf, -1), evbuffer_get_length(buf), nullptr, 0);
+            response.interval = buf.toUint32();
+            response.leechers = buf.toUint32();
+            response.seeders = buf.toUint32();
+
+            auto const compact_len = std::size(buf);
+            auto contiguous = std::array<uint8_t, 576>{};
+            buf.toBuf(std::data(contiguous), compact_len);
+            response.pex = tr_peerMgrCompactToPex(std::data(contiguous), compact_len, nullptr, 0);
             requestFinished();
         }
         else
         {
-            auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
-                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
-                _("Unknown error");
+            std::string const errmsg = action == TAU_ACTION_ERROR && !std::empty(buf) ? buf.toString() : _("Unknown error");
             fail(true, false, errmsg);
         }
     }
@@ -496,27 +477,20 @@ static void tau_tracker_send_reqs(tau_tracker* tracker)
     tau_tracker_send_requests(tracker, tracker->scrapes);
 }
 
-static void on_tracker_connection_response(struct tau_tracker& tracker, tau_action_t action, struct evbuffer* buf)
+static void on_tracker_connection_response(struct tau_tracker& tracker, tau_action_t action, libtransmission::Buffer& buf)
 {
-    time_t const now = tr_time();
-
     tracker.connecting_at = 0;
     tracker.connection_transaction_id = 0;
 
     if (action == TAU_ACTION_CONNECT)
     {
-        tracker.connection_id = evbuffer_read_ntoh_64(buf);
-        tracker.connection_expiration_time = now + TauConnectionTtlSecs;
+        tracker.connection_id = buf.toUint64();
+        tracker.connection_expiration_time = tr_time() + TauConnectionTtlSecs;
         logdbg(tracker.key, fmt::format("Got a new connection ID from tracker: {}", tracker.connection_id));
     }
-    else
+    else if (action == TAU_ACTION_ERROR)
     {
-        size_t const buflen = buf != nullptr ? evbuffer_get_length(buf) : 0;
-
-        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
-            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
-            std::string_view{ _("Connection failed") };
-
+        std::string const errmsg = !std::empty(buf) ? buf.toString() : _("Connection failed");
         logdbg(tracker.key, errmsg);
         tracker.failAll(true, false, errmsg);
     }
@@ -531,7 +505,8 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
     if (tracker->connecting_at != 0 && tracker->connecting_at + TauRequestTtl < now)
     {
-        on_tracker_connection_response(*tracker, TAU_ACTION_ERROR, nullptr);
+        auto empty_buf = libtransmission::Buffer{};
+        on_tracker_connection_response(*tracker, TAU_ACTION_ERROR, empty_buf);
     }
 
     if (auto& reqs = tracker->announces; !std::empty(reqs))
@@ -736,18 +711,17 @@ public:
         }
 
         // extract the action_id and see if it makes sense
-        auto* const buf = evbuffer_new();
-        evbuffer_add_reference(buf, msg, msglen, nullptr, nullptr);
-        auto const action_id = tau_action_t(evbuffer_read_ntoh_32(buf));
+        auto buf = libtransmission::Buffer{};
+        buf.add(msg, msglen);
+        auto const action_id = static_cast<tau_action_t>(buf.toUint32());
 
         if (!is_tau_response_message(action_id, msglen))
         {
-            evbuffer_free(buf);
             return false;
         }
 
         /* extract the transaction_id and look for a match */
-        tau_transaction_t const transaction_id = evbuffer_read_ntoh_32(buf);
+        tau_transaction_t const transaction_id = buf.toUint32();
 
         for (auto& tracker : trackers_)
         {
@@ -756,7 +730,6 @@ public:
             {
                 logtrace(tracker.key, fmt::format("{} is my connection request!", transaction_id));
                 on_tracker_connection_response(tracker, action_id, buf);
-                evbuffer_free(buf);
                 return true;
             }
 
@@ -773,7 +746,6 @@ public:
                     auto req = *it;
                     it = reqs.erase(it);
                     req.onResponse(action_id, buf);
-                    evbuffer_free(buf);
                     return true;
                 }
             }
@@ -791,14 +763,12 @@ public:
                     auto req = *it;
                     it = reqs.erase(it);
                     req.onResponse(action_id, buf);
-                    evbuffer_free(buf);
                     return true;
                 }
             }
         }
 
         /* no match... */
-        evbuffer_free(buf);
         return false;
     }
 
