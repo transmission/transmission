@@ -140,7 +140,7 @@ struct tau_scrape_request
         }
     }
 
-    std::vector<uint8_t> payload;
+    std::vector<std::byte> payload;
 
     time_t sent_at;
     time_t created_at;
@@ -159,18 +159,15 @@ static tau_scrape_request make_tau_scrape_request(
     tau_transaction_t const transaction_id = tau_transaction_new();
 
     /* build the payload */
-    auto* buf = evbuffer_new();
-    evbuffer_add_hton_32(buf, TAU_ACTION_SCRAPE);
-    evbuffer_add_hton_32(buf, transaction_id);
+    auto buf = libtransmission::Buffer{};
+    buf.addUint32(TAU_ACTION_SCRAPE);
+    buf.addUint32(transaction_id);
     for (int i = 0; i < in.info_hash_count; ++i)
     {
-        evbuffer_add(buf, std::data(in.info_hash[i]), std::size(in.info_hash[i]));
+        buf.add(in.info_hash[i]);
     }
-    auto const* const payload_begin = evbuffer_pullup(buf, -1);
-    auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
 
-    /* build the tau_scrape_request */
-
+    // build the tau_scrape_request
     auto req = tau_scrape_request{};
     req.callback = callback;
     req.created_at = tr_time();
@@ -179,7 +176,7 @@ static tau_scrape_request make_tau_scrape_request(
     req.user_data = user_data;
     req.response.scrape_url = in.scrape_url;
     req.response.row_count = in.info_hash_count;
-    req.payload.assign(payload_begin, payload_end);
+    req.payload.insert(std::end(req.payload), std::begin(buf), std::end(buf));
 
     for (int i = 0; i < req.response.row_count; ++i)
     {
@@ -190,7 +187,6 @@ static tau_scrape_request make_tau_scrape_request(
     }
 
     /* cleanup */
-    evbuffer_free(buf);
     return req;
 }
 
@@ -244,7 +240,7 @@ struct tau_announce_request
         }
     }
 
-    std::vector<uint8_t> payload;
+    std::vector<std::byte> payload;
 
     time_t created_at = 0;
     time_t sent_at = 0;
@@ -292,21 +288,19 @@ static tau_announce_request make_tau_announce_request(
     tau_transaction_t const transaction_id = tau_transaction_new();
 
     /* build the payload */
-    auto* buf = evbuffer_new();
-    evbuffer_add_hton_32(buf, TAU_ACTION_ANNOUNCE);
-    evbuffer_add_hton_32(buf, transaction_id);
-    evbuffer_add(buf, std::data(in.info_hash), std::size(in.info_hash));
-    evbuffer_add(buf, std::data(in.peer_id), std::size(in.peer_id));
-    evbuffer_add_hton_64(buf, in.down);
-    evbuffer_add_hton_64(buf, in.leftUntilComplete);
-    evbuffer_add_hton_64(buf, in.up);
-    evbuffer_add_hton_32(buf, get_tau_announce_event(in.event));
-    evbuffer_add_hton_32(buf, announce_ip);
-    evbuffer_add_hton_32(buf, in.key);
-    evbuffer_add_hton_32(buf, in.numwant);
-    evbuffer_add_hton_16(buf, in.port.host());
-    auto const* const payload_begin = evbuffer_pullup(buf, -1);
-    auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
+    auto buf = libtransmission::Buffer{};
+    buf.addUint32(TAU_ACTION_ANNOUNCE);
+    buf.addUint32(transaction_id);
+    buf.add(in.info_hash);
+    buf.add(in.peer_id);
+    buf.addUint64(in.down);
+    buf.addUint64(in.leftUntilComplete);
+    buf.addUint64(in.up);
+    buf.addUint32(get_tau_announce_event(in.event));
+    buf.addUint32(announce_ip);
+    buf.addUint32(in.key);
+    buf.addUint32(in.numwant);
+    buf.addUint16(in.port.host());
 
     /* build the tau_announce_request */
     auto req = tau_announce_request();
@@ -314,13 +308,12 @@ static tau_announce_request make_tau_announce_request(
     req.transaction_id = transaction_id;
     req.callback = callback;
     req.user_data = user_data;
-    req.payload.assign(payload_begin, payload_end);
+    req.payload.insert(std::end(req.payload), std::begin(buf), std::end(buf));
     req.response.seeders = -1;
     req.response.leechers = -1;
     req.response.downloads = -1;
     req.response.info_hash = in.info_hash;
 
-    evbuffer_free(buf);
     return req;
 }
 

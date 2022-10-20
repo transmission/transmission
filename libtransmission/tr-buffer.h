@@ -56,6 +56,16 @@ public:
             return Iterator(buf_, offset_ + n_bytes);
         }
 
+        [[nodiscard]] Iterator operator-(int n_bytes)
+        {
+            return Iterator(buf_, offset_ - n_bytes);
+        }
+
+        [[nodiscard]] constexpr auto operator-(Iterator const& that) const noexcept
+        {
+            return offset_ - that.offset_;
+        }
+
         Iterator& operator++() noexcept
         {
             if (iov_.iov_len > 1)
@@ -68,6 +78,19 @@ public:
             {
                 setOffset(offset_ + 1);
             }
+            return *this;
+        }
+
+        Iterator& operator+=(int n_bytes)
+        {
+            setOffset(offset_ + n_bytes);
+            return *this;
+        }
+
+        Iterator& operator--() noexcept
+        {
+            // TODO(ckerr) inefficient; calls evbuffer_ptr_peek() every time
+            setOffset(offset_ - 1);
             return *this;
         }
 
