@@ -333,9 +333,9 @@ struct tau_tracker
     {
     }
 
-    [[nodiscard]] auto isIdle() const
+    [[nodiscard]] auto isIdle() const noexcept
     {
-        return std::empty(announces) && std::empty(scrapes) && (dns_request_ != 0U);
+        return std::empty(announces) && std::empty(scrapes) && (dns_request_ == 0U);
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
