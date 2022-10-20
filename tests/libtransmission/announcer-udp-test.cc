@@ -171,6 +171,23 @@ protected:
         return request;
     }
 
+    [[nodiscard]] static auto buildSimpleScrapeRequestAndResponse()
+    {
+        auto response = tr_scrape_response{};
+        response.did_connect = true;
+        response.did_timeout = false;
+        response.row_count = 1;
+        response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
+        response.rows[0].seeders = 1;
+        response.rows[0].leechers = 2;
+        response.rows[0].downloads = 3;
+        response.rows[0].downloaders = 0;
+        response.scrape_url = DefaultScrapeUrl;
+        response.min_request_interval = 0;
+
+        return std::make_pair(buildScrapeRequestFromResponse(response), response);
+    }
+
     [[nodiscard]] static auto parseScrapeRequest(libtransmission::Buffer& buf, uint64_t expected_connection_id)
     {
         EXPECT_EQ(expected_connection_id, buf.toUint64());
@@ -244,27 +261,11 @@ TEST_F(AnnouncerUdpTest, canInstantiate)
 
 TEST_F(AnnouncerUdpTest, canScrape)
 {
-    // build the expected reponse
-    auto expected_response = tr_scrape_response{};
-    expected_response.did_connect = true;
-    expected_response.did_timeout = false;
-    expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
-    expected_response.rows[0].seeders = 1;
-    expected_response.rows[0].leechers = 2;
-    expected_response.rows[0].downloads = 3;
-    expected_response.rows[0].downloaders = 0;
-    expected_response.scrape_url = DefaultScrapeUrl;
-    expected_response.min_request_interval = 0;
-
-    // build the request
-    auto request = buildScrapeRequestFromResponse(expected_response);
-
-    // build the announcer
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
 
     // tell announcer to scrape
+    auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
     announcer->scrape(
         request,
@@ -283,7 +284,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
     sent = waitForAnnouncerToSendMessage(mediator);
-    auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
+    auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
     expectEqual(request, info_hashes);
 
     // Have the tracker respond to the request
@@ -301,6 +302,22 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // confirm that announcer processed the response
     EXPECT_TRUE(response);
     expectEqual(expected_response, *response);
+
+    // Now scrape again.
+    // Since the timestamp hasn't changed, the connection should be good
+    // and announcer-udp should skip the `connect` step, going straight to the scrape.
+    response.reset();
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
+
+    // The announcer should have sent a UDP connection request.
+    // Inspect that request for validity.
+    sent = waitForAnnouncerToSendMessage(mediator);
+    std::tie(scrape_transaction_id, info_hashes) = parseScrapeRequest(sent, connection_id);
+    expectEqual(request, info_hashes);
 }
 
 TEST_F(AnnouncerUdpTest, canHandleScrapeError)
@@ -443,11 +460,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     // but after discarding invalid messages,
     // a valid connection response should still work
     auto const connection_id = sendConnectionResponse(*announcer, transaction_id);
-    EXPECT_NE(0,  connection_id);
-}
-
-TEST_F(AnnouncerUdpTest, remembersConnectionId)
-{
+    EXPECT_NE(0, connection_id);
 }
 
 TEST_F(AnnouncerUdpTest, canMultiScrape)
