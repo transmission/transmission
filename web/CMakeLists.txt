@@ -31,12 +31,9 @@ set(TRWEB_IMGS
   assets/img/analytics.svg
   assets/img/modern-tortoise-blue.png
   assets/img/modern-tortoise.png
-  assets/img/checkered-flag.svg
   assets/img/chevron-down.svg
   assets/img/chevron-up.svg
   assets/img/diagram-3-fill.svg
-  assets/img/files.svg
-  assets/img/gear-fill.svg
   assets/img/horizontal-rule.svg
   assets/img/lock-fill.svg
   assets/img/logo.png
@@ -45,7 +42,6 @@ set(TRWEB_IMGS
   assets/img/play-circle-active.svg
   assets/img/play-circle-idle.svg
   assets/img/router.svg
-  assets/img/search.svg
   assets/img/team.svg
   assets/img/three-dots-vertical.svg
   assets/img/up-and-down-arrows.svg

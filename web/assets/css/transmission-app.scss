@@ -195,6 +195,12 @@ a {
   overflow: auto;
 }
 
+input {
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 4px 5px;
+}
+
 /// TOOLBAR
 
 $toolbar-height-number: 50;
@@ -208,7 +214,6 @@ $toolbar-height: $toolbar-height-number * 1px;
   flex-direction: row;
   height: $toolbar-height;
   margin: 0;
-  padding: 2px;
   width: 100%;
 
   button {
@@ -280,7 +285,6 @@ $toolbar-height: $toolbar-height-number * 1px;
   display: flex;
   flex-direction: row;
   height: 30px;
-  padding: 5px;
   width: 100%;
 
   @include for-phone-only {
@@ -689,13 +693,7 @@ $video-image: '../img/film.svg';
     overflow: hidden;
   }
 
-  input,
-  select {
-    // font-size: 25px;
-  }
-
   input[type='checkbox'] {
-    box-sizing: border-box;
     height: 20px;
     width: 20px;
   }
@@ -713,7 +711,7 @@ $video-image: '../img/film.svg';
 }
 
 #prefs-dialog {
-  $background-color: var(--color-toolbar-background);
+  $background-color: var(--color-inspector-background);
   background: $background-color;
   border: 0;
   bottom: 0;
@@ -1552,6 +1550,10 @@ dialog {
 }
 
 /// ABOUT DIALOG
+
+.about-dialog {
+  max-width: initial;
+}
 
 .about-dialog .dialog-workarea > * {
   margin-bottom: 10px;
