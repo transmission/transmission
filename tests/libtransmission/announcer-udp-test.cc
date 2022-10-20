@@ -64,7 +64,6 @@ protected:
     public:
         MockMediator()
             : event_base_{ event_base_new(), event_base_free }
-        // , dns_{ event_base_.get(), tr_time }
         {
         }
 
@@ -72,8 +71,6 @@ protected:
         {
             auto target = tr_address::fromSockaddr(sa);
             ASSERT_TRUE(target);
-            // auto const [addr, port] = *target;
-            // fmt::print("sending {:d} bytes to {:s}\n", buflen, addr.readable(port));
             sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
         }
 
@@ -113,8 +110,6 @@ protected:
         std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
 
         MockDns dns_;
-        // depends-on: event_base_
-        // libtransmission::EvDns dns_;
     };
 
     static void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)
