@@ -2,10 +2,6 @@ project(trgtk)
 
 add_compile_options(${C_WARNING_FLAGS})
 
-if(WITH_LIBAPPINDICATOR)
-    add_definitions(-DHAVE_LIBAPPINDICATOR)
-endif()
-
 execute_process(
     COMMAND
         ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
@@ -170,8 +166,8 @@ include_directories(
     ${EVENT2_INCLUDE_DIRS}
 )
 
-if(WITH_LIBAPPINDICATOR)
-    include_directories(SYSTEM ${LIBAPPINDICATOR_INCLUDE_DIRS})
+if(WITH_APPINDICATOR)
+    include_directories(SYSTEM ${APPINDICATOR_INCLUDE_DIRS})
 endif()
 
 link_directories(
@@ -198,6 +194,13 @@ add_definitions(
     ${GTK${GTK_VERSION}_CFLAGS_OTHER}
 )
 
+if(WITH_APPINDICATOR)
+    set_property(SOURCE SystemTrayIcon.cc APPEND PROPERTY COMPILE_DEFINITIONS HAVE_APPINDICATOR)
+    if(APPINDICATOR_IS_AYATANA)
+        set_property(SOURCE SystemTrayIcon.cc APPEND PROPERTY COMPILE_DEFINITIONS APPINDICATOR_IS_AYATANA)
+    endif()
+endif()
+
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
     "Transmission GTK+ Client"
     "${TR_NAME}-gtk"
@@ -219,8 +222,8 @@ target_link_libraries(${TR_NAME}-gtk
     ${EVENT2_LIBRARIES}
 )
 
-if(WITH_LIBAPPINDICATOR)
-    target_link_libraries(${TR_NAME}-gtk ${LIBAPPINDICATOR_LIBRARIES})
+if(WITH_APPINDICATOR)
+    target_link_libraries(${TR_NAME}-gtk ${APPINDICATOR_LIBRARIES})
 endif()
 
 if(NOT MSVC)
