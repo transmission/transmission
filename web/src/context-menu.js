@@ -49,11 +49,15 @@ export class ContextMenu extends EventTarget {
     root.classList.add('context-menu', 'popup');
 
     const actions = {};
-    const add_item = (action) => {
+    const add_item = (action, warn = false) => {
       const item = document.createElement('div');
       const text = this.action_manager.text(action);
       item.role = 'menuitem';
-      item.classList.add('context-menuitem');
+      if (warn) {
+        item.classList.add('context-menuitem', 'warning');
+      } else {
+        item.classList.add('context-menuitem');
+      }
       item.dataset.action = action;
       item.textContent = text;
       const keyshortcuts = this.action_manager.keyshortcuts(action);
@@ -83,8 +87,8 @@ export class ContextMenu extends EventTarget {
     add_item('move-down');
     add_item('move-bottom');
     add_separator();
-    add_item('remove-selected-torrents');
-    add_item('trash-selected-torrents');
+    add_item('remove-selected-torrents', true);
+    add_item('trash-selected-torrents', true);
     add_separator();
     add_item('verify-selected-torrents');
     add_item('show-move-dialog');

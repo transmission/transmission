@@ -1,70 +1,55 @@
-
 # GOT BETTER ICONS? PULL REQUESTS WELCOMED
 
-## Material Icons
+## [Material Icons](https://github.com/google/material-design-icons/)
 
-https://github.com/google/material-design-icons/
-https://material.io/resources/icons/
+[Material icons overview @ material.io](https://m3.material.io/styles/icons/overview)
 
-* analytics.svg
-* horizontal-rule.svg
-* pause-circle-active.svg (pause-circle-filled.svg)
-* pause-circle-idle.svg (pause-circle-filled.svg)
-* play-circle-active.svg (play-circle-filled.svg)
-* play-circle-idle.svg (play-circle-filled.svg)
-* router.svg
+license: Apache-2.0 license
+
+- horizontal-rule.svg
+- pause-circle-active.svg
+- pause-circle-idle.svg
+- play-circle-active.svg
+- play-circle-idle.svg
+- router.svg
+
+## [Feather Icons](https://github.com/feathericons/feather)
+
+license: MIT
+
+- index.html nav button svg
+- chevron-down.svg
+- chevron-up.svg
+
+## Inspector 'i' icon
+
+- Created in OmniGraffle by [https://github.com/dareiff]
 
 ## Bootstrap Icons
 
-https://github.com/twbs/icons
-https://icons.getbootstrap.com/icons/
+[https://github.com/twbs/icons]
+[https://icons.getbootstrap.com/icons/]
 license: MIT
 
-* chevron-down.svg
-* chevron-up.svg
-* files.svg
-* gear-fill.svg
-* lock-fill.svg
-* magnet.svg
-* search.svg
-* three-dots-vertical.svg
-
-## Adwaita Icons
-
-https://gitlab.gnome.org/GNOME/adwaita-icon-theme
-license: CC-BY-SA 3.0
-
-* audio-x-generic.png
-* folder.png
-* font-x-generic.png
-* image-x-generic.png
-* package-x-generic.png
-* text-x-generic.png
-* video-x-generic.png
-
+- lock-fill.svg
+- magnet.svg
 
 ## SVG Repo
 
 https://www.svgrepo.com/
 license: CC0
 
-* checkered-flag.svg
-* cloud-networking.svg
-* globa-server.svg
-* team.svg
-* top-speed.svg (license: MIT)
-* up-and-down-arrows.svg
-
+- up-and-down-arrows.svg
 
 ## Custom Icons
 
 license: MIT
 
-* blue-turtle.png
-* logo.png
-* toolbar-close.png
-* toolbar-folder.png
-* toolbar-info.png
-* toolbar-pause.png
-* toolbar-start.png
-* turtle.png
+- logo.png
+- toolbar-close.png
+- toolbar-folder.png
+- toolbar-info.png
+- toolbar-pause.png
+- toolbar-start.png
+- modern-tortoise.png
+- modern-tortoise-blue.png

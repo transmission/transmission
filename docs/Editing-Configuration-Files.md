@@ -33,10 +33,12 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
 
 ### Options
 #### IP Announce
+
  * **announce-ip:** String (default = "") Alternative IP address to announce to tracker.
  * **announce-ip-enabled:** Boolean (default = false) When enabled **announce-ip** value is used instead of client's address visible to tracker for announcement requests.
 
 #### Bandwidth
+
  * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')
    _Note: Clicking the "Turtle" in the GUI when the [scheduler](#Scheduling) is enabled, will only temporarily remove the scheduled limit until the next cycle._
  * **alt-speed-up:** Number (KB/s, default = 50)
@@ -48,10 +50,12 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **upload-slots-per-torrent:** Number (default = 14)
 
 #### [Blocklists](./Blocklists.md)
+
  * **blocklist-url:** String (default = https://www.example.com/blocklist)
  * **blocklist-enabled:** Boolean (default = false)
 
 #### [Files and Locations](./ConfigFiles.md)
+
  * **download-dir:** String (default = [default locations](Configuration-Files.md#Locations))
  * **incomplete-dir:** String (default = [default locations](Configuration-Files.md#Locations)) Directory to keep files in until torrent is complete.
  * **incomplete-dir-enabled:** Boolean (default = false) When enabled, new torrents will download the files to **incomplete-dir**. When complete, the files will be moved to **download-dir**.

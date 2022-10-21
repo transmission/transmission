@@ -334,7 +334,7 @@ uint16_t tr_sessionGetRPCPort(tr_session const* session);
  * The whitelist is a comma-separated list of dotted-quad IP addresses
  * to be allowed. Wildmat notation is supported, meaning that
  * '?' is interpreted as a single-character wildcard and
- * '*' is interprted as a multi-character wildcard.
+ * '*' is interpreted as a multi-character wildcard.
  */
 void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist);
 

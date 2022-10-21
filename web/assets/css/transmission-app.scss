@@ -1,9 +1,7 @@
 @use 'sass:color';
 @use 'sass:math';
 
-// Color palette recycled from GitHub Primer.
-// Please use those values if you need to add colors.
-// https://primer.style/css/support/color-system
+// Colors related to torrent status
 $blue-100: #dbedff;
 $blue-200: #c8e1ff;
 $blue-300: #79b8ff;
@@ -13,47 +11,43 @@ $green-200: #bef5cb;
 $green-300: #85e89d;
 $green-500: #28a745;
 $green-700: #176f2c;
-$grey-100: #f6f8fa;
-$grey-200: #e1e4e8;
-$grey-300: #d1d5da;
-$grey-400: #959da5;
-$grey-500: #6a737d;
-$grey-800: #2f363d;
+$grey-500: #828282;
+$grey-700: #373737;
+$grey-800: #292929;
+$grey-900: #191919;
 $pink-300: #f692ce;
 $pink-700: #b93a86;
-$purple-000: #f5f0ff;
-$purple-100: #e6dcfd;
 $red-500: #d73a49;
 $white: #fff;
-$yellow-200: #fff5b1;
 $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
 
+$nice-grey: #f8f8f8;
+$nice-grey-darker: #f0f0f0;
+$dark-mode-black: #121212;
+$default-accent-color: #fff8c5;
+$default-accent-color-dark: #2e2e2e;
+$default-border-dark: #575757;
+$default-border-light: #aeaeae;
 // Z-INDEX ENUM
 // $z-index-progressbar: 1;
 $z-index-popup: 2;
 
 // ICONS -- see assets/img/README.md for sources and license details
 // Are you a designer? New icon PRs welcomed!
-$image-alt-speed-disabled: '../img/turtle.png';
-$image-alt-speed-enabled: '../img/blue-turtle.png';
-$image-analytics: '../img/analytics.svg';
+$image-alt-speed-disabled: '../img/modern-tortoise.png';
+$image-alt-speed-enabled: '../img/modern-tortoise-blue.png';
 $image-baseline: '../img/horizontal-rule.svg';
 $image-chevron-dn: '../img/chevron-down.svg';
 $image-chevron-up: '../img/chevron-up.svg';
-$image-files: '../img/files.svg';
 $image-lock-fill: '../img/lock-fill.svg';
 $image-magnet: '../img/magnet.svg';
-$image-network: '../img/router.svg';
-$image-overflow: '../img/three-dots-vertical.svg';
 $image-pause-circle-active: '../img/pause-circle-active.svg';
 $image-pause-circle-idle: '../img/pause-circle-idle.svg';
-$image-peers: '../img/team.svg';
 $image-play-circle-active: '../img/play-circle-active.svg';
 $image-play-circle-idle: '../img/play-circle-idle.svg';
-$image-speed: '../img/checkered-flag.svg';
-$image-tiers: '../img/diagram-3-fill.svg';
-$image-upload-download: '../img/up-and-down-arrows.svg';
+
+/// MIXINS
 
 @mixin for-phone-only {
   @media (max-width: 599px) {
@@ -65,15 +59,6 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
     @content;
   }
 }
-// @mixin for-tablet-landscape-up {media (min-width: 900px) { @content; }}
-// @mixin for-desktop-up {@media (min-width: 1200px) { @content; }}
-// @mixin for-big-desktop-up {@media (min-width: 1800px) { @content; }}
-
-/// MIXINS
-
-@mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
-  background-image: url($src), linear-gradient($topColor, $bottomColor);
-}
 
 @mixin button {
   border: 1px solid var(--color-border);
@@ -83,48 +68,18 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
   user-select: none;
 }
 
-@mixin rounded-box($radius) {
-  border-radius: $radius;
-}
-
-@mixin rounded-button($radius) {
-  @include button;
-  border-radius: $radius;
-}
-
 /// GLOBAL
 
 :root {
-  --color-bg-even: #{$white};
-  --color-bg-hover: #{$grey-100};
-  --color-bg-menu: #{$grey-200};
-  --color-bg-odd: #{$grey-100};
-  --color-bg-selection-1: #{$purple-100};
-  --color-bg-selection-2: #{$purple-000};
-  --color-border: #{$grey-400};
-  --color-fg-disabled: #{$grey-400};
   --color-fg-error: #{$red-500};
-  --color-fg-name: #{$grey-800};
-  --color-fg-on-popup: #{$grey-800};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
-  @media (prefers-color-scheme: dark) {
-    --color-fg-primary: #{$grey-100};
-    --color-fg-secondary: #{$grey-400};
-    --color-fg-tertiary: #{$grey-500};
-  }
-  @media (prefers-color-scheme: light) {
-    --color-fg-primary: #{$grey-800};
-    --color-fg-secondary: #{$grey-500};
-    --color-fg-tertiary: #{$grey-400};
-  }
-  --color-progressbar-background-1: #{$grey-100};
-  --color-progressbar-background-2: #{$grey-400};
+  --color-progressbar-background-2: #{$grey-500};
   --color-progressbar-verify-1: #{$pink-300};
   --color-progressbar-verify-2: #{$pink-700};
   --color-progressbar-magnet-1: #{$yellow-300};
   --color-progressbar-magnet-2: #{$yellow-700};
-  --color-progressbar-magnet-paused-1: #{$yellow-200};
+  --color-progressbar-magnet-paused-1: #{$default-accent-color};
   --color-progressbar-magnet-paused-2: #{$grey-500};
   --color-progressbar-leech-paused-1: #{$blue-200};
   --color-progressbar-leech-paused-2: #{$grey-500};
@@ -138,20 +93,65 @@ $image-upload-download: '../img/up-and-down-arrows.svg';
   --color-progressbar-seed-queued-2: #{$green-300};
   --color-progressbar-seed-1: #{$green-300};
   --color-progressbar-seed-2: #{$green-700};
-  --color-tab-deselected-1: #{$grey-100};
-  --color-tab-deselected-2: #{$grey-400};
-  --color-tab-selected-1: #{$purple-100};
-  --color-tab-selected-2: #{$purple-000};
-  --color-toolbar-background: linear-gradient(#{$grey-300}, #{$grey-400});
+  color-scheme: light dark;
+  @media (prefers-color-scheme: dark) {
+    --color-bg-hover: #{$nice-grey};
+    --color-fg-primary: #fff;
+    --color-bg-primary: #{$grey-800};
+    --color-bg-odd: #{$grey-900};
+    --color-bg-even: #{$grey-800};
+    --color-bg-menu: #{$grey-800};
+    --color-fg-secondary: #{$nice-grey};
+    --color-fg-on-popup: #{$nice-grey};
+    --color-fg-disabled: #{$nice-grey};
+    --color-bg-popup: #{$grey-800};
+    --color-bg-warn: #cf6679;
+    --color-fg-warn: #{$dark-mode-black};
+    --color-border: #{$nice-grey};
+    --color-border-selected: #d0d7de;
+    --color-fg-tertiary: #{$grey-500};
+    --color-toolbar-background: #{$grey-800};
+    --color-inspector-background: #{$grey-800};
+    --color-inspector-tabs: #{$nice-grey};
+    --color-bg-selected: #{$default-accent-color-dark};
+    --color-bg-tabs: #{$grey-700};
+    --color-progressbar-background-1: #426389;
+    --color-default-border: #{$default-border-dark};
+  }
+  @media (prefers-color-scheme: light) {
+    --color-bg-hover: #{$nice-grey};
+    --color-fg-primary: #404040;
+    --color-bg-primary: #fff;
+    --color-bg-even: #{$white};
+    --color-bg-odd: #{$nice-grey};
+    --color-bg-menu: #{$nice-grey};
+    --color-fg-on-popup: #{$grey-900};
+    --color-bg-popup: #{$white};
+    --color-fg-secondary: #{$grey-500};
+    --color-border: #{$grey-500};
+    --color-border-selected: #d0d7de;
+    --color-fg-tertiary: #{$grey-500};
+    --color-bg-warn: #e4606d5b;
+    --color-fg-warn: #cf212e;
+    --color-fg-disabled: #{$grey-500};
+    --color-toolbar-background: #{$nice-grey};
+    --color-inspector-background: #{$white};
+    --color-bg-tabs: #{$nice-grey-darker};
+    --color-inspector-tabs: #{$nice-grey};
+    --color-bg-selected: #{$default-accent-color};
+    --color-progressbar-background-1: #{$nice-grey};
+    --color-default-border: #{$default-border-light};
+    --color-dialog-border: #{$nice-grey};
+  }
 }
 
 html,
 body {
   color: var(--color-fg-primary);
-  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   height: 100%;
   margin: 0;
-  overflow: hidden;
 }
 
 img {
@@ -159,7 +159,9 @@ img {
 }
 
 a {
+  color: var(--color-fg-primary);
   outline: 0;
+  text-decoration: underline;
 }
 
 .hidden {
@@ -193,20 +195,25 @@ a {
   overflow: auto;
 }
 
+input {
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 4px 5px;
+}
+
 /// TOOLBAR
 
-$toolbar-height-number: 36;
+$toolbar-height-number: 50;
 $toolbar-height: $toolbar-height-number * 1px;
 
 #mainwin-toolbar {
   align-items: center;
   background: var(--color-toolbar-background);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
   height: $toolbar-height;
   margin: 0;
-  padding: 2px;
   width: 100%;
 
   button {
@@ -214,15 +221,15 @@ $toolbar-height: $toolbar-height-number * 1px;
     background-position: center;
     background-repeat: no-repeat;
     border: 0;
-    border-radius: 10px;
+    border-radius: 5px;
     cursor: pointer;
     height: $toolbar-height;
     margin-right: 6px;
     user-select: none;
     width: $toolbar-height;
 
-    &:hover:not(:disabled) {
-      background-color: var(--color-bg-hover);
+    svg {
+      stroke: var(--color-fg-primary); // ios only? idk yet
     }
 
     &:disabled {
@@ -232,7 +239,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 
   > .toolbar-separator {
-    border-left: 1px solid var(--color-border);
+    border-left: 1px solid var(--color-default-border);
     height: 25px;
     margin: 0 6px 0 0;
   }
@@ -243,79 +250,58 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 }
 
-#toolbar-open {
-  background-image: url('../img/toolbar-folder.png');
-}
-
-#toolbar-remove {
-  background-image: url('../img/toolbar-close.png');
-}
-
-#toolbar-start {
-  background-image: url('../img/toolbar-start.png');
-}
-
-#toolbar-pause {
-  background-image: url('../img/toolbar-pause.png');
+.toolbar-icon {
+  stroke: var(--color-fg-primary);
 }
 
 #toolbar-inspector {
-  background-image: url('../img/toolbar-info.png');
+  svg {
+    color: var(--color-fg-primary);
+  }
 }
 
 #toolbar-overflow {
-  background-color: transparent;
-  background-image: url($image-overflow);
-  background-position: center;
-  background-size: 26px;
   margin-right: 4px;
-  width: 36px;
+
+  svg {
+    fill: var(--color-fg-primary);
+    height: 36px;
+    width: 36px;
+  }
 
   &.alt-speed-enabled {
-    background-image: url($image-alt-speed-enabled), url($image-overflow);
-    background-position: bottom left, center, center;
-    background-size: 16px 9px, 26px, 26px;
+    background-image: url($image-alt-speed-enabled);
+    background-position: bottom left;
+    background-size: 20px;
   }
 }
 
 /// FILTERBAR
 
-// $filterbar-height-number: 30;
-// $filterbar-height: $filterbar-height-number * 1px;
-
 .mainwin-filterbar {
   align-items: center;
   background: var(--color-toolbar-background);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
-  font-size: smaller;
-  // height: $filterbar-height;
+  height: 30px;
   width: 100%;
 
   @include for-phone-only {
-    > :not(select):not(input) {
+    padding: 5px 10px;
+
+    :not(select):not(input) {
       display: none;
     }
 
-    > input {
-      min-width: 50px;
-    }
-
-    > input,
-    > select {
-      height: 100%;
+    #torrent-search {
+      padding: 5px;
     }
   }
 
   > * {
+    margin-right: 5px;
     padding: 0 5px;
-  }
-}
-
-#torrent-search {
-  &.blur {
-    color: var(--color-fg-tertiary);
   }
 }
 
@@ -339,7 +325,7 @@ $speed-icon-size: 12px;
 
 /// TORRENT CONTAINER
 
-$pauseresume-size-number: 14;
+$pauseresume-size-number: 20;
 $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border-number: 1;
 $progressbar-height-number: 14;
@@ -363,17 +349,38 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   background-color: $white;
 }
 
-.torrent-list {
-  $app-image: '../img/application-x-executable.png';
-  $audio-image: '../img/audio-x-generic.png';
-  $folder-image: '../img/folder.png';
-  $font-image: '../img/font-x-generic.png';
-  $image-image: '../img/image-x-generic.png';
-  $package-image: '../img/package-x-generic.png';
-  $text-image: '../img/folder.png';
-  $text-image: '../img/text-x-generic.png';
-  $video-image: '../img/video-x-generic.png';
+$app-image: '../img/box.svg';
+$audio-image: '../img/music.svg';
+$folder-image: '../img/folder.svg';
+$font-image: '../img/type.svg';
+$image-image: '../img/image.svg';
+$package-image: '../img/package.svg';
+$text-image: '../img/file-text.svg';
+$video-image: '../img/film.svg';
 
+@mixin mime-icon-compact($mime-icon) {
+  &[data-icon-multifile='true'] {
+    background-image: url($folder-image);
+    background-position: center;
+    background-size: 16px;
+  }
+}
+
+@mixin mime-icon($mime-icon) {
+  // background-image: url($mime-icon);
+  background-color: var(--color-fg-primary);
+  mask-image: url($mime-icon);
+  mask-repeat: no-repeat;
+
+  &[data-icon-multifile='true'] {
+    mask-image: url($mime-icon), url($folder-image);
+    mask-position: top left, bottom right;
+    mask-repeat: no-repeat, no-repeat;
+    mask-size: 16px, 16px;
+  }
+}
+
+.torrent-list {
   cursor: pointer;
   list-style-type: none;
   margin: 0;
@@ -382,51 +389,40 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   width: 100%;
 
   .torrent {
-    border-bottom: 1px solid var(--color-border);
-    color: var(--color-fg-secondary);
+    border-bottom: 1px solid var(--color-default-border);
     user-select: none;
 
-    &.paused {
-      color: var(--color-fg-disabled);
-    }
-
     .icon {
+      // color the background svg fill
+      background-color: var(--color-fg-primary);
       background-position: center, top left;
 
-      @mixin mime-icon-compact($mime-icon) {
-        background-image: url($mime-icon);
-
-        &[data-icon-multifile='true'] {
-          background-image: url($mime-icon), url($folder-image);
-        }
-      }
-
       &[data-icon-mime-type='audio'] {
-        @include mime-icon-compact($audio-image);
+        @include mime-icon($audio-image);
       }
 
       &[data-icon-mime-type='application'] {
-        @include mime-icon-compact($app-image);
+        @include mime-icon($app-image);
       }
 
       &[data-icon-mime-type='font'] {
-        @include mime-icon-compact($font-image);
+        @include mime-icon($font-image);
       }
 
       &[data-icon-mime-type='image'] {
-        @include mime-icon-compact($image-image);
+        @include mime-icon($image-image);
       }
 
       &[data-icon-mime-type='model'] {
-        @include mime-icon-compact($package-image);
+        @include mime-icon($package-image);
       }
 
       &[data-icon-mime-type='text'] {
-        @include mime-icon-compact($text-image);
+        @include mime-icon($text-image);
       }
 
       &[data-icon-mime-type='video'] {
-        @include mime-icon-compact($video-image);
+        @include mime-icon($video-image);
       }
     }
 
@@ -439,14 +435,18 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       flex-direction: row-reverse;
 
       .icon {
-        background-size: $icon-size, $icon-size-num * 0.5px;
         flex-shrink: 0;
         height: $icon-size;
+        mask-size: $icon-size, $icon-size-num * 0.5px;
         width: $icon-size;
+
+        &[data-icon-multifile='true'] {
+          @include mime-icon($folder-image);
+        }
       }
 
       > * {
-        margin: 4px 5px;
+        margin: 5px;
       }
     }
 
@@ -462,7 +462,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
         'icon progressbar progressbar'
         'icon progress-text progress-text';
       grid-template-columns: $icon-size auto 1fr;
-      padding: 2px 12px;
+      padding: 6px 12px;
 
       .icon {
         background-size: $icon-size, $icon-size-num * 0.5px;
@@ -472,7 +472,12 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       }
 
       .torrent-name {
+        color: var(--color-fg-primary);
         grid-area: name;
+
+        &.paused {
+          color: var(--color-fg-disabled);
+        }
       }
 
       .torrent-labels {
@@ -499,7 +504,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     }
 
     &.selected {
-      background-color: var(--color-bg-selection-1);
+      background-color: var(--color-bg-selected);
     }
 
     &.selected .torrent-progress-details.error,
@@ -558,7 +563,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     }
 
     &:not(.paused) {
-      color: var(--color-fg-name);
+      color: var(--color-fg-primary);
     }
   }
 
@@ -579,11 +584,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .torrent-progress-details,
   .torrent-peer-details {
+    color: var(--color-fg-primary);
     font-size: x-small;
   }
 
   .torrent-progress-bar {
     background-repeat: no-repeat;
+    border-color: var(--color-border-selected);
     border-radius: 3px;
     border-style: solid;
     border-width: 1px;
@@ -608,7 +615,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       background: progressbar-gradient($color1, $color2),
         progressbar-gradient(
           var(--color-progressbar-background-1),
-          var(--color-progressbar-background-2)
+          var(--color-progressbar-background-1)
         );
       background-repeat: no-repeat;
     }
@@ -616,63 +623,63 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     &.leech.paused {
       @include progressbar-background(
         var(--color-progressbar-leech-paused-1),
-        var(--color-progressbar-leech-paused-2)
+        var(--color-progressbar-leech-paused-1)
       );
     }
 
     &.leech.queued {
       @include progressbar-background(
         var(--color-progressbar-leech-queued-1),
-        var(--color-progressbar-leech-queued-2)
+        var(--color-progressbar-leech-queued-1)
       );
     }
 
     &.leech {
       @include progressbar-background(
         var(--color-progressbar-leech-1),
-        var(--color-progressbar-leech-2)
+        var(--color-progressbar-leech-1)
       );
     }
 
     &.magnet.paused {
       @include progressbar-background(
         var(--color-progressbar-magnet-paused-1),
-        var(--color-progressbar-magnet-paused-2)
+        var(--color-progressbar-magnet-paused-1)
       );
     }
 
     &.magnet {
       @include progressbar-background(
         var(--color-progressbar-magnet-1),
-        var(--color-progressbar-magnet-2)
+        var(--color-progressbar-magnet-1)
       );
     }
 
     &.seed.paused {
       @include progressbar-background(
         var(--color-progressbar-seed-paused-1),
-        var(--color-progressbar-seed-paused-2)
+        var(--color-progressbar-seed-paused-1)
       );
     }
 
     &.seed.queued {
       @include progressbar-background(
         var(--color-progressbar-seed-queued-1),
-        var(--color-progressbar-seed-queued-2)
+        var(--color-progressbar-seed-queued-1)
       );
     }
 
     &.seed {
       @include progressbar-background(
         var(--color-progressbar-seed-1),
-        var(--color-progressbar-seed-2)
+        var(--color-progressbar-seed-1)
       );
     }
 
     &.verify {
       @include progressbar-background(
         var(--color-progressbar-verify-1),
-        var(--color-progressbar-verify-2)
+        var(--color-progressbar-verify-1)
       );
     }
   }
@@ -680,35 +687,16 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 /// PREFERENCES DIALOG
 
-@mixin tab-image($image-url) {
-  background-image: url($image-url),
-    linear-gradient(
-      var(--color-tab-deselected-1),
-      var(--color-tab-deselected-2)
-    );
-
-  &:active,
-  &:checked,
-  &.selected {
-    background-image: url($image-url),
-      linear-gradient(var(--color-tab-selected-1), var(--color-tab-selected-2));
+@include for-phone-only {
+  html,
+  body {
+    overflow: hidden;
   }
-}
 
-#inspector-tab-info {
-  @include tab-image($image-analytics);
-}
-
-#inspector-tab-peers {
-  @include tab-image($image-peers);
-}
-
-#inspector-tab-tiers {
-  @include tab-image($image-tiers);
-}
-
-#inspector-tab-files {
-  @include tab-image($image-files);
+  input[type='checkbox'] {
+    height: 20px;
+    width: 20px;
+  }
 }
 
 #inspector,
@@ -717,17 +705,18 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     left: 0;
   }
   @include for-tablet-portrait-up {
-    border-left: 1px solid var(--color-fg-secondary);
+    border-left: 1px solid var(--color-default-border);
     width: 570px;
   }
 }
 
 #prefs-dialog {
-  $background-color: $white;
-
+  $background-color: var(--color-inspector-background);
   background: $background-color;
+  border: 0;
   bottom: 0;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
   position: absolute;
   right: 0;
   top: $popup-top;
@@ -746,7 +735,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     .section-label {
       font-weight: bold;
       grid-column: span 2;
-      margin-left: -20px;
+      // margin-left: -20px;
       padding-bottom: 5px;
 
       &:not(:first-of-type) {
@@ -757,7 +746,9 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .alt-speed-section-label {
     background: transparent url($image-alt-speed-enabled) no-repeat;
-    background-position: left 4px;
+    background-position: left;
+    background-position-y: 4px;
+    background-size: 20px;
     padding-left: 22px;
   }
 
@@ -821,7 +812,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     font-size: smaller;
     font-style: lighter;
     // nudge it up next to the section label
-    margin: -10px 0 10px -20px;
+    margin: -10px 0 10px;
   }
 }
 
@@ -838,8 +829,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .title {
+    color: var(--color-fg-primary);
     font-size: larger;
     font-weight: bold;
+    margin-bottom: 10px;
     padding-left: 0;
   }
 
@@ -861,34 +854,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       }
     }
   }
-
-  .checkbox-row {
-    > input {
-      margin: 0;
-    }
-
-    > label {
-      margin-left: 5px;
-    }
-  }
-
-  #alternative-speed-limits-title {
-    background: transparent url($image-alt-speed-enabled) no-repeat;
-    padding-left: 18px;
-  }
-
-  #alternative-speed-limits-desc {
-    font-size: smaller;
-    padding-bottom: 4px;
-  }
 }
 
 /// TABS
 
 .tabs-container {
   align-items: stretch;
-  background: $white;
-  border-left: solid 1px var(--color-border);
+  background: var(--color-inspector-background);
   bottom: 0;
   display: flex;
   flex-direction: column;
@@ -906,28 +878,17 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 .tabs-buttons {
   align-self: center;
+  background-color: var(--color-bg-tabs);
+  border: 1px solid var(--color-border-selected);
+  border-radius: 6px;
   display: flex;
-  padding: 10px;
+  margin: 10px 0;
 
   button {
-    @include button;
     appearance: none;
-    padding: 3px;
-  }
-}
-
-.file-priority-radiobox,
-.tabs-buttons {
-  $radius: 8px;
-
-  :first-child {
-    border-bottom-left-radius: $radius;
-    border-top-left-radius: $radius;
-  }
-
-  :last-child {
-    border-bottom-right-radius: $radius;
-    border-top-right-radius: $radius;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--color-fg-primary);
   }
 }
 
@@ -945,22 +906,34 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 }
 
 .tabs-button {
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: var(--color-bg-tabs);
+  border: 1px solid transparent;
+  font-size: 14px;
+  padding: 3px 8px;
+
+  &:active,
+  &:checked,
+  &.selected {
+    background-color: var(--color-bg-even);
+    border: 1px solid var(--color-fg-primary);
+    border-radius: 6px;
+    font-weight: 500;
+  }
 }
 
 /// INSPECTOR
 
 #inspector {
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px rgba(58, 58, 58, 0.7);
 }
 
 .inspector-info-page {
+  font-size: 14px;
   // TODO: this is (mostly) copied from prefs-dialog.
   // can it be folded into a single set of rules?
 
   grid-column-gap: 8px;
-  grid-row-gap: 5px;
+  grid-row-gap: 8px;
   grid-template-columns: auto 1fr;
   margin: 20px;
   padding: 12px;
@@ -970,14 +943,18 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .section-label {
+    font-size: 16px;
     font-weight: bold;
     grid-column: span 2;
-    margin-left: -20px;
     padding-bottom: 5px;
 
     &:not(:first-of-type) {
       margin-top: 20px;
     }
+  }
+
+  label {
+    font-weight: 500;
   }
 
   :not(.section-label) {
@@ -989,13 +966,14 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 .inspector-info-magnet {
   button {
-    background-color: transparent;
-    background-image: url($image-magnet);
+    background-color: var(--color-border);
+
     background-position: top;
     background-repeat: no-repeat;
     border: 0;
     cursor: pointer;
     height: 1rem;
+    mask: url($image-magnet) no-repeat center / 14px;
     vertical-align: middle;
     width: 1rem;
   }
@@ -1003,27 +981,9 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 #inspector .tabs-button,
 #prefs-dialog .tabs-button {
-  background-size: 20px 20px, 40px 30px;
   height: 30px;
   margin: 0;
-  padding: 0;
-  width: 40px;
-}
-
-#prefs-tab-torrent {
-  @include tab-image($image-upload-download);
-}
-
-#prefs-tab-speed {
-  @include tab-image($image-speed);
-}
-
-#prefs-tab-peers {
-  @include tab-image($image-peers);
-}
-
-#prefs-tab-network {
-  @include tab-image($image-network);
+  min-width: 40px;
 }
 
 #inspector-file-list {
@@ -1050,8 +1010,9 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .inspector-torrent-file-list-entry-name {
-    color: var(--color-fg-name);
+    color: var(--color-fg-primary);
     cursor: pointer;
+    font-size: 14px;
     grid-area: name;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1065,6 +1026,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .inspector-torrent-file-list-entry-progress {
     color: var(--color-fg-secondary);
+    font-size: 12px;
     grid-area: info;
   }
 
@@ -1084,12 +1046,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 }
 
 #inspector-tiers-list {
-  color: var(--color-fg-secondary);
+  color: var(--color-fg-primary);
   margin: 0 10px;
   padding: 0 12px;
 
   .tier-list-row {
     display: grid;
+    font-size: 12px;
     grid-column-gap: 8px;
     grid-row-gap: 4px;
     margin-top: 8px;
@@ -1097,7 +1060,6 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .tier-list-torrent {
     color: var(--color-fg-primary);
-    font-size: larger;
     font-weight: bolder;
     margin-left: -12px;
     overflow-x: hidden;
@@ -1107,6 +1069,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .tier-list-tracker {
+    font-size: 14px;
     font-weight: bolder;
     grid-column: span 2;
     margin-top: 8px;
@@ -1129,8 +1092,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 // Peers Tab
 
 .peer-list {
-  $table-border-color: $grey-100;
-  $table-border: 1px solid $table-border-color;
+  $table-border: 1px solid var(--color-default-border);
 
   border: $table-border;
   border-collapse: collapse;
@@ -1152,7 +1114,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .torrent-row td {
-    background: $table-border-color;
+    background: var(--color-default-border);
     color: var(--color-fg-primary);
     font-size: normal;
     font-weight: bolder;
@@ -1163,12 +1125,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .encryption {
-    width: 16px;
-
     &[data-encrypted='true'] {
-      background: transparent url($image-lock-fill) center center no-repeat;
-      height: 16px;
-      width: 16px;
+      background-color: var(--color-border-selected);
+      mask: url($image-lock-fill) no-repeat center / 14px;
+      width: 10px;
     }
   }
 
@@ -1219,11 +1179,12 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   grid-area: priority;
 
   > * {
-    @include button;
     appearance: none;
+    background-color: var(--color-bg-primary);
     background-position: center;
     background-repeat: no-repeat;
     background-size: $halfsize, $size;
+    border: 1px solid var(--color-border);
     height: $size;
     margin: 0;
     padding: 0;
@@ -1231,45 +1192,60 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   > .low {
-    @include tab-image($image-chevron-dn);
+    background-image: url($image-chevron-dn);
     border-right-width: 0;
   }
 
   > .normal {
-    @include tab-image($image-baseline);
+    background-image: url($image-baseline);
   }
 
   > .high {
-    @include tab-image($image-chevron-up);
+    background-image: url($image-chevron-up);
     border-left-width: 0;
+  }
+
+  //if input is not checked, change background color
+  > *:not(:checked) {
+    background-color: var(--color-border-selected);
   }
 }
 
 /// CONTEXT MENU
 
 .context-menu {
-  $background-color: var(--color-bg-menu);
   $disabled-color: var(--color-fg-disabled);
-
-  background: $background-color;
+  background-color: var(--color-bg-primary);
+  border-radius: 5px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   color: var(--color-fg-on-popup);
+  padding: 10px 5px;
   position: absolute;
-  z-index: $z-index-popup;
+  z-index: 9999;
 
   .context-menuitem {
+    font-size: 13px;
+    font-weight: 400;
     list-style: none;
-    padding: 5px 10px;
+    margin-right: 10px;
+    padding: 5px 15px;
 
     &:hover:not(:disabled),
     &:focus:not(:disabled) {
-      background-image: linear-gradient($white, var(--color-bg-menu));
+      background-color: var(--color-bg-hover);
+      border-radius: 6px;
       cursor: pointer;
+      font-weight: 500;
     }
 
     &:disabled {
       color: $disabled-color;
       cursor: none;
+    }
+
+    &.warning:hover {
+      background-color: var(--color-bg-warn);
+      color: var(--color-fg-warn);
     }
   }
 }
@@ -1283,58 +1259,71 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 /// OVERFLOW MENU
 
 .overflow-menu {
-  background: linear-gradient(
-    160deg,
-    #d21,
-    1%,
-    var(--color-bg-hover),
-    40%,
-    var(--color-bg-menu)
-  );
-  border-radius: 8px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  background: var(--color-bg-popup);
+  border-radius: 5px;
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
-  padding: 20px;
-  position: fixed;
-  width: 200px;
+  min-width: 220px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px;
+  position: absolute;
+
+  right: 20px;
+  top: 50px;
   z-index: $z-index-popup;
+
+  @include for-phone-only() {
+    height: 80vh;
+  }
+  // hide the fullscreen button unless we're on mobile
+  @include for-tablet-portrait-up {
+    #display-fullscreen-check,
+    #display-fullscreen-label {
+      display: none;
+    }
+  }
 
   fieldset {
     border: 0;
-    margin-bottom: 8px;
-    padding: 0;
+    display: block;
+    margin: 8px 0;
   }
 
-  > .actions,
-  > .info,
-  > .links {
+  fieldset ul {
+    margin: 0;
+    padding-left: 0;
+
+    li {
+      list-style-type: none;
+    }
+
+    a {
+      cursor: pointer;
+    }
+  }
+
+  .table-row {
+    align-items: center;
+    border-radius: 6px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    padding: 3px 0;
   }
 
   legend {
+    color: var(--color-fg-primary);
     font-weight: bolder;
-    margin-bottom: 4px;
-  }
-
-  legend ~ * {
-    margin-left: 12px;
+    margin: 12px 0 4px;
   }
 
   a,
   button,
   label {
+    display: inline-flex;
     font-size: 1em;
-
-    &:disabled {
-      color: var(--color-fg-disabled);
-      cursor: default;
-    }
-
-    &:focus:not(:disabled),
-    &:hover:not(:disabled) {
-      background-color: var(--color-bg-hover);
-    }
+    width: 100%;
   }
 
   a,
@@ -1356,23 +1345,8 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   #display-options {
-    > * {
-      align-items: center;
-      display: inline-flex;
-      flex-direction: row;
-
-      > * {
-        margin: 4px;
-      }
-
-      :first-child {
-        margin-left: 0;
-      }
-
-      :last-child {
-        margin-right: 0;
-      }
-    }
+    display: flex;
+    flex-direction: column;
   }
 
   #speed-options {
@@ -1399,7 +1373,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       grid-template-areas:
         'check   lb'
         'turtle  values';
-      grid-template-columns: 20px 1fr;
+      grid-template-columns: 22px 1fr;
       margin-bottom: 4px;
     }
 
@@ -1408,10 +1382,13 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
       &:checked ~ #alt-speed-image {
         background-image: url($image-alt-speed-enabled);
+        background-position: left;
+        background-size: 22px;
       }
 
       &:not(:checked) ~ #alt-speed-image {
         background-image: url($image-alt-speed-disabled);
+        background-size: 22px;
       }
     }
 
@@ -1429,14 +1406,6 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       font-size: small;
       grid-area: values;
     }
-  }
-}
-
-// hide the fullscreen button unless we're on mobile
-@include for-tablet-portrait-up {
-  #display-fullscreen-check,
-  #display-fullscreen-label {
-    display: none;
   }
 }
 
@@ -1470,11 +1439,9 @@ $logo-size: 64px;
 }
 @include for-tablet-portrait-up {
   .dialog-container {
-    left: 50%;
     min-width: 400px;
     position: absolute;
     top: $popup-top * 2;
-    transform: translateX(-50%);
   }
 
   .dialog-heading {
@@ -1487,6 +1454,7 @@ $logo-size: 64px;
   }
 
   .dialog-window {
+    background-color: var(--color-bg-popup);
     color: var(--color-fg-on-popup);
     display: grid;
     grid-column-gap: 12px;
@@ -1509,18 +1477,13 @@ $logo-size: 64px;
 
   button {
     appearance: none;
-    background: transparent;
-    border: 1px solid var(--color-border);
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-default-border);
     border-radius: 5px;
-    color: var(--color-fg-name);
+    color: var(--color-fg-primary);
     margin-left: 8px;
     padding: 8px;
     text-decoration: none;
-  }
-
-  a:hover,
-  a:active {
-    background: linear-gradient($white, var(--color-bg-menu));
   }
 }
 
@@ -1532,14 +1495,23 @@ $logo-size: 64px;
   display: none;
 }
 
-.dialog-container {
+dialog {
   border: 0;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+.dialog-container {
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+    0 9px 28px 8px #0000000d;
   color: var(--color-fg-primary);
   display: block;
-  margin: 0;
   padding: 0;
   z-index: $z-index-popup;
+
+  @include for-tablet-portrait-up() {
+    border: 0;
+    border-radius: 8px;
+    max-width: 50%;
+  }
 }
 
 .dialog-heading {
@@ -1561,8 +1533,8 @@ $logo-size: 64px;
 }
 
 .dialog-window {
-  background: linear-gradient(160deg, #d21, 1%, #f7f7f7, 40%, #ccc);
-  height: 100%;
+  background: var(--color-bg-primary);
+  border-radius: 8px;
   padding: $dialog-padding-number * 1px;
 }
 
@@ -1578,6 +1550,10 @@ $logo-size: 64px;
 }
 
 /// ABOUT DIALOG
+
+.about-dialog {
+  max-width: initial;
+}
 
 .about-dialog .dialog-workarea > * {
   margin-bottom: 10px;
@@ -1662,7 +1638,6 @@ $logo-size: 64px;
 
 #free-space-text {
   display: inline-block;
-  float: right;
   font-size: smaller;
   font-style: italic;
 }

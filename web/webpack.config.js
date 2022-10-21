@@ -25,11 +25,9 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: [ 'style-loader', 'css-loader' ],
+        use: ['style-loader', 'css-loader'],
       },
-
       {
-        exclude: /(node_modules)/,
         include: /(assets)\/(img)/,
         test: /\.(jpe?g|png|gif|svg|webp)$/,
         type: 'asset/inline',
@@ -37,20 +35,17 @@ const config = {
     ],
   },
   optimization: {
-    minimizer: [
-      new TerserPlugin(),
-      new CssMinimizerPlugin(),
-    ],
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
   },
   output: {
-    filename: 'transmission-app.js' ,
+    filename: 'transmission-app.js',
     path: path.resolve(__dirname, 'public_html'),
     sourceMapFilename: 'transmission-app.js.map'
   },
   plugins: [
     new MiniCssExtractPlugin({
       chunkFilename: '[id].css',
-      filename: '[name].css'
+      filename: '[name].css',
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
