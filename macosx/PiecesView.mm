@@ -33,7 +33,6 @@ enum
 @property(nonatomic) NSInteger fNumPieces;
 @property(nonatomic) NSInteger fAcross;
 @property(nonatomic) NSInteger fWidth;
-@property(nonatomic) NSInteger fExtraBorder;
 
 @end
 
@@ -74,7 +73,6 @@ enum
 
         CGFloat const width = self.bounds.size.width;
         _fWidth = static_cast<NSInteger>((width - (_fAcross + 1) * kBetweenPadding) / _fAcross);
-        _fExtraBorder = static_cast<NSInteger>((width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2);
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
@@ -95,7 +93,8 @@ enum
         return;
     }
 
-    NSInteger numPieces = self.fNumPieces;
+    auto full_width = self.bounds.size.width;
+    auto extra_border = static_cast<NSInteger>((full_width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2);
 
     //determine if first time
     BOOL const first = std::empty(self.fPieces);
@@ -177,8 +176,8 @@ enum
             NSInteger const down = index / self.fAcross;
             fillRects[usedCount] = [NSValue
                 valueWithRect:NSMakeRect(
-                                  across * (self.fWidth + kBetweenPadding) + kBetweenPadding + self.fExtraBorder,
-                                  self.bounds.size.width - (down + 1) * (self.fWidth + kBetweenPadding) - self.fExtraBorder,
+                                  across * (self.fWidth + kBetweenPadding) + kBetweenPadding + extra_border,
+                                  full_width - (down + 1) * (self.fWidth + kBetweenPadding) - extra_border,
                                   self.fWidth,
                                   self.fWidth)];
             fillColors[usedCount] = pieceColor;
