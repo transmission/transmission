@@ -13,10 +13,14 @@
 #import "InfoWindowController.h"
 #import "NSApplicationAdditions.h"
 
-static NSInteger const kMaxAcross = 18;
-static CGFloat const kBetweenPadding = 1.0;
+namespace
+{
+constexpr auto kMaxAcross = NSInteger{ 18 };
+constexpr auto kMaxCells = kMaxAcross * kMaxAcross;
 
-static int8_t const kHighPeers = 10;
+constexpr auto kBetweenPadding = CGFloat{ 1.0 };
+
+constexpr auto kHighPeers = int8_t{ 10 };
 
 enum class PieceMode
 {
@@ -26,6 +30,7 @@ enum class PieceMode
     Finished,
     Flashing
 };
+} // namespace
 
 @interface PiecesView ()
 
@@ -80,9 +85,7 @@ enum class PieceMode
         return;
     }
 
-    static auto constexpr MaxCells = kMaxAcross * kMaxAcross;
-
-    auto const n_pieces = std::min(_torrent.pieceCount, MaxCells);
+    auto const n_pieces = std::min(_torrent.pieceCount, kMaxCells);
     auto const full_width = self.bounds.size.width;
     auto const across = static_cast<NSInteger>(ceil(sqrt(n_pieces)));
     auto const cell_width = static_cast<NSInteger>((full_width - (across + 1) * kBetweenPadding) / across);
@@ -93,8 +96,8 @@ enum class PieceMode
     _fNumPieces = n_pieces;
 
     // get the data that we're going to render
-    auto pieces = std::array<int8_t, MaxCells>{};
-    auto pieces_percent = std::array<float, MaxCells>{};
+    auto pieces = std::array<int8_t, kMaxCells>{};
+    auto pieces_percent = std::array<float, kMaxCells>{};
     auto const show_availability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     if (show_availability)
     {
@@ -106,9 +109,9 @@ enum class PieceMode
     }
 
     // get the rect, color info for each cell
-    auto fill_colors = std::array<NSColor*, MaxCells>{};
-    auto fill_rects = std::array<NSRect, MaxCells>{};
-    auto piece_modes = std::array<PieceMode, MaxCells>{};
+    auto fill_colors = std::array<NSColor*, kMaxCells>{};
+    auto fill_rects = std::array<NSRect, kMaxCells>{};
+    auto piece_modes = std::array<PieceMode, kMaxCells>{};
     auto* const default_color = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
     auto used_count = NSInteger{};
     for (NSInteger index = 0; index < n_pieces; ++index)
