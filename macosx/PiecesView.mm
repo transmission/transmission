@@ -2,7 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <vector>
+#include <algorithm>
+#include <optional>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -28,9 +29,7 @@ enum class PieceMode
 
 @interface PiecesView ()
 
-@property(nonatomic) std::vector<PieceMode> fPieces;
-
-@property(nonatomic) NSInteger fNumPieces;
+@property(nonatomic) std::optional<NSInteger> fNumPieces;
 
 @end
 
@@ -63,21 +62,15 @@ enum class PieceMode
     [self clearView];
 
     _torrent = (torrent && !torrent.magnet) ? torrent : nil;
-    if (_torrent)
-    {
-        //determine relevant values
-        _fNumPieces = MIN(_torrent.pieceCount, kMaxAcross * kMaxAcross);
-    }
-
-    NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
-    self.image = back;
+    _fNumPieces.reset();
+    self.image = [[NSImage alloc] initWithSize:self.bounds.size];
 
     [self setNeedsDisplay];
 }
 
 - (void)clearView
 {
-    self.fPieces.clear();
+    self.fNumPieces.reset();
 }
 
 - (void)updateView
@@ -87,83 +80,80 @@ enum class PieceMode
         return;
     }
 
-    auto const n_pieces = self.fNumPieces;
+    static auto constexpr MaxCells = kMaxAcross * kMaxAcross;
+
+    auto const n_pieces = std::min(_torrent.pieceCount, MaxCells);
     auto const full_width = self.bounds.size.width;
-    auto const across = static_cast<NSInteger>(ceil(sqrt(_fNumPieces)));
+    auto const across = static_cast<NSInteger>(ceil(sqrt(n_pieces)));
     auto const cell_width = static_cast<NSInteger>((full_width - (across + 1) * kBetweenPadding) / across);
     auto const extra_border = static_cast<NSInteger>((full_width - ((cell_width + kBetweenPadding) * across + kBetweenPadding)) / 2);
 
-    //determine if first time
-    BOOL const first = std::empty(self.fPieces);
-    if (first)
-    {
-        _fPieces.resize(n_pieces);
-    }
+    // determine if first time
+    auto const first = !_fNumPieces.has_value();
+    _fNumPieces = n_pieces;
 
-    auto pieces = std::vector<int8_t>{};
-    auto piecesPercent = std::vector<float>{};
-
-    BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
-    if (showAvailability)
+    // get the data that we're going to render
+    auto pieces = std::array<int8_t, MaxCells>{};
+    auto pieces_percent = std::array<float, MaxCells>{};
+    auto const show_availability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
+    if (show_availability)
     {
-        pieces.resize(n_pieces);
-        [self.torrent getAvailability:std::data(pieces) size:std::size(pieces)];
+        [self.torrent getAvailability:std::data(pieces) size:n_pieces];
     }
     else
     {
-        piecesPercent.resize(n_pieces);
-        [self.torrent getAmountFinished:std::data(piecesPercent) size:std::size(piecesPercent)];
+        [self.torrent getAmountFinished:std::data(pieces_percent) size:n_pieces];
     }
 
-    std::vector<NSRect> fill_rects(n_pieces);
-    std::vector<NSColor*> fill_colors(n_pieces);
-
+    // get the rect, color info for each cell
+    auto fill_colors = std::array<NSColor*, MaxCells>{};
+    auto fill_rects = std::array<NSRect, MaxCells>{};
+    auto piece_modes = std::array<PieceMode, MaxCells>{};
     auto* const default_color = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
     auto used_count = NSInteger{};
-
     for (NSInteger index = 0; index < n_pieces; ++index)
     {
         NSColor* pieceColor = nil;
 
-        if (showAvailability ? pieces[index] == -1 : piecesPercent[index] == 1.0)
+        if (show_availability ? pieces[index] == -1 : pieces_percent[index] == 1.0)
         {
-            if (first || self.fPieces[index] != PieceMode::Finished)
+            if (first || piece_modes[index] != PieceMode::Finished)
             {
-                if (!first && self.fPieces[index] != PieceMode::Flashing)
+                if (!first && piece_modes[index] != PieceMode::Flashing)
                 {
                     pieceColor = NSColor.systemOrangeColor;
-                    self.fPieces[index] = PieceMode::Flashing;
+                    piece_modes[index] = PieceMode::Flashing;
                 }
                 else
                 {
                     pieceColor = NSColor.systemBlueColor;
-                    self.fPieces[index] = PieceMode::Finished;
+                    piece_modes[index] = PieceMode::Finished;
                 }
             }
         }
-        else if (showAvailability ? pieces[index] == 0 : piecesPercent[index] == 0.0)
+        else if (show_availability ? pieces[index] == 0 : pieces_percent[index] == 0.0)
         {
-            if (first || self.fPieces[index] != PieceMode::None)
+            if (first || piece_modes[index] != PieceMode::None)
             {
                 pieceColor = default_color;
-                self.fPieces[index] = PieceMode::None;
+                piece_modes[index] = PieceMode::None;
             }
         }
-        else if (showAvailability && pieces[index] >= kHighPeers)
+        else if (show_availability && pieces[index] >= kHighPeers)
         {
-            if (first || self.fPieces[index] != PieceMode::HighPeers)
+            if (first || piece_modes[index] != PieceMode::HighPeers)
             {
                 pieceColor = NSColor.systemGreenColor;
-                self.fPieces[index] = PieceMode::HighPeers;
+                piece_modes[index] = PieceMode::HighPeers;
             }
         }
         else
         {
             //always redraw "mixed"
-            CGFloat percent = showAvailability ? (CGFloat)pieces[index] / kHighPeers : piecesPercent[index];
-            NSColor* fullColor = showAvailability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
+            CGFloat percent = show_availability ? (CGFloat)pieces[index] / kHighPeers : pieces_percent[index];
+            NSColor* fullColor = show_availability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
             pieceColor = [default_color blendedColorWithFraction:percent ofColor:fullColor];
-            self.fPieces[index] = PieceMode::Some;
+            piece_modes[index] = PieceMode::Some;
         }
 
         if (pieceColor)
