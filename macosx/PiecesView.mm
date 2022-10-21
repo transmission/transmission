@@ -190,12 +190,7 @@ enum class PieceMode
             {
                 cFillRects[i] = fillRects[i].rectValue;
             }
-            NSColor* cFillColors[usedCount];
-            for (NSInteger i = 0; i < usedCount; ++i)
-            {
-                cFillColors[i] = fillColors[i];
-            }
-            NSRectFillListWithColors(cFillRects, cFillColors, usedCount);
+            NSRectFillListWithColors(cFillRects, fillColors, usedCount);
             return YES;
         }];
         [self setNeedsDisplay];
