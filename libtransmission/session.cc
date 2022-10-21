@@ -650,7 +650,6 @@ void tr_session::onNowTimer()
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
-    udp_core_->dhtUpkeep();
     if (turtle.isClockEnabled)
     {
         turtleCheckClock(this, &this->turtle);

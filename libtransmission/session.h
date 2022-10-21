@@ -266,12 +266,15 @@ private:
     {
     public:
         tr_udp_core(tr_session& session, tr_port udp_port);
-
         ~tr_udp_core();
 
         static void startShutdown();
-        static void dhtUpkeep();
 
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+
+        void addDhtNode(tr_address const& addr, tr_port port);
+
+    private:
         void set_socket_buffers();
 
         void set_socket_tos()
@@ -280,11 +283,6 @@ private:
             session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
         }
 
-        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
-
-        void addDhtNode(tr_address const& addr, tr_port port);
-
-    private:
         tr_port const udp_port_;
         tr_session& session_;
         struct event* udp_event_ = nullptr;

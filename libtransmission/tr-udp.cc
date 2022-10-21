@@ -319,14 +319,6 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     }
 }
 
-void tr_session::tr_udp_core::dhtUpkeep()
-{
-    if (tr_dhtEnabled())
-    {
-        tr_dhtUpkeep();
-    }
-}
-
 void tr_session::tr_udp_core::startShutdown()
 {
     if (tr_dhtEnabled())
