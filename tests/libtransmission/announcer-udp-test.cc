@@ -121,7 +121,7 @@ protected:
         EXPECT_EQ(expected.scrape_url, actual.scrape_url);
 
         EXPECT_EQ(expected.row_count, actual.row_count);
-        for (size_t i = 0; i < std::min(expected.row_count, actual.row_count); ++i)
+        for (int i = 0; i < std::min(expected.row_count, actual.row_count); ++i)
         {
             EXPECT_EQ(expected.rows[i].info_hash, actual.rows[i].info_hash);
             EXPECT_EQ(expected.rows[i].seeders, actual.rows[i].seeders);
@@ -160,7 +160,7 @@ protected:
         auto request = tr_scrape_request{};
         request.scrape_url = response.scrape_url;
         request.info_hash_count = response.row_count;
-        for (size_t i = 0; i < request.info_hash_count; ++i)
+        for (int i = 0; i < request.info_hash_count; ++i)
         {
             request.info_hash[i] = response.rows[i].info_hash;
         }
@@ -251,7 +251,7 @@ protected:
         uint32_t event = 0; // 0: none; 1: completed; 2: started; 3: stopped
         uint32_t ip_address = 0;
         uint32_t key;
-        uint32_t num_want = -1; // default
+        uint32_t num_want = static_cast<uint32_t>(-1); // default
         uint16_t port;
     };
 
