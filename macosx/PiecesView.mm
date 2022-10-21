@@ -31,7 +31,6 @@ enum
 @property(nonatomic) std::vector<int8_t> fPieces;
 
 @property(nonatomic) NSInteger fNumPieces;
-@property(nonatomic) NSInteger fAcross;
 
 @end
 
@@ -68,7 +67,6 @@ enum
     {
         //determine relevant values
         _fNumPieces = MIN(_torrent.pieceCount, kMaxAcross * kMaxAcross);
-        _fAcross = static_cast<NSInteger>(ceil(sqrt(_fNumPieces)));
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
@@ -89,15 +87,17 @@ enum
         return;
     }
 
+    auto const n_pieces = self.fNumPieces;
     auto const full_width = self.bounds.size.width;
-    auto const cell_width = static_cast<NSInteger>((full_width - (_fAcross + 1) * kBetweenPadding) / _fAcross);
-    auto extra_border = static_cast<NSInteger>((full_width - ((cell_width + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2);
+    auto const across = static_cast<NSInteger>(ceil(sqrt(_fNumPieces)));
+    auto const cell_width = static_cast<NSInteger>((full_width - (across + 1) * kBetweenPadding) / across);
+    auto const extra_border = static_cast<NSInteger>((full_width - ((cell_width + kBetweenPadding) * across + kBetweenPadding)) / 2);
 
     //determine if first time
     BOOL const first = std::empty(self.fPieces);
     if (first)
     {
-        _fPieces.resize(numPieces);
+        _fPieces.resize(n_pieces);
     }
 
     auto pieces = std::vector<int8_t>{};
@@ -106,23 +106,23 @@ enum
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     if (showAvailability)
     {
-        pieces.resize(numPieces);
+        pieces.resize(n_pieces);
         [self.torrent getAvailability:std::data(pieces) size:std::size(pieces)];
     }
     else
     {
-        piecesPercent.resize(numPieces);
+        piecesPercent.resize(n_pieces);
         [self.torrent getAmountFinished:std::data(piecesPercent) size:std::size(piecesPercent)];
     }
 
-    NSMutableArray<NSValue*>* fillRects = [NSMutableArray arrayWithCapacity:numPieces];
-    NSMutableArray<NSColor*>* fillColors = [NSMutableArray arrayWithCapacity:numPieces];
+    NSMutableArray<NSValue*>* fillRects = [NSMutableArray arrayWithCapacity:n_pieces];
+    NSMutableArray<NSColor*>* fillColors = [NSMutableArray arrayWithCapacity:n_pieces];
 
     NSColor* defaultColor = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
 
     NSInteger usedCount = 0;
 
-    for (NSInteger index = 0; index < numPieces; index++)
+    for (NSInteger index = 0; index < n_pieces; index++)
     {
         NSColor* pieceColor = nil;
 
@@ -169,12 +169,12 @@ enum
 
         if (pieceColor)
         {
-            NSInteger const across = index % self.fAcross;
-            NSInteger const down = index / self.fAcross;
+            auto const row = index / across;
+            auto const col = index % across;
             fillRects[usedCount] = [NSValue
                 valueWithRect:NSMakeRect(
-                                  across * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
-                                  full_width - (down + 1) * (cell_width + kBetweenPadding) - extra_border,
+                                  col * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
+                                  full_width - (row + 1) * (cell_width + kBetweenPadding) - extra_border,
                                   cell_width,
                                   cell_width)];
             fillColors[usedCount] = pieceColor;
@@ -185,7 +185,7 @@ enum
 
     if (usedCount > 0)
     {
-        self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect dstRect) {
+        self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
             NSRect cFillRects[usedCount];
             for (NSInteger i = 0; i < usedCount; ++i)
             {
