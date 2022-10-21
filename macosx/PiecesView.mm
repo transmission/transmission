@@ -32,7 +32,6 @@ enum
 
 @property(nonatomic) NSInteger fNumPieces;
 @property(nonatomic) NSInteger fAcross;
-@property(nonatomic) NSInteger fWidth;
 
 @end
 
@@ -70,9 +69,6 @@ enum
         //determine relevant values
         _fNumPieces = MIN(_torrent.pieceCount, kMaxAcross * kMaxAcross);
         _fAcross = static_cast<NSInteger>(ceil(sqrt(_fNumPieces)));
-
-        CGFloat const width = self.bounds.size.width;
-        _fWidth = static_cast<NSInteger>((width - (_fAcross + 1) * kBetweenPadding) / _fAcross);
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
@@ -93,8 +89,9 @@ enum
         return;
     }
 
-    auto full_width = self.bounds.size.width;
-    auto extra_border = static_cast<NSInteger>((full_width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2);
+    auto const full_width = self.bounds.size.width;
+    auto const cell_width = static_cast<NSInteger>((full_width - (_fAcross + 1) * kBetweenPadding) / _fAcross);
+    auto extra_border = static_cast<NSInteger>((full_width - ((cell_width + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2);
 
     //determine if first time
     BOOL const first = std::empty(self.fPieces);
@@ -176,10 +173,10 @@ enum
             NSInteger const down = index / self.fAcross;
             fillRects[usedCount] = [NSValue
                 valueWithRect:NSMakeRect(
-                                  across * (self.fWidth + kBetweenPadding) + kBetweenPadding + extra_border,
-                                  full_width - (down + 1) * (self.fWidth + kBetweenPadding) - extra_border,
-                                  self.fWidth,
-                                  self.fWidth)];
+                                  across * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
+                                  full_width - (down + 1) * (cell_width + kBetweenPadding) - extra_border,
+                                  cell_width,
+                                  cell_width)];
             fillColors[usedCount] = pieceColor;
 
             usedCount++;
