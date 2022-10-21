@@ -115,14 +115,13 @@ enum class PieceMode
         [self.torrent getAmountFinished:std::data(piecesPercent) size:std::size(piecesPercent)];
     }
 
-    NSMutableArray<NSValue*>* fillRects = [NSMutableArray arrayWithCapacity:n_pieces];
-    NSMutableArray<NSColor*>* fillColors = [NSMutableArray arrayWithCapacity:n_pieces];
+    std::vector<NSRect> fill_rects(n_pieces);
+    std::vector<NSColor*> fill_colors(n_pieces);
 
-    NSColor* defaultColor = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
+    auto* const default_color = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
+    auto used_count = NSInteger{};
 
-    NSInteger usedCount = 0;
-
-    for (NSInteger index = 0; index < n_pieces; index++)
+    for (NSInteger index = 0; index < n_pieces; ++index)
     {
         NSColor* pieceColor = nil;
 
@@ -146,7 +145,7 @@ enum class PieceMode
         {
             if (first || self.fPieces[index] != PieceMode::None)
             {
-                pieceColor = defaultColor;
+                pieceColor = default_color;
                 self.fPieces[index] = PieceMode::None;
             }
         }
@@ -163,7 +162,7 @@ enum class PieceMode
             //always redraw "mixed"
             CGFloat percent = showAvailability ? (CGFloat)pieces[index] / kHighPeers : piecesPercent[index];
             NSColor* fullColor = showAvailability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
-            pieceColor = [defaultColor blendedColorWithFraction:percent ofColor:fullColor];
+            pieceColor = [default_color blendedColorWithFraction:percent ofColor:fullColor];
             self.fPieces[index] = PieceMode::Some;
         }
 
@@ -171,26 +170,21 @@ enum class PieceMode
         {
             auto const row = index / across;
             auto const col = index % across;
-            fillRects[usedCount] = [NSValue valueWithRect:NSMakeRect(
-                                                              col * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
-                                                              full_width - (row + 1) * (cell_width + kBetweenPadding) - extra_border,
-                                                              cell_width,
-                                                              cell_width)];
-            fillColors[usedCount] = pieceColor;
+            fill_rects[used_count] = NSMakeRect(
+                col * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
+                full_width - (row + 1) * (cell_width + kBetweenPadding) - extra_border,
+                cell_width,
+                cell_width);
+            fill_colors[used_count] = pieceColor;
 
-            usedCount++;
+            ++used_count;
         }
     }
 
-    if (usedCount > 0)
+    if (used_count > 0)
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
-            NSRect cFillRects[usedCount];
-            for (NSInteger i = 0; i < usedCount; ++i)
-            {
-                cFillRects[i] = fillRects[i].rectValue;
-            }
-            NSRectFillListWithColors(cFillRects, fillColors, usedCount);
+            NSRectFillListWithColors(std::data(fill_rects), std::data(fill_colors), used_count);
             return YES;
         }];
         [self setNeedsDisplay];
