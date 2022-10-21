@@ -12,6 +12,8 @@
 #include <string_view>
 #include <vector>
 
+#include <dht/dht.h>
+
 #include "transmission.h"
 
 #include "net.h" // tr_port
@@ -23,13 +25,6 @@ namespace libtransmission
 class TimerMaker;
 } // namespace libtransmission
 
-// int tr_dhtInit(tr_session*, tr_socket_t udp4_socket, tr_socket_t udp6_socket);
-// void tr_dhtUninit();
-// bool tr_dhtEnabled();
-// bool tr_dhtAddNode(tr_address, tr_port, bool bootstrap);
-// void tr_dhtUpkeep();
-// void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen);
-
 class tr_dht
 {
 public:
@@ -39,17 +34,53 @@ public:
         virtual ~Mediator() = default;
 
         [[nodiscard]] virtual std::string_view configDir() const = 0;
-
         [[nodiscard]] virtual tr_port peerPort() const = 0;
-
         [[nodiscard]] virtual std::vector<tr_torrent_id_t> torrentsAllowingDHT() const = 0;
-        [[nodiscard]] virtual tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t) = 0;
+        [[nodiscard]] virtual tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t) const = 0;
 
         [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
 
         virtual void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex);
-    };
 
+        // Wrapper arround `third_party/dht`; used so that a mock can be subbed in during testing.
+
+        virtual int dht_get_nodes(struct sockaddr_in* sin, int* num, struct sockaddr_in6* sin6, int* num6)
+        {
+            return ::dht_get_nodes(sin, num, sin6, num6);
+        }
+
+        virtual int dht_nodes(int af, int* good_return, int* dubious_return, int* cached_return, int* incoming_return)
+        {
+            return ::dht_nodes(af, good_return, dubious_return, cached_return, incoming_return);
+        }
+
+        virtual int dht_periodic(
+            void const* buf,
+            size_t buflen,
+            struct sockaddr const* from,
+            int fromlen,
+            time_t* tosleep,
+            dht_callback_t callback,
+            void* closure)
+        {
+            return ::dht_periodic(buf, buflen, from, fromlen, tosleep, callback, closure);
+        }
+
+        virtual int dht_ping_node(struct sockaddr const* sa, int salen)
+        {
+            return ::dht_ping_node(sa, salen);
+        }
+
+        virtual int dht_search(unsigned char const* id, int port, int af, dht_callback_t callback, void* closure)
+        {
+            return ::dht_search(id, port, af, callback, closure);
+        }
+
+        virtual int dht_uninit()
+        {
+            return ::dht_uninit();
+        }
+    };
 
     [[nodiscard]] static std::unique_ptr<tr_dht> create(Mediator& mediator, tr_socket_t udp4_socket, tr_socket_t udp6_socket);
     virtual ~tr_dht() = default;

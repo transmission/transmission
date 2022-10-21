@@ -30,8 +30,6 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
-#include <dht/dht.h>
-
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -133,9 +131,9 @@ public:
         , udp6_socket_{ udp6_socket }
         , mediator_{ mediator }
         , state_filename_{ tr_pathbuf{ mediator_.configDir(), "/dht.dat" } }
-        , announce_timer_{ mediator_.timerMaker().create([this](){ onAnnounceTimer(); }) }
-        , bootstrap_timer_{ mediator_.timerMaker().create([this](){ onBootstrapTimer(); }) }
-        , periodic_timer_{ mediator_.timerMaker().create([this](){ onPeriodicTimer(); }) }
+        , announce_timer_{ mediator_.timerMaker().create([this]() { onAnnounceTimer(); }) }
+        , bootstrap_timer_{ mediator_.timerMaker().create([this]() { onBootstrapTimer(); }) }
+        , periodic_timer_{ mediator_.timerMaker().create([this]() { onPeriodicTimer(); }) }
     {
         // load up the bootstrap nodes
         std::tie(id_, bootstrap_nodes_) = loadState(state_filename_);
@@ -170,7 +168,7 @@ public:
             auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
             auto num4 = int{ MaxNodes };
             auto num6 = int{ MaxNodes };
-            auto const n = dht_get_nodes(std::data(sins4), &num4, std::data(sins6), &num6);
+            auto const n = mediator_.dht_get_nodes(std::data(sins4), &num4, std::data(sins6), &num6);
             tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num4, num6));
 
             tr_variant benc;
@@ -211,7 +209,7 @@ public:
             tr_variantClear(&benc);
         }
 
-        dht_uninit();
+        mediator_.dht_uninit();
         tr_logAddTrace("Done uninitializing DHT");
     }
 
@@ -223,7 +221,7 @@ public:
             sin.sin_family = AF_INET;
             sin.sin_addr = addr.addr.addr4;
             sin.sin_port = port.network();
-            dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
+            mediator_.dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
         }
         else if (addr.isIPv6())
         {
@@ -231,7 +229,7 @@ public:
             sin6.sin6_family = AF_INET6;
             sin6.sin6_addr = addr.addr.addr6;
             sin6.sin6_port = port.network();
-            dht_ping_node((struct sockaddr*)&sin6, sizeof(sin6));
+            mediator_.dht_ping_node((struct sockaddr*)&sin6, sizeof(sin6));
         }
     }
 
@@ -300,7 +298,7 @@ private:
         int good = 0;
         int dubious = 0;
         int incoming = 0;
-        dht_nodes(family, &good, &dubious, nullptr, &incoming);
+        mediator_.dht_nodes(family, &good, &dubious, nullptr, &incoming);
 
         if (setme_node_count != nullptr)
         {
@@ -332,9 +330,7 @@ private:
 
     [[nodiscard]] bool isReady(int af = 0) const noexcept
     {
-        return af == AF_INET || af == AF_INET6
-            ? isReady(status(af))
-            : isReady(status(AF_INET)) && isReady(status(AF_INET6));
+        return af == AF_INET || af == AF_INET6 ? isReady(status(af)) : isReady(status(AF_INET)) && isReady(status(AF_INET6));
     }
 
     ///
@@ -376,7 +372,7 @@ private:
     bool announceTorrent(tr_sha1_digest_t const& info_hash, int af, tr_port port)
     {
         auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(info_hash));
-        int const rc = dht_search(dht_hash, port.host(), af, callback, this);
+        int const rc = mediator_.dht_search(dht_hash, port.host(), af, callback, this);
         return rc >= 0;
     }
 
@@ -392,7 +388,8 @@ private:
 
         // ensure announce_times_ has enough capacity
         auto const ids = mediator_.torrentsAllowingDHT();
-        if (auto const iter = std::max_element(std::begin(ids), std::end(ids)); static_cast<size_t>(*iter) >= std::size(announce_times_))
+        if (auto const iter = std::max_element(std::begin(ids), std::end(ids));
+            static_cast<size_t>(*iter) >= std::size(announce_times_))
         {
             announce_times_.resize(*iter + 1);
         }
@@ -447,7 +444,7 @@ private:
         // so let's ensure it's zero terminated here.
         auto szbuf = tr_strbuf<unsigned char, 1500>{ std::string_view{ static_cast<char const*>(buf), buflen } };
 
-        dht_periodic(std::data(szbuf), std::size(szbuf), from, fromlen, &call_again_in_n_secs, callback, this);
+        mediator_.dht_periodic(std::data(szbuf), std::size(szbuf), from, fromlen, &call_again_in_n_secs, callback, this);
 
         return std::chrono::seconds{ call_again_in_n_secs };
     }
@@ -472,7 +469,8 @@ private:
 
         if (auto dict = tr_variant{}; tr_variantFromFile(&dict, TR_VARIANT_PARSE_BENC, filename))
         {
-            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&dict, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
+            if (auto sv = std::string_view{};
+                tr_variantDictFindStrView(&dict, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
             {
                 std::copy(std::begin(sv), std::end(sv), std::begin(id));
             }
