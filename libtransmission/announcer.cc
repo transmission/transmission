@@ -215,8 +215,6 @@ void tr_announcerClose(tr_session* session)
 
     flushCloseMessages(announcer);
 
-    tr_tracker_udp_start_shutdown(session);
-
     session->announcer = nullptr;
     delete announcer;
 }
@@ -1197,7 +1195,7 @@ static void announce_request_delegate(
     }
     else if (tr_strvStartsWith(announce_sv, "udp://"sv))
     {
-        tr_tracker_udp_announce(session, request, callback, callback_data);
+        session->announcer_udp_->announce(*request, callback, callback_data);
     }
     else
     {
@@ -1429,7 +1427,7 @@ static void scrape_request_delegate(
     }
     else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
     {
-        tr_tracker_udp_scrape(session, request, callback, callback_data);
+        session->announcer_udp_->scrape(*request, callback, callback_data);
     }
     else
     {
@@ -1613,7 +1611,7 @@ void tr_announcer::upkeep()
     if (this->tau_upkeep_at <= now)
     {
         this->tau_upkeep_at = now + TauUpkeepIntervalSecs;
-        tr_tracker_udp_upkeep(session);
+        session->announcer_udp_->upkeep();
     }
 }
 

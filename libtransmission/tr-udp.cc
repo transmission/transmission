@@ -215,7 +215,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            if (!session->tau_handle_message(std::data(buf), rc))
+            if (!session->announcer_udp_->handleMessage(std::data(buf), rc))
             {
                 tr_logAddTrace("Couldn't parse UDP tracker packet.");
             }

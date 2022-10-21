@@ -90,6 +90,11 @@ struct tr_pex
         return 0;
     }
 
+    [[nodiscard]] bool operator==(tr_pex const& that) const noexcept
+    {
+        return compare(that) == 0;
+    }
+
     [[nodiscard]] bool operator<(tr_pex const& that) const noexcept
     {
         return compare(that) < 0;
