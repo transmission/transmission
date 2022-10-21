@@ -17,18 +17,18 @@ static CGFloat const kBetweenPadding = 1.0;
 
 static int8_t const kHighPeers = 10;
 
-enum
+enum class PieceMode
 {
-    PIECE_NONE,
-    PIECE_SOME,
-    PIECE_HIGH_PEERS,
-    PIECE_FINISHED,
-    PIECE_FLASHING
+    None,
+    Some,
+    HighPeers,
+    Finished,
+    Flashing
 };
 
 @interface PiecesView ()
 
-@property(nonatomic) std::vector<int8_t> fPieces;
+@property(nonatomic) std::vector<PieceMode> fPieces;
 
 @property(nonatomic) NSInteger fNumPieces;
 
@@ -128,34 +128,34 @@ enum
 
         if (showAvailability ? pieces[index] == -1 : piecesPercent[index] == 1.0)
         {
-            if (first || self.fPieces[index] != PIECE_FINISHED)
+            if (first || self.fPieces[index] != PieceMode::Finished)
             {
-                if (!first && self.fPieces[index] != PIECE_FLASHING)
+                if (!first && self.fPieces[index] != PieceMode::Flashing)
                 {
                     pieceColor = NSColor.systemOrangeColor;
-                    self.fPieces[index] = PIECE_FLASHING;
+                    self.fPieces[index] = PieceMode::Flashing;
                 }
                 else
                 {
                     pieceColor = NSColor.systemBlueColor;
-                    self.fPieces[index] = PIECE_FINISHED;
+                    self.fPieces[index] = PieceMode::Finished;
                 }
             }
         }
         else if (showAvailability ? pieces[index] == 0 : piecesPercent[index] == 0.0)
         {
-            if (first || self.fPieces[index] != PIECE_NONE)
+            if (first || self.fPieces[index] != PieceMode::None)
             {
                 pieceColor = defaultColor;
-                self.fPieces[index] = PIECE_NONE;
+                self.fPieces[index] = PieceMode::None;
             }
         }
         else if (showAvailability && pieces[index] >= kHighPeers)
         {
-            if (first || self.fPieces[index] != PIECE_HIGH_PEERS)
+            if (first || self.fPieces[index] != PieceMode::HighPeers)
             {
                 pieceColor = NSColor.systemGreenColor;
-                self.fPieces[index] = PIECE_HIGH_PEERS;
+                self.fPieces[index] = PieceMode::HighPeers;
             }
         }
         else
@@ -164,19 +164,18 @@ enum
             CGFloat percent = showAvailability ? (CGFloat)pieces[index] / kHighPeers : piecesPercent[index];
             NSColor* fullColor = showAvailability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
             pieceColor = [defaultColor blendedColorWithFraction:percent ofColor:fullColor];
-            self.fPieces[index] = PIECE_SOME;
+            self.fPieces[index] = PieceMode::Some;
         }
 
         if (pieceColor)
         {
             auto const row = index / across;
             auto const col = index % across;
-            fillRects[usedCount] = [NSValue
-                valueWithRect:NSMakeRect(
-                                  col * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
-                                  full_width - (row + 1) * (cell_width + kBetweenPadding) - extra_border,
-                                  cell_width,
-                                  cell_width)];
+            fillRects[usedCount] = [NSValue valueWithRect:NSMakeRect(
+                                                              col * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
+                                                              full_width - (row + 1) * (cell_width + kBetweenPadding) - extra_border,
+                                                              cell_width,
+                                                              cell_width)];
             fillColors[usedCount] = pieceColor;
 
             usedCount++;
