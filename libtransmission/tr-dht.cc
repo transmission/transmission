@@ -38,15 +38,13 @@
 #include "file.h"
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h"
-#include "session.h"
+#include "peer-mgr.h" // for tr_peerMgrCompactToPex()
 #include "timer.h"
-#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
 #include "tr-strbuf.h"
 #include "variant.h"
-#include "utils.h" // tr_time(), _()
+#include "utils.h" // for tr_time(), _()
 
 using namespace std::literals;
 

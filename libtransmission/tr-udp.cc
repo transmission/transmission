@@ -7,12 +7,6 @@
 #include <cstdint>
 #include <cstring> /* memcmp(), memset() */
 
-#ifdef _WIN32
-#include <io.h> /* dup2() */
-#else
-#include <unistd.h> /* dup2() */
-#endif
-
 #include <event2/event.h>
 
 #include <fmt/core.h>
