@@ -872,10 +872,10 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-using tr_fileFunc = bool (*)(char const* filename, struct tr_error** error);
+using tr_fileFunc = bool (*)(char const* filename, void* user_data, struct tr_error** error);
 
 /** @brief Removes our torrent and .resume files for this torrent */
-void tr_torrentRemove(tr_torrent* torrent, bool delete_flag, tr_fileFunc delete_func);
+void tr_torrentRemove(tr_torrent* torrent, bool delete_flag, tr_fileFunc delete_func, void* user_data);
 
 /** @brief Start a torrent */
 void tr_torrentStart(tr_torrent* torrent);

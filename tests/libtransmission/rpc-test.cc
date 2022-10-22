@@ -185,7 +185,7 @@ TEST_F(RpcTest, sessionGet)
 
     // cleanup
     tr_variantClear(&response);
-    tr_torrentRemove(tor, false, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
 } // namespace test
