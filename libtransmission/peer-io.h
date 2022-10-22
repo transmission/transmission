@@ -144,8 +144,8 @@ public:
 
     void readBufferAdd(void const* data, size_t n_bytes);
 
-    int flushOutgoingProtocolMsgs();
-    int flush(tr_direction dir, size_t byte_limit);
+    ssize_t flushOutgoingProtocolMsgs();
+    ssize_t flush(tr_direction dir, size_t byte_limit);
 
     void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 

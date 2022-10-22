@@ -1107,7 +1107,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
     {
-        tr_sessionSetAntiBruteForceThreshold(this, i);
+        tr_sessionSetAntiBruteForceThreshold(this, static_cast<int>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &val))

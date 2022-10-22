@@ -150,7 +150,7 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
     return buf;
 }
 
-static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)
+static ssize_t getPieceLength(struct tr_incomplete_metadata const* m, int piece)
 {
     return piece + 1 == m->piece_count ? // last piece
         std::size(m->metadata) - (piece * METADATA_PIECE_SIZE) :

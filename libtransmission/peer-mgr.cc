@@ -2059,8 +2059,8 @@ void rechokeDownloads(tr_swarm* s)
         return false;
     }
 
-    tr_speed_t const got = b.getPieceSpeedBytesPerSecond(now_msec, dir);
-    tr_speed_t const want = b.getDesiredSpeedBytesPerSecond(dir);
+    auto const got = b.getPieceSpeedBytesPerSecond(now_msec, dir);
+    auto const want = b.getDesiredSpeedBytesPerSecond(dir);
     return got >= want;
 }
 
@@ -2306,10 +2306,10 @@ namespace disconnect_helpers
 namespace
 {
 // when many peers are available, keep idle ones this long
-auto constexpr MinUploadIdleSecs = int{ 60 };
+auto constexpr MinUploadIdleSecs = time_t{ 60 };
 
 // when few peers are available, keep idle ones this long
-auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
+auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
 
 [[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, size_t peer_count, time_t const now)
 {
@@ -2338,10 +2338,10 @@ auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
         float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?
             1.0 :
             peer_count / (float)relax_strictness_if_fewer_than_n;
-        int const lo = MinUploadIdleSecs;
-        int const hi = MaxUploadIdleSecs;
-        int const limit = hi - (hi - lo) * strictness;
-        int const idle_time = now - std::max(atom->time, atom->piece_data_time);
+        auto const lo = MinUploadIdleSecs;
+        auto const hi = MaxUploadIdleSecs;
+        time_t const limit = hi - (hi - lo) * strictness;
+        time_t const idle_time = now - std::max(atom->time, atom->piece_data_time);
 
         if (idle_time > limit)
         {

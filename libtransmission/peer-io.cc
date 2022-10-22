@@ -74,7 +74,7 @@ static constexpr size_t guessPacketOverhead(size_t d)
 ****
 ***/
 
-static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
+static void didWriteWrapper(tr_peerIo* io, size_t bytes_transferred)
 {
     while (bytes_transferred != 0 && tr_isPeerIo(io) && !std::empty(io->outbuf_info))
     {
@@ -136,7 +136,7 @@ static void canReadWrapper(tr_peerIo* io_in)
         size_t const old_len = io->readBufferSize();
         int const ret = io->canRead(io.get(), io->userData, &piece);
         size_t const used = old_len - io->readBufferSize();
-        unsigned int const overhead = guessPacketOverhead(used);
+        auto const overhead = guessPacketOverhead(used);
 
         if (piece != 0 || piece != used)
         {
@@ -187,12 +187,12 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     /* Limit the input buffer to 256K, so it doesn't grow too large */
     tr_direction const dir = TR_DOWN;
-    unsigned int const max = 256 * 1024;
+    size_t const max = 256 * 1024;
 
     io->pendingEvents &= ~EV_READ;
 
-    unsigned int const curlen = io->readBufferSize();
-    unsigned int howmuch = curlen >= max ? 0 : max - curlen;
+    auto const curlen = io->readBufferSize();
+    unsigned int howmuch = static_cast<unsigned int>(curlen >= max ? 0 : max - curlen);
     howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
 
     tr_logAddTraceIo(io, "libevent says this peer is ready to read");
@@ -326,13 +326,13 @@ static size_t utp_get_rb_size(tr_peerIo* const io)
     return UtpReadBufferSize - bytes;
 }
 
-static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
+static ssize_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
 
 static void utp_on_writable(tr_peerIo* io)
 {
     tr_logAddTraceIo(io, "libutp says this peer is ready to write");
 
-    int const n = tr_peerIoTryWrite(io, SIZE_MAX);
+    auto const n = tr_peerIoTryWrite(io, SIZE_MAX);
     io->setEnabled(TR_UP, n != 0 && !std::empty(io->outbuf));
 }
 
@@ -776,7 +776,7 @@ int tr_peerIo::reconnect()
 ***
 **/
 
-static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now)
+static size_t getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now)
 {
     /* this is all kind of arbitrary, but what seems to work well is
      * being large enough to hold the next 20 seconds' worth of input,
@@ -875,7 +875,7 @@ void tr_peerIo::readBufferDrain(size_t byte_count)
 ****
 ***/
 
-static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
+static ssize_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 {
     howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
     if (howmuch == 0)
@@ -883,7 +883,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
         return 0;
     }
 
-    auto res = int{};
+    auto res = ssize_t{};
     switch (io->socket.type)
     {
     case TR_PEER_SOCKET_TYPE_UTP:
@@ -943,7 +943,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
     return res;
 }
 
-static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
+static ssize_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 {
     auto const old_len = std::size(io->outbuf);
 
@@ -955,7 +955,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
         return 0;
     }
 
-    auto n = int{};
+    auto n = ssize_t{};
     switch (io->socket.type)
     {
     case TR_PEER_SOCKET_TYPE_UTP:
@@ -1001,16 +1001,16 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     return n;
 }
 
-int tr_peerIo::flush(tr_direction dir, size_t limit)
+ssize_t tr_peerIo::flush(tr_direction dir, size_t limit)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    int const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
+    auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
     tr_logAddTraceIo(this, fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", dir, limit, bytes_used));
     return bytes_used;
 }
 
-int tr_peerIo::flushOutgoingProtocolMsgs()
+ssize_t tr_peerIo::flushOutgoingProtocolMsgs()
 {
     size_t byte_count = 0;
 

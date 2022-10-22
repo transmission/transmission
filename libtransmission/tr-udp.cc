@@ -193,7 +193,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     auto* session = static_cast<tr_session*>(vsession);
 
     socklen_t fromlen = sizeof(from);
-    int const
+    auto const
         rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are µTP, make quick inline

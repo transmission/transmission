@@ -1267,7 +1267,7 @@ static void printFileList(tr_variant* top)
             if (tr_variantDictFindStrView(d, TR_KEY_name, &name) && tr_variantDictFindList(d, TR_KEY_files, &files) &&
                 tr_variantDictFindList(d, TR_KEY_priorities, &priorities) && tr_variantDictFindList(d, TR_KEY_wanted, &wanteds))
             {
-                size_t const jn = tr_variantListSize(files);
+                auto const jn = tr_variantListSize(files);
                 fmt::print("{:s} ({:d} files):\n", name, jn);
                 printf("%3s  %4s %8s %3s %9s  %s\n", "#", "Done", "Priority", "Get", "Size", "Name");
 

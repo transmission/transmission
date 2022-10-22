@@ -2409,7 +2409,7 @@ ssize_t tr_torrentGetQueuePosition(tr_torrent const* tor)
 void tr_torrentSetQueuePosition(tr_torrent* tor, ssize_t queue_position)
 {
     ssize_t back = -1;
-    ssize_t const old_pos = tor->queuePosition;
+    auto const old_pos = tor->queuePosition;
 
     if (queue_position < 0)
     {

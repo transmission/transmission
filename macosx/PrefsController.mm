@@ -36,8 +36,8 @@ static ToolbarTab const ToolbarTabPeers = @"TOOLBAR_PEERS";
 static ToolbarTab const ToolbarTabNetwork = @"TOOLBAR_NETWORK";
 static ToolbarTab const ToolbarTabRemote = @"TOOLBAR_REMOTE";
 
-static char* const kRPCKeychainService = "Transmission:Remote";
-static char* const kRPCKeychainName = "Remote";
+static char const* const kRPCKeychainService = "Transmission:Remote";
+static char const* const kRPCKeychainName = "Remote";
 
 static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 

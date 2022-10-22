@@ -614,7 +614,7 @@ static bool bindUnixSocket(
     [[maybe_unused]] struct event_base* base,
     [[maybe_unused]] struct evhttp* httpd,
     [[maybe_unused]] char const* path,
-    [[maybe_unused]] int socket_mode)
+    [[maybe_unused]] mode_t socket_mode)
 {
 #ifdef _WIN32
     tr_logAddError(fmt::format(
@@ -1029,7 +1029,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        this->setAntiBruteForceLimit(i);
+        this->setAntiBruteForceLimit(static_cast<int>(i));
     }
 
     key = TR_KEY_rpc_socket_mode;
@@ -1052,7 +1052,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        this->socket_mode_ = i;
+        this->socket_mode_ = static_cast<mode_t>(i);
     }
 
     key = TR_KEY_rpc_bind_address;

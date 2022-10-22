@@ -141,8 +141,8 @@ public:
     int anti_brute_force_limit_ = 0;
     int login_attempts_ = 0;
     int start_retry_counter = 0;
-    static int constexpr DefaultRpcSocketMode = 0750;
-    int socket_mode_ = DefaultRpcSocketMode;
+    static mode_t constexpr DefaultRpcSocketMode = 0750;
+    mode_t socket_mode_ = DefaultRpcSocketMode;
 
     tr_port port_;
 

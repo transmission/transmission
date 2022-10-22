@@ -39,7 +39,7 @@ using namespace std::literals;
 using Buffer = libtransmission::Buffer;
 
 /* arbitrary value... this is much deeper than our code goes */
-static auto constexpr MaxDepth = int{ 64 };
+static auto constexpr MaxDepth = size_t{ 64 };
 
 struct json_wrapper_data
 {
@@ -316,7 +316,7 @@ static void action_callback_POP(
     }
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
-        int const depth = std::size(data->stack);
+        auto const depth = std::size(data->stack);
         auto const* const v = data->stack.back();
         data->stack.pop_back();
         if (depth < MaxDepth)

@@ -172,7 +172,7 @@ public:
      * @brief Get the desired speed for the bandwidth subtree.
      * @see tr_bandwidth::setDesiredSpeed
      */
-    [[nodiscard]] constexpr double getDesiredSpeedBytesPerSecond(tr_direction dir) const
+    [[nodiscard]] constexpr tr_speed_t getDesiredSpeedBytesPerSecond(tr_direction dir) const
     {
         return this->band_[dir].desired_speed_bps_;
     }
@@ -220,7 +220,7 @@ public:
     struct RateControl
     {
         std::array<uint64_t, HistorySize> date_;
-        std::array<uint32_t, HistorySize> size_;
+        std::array<size_t, HistorySize> size_;
         uint64_t cache_time_;
         tr_speed_t cache_val_;
         int newest_;

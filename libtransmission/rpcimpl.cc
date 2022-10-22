@@ -2115,7 +2115,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_anti_brute_force_threshold, &i))
     {
-        tr_sessionSetAntiBruteForceThreshold(session, i);
+        tr_sessionSetAntiBruteForceThreshold(session, static_cast<int>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_anti_brute_force_enabled, &val))
