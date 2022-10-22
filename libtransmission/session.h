@@ -1118,13 +1118,14 @@ public:
     std::unique_ptr<tr_udp_core> udp_core_;
 
 private:
-    struct tr_peerMgr* peer_mgr_ = nullptr;
-
-    std::unique_ptr<tr_port_forwarding> port_forwarding_;
-
     tr_torrents torrents_;
 
     tr_open_files open_files_;
+
+    // depends-on: torrents_
+    struct tr_peerMgr* peer_mgr_ = nullptr;
+
+    std::unique_ptr<tr_port_forwarding> port_forwarding_;
 
 public:
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
