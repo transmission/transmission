@@ -123,9 +123,44 @@ tr_peer_id_t tr_peerIdInit()
     return peer_id;
 }
 
-/***
-****
-***/
+///
+
+std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrentsAllowingDHT() const
+{
+    auto ids = std::vector<tr_torrent_id_t>{};
+    auto const& torrents = session_.torrents();
+
+    ids.reserve(std::size(torrents));
+    for (auto const* const tor : torrents)
+    {
+        if (tor->isRunning && tor->allowsDht())
+        {
+            ids.push_back(tor->id());
+        }
+    }
+
+    return ids;
+}
+
+tr_sha1_digest_t tr_session::DhtMediator::torrentInfoHash(tr_torrent_id_t id) const
+{
+    if (auto const* const tor = session_.torrents().get(id); tor != nullptr)
+    {
+        return tor->infoHash();
+    }
+
+    return {};
+}
+
+void tr_session::DhtMediator::addPex(tr_sha1_digest_t const& info_hash, tr_pex const* pex, size_t n_pex)
+{
+    if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
+    {
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n_pex);
+    }
+}
+
+///
 
 bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port)
 {
@@ -725,6 +760,11 @@ void tr_session::initImpl(init_data& data)
     tr_sessionSet(this, &settings);
 
     this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+
+    if (allowsDHT())
+    {
+        this->dht_ = tr_dht::create(dht_mediator_, public_peer_port_, udp_core_->socket4(), udp_core_->socket6());
+    }
 
     this->web_ = tr_web::create(this->web_mediator_);
 
@@ -1785,7 +1825,11 @@ void tr_session::closeImplStart()
 
     lpd_.reset();
 
-    udp_core_->startShutdown();
+    if (dht_)
+    {
+        dht_->startShutdown();
+    }
+
     announcer_udp_->startShutdown();
 
     save_timer_.reset();
@@ -1855,6 +1899,7 @@ void tr_session::closeImplFinish()
 
     /* we had to wait until UDP trackers were closed before closing these: */
     this->announcer_udp_.reset();
+    this->dht_.reset();
     this->udp_core_.reset();
 
     stats().saveIfDirty();

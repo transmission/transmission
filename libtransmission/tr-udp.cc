@@ -22,7 +22,6 @@
 #include "net.h"
 #include "session.h"
 #include "tr-assert.h"
-#include "tr-dht.h"
 #include "tr-utp.h"
 #include "utils.h"
 
@@ -88,11 +87,6 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 #endif
         }
     }
-}
-
-void tr_session::tr_udp_core::addDhtNode(tr_address const& addr, tr_port port)
-{
-    tr_dhtAddNode(addr, port, false);
 }
 
 void tr_session::tr_udp_core::set_socket_buffers()
@@ -207,10 +201,9 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     {
         if (buf[0] == 'd')
         {
-            if (session->allowsDHT())
+            if (session->dht_)
             {
-                buf[rc] = '\0'; /* required by the DHT code */
-                tr_dhtCallback(std::data(buf), rc, (struct sockaddr*)&from, fromlen);
+                session->dht_->handleMessage(std::data(buf), rc, reinterpret_cast<sockaddr*>(&from), fromlen);
             }
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
@@ -304,11 +297,6 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     set_socket_buffers();
     set_socket_tos();
 
-    if (session_.allowsDHT())
-    {
-        tr_dhtInit(&session_, udp_socket_, udp6_socket_);
-    }
-
     if (udp_event_ != nullptr)
     {
         event_add(udp_event_, nullptr);
@@ -319,18 +307,8 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     }
 }
 
-void tr_session::tr_udp_core::startShutdown()
-{
-    if (tr_dhtEnabled())
-    {
-        tr_dhtUninit();
-    }
-}
-
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    startShutdown();
-
     if (udp_socket_ != TR_BAD_SOCKET)
     {
         tr_netCloseSocket(udp_socket_);

@@ -126,8 +126,9 @@ private:
     };
 
 public:
-    tr_dht_impl(Mediator& mediator, tr_socket_t udp4_socket, tr_socket_t udp6_socket)
-        : udp4_socket_{ udp4_socket }
+    tr_dht_impl(Mediator& mediator, tr_port peer_port, tr_socket_t udp4_socket, tr_socket_t udp6_socket)
+        : peer_port_{ peer_port }
+        , udp4_socket_{ udp4_socket }
         , udp6_socket_{ udp6_socket }
         , mediator_{ mediator }
         , state_filename_{ tr_pathbuf{ mediator_.configDir(), "/dht.dat" } }
@@ -157,59 +158,10 @@ public:
         // Don't save the new state if nothing is ready yet.
         if (isReady(AF_INET) || isReady(AF_INET6))
         {
-            auto constexpr MaxNodes = int{ 300 };
-            auto constexpr PortLen = size_t{ 2 };
-            auto constexpr CompactAddrLen = size_t{ 4 };
-            auto constexpr CompactLen = size_t{ CompactAddrLen + PortLen };
-            auto constexpr Compact6AddrLen = size_t{ 16 };
-            auto constexpr Compact6Len = size_t{ Compact6AddrLen + PortLen };
-
-            auto sins4 = std::array<struct sockaddr_in, MaxNodes>{};
-            auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
-            auto num4 = int{ MaxNodes };
-            auto num6 = int{ MaxNodes };
-            auto const n = mediator_.dht_get_nodes(std::data(sins4), &num4, std::data(sins6), &num6);
-            tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num4, num6));
-
-            tr_variant benc;
-            tr_variantInitDict(&benc, 3);
-            tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(id_), std::size(id_));
-
-            if (num4 > 0)
-            {
-                auto compact = std::array<char, MaxNodes * CompactLen>{};
-                char* out = std::data(compact);
-                for (auto const* in = std::data(sins4), *end = in + num4; in != end; ++in)
-                {
-                    memcpy(out, &in->sin_addr, CompactAddrLen);
-                    out += CompactAddrLen;
-                    memcpy(out, &in->sin_port, PortLen);
-                    out += PortLen;
-                }
-
-                tr_variantDictAddRaw(&benc, TR_KEY_nodes, std::data(compact), out - std::data(compact));
-            }
-
-            if (num6 > 0)
-            {
-                auto compact6 = std::array<char, MaxNodes * Compact6Len>{};
-                char* out6 = std::data(compact6);
-                for (auto const* in = std::data(sins6), *end = in + num6; in != end; ++in)
-                {
-                    memcpy(out6, &in->sin6_addr, Compact6AddrLen);
-                    out6 += Compact6AddrLen;
-                    memcpy(out6, &in->sin6_port, PortLen);
-                    out6 += PortLen;
-                }
-
-                tr_variantDictAddRaw(&benc, TR_KEY_nodes6, std::data(compact6), out6 - std::data(compact6));
-            }
-
-            tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, state_filename_);
-            tr_variantClear(&benc);
+            saveState();
         }
 
-        mediator_.dht_uninit();
+        mediator_.api().uninit();
         tr_logAddTrace("Done uninitializing DHT");
     }
 
@@ -221,7 +173,7 @@ public:
             sin.sin_family = AF_INET;
             sin.sin_addr = addr.addr.addr4;
             sin.sin_port = port.network();
-            mediator_.dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
+            mediator_.api().ping_node((struct sockaddr*)&sin, sizeof(sin));
         }
         else if (addr.isIPv6())
         {
@@ -229,7 +181,7 @@ public:
             sin6.sin6_family = AF_INET6;
             sin6.sin6_addr = addr.addr.addr6;
             sin6.sin6_port = port.network();
-            mediator_.dht_ping_node((struct sockaddr*)&sin6, sizeof(sin6));
+            mediator_.api().ping_node((struct sockaddr*)&sin6, sizeof(sin6));
         }
     }
 
@@ -243,7 +195,66 @@ public:
         periodic_timer_->startSingleShot(interval);
     }
 
+    void startShutdown() override
+    {
+        // FIXME
+    }
+
 private:
+    void saveState() const
+    {
+        auto constexpr MaxNodes = int{ 300 };
+        auto constexpr PortLen = size_t{ 2 };
+        auto constexpr CompactAddrLen = size_t{ 4 };
+        auto constexpr CompactLen = size_t{ CompactAddrLen + PortLen };
+        auto constexpr Compact6AddrLen = size_t{ 16 };
+        auto constexpr Compact6Len = size_t{ Compact6AddrLen + PortLen };
+
+        auto sins4 = std::array<struct sockaddr_in, MaxNodes>{};
+        auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
+        auto num4 = int{ MaxNodes };
+        auto num6 = int{ MaxNodes };
+        auto const n = mediator_.api().get_nodes(std::data(sins4), &num4, std::data(sins6), &num6);
+        tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num4, num6));
+
+        tr_variant benc;
+        tr_variantInitDict(&benc, 3);
+        tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(id_), std::size(id_));
+
+        if (num4 > 0)
+        {
+            auto compact = std::array<char, MaxNodes * CompactLen>{};
+            char* out = std::data(compact);
+            for (auto const* in = std::data(sins4), *end = in + num4; in != end; ++in)
+            {
+                memcpy(out, &in->sin_addr, CompactAddrLen);
+                out += CompactAddrLen;
+                memcpy(out, &in->sin_port, PortLen);
+                out += PortLen;
+            }
+
+            tr_variantDictAddRaw(&benc, TR_KEY_nodes, std::data(compact), out - std::data(compact));
+        }
+
+        if (num6 > 0)
+        {
+            auto compact6 = std::array<char, MaxNodes * Compact6Len>{};
+            char* out6 = std::data(compact6);
+            for (auto const* in = std::data(sins6), *end = in + num6; in != end; ++in)
+            {
+                memcpy(out6, &in->sin6_addr, Compact6AddrLen);
+                out6 += Compact6AddrLen;
+                memcpy(out6, &in->sin6_port, PortLen);
+                out6 += PortLen;
+            }
+
+            tr_variantDictAddRaw(&benc, TR_KEY_nodes6, std::data(compact6), out6 - std::data(compact6));
+        }
+
+        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, state_filename_);
+        tr_variantClear(&benc);
+    }
+
     [[nodiscard]] static constexpr std::string_view printableStatus(Status status)
     {
         switch (status)
@@ -298,7 +309,7 @@ private:
         int good = 0;
         int dubious = 0;
         int incoming = 0;
-        mediator_.dht_nodes(family, &good, &dubious, nullptr, &incoming);
+        mediator_.api().nodes(family, &good, &dubious, nullptr, &incoming);
 
         if (setme_node_count != nullptr)
         {
@@ -372,7 +383,7 @@ private:
     bool announceTorrent(tr_sha1_digest_t const& info_hash, int af, tr_port port)
     {
         auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(info_hash));
-        int const rc = mediator_.dht_search(dht_hash, port.host(), af, callback, this);
+        int const rc = mediator_.api().search(dht_hash, port.host(), af, callback, this);
         return rc >= 0;
     }
 
@@ -395,21 +406,20 @@ private:
         }
 
         auto const now = tr_time();
-        auto const port = mediator_.peerPort();
         for (auto const id : ids)
         {
             auto& times = announce_times_[id];
 
             if (auto& announce_after = times.ipv4_announce_after; announce_after < now)
             {
-                auto const ok = announceTorrent(mediator_.torrentInfoHash(id), AF_INET, port);
+                auto const ok = announceTorrent(mediator_.torrentInfoHash(id), AF_INET, peer_port_);
                 auto const interval = ok ? 25 * 60 + tr_rand_int_weak(3 * 60) : 5 + tr_rand_int_weak(5);
                 announce_after = now + interval;
             }
 
             if (auto& announce_after = times.ipv6_announce_after; announce_after < now)
             {
-                auto const ok = announceTorrent(mediator_.torrentInfoHash(id), AF_INET6, port);
+                auto const ok = announceTorrent(mediator_.torrentInfoHash(id), AF_INET6, peer_port_);
                 auto const interval = ok ? 25 * 60 + tr_rand_int_weak(3 * 60) : 5 + tr_rand_int_weak(5);
                 announce_after = now + interval;
             }
@@ -444,7 +454,7 @@ private:
         // so let's ensure it's zero terminated here.
         auto szbuf = tr_strbuf<unsigned char, 1500>{ std::string_view{ static_cast<char const*>(buf), buflen } };
 
-        mediator_.dht_periodic(std::data(szbuf), std::size(szbuf), from, fromlen, &call_again_in_n_secs, callback, this);
+        mediator_.api().periodic(std::data(szbuf), std::size(szbuf), from, fromlen, &call_again_in_n_secs, callback, this);
 
         return std::chrono::seconds{ call_again_in_n_secs };
     }
@@ -576,6 +586,7 @@ private:
 
     ///
 
+    tr_port const peer_port_;
     tr_socket_t const udp4_socket_;
     tr_socket_t const udp6_socket_;
 
@@ -599,7 +610,11 @@ private:
     std::vector<AnnounceInfo> announce_times_;
 };
 
-[[nodiscard]] std::unique_ptr<tr_dht> tr_dht::create(Mediator& mediator, tr_socket_t udp4_socket, tr_socket_t udp6_socket)
+[[nodiscard]] std::unique_ptr<tr_dht> tr_dht::create(
+    Mediator& mediator,
+    tr_port peer_port,
+    tr_socket_t udp4_socket,
+    tr_socket_t udp6_socket)
 {
-    return std::make_unique<tr_dht_impl>(mediator, udp4_socket, udp6_socket);
+    return std::make_unique<tr_dht_impl>(mediator, peer_port, udp4_socket, udp6_socket);
 }

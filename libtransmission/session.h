@@ -39,6 +39,7 @@
 #include "session-id.h"
 #include "stats.h"
 #include "torrents.h"
+#include "tr-dht.h"
 #include "tr-lpd.h"
 #include "verify.h"
 #include "web.h"
@@ -174,6 +175,36 @@ private:
         tr_session& session_;
     };
 
+    class DhtMediator : public tr_dht::Mediator
+    {
+    public:
+        DhtMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+
+        ~DhtMediator() noexcept = default;
+
+        [[nodiscard]] std::vector<tr_torrent_id_t> torrentsAllowingDHT() const override;
+
+        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t id) const override;
+
+        [[nodiscard]] std::string_view configDir() const override
+        {
+            return session_.config_dir_;
+        }
+
+        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        {
+            return session_.timerMaker();
+        }
+
+        void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
+
+    private:
+        tr_session& session_;
+    };
+
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
     {
     public:
@@ -268,11 +299,17 @@ private:
         tr_udp_core(tr_session& session, tr_port udp_port);
         ~tr_udp_core();
 
-        static void startShutdown();
-
         void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
 
-        void addDhtNode(tr_address const& addr, tr_port port);
+        [[nodiscard]] constexpr auto socket4() const noexcept
+        {
+            return udp_socket_;
+        }
+
+        [[nodiscard]] constexpr auto socket6() const noexcept
+        {
+            return udp6_socket_;
+        }
 
     private:
         void set_socket_buffers();
@@ -846,9 +883,9 @@ public:
 
     void addDhtNode(tr_address const& addr, tr_port port)
     {
-        if (udp_core_)
+        if (dht_)
         {
-            udp_core_->addDhtNode(addr, port);
+            dht_->addNode(addr, port);
         }
     }
 
@@ -1107,8 +1144,16 @@ private:
     // depends-on: dns_, udp_core_
     AnnouncerUdpMediator announcer_udp_mediator_{ *this };
 
+    // depends-on: timer_maker_, torrents_, peer_mgr_,
+    DhtMediator dht_mediator_{ *this };
+
 public:
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
+
+    // depends-on: public_peer_port_, udp_core_, dht_mediator_
+    // TODO: when public_peer_port_ is rebuilt, rebuild dht
+    // TODO: when dht_core_ is rebuilt, rebuild dht
+    std::unique_ptr<tr_dht> dht_;
 
 private:
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
