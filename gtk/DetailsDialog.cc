@@ -76,6 +76,7 @@ private:
     void refreshInfo(std::vector<tr_torrent*> const& torrents);
     void refreshPeers(std::vector<tr_torrent*> const& torrents);
     void refreshTracker(std::vector<tr_torrent*> const& torrents);
+    void refreshFiles(std::vector<tr_torrent*> const& torrents);
     void refreshOptions(std::vector<tr_torrent*> const& torrents);
 
     void refreshPeerList(std::vector<tr_torrent*> const& torrents);
@@ -2111,6 +2112,22 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     edit_trackers_button_->set_sensitive(tracker_list_get_current_torrent_id() > 0);
 }
 
+void DetailsDialog::Impl::refreshFiles(std::vector<tr_torrent*> const& torrents)
+{
+    if (torrents.size() == 1)
+    {
+        file_list_->set_torrent(tr_torrentId(torrents.front()));
+        file_list_->show();
+        file_label_->hide();
+    }
+    else
+    {
+        file_list_->clear();
+        file_list_->hide();
+        file_label_->show();
+    }
+}
+
 void DetailsDialog::Impl::onScrapeToggled()
 {
     tr_quark const key = TR_KEY_show_tracker_scrapes;
@@ -2442,6 +2459,7 @@ void DetailsDialog::Impl::refresh()
     refreshInfo(torrents);
     refreshPeers(torrents);
     refreshTracker(torrents);
+    refreshFiles(torrents);
     refreshOptions(torrents);
 
     if (torrents.empty())
@@ -2578,20 +2596,12 @@ void DetailsDialog::Impl::set_torrents(std::vector<tr_torrent_id_t> const& ids)
         int const id = ids.front();
         auto const* tor = core_->find_torrent(id);
         title = fmt::format(_("{torrent_name} Properties"), fmt::arg("torrent_name", tr_torrentName(tor)));
-
-        file_list_->set_torrent(id);
-        file_list_->show();
-        file_label_->hide();
     }
     else
     {
         title = fmt::format(
             ngettext("Properties - {torrent_count:L} Torrent", "Properties - {torrent_count:L} Torrents", len),
             fmt::arg("torrent_count", len));
-
-        file_list_->clear();
-        file_list_->hide();
-        file_label_->show();
     }
 
     dialog_.set_title(title);

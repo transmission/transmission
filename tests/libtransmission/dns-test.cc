@@ -41,30 +41,6 @@ protected:
         ::testing::Test::TearDown();
     }
 
-    static bool waitFor(
-        struct event_base* evb,
-        std::function<bool()> const& test,
-        std::chrono::milliseconds msec = DefaultTimeout)
-    {
-        auto const deadline = std::chrono::steady_clock::now() + msec;
-
-        for (;;)
-        {
-            if (test())
-            {
-                return true;
-            }
-
-            if (std::chrono::steady_clock::now() > deadline)
-            {
-                return false;
-            }
-
-            event_base_loop(evb, EVLOOP_ONCE);
-        }
-    }
-
-    static auto constexpr DefaultTimeout = 5s;
     struct event_base* event_base_ = nullptr;
 };
 

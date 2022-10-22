@@ -11,7 +11,6 @@
 #include <string>
 
 #include <event2/event.h>
-#include <event2/buffer.h>
 #include <event2/bufferevent.h>
 
 #include <libutp/utp.h>
@@ -244,11 +243,6 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     tr_error_clear(&error);
 }
 
-static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
-{
-    return io->outbuf.toSocket(fd, howmuch);
-}
-
 static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
     auto* io = static_cast<tr_peerIo*>(vio);
@@ -273,7 +267,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
 
     EVUTIL_SET_SOCKET_ERROR(0);
-    auto const n_written = tr_evbuffer_write(io, fd, howmuch); // -1 on err, 0 on EOF
+    auto const n_written = io->outbuf.toSocket(fd, howmuch); // -1 on err, 0 on EOF
     auto const err = EVUTIL_SOCKET_ERROR();
     auto const should_retry = n_written == -1 && (err == 0 || err == EAGAIN || err == EINTR || err == EINPROGRESS);
 
@@ -838,48 +832,6 @@ void tr_peerIo::writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data
 ****
 ***/
 
-void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme)
-{
-    evbuffer_add(outbuf, &addme, 1);
-}
-
-void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t addme_hs)
-{
-    uint16_t const ns = htons(addme_hs);
-    evbuffer_add(outbuf, &ns, sizeof(ns));
-}
-
-void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t addme_hl)
-{
-    uint32_t const nl = htonl(addme_hl);
-    evbuffer_add(outbuf, &nl, sizeof(nl));
-}
-
-void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t addme_hll)
-{
-    uint64_t const nll = tr_htonll(addme_hll);
-    evbuffer_add(outbuf, &nll, sizeof(nll));
-}
-
-void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
-{
-    evbuffer_add_uint16(buf, val);
-}
-
-void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
-{
-    evbuffer_add_uint32(buf, val);
-}
-
-void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
-{
-    evbuffer_add_uint64(buf, val);
-}
-
-/***
-****
-***/
-
 void tr_peerIo::readBytes(void* bytes, size_t byte_count)
 {
     TR_ASSERT(readBufferSize() >= byte_count);
@@ -1020,7 +972,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
     case TR_PEER_SOCKET_TYPE_TCP:
         {
             EVUTIL_SET_SOCKET_ERROR(0);
-            n = tr_evbuffer_write(io, io->socket.handle.tcp, howmuch);
+            n = io->outbuf.toSocket(io->socket.handle.tcp, howmuch);
             int const e = EVUTIL_SOCKET_ERROR();
 
             if (n > 0)

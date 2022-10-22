@@ -359,12 +359,3 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
     return io != nullptr && tr_address_is_valid(&io->address());
 }
-
-void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme);
-void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
-void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t hl);
-void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t hll);
-
-void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val);
-void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val);
-void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val);
