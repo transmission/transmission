@@ -29,20 +29,28 @@ set(TRWEB_SRCS
 
 set(TRWEB_IMGS
   assets/img/analytics.svg
+  assets/img/box.svg
+  assets/img/film.svg
   assets/img/modern-tortoise-blue.png
   assets/img/modern-tortoise.png
   assets/img/chevron-down.svg
   assets/img/chevron-up.svg
-  assets/img/diagram-3-fill.svg
   assets/img/horizontal-rule.svg
   assets/img/lock-fill.svg
   assets/img/logo.png
+  assets/img/image.svg
+  assets/img/magnet.svg
+  assets/img/music.png
+  assets/img/file-text.svg
+  assets/img/package.png
+  assets/img/folder.png
   assets/img/pause-circle-active.svg
   assets/img/pause-circle-idle.svg
   assets/img/play-circle-active.svg
   assets/img/play-circle-idle.svg
   assets/img/router.svg
   assets/img/team.svg
+  assets/img/type.svg
   assets/img/three-dots-vertical.svg
   assets/img/up-and-down-arrows.svg
 )
