@@ -576,14 +576,21 @@ void BlocklistFile::assertValidRules(std::vector<AddressRange> const& ranges)
 
     for (size_t i = 1; i < std::size(ranges_ipv4); ++i)
     {
-        TR_ASSERT(ranges_ipv4[i - 1].end_ < ranges_ipv4[i].begin_);
+        if (ranges_ipv4[i - 1].end_ < ranges_ipv4[i].begin_)
+        {
+            TR_ASSERT(ranges_ipv4[i - 1].end_ < ranges_ipv4[i].begin_);
+        }
     }
 
     for (size_t i = 1; i < std::size(ranges_ipv6); ++i)
     {
         auto const& last_end_address = ranges_ipv6[i - 1].end6_;
         auto const& start_address = ranges_ipv6[i].begin6_;
-        TR_ASSERT(memcmp(&last_end_address, &start_address, sizeof(start_address)) > 0);
+        
+        if (memcmp(&last_end_address, &start_address, sizeof(start_address)) > 0)
+        {
+            TR_ASSERT(memcmp(&last_end_address, &start_address, sizeof(start_address)) > 0);
+        }
     }
 }
 #endif
