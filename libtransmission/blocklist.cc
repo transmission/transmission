@@ -586,7 +586,7 @@ void BlocklistFile::assertValidRules(std::vector<AddressRange> const& ranges)
     {
         auto const& last_end_address = ranges_ipv6[i - 1].end6_;
         auto const& start_address = ranges_ipv6[i].begin6_;
-        
+
         if (memcmp(&last_end_address, &start_address, sizeof(start_address)) > 0)
         {
             TR_ASSERT(memcmp(&last_end_address, &start_address, sizeof(start_address)) > 0);
