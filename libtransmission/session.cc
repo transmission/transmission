@@ -1824,11 +1824,7 @@ void tr_session::closeImplStart()
     is_closing_ = true;
 
     lpd_.reset();
-
-    if (dht_)
-    {
-        dht_->startShutdown();
-    }
+    dht_.reset();
 
     announcer_udp_->startShutdown();
 
@@ -1899,7 +1895,6 @@ void tr_session::closeImplFinish()
 
     /* we had to wait until UDP trackers were closed before closing these: */
     this->announcer_udp_.reset();
-    this->dht_.reset();
     this->udp_core_.reset();
 
     stats().saveIfDirty();

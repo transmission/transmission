@@ -1363,8 +1363,6 @@ static void torrentStartImpl(tr_torrent* const tor)
 
     tr_torrentResetTransferStats(tor);
     tr_announcerTorrentStarted(tor);
-    tor->dhtAnnounceAt = now + tr_rand_int_weak(20);
-    tor->dhtAnnounce6At = now + tr_rand_int_weak(20);
     tor->lpdAnnounceAt = now;
     tr_peerMgrStartTorrent(tor);
 }

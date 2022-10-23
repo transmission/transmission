@@ -11,12 +11,12 @@
 #include <ctime>
 #include <deque>
 #include <fstream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <tuple> // for std::tie()
-#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -48,8 +48,10 @@
 
 using namespace std::literals;
 
+// the dht library requires the app to implement these:
 extern "C"
 {
+
     // This function should return true when a node is blacklisted.
     // We don't support using a blacklist with the DHT in Transmission,
     // since massive (ab)use of this feature could harm the DHT. However,
@@ -114,7 +116,7 @@ private:
     using Nodes = std::deque<Node>;
     using Id = std::array<unsigned char, 20>;
 
-    enum class Status
+    enum class SwarmStatus
     {
         Stopped,
         Broken,
@@ -135,9 +137,9 @@ public:
         , periodic_timer_{ mediator_.timerMaker().create([this]() { onPeriodicTimer(); }) }
     {
         // load up the bootstrap nodes
-        std::tie(id_, bootstrap_nodes_) = loadState(state_filename_);
-        getNodesFromBootstrapFile(tr_pathbuf{ mediator_.configDir(), "/dht.bootstrap"sv }, bootstrap_nodes_);
-        getNodesFromName("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_nodes_);
+        std::tie(id_, bootstrap_queue_) = loadState(state_filename_);
+        getNodesFromBootstrapFile(tr_pathbuf{ mediator_.configDir(), "/dht.bootstrap"sv }, bootstrap_queue_);
+        getNodesFromName("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_queue_);
         bootstrap_timer_->startSingleShot(100ms);
 
         onAnnounceTimer();
@@ -153,7 +155,8 @@ public:
     {
         tr_logAddTrace("Uninitializing DHT");
 
-        // Don't save the new state if nothing is ready yet.
+        // Since we only save known good nodes,
+        // only overwrite older data if we know enough nodes.
         if (isReady(AF_INET) || isReady(AF_INET6))
         {
             saveState();
@@ -193,12 +196,198 @@ public:
         periodic_timer_->startSingleShot(interval);
     }
 
-    void startShutdown() override
+private:
+    [[nodiscard]] constexpr tr_socket_t udpSocket(int af) const noexcept
     {
-        // FIXME
+        switch (af)
+        {
+        case AF_INET:
+            return udp4_socket_;
+
+        case AF_INET6:
+            return udp6_socket_;
+
+        default:
+            return TR_BAD_SOCKET;
+        }
     }
 
-private:
+    [[nodiscard]] SwarmStatus swarmStatus(int family, int* const setme_node_count = nullptr) const
+    {
+        if (udpSocket(family) == TR_BAD_SOCKET)
+        {
+            if (setme_node_count != nullptr)
+            {
+                *setme_node_count = 0;
+            }
+
+            return SwarmStatus::Stopped;
+        }
+
+        int good = 0;
+        int dubious = 0;
+        int incoming = 0;
+        mediator_.api().nodes(family, &good, &dubious, nullptr, &incoming);
+
+        if (setme_node_count != nullptr)
+        {
+            *setme_node_count = good + dubious;
+        }
+
+        if (good < 4 || good + dubious <= 8)
+        {
+            return SwarmStatus::Broken;
+        }
+
+        if (good < 40)
+        {
+            return SwarmStatus::Poor;
+        }
+
+        if (incoming < 8)
+        {
+            return SwarmStatus::Firewalled;
+        }
+
+        return SwarmStatus::Good;
+    }
+
+    [[nodiscard]] static constexpr auto isReady(SwarmStatus const status)
+    {
+        return status >= SwarmStatus::Firewalled;
+    }
+
+    [[nodiscard]] bool isReady(int af) const noexcept
+    {
+        return isReady(swarmStatus(af));
+    }
+
+    [[nodiscard]] bool isReady() const noexcept
+    {
+        return isReady(AF_INET) && isReady(AF_INET6);
+    }
+
+    ///
+
+    // how long to wait between adding nodes during bootstrap
+    [[nodiscard]] static constexpr auto bootstrapInterval(size_t n_added)
+    {
+        // Our DHT code is able to take up to 9 nodes in a row without
+        // dropping any. After that, it takes some time to split buckets.
+        // So ping the first 8 nodes quickly, then slow down.
+        if (n_added < 8U)
+        {
+            return 2s;
+        }
+
+        if (n_added < 16U)
+        {
+            return 15s;
+        }
+
+        return 40s;
+    }
+
+    void onBootstrapTimer()
+    {
+        // Since we don't want to abuse our bootstrap nodes,
+        // we don't ping them if the DHT is in a good state.
+        if (isReady() || std::empty(bootstrap_queue_))
+        {
+            return;
+        }
+
+        auto [address, port] = bootstrap_queue_.front();
+        bootstrap_queue_.pop_front();
+        addNode(address, port);
+        ++n_bootstrapped_;
+
+        bootstrap_timer_->startSingleShot(bootstrapInterval(n_bootstrapped_));
+    }
+
+    ///
+
+    [[nodiscard]] auto announceTorrent(tr_sha1_digest_t const& info_hash, int af, tr_port port)
+    {
+        auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(info_hash));
+        auto const rc = mediator_.api().search(dht_hash, port.host(), af, callback, this);
+        auto const announce_again_in_n_secs = rc < 0 ? 5s + std::chrono::seconds{ tr_rand_int_weak(5) } :
+                                                       25min + std::chrono::seconds{ tr_rand_int_weak(3 * 60) };
+        return announce_again_in_n_secs;
+    }
+
+    void onAnnounceTimer()
+    {
+        // don't announce if the swarm isn't ready
+        if (swarmStatus(AF_INET) < SwarmStatus::Poor && swarmStatus(AF_INET6) < SwarmStatus::Poor)
+        {
+            return;
+        }
+
+        auto const now = tr_time();
+        for (auto const id : mediator_.torrentsAllowingDHT())
+        {
+            auto& times = announce_times_[id];
+
+            if (auto& announce_after = times.ipv4_announce_after; announce_after < now)
+            {
+                auto const announce_again_in_n_secs = announceTorrent(mediator_.torrentInfoHash(id), AF_INET, peer_port_);
+                announce_after = now + std::chrono::seconds{ announce_again_in_n_secs }.count();
+            }
+
+            if (auto& announce_after = times.ipv6_announce_after; announce_after < now)
+            {
+                auto const announce_again_in_n_secs = announceTorrent(mediator_.torrentInfoHash(id), AF_INET6, peer_port_);
+                announce_after = now + std::chrono::seconds{ announce_again_in_n_secs }.count();
+            }
+        }
+    }
+
+    ///
+
+    void onPeriodicTimer()
+    {
+        auto const call_again_in_n_secs = periodic(nullptr, 0, nullptr, 0);
+
+        // Being slightly late is fine,
+        // and has the added benefit of adding some jitter.
+        auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int_weak(1000) };
+        periodic_timer_->startSingleShot(interval);
+    }
+
+    [[nodiscard]] std::chrono::seconds periodic(void const* buf, size_t buflen, struct sockaddr const* from, int fromlen)
+    {
+        auto call_again_in_n_secs = time_t{};
+
+        // the only way dht_periodic() fails is if buf isn't zero-terminated,
+        // so let's ensure it's zero terminated here.
+        auto szbuf = tr_strbuf<unsigned char, 1500>{ std::string_view{ static_cast<char const*>(buf), buflen } };
+
+        mediator_.api().periodic(std::data(szbuf), std::size(szbuf), from, fromlen, &call_again_in_n_secs, callback, this);
+
+        return std::chrono::seconds{ call_again_in_n_secs };
+    }
+
+    static void callback(void* vself, int event, unsigned char const* info_hash, void const* data, size_t data_len)
+    {
+        auto* const self = static_cast<tr_dht_impl*>(vself);
+        auto hash = tr_sha1_digest_t{};
+        std::copy_n(reinterpret_cast<std::byte const*>(info_hash), std::size(hash), std::data(hash));
+
+        if (event == DHT_EVENT_VALUES)
+        {
+            auto const pex = tr_peerMgrCompactToPex(data, data_len, nullptr, 0);
+            self->mediator_.addPex(hash, std::data(pex), std::size(pex));
+        }
+        else if (event == DHT_EVENT_VALUES6)
+        {
+            auto const pex = tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
+            self->mediator_.addPex(hash, std::data(pex), std::size(pex));
+        }
+    }
+
+    ///
+
     void saveState() const
     {
         auto constexpr MaxNodes = int{ 300 };
@@ -253,221 +442,7 @@ private:
         tr_variantClear(&benc);
     }
 
-    [[nodiscard]] static constexpr std::string_view printableStatus(Status status)
-    {
-        switch (status)
-        {
-        case Status::Stopped:
-            return "stopped"sv;
-
-        case Status::Broken:
-            return "broken"sv;
-
-        case Status::Poor:
-            return "poor"sv;
-
-        case Status::Firewalled:
-            return "firewalled"sv;
-
-        case Status::Good:
-            return "good"sv;
-
-        default:
-            return "???"sv;
-        }
-    }
-
-    [[nodiscard]] constexpr tr_socket_t udpSocket(int af) const noexcept
-    {
-        switch (af)
-        {
-        case AF_INET:
-            return udp4_socket_;
-
-        case AF_INET6:
-            return udp6_socket_;
-
-        default:
-            return TR_BAD_SOCKET;
-        }
-    }
-
-    [[nodiscard]] Status status(int family, int* const setme_node_count = nullptr) const
-    {
-        if (udpSocket(family) == TR_BAD_SOCKET)
-        {
-            if (setme_node_count != nullptr)
-            {
-                *setme_node_count = 0;
-            }
-
-            return Status::Stopped;
-        }
-
-        int good = 0;
-        int dubious = 0;
-        int incoming = 0;
-        mediator_.api().nodes(family, &good, &dubious, nullptr, &incoming);
-
-        if (setme_node_count != nullptr)
-        {
-            *setme_node_count = good + dubious;
-        }
-
-        if (good < 4 || good + dubious <= 8)
-        {
-            return Status::Broken;
-        }
-
-        if (good < 40)
-        {
-            return Status::Poor;
-        }
-
-        if (incoming < 8)
-        {
-            return Status::Firewalled;
-        }
-
-        return Status::Good;
-    }
-
-    [[nodiscard]] static constexpr auto isReady(Status const status)
-    {
-        return status >= Status::Firewalled;
-    }
-
-    [[nodiscard]] bool isReady(int af = 0) const noexcept
-    {
-        return af == AF_INET || af == AF_INET6 ? isReady(status(af)) : isReady(status(AF_INET)) && isReady(status(AF_INET6));
-    }
-
-    ///
-
-    // how long to wait between adding nodes during bootstrap
-    [[nodiscard]] static constexpr auto bootstrapInterval(size_t n_added)
-    {
-        // Our DHT code is able to take up to 9 nodes in a row without
-        // dropping any. After that, it takes some time to split buckets.
-        // So ping the first 8 nodes quickly, then slow down.
-        if (n_added < 8U)
-        {
-            return 2s;
-        }
-
-        if (n_added < 16U)
-        {
-            return 15s;
-        }
-
-        return 40s;
-    }
-
-    void onBootstrapTimer()
-    {
-        if (isReady() || std::empty(bootstrap_nodes_))
-        {
-            return;
-        }
-
-        auto [address, port] = bootstrap_nodes_.front();
-        bootstrap_nodes_.pop_front();
-        addNode(address, port);
-        ++n_bootstrapped_nodes_;
-
-        bootstrap_timer_->startSingleShot(bootstrapInterval(n_bootstrapped_nodes_));
-    }
-
-    bool announceTorrent(tr_sha1_digest_t const& info_hash, int af, tr_port port)
-    {
-        auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(info_hash));
-        int const rc = mediator_.api().search(dht_hash, port.host(), af, callback, this);
-        return rc >= 0;
-    }
-
-    void onAnnounceTimer()
-    {
-        // before announcing, check the swarm quality first
-        auto const ipv4_status = status(AF_INET);
-        auto const ipv6_status = status(AF_INET6);
-        if (ipv4_status < Status::Poor && ipv6_status < Status::Poor)
-        {
-            return;
-        }
-
-        // ensure announce_times_ has enough capacity
-        auto const ids = mediator_.torrentsAllowingDHT();
-        if (auto const iter = std::max_element(std::begin(ids), std::end(ids));
-            static_cast<size_t>(*iter) >= std::size(announce_times_))
-        {
-            announce_times_.resize(*iter + 1);
-        }
-
-        auto const now = tr_time();
-        for (auto const id : ids)
-        {
-            auto& times = announce_times_[id];
-
-            if (auto& announce_after = times.ipv4_announce_after; announce_after < now)
-            {
-                auto const ok = announceTorrent(mediator_.torrentInfoHash(id), AF_INET, peer_port_);
-                auto const interval = ok ? 25 * 60 + tr_rand_int_weak(3 * 60) : 5 + tr_rand_int_weak(5);
-                announce_after = now + interval;
-            }
-
-            if (auto& announce_after = times.ipv6_announce_after; announce_after < now)
-            {
-                auto const ok = announceTorrent(mediator_.torrentInfoHash(id), AF_INET6, peer_port_);
-                auto const interval = ok ? 25 * 60 + tr_rand_int_weak(3 * 60) : 5 + tr_rand_int_weak(5);
-                announce_after = now + interval;
-            }
-        }
-    }
-
-    ///
-
-    static void callback(void* vself, int event, unsigned char const* info_hash, void const* data, size_t data_len)
-    {
-        auto* const self = static_cast<tr_dht_impl*>(vself);
-        auto hash = tr_sha1_digest_t{};
-        std::copy_n(reinterpret_cast<std::byte const*>(info_hash), std::size(hash), std::data(hash));
-
-        if (event == DHT_EVENT_VALUES)
-        {
-            auto const pex = tr_peerMgrCompactToPex(data, data_len, nullptr, 0);
-            self->mediator_.addPex(hash, std::data(pex), std::size(pex));
-        }
-        else if (event == DHT_EVENT_VALUES6)
-        {
-            auto const pex = tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
-            self->mediator_.addPex(hash, std::data(pex), std::size(pex));
-        }
-    }
-
-    [[nodiscard]] std::chrono::seconds periodic(void const* buf, size_t buflen, struct sockaddr const* from, int fromlen)
-    {
-        auto call_again_in_n_secs = time_t{};
-
-        // the only way dht_periodic() fails is if buf isn't zero-terminated,
-        // so let's ensure it's zero terminated here.
-        auto szbuf = tr_strbuf<unsigned char, 1500>{ std::string_view{ static_cast<char const*>(buf), buflen } };
-
-        mediator_.api().periodic(std::data(szbuf), std::size(szbuf), from, fromlen, &call_again_in_n_secs, callback, this);
-
-        return std::chrono::seconds{ call_again_in_n_secs };
-    }
-
-    void onPeriodicTimer()
-    {
-        auto const call_again_in_n_secs = periodic(nullptr, 0, nullptr, 0);
-
-        // Being slightly late is fine,
-        // and has the added benefit of adding some jitter.
-        auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int_weak(1000) };
-        periodic_timer_->startSingleShot(interval);
-    }
-
-    static std::pair<Id, Nodes> loadState(std::string_view filename)
+    [[nodiscard]] static std::pair<Id, Nodes> loadState(std::string_view filename)
     {
         // Note that DHT ids need to be distributed uniformly,
         // so it should be something truly random
@@ -518,6 +493,8 @@ private:
 
         return std::make_pair(id, nodes);
     }
+
+    ///
 
     static void getNodesFromBootstrapFile(std::string_view filename, Nodes& nodes)
     {
@@ -596,8 +573,8 @@ private:
 
     Id id_ = {};
 
-    Nodes bootstrap_nodes_;
-    size_t n_bootstrapped_nodes_ = 0;
+    Nodes bootstrap_queue_;
+    size_t n_bootstrapped_ = 0;
 
     struct AnnounceInfo
     {
@@ -605,7 +582,7 @@ private:
         time_t ipv6_announce_after = 0;
     };
 
-    std::vector<AnnounceInfo> announce_times_;
+    std::map<tr_torrent_id_t, AnnounceInfo> announce_times_;
 };
 
 [[nodiscard]] std::unique_ptr<tr_dht> tr_dht::create(

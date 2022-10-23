@@ -28,7 +28,7 @@ class TimerMaker;
 class tr_dht
 {
 public:
-    // Wrapper around `third_party/dht` to make it easier to inject a mock in tests
+    // Wraps around DHT library to DI possible in tests
     struct API
     {
         virtual ~API() = default;
@@ -97,7 +97,6 @@ public:
         tr_port peer_port,
         tr_socket_t udp4_socket,
         tr_socket_t udp6_socket);
-    virtual void startShutdown() = 0;
     virtual ~tr_dht() = default;
 
     virtual void addNode(tr_address const& address, tr_port port) = 0;
