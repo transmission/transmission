@@ -296,7 +296,7 @@ static char const* torrentRemove(
     {
         if (auto const status = session->rpcNotify(type, tor); (status & TR_RPC_NOREMOVE) == 0)
         {
-            tr_torrentRemove(tor, delete_flag, nullptr);
+            tr_torrentRemove(tor, delete_flag, nullptr, nullptr);
         }
     }
 

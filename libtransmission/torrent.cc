@@ -1623,7 +1623,12 @@ void tr_torrentFree(tr_torrent* tor)
     }
 }
 
-static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func)
+static bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error** error)
+{
+    return tr_sys_path_remove(filename, error);
+}
+
+static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
 {
     auto const lock = tor->unique_lock();
 
@@ -1635,12 +1640,12 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
 
         if (delete_func == nullptr)
         {
-            delete_func = tr_sys_path_remove;
+            delete_func = removeTorrentFile;
         }
 
-        auto const delete_func_wrapper = [&delete_func](char const* filename)
+        auto const delete_func_wrapper = [&delete_func, user_data](char const* filename)
         {
-            delete_func(filename, nullptr);
+            delete_func(filename, user_data, nullptr);
         };
         tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
@@ -1648,13 +1653,13 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
     closeTorrent(tor);
 }
 
-void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func)
+void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->isDeleting = true;
 
-    tr_runInEventThread(tor->session, removeTorrentInEventThread, tor, delete_flag, delete_func);
+    tr_runInEventThread(tor->session, removeTorrentInEventThread, tor, delete_flag, delete_func, user_data);
 }
 
 /**
