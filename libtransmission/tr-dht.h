@@ -65,6 +65,11 @@ public:
             return ::dht_search(id, port, af, callback, closure);
         }
 
+        virtual int init(int s, int s6, unsigned const char* id, unsigned const char* v)
+        {
+            return ::dht_init(s, s6, id, v);
+        }
+
         virtual int uninit()
         {
             return ::dht_uninit();

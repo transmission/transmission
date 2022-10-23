@@ -142,6 +142,8 @@ public:
         getNodesFromName("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_queue_);
         bootstrap_timer_->startSingleShot(100ms);
 
+        mediator_.api().init(udp4_socket_, udp6_socket_, std::data(id_), nullptr);
+
         onAnnounceTimer();
         announce_timer_->startRepeating(1s);
     }
@@ -290,6 +292,8 @@ private:
 
     void onBootstrapTimer()
     {
+        fmt::print("onBootstrapTimer, have {:d} nodes\n", std::size(bootstrap_queue_));
+
         // Since we don't want to abuse our bootstrap nodes,
         // we don't ping them if the DHT is in a good state.
         if (isReady() || std::empty(bootstrap_queue_))
