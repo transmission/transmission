@@ -467,8 +467,8 @@ size_t BlocklistFile::setContent(char const* filename)
 
     // combine sorted
     ranges.clear();
-    ranges.insert( ranges.end(), ipv4_ranges.begin(), ipv4_ranges.end() );
-    ranges.insert( ranges.end(), ipv6_ranges.begin(), ipv6_ranges.end() );
+    ranges.insert(ranges.end(), ipv4_ranges.begin(), ipv4_ranges.end());
+    ranges.insert(ranges.end(), ipv6_ranges.begin(), ipv6_ranges.end());
 
     size_t keep = 0; // index in ranges
 
@@ -597,7 +597,7 @@ void BlocklistFile::assertValidRules(std::vector<AddressRange> const& ranges)
         }
     }
 
-    TR_ASSERT(std::is_sorted(std::begin(ranges_ipv4), std::end(ranges_ipv4), BlocklistFile::compareAddressRangesByFirstAddress));
-    TR_ASSERT(std::is_sorted(std::begin(ranges_ipv6), std::end(ranges_ipv6), BlocklistFile::compareAddressRangesByFirstAddress));
+    TR_ASSERT(is_sorted(std::begin(ranges_ipv4), std::end(ranges_ipv4), BlocklistFile::compareAddressRangesByFirstAddress));
+    TR_ASSERT(is_sorted(std::begin(ranges_ipv6), std::end(ranges_ipv6), BlocklistFile::compareAddressRangesByFirstAddress));
 }
 #endif
