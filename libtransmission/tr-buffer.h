@@ -125,7 +125,7 @@ public:
     Buffer& operator=(Buffer&&) = default;
 
     template<typename T>
-    Buffer(T const& data)
+    explicit Buffer(T const& data)
     {
         add(std::data(data), std::size(data));
     }
