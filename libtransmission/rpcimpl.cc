@@ -458,8 +458,98 @@ static void addPeers(tr_torrent const* tor, tr_variant* list)
     tr_torrentPeersFree(peers, peer_count);
 }
 
+[[nodiscard]] static auto constexpr isSupportedTorrentGetField(tr_quark key)
+{
+    switch (key)
+    {
+    case TR_KEY_activityDate:
+    case TR_KEY_addedDate:
+    case TR_KEY_availability:
+    case TR_KEY_bandwidthPriority:
+    case TR_KEY_comment:
+    case TR_KEY_corruptEver:
+    case TR_KEY_creator:
+    case TR_KEY_dateCreated:
+    case TR_KEY_desiredAvailable:
+    case TR_KEY_doneDate:
+    case TR_KEY_downloadDir:
+    case TR_KEY_downloadLimit:
+    case TR_KEY_downloadLimited:
+    case TR_KEY_downloadedEver:
+    case TR_KEY_editDate:
+    case TR_KEY_error:
+    case TR_KEY_errorString:
+    case TR_KEY_eta:
+    case TR_KEY_etaIdle:
+    case TR_KEY_fileStats:
+    case TR_KEY_file_count:
+    case TR_KEY_files:
+    case TR_KEY_group:
+    case TR_KEY_hashString:
+    case TR_KEY_haveUnchecked:
+    case TR_KEY_haveValid:
+    case TR_KEY_honorsSessionLimits:
+    case TR_KEY_id:
+    case TR_KEY_isFinished:
+    case TR_KEY_isPrivate:
+    case TR_KEY_isStalled:
+    case TR_KEY_labels:
+    case TR_KEY_leftUntilDone:
+    case TR_KEY_magnetLink:
+    case TR_KEY_manualAnnounceTime:
+    case TR_KEY_maxConnectedPeers:
+    case TR_KEY_metadataPercentComplete:
+    case TR_KEY_name:
+    case TR_KEY_peer_limit:
+    case TR_KEY_peers:
+    case TR_KEY_peersConnected:
+    case TR_KEY_peersFrom:
+    case TR_KEY_peersGettingFromUs:
+    case TR_KEY_peersSendingToUs:
+    case TR_KEY_percentComplete:
+    case TR_KEY_percentDone:
+    case TR_KEY_pieceCount:
+    case TR_KEY_pieceSize:
+    case TR_KEY_pieces:
+    case TR_KEY_primary_mime_type:
+    case TR_KEY_priorities:
+    case TR_KEY_queuePosition:
+    case TR_KEY_rateDownload:
+    case TR_KEY_rateUpload:
+    case TR_KEY_recheckProgress:
+    case TR_KEY_secondsDownloading:
+    case TR_KEY_secondsSeeding:
+    case TR_KEY_seedIdleLimit:
+    case TR_KEY_seedIdleMode:
+    case TR_KEY_seedRatioLimit:
+    case TR_KEY_seedRatioMode:
+    case TR_KEY_sizeWhenDone:
+    case TR_KEY_source:
+    case TR_KEY_startDate:
+    case TR_KEY_status:
+    case TR_KEY_torrentFile:
+    case TR_KEY_totalSize:
+    case TR_KEY_trackerList:
+    case TR_KEY_trackerStats:
+    case TR_KEY_trackers:
+    case TR_KEY_uploadLimit:
+    case TR_KEY_uploadLimited:
+    case TR_KEY_uploadRatio:
+    case TR_KEY_uploadedEver:
+    case TR_KEY_wanted:
+    case TR_KEY_webseeds:
+    case TR_KEY_webseedsSendingToUs:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
 static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
 {
+    TR_ASSERT(isSupportedTorrentGetField(key));
+
     switch (key)
     {
     case TR_KEY_activityDate:
@@ -888,7 +978,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
                 continue;
             }
 
-            if (auto const key = tr_quark_lookup(sv); key)
+            if (auto const key = tr_quark_lookup(sv); key && isSupportedTorrentGetField(*key))
             {
                 keys.emplace_back(*key);
             }
