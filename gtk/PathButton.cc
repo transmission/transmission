@@ -13,7 +13,7 @@
 class PathButton::Impl
 {
 public:
-    Impl(PathButton& widget);
+    explicit Impl(PathButton& widget);
 
     TR_DISABLE_COPY_MOVE(Impl)
 
