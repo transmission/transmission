@@ -176,6 +176,7 @@ void tr_variantInitStrView(tr_variant* initme, std::string_view);
 void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
 
+bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
 
 /***
@@ -275,6 +276,7 @@ bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme)
 bool tr_variantDictFindBool(tr_variant* dict, tr_quark const key, bool* setme);
 bool tr_variantDictFindStrView(tr_variant* dict, tr_quark const key, std::string_view* setme);
 bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const** setme_raw, size_t* setme_len);
+bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, std::byte const** setme_raw, size_t* setme_len);
 
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
 void tr_variantMergeDicts(tr_variant* dict_target, tr_variant const* dict_source);
