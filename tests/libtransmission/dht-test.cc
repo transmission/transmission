@@ -26,25 +26,30 @@ namespace libtransmission::test
 class DhtTest : public SandboxedTest
 {
 protected:
+    // A fake libdht for the tests to call
     class MockDht final : public tr_dht::API
     {
     public:
-        // int get_nodes(struct sockaddr_in* sin, int* num, struct sockaddr_in6* sin6, int* num6) override
-        int get_nodes(struct sockaddr_in*, int*, struct sockaddr_in6*, int*) override
+        int get_nodes(struct sockaddr_in* /*sin*/, int* /*max*/, struct sockaddr_in6* /*sin6*/, int* /*max6*/) override
         {
             fmt::print("get_nodes\n");
             return 0;
         }
 
-        //int nodes(int af, int* good_return, int* dubious_return, int* cached_return, int* incoming_return) override
-        int nodes(int, int*, int*, int*, int*) override
+        int nodes(int /*af*/, int* /*good*/, int* /*dubious*/, int* /*cached*/, int* /*incoming*/) override
         {
             fmt::print("nodes\n");
             return 0;
         }
 
-        // int periodic( void const* buf, size_t buflen, sockaddr const* from, int fromlen, time_t* tosleep, dht_callback_t callback, void* closure) override
-        int periodic(void const*, size_t, sockaddr const*, int, time_t*, dht_callback_t, void*) override
+        int periodic(
+            void const* /*buf*/,
+            size_t /*buflen*/,
+            sockaddr const /*from*/*,
+            int /*fromlen*/,
+            time_t* /*tosleep*/,
+            dht_callback_t /*callback*/,
+            void* /*closure*/) override
         {
             fmt::print("periodic\n");
             return 0;
@@ -59,8 +64,8 @@ protected:
             return 0;
         }
 
-        // int search(unsigned char const* id, int port, int af, dht_callback_t callback, void* closure) override
-        int search(unsigned char const*, int, int, dht_callback_t, void*) override
+        int search(unsigned char const* /*id*/, int /*port*/, int /*af*/, dht_callback_t /*callback*/, void* /*closure*/)
+            override
         {
             fmt::print("search\n");
             return 0;
@@ -82,10 +87,11 @@ protected:
         std::vector<Pinged> pinged_;
     };
 
+    // Creates real timers, but with shortened intervals so that tests can run faster
     class MockTimer final : public libtransmission::Timer
     {
     public:
-        MockTimer(std::unique_ptr<Timer> real_timer)
+        explicit MockTimer(std::unique_ptr<Timer> real_timer)
             : real_timer_{ std::move(real_timer) }
         {
         }
@@ -135,10 +141,11 @@ protected:
         std::unique_ptr<Timer> const real_timer_;
     };
 
+    // Creates MockTimers
     class MockTimerMaker final : public libtransmission::TimerMaker
     {
     public:
-        MockTimerMaker(struct event_base* evb)
+        explicit MockTimerMaker(struct event_base* evb)
             : real_timer_maker_{ evb }
         {
         }
@@ -154,7 +161,7 @@ protected:
     class MockMediator final : public tr_dht::Mediator
     {
     public:
-        MockMediator(struct event_base* event_base)
+        explicit MockMediator(struct event_base* event_base)
             : mock_timer_maker_{ event_base }
         {
         }
@@ -164,7 +171,7 @@ protected:
             return torrents_allowing_dht_;
         }
 
-        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t) const override
+        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t /*id*/) const override
         {
             return {};
         }
@@ -184,8 +191,7 @@ protected:
             return mock_dht_;
         }
 
-        // void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override
-        void addPex(tr_sha1_digest_t const&, tr_pex const*, size_t) override
+        void addPex(tr_sha1_digest_t const& /*info_hash*/, tr_pex const* /*pex*/, size_t /*n_pex*/) override
         {
         }
 
@@ -247,27 +253,24 @@ protected:
 
 TEST_F(DhtTest, usesDhtBootstrapFile)
 {
-    auto constexpr Id = tr_torrent_id_t{ 1 };
-    auto constexpr PeerPort = tr_port::fromHost(909);
-
     // Make the 'dht.bootstrap' file.
     // This a file with each line holding `${host} ${port}`
     // which tr-dht will try to ping as nodes
-    auto constexpr BootstrapNodeName = "example.com"sv;
-    auto constexpr BootstrapNodePort = tr_port::fromHost(8080);
+    static auto constexpr BootstrapNodeName = "example.com"sv;
+    static auto constexpr BootstrapNodePort = tr_port::fromHost(8080);
     auto ofs = std::ofstream{ tr_pathbuf{ sandboxDir(), "/dht.bootstrap" } };
     ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << std::endl;
     ofs.close();
 
-    // make the mediator
+    // Make the mediator
     auto mediator = MockMediator{ event_base_ };
-    mediator.info_hashes_[Id] = tr_randObj<tr_sha1_digest_t>();
-    mediator.torrents_allowing_dht_ = { Id };
     mediator.config_dir_ = sandboxDir();
 
-    // make the dht object
-    auto constexpr Sock4 = tr_socket_t{ 404 };
-    auto constexpr Sock6 = tr_socket_t{ 418 };
+    // Make the dht object.
+    // PeerPort, Sock4, and Sock6 are arbitrary values; they're not used in this test
+    static auto constexpr PeerPort = tr_port::fromHost(909);
+    static auto constexpr Sock4 = tr_socket_t{ 404 };
+    static auto constexpr Sock6 = tr_socket_t{ 418 };
     auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
 
     // We didn't create a 'dht.dat' file to load state from,
@@ -285,5 +288,9 @@ TEST_F(DhtTest, usesDhtBootstrapFile)
     EXPECT_EQ(expected.second, actual.port);
     EXPECT_EQ(expected.first.readable(expected.second), actual.address.readable(actual.port));
 }
+
+// auto constexpr Id = tr_torrent_id_t{ 1 };
+// mediator.info_hashes_[Id] = tr_randObj<tr_sha1_digest_t>();
+// mediator.torrents_allowing_dht_ = { Id };
 
 } // namespace libtransmission::test
