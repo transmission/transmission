@@ -22,8 +22,6 @@
 #include "dns.h"
 #include "utils.h" // for tr_strlower()
 
-using namespace std::literals;
-
 namespace libtransmission
 {
 
