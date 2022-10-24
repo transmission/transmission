@@ -143,7 +143,7 @@ private:
     class AnnouncerUdpMediator final : public tr_announcer_udp::Mediator
     {
     public:
-        AnnouncerUdpMediator(tr_session& session)
+        explicit AnnouncerUdpMediator(tr_session& session)
             : session_{ session }
         {
         }
