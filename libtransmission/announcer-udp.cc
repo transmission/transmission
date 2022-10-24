@@ -225,10 +225,8 @@ struct tau_announce_request
             response.leechers = buf.toUint32();
             response.seeders = buf.toUint32();
 
-            auto const compact_len = std::size(buf);
-            auto contiguous = std::array<uint8_t, 576>{};
-            buf.toBuf(std::data(contiguous), compact_len);
-            response.pex = tr_pex::fromCompact4(std::data(contiguous), compact_len, nullptr, 0);
+            auto const contiguous = std::vector<std::byte>{ std::begin(buf), std::end(buf) };
+            response.pex = tr_pex::fromCompact4(std::data(contiguous), std::size(contiguous), nullptr, 0);
             requestFinished();
         }
         else
