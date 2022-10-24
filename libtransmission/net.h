@@ -8,8 +8,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm> // for std::copy_n
 #include <cstddef> // size_t
-#include <cstdint> // uint8_t
 #include <optional>
 #include <string>
 #include <string_view>
@@ -114,7 +114,7 @@ public:
         hport_ = ntohs(nport);
     }
 
-    [[nodiscard]] static std::pair<tr_port, uint8_t const*> fromCompact(uint8_t const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_port, std::byte const*> fromCompact(std::byte const* compact) noexcept;
 
     [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
     {
@@ -154,14 +154,69 @@ struct tr_address
 {
     [[nodiscard]] static std::optional<tr_address> fromString(std::string_view address_sv);
     [[nodiscard]] static std::optional<std::pair<tr_address, tr_port>> fromSockaddr(struct sockaddr const*);
-    [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact4(uint8_t const* compact) noexcept;
-    [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_address, std::byte const*> fromCompact4(std::byte const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_address, std::byte const*> fromCompact6(std::byte const* compact) noexcept;
 
     // human-readable formatting
     template<typename OutputIt>
     OutputIt readable(OutputIt out, tr_port port = {}) const;
     std::string_view readable(char* out, size_t outlen, tr_port port = {}) const;
     [[nodiscard]] std::string readable(tr_port port = {}) const;
+
+    template<typename OutputIt>
+    static OutputIt toCompact4(OutputIt out, in_addr const* addr4, tr_port port)
+    {
+        auto const nport = port.network();
+        out = std::copy_n(reinterpret_cast<std::byte const*>(addr4), sizeof(*addr4), out);
+        out = std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
+        return out;
+    }
+
+    template<typename OutputIt>
+    static OutputIt toCompact4(OutputIt out, sockaddr_in const* sa4)
+    {
+        return toCompact4(out, &sa4->sin_addr, tr_port::fromNetwork(sa4->sin_port));
+    }
+
+    template<typename OutputIt>
+    static OutputIt toCompact6(OutputIt out, in6_addr const* addr6, tr_port port)
+    {
+        auto const nport = port.network();
+        out = std::copy_n(reinterpret_cast<std::byte const*>(addr6), sizeof(*addr6), out);
+        out = std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
+        return out;
+    }
+
+    template<typename OutputIt>
+    static OutputIt toCompact6(OutputIt out, sockaddr_in6 const* sa6)
+    {
+        return toCompact6(out, &sa6->sin6_addr, tr_port::fromNetwork(sa6->sin6_port));
+    }
+
+    template<typename OutputIt>
+    OutputIt toCompact4(OutputIt out, tr_port port) const
+    {
+        return toCompact4(out, &this->addr.addr4, port);
+    }
+
+    template<typename OutputIt>
+    OutputIt toCompact6(OutputIt out, tr_port port) const
+    {
+        return toCompact6(out, &this->addr.addr6, port);
+    }
+
+    template<typename OutputIt>
+    static OutputIt toCompact(OutputIt out, sockaddr const* saddr)
+    {
+        return saddr->sa_family == AF_INET ? toCompact4(out, reinterpret_cast<sockaddr_in const*>(saddr)) :
+                                             toCompact6(out, reinterpret_cast<sockaddr_in6 const*>(saddr));
+    }
+
+    template<typename OutputIt>
+    static OutputIt toCompact(OutputIt out, struct sockaddr_storage* ss)
+    {
+        return toCompact(out, reinterpret_cast<struct sockaddr*>(ss));
+    }
 
     [[nodiscard]] constexpr auto isIPv4() const noexcept
     {

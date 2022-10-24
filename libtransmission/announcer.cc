@@ -30,7 +30,6 @@
 #include "announcer.h"
 #include "crypto-utils.h" /* tr_rand_int(), tr_rand_int_weak() */
 #include "log.h"
-#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "session.h"
 #include "timer.h"
 #include "torrent.h"

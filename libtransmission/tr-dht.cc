@@ -342,7 +342,7 @@ static void bootstrapFromFile(std::string_view config_dir)
     }
 }
 
-static void bootstrapStart(std::string_view config_dir, std::vector<uint8_t> nodes4, std::vector<uint8_t> nodes6)
+static void bootstrapStart(std::string_view config_dir, std::vector<std::byte> nodes4, std::vector<std::byte> nodes6)
 {
     if (!tr_dhtEnabled())
     {
@@ -452,8 +452,8 @@ int tr_dhtInit(tr_session* session, tr_socket_t udp4_socket, tr_socket_t udp6_so
     auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.sv());
 
     bool have_id = false;
-    auto nodes = std::vector<uint8_t>{};
-    auto nodes6 = std::vector<uint8_t>{};
+    auto nodes = std::vector<std::byte>{};
+    auto nodes6 = std::vector<std::byte>{};
 
     if (ok)
     {
@@ -465,7 +465,7 @@ int tr_dhtInit(tr_session* session, tr_socket_t udp4_socket, tr_socket_t udp6_so
         }
 
         size_t raw_len = 0U;
-        uint8_t const* raw = nullptr;
+        std::byte const* raw = nullptr;
 
         if (tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
         {
@@ -643,8 +643,8 @@ static void callback(void* vsession, int event, unsigned char const* info_hash, 
     {
         if (tor != nullptr && tor->allowsDht())
         {
-            auto const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0) :
-                                                         tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
+            auto const pex = event == DHT_EVENT_VALUES ? tr_pex::fromCompact4(data, data_len, nullptr, 0) :
+                                                         tr_pex::fromCompact6(data, data_len, nullptr, 0);
             tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
             tr_logAddDebugTor(
                 tor,
