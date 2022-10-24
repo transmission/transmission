@@ -284,7 +284,7 @@ BlocklistDownloader* fBLDownloader = nil;
     NSTask* gunzip = [[NSTask alloc] init];
     gunzip.launchPath = @"/usr/bin/gunzip";
     gunzip.currentDirectoryPath = destinationDir.path;
-    gunzip.arguments = @[ @"--keep", file.path ];
+    gunzip.arguments = @[ @"--keep", @"--force", file.path ];
 
     @try
     {
