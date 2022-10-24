@@ -380,12 +380,12 @@ private:
 
         if (event == DHT_EVENT_VALUES)
         {
-            auto const pex = tr_peerMgrCompactToPex(data, data_len, nullptr, 0);
+            auto const pex = tr_pex::fromCompact4(data, data_len, nullptr, 0);
             self->mediator_.addPex(hash, std::data(pex), std::size(pex));
         }
         else if (event == DHT_EVENT_VALUES6)
         {
-            auto const pex = tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
+            auto const pex = tr_pex::fromCompact6(data, data_len, nullptr, 0);
             self->mediator_.addPex(hash, std::data(pex), std::size(pex));
         }
     }
@@ -463,7 +463,7 @@ private:
             }
 
             size_t raw_len = 0U;
-            uint8_t const* raw = nullptr;
+            std::byte const* raw = nullptr;
             if (tr_variantDictFindRaw(&dict, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
             {
                 auto* walk = raw;

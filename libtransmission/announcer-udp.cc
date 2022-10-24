@@ -24,7 +24,7 @@
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
 #include "peer-io.h"
-#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
+#include "peer-mgr.h" // for tr_pex::fromCompact4()
 #include "session.h"
 #include "tr-assert.h"
 #include "tr-buffer.h"
@@ -228,7 +228,7 @@ struct tau_announce_request
             auto const compact_len = std::size(buf);
             auto contiguous = std::array<uint8_t, 576>{};
             buf.toBuf(std::data(contiguous), compact_len);
-            response.pex = tr_peerMgrCompactToPex(std::data(contiguous), compact_len, nullptr, 0);
+            response.pex = tr_pex::fromCompact4(std::data(contiguous), compact_len, nullptr, 0);
             requestFinished();
         }
         else
@@ -298,7 +298,7 @@ static tau_announce_request make_tau_announce_request(
     buf.addUint32(announce_ip);
     buf.addUint32(in.key);
     buf.addUint32(in.numwant);
-    buf.addUint16(in.port.host());
+    buf.addPort(in.port);
 
     /* build the tau_announce_request */
     auto req = tau_announce_request();

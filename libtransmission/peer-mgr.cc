@@ -1297,10 +1297,10 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
     return n_used;
 }
 
-std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
+std::vector<tr_pex> tr_pex::fromCompact4(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
 {
     size_t const n = compact_len / 6;
-    auto const* walk = static_cast<uint8_t const*>(compact);
+    auto const* walk = static_cast<std::byte const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
     for (size_t i = 0; i < n; ++i)
@@ -1317,10 +1317,10 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compact_l
     return pex;
 }
 
-std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
+std::vector<tr_pex> tr_pex::fromCompact6(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
 {
     size_t const n = compact_len / 18;
-    auto const* walk = static_cast<uint8_t const*>(compact);
+    auto const* walk = static_cast<std::byte const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
     for (size_t i = 0; i < n; ++i)

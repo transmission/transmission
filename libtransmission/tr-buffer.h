@@ -302,6 +302,12 @@ public:
         add(&ch, 1);
     }
 
+    void addPort(tr_port const& port)
+    {
+        auto nport = port.network();
+        add(&nport, sizeof(nport));
+    }
+
     void addUint8(uint8_t uch)
     {
         add(&uch, 1);
