@@ -445,7 +445,7 @@ size_t BlocklistFile::setContent(char const* filename)
         return {};
     }
 
-    //seperate before sorting
+    //separate before sorting
     auto ipv4_ranges = std::vector<AddressRange>{};
     auto ipv6_ranges = std::vector<AddressRange>{};
 
