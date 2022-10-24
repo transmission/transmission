@@ -34,6 +34,8 @@ TEST_F(NetTest, conversionsIPv4)
 
 TEST_F(NetTest, compact4)
 {
+    static auto constexpr ExpectedReadable = "10.10.10.5"sv;
+    static auto constexpr ExpectedPort = tr_port::fromHost(128);
     static auto constexpr Compact4 = std::array<std::byte, 6>{ std::byte{ 0x0A }, std::byte{ 0x0A }, std::byte{ 0x0A },
                                                                std::byte{ 0x05 }, std::byte{ 0x00 }, std::byte{ 0x80 } };
 
@@ -44,8 +46,8 @@ TEST_F(NetTest, compact4)
     std::tie(addr, in) = tr_address::fromCompact4(in);
     std::tie(port, in) = tr_port::fromCompact(in);
     EXPECT_EQ(std::data(Compact4) + std::size(Compact4), in);
-    EXPECT_EQ("10.10.10.5", addr.readable());
-    EXPECT_EQ(128, port.host());
+    EXPECT_EQ(ExpectedReadable, addr.readable());
+    EXPECT_EQ(ExpectedPort, port);
 
     // ...serialize it back again
     auto compact4 = std::array<std::byte, 6>{};
@@ -69,10 +71,12 @@ TEST_F(NetTest, compact4)
 
 TEST_F(NetTest, compact6)
 {
+    static auto constexpr ExpectedReadable = "1002:1035:4527:3546:7854:1237:3247:3217"sv;
+    static auto constexpr ExpectedPort = tr_port::fromHost(6881);
     static auto constexpr Compact6 = std::array<std::byte, 18>{
-        std::byte{ 0x20 }, std::byte{ 0x01 }, std::byte{ 0x0D }, std::byte{ 0xB8 }, std::byte{ 0x85 }, std::byte{ 0xA3 },
-        std::byte{ 0x00 }, std::byte{ 0x00 }, std::byte{ 0x00 }, std::byte{ 0x00 }, std::byte{ 0x8A }, std::byte{ 0x2E },
-        std::byte{ 0x03 }, std::byte{ 0x70 }, std::byte{ 0x73 }, std::byte{ 0x34 }, std::byte{ 0x00 }, std::byte{ 0x80 }
+        std::byte{ 0x10 }, std::byte{ 0x02 }, std::byte{ 0x10 }, std::byte{ 0x35 }, std::byte{ 0x45 }, std::byte{ 0x27 },
+        std::byte{ 0x35 }, std::byte{ 0x46 }, std::byte{ 0x78 }, std::byte{ 0x54 }, std::byte{ 0x12 }, std::byte{ 0x37 },
+        std::byte{ 0x32 }, std::byte{ 0x47 }, std::byte{ 0x32 }, std::byte{ 0x17 }, std::byte{ 0x1A }, std::byte{ 0xE1 }
     };
 
     // extract the address and port from a compact stream...
@@ -82,8 +86,8 @@ TEST_F(NetTest, compact6)
     std::tie(addr, in) = tr_address::fromCompact6(in);
     std::tie(port, in) = tr_port::fromCompact(in);
     EXPECT_EQ(std::data(Compact6) + std::size(Compact6), in);
-    EXPECT_EQ("2001:db8:85a3::8a2e:370:7334", addr.readable());
-    EXPECT_EQ(128, port.host());
+    EXPECT_EQ(ExpectedReadable, addr.readable());
+    EXPECT_EQ(ExpectedPort, port);
 
     // ...serialize it back again
     auto compact6 = std::array<std::byte, 18>{};
