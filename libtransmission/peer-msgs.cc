@@ -806,7 +806,7 @@ static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port)
     logtrace(msgs, fmt::format(FMT_STRING("sending Port {:d}"), port.host()));
     out.addUint32(3);
     out.addUint8(BtPeerMsgs::Port);
-    out.addUint16(port.network());
+    out.addPort(port);
 }
 
 static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
@@ -1221,7 +1221,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
                 added_f = nullptr;
             }
 
-            auto pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len);
+            auto pex = tr_pex::fromCompact4(added, added_len, added_f, added_f_len);
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
@@ -1236,7 +1236,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
                 added_f = nullptr;
             }
 
-            auto pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len);
+            auto pex = tr_pex::fromCompact6(added, added_len, added_f, added_f_len);
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
@@ -2288,33 +2288,25 @@ void tr_peerMsgsImpl::sendPex()
     auto val = tr_variant{};
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
-    auto tmpbuf = std::vector<uint8_t>{};
+    auto tmpbuf = std::vector<std::byte>{};
+    tmpbuf.reserve(MaxPexAdded * 18);
 
     if (!std::empty(added))
     {
         // "added"
-        tmpbuf.resize(std::size(added) * 6U);
-        auto* begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : added)
-        {
-            memcpy(walk, &p.addr.addr, 4U);
-            walk += 4U;
-            memcpy(walk, &p.port, 2U);
-            walk += 2U;
-        }
-
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added) * 6U);
-        tr_variantDictAddRaw(&val, TR_KEY_added, begin, walk - begin);
+        tmpbuf.clear();
+        tr_pex::toCompact4(std::back_inserter(tmpbuf), std::data(added), std::size(added));
+        TR_ASSERT(std::size(tmpbuf) == std::size(added) * 6);
+        tr_variantDictAddRaw(&val, TR_KEY_added, std::data(tmpbuf), std::size(tmpbuf));
 
         // "added.f"
         // unset each holepunch flag because we don't support it.
         tmpbuf.resize(std::size(added));
-        begin = std::data(tmpbuf);
-        walk = begin;
+        auto* begin = std::data(tmpbuf);
+        auto* walk = begin;
         for (auto const& p : added)
         {
-            *walk++ = p.flags & ~ADDED_F_HOLEPUNCH;
+            *walk++ = std::byte{ p.flags } & ~std::byte{ ADDED_F_HOLEPUNCH };
         }
 
         TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added));
@@ -2324,46 +2316,27 @@ void tr_peerMsgsImpl::sendPex()
     if (!std::empty(dropped))
     {
         // "dropped"
-        tmpbuf.resize(std::size(dropped) * 6U);
-        auto* begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : dropped)
-        {
-            memcpy(walk, &p.addr.addr, 4U);
-            walk += 4U;
-            memcpy(walk, &p.port, 2U);
-            walk += 2U;
-        }
-
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(dropped) * 6U);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped, begin, walk - begin);
+        tmpbuf.clear();
+        tr_pex::toCompact4(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
+        TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * 6);
+        tr_variantDictAddRaw(&val, TR_KEY_dropped, std::data(tmpbuf), std::size(tmpbuf));
     }
 
     if (!std::empty(added6))
     {
-        // "added6"
-        tmpbuf.resize(std::size(added6) * 18U);
-        auto* begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : added6)
-        {
-            memcpy(walk, &p.addr.addr.addr6.s6_addr, 16U);
-            walk += 16U;
-            memcpy(walk, &p.port, 2U);
-            walk += 2U;
-        }
-
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added6) * 18U);
-        tr_variantDictAddRaw(&val, TR_KEY_added6, begin, walk - begin);
+        tmpbuf.clear();
+        tr_pex::toCompact6(std::back_inserter(tmpbuf), std::data(added6), std::size(added6));
+        TR_ASSERT(std::size(tmpbuf) == std::size(added6) * 18);
+        tr_variantDictAddRaw(&val, TR_KEY_added6, std::data(tmpbuf), std::size(tmpbuf));
 
         // "added6.f"
         // unset each holepunch flag because we don't support it.
         tmpbuf.resize(std::size(added6));
-        begin = std::data(tmpbuf);
-        walk = begin;
+        auto* begin = std::data(tmpbuf);
+        auto* walk = begin;
         for (auto const& p : added6)
         {
-            *walk++ = p.flags & ~ADDED_F_HOLEPUNCH;
+            *walk++ = std::byte{ p.flags } & ~std::byte{ ADDED_F_HOLEPUNCH };
         }
 
         TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added6));
@@ -2373,19 +2346,10 @@ void tr_peerMsgsImpl::sendPex()
     if (!std::empty(dropped6))
     {
         // "dropped6"
-        tmpbuf.resize(std::size(dropped6) * 18U);
-        auto* const begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : dropped6)
-        {
-            memcpy(walk, &p.addr.addr.addr6.s6_addr, 16U);
-            walk += 16U;
-            memcpy(walk, &p.port, 2U);
-            walk += 2U;
-        }
-
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(dropped6) * 18U);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped6, begin, walk - begin);
+        tmpbuf.clear();
+        tr_pex::toCompact6(std::back_inserter(tmpbuf), std::data(dropped6), std::size(dropped6));
+        TR_ASSERT(std::size(tmpbuf) == std::size(dropped6) * 18);
+        tr_variantDictAddRaw(&val, TR_KEY_dropped6, std::data(tmpbuf), std::size(tmpbuf));
     }
 
     /* write the pex message */
