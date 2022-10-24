@@ -321,7 +321,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     auto const [source_addr, is_default_addr] = session->publicAddress(addr->type);
     auto const [source_sock, sourcelen] = source_addr.toSockaddr({});
 
-    if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
+    if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
@@ -334,7 +334,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     }
 
     auto ret = tr_peer_socket{};
-    if (connect(s, (struct sockaddr*)&sock, addrlen) == -1 &&
+    if (connect(s, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1 &&
 #ifdef _WIN32
         sockerrno != WSAEWOULDBLOCK &&
 #endif
