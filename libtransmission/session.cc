@@ -290,7 +290,7 @@ static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsessio
 
     if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
-        auto const [addr, port, sock] = *incoming_info;
+        auto const& [addr, port, sock] = *incoming_info;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
         session->addIncoming(addr, port, tr_peer_socket_tcp_create(sock));
     }
