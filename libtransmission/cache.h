@@ -35,7 +35,9 @@ public:
         return max_bytes_;
     }
 
-    void writeBlock(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme);
+    // @return any error code from cacheTrim()
+    int writeBlock(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme);
+
     int readBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len, uint8_t* setme);
     int prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len);
     int flushTorrent(tr_torrent const* torrent);
