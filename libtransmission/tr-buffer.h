@@ -137,7 +137,7 @@ public:
 
     [[nodiscard]] auto empty() const noexcept
     {
-        return size() == 0U;
+        return evbuffer_get_length(buf_.get()) == 0;
     }
 
     [[nodiscard]] auto vecs(size_t n_bytes) const
