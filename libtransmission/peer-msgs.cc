@@ -1527,12 +1527,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_
         return READ_LATER;
     }
 
-    // pass the block along...
-    int const err = clientGotBlock(msgs, block_buf, block);
-    msgs->incoming.block_buf.erase(block);
-
-    // cleanup
-    return err != 0 ? READ_ERR : READ_NOW;
+    return clientGotBlock(msgs, block_buf, block) != 0 ? READ_ERR : READ_NOW;
 }
 
 static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
@@ -1838,9 +1833,17 @@ static int clientGotBlock(
         return 0;
     }
 
-    msgs->session->cache->writeBlock(tor->id(), block, block_data);
+    // NB: if writeBlock() fails the torrent may be paused.
+    // If this happens, `msgs` will be a dangling pointer and must no longer be used.
+    if (auto const err = msgs->session->cache->writeBlock(tor->id(), block, block_data); err != 0)
+    {
+        return err;
+    }
+
     msgs->blame.set(loc.piece);
+    msgs->incoming.block_buf.erase(block);
     msgs->publish(tr_peer_event::GotBlock(tor->blockInfo(), block));
+
     return 0;
 }
 
@@ -1902,8 +1905,6 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 #endif
         }
     }
-
-    logtrace(msgs, fmt::format(FMT_STRING("canRead: ret is {:d}"), static_cast<int>(ret)));
 
     return ret;
 }
