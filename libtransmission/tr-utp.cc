@@ -92,7 +92,7 @@ static void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 
     if (auto addrport = tr_address::fromSockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
     {
-        auto const [addr, port] = *addrport;
+        auto const& [addr, port] = *addrport;
         session->addIncoming(addr, port, tr_peer_socket_utp_create(utp_sock));
     }
     else

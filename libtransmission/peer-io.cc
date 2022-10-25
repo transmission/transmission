@@ -205,8 +205,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
 
     tr_error* error = nullptr;
-    auto const res = io->inbuf.addSocket(fd, howmuch, &error);
-    if (res > 0)
+    if (auto const res = io->inbuf.addSocket(fd, howmuch, &error); res > 0)
     {
         io->setEnabled(dir, true);
 

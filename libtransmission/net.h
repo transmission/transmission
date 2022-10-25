@@ -142,7 +142,7 @@ public:
     }
 
 private:
-    constexpr tr_port(uint16_t hport) noexcept
+    explicit constexpr tr_port(uint16_t hport) noexcept
         : hport_{ hport }
     {
     }
