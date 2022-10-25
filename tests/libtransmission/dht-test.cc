@@ -119,14 +119,11 @@ protected:
     public:
         int get_nodes(struct sockaddr_in* /*sin*/, int* /*max*/, struct sockaddr_in6* /*sin6*/, int* /*max6*/) override
         {
-            fmt::print("get_nodes\n");
             return 0;
         }
 
         int nodes(int /*af*/, int* good, int* dubious, int* cached, int* incoming) override
         {
-            fmt::print("nodes\n");
-
             if (good != nullptr)
             {
                 *good = good_;
@@ -160,7 +157,6 @@ protected:
             void* /*closure*/) override
         {
             ++n_periodic_calls_;
-            fmt::print("periodic\n");
             return 0;
         }
 
@@ -168,7 +164,6 @@ protected:
         {
             auto addrport = tr_address::fromSockaddr(sa);
             auto const [addr, port] = *addrport;
-            fmt::print("ping_node {:s}\n", addr.readable(port));
             pinged_.push_back(Pinged{ addr, port, tr_time() });
             return 0;
         }
@@ -178,14 +173,12 @@ protected:
             auto info_hash = tr_sha1_digest_t{};
             std::copy_n(reinterpret_cast<std::byte const*>(id), std::size(info_hash), std::data(info_hash));
             searched_.push_back(Searched{ info_hash, tr_port::fromHost(port), af });
-            fmt::print("search {:d} {:d}\n", port, af);
             return 0;
         }
 
         int init(int dht_socket, int dht_socket6, unsigned const char* id, unsigned const char* /*v*/) override
         {
             inited_ = true;
-            fmt::print("init\n");
             dht_socket_ = dht_socket;
             dht_socket6_ = dht_socket6;
             std::copy_n(id, std::size(id_), std::begin(id_));
@@ -195,7 +188,6 @@ protected:
         int uninit() override
         {
             inited_ = false;
-            fmt::print("uninit\n");
             return 0;
         }
 
@@ -260,37 +252,31 @@ protected:
 
         void setCallback(std::function<void()> callback) override
         {
-            fmt::print("set callback\n");
             real_timer_->setCallback(std::move(callback));
         }
 
         void setRepeating(bool repeating = true) override
         {
-            fmt::print("set repeating {}\n", repeating);
             real_timer_->setRepeating(repeating);
         }
 
-        void setInterval(std::chrono::milliseconds interval) override
+        void setInterval(std::chrono::milliseconds /*interval*/) override
         {
-            fmt::print("setInterval requested {:d} using 10 msec\n", interval.count());
             real_timer_->setInterval(MockTimerInterval);
         }
 
         void start() override
         {
-            fmt::print("start()\n");
             real_timer_->start();
         }
 
         [[nodiscard]] std::chrono::milliseconds interval() const noexcept override
         {
-            fmt::print("interval()\n");
             return real_timer_->interval();
         }
 
         [[nodiscard]] bool isRepeating() const noexcept override
         {
-            fmt::print("isRepeating()\n");
             return real_timer_->isRepeating();
         }
 

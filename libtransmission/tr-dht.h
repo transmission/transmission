@@ -28,7 +28,8 @@ class TimerMaker;
 class tr_dht
 {
 public:
-    // Wraps around DHT library to DI possible in tests
+    // Wrapper around DHT library.
+    // This calls `jech/dht` in production, but makes it possible for tests to inject a mock.
     struct API
     {
         virtual ~API() = default;

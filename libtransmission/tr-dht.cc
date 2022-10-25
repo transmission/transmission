@@ -140,7 +140,10 @@ public:
         , periodic_timer_{ mediator_.timerMaker().create([this]() { onPeriodicTimer(); }) }
     {
         // load up the bootstrap nodes
-        std::tie(id_, bootstrap_queue_) = loadState(state_filename_);
+        if (tr_sys_path_exists(state_filename_.c_str()))
+        {
+            std::tie(id_, bootstrap_queue_) = loadState(state_filename_);
+        }
         getNodesFromBootstrapFile(tr_pathbuf{ mediator_.configDir(), "/dht.bootstrap"sv }, bootstrap_queue_);
         getNodesFromName("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_queue_);
         bootstrap_timer_->startSingleShot(100ms);
@@ -558,7 +561,6 @@ private:
         {
             if (auto addrport = tr_address::fromSockaddr(infop->ai_addr); addrport)
             {
-                fmt::print("from {:s}:{:d} -> {:s}\n", name, port_in.host(), addrport->first.readable(addrport->second));
                 nodes.emplace_back(addrport->first, addrport->second);
             }
         }
