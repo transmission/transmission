@@ -27,10 +27,19 @@ using namespace std::literals;
 namespace libtransmission::test
 {
 
+bool waitFor(struct event_base* event_base, std::chrono::milliseconds msec)
+{
+    return waitFor(
+        event_base,
+        []() { return false; },
+        msec);
+}
+
 namespace
 {
 auto constexpr IdLength = size_t{ 20U };
 auto constexpr MockTimerInterval = 10ms;
+
 } // namespace
 
 class DhtTest : public SandboxedTest
@@ -150,6 +159,7 @@ protected:
             dht_callback_t /*callback*/,
             void* /*closure*/) override
         {
+            ++n_periodic_calls_;
             fmt::print("periodic\n");
             return 0;
         }
@@ -225,6 +235,7 @@ protected:
         int dubious_ = 0;
         int cached_ = 0;
         int incoming_ = 0;
+        size_t n_periodic_calls_ = 0;
         bool inited_ = false;
         std::vector<Pinged> pinged_;
         std::vector<Searched> searched_;
@@ -493,10 +504,7 @@ TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
     // Now test to see if bootstrapping is done.
     // There's not public API for `isBootstrapping()`,
     // so to test this we just a moment to confirm that no more bootstrap nodes are pinged.
-    waitFor(
-        event_base_,
-        []() { return false; },
-        MockTimerInterval * 10);
+    waitFor(event_base_, MockTimerInterval * 10);
 
     // Confirm that the number of nodes pinged is unchanged,
     // indicating that boostrapping is done
@@ -617,10 +625,7 @@ TEST_F(DhtTest, announcesTorrents)
 
     auto dht = tr_dht::create(mediator, PeerPort, ArbitrarySock4, ArbitrarySock6);
 
-    waitFor(
-        event_base_,
-        []() { return false; },
-        MockTimerInterval * 10);
+    waitFor(event_base_, MockTimerInterval * 10);
 
     ASSERT_EQ(2U, std::size(mock_dht.searched_));
 
@@ -631,6 +636,20 @@ TEST_F(DhtTest, announcesTorrents)
     EXPECT_EQ(info_hash, mock_dht.searched_[1].info_hash);
     EXPECT_EQ(PeerPort, mock_dht.searched_[1].port);
     EXPECT_EQ(AF_INET6, mock_dht.searched_[1].af);
+}
+
+TEST_F(DhtTest, callsPeriodicPeriodically)
+{
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
+
+    auto& mock_dht = mediator.mock_dht_;
+    auto const baseline = mock_dht.n_periodic_calls_;
+    static auto constexpr Periods = 10;
+    waitFor(event_base_, std::chrono::duration_cast<std::chrono::milliseconds>(MockTimerInterval * Periods));
+    EXPECT_GE(mock_dht.n_periodic_calls_, baseline + Periods - 2);
+    EXPECT_LE(mock_dht.n_periodic_calls_, baseline + Periods + 2);
 }
 
 } // namespace libtransmission::test

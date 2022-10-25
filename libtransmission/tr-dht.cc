@@ -149,6 +149,8 @@ public:
 
         onAnnounceTimer();
         announce_timer_->startRepeating(1s);
+
+        onPeriodicTimer();
     }
 
     tr_dht_impl(tr_dht_impl&&) = delete;
