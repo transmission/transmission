@@ -79,7 +79,7 @@ class SessionTest;
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
-    std::array<tr_speed_t, 2> speedLimit_Bps = {};
+    std::array<tr_bytes_per_second_t, 2> speedLimit_Bps = {};
 
     /* is turtle mode on right now? */
     bool isEnabled = false;
@@ -791,7 +791,7 @@ public:
         return top_bandwidth_.getPieceSpeedBytesPerSecond(0, dir);
     }
 
-    [[nodiscard]] std::optional<tr_speed_t> activeSpeedLimitBps(tr_direction dir) const noexcept;
+    [[nodiscard]] std::optional<tr_bytes_per_second_t> activeSpeedLimitBps(tr_direction dir) const noexcept;
 
     [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
@@ -928,7 +928,7 @@ private:
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
-    friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_speed_t bytes_per_second);
+    friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_bytes_per_second_t bytes_per_second);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
     /// constexpr fields
@@ -981,7 +981,7 @@ private:
 
     float desired_ratio_ = 2.0F;
 
-    std::array<tr_speed_t, 2> speed_limit_Bps_ = { 0U, 0U };
+    std::array<tr_bytes_per_second_t, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
     std::array<bool, 2> queue_enabled_ = { false, false };

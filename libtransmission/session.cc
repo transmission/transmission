@@ -1003,7 +1003,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(this, TR_UP, static_cast<tr_speed_t>(i));
+        tr_sessionSetSpeedLimit_KBps(this, TR_UP, static_cast<tr_kilobytes_per_second_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_up_enabled, &val))
@@ -1013,7 +1013,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_down, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, static_cast<tr_speed_t>(i));
+        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_down_enabled, &val))
@@ -1369,9 +1369,9 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 ****
 ***/
 
-static tr_speed_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d);
+static tr_bytes_per_second_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d);
 
-std::optional<tr_speed_t> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
+std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
 {
     if (tr_sessionUsesAltSpeed(this))
     {
@@ -1518,7 +1518,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_speed_t bytes_per_second)
+void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_bytes_per_second_t bytes_per_second)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -1528,12 +1528,12 @@ void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_speed
     updateBandwidth(session, dir);
 }
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_speed_t kilo_per_second)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second)
 {
     tr_sessionSetSpeedLimit_Bps(session, dir, tr_toSpeedBytes(kilo_per_second));
 }
 
-tr_speed_t tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
+tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
 {
     return tr_toSpeedKBps(s->speedLimitBps(d));
 }
@@ -1560,7 +1560,7 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, tr_speed_t bytes_per_second)
+static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, tr_bytes_per_second_t bytes_per_second)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(tr_isDirection(d));
@@ -1570,12 +1570,12 @@ static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, tr_speed_t 
     updateBandwidth(s, d);
 }
 
-void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, tr_speed_t kilo_per_second)
+void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, tr_kilobytes_per_second_t kilo_per_second)
 {
     tr_sessionSetAltSpeed_Bps(s, d, tr_toSpeedBytes(kilo_per_second));
 }
 
-static tr_speed_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
+static tr_bytes_per_second_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(tr_isDirection(d));
@@ -1583,7 +1583,7 @@ static tr_speed_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
     return s->turtle.speedLimit_Bps[d];
 }
 
-tr_speed_t tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
+tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
 {
     return tr_toSpeedKBps(tr_sessionGetAltSpeed_Bps(s, d));
 }
@@ -1770,7 +1770,7 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 ****
 ***/
 
-static tr_speed_t tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
+static tr_kilobytes_per_second_t tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
     return session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
 }
@@ -2666,12 +2666,12 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
         if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &limit))
         {
-            limits.up_limit_KBps = static_cast<tr_speed_t>(limit);
+            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
         }
 
         if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &limit))
         {
-            limits.down_limit_KBps = static_cast<tr_speed_t>(limit);
+            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
         }
 
         group.setLimits(&limits);

@@ -630,9 +630,9 @@ private:
 *** tr_peer virtual functions
 **/
 
-tr_speed_t tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction)
+tr_bytes_per_second_t tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction)
 {
-    tr_speed_t bytes_per_second = 0;
+    tr_bytes_per_second_t bytes_per_second = 0;
     peer->isTransferringPieces(now, direction, &bytes_per_second);
     return bytes_per_second;
 }

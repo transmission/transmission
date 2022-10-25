@@ -188,7 +188,7 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 ****  PER-TORRENT UL / DL SPEEDS
 ***/
 
-void tr_torrent::setSpeedLimitBps(tr_direction dir, tr_speed_t bytes_per_second)
+void tr_torrent::setSpeedLimitBps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -198,19 +198,19 @@ void tr_torrent::setSpeedLimitBps(tr_direction dir, tr_speed_t bytes_per_second)
     }
 }
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_speed_t kilo_per_second)
+void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second)
 {
     tor->setSpeedLimitBps(dir, tr_toSpeedBytes(kilo_per_second));
 }
 
-tr_speed_t tr_torrent::speedLimitBps(tr_direction dir) const
+tr_bytes_per_second_t tr_torrent::speedLimitBps(tr_direction dir) const
 {
     TR_ASSERT(tr_isDirection(dir));
 
     return this->bandwidth_.getDesiredSpeedBytesPerSecond(dir);
 }
 
-tr_speed_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
+tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));

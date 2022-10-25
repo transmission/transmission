@@ -324,7 +324,7 @@ public:
         }
     }
 
-    bool isTransferringPieces(uint64_t now, tr_direction dir, tr_speed_t* setme_bytes_per_second) const override
+    bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const override
     {
         auto const bytes_per_second = io->getPieceSpeedBytesPerSecond(now, dir);
 

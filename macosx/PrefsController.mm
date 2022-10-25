@@ -1385,14 +1385,14 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const downLimitEnabled = tr_sessionIsSpeedLimited(self.fHandle, TR_DOWN);
     [self.fDefaults setBool:downLimitEnabled forKey:@"CheckDownload"];
 
-    tr_speed_t const downLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_DOWN);
+    auto const downLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_DOWN);
     [self.fDefaults setInteger:downLimit forKey:@"DownloadLimit"];
 
     //speed limit - up
     BOOL const upLimitEnabled = tr_sessionIsSpeedLimited(self.fHandle, TR_UP);
     [self.fDefaults setBool:upLimitEnabled forKey:@"CheckUpload"];
 
-    tr_speed_t const upLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_UP);
+    auto const upLimit = tr_sessionGetSpeedLimit_KBps(self.fHandle, TR_UP);
     [self.fDefaults setInteger:upLimit forKey:@"UploadLimit"];
 
     //alt speed limit enabled
@@ -1400,11 +1400,11 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fDefaults setBool:useAltSpeed forKey:@"SpeedLimit"];
 
     //alt speed limit - down
-    tr_speed_t const downLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_DOWN);
+    auto const downLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_DOWN);
     [self.fDefaults setInteger:downLimitAlt forKey:@"SpeedLimitDownloadLimit"];
 
     //alt speed limit - up
-    tr_speed_t const upLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_UP);
+    auto const upLimitAlt = tr_sessionGetAltSpeed_KBps(self.fHandle, TR_UP);
     [self.fDefaults setInteger:upLimitAlt forKey:@"SpeedLimitUploadLimit"];
 
     //alt speed limit schedule

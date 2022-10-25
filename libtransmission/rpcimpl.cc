@@ -1838,12 +1838,12 @@ static char const* groupSet(
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
     {
-        limits.down_limit_KBps = static_cast<tr_speed_t>(limit);
+        limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
     }
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
     {
-        limits.up_limit_KBps = static_cast<tr_speed_t>(limit);
+        limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
     }
 
     group.setLimits(&limits);
@@ -2079,7 +2079,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, static_cast<tr_speed_t>(i));
+        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &val))
@@ -2089,7 +2089,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_UP, static_cast<tr_speed_t>(i));
+        tr_sessionSetSpeedLimit_KBps(session, TR_UP, static_cast<tr_kilobytes_per_second_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &val))

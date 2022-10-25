@@ -33,7 +33,8 @@ using tr_byte_index_t = uint64_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
-using tr_speed_t = size_t;
+using tr_bytes_per_second_t = size_t;
+using tr_kilobytes_per_second_t = size_t;
 
 struct tr_block_span_t
 {
@@ -502,9 +503,9 @@ enum tr_direction
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, tr_speed_t bytes_per_second);
-void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, tr_speed_t kilo_per_second);
-tr_speed_t tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
+void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, tr_bytes_per_second_t bytes_per_second);
+void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t kilo_per_second);
+tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
 
 void tr_sessionLimitSpeed(tr_session*, tr_direction, bool);
 bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
@@ -513,8 +514,8 @@ bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, tr_speed_t kilo_per_second);
-tr_speed_t tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
+void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t kilo_per_second);
+tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
 
 void tr_sessionUseAltSpeed(tr_session*, bool);
 bool tr_sessionUsesAltSpeed(tr_session const*);
@@ -1010,8 +1011,8 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
 ****
 ***/
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, tr_speed_t kilo_per_second);
-tr_speed_t tr_torrentGetSpeedLimit_KBps(tr_torrent const*, tr_direction);
+void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, tr_kilobytes_per_second_t kilo_per_second);
+tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const*, tr_direction);
 
 void tr_torrentUseSpeedLimit(tr_torrent*, tr_direction, bool);
 bool tr_torrentUsesSpeedLimit(tr_torrent const*, tr_direction);
@@ -1397,7 +1398,7 @@ struct tr_webseed_view
 {
     char const* url; // the url to download from
     bool is_downloading; // can be true even if speed is 0, e.g. slow download
-    tr_speed_t download_bytes_per_second; // current download speed
+    tr_bytes_per_second_t download_bytes_per_second; // current download speed
 };
 
 struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);
