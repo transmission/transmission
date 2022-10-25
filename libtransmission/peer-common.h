@@ -185,7 +185,7 @@ public:
     tr_peer(tr_torrent const* tor, peer_atom* atom = nullptr);
     virtual ~tr_peer();
 
-    virtual bool isTransferringPieces(uint64_t now, tr_direction dir, unsigned int* setme_bytes_per_second) const = 0;
+    virtual bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const = 0;
 
     [[nodiscard]] virtual std::string readable() const = 0;
 

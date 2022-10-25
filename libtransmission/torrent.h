@@ -123,9 +123,9 @@ public:
 
     /// SPEED LIMIT
 
-    void setSpeedLimitBps(tr_direction, unsigned int bytes_per_second);
+    void setSpeedLimitBps(tr_direction, tr_bytes_per_second_t bytes_per_second);
 
-    [[nodiscard]] unsigned int speedLimitBps(tr_direction) const;
+    [[nodiscard]] tr_bytes_per_second_t speedLimitBps(tr_direction) const;
 
     /// BLOCK INFO
 
@@ -705,12 +705,12 @@ public:
 
     tr_stat_errtype error = TR_STAT_OK;
 
-    unsigned int etaSpeed_Bps = 0;
+    tr_bytes_per_second_t etaSpeed_Bps = 0;
 
-    int secondsDownloading = 0;
-    int secondsSeeding = 0;
+    time_t secondsDownloading = 0;
+    time_t secondsSeeding = 0;
 
-    int queuePosition = 0;
+    size_t queuePosition = 0;
 
     tr_torrent_id_t unique_id_ = 0;
 

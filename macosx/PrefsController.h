@@ -11,7 +11,8 @@
 
 @property(nonatomic, readonly) NSArray<NSString*>* sounds;
 
-+ (NSInteger)dateToTimeSum:(NSDate*)date;
+/// - returns: number of minutes
++ (int)dateToTimeSum:(NSDate*)date;
 
 - (instancetype)initWithHandle:(tr_session*)handle;
 

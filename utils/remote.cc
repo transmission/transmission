@@ -122,7 +122,7 @@ static std::string etaToString(int64_t eta)
     return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
 }
 
-static std::string tr_strltime(int seconds)
+static std::string tr_strltime(time_t seconds)
 {
     if (seconds < 0)
     {
@@ -372,7 +372,7 @@ static void showUsage(void)
     tr_getopt_usage(MyName, Usage, std::data(Options));
 }
 
-static int numarg(char const* arg)
+static long numarg(char const* arg)
 {
     char* end = nullptr;
     long const num = strtol(arg, &end, 10);
@@ -927,7 +927,7 @@ static void printDetails(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        for (int ti = 0, tCount = tr_variantListSize(torrents); ti < tCount; ++ti)
+        for (size_t ti = 0, tCount = tr_variantListSize(torrents); ti < tCount; ++ti)
         {
             tr_variant* t = tr_variantListChild(torrents, ti);
             tr_variant* l;
@@ -1256,7 +1256,7 @@ static void printFileList(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        for (int i = 0, in = tr_variantListSize(torrents); i < in; ++i)
+        for (size_t i = 0, in = tr_variantListSize(torrents); i < in; ++i)
         {
             tr_variant* d = tr_variantListChild(torrents, i);
             tr_variant* files;
@@ -1267,11 +1267,11 @@ static void printFileList(tr_variant* top)
             if (tr_variantDictFindStrView(d, TR_KEY_name, &name) && tr_variantDictFindList(d, TR_KEY_files, &files) &&
                 tr_variantDictFindList(d, TR_KEY_priorities, &priorities) && tr_variantDictFindList(d, TR_KEY_wanted, &wanteds))
             {
-                int const jn = tr_variantListSize(files);
+                auto const jn = tr_variantListSize(files);
                 fmt::print("{:s} ({:d} files):\n", name, jn);
                 printf("%3s  %4s %8s %3s %9s  %s\n", "#", "Done", "Priority", "Get", "Size", "Name");
 
-                for (int j = 0; j < jn; ++j)
+                for (size_t j = 0; j < jn; ++j)
                 {
                     int64_t have;
                     int64_t length;
@@ -1323,7 +1323,7 @@ static void printPeersImpl(tr_variant* peers)
 {
     printf("%-40s  %-12s  %-5s %-6s  %-6s  %s\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
-    for (int i = 0, n = tr_variantListSize(peers); i < n; ++i)
+    for (size_t i = 0, n = tr_variantListSize(peers); i < n; ++i)
     {
         auto address = std::string_view{};
         auto client = std::string_view{};
@@ -1359,7 +1359,7 @@ static void printPeers(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
+        for (size_t i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             tr_variant* peers;
             tr_variant* torrent = tr_variantListChild(torrents, i);
@@ -1409,7 +1409,7 @@ static void printPieces(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
+        for (size_t i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             int64_t j;
             auto raw = std::string_view{};
@@ -1468,7 +1468,7 @@ static void printTorrentList(tr_variant* top)
             "Status",
             "Name");
 
-        for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
+        for (size_t i = 0, n = tr_variantListSize(list); i < n; ++i)
         {
             int64_t torId;
             int64_t eta;
@@ -1680,7 +1680,7 @@ static void printTrackers(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
+        for (size_t i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             tr_variant* trackerStats;
             tr_variant* torrent = tr_variantListChild(torrents, i);
@@ -2021,7 +2021,7 @@ static void filterIds(tr_variant* top, Config& config)
             arg = &config.filter[pos + 2];
         }
 
-        for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
+        for (size_t i = 0, n = tr_variantListSize(list); i < n; ++i)
         {
             tr_variant* d = tr_variantListChild(list, i);
             int64_t torId;

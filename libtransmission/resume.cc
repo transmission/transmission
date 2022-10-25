@@ -415,7 +415,7 @@ static auto loadFilenames(tr_variant* dict, tr_torrent* tor)
 
     auto const n_files = tor->fileCount();
     auto const n_list = tr_variantListSize(list);
-    for (size_t i = 0; i < n_files && i < n_list; ++i)
+    for (tr_file_index_t i = 0; i < n_files && i < n_list; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))

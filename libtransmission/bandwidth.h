@@ -29,8 +29,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    unsigned int up_limit_KBps = 0;
-    unsigned int down_limit_KBps = 0;
+    tr_kilobytes_per_second_t up_limit_KBps = 0;
+    tr_kilobytes_per_second_t down_limit_KBps = 0;
     bool up_limited = false;
     bool down_limited = false;
 };
@@ -140,7 +140,7 @@ public:
     }
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] unsigned int getRawSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] tr_bytes_per_second_t getRawSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
@@ -148,7 +148,7 @@ public:
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] unsigned int getPieceSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] tr_bytes_per_second_t getPieceSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
@@ -160,7 +160,7 @@ public:
      * @see tr_bandwidth::allocate
      * @see tr_bandwidth::getDesiredSpeed
      */
-    constexpr bool setDesiredSpeedBytesPerSecond(tr_direction dir, unsigned int desired_speed)
+    constexpr bool setDesiredSpeedBytesPerSecond(tr_direction dir, tr_bytes_per_second_t desired_speed)
     {
         auto& value = this->band_[dir].desired_speed_bps_;
         bool const did_change = desired_speed != value;
@@ -172,7 +172,7 @@ public:
      * @brief Get the desired speed for the bandwidth subtree.
      * @see tr_bandwidth::setDesiredSpeed
      */
-    [[nodiscard]] constexpr double getDesiredSpeedBytesPerSecond(tr_direction dir) const
+    [[nodiscard]] constexpr tr_bytes_per_second_t getDesiredSpeedBytesPerSecond(tr_direction dir) const
     {
         return this->band_[dir].desired_speed_bps_;
     }
@@ -220,9 +220,9 @@ public:
     struct RateControl
     {
         std::array<uint64_t, HistorySize> date_;
-        std::array<uint32_t, HistorySize> size_;
+        std::array<size_t, HistorySize> size_;
         uint64_t cache_time_;
-        unsigned int cache_val_;
+        tr_bytes_per_second_t cache_val_;
         int newest_;
     };
 
@@ -231,7 +231,7 @@ public:
         RateControl raw_;
         RateControl piece_;
         unsigned int bytes_left_;
-        unsigned int desired_speed_bps_;
+        tr_bytes_per_second_t desired_speed_bps_;
         bool is_limited_ = false;
         bool honor_parent_limits_ = true;
     };
@@ -246,7 +246,7 @@ public:
     }
 
 private:
-    static unsigned int getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
+    static tr_bytes_per_second_t getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
 
     static void notifyBandwidthConsumedBytes(uint64_t now, RateControl* r, size_t size);
 
