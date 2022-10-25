@@ -287,7 +287,7 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSMenu*)groupMenuWithTarget:(id)target action:(SEL)action isSmall:(BOOL)small
 {
-    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Groups"];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
 
     NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", "Groups -> Menu") action:action
                                            keyEquivalent:@""];

@@ -3305,10 +3305,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     if (menu == self.fGroupsSetMenu || menu == self.fGroupsSetContextMenu)
     {
-        for (NSInteger i = menu.numberOfItems - 1; i >= 0; i--)
-        {
-            [menu removeItemAtIndex:i];
-        }
+        [menu removeAllItems];
 
         NSMenu* groupMenu = [GroupsController.groups groupMenuWithTarget:self action:@selector(setGroup:) isSmall:NO];
 
