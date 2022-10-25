@@ -566,6 +566,19 @@ TEST_F(DhtTest, usesBootstrapFile)
 
 TEST_F(DhtTest, pingsAddedNodes)
 {
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
+
+    EXPECT_EQ(0U, std::size(mediator.mock_dht_.pinged_));
+
+    auto const addr = *tr_address::fromString("10.10.10.1");
+    auto constexpr Port = tr_port::fromHost(128);
+    dht->addNode(addr, Port);
+
+    ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
+    EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().address);
+    EXPECT_EQ(Port, mediator.mock_dht_.pinged_.front().port);
 }
 
 TEST_F(DhtTest, announcesTorrents)
