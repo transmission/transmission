@@ -292,8 +292,6 @@ private:
 
     void onBootstrapTimer()
     {
-        fmt::print("onBootstrapTimer, have {:d} nodes\n", std::size(bootstrap_queue_));
-
         // Since we don't want to abuse our bootstrap nodes,
         // we don't ping them if the DHT is in a good state.
         if (isReady() || std::empty(bootstrap_queue_))

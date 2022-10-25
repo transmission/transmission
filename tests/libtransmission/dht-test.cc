@@ -163,10 +163,12 @@ protected:
             return 0;
         }
 
-        int search(unsigned char const* /*id*/, int /*port*/, int /*af*/, dht_callback_t /*callback*/, void* /*closure*/)
-            override
+        int search(unsigned char const* id, int port, int af, dht_callback_t /*callback*/, void* /*closure*/) override
         {
-            fmt::print("search\n");
+            auto info_hash = tr_sha1_digest_t{};
+            std::copy_n(reinterpret_cast<std::byte const*>(id), std::size(info_hash), std::data(info_hash));
+            searched_.push_back(Searched{ info_hash, tr_port::fromHost(port), af });
+            fmt::print("search {:d} {:d}\n", port, af);
             return 0;
         }
 
@@ -205,6 +207,13 @@ protected:
             incoming_ = 1;
         }
 
+        struct Searched
+        {
+            tr_sha1_digest_t info_hash;
+            tr_port port;
+            int af;
+        };
+
         struct Pinged
         {
             tr_address address;
@@ -218,6 +227,7 @@ protected:
         int incoming_ = 0;
         bool inited_ = false;
         std::vector<Pinged> pinged_;
+        std::vector<Searched> searched_;
         std::array<char, IdLength> id_ = {};
         int dht_socket_ = TR_BAD_SOCKET;
         int dht_socket6_ = TR_BAD_SOCKET;
@@ -307,8 +317,13 @@ protected:
             return torrents_allowing_dht_;
         }
 
-        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t /*id*/) const override
+        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t id) const override
         {
+            if (auto const iter = info_hashes_.find(id); iter != std::end(info_hashes_))
+            {
+                return iter->second;
+            }
+
             return {};
         }
 
@@ -583,14 +598,39 @@ TEST_F(DhtTest, pingsAddedNodes)
 
 TEST_F(DhtTest, announcesTorrents)
 {
-}
+    auto constexpr Id = tr_torrent_id_t{ 1 };
+    auto constexpr PeerPort = tr_port::fromHost(999);
+    auto const info_hash = tr_randObj<tr_sha1_digest_t>();
 
-TEST_F(DhtTest, honorsPeriodicSleepTime)
-{
-}
+    tr_timeUpdate(time(nullptr));
 
-// auto constexpr Id = tr_torrent_id_t{ 1 };
-// mediator.info_hashes_[Id] = tr_randObj<tr_sha1_digest_t>();
-// mediator.torrents_allowing_dht_ = { Id };
+    auto mediator = MockMediator{ event_base_ };
+    mediator.info_hashes_[Id] = info_hash;
+    mediator.torrents_allowing_dht_ = { Id };
+    mediator.config_dir_ = sandboxDir();
+
+    // Since we're mocking a swarm that's magically healthy out-of-the-box,
+    // the DHT object we create can skip bootstrapping and proceed straight
+    // to announces
+    auto& mock_dht = mediator.mock_dht_;
+    mock_dht.setHealthySwarm();
+
+    auto dht = tr_dht::create(mediator, PeerPort, ArbitrarySock4, ArbitrarySock6);
+
+    waitFor(
+        event_base_,
+        []() { return false; },
+        MockTimerInterval * 10);
+
+    ASSERT_EQ(2U, std::size(mock_dht.searched_));
+
+    EXPECT_EQ(info_hash, mock_dht.searched_[0].info_hash);
+    EXPECT_EQ(PeerPort, mock_dht.searched_[0].port);
+    EXPECT_EQ(AF_INET, mock_dht.searched_[0].af);
+
+    EXPECT_EQ(info_hash, mock_dht.searched_[1].info_hash);
+    EXPECT_EQ(PeerPort, mock_dht.searched_[1].port);
+    EXPECT_EQ(AF_INET6, mock_dht.searched_[1].af);
+}
 
 } // namespace libtransmission::test
