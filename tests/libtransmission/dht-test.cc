@@ -251,7 +251,19 @@ protected:
     struct event_base* event_base_ = nullptr;
 };
 
-TEST_F(DhtTest, usesDhtBootstrapFile)
+TEST_F(DhtTest, usesStateFile)
+{
+}
+
+TEST_F(DhtTest, savesStateIfSwarmIsGood)
+{
+}
+
+TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
+{
+}
+
+TEST_F(DhtTest, usesBootstrapFile)
 {
     // Make the 'dht.bootstrap' file.
     // This a file with each line holding `${host} ${port}`
@@ -287,6 +299,18 @@ TEST_F(DhtTest, usesDhtBootstrapFile)
     EXPECT_EQ(expected.first, actual.address);
     EXPECT_EQ(expected.second, actual.port);
     EXPECT_EQ(expected.first.readable(expected.second), actual.address.readable(actual.port));
+}
+
+TEST_F(DhtTest, pingsAddedNodes)
+{
+}
+
+TEST_F(DhtTest, announcesTorrents)
+{
+}
+
+TEST_F(DhtTest, honorsPeriodicSleepTime)
+{
 }
 
 // auto constexpr Id = tr_torrent_id_t{ 1 };
