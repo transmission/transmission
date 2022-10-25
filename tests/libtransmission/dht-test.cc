@@ -34,6 +34,69 @@ auto constexpr IdLength = size_t{ 20U };
 class DhtTest : public SandboxedTest
 {
 protected:
+    // Helper for creating a mock dht.dat state file
+    struct MockStateFile
+    {
+        // Fake data to be written to the test state file
+
+        std::array<char, IdLength> id_ = tr_randObj<std::array<char, IdLength>>();
+
+        std::vector<std::pair<tr_address, tr_port>> ipv4_nodes_ = {
+            std::make_pair(*tr_address::fromString("10.10.10.1"), tr_port::fromHost(128)),
+            std::make_pair(*tr_address::fromString("10.10.10.2"), tr_port::fromHost(129)),
+            std::make_pair(*tr_address::fromString("10.10.10.3"), tr_port::fromHost(130)),
+            std::make_pair(*tr_address::fromString("10.10.10.4"), tr_port::fromHost(131)),
+            std::make_pair(*tr_address::fromString("10.10.10.5"), tr_port::fromHost(132))
+        };
+
+        std::vector<std::pair<tr_address, tr_port>> ipv6_nodes_ = {
+            std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3217"), tr_port::fromHost(6881)),
+            std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3218"), tr_port::fromHost(6882)),
+            std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3219"), tr_port::fromHost(6883)),
+            std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3220"), tr_port::fromHost(6884)),
+            std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885))
+        };
+
+        [[nodiscard]] auto nodesString() const
+        {
+            auto str = std::string{};
+            for (auto const& [addr, port] : ipv4_nodes_)
+            {
+                str += addr.readable(port);
+                str += ',';
+            }
+            for (auto const& [addr, port] : ipv6_nodes_)
+            {
+                str += addr.readable(port);
+                str += ',';
+            }
+            return str;
+        }
+
+        void save(std::string_view sandbox_dir) const
+        {
+            auto const dat_file = tr_pathbuf{ sandbox_dir, "/dht.dat" };
+
+            auto dict = tr_variant{};
+            tr_variantInitDict(&dict, 3U);
+            tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(id_), std::size(id_));
+            auto compact = std::vector<std::byte>{};
+            for (auto const& [addr, port] : ipv4_nodes_)
+            {
+                addr.toCompact4(std::back_inserter(compact), port);
+            }
+            tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
+            compact.clear();
+            for (auto const& [addr, port] : ipv6_nodes_)
+            {
+                addr.toCompact6(std::back_inserter(compact), port);
+            }
+            tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
+            tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
+            tr_variantClear(&dict);
+        }
+    };
+
     // A fake libdht for the tests to call
     class MockDht final : public tr_dht::API
     {
@@ -312,65 +375,20 @@ TEST_F(DhtTest, callsUninitOnDestruct)
     EXPECT_FALSE(mediator.mock_dht_.inited_);
 }
 
-TEST_F(DhtTest, usesStateFile)
+TEST_F(DhtTest, loadsStateFromStateFile)
 {
-    // Fake data to be written to the test state file
-
-    auto const expected_id = tr_randObj<std::array<char, IdLength>>();
-
-    auto const expected_ipv4_nodes = std::array<std::pair<tr_address, tr_port>, 5>{
-        std::make_pair(*tr_address::fromString("10.10.10.1"), tr_port::fromHost(128)),
-        std::make_pair(*tr_address::fromString("10.10.10.2"), tr_port::fromHost(129)),
-        std::make_pair(*tr_address::fromString("10.10.10.3"), tr_port::fromHost(130)),
-        std::make_pair(*tr_address::fromString("10.10.10.4"), tr_port::fromHost(131)),
-        std::make_pair(*tr_address::fromString("10.10.10.5"), tr_port::fromHost(132))
-    };
-
-    auto const expected_ipv6_nodes = std::array<std::pair<tr_address, tr_port>, 5>{
-        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3217"), tr_port::fromHost(6881)),
-        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3218"), tr_port::fromHost(6882)),
-        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3219"), tr_port::fromHost(6883)),
-        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3220"), tr_port::fromHost(6884)),
-        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885))
-    };
-
-    auto expected_nodes_str = std::string{};
-
-    // Make the state file
-    {
-        auto const dat_file = tr_pathbuf{ sandboxDir(), "/dht.dat" };
-        auto dict = tr_variant{};
-        tr_variantInitDict(&dict, 3U);
-        tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(expected_id), std::size(expected_id));
-        auto compact = std::vector<std::byte>{};
-        for (auto const& [addr, port] : expected_ipv4_nodes)
-        {
-            addr.toCompact4(std::back_inserter(compact), port);
-            expected_nodes_str += addr.readable(port);
-            expected_nodes_str += ',';
-        }
-        tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
-        compact.clear();
-        for (auto const& [addr, port] : expected_ipv6_nodes)
-        {
-            addr.toCompact6(std::back_inserter(compact), port);
-            expected_nodes_str += addr.readable(port);
-            expected_nodes_str += ',';
-        }
-        tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
-        tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
-        tr_variantClear(&dict);
-    }
+    auto const state_file = MockStateFile{};
+    state_file.save(sandboxDir());
 
     // Make the DHT
     auto mediator = MockMediator{ event_base_ };
     mediator.config_dir_ = sandboxDir();
     auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
 
-    // Wait for all the state nodes to be pinged.
+    // Wait for all the state nodes to be pinged
     auto& pinged = mediator.mock_dht_.pinged_;
-    static auto constexpr ExpectedN = std::size(expected_ipv4_nodes) + std::size(expected_ipv6_nodes);
-    waitFor(event_base_, [&pinged]() { return std::size(pinged) >= ExpectedN; });
+    auto const n_expected_nodes = std::size(state_file.ipv4_nodes_) + std::size(state_file.ipv6_nodes_);
+    waitFor(event_base_, [&pinged, n_expected_nodes]() { return std::size(pinged) >= n_expected_nodes; });
     auto actual_nodes_str = std::string{};
     for (auto const& [addr, port, timestamp] : pinged)
     {
@@ -378,9 +396,13 @@ TEST_F(DhtTest, usesStateFile)
         actual_nodes_str += ',';
     }
 
-    // confirm that the state was loaded
-    EXPECT_EQ(expected_id, mediator.mock_dht_.id_);
-    EXPECT_EQ(expected_nodes_str, actual_nodes_str);
+    /// Confirm that the state was loaded
+
+    // dht_init() should have been called with the state file's id
+    EXPECT_EQ(state_file.id_, mediator.mock_dht_.id_);
+
+    // dht_ping_nodedht_init() should have been called with state file's nodes
+    EXPECT_EQ(state_file.nodesString(), actual_nodes_str);
 }
 
 TEST_F(DhtTest, savesStateIfSwarmIsGood)
@@ -388,6 +410,10 @@ TEST_F(DhtTest, savesStateIfSwarmIsGood)
 }
 
 TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
+{
+}
+
+TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
 {
 }
 
