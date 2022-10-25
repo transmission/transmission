@@ -29,7 +29,8 @@ namespace libtransmission::test
 namespace
 {
 auto constexpr IdLength = size_t{ 20U };
-}
+auto constexpr MockTimerInterval = 10ms;
+} // namespace
 
 class DhtTest : public SandboxedTest
 {
@@ -107,9 +108,30 @@ protected:
             return 0;
         }
 
-        int nodes(int /*af*/, int* /*good*/, int* /*dubious*/, int* /*cached*/, int* /*incoming*/) override
+        int nodes(int /*af*/, int* good, int* dubious, int* cached, int* incoming) override
         {
             fmt::print("nodes\n");
+
+            if (good != nullptr)
+            {
+                *good = good_;
+            }
+
+            if (dubious != nullptr)
+            {
+                *dubious = dubious_;
+            }
+
+            if (cached != nullptr)
+            {
+                *cached = cached_;
+            }
+
+            if (incoming != nullptr)
+            {
+                *incoming = incoming_;
+            }
+
             return 0;
         }
 
@@ -166,6 +188,10 @@ protected:
             time_t timestamp;
         };
 
+        int good_ = 0;
+        int dubious_ = 0;
+        int cached_ = 0;
+        int incoming_ = 0;
         bool inited_ = false;
         std::vector<Pinged> pinged_;
         std::array<char, IdLength> id_ = {};
@@ -202,7 +228,7 @@ protected:
         void setInterval(std::chrono::milliseconds interval) override
         {
             fmt::print("setInterval requested {:d} using 10 msec\n", interval.count());
-            real_timer_->setInterval(10ms);
+            real_timer_->setInterval(MockTimerInterval);
         }
 
         void start() override
@@ -405,15 +431,44 @@ TEST_F(DhtTest, loadsStateFromStateFile)
     EXPECT_EQ(state_file.nodesString(), actual_nodes_str);
 }
 
+TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
+{
+    auto const state_file = MockStateFile{};
+    state_file.save(sandboxDir());
+
+    // Make the DHT
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
+
+    // Wait for N pings to occur...
+    auto& mock_dht = mediator.mock_dht_;
+    static auto constexpr TurnGoodAfterNthPing = size_t{ 3 };
+    waitFor(event_base_, [&mock_dht]() { return std::size(mock_dht.pinged_) == TurnGoodAfterNthPing; });
+    EXPECT_EQ(TurnGoodAfterNthPing, std::size(mock_dht.pinged_));
+
+    // Now fake the swarm data that should cause bootstrapping to end
+    mock_dht.good_ = 50;
+    mock_dht.incoming_ = 10;
+
+    // Now test to see if bootstrapping is done.
+    // There's not public API for `isBootstrapping()`,
+    // so to test this we just a moment to confirm that no more bootstrap nodes are pinged.
+    waitFor(
+        event_base_,
+        []() { return false; },
+        MockTimerInterval * 10);
+
+    // Confirm that the number of nodes pinged is unchanged,
+    // indicating that boostrapping is done
+    EXPECT_EQ(TurnGoodAfterNthPing, std::size(mock_dht.pinged_));
+}
+
 TEST_F(DhtTest, savesStateIfSwarmIsGood)
 {
 }
 
 TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
-{
-}
-
-TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
 {
 }
 
