@@ -272,21 +272,24 @@ protected:
     }
 
     struct event_base* event_base_ = nullptr;
+
+    // Arbitrary values. Several tests requires socket/port values
+    // to be provided but they aren't central to the tests, so they're
+    // declared here with "Arbitrary" in the name to make that clear.
+    static auto constexpr ArbitrarySock4 = tr_socket_t{ 404 };
+    static auto constexpr ArbitrarySock6 = tr_socket_t{ 418 };
+    static auto constexpr ArbitraryPeerPort = tr_port::fromHost(909);
 };
 
 TEST_F(DhtTest, initsWithCorrectSockets)
 {
-    // Arbitrary values; could be anything
-    static auto constexpr Sock4 = tr_socket_t{ 404 };
-    static auto constexpr Sock6 = tr_socket_t{ 418 };
-    static auto constexpr PeerPort = tr_port::fromHost(909);
+    static auto constexpr Sock4 = tr_socket_t{ 1000 };
+    static auto constexpr Sock6 = tr_socket_t{ 2000 };
 
-    // Make the mediator
+    // Make the DHT
     auto mediator = MockMediator{ event_base_ };
     mediator.config_dir_ = sandboxDir();
-
-    // Make the dht object
-    auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, Sock4, Sock6);
 
     // Confirm that dht_init() was called with the right sockets
     EXPECT_EQ(Sock4, mediator.mock_dht_.dht_socket_);
@@ -300,12 +303,7 @@ TEST_F(DhtTest, callsUninitOnDestruct)
     EXPECT_FALSE(mediator.mock_dht_.inited_);
 
     {
-        // Make the dht object.
-        // PeerPort, Sock4, and Sock6 are arbitrary values; they're not used in this test
-        static auto constexpr PeerPort = tr_port::fromHost(909);
-        static auto constexpr Sock4 = tr_socket_t{ 404 };
-        static auto constexpr Sock6 = tr_socket_t{ 418 };
-        auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
+        auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
         EXPECT_TRUE(mediator.mock_dht_.inited_);
 
         // dht goes out-of-scope here
@@ -336,42 +334,38 @@ TEST_F(DhtTest, usesStateFile)
         std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885))
     };
 
-    // Make the state file
-
     auto expected_nodes_str = std::string{};
-    auto const dat_file = tr_pathbuf{ sandboxDir(), "/dht.dat" };
-    auto dict = tr_variant{};
-    tr_variantInitDict(&dict, 3U);
-    tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(expected_id), std::size(expected_id));
-    auto compact = std::vector<std::byte>{};
-    for (auto const& [addr, port] : expected_ipv4_nodes)
-    {
-        addr.toCompact4(std::back_inserter(compact), port);
-        expected_nodes_str += addr.readable(port);
-        expected_nodes_str += ',';
-    }
-    tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
-    compact.clear();
-    for (auto const& [addr, port] : expected_ipv6_nodes)
-    {
-        addr.toCompact6(std::back_inserter(compact), port);
-        expected_nodes_str += addr.readable(port);
-        expected_nodes_str += ',';
-    }
-    tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
-    tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
-    tr_variantClear(&dict);
 
-    // Make the mediator
+    // Make the state file
+    {
+        auto const dat_file = tr_pathbuf{ sandboxDir(), "/dht.dat" };
+        auto dict = tr_variant{};
+        tr_variantInitDict(&dict, 3U);
+        tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(expected_id), std::size(expected_id));
+        auto compact = std::vector<std::byte>{};
+        for (auto const& [addr, port] : expected_ipv4_nodes)
+        {
+            addr.toCompact4(std::back_inserter(compact), port);
+            expected_nodes_str += addr.readable(port);
+            expected_nodes_str += ',';
+        }
+        tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
+        compact.clear();
+        for (auto const& [addr, port] : expected_ipv6_nodes)
+        {
+            addr.toCompact6(std::back_inserter(compact), port);
+            expected_nodes_str += addr.readable(port);
+            expected_nodes_str += ',';
+        }
+        tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
+        tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
+        tr_variantClear(&dict);
+    }
+
+    // Make the DHT
     auto mediator = MockMediator{ event_base_ };
     mediator.config_dir_ = sandboxDir();
-
-    // Make the dht object.
-    // PeerPort, Sock4, and Sock6 are arbitrary values; they're not used in this test
-    static auto constexpr PeerPort = tr_port::fromHost(909);
-    static auto constexpr Sock4 = tr_socket_t{ 404 };
-    static auto constexpr Sock6 = tr_socket_t{ 418 };
-    auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
 
     // Wait for all the state nodes to be pinged.
     auto& pinged = mediator.mock_dht_.pinged_;
@@ -385,8 +379,8 @@ TEST_F(DhtTest, usesStateFile)
     }
 
     // confirm that the state was loaded
-    EXPECT_EQ(expected_nodes_str, actual_nodes_str);
     EXPECT_EQ(expected_id, mediator.mock_dht_.id_);
+    EXPECT_EQ(expected_nodes_str, actual_nodes_str);
 }
 
 TEST_F(DhtTest, savesStateIfSwarmIsGood)
@@ -404,20 +398,16 @@ TEST_F(DhtTest, usesBootstrapFile)
     // which tr-dht will try to ping as nodes
     static auto constexpr BootstrapNodeName = "example.com"sv;
     static auto constexpr BootstrapNodePort = tr_port::fromHost(8080);
-    auto ofs = std::ofstream{ tr_pathbuf{ sandboxDir(), "/dht.bootstrap" } };
-    ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << std::endl;
-    ofs.close();
+    if (auto ofs = std::ofstream{ tr_pathbuf{ sandboxDir(), "/dht.bootstrap" } }; ofs)
+    {
+        ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << std::endl;
+        ofs.close();
+    }
 
-    // Make the mediator
+    // Make the DHT
     auto mediator = MockMediator{ event_base_ };
     mediator.config_dir_ = sandboxDir();
-
-    // Make the dht object.
-    // PeerPort, Sock4, and Sock6 are arbitrary values; they're not used in this test
-    static auto constexpr PeerPort = tr_port::fromHost(909);
-    static auto constexpr Sock4 = tr_socket_t{ 404 };
-    static auto constexpr Sock6 = tr_socket_t{ 418 };
-    auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
 
     // We didn't create a 'dht.dat' file to load state from,
     // so 'dht.bootstrap' should be the first nodes in the bootstrap list.
