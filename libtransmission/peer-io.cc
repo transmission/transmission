@@ -119,59 +119,61 @@ static void canReadWrapper(tr_peerIo* io_in)
     tr_session const* const session = io->session;
 
     /* try to consume the input buffer */
-    if (io->canRead != nullptr)
+    if (io->canRead == nullptr)
     {
-        auto const lock = session->unique_lock();
+        return;
+    }
 
-        auto const now = tr_time_msec();
-        auto done = bool{ false };
-        auto err = bool{ false };
+    auto const lock = session->unique_lock();
 
-        while (!done && !err)
+    auto const now = tr_time_msec();
+    auto done = bool{ false };
+    auto err = bool{ false };
+
+    while (!done && !err)
+    {
+        size_t piece = 0;
+        size_t const old_len = io->readBufferSize();
+        int const ret = io->canRead(io.get(), io->userData, &piece);
+        size_t const used = old_len - io->readBufferSize();
+        unsigned int const overhead = guessPacketOverhead(used);
+
+        if (piece != 0 || piece != used)
         {
-            size_t piece = 0;
-            size_t const old_len = io->readBufferSize();
-            int const ret = io->canRead(io.get(), io->userData, &piece);
-            size_t const used = old_len - io->readBufferSize();
-            unsigned int const overhead = guessPacketOverhead(used);
-
-            if (piece != 0 || piece != used)
+            if (piece != 0)
             {
-                if (piece != 0)
-                {
-                    io->bandwidth().notifyBandwidthConsumed(TR_DOWN, piece, true, now);
-                }
-
-                if (used != piece)
-                {
-                    io->bandwidth().notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
-                }
+                io->bandwidth().notifyBandwidthConsumed(TR_DOWN, piece, true, now);
             }
 
-            if (overhead > 0)
+            if (used != piece)
             {
-                io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
+                io->bandwidth().notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
+            }
+        }
+
+        if (overhead > 0)
+        {
+            io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
+        }
+
+        switch (ret)
+        {
+        case READ_NOW:
+            if (io->readBufferSize() != 0)
+            {
+                continue;
             }
 
-            switch (ret)
-            {
-            case READ_NOW:
-                if (io->readBufferSize() != 0)
-                {
-                    continue;
-                }
+            done = true;
+            break;
 
-                done = true;
-                break;
+        case READ_LATER:
+            done = true;
+            break;
 
-            case READ_LATER:
-                done = true;
-                break;
-
-            case READ_ERR:
-                err = true;
-                break;
-            }
+        case READ_ERR:
+            err = true;
+            break;
         }
     }
 }
@@ -203,8 +205,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
 
     tr_error* error = nullptr;
-    auto const res = io->inbuf.addSocket(fd, howmuch, &error);
-    if (res > 0)
+    if (auto const res = io->inbuf.addSocket(fd, howmuch, &error); res > 0)
     {
         io->setEnabled(dir, true);
 

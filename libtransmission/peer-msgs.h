@@ -80,11 +80,4 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_peer_callback callback,
     void* callback_data);
 
-size_t tr_generateAllowedSet(
-    tr_piece_index_t* setmePieces,
-    size_t desiredSetSize,
-    size_t pieceCount,
-    uint8_t const* infohash,
-    struct tr_address const* addr);
-
 /* @} */

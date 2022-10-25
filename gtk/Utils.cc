@@ -286,9 +286,9 @@ bool on_tree_view_button_pressed(
     if (context_menu_requested)
     {
         Gtk::TreeModel::Path path;
-        auto const selection = view.get_selection();
 
-        if (view.get_path_at_pos((int)view_x, (int)view_y, path) && !selection->is_selected(path))
+        if (auto const selection = view.get_selection();
+            view.get_path_at_pos((int)view_x, (int)view_y, path) && !selection->is_selected(path))
         {
             selection->unselect_all();
             selection->select(path);
@@ -707,8 +707,8 @@ void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
     auto const process = [&entry](Glib::ustring const& text)
     {
-        auto const sv = tr_strvStrip(text.raw());
-        if (!sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
+        if (auto const sv = tr_strvStrip(text.raw());
+            !sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
         {
             entry.set_text(text);
             return true;

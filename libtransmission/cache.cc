@@ -133,7 +133,7 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 ****
 ***/
 
-void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme)
+int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme)
 {
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
@@ -150,7 +150,7 @@ void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
     ++cache_writes_;
     cache_write_bytes_ += std::size(*iter->buf);
 
-    (void)cacheTrim();
+    return cacheTrim();
 }
 
 Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location loc) noexcept

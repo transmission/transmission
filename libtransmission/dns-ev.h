@@ -22,8 +22,6 @@
 #include "dns.h"
 #include "utils.h" // for tr_strlower()
 
-using namespace std::literals;
-
 namespace libtransmission
 {
 
@@ -107,7 +105,8 @@ public:
         }
 
         auto& request = requests_[key];
-        auto const tag = next_tag_++;
+        auto const tag = next_tag_;
+        ++next_tag_;
         request.callbacks.emplace_back(tag, std::move(callback));
         if (request.request == nullptr)
         {
