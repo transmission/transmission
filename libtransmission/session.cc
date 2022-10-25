@@ -761,10 +761,7 @@ void tr_session::initImpl(init_data& data)
 
     this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
 
-    if (allowsDHT())
-    {
-        this->dht_ = tr_dht::create(dht_mediator_, public_peer_port_, udp_core_->socket4(), udp_core_->socket6());
-    }
+    rebuildDHT();
 
     this->web_ = tr_web::create(this->web_mediator_);
 
@@ -2083,6 +2080,16 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
     return session->allowsDHT();
 }
 
+void tr_session::rebuildDHT()
+{
+    dht_.reset();
+
+    if (allowsDHT())
+    {
+        dht_ = tr_dht::create(dht_mediator_, public_peer_port_, udp_core_->socket4(), udp_core_->socket6());
+    }
+}
+
 void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
@@ -2096,9 +2103,8 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         session,
         [session, enabled]()
         {
-            session->udp_core_.reset();
             session->is_dht_enabled_ = enabled;
-            session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session, session->udpPort());
+            session->rebuildDHT();
         });
 }
 

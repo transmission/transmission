@@ -896,6 +896,8 @@ private:
 
     void setPeerPort(tr_port port);
 
+    void rebuildDHT();
+
     void closePeerPort()
     {
         bind_ipv4_.close();
@@ -1155,7 +1157,6 @@ public:
 
     // depends-on: public_peer_port_, udp_core_, dht_mediator_
     // TODO: when public_peer_port_ is rebuilt, rebuild dht
-    // TODO: when dht_core_ is rebuilt, rebuild dht
     std::unique_ptr<tr_dht> dht_;
 
 private:
