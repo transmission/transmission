@@ -80,7 +80,7 @@ class SessionTest;
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
-    std::array<unsigned int, 2> speedLimit_Bps = {};
+    std::array<tr_bytes_per_second_t, 2> speedLimit_Bps = {};
 
     /* is turtle mode on right now? */
     bool isEnabled = false;
@@ -88,10 +88,12 @@ struct tr_turtle_info
     /* does turtle mode turn itself on and off at given times? */
     bool isClockEnabled = false;
 
-    /* when clock mode is on, minutes after midnight to turn on turtle mode */
+    /* when clock mode is on, minutes after midnight to turn on turtle mode.
+     * Valid range: 0..<1440 */
     int beginMinute = 0;
 
-    /* when clock mode is on, minutes after midnight to turn off turtle mode */
+    /* when clock mode is on, minutes after midnight to turn off turtle mode.
+     * Valid range: 0..<1440 */
     int endMinute = 0;
 
     /* only use clock mode on these days of the week */
@@ -824,7 +826,7 @@ public:
         return top_bandwidth_.getPieceSpeedBytesPerSecond(0, dir);
     }
 
-    [[nodiscard]] std::optional<unsigned int> activeSpeedLimitBps(tr_direction dir) const noexcept;
+    [[nodiscard]] std::optional<tr_bytes_per_second_t> activeSpeedLimitBps(tr_direction dir) const noexcept;
 
     [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
@@ -950,7 +952,7 @@ private:
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
-    friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents);
+    friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
@@ -961,7 +963,7 @@ private:
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
-    friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int bytes_per_second);
+    friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_bytes_per_second_t bytes_per_second);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
     /// constexpr fields
@@ -1014,11 +1016,11 @@ private:
 
     float desired_ratio_ = 2.0F;
 
-    std::array<unsigned int, 2> speed_limit_Bps_ = { 0U, 0U };
+    std::array<tr_bytes_per_second_t, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
     std::array<bool, 2> queue_enabled_ = { false, false };
-    std::array<int, 2> queue_size_ = { 0, 0 };
+    std::array<size_t, 2> queue_size_ = { 0, 0 };
 
     int umask_ = 022;
 

@@ -905,7 +905,7 @@ void tr_session::setImpl(init_data& data)
     /* torrent queues */
     if (tr_variantDictFindInt(settings, TR_KEY_queue_stalled_minutes, &i))
     {
-        tr_sessionSetQueueStalledMinutes(this, i);
+        tr_sessionSetQueueStalledMinutes(this, static_cast<int>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_queue_stalled_enabled, &val))
@@ -1042,7 +1042,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(this, TR_UP, i);
+        tr_sessionSetSpeedLimit_KBps(this, TR_UP, static_cast<tr_kilobytes_per_second_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_up_enabled, &val))
@@ -1052,7 +1052,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_down, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, i);
+        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_down_enabled, &val))
@@ -1097,12 +1097,12 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_begin, &i))
     {
-        turtle.beginMinute = i;
+        turtle.beginMinute = static_cast<int>(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_end, &i))
     {
-        turtle.endMinute = i;
+        turtle.endMinute = static_cast<int>(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_day, &i))
@@ -1146,7 +1146,7 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
     {
-        tr_sessionSetAntiBruteForceThreshold(this, i);
+        tr_sessionSetAntiBruteForceThreshold(this, static_cast<int>(i));
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &val))
@@ -1408,9 +1408,9 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 ****
 ***/
 
-static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d);
+static tr_bytes_per_second_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d);
 
-std::optional<unsigned int> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
+std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
 {
     if (tr_sessionUsesAltSpeed(this))
     {
@@ -1450,8 +1450,8 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
     {
         if ((t->days & (1 << day)) != 0)
         {
-            time_t const begin = t->beginMinute;
-            time_t end = t->endMinute;
+            auto const begin = t->beginMinute;
+            auto end = t->endMinute;
 
             if (end <= begin)
             {
@@ -1557,7 +1557,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned int bytes_per_second)
+void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_bytes_per_second_t bytes_per_second)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -1567,12 +1567,12 @@ void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, unsigned
     updateBandwidth(session, dir);
 }
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, unsigned int kilo_per_second)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second)
 {
     tr_sessionSetSpeedLimit_Bps(session, dir, tr_toSpeedBytes(kilo_per_second));
 }
 
-unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
+tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
 {
     return tr_toSpeedKBps(s->speedLimitBps(d));
 }
@@ -1599,7 +1599,7 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned int bytes_per_second)
+static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, tr_bytes_per_second_t bytes_per_second)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(tr_isDirection(d));
@@ -1609,12 +1609,12 @@ static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned in
     updateBandwidth(s, d);
 }
 
-void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int kilo_per_second)
+void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, tr_kilobytes_per_second_t kilo_per_second)
 {
     tr_sessionSetAltSpeed_Bps(s, d, tr_toSpeedBytes(kilo_per_second));
 }
 
-static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
+static tr_bytes_per_second_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(tr_isDirection(d));
@@ -1622,7 +1622,7 @@ static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction 
     return s->turtle.speedLimit_Bps[d];
 }
 
-unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
+tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
 {
     return tr_toSpeedKBps(tr_sessionGetAltSpeed_Bps(s, d));
 }
@@ -1667,7 +1667,7 @@ void tr_sessionSetAltSpeedBegin(tr_session* s, int minutes_since_midnight)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(minutes_since_midnight >= 0);
-    TR_ASSERT(minutes_since_midnight < 60 * 24);
+    TR_ASSERT(minutes_since_midnight < MinutesPerDay);
 
     if (s->turtle.beginMinute != minutes_since_midnight)
     {
@@ -1687,7 +1687,7 @@ void tr_sessionSetAltSpeedEnd(tr_session* s, int minutes_since_midnight)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(minutes_since_midnight >= 0);
-    TR_ASSERT(minutes_since_midnight < 60 * 24);
+    TR_ASSERT(minutes_since_midnight < MinutesPerDay);
 
     if (s->turtle.endMinute != minutes_since_midnight)
     {
@@ -1809,7 +1809,7 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 ****
 ***/
 
-static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
+static tr_kilobytes_per_second_t tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
     return session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
 }
@@ -2167,14 +2167,14 @@ bool tr_sessionIsLPDEnabled(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetCacheLimit_MB(tr_session* session, int mb)
+void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb)
 {
     TR_ASSERT(session != nullptr);
 
     session->cache->setLimit(tr_toMemBytes(mb));
 }
 
-int tr_sessionGetCacheLimit_MB(tr_session const* session)
+size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
@@ -2514,7 +2514,7 @@ char const* tr_sessionGetScript(tr_session const* session, TrScript type)
 ****
 ***/
 
-void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simultaneous_seed_torrents)
+void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_seed_torrents)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -2522,7 +2522,7 @@ void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int max_simul
     session->queue_size_[dir] = max_simultaneous_seed_torrents;
 }
 
-int tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
+size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -2705,12 +2705,12 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
         if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &limit))
         {
-            limits.up_limit_KBps = limit;
+            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
         }
 
         if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &limit))
         {
-            limits.down_limit_KBps = limit;
+            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
         }
 
         group.setLimits(&limits);

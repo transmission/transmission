@@ -207,11 +207,14 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor);
 
 void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr);
 
-[[nodiscard]] struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count);
+[[nodiscard]] struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count);
 
 [[nodiscard]] tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 
-[[nodiscard]] unsigned int tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction);
+[[nodiscard]] tr_bytes_per_second_t tr_peerGetPieceSpeedBytesPerSecond(
+    tr_peer const* peer,
+    uint64_t now,
+    tr_direction direction);
 
 void tr_peerMgrClearInterest(tr_torrent* tor);
 

@@ -123,7 +123,7 @@ void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view na
 // characters denoting version are limited to the following characters:
 // 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-
 // For example: 'S58B-----'... for Shadow's 5.8.11
-std::optional<size_t> get_shad0w_int(char ch)
+std::optional<int> get_shad0w_int(char ch)
 {
     auto constexpr Str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-"sv;
 

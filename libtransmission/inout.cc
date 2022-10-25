@@ -236,7 +236,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(piece < tor->pieceCount());
 
-    auto bytes_left = size_t(tor->pieceSize(piece));
+    auto bytes_left = tor->pieceSize(piece);
     auto loc = tor->pieceLoc(piece);
     tr_ioPrefetch(tor, loc, bytes_left);
 
@@ -244,7 +244,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     auto buffer = std::vector<uint8_t>(tr_block_info::BlockSize);
     while (bytes_left != 0)
     {
-        size_t const len = std::min(bytes_left, std::size(buffer));
+        auto const len = static_cast<uint32_t>(std::min(static_cast<size_t>(bytes_left), std::size(buffer)));
         if (auto const success = tor->session->cache->readBlock(tor, loc, len, std::data(buffer)) == 0; !success)
         {
             return {};

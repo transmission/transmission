@@ -324,7 +324,7 @@ public:
         }
     }
 
-    bool isTransferringPieces(uint64_t now, tr_direction dir, unsigned int* setme_bytes_per_second) const override
+    bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const override
     {
         auto const bytes_per_second = io->getPieceSpeedBytesPerSecond(now, dir);
 
@@ -1159,7 +1159,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
     if (msg_type == MetadataMsgType::Data && !msgs->torrent->hasMetainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
         piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
-        int const piece_len = msg_end - benc_end;
+        auto const piece_len = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
     }
 

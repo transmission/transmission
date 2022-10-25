@@ -546,7 +546,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
 {
     auto constexpr Delimiter = "-"sv;
 
-    auto const first = tr_parseNum<size_t>(str, &str);
+    auto const first = tr_parseNum<int>(str, &str);
     if (!first)
     {
         return false;
@@ -564,7 +564,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
     }
 
     str.remove_prefix(std::size(Delimiter));
-    auto const second = tr_parseNum<size_t>(str);
+    auto const second = tr_parseNum<int>(str);
     if (!second)
     {
         return false;

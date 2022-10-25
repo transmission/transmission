@@ -188,9 +188,12 @@ public:
         return tr_torrentFindFromId(session, torrent_id);
     }
 
-    [[nodiscard]] bool isTransferringPieces(uint64_t now, tr_direction dir, unsigned int* setme_bytes_per_second) const override
+    [[nodiscard]] bool isTransferringPieces( //
+        uint64_t now,
+        tr_direction dir,
+        tr_bytes_per_second_t* setme_bytes_per_second) const override
     {
-        unsigned int bytes_per_second = 0;
+        tr_bytes_per_second_t bytes_per_second = 0;
         bool is_active = false;
 
         if (dir == TR_DOWN)
@@ -547,7 +550,7 @@ tr_webseed_view tr_webseedView(tr_peer const* peer)
         return {};
     }
 
-    auto bytes_per_second = unsigned{ 0 };
+    auto bytes_per_second = tr_bytes_per_second_t{ 0 };
     auto const is_downloading = peer->isTransferringPieces(tr_time_msec(), TR_DOWN, &bytes_per_second);
     return { w->base_url.c_str(), is_downloading, bytes_per_second };
 }
