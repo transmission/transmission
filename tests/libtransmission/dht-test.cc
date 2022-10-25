@@ -73,9 +73,11 @@ protected:
             return 0;
         }
 
-        int init(int /*s*/, int /*s6*/, unsigned const char* id, unsigned const char* /*v*/) override
+        int init(int dht_socket, int dht_socket6, unsigned const char* id, unsigned const char* /*v*/) override
         {
             fmt::print("init\n");
+            dht_socket_ = dht_socket;
+            dht_socket6_ = dht_socket6;
             std::copy_n(id, std::size(id_), std::begin(id_));
             return 0;
         }
@@ -95,6 +97,8 @@ protected:
 
         std::vector<Pinged> pinged_;
         std::array<char, 20> id_ = {};
+        int dht_socket_ = TR_BAD_SOCKET;
+        int dht_socket6_ = TR_BAD_SOCKET;
     };
 
     // Creates real timers, but with shortened intervals so that tests can run faster
@@ -261,6 +265,25 @@ protected:
     struct event_base* event_base_ = nullptr;
 };
 
+TEST_F(DhtTest, initsWithCorrectSockets)
+{
+    // Arbitrary values; could be anything
+    static auto constexpr Sock4 = tr_socket_t{ 404 };
+    static auto constexpr Sock6 = tr_socket_t{ 418 };
+    static auto constexpr PeerPort = tr_port::fromHost(909);
+
+    // Make the mediator
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+
+    // Make the dht object
+    auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
+
+    // Confirm that dht_init() was called with the right sockets
+    EXPECT_EQ(Sock4, mediator.mock_dht_.dht_socket_);
+    EXPECT_EQ(Sock6, mediator.mock_dht_.dht_socket6_);
+}
+
 TEST_F(DhtTest, usesStateFile)
 {
     auto const expected_ipv4_nodes = std::array<std::pair<tr_address, tr_port>, 5>{
@@ -308,7 +331,6 @@ TEST_F(DhtTest, usesStateFile)
     tr_variantClear(&dict);
 
     // Make the mediator
-    //
     auto mediator = MockMediator{ event_base_ };
     mediator.config_dir_ = sandboxDir();
 
