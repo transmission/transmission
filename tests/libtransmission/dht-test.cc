@@ -15,6 +15,7 @@
 
 #include "dns-ev.h"
 #include "dns.h"
+#include "file.h"
 #include "timer-ev.h"
 #include "trevent.h" // for tr_evthread_init();
 
@@ -74,9 +75,14 @@ protected:
             return str;
         }
 
-        void save(std::string_view sandbox_dir) const
+        [[nodiscard]] static auto filename(std::string_view dirname)
         {
-            auto const dat_file = tr_pathbuf{ sandbox_dir, "/dht.dat" };
+            return std::string{ dirname } + "/dht.dat";
+        }
+
+        void save(std::string_view path) const
+        {
+            auto const dat_file = MockStateFile::filename(path);
 
             auto dict = tr_variant{};
             tr_variantInitDict(&dict, 3U);
@@ -179,6 +185,24 @@ protected:
             inited_ = false;
             fmt::print("uninit\n");
             return 0;
+        }
+
+        constexpr void setHealthySwarm()
+        {
+            good_ = 50;
+            incoming_ = 10;
+        }
+
+        constexpr void setFirewalledSwarm()
+        {
+            good_ = 50;
+            incoming_ = 0;
+        }
+
+        constexpr void setPoorSwarm()
+        {
+            good_ = 10;
+            incoming_ = 1;
         }
 
         struct Pinged
@@ -447,9 +471,9 @@ TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
     waitFor(event_base_, [&mock_dht]() { return std::size(mock_dht.pinged_) == TurnGoodAfterNthPing; });
     EXPECT_EQ(TurnGoodAfterNthPing, std::size(mock_dht.pinged_));
 
-    // Now fake the swarm data that should cause bootstrapping to end
-    mock_dht.good_ = 50;
-    mock_dht.incoming_ = 10;
+    // Now fake that libdht says the swarm is healthy.
+    // This should cause bootstrapping to end.
+    mock_dht.setHealthySwarm();
 
     // Now test to see if bootstrapping is done.
     // There's not public API for `isBootstrapping()`,
@@ -466,6 +490,23 @@ TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
 
 TEST_F(DhtTest, savesStateIfSwarmIsGood)
 {
+    auto const state_file = MockStateFile{};
+    auto const dat_file = MockStateFile::filename(sandboxDir());
+    EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+
+    {
+        auto mediator = MockMediator{ event_base_ };
+        mediator.config_dir_ = sandboxDir();
+        mediator.mock_dht_.setHealthySwarm();
+
+        auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
+
+        // as dht goes out of scope,
+        // it should save its state if the swarm is healthy
+        EXPECT_FALSE(tr_sys_path_exists(dat_file.c_str()));
+    }
+
+    EXPECT_TRUE(tr_sys_path_exists(dat_file.c_str()));
 }
 
 TEST_F(DhtTest, doesNotSaveStateIfSwarmIsBad)
