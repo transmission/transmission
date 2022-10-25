@@ -420,7 +420,7 @@ private:
             {
                 memcpy(out, &in->sin_addr, CompactAddrLen);
                 out += CompactAddrLen;
-                memcpy(out, &in->sin_port, PortLen);
+                memcpy(out, &in->sin_port, PortLen); // saved in network byte order
                 out += PortLen;
             }
 
@@ -435,7 +435,7 @@ private:
             {
                 memcpy(out6, &in->sin6_addr, Compact6AddrLen);
                 out6 += Compact6AddrLen;
-                memcpy(out6, &in->sin6_port, PortLen);
+                memcpy(out6, &in->sin6_port, PortLen); // saved in network byte order
                 out6 += PortLen;
             }
 

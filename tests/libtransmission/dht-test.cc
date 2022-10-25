@@ -6,6 +6,8 @@
 #include <chrono>
 #include <fstream>
 #include <memory>
+#include <utility>
+
 #include <event2/event.h>
 
 #include "transmission.h"
@@ -71,6 +73,13 @@ protected:
             return 0;
         }
 
+        int init(int /*s*/, int /*s6*/, unsigned const char* id, unsigned const char* /*v*/) override
+        {
+            fmt::print("init\n");
+            std::copy_n(id, std::size(id_), std::begin(id_));
+            return 0;
+        }
+
         int uninit() override
         {
             fmt::print("uninit\n");
@@ -85,6 +94,7 @@ protected:
         };
 
         std::vector<Pinged> pinged_;
+        std::array<char, 20> id_ = {};
     };
 
     // Creates real timers, but with shortened intervals so that tests can run faster
@@ -253,6 +263,76 @@ protected:
 
 TEST_F(DhtTest, usesStateFile)
 {
+    auto const expected_ipv4_nodes = std::array<std::pair<tr_address, tr_port>, 5>{
+        std::make_pair(*tr_address::fromString("10.10.10.1"), tr_port::fromHost(128)),
+        std::make_pair(*tr_address::fromString("10.10.10.2"), tr_port::fromHost(129)),
+        std::make_pair(*tr_address::fromString("10.10.10.3"), tr_port::fromHost(130)),
+        std::make_pair(*tr_address::fromString("10.10.10.4"), tr_port::fromHost(131)),
+        std::make_pair(*tr_address::fromString("10.10.10.5"), tr_port::fromHost(132))
+    };
+
+    auto const expected_ipv6_nodes = std::array<std::pair<tr_address, tr_port>, 5>{
+        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3217"), tr_port::fromHost(6881)),
+        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3218"), tr_port::fromHost(6882)),
+        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3219"), tr_port::fromHost(6883)),
+        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3220"), tr_port::fromHost(6884)),
+        std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885))
+    };
+
+    auto const expected_id = tr_randObj<std::array<char, 20>>();
+
+    // create a state file
+
+    auto expected_nodes_str = std::string{};
+    auto const dat_file = tr_pathbuf{ sandboxDir(), "/dht.dat" };
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 3U);
+    tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(expected_id), std::size(expected_id));
+    auto compact = std::vector<std::byte>{};
+    for (auto const& [addr, port] : expected_ipv4_nodes)
+    {
+        addr.toCompact4(std::back_inserter(compact), port);
+        expected_nodes_str += addr.readable(port);
+        expected_nodes_str += ',';
+    }
+    tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
+    compact.clear();
+    for (auto const& [addr, port] : expected_ipv6_nodes)
+    {
+        addr.toCompact6(std::back_inserter(compact), port);
+        expected_nodes_str += addr.readable(port);
+        expected_nodes_str += ',';
+    }
+    tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
+    tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
+    tr_variantClear(&dict);
+
+    // Make the mediator
+    //
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+
+    // Make the dht object.
+    // PeerPort, Sock4, and Sock6 are arbitrary values; they're not used in this test
+    static auto constexpr PeerPort = tr_port::fromHost(909);
+    static auto constexpr Sock4 = tr_socket_t{ 404 };
+    static auto constexpr Sock6 = tr_socket_t{ 418 };
+    auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
+
+    // Wait for all the state nodes to be pinged.
+    auto& pinged = mediator.mock_dht_.pinged_;
+    auto const expected_n = std::size(expected_ipv4_nodes) + std::size(expected_ipv6_nodes);
+    waitFor(event_base_, [&pinged]() { return std::size(pinged) >= expected_n; });
+    auto actual_nodes_str = std::string{};
+    for (auto const& [addr, port, timestamp] : pinged)
+    {
+        actual_nodes_str += addr.readable(port);
+        actual_nodes_str += ',';
+    }
+
+    // confirm that the state was loaded
+    EXPECT_EQ(expected_nodes_str, actual_nodes_str);
+    EXPECT_EQ(expected_id, mediator.mock_dht_.id_);
 }
 
 TEST_F(DhtTest, savesStateIfSwarmIsGood)
