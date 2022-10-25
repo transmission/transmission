@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <memory>
@@ -24,6 +25,11 @@ using namespace std::literals;
 
 namespace libtransmission::test
 {
+
+namespace
+{
+auto constexpr IdLength = size_t{ 20U };
+}
 
 class DhtTest : public SandboxedTest
 {
@@ -75,6 +81,7 @@ protected:
 
         int init(int dht_socket, int dht_socket6, unsigned const char* id, unsigned const char* /*v*/) override
         {
+            inited_ = true;
             fmt::print("init\n");
             dht_socket_ = dht_socket;
             dht_socket6_ = dht_socket6;
@@ -84,6 +91,7 @@ protected:
 
         int uninit() override
         {
+            inited_ = false;
             fmt::print("uninit\n");
             return 0;
         }
@@ -95,8 +103,9 @@ protected:
             time_t timestamp;
         };
 
+        bool inited_ = false;
         std::vector<Pinged> pinged_;
-        std::array<char, 20> id_ = {};
+        std::array<char, IdLength> id_ = {};
         int dht_socket_ = TR_BAD_SOCKET;
         int dht_socket6_ = TR_BAD_SOCKET;
     };
@@ -284,8 +293,33 @@ TEST_F(DhtTest, initsWithCorrectSockets)
     EXPECT_EQ(Sock6, mediator.mock_dht_.dht_socket6_);
 }
 
+TEST_F(DhtTest, callsUninitOnDestruct)
+{
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+    EXPECT_FALSE(mediator.mock_dht_.inited_);
+
+    {
+        // Make the dht object.
+        // PeerPort, Sock4, and Sock6 are arbitrary values; they're not used in this test
+        static auto constexpr PeerPort = tr_port::fromHost(909);
+        static auto constexpr Sock4 = tr_socket_t{ 404 };
+        static auto constexpr Sock6 = tr_socket_t{ 418 };
+        auto dht = tr_dht::create(mediator, PeerPort, Sock4, Sock6);
+        EXPECT_TRUE(mediator.mock_dht_.inited_);
+
+        // dht goes out-of-scope here
+    }
+
+    EXPECT_FALSE(mediator.mock_dht_.inited_);
+}
+
 TEST_F(DhtTest, usesStateFile)
 {
+    // Fake data to be written to the test state file
+
+    auto const expected_id = tr_randObj<std::array<char, IdLength>>();
+
     auto const expected_ipv4_nodes = std::array<std::pair<tr_address, tr_port>, 5>{
         std::make_pair(*tr_address::fromString("10.10.10.1"), tr_port::fromHost(128)),
         std::make_pair(*tr_address::fromString("10.10.10.2"), tr_port::fromHost(129)),
@@ -302,9 +336,7 @@ TEST_F(DhtTest, usesStateFile)
         std::make_pair(*tr_address::fromString("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885))
     };
 
-    auto const expected_id = tr_randObj<std::array<char, 20>>();
-
-    // create a state file
+    // Make the state file
 
     auto expected_nodes_str = std::string{};
     auto const dat_file = tr_pathbuf{ sandboxDir(), "/dht.dat" };
@@ -343,8 +375,8 @@ TEST_F(DhtTest, usesStateFile)
 
     // Wait for all the state nodes to be pinged.
     auto& pinged = mediator.mock_dht_.pinged_;
-    auto const expected_n = std::size(expected_ipv4_nodes) + std::size(expected_ipv6_nodes);
-    waitFor(event_base_, [&pinged]() { return std::size(pinged) >= expected_n; });
+    static auto constexpr ExpectedN = std::size(expected_ipv4_nodes) + std::size(expected_ipv6_nodes);
+    waitFor(event_base_, [&pinged]() { return std::size(pinged) >= ExpectedN; });
     auto actual_nodes_str = std::string{};
     for (auto const& [addr, port, timestamp] : pinged)
     {
