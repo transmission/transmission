@@ -87,11 +87,13 @@ struct tr_turtle_info
     /* does turtle mode turn itself on and off at given times? */
     bool isClockEnabled = false;
 
-    /* when clock mode is on, minutes after midnight to turn on turtle mode */
-    time_t beginMinute = 0;
+    /* when clock mode is on, minutes after midnight to turn on turtle mode.
+     * Valid range: 0..<1440 */
+    int beginMinute = 0;
 
-    /* when clock mode is on, minutes after midnight to turn off turtle mode */
-    time_t endMinute = 0;
+    /* when clock mode is on, minutes after midnight to turn off turtle mode.
+     * Valid range: 0..<1440 */
+    int endMinute = 0;
 
     /* only use clock mode on these days of the week */
     tr_sched_day days = {};

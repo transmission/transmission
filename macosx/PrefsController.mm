@@ -785,14 +785,14 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     tr_sessionSetAltSpeedDay(self.fHandle, static_cast<tr_sched_day>([sender selectedItem].tag));
 }
 
-+ (NSInteger)dateToTimeSum:(NSDate*)date
++ (int)dateToTimeSum:(NSDate*)date
 {
     NSCalendar* calendar = NSCalendar.currentCalendar;
     NSDateComponents* components = [calendar components:NSCalendarUnitHour | NSCalendarUnitMinute fromDate:date];
-    return components.hour * 60 + components.minute;
+    return static_cast<int>(components.hour * 60 + components.minute);
 }
 
-+ (NSDate*)timeSumToDate:(NSInteger)sum
++ (NSDate*)timeSumToDate:(int)sum
 {
     NSDateComponents* comps = [[NSDateComponents alloc] init];
     comps.hour = sum / 60;

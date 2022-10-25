@@ -1058,12 +1058,12 @@ void tr_session::setImpl(init_data& data)
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_begin, &i))
     {
-        turtle.beginMinute = static_cast<time_t>(i);
+        turtle.beginMinute = static_cast<int>(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_end, &i))
     {
-        turtle.endMinute = static_cast<time_t>(i);
+        turtle.endMinute = static_cast<int>(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_day, &i))
@@ -1411,8 +1411,8 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
     {
         if ((t->days & (1 << day)) != 0)
         {
-            time_t const begin = t->beginMinute;
-            time_t end = t->endMinute;
+            auto const begin = t->beginMinute;
+            auto end = t->endMinute;
 
             if (end <= begin)
             {
@@ -1624,11 +1624,11 @@ bool tr_sessionUsesAltSpeedTime(tr_session const* s)
     return s->turtle.isClockEnabled;
 }
 
-void tr_sessionSetAltSpeedBegin(tr_session* s, time_t minutes_since_midnight)
+void tr_sessionSetAltSpeedBegin(tr_session* s, int minutes_since_midnight)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(minutes_since_midnight >= 0);
-    TR_ASSERT(minutes_since_midnight < 60 * 24);
+    TR_ASSERT(minutes_since_midnight < MinutesPerDay);
 
     if (s->turtle.beginMinute != minutes_since_midnight)
     {
@@ -1637,18 +1637,18 @@ void tr_sessionSetAltSpeedBegin(tr_session* s, time_t minutes_since_midnight)
     }
 }
 
-time_t tr_sessionGetAltSpeedBegin(tr_session const* s)
+int tr_sessionGetAltSpeedBegin(tr_session const* s)
 {
     TR_ASSERT(s != nullptr);
 
     return s->turtle.beginMinute;
 }
 
-void tr_sessionSetAltSpeedEnd(tr_session* s, time_t minutes_since_midnight)
+void tr_sessionSetAltSpeedEnd(tr_session* s, int minutes_since_midnight)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(minutes_since_midnight >= 0);
-    TR_ASSERT(minutes_since_midnight < 60 * 24);
+    TR_ASSERT(minutes_since_midnight < MinutesPerDay);
 
     if (s->turtle.endMinute != minutes_since_midnight)
     {
@@ -1657,7 +1657,7 @@ void tr_sessionSetAltSpeedEnd(tr_session* s, time_t minutes_since_midnight)
     }
 }
 
-time_t tr_sessionGetAltSpeedEnd(tr_session const* s)
+int tr_sessionGetAltSpeedEnd(tr_session const* s)
 {
     TR_ASSERT(s != nullptr);
 
