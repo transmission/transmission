@@ -710,7 +710,7 @@ public:
     time_t secondsDownloading = 0;
     time_t secondsSeeding = 0;
 
-    ssize_t queuePosition = 0;
+    size_t queuePosition = 0;
 
     tr_torrent_id_t unique_id_ = 0;
 

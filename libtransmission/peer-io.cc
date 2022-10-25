@@ -67,7 +67,7 @@ static constexpr size_t guessPacketOverhead(size_t d)
      */
     double const assumed_payload_data_rate = 94.0;
 
-    return (unsigned int)(d * (100.0 / assumed_payload_data_rate) - d);
+    return (size_t)(d * (100.0 / assumed_payload_data_rate) - d);
 }
 
 /***
@@ -80,9 +80,9 @@ static void didWriteWrapper(tr_peerIo* io, size_t bytes_transferred)
     {
         auto& [n_bytes_left, is_piece_data] = io->outbuf_info.front();
 
-        unsigned int const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
+        size_t const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
         /* For µTP sockets, the overhead is computed in utp_on_overhead. */
-        unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
+        size_t const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
         io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);

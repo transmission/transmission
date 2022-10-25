@@ -614,11 +614,11 @@ bool tr_sessionGetAntiBruteForceEnabled(tr_session const*);
 void tr_torrentStartNow(tr_torrent*);
 
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */
-ssize_t tr_torrentGetQueuePosition(tr_torrent const*);
+size_t tr_torrentGetQueuePosition(tr_torrent const*);
 
 /** @brief Set the queued torrent's position in the queue it's in.
  * Special cases: pos <= 0 moves to the front; pos >= queue length moves to the back */
-void tr_torrentSetQueuePosition(tr_torrent*, ssize_t queue_position);
+void tr_torrentSetQueuePosition(tr_torrent*, size_t queue_position);
 
 /**
 **/
@@ -639,10 +639,10 @@ void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_coun
 **/
 
 /** @brief Set the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
-void tr_sessionSetQueueSize(tr_session*, tr_direction, ssize_t max_simultaneous_seed_torrents);
+void tr_sessionSetQueueSize(tr_session*, tr_direction, size_t max_simultaneous_seed_torrents);
 
 /** @brief Return the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
-ssize_t tr_sessionGetQueueSize(tr_session const*, tr_direction);
+size_t tr_sessionGetQueueSize(tr_session const*, tr_direction);
 
 /** @brief Set whether or not to limit how many torrents can download (TR_DOWN) or seed (TR_UP) at the same time  */
 void tr_sessionSetQueueEnabled(tr_session*, tr_direction, bool do_limit_simultaneous_seed_torrents);
@@ -1486,6 +1486,11 @@ enum
     TR_PEER_FROM_LTEP, /* peer address provided in an LTEP handshake */
     TR_PEER_FROM__MAX
 };
+enum
+{
+    TR_ETA_NOT_AVAIL = -1,
+    TR_ETA_UNKNOWN = -2,
+};
 
 enum tr_stat_errtype
 {
@@ -1607,26 +1612,24 @@ struct tr_stat
 
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
-    int idleSecs;
+    time_t idleSecs;
 
     /** Cumulative seconds the torrent's ever spent downloading */
-    int secondsDownloading;
+    time_t secondsDownloading;
 
     /** Cumulative seconds the torrent's ever spent seeding */
-    int secondsSeeding;
+    time_t secondsSeeding;
 
     /** This torrent's queue position.
         All torrents have a queue position, even if it's not queued. */
-    int queuePosition;
+    size_t queuePosition;
 
-#define TR_ETA_NOT_AVAIL (-1)
-#define TR_ETA_UNKNOWN (-2)
     /** If downloading, estimated number of seconds left until the torrent is done.
         If seeding, estimated number of seconds left until seed ratio is reached. */
-    int eta;
+    time_t eta;
 
     /** If seeding, number of seconds left until the idle time limit is reached. */
-    int etaIdle;
+    time_t etaIdle;
 
     /** What is this torrent doing right now? */
     tr_torrent_activity activity;

@@ -993,14 +993,14 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
     return ret;
 }
 
-static int torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
+static time_t torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
 {
     return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
-        (int)difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) :
+        (time_t)difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) :
         -1;
 }
 
-static inline bool tr_torrentIsStalled(tr_torrent const* tor, int idle_secs)
+static inline bool tr_torrentIsStalled(tr_torrent const* tor, time_t idle_secs)
 {
     return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60;
 }
@@ -2375,19 +2375,6 @@ static bool queueIsSequenced(tr_session const* session)
         std::end(torrents),
         [](auto const* a, auto const* b) { return a->queuePosition < b->queuePosition; });
 
-#if 0
-
-    fprintf(stderr, "%s", "queue: ");
-
-    for (int i = 0; i < n; ++i)
-    {
-        fprintf(stderr, "%d ", tmp[i]->queuePosition);
-    }
-
-    fputc('\n', stderr);
-
-#endif
-
     /* test them */
     bool is_sequenced = true;
 
@@ -2401,20 +2388,15 @@ static bool queueIsSequenced(tr_session const* session)
 
 #endif
 
-ssize_t tr_torrentGetQueuePosition(tr_torrent const* tor)
+size_t tr_torrentGetQueuePosition(tr_torrent const* tor)
 {
     return tor->queuePosition;
 }
 
-void tr_torrentSetQueuePosition(tr_torrent* tor, ssize_t queue_position)
+void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
 {
-    ssize_t back = -1;
+    size_t current = 0;
     auto const old_pos = tor->queuePosition;
-
-    if (queue_position < 0)
-    {
-        queue_position = 0;
-    }
 
     tor->queuePosition = -1;
 
@@ -2432,13 +2414,13 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, ssize_t queue_position)
             walk->markChanged();
         }
 
-        if (back < walk->queuePosition)
+        if (current < walk->queuePosition + 1)
         {
-            back = walk->queuePosition;
+            current = walk->queuePosition + 1;
         }
     }
 
-    tor->queuePosition = std::min(queue_position, back + 1);
+    tor->queuePosition = std::min(queue_position, current);
     tor->markChanged();
 
     TR_ASSERT(queueIsSequenced(tor->session));
@@ -2468,7 +2450,10 @@ void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
     for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(tor, tor->queuePosition - 1);
+        if (tor->queuePosition > 0)
+        {
+            tr_torrentSetQueuePosition(tor, tor->queuePosition - 1);
+        }
     }
 }
 
@@ -2478,7 +2463,10 @@ void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_cou
     std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition{});
     for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(tor, tor->queuePosition + 1);
+        if (tor->queuePosition < UINT_MAX)
+        {
+            tr_torrentSetQueuePosition(tor, tor->queuePosition + 1);
+        }
     }
 }
 
@@ -2488,7 +2476,7 @@ void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t torrent_c
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
     for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(tor, INT_MAX);
+        tr_torrentSetQueuePosition(tor, UINT_MAX);
     }
 }
 

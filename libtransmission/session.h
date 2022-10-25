@@ -917,7 +917,7 @@ private:
     friend void tr_sessionSetPexEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents);
-    friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, ssize_t max_simultaneous_seed_torrents);
+    friend void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_seed_torrents);
     friend void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
     friend void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
@@ -985,7 +985,7 @@ private:
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
     std::array<bool, 2> queue_enabled_ = { false, false };
-    std::array<ssize_t, 2> queue_size_ = { 0, 0 };
+    std::array<size_t, 2> queue_size_ = { 0, 0 };
 
     int umask_ = 022;
 

@@ -1316,7 +1316,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
         {
-            tr_torrentSetQueuePosition(tor, static_cast<ssize_t>(tmp));
+            tr_torrentSetQueuePosition(tor, static_cast<size_t>(tmp));
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))
@@ -1956,7 +1956,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_download_queue_size, &i))
     {
-        tr_sessionSetQueueSize(session, TR_DOWN, (int)i);
+        tr_sessionSetQueueSize(session, TR_DOWN, i);
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_download_queue_enabled, &val))
@@ -2056,7 +2056,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_seed_queue_size, &i))
     {
-        tr_sessionSetQueueSize(session, TR_UP, (int)i);
+        tr_sessionSetQueueSize(session, TR_UP, i);
     }
 
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)

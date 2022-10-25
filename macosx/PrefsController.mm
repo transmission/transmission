@@ -758,13 +758,13 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)setGlobalLimit:(id)sender
 {
-    [self.fDefaults setInteger:[sender intValue] forKey:sender == self.fUploadField ? @"UploadLimit" : @"DownloadLimit"];
+    [self.fDefaults setInteger:[sender integerValue] forKey:sender == self.fUploadField ? @"UploadLimit" : @"DownloadLimit"];
     [self applySpeedSettings:self];
 }
 
 - (void)setSpeedLimit:(id)sender
 {
-    [self.fDefaults setInteger:[sender intValue]
+    [self.fDefaults setInteger:[sender integerValue]
                         forKey:sender == self.fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
     [self applyAltSpeedSettings];
 }
@@ -866,7 +866,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)setQueueNumber:(id)sender
 {
-    int const number = [sender intValue];
+    NSInteger const number = [sender integerValue];
     BOOL const seed = sender == self.fQueueSeedField;
 
     [self.fDefaults setInteger:number forKey:seed ? @"QueueSeedNumber" : @"QueueDownloadNumber"];
@@ -1445,13 +1445,13 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const downloadQueue = tr_sessionGetQueueEnabled(self.fHandle, TR_DOWN);
     [self.fDefaults setBool:downloadQueue forKey:@"Queue"];
 
-    ssize_t const downloadQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_DOWN);
+    size_t const downloadQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_DOWN);
     [self.fDefaults setInteger:downloadQueueNum forKey:@"QueueDownloadNumber"];
 
     BOOL const seedQueue = tr_sessionGetQueueEnabled(self.fHandle, TR_UP);
     [self.fDefaults setBool:seedQueue forKey:@"QueueSeed"];
 
-    ssize_t const seedQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_UP);
+    size_t const seedQueueNum = tr_sessionGetQueueSize(self.fHandle, TR_UP);
     [self.fDefaults setInteger:seedQueueNum forKey:@"QueueSeedNumber"];
 
     BOOL const checkStalled = tr_sessionGetQueueStalledEnabled(self.fHandle);

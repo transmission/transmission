@@ -2475,7 +2475,7 @@ char const* tr_sessionGetScript(tr_session const* session, TrScript type)
 ****
 ***/
 
-void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, ssize_t max_simultaneous_seed_torrents)
+void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_seed_torrents)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -2483,7 +2483,7 @@ void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, ssize_t max_s
     session->queue_size_[dir] = max_simultaneous_seed_torrents;
 }
 
-ssize_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
+size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
