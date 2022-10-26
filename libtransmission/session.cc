@@ -830,12 +830,12 @@ void tr_session::setImpl(init_data& data)
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_pex_enabled, &val))
     {
-        tr_sessionSetPexEnabled(this, val);
+        is_pex_enabled_ = val;
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &val))
     {
-        tr_sessionSetDHTEnabled(this, val);
+        is_dht_enabled_ = val;
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_tcp_enabled, &val))
@@ -1016,7 +1016,7 @@ void tr_session::setImpl(init_data& data)
             peer_port.setHost(static_cast<uint16_t>(port));
         }
 
-        setPeerPort(isPortRandom() ? randomPort() : peer_port);
+        tr_sessionSetPeerPort(this, isPortRandom() ? randomPort().host() : peer_port.host());
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &val))
@@ -1265,41 +1265,55 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 ****  Peer Port
 ***/
 
-void tr_session::setPeerPort(tr_port port_in)
+// Called when the _public_ peer port changes, e.g. when the user
+// manually changes the ports or when NAT-PMP returns a different
+// port than the one we requested.
+void tr_session::onPublicPeerPortChanged()
 {
-    auto const in_session_thread = [this](tr_port port)
+    for (auto* const tor : torrents())
     {
-        private_peer_port_ = port;
-        public_peer_port_ = port;
+        tr_torrentChangeMyPort(tor);
+    }
 
-        closePeerPort();
-
-        if (allowsTCP())
-        {
-            bind_ipv4_.bindAndListenForIncomingPeers(this);
-
-            if (tr_net_hasIPv6(private_peer_port_))
-            {
-                bind_ipv6_.bindAndListenForIncomingPeers(this);
-            }
-        }
-
-        port_forwarding_->portChanged();
-
-        for (auto* const tor : torrents())
-        {
-            tr_torrentChangeMyPort(tor);
-        }
-    };
-
-    tr_runInEventThread(this, in_session_thread, port_in);
+    rebuildDHT();
 }
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setPeerPort(tr_port::fromHost(hport));
+    auto const in_session_thread = [session](tr_port port)
+    {
+        session->private_peer_port_ = port;
+
+        auto const public_changed = session->public_peer_port_ != port;
+
+        if (public_changed)
+        {
+            session->public_peer_port_ = port;
+        }
+
+        session->closePeerPort();
+
+        if (session->allowsTCP())
+        {
+            session->bind_ipv4_.bindAndListenForIncomingPeers(session);
+
+            if (tr_net_hasIPv6(session->private_peer_port_))
+            {
+                session->bind_ipv6_.bindAndListenForIncomingPeers(session);
+            }
+        }
+
+        session->port_forwarding_->portChanged();
+
+        if (public_changed)
+        {
+            session->onPublicPeerPortChanged();
+        }
+    };
+
+    tr_runInEventThread(session, in_session_thread, tr_port::fromHost(hport));
 }
 
 uint16_t tr_sessionGetPeerPort(tr_session const* session)

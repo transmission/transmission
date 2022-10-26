@@ -139,6 +139,8 @@ public:
         , bootstrap_timer_{ mediator_.timerMaker().create([this]() { onBootstrapTimer(); }) }
         , periodic_timer_{ mediator_.timerMaker().create([this]() { onPeriodicTimer(); }) }
     {
+        tr_logAddDebug(fmt::format("Starting DHT on port {port}", fmt::arg("port", peer_port.host())));
+
         // load up the bootstrap nodes
         if (tr_sys_path_exists(state_filename_.c_str()))
         {
@@ -525,7 +527,9 @@ private:
 
             if (line_stream.bad() || std::empty(addrstr))
             {
-                tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line)));
+                tr_logAddWarn(fmt::format(_("Couldn't parse '{filename}' line: '{line}'"),
+                    fmt::arg("filename", filename),
+                    fmt::arg("line", line)));
             }
             else
             {

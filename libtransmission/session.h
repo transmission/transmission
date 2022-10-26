@@ -232,8 +232,13 @@ private:
 
         void onPortForwarded(tr_port public_port, tr_port private_port) override
         {
-            session_.public_peer_port_ = public_port;
-            session_.private_peer_port_ = private_port;
+            TR_ASSERT(session_.private_peer_port_ == private_port);
+
+            if (session_.public_peer_port_ != public_port)
+            {
+                session_.public_peer_port_ = public_port;
+                session_.onPublicPeerPortChanged();
+            }
         }
 
     private:
@@ -894,8 +899,7 @@ public:
 private:
     [[nodiscard]] tr_port randomPort() const;
 
-    void setPeerPort(tr_port port);
-
+    void onPublicPeerPortChanged();
     void rebuildDHT();
 
     void closePeerPort()
