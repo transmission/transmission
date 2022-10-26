@@ -333,7 +333,6 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(data != nullptr);
-    TR_ASSERT(len >= 0);
 
     tr_logAddDebugTor(tor, fmt::format("got metadata piece {} of {} bytes", piece, len));
 
