@@ -1065,7 +1065,7 @@ static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr
         {
             if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
             {
-                if (auto file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
+                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
                 {
                     files.push_back(file_index);
                 }
@@ -1103,9 +1103,7 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
         {
             if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
             {
-                auto file_index = static_cast<tr_file_index_t>(val);
-
-                if (file_index < n_files)
+                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
                 {
                     files.push_back(file_index);
                 }
