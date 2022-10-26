@@ -642,7 +642,7 @@ static bool bindUnixSocket(
         return false;
     }
 
-    if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
+    if (chmod(addr.sun_path, socket_mode) != 0)
     {
         tr_logAddWarn(
             fmt::format(_("Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
@@ -1052,7 +1052,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        this->socket_mode_ = static_cast<mode_t>(i);
+        this->socket_mode_ = static_cast<tr_mode_t>(i);
     }
 
     key = TR_KEY_rpc_bind_address;
