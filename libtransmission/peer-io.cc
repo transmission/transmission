@@ -192,7 +192,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     io->pendingEvents &= ~EV_READ;
 
     auto const curlen = io->readBufferSize();
-    unsigned int howmuch = static_cast<unsigned int>(curlen >= max ? 0 : max - curlen);
+    auto howmuch = static_cast<unsigned int>(curlen >= max ? 0 : max - curlen);
     howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
 
     tr_logAddTraceIo(io, "libevent says this peer is ready to read");

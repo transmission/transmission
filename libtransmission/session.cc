@@ -2606,7 +2606,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
     auto const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 
     /* count how many torrents are active */
-    int active_count = 0;
+    auto active_count = size_t{};
     bool const stalled_enabled = queueStalledEnabled();
     int const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
     time_t const now = tr_time();

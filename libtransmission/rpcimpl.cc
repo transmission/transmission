@@ -1063,12 +1063,11 @@ static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr
     {
         for (size_t i = 0; i < n; ++i)
         {
-            auto tmp = int64_t{};
-            if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
+            if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
             {
-                if (0 <= tmp && tmp < n_files)
+                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
                 {
-                    files.push_back(tr_file_index_t(tmp));
+                    files.push_back(file_index);
                 }
                 else
                 {
@@ -1093,7 +1092,7 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
     char const* errmsg = nullptr;
 
     auto const n_files = tor->fileCount();
-    size_t const n_items = tr_variantListSize(list);
+    auto const n_items = tr_variantListSize(list);
 
     auto files = std::vector<tr_file_index_t>{};
     files.reserve(n_files);
@@ -1102,12 +1101,11 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
     {
         for (size_t i = 0; i < n_items; ++i)
         {
-            auto file_index = int64_t{};
-            if (tr_variantGetInt(tr_variantListChild(list, i), &file_index))
+            if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
             {
-                if (0 <= file_index && file_index < n_files)
+                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
                 {
-                    files.push_back(static_cast<tr_file_index_t>(file_index));
+                    files.push_back(file_index);
                 }
                 else
                 {
