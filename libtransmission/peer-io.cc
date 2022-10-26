@@ -47,6 +47,15 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
 
+[[nodiscard]] static constexpr auto isSupportedSocket(tr_peer_socket const& sock)
+{
+#ifdef WITH_UTP
+    return sock.type == TR_PEER_SOCKET_TYPE_TCP || sock.type == TR_PEER_SOCKET_TYPE_UTP;
+#else
+    return sock.type == TR_PEER_SOCKET_TYPE_TCP;
+#endif
+}
+
 static constexpr size_t guessPacketOverhead(size_t d)
 {
     /**
@@ -244,6 +253,13 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     tr_error_clear(&error);
 }
 
+// Helps us to ignore errors that say "try again later"
+// since that's what peer-io does by default anyway.
+[[nodiscard]] static auto constexpr canRetryFromError(int error_code)
+{
+    return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
+}
+
 static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
     auto* io = static_cast<tr_peerIo*>(vio);
@@ -267,10 +283,9 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
         return;
     }
 
-    EVUTIL_SET_SOCKET_ERROR(0);
-    auto const n_written = io->outbuf.toSocket(fd, howmuch); // -1 on err, 0 on EOF
-    auto const err = EVUTIL_SOCKET_ERROR();
-    auto const should_retry = n_written == -1 && (err == 0 || err == EAGAIN || err == EINTR || err == EINPROGRESS);
+    tr_error* error = nullptr;
+    auto const n_written = io->outbuf.toSocket(fd, howmuch, &error);
+    auto const should_retry = (error == nullptr) || canRetryFromError(error->code);
 
     // schedule another write if we have more data to write & think future writes would succeed
     if (!std::empty(io->outbuf) && (n_written > 0 || should_retry))
@@ -284,16 +299,20 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
     else
     {
-        auto const what = n_written == -1 ? BEV_EVENT_WRITING | BEV_EVENT_ERROR : BEV_EVENT_WRITING | BEV_EVENT_EOF;
-        auto const errmsg = tr_net_strerror(err);
+        auto const what = BEV_EVENT_WRITING | (n_written == 0 ? BEV_EVENT_EOF : BEV_EVENT_ERROR);
+        auto const errcode = error != nullptr ? error->code : 0;
+        auto const errmsg = error != nullptr ? error->message : "EOF";
         tr_logAddDebugIo(
             io,
-            fmt::format("event_write_cb got an err. n_written:{}, what:{}, errno:{} ({})", n_written, what, err, errmsg));
+            fmt::format("event_write_cb got an err. n_written:{}, what:{}, errno:{} ({})", n_written, what, errcode, errmsg));
+
         if (io->gotError != nullptr)
         {
             io->gotError(io, what, io->userData);
         }
     }
+
+    tr_error_clear(&error);
 }
 
 /**
@@ -326,7 +345,7 @@ static size_t utp_get_rb_size(tr_peerIo* const io)
     return UtpReadBufferSize - bytes;
 }
 
-static ssize_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
+static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error = nullptr);
 
 static void utp_on_writable(tr_peerIo* io)
 {
@@ -460,11 +479,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     TR_ASSERT(session->events != nullptr);
     auto lock = session->unique_lock();
 
-#ifdef WITH_UTP
-    TR_ASSERT(socket.type == TR_PEER_SOCKET_TYPE_TCP || socket.type == TR_PEER_SOCKET_TYPE_UTP);
-#else
-    TR_ASSERT(socket.type == TR_PEER_SOCKET_TYPE_TCP);
-#endif
+    TR_ASSERT(isSupportedSocket(socket));
     TR_ASSERT(session->allowsTCP() || socket.type != TR_PEER_SOCKET_TYPE_TCP);
 
     if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
@@ -875,142 +890,146 @@ void tr_peerIo::readBufferDrain(size_t byte_count)
 ****
 ***/
 
-static ssize_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
+static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
 {
+    auto n_read = size_t{ 0U };
+
     howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
     if (howmuch == 0)
     {
-        return 0;
+        return n_read;
     }
 
-    auto res = ssize_t{};
-    switch (io->socket.type)
+    TR_ASSERT(isSupportedSocket(io->socket));
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
-    case TR_PEER_SOCKET_TYPE_UTP:
-        /* UTP_RBDrained notifies libutp that your read buffer is empty.
-         * It opens up the congestion window by sending an ACK (soonish)
-         * if one was not going to be sent. */
+        tr_error* my_error = nullptr;
+        n_read = io->inbuf.addSocket(io->socket.handle.tcp, howmuch, &my_error);
+        if (io->readBufferSize() != 0)
+        {
+            canReadWrapper(io);
+        }
+
+        if (my_error != nullptr)
+        {
+            if (canRetryFromError(my_error->code))
+            {
+                tr_error_clear(&my_error);
+            }
+            else
+            {
+                short const what = BEV_EVENT_READING | BEV_EVENT_ERROR | (n_read == 0 ? BEV_EVENT_EOF : 0);
+                auto const msg = fmt::format(
+                    "tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})",
+                    n_read,
+                    what,
+                    my_error->code,
+                    my_error->message);
+                tr_logAddTraceIo(io, msg);
+
+                if (io->gotError != nullptr)
+                {
+                    io->gotError(io, what, io->userData);
+                }
+
+                tr_error_propagate(error, &my_error);
+            }
+        }
+    }
+#ifdef WITH_UTP
+    else if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
+    {
+        // UTP_RBDrained notifies libutp that your read buffer is empty.
+        // It opens up the congestion window by sending an ACK (soonish)
+        // if one was not going to be sent.
         if (io->readBufferSize() == 0)
         {
             utp_read_drained(io->socket.handle.utp);
         }
-
-        break;
-
-    case TR_PEER_SOCKET_TYPE_TCP:
-        {
-            tr_error* error = nullptr;
-            res = io->inbuf.addSocket(io->socket.handle.tcp, howmuch, &error);
-
-            if (io->readBufferSize() != 0)
-            {
-                canReadWrapper(io);
-            }
-
-            if (error != nullptr)
-            {
-                if (error->code != EAGAIN && error->code != EINTR && error->code != EINPROGRESS && io->gotError != nullptr)
-                {
-                    short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
-
-                    if (res == 0)
-                    {
-                        what |= BEV_EVENT_EOF;
-                    }
-
-                    tr_logAddTraceIo(
-                        io,
-                        fmt::format(
-                            "tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})",
-                            res,
-                            what,
-                            error->code,
-                            error->message));
-
-                    io->gotError(io, what, io->userData);
-                }
-
-                tr_error_clear(&error);
-            }
-
-            break;
-        }
-
-    default:
-        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
+#endif
 
-    return res;
+    return n_read;
 }
 
-static ssize_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
+static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
 {
+    auto n_written = size_t{ 0U };
+
     auto const old_len = std::size(io->outbuf);
 
-    tr_logAddTraceIo(io, fmt::format("in tr_peerIoTryWrite {}", howmuch));
     howmuch = std::min(howmuch, old_len);
     howmuch = io->bandwidth().clamp(TR_UP, howmuch);
     if (howmuch == 0)
     {
-        return 0;
+        return n_written;
     }
 
-    auto n = ssize_t{};
-    switch (io->socket.type)
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
-    case TR_PEER_SOCKET_TYPE_UTP:
+        tr_error* my_error = nullptr;
+        n_written = io->outbuf.toSocket(io->socket.handle.tcp, howmuch, &my_error);
+
+        if (n_written > 0)
         {
-            auto iov = io->outbuf.vecs(howmuch);
-            n = utp_writev(io->socket.handle.utp, reinterpret_cast<struct utp_iovec*>(std::data(iov)), std::size(iov));
-            if (n > 0)
-            {
-                io->outbuf.drain(n);
-                didWriteWrapper(io, n);
-            }
-            break;
+            didWriteWrapper(io, n_written);
         }
 
-    case TR_PEER_SOCKET_TYPE_TCP:
+        if (my_error != nullptr)
         {
-            EVUTIL_SET_SOCKET_ERROR(0);
-            n = io->outbuf.toSocket(io->socket.handle.tcp, howmuch);
-            int const e = EVUTIL_SOCKET_ERROR();
-
-            if (n > 0)
+            if (canRetryFromError(my_error->code))
             {
-                didWriteWrapper(io, n);
+                tr_error_clear(&my_error);
             }
-
-            if (n < 0 && io->gotError != nullptr && e != 0 && e != EPIPE && e != EAGAIN && e != EINTR && e != EINPROGRESS)
+            else
             {
-                short const what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
-
+                short constexpr What = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
                 tr_logAddTraceIo(
                     io,
-                    fmt::format("tr_peerIoTryWrite err: res:{}, what:{}, errno:{} ({})", n, what, e, tr_net_strerror(e)));
-                io->gotError(io, what, io->userData);
+                    fmt::format(
+                        "tr_peerIoTryWrite err: res:{}, what:{}, errno:{} ({})",
+                        n_written,
+                        What,
+                        my_error->code,
+                        my_error->message));
+                io->gotError(io, What, io->userData);
+                tr_error_propagate(error, &my_error);
             }
-
-            break;
         }
-
-    default:
-        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
+#ifdef WITH_UTP
+    else if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
+    {
+        auto iov = io->outbuf.vecs(howmuch);
+        errno = 0;
+        auto const n = utp_writev(io->socket.handle.utp, reinterpret_cast<struct utp_iovec*>(std::data(iov)), std::size(iov));
+        auto const error_code = errno;
+        if (n > 0)
+        {
+            n_written = static_cast<size_t>(n);
+            io->outbuf.drain(n);
+            didWriteWrapper(io, n);
+        }
+        else if (n < 0 && !canRetryFromError(error_code))
+        {
+            tr_error_set(error, error_code, tr_strerror(error_code));
+        }
+    }
+#endif
 
-    return n;
+    return n_written;
 }
 
-ssize_t tr_peerIo::flush(tr_direction dir, size_t limit)
+size_t tr_peerIo::flush(tr_direction dir, size_t limit, tr_error** error)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
+    auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit, error) : tr_peerIoTryWrite(this, limit, error);
     tr_logAddTraceIo(this, fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", dir, limit, bytes_used));
     return bytes_used;
 }
 
-ssize_t tr_peerIo::flushOutgoingProtocolMsgs()
+size_t tr_peerIo::flushOutgoingProtocolMsgs(tr_error** error)
 {
     size_t byte_count = 0;
 
@@ -1026,5 +1045,5 @@ ssize_t tr_peerIo::flushOutgoingProtocolMsgs()
         byte_count += n_bytes;
     }
 
-    return flush(TR_UP, byte_count);
+    return flush(TR_UP, byte_count, error);
 }
