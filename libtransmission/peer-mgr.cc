@@ -2332,7 +2332,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        auto const relax_strictness_if_fewer_than_n = std::lround(getMaxPeerCount(tor) * 0.9);
+        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(getMaxPeerCount(tor) * 0.9));
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?
