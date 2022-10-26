@@ -300,11 +300,15 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     else
     {
         auto const what = BEV_EVENT_WRITING | (n_written == 0 ? BEV_EVENT_EOF : BEV_EVENT_ERROR);
-        auto const errcode = error != nullptr ? error->code : 0;
-        auto const errmsg = error != nullptr ? error->message : "EOF";
+
         tr_logAddDebugIo(
             io,
-            fmt::format("event_write_cb got an err. n_written:{}, what:{}, errno:{} ({})", n_written, what, errcode, errmsg));
+            fmt::format(
+                "event_write_cb got an err. n_written:{}, what:{}, errno:{} ({})",
+                n_written,
+                what,
+                (error != nullptr ? error->code : 0),
+                (error != nullptr ? error->message : "EOF")));
 
         if (io->gotError != nullptr)
         {
