@@ -614,7 +614,7 @@ static bool bindUnixSocket(
     [[maybe_unused]] struct event_base* base,
     [[maybe_unused]] struct evhttp* httpd,
     [[maybe_unused]] char const* path,
-    [[maybe_unused]] mode_t socket_mode)
+    [[maybe_unused]] tr_mode_t socket_mode)
 {
 #ifdef _WIN32
     tr_logAddError(fmt::format(

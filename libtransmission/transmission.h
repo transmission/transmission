@@ -35,6 +35,7 @@ using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
 using tr_bytes_per_second_t = size_t;
 using tr_kilobytes_per_second_t = size_t;
+using tr_mode_t = uint32_t;
 
 struct tr_block_span_t
 {
