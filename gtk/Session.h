@@ -158,7 +158,7 @@ public:
     Gtk::TreeModelColumn<tr_torrent_activity> activity;
     Gtk::TreeModelColumn<bool> finished;
     Gtk::TreeModelColumn<tr_priority_t> priority;
-    Gtk::TreeModelColumn<int> queue_position;
+    Gtk::TreeModelColumn<size_t> queue_position;
     Gtk::TreeModelColumn<unsigned int> trackers;
     /* tr_stat.error
      * Tracked because ACTIVITY_FILTER_ERROR needs the row-changed events */
