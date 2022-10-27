@@ -45,17 +45,6 @@ public:
     {
     }
 
-    template<typename T>
-    [[nodiscard]] static std::optional<Value> parse(tr_variant* var)
-    {
-        if (auto val = variantToVal<T>(var); val)
-        {
-            return Value(*val);
-        }
-
-        return {};
-    }
-
     [[nodiscard]] constexpr auto key() const noexcept
     {
         return key_;
@@ -79,7 +68,7 @@ public:
         return true;
     }
 
-    bool import(tr_variant* trvar)
+    bool load(tr_variant* trvar)
     {
         auto value = std::optional<Value>{};
 
@@ -109,9 +98,22 @@ public:
         return true;
     }
 
+    void save(tr_variant*) const;
+
 private:
     template<typename T>
     [[nodiscard]] static std::optional<T> variantToVal(tr_variant*);
+
+    template<typename T>
+    [[nodiscard]] static std::optional<Value> parse(tr_variant* var)
+    {
+        if (auto val = variantToVal<T>(var); val)
+        {
+            return Value(*val);
+        }
+
+        return {};
+    }
 
     tr_quark key_ = TR_KEY_NONE;
     Value value_;
@@ -207,7 +209,9 @@ public:
 
     SessionSettings();
 
-    Changed import(tr_variant* dict);
+    Changed load(tr_variant* dict);
+
+    void save(tr_variant* dict) const;
 
     template<typename T>
     [[nodiscard]] constexpr auto const& get(Field field) const

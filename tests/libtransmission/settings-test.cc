@@ -54,7 +54,7 @@ TEST_F(SettingsTest, canSetValues)
     EXPECT_FALSE(changed);
 }
 
-TEST_F(SettingsTest, canImportBools)
+TEST_F(SettingsTest, canLoadBools)
 {
     static auto constexpr Field = Settings::SeedQueueEnabled;
 
@@ -65,7 +65,7 @@ TEST_F(SettingsTest, canImportBools)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddBool(&dict, settings.key(Field), expected_value);
-    auto const changed = settings.import(&dict);
+    auto const changed = settings.load(&dict);
     tr_variantClear(&dict);
 
     EXPECT_EQ(1U, changed.count());
@@ -73,7 +73,26 @@ TEST_F(SettingsTest, canImportBools)
     EXPECT_EQ(expected_value, settings.get<bool>(Field));
 }
 
-TEST_F(SettingsTest, canImportDoubles)
+TEST_F(SettingsTest, canSaveBools)
+{
+    static auto constexpr Field = Settings::SeedQueueEnabled;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<bool>(Field);
+    auto const expected_value = !default_value;
+    settings.set<bool>(Field, expected_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.save(&dict);
+    auto val = bool{};
+    EXPECT_TRUE(tr_variantDictFindBool(&dict, settings.key(Field), &val));
+    EXPECT_EQ(expected_value, val);
+    fmt::print("{:s}\n", tr_variantToStr(&dict, TR_VARIANT_FMT_JSON));
+    tr_variantClear(&dict);
+}
+
+TEST_F(SettingsTest, canLoadDoubles)
 {
     static auto constexpr Field = Settings::RatioLimit;
 
@@ -84,7 +103,7 @@ TEST_F(SettingsTest, canImportDoubles)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddReal(&dict, settings.key(Field), expected_value);
-    auto const changed = settings.import(&dict);
+    auto const changed = settings.load(&dict);
     tr_variantClear(&dict);
 
     EXPECT_EQ(1U, changed.count());
@@ -92,7 +111,7 @@ TEST_F(SettingsTest, canImportDoubles)
     EXPECT_NEAR(expected_value, settings.get<double>(Field), 0.001);
 }
 
-TEST_F(SettingsTest, canImportEncryptionMode)
+TEST_F(SettingsTest, canLoadEncryptionMode)
 {
     static auto constexpr Field = Settings::Encryption;
 
@@ -105,7 +124,7 @@ TEST_F(SettingsTest, canImportEncryptionMode)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
-    auto changed = settings->import(&dict);
+    auto changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
@@ -114,14 +133,14 @@ TEST_F(SettingsTest, canImportEncryptionMode)
     settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings->key(Field), "required");
-    changed = settings->import(&dict);
+    changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings->get<tr_encryption_mode>(Field));
 }
 
-TEST_F(SettingsTest, canImportInt)
+TEST_F(SettingsTest, canLoadInt)
 {
     static auto constexpr Field = Settings::PeerSocketTos;
 
@@ -132,14 +151,14 @@ TEST_F(SettingsTest, canImportInt)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
-    auto const changed = settings.import(&dict);
+    auto const changed = settings.load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(expected_value, settings.get<int>(Field));
 }
 
-TEST_F(SettingsTest, canImportLogLevel)
+TEST_F(SettingsTest, canLoadLogLevel)
 {
     static auto constexpr Field = Settings::MessageLevel;
 
@@ -151,7 +170,7 @@ TEST_F(SettingsTest, canImportLogLevel)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
-    auto changed = settings->import(&dict);
+    auto changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
@@ -160,14 +179,14 @@ TEST_F(SettingsTest, canImportLogLevel)
     settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings->key(Field), "debug");
-    changed = settings->import(&dict);
+    changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings->get<tr_log_level>(Field));
 }
 
-TEST_F(SettingsTest, canImportMode)
+TEST_F(SettingsTest, canLoadMode)
 {
     static auto constexpr Field = Settings::Umask;
 
@@ -179,7 +198,7 @@ TEST_F(SettingsTest, canImportMode)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
-    auto changed = settings->import(&dict);
+    auto changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
@@ -188,14 +207,14 @@ TEST_F(SettingsTest, canImportMode)
     settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings->key(Field), "0777");
-    changed = settings->import(&dict);
+    changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings->get<mode_t>(Field));
 }
 
-TEST_F(SettingsTest, canImportPort)
+TEST_F(SettingsTest, canLoadPort)
 {
     static auto constexpr Field = Settings::PeerPort;
 
@@ -207,14 +226,14 @@ TEST_F(SettingsTest, canImportPort)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue.host());
-    auto const changed = settings.import(&dict);
+    auto const changed = settings.load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings.get<tr_port>(Field));
 }
 
-TEST_F(SettingsTest, canImportPreallocation)
+TEST_F(SettingsTest, canLoadPreallocation)
 {
     static auto constexpr Field = Settings::Preallocation;
 
@@ -226,7 +245,7 @@ TEST_F(SettingsTest, canImportPreallocation)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
-    auto changed = settings->import(&dict);
+    auto changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
@@ -235,14 +254,14 @@ TEST_F(SettingsTest, canImportPreallocation)
     settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings->key(Field), "full");
-    changed = settings->import(&dict);
+    changed = settings->load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings->get<tr_preallocation_mode>(Field));
 }
 
-TEST_F(SettingsTest, canImportSizeT)
+TEST_F(SettingsTest, canLoadSizeT)
 {
     static auto constexpr Field = Settings::SeedQueueSize;
 
@@ -254,14 +273,14 @@ TEST_F(SettingsTest, canImportSizeT)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
-    auto changed = settings.import(&dict);
+    auto changed = settings.load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(expected_value, settings.get<size_t>(Field));
 }
 
-TEST_F(SettingsTest, canImportString)
+TEST_F(SettingsTest, canLoadString)
 {
     static auto constexpr Field = Settings::BlocklistUrl;
 
@@ -273,7 +292,7 @@ TEST_F(SettingsTest, canImportString)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings.key(Field), expected_value);
-    auto changed = settings.import(&dict);
+    auto changed = settings.load(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));

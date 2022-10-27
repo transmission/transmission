@@ -9,6 +9,8 @@
 #include <utility> // for std::in_place_index
 #include <variant>
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "log.h" // for tr_log_level
@@ -47,18 +49,19 @@ std::optional<double> Setting::variantToVal(tr_variant* var)
     return {};
 }
 
+static auto constexpr EncryptionKeys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{
+    { { "required", TR_ENCRYPTION_REQUIRED }, { "preferred", TR_ENCRYPTION_PREFERRED }, { "allowed", TR_CLEAR_PREFERRED } }
+};
+
 template<>
 std::optional<tr_encryption_mode> Setting::variantToVal(tr_variant* var)
 {
-    static auto constexpr Keys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{
-        { { "required", TR_ENCRYPTION_REQUIRED }, { "preferred", TR_ENCRYPTION_PREFERRED }, { "allowed", TR_CLEAR_PREFERRED } }
-    };
 
     if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
     {
         auto const needle = tr_strlower(tr_strvStrip(val));
 
-        for (auto const& [key, encryption] : Keys)
+        for (auto const& [key, encryption] : EncryptionKeys)
         {
             if (key == needle)
             {
@@ -69,7 +72,7 @@ std::optional<tr_encryption_mode> Setting::variantToVal(tr_variant* var)
 
     if (auto val = int64_t{}; tr_variantGetInt(var, &val))
     {
-        for (auto const& [key, encryption] : Keys)
+        for (auto const& [key, encryption] : EncryptionKeys)
         {
             if (encryption == val)
             {
@@ -92,24 +95,25 @@ std::optional<int> Setting::variantToVal(tr_variant* var)
     return {};
 }
 
+static auto constexpr LogKeys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
+    { "critical"sv, TR_LOG_CRITICAL },
+    { "debug"sv, TR_LOG_DEBUG },
+    { "error"sv, TR_LOG_ERROR },
+    { "info"sv, TR_LOG_INFO },
+    { "off"sv, TR_LOG_OFF },
+    { "trace"sv, TR_LOG_TRACE },
+    { "warn"sv, TR_LOG_WARN },
+} };
+
 template<>
 std::optional<tr_log_level> Setting::variantToVal(tr_variant* var)
 {
-    static auto constexpr Keys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
-        { "critical"sv, TR_LOG_CRITICAL },
-        { "debug"sv, TR_LOG_DEBUG },
-        { "error"sv, TR_LOG_ERROR },
-        { "info"sv, TR_LOG_INFO },
-        { "off"sv, TR_LOG_OFF },
-        { "trace"sv, TR_LOG_TRACE },
-        { "warn"sv, TR_LOG_WARN },
-    } };
 
     if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
     {
 
         auto const needle = tr_strlower(tr_strvStrip(val));
-        for (auto const& [name, log_level] : Keys)
+        for (auto const& [name, log_level] : LogKeys)
         {
             if (needle == name)
             {
@@ -120,7 +124,7 @@ std::optional<tr_log_level> Setting::variantToVal(tr_variant* var)
 
     if (auto val = int64_t{}; tr_variantGetInt(var, &val))
     {
-        for (auto const& [name, log_level] : Keys)
+        for (auto const& [name, log_level] : LogKeys)
         {
             if (log_level == val)
             {
@@ -162,21 +166,21 @@ std::optional<tr_port> Setting::variantToVal(tr_variant* var)
     return {};
 }
 
+static auto constexpr PreallocationKeys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 4>{ {
+    { "none"sv, TR_PREALLOCATE_NONE },
+    { "fast"sv, TR_PREALLOCATE_SPARSE },
+    { "sparse"sv, TR_PREALLOCATE_SPARSE },
+    { "full"sv, TR_PREALLOCATE_FULL },
+} };
+
 template<>
 std::optional<tr_preallocation_mode> Setting::variantToVal(tr_variant* var)
 {
-    static auto constexpr Keys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 4>{ {
-        { "none"sv, TR_PREALLOCATE_NONE },
-        { "fast"sv, TR_PREALLOCATE_SPARSE },
-        { "sparse"sv, TR_PREALLOCATE_SPARSE },
-        { "full"sv, TR_PREALLOCATE_FULL },
-    } };
-
     if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
     {
         auto const needle = tr_strlower(tr_strvStrip(val));
 
-        for (auto const& [key, value] : Keys)
+        for (auto const& [key, value] : PreallocationKeys)
         {
             if (key == needle)
             {
@@ -187,7 +191,7 @@ std::optional<tr_preallocation_mode> Setting::variantToVal(tr_variant* var)
 
     if (auto val = int64_t{}; tr_variantGetInt(var, &val))
     {
-        for (auto const& [name, value] : Keys)
+        for (auto const& [name, value] : PreallocationKeys)
         {
             if (value == val)
             {
@@ -219,6 +223,99 @@ std::optional<std::string> Setting::variantToVal(tr_variant* var)
     }
 
     return {};
+}
+
+static void saveBool(tr_variant* tgt, Setting const& setting)
+{
+    tr_variantInitBool(tgt, setting.get<bool>());
+}
+
+static void saveDouble(tr_variant* tgt, Setting const& setting)
+{
+    tr_variantInitReal(tgt, setting.get<double>());
+}
+
+static void saveEncryption(tr_variant* tgt, Setting const& setting)
+{
+    auto const val = setting.get<tr_encryption_mode>();
+
+    for (auto const& [key, value] : EncryptionKeys)
+    {
+        if (value == val)
+        {
+            tr_variantInitStrView(tgt, key);
+            return;
+        }
+    }
+}
+
+static void saveInt(tr_variant* tgt, Setting const& setting)
+{
+    tr_variantInitInt(tgt, setting.get<int>());
+}
+
+static void saveLogLevel(tr_variant* tgt, Setting const& setting)
+{
+    auto const val = setting.get<tr_log_level>();
+
+    for (auto const& [key, value] : LogKeys)
+    {
+        if (value == val)
+        {
+            tr_variantInitStrView(tgt, key);
+            return;
+        }
+    }
+}
+
+static void saveModeT(tr_variant* tgt, Setting const& setting)
+{
+    tr_variantInitStr(tgt, fmt::format("{:03o}", setting.get<mode_t>()));
+}
+
+static void savePort(tr_variant* tgt, Setting const& setting)
+{
+    tr_variantInitInt(tgt, setting.get<tr_port>().host());
+}
+
+static void savePreallocation(tr_variant* tgt, Setting const& setting)
+{
+    auto const val = setting.get<tr_preallocation_mode>();
+
+    for (auto const& [key, value] : PreallocationKeys)
+    {
+        if (value == val)
+        {
+            tr_variantInitStrView(tgt, key);
+            return;
+        }
+    }
+}
+
+static void saveSizeT(tr_variant* tgt, Setting const& setting)
+{
+    tr_variantInitInt(tgt, setting.get<size_t>());
+}
+
+static void saveString(tr_variant* tgt, Setting const& setting)
+{
+    tr_variantInitStr(tgt, setting.get<std::string>());
+}
+
+using Saver = void (*)(tr_variant* tgt, Setting const& setting);
+
+static auto const savers = std::array<Saver, std::variant_size_v<Setting::Value>>{
+    saveBool, saveDouble, saveEncryption, saveInt, saveLogLevel, saveModeT, savePort, savePreallocation, saveSizeT, saveString
+};
+
+void Setting::save(tr_variant* tgt) const
+{
+    auto const idx = value_.index();
+
+    if (savers[idx])
+    {
+        savers[idx](tgt, *this);
+    }
 }
 
 SessionSettings::SessionSettings()
@@ -308,7 +405,18 @@ SessionSettings::SessionSettings()
     // clang-format on
 }
 
-SessionSettings::Changed SessionSettings::import(tr_variant* dict)
+void SessionSettings::save(tr_variant* dict) const
+{
+    for (size_t i = 0; i < FieldCount; ++i)
+    {
+        auto& setting = settings_[i];
+        auto const& key = setting.key();
+        tr_variantDictRemove(dict, key);
+        setting.save(tr_variantDictAdd(dict, key));
+    }
+}
+
+SessionSettings::Changed SessionSettings::load(tr_variant* dict)
 {
     auto changed = Changed{};
 
@@ -318,7 +426,7 @@ SessionSettings::Changed SessionSettings::import(tr_variant* dict)
 
         if (auto* const child = tr_variantDictFind(dict, setting.key()); child != nullptr)
         {
-            if (setting.import(child))
+            if (setting.load(child))
             {
                 changed.set(i);
             }
