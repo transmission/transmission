@@ -96,7 +96,7 @@ TEST_F(SettingsTest, canImportEncryptionMode)
     auto settings = SessionSettings{};
     auto const default_value = settings.get<tr_encryption_mode>(Field);
     auto const expected_value = TR_ENCRYPTION_REQUIRED;
-    TR_ASSERT(default_value != expected_value);
+    ASSERT_NE(expected_value, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
@@ -114,4 +114,49 @@ TEST_F(SettingsTest, canImportEncryptionMode)
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(expected_value, settings.get<tr_encryption_mode>(Field));
+}
+
+TEST_F(SettingsTest, canImportInt)
+{
+    static auto constexpr Field = Settings::PeerSocketTos;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<int>(Field);
+    auto const expected_value = default_value + 1;
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
+    auto const changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<int>(Field));
+}
+
+TEST_F(SettingsTest, canImportLogLevel)
+{
+    static auto constexpr Field = Settings::MessageLevel;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<tr_log_level>(Field);
+    auto const expected_value = TR_LOG_DEBUG;
+    ASSERT_NE(expected_value, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
+    auto changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<tr_log_level>(Field));
+
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddStrView(&dict, settings.key(Field), "debug");
+    changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<tr_log_level>(Field));
 }
