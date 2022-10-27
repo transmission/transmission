@@ -176,6 +176,11 @@ public:
         return settings_[field].set<T>(new_value);
     }
 
+    [[nodiscard]] constexpr auto key(Field field) const noexcept
+    {
+        return settings_[field].key();
+    }
+
 private:
     std::array<Setting, FieldCount> settings_;
 };

@@ -11,8 +11,9 @@
 
 using namespace std::literals;
 
-using SessionSettings = libtransmission::SessionSettings;
 using Setting = libtransmission::Setting;
+using Settings = libtransmission::SessionSettings;
+using SessionSettings = libtransmission::SessionSettings;
 using SettingsTest = ::testing::Test;
 
 TEST_F(SettingsTest, canInstantiate)
@@ -22,7 +23,6 @@ TEST_F(SettingsTest, canInstantiate)
 
 TEST_F(SettingsTest, canGetValues)
 {
-    using Settings = SessionSettings;
     auto settings = SessionSettings{};
 
     EXPECT_EQ(false, settings.get<bool>(Settings::TrashOriginalTorrentFiles));
@@ -39,8 +39,6 @@ TEST_F(SettingsTest, canGetValues)
 
 TEST_F(SettingsTest, canSetValues)
 {
-
-    using Settings = SessionSettings;
     auto settings = SessionSettings{};
 
     EXPECT_EQ(false, settings.get<bool>(Settings::TrashOriginalTorrentFiles));
@@ -51,4 +49,42 @@ TEST_F(SettingsTest, canSetValues)
 
     changed = settings.set<bool>(Settings::TrashOriginalTorrentFiles, true);
     EXPECT_FALSE(changed);
+}
+
+TEST_F(SettingsTest, canImportBools)
+{
+    static auto constexpr Field = Settings::SeedQueueEnabled;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<bool>(Field);
+    auto const expected_value = !default_value;
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddBool(&dict, settings.key(Field), expected_value);
+    auto const changed = settings.import(&dict);
+    tr_variantClear(&dict);
+
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<bool>(Field));
+}
+
+TEST_F(SettingsTest, canImportDoubles)
+{
+    static auto constexpr Field = Settings::RatioLimit;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<double>(Field);
+    auto const expected_value = default_value + 1.0;
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddReal(&dict, settings.key(Field), expected_value);
+    auto const changed = settings.import(&dict);
+    tr_variantClear(&dict);
+
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_NEAR(expected_value, settings.get<double>(Field), 0.001);
 }
