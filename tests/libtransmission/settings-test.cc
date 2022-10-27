@@ -187,3 +187,87 @@ TEST_F(SettingsTest, canImportMode)
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings.get<mode_t>(Field));
 }
+
+TEST_F(SettingsTest, canImportPort)
+{
+    static auto constexpr Field = Settings::PeerPort;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<tr_port>(Field);
+    auto constexpr ExpectedValue = tr_port::fromHost(8080);
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue.host());
+    auto const changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<tr_port>(Field));
+}
+
+TEST_F(SettingsTest, canImportPreallocation)
+{
+    static auto constexpr Field = Settings::Preallocation;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<tr_preallocation_mode>(Field);
+    auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
+    auto changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<tr_preallocation_mode>(Field));
+
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddStrView(&dict, settings.key(Field), "full");
+    changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<tr_preallocation_mode>(Field));
+}
+
+TEST_F(SettingsTest, canImportSizeT)
+{
+    static auto constexpr Field = Settings::SeedQueueSize;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<size_t>(Field);
+    auto const expected_value = default_value + 5U;
+    ASSERT_NE(expected_value, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
+    auto changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<size_t>(Field));
+}
+
+TEST_F(SettingsTest, canImportString)
+{
+    static auto constexpr Field = Settings::BlocklistUrl;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<std::string>(Field);
+    auto const expected_value = default_value + "/subpath";
+    ASSERT_NE(expected_value, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddStrView(&dict, settings.key(Field), expected_value);
+    auto changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<std::string>(Field));
+}
