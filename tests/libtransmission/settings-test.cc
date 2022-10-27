@@ -95,17 +95,17 @@ TEST_F(SettingsTest, canImportEncryptionMode)
 
     auto settings = SessionSettings{};
     auto const default_value = settings.get<tr_encryption_mode>(Field);
-    auto const expected_value = TR_ENCRYPTION_REQUIRED;
-    ASSERT_NE(expected_value, default_value);
+    auto constexpr ExpectedValue = TR_ENCRYPTION_REQUIRED;
+    ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
+    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
     auto changed = settings.import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(expected_value, settings.get<tr_encryption_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<tr_encryption_mode>(Field));
 
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings.key(Field), "required");
@@ -113,7 +113,7 @@ TEST_F(SettingsTest, canImportEncryptionMode)
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(expected_value, settings.get<tr_encryption_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<tr_encryption_mode>(Field));
 }
 
 TEST_F(SettingsTest, canImportInt)
@@ -140,17 +140,17 @@ TEST_F(SettingsTest, canImportLogLevel)
 
     auto settings = SessionSettings{};
     auto const default_value = settings.get<tr_log_level>(Field);
-    auto const expected_value = TR_LOG_DEBUG;
-    ASSERT_NE(expected_value, default_value);
+    auto constexpr ExpectedValue = TR_LOG_DEBUG;
+    ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
+    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
     auto changed = settings.import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(expected_value, settings.get<tr_log_level>(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<tr_log_level>(Field));
 
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings.key(Field), "debug");
@@ -158,5 +158,32 @@ TEST_F(SettingsTest, canImportLogLevel)
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(expected_value, settings.get<tr_log_level>(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<tr_log_level>(Field));
+}
+
+TEST_F(SettingsTest, canImportMode)
+{
+    static auto constexpr Field = Settings::Umask;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<mode_t>(Field);
+    auto constexpr ExpectedValue = mode_t{ 0777 };
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
+    auto changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<mode_t>(Field));
+
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddStrView(&dict, settings.key(Field), "0777");
+    changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(ExpectedValue, settings.get<mode_t>(Field));
 }
