@@ -96,27 +96,29 @@ TEST_F(SettingsTest, canImportEncryptionMode)
 {
     static auto constexpr Field = Settings::Encryption;
 
-    auto settings = SessionSettings{};
-    auto const default_value = settings.get<tr_encryption_mode>(Field);
     auto constexpr ExpectedValue = TR_ENCRYPTION_REQUIRED;
+
+    auto settings = std::make_unique<SessionSettings>();
+    auto const default_value = settings->get<tr_encryption_mode>(Field);
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
-    auto changed = settings.import(&dict);
+    tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
+    auto changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<tr_encryption_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<tr_encryption_mode>(Field));
 
+    settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings.key(Field), "required");
-    changed = settings.import(&dict);
+    tr_variantDictAddStrView(&dict, settings->key(Field), "required");
+    changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<tr_encryption_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<tr_encryption_mode>(Field));
 }
 
 TEST_F(SettingsTest, canImportInt)
@@ -141,54 +143,56 @@ TEST_F(SettingsTest, canImportLogLevel)
 {
     static auto constexpr Field = Settings::MessageLevel;
 
-    auto settings = SessionSettings{};
-    auto const default_value = settings.get<tr_log_level>(Field);
+    auto settings = std::make_unique<SessionSettings>();
+    auto const default_value = settings->get<tr_log_level>(Field);
     auto constexpr ExpectedValue = TR_LOG_DEBUG;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
-    auto changed = settings.import(&dict);
+    tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
+    auto changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<tr_log_level>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<tr_log_level>(Field));
 
+    settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings.key(Field), "debug");
-    changed = settings.import(&dict);
+    tr_variantDictAddStrView(&dict, settings->key(Field), "debug");
+    changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<tr_log_level>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<tr_log_level>(Field));
 }
 
 TEST_F(SettingsTest, canImportMode)
 {
     static auto constexpr Field = Settings::Umask;
 
-    auto settings = SessionSettings{};
-    auto const default_value = settings.get<mode_t>(Field);
+    auto settings = std::make_unique<SessionSettings>();
+    auto const default_value = settings->get<mode_t>(Field);
     auto constexpr ExpectedValue = mode_t{ 0777 };
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
-    auto changed = settings.import(&dict);
+    tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
+    auto changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<mode_t>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<mode_t>(Field));
 
+    settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings.key(Field), "0777");
-    changed = settings.import(&dict);
+    tr_variantDictAddStrView(&dict, settings->key(Field), "0777");
+    changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<mode_t>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<mode_t>(Field));
 }
 
 TEST_F(SettingsTest, canImportPort)
@@ -214,27 +218,28 @@ TEST_F(SettingsTest, canImportPreallocation)
 {
     static auto constexpr Field = Settings::Preallocation;
 
-    auto settings = SessionSettings{};
-    auto const default_value = settings.get<tr_preallocation_mode>(Field);
+    auto settings = std::make_unique<SessionSettings>();
+    auto const default_value = settings->get<tr_preallocation_mode>(Field);
     auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue);
-    auto changed = settings.import(&dict);
+    tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
+    auto changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<tr_preallocation_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<tr_preallocation_mode>(Field));
 
+    settings = std::make_unique<SessionSettings>();
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings.key(Field), "full");
-    changed = settings.import(&dict);
+    tr_variantDictAddStrView(&dict, settings->key(Field), "full");
+    changed = settings->import(&dict);
     tr_variantClear(&dict);
     EXPECT_EQ(1U, changed.count());
     EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<tr_preallocation_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings->get<tr_preallocation_mode>(Field));
 }
 
 TEST_F(SettingsTest, canImportSizeT)

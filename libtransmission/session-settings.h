@@ -6,6 +6,7 @@
 #include <bitset>
 #include <cstddef> // for size_t
 #include <cstdint> // for int64_t
+#include <optional>
 #include <string>
 #include <string_view>
 #include <variant>
@@ -37,16 +38,23 @@ public:
         std::string>;
 
     Setting() = default;
-    Setting(tr_quark key, Value const& default_value);
+    Setting(tr_quark key, Value const& value);
 
-    [[nodiscard]] static std::optional<Value> parse(tr_variant* var, size_t desired_type);
+    template<typename T>
+    [[nodiscard]] static std::optional<Value> parse(tr_variant* var)
+    {
+        if (auto val = variantToVal<T>(var); val)
+        {
+            return Value(*val);
+        }
+
+        return {};
+    }
 
     [[nodiscard]] constexpr auto key() const noexcept
     {
         return key_;
     }
-
-    bool import(tr_variant* var);
 
     template<typename T>
     [[nodiscard]] constexpr auto const& get() const
@@ -57,18 +65,50 @@ public:
     template<typename T>
     constexpr bool set(T const& new_value)
     {
-        if (get<T>() != new_value)
+        if (get<T>() == new_value)
         {
-            value_.emplace<T>(new_value);
-            return true;
+            return false;
         }
 
-        return false;
+        value_.emplace<T>(new_value);
+        return true;
+    }
+
+    bool import(tr_variant* trvar)
+    {
+        auto value = std::optional<Value>{};
+
+        // clang-format off
+        switch (value_.index())
+        {
+            case 0: value = parse<bool>(trvar); break;
+            case 1: value = parse<double>(trvar); break;
+            case 2: value = parse<tr_encryption_mode>(trvar); break;
+            case 3: value = parse<int>(trvar); break;
+            case 4: value = parse<tr_log_level>(trvar); break;
+            case 5: value = parse<mode_t>(trvar); break;
+            case 6: value = parse<tr_port>(trvar); break;
+            case 7: value = parse<tr_preallocation_mode>(trvar); break;
+            case 8: value = parse<size_t>(trvar); break;
+            case 9: value = parse<std::string>(trvar); break;
+            default: break;
+        }
+        // clang-format on
+
+        if (!value || value_ == *value)
+        {
+            return false;
+        }
+
+        value_ = std::move(*value);
+        return true;
     }
 
 private:
+    template<typename T>
+    [[nodiscard]] static std::optional<T> variantToVal(tr_variant*);
+
     tr_quark key_ = TR_KEY_NONE;
-    Value default_value_;
     Value value_;
 };
 
