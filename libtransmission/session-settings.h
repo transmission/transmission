@@ -46,23 +46,11 @@ public:
         return key_;
     }
 
-    bool import(tr_variant* var)
-    {
-        auto const idx = default_value_.index();
-
-        if (auto value = parse(var, idx); value && value->index() == idx)
-        {
-            value_ = *value;
-            return true;
-        }
-
-        return false;
-    }
+    bool import(tr_variant* var);
 
     template<typename T>
     [[nodiscard]] constexpr auto const& get() const
     {
-        //static_assert(std::variant_size_v<Value> == TypeCount);
         return std::get<T>(value_);
     }
 
@@ -79,7 +67,7 @@ public:
     }
 
 private:
-    tr_quark key_ = {};
+    tr_quark key_ = TR_KEY_NONE;
     Value default_value_;
     Value value_;
 };

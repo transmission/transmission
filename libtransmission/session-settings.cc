@@ -25,6 +25,20 @@ using namespace std::literals;
 namespace libtransmission
 {
 
+bool Setting::import(tr_variant* var)
+{
+    auto const idx = default_value_.index();
+
+    if (auto value = parse(var, idx); value)
+    {
+        TR_ASSERT(value->index() == idx);
+        value_ = *value;
+        return true;
+    }
+
+    return false;
+}
+
 Setting::Setting(tr_quark key, Value const& default_value)
     : key_{ key }
     , default_value_{ default_value }
