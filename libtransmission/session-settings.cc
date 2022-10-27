@@ -25,12 +25,6 @@ using namespace std::literals;
 namespace libtransmission
 {
 
-Setting::Setting(tr_quark key, Value const& value)
-    : key_{ key }
-    , value_{ value }
-{
-}
-
 template<>
 std::optional<bool> Setting::variantToVal(tr_variant* var)
 {

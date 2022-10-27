@@ -37,8 +37,13 @@ public:
         size_t,
         std::string>;
 
-    Setting() = default;
-    Setting(tr_quark key, Value const& value);
+    constexpr Setting() noexcept = default;
+
+    Setting(tr_quark key, Value const& value)
+        : key_{ key }
+        , value_{ value }
+    {
+    }
 
     template<typename T>
     [[nodiscard]] static std::optional<Value> parse(tr_variant* var)
