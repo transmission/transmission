@@ -52,6 +52,7 @@ set(PROJECT_FILES
   rpcimpl.cc
   session-id.cc
   session.cc
+  session-settings.cc
   stats.cc
   subprocess-posix.cc
   subprocess-win32.cc
