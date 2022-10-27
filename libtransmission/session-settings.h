@@ -60,14 +60,14 @@ public:
     }
 
     template<typename T>
-    [[nodiscard]] auto const& get() const
+    [[nodiscard]] constexpr auto const& get() const
     {
         //static_assert(std::variant_size_v<Value> == TypeCount);
         return std::get<T>(value_);
     }
 
     template<typename T>
-    bool set(T const& new_value)
+    constexpr bool set(T const& new_value)
     {
         if (get<T>() != new_value)
         {
@@ -177,13 +177,13 @@ public:
     Changed import(tr_variant* dict);
 
     template<typename T>
-    [[nodiscard]] auto const& get(Field field) const
+    [[nodiscard]] constexpr auto const& get(Field field) const
     {
         return settings_[field].get<T>();
     }
 
     template<typename T>
-    bool set(Field field, T const& new_value)
+    constexpr bool set(Field field, T const& new_value)
     {
         return settings_[field].set<T>(new_value);
     }
