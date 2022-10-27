@@ -11,10 +11,13 @@
 
 using namespace std::literals;
 
-using Setting = libtransmission::Setting;
-using Settings = libtransmission::SessionSettings;
-using SessionSettings = libtransmission::SessionSettings;
-using SettingsTest = ::testing::Test;
+class SettingsTest : public ::testing::Test
+{
+protected:
+    using Setting = libtransmission::Setting;
+    using Settings = libtransmission::SessionSettings;
+    using SessionSettings = libtransmission::SessionSettings;
+};
 
 TEST_F(SettingsTest, canInstantiate)
 {
