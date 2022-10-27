@@ -88,3 +88,30 @@ TEST_F(SettingsTest, canImportDoubles)
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_NEAR(expected_value, settings.get<double>(Field), 0.001);
 }
+
+TEST_F(SettingsTest, canImportEncryptionMode)
+{
+    static auto constexpr Field = Settings::Encryption;
+
+    auto settings = SessionSettings{};
+    auto const default_value = settings.get<tr_encryption_mode>(Field);
+    auto const expected_value = TR_ENCRYPTION_REQUIRED;
+    TR_ASSERT(default_value != expected_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
+    auto changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<tr_encryption_mode>(Field));
+
+    tr_variantInitDict(&dict, 1);
+    tr_variantDictAddStrView(&dict, settings.key(Field), "required");
+    changed = settings.import(&dict);
+    tr_variantClear(&dict);
+    EXPECT_EQ(1U, changed.count());
+    EXPECT_EQ(true, changed.test(Field));
+    EXPECT_EQ(expected_value, settings.get<tr_encryption_mode>(Field));
+}
