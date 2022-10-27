@@ -35,6 +35,7 @@ add_executable(libtransmission-test
     rename-test.cc
     rpc-test.cc
     session-test.cc
+    settings-test.cc
     strbuf-test.cc
     subprocess-test-script.cmd
     subprocess-test.cc

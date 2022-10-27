@@ -33,17 +33,6 @@ Setting::Setting(tr_quark key, Type type, Value const& default_value)
 {
 }
 
-void Setting::fromDict(tr_variant* dict)
-{
-    if (auto* const child = tr_variantDictFind(dict, key_); child != nullptr)
-    {
-        if (auto const value = import(child, type_); value)
-        {
-            value_ = *value;
-        }
-    }
-}
-
 [[nodiscard]] std::optional<Setting::Value> Setting::import(tr_variant* var, Type type)
 {
     switch (type)
@@ -99,13 +88,6 @@ void Setting::fromDict(tr_variant* dict)
         if (auto val = int64_t{}; tr_variantGetInt(var, &val))
         {
             return Value{ std::in_place_type<int>, static_cast<int>(val) };
-        }
-        break;
-
-    case Type::Int64:
-        if (auto val = int64_t{}; tr_variantGetInt(var, &val))
-        {
-            return Value{ std::in_place_type<int64_t>, val };
         }
         break;
 
@@ -271,7 +253,7 @@ SessionSettings::SessionSettings()
         { TR_KEY_prefetch_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
         { TR_KEY_queue_stalled_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
         { TR_KEY_queue_stalled_minutes, Type::SizeT, Value{ std::in_place_type<size_t>, 30U } },
-        { TR_KEY_ratio_limit, Type::Double, Value{ std::in_place_type<size_t>, 2.0 } },
+        { TR_KEY_ratio_limit, Type::Double, Value{ std::in_place_type<double>, 2.0 } },
         { TR_KEY_ratio_limit_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
         { TR_KEY_rename_partial_files, Type::Bool, Value{ std::in_place_type<bool>, true } },
         { TR_KEY_rpc_authentication_required, Type::Bool, Value{ std::in_place_type<bool>, false } },
@@ -307,6 +289,26 @@ SessionSettings::SessionSettings()
         { TR_KEY_utp_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
     }};
     // clang-format on
+}
+
+SessionSettings::Changed SessionSettings::import(tr_variant* dict)
+{
+    auto changed = Changed{};
+
+    for (size_t i = 0; i < FieldCount; ++i)
+    {
+        auto& setting = settings_[i];
+
+        if (auto* const child = tr_variantDictFind(dict, setting.key()); child != nullptr)
+        {
+            if (setting.import(child))
+            {
+                changed.set(i);
+            }
+        }
+    }
+
+    return changed;
 }
 
 } // namespace libtransmission

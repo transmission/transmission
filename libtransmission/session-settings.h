@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <bitset>
 #include <cstddef> // for size_t
 #include <cstdint> // for int64_t
 #include <string>
@@ -28,7 +29,6 @@ public:
         double,
         tr_encryption_mode,
         int,
-        int64_t,
         tr_log_level,
         mode_t,
         tr_port,
@@ -42,7 +42,6 @@ public:
         Double,
         Encryption,
         Int,
-        Int64,
         Log,
         ModeT,
         Port,
@@ -56,9 +55,23 @@ public:
     Setting() = default;
     Setting(tr_quark key, Type type, Value const& default_value);
 
-    void fromDict(tr_variant* dict);
-
     [[nodiscard]] static std::optional<Value> import(tr_variant* var, Type type);
+
+    [[nodiscard]] constexpr auto key() const noexcept
+    {
+        return key_;
+    }
+
+    bool import(tr_variant* var)
+    {
+        if (auto value = import(var, type_); value)
+        {
+            value_ = *value;
+            return true;
+        }
+
+        return false;
+    }
 
     template<typename T>
     [[nodiscard]] auto const& get() const
@@ -160,7 +173,11 @@ public:
         FieldCount
     };
 
+    using Changed = std::bitset<FieldCount>;
+
     SessionSettings();
+
+    Changed import(tr_variant* dict);
 
     template<typename T>
     [[nodiscard]] auto const& get(Field field) const
