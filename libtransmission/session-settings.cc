@@ -25,33 +25,32 @@ using namespace std::literals;
 namespace libtransmission
 {
 
-Setting::Setting(tr_quark key, Type type, Value const& default_value)
+Setting::Setting(tr_quark key, Value const& default_value)
     : key_{ key }
-    , type_{ type }
     , default_value_{ default_value }
     , value_{ default_value }
 {
 }
 
-[[nodiscard]] std::optional<Setting::Value> Setting::import(tr_variant* var, Type type)
+[[nodiscard]] std::optional<Setting::Value> Setting::parse(tr_variant* var, size_t desired_type)
 {
-    switch (type)
+    switch (desired_type)
     {
-    case Type::Bool:
+    case 0: // bool
         if (auto val = bool{}; tr_variantGetBool(var, &val))
         {
             return Value{ std::in_place_type<bool>, val };
         }
         break;
 
-    case Type::Double:
+    case 1: // double
         if (auto val = double{}; tr_variantGetReal(var, &val))
         {
             return Value{ std::in_place_type<double>, val };
         }
         break;
 
-    case Type::Encryption:
+    case 2: // tr_encryption_mode
         {
             static auto constexpr Keys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{
                 { { "required", TR_ENCRYPTION_REQUIRED },
@@ -84,14 +83,14 @@ Setting::Setting(tr_quark key, Type type, Value const& default_value)
         }
         break;
 
-    case Type::Int:
+    case 3: // int
         if (auto val = int64_t{}; tr_variantGetInt(var, &val))
         {
             return Value{ std::in_place_type<int>, static_cast<int>(val) };
         }
         break;
 
-    case Type::Log:
+    case 4: // tr_log_level
         {
             static auto constexpr Keys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
                 { "critical"sv, TR_LOG_CRITICAL },
@@ -127,7 +126,7 @@ Setting::Setting(tr_quark key, Type type, Value const& default_value)
         }
         break;
 
-    case Type::ModeT:
+    case 5: // mode_t
         if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
         {
             if (auto const mode = tr_parseNum<uint32_t>(val, nullptr, 8); mode)
@@ -141,14 +140,14 @@ Setting::Setting(tr_quark key, Type type, Value const& default_value)
         }
         break;
 
-    case Type::Port:
+    case 6: // tr_port
         if (auto val = int64_t{}; tr_variantGetInt(var, &val))
         {
             return Value{ std::in_place_type<tr_port>, tr_port::fromHost(val) };
         }
         break;
 
-    case Type::Preallocation:
+    case 7: // tr_preallocation_mode
         {
             static auto constexpr Keys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 4>{ {
                 { "none"sv, TR_PREALLOCATE_NONE },
@@ -181,14 +180,14 @@ Setting::Setting(tr_quark key, Type type, Value const& default_value)
         }
         break;
 
-    case Type::SizeT:
+    case 8: // size_t
         if (auto val = int64_t{}; tr_variantGetInt(var, &val))
         {
             return Value{ std::in_place_type<size_t>, static_cast<size_t>(val) };
         }
         break;
 
-    case Type::String:
+    case 9: // std::string
         if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
         {
             return Value{ std::in_place_type<std::string>, val };
@@ -205,88 +204,87 @@ Setting::Setting(tr_quark key, Type type, Value const& default_value)
 
 SessionSettings::SessionSettings()
 {
-    using Type = Setting::Type;
     using Value = Setting::Value;
 
     // clang-format off
     settings_ = std::array<Setting, FieldCount>{{
-        { TR_KEY_alt_speed_down, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 50U } } }, // half the regular
-        { TR_KEY_alt_speed_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_alt_speed_time_begin, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 540U } } }, // 9am
-        { TR_KEY_alt_speed_time_day, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ TR_SCHED_ALL } } },
-        { TR_KEY_alt_speed_time_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_alt_speed_time_end, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 1020U } } }, // 5pm
-        { TR_KEY_alt_speed_up, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 50U } } }, // half the regular
-        { TR_KEY_announce_ip, Type::String, Value{ std::in_place_type<std::string>, ""sv } },
-        { TR_KEY_announce_ip_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_anti_brute_force_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_anti_brute_force_threshold, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 100 } } },
-        { TR_KEY_bind_address_ipv4, Type::String, Value{ std::in_place_type<std::string>, "0.0.0.0"sv } },
-        { TR_KEY_bind_address_ipv6, Type::String, Value{ std::in_place_type<std::string>, "::"sv } },
-        { TR_KEY_blocklist_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_blocklist_url, Type::String, Value{ std::in_place_type<std::string>, "http://www.example.com/blocklist"sv } },
-        { TR_KEY_cache_size_mb, Type::SizeT, Value{ std::in_place_type<std::size_t>, 4U } },
-        { TR_KEY_default_trackers, Type::String, Value{ std::in_place_type<std::string>, "" } },
-        { TR_KEY_dht_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_download_dir, Type::String, Value{ std::in_place_type<std::string>, tr_getDefaultDownloadDir() } },
-        { TR_KEY_download_queue_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_download_queue_size, Type::SizeT, Value{ std::in_place_type<size_t>, 5U } },
-        { TR_KEY_encryption, Type::Encryption, Value{ std::in_place_type<tr_encryption_mode>, TR_ENCRYPTION_PREFERRED } },
-        { TR_KEY_idle_seeding_limit, Type::SizeT, Value{ std::in_place_type<size_t>, 30U } },
-        { TR_KEY_idle_seeding_limit_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_incomplete_dir, Type::String, Value{ std::in_place_type<std::string>, tr_getDefaultDownloadDir() } },
-        { TR_KEY_incomplete_dir_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_lpd_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_message_level, Type::Log, Value{ std::in_place_type<tr_log_level>, TR_LOG_INFO } },
-        { TR_KEY_peer_congestion_algorithm, Type::String, Value{ std::in_place_type<std::string>, "" } },
-        { TR_KEY_peer_id_ttl_hours, Type::SizeT, Value{ std::in_place_type<size_t>, 6U } },
-        { TR_KEY_peer_limit_global, Type::SizeT, Value{ std::in_place_type<size_t>, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR) } },
-        { TR_KEY_peer_limit_per_torrent, Type::SizeT, Value{ std::in_place_type<size_t>, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_TORRENT_STR) } },
-        { TR_KEY_peer_port, Type::Port, Value{ std::in_place_type<tr_port>, tr_port::fromHost(*tr_parseNum<unsigned short>(TR_DEFAULT_PEER_PORT_STR)) } },
-        { TR_KEY_peer_port_random_high, Type::Port, Value{ std::in_place_type<tr_port>, tr_port::fromHost(65535) } },
-        { TR_KEY_peer_port_random_low, Type::Port, Value{ std::in_place_type<tr_port>, tr_port::fromHost(49152) } },
-        { TR_KEY_peer_port_random_on_start, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_peer_socket_tos, Type::Int, Value{ std::in_place_type<int>, int{ 0x04 } } },
-        { TR_KEY_pex_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_port_forwarding_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_preallocation, Type::Preallocation, Value{ std::in_place_type<tr_preallocation_mode>, TR_PREALLOCATE_SPARSE } },
-        { TR_KEY_prefetch_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_queue_stalled_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_queue_stalled_minutes, Type::SizeT, Value{ std::in_place_type<size_t>, 30U } },
-        { TR_KEY_ratio_limit, Type::Double, Value{ std::in_place_type<double>, 2.0 } },
-        { TR_KEY_ratio_limit_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_rename_partial_files, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_rpc_authentication_required, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_rpc_bind_address, Type::String, Value{ std::in_place_type<std::string>, "0.0.0.0"sv } },
-        { TR_KEY_rpc_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_rpc_host_whitelist, Type::String, Value{ std::in_place_type<std::string>, ""sv } },
-        { TR_KEY_rpc_host_whitelist_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_rpc_password, Type::String, Value{ std::in_place_type<std::string>, ""sv } },
-        { TR_KEY_rpc_port, Type::Port, Value{ std::in_place_type<tr_port>, tr_port::fromHost(TR_DEFAULT_RPC_PORT) } },
-        { TR_KEY_rpc_socket_mode, Type::ModeT, Value{ std::in_place_type<mode_t>, tr_rpc_server::DefaultRpcSocketMode } },
-        { TR_KEY_rpc_url, Type::String, Value{ std::in_place_type<std::string>, TR_DEFAULT_RPC_URL_STR } },
-        { TR_KEY_rpc_username, Type::String, Value{ std::in_place_type<std::string>, ""sv } },
-        { TR_KEY_rpc_whitelist, Type::String, Value{ std::in_place_type<std::string>, TR_DEFAULT_RPC_WHITELIST } },
-        { TR_KEY_rpc_whitelist_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_scrape_paused_torrents_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_script_torrent_added_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_script_torrent_added_filename, Type::String, Value{ std::in_place_type<std::string>, ""sv } },
-        { TR_KEY_script_torrent_done_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_script_torrent_done_filename, Type::String, Value{ std::in_place_type<std::string>, ""sv } },
-        { TR_KEY_script_torrent_done_seeding_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_script_torrent_done_seeding_filename, Type::String, Value{ std::in_place_type<std::string>, ""sv } },
-        { TR_KEY_seed_queue_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_seed_queue_size, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 10 } } },
-        { TR_KEY_speed_limit_down, Type::SizeT, Value{ std::in_place_type<std::size_t>, 100U } },
-        { TR_KEY_speed_limit_down_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_speed_limit_up, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 100 } } },
-        { TR_KEY_speed_limit_up_enabled, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_start_added_torrents, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_tcp_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
-        { TR_KEY_trash_original_torrent_files, Type::Bool, Value{ std::in_place_type<bool>, false } },
-        { TR_KEY_umask, Type::ModeT, Value{ std::in_place_type<mode_t>, mode_t{ 022 } } },
-        { TR_KEY_upload_slots_per_torrent, Type::SizeT, Value{ std::in_place_type<size_t>, size_t{ 8 } } },
-        { TR_KEY_utp_enabled, Type::Bool, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_alt_speed_down, Value{ std::in_place_type<size_t>, size_t{ 50U } } }, // half the regular
+        { TR_KEY_alt_speed_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_alt_speed_time_begin, Value{ std::in_place_type<size_t>, size_t{ 540U } } }, // 9am
+        { TR_KEY_alt_speed_time_day, Value{ std::in_place_type<size_t>, size_t{ TR_SCHED_ALL } } },
+        { TR_KEY_alt_speed_time_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_alt_speed_time_end, Value{ std::in_place_type<size_t>, size_t{ 1020U } } }, // 5pm
+        { TR_KEY_alt_speed_up, Value{ std::in_place_type<size_t>, size_t{ 50U } } }, // half the regular
+        { TR_KEY_announce_ip, Value{ std::in_place_type<std::string>, ""sv } },
+        { TR_KEY_announce_ip_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_anti_brute_force_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_anti_brute_force_threshold, Value{ std::in_place_type<size_t>, size_t{ 100 } } },
+        { TR_KEY_bind_address_ipv4, Value{ std::in_place_type<std::string>, "0.0.0.0"sv } },
+        { TR_KEY_bind_address_ipv6, Value{ std::in_place_type<std::string>, "::"sv } },
+        { TR_KEY_blocklist_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_blocklist_url, Value{ std::in_place_type<std::string>, "http://www.example.com/blocklist"sv } },
+        { TR_KEY_cache_size_mb, Value{ std::in_place_type<std::size_t>, 4U } },
+        { TR_KEY_default_trackers, Value{ std::in_place_type<std::string>, "" } },
+        { TR_KEY_dht_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_download_dir, Value{ std::in_place_type<std::string>, tr_getDefaultDownloadDir() } },
+        { TR_KEY_download_queue_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_download_queue_size, Value{ std::in_place_type<size_t>, 5U } },
+        { TR_KEY_encryption, Value{ std::in_place_type<tr_encryption_mode>, TR_ENCRYPTION_PREFERRED } },
+        { TR_KEY_idle_seeding_limit, Value{ std::in_place_type<size_t>, 30U } },
+        { TR_KEY_idle_seeding_limit_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_incomplete_dir, Value{ std::in_place_type<std::string>, tr_getDefaultDownloadDir() } },
+        { TR_KEY_incomplete_dir_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_lpd_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_message_level, Value{ std::in_place_type<tr_log_level>, TR_LOG_INFO } },
+        { TR_KEY_peer_congestion_algorithm, Value{ std::in_place_type<std::string>, "" } },
+        { TR_KEY_peer_id_ttl_hours, Value{ std::in_place_type<size_t>, 6U } },
+        { TR_KEY_peer_limit_global, Value{ std::in_place_type<size_t>, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR) } },
+        { TR_KEY_peer_limit_per_torrent, Value{ std::in_place_type<size_t>, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_TORRENT_STR) } },
+        { TR_KEY_peer_port, Value{ std::in_place_type<tr_port>, tr_port::fromHost(*tr_parseNum<unsigned short>(TR_DEFAULT_PEER_PORT_STR)) } },
+        { TR_KEY_peer_port_random_high, Value{ std::in_place_type<tr_port>, tr_port::fromHost(65535) } },
+        { TR_KEY_peer_port_random_low, Value{ std::in_place_type<tr_port>, tr_port::fromHost(49152) } },
+        { TR_KEY_peer_port_random_on_start, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_peer_socket_tos, Value{ std::in_place_type<int>, int{ 0x04 } } },
+        { TR_KEY_pex_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_port_forwarding_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_preallocation, Value{ std::in_place_type<tr_preallocation_mode>, TR_PREALLOCATE_SPARSE } },
+        { TR_KEY_prefetch_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_queue_stalled_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_queue_stalled_minutes, Value{ std::in_place_type<size_t>, 30U } },
+        { TR_KEY_ratio_limit, Value{ std::in_place_type<double>, 2.0 } },
+        { TR_KEY_ratio_limit_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_rename_partial_files, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_rpc_authentication_required, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_rpc_bind_address, Value{ std::in_place_type<std::string>, "0.0.0.0"sv } },
+        { TR_KEY_rpc_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_rpc_host_whitelist, Value{ std::in_place_type<std::string>, ""sv } },
+        { TR_KEY_rpc_host_whitelist_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_rpc_password, Value{ std::in_place_type<std::string>, ""sv } },
+        { TR_KEY_rpc_port, Value{ std::in_place_type<tr_port>, tr_port::fromHost(TR_DEFAULT_RPC_PORT) } },
+        { TR_KEY_rpc_socket_mode, Value{ std::in_place_type<mode_t>, tr_rpc_server::DefaultRpcSocketMode } },
+        { TR_KEY_rpc_url, Value{ std::in_place_type<std::string>, TR_DEFAULT_RPC_URL_STR } },
+        { TR_KEY_rpc_username, Value{ std::in_place_type<std::string>, ""sv } },
+        { TR_KEY_rpc_whitelist, Value{ std::in_place_type<std::string>, TR_DEFAULT_RPC_WHITELIST } },
+        { TR_KEY_rpc_whitelist_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_scrape_paused_torrents_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_script_torrent_added_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_script_torrent_added_filename, Value{ std::in_place_type<std::string>, ""sv } },
+        { TR_KEY_script_torrent_done_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_script_torrent_done_filename, Value{ std::in_place_type<std::string>, ""sv } },
+        { TR_KEY_script_torrent_done_seeding_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_script_torrent_done_seeding_filename, Value{ std::in_place_type<std::string>, ""sv } },
+        { TR_KEY_seed_queue_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_seed_queue_size, Value{ std::in_place_type<size_t>, size_t{ 10 } } },
+        { TR_KEY_speed_limit_down, Value{ std::in_place_type<std::size_t>, 100U } },
+        { TR_KEY_speed_limit_down_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_speed_limit_up, Value{ std::in_place_type<size_t>, size_t{ 100 } } },
+        { TR_KEY_speed_limit_up_enabled, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_start_added_torrents, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_tcp_enabled, Value{ std::in_place_type<bool>, true } },
+        { TR_KEY_trash_original_torrent_files, Value{ std::in_place_type<bool>, false } },
+        { TR_KEY_umask, Value{ std::in_place_type<mode_t>, mode_t{ 022 } } },
+        { TR_KEY_upload_slots_per_torrent, Value{ std::in_place_type<size_t>, size_t{ 8 } } },
+        { TR_KEY_utp_enabled, Value{ std::in_place_type<bool>, true } },
     }};
     // clang-format on
 }

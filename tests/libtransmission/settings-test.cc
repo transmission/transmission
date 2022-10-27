@@ -20,24 +20,6 @@ TEST_F(SettingsTest, canInstantiate)
     auto settings = SessionSettings{};
 }
 
-#if 0
-    enum Type
-    {
-        Bool,
-        Double,
-        Encryption,
-        Int,
-        Log,
-        ModeT,
-        Port,
-        Preallocation,
-        SizeT,
-        String,
-
-        TypeCount
-    };
-#endif
-
 TEST_F(SettingsTest, canGetValues)
 {
     using Settings = SessionSettings;
@@ -53,4 +35,20 @@ TEST_F(SettingsTest, canGetValues)
     EXPECT_EQ(TR_PREALLOCATE_SPARSE, settings.get<tr_preallocation_mode>(Settings::Preallocation));
     EXPECT_EQ(size_t{ 100U }, settings.get<size_t>(Settings::SpeedLimitDown));
     EXPECT_EQ("0.0.0.0"sv, settings.get<std::string>(Settings::RpcBindAddress));
+}
+
+TEST_F(SettingsTest, canSetValues)
+{
+
+    using Settings = SessionSettings;
+    auto settings = SessionSettings{};
+
+    EXPECT_EQ(false, settings.get<bool>(Settings::TrashOriginalTorrentFiles));
+
+    auto changed = settings.set<bool>(Settings::TrashOriginalTorrentFiles, true);
+    EXPECT_TRUE(changed);
+    EXPECT_EQ(true, settings.get<bool>(Settings::TrashOriginalTorrentFiles));
+
+    changed = settings.set<bool>(Settings::TrashOriginalTorrentFiles, true);
+    EXPECT_FALSE(changed);
 }

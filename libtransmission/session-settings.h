@@ -36,26 +36,10 @@ public:
         size_t,
         std::string>;
 
-    enum Type
-    {
-        Bool,
-        Double,
-        Encryption,
-        Int,
-        Log,
-        ModeT,
-        Port,
-        Preallocation,
-        SizeT,
-        String,
-
-        TypeCount
-    };
-
     Setting() = default;
-    Setting(tr_quark key, Type type, Value const& default_value);
+    Setting(tr_quark key, Value const& default_value);
 
-    [[nodiscard]] static std::optional<Value> import(tr_variant* var, Type type);
+    [[nodiscard]] static std::optional<Value> parse(tr_variant* var, size_t desired_type);
 
     [[nodiscard]] constexpr auto key() const noexcept
     {
@@ -64,7 +48,9 @@ public:
 
     bool import(tr_variant* var)
     {
-        if (auto value = import(var, type_); value)
+        auto const idx = default_value_.index();
+
+        if (auto value = parse(var, idx); value && value->index() == idx)
         {
             value_ = *value;
             return true;
@@ -76,13 +62,24 @@ public:
     template<typename T>
     [[nodiscard]] auto const& get() const
     {
-        static_assert(std::variant_size_v<Value> == TypeCount);
+        //static_assert(std::variant_size_v<Value> == TypeCount);
         return std::get<T>(value_);
     }
 
+    template<typename T>
+    bool set(T const& new_value)
+    {
+        if (get<T>() != new_value)
+        {
+            value_.emplace<T>(new_value);
+            return true;
+        }
+
+        return false;
+    }
+
 private:
-    tr_quark key_;
-    Type type_;
+    tr_quark key_ = {};
     Value default_value_;
     Value value_;
 };
@@ -183,6 +180,12 @@ public:
     [[nodiscard]] auto const& get(Field field) const
     {
         return settings_[field].get<T>();
+    }
+
+    template<typename T>
+    bool set(Field field, T const& new_value)
+    {
+        return settings_[field].set<T>(new_value);
     }
 
 private:
