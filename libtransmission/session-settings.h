@@ -68,53 +68,10 @@ public:
         return true;
     }
 
-    bool load(tr_variant* trvar)
-    {
-        auto value = std::optional<Value>{};
-
-        // clang-format off
-        switch (value_.index())
-        {
-            case 0: value = parse<bool>(trvar); break;
-            case 1: value = parse<double>(trvar); break;
-            case 2: value = parse<tr_encryption_mode>(trvar); break;
-            case 3: value = parse<int>(trvar); break;
-            case 4: value = parse<tr_log_level>(trvar); break;
-            case 5: value = parse<mode_t>(trvar); break;
-            case 6: value = parse<tr_port>(trvar); break;
-            case 7: value = parse<tr_preallocation_mode>(trvar); break;
-            case 8: value = parse<size_t>(trvar); break;
-            case 9: value = parse<std::string>(trvar); break;
-            default: break;
-        }
-        // clang-format on
-
-        if (!value || value_ == *value)
-        {
-            return false;
-        }
-
-        value_ = std::move(*value);
-        return true;
-    }
-
+    bool load(tr_variant*);
     void save(tr_variant*) const;
 
 private:
-    template<typename T>
-    [[nodiscard]] static std::optional<T> variantToVal(tr_variant*);
-
-    template<typename T>
-    [[nodiscard]] static std::optional<Value> parse(tr_variant* var)
-    {
-        if (auto val = variantToVal<T>(var); val)
-        {
-            return Value(*val);
-        }
-
-        return {};
-    }
-
     tr_quark key_ = TR_KEY_NONE;
     Value value_;
 };

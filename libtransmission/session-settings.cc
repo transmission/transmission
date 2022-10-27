@@ -24,298 +24,389 @@
 
 using namespace std::literals;
 
-namespace libtransmission
+namespace
 {
 
-template<>
-std::optional<bool> Setting::variantToVal(tr_variant* var)
+template<typename T>
+struct Converter
 {
-    if (auto val = bool{}; tr_variantGetBool(var, &val))
-    {
-        return val;
-    }
-
-    return {};
-}
-
-template<>
-std::optional<double> Setting::variantToVal(tr_variant* var)
-{
-    if (auto val = double{}; tr_variantGetReal(var, &val))
-    {
-        return val;
-    }
-
-    return {};
-}
-
-static auto constexpr EncryptionKeys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{
-    { { "required", TR_ENCRYPTION_REQUIRED }, { "preferred", TR_ENCRYPTION_PREFERRED }, { "allowed", TR_CLEAR_PREFERRED } }
+public:
+    static std::optional<T> load(tr_variant* src);
+    static void save(tr_variant* tgt, T const& val);
 };
 
 template<>
-std::optional<tr_encryption_mode> Setting::variantToVal(tr_variant* var)
+struct Converter<bool>
 {
-
-    if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
+    static std::optional<bool> load(tr_variant* src)
     {
-        auto const needle = tr_strlower(tr_strvStrip(val));
-
-        for (auto const& [key, encryption] : EncryptionKeys)
+        if (auto val = bool{}; tr_variantGetBool(src, &val))
         {
-            if (key == needle)
-            {
-                return encryption;
-            }
+            return val;
         }
+
+        return {};
     }
 
-    if (auto val = int64_t{}; tr_variantGetInt(var, &val))
+    static void save(tr_variant* tgt, bool const& val)
     {
-        for (auto const& [key, encryption] : EncryptionKeys)
-        {
-            if (encryption == val)
-            {
-                return encryption;
-            }
-        }
+        tr_variantInitBool(tgt, val);
     }
-
-    return {};
-}
+};
 
 template<>
-std::optional<int> Setting::variantToVal(tr_variant* var)
+struct Converter<double>
 {
-    if (auto val = int64_t{}; tr_variantGetInt(var, &val))
+    static std::optional<double> load(tr_variant* src)
     {
-        return static_cast<int>(val);
+        if (auto val = double{}; tr_variantGetReal(src, &val))
+        {
+            return val;
+        }
+
+        return {};
     }
 
-    return {};
-}
-
-static auto constexpr LogKeys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
-    { "critical"sv, TR_LOG_CRITICAL },
-    { "debug"sv, TR_LOG_DEBUG },
-    { "error"sv, TR_LOG_ERROR },
-    { "info"sv, TR_LOG_INFO },
-    { "off"sv, TR_LOG_OFF },
-    { "trace"sv, TR_LOG_TRACE },
-    { "warn"sv, TR_LOG_WARN },
-} };
+    static void save(tr_variant* tgt, double const& val)
+    {
+        tr_variantInitReal(tgt, val);
+    }
+};
 
 template<>
-std::optional<tr_log_level> Setting::variantToVal(tr_variant* var)
+struct Converter<tr_encryption_mode>
 {
-
-    if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
+    static std::optional<tr_encryption_mode> load(tr_variant* src)
     {
-
-        auto const needle = tr_strlower(tr_strvStrip(val));
-        for (auto const& [name, log_level] : LogKeys)
+        if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
         {
-            if (needle == name)
+            auto const needle = tr_strlower(tr_strvStrip(val));
+
+            for (auto const& [key, encryption] : Keys)
             {
-                return log_level;
+                if (key == needle)
+                {
+                    return encryption;
+                }
             }
         }
-    }
 
-    if (auto val = int64_t{}; tr_variantGetInt(var, &val))
-    {
-        for (auto const& [name, log_level] : LogKeys)
+        if (auto val = int64_t{}; tr_variantGetInt(src, &val))
         {
-            if (log_level == val)
+            for (auto const& [key, encryption] : Keys)
             {
-                return log_level;
+                if (encryption == val)
+                {
+                    return encryption;
+                }
             }
         }
+
+        return {};
     }
 
-    return {};
-}
-
-template<>
-std::optional<mode_t> Setting::variantToVal(tr_variant* var)
-{
-    if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
+    static void save(tr_variant* tgt, tr_encryption_mode const& val)
     {
-        if (auto const mode = tr_parseNum<uint32_t>(val, nullptr, 8); mode)
-        {
-            return static_cast<mode_t>(*mode);
-        }
-    }
-
-    if (auto val = int64_t{}; tr_variantGetInt(var, &val))
-    {
-        return static_cast<mode_t>(val);
-    }
-
-    return {};
-}
-
-template<>
-std::optional<tr_port> Setting::variantToVal(tr_variant* var)
-{
-    if (auto val = int64_t{}; tr_variantGetInt(var, &val))
-    {
-        return tr_port::fromHost(val);
-    }
-
-    return {};
-}
-
-static auto constexpr PreallocationKeys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 4>{ {
-    { "none"sv, TR_PREALLOCATE_NONE },
-    { "fast"sv, TR_PREALLOCATE_SPARSE },
-    { "sparse"sv, TR_PREALLOCATE_SPARSE },
-    { "full"sv, TR_PREALLOCATE_FULL },
-} };
-
-template<>
-std::optional<tr_preallocation_mode> Setting::variantToVal(tr_variant* var)
-{
-    if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
-    {
-        auto const needle = tr_strlower(tr_strvStrip(val));
-
-        for (auto const& [key, value] : PreallocationKeys)
-        {
-            if (key == needle)
-            {
-                return value;
-            }
-        }
-    }
-
-    if (auto val = int64_t{}; tr_variantGetInt(var, &val))
-    {
-        for (auto const& [name, value] : PreallocationKeys)
+        for (auto const& [key, value] : Keys)
         {
             if (value == val)
             {
-                return value;
+                tr_variantInitStrView(tgt, key);
+                return;
             }
         }
     }
 
-    return {};
-}
-
-template<>
-std::optional<size_t> Setting::variantToVal(tr_variant* var)
-{
-    if (auto val = int64_t{}; tr_variantGetInt(var, &val))
-    {
-        return static_cast<size_t>(val);
-    }
-
-    return {};
-}
-
-template<>
-std::optional<std::string> Setting::variantToVal(tr_variant* var)
-{
-    if (auto val = std::string_view{}; tr_variantGetStrView(var, &val))
-    {
-        return std::string{ val };
-    }
-
-    return {};
-}
-
-static void saveBool(tr_variant* tgt, Setting const& setting)
-{
-    tr_variantInitBool(tgt, setting.get<bool>());
-}
-
-static void saveDouble(tr_variant* tgt, Setting const& setting)
-{
-    tr_variantInitReal(tgt, setting.get<double>());
-}
-
-static void saveEncryption(tr_variant* tgt, Setting const& setting)
-{
-    auto const val = setting.get<tr_encryption_mode>();
-
-    for (auto const& [key, value] : EncryptionKeys)
-    {
-        if (value == val)
-        {
-            tr_variantInitStrView(tgt, key);
-            return;
-        }
-    }
-}
-
-static void saveInt(tr_variant* tgt, Setting const& setting)
-{
-    tr_variantInitInt(tgt, setting.get<int>());
-}
-
-static void saveLogLevel(tr_variant* tgt, Setting const& setting)
-{
-    auto const val = setting.get<tr_log_level>();
-
-    for (auto const& [key, value] : LogKeys)
-    {
-        if (value == val)
-        {
-            tr_variantInitStrView(tgt, key);
-            return;
-        }
-    }
-}
-
-static void saveModeT(tr_variant* tgt, Setting const& setting)
-{
-    tr_variantInitStr(tgt, fmt::format("{:03o}", setting.get<mode_t>()));
-}
-
-static void savePort(tr_variant* tgt, Setting const& setting)
-{
-    tr_variantInitInt(tgt, setting.get<tr_port>().host());
-}
-
-static void savePreallocation(tr_variant* tgt, Setting const& setting)
-{
-    auto const val = setting.get<tr_preallocation_mode>();
-
-    for (auto const& [key, value] : PreallocationKeys)
-    {
-        if (value == val)
-        {
-            tr_variantInitStrView(tgt, key);
-            return;
-        }
-    }
-}
-
-static void saveSizeT(tr_variant* tgt, Setting const& setting)
-{
-    tr_variantInitInt(tgt, setting.get<size_t>());
-}
-
-static void saveString(tr_variant* tgt, Setting const& setting)
-{
-    tr_variantInitStr(tgt, setting.get<std::string>());
-}
-
-using Saver = void (*)(tr_variant* tgt, Setting const& setting);
-
-static auto const savers = std::array<Saver, std::variant_size_v<Setting::Value>>{
-    saveBool, saveDouble, saveEncryption, saveInt, saveLogLevel, saveModeT, savePort, savePreallocation, saveSizeT, saveString
+private:
+    static auto constexpr Keys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{
+        { { "required", TR_ENCRYPTION_REQUIRED }, { "preferred", TR_ENCRYPTION_PREFERRED }, { "allowed", TR_CLEAR_PREFERRED } }
+    };
 };
+
+template<>
+struct Converter<int>
+{
+    static std::optional<int> load(tr_variant* src)
+    {
+        if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+        {
+            return static_cast<int>(val);
+        }
+
+        return {};
+    }
+
+    static void save(tr_variant* tgt, int val)
+    {
+        tr_variantInitInt(tgt, val);
+    }
+};
+
+template<>
+struct Converter<tr_log_level>
+{
+    static std::optional<tr_log_level> load(tr_variant* src)
+    {
+        if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
+        {
+            auto const needle = tr_strlower(tr_strvStrip(val));
+
+            for (auto const& [name, log_level] : Keys)
+            {
+                if (needle == name)
+                {
+                    return log_level;
+                }
+            }
+        }
+
+        if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+        {
+            for (auto const& [name, log_level] : Keys)
+            {
+                if (log_level == val)
+                {
+                    return log_level;
+                }
+            }
+        }
+
+        return {};
+    }
+
+    static void save(tr_variant* tgt, tr_log_level val)
+    {
+        for (auto const& [key, value] : Keys)
+        {
+            if (value == val)
+            {
+                tr_variantInitStrView(tgt, key);
+                return;
+            }
+        }
+    }
+
+private:
+    static auto constexpr Keys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
+        { "critical"sv, TR_LOG_CRITICAL },
+        { "debug"sv, TR_LOG_DEBUG },
+        { "error"sv, TR_LOG_ERROR },
+        { "info"sv, TR_LOG_INFO },
+        { "off"sv, TR_LOG_OFF },
+        { "trace"sv, TR_LOG_TRACE },
+        { "warn"sv, TR_LOG_WARN },
+    } };
+};
+
+template<>
+struct Converter<mode_t>
+{
+    static std::optional<mode_t> load(tr_variant* src)
+    {
+        if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
+        {
+            if (auto const mode = tr_parseNum<uint32_t>(val, nullptr, 8); mode)
+            {
+                return static_cast<mode_t>(*mode);
+            }
+        }
+
+        if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+        {
+            return static_cast<mode_t>(val);
+        }
+
+        return {};
+    }
+
+    static void save(tr_variant* tgt, mode_t const& val)
+    {
+        tr_variantInitStr(tgt, fmt::format("{:03o}", val));
+    }
+};
+
+template<>
+struct Converter<tr_port>
+{
+    static std::optional<tr_port> load(tr_variant* src)
+    {
+        if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+        {
+            return tr_port::fromHost(val);
+        }
+
+        return {};
+    }
+
+    static void save(tr_variant* tgt, tr_port const& val)
+    {
+        tr_variantInitInt(tgt, val.host());
+    }
+};
+
+template<>
+struct Converter<tr_preallocation_mode>
+{
+    static std::optional<tr_preallocation_mode> load(tr_variant* src)
+    {
+        if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
+        {
+            auto const needle = tr_strlower(tr_strvStrip(val));
+
+            for (auto const& [name, value] : Keys)
+            {
+                if (name == needle)
+                {
+                    return value;
+                }
+            }
+        }
+
+        if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+        {
+            for (auto const& [name, value] : Keys)
+            {
+                if (value == val)
+                {
+                    return value;
+                }
+            }
+        }
+
+        return {};
+    }
+
+    static void save(tr_variant* tgt, tr_preallocation_mode val)
+    {
+        for (auto const& [key, value] : Keys)
+        {
+            if (value == val)
+            {
+                tr_variantInitStrView(tgt, key);
+                return;
+            }
+        }
+    }
+
+private:
+    static auto constexpr Keys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 4>{ {
+        { "none"sv, TR_PREALLOCATE_NONE },
+        { "fast"sv, TR_PREALLOCATE_SPARSE },
+        { "sparse"sv, TR_PREALLOCATE_SPARSE },
+        { "full"sv, TR_PREALLOCATE_FULL },
+    } };
+};
+
+template<>
+struct Converter<size_t>
+{
+    static std::optional<size_t> load(tr_variant* src)
+    {
+        if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+        {
+            return static_cast<size_t>(val);
+        }
+
+        return {};
+    }
+
+    static void save(tr_variant* tgt, size_t const& val)
+    {
+        tr_variantInitInt(tgt, val);
+    }
+};
+
+template<>
+struct Converter<std::string>
+{
+    static std::optional<std::string> load(tr_variant* src)
+    {
+        if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
+        {
+            return std::string{ val };
+        }
+
+        return {};
+    }
+
+    static void save(tr_variant* tgt, std::string const& val)
+    {
+        tr_variantInitStr(tgt, val);
+    }
+};
+
+} // namespace
+
+namespace libtransmission
+{
+namespace
+{
+template<typename T>
+void vsave(tr_variant* tgt, Setting const& src)
+{
+    Converter<T>::save(tgt, src.get<T>());
+}
+
+template<typename T>
+std::optional<Setting::Value> vload(tr_variant* src)
+{
+    if (auto val = Converter<T>::load(src); val)
+    {
+        return Setting::Value{ *val };
+    }
+
+    return {};
+}
+} // namespace
 
 void Setting::save(tr_variant* tgt) const
 {
-    auto const idx = value_.index();
-
-    if (savers[idx])
+    // clang-format off
+    switch(value_.index())
     {
-        savers[idx](tgt, *this);
+        case 0: vsave<bool>(tgt, *this); break;
+        case 1: vsave<double>(tgt, *this); break;
+        case 2: vsave<tr_encryption_mode>(tgt, *this); break;
+        case 3: vsave<int>(tgt, *this); break;
+        case 4: vsave<tr_log_level>(tgt, *this); break;
+        case 5: vsave<mode_t>(tgt, *this); break;
+        case 6: vsave<tr_port>(tgt, *this); break;
+        case 7: vsave<tr_preallocation_mode>(tgt, *this); break;
+        case 8: vsave<size_t>(tgt, *this); break;
+        case 9: vsave<std::string>(tgt, *this); break;
+        break;
     }
+    // clang-format on
+}
+
+bool Setting::load(tr_variant* src)
+{
+    auto value = std::optional<Value>{};
+
+    // clang-format off
+    switch(value_.index())
+    {
+        case 0: value = vload<bool>(src); break;
+        case 1: value = vload<double>(src); break;
+        case 2: value = vload<tr_encryption_mode>(src); break;
+        case 3: value = vload<int>(src); break;
+        case 4: value = vload<tr_log_level>(src); break;
+        case 5: value = vload<mode_t>(src); break;
+        case 6: value = vload<tr_port>(src); break;
+        case 7: value = vload<tr_preallocation_mode>(src); break;
+        case 8: value = vload<size_t>(src); break;
+        case 9: value = vload<std::string>(src); break;
+        break;
+    }
+    // clang-format on
+
+    if (!value || value_ == *value)
+    {
+        return false;
+    }
+
+    value_ = std::move(*value);
+    return true;
 }
 
 SessionSettings::SessionSettings()
