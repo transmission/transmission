@@ -18,6 +18,7 @@
 struct tr_variant;
 
 #define SESSION_SETTINGS_FIELDS(V) \
+    V(TR_KEY_umask, umask, mode_t, 022) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false) \
@@ -93,7 +94,6 @@ struct tr_variant;
     V(TR_KEY_start_added_torrents, start_added_torrents, bool, true) \
     V(TR_KEY_tcp_enabled, tcp_enabled, bool, true) \
     V(TR_KEY_trash_original_torrent_files, trash_original_torrent_files, bool, false) \
-    V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true)
 

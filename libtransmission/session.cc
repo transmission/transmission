@@ -487,7 +487,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
-    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask_));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4_.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6_.readable());
@@ -740,12 +739,17 @@ void tr_session::initImpl(init_data& data)
 
 static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
 
-void tr_session::setImpl(init_data& data)
+void tr_session::setImpl(init_data& data, bool force)
 {
     TR_ASSERT(tr_amInEventThread(this));
 
     tr_variant* const settings = data.client_settings;
     TR_ASSERT(tr_variantIsDict(settings));
+
+    TR_ASSERT(tr_variantIsDict(data.client_settings));
+    auto const old_settings = settings_;
+    auto new_settings = old_settings;
+    new_settings.load(data.client_settings);
 
     auto d = double{};
     auto i = int64_t{};
@@ -757,20 +761,10 @@ void tr_session::setImpl(init_data& data)
     }
 
 #ifndef _WIN32
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
+    if (force || (new_settings.umask != old_settings.umask))
     {
-        /* Read a umask as a string representing an octal number. */
-        this->umask_ = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, nullptr, 8).value_or(DefaultUmask));
-        ::umask(this->umask_);
+        ::umask(new_settings.umask);
     }
-    else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
-    {
-        /* Or as a base 10 integer to remain compatible with the old settings format. */
-        this->umask_ = (mode_t)i;
-        ::umask(this->umask_);
-    }
-
 #endif
 
     /* misc features */
@@ -1125,6 +1119,7 @@ void tr_session::setImpl(init_data& data)
         this->useAnnounceIP(val);
     }
 
+    this->settings_ = new_settings;
     data.done_cv.notify_one();
 }
 
@@ -1137,12 +1132,12 @@ void tr_sessionSet(tr_session* session, tr_variant* settings)
 
     if (tr_amInEventThread(session))
     {
-        session->setImpl(data);
+        session->setImpl(data, false);
     }
     else
     {
         auto lock = session->unique_lock();
-        tr_runInEventThread(session, [&session, &data]() { session->setImpl(data); });
+        tr_runInEventThread(session, [&session, &data]() { session->setImpl(data, false); });
         data.done_cv.wait(lock);
     }
 }
