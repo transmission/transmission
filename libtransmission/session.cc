@@ -747,7 +747,7 @@ void tr_session::setImpl(init_data& data, bool force)
 
     TR_ASSERT(tr_variantIsDict(data.client_settings));
     auto const old_settings = settings_;
-    auto new_settings = old_settings;
+    auto& new_settings = settings_;
     new_settings.load(data.client_settings);
 
     auto d = double{};
@@ -797,9 +797,9 @@ void tr_session::setImpl(init_data& data, bool force)
         is_tcp_enabled_ = val;
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_utp_enabled, &val))
+    if (force || (new_settings.utp_enabled != old_settings.utp_enabled))
     {
-        tr_sessionSetUTPEnabled(this, val);
+        tr_sessionSetUTPEnabled(this, new_settings.utp_enabled);
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_lpd_enabled, &val))
@@ -1113,7 +1113,6 @@ void tr_session::setImpl(init_data& data, bool force)
         this->useAnnounceIP(val);
     }
 
-    this->settings_ = new_settings;
     data.done_cv.notify_one();
 }
 
@@ -2056,7 +2055,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 bool tr_session::allowsUTP() const noexcept
 {
 #ifdef WITH_UTP
-    return is_utp_enabled_;
+    return settings_.utp_enabled;
 #else
     return false;
 #endif
@@ -2073,12 +2072,12 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled == session->allowsUTP())
+    if (enabled != session->allowsUTP())
     {
         return;
     }
 
-    session->is_utp_enabled_ = enabled;
+    session->settings_.utp_enabled = enabled;
 }
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
