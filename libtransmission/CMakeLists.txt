@@ -75,6 +75,7 @@ set(PROJECT_FILES
   variant-benc.cc
   variant-json.cc
   variant.cc
+  variant-converters.cc
   verify.cc
   watchdir-generic.cc
   watchdir-inotify.cc
@@ -154,6 +155,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     transmission.h
     utils.h
     variant.h
+    variant-converters.h
     watchdir.h
     web-utils.h
     web.h

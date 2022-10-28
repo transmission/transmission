@@ -3,33 +3,20 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <bitset>
 #include <cstddef> // for size_t
-#include <cstdint> // for int64_t
-#include <optional>
 #include <string>
-#include <string_view>
-#include <variant>
 
 #include "transmission.h"
 
 #include "log.h" // for tr_log_level
 #include "net.h" // for tr_port
 #include "quark.h"
-#include "rpc-server.h"
+#include "rpc-server.h" // for tr_rpc_server::DefaultRpcSocketMode
 
 struct tr_variant;
 
 namespace libtransmission
 {
-
-template<typename T>
-struct VariantConverter
-{
-public:
-    static std::optional<T> load(tr_variant* src);
-    static void save(tr_variant* tgt, T const& val);
-};
 
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \

@@ -37,6 +37,7 @@
 #include "tr-macros.h"
 #include "tr-utp.h"
 #include "utils.h"
+#include "variant.h"
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
