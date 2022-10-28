@@ -39,13 +39,14 @@ struct tr_variant;
     V(TR_KEY_ratio_limit, ratio_limit, double, 2.0) \
     V(TR_KEY_ratio_limit_enabled, ratio_limit_enabled, bool, false) \
     V(TR_KEY_rename_partial_files, is_incomplete_file_naming_enabled, bool, false) \
+    V(TR_KEY_scrape_paused_torrents_enabled, should_scrape_paused_torrents, bool, true) \
     V(TR_KEY_seed_queue_enabled, seed_queue_enabled, bool, false) \
     V(TR_KEY_seed_queue_size, seed_queue_size, size_t, 10U) \
+    V(TR_KEY_start_added_torrents, should_start_added_torrents, bool, true) \
     V(TR_KEY_tcp_enabled, tcp_enabled, bool, true) \
+    V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false) \
     V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
-    V(TR_KEY_scrape_paused_torrents_enabled, should_scrape_paused_torrents, bool, true) \
-    V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false) \
@@ -94,7 +95,6 @@ struct tr_variant;
     V(TR_KEY_speed_limit_down_enabled, speed_limit_down_enabled, bool, false) \
     V(TR_KEY_speed_limit_up, speed_limit_up, size_t, 100U) \
     V(TR_KEY_speed_limit_up_enabled, speed_limit_up_enabled, bool, false) \
-    V(TR_KEY_start_added_torrents, start_added_torrents, bool, true) \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U)
 
 struct tr_session_settings

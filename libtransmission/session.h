@@ -701,7 +701,7 @@ public:
 
     [[nodiscard]] constexpr auto shouldPauseAddedTorrents() const noexcept
     {
-        return should_pause_added_torrents_;
+        return !settings_.should_start_added_torrents;
     }
 
     [[nodiscard]] constexpr auto shouldDeleteSource() const noexcept
@@ -1017,8 +1017,6 @@ private:
     bool queue_stalled_enabled_ = false;
 
     bool is_port_random_ = false;
-
-    bool should_pause_added_torrents_ = false;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
 
