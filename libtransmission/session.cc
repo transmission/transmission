@@ -913,19 +913,6 @@ void tr_session::setImpl(init_data& data, bool force)
 
     turtleBootstrap(this, &turtle);
 
-    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
-    {
-        if (auto enabled = bool{}; tr_variantDictFindBool(settings, enabled_key, &enabled))
-        {
-            this->useScript(script, enabled);
-        }
-
-        if (auto file = std::string_view{}; tr_variantDictFindStrView(settings, script_key, &file))
-        {
-            this->setScript(script, file);
-        }
-    }
-
     /**
     ***  BruteForce
     **/

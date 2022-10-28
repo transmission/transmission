@@ -42,6 +42,12 @@ struct tr_variant;
     V(TR_KEY_ratio_limit_enabled, ratio_limit_enabled, bool, false) \
     V(TR_KEY_rename_partial_files, is_incomplete_file_naming_enabled, bool, false) \
     V(TR_KEY_scrape_paused_torrents_enabled, should_scrape_paused_torrents, bool, true) \
+    V(TR_KEY_script_torrent_added_enabled, script_torrent_added_enabled, bool, false) \
+    V(TR_KEY_script_torrent_added_filename, script_torrent_added_filename, std::string, "") \
+    V(TR_KEY_script_torrent_done_enabled, script_torrent_done_enabled, bool, false) \
+    V(TR_KEY_script_torrent_done_filename, script_torrent_done_filename, std::string, "") \
+    V(TR_KEY_script_torrent_done_seeding_enabled, script_torrent_done_seeding_enabled, bool, false) \
+    V(TR_KEY_script_torrent_done_seeding_filename, script_torrent_done_seeding_filename, std::string, "") \
     V(TR_KEY_seed_queue_enabled, seed_queue_enabled, bool, false) \
     V(TR_KEY_seed_queue_size, seed_queue_size, size_t, 10U) \
     V(TR_KEY_start_added_torrents, should_start_added_torrents, bool, true) \
@@ -86,12 +92,6 @@ struct tr_variant;
     V(TR_KEY_rpc_username, rpc_username, std::string, "") \
     V(TR_KEY_rpc_whitelist, rpc_whitelist, std::string, TR_DEFAULT_RPC_WHITELIST) \
     V(TR_KEY_rpc_whitelist_enabled, rpc_whitelist_enabled, bool, true) \
-    V(TR_KEY_script_torrent_added_enabled, script_torrent_added_enabled, bool, false) \
-    V(TR_KEY_script_torrent_added_filename, script_torrent_added_filename, std::string, "") \
-    V(TR_KEY_script_torrent_done_enabled, script_torrent_done_enabled, bool, false) \
-    V(TR_KEY_script_torrent_done_filename, script_torrent_done_filename, std::string, "") \
-    V(TR_KEY_script_torrent_done_seeding_enabled, script_torrent_done_seeding_enabled, bool, false) \
-    V(TR_KEY_script_torrent_done_seeding_filename, script_torrent_done_seeding_filename, std::string, "") \
     V(TR_KEY_speed_limit_down, speed_limit_down, size_t, 100U) \
     V(TR_KEY_speed_limit_down_enabled, speed_limit_down_enabled, bool, false) \
     V(TR_KEY_speed_limit_up, speed_limit_up, size_t, 100U) \

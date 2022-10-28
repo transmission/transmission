@@ -400,22 +400,22 @@ public:
 
     constexpr void useScript(TrScript i, bool enabled)
     {
-        scripts_enabled_[i] = enabled;
+        scriptEnabledFlag(i) = enabled;
     }
 
-    [[nodiscard]] constexpr auto useScript(TrScript i) const
+    [[nodiscard]] constexpr bool useScript(TrScript i) const
     {
-        return scripts_enabled_[i];
+        return const_cast<tr_session*>(this)->scriptEnabledFlag(i);
     }
 
     void setScript(TrScript i, std::string_view path)
     {
-        scripts_[i] = path;
+        scriptFilename(i) = path;
     }
 
     [[nodiscard]] constexpr auto const& script(TrScript i) const
     {
-        return scripts_[i];
+        return const_cast<tr_session*>(this)->scriptFilename(i);
     }
 
     // blocklist
@@ -858,6 +858,36 @@ public:
     }
 
 private:
+    constexpr bool& scriptEnabledFlag(TrScript i)
+    {
+        if (i == TR_SCRIPT_ON_TORRENT_ADDED)
+        {
+            return settings_.script_torrent_added_enabled;
+        }
+
+        if (i == TR_SCRIPT_ON_TORRENT_DONE)
+        {
+            return settings_.script_torrent_done_enabled;
+        }
+
+        return settings_.script_torrent_done_seeding_enabled;
+    }
+
+    constexpr std::string& scriptFilename(TrScript i)
+    {
+        if (i == TR_SCRIPT_ON_TORRENT_ADDED)
+        {
+            return settings_.script_torrent_added_filename;
+        }
+
+        if (i == TR_SCRIPT_ON_TORRENT_DONE)
+        {
+            return settings_.script_torrent_done_filename;
+        }
+
+        return settings_.script_torrent_done_seeding_filename;
+    }
+
     [[nodiscard]] tr_port randomPort() const;
 
     void setPeerPort(tr_port port);
@@ -1013,14 +1043,10 @@ private:
 
     bool is_port_random_ = false;
 
-    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
-
     /// fields that aren't trivial,
     /// but are self-contained / have no interdependencies
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
-
-    std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
     std::string peer_congestion_algorithm_;
 
