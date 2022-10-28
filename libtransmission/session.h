@@ -85,14 +85,6 @@ struct tr_turtle_info
     /* does turtle mode turn itself on and off at given times? */
     bool isClockEnabled = false;
 
-    /* when clock mode is on, minutes after midnight to turn on turtle mode.
-     * Valid range: 0..<1440 */
-    int beginMinute = 0;
-
-    /* when clock mode is on, minutes after midnight to turn off turtle mode.
-     * Valid range: 0..<1440 */
-    int endMinute = 0;
-
     /* called when isEnabled changes */
     tr_altSpeedFunc callback = nullptr;
 
@@ -912,6 +904,8 @@ private:
     friend char const* tr_sessionGetRPCPassword(tr_session const* session);
     friend char const* tr_sessionGetRPCUsername(tr_session const* session);
     friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
+    friend int tr_sessionGetAltSpeedBegin(tr_session const* session);
+    friend int tr_sessionGetAltSpeedEnd(tr_session const* session);
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
@@ -929,7 +923,9 @@ private:
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetAltSpeedBegin(tr_session* session, int minutes_since_midnight);
     friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day new_val);
+    friend void tr_sessionSetAltSpeedEnd(tr_session* session, int minutes_since_midnight);
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
@@ -962,6 +958,7 @@ private:
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
     friend void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
+    friend void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled);
 
     /// constexpr fields
 

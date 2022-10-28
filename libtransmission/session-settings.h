@@ -19,7 +19,9 @@ struct tr_variant;
 
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
+    V(TR_KEY_alt_speed_time_begin, alt_speed_time_begin_minute, size_t, 540U) /* minutes past midnight; 9AM */ \
     V(TR_KEY_alt_speed_time_day, use_alt_speed_on_these_weekdays, size_t, TR_SCHED_ALL) \
+    V(TR_KEY_alt_speed_time_end, alt_speed_time_end_minute, size_t, 1020U) /* minutes past midnight; 5PM */ \
     V(TR_KEY_alt_speed_up, alt_speed_up_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_announce_ip, announce_ip, std::string, "") \
     V(TR_KEY_announce_ip_enabled, announce_ip_enabled, bool, false) \
@@ -77,9 +79,7 @@ struct tr_variant;
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false) \
-    V(TR_KEY_alt_speed_time_begin, alt_speed_time_begin, size_t, 540U) /* minutes past midnight; 9AM */ \
     V(TR_KEY_alt_speed_time_enabled, alt_speed_time_enabled, bool, false) \
-    V(TR_KEY_alt_speed_time_end, alt_speed_time_end, size_t, 1020U) /* minutes past midnight; 5PM */ \
     V(TR_KEY_anti_brute_force_enabled, anti_brute_force_enabled, bool, false) \
     V(TR_KEY_anti_brute_force_threshold, anti_brute_force_threshold, size_t, 100U) \
     V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT)) \
