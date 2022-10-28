@@ -27,6 +27,7 @@ struct tr_variant;
     V(TR_KEY_lpd_enabled, lpd_enabled, bool, true) \
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO) \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
+    V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE) \
     V(TR_KEY_seed_queue_enabled, seed_queue_enabled, bool, false) \
     V(TR_KEY_seed_queue_size, seed_queue_size, size_t, 10U) \
     V(TR_KEY_umask, umask, mode_t, 022) \
@@ -62,7 +63,6 @@ struct tr_variant;
     V(TR_KEY_peer_port_random_on_start, peer_port_random_on_start, bool, false) \
     V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04) \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true) \
-    V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE) \
     V(TR_KEY_prefetch_enabled, prefetch_enabled, bool, true) \
     V(TR_KEY_queue_stalled_enabled, queue_stalled_enabled, bool, true) \
     V(TR_KEY_queue_stalled_minutes, queue_stalled_minutes, size_t, 30U) \

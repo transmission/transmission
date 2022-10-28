@@ -369,7 +369,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddStrView(d, TR_KEY_peer_socket_tos, TR_DEFAULT_PEER_SOCKET_TOS_STR);
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
-    tr_variantDictAddInt(d, TR_KEY_preallocation, TR_PREALLOCATE_SPARSE);
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, DefaultPrefetchEnabled);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, 6);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, true);
@@ -447,7 +446,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
-    tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode());
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTTLHours());
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
@@ -842,11 +840,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &val))
     {
         this->is_prefetch_enabled_ = val;
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
-    {
-        this->preallocation_mode_ = tr_preallocation_mode(i);
     }
 
     if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))

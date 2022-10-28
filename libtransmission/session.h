@@ -691,7 +691,7 @@ public:
 
     [[nodiscard]] constexpr auto preallocationMode() const noexcept
     {
-        return preallocation_mode_;
+        return settings_.preallocation_mode;
     }
 
     [[nodiscard]] constexpr auto shouldScrapePausedTorrents() const noexcept
@@ -991,8 +991,6 @@ private:
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
     int queue_stalled_minutes_ = 0;
-
-    tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
 
     // The open port on the local machine for incoming peer requests
     tr_port private_peer_port_;
