@@ -70,13 +70,6 @@ std::recursive_mutex tr_session::session_mutex_;
 
 static auto constexpr DefaultBindAddressIpv4 = "0.0.0.0"sv;
 static auto constexpr DefaultBindAddressIpv6 = "::"sv;
-static auto constexpr DefaultRpcHostWhitelist = ""sv;
-#ifdef TR_LIGHTWEIGHT
-static auto constexpr DefaultPrefetchEnabled = bool{ false };
-#else
-static auto constexpr DefaultPrefetchEnabled = bool{ true };
-#endif
-static auto constexpr DefaultUmask = int{ 022 };
 static auto constexpr SaveIntervalSecs = 360s;
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
@@ -330,85 +323,17 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
 ****
 ***/
 
-#ifdef TR_LIGHTWEIGHT
-#define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
-#else
-#define TR_DEFAULT_ENCRYPTION TR_ENCRYPTION_PREFERRED
-#endif
-
 void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 {
-    auto const download_dir = tr_getDefaultDownloadDir();
-
-    auto* const d = setme_dictionary;
-    TR_ASSERT(tr_variantIsDict(d));
-    tr_variantDictReserve(d, 71);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
-    tr_variantDictAddStrView(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist"sv);
-    tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
-    tr_variantDictAddInt(d, TR_KEY_peer_port, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_PORT_STR));
-    tr_variantDictAddStrView(d, TR_KEY_peer_socket_tos, TR_DEFAULT_PEER_SOCKET_TOS_STR);
-    tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, DefaultPrefetchEnabled);
-    tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, false);
-    tr_variantDictAddStrView(d, TR_KEY_rpc_bind_address, "0.0.0.0");
-    tr_variantDictAddBool(d, TR_KEY_rpc_enabled, false);
-    tr_variantDictAddStrView(d, TR_KEY_rpc_password, "");
-    tr_variantDictAddStrView(d, TR_KEY_rpc_username, "");
-    tr_variantDictAddStrView(d, TR_KEY_rpc_whitelist, TR_DEFAULT_RPC_WHITELIST);
-    tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, true);
-    tr_variantDictAddStrView(d, TR_KEY_rpc_host_whitelist, DefaultRpcHostWhitelist);
-    tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
-    tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
-    tr_variantDictAddStrView(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
-    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:03o}", tr_rpc_server::DefaultRpcSocketMode));
-    tr_variantDictAddStrView(d, TR_KEY_script_torrent_added_filename, "");
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
-    tr_variantDictAddStrView(d, TR_KEY_script_torrent_done_filename, "");
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, false);
-    tr_variantDictAddStrView(d, TR_KEY_script_torrent_done_seeding_filename, "");
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_seeding_enabled, false);
-    tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
-    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
-    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
+    tr_session_settings{}.save(setme_dictionary);
+    tr_rpc_server::defaultSettings(setme_dictionary);
 }
 
-void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
+void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
 {
-    auto* const d = setme_dictionary;
-    TR_ASSERT(tr_variantIsDict(d));
-
-    tr_variantDictReserve(d, 70);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
-    tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
-    tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
-    tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
-    tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
-    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
-    tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
-    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
-    tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
-    tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_rpc_password, tr_sessionGetRPCPassword(s));
-    tr_variantDictAddInt(d, TR_KEY_rpc_port, tr_sessionGetRPCPort(s));
-    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", s->rpc_server_->socket_mode_));
-    tr_variantDictAddStr(d, TR_KEY_rpc_url, s->rpc_server_->url());
-    tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
-    tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
-    tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
-    tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
-    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
-    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
-    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
-    {
-        tr_variantDictAddBool(d, enabled_key, s->useScript(script));
-        tr_variantDictAddStr(d, script_key, s->script(script));
-    }
+    session->settings_.save(setme_dictionary);
+    TR_ASSERT(session->rpc_server_);
+    session->rpc_server_->save(setme_dictionary);
 }
 
 static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char const* appname)
@@ -518,10 +443,10 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     auto* const session = new tr_session{ config_dir };
     bandwidthGroupRead(session, config_dir);
 
-    /* nice to start logging at the very beginning */
-    if (auto i = int64_t{}; tr_variantDictFindInt(client_settings, TR_KEY_message_level, &i))
+    // nice to start logging at the very beginning
+    if (auto val = int64_t{}; tr_variantDictFindInt(client_settings, TR_KEY_message_level, &val))
     {
-        tr_logSetLevel(tr_log_level(i));
+        tr_logSetLevel(static_cast<tr_log_level>(val));
     }
 
     /* start the libtransmission thread */
@@ -785,20 +710,6 @@ void tr_session::setImpl(init_data& data, bool force)
     }
 
     turtleBootstrap(this, settings_, turtle);
-
-    /**
-    ***  BruteForce
-    **/
-
-    if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
-    {
-        tr_sessionSetAntiBruteForceThreshold(this, static_cast<int>(i));
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &val))
-    {
-        tr_sessionSetAntiBruteForceEnabled(this, val);
-    }
 
     data.done_cv.notify_one();
 }

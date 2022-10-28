@@ -24,6 +24,7 @@ TEST_F(SettingsTest, canInstantiate)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 100);
     settings.save(&dict);
+    fmt::print("{:s}\n", tr_variantToStr(&dict, TR_VARIANT_FMT_JSON));
     tr_variantClear(&dict);
 }
 
@@ -364,32 +365,34 @@ TEST_F(SettingsTest, canSaveSizeT)
 
 TEST_F(SettingsTest, canLoadString)
 {
-    static auto constexpr Key = TR_KEY_rpc_url;
+    static auto constexpr Key = TR_KEY_bind_address_ipv4;
+    static auto constexpr ChangedValue = std::string_view{ "127.0.0.1" };
 
     auto settings = tr_session_settings{};
-    auto const expected_value = settings.rpc_url + "/subpath";
+    EXPECT_NE(ChangedValue, tr_session_settings{}.bind_address_ipv4);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, Key, expected_value);
+    tr_variantDictAddStrView(&dict, Key, ChangedValue);
     settings.load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(expected_value, settings.rpc_url);
+    EXPECT_EQ(ChangedValue, settings.bind_address_ipv4);
 }
 
 TEST_F(SettingsTest, canSaveString)
 {
-    static auto constexpr Key = TR_KEY_rpc_url;
+    static auto constexpr Key = TR_KEY_bind_address_ipv4;
+    static auto constexpr ChangedValue = std::string_view{ "127.0.0.1" };
 
     auto settings = tr_session_settings{};
-    auto const expected_value = settings.rpc_url + "/subpath";
+    EXPECT_NE(ChangedValue, tr_session_settings{}.bind_address_ipv4);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 100);
-    settings.rpc_url = expected_value;
+    settings.bind_address_ipv4 = ChangedValue;
     settings.save(&dict);
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
-    EXPECT_EQ(expected_value, val);
+    EXPECT_EQ(ChangedValue, val);
     tr_variantClear(&dict);
 }

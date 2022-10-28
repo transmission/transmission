@@ -13,13 +13,11 @@
 #include "log.h" // for tr_log_level
 #include "net.h" // for tr_port
 #include "quark.h"
-#include "rpc-server.h" // for tr_rpc_server::DefaultRpcSocketMode
 
 struct tr_variant;
 
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U, "") \
-    V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false, "") \
     V(TR_KEY_alt_speed_time_begin, alt_speed_time_begin_minute, size_t, 540U, "minutes past midnight; 9AM") \
     V(TR_KEY_alt_speed_time_day, use_alt_speed_on_these_weekdays, size_t, TR_SCHED_ALL, "days of the week") \
     V(TR_KEY_alt_speed_time_enabled, alt_speed_time_enabled, bool, false, "whether alt speeds toggle on and off on schedule") \
@@ -80,22 +78,9 @@ struct tr_variant;
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
     /* below here: unprocessed */ \
-    V(TR_KEY_anti_brute_force_enabled, anti_brute_force_enabled, bool, false, "") \
-    V(TR_KEY_anti_brute_force_threshold, anti_brute_force_threshold, size_t, 100U, "") \
+    V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false, "") \
     V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "") \
-    V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04, "") \
-    V(TR_KEY_rpc_authentication_required, rpc_authentication_required, bool, false, "") \
-    V(TR_KEY_rpc_bind_address, rpc_bind_address, std::string, "0.0.0.0", "") \
-    V(TR_KEY_rpc_enabled, rpc_enabled, bool, false, "") \
-    V(TR_KEY_rpc_host_whitelist, rpc_host_whitelist, std::string, "", "") \
-    V(TR_KEY_rpc_host_whitelist_enabled, rpc_host_whitelist_enabled, bool, true, "") \
-    V(TR_KEY_rpc_password, rpc_password, std::string, "", "") \
-    V(TR_KEY_rpc_port, rpc_port, tr_port, tr_port::fromHost(TR_DEFAULT_RPC_PORT), "") \
-    V(TR_KEY_rpc_socket_mode, rpc_socket_mode, mode_t, tr_rpc_server::DefaultRpcSocketMode, "") \
-    V(TR_KEY_rpc_url, rpc_url, std::string, TR_DEFAULT_RPC_URL_STR, "") \
-    V(TR_KEY_rpc_username, rpc_username, std::string, "", "") \
-    V(TR_KEY_rpc_whitelist, rpc_whitelist, std::string, TR_DEFAULT_RPC_WHITELIST, "") \
-    V(TR_KEY_rpc_whitelist_enabled, rpc_whitelist_enabled, bool, true, "")
+    V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04, "")
 
 struct tr_session_settings
 {
