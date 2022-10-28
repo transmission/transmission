@@ -738,12 +738,12 @@ public:
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
     {
-        return is_idle_limited_;
+        return settings_.idle_seeding_limit_enabled;
     }
 
     [[nodiscard]] constexpr auto idleLimitMinutes() const noexcept
     {
-        return idle_limit_minutes_;
+        return settings_.idle_seeding_limit_minutes;
     }
 
     [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
@@ -1006,8 +1006,6 @@ private:
     uint16_t peer_limit_ = 200;
     uint16_t peer_limit_per_torrent_ = 50;
 
-    uint16_t idle_limit_minutes_ = 0;
-
     uint16_t upload_slots_per_torrent_ = 8;
 
     uint8_t peer_id_ttl_hours_ = 6;
@@ -1017,7 +1015,6 @@ private:
 
     bool is_tcp_enabled_ = true;
 
-    bool is_idle_limited_ = false;
     bool is_prefetch_enabled_ = false;
     bool queue_stalled_enabled_ = false;
 

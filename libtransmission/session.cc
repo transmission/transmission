@@ -356,8 +356,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
-    tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, 30);
-    tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
     tr_variantDictAddInt(d, TR_KEY_peer_port, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_PORT_STR));
@@ -428,8 +426,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, s->isSpeedLimited(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
-    tr_variantDictAddInt(d, TR_KEY_idle_seeding_limit, s->idleLimitMinutes());
-    tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, s->isIdleLimited());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
@@ -940,16 +936,6 @@ void tr_session::setImpl(init_data& data, bool force)
         tr_sessionLimitSpeed(this, TR_DOWN, val);
     }
 
-    if (tr_variantDictFindInt(settings, TR_KEY_idle_seeding_limit, &i))
-    {
-        tr_sessionSetIdleLimit(this, i);
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_idle_seeding_limit_enabled, &val))
-    {
-        tr_sessionSetIdleLimited(this, val);
-    }
-
     /**
     ***  Turtle Mode
     **/
@@ -1248,14 +1234,14 @@ void tr_sessionSetIdleLimited(tr_session* session, bool is_limited)
 {
     TR_ASSERT(session != nullptr);
 
-    session->is_idle_limited_ = is_limited;
+    session->settings_.idle_seeding_limit_enabled = is_limited;
 }
 
 void tr_sessionSetIdleLimit(tr_session* session, uint16_t idle_minutes)
 {
     TR_ASSERT(session != nullptr);
 
-    session->idle_limit_minutes_ = idle_minutes;
+    session->settings_.idle_seeding_limit_minutes = idle_minutes;
 }
 
 bool tr_sessionIsIdleLimited(tr_session const* session)
