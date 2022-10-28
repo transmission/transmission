@@ -709,8 +709,6 @@ void tr_session::initImpl(init_data& data)
 
     this->peer_mgr_ = tr_peerMgrNew(this);
 
-    this->port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
-
     /**
     ***  Blocklist
     **/

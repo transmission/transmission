@@ -1089,8 +1089,6 @@ public:
 private:
     struct tr_peerMgr* peer_mgr_ = nullptr;
 
-    std::unique_ptr<tr_port_forwarding> port_forwarding_;
-
     tr_torrents torrents_;
 
     tr_open_files open_files_;
@@ -1124,6 +1122,8 @@ private:
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
     PortForwardingMediator port_forwarding_mediator_{ *this };
+
+    std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
     WebMediator web_mediator_{ this };
 
