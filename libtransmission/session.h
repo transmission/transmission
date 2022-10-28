@@ -686,7 +686,7 @@ public:
 
     [[nodiscard]] constexpr auto encryptionMode() const noexcept
     {
-        return encryption_mode_;
+        return settings_.encryption_mode;
     }
 
     [[nodiscard]] constexpr auto preallocationMode() const noexcept
@@ -994,8 +994,6 @@ private:
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
     int queue_stalled_minutes_ = 0;
-
-    tr_encryption_mode encryption_mode_ = TR_ENCRYPTION_PREFERRED;
 
     tr_preallocation_mode preallocation_mode_ = TR_PREALLOCATE_SPARSE;
 

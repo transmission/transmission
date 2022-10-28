@@ -262,7 +262,7 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED || mode == TR_CLEAR_PREFERRED);
 
-    session->encryption_mode_ = mode;
+    session->settings_.encryption_mode = mode;
 }
 
 /***
@@ -805,11 +805,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_lpd_enabled, &val))
     {
         tr_sessionSetLPDEnabled(this, val);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_encryption, &i))
-    {
-        tr_sessionSetEncryption(this, tr_encryption_mode(i));
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_socket_tos, &i))

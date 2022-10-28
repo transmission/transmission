@@ -20,6 +20,7 @@ struct tr_variant;
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
+    V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false) \
@@ -41,7 +42,6 @@ struct tr_variant;
     V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir()) \
     V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true) \
     V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U) \
-    V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED) \
     V(TR_KEY_idle_seeding_limit, idle_seeding_limit, size_t, 30U) \
     V(TR_KEY_idle_seeding_limit_enabled, idle_seeding_limit_enabled, bool, false) \
     V(TR_KEY_incomplete_dir, incomplete_dir, std::string, tr_getDefaultDownloadDir()) \
