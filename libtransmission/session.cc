@@ -72,10 +72,8 @@ static auto constexpr DefaultBindAddressIpv4 = "0.0.0.0"sv;
 static auto constexpr DefaultBindAddressIpv6 = "::"sv;
 static auto constexpr DefaultRpcHostWhitelist = ""sv;
 #ifdef TR_LIGHTWEIGHT
-static auto constexpr DefaultCacheSizeMB = int{ 2 };
 static auto constexpr DefaultPrefetchEnabled = bool{ false };
 #else
-static auto constexpr DefaultCacheSizeMB = int{ 4 };
 static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr DefaultUmask = int{ 022 };
@@ -347,7 +345,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictReserve(d, 71);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
     tr_variantDictAddStrView(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist"sv);
-    tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DefaultCacheSizeMB);
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
@@ -402,7 +399,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
 
     tr_variantDictReserve(d, 70);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
-    tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
@@ -708,10 +704,9 @@ void tr_session::setImpl(init_data& data, bool force)
     }
 #endif
 
-    /* misc features */
-    if (tr_variantDictFindInt(settings, TR_KEY_cache_size_mb, &i))
+    if (auto const& val = new_settings.cache_size_mb; force || val != old_settings.cache_size_mb)
     {
-        tr_sessionSetCacheLimit_MB(this, i);
+        tr_sessionSetCacheLimit_MB(this, val);
     }
 
     if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)
@@ -751,10 +746,7 @@ void tr_session::setImpl(init_data& data, bool force)
         }
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &val))
-    {
-        useBlocklist(val);
-    }
+    useBlocklist(new_settings.blocklist_enabled);
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
     {
@@ -1924,6 +1916,7 @@ void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb)
 {
     TR_ASSERT(session != nullptr);
 
+    session->settings_.cache_size_mb = mb;
     session->cache->setLimit(tr_toMemBytes(mb));
 }
 
@@ -1931,7 +1924,7 @@ size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_toMemMB(session->cache->getLimit());
+    return session->settings_.cache_size_mb;
 }
 
 /***
