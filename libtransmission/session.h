@@ -806,12 +806,12 @@ public:
 
     [[nodiscard]] constexpr auto isRatioLimited() const noexcept
     {
-        return is_ratio_limited_;
+        return settings_.ratio_limit_enabled;
     }
 
     [[nodiscard]] constexpr auto desiredRatio() const noexcept
     {
-        return desired_ratio_;
+        return settings_.ratio_limit;
     }
 
     [[nodiscard]] constexpr auto peerIdTTLHours() const noexcept
@@ -981,8 +981,6 @@ private:
     tr_rpc_func rpc_func_ = nullptr;
     void* rpc_func_user_data_ = nullptr;
 
-    float desired_ratio_ = 2.0F;
-
     std::array<tr_bytes_per_second_t, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
@@ -1021,7 +1019,6 @@ private:
 
     bool is_idle_limited_ = false;
     bool is_prefetch_enabled_ = false;
-    bool is_ratio_limited_ = false;
     bool queue_stalled_enabled_ = false;
 
     bool is_port_random_ = false;

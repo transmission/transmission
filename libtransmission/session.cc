@@ -371,8 +371,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, 6);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, 30);
-    tr_variantDictAddReal(d, TR_KEY_ratio_limit, 2.0);
-    tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_rename_partial_files, true);
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, false);
     tr_variantDictAddStrView(d, TR_KEY_rpc_bind_address, "0.0.0.0");
@@ -446,8 +444,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTTLHours());
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
-    tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio());
-    tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited());
     tr_variantDictAddBool(d, TR_KEY_rename_partial_files, s->isIncompleteFileNamingEnabled());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
@@ -944,16 +940,6 @@ void tr_session::setImpl(init_data& data, bool force)
         tr_sessionLimitSpeed(this, TR_DOWN, val);
     }
 
-    if (tr_variantDictFindReal(settings, TR_KEY_ratio_limit, &d))
-    {
-        tr_sessionSetRatioLimit(this, d);
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_ratio_limit_enabled, &val))
-    {
-        tr_sessionSetRatioLimited(this, val);
-    }
-
     if (tr_variantDictFindInt(settings, TR_KEY_idle_seeding_limit, &i))
     {
         tr_sessionSetIdleLimit(this, i);
@@ -1230,14 +1216,14 @@ void tr_sessionSetRatioLimited(tr_session* session, bool is_limited)
 {
     TR_ASSERT(session != nullptr);
 
-    session->is_ratio_limited_ = is_limited;
+    session->settings_.ratio_limit_enabled = is_limited;
 }
 
 void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio)
 {
     TR_ASSERT(session != nullptr);
 
-    session->desired_ratio_ = desired_ratio;
+    session->settings_.ratio_limit = desired_ratio;
 }
 
 bool tr_sessionIsRatioLimited(tr_session const* session)
