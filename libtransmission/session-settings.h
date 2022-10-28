@@ -19,6 +19,7 @@ struct tr_variant;
 
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_umask, umask, mode_t, 022) \
+    V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false) \
@@ -37,7 +38,6 @@ struct tr_variant;
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist") \
     V(TR_KEY_cache_size_mb, cache_sizes_mb, size_t, 4U) \
     V(TR_KEY_default_trackers, default_trackers_str, std::string, "") \
-    V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
     V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir()) \
     V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true) \
     V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U) \

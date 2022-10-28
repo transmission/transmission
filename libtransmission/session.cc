@@ -431,7 +431,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
-    tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->allowsDHT());
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddBool(d, TR_KEY_tcp_enabled, s->allowsTCP());
@@ -2050,7 +2049,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         [session, enabled]()
         {
             session->udp_core_.reset();
-            session->is_dht_enabled_ = enabled;
+            session->settings_.dht_enabled = enabled;
             session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session, session->udpPort());
         });
 }

@@ -711,7 +711,7 @@ public:
 
     [[nodiscard]] constexpr auto allowsDHT() const noexcept
     {
-        return is_dht_enabled_;
+        return settings_.dht_enabled;
     }
 
     [[nodiscard]] constexpr bool allowsLPD() const noexcept
@@ -1026,7 +1026,6 @@ private:
 
     bool is_utp_enabled_ = false;
     bool is_pex_enabled_ = false;
-    bool is_dht_enabled_ = false;
     bool is_lpd_enabled_ = false;
     bool is_tcp_enabled_ = true;
 
