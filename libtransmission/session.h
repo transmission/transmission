@@ -696,7 +696,7 @@ public:
 
     [[nodiscard]] constexpr auto shouldScrapePausedTorrents() const noexcept
     {
-        return should_scrape_paused_torrents_;
+        return settings_.should_scrape_paused_torrents;
     }
 
     [[nodiscard]] constexpr auto shouldPauseAddedTorrents() const noexcept
@@ -1020,7 +1020,6 @@ private:
 
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
-    bool should_scrape_paused_torrents_ = false;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
 

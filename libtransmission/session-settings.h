@@ -44,6 +44,7 @@ struct tr_variant;
     V(TR_KEY_tcp_enabled, tcp_enabled, bool, true) \
     V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
+    V(TR_KEY_scrape_paused_torrents_enabled, should_scrape_paused_torrents, bool, true) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false) \
@@ -82,7 +83,6 @@ struct tr_variant;
     V(TR_KEY_rpc_username, rpc_username, std::string, "") \
     V(TR_KEY_rpc_whitelist, rpc_whitelist, std::string, TR_DEFAULT_RPC_WHITELIST) \
     V(TR_KEY_rpc_whitelist_enabled, rpc_whitelist_enabled, bool, true) \
-    V(TR_KEY_scrape_paused_torrents_enabled, scrape_paused_torrents_enabled, bool, true) \
     V(TR_KEY_script_torrent_added_enabled, script_torrent_added_enabled, bool, false) \
     V(TR_KEY_script_torrent_added_filename, script_torrent_added_filename, std::string, "") \
     V(TR_KEY_script_torrent_done_enabled, script_torrent_done_enabled, bool, false) \
