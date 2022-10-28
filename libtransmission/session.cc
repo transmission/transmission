@@ -352,7 +352,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_port, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_PORT_STR));
     tr_variantDictAddStrView(d, TR_KEY_peer_socket_tos, TR_DEFAULT_PEER_SOCKET_TOS_STR);
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, DefaultPrefetchEnabled);
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, false);
     tr_variantDictAddStrView(d, TR_KEY_rpc_bind_address, "0.0.0.0");
@@ -397,7 +396,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
-    tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
@@ -761,7 +759,7 @@ void tr_session::setImpl(init_data& data, bool force)
         setPeerPort(isPortRandom() ? randomPort() : peer_port);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &val))
+    if (auto val = new_settings.port_forwarding_enabled; force || val != old_settings.port_forwarding_enabled)
     {
         tr_sessionSetPortForwardingEnabled(this, val);
     }
