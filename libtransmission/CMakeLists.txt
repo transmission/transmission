@@ -155,7 +155,6 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     transmission.h
     utils.h
     variant.h
-    variant-converters.h
     watchdir.h
     web-utils.h
     web.h

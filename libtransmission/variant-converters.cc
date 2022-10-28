@@ -7,16 +7,18 @@
 
 #include "transmission.h"
 
+#include "log.h" // for tr_log_level
+#include "net.h" // for tr_port
 #include "utils.h" // for tr_strvStrip(), tr_strlower()
 #include "variant.h"
-#include "variant-converters.h"
 
 using namespace std::literals;
 
 namespace libtransmission
 {
 
-std::optional<bool> VariantConverter<bool>::load(tr_variant* src)
+template<>
+std::optional<bool> VariantConverter::load<bool>(tr_variant* src)
 {
     if (auto val = bool{}; tr_variantGetBool(src, &val))
     {
@@ -26,14 +28,16 @@ std::optional<bool> VariantConverter<bool>::load(tr_variant* src)
     return {};
 }
 
-void VariantConverter<bool>::save(tr_variant* tgt, bool const& val)
+template<>
+void VariantConverter::save<bool>(tr_variant* tgt, bool const& val)
 {
     tr_variantInitBool(tgt, val);
 }
 
 ///
 
-std::optional<double> VariantConverter<double>::load(tr_variant* src)
+template<>
+std::optional<double> VariantConverter::load<double>(tr_variant* src)
 {
     if (auto val = double{}; tr_variantGetReal(src, &val))
     {
@@ -43,15 +47,30 @@ std::optional<double> VariantConverter<double>::load(tr_variant* src)
     return {};
 }
 
-void VariantConverter<double>::save(tr_variant* tgt, double const& val)
+template<>
+void VariantConverter::save<double>(tr_variant* tgt, double const& val)
 {
     tr_variantInitReal(tgt, val);
 }
 
 ///
 
-std::optional<tr_encryption_mode> VariantConverter<tr_encryption_mode>::load(tr_variant* src)
+namespace EncryptionHelpers
 {
+// clang-format off
+static auto constexpr Keys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{{
+    { "required", TR_ENCRYPTION_REQUIRED },
+    { "preferred", TR_ENCRYPTION_PREFERRED },
+    { "allowed", TR_CLEAR_PREFERRED }
+}};
+// clang-format on
+}
+
+template<>
+std::optional<tr_encryption_mode> VariantConverter::load<tr_encryption_mode>(tr_variant* src)
+{
+    using namespace EncryptionHelpers;
+
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
         auto const needle = tr_strlower(tr_strvStrip(val));
@@ -79,8 +98,11 @@ std::optional<tr_encryption_mode> VariantConverter<tr_encryption_mode>::load(tr_
     return {};
 }
 
-void VariantConverter<tr_encryption_mode>::save(tr_variant* tgt, tr_encryption_mode const& val)
+template<>
+void VariantConverter::save<tr_encryption_mode>(tr_variant* tgt, tr_encryption_mode const& val)
 {
+    using namespace EncryptionHelpers;
+
     for (auto const& [key, value] : Keys)
     {
         if (value == val)
@@ -93,7 +115,8 @@ void VariantConverter<tr_encryption_mode>::save(tr_variant* tgt, tr_encryption_m
 
 ///
 
-std::optional<int> VariantConverter<int>::load(tr_variant* src)
+template<>
+std::optional<int> VariantConverter::load<int>(tr_variant* src)
 {
     if (auto val = int64_t{}; tr_variantGetInt(src, &val))
     {
@@ -103,15 +126,34 @@ std::optional<int> VariantConverter<int>::load(tr_variant* src)
     return {};
 }
 
-void VariantConverter<int>::save(tr_variant* tgt, int val)
+template<>
+void VariantConverter::save<int>(tr_variant* tgt, int const& val)
 {
     tr_variantInitInt(tgt, val);
 }
 
 ///
 
-std::optional<tr_log_level> VariantConverter<tr_log_level>::load(tr_variant* src)
+namespace LogLevelHelpers
 {
+// clang-format off
+static auto constexpr Keys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
+    { "critical", TR_LOG_CRITICAL },
+    { "debug", TR_LOG_DEBUG },
+    { "error", TR_LOG_ERROR },
+    { "info", TR_LOG_INFO },
+    { "off", TR_LOG_OFF },
+    { "trace", TR_LOG_TRACE },
+    { "warn", TR_LOG_WARN },
+}};
+// clang-format on
+} // namespace LogLevelHelpers
+
+template<>
+std::optional<tr_log_level> VariantConverter::load<tr_log_level>(tr_variant* src)
+{
+    using namespace LogLevelHelpers;
+
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
         auto const needle = tr_strlower(tr_strvStrip(val));
@@ -139,8 +181,11 @@ std::optional<tr_log_level> VariantConverter<tr_log_level>::load(tr_variant* src
     return {};
 }
 
-void VariantConverter<tr_log_level>::save(tr_variant* tgt, tr_log_level val)
+template<>
+void VariantConverter::save<tr_log_level>(tr_variant* tgt, tr_log_level const& val)
 {
+    using namespace LogLevelHelpers;
+
     for (auto const& [key, value] : Keys)
     {
         if (value == val)
@@ -153,7 +198,8 @@ void VariantConverter<tr_log_level>::save(tr_variant* tgt, tr_log_level val)
 
 ///
 
-std::optional<mode_t> VariantConverter<mode_t>::load(tr_variant* src)
+template<>
+std::optional<mode_t> VariantConverter::load<mode_t>(tr_variant* src)
 {
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
@@ -171,14 +217,16 @@ std::optional<mode_t> VariantConverter<mode_t>::load(tr_variant* src)
     return {};
 }
 
-void VariantConverter<mode_t>::save(tr_variant* tgt, mode_t const& val)
+template<>
+void VariantConverter::save<mode_t>(tr_variant* tgt, mode_t const& val)
 {
     tr_variantInitStr(tgt, fmt::format("{:03o}", val));
 }
 
 ///
 
-std::optional<tr_port> VariantConverter<tr_port>::load(tr_variant* src)
+template<>
+std::optional<tr_port> VariantConverter::load<tr_port>(tr_variant* src)
 {
     if (auto val = int64_t{}; tr_variantGetInt(src, &val))
     {
@@ -188,15 +236,32 @@ std::optional<tr_port> VariantConverter<tr_port>::load(tr_variant* src)
     return {};
 }
 
-void VariantConverter<tr_port>::save(tr_variant* tgt, tr_port const& val)
+template<>
+void VariantConverter::save<tr_port>(tr_variant* tgt, tr_port const& val)
 {
     tr_variantInitInt(tgt, val.host());
 }
 
 ///
 
-std::optional<tr_preallocation_mode> VariantConverter<tr_preallocation_mode>::load(tr_variant* src)
+namespace PreallocationModeHelpers
 {
+// clang-format off
+static auto constexpr Keys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 5>{{
+    { "off", TR_PREALLOCATE_NONE },
+    { "none", TR_PREALLOCATE_NONE },
+    { "fast", TR_PREALLOCATE_SPARSE },
+    { "sparse", TR_PREALLOCATE_SPARSE },
+    { "full", TR_PREALLOCATE_FULL },
+}};
+// clang-format on
+} // namespace PreallocationModeHelpers
+
+template<>
+std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mode>(tr_variant* src)
+{
+    using namespace PreallocationModeHelpers;
+
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
         auto const needle = tr_strlower(tr_strvStrip(val));
@@ -224,8 +289,11 @@ std::optional<tr_preallocation_mode> VariantConverter<tr_preallocation_mode>::lo
     return {};
 }
 
-void VariantConverter<tr_preallocation_mode>::save(tr_variant* tgt, tr_preallocation_mode val)
+template<>
+void VariantConverter::save<tr_preallocation_mode>(tr_variant* tgt, tr_preallocation_mode const& val)
 {
+    using namespace PreallocationModeHelpers;
+
     for (auto const& [key, value] : Keys)
     {
         if (value == val)
@@ -238,7 +306,8 @@ void VariantConverter<tr_preallocation_mode>::save(tr_variant* tgt, tr_prealloca
 
 ///
 
-std::optional<size_t> VariantConverter<size_t>::load(tr_variant* src)
+template<>
+std::optional<size_t> VariantConverter::load<size_t>(tr_variant* src)
 {
     if (auto val = int64_t{}; tr_variantGetInt(src, &val))
     {
@@ -248,14 +317,16 @@ std::optional<size_t> VariantConverter<size_t>::load(tr_variant* src)
     return {};
 }
 
-void VariantConverter<size_t>::save(tr_variant* tgt, size_t const& val)
+template<>
+void VariantConverter::save<size_t>(tr_variant* tgt, size_t const& val)
 {
     tr_variantInitInt(tgt, val);
 }
 
 ///
 
-std::optional<std::string> VariantConverter<std::string>::load(tr_variant* src)
+template<>
+std::optional<std::string> VariantConverter::load<std::string>(tr_variant* src)
 {
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
@@ -265,7 +336,8 @@ std::optional<std::string> VariantConverter<std::string>::load(tr_variant* src)
     return {};
 }
 
-void VariantConverter<std::string>::save(tr_variant* tgt, std::string const& val)
+template<>
+void VariantConverter::save<std::string>(tr_variant* tgt, std::string const& val)
 {
     tr_variantInitStr(tgt, val);
 }

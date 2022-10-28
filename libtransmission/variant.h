@@ -281,4 +281,19 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, std::byte const
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
 void tr_variantMergeDicts(tr_variant* dict_target, tr_variant const* dict_source);
 
+namespace libtransmission
+{
+
+struct VariantConverter
+{
+public:
+    template<typename T>
+    static std::optional<T> load(tr_variant* src);
+
+    template<typename T>
+    static void save(tr_variant* tgt, T const& val);
+};
+
+} // namespace libtransmission
+
 /* @} */
