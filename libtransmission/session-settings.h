@@ -36,6 +36,8 @@ struct tr_variant;
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO) \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
     V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE) \
+    V(TR_KEY_queue_stalled_enabled, queue_stalled_enabled, bool, true) \
+    V(TR_KEY_queue_stalled_minutes, queue_stalled_minutes, size_t, 30U) \
     V(TR_KEY_ratio_limit, ratio_limit, double, 2.0) \
     V(TR_KEY_ratio_limit_enabled, ratio_limit_enabled, bool, false) \
     V(TR_KEY_rename_partial_files, is_incomplete_file_naming_enabled, bool, false) \
@@ -72,8 +74,6 @@ struct tr_variant;
     V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04) \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true) \
     V(TR_KEY_prefetch_enabled, prefetch_enabled, bool, true) \
-    V(TR_KEY_queue_stalled_enabled, queue_stalled_enabled, bool, true) \
-    V(TR_KEY_queue_stalled_minutes, queue_stalled_minutes, size_t, 30U) \
     V(TR_KEY_rpc_authentication_required, rpc_authentication_required, bool, false) \
     V(TR_KEY_rpc_bind_address, rpc_bind_address, std::string, "0.0.0.0") \
     V(TR_KEY_rpc_enabled, rpc_enabled, bool, false) \

@@ -651,12 +651,12 @@ public:
 
     [[nodiscard]] constexpr auto queueStalledEnabled() const noexcept
     {
-        return queue_stalled_enabled_;
+        return settings_.queue_stalled_enabled;
     }
 
     [[nodiscard]] constexpr auto queueStalledMinutes() const noexcept
     {
-        return queue_stalled_minutes_;
+        return settings_.queue_stalled_minutes;
     }
 
     [[nodiscard]] constexpr auto peerLimit() const noexcept
@@ -988,8 +988,6 @@ private:
     // See tr_netTos*() in libtransmission/net.h for more info
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
-    int queue_stalled_minutes_ = 0;
-
     // The open port on the local machine for incoming peer requests
     tr_port private_peer_port_;
 
@@ -1012,7 +1010,6 @@ private:
     bool is_closed_ = false;
 
     bool is_prefetch_enabled_ = false;
-    bool queue_stalled_enabled_ = false;
 
     bool is_port_random_ = false;
 

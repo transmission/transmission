@@ -365,8 +365,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, DefaultPrefetchEnabled);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, 6);
-    tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, true);
-    tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, 30);
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, false);
     tr_variantDictAddStrView(d, TR_KEY_rpc_bind_address, "0.0.0.0");
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, false);
@@ -426,8 +424,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTTLHours());
-    tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
-    tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
@@ -776,17 +772,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
     {
         this->peer_id_ttl_hours_ = i;
-    }
-
-    /* torrent queues */
-    if (tr_variantDictFindInt(settings, TR_KEY_queue_stalled_minutes, &i))
-    {
-        tr_sessionSetQueueStalledMinutes(this, static_cast<int>(i));
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_queue_stalled_enabled, &val))
-    {
-        tr_sessionSetQueueStalledEnabled(this, val);
     }
 
     /* files and directories */
@@ -2353,14 +2338,14 @@ void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(minutes > 0);
 
-    session->queue_stalled_minutes_ = minutes;
+    session->settings_.queue_stalled_minutes = minutes;
 }
 
 void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->queue_stalled_enabled_ = is_enabled;
+    session->settings_.queue_stalled_enabled = is_enabled;
 }
 
 bool tr_sessionGetQueueStalledEnabled(tr_session const* session)
