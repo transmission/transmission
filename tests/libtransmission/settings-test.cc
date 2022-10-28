@@ -247,7 +247,7 @@ TEST_F(SettingsTest, canSaveMode)
     settings.save(&dict);
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
-    EXPECT_EQ("777", val);
+    EXPECT_EQ("0777", val);
     tr_variantClear(&dict);
 }
 

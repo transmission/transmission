@@ -220,7 +220,7 @@ std::optional<mode_t> VariantConverter::load<mode_t>(tr_variant* src)
 template<>
 void VariantConverter::save<mode_t>(tr_variant* tgt, mode_t const& val)
 {
-    tr_variantInitStr(tgt, fmt::format("{:03o}", val));
+    tr_variantInitStr(tgt, fmt::format("{:#03o}", val));
 }
 
 ///
