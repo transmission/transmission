@@ -726,7 +726,7 @@ public:
 
     [[nodiscard]] constexpr auto allowsTCP() const noexcept
     {
-        return is_tcp_enabled_;
+        return settings_.tcp_enabled;
     }
 
     [[nodiscard]] bool allowsUTP() const noexcept;
@@ -1012,8 +1012,6 @@ private:
 
     bool is_closing_ = false;
     bool is_closed_ = false;
-
-    bool is_tcp_enabled_ = true;
 
     bool is_prefetch_enabled_ = false;
     bool queue_stalled_enabled_ = false;

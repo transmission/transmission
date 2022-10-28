@@ -420,7 +420,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
-    tr_variantDictAddBool(d, TR_KEY_tcp_enabled, s->allowsTCP());
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
@@ -760,11 +759,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &val))
     {
         tr_sessionSetDHTEnabled(this, val);
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_tcp_enabled, &val))
-    {
-        is_tcp_enabled_ = val;
     }
 
     if (auto const& val = new_settings.utp_enabled; force || val != old_settings.utp_enabled)
