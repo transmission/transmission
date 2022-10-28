@@ -36,6 +36,7 @@ struct tr_variant;
     V(TR_KEY_lpd_enabled, lpd_enabled, bool, true) \
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO) \
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "") \
+    V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U) \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL) \
     V(TR_KEY_peer_limit_per_torrent, peer_limit_per_torrent, size_t, TR_DEFAULT_PEER_LIMIT_TORRENT) \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
@@ -77,7 +78,6 @@ struct tr_variant;
     V(TR_KEY_anti_brute_force_threshold, anti_brute_force_threshold, size_t, 100U) \
     V(TR_KEY_bind_address_ipv4, bind_address_ipv4, std::string, "0.0.0.0") \
     V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::") \
-    V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U) \
     V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT)) \
     V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::fromHost(65535)) \
     V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::fromHost(49152)) \

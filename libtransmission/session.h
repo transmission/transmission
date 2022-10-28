@@ -816,7 +816,7 @@ public:
 
     [[nodiscard]] constexpr auto peerIdTTLHours() const noexcept
     {
-        return peer_id_ttl_hours_;
+        return settings_.peer_id_ttl_hours;
     }
 
     void verifyRemove(tr_torrent* tor)
@@ -1031,8 +1031,6 @@ private:
     tr_port random_port_high_;
 
     uint16_t peer_count_ = 0;
-
-    uint8_t peer_id_ttl_hours_ = 6;
 
     bool is_closing_ = false;
     bool is_closed_ = false;

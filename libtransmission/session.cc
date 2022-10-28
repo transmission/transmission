@@ -357,7 +357,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, DefaultPrefetchEnabled);
-    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, 6);
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, false);
     tr_variantDictAddStrView(d, TR_KEY_rpc_bind_address, "0.0.0.0");
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, false);
@@ -408,7 +407,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
-    tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTTLHours());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
@@ -738,11 +736,6 @@ void tr_session::setImpl(init_data& data, bool force)
     }
 
     useBlocklist(new_settings.blocklist_enabled);
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
-    {
-        this->peer_id_ttl_hours_ = i;
-    }
 
     /* rpc server */
     this->rpc_server_ = std::make_unique<tr_rpc_server>(this, settings);
