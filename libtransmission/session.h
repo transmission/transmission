@@ -706,7 +706,7 @@ public:
 
     [[nodiscard]] constexpr auto shouldDeleteSource() const noexcept
     {
-        return should_delete_source_torrents_;
+        return settings_.should_delete_source_torrents;
     }
 
     [[nodiscard]] constexpr auto allowsDHT() const noexcept
@@ -1019,7 +1019,6 @@ private:
     bool is_port_random_ = false;
 
     bool should_pause_added_torrents_ = false;
-    bool should_delete_source_torrents_ = false;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
 

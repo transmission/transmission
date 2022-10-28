@@ -399,7 +399,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, DefaultBindAddressIpv4);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, DefaultBindAddressIpv6);
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, true);
-    tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
 }
@@ -454,7 +453,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4_.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6_.readable());
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !s->shouldPauseAddedTorrents());
-    tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
@@ -782,11 +780,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &val))
     {
         tr_sessionSetPaused(this, !val);
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_trash_original_torrent_files, &val))
-    {
-        tr_sessionSetDeleteSource(this, val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
@@ -1604,7 +1597,7 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 {
     TR_ASSERT(session != nullptr);
 
-    session->should_delete_source_torrents_ = delete_source;
+    session->settings_.should_delete_source_torrents = delete_source;
 }
 
 bool tr_sessionGetDeleteSource(tr_session const* session)
