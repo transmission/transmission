@@ -360,8 +360,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, download_dir);
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_download_queue_size, 5);
-    tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
     tr_variantDictAddInt(d, TR_KEY_peer_port, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_PORT_STR));
@@ -398,8 +396,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, false);
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_done_seeding_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_seeding_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_seed_queue_size, 10);
-    tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_alt_speed_up, 50); /* half the regular */
     tr_variantDictAddInt(d, TR_KEY_alt_speed_down, 50); /* half the regular */
@@ -434,8 +430,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_tcp_enabled, s->allowsTCP());
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
-    tr_variantDictAddInt(d, TR_KEY_download_queue_size, s->queueSize(TR_DOWN));
-    tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, s->queueEnabled(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, s->isSpeedLimited(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
@@ -472,8 +466,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->shouldScrapePausedTorrents());
-    tr_variantDictAddInt(d, TR_KEY_seed_queue_size, s->queueSize(TR_UP));
-    tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, s->queueEnabled(TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_up, tr_sessionGetAltSpeed_KBps(s, TR_UP));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_down, tr_sessionGetAltSpeed_KBps(s, TR_DOWN));
@@ -844,26 +836,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_queue_stalled_enabled, &val))
     {
         tr_sessionSetQueueStalledEnabled(this, val);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_download_queue_size, &i))
-    {
-        tr_sessionSetQueueSize(this, TR_DOWN, i);
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_download_queue_enabled, &val))
-    {
-        tr_sessionSetQueueEnabled(this, TR_DOWN, val);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_seed_queue_size, &i))
-    {
-        tr_sessionSetQueueSize(this, TR_UP, i);
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_seed_queue_enabled, &val))
-    {
-        tr_sessionSetQueueEnabled(this, TR_UP, val);
     }
 
     /* files and directories */
@@ -2447,12 +2419,19 @@ char const* tr_sessionGetScript(tr_session const* session, TrScript type)
 ****
 ***/
 
-void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_seed_torrents)
+void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->queue_size_[dir] = max_simultaneous_seed_torrents;
+    if (dir == TR_DOWN)
+    {
+        session->settings_.download_queue_size = max_simultaneous_torrents;
+    }
+    else
+    {
+        session->settings_.seed_queue_size = max_simultaneous_torrents;
+    }
 }
 
 size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
@@ -2463,12 +2442,19 @@ size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
     return session->queueSize(dir);
 }
 
-void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_seed_torrents)
+void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool enabled)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->queue_enabled_[dir] = do_limit_simultaneous_seed_torrents;
+    if (dir == TR_DOWN)
+    {
+        session->settings_.download_queue_enabled = enabled;
+    }
+    else
+    {
+        session->settings_.seed_queue_enabled = enabled;
+    }
 }
 
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)

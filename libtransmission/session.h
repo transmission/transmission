@@ -641,12 +641,12 @@ public:
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
     {
-        return queue_enabled_[dir];
+        return dir == TR_DOWN ? settings_.download_queue_enabled : settings_.seed_queue_enabled;
     }
 
     [[nodiscard]] constexpr auto queueSize(tr_direction dir) const noexcept
     {
-        return queue_size_[dir];
+        return dir == TR_DOWN ? settings_.download_queue_size : settings_.seed_queue_size;
     }
 
     [[nodiscard]] constexpr auto queueStalledEnabled() const noexcept
@@ -985,9 +985,6 @@ private:
 
     std::array<tr_bytes_per_second_t, 2> speed_limit_Bps_ = { 0U, 0U };
     std::array<bool, 2> speed_limit_enabled_ = { false, false };
-
-    std::array<bool, 2> queue_enabled_ = { false, false };
-    std::array<size_t, 2> queue_size_ = { 0, 0 };
 
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info

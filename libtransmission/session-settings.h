@@ -21,10 +21,14 @@ struct tr_variant;
     V(TR_KEY_blocklist_enabled, blocklist_enabled, bool, false) \
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist") \
     V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
+    V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true) \
+    V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U) \
     V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED) \
     V(TR_KEY_lpd_enabled, lpd_enabled, bool, true) \
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO) \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
+    V(TR_KEY_seed_queue_enabled, seed_queue_enabled, bool, false) \
+    V(TR_KEY_seed_queue_size, seed_queue_size, size_t, 10U) \
     V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
     /* below here: unprocessed */ \
@@ -44,8 +48,6 @@ struct tr_variant;
     V(TR_KEY_cache_size_mb, cache_sizes_mb, size_t, 4U) \
     V(TR_KEY_default_trackers, default_trackers_str, std::string, "") \
     V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir()) \
-    V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true) \
-    V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U) \
     V(TR_KEY_idle_seeding_limit, idle_seeding_limit, size_t, 30U) \
     V(TR_KEY_idle_seeding_limit_enabled, idle_seeding_limit_enabled, bool, false) \
     V(TR_KEY_incomplete_dir, incomplete_dir, std::string, tr_getDefaultDownloadDir()) \
@@ -86,8 +88,6 @@ struct tr_variant;
     V(TR_KEY_script_torrent_done_filename, script_torrent_done_filename, std::string, "") \
     V(TR_KEY_script_torrent_done_seeding_enabled, script_torrent_done_seeding_enabled, bool, false) \
     V(TR_KEY_script_torrent_done_seeding_filename, script_torrent_done_seeding_filename, std::string, "") \
-    V(TR_KEY_seed_queue_enabled, seed_queue_enabled, bool, false) \
-    V(TR_KEY_seed_queue_size, seed_queue_size, size_t, 10U) \
     V(TR_KEY_speed_limit_down, speed_limit_down, size_t, 100U) \
     V(TR_KEY_speed_limit_down_enabled, speed_limit_down_enabled, bool, false) \
     V(TR_KEY_speed_limit_up, speed_limit_up, size_t, 100U) \
