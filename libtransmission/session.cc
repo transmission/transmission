@@ -85,8 +85,8 @@ static auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 
 tr_port tr_session::randomPort() const
 {
-    auto const lower = std::min(random_port_low_.host(), random_port_high_.host());
-    auto const upper = std::max(random_port_low_.host(), random_port_high_.host());
+    auto const lower = std::min(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
+    auto const upper = std::max(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const range = upper - lower;
     return tr_port::fromHost(lower + tr_rand_int_weak(range + 1));
 }
@@ -350,9 +350,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
     tr_variantDictAddInt(d, TR_KEY_peer_port, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_PORT_STR));
-    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, false);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, 49152);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, 65535);
     tr_variantDictAddStrView(d, TR_KEY_peer_socket_tos, TR_DEFAULT_PEER_SOCKET_TOS_STR);
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
@@ -400,9 +397,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
-    tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom());
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->random_port_high_.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
@@ -768,22 +762,6 @@ void tr_session::setImpl(init_data& data, bool force)
 
     this->bind_ipv6_ = tr_bindinfo{ address };
 
-    /* incoming peer port */
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
-    {
-        this->random_port_low_.setHost(i);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_high, &i))
-    {
-        this->random_port_high_.setHost(i);
-    }
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &val))
-    {
-        tr_sessionSetPeerPortRandomOnStart(this, val);
-    }
-
     {
         auto peer_port = this->private_peer_port_;
 
@@ -1033,7 +1011,7 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
 {
     TR_ASSERT(session != nullptr);
 
-    session->is_port_random_ = random;
+    session->settings_.peer_port_random_on_start = random;
 }
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)

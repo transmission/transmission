@@ -801,7 +801,7 @@ public:
 
     [[nodiscard]] constexpr auto isPortRandom() const noexcept
     {
-        return is_port_random_;
+        return settings_.peer_port_random_on_start;
     }
 
     [[nodiscard]] constexpr auto isRatioLimited() const noexcept
@@ -1027,15 +1027,10 @@ private:
     // port than the one requested by Transmission.
     tr_port public_peer_port_;
 
-    tr_port random_port_low_;
-    tr_port random_port_high_;
-
     uint16_t peer_count_ = 0;
 
     bool is_closing_ = false;
     bool is_closed_ = false;
-
-    bool is_port_random_ = false;
 
     /// fields that aren't trivial,
     /// but are self-contained / have no interdependencies
