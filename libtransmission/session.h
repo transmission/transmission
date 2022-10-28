@@ -364,7 +364,7 @@ public:
 
     [[nodiscard]] constexpr auto const& defaultTrackersStr() const noexcept
     {
-        return default_trackers_str_;
+        return settings_.default_trackers_str;
     }
 
     [[nodiscard]] constexpr auto const& defaultTrackers() const noexcept
@@ -1036,7 +1036,6 @@ private:
 
     std::string download_dir_;
 
-    std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
 
     std::string announce_ip_;

@@ -352,7 +352,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_download_dir, download_dir);
-    tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
@@ -421,7 +420,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
-    tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, s->isSpeedLimited(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
@@ -724,7 +722,6 @@ void tr_session::setImpl(init_data& data, bool force)
     auto& new_settings = settings_;
     new_settings.load(data.client_settings);
 
-    auto d = double{};
     auto i = int64_t{};
     auto sv = std::string_view{};
 
@@ -746,9 +743,9 @@ void tr_session::setImpl(init_data& data, bool force)
         tr_sessionSetCacheLimit_MB(this, i);
     }
 
-    if (tr_variantDictFindStrView(settings, TR_KEY_default_trackers, &sv))
+    if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)
     {
-        setDefaultTrackers(sv);
+        setDefaultTrackers(val);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
@@ -2039,7 +2036,7 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
 {
     auto const oldval = default_trackers_;
 
-    default_trackers_str_ = trackers;
+    settings_.default_trackers_str = trackers;
     default_trackers_.parse(trackers);
 
     // if the list changed, update all the public torrents
