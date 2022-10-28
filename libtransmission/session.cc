@@ -367,7 +367,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, 6);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, 30);
-    tr_variantDictAddBool(d, TR_KEY_rename_partial_files, true);
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, false);
     tr_variantDictAddStrView(d, TR_KEY_rpc_bind_address, "0.0.0.0");
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, false);
@@ -433,7 +432,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, s->peerIdTTLHours());
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, s->queueStalledEnabled());
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, s->queueStalledMinutes());
-    tr_variantDictAddBool(d, TR_KEY_rename_partial_files, s->isIncompleteFileNamingEnabled());
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
@@ -815,11 +813,6 @@ void tr_session::setImpl(init_data& data, bool force)
         this->is_prefetch_enabled_ = val;
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &val))
-    {
-        tr_sessionSetIncompleteFileNamingEnabled(this, val);
-    }
-
     /* rpc server */
     this->rpc_server_ = std::make_unique<tr_rpc_server>(this, settings);
 
@@ -1045,7 +1038,7 @@ void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->is_incomplete_file_naming_enabled_ = enabled;
+    session->settings_.is_incomplete_file_naming_enabled = enabled;
 }
 
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)

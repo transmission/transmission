@@ -796,7 +796,7 @@ public:
 
     [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
-        return is_incomplete_file_naming_enabled_;
+        return settings_.is_incomplete_file_naming_enabled;
     }
 
     [[nodiscard]] constexpr auto isPortRandom() const noexcept
@@ -1021,7 +1021,6 @@ private:
     bool should_pause_added_torrents_ = false;
     bool should_delete_source_torrents_ = false;
     bool should_scrape_paused_torrents_ = false;
-    bool is_incomplete_file_naming_enabled_ = false;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
 
