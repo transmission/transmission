@@ -32,8 +32,7 @@ TEST_F(SettingsTest, canLoadBools)
     static auto constexpr Key = TR_KEY_seed_queue_enabled;
 
     auto settings = tr_session_settings{};
-    auto const default_value = settings.seed_queue_enabled;
-    auto const expected_value = !default_value;
+    auto const expected_value = !settings.seed_queue_enabled;
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
@@ -49,8 +48,7 @@ TEST_F(SettingsTest, canSaveBools)
     static auto constexpr Key = TR_KEY_seed_queue_enabled;
 
     auto settings = tr_session_settings{};
-    auto const default_value = settings.seed_queue_enabled;
-    auto const expected_value = !default_value;
+    auto const expected_value = !settings.seed_queue_enabled;
     settings.seed_queue_enabled = expected_value;
 
     auto dict = tr_variant{};
@@ -67,8 +65,7 @@ TEST_F(SettingsTest, canLoadDoubles)
     static auto constexpr Key = TR_KEY_ratio_limit;
 
     auto settings = tr_session_settings{};
-    auto const default_value = settings.ratio_limit;
-    auto const expected_value = default_value + 1.0;
+    auto const expected_value = settings.ratio_limit + 1.0;
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
@@ -137,163 +134,262 @@ TEST_F(SettingsTest, canSaveEncryptionMode)
     tr_variantClear(&dict);
 }
 
-#if 0
 TEST_F(SettingsTest, canLoadInt)
 {
-    static auto constexpr Field = Settings::PeerSocketTos;
+    static auto constexpr Key = TR_KEY_peer_socket_tos;
 
     auto settings = tr_session_settings{};
-    auto const default_value = settings.get<int>(Field);
-    auto const expected_value = default_value + 1;
+    auto const expected_value = ++settings.peer_socket_tos;
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
-    auto const changed = settings.load(&dict);
+    tr_variantDictAddInt(&dict, Key, expected_value);
+    settings.load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(expected_value, settings.get<int>(Field));
+    EXPECT_EQ(expected_value, settings.peer_socket_tos);
+}
+
+TEST_F(SettingsTest, canSaveInt)
+{
+    static auto constexpr Key = TR_KEY_peer_socket_tos;
+
+    auto settings = tr_session_settings{};
+    auto const expected_value = ++settings.peer_socket_tos;
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.save(&dict);
+    auto val = int64_t{};
+    EXPECT_TRUE(tr_variantDictFindInt(&dict, Key, &val));
+    EXPECT_EQ(expected_value, val);
+    tr_variantClear(&dict);
 }
 
 TEST_F(SettingsTest, canLoadLogLevel)
 {
-    static auto constexpr Field = Settings::MessageLevel;
+    static auto constexpr Key = TR_KEY_message_level;
 
     auto settings = std::make_unique<tr_session_settings>();
-    auto const default_value = settings->get<tr_log_level>(Field);
+    auto const default_value = settings->log_level;
     auto constexpr ExpectedValue = TR_LOG_DEBUG;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
-    auto changed = settings->load(&dict);
+    tr_variantDictAddInt(&dict, Key, ExpectedValue);
+    settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings->get<tr_log_level>(Field));
+    EXPECT_EQ(ExpectedValue, settings->log_level);
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings->key(Field), "debug");
-    changed = settings->load(&dict);
+    tr_variantDictAddStrView(&dict, Key, "debug");
+    settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings->get<tr_log_level>(Field));
+    EXPECT_EQ(ExpectedValue, settings->log_level);
+}
+
+TEST_F(SettingsTest, canSaveLogLevel)
+{
+    static auto constexpr Key = TR_KEY_message_level;
+
+    auto settings = tr_session_settings{};
+    auto const default_value = settings.log_level;
+    auto constexpr ExpectedValue = TR_LOG_DEBUG;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.log_level = ExpectedValue;
+    settings.save(&dict);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
+    EXPECT_EQ("debug", val);
+    tr_variantClear(&dict);
 }
 
 TEST_F(SettingsTest, canLoadMode)
 {
-    static auto constexpr Field = Settings::Umask;
+    static auto constexpr Key = TR_KEY_umask;
 
     auto settings = std::make_unique<tr_session_settings>();
-    auto const default_value = settings->get<mode_t>(Field);
+    auto const default_value = settings->umask;
     auto constexpr ExpectedValue = mode_t{ 0777 };
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
-    auto changed = settings->load(&dict);
+    tr_variantDictAddInt(&dict, Key, ExpectedValue);
+    settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings->get<mode_t>(Field));
+    EXPECT_EQ(ExpectedValue, settings->umask);
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings->key(Field), "0777");
-    changed = settings->load(&dict);
+    tr_variantDictAddStrView(&dict, Key, "0777");
+    settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings->get<mode_t>(Field));
+    EXPECT_EQ(ExpectedValue, settings->umask);
+}
+
+TEST_F(SettingsTest, canSaveMode)
+{
+    static auto constexpr Key = TR_KEY_umask;
+
+    auto settings = tr_session_settings{};
+    auto const default_value = settings.log_level;
+    auto constexpr ExpectedValue = mode_t{ 0777 };
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.umask = ExpectedValue;
+    settings.save(&dict);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
+    EXPECT_EQ("777", val);
+    tr_variantClear(&dict);
 }
 
 TEST_F(SettingsTest, canLoadPort)
 {
-    static auto constexpr Field = Settings::PeerPort;
+    static auto constexpr Key = TR_KEY_peer_port;
 
     auto settings = tr_session_settings{};
-    auto const default_value = settings.get<tr_port>(Field);
+    auto const default_value = settings.peer_port;
     auto constexpr ExpectedValue = tr_port::fromHost(8080);
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), ExpectedValue.host());
-    auto const changed = settings.load(&dict);
+    tr_variantDictAddInt(&dict, Key, ExpectedValue.host());
+    settings.load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings.get<tr_port>(Field));
+    EXPECT_EQ(ExpectedValue, settings.peer_port);
+}
+
+TEST_F(SettingsTest, canSavePort)
+{
+    static auto constexpr Key = TR_KEY_peer_port;
+
+    auto settings = tr_session_settings{};
+    auto const default_value = settings.peer_port;
+    auto constexpr ExpectedValue = tr_port::fromHost(8080);
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.peer_port = ExpectedValue;
+    settings.save(&dict);
+    auto val = int64_t{};
+    EXPECT_TRUE(tr_variantDictFindInt(&dict, Key, &val));
+    EXPECT_EQ(ExpectedValue.host(), val);
+    tr_variantClear(&dict);
 }
 
 TEST_F(SettingsTest, canLoadPreallocation)
 {
-    static auto constexpr Field = Settings::Preallocation;
+    static auto constexpr Key = TR_KEY_preallocation;
 
     auto settings = std::make_unique<tr_session_settings>();
-    auto const default_value = settings->get<tr_preallocation_mode>(Field);
+    auto const default_value = settings->preallocation_mode;
     auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings->key(Field), ExpectedValue);
-    auto changed = settings->load(&dict);
+    tr_variantDictAddInt(&dict, Key, ExpectedValue);
+    settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings->get<tr_preallocation_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings->preallocation_mode);
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings->key(Field), "full");
-    changed = settings->load(&dict);
+    tr_variantDictAddStrView(&dict, Key, "full");
+    settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(ExpectedValue, settings->get<tr_preallocation_mode>(Field));
+    EXPECT_EQ(ExpectedValue, settings->preallocation_mode);
+}
+
+TEST_F(SettingsTest, canSavePreallocation)
+{
+    static auto constexpr Key = TR_KEY_preallocation;
+
+    auto settings = tr_session_settings{};
+    auto const default_value = settings.preallocation_mode;
+    auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.preallocation_mode = ExpectedValue;
+    settings.save(&dict);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
+    EXPECT_EQ("full", val);
+    tr_variantClear(&dict);
 }
 
 TEST_F(SettingsTest, canLoadSizeT)
 {
-    static auto constexpr Field = Settings::SeedQueueSize;
+    static auto constexpr Key = TR_KEY_queue_stalled_minutes;
 
     auto settings = tr_session_settings{};
-    auto const default_value = settings.get<size_t>(Field);
-    auto const expected_value = default_value + 5U;
-    ASSERT_NE(expected_value, default_value);
+    auto const expected_value = settings.queue_stalled_minutes + 5U;
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddInt(&dict, settings.key(Field), expected_value);
-    auto changed = settings.load(&dict);
+    tr_variantDictAddInt(&dict, Key, expected_value);
+    settings.load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(expected_value, settings.get<size_t>(Field));
+    EXPECT_EQ(expected_value, settings.queue_stalled_minutes);
+}
+
+TEST_F(SettingsTest, canSaveSizeT)
+{
+    static auto constexpr Key = TR_KEY_queue_stalled_minutes;
+
+    auto settings = tr_session_settings{};
+    auto const expected_value = settings.queue_stalled_minutes + 5U;
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.queue_stalled_minutes = expected_value;
+    settings.save(&dict);
+    auto val = int64_t{};
+    EXPECT_TRUE(tr_variantDictFindInt(&dict, Key, &val));
+    EXPECT_EQ(expected_value, val);
+    tr_variantClear(&dict);
 }
 
 TEST_F(SettingsTest, canLoadString)
 {
-    static auto constexpr Field = Settings::BlocklistUrl;
+    static auto constexpr Key = TR_KEY_rpc_url;
 
     auto settings = tr_session_settings{};
-    auto const default_value = settings.get<std::string>(Field);
-    auto const expected_value = default_value + "/subpath";
-    ASSERT_NE(expected_value, default_value);
+    auto const expected_value = settings.rpc_url + "/subpath";
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 1);
-    tr_variantDictAddStrView(&dict, settings.key(Field), expected_value);
-    auto changed = settings.load(&dict);
+    tr_variantDictAddStrView(&dict, Key, expected_value);
+    settings.load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(1U, changed.count());
-    EXPECT_EQ(true, changed.test(Field));
-    EXPECT_EQ(expected_value, settings.get<std::string>(Field));
+    EXPECT_EQ(expected_value, settings.rpc_url);
 }
-#endif
+
+TEST_F(SettingsTest, canSaveString)
+{
+    static auto constexpr Key = TR_KEY_rpc_url;
+
+    auto settings = tr_session_settings{};
+    auto const expected_value = settings.rpc_url + "/subpath";
+
+    auto dict = tr_variant{};
+    tr_variantInitDict(&dict, 100);
+    settings.rpc_url = expected_value;
+    settings.save(&dict);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
+    EXPECT_EQ(expected_value, val);
+    tr_variantClear(&dict);
+}

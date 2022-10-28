@@ -18,6 +18,7 @@
 struct tr_variant;
 
 #define SESSION_SETTINGS_FIELDS(V) \
+    /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false) \
     V(TR_KEY_alt_speed_time_begin, alt_speed_time_begin, size_t, 540U) /* minutes past midnight; 9AM */ \
@@ -54,7 +55,7 @@ struct tr_variant;
     V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::fromHost(65535)) \
     V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::fromHost(49152)) \
     V(TR_KEY_peer_port_random_on_start, peer_port_random_on_start, bool, false) \
-    V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x004) \
+    V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04) \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true) \
     V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE) \
