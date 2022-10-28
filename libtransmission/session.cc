@@ -419,7 +419,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->random_port_high_.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
-    tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->allowsPEX());
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, s->allowsPrefetch());
@@ -759,10 +758,6 @@ void tr_session::setImpl(init_data& data, bool force)
             peer_socket_tos_ = *ip_tos;
         }
     }
-
-    sv = ""sv;
-    (void)tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
-    setPeerCongestionAlgorithm(sv);
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &val))
     {

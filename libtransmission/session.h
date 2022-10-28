@@ -459,12 +459,12 @@ public:
 
     [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
     {
-        return peer_congestion_algorithm_;
+        return settings_.peer_congestion_algorithm;
     }
 
     void setPeerCongestionAlgorithm(std::string_view algorithm)
     {
-        peer_congestion_algorithm_ = algorithm;
+        settings_.peer_congestion_algorithm = algorithm;
     }
 
     void setSocketTOS(tr_socket_t sock, tr_address_type type) const
@@ -1047,8 +1047,6 @@ private:
     /// but are self-contained / have no interdependencies
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
-
-    std::string peer_congestion_algorithm_;
 
     tr_announce_list default_trackers_;
 
