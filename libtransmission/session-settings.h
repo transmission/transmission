@@ -18,10 +18,13 @@
 struct tr_variant;
 
 #define SESSION_SETTINGS_FIELDS(V) \
+    V(TR_KEY_announce_ip, announce_ip, std::string, "") \
+    V(TR_KEY_announce_ip_enabled, announce_ip_enabled, bool, false) \
     V(TR_KEY_blocklist_enabled, blocklist_enabled, bool, false) \
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist") \
     V(TR_KEY_default_trackers, default_trackers_str, std::string, "") \
     V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
+    V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir()) \
     V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true) \
     V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U) \
     V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED) \
@@ -48,14 +51,11 @@ struct tr_variant;
     V(TR_KEY_alt_speed_time_enabled, alt_speed_time_enabled, bool, false) \
     V(TR_KEY_alt_speed_time_end, alt_speed_time_end, size_t, 1020U) /* minutes past midnight; 5PM */ \
     V(TR_KEY_alt_speed_up, alt_speed_up_kilobytes_per_second, size_t, 50U) \
-    V(TR_KEY_announce_ip, announce_ip, std::string, "") \
-    V(TR_KEY_announce_ip_enabled, announce_ip_enabled, bool, false) \
     V(TR_KEY_anti_brute_force_enabled, anti_brute_force_enabled, bool, false) \
     V(TR_KEY_anti_brute_force_threshold, anti_brute_force_threshold, size_t, 100U) \
     V(TR_KEY_bind_address_ipv4, bind_address_ipv4, std::string, "0.0.0.0") \
     V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::") \
     V(TR_KEY_cache_size_mb, cache_sizes_mb, size_t, 4U) \
-    V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir()) \
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "") \
     V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U) \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL) \

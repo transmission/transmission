@@ -509,22 +509,22 @@ public:
 
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
     {
-        return announce_ip_;
+        return settings_.announce_ip;
     }
 
     void setAnnounceIP(std::string_view ip)
     {
-        announce_ip_ = ip;
+        settings_.announce_ip = ip;
     }
 
     [[nodiscard]] constexpr bool useAnnounceIP() const noexcept
     {
-        return announce_ip_enabled_;
+        return settings_.announce_ip_enabled;
     }
 
     constexpr void useAnnounceIP(bool enabled) noexcept
     {
-        announce_ip_enabled_ = enabled;
+        settings_.announce_ip_enabled = enabled;
     }
 
     // callbacks
@@ -1025,8 +1025,6 @@ private:
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
 
-    bool announce_ip_enabled_ = false;
-
     /// fields that aren't trivial,
     /// but are self-contained / have no interdependencies
 
@@ -1035,8 +1033,6 @@ private:
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
     std::string peer_congestion_algorithm_;
-
-    std::string announce_ip_;
 
     tr_announce_list default_trackers_;
 
