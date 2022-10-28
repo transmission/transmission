@@ -360,7 +360,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, download_dir);
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_message_level, TR_LOG_INFO);
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, 5);
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
@@ -445,7 +444,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_idle_seeding_limit_enabled, s->isIdleLimited());
     tr_variantDictAddStr(d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir(s));
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, tr_sessionIsIncompleteDirEnabled(s));
-    tr_variantDictAddInt(d, TR_KEY_message_level, tr_logGetLevel());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
@@ -754,9 +752,9 @@ void tr_session::setImpl(init_data& data, bool force)
     auto i = int64_t{};
     auto sv = std::string_view{};
 
-    if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
+    if (auto const& val = new_settings.log_level; force || val != old_settings.log_level)
     {
-        tr_logSetLevel(tr_log_level(i));
+        tr_logSetLevel(val);
     }
 
 #ifndef _WIN32
