@@ -351,12 +351,12 @@ public:
 
     [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
-        return download_dir_;
+        return settings_.download_dir;
     }
 
     void setDownloadDir(std::string_view dir)
     {
-        download_dir_ = dir;
+        settings_.download_dir = dir;
     }
 
     // default trackers
@@ -1033,8 +1033,6 @@ private:
     tr_stats session_stats_{ config_dir_, time(nullptr) };
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
-
-    std::string download_dir_;
 
     std::string peer_congestion_algorithm_;
 

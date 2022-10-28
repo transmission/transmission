@@ -20,6 +20,7 @@ struct tr_variant;
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_blocklist_enabled, blocklist_enabled, bool, false) \
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist") \
+    V(TR_KEY_default_trackers, default_trackers_str, std::string, "") \
     V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
     V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true) \
     V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U) \
@@ -36,6 +37,7 @@ struct tr_variant;
     V(TR_KEY_ratio_limit_enabled, ratio_limit_enabled, bool, false) \
     V(TR_KEY_seed_queue_enabled, seed_queue_enabled, bool, false) \
     V(TR_KEY_seed_queue_size, seed_queue_size, size_t, 10U) \
+    V(TR_KEY_tcp_enabled, tcp_enabled, bool, true) \
     V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
     /* below here: unprocessed */ \
@@ -53,7 +55,6 @@ struct tr_variant;
     V(TR_KEY_bind_address_ipv4, bind_address_ipv4, std::string, "0.0.0.0") \
     V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::") \
     V(TR_KEY_cache_size_mb, cache_sizes_mb, size_t, 4U) \
-    V(TR_KEY_default_trackers, default_trackers_str, std::string, "") \
     V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir()) \
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "") \
     V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U) \
@@ -93,7 +94,6 @@ struct tr_variant;
     V(TR_KEY_speed_limit_up, speed_limit_up, size_t, 100U) \
     V(TR_KEY_speed_limit_up_enabled, speed_limit_up_enabled, bool, false) \
     V(TR_KEY_start_added_torrents, start_added_torrents, bool, true) \
-    V(TR_KEY_tcp_enabled, tcp_enabled, bool, true) \
     V(TR_KEY_trash_original_torrent_files, trash_original_torrent_files, bool, false) \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U)
 
