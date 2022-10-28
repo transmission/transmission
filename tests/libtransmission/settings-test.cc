@@ -14,12 +14,12 @@ using namespace std::literals;
 class SettingsTest : public ::testing::Test
 {
 protected:
-    using SessionSettings = libtransmission::SessionSettings;
+    using SessionSettings = tr_session_settings;
 };
 
 TEST_F(SettingsTest, canInstantiate)
 {
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 100);
@@ -31,7 +31,7 @@ TEST_F(SettingsTest, canLoadBools)
 {
     static auto constexpr Key = TR_KEY_seed_queue_enabled;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.seed_queue_enabled;
     auto const expected_value = !default_value;
 
@@ -48,7 +48,7 @@ TEST_F(SettingsTest, canSaveBools)
 {
     static auto constexpr Key = TR_KEY_seed_queue_enabled;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.seed_queue_enabled;
     auto const expected_value = !default_value;
     settings.seed_queue_enabled = expected_value;
@@ -66,7 +66,7 @@ TEST_F(SettingsTest, canLoadDoubles)
 {
     static auto constexpr Key = TR_KEY_ratio_limit;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.ratio_limit;
     auto const expected_value = default_value + 1.0;
 
@@ -82,7 +82,7 @@ TEST_F(SettingsTest, canSaveDoubles)
 {
     static auto constexpr Key = TR_KEY_seed_queue_enabled;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.seed_queue_enabled;
     auto const expected_value = !default_value;
     settings.seed_queue_enabled = expected_value;
@@ -101,7 +101,7 @@ TEST_F(SettingsTest, canLoadEncryptionMode)
     static auto constexpr Key = TR_KEY_encryption;
     static auto constexpr ExpectedValue = TR_ENCRYPTION_REQUIRED;
 
-    auto settings = std::make_unique<SessionSettings>();
+    auto settings = std::make_unique<tr_session_settings>();
     ASSERT_NE(ExpectedValue, settings->encryption_mode);
 
     auto dict = tr_variant{};
@@ -111,7 +111,7 @@ TEST_F(SettingsTest, canLoadEncryptionMode)
     tr_variantClear(&dict);
     EXPECT_EQ(ExpectedValue, settings->encryption_mode);
 
-    settings = std::make_unique<SessionSettings>();
+    settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, Key, "required");
     settings->load(&dict);
@@ -124,7 +124,7 @@ TEST_F(SettingsTest, canSaveEncryptionMode)
     static auto constexpr Key = TR_KEY_encryption;
     static auto constexpr ExpectedValue = TR_ENCRYPTION_REQUIRED;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     EXPECT_NE(ExpectedValue, settings.seed_queue_enabled);
     settings.encryption_mode = ExpectedValue;
 
@@ -142,7 +142,7 @@ TEST_F(SettingsTest, canLoadInt)
 {
     static auto constexpr Field = Settings::PeerSocketTos;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.get<int>(Field);
     auto const expected_value = default_value + 1;
 
@@ -160,7 +160,7 @@ TEST_F(SettingsTest, canLoadLogLevel)
 {
     static auto constexpr Field = Settings::MessageLevel;
 
-    auto settings = std::make_unique<SessionSettings>();
+    auto settings = std::make_unique<tr_session_settings>();
     auto const default_value = settings->get<tr_log_level>(Field);
     auto constexpr ExpectedValue = TR_LOG_DEBUG;
     ASSERT_NE(ExpectedValue, default_value);
@@ -174,7 +174,7 @@ TEST_F(SettingsTest, canLoadLogLevel)
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings->get<tr_log_level>(Field));
 
-    settings = std::make_unique<SessionSettings>();
+    settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings->key(Field), "debug");
     changed = settings->load(&dict);
@@ -188,7 +188,7 @@ TEST_F(SettingsTest, canLoadMode)
 {
     static auto constexpr Field = Settings::Umask;
 
-    auto settings = std::make_unique<SessionSettings>();
+    auto settings = std::make_unique<tr_session_settings>();
     auto const default_value = settings->get<mode_t>(Field);
     auto constexpr ExpectedValue = mode_t{ 0777 };
     ASSERT_NE(ExpectedValue, default_value);
@@ -202,7 +202,7 @@ TEST_F(SettingsTest, canLoadMode)
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings->get<mode_t>(Field));
 
-    settings = std::make_unique<SessionSettings>();
+    settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings->key(Field), "0777");
     changed = settings->load(&dict);
@@ -216,7 +216,7 @@ TEST_F(SettingsTest, canLoadPort)
 {
     static auto constexpr Field = Settings::PeerPort;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.get<tr_port>(Field);
     auto constexpr ExpectedValue = tr_port::fromHost(8080);
     ASSERT_NE(ExpectedValue, default_value);
@@ -235,7 +235,7 @@ TEST_F(SettingsTest, canLoadPreallocation)
 {
     static auto constexpr Field = Settings::Preallocation;
 
-    auto settings = std::make_unique<SessionSettings>();
+    auto settings = std::make_unique<tr_session_settings>();
     auto const default_value = settings->get<tr_preallocation_mode>(Field);
     auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
     ASSERT_NE(ExpectedValue, default_value);
@@ -249,7 +249,7 @@ TEST_F(SettingsTest, canLoadPreallocation)
     EXPECT_EQ(true, changed.test(Field));
     EXPECT_EQ(ExpectedValue, settings->get<tr_preallocation_mode>(Field));
 
-    settings = std::make_unique<SessionSettings>();
+    settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddStrView(&dict, settings->key(Field), "full");
     changed = settings->load(&dict);
@@ -263,7 +263,7 @@ TEST_F(SettingsTest, canLoadSizeT)
 {
     static auto constexpr Field = Settings::SeedQueueSize;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.get<size_t>(Field);
     auto const expected_value = default_value + 5U;
     ASSERT_NE(expected_value, default_value);
@@ -282,7 +282,7 @@ TEST_F(SettingsTest, canLoadString)
 {
     static auto constexpr Field = Settings::BlocklistUrl;
 
-    auto settings = SessionSettings{};
+    auto settings = tr_session_settings{};
     auto const default_value = settings.get<std::string>(Field);
     auto const expected_value = default_value + "/subpath";
     ASSERT_NE(expected_value, default_value);

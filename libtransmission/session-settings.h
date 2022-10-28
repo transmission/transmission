@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#pragma once
+
 #include <cstddef> // for size_t
 #include <string>
 
@@ -14,9 +16,6 @@
 #include "rpc-server.h" // for tr_rpc_server::DefaultRpcSocketMode
 
 struct tr_variant;
-
-namespace libtransmission
-{
 
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
@@ -97,7 +96,7 @@ namespace libtransmission
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true)
 
-struct SessionSettings
+struct tr_session_settings
 {
     void load(tr_variant* src);
     void save(tr_variant* tgt) const;
@@ -106,5 +105,3 @@ struct SessionSettings
     SESSION_SETTINGS_FIELDS(V)
 #undef V
 };
-
-} // namespace libtransmission

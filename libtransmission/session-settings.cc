@@ -10,15 +10,12 @@
 #include "session-settings.h"
 #include "variant.h"
 
-namespace libtransmission
-{
-
-void SessionSettings::load(tr_variant* src)
+void tr_session_settings::load(tr_variant* src)
 {
 #define V(key, field, type, default_value) \
     if (auto* const child = tr_variantDictFind(src, key); child != nullptr) \
     { \
-        if (auto val = VariantConverter::load<decltype(field)>(child); val) \
+        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(child); val) \
         { \
             this->field = *val; \
         } \
@@ -27,13 +24,11 @@ void SessionSettings::load(tr_variant* src)
 #undef V
 }
 
-void SessionSettings::save(tr_variant* tgt) const
+void tr_session_settings::save(tr_variant* tgt) const
 {
 #define V(key, field, type, default_value) \
     tr_variantDictRemove(tgt, key); \
-    VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
+    libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
     SESSION_SETTINGS_FIELDS(V)
 #undef V
 }
-
-} // namespace libtransmission

@@ -37,6 +37,7 @@
 #include "port-forwarding.h"
 #include "quark.h"
 #include "session-id.h"
+#include "session-settings.h"
 #include "stats.h"
 #include "torrents.h"
 #include "tr-lpd.h"
@@ -959,6 +960,7 @@ private:
 
     /// trivial type fields
 
+    tr_session_settings settings_;
     std::optional<tr_address> external_ip_;
 
     queue_start_callback_t queue_start_callback_ = nullptr;

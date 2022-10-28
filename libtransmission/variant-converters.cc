@@ -64,7 +64,7 @@ static auto constexpr Keys = std::array<std::pair<std::string_view, tr_encryptio
     { "allowed", TR_CLEAR_PREFERRED }
 }};
 // clang-format on
-}
+} // namespace EncryptionHelpers
 
 template<>
 std::optional<tr_encryption_mode> VariantConverter::load<tr_encryption_mode>(tr_variant* src)
