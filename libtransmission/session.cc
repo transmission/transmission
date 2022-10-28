@@ -372,8 +372,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_done_seeding_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_seeding_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_alt_speed_up, 50); /* half the regular */
-    tr_variantDictAddInt(d, TR_KEY_alt_speed_down, 50); /* half the regular */
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_begin, 540); /* 9am */
     tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, 1020); /* 5pm */
@@ -408,8 +406,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
-    tr_variantDictAddInt(d, TR_KEY_alt_speed_up, tr_sessionGetAltSpeed_KBps(s, TR_UP));
-    tr_variantDictAddInt(d, TR_KEY_alt_speed_down, tr_sessionGetAltSpeed_KBps(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_begin, tr_sessionGetAltSpeedBegin(s));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, tr_sessionUsesAltSpeedTime(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, tr_sessionGetAltSpeedEnd(s));
@@ -790,17 +786,6 @@ void tr_session::setImpl(init_data& data, bool force)
     /**
     ***  Turtle Mode
     **/
-
-    /* update the turtle mode's fields */
-    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_up, &i))
-    {
-        turtle.speedLimit_Bps[TR_UP] = tr_toSpeedBytes(i);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_down, &i))
-    {
-        turtle.speedLimit_Bps[TR_DOWN] = tr_toSpeedBytes(i);
-    }
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_begin, &i))
     {
@@ -1287,32 +1272,30 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, tr_bytes_per_second_t bytes_per_second)
+void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit)
 {
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-    s->turtle.speedLimit_Bps[d] = bytes_per_second;
+    if (dir == TR_DOWN)
+    {
+        session->settings_.alt_speed_down_kilobytes_per_second = limit;
+    }
+    else
+    {
+        session->settings_.alt_speed_up_kilobytes_per_second = limit;
+    }
 
-    updateBandwidth(s, d);
+    updateBandwidth(session, dir);
 }
 
-void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, tr_kilobytes_per_second_t kilo_per_second)
+tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    tr_sessionSetAltSpeed_Bps(s, d, tr_toSpeedBytes(kilo_per_second));
-}
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-static tr_bytes_per_second_t tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
-{
-    TR_ASSERT(s != nullptr);
-    TR_ASSERT(tr_isDirection(d));
-
-    return s->turtle.speedLimit_Bps[d];
-}
-
-tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
-{
-    return tr_toSpeedKBps(tr_sessionGetAltSpeed_Bps(s, d));
+    return dir == TR_DOWN ? session->settings_.alt_speed_down_kilobytes_per_second :
+                            session->settings_.alt_speed_up_kilobytes_per_second;
 }
 
 static void userPokedTheClock(tr_session* s, struct tr_turtle_info* t)

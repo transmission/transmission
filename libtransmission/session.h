@@ -79,9 +79,6 @@ class SessionTest;
 
 struct tr_turtle_info
 {
-    /* TR_UP and TR_DOWN speed limits */
-    std::array<tr_bytes_per_second_t, 2> speedLimit_Bps = {};
-
     /* is turtle mode on right now? */
     bool isEnabled = false;
 
@@ -922,6 +919,7 @@ private:
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
     friend size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
+    friend tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
@@ -933,6 +931,7 @@ private:
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
