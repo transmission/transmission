@@ -472,9 +472,19 @@ public:
         tr_netSetTOS(sock, peer_socket_tos_, type);
     }
 
+    [[nodiscard]] constexpr auto peerLimit() const noexcept
+    {
+        return settings_.peer_limit_global;
+    }
+
+    [[nodiscard]] constexpr auto peerLimitPerTorrent() const noexcept
+    {
+        return settings_.peer_limit_per_torrent;
+    }
+
     [[nodiscard]] constexpr bool incPeerCount() noexcept
     {
-        if (this->peer_count_ >= this->peer_limit_)
+        if (this->peer_count_ >= this->peerLimit())
         {
             return false;
         }
@@ -657,16 +667,6 @@ public:
     [[nodiscard]] constexpr auto queueStalledMinutes() const noexcept
     {
         return settings_.queue_stalled_minutes;
-    }
-
-    [[nodiscard]] constexpr auto peerLimit() const noexcept
-    {
-        return peer_limit_;
-    }
-
-    [[nodiscard]] constexpr auto peerLimitPerTorrent() const noexcept
-    {
-        return peer_limit_per_torrent_;
     }
 
     [[nodiscard]] constexpr auto uploadSlotsPerTorrent() const noexcept
@@ -1031,8 +1031,6 @@ private:
     tr_port random_port_high_;
 
     uint16_t peer_count_ = 0;
-    uint16_t peer_limit_ = 200;
-    uint16_t peer_limit_per_torrent_ = 50;
 
     uint8_t peer_id_ttl_hours_ = 6;
 

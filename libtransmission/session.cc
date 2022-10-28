@@ -349,8 +349,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_global, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
     tr_variantDictAddInt(d, TR_KEY_peer_port, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_PORT_STR));
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, false);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, 49152);
@@ -402,8 +400,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit());
-    tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
     tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom());
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->random_port_low_.host());
@@ -714,11 +710,6 @@ void tr_session::setImpl(init_data& data, bool force)
         setDefaultTrackers(val);
     }
 
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
-    {
-        tr_sessionSetPeerLimitPerTorrent(this, i);
-    }
-
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &val))
     {
         tr_sessionSetDHTEnabled(this, val);
@@ -814,11 +805,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &val))
     {
         tr_sessionSetPortForwardingEnabled(this, val);
-    }
-
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_global, &i))
-    {
-        this->peer_limit_ = i;
     }
 
     /**
@@ -1494,7 +1480,7 @@ void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers)
 {
     TR_ASSERT(session != nullptr);
 
-    session->peer_limit_ = max_global_peers;
+    session->settings_.peer_limit_global = max_global_peers;
 }
 
 uint16_t tr_sessionGetPeerLimit(tr_session const* session)
@@ -1508,7 +1494,7 @@ void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers)
 {
     TR_ASSERT(session != nullptr);
 
-    session->peer_limit_per_torrent_ = max_peers;
+    session->settings_.peer_limit_per_torrent = max_peers;
 }
 
 uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
