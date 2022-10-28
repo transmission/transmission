@@ -671,7 +671,7 @@ public:
 
     [[nodiscard]] constexpr auto uploadSlotsPerTorrent() const noexcept
     {
-        return upload_slots_per_torrent_;
+        return settings_.upload_slots_per_torrent;
     }
 
     [[nodiscard]] constexpr auto isClosing() const noexcept
@@ -1005,8 +1005,6 @@ private:
     uint16_t peer_count_ = 0;
     uint16_t peer_limit_ = 200;
     uint16_t peer_limit_per_torrent_ = 50;
-
-    uint16_t upload_slots_per_torrent_ = 8;
 
     uint8_t peer_id_ttl_hours_ = 6;
 

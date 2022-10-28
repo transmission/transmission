@@ -395,7 +395,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
-    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, 8);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, DefaultBindAddressIpv4);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, DefaultBindAddressIpv6);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
@@ -448,7 +447,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
-    tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4_.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6_.readable());
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
@@ -867,11 +865,6 @@ void tr_session::setImpl(init_data& data, bool force)
 
     /**
     **/
-
-    if (tr_variantDictFindInt(settings, TR_KEY_upload_slots_per_torrent, &i))
-    {
-        this->upload_slots_per_torrent_ = i;
-    }
 
     if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
     {

@@ -46,6 +46,7 @@ struct tr_variant;
     V(TR_KEY_tcp_enabled, tcp_enabled, bool, true) \
     V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false) \
     V(TR_KEY_umask, umask, mode_t, 022) \
+    V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
@@ -94,8 +95,7 @@ struct tr_variant;
     V(TR_KEY_speed_limit_down, speed_limit_down, size_t, 100U) \
     V(TR_KEY_speed_limit_down_enabled, speed_limit_down_enabled, bool, false) \
     V(TR_KEY_speed_limit_up, speed_limit_up, size_t, 100U) \
-    V(TR_KEY_speed_limit_up_enabled, speed_limit_up_enabled, bool, false) \
-    V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U)
+    V(TR_KEY_speed_limit_up_enabled, speed_limit_up_enabled, bool, false)
 
 struct tr_session_settings
 {
