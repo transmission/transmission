@@ -721,7 +721,7 @@ public:
 
     [[nodiscard]] constexpr auto allowsPEX() const noexcept
     {
-        return is_pex_enabled_;
+        return settings_.pex_enabled;
     }
 
     [[nodiscard]] constexpr auto allowsTCP() const noexcept
@@ -1022,7 +1022,6 @@ private:
     bool is_closing_ = false;
     bool is_closed_ = false;
 
-    bool is_pex_enabled_ = false;
     bool is_tcp_enabled_ = true;
 
     bool is_idle_limited_ = false;

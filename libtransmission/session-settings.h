@@ -21,6 +21,7 @@ struct tr_variant;
     V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
     V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED) \
     V(TR_KEY_lpd_enabled, lpd_enabled, bool, true) \
+    V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
     V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
     /* below here: unprocessed */ \
@@ -58,7 +59,6 @@ struct tr_variant;
     V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::fromHost(49152)) \
     V(TR_KEY_peer_port_random_on_start, peer_port_random_on_start, bool, false) \
     V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04) \
-    V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true) \
     V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE) \
     V(TR_KEY_prefetch_enabled, prefetch_enabled, bool, true) \

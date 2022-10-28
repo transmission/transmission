@@ -782,11 +782,6 @@ void tr_session::setImpl(init_data& data, bool force)
         tr_sessionSetPeerLimitPerTorrent(this, i);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_pex_enabled, &val))
-    {
-        tr_sessionSetPexEnabled(this, val);
-    }
-
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &val))
     {
         tr_sessionSetDHTEnabled(this, val);
@@ -2012,7 +2007,7 @@ void tr_sessionSetPexEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->is_pex_enabled_ = enabled;
+    session->settings_.pex_enabled = enabled;
 }
 
 bool tr_sessionIsPexEnabled(tr_session const* session)
