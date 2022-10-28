@@ -1,3 +1,11 @@
+#warning TODO: tos needs its own type in settings
+#warning TODO: tos needs its own VariantConverter that uses tr_net
+#warning TODO: settings.peer_port_
+#warning TODO: alt_speed_enabled is confusing and probably broken
+#warning TODO: add alt_speed tests
+#warning TODO: add rpc_server settings tests
+#warning TODO: add tr_sessionLoad / getDefaults tests
+
 // This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
@@ -332,7 +340,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
 {
     session->settings_.save(setme_dictionary);
-    TR_ASSERT(session->rpc_server_);
     session->rpc_server_->save(setme_dictionary);
 }
 
