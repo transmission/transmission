@@ -18,9 +18,10 @@
 struct tr_variant;
 
 #define SESSION_SETTINGS_FIELDS(V) \
-    V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_dht_enabled, dht_enabled, bool, true) \
     V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED) \
+    V(TR_KEY_lpd_enabled, lpd_enabled, bool, true) \
+    V(TR_KEY_umask, umask, mode_t, 022) \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true) \
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_down, alt_speed_down_kilobytes_per_second, size_t, 50U) \
@@ -47,7 +48,6 @@ struct tr_variant;
     V(TR_KEY_idle_seeding_limit_enabled, idle_seeding_limit_enabled, bool, false) \
     V(TR_KEY_incomplete_dir, incomplete_dir, std::string, tr_getDefaultDownloadDir()) \
     V(TR_KEY_incomplete_dir_enabled, incomplete_dir_enabled, bool, false) \
-    V(TR_KEY_lpd_enabled, lpd_enabled, bool, true) \
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO) \
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "") \
     V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U) \

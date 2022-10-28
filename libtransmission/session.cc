@@ -760,9 +760,9 @@ void tr_session::setImpl(init_data& data, bool force)
     }
 
 #ifndef _WIN32
-    if (force || (new_settings.umask != old_settings.umask))
+    if (auto const& val = new_settings.umask; force || val != old_settings.umask)
     {
-        ::umask(new_settings.umask);
+        ::umask(val);
     }
 #endif
 
@@ -797,12 +797,12 @@ void tr_session::setImpl(init_data& data, bool force)
         is_tcp_enabled_ = val;
     }
 
-    if (force || (new_settings.utp_enabled != old_settings.utp_enabled))
+    if (auto const& val = new_settings.utp_enabled; force || val != old_settings.utp_enabled)
     {
-        tr_sessionSetUTPEnabled(this, new_settings.utp_enabled);
+        tr_sessionSetUTPEnabled(this, val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_lpd_enabled, &val))
+    if (auto const& val = new_settings.lpd_enabled; force || val != old_settings.lpd_enabled)
     {
         tr_sessionSetLPDEnabled(this, val);
     }
@@ -2094,7 +2094,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
         [session, enabled]()
         {
             session->lpd_.reset();
-            session->is_lpd_enabled_ = enabled;
+            session->settings_.lpd_enabled = enabled;
             if (enabled)
             {
                 session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->eventBase());
