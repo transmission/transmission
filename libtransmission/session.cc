@@ -351,8 +351,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, *tr_parseNum<int64_t>(TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
@@ -390,8 +388,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, 1020); /* 5pm */
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, TR_SCHED_ALL);
-    tr_variantDictAddInt(d, TR_KEY_speed_limit_up, 100);
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, DefaultBindAddressIpv4);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, DefaultBindAddressIpv6);
@@ -409,8 +405,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
-    tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, s->isSpeedLimited(TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_encryption, s->encryptionMode());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent());
@@ -440,8 +434,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, tr_sessionUsesAltSpeedTime(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, tr_sessionGetAltSpeedEnd(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
-    tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
-    tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, s->isSpeedLimited(TR_UP));
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4_.readable());
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6_.readable());
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
@@ -840,22 +832,22 @@ void tr_session::setImpl(init_data& data, bool force)
     /**
     **/
 
-    if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_up, &i))
+    if (auto const& val = new_settings.speed_limit_up; force || val != old_settings.speed_limit_up)
     {
-        tr_sessionSetSpeedLimit_KBps(this, TR_UP, static_cast<tr_kilobytes_per_second_t>(i));
+        tr_sessionSetSpeedLimit_KBps(this, TR_UP, static_cast<tr_kilobytes_per_second_t>(val));
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_up_enabled, &val))
+    if (auto const& val = new_settings.speed_limit_up_enabled; force || val != old_settings.speed_limit_up_enabled)
     {
         tr_sessionLimitSpeed(this, TR_UP, val);
     }
 
-    if (tr_variantDictFindInt(settings, TR_KEY_speed_limit_down, &i))
+    if (auto const& val = new_settings.speed_limit_down; force || val != old_settings.speed_limit_down)
     {
-        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(i));
+        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(val));
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_speed_limit_down_enabled, &val))
+    if (auto const& val = new_settings.speed_limit_down_enabled; force || val != old_settings.speed_limit_down_enabled)
     {
         tr_sessionLimitSpeed(this, TR_DOWN, val);
     }
@@ -1168,7 +1160,7 @@ std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_directio
 
     if (this->isSpeedLimited(dir))
     {
-        return speedLimitBps(dir);
+        return tr_toSpeedBytes(tr_sessionGetSpeedLimit_KBps(this, dir));
     }
 
     return {};
@@ -1306,24 +1298,29 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_bytes_per_second_t bytes_per_second)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->speed_limit_Bps_[dir] = bytes_per_second;
+    if (dir == TR_DOWN)
+    {
+        session->settings_.speed_limit_down = limit;
+    }
+    else
+    {
+        session->settings_.speed_limit_up = limit;
+    }
 
     updateBandwidth(session, dir);
 }
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second)
+tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
 {
-    tr_sessionSetSpeedLimit_Bps(session, dir, tr_toSpeedBytes(kilo_per_second));
-}
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(tr_isDirection(dir));
 
-tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
-{
-    return tr_toSpeedKBps(s->speedLimitBps(d));
+    return dir == TR_DOWN ? session->settings_.speed_limit_down_enabled : session->settings_.speed_limit_up_enabled;
 }
 
 void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
@@ -1331,7 +1328,14 @@ void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->speed_limit_enabled_[dir] = limited;
+    if (dir == TR_DOWN)
+    {
+        session->settings_.speed_limit_down_enabled = limited;
+    }
+    else
+    {
+        session->settings_.speed_limit_up_enabled = limited;
+    }
 
     updateBandwidth(session, dir);
 }

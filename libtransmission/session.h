@@ -777,14 +777,14 @@ public:
 
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
 
-    [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
     {
-        return speed_limit_Bps_[dir];
+        return dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
     }
 
     [[nodiscard]] constexpr auto isSpeedLimited(tr_direction dir) const noexcept
     {
-        return speed_limit_enabled_[dir];
+        return dir == TR_DOWN ? settings_.speed_limit_down_enabled : settings_.speed_limit_up_enabled;
     }
 
     [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
@@ -921,6 +921,7 @@ private:
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
+    friend tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
@@ -959,7 +960,7 @@ private:
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
-    friend void tr_sessionSetSpeedLimit_Bps(tr_session* session, tr_direction dir, tr_bytes_per_second_t bytes_per_second);
+    friend void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
 
     /// constexpr fields
@@ -1010,9 +1011,6 @@ private:
 
     tr_rpc_func rpc_func_ = nullptr;
     void* rpc_func_user_data_ = nullptr;
-
-    std::array<tr_bytes_per_second_t, 2> speed_limit_Bps_ = { 0U, 0U };
-    std::array<bool, 2> speed_limit_enabled_ = { false, false };
 
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
