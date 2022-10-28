@@ -378,22 +378,22 @@ public:
 
     [[nodiscard]] constexpr auto const& incompleteDir() const noexcept
     {
-        return incomplete_dir_;
+        return settings_.incomplete_dir;
     }
 
     void setIncompleteDir(std::string_view dir)
     {
-        incomplete_dir_ = dir;
+        settings_.incomplete_dir = dir;
     }
 
     [[nodiscard]] constexpr auto useIncompleteDir() const noexcept
     {
-        return incomplete_dir_enabled_;
+        return settings_.incomplete_dir_enabled;
     }
 
     constexpr void useIncompleteDir(bool enabled) noexcept
     {
-        incomplete_dir_enabled_ = enabled;
+        settings_.incomplete_dir_enabled = enabled;
     }
 
     // scripts
@@ -1032,7 +1032,6 @@ private:
     bool is_incomplete_file_naming_enabled_ = false;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
-    bool incomplete_dir_enabled_ = false;
 
     bool announce_ip_enabled_ = false;
 
@@ -1044,7 +1043,6 @@ private:
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
 
     std::string download_dir_;
-    std::string incomplete_dir_;
 
     std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;

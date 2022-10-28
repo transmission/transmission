@@ -24,6 +24,8 @@ struct tr_variant;
     V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true) \
     V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U) \
     V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED) \
+    V(TR_KEY_incomplete_dir, incomplete_dir, std::string, tr_getDefaultDownloadDir()) \
+    V(TR_KEY_incomplete_dir_enabled, incomplete_dir_enabled, bool, false) \
     V(TR_KEY_lpd_enabled, lpd_enabled, bool, true) \
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO) \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true) \
@@ -51,8 +53,6 @@ struct tr_variant;
     V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir()) \
     V(TR_KEY_idle_seeding_limit, idle_seeding_limit, size_t, 30U) \
     V(TR_KEY_idle_seeding_limit_enabled, idle_seeding_limit_enabled, bool, false) \
-    V(TR_KEY_incomplete_dir, incomplete_dir, std::string, tr_getDefaultDownloadDir()) \
-    V(TR_KEY_incomplete_dir_enabled, incomplete_dir_enabled, bool, false) \
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "") \
     V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U) \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL) \
