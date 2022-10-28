@@ -93,9 +93,6 @@ struct tr_turtle_info
      * Valid range: 0..<1440 */
     int endMinute = 0;
 
-    /* only use clock mode on these days of the week */
-    tr_sched_day days = {};
-
     /* called when isEnabled changes */
     tr_altSpeedFunc callback = nullptr;
 
@@ -922,6 +919,7 @@ private:
     friend tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
+    friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings);
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
@@ -931,6 +929,7 @@ private:
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
+    friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day new_val);
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
