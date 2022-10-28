@@ -20,6 +20,8 @@ struct tr_variant;
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_announce_ip, announce_ip, std::string, "") \
     V(TR_KEY_announce_ip_enabled, announce_ip_enabled, bool, false) \
+    V(TR_KEY_bind_address_ipv4, bind_address_ipv4, std::string, "0.0.0.0") \
+    V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::") \
     V(TR_KEY_blocklist_enabled, blocklist_enabled, bool, false) \
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist") \
     V(TR_KEY_cache_size_mb, cache_size_mb, size_t, 4U) \
@@ -79,8 +81,6 @@ struct tr_variant;
     V(TR_KEY_alt_speed_up, alt_speed_up_kilobytes_per_second, size_t, 50U) \
     V(TR_KEY_anti_brute_force_enabled, anti_brute_force_enabled, bool, false) \
     V(TR_KEY_anti_brute_force_threshold, anti_brute_force_threshold, size_t, 100U) \
-    V(TR_KEY_bind_address_ipv4, bind_address_ipv4, std::string, "0.0.0.0") \
-    V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::") \
     V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT)) \
     V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04) \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true) \

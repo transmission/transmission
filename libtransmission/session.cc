@@ -380,8 +380,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, 1020); /* 5pm */
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, TR_SCHED_ALL);
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
-    tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, DefaultBindAddressIpv4);
-    tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, DefaultBindAddressIpv6);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
 }
@@ -418,8 +416,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, tr_sessionUsesAltSpeedTime(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, tr_sessionGetAltSpeedEnd(s));
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, s->bind_ipv4_.readable());
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, s->bind_ipv6_.readable());
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
@@ -738,29 +734,21 @@ void tr_session::setImpl(init_data& data, bool force)
 
     closePeerPort();
 
-    auto address = tr_inaddr_any;
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv))
+    if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
     {
         if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv4())
         {
-            address = *addr;
+            this->bind_ipv4_ = tr_bindinfo{ *addr };
         }
     }
 
-    this->bind_ipv4_ = tr_bindinfo{ address };
-
-    address = tr_in6addr_any;
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv))
+    if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
     {
         if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv6())
         {
-            address = *addr;
+            this->bind_ipv6_ = tr_bindinfo{ *addr };
         }
     }
-
-    this->bind_ipv6_ = tr_bindinfo{ address };
 
     {
         auto peer_port = this->private_peer_port_;
