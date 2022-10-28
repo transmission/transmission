@@ -733,7 +733,7 @@ public:
 
     [[nodiscard]] constexpr auto allowsPrefetch() const noexcept
     {
-        return is_prefetch_enabled_;
+        return settings_.is_prefetch_enabled;
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
@@ -1038,8 +1038,6 @@ private:
 
     bool is_closing_ = false;
     bool is_closed_ = false;
-
-    bool is_prefetch_enabled_ = false;
 
     bool is_port_random_ = false;
 

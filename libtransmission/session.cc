@@ -769,12 +769,6 @@ void tr_session::setImpl(init_data& data, bool force)
         this->peer_id_ttl_hours_ = i;
     }
 
-    /* files and directories */
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_prefetch_enabled, &val))
-    {
-        this->is_prefetch_enabled_ = val;
-    }
-
     /* rpc server */
     this->rpc_server_ = std::make_unique<tr_rpc_server>(this, settings);
 
