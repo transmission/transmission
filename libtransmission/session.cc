@@ -372,7 +372,6 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_done_seeding_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_seeding_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, false);
-    tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
@@ -403,7 +402,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
-    tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, tr_sessionUsesAltSpeedTime(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
@@ -560,7 +558,7 @@ void tr_session::onNowTimer()
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
     udp_core_->dhtUpkeep();
-    if (turtle.isClockEnabled)
+    if (settings_.alt_speed_time_enabled)
     {
         turtleCheckClock(this, this->turtle);
     }
@@ -780,11 +778,6 @@ void tr_session::setImpl(init_data& data, bool force)
     /**
     ***  Turtle Mode
     **/
-
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_alt_speed_time_enabled, &val))
-    {
-        turtle.isClockEnabled = val;
-    }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_alt_speed_enabled, &val))
     {
@@ -1156,8 +1149,6 @@ static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
 
 static void turtleCheckClock(tr_session* session, tr_turtle_info& turtle)
 {
-    TR_ASSERT(turtle.isClockEnabled);
-
     auto const enabled = getInTurtleTime(turtle);
     auto const new_auto_turtle_state = autoSwitchState(enabled);
     auto const already_switched = turtle.autoTurtleState == new_auto_turtle_state;
@@ -1181,7 +1172,7 @@ static void turtleBootstrap(tr_session* const session, tr_session_settings const
 
     turtleUpdateTable(settings, turtle);
 
-    if (turtle.isClockEnabled)
+    if (settings.alt_speed_time_enabled)
     {
         turtle.isEnabled = getInTurtleTime(turtle);
         turtle.autoTurtleState = autoSwitchState(turtle.isEnabled);
@@ -1282,7 +1273,7 @@ static void userPokedTheClock(tr_session* session, tr_session_settings const& se
 
     turtleUpdateTable(settings, turtle);
 
-    if (turtle.isClockEnabled)
+    if (settings.alt_speed_time_enabled)
     {
         bool const enabled = getInTurtleTime(turtle);
         useAltSpeed(session, turtle, enabled, true);
@@ -1294,12 +1285,10 @@ void tr_sessionUseAltSpeedTime(tr_session* session, bool b)
 {
     TR_ASSERT(session != nullptr);
 
-    struct tr_turtle_info& turtle = session->turtle;
-
-    if (turtle.isClockEnabled != b)
+    if (auto& val = session->settings_.alt_speed_time_enabled; val != b)
     {
-        turtle.isClockEnabled = b;
-        userPokedTheClock(session, session->settings_, turtle);
+        val = b;
+        userPokedTheClock(session, session->settings_, session->turtle);
     }
 }
 
@@ -1307,7 +1296,7 @@ bool tr_sessionUsesAltSpeedTime(tr_session const* s)
 {
     TR_ASSERT(s != nullptr);
 
-    return s->turtle.isClockEnabled;
+    return s->settings_.alt_speed_time_enabled;
 }
 
 void tr_sessionSetAltSpeedBegin(tr_session* session, int minutes_since_midnight)

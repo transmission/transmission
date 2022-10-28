@@ -82,9 +82,6 @@ struct tr_turtle_info
     /* is turtle mode on right now? */
     bool isEnabled = false;
 
-    /* does turtle mode turn itself on and off at given times? */
-    bool isClockEnabled = false;
-
     /* called when isEnabled changes */
     tr_altSpeedFunc callback = nullptr;
 
@@ -901,6 +898,7 @@ private:
     friend bool tr_sessionIsPortForwardingEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
+    friend bool tr_sessionUsesAltSpeedTime(tr_session const* session);
     friend char const* tr_sessionGetRPCPassword(tr_session const* session);
     friend char const* tr_sessionGetRPCUsername(tr_session const* session);
     friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
