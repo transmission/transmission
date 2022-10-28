@@ -428,7 +428,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary)
 
     tr_variantDictReserve(d, 70);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
-    tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->allowsUTP());
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->allowsLPD());
@@ -819,11 +818,6 @@ void tr_session::setImpl(init_data& data, bool force)
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &val))
     {
         useBlocklist(val);
-    }
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_blocklist_url, &sv))
-    {
-        setBlocklistUrl(sv);
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &val))
@@ -2193,7 +2187,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 
 void tr_session::useBlocklist(bool enabled)
 {
-    this->blocklist_enabled_ = enabled;
+    settings_.blocklist_enabled = enabled;
 
     std::for_each(
         std::begin(blocklists_),

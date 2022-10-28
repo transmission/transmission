@@ -422,19 +422,19 @@ public:
 
     [[nodiscard]] constexpr auto useBlocklist() const noexcept
     {
-        return blocklist_enabled_;
+        return settings_.blocklist_enabled;
     }
 
     void useBlocklist(bool enabled);
 
     [[nodiscard]] constexpr auto const& blocklistUrl() const noexcept
     {
-        return blocklist_url_;
+        return settings_.blocklist_url;
     }
 
     void setBlocklistUrl(std::string_view url)
     {
-        blocklist_url_ = url;
+        settings_.blocklist_url = url;
     }
 
     // RPC
@@ -1037,7 +1037,6 @@ private:
     bool is_incomplete_file_naming_enabled_ = false;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_ = {};
-    bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
 
     bool announce_ip_enabled_ = false;
@@ -1052,7 +1051,6 @@ private:
     std::string download_dir_;
     std::string incomplete_dir_;
 
-    std::string blocklist_url_;
     std::string default_trackers_str_;
     std::string peer_congestion_algorithm_;
 
