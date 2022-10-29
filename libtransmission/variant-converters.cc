@@ -115,25 +115,6 @@ void VariantConverter::save<tr_encryption_mode>(tr_variant* tgt, tr_encryption_m
 
 ///
 
-template<>
-std::optional<int> VariantConverter::load<int>(tr_variant* src)
-{
-    if (auto val = int64_t{}; tr_variantGetInt(src, &val))
-    {
-        return static_cast<int>(val);
-    }
-
-    return {};
-}
-
-template<>
-void VariantConverter::save<int>(tr_variant* tgt, int const& val)
-{
-    tr_variantInitInt(tgt, val);
-}
-
-///
-
 namespace LogLevelHelpers
 {
 // clang-format off
@@ -340,6 +321,30 @@ template<>
 void VariantConverter::save<std::string>(tr_variant* tgt, std::string const& val)
 {
     tr_variantInitStr(tgt, val);
+}
+
+///
+
+template<>
+std::optional<tr_tos_t> VariantConverter::load<tr_tos_t>(tr_variant* src)
+{
+    if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
+    {
+        return tr_tos_t::fromString(val);
+    }
+
+    if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+    {
+        return tr_tos_t(val);
+    }
+
+    return {};
+}
+
+template<>
+void VariantConverter::save<tr_tos_t>(tr_variant* tgt, tr_tos_t const& val)
+{
+    tr_variantInitStr(tgt, val.toString());
 }
 
 } // namespace libtransmission

@@ -38,7 +38,7 @@ class Timer;
     V(TR_KEY_rpc_host_whitelist_enabled, is_host_whitelist_enabled_, bool, true, "") \
     V(TR_KEY_rpc_port, port_, tr_port, tr_port::fromHost(TR_DEFAULT_RPC_PORT), "") \
     V(TR_KEY_rpc_password, salted_password_, std::string, "", "") \
-    V(TR_KEY_rpc_socket_mode, socket_mode_, mode_t, 0750, "") \
+    V(TR_KEY_rpc_socket_mode, socket_mode_, tr_mode_t, 0750, "") \
     V(TR_KEY_rpc_url, url_, std::string, TR_DEFAULT_RPC_URL_STR, "") \
     V(TR_KEY_rpc_username, username_, std::string, "", "") \
     V(TR_KEY_rpc_whitelist, whitelist_str_, std::string, TR_DEFAULT_RPC_WHITELIST, "") \

@@ -11,7 +11,7 @@
 #include "transmission.h"
 
 #include "log.h" // for tr_log_level
-#include "net.h" // for tr_port
+#include "net.h" // for tr_port, tr_tos_t
 #include "quark.h"
 
 struct tr_variant;
@@ -80,7 +80,7 @@ struct tr_variant;
     /* below here: unprocessed */ \
     V(TR_KEY_alt_speed_enabled, alt_speed_enabled, bool, false, "") \
     V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "") \
-    V(TR_KEY_peer_socket_tos, peer_socket_tos, int, 0x04, "")
+    V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "")
 
 struct tr_session_settings
 {

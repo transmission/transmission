@@ -452,7 +452,7 @@ public:
 
     void setSocketTOS(tr_socket_t sock, tr_address_type type) const
     {
-        tr_netSetTOS(sock, peer_socket_tos_, type);
+        tr_netSetTOS(sock, settings_.peer_socket_tos, type);
     }
 
     [[nodiscard]] constexpr auto peerLimit() const noexcept
@@ -1006,10 +1006,6 @@ private:
 
     tr_rpc_func rpc_func_ = nullptr;
     void* rpc_func_user_data_ = nullptr;
-
-    // One of <netinet/ip.h>'s IPTOS_ values.
-    // See tr_netTos*() in libtransmission/net.h for more info
-    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
     // The open port on the local machine for incoming peer requests
     tr_port private_peer_port_;

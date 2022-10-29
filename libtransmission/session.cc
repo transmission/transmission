@@ -1,5 +1,3 @@
-#warning TODO: tos needs its own type in settings
-#warning TODO: tos needs its own VariantConverter that uses tr_net
 #warning TODO: settings.peer_port_
 #warning TODO: alt_speed_enabled is confusing and probably broken
 #warning TODO: add alt_speed tests
@@ -591,9 +589,6 @@ void tr_session::setImpl(init_data& data, bool force)
     auto& new_settings = settings_;
     new_settings.load(data.client_settings);
 
-    auto i = int64_t{};
-    auto sv = std::string_view{};
-
     if (auto const& val = new_settings.log_level; force || val != old_settings.log_level)
     {
         tr_logSetLevel(val);
@@ -631,18 +626,6 @@ void tr_session::setImpl(init_data& data, bool force)
         tr_sessionSetLPDEnabled(this, val);
     }
 
-    if (tr_variantDictFindInt(settings, TR_KEY_peer_socket_tos, &i))
-    {
-        peer_socket_tos_ = i;
-    }
-    else if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
-    {
-        if (auto ip_tos = tr_netTosFromName(sv); ip_tos)
-        {
-            peer_socket_tos_ = *ip_tos;
-        }
-    }
-
     useBlocklist(new_settings.blocklist_enabled);
 
     /* rpc server */
@@ -654,7 +637,7 @@ void tr_session::setImpl(init_data& data, bool force)
 
     if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
     {
-        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv4())
+        if (auto const addr = tr_address::fromString(val); addr && addr->isIPv4())
         {
             this->bind_ipv4_ = tr_bindinfo{ *addr };
         }
@@ -662,7 +645,7 @@ void tr_session::setImpl(init_data& data, bool force)
 
     if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
     {
-        if (auto const addr = tr_address::fromString(sv); addr && addr->isIPv6())
+        if (auto const addr = tr_address::fromString(val); addr && addr->isIPv6())
         {
             this->bind_ipv6_ = tr_bindinfo{ *addr };
         }
