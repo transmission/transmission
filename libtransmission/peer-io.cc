@@ -732,10 +732,7 @@ tr_peerIo::~tr_peerIo()
     auto const lock = session->unique_lock();
     TR_ASSERT(session->events != nullptr);
 
-    this->canRead = nullptr;
-    this->didWrite = nullptr;
-    this->gotError = nullptr;
-
+    clearCallbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
     event_disable(this, EV_READ | EV_WRITE);
     io_close_socket(this);
@@ -756,7 +753,7 @@ void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_
 
 void tr_peerIo::clear()
 {
-    setCallbacks(nullptr, nullptr, nullptr, nullptr);
+    clearCallbacks();
     setEnabled(TR_UP, false);
     setEnabled(TR_DOWN, false);
     io_close_socket(this);
@@ -996,7 +993,12 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
                         What,
                         my_error->code,
                         my_error->message));
-                io->gotError(io, What, io->userData);
+
+                if (io->gotError != nullptr)
+                {
+                    io->gotError(io, What, io->userData);
+                }
+
                 tr_error_propagate(error, &my_error);
             }
         }
