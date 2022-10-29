@@ -732,10 +732,7 @@ tr_peerIo::~tr_peerIo()
     auto const lock = session->unique_lock();
     TR_ASSERT(session->events != nullptr);
 
-    this->canRead = nullptr;
-    this->didWrite = nullptr;
-    this->gotError = nullptr;
-
+    disableCallbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
     event_disable(this, EV_READ | EV_WRITE);
     io_close_socket(this);

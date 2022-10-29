@@ -49,12 +49,6 @@ enum ReadState
     READ_ERR
 };
 
-using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
-
-using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
-
-using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
-
 auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
 
 struct evbuffer_deleter
@@ -235,6 +229,9 @@ public:
         return torrent_hash_;
     }
 
+    using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+    using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+    using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
     void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
     void disableCallbacks()
