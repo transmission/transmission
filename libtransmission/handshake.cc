@@ -1027,7 +1027,7 @@ static bool fireDoneFunc(tr_handshake* handshake, bool is_connected)
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool is_connected)
 {
     tr_logAddTraceHand(handshake, is_connected ? "handshakeDone: connected" : "handshakeDone: aborting");
-    handshake->io->setCallbacks(nullptr, nullptr, nullptr, nullptr);
+    handshake->io->clearCallbacks();
 
     bool const success = fireDoneFunc(handshake, is_connected);
     delete handshake;
