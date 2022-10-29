@@ -74,7 +74,7 @@ struct tr_variant;
     V(TR_KEY_start_added_torrents, should_start_added_torrents, bool, true, "") \
     V(TR_KEY_tcp_enabled, tcp_enabled, bool, true, "") \
     V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false, "") \
-    V(TR_KEY_umask, umask, mode_t, 022, "") \
+    V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
     /* below here: unprocessed */ \

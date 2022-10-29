@@ -227,17 +227,18 @@ public:
         drain(size());
     }
 
-    // -1 on error, 0 on eof, >0 on n bytes written
-    auto toSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    // Returns the number of bytes written. Check `error` for error.
+    size_t toSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
         auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
         auto const err = EVUTIL_SOCKET_ERROR();
-        if (res == -1)
+        if (res >= 0)
         {
-            tr_error_set(error, err, tr_net_strerror(err));
+            return static_cast<size_t>(res);
         }
-        return res;
+        tr_error_set(error, err, tr_net_strerror(err));
+        return 0;
     }
 
     [[nodiscard]] Iovec alloc(size_t n_bytes)

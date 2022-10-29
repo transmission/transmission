@@ -199,26 +199,26 @@ void VariantConverter::save<tr_log_level>(tr_variant* tgt, tr_log_level const& v
 ///
 
 template<>
-std::optional<mode_t> VariantConverter::load<mode_t>(tr_variant* src)
+std::optional<tr_mode_t> VariantConverter::load<tr_mode_t>(tr_variant* src)
 {
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
         if (auto const mode = tr_parseNum<uint32_t>(val, nullptr, 8); mode)
         {
-            return static_cast<mode_t>(*mode);
+            return static_cast<tr_mode_t>(*mode);
         }
     }
 
     if (auto val = int64_t{}; tr_variantGetInt(src, &val))
     {
-        return static_cast<mode_t>(val);
+        return static_cast<tr_mode_t>(val);
     }
 
     return {};
 }
 
 template<>
-void VariantConverter::save<mode_t>(tr_variant* tgt, mode_t const& val)
+void VariantConverter::save<tr_mode_t>(tr_variant* tgt, tr_mode_t const& val)
 {
     tr_variantInitStr(tgt, fmt::format("{:#03o}", val));
 }

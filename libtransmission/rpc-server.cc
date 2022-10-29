@@ -614,7 +614,7 @@ static bool bindUnixSocket(
     [[maybe_unused]] struct event_base* base,
     [[maybe_unused]] struct evhttp* httpd,
     [[maybe_unused]] char const* path,
-    [[maybe_unused]] mode_t socket_mode)
+    [[maybe_unused]] tr_mode_t socket_mode)
 {
 #ifdef _WIN32
     tr_logAddError(fmt::format(
@@ -642,7 +642,7 @@ static bool bindUnixSocket(
         return false;
     }
 
-    if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
+    if (chmod(addr.sun_path, socket_mode) != 0)
     {
         tr_logAddWarn(
             fmt::format(_("Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
