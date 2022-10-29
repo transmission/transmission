@@ -234,7 +234,7 @@ public:
     using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
     void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
-    void disableCallbacks()
+    void clearCallbacks()
     {
         setCallbacks(nullptr, nullptr, nullptr, nullptr);
     }
