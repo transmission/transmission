@@ -756,7 +756,7 @@ void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_
 
 void tr_peerIo::clear()
 {
-    setCallbacks(nullptr, nullptr, nullptr, nullptr);
+    disableCallbacks();
     setEnabled(TR_UP, false);
     setEnabled(TR_DOWN, false);
     io_close_socket(this);

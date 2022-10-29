@@ -237,6 +237,11 @@ public:
 
     void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
+    void disableCallbacks()
+    {
+        setCallbacks(nullptr, nullptr, nullptr, nullptr);
+    }
+
     struct tr_peer_socket socket = {};
 
     tr_session* const session;
