@@ -78,7 +78,7 @@ static auto constexpr DefaultPrefetchEnabled = bool{ false };
 static auto constexpr DefaultCacheSizeMB = int{ 4 };
 static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
-static auto constexpr DefaultUmask = int{ 022 };
+static auto constexpr DefaultUmask = tr_mode_t{ 022 };
 static auto constexpr SaveIntervalSecs = 360s;
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
@@ -764,13 +764,13 @@ void tr_session::setImpl(init_data& data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        this->umask_ = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, nullptr, 8).value_or(DefaultUmask));
+        this->umask_ = tr_parseNum<tr_mode_t>(sv, nullptr, 8).value_or(DefaultUmask);
         ::umask(this->umask_);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
     {
         /* Or as a base 10 integer to remain compatible with the old settings format. */
-        this->umask_ = (mode_t)i;
+        this->umask_ = static_cast<tr_mode_t>(i);
         ::umask(this->umask_);
     }
 

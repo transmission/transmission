@@ -98,7 +98,7 @@ private:
         auto const secs = duration_cast<seconds>(interval_);
         auto tv = timeval{};
         tv.tv_sec = secs.count();
-        tv.tv_usec = static_cast<suseconds_t>(duration_cast<microseconds>(interval_ - secs).count());
+        tv.tv_usec = static_cast<decltype(tv.tv_usec)>(duration_cast<microseconds>(interval_ - secs).count());
         evtimer_add(evtimer_, &tv);
     }
 

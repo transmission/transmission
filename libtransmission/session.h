@@ -987,7 +987,7 @@ private:
     std::array<bool, 2> queue_enabled_ = { false, false };
     std::array<size_t, 2> queue_size_ = { 0, 0 };
 
-    int umask_ = 022;
+    uint32_t umask_ = 022;
 
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
