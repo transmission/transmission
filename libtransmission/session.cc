@@ -1,5 +1,3 @@
-#warning TODO: settings.peer_port_
-
 // This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
@@ -293,13 +291,14 @@ void tr_session::tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
 {
     TR_ASSERT(session->allowsTCP());
 
-    socket_ = tr_netBindTCP(&addr_, session->private_peer_port_, false);
+    auto const& port = session->localPeerPort();
+
+    socket_ = tr_netBindTCP(&addr_, port, false);
 
     if (socket_ != TR_BAD_SOCKET)
     {
-        tr_logAddInfo(fmt::format(
-            _("Listening to incoming peer connections on {hostport}"),
-            fmt::arg("hostport", addr_.readable(session->private_peer_port_))));
+        tr_logAddInfo(
+            fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr_.readable(port))));
         ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, acceptIncomingPeer, session);
         event_add(ev_, nullptr);
     }
@@ -568,6 +567,8 @@ void tr_session::initImpl(init_data& data)
     data.done_cv.notify_one();
 }
 
+static void updateBandwidth(tr_session* session, tr_direction dir);
+
 void tr_session::setImpl(init_data& data, bool force)
 {
     TR_ASSERT(tr_amInEventThread(this));
@@ -575,10 +576,10 @@ void tr_session::setImpl(init_data& data, bool force)
     tr_variant* const settings = data.client_settings;
     TR_ASSERT(tr_variantIsDict(settings));
 
-    TR_ASSERT(tr_variantIsDict(data.client_settings));
+    TR_ASSERT(tr_variantIsDict(settings));
     auto const old_settings = settings_;
     auto& new_settings = settings_;
-    new_settings.load(data.client_settings);
+    new_settings.load(settings);
 
     if (auto const& val = new_settings.log_level; force || val != old_settings.log_level)
     {
@@ -619,71 +620,45 @@ void tr_session::setImpl(init_data& data, bool force)
 
     useBlocklist(new_settings.blocklist_enabled);
 
-    /* rpc server */
-    this->rpc_server_ = std::make_unique<tr_rpc_server>(this, settings);
-
-    /* public addresses */
-
-    closePeerPort();
-
-    if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
+    /// bound addresses, peer port, port forwarding
     {
-        if (auto const addr = tr_address::fromString(val); addr && addr->isIPv4())
+        auto port_needs_update = force;
+
+        if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
         {
-            this->bind_ipv4_ = tr_bindinfo{ *addr };
+            if (auto const addr = tr_address::fromString(val); addr && addr->isIPv4())
+            {
+                this->bind_ipv4_ = tr_bindinfo{ *addr };
+                port_needs_update |= true;
+            }
+        }
+
+        if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
+        {
+            if (auto const addr = tr_address::fromString(val); addr && addr->isIPv6())
+            {
+                this->bind_ipv6_ = tr_bindinfo{ *addr };
+                port_needs_update |= true;
+            }
+        }
+
+        port_needs_update |= (new_settings.port_forwarding_enabled != old_settings.port_forwarding_enabled);
+
+        if (port_needs_update)
+        {
+            setPeerPort(isPortRandom() ? randomPort() : new_settings.peer_port);
+            tr_sessionSetPortForwardingEnabled(this, new_settings.port_forwarding_enabled);
         }
     }
 
-    if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
-    {
-        if (auto const addr = tr_address::fromString(val); addr && addr->isIPv6())
-        {
-            this->bind_ipv6_ = tr_bindinfo{ *addr };
-        }
-    }
+    // We need to update bandwidth if speed settings changed.
+    // It's a harmless call, so just call it instead of checking for settings changes
+    updateBandwidth(this, TR_UP);
+    updateBandwidth(this, TR_DOWN);
 
-    {
-        auto peer_port = this->private_peer_port_;
+    rpc_server_ = std::make_unique<tr_rpc_server>(this, settings);
 
-        if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
-        {
-            peer_port.setHost(static_cast<uint16_t>(port));
-        }
-
-        setPeerPort(isPortRandom() ? randomPort() : peer_port);
-    }
-
-    if (auto val = new_settings.port_forwarding_enabled; force || val != old_settings.port_forwarding_enabled)
-    {
-        tr_sessionSetPortForwardingEnabled(this, val);
-    }
-
-    /**
-    **/
-
-    if (auto const& val = new_settings.speed_limit_up; force || val != old_settings.speed_limit_up)
-    {
-        tr_sessionSetSpeedLimit_KBps(this, TR_UP, static_cast<tr_kilobytes_per_second_t>(val));
-    }
-
-    if (auto const& val = new_settings.speed_limit_up_enabled; force || val != old_settings.speed_limit_up_enabled)
-    {
-        tr_sessionLimitSpeed(this, TR_UP, val);
-    }
-
-    if (auto const& val = new_settings.speed_limit_down; force || val != old_settings.speed_limit_down)
-    {
-        tr_sessionSetSpeedLimit_KBps(this, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(val));
-    }
-
-    if (auto const& val = new_settings.speed_limit_down_enabled; force || val != old_settings.speed_limit_down_enabled)
-    {
-        tr_sessionLimitSpeed(this, TR_DOWN, val);
-    }
-
-    // FIXME(ckerr): update rpc_server_ here too
-
-    alt_speeds_.load(data.client_settings);
+    alt_speeds_.load(settings);
 
     data.done_cv.notify_one();
 }
@@ -790,8 +765,11 @@ void tr_session::setPeerPort(tr_port port_in)
 {
     auto const in_session_thread = [this](tr_port port)
     {
-        private_peer_port_ = port;
-        public_peer_port_ = port;
+        auto const lock = unique_lock();
+
+        auto& private_peer_port = settings_.peer_port;
+        private_peer_port = port;
+        advertised_peer_port_ = port;
 
         closePeerPort();
 
@@ -799,7 +777,7 @@ void tr_session::setPeerPort(tr_port port_in)
         {
             bind_ipv4_.bindAndListenForIncomingPeers(this);
 
-            if (tr_net_hasIPv6(private_peer_port_))
+            if (tr_net_hasIPv6(private_peer_port))
             {
                 bind_ipv6_.bindAndListenForIncomingPeers(this);
             }
@@ -825,7 +803,7 @@ void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 
 uint16_t tr_sessionGetPeerPort(tr_session const* session)
 {
-    return session != nullptr ? session->public_peer_port_.host() : 0U;
+    return session != nullptr ? session->localPeerPort().host() : 0U;
 }
 
 uint16_t tr_sessionSetPeerPortRandom(tr_session* session)

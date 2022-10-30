@@ -40,6 +40,7 @@ struct tr_variant;
     V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U, "") \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL, "") \
     V(TR_KEY_peer_limit_per_torrent, peer_limit_per_torrent, size_t, TR_DEFAULT_PEER_LIMIT_TORRENT, "") \
+    V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "The local machine's incoming peer port") \
     V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::fromHost(65535), "") \
     V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::fromHost(49152), "") \
     V(TR_KEY_peer_port_random_on_start, peer_port_random_on_start, bool, false, "") \
@@ -71,9 +72,7 @@ struct tr_variant;
     V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false, "") \
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
-    V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
-    /* below here: unprocessed */ \
-    V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "")
+    V(TR_KEY_utp_enabled, utp_enabled, bool, true, "")
 
 struct tr_session_settings
 {

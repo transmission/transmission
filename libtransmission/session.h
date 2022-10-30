@@ -161,9 +161,9 @@ private:
             return session_.bind_ipv4_.addr_;
         }
 
-        [[nodiscard]] tr_port privatePeerPort() const override
+        [[nodiscard]] tr_port localPeerPort() const override
         {
-            return session_.private_peer_port_;
+            return session_.localPeerPort();
         }
 
         [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
@@ -171,10 +171,9 @@ private:
             return session_.timerMaker();
         }
 
-        void onPortForwarded(tr_port public_port, tr_port private_port) override
+        void onPortForwarded(tr_port public_port) override
         {
-            session_.public_peer_port_ = public_port;
-            session_.private_peer_port_ = private_port;
+            session_.advertised_peer_port_ = public_port;
         }
 
     private:
@@ -212,7 +211,7 @@ private:
 
         [[nodiscard]] tr_port port() const override
         {
-            return session_.peerPort();
+            return session_.advertisedPeerPort();
         }
 
         [[nodiscard]] bool allowsLPD() const override
@@ -609,15 +608,28 @@ public:
         session_stats_.addFileCreated();
     }
 
-    [[nodiscard]] constexpr tr_port peerPort() const noexcept
+    // The incoming peer port that's been opened on the local machine
+    // that Transmission is running on.
+    [[nodiscard]] constexpr tr_port localPeerPort() const noexcept
     {
-        return public_peer_port_;
+        return settings_.peer_port;
+    }
+
+    // The incoming peer port that's been opened on the public-facing
+    // device. This is usually the same as localPeerPort() but can differ,
+    // e.g. if the public device is a router that chose to use a different
+    // port than the one requested by Transmission.
+    [[nodiscard]] constexpr tr_port advertisedPeerPort() const noexcept
+    {
+        return advertised_peer_port_;
     }
 
     [[nodiscard]] constexpr tr_port udpPort() const noexcept
     {
-        // uses the same port number that's used for incoming TCP connections
-        return public_peer_port_;
+        // Always use the same port number that's used for incoming TCP connections.
+        // This simplifies port forwarding and reduces the chance of confusion,
+        // since incoming UDP and TCP connections will use the same port number
+        return advertisedPeerPort();
     }
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
@@ -950,9 +962,9 @@ private:
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled);
 
+public:
     /// constexpr fields
 
-public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
           { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
@@ -961,20 +973,24 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
+private:
     /// const fields
 
-private:
     std::string const config_dir_;
     std::string const resume_dir_;
     std::string const torrent_dir_;
 
     std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
 
-    // depends on: event_base_
+    // depends-on: event_base_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    // depends on: event_base_
+    // depends-on: event_base_
     std::unique_ptr<libtransmission::Dns> const dns_;
+
+    /// static fields
+
+    static std::recursive_mutex session_mutex_;
 
     /// trivial type fields
 
@@ -1002,14 +1018,11 @@ private:
     tr_altSpeedFunc alt_speed_active_changed_func_ = nullptr;
     void* alt_speed_active_changed_func_user_data_ = nullptr;
 
-    // The open port on the local machine for incoming peer requests
-    tr_port private_peer_port_;
-
-    // The open port on the public device for incoming peer requests.
-    // This is usually the same as private_peer_port but can differ
-    // if the public device is a router and it decides to use a different
+    // The incoming peer port that's been opened on the public-facing
+    // device. This is usually the same as localPeerPort() but can differ,
+    // e.g. if the public device is a router that chose to use a different
     // port than the one requested by Transmission.
-    tr_port public_peer_port_;
+    tr_port advertised_peer_port_;
 
     uint16_t peer_count_ = 0;
 
@@ -1030,9 +1043,6 @@ private:
 
     /// other fields
 
-private:
-    static std::recursive_mutex session_mutex_;
-
 public:
     struct tr_event_handle* events = nullptr;
 
@@ -1046,6 +1056,7 @@ private:
     tr_open_files open_files_;
 
 public:
+    // depends-on: torrents_
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
