@@ -1,6 +1,4 @@
 #warning TODO: settings.peer_port_
-#warning TODO: add rpc_server settings tests
-#warning TODO: add tr_sessionLoad / getDefaults tests
 
 // This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
