@@ -536,8 +536,6 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->peer_mgr_ = tr_peerMgrNew(this);
-
     /**
     ***  Blocklist
     **/
@@ -1264,7 +1262,7 @@ void tr_session::closeImplFinish()
     this->udp_core_.reset();
 
     stats().saveIfDirty();
-    tr_peerMgrFree(peer_mgr_);
+    peer_mgr_.reset();
     tr_utpClose(this);
     blocklists_.clear();
     openFiles().closeAll();
@@ -1642,7 +1640,10 @@ void tr_sessionReloadBlocklists(tr_session* session)
     session->blocklists_.clear();
     session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
 
-    tr_peerMgrOnBlocklistChanged(session->peer_mgr_);
+    if (session->peer_mgr_)
+    {
+        tr_peerMgrOnBlocklistChanged(session->peer_mgr_.get());
+    }
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)
@@ -2228,6 +2229,7 @@ tr_session::tr_session(std::string_view config_dir)
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
     , session_id_{ tr_time }
+    , peer_mgr_{ tr_peerMgrNew(this), tr_peerMgrFree }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->startRepeating(1s);
@@ -2252,12 +2254,12 @@ tr_session::tr_session(std::string_view config_dir)
 
 void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
 {
-    tr_peerMgrAddIncoming(peer_mgr_, addr, port, socket);
+    tr_peerMgrAddIncoming(peer_mgr_.get(), addr, port, socket);
 }
 
 void tr_session::addTorrent(tr_torrent* tor)
 {
     tor->unique_id_ = torrents().add(tor);
 
-    tr_peerMgrAddTorrent(peer_mgr_, tor);
+    tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
 }
