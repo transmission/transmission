@@ -51,8 +51,9 @@ set(PROJECT_FILES
   rpc-server.cc
   rpcimpl.cc
   session-id.cc
-  session.cc
+  session-alt-speeds.cc
   session-settings.cc
+  session.cc
   stats.cc
   subprocess-posix.cc
   subprocess-win32.cc
@@ -197,6 +198,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     port-forwarding.h
     resume.h
     rpc-server.h
+    session-alt-speeds.h
     session.h
     stats.h
     subprocess.h

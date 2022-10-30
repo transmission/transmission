@@ -1,6 +1,4 @@
 #warning TODO: settings.peer_port_
-#warning TODO: alt_speed_enabled is confusing and probably broken
-#warning TODO: add alt_speed tests
 #warning TODO: add rpc_server settings tests
 #warning TODO: add tr_sessionLoad / getDefaults tests
 
@@ -333,11 +331,13 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 {
     tr_session_settings{}.save(setme_dictionary);
     tr_rpc_server::defaultSettings(setme_dictionary);
+    tr_session_alt_speeds::defaultSettings(setme_dictionary);
 }
 
 void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
 {
     session->settings_.save(setme_dictionary);
+    session->alt_speeds_.save(setme_dictionary);
     session->rpc_server_->save(setme_dictionary);
 }
 
@@ -479,8 +479,6 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     return session;
 }
 
-static void turtleCheckClock(tr_session* s, tr_turtle_info& t);
-
 void tr_session::onNowTimer()
 {
     TR_ASSERT(now_timer_);
@@ -488,10 +486,7 @@ void tr_session::onNowTimer()
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
     udp_core_->dhtUpkeep();
-    if (settings_.alt_speed_time_enabled)
-    {
-        turtleCheckClock(this, this->turtle);
-    }
+    alt_speeds_.checkScheduler();
 
     // TODO: this seems a little silly. Why do we increment this
     // every second instead of computing the value as needed by
@@ -574,8 +569,6 @@ void tr_session::initImpl(init_data& data)
     tr_variantClear(&settings);
     data.done_cv.notify_one();
 }
-
-static void turtleBootstrap(tr_session* const /*session*/, tr_session_settings const&, tr_turtle_info& /*turtle*/);
 
 void tr_session::setImpl(init_data& data, bool force)
 {
@@ -690,16 +683,9 @@ void tr_session::setImpl(init_data& data, bool force)
         tr_sessionLimitSpeed(this, TR_DOWN, val);
     }
 
-    /**
-    ***  Turtle Mode
-    **/
+    // FIXME(ckerr): update rpc_server_ here too
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_alt_speed_enabled, &val))
-    {
-        turtle.isEnabled = val;
-    }
-
-    turtleBootstrap(this, settings_, turtle);
+    alt_speeds_.load(data.client_settings);
 
     data.done_cv.notify_one();
 }
@@ -970,116 +956,29 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
     }
 }
 
-static auto constexpr MinutesPerHour = int{ 60 };
-static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
-static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
-
-static void turtleUpdateTable(tr_session_settings const& settings, tr_turtle_info& turtle)
+time_t tr_session::AltSpeedMediator::time()
 {
-    turtle.minutes.setHasNone();
+    return tr_time();
+}
 
-    for (int day = 0; day < 7; ++day)
+void tr_session::AltSpeedMediator::isActiveChanged(bool is_active, tr_session_alt_speeds::ChangeReason reason)
+{
+    auto const in_session_thread = [session = &session_, is_active, reason]()
     {
-        if ((static_cast<tr_sched_day>(settings.use_alt_speed_on_these_weekdays) & (1 << day)) != 0)
+        updateBandwidth(session, TR_UP);
+        updateBandwidth(session, TR_DOWN);
+
+        if (session->alt_speed_active_changed_func_ != nullptr)
         {
-            auto const begin = settings.alt_speed_time_begin_minute;
-            auto end = settings.alt_speed_time_end_minute;
-
-            if (end <= begin)
-            {
-                end += MinutesPerDay;
-            }
-
-            for (auto i = begin; i < end; ++i)
-            {
-                turtle.minutes.set((i + day * MinutesPerDay) % MinutesPerWeek);
-            }
+            session->alt_speed_active_changed_func_(
+                session,
+                is_active,
+                reason == tr_session_alt_speeds::ChangeReason::User,
+                session->alt_speed_active_changed_func_user_data_);
         }
-    }
-}
+    };
 
-static void altSpeedToggled(tr_session* const session)
-{
-    TR_ASSERT(session != nullptr);
-
-    updateBandwidth(session, TR_UP);
-    updateBandwidth(session, TR_DOWN);
-
-    struct tr_turtle_info* t = &session->turtle;
-
-    if (t->callback != nullptr)
-    {
-        (*t->callback)(session, t->isEnabled, t->changedByUser, t->callbackUserData);
-    }
-}
-
-static void useAltSpeed(tr_session* session, tr_turtle_info& turtle, bool enabled, bool by_user)
-{
-    TR_ASSERT(session != nullptr);
-
-    if (turtle.isEnabled != enabled)
-    {
-        turtle.isEnabled = enabled;
-        turtle.changedByUser = by_user;
-        tr_runInEventThread(session, altSpeedToggled, session);
-    }
-}
-
-/**
- * @return whether turtle should be on/off according to the scheduler
- */
-[[nodiscard]] static bool getInTurtleTime(tr_turtle_info const& turtle)
-{
-    auto const now = tr_time();
-    struct tm const tm = fmt::localtime(now);
-
-    size_t minute_of_the_week = tm.tm_wday * MinutesPerDay + tm.tm_hour * MinutesPerHour + tm.tm_min;
-
-    if (minute_of_the_week >= MinutesPerWeek) /* leap minutes? */
-    {
-        minute_of_the_week = MinutesPerWeek - 1;
-    }
-
-    return turtle.minutes.test(minute_of_the_week);
-}
-
-static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
-{
-    return enabled ? TR_AUTO_SWITCH_ON : TR_AUTO_SWITCH_OFF;
-}
-
-static void turtleCheckClock(tr_session* session, tr_turtle_info& turtle)
-{
-    auto const enabled = getInTurtleTime(turtle);
-    auto const new_auto_turtle_state = autoSwitchState(enabled);
-    auto const already_switched = turtle.autoTurtleState == new_auto_turtle_state;
-
-    if (!already_switched)
-    {
-        tr_logAddInfo(enabled ? _("Time to turn on turtle mode") : _("Time to turn off turtle mode"));
-        turtle.autoTurtleState = new_auto_turtle_state;
-        useAltSpeed(session, turtle, enabled, false);
-    }
-}
-
-/* Called after the turtle's fields are loaded from an outside source.
- * It initializes the implementation fields
- * and turns on turtle mode if the clock settings say to. */
-static void turtleBootstrap(tr_session* const session, tr_session_settings const& settings, tr_turtle_info& turtle)
-{
-    turtle.changedByUser = false;
-    turtle.autoTurtleState = TR_AUTO_SWITCH_UNUSED;
-    turtle.minutes.setHasNone();
-
-    turtleUpdateTable(settings, turtle);
-
-    if (settings.alt_speed_time_enabled)
-    {
-        turtle.isEnabled = getInTurtleTime(turtle);
-        turtle.autoTurtleState = autoSwitchState(turtle.isEnabled);
-    }
-
-    altSpeedToggled(session);
+    tr_runInEventThread(&session_, in_session_thread);
 }
 
 /***
@@ -1140,20 +1039,12 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit)
+void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
-    {
-        session->settings_.alt_speed_down_kilobytes_per_second = limit;
-    }
-    else
-    {
-        session->settings_.alt_speed_up_kilobytes_per_second = limit;
-    }
-
+    session->alt_speeds_.setLimitKBps(dir, limit);
     updateBandwidth(session, dir);
 }
 
@@ -1162,122 +1053,82 @@ tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, 
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return dir == TR_DOWN ? session->settings_.alt_speed_down_kilobytes_per_second :
-                            session->settings_.alt_speed_up_kilobytes_per_second;
+    return session->alt_speeds_.limitKBps(dir);
 }
 
-static void userPokedTheClock(tr_session* session, tr_session_settings const& settings, tr_turtle_info& turtle)
-{
-    tr_logAddTrace("Refreshing the turtle mode clock due to user changes");
-
-    turtle.autoTurtleState = TR_AUTO_SWITCH_UNUSED;
-
-    turtleUpdateTable(settings, turtle);
-
-    if (settings.alt_speed_time_enabled)
-    {
-        bool const enabled = getInTurtleTime(turtle);
-        useAltSpeed(session, turtle, enabled, true);
-        turtle.autoTurtleState = autoSwitchState(enabled);
-    }
-}
-
-void tr_sessionUseAltSpeedTime(tr_session* session, bool b)
+void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (auto& val = session->settings_.alt_speed_time_enabled; val != b)
-    {
-        val = b;
-        userPokedTheClock(session, session->settings_, session->turtle);
-    }
+    session->alt_speeds_.setSchedulerEnabled(enabled);
 }
 
-bool tr_sessionUsesAltSpeedTime(tr_session const* s)
-{
-    TR_ASSERT(s != nullptr);
-
-    return s->settings_.alt_speed_time_enabled;
-}
-
-void tr_sessionSetAltSpeedBegin(tr_session* session, int minutes_since_midnight)
-{
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(minutes_since_midnight >= 0);
-    TR_ASSERT(minutes_since_midnight < MinutesPerDay);
-
-    auto const new_val = static_cast<size_t>(minutes_since_midnight);
-    if (auto& val = session->settings_.alt_speed_time_begin_minute; val != new_val)
-    {
-        val = new_val;
-        userPokedTheClock(session, session->settings_, session->turtle);
-    }
-}
-
-int tr_sessionGetAltSpeedBegin(tr_session const* session)
+bool tr_sessionUsesAltSpeedTime(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->settings_.alt_speed_time_begin_minute;
+    return session->alt_speeds_.isSchedulerEnabled();
 }
 
-void tr_sessionSetAltSpeedEnd(tr_session* session, int minutes_since_midnight)
-{
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(minutes_since_midnight >= 0);
-    TR_ASSERT(minutes_since_midnight < MinutesPerDay);
-
-    auto const new_val = static_cast<size_t>(minutes_since_midnight);
-    if (auto& val = session->settings_.alt_speed_time_end_minute; val != new_val)
-    {
-        val = minutes_since_midnight;
-        userPokedTheClock(session, session->settings_, session->turtle);
-    }
-}
-
-int tr_sessionGetAltSpeedEnd(tr_session const* session)
+void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnight)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->settings_.alt_speed_time_end_minute;
+    session->alt_speeds_.setStartMinute(minutes_since_midnight);
 }
 
-void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day new_val)
+size_t tr_sessionGetAltSpeedBegin(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    if (auto& val = session->settings_.use_alt_speed_on_these_weekdays; val != new_val)
-    {
-        val = new_val;
-        userPokedTheClock(session, session->settings_, session->turtle);
-    }
+    return session->alt_speeds_.startMinute();
+}
+void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->alt_speeds_.setEndMinute(minutes_since_midnight);
+}
+
+size_t tr_sessionGetAltSpeedEnd(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->alt_speeds_.endMinute();
+}
+
+void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day days)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->alt_speeds_.setWeekdays(days);
 }
 
 tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return static_cast<tr_sched_day>(session->settings_.use_alt_speed_on_these_weekdays);
+    return session->alt_speeds_.weekdays();
 }
 
 void tr_sessionUseAltSpeed(tr_session* session, bool enabled)
 {
-    useAltSpeed(session, session->turtle, enabled, true);
+    session->alt_speeds_.setActive(enabled, tr_session_alt_speeds::ChangeReason::User);
 }
 
-bool tr_sessionUsesAltSpeed(tr_session const* s)
+bool tr_sessionUsesAltSpeed(tr_session const* session)
 {
-    TR_ASSERT(s != nullptr);
+    TR_ASSERT(session != nullptr);
 
-    return s->turtle.isEnabled;
+    return session->alt_speeds_.isActive();
 }
 
 void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data)
 {
     TR_ASSERT(session != nullptr);
 
-    session->turtle.callback = func;
-    session->turtle.callbackUserData = user_data;
+    session->alt_speed_active_changed_func_ = func;
+    session->alt_speed_active_changed_func_user_data_ = user_data;
 }
 
 /***

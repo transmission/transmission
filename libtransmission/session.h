@@ -36,6 +36,7 @@
 #include "open-files.h"
 #include "port-forwarding.h"
 #include "quark.h"
+#include "session-alt-speeds.h"
 #include "session-id.h"
 #include "session-settings.h"
 #include "stats.h"
@@ -43,13 +44,6 @@
 #include "tr-lpd.h"
 #include "verify.h"
 #include "web.h"
-
-enum tr_auto_switch_state_t
-{
-    TR_AUTO_SWITCH_UNUSED,
-    TR_AUTO_SWITCH_ON,
-    TR_AUTO_SWITCH_OFF,
-};
 
 tr_peer_id_t tr_peerIdInit();
 
@@ -77,30 +71,6 @@ class SessionTest;
 
 } // namespace libtransmission::test
 
-struct tr_turtle_info
-{
-    /* is turtle mode on right now? */
-    bool isEnabled = false;
-
-    /* called when isEnabled changes */
-    tr_altSpeedFunc callback = nullptr;
-
-    /* the callback's user_data argument */
-    void* callbackUserData = nullptr;
-
-    /* the callback's changedByUser argument.
-     * indicates whether the change came from the user or from the clock. */
-    bool changedByUser = false;
-
-    /* bitfield of all the minutes in a week.
-     * Each bit's value indicates whether the scheduler wants turtle
-     * limits on or off at that given minute in the week. */
-    tr_bitfield minutes{ 10080 };
-
-    /* recent action that was done by turtle's automatic switch */
-    tr_auto_switch_state_t autoTurtleState = TR_AUTO_SWITCH_UNUSED;
-};
-
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
@@ -124,6 +94,24 @@ private:
         tr_address addr_;
         struct event* ev_ = nullptr;
         tr_socket_t socket_ = TR_BAD_SOCKET;
+    };
+
+    class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
+    {
+    public:
+        explicit AltSpeedMediator(tr_session& session)
+            : session_{ session }
+        {
+        }
+
+        void isActiveChanged(bool is_active, tr_session_alt_speeds::ChangeReason reason) override;
+
+        [[nodiscard]] time_t time() override;
+
+        ~AltSpeedMediator() noexcept override = default;
+
+    private:
+        tr_session& session_;
     };
 
     class AnnouncerUdpMediator final : public tr_announcer_udp::Mediator
@@ -894,6 +882,16 @@ private:
     friend struct tr_bindinfo;
 
     friend bool tr_blocklistExists(tr_session const* session);
+    friend bool tr_sessionUsesAltSpeed(tr_session const* session);
+    friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
+    friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
+    friend void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnight);
+    friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day new_val);
+    friend void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
+    friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
+    friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit);
+    friend void tr_sessionUseAltSpeed(tr_session* session, bool enabled);
+
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
     friend bool tr_sessionIsPortForwardingEnabled(tr_session const* session);
     friend bool tr_sessionIsRPCEnabled(tr_session const* session);
@@ -902,8 +900,6 @@ private:
     friend char const* tr_sessionGetRPCPassword(tr_session const* session);
     friend char const* tr_sessionGetRPCUsername(tr_session const* session);
     friend char const* tr_sessionGetRPCWhitelist(tr_session const* session);
-    friend int tr_sessionGetAltSpeedBegin(tr_session const* session);
-    friend int tr_sessionGetAltSpeedEnd(tr_session const* session);
     friend int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
     friend size_t tr_blocklistGetRuleCount(tr_session const* session);
     friend size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
@@ -921,10 +917,6 @@ private:
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);
-    friend void tr_sessionSetAltSpeedBegin(tr_session* session, int minutes_since_midnight);
-    friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day new_val);
-    friend void tr_sessionSetAltSpeedEnd(tr_session* session, int minutes_since_midnight);
-    friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
@@ -1007,6 +999,9 @@ private:
     tr_rpc_func rpc_func_ = nullptr;
     void* rpc_func_user_data_ = nullptr;
 
+    tr_altSpeedFunc alt_speed_active_changed_func_ = nullptr;
+    void* alt_speed_active_changed_func_user_data_ = nullptr;
+
     // The open port on the local machine for incoming peer requests
     tr_port private_peer_port_;
 
@@ -1033,9 +1028,6 @@ private:
     tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
     tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
 
-public:
-    struct tr_turtle_info turtle;
-
     /// other fields
 
 private:
@@ -1060,6 +1052,9 @@ private:
     std::unique_ptr<tr_web> web_;
 
     std::unique_ptr<tr_lpd> lpd_;
+
+    AltSpeedMediator alt_speed_mediator_{ *this };
+    tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
 
 public:
     struct tr_announcer* announcer = nullptr;

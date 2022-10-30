@@ -525,11 +525,11 @@ bool tr_sessionUsesAltSpeed(tr_session const*);
 void tr_sessionUseAltSpeedTime(tr_session*, bool);
 bool tr_sessionUsesAltSpeedTime(tr_session const*);
 
-void tr_sessionSetAltSpeedBegin(tr_session*, int minutes_since_midnight);
-int tr_sessionGetAltSpeedBegin(tr_session const*);
+void tr_sessionSetAltSpeedBegin(tr_session*, size_t minutes_since_midnight);
+size_t tr_sessionGetAltSpeedBegin(tr_session const*);
 
-void tr_sessionSetAltSpeedEnd(tr_session*, int minutes_since_midnight);
-int tr_sessionGetAltSpeedEnd(tr_session const*);
+void tr_sessionSetAltSpeedEnd(tr_session*, size_t minutes_since_midnight);
+size_t tr_sessionGetAltSpeedEnd(tr_session const*);
 
 enum tr_sched_day
 {

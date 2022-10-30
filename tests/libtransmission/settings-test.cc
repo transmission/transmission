@@ -24,7 +24,6 @@ TEST_F(SettingsTest, canInstantiate)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 100);
     settings.save(&dict);
-    fmt::print("{:s}\n", tr_variantToStr(&dict, TR_VARIANT_FMT_JSON));
     tr_variantClear(&dict);
 }
 

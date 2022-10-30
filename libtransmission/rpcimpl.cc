@@ -1904,12 +1904,12 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_begin, &i))
     {
-        tr_sessionSetAltSpeedBegin(session, static_cast<int>(i));
+        tr_sessionSetAltSpeedBegin(session, static_cast<size_t>(i));
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_end, &i))
     {
-        tr_sessionSetAltSpeedEnd(session, static_cast<int>(i));
+        tr_sessionSetAltSpeedEnd(session, static_cast<size_t>(i));
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_day, &i))
