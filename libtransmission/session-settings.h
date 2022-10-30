@@ -43,6 +43,7 @@ struct tr_variant;
     V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::fromHost(65535), "") \
     V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::fromHost(49152), "") \
     V(TR_KEY_peer_port_random_on_start, peer_port_random_on_start, bool, false, "") \
+    V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "") \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true, "") \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true, "") \
     V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE, "") \
@@ -72,8 +73,7 @@ struct tr_variant;
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
     /* below here: unprocessed */ \
-    V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "") \
-    V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "")
+    V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "")
 
 struct tr_session_settings
 {
