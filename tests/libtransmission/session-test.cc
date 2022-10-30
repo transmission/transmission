@@ -298,7 +298,7 @@ TEST_F(SessionTest, honorsSettings)
 {
     // Baseline: confirm that these settings are disabled by default
     EXPECT_FALSE(session_->isPortRandom());
-    EXPECT_FALSE(tr_sessionUsesAltSpeed(session_));
+    EXPECT_FALSE(tr_sessionUsesAltSpeedTime(session_));
     EXPECT_FALSE(tr_sessionIsRPCEnabled(session_));
 
     // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
@@ -316,7 +316,7 @@ TEST_F(SessionTest, honorsSettings)
 
     // confirm that these settings were enabled
     EXPECT_TRUE(session->isPortRandom());
-    EXPECT_TRUE(tr_sessionUsesAltSpeed(session));
+    EXPECT_TRUE(tr_sessionUsesAltSpeedTime(session));
     EXPECT_TRUE(tr_sessionIsRPCEnabled(session));
 
     tr_sessionClose(session);
@@ -326,7 +326,7 @@ TEST_F(SessionTest, savesSettings)
 {
     // Baseline: confirm that these settings are disabled by default
     EXPECT_FALSE(session_->isPortRandom());
-    EXPECT_FALSE(tr_sessionUsesAltSpeed(session_));
+    EXPECT_FALSE(tr_sessionUsesAltSpeedTime(session_));
     EXPECT_FALSE(tr_sessionIsRPCEnabled(session_));
 
     tr_sessionSetPeerPortRandomOnStart(session_, true);
