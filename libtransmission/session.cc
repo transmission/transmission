@@ -981,7 +981,7 @@ tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return dir == TR_DOWN ? session->settings_.speed_limit_down_enabled : session->settings_.speed_limit_up_enabled;
+    return dir == TR_DOWN ? session->settings_.speed_limit_down : session->settings_.speed_limit_up;
 }
 
 void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
@@ -1905,18 +1905,18 @@ size_t tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
     return session->queueSize(dir);
 }
 
-void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool enabled)
+void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_limit_simultaneous_torrents)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
     if (dir == TR_DOWN)
     {
-        session->settings_.download_queue_enabled = enabled;
+        session->settings_.download_queue_enabled = do_limit_simultaneous_torrents;
     }
     else
     {
-        session->settings_.seed_queue_enabled = enabled;
+        session->settings_.seed_queue_enabled = do_limit_simultaneous_torrents;
     }
 }
 

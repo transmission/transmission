@@ -126,7 +126,7 @@ public:
         }
     }
 
-    void setActive(bool enabled, ChangeReason reason);
+    void setActive(bool active, ChangeReason reason);
 
 private:
     Mediator& mediator_;

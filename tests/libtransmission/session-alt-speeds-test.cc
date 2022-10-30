@@ -25,7 +25,7 @@ protected:
     class MockMediator final : public tr_session_alt_speeds::Mediator
     {
     public:
-        ~MockMediator() = default;
+        ~MockMediator() override = default;
 
         void isActiveChanged(bool is_active, ChangeReason reason) override
         {
@@ -94,7 +94,7 @@ TEST_F(SessionAltSpeedsTest, canActivate)
     mediator.current_time_ = Now;
 
     auto alt_speeds = tr_session_alt_speeds{ mediator };
-    static auto const changed_value = !alt_speeds.isActive();
+    auto const changed_value = !alt_speeds.isActive();
     EXPECT_EQ(0U, std::size(mediator.changelog_));
 
     static auto constexpr Reason = ChangeReason::User;

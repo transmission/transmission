@@ -43,7 +43,7 @@ void tr_session_alt_speeds::defaultSettings(tr_variant* tgt)
 {
 #define V(key, field, type, default_value, comment) \
     { \
-        auto const val = type{ default_value }; \
+        auto const val = (type){ default_value }; \
         tr_variantDictRemove(tgt, key); \
         libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), val); \
     }

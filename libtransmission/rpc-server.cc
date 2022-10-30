@@ -965,7 +965,7 @@ void tr_rpc_server::defaultSettings(tr_variant* tgt){
 #define V(key, field, type, default_value, comment) \
     { \
         tr_variantDictRemove(tgt, key); \
-        libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), type{ default_value }); \
+        libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), (type){ default_value }); \
     }
     RPC_SETTINGS_FIELDS(V)
 #undef V
