@@ -4,12 +4,14 @@
 
 @import ObjectiveC;
 @import AppKit;
+#import "NSStringAdditions.h"
 
+// Development-only proxy when app is not signed for running Sparkle
 void SUUpdater_checkForUpdates(id self, SEL _cmd, ...)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert* alert = [[NSAlert alloc] init];
-        alert.messageText = @"Sparkle not configured";
+        alert.messageText = LocalizationNotNeeded(@"Sparkle not configured");
         alert.informativeText = [NSString
             stringWithFormat:@"App needs to be codesigned for Development to support Sparkle with Hardened Runtime. Alternatively, re-codesign without the Hardened Runtime option: `sudo codesign -s - %@`",
                              NSBundle.mainBundle.bundleURL.lastPathComponent];
