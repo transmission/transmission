@@ -105,20 +105,9 @@ void tr_session_alt_speeds::setActive(bool active, ChangeReason reason)
 
 [[nodiscard]] bool tr_session_alt_speeds::isActiveMinute(time_t time) const noexcept
 {
-    fmt::print("{:s}:{:d} isActiveMinute {:d}\n", __FILE__, __LINE__, time);
     auto const tm = fmt::localtime(time);
-    fmt::print("{:s}:{:d} tm_sec {:d}\n", __FILE__, __LINE__, tm.tm_sec);
-    fmt::print("{:s}:{:d} tm_min {:d}\n", __FILE__, __LINE__, tm.tm_min);
-    fmt::print("{:s}:{:d} tm_hour {:d}\n", __FILE__, __LINE__, tm.tm_hour);
-    fmt::print("{:s}:{:d} tm_mday {:d}\n", __FILE__, __LINE__, tm.tm_mday);
-    fmt::print("{:s}:{:d} tm_mon {:d}\n", __FILE__, __LINE__, tm.tm_mon);
-    fmt::print("{:s}:{:d} tm_year {:d}\n", __FILE__, __LINE__, tm.tm_year);
-    fmt::print("{:s}:{:d} tm_wday {:d}\n", __FILE__, __LINE__, tm.tm_wday);
-    fmt::print("{:s}:{:d} tm_yday {:d}\n", __FILE__, __LINE__, tm.tm_yday);
-    fmt::print("{:s}:{:d} tm_isdst {:d}\n", __FILE__, __LINE__, tm.tm_isdst);
 
     size_t minute_of_the_week = tm.tm_wday * MinutesPerDay + tm.tm_hour * MinutesPerHour + tm.tm_min;
-    fmt::print("{:s}:{:d} minute_of_the_week {:d}\n", __FILE__, __LINE__, minute_of_the_week);
 
     if (minute_of_the_week >= MinutesPerWeek) /* leap minutes? */
     {
