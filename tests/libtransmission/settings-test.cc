@@ -183,7 +183,7 @@ TEST_F(SettingsTest, canLoadMode)
 
     auto settings = std::make_unique<tr_session_settings>();
     auto const default_value = settings->umask;
-    auto constexpr ExpectedValue = mode_t{ 0777 };
+    auto constexpr ExpectedValue = tr_mode_t{ 0777 };
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
@@ -207,7 +207,7 @@ TEST_F(SettingsTest, canSaveMode)
 
     auto settings = tr_session_settings{};
     auto const default_value = settings.log_level;
-    auto constexpr ExpectedValue = mode_t{ 0777 };
+    auto constexpr ExpectedValue = tr_mode_t{ 0777 };
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
