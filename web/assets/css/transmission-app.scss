@@ -369,13 +369,19 @@ $video-image: '../img/film.svg';
 @mixin mime-icon($mime-icon) {
   // background-image: url($mime-icon);
   background-color: var(--color-fg-primary);
+  -webkit-mask-image: url($mime-icon);
   mask-image: url($mime-icon);
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 
   &[data-icon-multifile='true'] {
+    -webkit-mask-image: url($mime-icon), url($folder-image);
     mask-image: url($mime-icon), url($folder-image);
+    -webkit-mask-position: top left, bottom right;
     mask-position: top left, bottom right;
+    -webkit-mask-repeat: no-repeat, no-repeat;
     mask-repeat: no-repeat, no-repeat;
+    -webkit-mask-size: 16px, 16px;
     mask-size: 16px, 16px;
   }
 }
@@ -437,6 +443,7 @@ $video-image: '../img/film.svg';
       .icon {
         flex-shrink: 0;
         height: $icon-size;
+        -webkit-mask-size: $icon-size, $icon-size-num * 0.5px;
         mask-size: $icon-size, $icon-size-num * 0.5px;
         width: $icon-size;
 
