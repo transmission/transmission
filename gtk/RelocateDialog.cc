@@ -33,6 +33,7 @@ public:
         RelocateDialog& dialog,
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings,
         std::vector<tr_torrent_id_t> const& torrent_ids);
     ~Impl();
 
@@ -47,6 +48,7 @@ private:
 private:
     RelocateDialog& dialog_;
     Glib::RefPtr<Session> const core_;
+    Glib::RefPtr<Gio::Settings> const settings_;
     std::vector<tr_torrent_id_t> torrent_ids_;
 
     int done_ = 0;
@@ -145,7 +147,7 @@ void RelocateDialog::Impl::onResponse(int response)
         targetLocation = location;
 
         /* remember this location so that it can be the default next time */
-        gtr_save_recent_dir("relocate", core_, location);
+        ClientPrefs::save_recent_dir(settings_, ClientPrefs::DirKeyPrefix::Relocate, location);
 
         /* start the move and periodically check its status */
         done_ = TR_LOC_DONE;
@@ -163,9 +165,10 @@ RelocateDialog::RelocateDialog(
     Glib::RefPtr<Gtk::Builder> const& builder,
     Gtk::Window& parent,
     Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings,
     std::vector<int> const& torrent_ids)
     : Gtk::Dialog(cast_item)
-    , impl_(std::make_unique<Impl>(*this, builder, core, torrent_ids))
+    , impl_(std::make_unique<Impl>(*this, builder, core, settings, torrent_ids))
 {
     set_transient_for(parent);
 }
@@ -175,20 +178,23 @@ RelocateDialog::~RelocateDialog() = default;
 std::unique_ptr<RelocateDialog> RelocateDialog::create(
     Gtk::Window& parent,
     Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings,
     std::vector<tr_torrent_id_t> const& torrent_ids)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("RelocateDialog.ui"));
     return std::unique_ptr<RelocateDialog>(
-        gtr_get_widget_derived<RelocateDialog>(builder, "RelocateDialog", parent, core, torrent_ids));
+        gtr_get_widget_derived<RelocateDialog>(builder, "RelocateDialog", parent, core, settings, torrent_ids));
 }
 
 RelocateDialog::Impl::Impl(
     RelocateDialog& dialog,
     Glib::RefPtr<Gtk::Builder> const& builder,
     Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings,
     std::vector<tr_torrent_id_t> const& torrent_ids)
     : dialog_(dialog)
     , core_(core)
+    , settings_(settings)
     , torrent_ids_(torrent_ids)
     , chooser_(gtr_get_widget_derived<PathButton>(builder, "new_location_button"))
     , move_tb_(gtr_get_widget<Gtk::CheckButton>(builder, "move_data_radio"))
@@ -196,7 +202,7 @@ RelocateDialog::Impl::Impl(
     dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(CANCEL));
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
-    auto recent_dirs = gtr_get_recent_dirs("relocate");
+    auto recent_dirs = ClientPrefs::get_recent_dirs(settings_, ClientPrefs::DirKeyPrefix::Relocate);
     if (recent_dirs.empty())
     {
         /* default to download dir */

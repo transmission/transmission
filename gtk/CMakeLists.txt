@@ -3,15 +3,30 @@ project(trgtk)
 add_compile_options(${C_WARNING_FLAGS})
 
 execute_process(
-    COMMAND
-        ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
-    OUTPUT_VARIABLE
-        GLIB_COMPILE_RESOURCES_EXECUTABLE
+    COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
+    OUTPUT_VARIABLE GLIB_COMPILE_RESOURCES_EXECUTABLE
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-
 if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
     message(SEND_ERROR "Unable to find glib-compile-resources executable")
+endif()
+
+execute_process(
+    COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_schemas
+    OUTPUT_VARIABLE GLIB_COMPILE_SCHEMAS_EXECUTABLE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if(NOT GLIB_COMPILE_SCHEMAS_EXECUTABLE)
+    message(SEND_ERROR "Unable to find glib-compile-schemas executable")
+endif()
+
+execute_process(
+    COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable schemasdir
+    OUTPUT_VARIABLE GLIB_SCHEMAS_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if(NOT GLIB_SCHEMAS_DIR)
+    message(SEND_ERROR "Unable to find glib schemas directory")
 endif()
 
 find_program(APPSTREAM appstreamcli)
@@ -76,6 +91,17 @@ gtr_compile_resources(transmission ${CMAKE_CURRENT_SOURCE_DIR} transmission.gres
 )
 gtr_compile_resources(transmission_ui ${CMAKE_CURRENT_SOURCE_DIR}/${UI_SUBDIR} transmission-ui.gresource.xml transmission-ui-resources
     ${${PROJECT_NAME}_UI_FILES}
+)
+
+# For development only: allows to use `GSETTINGS_SCHEMA_DIR` environment variable and avoid installing the schema on every change
+add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gschemas.compiled"
+    COMMAND
+        "${GLIB_COMPILE_SCHEMAS_EXECUTABLE}"
+        "--targetdir=${CMAKE_CURRENT_BINARY_DIR}"
+        --strict
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/transmission-gtk.gschema.xml"
 )
 
 if(ENABLE_NLS)
@@ -154,6 +180,7 @@ set(${PROJECT_NAME}_HEADERS
     Utils.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gschemas.compiled
 )
 
 include_directories(
@@ -241,6 +268,12 @@ if(MSVC)
 endif()
 
 install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(
+    FILES transmission-gtk.gschema.xml
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/glib-2.0/schemas
+    RENAME org.transmissionbt.Transmission.gschema.xml
+)
 
 set(${PROJECT_NAME}_PUBLIC_ICONS
     hicolor_apps_scalable_transmission.svg

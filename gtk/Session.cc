@@ -88,8 +88,10 @@ private:
 
 class Session::Impl
 {
+    using TrFileMonitorEvent = IF_GLIBMM2_68(Gio::FileMonitor::Event, Gio::FileMonitorEvent);
+
 public:
-    Impl(Session& core, tr_session* session);
+    Impl(Session& core, tr_session* session, Glib::RefPtr<Gio::Settings> const& settings);
 
     tr_session* close();
 
@@ -98,14 +100,18 @@ public:
     Glib::RefPtr<Gtk::TreeModelSort const> get_model() const;
     tr_session* get_session() const;
 
+    tr_torrent* find_torrent(tr_torrent_id_t id) const;
+
     size_t get_active_torrent_count() const;
 
     void update();
     void torrents_added();
 
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
+    void add_ctor(tr_ctor* ctor);
     int add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(tr_torrent* tor, bool do_notify);
+    void remove_torrent(tr_torrent_id_t id, bool delete_local_data);
     bool add_from_url(Glib::ustring const& url);
 
     void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
@@ -158,9 +164,10 @@ private:
         bool do_prompt,
         bool do_notify);
 
+    void core_apply_defaults(tr_ctor* ctor);
     tr_torrent* create_new_torrent(tr_ctor* ctor);
 
-    void set_sort_mode(std::string_view mode, bool is_reversed);
+    void update_sort_mode();
 
     void maybe_inhibit_hibernation();
     void set_hibernation_allowed(bool allowed);
@@ -172,7 +179,7 @@ private:
     void on_file_changed_in_watchdir(
         Glib::RefPtr<Gio::File> const& file,
         Glib::RefPtr<Gio::File> const& other_type,
-        IF_GLIBMM2_68(Gio::FileMonitor::Event, Gio::FileMonitorEvent) event_type);
+        TrFileMonitorEvent event_type);
 
     void on_pref_changed(tr_quark key);
 
@@ -181,6 +188,8 @@ private:
 
 private:
     Session& core_;
+    tr_session* session_ = nullptr;
+    Glib::RefPtr<Gio::Settings> const settings_;
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error_;
     sigc::signal<void(tr_ctor*)> signal_add_prompt_;
@@ -203,7 +212,6 @@ private:
     gint busy_count_ = 0;
     Glib::RefPtr<Gtk::ListStore> raw_model_;
     Glib::RefPtr<Gtk::TreeModelSort> sorted_model_;
-    tr_session* session_ = nullptr;
 };
 
 TorrentModelColumns::TorrentModelColumns() noexcept
@@ -522,42 +530,45 @@ int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::co
 
 } // namespace
 
-void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
+void Session::Impl::update_sort_mode()
 {
+    auto const mode = settings_->get_string(ClientPrefs::Key::SortMode);
+    bool const is_reversed = settings_->get_boolean(ClientPrefs::Key::SortReversed);
+
     auto const& col = torrent_cols.torrent;
     Gtk::TreeSortable::SlotCompare sort_func;
     auto type = is_reversed ? TR_GTK_SORT_TYPE(ASCENDING) : TR_GTK_SORT_TYPE(DESCENDING);
     auto const sortable = get_model();
 
-    if (mode == "sort-by-activity")
+    if (mode == ClientPrefs::SortMode::Activity)
     {
         sort_func = &compare_by_activity;
     }
-    else if (mode == "sort-by-age")
+    else if (mode == ClientPrefs::SortMode::Age)
     {
         sort_func = &compare_by_age;
     }
-    else if (mode == "sort-by-progress")
+    else if (mode == ClientPrefs::SortMode::Progress)
     {
         sort_func = &compare_by_progress;
     }
-    else if (mode == "sort-by-queue")
+    else if (mode == ClientPrefs::SortMode::Queue)
     {
         sort_func = &compare_by_queue;
     }
-    else if (mode == "sort-by-time-left")
+    else if (mode == ClientPrefs::SortMode::TimeLeft)
     {
         sort_func = &compare_by_eta;
     }
-    else if (mode == "sort-by-ratio")
+    else if (mode == ClientPrefs::SortMode::Ratio)
     {
         sort_func = &compare_by_ratio;
     }
-    else if (mode == "sort-by-state")
+    else if (mode == ClientPrefs::SortMode::State)
     {
         sort_func = &compare_by_state;
     }
-    else if (mode == "sort-by-size")
+    else if (mode == ClientPrefs::SortMode::Size)
     {
         sort_func = &compare_by_size;
     }
@@ -650,7 +661,7 @@ bool Session::Impl::watchdir_idle()
     if (!unchanging.empty())
     {
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-        bool const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
+        bool const do_prompt = settings_->get_boolean(ClientPrefs::Key::ShowOptionsWindow);
 
         adding_from_watch_dir_ = true;
         add_files(unchanging, do_start, do_prompt, true);
@@ -701,7 +712,7 @@ void Session::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
 void Session::Impl::on_file_changed_in_watchdir(
     Glib::RefPtr<Gio::File> const& file,
     Glib::RefPtr<Gio::File> const& /*other_type*/,
-    IF_GLIBMM2_68(Gio::FileMonitor::Event, Gio::FileMonitorEvent) event_type)
+    TrFileMonitorEvent event_type)
 {
     if (event_type == TR_GIO_FILE_MONITOR_EVENT(CREATED))
     {
@@ -712,7 +723,7 @@ void Session::Impl::on_file_changed_in_watchdir(
 /* walk through the pre-existing files in the watchdir */
 void Session::Impl::watchdir_scan()
 {
-    auto const dirname = gtr_pref_string_get(TR_KEY_watch_dir);
+    auto const dirname = Glib::locale_from_utf8(settings_->get_string(ClientPrefs::Key::WatchDir));
 
     try
     {
@@ -728,8 +739,8 @@ void Session::Impl::watchdir_scan()
 
 void Session::Impl::watchdir_update()
 {
-    bool const is_enabled = gtr_pref_flag_get(TR_KEY_watch_dir_enabled);
-    auto const dir = Gio::File::create_for_path(gtr_pref_string_get(TR_KEY_watch_dir));
+    bool const is_enabled = settings_->get_boolean(ClientPrefs::Key::WatchDirEnabled);
+    auto const dir = Gio::File::create_for_path(Glib::locale_from_utf8(settings_->get_string(ClientPrefs::Key::WatchDir)));
 
     if (monitor_ != nullptr && (!is_enabled || !dir->equal(monitor_dir_)))
     {
@@ -771,30 +782,12 @@ void Session::Impl::on_pref_changed(tr_quark const key)
 {
     switch (key)
     {
-    case TR_KEY_sort_mode:
-    case TR_KEY_sort_reversed:
-        {
-            auto const mode = gtr_pref_string_get(TR_KEY_sort_mode);
-            bool const is_reversed = gtr_pref_flag_get(TR_KEY_sort_reversed);
-            set_sort_mode(mode, is_reversed);
-            break;
-        }
-
     case TR_KEY_peer_limit_global:
         tr_sessionSetPeerLimit(session_, gtr_pref_int_get(key));
         break;
 
     case TR_KEY_peer_limit_per_torrent:
         tr_sessionSetPeerLimitPerTorrent(session_, gtr_pref_int_get(key));
-        break;
-
-    case TR_KEY_inhibit_desktop_hibernation:
-        maybe_inhibit_hibernation();
-        break;
-
-    case TR_KEY_watch_dir:
-    case TR_KEY_watch_dir_enabled:
-        watchdir_update();
         break;
 
     default:
@@ -806,23 +799,24 @@ void Session::Impl::on_pref_changed(tr_quark const key)
 ***
 **/
 
-Glib::RefPtr<Session> Session::create(tr_session* session)
+Glib::RefPtr<Session> Session::create(tr_session* session, Glib::RefPtr<Gio::Settings> const& settings)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-    return Glib::make_refptr_for_instance(new Session(session));
+    return Glib::make_refptr_for_instance(new Session(session, settings));
 }
 
-Session::Session(tr_session* session)
+Session::Session(tr_session* session, Glib::RefPtr<Gio::Settings> const& settings)
     : Glib::ObjectBase(typeid(Session))
-    , impl_(std::make_unique<Impl>(*this, session))
+    , impl_(std::make_unique<Impl>(*this, session, settings))
 {
 }
 
 Session::~Session() = default;
 
-Session::Impl::Impl(Session& core, tr_session* session)
+Session::Impl::Impl(Session& core, tr_session* session, Glib::RefPtr<Gio::Settings> const& settings)
     : core_(core)
     , session_(session)
+    , settings_(settings)
 {
     raw_model_ = Gtk::ListStore::create(torrent_cols);
     sorted_model_ = Gtk::TreeModelSort::create(raw_model_);
@@ -830,11 +824,14 @@ Session::Impl::Impl(Session& core, tr_session* session)
         [](Gtk::TreeModel::const_iterator const& /*a*/, Gtk::TreeModel::const_iterator const& /*b*/) { return 0; });
 
     /* init from prefs & listen to pref changes */
-    on_pref_changed(TR_KEY_sort_mode);
-    on_pref_changed(TR_KEY_sort_reversed);
-    on_pref_changed(TR_KEY_watch_dir_enabled);
-    on_pref_changed(TR_KEY_peer_limit_global);
-    on_pref_changed(TR_KEY_inhibit_desktop_hibernation);
+    settings_->signal_changed(ClientPrefs::Key::SortMode).connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::update_sort_mode)));
+    settings_->signal_changed(ClientPrefs::Key::SortReversed)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::update_sort_mode)));
+    settings_->signal_changed(ClientPrefs::Key::WatchDir).connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::watchdir_update)));
+    settings_->signal_changed(ClientPrefs::Key::WatchDirEnabled)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::watchdir_update)));
+    settings_->signal_changed(ClientPrefs::Key::InhibitDesktopHibernation)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::maybe_inhibit_hibernation)));
     signal_prefs_changed_.connect([this](auto key) { on_pref_changed(key); });
 
     tr_sessionSetMetadataCallback(
@@ -847,6 +844,10 @@ Session::Impl::Impl(Session& core, tr_session* session)
         [](auto* tor, auto completeness, bool was_running, gpointer impl)
         { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor, completeness, was_running); },
         this);
+
+    update_sort_mode();
+    watchdir_update();
+    on_pref_changed(TR_KEY_peer_limit_global);
 }
 
 tr_session* Session::close()
@@ -878,9 +879,9 @@ void Session::Impl::on_torrent_completeness_changed(tr_torrent* tor, tr_complete
     if (was_running && completeness != TR_LEECH && tr_torrentStat(tor)->sizeWhenDone != 0)
     {
         Glib::signal_idle().connect(
-            [core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
+            [this, core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
             {
-                gtr_notify_torrent_completed(core, torrent_id);
+                gtr_notify_torrent_completed(core, settings_, torrent_id);
                 return false;
             });
     }
@@ -1003,7 +1004,7 @@ void Session::Impl::add_torrent(tr_torrent* tor, bool do_notify)
 
         if (do_notify)
         {
-            gtr_notify_torrent_added(get_core_ptr(), tr_torrentId(tor));
+            gtr_notify_torrent_added(get_core_ptr(), settings_, tr_torrentId(tor));
         }
     }
 }
@@ -1030,7 +1031,7 @@ tr_torrent* Session::Impl::create_new_torrent(tr_ctor* ctor)
 
             if (!is_internal)
             {
-                gtr_file_trash_or_remove(source, nullptr);
+                gtr_file_trash_or_remove(source, settings_->get_boolean(ClientPrefs::Key::TrashCanEnabled), nullptr);
             }
         }
     }
@@ -1072,10 +1073,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
     return 0;
 }
 
-namespace
-{
-
-void core_apply_defaults(tr_ctor* ctor)
+void Session::Impl::core_apply_defaults(tr_ctor* ctor)
 {
     if (!tr_ctorGetPaused(ctor, TR_FORCE, nullptr))
     {
@@ -1098,14 +1096,17 @@ void core_apply_defaults(tr_ctor* ctor)
     }
 }
 
-} // namespace
-
 void Session::add_ctor(tr_ctor* ctor)
 {
+    impl_->add_ctor(ctor);
+}
+
+void Session::Impl::add_ctor(tr_ctor* ctor)
+{
     bool const do_notify = false;
-    bool const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
+    bool const do_prompt = settings_->get_boolean(ClientPrefs::Key::ShowOptionsWindow);
     core_apply_defaults(ctor);
-    impl_->add_ctor(ctor, do_prompt, do_notify);
+    add_ctor(ctor, do_prompt, do_notify);
 }
 
 /***
@@ -1207,7 +1208,7 @@ bool Session::Impl::add_from_url(Glib::ustring const& url)
 {
     auto const file = Gio::File::create_for_uri(url);
     auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-    auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
+    auto const do_prompt = settings_->get_boolean(ClientPrefs::Key::ShowOptionsWindow);
     auto const do_notify = false;
 
     auto const handled = add_file(file, do_start, do_prompt, do_notify);
@@ -1253,12 +1254,17 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
+    impl_->remove_torrent(id, delete_files);
+}
+
+void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
+{
     auto* tor = find_torrent(id);
 
     if (tor != nullptr)
     {
         /* remove from the gui */
-        auto const model = impl_->get_raw_model();
+        auto const model = get_raw_model();
 
         if (auto const iter = find_row_from_torrent_id(model, id); iter)
         {
@@ -1266,12 +1272,13 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
         }
 
         /* remove the torrent */
+        auto const use_trash_can = settings_->get_boolean(ClientPrefs::Key::TrashCanEnabled);
         tr_torrentRemove(
             tor,
             delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error** error)
-            { return gtr_file_trash_or_remove(filename, error); },
-            nullptr);
+            [](char const* filename, void* user_data, tr_error** error)
+            { return gtr_file_trash_or_remove(filename, *static_cast<bool const*>(user_data), error); },
+            const_cast<bool*>(&use_trash_can));
     }
 }
 
@@ -1527,7 +1534,8 @@ void Session::Impl::maybe_inhibit_hibernation()
     /* hibernation is allowed if EITHER
      * (a) the "inhibit" pref is turned off OR
      * (b) there aren't any active torrents */
-    bool const hibernation_allowed = !gtr_pref_flag_get(TR_KEY_inhibit_desktop_hibernation) || get_active_torrent_count() == 0;
+    bool const hibernation_allowed = !settings_->get_boolean(ClientPrefs::Key::InhibitDesktopHibernation) ||
+        get_active_torrent_count() == 0;
     set_hibernation_allowed(hibernation_allowed);
 }
 
@@ -1757,14 +1765,12 @@ size_t Session::Impl::get_active_torrent_count() const
 
 tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
 {
-    tr_torrent* tor = nullptr;
+    return impl_->find_torrent(id);
+}
 
-    if (auto* const session = impl_->get_session(); session != nullptr)
-    {
-        tor = tr_torrentFindFromId(session, id);
-    }
-
-    return tor;
+tr_torrent* Session::Impl::find_torrent(tr_torrent_id_t id) const
+{
+    return session_ != nullptr ? tr_torrentFindFromId(session_, id) : nullptr;
 }
 
 void Session::open_folder(tr_torrent_id_t torrent_id) const

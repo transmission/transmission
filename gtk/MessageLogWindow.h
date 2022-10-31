@@ -20,12 +20,16 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
-        Glib::RefPtr<Session> const& core);
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~MessageLogWindow() override;
 
     TR_DISABLE_COPY_MOVE(MessageLogWindow)
 
-    static std::unique_ptr<MessageLogWindow> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
+    static std::unique_ptr<MessageLogWindow> create(
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
 
 private:
     class Impl;

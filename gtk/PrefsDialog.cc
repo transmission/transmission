@@ -33,7 +33,11 @@
 class PrefsDialog::Impl
 {
 public:
-    Impl(PrefsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(
+        PrefsDialog& dialog,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -69,17 +73,23 @@ namespace
 class PageBase : public Gtk::Box
 {
 public:
-    PageBase(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    PageBase(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~PageBase() override;
 
     TR_DISABLE_COPY_MOVE(PageBase)
 
     Gtk::CheckButton* init_check_button(Glib::ustring const& name, tr_quark key);
+    Gtk::CheckButton* init_check_button(Glib::ustring const& name, Glib::ustring const& key);
     Gtk::SpinButton* init_spin_button(Glib::ustring const& name, tr_quark key, int low, int high, int step);
     Gtk::SpinButton* init_spin_button_double(Glib::ustring const& name, tr_quark key, double low, double high, double step);
     Gtk::Entry* init_entry(Glib::ustring const& name, tr_quark key);
     Gtk::TextView* init_text_view(Glib::ustring const& name, tr_quark key);
     PathButton* init_chooser_button(Glib::ustring const& name, tr_quark key);
+    PathButton* init_chooser_button(Glib::ustring const& name, Glib::ustring const key);
     Gtk::ComboBox* init_encryption_combo(Glib::ustring const& name, tr_quark key);
     Gtk::ComboBox* init_time_combo(Glib::ustring const& name, tr_quark key);
     Gtk::ComboBox* init_week_combo(Glib::ustring const& name, tr_quark key);
@@ -117,14 +127,20 @@ private:
 private:
     Glib::RefPtr<Gtk::Builder> const builder_;
     Glib::RefPtr<Session> const core_;
+    Glib::RefPtr<Gio::Settings> const settings_;
 
     std::map<tr_quark, std::pair<std::unique_ptr<Glib::Timer>, sigc::connection>> spin_timers_;
 };
 
-PageBase::PageBase(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
+PageBase::PageBase(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : Gtk::Box(cast_item)
     , builder_(builder)
     , core_(core)
+    , settings_(settings)
 {
 }
 
@@ -141,6 +157,13 @@ Gtk::CheckButton* PageBase::init_check_button(Glib::ustring const& name, tr_quar
     auto* button = get_widget<Gtk::CheckButton>(name);
     button->set_active(gtr_pref_flag_get(key));
     button->signal_toggled().connect([this, button, key]() { core_->set_pref(key, button->get_active()); });
+    return button;
+}
+
+Gtk::CheckButton* PageBase::init_check_button(Glib::ustring const& name, Glib::ustring const& key)
+{
+    auto* button = get_widget<Gtk::CheckButton>(name);
+    settings_->bind(key, button->property_active());
     return button;
 }
 
@@ -269,6 +292,20 @@ PathButton* PageBase::init_chooser_button(Glib::ustring const& name, tr_quark co
     return button;
 }
 
+PathButton* PageBase::init_chooser_button(Glib::ustring const& name, Glib::ustring const key)
+{
+    auto* const button = get_widget_derived<PathButton>(name);
+
+    if (auto const path = settings_->get_string(key); !path.empty())
+    {
+        button->set_filename(Glib::locale_from_utf8(path));
+    }
+
+    button->signal_selection_changed().connect([this, button, key]()
+                                               { settings_->set_string(key, Glib::locale_to_utf8(button->get_filename())); });
+    return button;
+}
+
 void PageBase::onIntComboChanged(Gtk::ComboBox& combo_box, tr_quark const key)
 {
     core_->set_pref(key, gtr_combo_box_get_active_enum(combo_box));
@@ -371,7 +408,11 @@ Gtk::ComboBox* PageBase::init_week_combo(Glib::ustring const& name, tr_quark con
 class DownloadingPage : public PageBase
 {
 public:
-    DownloadingPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    DownloadingPage(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~DownloadingPage() override;
 
     TR_DISABLE_COPY_MOVE(DownloadingPage)
@@ -407,16 +448,17 @@ DownloadingPage::~DownloadingPage()
 DownloadingPage::DownloadingPage(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
-    Glib::RefPtr<Session> const& core)
-    : PageBase(cast_item, builder, core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
+    : PageBase(cast_item, builder, core, settings)
     , core_(core)
     , freespace_label_(get_widget_derived<FreeSpaceLabel>("download_dir_stats_label", core))
 {
     core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &DownloadingPage::on_core_prefs_changed));
 
-    init_check_button("watch_dir_check", TR_KEY_watch_dir_enabled);
-    init_chooser_button("watch_dir_chooser", TR_KEY_watch_dir);
-    init_check_button("show_options_dialog_check", TR_KEY_show_options_window);
+    init_check_button("watch_dir_check", ClientPrefs::Key::WatchDirEnabled);
+    init_chooser_button("watch_dir_chooser", ClientPrefs::Key::WatchDir);
+    init_check_button("show_options_dialog_check", ClientPrefs::Key::ShowOptionsWindow);
     init_check_button("start_on_add_check", TR_KEY_start_added_torrents);
     init_check_button("trash_on_add_check", TR_KEY_trash_original_torrent_files);
     init_chooser_button("download_dir_chooser", TR_KEY_download_dir);
@@ -448,7 +490,7 @@ SeedingPage::SeedingPage(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     Glib::RefPtr<Session> const& core)
-    : PageBase(cast_item, builder, core)
+    : PageBase(cast_item, builder, core, {})
 {
     init_check_button("stop_seeding_ratio_check", TR_KEY_ratio_limit_enabled);
     init_spin_button_double("stop_seeding_ratio_spin", TR_KEY_ratio_limit, 0, 1000, 0.05);
@@ -465,7 +507,11 @@ SeedingPage::SeedingPage(
 class DesktopPage : public PageBase
 {
 public:
-    DesktopPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    DesktopPage(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~DesktopPage() override = default;
 
     TR_DISABLE_COPY_MOVE(DesktopPage)
@@ -474,23 +520,24 @@ public:
 DesktopPage::DesktopPage(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
-    Glib::RefPtr<Session> const& core)
-    : PageBase(cast_item, builder, core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
+    : PageBase(cast_item, builder, core, settings)
 {
-    init_check_button("inhibit_hibernation_check", TR_KEY_inhibit_desktop_hibernation);
+    init_check_button("inhibit_hibernation_check", ClientPrefs::Key::InhibitDesktopHibernation);
 
     if (SystemTrayIcon::is_available())
     {
-        init_check_button("show_systray_icon_check", TR_KEY_show_notification_area_icon);
+        init_check_button("show_systray_icon_check", ClientPrefs::Key::ShowNotificationAreaIcon);
     }
     else
     {
         get_widget<Gtk::CheckButton>("show_systray_icon_check")->hide();
     }
 
-    init_check_button("notify_on_torrent_add_check", TR_KEY_torrent_added_notification_enabled);
-    init_check_button("notify_on_torrent_finish_check", TR_KEY_torrent_complete_notification_enabled);
-    init_check_button("ding_no_torrent_finish_check", TR_KEY_torrent_complete_sound_enabled);
+    init_check_button("notify_on_torrent_add_check", ClientPrefs::Key::TorrentAddedNotificationEnabled);
+    init_check_button("notify_on_torrent_finish_check", ClientPrefs::Key::TorrentCompleteNotificationEnabled);
+    init_check_button("ding_no_torrent_finish_check", ClientPrefs::Key::TorrentCompleteSoundEnabled);
 }
 
 /****
@@ -500,7 +547,11 @@ DesktopPage::DesktopPage(
 class PrivacyPage : public PageBase
 {
 public:
-    PrivacyPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    PrivacyPage(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~PrivacyPage() override;
 
     TR_DISABLE_COPY_MOVE(PrivacyPage)
@@ -591,8 +642,9 @@ void PrivacyPage::on_blocklist_url_changed(Gtk::Editable* e)
 PrivacyPage::PrivacyPage(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
-    Glib::RefPtr<Session> const& core)
-    : PageBase(cast_item, builder, core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
+    : PageBase(cast_item, builder, core, settings)
     , core_(core)
     , updateBlocklistButton_(get_widget<Gtk::Button>("update_blocklist_button"))
     , label_(get_widget<Gtk::Label>("blocklist_stats_label"))
@@ -610,7 +662,7 @@ PrivacyPage::PrivacyPage(
                                                   { on_blocklist_url_changed(blocklist_url_entry); });
     on_blocklist_url_changed(blocklist_url_entry);
 
-    init_check_button("blocklist_autoupdate_check", TR_KEY_blocklist_updates_enabled);
+    init_check_button("blocklist_autoupdate_check", ClientPrefs::Key::BlocklistUpdatesEnabled);
 }
 
 /****
@@ -764,7 +816,7 @@ void RemotePage::onLaunchClutchCB()
 }
 
 RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
-    : PageBase(cast_item, builder, core)
+    : PageBase(cast_item, builder, core, {})
     , core_(core)
     , view_(get_widget<Gtk::TreeView>("rpc_whitelist_view"))
     , remove_button_(get_widget<Gtk::Button>("remove_from_rpc_whistlist_button"))
@@ -837,7 +889,7 @@ public:
 };
 
 SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
-    : PageBase(cast_item, builder, core)
+    : PageBase(cast_item, builder, core, {})
 {
     localize_label(
         *init_check_button("upload_limit_check", TR_KEY_speed_limit_up_enabled),
@@ -940,7 +992,7 @@ NetworkPage::NetworkPage(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     Glib::RefPtr<Session> const& core)
-    : PageBase(cast_item, builder, core)
+    : PageBase(cast_item, builder, core, {})
     , core_(core)
     , portLabel_(get_widget<Gtk::Label>("listening_port_status_label"))
     , portButton_(get_widget<Gtk::Button>("test_listening_port_button"))
@@ -973,35 +1025,43 @@ NetworkPage::NetworkPage(
 *****
 ****/
 
-std::unique_ptr<PrefsDialog> PrefsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
+std::unique_ptr<PrefsDialog> PrefsDialog::create(
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("PrefsDialog.ui"));
-    return std::unique_ptr<PrefsDialog>(gtr_get_widget_derived<PrefsDialog>(builder, "PrefsDialog", parent, core));
+    return std::unique_ptr<PrefsDialog>(gtr_get_widget_derived<PrefsDialog>(builder, "PrefsDialog", parent, core, settings));
 }
 
 PrefsDialog::PrefsDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     Gtk::Window& parent,
-    Glib::RefPtr<Session> const& core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : Gtk::Dialog(cast_item)
-    , impl_(std::make_unique<Impl>(*this, builder, core))
+    , impl_(std::make_unique<Impl>(*this, builder, core, settings))
 {
     set_transient_for(parent);
 }
 
 PrefsDialog::~PrefsDialog() = default;
 
-PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
+PrefsDialog::Impl::Impl(
+    PrefsDialog& dialog,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : dialog_(dialog)
     , core_(core)
 {
     gtr_get_widget_derived<SpeedPage>(builder, "speed_page_layout", core_);
-    gtr_get_widget_derived<DownloadingPage>(builder, "downloading_page_layout", core_);
+    gtr_get_widget_derived<DownloadingPage>(builder, "downloading_page_layout", core_, settings);
     gtr_get_widget_derived<SeedingPage>(builder, "seeding_page_layout", core_);
-    gtr_get_widget_derived<PrivacyPage>(builder, "privacy_page_layout", core_);
+    gtr_get_widget_derived<PrivacyPage>(builder, "privacy_page_layout", core_, settings);
     gtr_get_widget_derived<NetworkPage>(builder, "network_page_layout", core_);
-    gtr_get_widget_derived<DesktopPage>(builder, "desktop_page_layout", core_);
+    gtr_get_widget_derived<DesktopPage>(builder, "desktop_page_layout", core_, settings);
     gtr_get_widget_derived<RemotePage>(builder, "remote_page_layout", core_);
 
     dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::response_cb));

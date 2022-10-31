@@ -199,47 +199,47 @@
       </section>
       <section>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by _Activity</attribute>
           <attribute name="target">sort-by-activity</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by A_ge</attribute>
           <attribute name="target">sort-by-age</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by _Name</attribute>
           <attribute name="target">sort-by-name</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by _Progress</attribute>
           <attribute name="target">sort-by-progress</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by _Queue</attribute>
           <attribute name="target">sort-by-queue</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by Rati_o</attribute>
           <attribute name="target">sort-by-ratio</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by Si_ze</attribute>
           <attribute name="target">sort-by-size</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by Stat_e</attribute>
           <attribute name="target">sort-by-state</attribute>
         </item>
         <item>
-          <attribute name="action">win.sort-torrents</attribute>
+          <attribute name="action">win.sort-mode</attribute>
           <attribute name="label" translatable="yes">Sort by Time _Left</attribute>
           <attribute name="target">sort-by-time-left</attribute>
         </item>
@@ -306,47 +306,47 @@
         <attribute name="label" translatable="true">_Sort Torrents By</attribute>
         <section>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by _Activity</attribute>
             <attribute name="target">sort-by-activity</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by A_ge</attribute>
             <attribute name="target">sort-by-age</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by _Name</attribute>
             <attribute name="target">sort-by-name</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by _Progress</attribute>
             <attribute name="target">sort-by-progress</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by _Queue</attribute>
             <attribute name="target">sort-by-queue</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by Rati_o</attribute>
             <attribute name="target">sort-by-ratio</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by Si_ze</attribute>
             <attribute name="target">sort-by-size</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by Stat_e</attribute>
             <attribute name="target">sort-by-state</attribute>
           </item>
           <item>
-            <attribute name="action">win.sort-torrents</attribute>
+            <attribute name="action">win.sort-mode</attribute>
             <attribute name="label" translatable="yes">Sort by Time _Left</attribute>
             <attribute name="target">sort-by-time-left</attribute>
           </item>

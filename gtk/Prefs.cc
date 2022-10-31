@@ -2,10 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <string>
-#include <string_view>
+#include <algorithm>
 
-#include <glibmm.h>
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
@@ -14,12 +12,101 @@
 #include <libtransmission/variant.h>
 
 #include "Prefs.h"
-#include "PrefsDialog.h"
 #include "Utils.h"
 
-using namespace std::literals;
+namespace
+{
+
+auto constexpr MaxRecentDirs = size_t{ 4 };
 
 std::string gl_confdir;
+
+} // namespace
+
+namespace ClientPrefs
+{
+
+void bind_window_state(Gtk::Window& window, Glib::RefPtr<Gio::Settings> const& settings, std::string_view key_prefix)
+{
+    auto const width_key = fmt::format("{}{}", key_prefix, WindowKeySuffix::Width);
+    auto const height_key = fmt::format("{}{}", key_prefix, WindowKeySuffix::Height);
+    auto const maximized_key = fmt::format("{}{}", key_prefix, WindowKeySuffix::Maximized);
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+    settings->bind(width_key, window.property_default_width());
+    settings->bind(height_key, window.property_default_height());
+    settings->bind(maximized_key, window.property_maximized());
+
+#else
+
+    auto on_main_window_size_allocated = [&window, settings, width_key, height_key]()
+    {
+        if (window.is_maximized())
+        {
+            return;
+        }
+
+        int width = 0;
+        int height = 0;
+        window.get_size(width, height);
+
+        if (settings->get_int(width_key) != width)
+        {
+            settings->set_int(width_key, width);
+        }
+
+        if (settings->get_int(height_key) != height)
+        {
+            settings->set_int(height_key, height);
+        }
+    };
+
+    window.set_default_size(settings->get_int(width_key), settings->get_int(height_key));
+
+    if (settings->get_boolean(maximized_key))
+    {
+        window.maximize();
+    }
+
+    settings->bind(maximized_key, window.property_is_maximized(), TR_GIO_SETTINGS_BIND_FLAGS(SET));
+    window.signal_size_allocate().connect(sigc::hide<0>(on_main_window_size_allocated));
+
+#endif
+}
+
+std::list<std::string> get_recent_dirs(Glib::RefPtr<Gio::Settings> const& settings, std::string_view key_prefix)
+{
+    auto const items = settings->get_string_array(fmt::format("{}{}", key_prefix, DirKeySuffix::Recents));
+    auto result = std::list<std::string>();
+    std::transform(items.begin(), items.end(), std::back_inserter(result), &Glib::locale_from_utf8);
+    return result;
+}
+
+void save_recent_dir(Glib::RefPtr<Gio::Settings> const& settings, std::string_view key_prefix, std::string_view dir)
+{
+    if (dir.empty())
+    {
+        return;
+    }
+
+    auto const key = fmt::format("{}{}", key_prefix, DirKeySuffix::Recents);
+    auto const dir_utf8 = Glib::locale_to_utf8(std::string(dir));
+
+    auto items = std::vector<Glib::ustring>(settings->get_string_array(key));
+    if (!items.empty() && items.front() == dir_utf8)
+    {
+        return;
+    }
+
+    items.erase(std::remove(items.begin(), items.end(), dir_utf8), items.end());
+    items.emplace(items.begin(), dir_utf8);
+    items.resize(std::min(items.size(), MaxRecentDirs));
+
+    settings->set_string_array(key, items);
+}
+
+} // namespace ClientPrefs
 
 void gtr_pref_init(std::string_view config_dir)
 {
@@ -32,11 +119,10 @@ void gtr_pref_init(std::string_view config_dir)
 ****
 ***/
 
-/**
- * This is where we initialize the preferences file with the default values.
- * If you add a new preferences key, you /must/ add a default value here.
- */
-static void tr_prefs_init_defaults(tr_variant* d)
+namespace
+{
+
+std::string get_default_download_dir()
 {
     auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD));
 
@@ -50,73 +136,26 @@ static void tr_prefs_init_defaults(tr_variant* d)
         dir = tr_getDefaultDownloadDir();
     }
 
-    tr_variantDictReserve(d, 31);
-    tr_variantDictAddStr(d, TR_KEY_watch_dir, dir);
-    tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, false);
-    tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, false);
-    tr_variantDictAddBool(d, TR_KEY_inhibit_desktop_hibernation, false);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_updates_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, Glib::get_home_dir());
-    tr_variantDictAddBool(d, TR_KEY_show_toolbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_filterbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_statusbar, true);
-    tr_variantDictAddBool(d, TR_KEY_trash_can_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_show_notification_area_icon, false);
-    tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, false);
-    tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, false);
-    tr_variantDictAddBool(d, TR_KEY_show_backup_trackers, false);
-    tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio"sv);
-    tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_show_options_window, true);
-    tr_variantDictAddBool(d, TR_KEY_main_window_is_maximized, false);
-    tr_variantDictAddInt(d, TR_KEY_main_window_height, 500);
-    tr_variantDictAddInt(d, TR_KEY_main_window_width, 300);
-    tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
-    tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
-    tr_variantDictAddInt(d, TR_KEY_details_window_height, 500);
-    tr_variantDictAddInt(d, TR_KEY_details_window_width, 700);
-    tr_variantDictAddStr(d, TR_KEY_download_dir, dir);
-    tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name"sv);
-    tr_variantDictAddBool(d, TR_KEY_sort_reversed, false);
-    tr_variantDictAddBool(d, TR_KEY_compact_view, false);
+    return dir;
 }
 
-static void ensure_sound_cmd_is_a_list(tr_variant* dict)
-{
-    tr_quark const key = TR_KEY_torrent_complete_sound_command;
-    tr_variant* list = nullptr;
-    if (tr_variantDictFindList(dict, key, &list))
-    {
-        return;
-    }
-
-    tr_variantDictRemove(dict, key);
-    list = tr_variantDictAddList(dict, key, 5);
-    tr_variantListAddStr(list, "canberra-gtk-play"sv);
-    tr_variantListAddStr(list, "-i"sv);
-    tr_variantListAddStr(list, "complete-download"sv);
-    tr_variantListAddStr(list, "-d"sv);
-    tr_variantListAddStr(list, "transmission torrent downloaded"sv);
-}
-
-static tr_variant* getPrefs()
+tr_variant* getPrefs()
 {
     static tr_variant settings;
     static bool loaded = false;
 
     if (!loaded)
     {
-        tr_variantInitDict(&settings, 0);
-        tr_prefs_init_defaults(&settings);
+        tr_variantInitDict(&settings, 1);
+        tr_variantDictAddStr(&settings, TR_KEY_download_dir, get_default_download_dir());
         tr_sessionLoadSettings(&settings, gl_confdir.c_str(), nullptr);
-        ensure_sound_cmd_is_a_list(&settings);
         loaded = true;
     }
 
     return &settings;
 }
+
+} // namespace
 
 /***
 ****
@@ -170,28 +209,6 @@ void gtr_pref_flag_set(tr_quark const key, bool value)
 /***
 ****
 ***/
-
-std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
-{
-    std::vector<std::string> ret;
-
-    if (tr_variant* list = nullptr; tr_variantDictFindList(getPrefs(), key, &list))
-    {
-        size_t const n = tr_variantListSize(list);
-        ret.reserve(n);
-
-        for (size_t i = 0; i < n; ++i)
-        {
-            auto sv = std::string_view{};
-            if (tr_variantGetStrView(tr_variantListChild(list, i), &sv))
-            {
-                ret.emplace_back(sv);
-            }
-        }
-    }
-
-    return ret;
-}
 
 std::string gtr_pref_string_get(tr_quark const key)
 {

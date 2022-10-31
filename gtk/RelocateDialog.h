@@ -22,6 +22,7 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings,
         std::vector<tr_torrent_id_t> const& torrent_ids);
     ~RelocateDialog() override;
 
@@ -30,6 +31,7 @@ public:
     static std::unique_ptr<RelocateDialog> create(
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings,
         std::vector<tr_torrent_id_t> const& torrent_ids);
 
 private:

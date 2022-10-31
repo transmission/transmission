@@ -36,13 +36,19 @@ class TorrentFileChooserDialog : public Gtk::FileChooserDialog
 public:
     TR_DISABLE_COPY_MOVE(TorrentFileChooserDialog)
 
-    static std::unique_ptr<TorrentFileChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
+    static std::unique_ptr<TorrentFileChooserDialog> create(
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
 
 protected:
-    TorrentFileChooserDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
+    TorrentFileChooserDialog(
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
 
 private:
-    void onOpenDialogResponse(int response, Glib::RefPtr<Session> const& core);
+    void onOpenDialogResponse(int response, Glib::RefPtr<Session> const& core, Glib::RefPtr<Gio::Settings> const& settings);
 };
 
 class OptionsDialog : public Gtk::Dialog
@@ -53,6 +59,7 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
     ~OptionsDialog() override;
 
@@ -61,6 +68,7 @@ public:
     static std::unique_ptr<OptionsDialog> create(
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
 
 private:

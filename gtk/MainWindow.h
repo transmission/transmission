@@ -21,7 +21,8 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Application& app,
         Glib::RefPtr<Gio::ActionGroup> const& actions,
-        Glib::RefPtr<Session> const& core);
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~MainWindow() override;
 
     TR_DISABLE_COPY_MOVE(MainWindow)
@@ -29,7 +30,8 @@ public:
     static std::unique_ptr<MainWindow> create(
         Gtk::Application& app,
         Glib::RefPtr<Gio::ActionGroup> const& actions,
-        Glib::RefPtr<Session> const& core);
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
 
     Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
 

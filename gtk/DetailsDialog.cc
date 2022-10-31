@@ -47,7 +47,11 @@ using namespace std::literals;
 class DetailsDialog::Impl
 {
 public:
-    Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(
+        DetailsDialog& dialog,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -61,10 +65,9 @@ private:
     void tracker_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
     void options_page_init(Glib::RefPtr<Gtk::Builder> const& builder);
 
-    void on_details_window_size_allocated();
-
     bool onPeerViewQueryTooltip(int x, int y, bool keyboard_tip, Glib::RefPtr<Gtk::Tooltip> const& tooltip);
     void onMorePeerInfoToggled();
+    void setPeerViewColumns();
 
     bool trackerVisibleFunc(Gtk::TreeModel::const_iterator const& iter);
     void on_tracker_list_selection_changed();
@@ -72,8 +75,6 @@ private:
     void on_tracker_list_add_button_clicked();
     void on_edit_trackers();
     void on_tracker_list_remove_button_clicked();
-    void onScrapeToggled();
-    void onBackupToggled();
 
     void torrent_set_bool(tr_quark key, bool value);
     void torrent_set_int(tr_quark key, int value);
@@ -96,6 +97,7 @@ private:
 private:
     DetailsDialog& dialog_;
     Glib::RefPtr<Session> const core_;
+    Glib::RefPtr<Gio::Settings> const settings_;
 
     Gtk::CheckButton* honor_limits_check_ = nullptr;
     Gtk::CheckButton* up_limited_check_ = nullptr;
@@ -1530,14 +1532,11 @@ bool DetailsDialog::Impl::onPeerViewQueryTooltip(int x, int y, bool keyboard_tip
     return show_tip;
 }
 
-namespace
-{
-
-void setPeerViewColumns(Gtk::TreeView* peer_view)
+void DetailsDialog::Impl::setPeerViewColumns()
 {
     std::vector<Gtk::TreeModelColumnBase const*> view_columns;
     Gtk::TreeViewColumn* c = nullptr;
-    bool const more = gtr_pref_flag_get(TR_KEY_show_extra_peer_details);
+    bool const more = settings_->get_boolean(ClientPrefs::Key::ShowExtraPeerDetails);
 
     view_columns.push_back(&peer_cols.encryption_stock_id);
     view_columns.push_back(&peer_cols.upload_rate_string);
@@ -1580,7 +1579,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
     view_columns.push_back(&peer_cols.client);
 
     /* remove any existing columns */
-    peer_view->remove_all_columns();
+    peer_view_->remove_all_columns();
 
     for (auto const* const col : view_columns)
     {
@@ -1687,7 +1686,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
 
         c->set_resizable(false);
         c->set_sort_column(*sort_col);
-        peer_view->append_column(*c);
+        peer_view_->append_column(*c);
     }
 
     /* the 'expander' column has a 10-pixel margin on the left
@@ -1696,18 +1695,8 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
        'expander column. */
     c = Gtk::make_managed<Gtk::TreeViewColumn>();
     c->set_visible(false);
-    peer_view->append_column(*c);
-    peer_view->set_expander_column(*c);
-}
-
-} // namespace
-
-void DetailsDialog::Impl::onMorePeerInfoToggled()
-{
-    tr_quark const key = TR_KEY_show_extra_peer_details;
-    bool const value = more_peer_details_check_->get_active();
-    core_->set_pref(key, value);
-    setPeerViewColumns(peer_view_);
+    peer_view_->append_column(*c);
+    peer_view_->set_expander_column(*c);
 }
 
 void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& builder)
@@ -1754,10 +1743,11 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
         {},
         [this](double view_x, double view_y) { return on_tree_view_button_released(*peer_view_, view_x, view_y); });
 
-    setPeerViewColumns(peer_view_);
+    setPeerViewColumns();
 
-    more_peer_details_check_->set_active(gtr_pref_flag_get(TR_KEY_show_extra_peer_details));
-    more_peer_details_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onMorePeerInfoToggled));
+    settings_->bind(ClientPrefs::Key::ShowExtraPeerDetails, more_peer_details_check_->property_active());
+    settings_->signal_changed(ClientPrefs::Key::ShowExtraPeerDetails)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::setPeerViewColumns)));
 }
 
 /****
@@ -1985,7 +1975,7 @@ TrackerModelColumns const tracker_cols;
 bool DetailsDialog::Impl::trackerVisibleFunc(Gtk::TreeModel::const_iterator const& iter)
 {
     /* show all */
-    if (all_check_->get_active())
+    if (settings_->get_boolean(ClientPrefs::Key::ShowBackupTrackers))
     {
         return true;
     }
@@ -2042,7 +2032,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     auto& hash = tracker_hash_;
     auto const& store = tracker_store_;
     auto* session = core_->get_session();
-    bool const showScrape = scrape_check_->get_active();
+    bool const showScrape = settings_->get_boolean(ClientPrefs::Key::ShowTrackerScrapes);
 
     /* step 1: get all the trackers */
     auto trackers = std::multimap<tr_torrent const*, tr_tracker_view>{};
@@ -2140,22 +2130,6 @@ void DetailsDialog::Impl::refreshFiles(std::vector<tr_torrent*> const& torrents)
         file_list_->hide();
         file_label_->show();
     }
-}
-
-void DetailsDialog::Impl::onScrapeToggled()
-{
-    tr_quark const key = TR_KEY_show_tracker_scrapes;
-    bool const value = scrape_check_->get_active();
-    core_->set_pref(key, value);
-    refresh();
-}
-
-void DetailsDialog::Impl::onBackupToggled()
-{
-    tr_quark const key = TR_KEY_show_backup_trackers;
-    bool const value = all_check_->get_active();
-    core_->set_pref(key, value);
-    refresh();
 }
 
 namespace
@@ -2459,11 +2433,13 @@ void DetailsDialog::Impl::tracker_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     edit_trackers_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_edit_trackers));
     remove_tracker_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_remove_button_clicked));
 
-    scrape_check_->set_active(gtr_pref_flag_get(TR_KEY_show_tracker_scrapes));
-    scrape_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onScrapeToggled));
+    settings_->bind(ClientPrefs::Key::ShowTrackerScrapes, scrape_check_->property_active());
+    settings_->signal_changed(ClientPrefs::Key::ShowTrackerScrapes)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::refresh)));
 
-    all_check_->set_active(gtr_pref_flag_get(TR_KEY_show_backup_trackers));
-    all_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onBackupToggled));
+    settings_->bind(ClientPrefs::Key::ShowBackupTrackers, all_check_->property_active());
+    settings_->signal_changed(ClientPrefs::Key::ShowBackupTrackers)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::refresh)));
 }
 
 /****
@@ -2486,47 +2462,44 @@ void DetailsDialog::Impl::refresh()
     }
 }
 
-void DetailsDialog::Impl::on_details_window_size_allocated()
-{
-    int w = 0;
-    int h = 0;
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    dialog_.get_default_size(w, h);
-#else
-    dialog_.get_size(w, h);
-#endif
-    gtr_pref_int_set(TR_KEY_details_window_width, w);
-    gtr_pref_int_set(TR_KEY_details_window_height, h);
-}
-
 DetailsDialog::Impl::~Impl()
 {
     periodic_refresh_tag_.disconnect();
     last_page_tag_.disconnect();
 }
 
-std::unique_ptr<DetailsDialog> DetailsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
+std::unique_ptr<DetailsDialog> DetailsDialog::create(
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("DetailsDialog.ui"));
-    return std::unique_ptr<DetailsDialog>(gtr_get_widget_derived<DetailsDialog>(builder, "DetailsDialog", parent, core));
+    return std::unique_ptr<DetailsDialog>(
+        gtr_get_widget_derived<DetailsDialog>(builder, "DetailsDialog", parent, core, settings));
 }
 
 DetailsDialog::DetailsDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     Gtk::Window& parent,
-    Glib::RefPtr<Session> const& core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : Gtk::Dialog(cast_item)
-    , impl_(std::make_unique<Impl>(*this, builder, core))
+    , impl_(std::make_unique<Impl>(*this, builder, core, settings))
 {
     set_transient_for(parent);
 }
 
 DetailsDialog::~DetailsDialog() = default;
 
-DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
+DetailsDialog::Impl::Impl(
+    DetailsDialog& dialog,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : dialog_(dialog)
     , core_(core)
+    , settings_(settings)
     , honor_limits_check_(gtr_get_widget<Gtk::CheckButton>(builder, "honor_limits_check"))
     , up_limited_check_(gtr_get_widget<Gtk::CheckButton>(builder, "upload_limit_check"))
     , up_limit_sping_(gtr_get_widget<Gtk::SpinButton>(builder, "upload_limit_spin"))
@@ -2565,16 +2538,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     , file_label_(gtr_get_widget<Gtk::Label>(builder, "files_label"))
 {
     /* return saved window size */
-    auto const width = (int)gtr_pref_int_get(TR_KEY_details_window_width);
-    auto const height = (int)gtr_pref_int_get(TR_KEY_details_window_height);
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    dialog_.set_default_size(width, height);
-    dialog_.property_default_width().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
-    dialog_.property_default_height().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
-#else
-    dialog_.resize(width, height);
-    dialog_.signal_size_allocate().connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated)));
-#endif
+    ClientPrefs::bind_window_state(dialog_, settings_, ClientPrefs::WindowKeyPrefix::Details);
 
     dialog_.signal_response().connect(sigc::hide<0>(sigc::mem_fun(dialog_, &DetailsDialog::close)));
 

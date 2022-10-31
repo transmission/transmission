@@ -50,7 +50,8 @@ public:
         MainWindow& window,
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Gio::ActionGroup> const& actions,
-        Glib::RefPtr<Session> const& core);
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -80,10 +81,10 @@ private:
 
     void updateStats();
     void updateSpeeds();
+    void update_compact_view();
 
     void syncAltSpeedButton();
 
-    void status_menu_toggled_cb(std::string const& action_name, Glib::ustring const& val);
     void onOptionsClicked();
     void alt_speed_toggled_cb();
     void onAltSpeedToggledIdle();
@@ -91,6 +92,7 @@ private:
 private:
     MainWindow& window_;
     Glib::RefPtr<Session> const core_;
+    Glib::RefPtr<Gio::Settings> const settings_;
 
     Glib::RefPtr<Gio::ActionGroup> options_actions_;
     Glib::RefPtr<Gio::ActionGroup> stats_actions_;
@@ -205,33 +207,6 @@ void MainWindow::Impl::prefsChanged(tr_quark const key)
 {
     switch (key)
     {
-    case TR_KEY_compact_view:
-        renderer_->property_compact() = gtr_pref_flag_get(key);
-        /* since the cell size has changed, we need gtktreeview to revalidate
-         * its fixed-height mode values. Unfortunately there's not an API call
-         * for that, but this seems to work for both GTK 3 and 4 */
-        view_->set_fixed_height_mode(false);
-        view_->set_row_separator_func({});
-        view_->unset_row_separator_func();
-        view_->set_fixed_height_mode(true);
-        break;
-
-    case TR_KEY_show_statusbar:
-        status_->set_visible(gtr_pref_flag_get(key));
-        break;
-
-    case TR_KEY_show_filterbar:
-        filter_->set_visible(gtr_pref_flag_get(key));
-        break;
-
-    case TR_KEY_show_toolbar:
-        toolbar_->set_visible(gtr_pref_flag_get(key));
-        break;
-
-    case TR_KEY_statusbar_stats:
-        refresh();
-        break;
-
     case TR_KEY_alt_speed_enabled:
     case TR_KEY_alt_speed_up:
     case TR_KEY_alt_speed_down:
@@ -248,10 +223,16 @@ MainWindow::Impl::~Impl()
     pref_handler_id_.disconnect();
 }
 
-void MainWindow::Impl::status_menu_toggled_cb(std::string const& action_name, Glib::ustring const& val)
+void MainWindow::Impl::update_compact_view()
 {
-    stats_actions_->change_action_state(action_name, VariantString::create(val));
-    core_->set_pref(TR_KEY_statusbar_stats, val.raw());
+    renderer_->property_compact() = settings_->get_boolean(ClientPrefs::Key::CompactView);
+    /* since the cell size has changed, we need gtktreeview to revalidate
+     * its fixed-height mode values. Unfortunately there's not an API call
+     * for that, but this seems to work for both GTK 3 and 4 */
+    view_->set_fixed_height_mode(false);
+    view_->set_row_separator_func({});
+    view_->unset_row_separator_func();
+    view_->set_fixed_height_mode(true);
 }
 
 void MainWindow::Impl::syncAltSpeedButton()
@@ -471,21 +452,18 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
     };
 
     static auto const stats_modes = std::array<StatsModeInfo, 4>({ {
-        { "total-ratio", N_("Total Ratio") },
-        { "session-ratio", N_("Session Ratio") },
-        { "total-transfer", N_("Total Transfer") },
-        { "session-transfer", N_("Session Transfer") },
+        { ClientPrefs::StatusMode::TotalRatio, N_("Total Ratio") },
+        { ClientPrefs::StatusMode::SessionRatio, N_("Session Ratio") },
+        { ClientPrefs::StatusMode::TotalTransfer, N_("Total Transfer") },
+        { ClientPrefs::StatusMode::SessionTransfer, N_("Session Transfer") },
     } });
 
     auto top = Gio::Menu::create();
     auto actions = Gio::SimpleActionGroup::create();
 
-    auto const action_name = "stats-mode"s;
+    auto const* const action_name = ClientPrefs::Key::StatusbarStats;
     auto const full_action_name = fmt::format("{}.{}", StatsMenuActionGroupName, action_name);
-    auto stats_mode_action = actions->add_action_radio_string(
-        action_name,
-        [this, action_name](Glib::ustring const& value) { status_menu_toggled_cb(action_name, value); },
-        gtr_pref_string_get(TR_KEY_statusbar_stats));
+    actions->add_action(settings_->create_action(action_name));
 
     for (auto const& mode : stats_modes)
     {
@@ -507,10 +485,11 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
 std::unique_ptr<MainWindow> MainWindow::create(
     Gtk::Application& app,
     Glib::RefPtr<Gio::ActionGroup> const& actions,
-    Glib::RefPtr<Session> const& core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MainWindow.ui"));
-    return std::unique_ptr<MainWindow>(gtr_get_widget_derived<MainWindow>(builder, "MainWindow", app, actions, core));
+    return std::unique_ptr<MainWindow>(gtr_get_widget_derived<MainWindow>(builder, "MainWindow", app, actions, core, settings));
 }
 
 MainWindow::MainWindow(
@@ -518,9 +497,10 @@ MainWindow::MainWindow(
     Glib::RefPtr<Gtk::Builder> const& builder,
     Gtk::Application& app,
     Glib::RefPtr<Gio::ActionGroup> const& actions,
-    Glib::RefPtr<Session> const& core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : Gtk::ApplicationWindow(cast_item)
-    , impl_(std::make_unique<Impl>(*this, builder, actions, core))
+    , impl_(std::make_unique<Impl>(*this, builder, actions, core, settings))
 {
     app.add_window(*this);
 }
@@ -531,9 +511,11 @@ MainWindow::Impl::Impl(
     MainWindow& window,
     Glib::RefPtr<Gtk::Builder> const& builder,
     Glib::RefPtr<Gio::ActionGroup> const& actions,
-    Glib::RefPtr<Session> const& core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : window_(window)
     , core_(core)
+    , settings_(settings)
     , scroll_(gtr_get_widget<Gtk::ScrolledWindow>(builder, "torrents_view_scroll"))
     , view_(gtr_get_widget<Gtk::TreeView>(builder, "torrents_view"))
     , toolbar_(gtr_get_widget<Gtk::Widget>(builder, "toolbar"))
@@ -547,15 +529,8 @@ MainWindow::Impl::Impl(
 {
     /* make the window */
     window.set_title(Glib::get_application_name());
-    window.set_default_size(gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
-#if !GTKMM_CHECK_VERSION(4, 0, 0)
-    window.move(gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
-#endif
 
-    if (gtr_pref_flag_get(TR_KEY_main_window_is_maximized))
-    {
-        window.maximize();
-    }
+    ClientPrefs::bind_window_state(window_, settings_, ClientPrefs::WindowKeyPrefix::Main);
 
     window.insert_action_group("win", actions);
 
@@ -603,11 +578,12 @@ MainWindow::Impl::Impl(
     }
 
     /* listen for prefs changes that affect the window */
-    prefsChanged(TR_KEY_compact_view);
-    prefsChanged(TR_KEY_show_filterbar);
-    prefsChanged(TR_KEY_show_statusbar);
-    prefsChanged(TR_KEY_statusbar_stats);
-    prefsChanged(TR_KEY_show_toolbar);
+    settings_->bind(ClientPrefs::Key::ShowToolbar, toolbar_->property_visible(), TR_GIO_SETTINGS_BIND_FLAGS(GET));
+    settings_->bind(ClientPrefs::Key::ShowFilterbar, filter_->property_visible(), TR_GIO_SETTINGS_BIND_FLAGS(GET));
+    settings_->bind(ClientPrefs::Key::ShowStatusbar, status_->property_visible(), TR_GIO_SETTINGS_BIND_FLAGS(GET));
+    settings_->signal_changed(ClientPrefs::Key::CompactView)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::update_compact_view)));
+    settings_->signal_changed(ClientPrefs::Key::StatusbarStats).connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::refresh)));
     prefsChanged(TR_KEY_alt_speed_enabled);
     pref_handler_id_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::prefsChanged));
 
@@ -617,6 +593,7 @@ MainWindow::Impl::Impl(
         { Glib::signal_idle().connect_once([p]() { static_cast<Impl*>(p)->onAltSpeedToggledIdle(); }); },
         this);
 
+    update_compact_view();
     refresh();
 
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
@@ -636,12 +613,12 @@ void MainWindow::Impl::updateStats()
     auto const* const session = core_->get_session();
 
     /* update the stats */
-    if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
+    if (auto const pch = settings_->get_string(ClientPrefs::Key::StatusbarStats); pch == ClientPrefs::StatusMode::SessionRatio)
     {
         auto const stats = tr_sessionGetStats(session);
         buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
-    else if (pch == "session-transfer")
+    else if (pch == ClientPrefs::StatusMode::SessionTransfer)
     {
         auto const stats = tr_sessionGetStats(session);
         buf = fmt::format(
@@ -649,7 +626,7 @@ void MainWindow::Impl::updateStats()
             fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
             fmt::arg("uploaded_size", tr_strlsize(stats.uploadedBytes)));
     }
-    else if (pch == "total-transfer")
+    else if (pch == ClientPrefs::StatusMode::TotalTransfer)
     {
         auto const stats = tr_sessionGetCumulativeStats(session);
         buf = fmt::format(
@@ -657,7 +634,7 @@ void MainWindow::Impl::updateStats()
             fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
             fmt::arg("uploaded_size", tr_strlsize(stats.uploadedBytes)));
     }
-    else /* default is total-ratio */
+    else /* default is ClientPrefs::StatusMode::TotalRatio */
     {
         auto const stats = tr_sessionGetCumulativeStats(session);
         buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));

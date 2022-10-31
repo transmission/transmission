@@ -34,12 +34,6 @@ void action_cb(Gio::SimpleAction& action, gpointer user_data)
     gtr_actions_handler(action.get_name(), user_data);
 }
 
-void sort_changed_cb(Gio::SimpleAction& action, Glib::VariantBase const& value, gpointer /*user_data*/)
-{
-    action.set_state(value);
-    myCore->set_pref(TR_KEY_sort_mode, Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(value).get());
-}
-
 std::array<std::string_view, 2> const show_toggle_entries = {
     "toggle-main-window"sv,
     "toggle-message-log"sv,
@@ -56,13 +50,17 @@ void toggle_pref_cb(Gio::SimpleAction& action, gpointer /*user_data*/)
     myCore->set_pref(tr_quark_new({ key.c_str(), key.size() }), !val);
 }
 
-std::array<std::string_view, 6> const pref_toggle_entries = {
+std::array<std::string_view, 1> const pref_toggle_entries = {
     "alt-speed-enabled"sv, //
-    "compact-view"sv, //
-    "sort-reversed"sv, //
-    "show-filterbar"sv, //
-    "show-statusbar"sv, //
-    "show-toolbar"sv, //
+};
+
+std::array<char const*, 6> const settings_entries = {
+    ClientPrefs::Key::CompactView, //
+    ClientPrefs::Key::ShowFilterbar, //
+    ClientPrefs::Key::ShowStatusbar, //
+    ClientPrefs::Key::ShowToolbar, //
+    ClientPrefs::Key::SortMode, //
+    ClientPrefs::Key::SortReversed, //
 };
 
 std::array<std::string_view, 29> const entries = {
@@ -99,7 +97,7 @@ std::array<std::string_view, 29> const entries = {
 
 Gtk::Builder* myBuilder = nullptr;
 
-std::unordered_map<Glib::ustring, Glib::RefPtr<Gio::SimpleAction>> key_to_action;
+std::unordered_map<Glib::ustring, Glib::RefPtr<Gio::Action>> key_to_action;
 
 } // namespace
 
@@ -108,19 +106,19 @@ void gtr_actions_set_core(Glib::RefPtr<Session> const& core)
     myCore = core.get();
 }
 
-Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, gpointer callback_user_data)
+Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::RefPtr<Gio::Settings> const& settings,
+    gpointer callback_user_data)
 {
     myBuilder = builder.get();
 
     auto action_group = Gio::SimpleActionGroup::create();
 
-    auto const match = gtr_pref_string_get(TR_KEY_sort_mode);
-
+    for (auto const* const action_name_view : settings_entries)
     {
-        auto const action_name = Glib::ustring("sort-torrents");
-        auto const action = Gio::SimpleAction::create_radio_string(action_name, match);
-        action->signal_activate().connect([a = action.get(), callback_user_data](auto const& value)
-                                          { sort_changed_cb(*a, value, callback_user_data); });
+        auto const action_name = Glib::ustring(action_name_view);
+        auto const action = settings->create_action(action_name);
         action_group->add_action(action);
         key_to_action.try_emplace(action_name, action);
     }
@@ -165,7 +163,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
 namespace
 {
 
-Glib::RefPtr<Gio::SimpleAction> get_action(Glib::ustring const& name)
+Glib::RefPtr<Gio::Action> get_action(Glib::ustring const& name)
 {
     return key_to_action.at(name);
 }
@@ -179,7 +177,7 @@ void gtr_action_activate(Glib::ustring const& name)
 
 void gtr_action_set_sensitive(Glib::ustring const& name, bool is_sensitive)
 {
-    get_action(name)->set_enabled(is_sensitive);
+    get_action(name)->set_property("enabled", is_sensitive);
 }
 
 void gtr_action_set_toggled(Glib::ustring const& name, bool is_toggled)

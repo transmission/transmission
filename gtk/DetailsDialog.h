@@ -22,12 +22,16 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
-        Glib::RefPtr<Session> const& core);
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~DetailsDialog() override;
 
     TR_DISABLE_COPY_MOVE(DetailsDialog)
 
-    static std::unique_ptr<DetailsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
+    static std::unique_ptr<DetailsDialog> create(
+        Gtk::Window& parent,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
 
     void set_torrents(std::vector<tr_torrent_id_t> const& torrent_ids);
     void refresh();

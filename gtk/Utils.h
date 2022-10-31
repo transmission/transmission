@@ -100,6 +100,7 @@
 #define TR_GIO_DBUS_BUS_TYPE(Code) IF_GLIBMM2_68(Gio::DBus::BusType::Code, Gio::DBus::BUS_TYPE_##Code)
 #define TR_GIO_DBUS_PROXY_FLAGS(Code) IF_GLIBMM2_68(Gio::DBus::ProxyFlags::Code, Gio::DBus::PROXY_FLAGS_##Code)
 #define TR_GIO_FILE_MONITOR_EVENT(Code) IF_GLIBMM2_68(Gio::FileMonitor::Event::Code, Gio::FILE_MONITOR_EVENT_##Code)
+#define TR_GIO_SETTINGS_BIND_FLAGS(Code) IF_GLIBMM2_68(Gio::Settings::BindFlags::Code, Gio::SETTINGS_BIND_##Code)
 
 #define TR_CAIRO_SURFACE_FORMAT(Code) IF_GTKMM4(Cairo::Surface::Format::Code, Cairo::FORMAT_##Code)
 #define TR_CAIRO_CONTEXT_OPERATOR(Code) IF_GTKMM4(Cairo::Context::Operator::Code, Cairo::OPERATOR_##Code)
@@ -227,7 +228,7 @@ void setup_tree_view_button_event_handling(
     std::function<bool(double, double)> const& release_callback);
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
+bool gtr_file_trash_or_remove(std::string const& filename, bool use_trash_can, tr_error** error);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 
@@ -249,10 +250,6 @@ std::string gtr_get_full_resource_path(std::string const& rel_path);
 /***
 ****
 ***/
-
-extern size_t const max_recent_dirs;
-std::list<std::string> gtr_get_recent_dirs(std::string const& pref);
-void gtr_save_recent_dir(std::string const& pref, Glib::RefPtr<Session> const& core, std::string const& dir);
 
 namespace gtr_detail
 {

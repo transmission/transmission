@@ -45,7 +45,11 @@ MessageLogColumnsModel const message_log_cols;
 class MessageLogWindow::Impl
 {
 public:
-    Impl(MessageLogWindow& window, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(
+        MessageLogWindow& window,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        Glib::RefPtr<Gio::Settings> const& settings);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -427,20 +431,24 @@ bool MessageLogWindow::Impl::onRefresh()
 ***  Public Functions
 **/
 
-std::unique_ptr<MessageLogWindow> MessageLogWindow::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
+std::unique_ptr<MessageLogWindow> MessageLogWindow::create(
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MessageLogWindow.ui"));
     return std::unique_ptr<MessageLogWindow>(
-        gtr_get_widget_derived<MessageLogWindow>(builder, "MessageLogWindow", parent, core));
+        gtr_get_widget_derived<MessageLogWindow>(builder, "MessageLogWindow", parent, core, settings));
 }
 
 MessageLogWindow::MessageLogWindow(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     Gtk::Window& parent,
-    Glib::RefPtr<Session> const& core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : Gtk::Window(cast_item)
-    , impl_(std::make_unique<Impl>(*this, builder, core))
+    , impl_(std::make_unique<Impl>(*this, builder, core, settings))
 {
     set_transient_for(parent);
 }
@@ -450,7 +458,8 @@ MessageLogWindow::~MessageLogWindow() = default;
 MessageLogWindow::Impl::Impl(
     MessageLogWindow& window,
     Glib::RefPtr<Gtk::Builder> const& builder,
-    Glib::RefPtr<Session> const& core)
+    Glib::RefPtr<Session> const& core,
+    Glib::RefPtr<Gio::Settings> const& settings)
     : window_(window)
     , core_(core)
     , view_(gtr_get_widget<Gtk::TreeView>(builder, "messages_view"))
@@ -469,6 +478,8 @@ MessageLogWindow::Impl::Impl(
           { TR_LOG_DEBUG, C_("Logging level", "Debug") },
       } }
 {
+    ClientPrefs::bind_window_state(window_, settings, ClientPrefs::WindowKeyPrefix::MessageLog);
+
     /**
     ***  toolbar
     **/

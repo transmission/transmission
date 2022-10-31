@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="transmission-gtk">
+  <schema id="org.transmissionbt.Transmission" path="/org/transmissionbt/Transmission/">
+    <key name="blocklist-updates-enabled" type="b">
+      <default>true</default>
+    </key>
+    <key name="compact-view" type="b">
+      <default>false</default>
+    </key>
+    <key name="details-window-height" type="i">
+      <default>500</default>
+    </key>
+    <key name="details-window-maximized" type="b">
+      <default>false</default>
+    </key>
+    <key name="details-window-width" type="i">
+      <default>700</default>
+    </key>
+    <key name="download-dir-recents" type="as">
+      <default>[]</default>
+    </key>
+    <key name="inhibit-desktop-hibernation" type="b">
+      <default>false</default>
+    </key>
+    <key name="main-window-height" type="i">
+      <default>500</default>
+    </key>
+    <key name="main-window-maximized" type="b">
+      <default>false</default>
+    </key>
+    <key name="main-window-width" type="i">
+      <default>300</default>
+    </key>
+    <key name="message-log-window-height" type="i">
+      <default>350</default>
+    </key>
+    <key name="message-log-window-maximized" type="b">
+      <default>false</default>
+    </key>
+    <key name="message-log-window-width" type="i">
+      <default>750</default>
+    </key>
+    <key name="open-dialog-dir" type="s">
+      <default>""</default>
+    </key>
+    <key name="relocate-dir-recents" type="as">
+      <default>[]</default>
+    </key>
+    <key name="show-backup-trackers" type="b">
+      <default>false</default>
+    </key>
+    <key name="show-extra-peer-details" type="b">
+      <default>false</default>
+    </key>
+    <key name="show-filterbar" type="b">
+      <default>true</default>
+    </key>
+    <key name="show-notification-area-icon" type="b">
+      <default>false</default>
+    </key>
+    <key name="show-options-window" type="b">
+      <default>true</default>
+    </key>
+    <key name="show-statusbar" type="b">
+      <default>true</default>
+    </key>
+    <key name="show-toolbar" type="b">
+      <default>true</default>
+    </key>
+    <key name="show-tracker-scrapes" type="b">
+      <default>false</default>
+    </key>
+    <key name="sort-mode" type="s">
+      <choices>
+        <choice value="sort-by-activity" />
+        <choice value="sort-by-age" />
+        <choice value="sort-by-name" />
+        <choice value="sort-by-progress" />
+        <choice value="sort-by-queue" />
+        <choice value="sort-by-ratio" />
+        <choice value="sort-by-size" />
+        <choice value="sort-by-state" />
+        <choice value="sort-by-time-left" />
+      </choices>
+      <default>"sort-by-name"</default>
+    </key>
+    <key name="sort-reversed" type="b">
+      <default>false</default>
+    </key>
+    <key name="statusbar-stats" type="s">
+      <choices>
+        <choice value="session-ratio" />
+        <choice value="session-transfer" />
+        <choice value="total-ratio" />
+        <choice value="total-transfer" />
+      </choices>
+      <default>"total-ratio"</default>
+    </key>
+    <key name="torrent-added-notification-enabled" type="b">
+      <default>true</default>
+    </key>
+    <key name="torrent-complete-notification-enabled" type="b">
+      <default>true</default>
+    </key>
+    <key name="torrent-complete-sound-command" type="as">
+      <default>["canberra-gtk-play", "-i", "complete-download", "-d", "transmission torrent downloaded"]</default>
+    </key>
+    <key name="torrent-complete-sound-enabled" type="b">
+      <default>true</default>
+    </key>
+    <key name="trash-can-enabled" type="b">
+      <default>true</default>
+    </key>
+    <key name="user-has-given-informed-consent" type="b">
+      <default>false</default>
+    </key>
+    <key name="watch-dir" type="s">
+      <default>""</default>
+    </key>
+    <key name="watch-dir-enabled" type="b">
+      <default>false</default>
+    </key>
+  </schema>
+</schemalist>

@@ -113,7 +113,6 @@ private:
     bool refresh_actions();
     void refresh_actions_soon();
 
-    void on_main_window_size_allocated();
     void on_main_window_focus_in();
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
@@ -130,7 +129,6 @@ private:
 
     bool on_rpc_changed_idle(tr_rpc_callback_type type, tr_torrent_id_t torrent_id);
 
-    void placeWindowFromPrefs();
     void presentMainWindow();
     void hideMainWindow();
     void toggleMainWindow();
@@ -166,6 +164,8 @@ private:
     bool call_rpc_for_selected_torrents(std::string const& method);
     void remove_selected(bool delete_files);
 
+    void update_tray_icon_visibility();
+
     static tr_rpc_callback_status on_rpc_changed(
         tr_session* session,
         tr_rpc_callback_type type,
@@ -179,6 +179,8 @@ private:
     bool start_paused_ = false;
     bool is_iconified_ = false;
     bool is_closing_ = false;
+
+    Glib::RefPtr<Gio::Settings> const settings_;
 
     Glib::RefPtr<Gtk::Builder> ui_builder_;
 
@@ -246,7 +248,7 @@ void Application::Impl::show_details_dialog_for_selected_torrents()
 
     if (dialog_it == details_.end())
     {
-        auto dialog = DetailsDialog::create(*wind_, core_);
+        auto dialog = DetailsDialog::create(*wind_, core_, settings_);
         dialog->set_torrents(ids);
         gtr_window_on_close(*dialog, [this, key]() { details_.erase(key); });
         dialog_it = details_.try_emplace(key, std::move(dialog)).first;
@@ -383,39 +385,6 @@ void ensure_magnet_handler_exists()
 }
 
 } // namespace
-
-void Application::Impl::on_main_window_size_allocated()
-{
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    bool const is_maximized = wind_->is_maximized();
-#else
-    auto const gdk_window = wind_->get_window();
-    bool const is_maximized = gdk_window != nullptr && (gdk_window->get_state() & Gdk::WINDOW_STATE_MAXIMIZED) != 0;
-#endif
-
-    gtr_pref_flag_set(TR_KEY_main_window_is_maximized, is_maximized);
-
-    if (!is_maximized)
-    {
-#if !GTKMM_CHECK_VERSION(4, 0, 0)
-        int x = 0;
-        int y = 0;
-        wind_->get_position(x, y);
-        gtr_pref_int_set(TR_KEY_main_window_x, x);
-        gtr_pref_int_set(TR_KEY_main_window_y, y);
-#endif
-
-        int w = 0;
-        int h = 0;
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-        wind_->get_default_size(w, h);
-#else
-        wind_->get_size(w, h);
-#endif
-        gtr_pref_int_set(TR_KEY_main_window_width, w);
-        gtr_pref_int_set(TR_KEY_main_window_height, h);
-    }
-}
 
 /***
 **** listen to changes that come from RPC
@@ -585,25 +554,18 @@ void Application::Impl::on_startup()
 
     gtr_pref_flag_set(TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(session));
     gtr_pref_int_set(TR_KEY_peer_port, tr_sessionGetPeerPort(session));
-    core_ = Session::create(session);
+    core_ = Session::create(session, settings_);
 
     /* init the ui manager */
     ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));
-    auto const actions = gtr_actions_init(ui_builder_, this);
+    auto const actions = gtr_actions_init(ui_builder_, settings_, this);
 
     auto const main_menu = gtr_action_get_object<Gio::Menu>("main-window-menu");
     app_.set_menubar(main_menu);
 
     /* create main window now to be a parent to any error dialogs */
-    wind_ = MainWindow::create(app_, actions, core_);
+    wind_ = MainWindow::create(app_, actions, core_, settings_);
     wind_->set_show_menubar(true);
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    wind_->property_maximized().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
-    wind_->property_default_width().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
-    wind_->property_default_height().signal_changed().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
-#else
-    wind_->signal_size_allocate().connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated)));
-#endif
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     auto const shortcut_controller = Gtk::ShortcutController::create(gtr_shortcuts_get_from_menu(main_menu));
@@ -616,7 +578,7 @@ void Application::Impl::on_startup()
     tr_sessionSetRPCCallback(session, &Impl::on_rpc_changed, this);
 
     /* check & see if it's time to update the blocklist */
-    if (gtr_pref_flag_get(TR_KEY_blocklist_enabled) && gtr_pref_flag_get(TR_KEY_blocklist_updates_enabled))
+    if (gtr_pref_flag_get(TR_KEY_blocklist_enabled) && settings_->get_boolean(ClientPrefs::Key::BlocklistUpdatesEnabled))
     {
         int64_t const last_time = gtr_pref_int_get(TR_KEY_blocklist_date);
         int const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
@@ -657,7 +619,7 @@ void Application::Impl::on_activate()
 void Application::Impl::open_files(std::vector<Glib::RefPtr<Gio::File>> const& files)
 {
     bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents) && !start_paused_;
-    bool const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
+    bool const do_prompt = settings_->get_boolean(ClientPrefs::Key::ShowOptionsWindow);
     bool const do_notify = true;
 
     core_->add_files(files, do_start, do_prompt, do_notify);
@@ -695,6 +657,7 @@ Application::Impl::Impl(Application& app, std::string const& config_dir, bool st
     , config_dir_(config_dir)
     , start_paused_(start_paused)
     , is_iconified_(is_iconified)
+    , settings_(Gio::Settings::create("org.transmissionbt.Transmission"))
 {
 }
 
@@ -707,7 +670,7 @@ void Application::Impl::app_setup()
 {
     if (is_iconified_)
     {
-        gtr_pref_flag_set(TR_KEY_show_notification_area_icon, true);
+        settings_->set_boolean(ClientPrefs::Key::ShowNotificationAreaIcon, true);
     }
 
     gtr_actions_set_core(core_);
@@ -726,7 +689,9 @@ void Application::Impl::app_setup()
     main_window_setup();
 
     /* set up the icon */
-    on_prefs_changed(TR_KEY_show_notification_area_icon);
+    settings_->signal_changed(ClientPrefs::Key::ShowNotificationAreaIcon)
+        .connect(sigc::hide<0>(sigc::mem_fun(*this, &Impl::update_tray_icon_visibility)));
+    update_tray_icon_visibility();
 
     /* start model update timer */
     timer_ = Glib::signal_timeout().connect_seconds(
@@ -747,7 +712,7 @@ void Application::Impl::app_setup()
         gtr_action_set_toggled("toggle-main-window", false);
     }
 
-    if (!gtr_pref_flag_get(TR_KEY_user_has_given_informed_consent))
+    if (!settings_->get_boolean(ClientPrefs::Key::UserHasGivenInformedConsent))
     {
         auto w = std::make_shared<Gtk::MessageDialog>(
             *wind_,
@@ -761,12 +726,12 @@ void Application::Impl::app_setup()
         w->add_button(_("I _Agree"), TR_GTK_RESPONSE_TYPE(ACCEPT));
         w->set_default_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
         w->signal_response().connect(
-            [w](int response) mutable
+            [this, w](int response) mutable
             {
                 if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
                 {
                     // only show it once
-                    gtr_pref_flag_set(TR_KEY_user_has_given_informed_consent, true);
+                    settings_->set_boolean(ClientPrefs::Key::UserHasGivenInformedConsent, true);
                     w.reset();
                 }
                 else
@@ -776,16 +741,6 @@ void Application::Impl::app_setup()
             });
         w->show();
     }
-}
-
-void Application::Impl::placeWindowFromPrefs()
-{
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    wind_->set_default_size((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
-#else
-    wind_->resize((int)gtr_pref_int_get(TR_KEY_main_window_width), (int)gtr_pref_int_get(TR_KEY_main_window_height));
-    wind_->move((int)gtr_pref_int_get(TR_KEY_main_window_x), (int)gtr_pref_int_get(TR_KEY_main_window_y));
-#endif
 }
 
 void Application::Impl::presentMainWindow()
@@ -801,7 +756,6 @@ void Application::Impl::presentMainWindow()
 
     if (!wind_->get_visible())
     {
-        placeWindowFromPrefs();
         gtr_widget_set_visible(*wind_, true);
     }
 
@@ -1017,11 +971,6 @@ void Application::Impl::on_app_exit()
     /* clear the UI */
     core_->clear();
 
-    /* ensure the window is in its previous position & size.
-     * this seems to be necessary because changing the main window's
-     * child seems to unset the size */
-    placeWindowFromPrefs();
-
     /* shut down libT */
     /* since tr_sessionClose () is a blocking function,
      * delegate its call to another thread here... when it's done,
@@ -1109,7 +1058,7 @@ void Application::Impl::on_main_window_focus_in()
 void Application::Impl::on_add_torrent(tr_ctor* ctor)
 {
     auto w = std::shared_ptr<OptionsDialog>(
-        OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
+        OptionsDialog::create(*wind_, core_, settings_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
     gtr_window_on_close(*w, [w]() mutable { w.reset(); });
 
@@ -1161,17 +1110,6 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
 
     case TR_KEY_blocklist_url:
         tr_blocklistSetURL(tr, gtr_pref_string_get(key).c_str());
-        break;
-
-    case TR_KEY_show_notification_area_icon:
-        if (bool const show = gtr_pref_flag_get(key); show && icon_ == nullptr)
-        {
-            icon_ = SystemTrayIcon::create(*wind_, core_);
-        }
-        else if (!show && icon_ != nullptr)
-        {
-            icon_.reset();
-        }
         break;
 
     case TR_KEY_speed_limit_down_enabled:
@@ -1338,6 +1276,18 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
 
     default:
         break;
+    }
+}
+
+void Application::Impl::update_tray_icon_visibility()
+{
+    if (bool const show = settings_->get_boolean(ClientPrefs::Key::ShowNotificationAreaIcon); show && icon_ == nullptr)
+    {
+        icon_ = SystemTrayIcon::create(*wind_, core_);
+    }
+    else if (!show && icon_ != nullptr)
+    {
+        icon_.reset();
     }
 }
 
@@ -1526,7 +1476,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else if (action_name == "open-torrent")
     {
-        auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
+        auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_, settings_));
         gtr_window_on_close(*w, [w]() mutable { w.reset(); });
         w->show();
     }
@@ -1563,7 +1513,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
 
         if (!ids.empty())
         {
-            auto w = std::shared_ptr<RelocateDialog>(RelocateDialog::create(*wind_, core_, ids));
+            auto w = std::shared_ptr<RelocateDialog>(RelocateDialog::create(*wind_, core_, settings_, ids));
             gtr_window_on_close(*w, [w]() mutable { w.reset(); });
             w->show();
         }
@@ -1614,7 +1564,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     {
         if (prefs_ == nullptr)
         {
-            prefs_ = PrefsDialog::create(*wind_, core_);
+            prefs_ = PrefsDialog::create(*wind_, core_, settings_);
             gtr_window_on_close(*prefs_, [this]() { prefs_.reset(); });
         }
 
@@ -1624,7 +1574,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     {
         if (msgwin_ == nullptr)
         {
-            msgwin_ = MessageLogWindow::create(*wind_, core_);
+            msgwin_ = MessageLogWindow::create(*wind_, core_, settings_);
             gtr_window_on_close(
                 *msgwin_,
                 [this]()

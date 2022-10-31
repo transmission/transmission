@@ -32,7 +32,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(Session)
 
-    static Glib::RefPtr<Session> create(tr_session* session);
+    static Glib::RefPtr<Session> create(tr_session* session, Glib::RefPtr<Gio::Settings> const& settings);
 
     tr_session* close();
 
@@ -130,7 +130,7 @@ public:
     sigc::signal<void(bool)>& signal_port_tested();
 
 protected:
-    explicit Session(tr_session* session);
+    explicit Session(tr_session* session, Glib::RefPtr<Gio::Settings> const& settings);
 
 private:
     class Impl;
