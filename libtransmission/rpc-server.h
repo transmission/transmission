@@ -155,7 +155,8 @@ public:
     std::unique_ptr<struct tr_rpc_address> bind_address_;
 
     std::unique_ptr<libtransmission::Timer> start_retry_timer;
-    struct evhttp* httpd = nullptr;
+    std::unique_ptr<struct evhttp, void (*)(struct evhttp*)> httpd{ nullptr, [](evhttp*) {
+                                                                   } };
     tr_session* const session;
 
     size_t login_attempts_ = 0U;

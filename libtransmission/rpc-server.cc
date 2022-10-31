@@ -675,7 +675,7 @@ static void rpc_server_start_retry_cancel(tr_rpc_server* server)
 
 static void startServer(tr_rpc_server* server)
 {
-    if (server->httpd != nullptr)
+    if (server->httpd)
     {
         return;
     }
@@ -717,7 +717,7 @@ static void startServer(tr_rpc_server* server)
     else
     {
         evhttp_set_gencb(httpd, handle_request, server);
-        server->httpd = httpd;
+        server->httpd = std::unique_ptr<evhttp, void (*)(evhttp*)>{ httpd, evhttp_free };
 
         tr_logAddInfo(fmt::format(_("Listening for RPC and Web requests on '{address}'"), fmt::arg("address", addr_port_str)));
     }
@@ -731,17 +731,15 @@ static void stopServer(tr_rpc_server* server)
 
     rpc_server_start_retry_cancel(server);
 
-    struct evhttp* httpd = server->httpd;
-
-    if (httpd == nullptr)
+    auto& httpd = server->httpd;
+    if (httpd)
     {
         return;
     }
 
     auto const address = server->getBindAddress();
 
-    server->httpd = nullptr;
-    evhttp_free(httpd);
+    httpd.reset();
 
     if (server->bind_address_->type == TR_RPC_AF_UNIX)
     {
