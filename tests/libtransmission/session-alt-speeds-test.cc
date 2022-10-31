@@ -62,18 +62,43 @@ protected:
 
     static auto midnightSundayMorning()
     {
-        // new year's, Jan 1 2022
-        struct tm tmdate = {};
+        // new year's, Sun Jan 1 2023
+        auto tmdate = tm{};
         tmdate.tm_sec = 0;
         tmdate.tm_min = 0;
         tmdate.tm_hour = 0;
-        tmdate.tm_mday = 0;
+        tmdate.tm_mday = 1;
         tmdate.tm_mon = 0;
-        tmdate.tm_year = 2022;
+        tmdate.tm_year = 2023 - 1900;
         tmdate.tm_wday = 0; // Sunday
         tmdate.tm_yday = 0;
-        tmdate.tm_isdst = -1;
-        return mktime(&tmdate);
+        tmdate.tm_isdst = 0;
+
+        fmt::print("{:s}:{:d} tm_sec {:d}\n", __FILE__, __LINE__, tmdate.tm_sec);
+        fmt::print("{:s}:{:d} tm_min {:d}\n", __FILE__, __LINE__, tmdate.tm_min);
+        fmt::print("{:s}:{:d} tm_hour {:d}\n", __FILE__, __LINE__, tmdate.tm_hour);
+        fmt::print("{:s}:{:d} tm_mday {:d}\n", __FILE__, __LINE__, tmdate.tm_mday);
+        fmt::print("{:s}:{:d} tm_mon {:d}\n", __FILE__, __LINE__, tmdate.tm_mon);
+        fmt::print("{:s}:{:d} tm_year {:d}\n", __FILE__, __LINE__, tmdate.tm_year);
+        fmt::print("{:s}:{:d} tm_wday {:d}\n", __FILE__, __LINE__, tmdate.tm_wday);
+        fmt::print("{:s}:{:d} tm_yday {:d}\n", __FILE__, __LINE__, tmdate.tm_yday);
+        fmt::print("{:s}:{:d} tm_isdst {:d}\n", __FILE__, __LINE__, tmdate.tm_isdst);
+        fmt::print("{:s}:{:d}\n", __FILE__, __LINE__);
+
+        auto const ret = mktime(&tmdate);
+        fmt::print("{:s}:{:d} tm_sec {:d}\n", __FILE__, __LINE__, tmdate.tm_sec);
+        fmt::print("{:s}:{:d} tm_min {:d}\n", __FILE__, __LINE__, tmdate.tm_min);
+        fmt::print("{:s}:{:d} tm_hour {:d}\n", __FILE__, __LINE__, tmdate.tm_hour);
+        fmt::print("{:s}:{:d} tm_mday {:d}\n", __FILE__, __LINE__, tmdate.tm_mday);
+        fmt::print("{:s}:{:d} tm_mon {:d}\n", __FILE__, __LINE__, tmdate.tm_mon);
+        fmt::print("{:s}:{:d} tm_year {:d}\n", __FILE__, __LINE__, tmdate.tm_year);
+        fmt::print("{:s}:{:d} tm_wday {:d}\n", __FILE__, __LINE__, tmdate.tm_wday);
+        fmt::print("{:s}:{:d} tm_yday {:d}\n", __FILE__, __LINE__, tmdate.tm_yday);
+        fmt::print("{:s}:{:d} tm_isdst {:d}\n", __FILE__, __LINE__, tmdate.tm_isdst);
+        fmt::print("{:s}:{:d}\n", __FILE__, __LINE__);
+        fmt::print(FMT_STRING("{:s}:{:d} {:d}\n"), __FILE__, __LINE__, ret);
+        fmt::print(FMT_STRING("{:s}:{:d} {:%Y-%m-%d %H:%M:%S}\n"), __FILE__, __LINE__, tmdate);
+        return ret;
     }
 };
 
@@ -112,6 +137,7 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
 
     auto now = midnightSundayMorning(); // midnight
     mediator.current_time_ = now;
+    fmt::print("{:s}:{:d} {:%Y-%m-%d %H:%M:%S}\n", __FILE__, __LINE__, fmt::localtime(now));
 
     auto alt_speeds = tr_session_alt_speeds{ mediator };
     alt_speeds.setStartMinute(60); // start at 1AM
@@ -123,12 +149,14 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
 
     // Confirm that walking up to the threshold, but not crossing it, does not enable
     now += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
+    fmt::print("{:s}:{:d} {:%Y-%m-%d %H:%M:%S}\n", __FILE__, __LINE__, fmt::localtime(now));
     mediator.current_time_ = now;
     alt_speeds.checkScheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
     // Confirm that crossin the threshold does enable
     now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
+    fmt::print("{:s}:{:d} {:%Y-%m-%d %H:%M:%S}\n", __FILE__, __LINE__, fmt::localtime(now));
     mediator.current_time_ = now;
     alt_speeds.checkScheduler();
     ASSERT_EQ(n_changes + 1, std::size(mediator.changelog_));
@@ -139,12 +167,14 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
 
     // Confirm that walking up to the threshold, but not crossing it, does not disable
     now += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
+    fmt::print("{:s}:{:d} {:%Y-%m-%d %H:%M:%S}\n", __FILE__, __LINE__, fmt::localtime(now));
     mediator.current_time_ = now;
     alt_speeds.checkScheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
     // Confirm that crossin the threshold does disable
     now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
+    fmt::print("{:s}:{:d} {:%Y-%m-%d %H:%M:%S}\n", __FILE__, __LINE__, fmt::localtime(now));
     mediator.current_time_ = now;
     alt_speeds.checkScheduler();
     ASSERT_EQ(n_changes + 1, std::size(mediator.changelog_));
