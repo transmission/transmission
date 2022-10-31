@@ -56,6 +56,7 @@ class tr_web;
 struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
+struct tr_variant;
 
 namespace libtransmission
 {
@@ -270,7 +271,7 @@ private:
     };
 
 public:
-    explicit tr_session(std::string_view config_dir);
+    explicit tr_session(std::string_view config_dir, tr_variant* settings_dict = nullptr);
 
     [[nodiscard]] std::string_view sessionId() const noexcept
     {
@@ -883,7 +884,8 @@ private:
 
     struct init_data;
     void initImpl(init_data&);
-    void setImpl(init_data&, bool force);
+    void setSettings(tr_variant* settings_dict, bool force);
+
     void closeImplStart();
     void closeImplWaitForIdleUdp();
     void closeImplFinish();
@@ -978,6 +980,7 @@ private:
     std::string const config_dir_;
     std::string const resume_dir_;
     std::string const torrent_dir_;
+    std::string const blocklist_dir_;
 
     std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
 
@@ -1043,59 +1046,70 @@ private:
     /// other fields
 
 public:
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+
     struct tr_event_handle* events = nullptr;
 
+    // depends-on: announcer_udp_
+    // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
-
-private:
-    tr_torrents torrents_;
-
-    std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
-
-    tr_open_files open_files_;
-
-public:
-    // depends-on: torrents_
-    std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
-
-private:
-    std::unique_ptr<tr_web> web_;
-
-    std::unique_ptr<tr_lpd> lpd_;
-
-    AltSpeedMediator alt_speed_mediator_{ *this };
-    tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
-
-public:
-    struct tr_announcer* announcer = nullptr;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_;
 
 private:
+    // depends-on: top_bandwidth_
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
+
+    // depends-on: settings_, timer_maker_
+    PortForwardingMediator port_forwarding_mediator_{ *this };
+    std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
+
+    // depends-on: events, top_bandwidth_
+    AltSpeedMediator alt_speed_mediator_{ *this };
+    tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
+
+    tr_open_files open_files_;
+
+    // depends-on: open_files_
+    tr_torrents torrents_;
+
+    // depends-on: timer_maker_, top_bandwidth_, torrents_
+    std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
+
+public:
+    // depends-on: settings_, open_files_, torrents_
+    std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
+
+private:
+    // depends-on: settings_, events, torrents_
+    WebMediator web_mediator_{ this };
+    std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
+
+    // depends-on: peer_mgr_, torrents_
+    LpdMediator lpd_mediator_{ *this };
+
+    // depends-on: lpd_mediator_
+    std::unique_ptr<tr_lpd> lpd_;
+
     // depends-on: dns_, udp_core_
     AnnouncerUdpMediator announcer_udp_mediator_{ *this };
 
 public:
+    // depends-on: announcer_udp_mediator_
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
+    // depends-on: settings_, torrents_, announcer_udp_
+    struct tr_announcer* announcer = nullptr;
+
 private:
-    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
-
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
-
+    // depends-on: event_base_, timer_maker_, settings_, torrents_
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
-    PortForwardingMediator port_forwarding_mediator_{ *this };
-
-    std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
-
-    WebMediator web_mediator_{ this };
-
-    LpdMediator lpd_mediator_{ *this };
-
+    // depends-on: alt_speeds_, udp_core_, torrents_
     std::unique_ptr<libtransmission::Timer> now_timer_;
 
+    // depends-on: torrents_
     std::unique_ptr<libtransmission::Timer> save_timer_;
 
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();

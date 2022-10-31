@@ -76,6 +76,13 @@ struct tr_variant;
 
 struct tr_session_settings
 {
+    tr_session_settings() = default;
+
+    explicit tr_session_settings(tr_variant* src)
+    {
+        load(src);
+    }
+
     void load(tr_variant* src);
     void save(tr_variant* tgt) const;
 

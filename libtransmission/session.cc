@@ -451,8 +451,8 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
         tr_logSetLevel(static_cast<tr_log_level>(val));
     }
 
-    /* start the libtransmission thread */
-    tr_net_init(); /* must go before tr_eventInit */
+    // start the libtransmission thread
+    tr_net_init(); // must go before tr_eventInit
     tr_eventInit(session);
     TR_ASSERT(session->events != nullptr);
 
@@ -519,7 +519,7 @@ void tr_session::initImpl(init_data& data)
     auto lock = unique_lock();
     TR_ASSERT(tr_amInEventThread(this));
 
-    tr_variant const* const client_settings = data.client_settings;
+    auto* const client_settings = data.client_settings;
     TR_ASSERT(tr_variantIsDict(client_settings));
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
@@ -536,22 +536,15 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    /**
-    ***  Blocklist
-    **/
-
-    tr_sys_dir_create(tr_pathbuf{ configDir(), "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
     this->blocklists_ = BlocklistFile::loadBlocklists(configDir(), useBlocklist());
 
     tr_announcerInit(this);
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
-    tr_sessionSet(this, &settings);
+    setSettings(client_settings, true);
 
     this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
-
-    this->web_ = tr_web::create(this->web_mediator_);
 
     if (this->allowsLPD())
     {
@@ -567,17 +560,19 @@ void tr_session::initImpl(init_data& data)
 
 static void updateBandwidth(tr_session* session, tr_direction dir);
 
-void tr_session::setImpl(init_data& data, bool force)
+void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
     TR_ASSERT(tr_amInEventThread(this));
 
-    tr_variant* const settings = data.client_settings;
+    auto* const settings = settings_dict;
     TR_ASSERT(tr_variantIsDict(settings));
 
-    TR_ASSERT(tr_variantIsDict(settings));
+    // update the `settings_` field
     auto const old_settings = settings_;
     auto& new_settings = settings_;
     new_settings.load(settings);
+
+    // the rest of the func is session_ responding to settings changes
 
     if (auto const& val = new_settings.log_level; force || val != old_settings.log_level)
     {
@@ -654,29 +649,31 @@ void tr_session::setImpl(init_data& data, bool force)
     updateBandwidth(this, TR_UP);
     updateBandwidth(this, TR_DOWN);
 
-    rpc_server_ = std::make_unique<tr_rpc_server>(this, settings);
-
     alt_speeds_.load(settings);
-
-    data.done_cv.notify_one();
+    rpc_server_->load(settings);
 }
 
 void tr_sessionSet(tr_session* session, tr_variant* settings)
 {
-    auto data = tr_session::init_data{};
-    data.client_settings = settings;
-
     // run it in the libtransmission thread
 
     if (tr_amInEventThread(session))
     {
-        session->setImpl(data, false);
+        session->setSettings(settings, false);
     }
     else
     {
         auto lock = session->unique_lock();
-        tr_runInEventThread(session, [&session, &data]() { session->setImpl(data, false); });
-        data.done_cv.wait(lock);
+
+        auto done_cv = std::condition_variable_any{};
+        tr_runInEventThread(
+            session,
+            [&session, &settings, &done_cv]()
+            {
+                session->setSettings(settings, false);
+                done_cv.notify_one();
+            });
+        done_cv.wait(lock);
     }
 }
 
@@ -2221,15 +2218,17 @@ auto makeEventBase()
 
 } // namespace
 
-tr_session::tr_session(std::string_view config_dir)
+tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , event_base_{ makeEventBase() }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
+    , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), tr_peerMgrFree }
+    , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->startRepeating(1s);
