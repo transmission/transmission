@@ -883,7 +883,7 @@ void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
-    , bind_address_(std::make_unique<struct tr_rpc_address>()) // TODO(ckerr) why is thnis a unique_ptr
+    , bind_address_(std::make_unique<struct tr_rpc_address>())
     , session{ session_in }
 {
     load(settings);
