@@ -141,7 +141,7 @@ private:
     static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
     static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
 
-    // is turtle mode on right now?
+    // are alt speeds active right now?
     bool is_active_ = false;
 
     // bitfield of all the minutes in a week.
@@ -149,7 +149,7 @@ private:
     // alt speeds on or off at that given minute.
     std::bitset<10080> minutes_{};
 
-    // recent action that was done by turtle's automatic switch
+    // recent change that was made by the scheduler
     std::optional<bool> scheduler_set_is_active_to_;
 
 #define V(key, name, type, default_value, comment) type name = type{ default_value };
