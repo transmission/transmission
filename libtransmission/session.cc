@@ -1487,7 +1487,7 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled != session->allowsUTP())
+    if (enabled == session->allowsUTP())
     {
         return;
     }
