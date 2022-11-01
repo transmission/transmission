@@ -1571,6 +1571,17 @@ dialog {
   padding-left: 10px;
 }
 
+/// OPEN TORRENT DIALOG
+.open-torrent {
+  input {
+    margin-bottom: 15px;
+  }
+
+  #auto-start-label {
+    margin-left: 5px;
+  }
+}
+
 /// HOTKEYS DIALOG
 
 .shortcuts-dialog {

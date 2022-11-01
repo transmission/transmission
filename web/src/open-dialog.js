@@ -160,7 +160,7 @@ export class OpenDialog extends EventTarget {
     label = document.createElement('label');
     label.id = 'add-dialog-folder-label';
     label.for = input_id;
-    label.textContent = 'Destination folder:';
+    label.textContent = 'Destination folder: ';
     workarea.append(label);
 
     const freespace = document.createElement('span');
