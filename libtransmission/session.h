@@ -1074,17 +1074,17 @@ private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
-    // depends-on: timer_maker_, top_bandwidth_, torrents_
-    std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
+    // depends-on: settings_, events, torrents_
+    WebMediator web_mediator_{ this };
+    std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
 public:
     // depends-on: settings_, open_files_, torrents_
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
-    // depends-on: settings_, events, torrents_
-    WebMediator web_mediator_{ this };
-    std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
+    // depends-on: timer_maker_, top_bandwidth_, torrents_, web_
+    std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
     // depends-on: peer_mgr_, torrents_
     LpdMediator lpd_mediator_{ *this };
@@ -1099,11 +1099,11 @@ public:
     // depends-on: announcer_udp_mediator_
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
-    // depends-on: settings_, torrents_, announcer_udp_
+    // depends-on: settings_, torrents_, web_, announcer_udp_
     struct tr_announcer* announcer = nullptr;
 
 private:
-    // depends-on: event_base_, timer_maker_, settings_, torrents_
+    // depends-on: event_base_, timer_maker_, settings_, torrents_, web_
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
     // depends-on: alt_speeds_, udp_core_, torrents_
