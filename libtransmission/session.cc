@@ -57,7 +57,6 @@
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
 #include "tr-utp.h"
-#include "trevent.h"
 #include "utils.h"
 #include "variant.h"
 #include "verify.h"
@@ -229,7 +228,7 @@ void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byt
 
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
 {
-    tr_runInEventThread(session_, std::move(func), std::move(response));
+    session_->runInSessionThread(std::move(func), std::move(response));
 }
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
@@ -451,27 +450,15 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
         tr_logSetLevel(static_cast<tr_log_level>(val));
     }
 
-    // start the libtransmission thread
-    tr_net_init(); // must go before tr_eventInit
-    tr_eventInit(session);
-    TR_ASSERT(session->events != nullptr);
-
     auto data = tr_session::init_data{};
     data.config_dir = config_dir;
     data.message_queuing_enabled = message_queueing_enabled;
     data.client_settings = client_settings;
 
-    // run it in the libtransmission thread
-    if (tr_amInEventThread(session))
-    {
-        session->initImpl(data);
-    }
-    else
-    {
-        auto lock = session->unique_lock();
-        tr_runInEventThread(session, [&session, &data]() { session->initImpl(data); });
-        data.done_cv.wait(lock); // wait for the session to be ready
-    }
+    // run initImpl() in the libtransmission thread
+    auto lock = session->unique_lock();
+    session->runInSessionThread([&session, &data]() { session->initImpl(data); });
+    data.done_cv.wait(lock); // wait for the session to be ready
 
     return session;
 }
@@ -517,7 +504,7 @@ void tr_session::onNowTimer()
 void tr_session::initImpl(init_data& data)
 {
     auto lock = unique_lock();
-    TR_ASSERT(tr_amInEventThread(this));
+    TR_ASSERT(amInSessionThread());
 
     auto* const client_settings = data.client_settings;
     TR_ASSERT(tr_variantIsDict(client_settings));
@@ -562,7 +549,7 @@ static void updateBandwidth(tr_session* session, tr_direction dir);
 
 void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
-    TR_ASSERT(tr_amInEventThread(this));
+    TR_ASSERT(amInSessionThread());
 
     auto* const settings = settings_dict;
     TR_ASSERT(tr_variantIsDict(settings));
@@ -657,7 +644,7 @@ void tr_sessionSet(tr_session* session, tr_variant* settings)
 {
     // run it in the libtransmission thread
 
-    if (tr_amInEventThread(session))
+    if (session->amInSessionThread())
     {
         session->setSettings(settings, false);
     }
@@ -666,8 +653,7 @@ void tr_sessionSet(tr_session* session, tr_variant* settings)
         auto lock = session->unique_lock();
 
         auto done_cv = std::condition_variable_any{};
-        tr_runInEventThread(
-            session,
+        session->runInSessionThread(
             [&session, &settings, &done_cv]()
             {
                 session->setSettings(settings, false);
@@ -786,7 +772,7 @@ void tr_session::setPeerPort(tr_port port_in)
         }
     };
 
-    tr_runInEventThread(this, in_session_thread, port_in);
+    runInSessionThread(in_session_thread, port_in);
 }
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
@@ -949,7 +935,7 @@ void tr_session::AltSpeedMediator::isActiveChanged(bool is_active, tr_session_al
         }
     };
 
-    tr_runInEventThread(&session_, in_session_thread);
+    session_.runInSessionThread(in_session_thread);
 }
 
 /***
@@ -1180,27 +1166,26 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-void tr_session::closeImplStart()
+void tr_session::closeImplPt1()
 {
     is_closing_ = true;
 
+    // close the low-hanging fruit that can be closed immediately w/o consequences
+    verifier_.reset();
+    save_timer_.reset();
+    now_timer_.reset();
+    rpc_server_.reset();
     lpd_.reset();
+    port_forwarding_.reset();
+    closePeerPort();
 
+    // tell other items to start shutting down
     udp_core_->startShutdown();
     announcer_udp_->startShutdown();
 
-    save_timer_.reset();
-    now_timer_.reset();
-
-    verifier_.reset();
-    port_forwarding_.reset();
-
-    closePeerPort();
-    this->rpc_server_.reset();
-
-    /* Close the torrents. Get the most active ones first so that
-     * if we can't get them all closed in a reasonable amount of time,
-     * at least we get the most important ones first. */
+    // Close the torrents in order of most active to least active
+    // so that the most important announce=stopped events are
+    // fired out first...
     auto torrents = getAllTorrents();
     std::sort(
         std::begin(torrents),
@@ -1211,128 +1196,86 @@ void tr_session::closeImplStart()
             auto const b_cur = b->downloadedCur + b->uploadedCur;
             return a_cur > b_cur; // larger xfers go first
         });
-
     for (auto* tor : torrents)
     {
         tr_torrentFree(tor);
     }
-
     torrents.clear();
-
-    /* Close the announcer *after* closing the torrents
-       so that all the &event=stopped messages will be
-       queued to be sent by tr_announcerClose() */
+    // ...and now that all the torrents have been closed, any
+    // remaining `event=stopped` announce messages are queued in
+    // the announcer. The announcer's destructor sends all those
+    // out via `web_`...
     tr_announcerClose(this);
-
-    /* and this goes *after* announcer close so that
-       it won't be idle until the announce events are sent... */
-    this->web_->closeSoon();
-
+    // ...and now that those are queued, tell web_ that we're
+    // shutting down soon. This leaves the `event=stopped` messages
+    // in the queue but refuses to take any _new_ tasks
+    this->web_->startShutdown();
     this->cache.reset();
 
-    /* saveTimer is not used at this point, reusing for UDP shutdown wait */
+    // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
-    save_timer_ = timerMaker().create([this]() { closeImplWaitForIdleUdp(); });
-    save_timer_->start(1ms);
+    save_timer_ = timerMaker().create([this]() { closeImplPt2(); });
+    save_timer_->startRepeating(50ms);
 }
 
-void tr_session::closeImplWaitForIdleUdp()
+void tr_session::closeImplPt2()
 {
-    /* gotta keep udp running long enough to send out all
-       the &event=stopped UDP tracker messages */
+    // try to keep the UDP announcer alive long enough to send out
+    // all the &event=stopped tracker announces
     if (announcer_udp_ && !announcer_udp_->isIdle())
     {
         announcer_udp_->upkeep();
-        save_timer_->start(100ms);
         return;
     }
 
-    closeImplFinish();
-}
-
-void tr_session::closeImplFinish()
-{
     save_timer_.reset();
 
-    /* we had to wait until UDP trackers were closed before closing these: */
     this->announcer_udp_.reset();
     this->udp_core_.reset();
 
     stats().saveIfDirty();
     peer_mgr_.reset();
     tr_utpClose(this);
-    blocklists_.clear();
     openFiles().closeAll();
     is_closed_ = true;
 }
-
-static bool deadlineReached(time_t const deadline)
-{
-    return time(nullptr) >= deadline;
-}
-
-static auto constexpr ShutdownMaxSeconds = time_t{ 20 };
 
 void tr_sessionClose(tr_session* session)
 {
     TR_ASSERT(session != nullptr);
 
-    time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
+    static auto constexpr DeadlineSecs = 20s;
+    auto const deadline = std::chrono::steady_clock::now() + DeadlineSecs;
+    auto deadline_reached = [deadline]()
+    {
+        return std::chrono::steady_clock::now() >= deadline;
+    };
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
-    tr_logAddDebug(fmt::format("now is {}, deadline is {}", time(nullptr), deadline));
 
     /* close the session */
-    tr_runInEventThread(session, [session]() { session->closeImplStart(); });
+    session->runInSessionThread([session]() { session->closeImplPt1(); });
 
-    while (!session->isClosed() && !deadlineReached(deadline))
+    while (!session->isClosed() && !deadline_reached())
     {
         tr_logAddTrace("waiting for the libtransmission thread to finish");
         tr_wait_msec(10);
     }
 
-    /* "port_forwarding" and "tracker" have live sockets,
-     * so we need to keep the transmission thread alive
-     * for a bit while they tell the router & tracker
-     * that we're closing now */
-    while (
-        (session->port_forwarding_ || !session->web_->isClosed() || session->announcer != nullptr || session->announcer_udp_) &&
-        !deadlineReached(deadline))
+    // There's usually a bit of housekeeping to do during shutdown,
+    // e.g. sending out `event=stopped` announcements to trackers,
+    // so wait a bit for the session thread to close.
+    while (!deadline_reached() && (!session->web_->isClosed() || session->announcer != nullptr || session->announcer_udp_))
     {
         tr_logAddTrace(fmt::format(
-            "waiting on port unmap ({}) or announcer ({})... now {} deadline {}",
+            "waiting on port unmap ({}) or announcer ({})... now {}",
             fmt::ptr(session->port_forwarding_.get()),
             fmt::ptr(session->announcer),
-            time(nullptr),
-            deadline));
+            time(nullptr)));
         tr_wait_msec(50);
     }
 
     session->web_.reset();
-
-    /* close the libtransmission thread */
-    tr_eventClose(session);
-
-    while (session->events != nullptr)
-    {
-        static bool forced = false;
-        tr_logAddTrace(
-            fmt::format("waiting for libtransmission thread to finish... now {} deadline {}", time(nullptr), deadline));
-        tr_wait_msec(10);
-
-        if (deadlineReached(deadline) && !forced)
-        {
-            tr_logAddTrace("calling event_loopbreak()");
-            forced = true;
-            event_base_loopbreak(session->eventBase());
-        }
-
-        if (deadlineReached(deadline + 3))
-        {
-            tr_logAddTrace("deadline+3 reached... calling break...");
-            break;
-        }
-    }
 
     delete session;
 }
@@ -1397,7 +1340,7 @@ size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
     data.session = session;
     data.ctor = ctor;
     data.done = false;
-    tr_runInEventThread(session, sessionLoadTorrents, &data);
+    session->runInSessionThread(sessionLoadTorrents, &data);
     while (!data.done)
     {
         tr_wait_msec(100);
@@ -1453,8 +1396,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
         return;
     }
 
-    tr_runInEventThread(
-        session,
+    session->runInSessionThread(
         [session, enabled]()
         {
             session->udp_core_.reset();
@@ -1504,8 +1446,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
         return;
     }
 
-    tr_runInEventThread(
-        session,
+    session->runInSessionThread(
         [session, enabled]()
         {
             session->lpd_.reset();
@@ -1600,7 +1541,7 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    tr_runInEventThread(session, [session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
+    session->runInSessionThread([session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
@@ -2210,19 +2151,13 @@ auto makeTorrentDir(std::string_view config_dir)
     return dir;
 }
 
-auto makeEventBase()
-{
-    tr_evthread_init();
-    return std::unique_ptr<event_base, void (*)(event_base*)>{ event_base_new(), event_base_free };
-}
-
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
-    , event_base_{ makeEventBase() }
+    , session_thread_{ tr_session_thread::create() }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
     , settings_{ settings_dict }

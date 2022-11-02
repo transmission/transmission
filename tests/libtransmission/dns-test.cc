@@ -12,7 +12,6 @@
 
 #include "dns-ev.h"
 #include "dns.h"
-#include "trevent.h" // for tr_evthread_init();
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
@@ -29,7 +28,7 @@ protected:
     {
         ::testing::Test::SetUp();
 
-        tr_evthread_init();
+        tr_session_thread::tr_evthread_init();
         event_base_ = event_base_new();
     }
 

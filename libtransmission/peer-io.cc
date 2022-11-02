@@ -480,7 +480,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     struct tr_peer_socket const socket)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(session->events != nullptr);
     auto lock = session->unique_lock();
 
     TR_ASSERT(isSupportedSocket(socket));
@@ -596,7 +595,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
 static void event_enable(tr_peerIo* io, short event)
 {
     TR_ASSERT(io->session != nullptr);
-    TR_ASSERT(io->session->events != nullptr);
 
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
 
@@ -633,8 +631,6 @@ static void event_enable(tr_peerIo* io, short event)
 
 static void event_disable(tr_peerIo* io, short event)
 {
-    TR_ASSERT(io->session->events != nullptr);
-
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
 
     if (need_events)
@@ -730,7 +726,6 @@ static void io_close_socket(tr_peerIo* io)
 tr_peerIo::~tr_peerIo()
 {
     auto const lock = session->unique_lock();
-    TR_ASSERT(session->events != nullptr);
 
     clearCallbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
