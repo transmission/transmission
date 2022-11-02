@@ -28,12 +28,15 @@ namespace libtransmission
 {
 namespace
 {
-using address_pair_t = std::pair<tr_address, tr_address>;
 
-auto constexpr FileFormatVersion = std::array<char, 4>{ 'v', '0', '0', '3' };
+// A test at the beginning of .bin files to ensure we don't load incompatible files
+auto constexpr BinContentsPrefix = std::string_view{ "-tr-blocklist-blocklist-3-" };
+
 auto constexpr BinSuffix = std::string_view{ ".bin" };
 
-void save(std::string_view filename, std::pair<tr_address, tr_address> const* ranges, size_t n_ranges)
+using address_pair_t = std::pair<tr_address, tr_address>;
+
+void save(std::string_view filename, address_pair_t const* ranges, size_t n_ranges)
 {
     auto out = std::ofstream{ tr_pathbuf{ filename }, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary };
     if (!out.is_open())
@@ -46,7 +49,7 @@ void save(std::string_view filename, std::pair<tr_address, tr_address> const* ra
         return;
     }
 
-    if (!out.write(std::data(FileFormatVersion), std::size(FileFormatVersion)) ||
+    if (!out.write(std::data(BinContentsPrefix), std::size(BinContentsPrefix)) ||
         !out.write(reinterpret_cast<char const*>(ranges), n_ranges * sizeof(*ranges)))
     {
         tr_logAddWarn(fmt::format(
@@ -350,21 +353,23 @@ void Blocklist::ensureLoaded() const
         return;
     }
 
+    // check to see if the file is usable:
     bool unsupported_file = false;
-    if (file_info->size < std::size(FileFormatVersion))
+    if (file_info->size < std::size(BinContentsPrefix)) // too small
     {
         unsupported_file = true;
     }
-    else if (((file_info->size - std::size(FileFormatVersion)) % sizeof(AddressPair)) != 0)
+    else if (((file_info->size - std::size(BinContentsPrefix)) % sizeof(AddressPair)) != 0) // wrong size
     {
         unsupported_file = true;
     }
     else
     {
-        auto version_string = std::array<char, std::size(FileFormatVersion)>{};
-        in.read(std::data(version_string), std::size(version_string));
-        unsupported_file = version_string != FileFormatVersion;
+        auto tmp = std::array<char, std::size(BinContentsPrefix)>{};
+        in.read(std::data(tmp), std::size(tmp));
+        unsupported_file = BinContentsPrefix != std::string_view{ std::data(tmp), std::size(tmp) };
     }
+
     if (unsupported_file)
     {
         tr_sys_path_remove(bin_file_);
