@@ -445,9 +445,32 @@ size_t BlocklistFile::setContent(char const* filename)
         return {};
     }
 
-    size_t keep = 0; // index in ranges
+    //separate before sorting
+    auto ipv4_ranges = std::vector<AddressRange>{};
+    auto ipv6_ranges = std::vector<AddressRange>{};
 
-    std::sort(std::begin(ranges), std::end(ranges), BlocklistFile::compareAddressRangesByFirstAddress);
+    for (auto const& range : ranges)
+    {
+        if (range.begin_ == 0 && range.end_ == 0)
+        {
+            // IPv6
+            ipv6_ranges.emplace_back(range);
+        }
+        else
+        {
+            ipv4_ranges.emplace_back(range);
+        }
+    }
+
+    std::sort(std::begin(ipv4_ranges), std::end(ipv4_ranges), BlocklistFile::compareAddressRangesByFirstAddress);
+    std::sort(std::begin(ipv6_ranges), std::end(ipv6_ranges), BlocklistFile::compareAddressRangesByFirstAddress);
+
+    // combine sorted
+    ranges.clear();
+    ranges.insert(ranges.end(), ipv4_ranges.begin(), ipv4_ranges.end());
+    ranges.insert(ranges.end(), ipv6_ranges.begin(), ipv6_ranges.end());
+
+    size_t keep = 0; // index in ranges
 
     // merge
     for (auto const& range : ranges)
@@ -574,16 +597,7 @@ void BlocklistFile::assertValidRules(std::vector<AddressRange> const& ranges)
         }
     }
 
-    for (size_t i = 1; i < std::size(ranges_ipv4); ++i)
-    {
-        TR_ASSERT(ranges_ipv4[i - 1].end_ < ranges_ipv4[i].begin_);
-    }
-
-    for (size_t i = 1; i < std::size(ranges_ipv6); ++i)
-    {
-        auto const& last_end_address = ranges_ipv6[i - 1].end6_;
-        auto const& start_address = ranges_ipv6[i].begin6_;
-        TR_ASSERT(memcmp(&last_end_address, &start_address, sizeof(start_address)) > 0);
-    }
+    TR_ASSERT(is_sorted(std::begin(ranges_ipv4), std::end(ranges_ipv4), BlocklistFile::compareAddressRangesByFirstAddress));
+    TR_ASSERT(is_sorted(std::begin(ranges_ipv6), std::end(ranges_ipv6), BlocklistFile::compareAddressRangesByFirstAddress));
 }
 #endif
