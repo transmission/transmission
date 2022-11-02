@@ -753,9 +753,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
         tr_torrentUseSpeedLimit(tor, TR_UP, false);
-        tor->setSpeedLimitBps(TR_UP, tor->session->speedLimitBps(TR_UP));
+        tor->setSpeedLimitBps(TR_UP, tr_toSpeedBytes(tor->session->speedLimitKBps(TR_UP)));
         tr_torrentUseSpeedLimit(tor, TR_DOWN, false);
-        tor->setSpeedLimitBps(TR_DOWN, tor->session->speedLimitBps(TR_DOWN));
+        tor->setSpeedLimitBps(TR_DOWN, tr_toSpeedBytes(tor->session->speedLimitKBps(TR_DOWN)));
         tr_torrentUseSessionLimits(tor, true);
     }
 
@@ -1000,9 +1000,9 @@ static time_t torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity acti
         -1;
 }
 
-static inline bool tr_torrentIsStalled(tr_torrent const* tor, time_t idle_secs)
+static inline bool tr_torrentIsStalled(tr_torrent const* tor, size_t idle_secs)
 {
-    return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60;
+    return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
 }
 
 tr_stat const* tr_torrentStat(tr_torrent* tor)

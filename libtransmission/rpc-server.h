@@ -28,6 +28,22 @@ namespace libtransmission
 class Timer;
 }
 
+#define RPC_SETTINGS_FIELDS(V) \
+    V(TR_KEY_anti_brute_force_enabled, is_anti_brute_force_enabled_, bool, false, "") \
+    V(TR_KEY_anti_brute_force_threshold, anti_brute_force_limit_, size_t, 100U, "") \
+    V(TR_KEY_rpc_authentication_required, authentication_required_, bool, false, "") \
+    V(TR_KEY_rpc_bind_address, bind_address_str_, std::string, "0.0.0.0", "") \
+    V(TR_KEY_rpc_enabled, is_enabled_, bool, false, "") \
+    V(TR_KEY_rpc_host_whitelist, host_whitelist_str_, std::string, "", "") \
+    V(TR_KEY_rpc_host_whitelist_enabled, is_host_whitelist_enabled_, bool, true, "") \
+    V(TR_KEY_rpc_port, port_, tr_port, tr_port::fromHost(TR_DEFAULT_RPC_PORT), "") \
+    V(TR_KEY_rpc_password, salted_password_, std::string, "", "") \
+    V(TR_KEY_rpc_socket_mode, socket_mode_, tr_mode_t, 0750, "") \
+    V(TR_KEY_rpc_url, url_, std::string, TR_DEFAULT_RPC_URL_STR, "") \
+    V(TR_KEY_rpc_username, username_, std::string, "", "") \
+    V(TR_KEY_rpc_whitelist, whitelist_str_, std::string, TR_DEFAULT_RPC_WHITELIST, "") \
+    V(TR_KEY_rpc_whitelist_enabled, is_whitelist_enabled_, bool, true, "")
+
 class tr_rpc_server
 {
 public:
@@ -38,6 +54,10 @@ public:
     tr_rpc_server(tr_rpc_server&&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
+
+    void load(tr_variant* src);
+    void save(tr_variant* tgt) const;
+    static void defaultSettings(tr_variant* tgt);
 
     [[nodiscard]] constexpr tr_port port() const noexcept
     {
@@ -124,31 +144,23 @@ public:
         return socket_mode_;
     }
 
-    std::vector<std::string> hostWhitelist;
+#define V(key, name, type, default_value, comment) type name = type{ default_value };
+    RPC_SETTINGS_FIELDS(V)
+#undef V
+
+    std::vector<std::string> host_whitelist_;
     std::vector<std::string> whitelist_;
     std::string const web_client_dir_;
-    std::string salted_password_;
-    std::string username_;
-    std::string whitelist_str_;
-    std::string url_;
 
-    std::unique_ptr<struct tr_rpc_address> bindAddress;
+    std::unique_ptr<struct tr_rpc_address> bind_address_;
 
     std::unique_ptr<libtransmission::Timer> start_retry_timer;
-    struct evhttp* httpd = nullptr;
+    std::unique_ptr<struct evhttp, void (*)(struct evhttp*)> httpd{ nullptr, [](evhttp*) {
+                                                                   } };
     tr_session* const session;
 
-    int anti_brute_force_limit_ = 0;
-    int login_attempts_ = 0;
+    size_t login_attempts_ = 0U;
     int start_retry_counter = 0;
-    static tr_mode_t constexpr DefaultRpcSocketMode = 0750;
-    tr_mode_t socket_mode_ = DefaultRpcSocketMode;
 
-    tr_port port_;
-
-    bool is_anti_brute_force_enabled_ = false;
-    bool is_enabled_ = false;
-    bool isHostWhitelistEnabled = false;
     bool is_password_enabled_ = false;
-    bool is_whitelist_enabled_ = false;
 };

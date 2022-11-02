@@ -39,11 +39,11 @@ public:
     {
         tr_port_forwarding_state state = TR_PORT_ERROR;
 
-        tr_port public_port = {};
-        tr_port private_port = {};
+        tr_port local_port = {};
+        tr_port advertised_port = {};
     };
 
-    PulseResult pulse(tr_port port, bool is_enabled);
+    PulseResult pulse(tr_port local_port, bool is_enabled);
 
 private:
     enum class State
@@ -67,8 +67,8 @@ private:
 
     natpmp_t natpmp_ = {};
 
-    tr_port public_port_ = {};
-    tr_port private_port_ = {};
+    tr_port local_port_ = {};
+    tr_port advertised_port_ = {};
 
     time_t renew_time_ = 0;
     time_t command_time_ = 0;
