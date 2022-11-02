@@ -12,6 +12,7 @@
 #include <cstddef> // for size_t
 #include <cstdint>
 #include <cstring>
+#include <array>
 #include <memory>
 #include <optional>
 #include <string>
@@ -49,12 +50,7 @@ public:
     {
     }
 
-    ~BlocklistFile()
-    {
-        close();
-    }
-
-    [[nodiscard]] constexpr auto& filename() const
+    [[nodiscard]] constexpr auto const& filename() const noexcept
     {
         return filename_;
     }
@@ -71,7 +67,7 @@ public:
         return std::size(rules_);
     }
 
-    [[nodiscard]] constexpr bool isEnabled() const
+    [[nodiscard]] constexpr bool isEnabled() const noexcept
     {
         return is_enabled_;
     }
@@ -91,75 +87,22 @@ public:
         bool const is_enabled);
 
 private:
-    struct AddressRange
-    {
-        uint32_t begin_ = 0;
-        uint32_t end_ = 0;
-        in6_addr begin6_;
-        in6_addr end6_;
-
-        /// @brief Used for std::bsearch of an IPv4 address
-        static int compareIPv4AddressToRange(void const* va, void const* vb)
-        {
-            auto const* a = reinterpret_cast<uint32_t const*>(va);
-            auto const* b = reinterpret_cast<AddressRange const*>(vb);
-
-            if (*a < b->begin_)
-            {
-                return -1;
-            }
-
-            if (*a > b->end_)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-
-        /// @brief Used for std::bsearch of an IPv6 address
-        static int compareIPv6AddressToRange(void const* va, void const* vb)
-        {
-            auto const* a = reinterpret_cast<in6_addr const*>(va);
-            auto const* b = reinterpret_cast<AddressRange const*>(vb);
-
-            if (memcmp(&a->s6_addr, &b->begin6_.s6_addr, sizeof(a->s6_addr)) < 0)
-            {
-                return -1;
-            }
-
-            if (memcmp(&a->s6_addr, &b->end6_.s6_addr, sizeof(a->s6_addr)) > 0)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-    };
-
     using AddressPair = std::pair<tr_address, tr_address>;
 
-    static AddressRange addressPairToRange(AddressPair const& pair);
-
-    void RewriteBlocklistFile() const;
     void ensureLoaded() const;
-    void load();
-    void close();
 
-    static std::optional<AddressRange> parseLine(char const* line);
-    static bool compareAddressRangesByFirstAddress(AddressRange const& a, AddressRange const& b);
-
+    static void save(std::string_view filename, AddressPair const* pairs, size_t n_pairs);
+    static std::vector<AddressPair> parseFile(std::string_view filename);
+    static std::optional<AddressPair> parseLine(char const* line);
     static std::optional<AddressPair> parseLine1(std::string_view line);
     static std::optional<AddressPair> parseLine2(std::string_view line);
     static std::optional<AddressPair> parseLine3(char const* line);
 
-#ifdef TR_ENABLE_ASSERTS
-    /// @brief Sanity checks: make sure the rules are sorted in ascending order and don't overlap
-    static void assertValidRules(std::vector<AddressRange> const& ranges);
-#endif
-
     std::string const filename_;
 
     bool is_enabled_ = false;
-    mutable std::vector<AddressRange> rules_;
+    mutable std::vector<AddressPair> rules_;
+
+    static auto constexpr FileFormatVersion = std::array<char, 4>{ 'v', '0', '0', '3' };
+    static auto constexpr BinSuffix = std::string_view{ ".bin" };
 };
