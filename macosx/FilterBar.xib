@@ -15,6 +15,7 @@
                 <outlet property="fNoFilterButton" destination="9" id="27"/>
                 <outlet property="fPauseFilterButton" destination="6" id="28"/>
                 <outlet property="fSearchField" destination="10" id="31"/>
+                <outlet property="fSearchFieldMinWidthConstraint" destination="Ven-bt-DjP" id="X9R-JZ-TVl"/>
                 <outlet property="fSeedFilterButton" destination="7" id="32"/>
                 <outlet property="view" destination="2" id="33"/>
             </connections>
