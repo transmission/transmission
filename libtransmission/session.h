@@ -904,8 +904,8 @@ private:
     void initImpl(init_data&);
     void setSettings(tr_variant* settings_dict, bool force);
 
-    void closeImplPt1();
-    void closeImplPt2();
+    void closeImplPart1();
+    void closeImplPart2();
 
     void onNowTimer();
 

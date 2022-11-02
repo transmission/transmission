@@ -1166,7 +1166,7 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-void tr_session::closeImplPt1()
+void tr_session::closeImplPart1()
 {
     is_closing_ = true;
 
@@ -1214,11 +1214,11 @@ void tr_session::closeImplPt1()
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
-    save_timer_ = timerMaker().create([this]() { closeImplPt2(); });
+    save_timer_ = timerMaker().create([this]() { closeImplPart2(); });
     save_timer_->startRepeating(50ms);
 }
 
-void tr_session::closeImplPt2()
+void tr_session::closeImplPart2()
 {
     // try to keep the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces
@@ -1254,7 +1254,7 @@ void tr_sessionClose(tr_session* session)
     tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
 
     /* close the session */
-    session->runInSessionThread([session]() { session->closeImplPt1(); });
+    session->runInSessionThread([session]() { session->closeImplPart1(); });
 
     while (!session->isClosed() && !deadline_reached())
     {
