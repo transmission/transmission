@@ -264,11 +264,11 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 - (void)update
 {
     //get previous stalled value before update
-    BOOL const wasTransmitting = self.fStat == NULL || self.transmitting;
+    BOOL const wasTransmitting = self.fStat != NULL && self.transmitting;
 
     self.fStat = tr_torrentStat(self.fHandle);
 
-    //make sure the "active" filter is updated when stalled-ness changes
+    //make sure the "active" filter is updated when transmitting changes
     if (wasTransmitting != self.transmitting)
     {
         //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
