@@ -1188,11 +1188,11 @@
 		C8B27B9028153F3100A22B5D /* transmission-edit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-edit"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B27BA128153F3400A22B5D /* transmission-show */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-show"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
-		CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = session-alt-speeds.cc; sourceTree = "<group>"; };
-		CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = session-alt-speeds.h; sourceTree = "<group>"; };
-		D5C306568A7346FFFB8EFAD1 /* session-settings.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = session-settings.cc; sourceTree = "<group>"; };
-		D5C306568A7346FFFB8EFAD3 /* session-settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = session-settings.h; sourceTree = "<group>"; };
-		D9057D68C13B75636539B681 /* variant-converters.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = variant-converters.cc; sourceTree = "<group>"; };
+		CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-alt-speeds.cc"; sourceTree = "<group>"; };
+		CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "session-alt-speeds.h"; sourceTree = "<group>"; };
+		D5C306568A7346FFFB8EFAD1 /* session-settings.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-settings.cc"; sourceTree = "<group>"; };
+		D5C306568A7346FFFB8EFAD3 /* session-settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "session-settings.h"; sourceTree = "<group>"; };
+		D9057D68C13B75636539B681 /* variant-converters.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-converters.cc"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = "<group>"; };

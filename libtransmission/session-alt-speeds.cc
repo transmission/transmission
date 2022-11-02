@@ -24,7 +24,7 @@ void tr_session_alt_speeds::load(tr_variant* src)
             this->field = *val; \
         } \
     }
-    ALT_SPEEDS_FIELDS(V);
+    ALT_SPEEDS_FIELDS(V)
 #undef V
 
     updateScheduler();
