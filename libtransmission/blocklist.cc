@@ -155,14 +155,11 @@ std::vector<BlocklistFile> BlocklistFile::loadBlocklists(std::string_view const 
     }
 
     auto ret = std::vector<BlocklistFile>{};
-    for (auto const& filename : getFilenamesInDir(blocklist_dir))
+    for (auto const& bin_file : getFilenamesInDir(blocklist_dir))
     {
-        if (tr_strvEndsWith(filename, BinSuffix))
+        if (tr_strvEndsWith(bin_file, BinSuffix))
         {
-            auto const bin_file = filename;
-            auto src_file = std::string_view{ bin_file };
-            src_file.remove_suffix(std::size(BinSuffix));
-            ret.emplace_back(src_file, bin_file, is_enabled);
+            ret.emplace_back(bin_file, is_enabled);
         }
     }
     return ret;
@@ -499,7 +496,7 @@ std::optional<BlocklistFile> BlocklistFile::saveNew(std::string_view external_fi
 
     save(bin_file, std::data(rules), std::size(rules));
 
-    auto ret = BlocklistFile(src_file, bin_file, is_enabled);
+    auto ret = BlocklistFile{ bin_file, is_enabled };
     ret.rules_ = std::move(rules);
     return ret;
 }

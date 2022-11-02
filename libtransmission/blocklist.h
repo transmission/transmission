@@ -26,19 +26,13 @@ struct BlocklistFile
 public:
     BlocklistFile() = default;
 
-    BlocklistFile(std::string_view src_file, std::string_view bin_file, bool is_enabled)
-        : src_file_{ src_file }
-        , bin_file_{ bin_file }
+    BlocklistFile(std::string_view bin_file, bool is_enabled)
+        : bin_file_{ bin_file }
         , is_enabled_{ is_enabled }
     {
     }
 
     static std::vector<BlocklistFile> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
-
-    [[nodiscard]] constexpr auto const& srcFile() const noexcept
-    {
-        return src_file_;
-    }
 
     [[nodiscard]] constexpr auto const& binFile() const noexcept
     {
@@ -83,7 +77,6 @@ private:
 
     mutable std::vector<AddressPair> rules_;
 
-    std::string src_file_;
     std::string bin_file_;
     bool is_enabled_ = false;
 };
