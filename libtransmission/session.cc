@@ -536,7 +536,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->blocklists_ = BlocklistFile::loadBlocklists(configDir(), useBlocklist());
+    this->blocklists_ = BlocklistFile::loadBlocklists(blocklist_dir_, useBlocklist());
 
     tr_announcerInit(this);
 
@@ -1635,7 +1635,7 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
 void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_.clear();
-    session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
+    session->blocklists_ = BlocklistFile::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
 
     if (session->peer_mgr_)
     {
@@ -1687,8 +1687,7 @@ size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
     BlocklistFile* b = nullptr;
     if (it == std::end(src))
     {
-        auto path = tr_pathbuf{ session->configDir(), "/blocklists/"sv, name };
-        src.push_back(std::make_unique<BlocklistFile>(path, session->useBlocklist()));
+        src.push_back(std::make_unique<BlocklistFile>(session->blocklist_dir_.c_str(), session->useBlocklist()));
         b = std::rbegin(src)->get();
     }
     else
@@ -2210,6 +2209,13 @@ auto makeTorrentDir(std::string_view config_dir)
     return dir;
 }
 
+auto makeBlocklistDir(std::string_view config_dir)
+{
+    auto dir = fmt::format("{:s}/blocklists"sv, config_dir);
+    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
 auto makeEventBase()
 {
     tr_evthread_init();
@@ -2222,6 +2228,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
+    , blocklist_dir_{ makeBlocklistDir(config_dir) }
     , event_base_{ makeEventBase() }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }

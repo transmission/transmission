@@ -124,15 +124,15 @@ void BlocklistFile::ensureLoaded() const
 ***/
 
 std::vector<std::unique_ptr<BlocklistFile>> BlocklistFile::loadBlocklists(
-    std::string_view const config_dir,
+    std::string_view const blocklist_dir,
     bool const is_enabled)
 {
     auto loadme = std::unordered_set<std::string>{};
     auto working_set = std::vector<std::unique_ptr<BlocklistFile>>{};
 
-    /* walk the blocklist directory... */
-    auto const dirname = tr_pathbuf{ config_dir, "/blocklists"sv };
-    auto const odir = tr_sys_dir_open(dirname);
+    // walk the blocklist directory
+
+    auto const odir = tr_sys_dir_open(tr_pathbuf{ blocklist_dir });
 
     if (odir == TR_BAD_SYS_DIR)
     {
@@ -149,13 +149,13 @@ std::vector<std::unique_ptr<BlocklistFile>> BlocklistFile::loadBlocklists(
             continue;
         }
 
-        if (auto const path = tr_pathbuf{ dirname, '/', name }; tr_strvEndsWith(path, ".bin"sv))
+        if (auto const path = tr_pathbuf{ blocklist_dir, '/', name }; tr_strvEndsWith(path, ".bin"sv))
         {
             load = path;
         }
         else
         {
-            auto const binname = tr_pathbuf{ dirname, '/', name, ".bin"sv };
+            auto const binname = tr_pathbuf{ blocklist_dir, '/', name, ".bin"sv };
 
             if (auto const bininfo = tr_sys_path_get_info(binname); !bininfo)
             {
