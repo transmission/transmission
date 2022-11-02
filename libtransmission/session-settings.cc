@@ -20,7 +20,7 @@ void tr_session_settings::load(tr_variant* src)
             this->field = *val; \
         } \
     }
-    SESSION_SETTINGS_FIELDS(V);
+    SESSION_SETTINGS_FIELDS(V)
 #undef V
 }
 

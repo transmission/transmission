@@ -899,7 +899,7 @@ void tr_rpc_server::load(tr_variant* src)
             this->field = *val; \
         } \
     }
-    RPC_SETTINGS_FIELDS(V);
+    RPC_SETTINGS_FIELDS(V)
 #undef V
 
     if (!tr_strvEndsWith(url_, '/'))
