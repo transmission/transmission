@@ -1246,7 +1246,7 @@ void tr_sessionClose(tr_session* session)
 
     static auto constexpr DeadlineSecs = 20s;
     auto const deadline = std::chrono::steady_clock::now() + DeadlineSecs;
-    auto deadline_reached = [deadline]()
+    auto const deadline_reached = [deadline]()
     {
         return std::chrono::steady_clock::now() >= deadline;
     };
