@@ -25,11 +25,10 @@
 
 using namespace std::literals;
 
-/***
-****  PRIVATE
-***/
+namespace libtransmission
+{
 
-void BlocklistFile::ensureLoaded() const
+void Blocklist::ensureLoaded() const
 {
     if (!std::empty(rules_))
     {
@@ -130,7 +129,7 @@ auto getFilenamesInDir(std::string_view folder)
 
 } // namespace
 
-std::vector<BlocklistFile> BlocklistFile::loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled)
+std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled)
 {
     // check for .bin files that need to be updated
     for (auto const& src_file : getFilenamesInDir(blocklist_dir))
@@ -154,7 +153,7 @@ std::vector<BlocklistFile> BlocklistFile::loadBlocklists(std::string_view const 
         }
     }
 
-    auto ret = std::vector<BlocklistFile>{};
+    auto ret = std::vector<Blocklist>{};
     for (auto const& bin_file : getFilenamesInDir(blocklist_dir))
     {
         if (tr_strvEndsWith(bin_file, BinSuffix))
@@ -165,7 +164,7 @@ std::vector<BlocklistFile> BlocklistFile::loadBlocklists(std::string_view const 
     return ret;
 }
 
-bool BlocklistFile::hasAddress(tr_address const& addr) const
+bool Blocklist::hasAddress(tr_address const& addr) const
 {
     TR_ASSERT(tr_address_is_valid(&addr));
 
@@ -215,7 +214,7 @@ bool BlocklistFile::hasAddress(tr_address const& addr) const
  * https://web.archive.org/web/20100328075307/http://wiki.phoenixlabs.org/wiki/P2P_Format
  * https://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
-std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine1(std::string_view line)
+std::optional<Blocklist::AddressPair> Blocklist::parseLine1(std::string_view line)
 {
     // remove leading "comment:"
     auto pos = line.find(':');
@@ -261,7 +260,7 @@ std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine1(std::string_
  * DAT / eMule format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"a
  * https://sourceforge.net/p/peerguardian/wiki/dev-blocklist-format-dat/
  */
-std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine2(std::string_view line)
+std::optional<Blocklist::AddressPair> Blocklist::parseLine2(std::string_view line)
 {
     static auto constexpr Delim1 = std::string_view{ " - " };
     static auto constexpr Delim2 = std::string_view{ " , " };
@@ -306,7 +305,7 @@ std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine2(std::string_
  * CIDR notation: "0.0.0.0/8", "::/64"
  * https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation
  */
-std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine3(char const* line)
+std::optional<Blocklist::AddressPair> Blocklist::parseLine3(char const* line)
 {
     auto ip = std::array<unsigned int, 4>{};
     unsigned int pflen = 0;
@@ -335,7 +334,7 @@ std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine3(char const* 
     return addrpair;
 }
 
-std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine(char const* line)
+std::optional<Blocklist::AddressPair> Blocklist::parseLine(char const* line)
 {
     if (auto range = parseLine1(line); range)
     {
@@ -355,7 +354,7 @@ std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine(char const* l
     return {};
 }
 
-std::vector<BlocklistFile::AddressPair> BlocklistFile::parseFile(std::string_view filename)
+std::vector<Blocklist::AddressPair> Blocklist::parseFile(std::string_view filename)
 {
     auto in = std::ifstream{ tr_pathbuf{ filename } };
     if (!in.is_open())
@@ -434,7 +433,7 @@ std::vector<BlocklistFile::AddressPair> BlocklistFile::parseFile(std::string_vie
     return ranges;
 }
 
-void BlocklistFile::save(std::string_view filename, AddressPair const* ranges, size_t n_ranges)
+void Blocklist::save(std::string_view filename, AddressPair const* ranges, size_t n_ranges)
 {
     auto out = std::ofstream{ tr_pathbuf{ filename }, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary };
     if (!out.is_open())
@@ -467,10 +466,10 @@ void BlocklistFile::save(std::string_view filename, AddressPair const* ranges, s
     out.close();
 }
 
-std::optional<BlocklistFile> BlocklistFile::saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled)
+std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled)
 {
     // if we can't parse the file, do nothing
-    auto const rules = BlocklistFile::parseFile(external_file);
+    auto const rules = Blocklist::parseFile(external_file);
     if (std::empty(rules))
     {
         return {};
@@ -496,7 +495,9 @@ std::optional<BlocklistFile> BlocklistFile::saveNew(std::string_view external_fi
 
     save(bin_file, std::data(rules), std::size(rules));
 
-    auto ret = BlocklistFile{ bin_file, is_enabled };
+    auto ret = Blocklist{ bin_file, is_enabled };
     ret.rules_ = std::move(rules);
     return ret;
 }
+
+} // namespace libtransmission

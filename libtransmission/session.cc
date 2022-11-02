@@ -536,7 +536,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->blocklists_ = BlocklistFile::loadBlocklists(blocklist_dir_, useBlocklist());
+    this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
 
     tr_announcerInit(this);
 
@@ -1634,7 +1634,7 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
 
 void tr_sessionReloadBlocklists(tr_session* session)
 {
-    session->blocklists_ = BlocklistFile::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
+    session->blocklists_ = libtransmission::Blocklist::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
 
     if (session->peer_mgr_)
     {
@@ -1680,7 +1680,7 @@ size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
     auto const bin_file = tr_pathbuf{ session->blocklist_dir_, '/', DEFAULT_BLOCKLIST_FILENAME };
 
     // Try to save it
-    auto added = BlocklistFile::saveNew(content_filename, bin_file, session->useBlocklist());
+    auto added = libtransmission::Blocklist::saveNew(content_filename, bin_file, session->useBlocklist());
     if (!added)
     {
         return 0U;

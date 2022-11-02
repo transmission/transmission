@@ -21,22 +21,32 @@
 
 struct tr_address;
 
-struct BlocklistFile
+namespace libtransmission
+{
+
+class Blocklist
 {
 public:
-    BlocklistFile() = default;
+    static std::vector<Blocklist> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
 
-    BlocklistFile(std::string_view bin_file, bool is_enabled)
+    static std::optional<Blocklist> saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled);
+
+    Blocklist() = default;
+
+    Blocklist(std::string_view bin_file, bool is_enabled)
         : bin_file_{ bin_file }
         , is_enabled_{ is_enabled }
     {
     }
 
-    static std::vector<BlocklistFile> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
-
     [[nodiscard]] constexpr auto const& binFile() const noexcept
     {
         return bin_file_;
+    }
+
+    [[nodiscard]] constexpr bool enabled() const noexcept
+    {
+        return is_enabled_;
     }
 
     [[nodiscard]] size_t size() const
@@ -46,19 +56,12 @@ public:
         return std::size(rules_);
     }
 
-    [[nodiscard]] constexpr bool enabled() const noexcept
-    {
-        return is_enabled_;
-    }
-
     void setEnabled(bool is_enabled) noexcept
     {
         is_enabled_ = is_enabled;
     }
 
     bool hasAddress(tr_address const& addr) const;
-
-    static std::optional<BlocklistFile> saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled);
 
 private:
     using AddressPair = std::pair<tr_address, tr_address>;
@@ -80,3 +83,5 @@ private:
     std::string bin_file_;
     bool is_enabled_ = false;
 };
+
+} // namespace libtransmission
