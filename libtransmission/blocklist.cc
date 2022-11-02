@@ -381,7 +381,7 @@ std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine2(std::string_
  * CIDR notation: "0.0.0.0/8", "::/64"
  * https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation
  */
-bool BlocklistFile::parseLine3(char const* line, AddressRange* range)
+std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine3(char const* line)
 {
     auto ip = std::array<unsigned int, 4>{};
     unsigned int pflen = 0;
@@ -391,23 +391,23 @@ bool BlocklistFile::parseLine3(char const* line, AddressRange* range)
     // NOLINTNEXTLINE readability-container-data-pointer
     if (sscanf(line, "%u.%u.%u.%u/%u", TR_ARG_TUPLE(&ip[0], &ip[1], &ip[2], &ip[3]), &pflen) != 5)
     {
-        return false;
+        return {};
     }
 
     if (pflen > 32 || ip[0] > 0xff || ip[1] > 0xff || ip[2] > 0xff || ip[3] > 0xff)
     {
-        return false;
+        return {};
     }
 
-    /* this is host order */
+    // this is host order
     mask <<= 32 - pflen;
     ip_u = ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3];
 
-    /* fill the non-prefix bits the way we need it */
-    range->begin_ = ip_u & mask;
-    range->end_ = ip_u | (~mask);
-
-    return true;
+    // fill the non-prefix bits the way we need it
+    auto addrpair = AddressPair{};
+    addrpair.first.addr.addr4.s_addr = ntohl(ip_u & mask);
+    addrpair.second.addr.addr4.s_addr = ntohl(ip_u | (~mask));
+    return addrpair;
 }
 
 std::optional<BlocklistFile::AddressRange> BlocklistFile::parseLine(char const* line)
@@ -425,10 +425,10 @@ std::optional<BlocklistFile::AddressRange> BlocklistFile::parseLine(char const* 
         return addressPairToRange(*addrpair);
     }
 
-    auto range = AddressRange{};
-    if (parseLine3(line, &range))
+    if (auto const addrpair = parseLine3(line); addrpair)
     {
-        return range;
+        fmt::print("parseLine3 succeeded: {:s} -> {:s}\n", addrpair->first.readable(), addrpair->second.readable());
+        return addressPairToRange(*addrpair);
     }
 
     return {};

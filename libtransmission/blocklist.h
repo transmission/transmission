@@ -151,7 +151,7 @@ private:
 
     static std::optional<AddressPair> parseLine1(std::string_view line);
     static std::optional<AddressPair> parseLine2(std::string_view line);
-    static bool parseLine3(char const* line, AddressRange* range);
+    static std::optional<AddressPair> parseLine3(char const* line);
 
 #ifdef TR_ENABLE_ASSERTS
     /// @brief Sanity checks: make sure the rules are sorted in ascending order and don't overlap
