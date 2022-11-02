@@ -6,11 +6,8 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
-#include <cstdlib> // bsearch()
 #include <fstream>
-#include <memory>
 #include <string_view>
-#include <unordered_set>
 #include <vector>
 
 #include <fmt/core.h>
@@ -22,6 +19,7 @@
 #include "file.h"
 #include "log.h"
 #include "net.h"
+#include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "utils.h"
 
@@ -39,24 +37,24 @@ void BlocklistFile::ensureLoaded() const
     }
 
     tr_error* error = nullptr;
-    auto const file_info = tr_sys_path_get_info(filename_, 0, &error);
+    auto const file_info = tr_sys_path_get_info(bin_file_, 0, &error);
     if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", filename_),
+            fmt::arg("path", bin_file_),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_clear(&error);
         return;
     }
 
-    auto in = std::ifstream{ filename_, std::ios_base::in | std::ios_base::binary };
+    auto in = std::ifstream{ bin_file_, std::ios_base::in | std::ios_base::binary };
     if (!in)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", filename_),
+            fmt::arg("path", bin_file_),
             fmt::arg("error", tr_strerror(errno)),
             fmt::arg("error_code", errno)));
         return;
@@ -79,12 +77,12 @@ void BlocklistFile::ensureLoaded() const
     }
     if (unsupported_file)
     {
-        tr_sys_path_remove(filename_);
-        auto source_file = std::string_view{ filename_ };
+        tr_sys_path_remove(bin_file_);
+        auto source_file = std::string_view{ bin_file_ };
         source_file.remove_suffix(std::size(BinSuffix));
         tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
         rules_ = parseFile(source_file);
-        save(filename_, std::data(rules_), std::size(rules_));
+        save(bin_file_, std::data(rules_), std::size(rules_));
         return;
     }
 
@@ -96,98 +94,81 @@ void BlocklistFile::ensureLoaded() const
 
     tr_logAddInfo(fmt::format(
         ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", std::size(rules_)),
-        fmt::arg("path", tr_sys_path_basename(filename_)),
+        fmt::arg("path", tr_sys_path_basename(bin_file_)),
         fmt::arg("count", std::size(rules_))));
 }
 
-/***
-****  PACKAGE-VISIBLE
-***/
-
-std::vector<std::unique_ptr<BlocklistFile>> BlocklistFile::loadBlocklists(
-    std::string_view const blocklist_dir,
-    bool const is_enabled)
+namespace
 {
-    auto loadme = std::unordered_set<std::string>{};
-    auto working_set = std::vector<std::unique_ptr<BlocklistFile>>{};
 
-    // walk the blocklist directory
+auto getFilenamesInDir(std::string_view folder)
+{
+    auto files = std::vector<std::string>{};
 
-    auto const odir = tr_sys_dir_open(tr_pathbuf{ blocklist_dir });
+    auto const odir = tr_sys_dir_open(tr_pathbuf{ folder });
 
     if (odir == TR_BAD_SYS_DIR)
     {
-        return working_set;
+        return files;
     }
 
     char const* name = nullptr;
+    auto prefix = std::string{ folder } + '/';
     while ((name = tr_sys_dir_read_name(odir)) != nullptr)
     {
-        auto load = std::string{};
-
-        if (name[0] == '.') /* ignore dotfiles */
+        if (name[0] == '.') // ignore dotfiles
         {
             continue;
         }
 
-        if (auto const path = tr_pathbuf{ blocklist_dir, '/', name }; tr_strvEndsWith(path, BinSuffix))
+        files.emplace_back(prefix + name);
+    }
+
+    tr_sys_dir_close(odir);
+    return files;
+}
+
+} // namespace
+
+std::vector<BlocklistFile> BlocklistFile::loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled)
+{
+    // check for .bin files that need to be updated
+    for (auto const& src_file : getFilenamesInDir(blocklist_dir))
+    {
+        if (tr_strvEndsWith(src_file, BinSuffix))
         {
-            load = path;
-        }
-        else
-        {
-            auto const binname = tr_pathbuf{ blocklist_dir, '/', name, BinSuffix };
-
-            if (auto const bininfo = tr_sys_path_get_info(binname); !bininfo)
-            {
-                // create it
-                auto b = BlocklistFile{ binname, is_enabled };
-                if (auto const n = b.setContent(path); n > 0)
-                {
-                    load = binname;
-                }
-            }
-            else if (auto const pathinfo = tr_sys_path_get_info(path);
-                     pathinfo && pathinfo->last_modified_at >= bininfo->last_modified_at)
-            {
-                // update it
-                auto const old = tr_pathbuf{ binname, ".old"sv };
-                tr_sys_path_remove(old);
-                tr_sys_path_rename(binname, old);
-
-                BlocklistFile b(binname, is_enabled);
-
-                if (b.setContent(path) > 0)
-                {
-                    tr_sys_path_remove(old);
-                }
-                else
-                {
-                    tr_sys_path_remove(binname);
-                    tr_sys_path_rename(old, binname);
-                }
-            }
+            continue;
         }
 
-        if (!std::empty(load))
+        // check to see if bin_file is up-to-date
+        auto const src_info = tr_sys_path_get_info(src_file);
+        auto const bin_file = tr_pathbuf{ src_file, BinSuffix };
+        auto const bin_info = tr_sys_path_get_info(bin_file);
+        auto const bin_needs_update = src_info && (!bin_info || bin_info->last_modified_at <= src_info->last_modified_at);
+        if (bin_needs_update)
         {
-            loadme.emplace(load);
+            if (auto const ranges = parseFile(src_file); !std::empty(ranges))
+            {
+                save(bin_file, std::data(ranges), std::size(ranges));
+            }
         }
     }
 
-    std::transform(
-        std::begin(loadme),
-        std::end(loadme),
-        std::back_inserter(working_set),
-        [&is_enabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), is_enabled); });
-
-    /* cleanup */
-    tr_sys_dir_close(odir);
-
-    return working_set;
+    auto ret = std::vector<BlocklistFile>{};
+    for (auto const& filename : getFilenamesInDir(blocklist_dir))
+    {
+        if (tr_strvEndsWith(filename, BinSuffix))
+        {
+            auto const bin_file = filename;
+            auto src_file = std::string_view{ bin_file };
+            src_file.remove_suffix(std::size(BinSuffix));
+            ret.emplace_back(src_file, bin_file, is_enabled);
+        }
+    }
+    return ret;
 }
 
-bool BlocklistFile::hasAddress(tr_address const& addr)
+bool BlocklistFile::hasAddress(tr_address const& addr) const
 {
     TR_ASSERT(tr_address_is_valid(&addr));
 
@@ -422,6 +403,7 @@ std::vector<BlocklistFile::AddressPair> BlocklistFile::parseFile(std::string_vie
         }
     }
 
+    // sort ranges by start address
     std::sort(std::begin(ranges), std::end(ranges), [](auto const& a, auto const& b) { return a.first < b.first; });
 
     // merge overlapping ranges
@@ -442,9 +424,9 @@ std::vector<BlocklistFile::AddressPair> BlocklistFile::parseFile(std::string_vie
     ranges.resize(keep + 1);
 
 #ifdef TR_ENABLE_ASSERTS
-    for (auto const& r : ranges)
+    for (auto const& range : ranges)
     {
-        TR_ASSERT(r.first <= r.second);
+        TR_ASSERT(range.first <= range.second);
     }
     for (size_t i = 1, n = std::size(ranges); i < n; ++i)
     {
@@ -453,21 +435,6 @@ std::vector<BlocklistFile::AddressPair> BlocklistFile::parseFile(std::string_vie
 #endif
 
     return ranges;
-}
-
-size_t BlocklistFile::setContent(char const* filename)
-{
-    auto const ranges = parseFile(filename);
-    auto const n_ranges = std::size(ranges);
-
-    if (n_ranges != 0U)
-    {
-        save(filename_, std::data(ranges), std::size(ranges));
-        rules_ = ranges;
-        ensureLoaded();
-    }
-
-    return n_ranges;
 }
 
 void BlocklistFile::save(std::string_view filename, AddressPair const* ranges, size_t n_ranges)
@@ -501,4 +468,38 @@ void BlocklistFile::save(std::string_view filename, AddressPair const* ranges, s
     }
 
     out.close();
+}
+
+std::optional<BlocklistFile> BlocklistFile::saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled)
+{
+    // if we can't parse the file, do nothing
+    auto const rules = BlocklistFile::parseFile(external_file);
+    if (std::empty(rules))
+    {
+        return {};
+    }
+
+    // copy the src file
+    auto src_file = bin_file;
+    src_file.remove_suffix(std::size(BinSuffix));
+    tr_error* error = nullptr;
+    if (!tr_sys_path_copy(tr_pathbuf{ external_file }, tr_pathbuf{ src_file }, &error))
+    {
+        if (error != nullptr)
+        {
+            tr_logAddWarn(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", src_file),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_clear(&error);
+        }
+        return {};
+    }
+
+    save(bin_file, std::data(rules), std::size(rules));
+
+    auto ret = BlocklistFile(src_file, bin_file, is_enabled);
+    ret.rules_ = std::move(rules);
+    return ret;
 }

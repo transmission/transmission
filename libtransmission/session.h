@@ -1046,7 +1046,7 @@ private:
     /// other fields
 
 public:
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+    std::vector<BlocklistFile> blocklists_;
 
     struct tr_event_handle* events = nullptr;
 

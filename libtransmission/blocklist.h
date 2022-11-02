@@ -9,87 +9,68 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstddef> // for size_t
-#include <cstdint>
-#include <cstring>
 #include <array>
-#include <memory>
+#include <cstddef> // for size_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <utility> // for std::pair
 #include <vector>
 
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#else
-#include <netinet/in.h>
-#endif
-
-#include "transmission.h"
-
-#include "file.h" // for tr_sys_file_t
 #include "net.h" // for tr_address
-#include "tr-assert.h"
-#include "tr-macros.h"
 
 struct tr_address;
 
 struct BlocklistFile
 {
 public:
-    // Prevent moving to protect the fd_ from accidental destruction
-    BlocklistFile(BlocklistFile&&) = delete;
-    BlocklistFile(BlocklistFile const&) = delete;
-    BlocklistFile& operator=(BlocklistFile const&) = delete;
-    BlocklistFile& operator=(BlocklistFile&&) = delete;
+    BlocklistFile() = default;
 
-    BlocklistFile(char const* filename, bool isEnabled)
-        : filename_(filename)
-        , is_enabled_(isEnabled)
+    BlocklistFile(std::string_view src_file, std::string_view bin_file, bool is_enabled)
+        : src_file_{ src_file }
+        , bin_file_{ bin_file }
+        , is_enabled_{ is_enabled }
     {
     }
 
-    [[nodiscard]] constexpr auto const& filename() const noexcept
+    static std::vector<BlocklistFile> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
+
+    [[nodiscard]] constexpr auto const& srcFile() const noexcept
     {
-        return filename_;
+        return src_file_;
     }
 
-    [[nodiscard]] bool exists() const
+    [[nodiscard]] constexpr auto const& binFile() const noexcept
     {
-        return tr_sys_path_exists(filename_.c_str(), nullptr);
+        return bin_file_;
     }
 
-    [[nodiscard]] size_t getRuleCount() const
+    [[nodiscard]] size_t size() const
     {
         ensureLoaded();
 
         return std::size(rules_);
     }
 
-    [[nodiscard]] constexpr bool isEnabled() const noexcept
+    [[nodiscard]] constexpr bool enabled() const noexcept
     {
         return is_enabled_;
     }
 
-    void setEnabled(bool isEnabled)
+    void setEnabled(bool is_enabled) noexcept
     {
-        is_enabled_ = isEnabled;
+        is_enabled_ = is_enabled;
     }
 
-    bool hasAddress(tr_address const& addr);
+    bool hasAddress(tr_address const& addr) const;
 
-    /// @brief Read the file of ranges, sort and merge, write to our own file, and reload from it
-    size_t setContent(char const* filename);
-
-    static std::vector<std::unique_ptr<BlocklistFile>> loadBlocklists(
-        std::string_view const blocklist_dir,
-        bool const is_enabled);
+    static std::optional<BlocklistFile> saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled);
 
 private:
     using AddressPair = std::pair<tr_address, tr_address>;
 
-    void ensureLoaded() const;
+    static auto constexpr FileFormatVersion = std::array<char, 4>{ 'v', '0', '0', '3' };
+    static auto constexpr BinSuffix = std::string_view{ ".bin" };
 
     static void save(std::string_view filename, AddressPair const* pairs, size_t n_pairs);
     static std::vector<AddressPair> parseFile(std::string_view filename);
@@ -98,11 +79,11 @@ private:
     static std::optional<AddressPair> parseLine2(std::string_view line);
     static std::optional<AddressPair> parseLine3(char const* line);
 
-    std::string const filename_;
+    void ensureLoaded() const;
 
-    bool is_enabled_ = false;
     mutable std::vector<AddressPair> rules_;
 
-    static auto constexpr FileFormatVersion = std::array<char, 4>{ 'v', '0', '0', '3' };
-    static auto constexpr BinSuffix = std::string_view{ ".bin" };
+    std::string src_file_;
+    std::string bin_file_;
+    bool is_enabled_ = false;
 };
