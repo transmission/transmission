@@ -287,7 +287,7 @@ public:
 
     [[nodiscard]] auto amInSessionThread() noexcept
     {
-        return session_thread_->amInThread();
+        return session_thread_->amInSessionThread();
     }
 
     void runInSessionThread(std::function<void(void)>&& func)

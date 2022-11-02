@@ -28,11 +28,6 @@ public:
 
     [[nodiscard]] virtual bool amInSessionThread() const noexcept = 0;
 
-    [[nodiscard]] bool amInThread() const noexcept
-    {
-        return amInSessionThread();
-    }
-
     virtual void run(std::function<void(void)>&& func) = 0;
 
     template<typename Func, typename... Args>
