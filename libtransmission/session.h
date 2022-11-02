@@ -999,17 +999,12 @@ private:
     std::string const torrent_dir_;
     std::string const blocklist_dir_;
 
-    // std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
-
-    // depends-on: event_base_
-    // BUT needs to be first in line after event_base_ because its shutdown
-    // blocks until all other events are done
     std::unique_ptr<tr_session_thread> const session_thread_;
 
-    // depends-on: event_base_
+    // depends-on: session_thread_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    // depends-on: event_base_
+    // depends-on: session_thread_
     std::unique_ptr<libtransmission::Dns> const dns_;
 
     /// static fields
@@ -1062,10 +1057,10 @@ private:
 
     tr_session_id session_id_;
 
-    // depends-on: event_base_
+    // depends-on: session_thread_
     tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
 
-    // depends-on: event_base_
+    // depends-on: session_thread_
     tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
 
     /// other fields
@@ -1126,7 +1121,7 @@ public:
     struct tr_announcer* announcer = nullptr;
 
 private:
-    // depends-on: event_base_, timer_maker_, settings_, torrents_, web_
+    // depends-on: session_thread_, timer_maker_, settings_, torrents_, web_
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
     // depends-on: alt_speeds_, udp_core_, torrents_
