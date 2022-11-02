@@ -31,6 +31,36 @@ using namespace std::literals;
 ****  PRIVATE
 ***/
 
+BlocklistFile::AddressRange BlocklistFile::addressPairToRange(AddressPair const& pair)
+{
+    auto ret = AddressRange{};
+
+    if (auto const& addr = pair.first; addr.isIPv4())
+    {
+        ret.begin_ = ntohl(addr.addr.addr4.s_addr);
+        fmt::print("ipv4 begin {:s} -> {:d}\n", addr.readable(), ret.begin_);
+    }
+    else // IPv6
+    {
+        ret.begin6_ = addr.addr.addr6;
+        fmt::print("ipv6 begin {:s} -> {:d}\n", addr.readable(), ret.begin_);
+    }
+
+    if (auto const& addr = pair.second; addr.isIPv4())
+    {
+        ret.end_ = ntohl(addr.addr.addr4.s_addr);
+        fmt::print("ipv4 end {:s} -> {:d}\n", addr.readable(), ret.end_);
+    }
+    else // IPv6
+    {
+        ret.end6_ = addr.addr.addr6;
+        fmt::print("ipv6 end {:s} -> {:d}\n", addr.readable(), ret.end_);
+    }
+
+    return ret;
+}
+
+
 void BlocklistFile::close()
 {
     rules_.clear();
@@ -260,13 +290,13 @@ bool BlocklistFile::hasAddress(tr_address const& addr)
  * https://web.archive.org/web/20100328075307/http://wiki.phoenixlabs.org/wiki/P2P_Format
  * https://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
-bool BlocklistFile::parseLine1(std::string_view line, struct AddressRange* range)
+std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine1(std::string_view line)
 {
     // remove leading "comment:"
     auto pos = line.find(':');
     if (pos == std::string_view::npos)
     {
-        return false;
+        return {};
     }
     line = line.substr(pos + 1);
 
@@ -274,43 +304,32 @@ bool BlocklistFile::parseLine1(std::string_view line, struct AddressRange* range
     pos = line.find('-');
     if (pos == std::string_view::npos)
     {
-        return false;
+        return {};
     }
+
+    auto addrpair = AddressPair{};
     if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
     {
-        if (addr->isIPv4())
-        {
-            range->begin_ = ntohl(addr->addr.addr4.s_addr);
-        }
-        else
-        {
-            range->begin6_ = addr->addr.addr6;
-        }
+        addrpair.first = *addr;
     }
     else
     {
-        return false;
+        return {};
     }
+
     line = line.substr(pos + 1);
 
     // parse the trailing 'y.y.y.y'
     if (auto const addr = tr_address::fromString(line); addr)
     {
-        if (addr->isIPv4())
-        {
-            range->end_ = ntohl(addr->addr.addr4.s_addr);
-        }
-        else
-        {
-            range->end6_ = addr->addr.addr6;
-        }
+        addrpair.second = *addr;
     }
     else
     {
-        return false;
+        return {};
     }
 
-    return true;
+    return addrpair;
 }
 
 /*
@@ -389,9 +408,22 @@ bool BlocklistFile::parseLine3(char const* line, AddressRange* range)
     return true;
 }
 
-bool BlocklistFile::parseLine(char const* line, AddressRange* range)
+std::optional<BlocklistFile::AddressRange> BlocklistFile::parseLine(char const* line)
 {
-    return parseLine1(line, range) || parseLine2(line, range) || parseLine3(line, range);
+    fmt::print("parseLine {:s}\n", line);
+    if (auto const addrpair = parseLine1(line); addrpair)
+    {
+        fmt::print("parseLine1 succeeded: {:s} -> {:s}\n", addrpair->first.readable(), addrpair->second.readable());
+        return addressPairToRange(*addrpair);
+    }
+
+    auto range = AddressRange{};
+    if (parseLine2(line, &range) || parseLine3(line, &range))
+    {
+        return range;
+    }
+
+    return {};
 }
 
 bool BlocklistFile::compareAddressRangesByFirstAddress(AddressRange const& a, AddressRange const& b)
@@ -429,15 +461,19 @@ size_t BlocklistFile::setContent(char const* filename)
     while (std::getline(in, line))
     {
         ++line_number;
-        auto range = AddressRange{};
-        if (!parseLine(line.c_str(), &range))
+        if (auto const range = parseLine(line.c_str()); range)
         {
-            /* don't try to display the actual lines - it causes issues */
-            tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line_number)));
-            continue;
+            fmt::print("pushing range back\n");
+            ranges.push_back(*range);
         }
-        ranges.push_back(range);
+        else
+        {
+            // don't try to display the actual lines - it causes issues
+            fmt::print(_("Couldn't parse line: '{line}'\n"), fmt::arg("line", line_number));
+            tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line_number)));
+        }
     }
+    fmt::print("ranges size {:d}\n", std::size(ranges));
     in.close();
 
     if (std::empty(ranges))
@@ -464,11 +500,13 @@ size_t BlocklistFile::setContent(char const* filename)
 
     std::sort(std::begin(ipv4_ranges), std::end(ipv4_ranges), BlocklistFile::compareAddressRangesByFirstAddress);
     std::sort(std::begin(ipv6_ranges), std::end(ipv6_ranges), BlocklistFile::compareAddressRangesByFirstAddress);
+    fmt::print("I think we have {:d} ipv4 and {:d} ipv6\n", std::size(ipv4_ranges), std::size(ipv6_ranges));
 
     // combine sorted
     ranges.clear();
     ranges.insert(ranges.end(), ipv4_ranges.begin(), ipv4_ranges.end());
     ranges.insert(ranges.end(), ipv6_ranges.begin(), ipv6_ranges.end());
+    fmt::print("ranges size after sorting {:d}\n", std::size(ranges));
 
     size_t keep = 0; // index in ranges
 
@@ -477,6 +515,7 @@ size_t BlocklistFile::setContent(char const* filename)
     {
         if (range.begin_ == 0 && range.end_ == 0)
         {
+            fmt::print("ipv6\n");
             // IPv6
             if (memcmp(ranges[keep].end6_.s6_addr, range.begin6_.s6_addr, sizeof(range.begin6_.s6_addr)) < 0)
             {
@@ -489,6 +528,7 @@ size_t BlocklistFile::setContent(char const* filename)
         }
         else
         {
+            fmt::print("ipv4 {:d} {:d}\n", range.begin_, range.end_);
             if (ranges[keep].end_ < range.begin_)
             {
                 ranges[++keep] = range;
@@ -502,6 +542,7 @@ size_t BlocklistFile::setContent(char const* filename)
 
     TR_ASSERT_MSG(keep + 1 <= std::size(ranges), "Can shrink `ranges` or leave intact, but not grow");
     ranges.resize(keep + 1);
+    fmt::print("ranges size after merging {:d}\n", std::size(ranges));
 
 #ifdef TR_ENABLE_ASSERTS
     assertValidRules(ranges);

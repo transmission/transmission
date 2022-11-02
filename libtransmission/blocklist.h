@@ -13,8 +13,10 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // for std::pair
 #include <vector>
 
 #ifdef _WIN32
@@ -23,7 +25,10 @@
 #include <netinet/in.h>
 #endif
 
+#include "transmission.h"
+
 #include "file.h" // for tr_sys_file_t
+#include "net.h" // for tr_address
 #include "tr-assert.h"
 #include "tr-macros.h"
 
@@ -132,15 +137,19 @@ private:
         }
     };
 
+    using AddressPair = std::pair<tr_address, tr_address>;
+
+    static AddressRange addressPairToRange(AddressPair const& pair);
+
     void RewriteBlocklistFile() const;
     void ensureLoaded() const;
     void load();
     void close();
 
-    static bool parseLine(char const* line, AddressRange* range);
+    static std::optional<AddressRange> parseLine(char const* line);
     static bool compareAddressRangesByFirstAddress(AddressRange const& a, AddressRange const& b);
 
-    static bool parseLine1(std::string_view line, struct AddressRange* range);
+    static std::optional<AddressPair> parseLine1(std::string_view line);
     static bool parseLine2(std::string_view line, struct AddressRange* range);
     static bool parseLine3(char const* line, AddressRange* range);
 
