@@ -66,16 +66,6 @@ public:
 private:
     using AddressPair = std::pair<tr_address, tr_address>;
 
-    static auto constexpr FileFormatVersion = std::array<char, 4>{ 'v', '0', '0', '3' };
-    static auto constexpr BinSuffix = std::string_view{ ".bin" };
-
-    static void save(std::string_view filename, AddressPair const* pairs, size_t n_pairs);
-    static std::vector<AddressPair> parseFile(std::string_view filename);
-    static std::optional<AddressPair> parseLine(char const* line);
-    static std::optional<AddressPair> parseLine1(std::string_view line);
-    static std::optional<AddressPair> parseLine2(std::string_view line);
-    static std::optional<AddressPair> parseLine3(char const* line);
-
     void ensureLoaded() const;
 
     mutable std::vector<AddressPair> rules_;
