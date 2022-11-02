@@ -336,7 +336,7 @@ std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine1(std::string_
  * DAT / eMule format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"a
  * https://sourceforge.net/p/peerguardian/wiki/dev-blocklist-format-dat/
  */
-bool BlocklistFile::parseLine2(std::string_view line, struct AddressRange* range)
+std::optional<BlocklistFile::AddressPair> BlocklistFile::parseLine2(std::string_view line)
 {
     static auto constexpr Delim1 = std::string_view{ " - " };
     static auto constexpr Delim2 = std::string_view{ " , " };
@@ -344,35 +344,37 @@ bool BlocklistFile::parseLine2(std::string_view line, struct AddressRange* range
     auto pos = line.find(Delim1);
     if (pos == std::string_view::npos)
     {
-        return false;
+        return {};
     }
+
+    auto addrpair = AddressPair{};
 
     if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
     {
-        range->begin_ = ntohl(addr->addr.addr4.s_addr);
+        addrpair.first = *addr;
     }
     else
     {
-        return false;
+        return {};
     }
 
     line = line.substr(pos + std::size(Delim1));
     pos = line.find(Delim2);
     if (pos == std::string_view::npos)
     {
-        return false;
+        return {};
     }
 
     if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
     {
-        range->end_ = ntohl(addr->addr.addr4.s_addr);
+        addrpair.second = *addr;
     }
     else
     {
-        return false;
+        return {};
     }
 
-    return true;
+    return addrpair;
 }
 
 /*
@@ -417,8 +419,14 @@ std::optional<BlocklistFile::AddressRange> BlocklistFile::parseLine(char const* 
         return addressPairToRange(*addrpair);
     }
 
+    if (auto const addrpair = parseLine2(line); addrpair)
+    {
+        fmt::print("parseLine2 succeeded: {:s} -> {:s}\n", addrpair->first.readable(), addrpair->second.readable());
+        return addressPairToRange(*addrpair);
+    }
+
     auto range = AddressRange{};
-    if (parseLine2(line, &range) || parseLine3(line, &range))
+    if (parseLine3(line, &range))
     {
         return range;
     }

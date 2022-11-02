@@ -150,7 +150,7 @@ private:
     static bool compareAddressRangesByFirstAddress(AddressRange const& a, AddressRange const& b);
 
     static std::optional<AddressPair> parseLine1(std::string_view line);
-    static bool parseLine2(std::string_view line, struct AddressRange* range);
+    static std::optional<AddressPair> parseLine2(std::string_view line);
     static bool parseLine3(char const* line, AddressRange* range);
 
 #ifdef TR_ENABLE_ASSERTS
