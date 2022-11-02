@@ -95,7 +95,7 @@ int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
         {
             return tr_tos_t(value);
         }
-    };
+    }
 
     if (auto value = tr_parseNum<int>(needle); value)
     {
