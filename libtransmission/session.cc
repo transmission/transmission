@@ -1629,7 +1629,7 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
     return std::any_of(
         std::begin(blocklists_),
         std::end(blocklists_),
-        [&addr](auto& blocklist) { return blocklist.hasAddress(addr); });
+        [&addr](auto& blocklist) { return blocklist.contains(addr); });
 }
 
 void tr_sessionReloadBlocklists(tr_session* session)

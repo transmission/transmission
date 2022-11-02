@@ -20,7 +20,7 @@
 #include "net.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "utils.h"
+#include "utils.h" // for _(), tr_strerror(), tr_strvEndsWith()
 
 using namespace std::literals;
 
@@ -29,14 +29,16 @@ namespace libtransmission
 namespace
 {
 
-// A test at the beginning of .bin files to ensure we don't load incompatible files
-auto constexpr BinContentsPrefix = std::string_view{ "-tr-blocklist-blocklist-3-" };
+// A string at the beginning of .bin files to test & make sure we don't load incompatible files
+auto constexpr BinContentsPrefix = std::string_view{ "-tr-blocklist-file-format-v3-" };
 
+// In the blocklists directory, the The plaintext source file can be anything, e.g. "level1".
+// The pre-parsed, fast-to-load binary file will have a ".bin" suffix e.g. "level1.bin".
 auto constexpr BinSuffix = std::string_view{ ".bin" };
 
-using address_pair_t = std::pair<tr_address, tr_address>;
+using address_range_t = std::pair<tr_address, tr_address>;
 
-void save(std::string_view filename, address_pair_t const* ranges, size_t n_ranges)
+void save(std::string_view filename, address_range_t const* ranges, size_t n_ranges)
 {
     auto out = std::ofstream{ tr_pathbuf{ filename }, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary };
     if (!out.is_open())
@@ -69,12 +71,10 @@ void save(std::string_view filename, address_pair_t const* ranges, size_t n_rang
     out.close();
 }
 
-/*
- * P2P plaintext format: "comment:x.x.x.x-y.y.y.y" / "comment:x:x:x:x:x:x:x:x-x:x:x:x:x:x:x:x"
- * https://web.archive.org/web/20100328075307/http://wiki.phoenixlabs.org/wiki/P2P_Format
- * https://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
- */
-std::optional<address_pair_t> parseLine1(std::string_view line)
+// P2P plaintext format: "comment:x.x.x.x-y.y.y.y" / "comment:x:x:x:x:x:x:x:x-x:x:x:x:x:x:x:x"
+// https://web.archive.org/web/20100328075307/http://wiki.phoenixlabs.org/wiki/P2P_Format
+// https://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
+std::optional<address_range_t> parsePeerGuardianLine(std::string_view line)
 {
     // remove leading "comment:"
     auto pos = line.find(':');
@@ -91,7 +91,7 @@ std::optional<address_pair_t> parseLine1(std::string_view line)
         return {};
     }
 
-    auto addrpair = address_pair_t{};
+    auto addrpair = address_range_t{};
     if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
     {
         addrpair.first = *addr;
@@ -115,11 +115,10 @@ std::optional<address_pair_t> parseLine1(std::string_view line)
 
     return addrpair;
 }
-/*
- * DAT / eMule format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"a
- * https://sourceforge.net/p/peerguardian/wiki/dev-blocklist-format-dat/
- */
-std::optional<address_pair_t> parseLine2(std::string_view line)
+
+// DAT / eMule format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"a
+// https://sourceforge.net/p/peerguardian/wiki/dev-blocklist-format-dat/
+std::optional<address_range_t> parseEmuleLine(std::string_view line)
 {
     static auto constexpr Delim1 = std::string_view{ " - " };
     static auto constexpr Delim2 = std::string_view{ " , " };
@@ -130,7 +129,7 @@ std::optional<address_pair_t> parseLine2(std::string_view line)
         return {};
     }
 
-    auto addrpair = address_pair_t{};
+    auto addrpair = address_range_t{};
 
     if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
     {
@@ -160,54 +159,49 @@ std::optional<address_pair_t> parseLine2(std::string_view line)
     return addrpair;
 }
 
-/*
- * CIDR notation: "0.0.0.0/8", "::/64"
- * https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation
- */
-std::optional<address_pair_t> parseLine3(char const* line)
+// CIDR notation: "0.0.0.0/8", "::/64"
+// https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation
+// Example here: 10.5.6.7/8 will block the range [10.0.0.0 .. 10.255.255.255]
+std::optional<address_range_t> parseCidrLine(std::string_view line)
 {
-    auto ip = std::array<unsigned int, 4>{};
-    unsigned int pflen = 0;
-    uint32_t ip_u = 0;
-    uint32_t mask = 0xffffffff;
+    auto addrpair = address_range_t{};
 
-    // NOLINTNEXTLINE readability-container-data-pointer
-    if (sscanf(line, "%u.%u.%u.%u/%u", TR_ARG_TUPLE(&ip[0], &ip[1], &ip[2], &ip[3]), &pflen) != 5)
+    auto pos = line.find('/');
+    if (pos == std::string_view::npos)
     {
         return {};
     }
 
-    if (pflen > 32 || ip[0] > 0xff || ip[1] > 0xff || ip[2] > 0xff || ip[3] > 0xff)
+    if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr && addr->isIPv4())
+    {
+        addrpair.first = *addr;
+    }
+    else
     {
         return {};
     }
 
-    // this is host order
-    mask <<= 32 - pflen;
-    ip_u = ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3];
+    auto pflen = tr_parseNum<size_t>(line.substr(pos + 1));
+    if (!pflen)
+    {
+        return {};
+    }
 
-    // fill the non-prefix bits the way we need it
-    auto addrpair = address_pair_t{};
+    auto const mask = uint32_t{ 0xFFFFFFFF } << (32 - *pflen);
+    auto const ip_u = htonl(addrpair.first.addr.addr4.s_addr);
     addrpair.first.addr.addr4.s_addr = ntohl(ip_u & mask);
     addrpair.second.addr.addr4.s_addr = ntohl(ip_u | (~mask));
     return addrpair;
 }
 
-std::optional<address_pair_t> parseLine(char const* line)
+std::optional<address_range_t> parseLine(std::string_view line)
 {
-    if (auto range = parseLine1(line); range)
+    for (auto const& line_parser : { parsePeerGuardianLine, parseEmuleLine, parseCidrLine })
     {
-        return range;
-    }
-
-    if (auto range = parseLine2(line); range)
-    {
-        return range;
-    }
-
-    if (auto range = parseLine3(line); range)
-    {
-        return range;
+        if (auto range = line_parser(line); range)
+        {
+            return range;
+        }
     }
 
     return {};
@@ -215,7 +209,7 @@ std::optional<address_pair_t> parseLine(char const* line)
 
 auto parseFile(std::string_view filename)
 {
-    auto ranges = std::vector<address_pair_t>{};
+    auto ranges = std::vector<address_range_t>{};
 
     auto in = std::ifstream{ tr_pathbuf{ filename } };
     if (!in.is_open())
@@ -233,7 +227,7 @@ auto parseFile(std::string_view filename)
     while (std::getline(in, line))
     {
         ++line_number;
-        if (auto range = parseLine(line.c_str()); range)
+        if (auto range = parseLine(line); range)
         {
             ranges.push_back(*range);
         }
@@ -353,35 +347,39 @@ void Blocklist::ensureLoaded() const
         return;
     }
 
-    // check to see if the file is usable:
-    bool unsupported_file = false;
+    // check to see if the file is usable
+    bool supported_file = true;
     if (file_info->size < std::size(BinContentsPrefix)) // too small
     {
-        unsupported_file = true;
+        supported_file = false;
     }
-    else if (((file_info->size - std::size(BinContentsPrefix)) % sizeof(AddressPair)) != 0) // wrong size
+    else if (((file_info->size - std::size(BinContentsPrefix)) % sizeof(address_range_t)) != 0) // wrong size
     {
-        unsupported_file = true;
+        supported_file = false;
     }
     else
     {
         auto tmp = std::array<char, std::size(BinContentsPrefix)>{};
         in.read(std::data(tmp), std::size(tmp));
-        unsupported_file = BinContentsPrefix != std::string_view{ std::data(tmp), std::size(tmp) };
+        supported_file = BinContentsPrefix == std::string_view{ std::data(tmp), std::size(tmp) };
     }
 
-    if (unsupported_file)
+    if (!supported_file)
     {
-        tr_sys_path_remove(bin_file_);
+        // bad binary file; try to rebuild it
         auto source_file = std::string_view{ bin_file_ };
         source_file.remove_suffix(std::size(BinSuffix));
-        tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
         rules_ = parseFile(source_file);
-        save(bin_file_, std::data(rules_), std::size(rules_));
+        if (!std::empty(rules_))
+        {
+            tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
+            tr_sys_path_remove(bin_file_);
+            save(bin_file_, std::data(rules_), std::size(rules_));
+        }
         return;
     }
 
-    auto range = AddressPair{};
+    auto range = address_range_t{};
     while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
     {
         rules_.emplace_back(range);
@@ -428,7 +426,7 @@ std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklis
     return ret;
 }
 
-bool Blocklist::hasAddress(tr_address const& addr) const
+bool Blocklist::contains(tr_address const& addr) const
 {
     TR_ASSERT(tr_address_is_valid(&addr));
 
@@ -441,7 +439,7 @@ bool Blocklist::hasAddress(tr_address const& addr) const
 
     struct Compare
     {
-        [[nodiscard]] auto compare(tr_address const& a, AddressPair const& b) const noexcept // <=>
+        [[nodiscard]] auto compare(tr_address const& a, address_range_t const& b) const noexcept // <=>
         {
             if (a < b.first)
             {
@@ -454,17 +452,17 @@ bool Blocklist::hasAddress(tr_address const& addr) const
             return 0;
         }
 
-        [[nodiscard]] auto compare(AddressPair const& a, tr_address const& b) const noexcept // <=>
+        [[nodiscard]] auto compare(address_range_t const& a, tr_address const& b) const noexcept // <=>
         {
             return -compare(b, a);
         }
 
-        [[nodiscard]] auto operator()(AddressPair const& a, tr_address const& b) const noexcept // <
+        [[nodiscard]] auto operator()(address_range_t const& a, tr_address const& b) const noexcept // <
         {
             return compare(a, b) < 0;
         }
 
-        [[nodiscard]] auto operator()(tr_address const& a, AddressPair const& b) const noexcept // <
+        [[nodiscard]] auto operator()(tr_address const& a, address_range_t const& b) const noexcept // <
         {
             return compare(a, b) < 0;
         }
@@ -500,6 +498,7 @@ std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std:
         return {};
     }
 
+    // save the bin file
     save(bin_file, std::data(rules), std::size(rules));
 
     auto ret = Blocklist{ bin_file, is_enabled };

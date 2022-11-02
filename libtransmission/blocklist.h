@@ -9,8 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <array>
-#include <cstddef> // for size_t
 #include <optional>
 #include <string>
 #include <string_view>
@@ -39,9 +37,13 @@ public:
     {
     }
 
-    [[nodiscard]] constexpr auto const& binFile() const noexcept
+    [[nodiscard]] bool contains(tr_address const& addr) const;
+
+    [[nodiscard]] auto size() const
     {
-        return bin_file_;
+        ensureLoaded();
+
+        return std::size(rules_);
     }
 
     [[nodiscard]] constexpr bool enabled() const noexcept
@@ -49,26 +51,20 @@ public:
         return is_enabled_;
     }
 
-    [[nodiscard]] size_t size() const
-    {
-        ensureLoaded();
-
-        return std::size(rules_);
-    }
-
     void setEnabled(bool is_enabled) noexcept
     {
         is_enabled_ = is_enabled;
     }
 
-    bool hasAddress(tr_address const& addr) const;
+    [[nodiscard]] constexpr auto const& binFile() const noexcept
+    {
+        return bin_file_;
+    }
 
 private:
-    using AddressPair = std::pair<tr_address, tr_address>;
-
     void ensureLoaded() const;
 
-    mutable std::vector<AddressPair> rules_;
+    mutable std::vector<std::pair<tr_address, tr_address>> rules_;
 
     std::string bin_file_;
     bool is_enabled_ = false;
