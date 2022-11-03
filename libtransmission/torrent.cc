@@ -2401,7 +2401,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
 
 struct CompareTorrentByQueuePosition
 {
-    bool operator()(tr_torrent const* a, tr_torrent const* b) const
+    constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
     {
         return a->queuePosition < b->queuePosition;
     }
