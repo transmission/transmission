@@ -29,7 +29,7 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param n how many items to add to the history's counter
      */
-    void add(time_t now, SizeType n)
+    constexpr void add(time_t now, SizeType n)
     {
         if (timestamps_[newest_] != now)
         {
@@ -46,7 +46,7 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param seconds how many seconds to count back through.
      */
-    SizeType count(time_t now, unsigned int age_sec) const
+    constexpr SizeType count(time_t now, unsigned int age_sec) const
     {
         auto sum = SizeType{};
         time_t const oldest = now - age_sec;

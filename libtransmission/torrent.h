@@ -61,11 +61,11 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDi
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
-tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
+[[nodiscard]] tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
-tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
+[[nodiscard]] tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
 
 void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
@@ -123,13 +123,58 @@ public:
 
     /// SPEED LIMIT
 
-    void setSpeedLimitBps(tr_direction, tr_bytes_per_second_t bytes_per_second);
+    constexpr void setSpeedLimitBps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
+    {
+        if (bandwidth_.setDesiredSpeedBytesPerSecond(dir, bytes_per_second))
+        {
+            setDirty();
+        }
+    }
 
-    [[nodiscard]] tr_bytes_per_second_t speedLimitBps(tr_direction) const;
+    constexpr void useSpeedLimit(tr_direction dir, bool do_use)
+    {
+        if (bandwidth_.setLimited(dir, do_use))
+        {
+            setDirty();
+        }
+    }
+
+    [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
+    {
+        return bandwidth_.getDesiredSpeedBytesPerSecond(dir);
+    }
+
+    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
+    {
+        return bandwidth_.areParentLimitsHonored(TR_UP);
+    }
+
+    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
+    {
+        return bandwidth_.isLimited(dir);
+    }
+
+    [[nodiscard]] constexpr auto isPieceTransferAllowed(tr_direction direction) const noexcept
+    {
+        if (usesSpeedLimit(direction) && speedLimitBps(direction) <= 0)
+        {
+            return false;
+        }
+
+        if (usesSessionLimits())
+        {
+            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /// BLOCK INFO
 
-    [[nodiscard]] constexpr auto const& blockInfo() const
+    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
     {
         return metainfo_.blockInfo();
     }
@@ -138,15 +183,15 @@ public:
     {
         return metainfo_.blockCount();
     }
-    [[nodiscard]] constexpr auto byteLoc(uint64_t byte) const
+    [[nodiscard]] constexpr auto byteLoc(uint64_t byte) const noexcept
     {
         return metainfo_.byteLoc(byte);
     }
-    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const noexcept
     {
         return metainfo_.blockLoc(block);
     }
-    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
         return metainfo_.pieceLoc(piece, offset, length);
     }
@@ -154,7 +199,7 @@ public:
     {
         return metainfo_.blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const noexcept
     {
         return metainfo_.blockSpanForPiece(piece);
     }
@@ -530,8 +575,6 @@ public:
         return this->isPublic() && this->session->allowsLPD();
     }
 
-    [[nodiscard]] bool isPieceTransferAllowed(tr_direction direction) const;
-
     [[nodiscard]] bool clientCanDownload() const
     {
         return this->isPieceTransferAllowed(TR_PEER_TO_CLIENT);
@@ -581,7 +624,7 @@ public:
         return {};
     }
 
-    [[nodiscard]] constexpr auto id() const noexcept
+    [[nodiscard]] constexpr auto const& id() const noexcept
     {
         return unique_id_;
     }
@@ -612,9 +655,47 @@ public:
 
     void setBandwidthGroup(std::string_view group_name) noexcept;
 
-    [[nodiscard]] constexpr tr_interned_string const& bandwidthGroup() const noexcept
+    [[nodiscard]] constexpr auto getPriority() const noexcept
+    {
+        return bandwidth_.getPriority();
+    }
+
+    [[nodiscard]] constexpr auto const& bandwidthGroup() const noexcept
     {
         return bandwidth_group_;
+    }
+
+    [[nodiscard]] constexpr auto idleLimitMode() const noexcept
+    {
+        return idle_limit_mode_;
+    }
+
+    [[nodiscard]] constexpr auto idleLimitMinutes() const noexcept
+    {
+        return idle_limit_minutes_;
+    }
+
+    [[nodiscard]] constexpr auto peerLimit() const noexcept
+    {
+        return max_connected_peers_;
+    }
+
+    constexpr void setRatioMode(tr_ratiolimit mode) noexcept
+    {
+        if (ratioLimitMode != mode)
+        {
+            ratioLimitMode = mode;
+            setDirty();
+        }
+    }
+
+    constexpr void setIdleLimit(uint16_t idle_minutes) noexcept
+    {
+        if ((idle_limit_minutes_ != idle_minutes) && (idle_minutes > 0))
+        {
+            idle_limit_minutes_ = idle_minutes;
+            setDirty();
+        }
     }
 
     tr_torrent_metainfo metainfo_;
@@ -719,11 +800,11 @@ public:
     float desiredRatio = 0.0F;
     tr_ratiolimit ratioLimitMode = TR_RATIOLIMIT_GLOBAL;
 
-    tr_idlelimit idleLimitMode = TR_IDLELIMIT_GLOBAL;
+    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
-    uint16_t max_connected_peers = TR_DEFAULT_PEER_LIMIT_TORRENT;
+    uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
-    uint16_t idleLimitMinutes = 0;
+    uint16_t idle_limit_minutes_ = 0;
 
     bool finishedSeedingByIdle = false;
 

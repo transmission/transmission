@@ -21,12 +21,15 @@ public:
 
     explicit tr_interned_string(tr_quark quark)
         : quark_{ quark }
+        , sv_{ tr_quark_get_string_view(quark_) }
     {
     }
+
     explicit tr_interned_string(std::string_view sv)
         : tr_interned_string{ tr_quark_new(sv) }
     {
     }
+
     explicit tr_interned_string(char const* c_str)
         : tr_interned_string{ std::string_view{ c_str ? c_str : "" } }
     {
@@ -35,63 +38,72 @@ public:
     tr_interned_string& operator=(tr_quark quark)
     {
         quark_ = quark;
+        sv_ = tr_quark_get_string_view(quark_);
         return *this;
     }
+
     tr_interned_string& operator=(std::string_view sv)
     {
         return *this = tr_quark_new(sv);
     }
+
     tr_interned_string& operator=(char const* c_str)
     {
         return *this = std::string_view{ c_str != nullptr ? c_str : "" };
     }
 
-    [[nodiscard]] constexpr tr_quark quark() const noexcept
+    [[nodiscard]] constexpr auto quark() const noexcept
     {
         return quark_;
     }
-    [[nodiscard]] std::string_view sv() const
+
+    [[nodiscard]] constexpr auto sv() const noexcept
     {
-        return tr_quark_get_string_view(quark_);
+        return sv_;
     }
-    [[nodiscard]] char const* c_str() const
+
+    [[nodiscard]] constexpr char const* c_str() const noexcept
     {
         return std::data(sv()); // tr_quark strs are always zero-terminated
     }
 
-    [[nodiscard]] auto data() const
+    [[nodiscard]] constexpr auto data() const noexcept
     {
-        return std::data(this->sv());
+        return std::data(sv());
     }
+
     [[nodiscard]] constexpr auto empty() const noexcept
     {
         return quark_ == TR_KEY_NONE;
     }
-    [[nodiscard]] auto size() const
+
+    [[nodiscard]] constexpr auto size() const noexcept
     {
-        return std::size(this->sv());
-    }
-    void clear()
-    {
-        *this = TR_KEY_NONE;
+        return std::size(sv());
     }
 
-    [[nodiscard]] auto begin() const
+    constexpr void clear()
     {
-        return std::begin(this->sv());
-    }
-    [[nodiscard]] auto end() const
-    {
-        return std::end(this->sv());
+        *this = tr_interned_string{};
     }
 
-    [[nodiscard]] auto rbegin() const
+    [[nodiscard]] constexpr auto begin() const noexcept
     {
-        return std::rbegin(this->sv());
+        return std::begin(sv());
     }
-    [[nodiscard]] auto rend() const
+
+    [[nodiscard]] constexpr auto end() const noexcept
     {
-        return std::rend(this->sv());
+        return std::end(sv());
+    }
+
+    [[nodiscard]] constexpr auto rbegin() const noexcept
+    {
+        return std::rbegin(sv());
+    }
+    [[nodiscard]] constexpr auto rend() const noexcept
+    {
+        return std::rend(sv());
     }
 
     [[nodiscard]] constexpr auto compare(tr_interned_string const& that) const noexcept // <=>
@@ -128,30 +140,31 @@ public:
         return this->compare(that) != 0;
     }
 
-    [[nodiscard]] bool operator==(std::string_view that) const
+    [[nodiscard]] constexpr auto operator==(std::string_view that) const noexcept
     {
-        return this->sv() == that;
+        return sv() == that;
     }
-    [[nodiscard]] bool operator!=(std::string_view that) const
+    [[nodiscard]] constexpr auto operator!=(std::string_view that) const noexcept
     {
-        return this->sv() != that;
+        return sv() != that;
     }
-    [[nodiscard]] bool operator==(char const* that) const
+    [[nodiscard]] constexpr bool operator==(char const* that) const noexcept
     {
         return *this == std::string_view{ that != nullptr ? that : "" };
     }
-    [[nodiscard]] bool operator!=(char const* that) const
+    [[nodiscard]] constexpr bool operator!=(char const* that) const noexcept
     {
         return *this != std::string_view{ that != nullptr ? that : "" };
     }
 
-    operator std::string_view() const
+    constexpr operator std::string_view() const noexcept
     {
         return sv();
     }
 
 private:
     tr_quark quark_ = TR_KEY_NONE;
+    std::string_view sv_ = "";
 };
 
 template<>
