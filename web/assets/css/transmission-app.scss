@@ -506,11 +506,6 @@ $video-image: '../img/film.svg';
     &.selected {
       background-color: var(--color-bg-selected);
     }
-
-    &.selected .torrent-progress-details.error,
-    &.selected .torrent-peer-details.error {
-      color: $white;
-    }
   }
 
   .icon {
