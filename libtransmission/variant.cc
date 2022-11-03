@@ -41,7 +41,7 @@ static bool tr_variantIsContainer(tr_variant const* v)
     return tr_variantIsList(v) || tr_variantIsDict(v);
 }
 
-void tr_variantInit(tr_variant* v, char type)
+static void tr_variantInit(tr_variant* v, char type)
 {
     v->type = type;
     memset(&v->val, 0, sizeof(v->val));
