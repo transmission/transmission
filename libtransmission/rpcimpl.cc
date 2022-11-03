@@ -1271,7 +1271,7 @@ static char const* torrentSet(
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))
         {
-            tr_torrentUseSpeedLimit(tor, TR_DOWN, val);
+            tor->useSpeedLimit(TR_DOWN, val);
         }
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &val))
@@ -1286,7 +1286,7 @@ static char const* torrentSet(
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_uploadLimited, &val))
         {
-            tr_torrentUseSpeedLimit(tor, TR_UP, val);
+            tor->useSpeedLimit(TR_UP, val);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))

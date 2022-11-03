@@ -286,7 +286,7 @@ static void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* to
 
     if (auto val = bool{}; tr_variantDictFindBool(d, TR_KEY_use_speed_limit, &val))
     {
-        tr_torrentUseSpeedLimit(tor, dir, val);
+        tor->useSpeedLimit(dir, val);
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(d, TR_KEY_use_global_speed_limit, &val))

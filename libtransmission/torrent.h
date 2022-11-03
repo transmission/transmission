@@ -131,6 +131,14 @@ public:
         }
     }
 
+    constexpr void useSpeedLimit(tr_direction dir, bool do_use)
+    {
+        if (bandwidth_.setLimited(dir, do_use))
+        {
+            setDirty();
+        }
+    }
+
     [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
     {
         return bandwidth_.getDesiredSpeedBytesPerSecond(dir);

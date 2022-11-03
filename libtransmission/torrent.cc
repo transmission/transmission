@@ -186,10 +186,7 @@ void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tor->bandwidth_.setLimited(dir, do_use))
-    {
-        tor->setDirty();
-    }
+    tor->useSpeedLimit(dir, do_use);
 }
 
 bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
@@ -715,9 +712,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
-        tr_torrentUseSpeedLimit(tor, TR_UP, false);
+        tor->useSpeedLimit(TR_UP, false);
         tor->setSpeedLimitBps(TR_UP, tr_toSpeedBytes(tor->session->speedLimitKBps(TR_UP)));
-        tr_torrentUseSpeedLimit(tor, TR_DOWN, false);
+        tor->useSpeedLimit(TR_DOWN, false);
         tor->setSpeedLimitBps(TR_DOWN, tr_toSpeedBytes(tor->session->speedLimitKBps(TR_DOWN)));
         tr_torrentUseSessionLimits(tor, true);
     }
