@@ -71,15 +71,15 @@ public:
     {
         return blockInfo().blockCount();
     }
-    [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const
+    [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const noexcept
     {
         return blockInfo().byteLoc(nth_byte);
     }
-    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const noexcept
     {
         return blockInfo().blockLoc(block);
     }
-    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
         return blockInfo().pieceLoc(piece, offset, length);
     }
@@ -87,7 +87,7 @@ public:
     {
         return blockInfo().blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const noexcept
     {
         return blockInfo().blockSpanForPiece(piece);
     }

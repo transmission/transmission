@@ -2162,6 +2162,7 @@ auto makeBlocklistDir(std::string_view config_dir)
     tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
     return dir;
 }
+
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)

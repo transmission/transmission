@@ -25,7 +25,7 @@ namespace libtransmission
 class Blocklist
 {
 public:
-    static std::vector<Blocklist> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
+    [[nodiscard]] static std::vector<Blocklist> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
 
     static std::optional<Blocklist> saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled);
 

@@ -85,7 +85,7 @@ private:
     }
 
 public:
-    explicit tr_handshake_mediator_impl(tr_session& session)
+    explicit tr_handshake_mediator_impl(tr_session& session) noexcept
         : session_{ session }
     {
     }
@@ -1101,11 +1101,6 @@ static struct peer_atom* ensureAtomExists(
     return a;
 }
 
-[[nodiscard]] static constexpr auto getMaxPeerCount(tr_torrent const* tor) noexcept
-{
-    return tor->max_connected_peers;
-}
-
 static void createBitTorrentPeer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_quark client)
 {
     TR_ASSERT(atom != nullptr);
@@ -1202,7 +1197,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", atom->readable()));
         }
-        else if (result.io->isIncoming() && s->peerCount() >= getMaxPeerCount(s->tor))
+        else if (result.io->isIncoming() && s->peerCount() >= s->tor->peerLimit())
         {
             /* too many peers already */
         }
@@ -1492,7 +1487,7 @@ void tr_peerMgrStartTorrent(tr_torrent* tor)
     tr_swarm* const swarm = tor->swarm;
 
     swarm->is_running = true;
-    swarm->max_peers = getMaxPeerCount(tor);
+    swarm->max_peers = tor->peerLimit();
 
     swarm->manager->rechokeSoon();
 }
@@ -1969,7 +1964,7 @@ void rechokeDownloads(tr_swarm* s)
     }
 
     /* don't let the previous section's number tweaking go too far... */
-    max_peers = std::clamp(max_peers, MinInterestingPeers, s->tor->max_connected_peers);
+    max_peers = std::clamp(max_peers, MinInterestingPeers, s->tor->peerLimit());
 
     s->max_peers = max_peers;
 
@@ -2326,7 +2321,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(getMaxPeerCount(tor) * 0.9));
+        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(tor->peerLimit() * 0.9));
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?
@@ -2434,7 +2429,7 @@ void enforceTorrentPeerLimit(tr_swarm* swarm)
 {
     // do we have too many peers?
     auto const n = swarm->peerCount();
-    auto const max = tr_torrentGetPeerLimit(swarm->tor);
+    auto const max = swarm->tor->peerLimit();
     if (n <= max)
     {
         return;
@@ -2681,7 +2676,7 @@ struct peer_candidate
     score = addValToKey(score, 32, i);
 
     /* prefer peers belonging to a torrent of a higher priority */
-    switch (tr_torrentGetPriority(tor))
+    switch (tor->getPriority())
     {
     case TR_PRI_HIGH:
         i = 0;
@@ -2771,7 +2766,7 @@ struct peer_candidate
         }
 
         /* if we've already got enough peers in this torrent... */
-        if (tr_torrentGetPeerLimit(tor) <= tor->swarm->peerCount())
+        if (tor->peerLimit() <= tor->swarm->peerCount())
         {
             continue;
         }

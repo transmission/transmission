@@ -102,7 +102,7 @@ private:
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
     {
     public:
-        explicit AltSpeedMediator(tr_session& session)
+        explicit AltSpeedMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -120,7 +120,7 @@ private:
     class AnnouncerUdpMediator final : public tr_announcer_udp::Mediator
     {
     public:
-        explicit AnnouncerUdpMediator(tr_session& session)
+        explicit AnnouncerUdpMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -154,7 +154,7 @@ private:
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
     {
     public:
-        explicit PortForwardingMediator(tr_session& session)
+        explicit PortForwardingMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -186,7 +186,7 @@ private:
     class WebMediator final : public tr_web::Mediator
     {
     public:
-        explicit WebMediator(tr_session* session)
+        explicit WebMediator(tr_session* session) noexcept
             : session_{ session }
         {
         }
@@ -207,7 +207,7 @@ private:
     class LpdMediator final : public tr_lpd::Mediator
     {
     public:
-        explicit LpdMediator(tr_session& session)
+        explicit LpdMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -612,19 +612,19 @@ public:
         return session_stats_;
     }
 
-    void addUploaded(uint32_t n_bytes) noexcept
+    constexpr void addUploaded(uint32_t n_bytes) noexcept
     {
-        session_stats_.addUploaded(n_bytes);
+        stats().addUploaded(n_bytes);
     }
 
-    void addDownloaded(uint32_t n_bytes) noexcept
+    constexpr void addDownloaded(uint32_t n_bytes) noexcept
     {
-        session_stats_.addDownloaded(n_bytes);
+        stats().addDownloaded(n_bytes);
     }
 
-    void addFileCreated() noexcept
+    constexpr void addFileCreated() noexcept
     {
-        session_stats_.addFileCreated();
+        stats().addFileCreated();
     }
 
     // The incoming peer port that's been opened on the local machine
