@@ -129,7 +129,7 @@ static constexpr char const* getStr(tr_variant const* v)
     return tr_variant_string_get_string(&v->val.s);
 }
 
-static int dictIndexOf(tr_variant const* dict, tr_quark const key)
+static constexpr int dictIndexOf(tr_variant const* dict, tr_quark const key)
 {
     if (tr_variantIsDict(dict))
     {
@@ -147,7 +147,7 @@ static int dictIndexOf(tr_variant const* dict, tr_quark const key)
 
 tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
 {
-    int const i = dictIndexOf(dict, key);
+    auto const i = dictIndexOf(dict, key);
 
     return i < 0 ? nullptr : dict->val.l.vals + i;
 }
