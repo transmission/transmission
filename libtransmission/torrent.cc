@@ -203,13 +203,6 @@ void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobyte
     tor->setSpeedLimitBps(dir, tr_toSpeedBytes(kilo_per_second));
 }
 
-tr_bytes_per_second_t tr_torrent::speedLimitBps(tr_direction dir) const
-{
-    TR_ASSERT(tr_isDirection(dir));
-
-    return this->bandwidth_.getDesiredSpeedBytesPerSecond(dir);
-}
-
 tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
