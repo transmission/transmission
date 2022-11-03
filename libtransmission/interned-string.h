@@ -64,12 +64,12 @@ public:
 
     [[nodiscard]] constexpr char const* c_str() const noexcept
     {
-        return std::data(sv_); // tr_quark strs are always zero-terminated
+        return std::data(sv()); // tr_quark strs are always zero-terminated
     }
 
     [[nodiscard]] constexpr auto data() const noexcept
     {
-        return std::data(sv_);
+        return std::data(sv());
     }
 
     [[nodiscard]] constexpr auto empty() const noexcept
@@ -79,7 +79,7 @@ public:
 
     [[nodiscard]] constexpr auto size() const noexcept
     {
-        return std::size(sv_);
+        return std::size(sv());
     }
 
     constexpr void clear()
@@ -89,21 +89,21 @@ public:
 
     [[nodiscard]] constexpr auto begin() const noexcept
     {
-        return std::begin(sv_);
+        return std::begin(sv());
     }
 
     [[nodiscard]] constexpr auto end() const noexcept
     {
-        return std::end(sv_);
+        return std::end(sv());
     }
 
     [[nodiscard]] constexpr auto rbegin() const noexcept
     {
-        return std::rbegin(sv_);
+        return std::rbegin(sv());
     }
     [[nodiscard]] constexpr auto rend() const noexcept
     {
-        return std::rend(sv_);
+        return std::rend(sv());
     }
 
     [[nodiscard]] constexpr auto compare(tr_interned_string const& that) const noexcept // <=>
@@ -142,11 +142,11 @@ public:
 
     [[nodiscard]] constexpr auto operator==(std::string_view that) const noexcept
     {
-        return sv_ == that;
+        return sv() == that;
     }
     [[nodiscard]] constexpr auto operator!=(std::string_view that) const noexcept
     {
-        return sv_ != that;
+        return sv() != that;
     }
     [[nodiscard]] constexpr bool operator==(char const* that) const noexcept
     {
@@ -159,7 +159,7 @@ public:
 
     constexpr operator std::string_view() const noexcept
     {
-        return sv_;
+        return sv();
     }
 
 private:
