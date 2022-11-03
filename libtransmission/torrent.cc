@@ -134,26 +134,6 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     return true;
 }
 
-bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
-{
-    TR_ASSERT(tr_isDirection(direction));
-
-    if (this->usesSpeedLimit(direction) && this->speedLimitBps(direction) <= 0)
-    {
-        return false;
-    }
-
-    if (usesSessionLimits())
-    {
-        if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 /***
 ****
 ***/

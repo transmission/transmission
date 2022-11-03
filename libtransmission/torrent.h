@@ -130,6 +130,34 @@ public:
         return bandwidth_.getDesiredSpeedBytesPerSecond(dir);
     }
 
+    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
+    {
+        return bandwidth_.areParentLimitsHonored(TR_UP);
+    }
+
+    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
+    {
+        return bandwidth_.isLimited(dir);
+    }
+
+    [[nodiscard]] constexpr auto isPieceTransferAllowed(tr_direction direction) const noexcept
+    {
+        if (usesSpeedLimit(direction) && speedLimitBps(direction) <= 0)
+        {
+            return false;
+        }
+
+        if (usesSessionLimits())
+        {
+            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /// BLOCK INFO
 
     [[nodiscard]] constexpr auto const& blockInfo() const noexcept
@@ -533,8 +561,6 @@ public:
         return this->isPublic() && this->session->allowsLPD();
     }
 
-    [[nodiscard]] bool isPieceTransferAllowed(tr_direction direction) const;
-
     [[nodiscard]] bool clientCanDownload() const
     {
         return this->isPieceTransferAllowed(TR_PEER_TO_CLIENT);
@@ -618,16 +644,6 @@ public:
     [[nodiscard]] constexpr auto getPriority() const noexcept
     {
         return bandwidth_.getPriority();
-    }
-
-    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
-    {
-        return bandwidth_.areParentLimitsHonored(TR_UP);
-    }
-
-    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
-    {
-        return bandwidth_.isLimited(dir);
     }
 
     [[nodiscard]] constexpr auto const& bandwidthGroup() const noexcept
