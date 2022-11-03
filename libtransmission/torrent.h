@@ -627,6 +627,11 @@ public:
         return idle_limit_mode_;
     }
 
+    [[nodiscard]] constexpr auto peerLimit() const noexcept
+    {
+        return max_connected_peers_;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -731,7 +736,7 @@ public:
 
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
-    uint16_t max_connected_peers = TR_DEFAULT_PEER_LIMIT_TORRENT;
+    uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
     uint16_t idleLimitMinutes = 0;
 

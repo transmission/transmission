@@ -691,7 +691,8 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_maxConnectedPeers:
-        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
+    case TR_KEY_peer_limit:
+        tr_variantInitInt(initme, tor->peerLimit());
         break;
 
     case TR_KEY_magnetLink:
@@ -712,10 +713,6 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
 
     case TR_KEY_percentDone:
         tr_variantInitReal(initme, st->percentDone);
-        break;
-
-    case TR_KEY_peer_limit:
-        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
         break;
 
     case TR_KEY_peers:

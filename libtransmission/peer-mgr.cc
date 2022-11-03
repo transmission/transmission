@@ -2440,7 +2440,7 @@ void enforceTorrentPeerLimit(tr_swarm* swarm)
 {
     // do we have too many peers?
     auto const n = swarm->peerCount();
-    auto const max = tr_torrentGetPeerLimit(swarm->tor);
+    auto const max = swarm->tor->peerLimit();
     if (n <= max)
     {
         return;
@@ -2777,7 +2777,7 @@ struct peer_candidate
         }
 
         /* if we've already got enough peers in this torrent... */
-        if (tr_torrentGetPeerLimit(tor) <= tor->swarm->peerCount())
+        if (tor->peerLimit() <= tor->swarm->peerCount())
         {
             continue;
         }
