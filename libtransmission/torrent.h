@@ -581,7 +581,7 @@ public:
         return {};
     }
 
-    [[nodiscard]] constexpr auto id() const noexcept
+    [[nodiscard]] constexpr auto const& id() const noexcept
     {
         return unique_id_;
     }
@@ -611,6 +611,11 @@ public:
     void markChanged();
 
     void setBandwidthGroup(std::string_view group_name) noexcept;
+
+    [[nodiscard]] constexpr auto getPriority() const noexcept
+    {
+        return bandwidth_.getPriority();
+    }
 
     [[nodiscard]] constexpr tr_interned_string const& bandwidthGroup() const noexcept
     {

@@ -2687,7 +2687,7 @@ struct peer_candidate
     score = addValToKey(score, 32, i);
 
     /* prefer peers belonging to a torrent of a higher priority */
-    switch (tr_torrentGetPriority(tor))
+    switch (tor->getPriority())
     {
     case TR_PRI_HIGH:
         i = 0;
