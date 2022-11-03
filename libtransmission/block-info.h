@@ -74,12 +74,12 @@ public:
         tr_block_index_t block = 0;
         uint32_t block_offset = 0;
 
-        [[nodiscard]] bool operator==(Location const& that) const
+        [[nodiscard]] constexpr bool operator==(Location const& that) const noexcept
         {
             return this->byte == that.byte;
         }
 
-        [[nodiscard]] bool operator<(Location const& that) const
+        [[nodiscard]] constexpr bool operator<(Location const& that) const noexcept
         {
             return this->byte < that.byte;
         }
@@ -147,7 +147,7 @@ public:
 
 private:
     // Location of the last byte in `piece`.
-    [[nodiscard]] constexpr Location pieceLastLoc(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr Location pieceLastLoc(tr_piece_index_t piece) const noexcept
     {
         return byteLoc(static_cast<uint64_t>(piece) * pieceSize() + pieceSize(piece) - 1);
     }
