@@ -138,7 +138,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
 ****
 ***/
 
-static void tr_torrentUnsetPeerId(tr_torrent* tor)
+static constexpr void tr_torrentUnsetPeerId(tr_torrent* tor)
 {
     // triggers a rebuild next time tr_torrentGetPeerId() is called
     tor->peer_id_ = {};
