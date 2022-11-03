@@ -201,8 +201,13 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
     return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
 }
 
-void tr_variantInitReal(tr_variant* initme, double value);
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
+
+constexpr void tr_variantInitReal(tr_variant* initme, double value)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_REAL);
+    initme->val.d = value;
+}
 
 /***
 ****  Booleans
@@ -213,8 +218,13 @@ bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
     return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
 }
 
-void tr_variantInitBool(tr_variant* initme, bool value);
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
+
+constexpr void tr_variantInitBool(tr_variant* initme, bool value)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_BOOL);
+    initme->val.b = value;
+}
 
 /***
 ****  Ints
@@ -225,8 +235,13 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
 
-void tr_variantInitInt(tr_variant* initme, int64_t value);
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
+
+constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_INT);
+    initme->val.i = value;
+}
 
 /***
 ****  Lists

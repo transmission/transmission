@@ -388,24 +388,6 @@ void tr_variantInitStr(tr_variant* initme, std::string_view str)
     tr_variant_string_set_string(&initme->val.s, str);
 }
 
-void tr_variantInitBool(tr_variant* initme, bool value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_BOOL);
-    initme->val.b = value;
-}
-
-void tr_variantInitReal(tr_variant* initme, double value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_REAL);
-    initme->val.d = value;
-}
-
-void tr_variantInitInt(tr_variant* initme, int64_t value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_INT);
-    initme->val.i = value;
-}
-
 void tr_variantInitList(tr_variant* initme, size_t reserve_count)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_LIST);
