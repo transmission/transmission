@@ -1107,11 +1107,6 @@ static struct peer_atom* ensureAtomExists(
     return a;
 }
 
-[[nodiscard]] static constexpr auto getMaxPeerCount(tr_torrent const* tor) noexcept
-{
-    return tor->max_connected_peers;
-}
-
 static void createBitTorrentPeer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_quark client)
 {
     TR_ASSERT(atom != nullptr);
@@ -1208,7 +1203,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", atom->readable()));
         }
-        else if (result.io->isIncoming() && s->peerCount() >= getMaxPeerCount(s->tor))
+        else if (result.io->isIncoming() && s->peerCount() >= s->tor->peerLimit())
         {
             /* too many peers already */
         }
@@ -1498,7 +1493,7 @@ void tr_peerMgrStartTorrent(tr_torrent* tor)
     tr_swarm* const swarm = tor->swarm;
 
     swarm->is_running = true;
-    swarm->max_peers = getMaxPeerCount(tor);
+    swarm->max_peers = tor->peerLimit();
 
     swarm->manager->rechokeSoon();
 }
@@ -1975,7 +1970,7 @@ void rechokeDownloads(tr_swarm* s)
     }
 
     /* don't let the previous section's number tweaking go too far... */
-    max_peers = std::clamp(max_peers, MinInterestingPeers, s->tor->max_connected_peers);
+    max_peers = std::clamp(max_peers, MinInterestingPeers, s->tor->peerLimit());
 
     s->max_peers = max_peers;
 
@@ -2332,7 +2327,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(getMaxPeerCount(tor) * 0.9));
+        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(tor->peerLimit() * 0.9));
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?

@@ -269,7 +269,7 @@ static void saveRatioLimits(tr_variant* dict, tr_torrent const* tor)
 static void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_idle_limit, 2);
-    tr_variantDictAddInt(d, TR_KEY_idle_limit, tr_torrentGetIdleLimit(tor));
+    tr_variantDictAddInt(d, TR_KEY_idle_limit, tor->idleLimitMinutes());
     tr_variantDictAddInt(d, TR_KEY_idle_mode, tor->idleLimitMode());
 }
 
@@ -723,7 +723,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bo
 
     if ((fields_to_load & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
     {
-        tor->max_connected_peers = static_cast<uint16_t>(i);
+        tor->max_connected_peers_ = static_cast<uint16_t>(i);
         fields_loaded |= tr_resume::MaxPeers;
     }
 
@@ -853,7 +853,7 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
         }
     }
 
-    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->max_connected_peers))
+    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->max_connected_peers_))
     {
         ret |= tr_resume::MaxPeers;
     }
@@ -923,7 +923,7 @@ void save(tr_torrent* tor)
 
     tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
-    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->max_connected_peers);
+    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->peerLimit());
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tor->getPriority());
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);

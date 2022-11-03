@@ -627,6 +627,11 @@ public:
         return idle_limit_mode_;
     }
 
+    [[nodiscard]] constexpr auto idleLimitMinutes() const noexcept
+    {
+        return idle_limit_minutes_;
+    }
+
     [[nodiscard]] constexpr auto peerLimit() const noexcept
     {
         return max_connected_peers_;
@@ -738,7 +743,7 @@ public:
 
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
-    uint16_t idleLimitMinutes = 0;
+    uint16_t idle_limit_minutes_ = 0;
 
     bool finishedSeedingByIdle = false;
 

@@ -398,7 +398,7 @@ void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes)
 
     if (idle_minutes > 0)
     {
-        tor->idleLimitMinutes = idle_minutes;
+        tor->idle_limit_minutes_ = idle_minutes;
 
         tor->setDirty();
     }
@@ -408,7 +408,7 @@ uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->idleLimitMinutes;
+    return tor->idleLimitMinutes();
 }
 
 bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idle_minutes)
@@ -422,7 +422,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idle_minutes)
 
         if (idle_minutes != nullptr)
         {
-            *idle_minutes = tr_torrentGetIdleLimit(tor);
+            *idle_minutes = tor->idleLimitMinutes();
         }
 
         break;
