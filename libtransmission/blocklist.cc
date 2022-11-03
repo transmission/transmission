@@ -372,9 +372,9 @@ void Blocklist::ensureLoaded() const
     {
         // bad binary file; try to rebuild it
         in.close();
-        auto source_file = std::string_view{ bin_file_ };
-        source_file.remove_suffix(std::size(BinFileSuffix));
-        rules_ = parseFile(source_file);
+        auto src_file = std::string_view{ bin_file_ };
+        src_file.remove_suffix(std::size(BinFileSuffix));
+        rules_ = parseFile(src_file);
         if (!std::empty(rules_))
         {
             tr_logAddInfo(_("Rewriting old blocklist file format to new format"));
