@@ -127,6 +127,11 @@ public:
 
     [[nodiscard]] tr_bytes_per_second_t speedLimitBps(tr_direction) const;
 
+    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
+    {
+        return bandwidth_.areParentLimitsHonored(TR_UP);
+    }
+
     /// BLOCK INFO
 
     [[nodiscard]] constexpr auto const& blockInfo() const noexcept

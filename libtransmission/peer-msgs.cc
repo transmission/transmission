@@ -584,7 +584,7 @@ private:
         }
 
         // honor the session limits, if enabled
-        if (tr_torrentUsesSessionLimits(torrent))
+        if (torrent->usesSessionLimits())
         {
             if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
                 irate_bytes_per_second)

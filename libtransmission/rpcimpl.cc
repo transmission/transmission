@@ -655,7 +655,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_honorsSessionLimits:
-        tr_variantInitBool(initme, tr_torrentUsesSessionLimits(tor));
+        tr_variantInitBool(initme, tor->usesSessionLimits());
         break;
 
     case TR_KEY_id:

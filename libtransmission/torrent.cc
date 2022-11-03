@@ -143,7 +143,7 @@ bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
         return false;
     }
 
-    if (tr_torrentUsesSessionLimits(this))
+    if (usesSessionLimits())
     {
         if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
         {
@@ -250,7 +250,7 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->bandwidth_.areParentLimitsHonored(TR_UP);
+    return tor->usesSessionLimits();
 }
 
 /***
