@@ -805,7 +805,7 @@ static size_t getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now)
     return std::max(ceiling, current_speed_bytes_per_second * period);
 }
 
-size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
+size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const noexcept
 {
     size_t const desired_len = getDesiredOutputBufferSize(this, now);
     size_t const current_len = std::size(outbuf);
