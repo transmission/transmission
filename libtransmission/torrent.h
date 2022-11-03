@@ -689,6 +689,15 @@ public:
         }
     }
 
+    constexpr void setIdleLimit(uint16_t idle_minutes) noexcept
+    {
+        if ((idle_limit_minutes_ != idle_minutes) && (idle_minutes > 0))
+        {
+            idle_limit_minutes_ = idle_minutes;
+            setDirty();
+        }
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;

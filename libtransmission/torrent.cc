@@ -351,12 +351,7 @@ void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (idle_minutes > 0)
-    {
-        tor->idle_limit_minutes_ = idle_minutes;
-
-        tor->setDirty();
-    }
+    tor->setIdleLimit(idle_minutes);
 }
 
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor)
@@ -723,7 +718,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if ((loaded & tr_resume::Idlelimit) == 0)
     {
         tr_torrentSetIdleMode(tor, TR_IDLELIMIT_GLOBAL);
-        tr_torrentSetIdleLimit(tor, tor->session->idleLimitMinutes());
+        tor->setIdleLimit(tor->session->idleLimitMinutes());
     }
 
     auto has_local_data = std::optional<bool>{};

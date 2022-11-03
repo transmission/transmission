@@ -344,7 +344,7 @@ static auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
     {
         if (auto imin = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
         {
-            tr_torrentSetIdleLimit(tor, imin);
+            tor->setIdleLimit(imin);
         }
 
         if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))

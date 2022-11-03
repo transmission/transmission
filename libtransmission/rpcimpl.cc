@@ -1291,7 +1291,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tr_torrentSetIdleLimit(tor, static_cast<uint16_t>(tmp));
+            tor->setIdleLimit(static_cast<uint16_t>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
