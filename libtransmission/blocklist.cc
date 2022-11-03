@@ -457,6 +457,7 @@ bool Blocklist::contains(tr_address const& addr) const
             }
             return 0;
         }
+
         [[nodiscard]] static auto compare(address_range_t const& a, tr_address const& b) noexcept // <=>
         {
             return -compare(b, a);
@@ -503,9 +504,9 @@ std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std:
         return {};
     }
 
-    // save the bin file
     save(bin_file, std::data(rules), std::size(rules));
 
+    // return a new Blocklist with these rules
     auto ret = Blocklist{ bin_file, is_enabled };
     ret.rules_ = std::move(rules);
     return ret;
