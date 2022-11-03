@@ -127,11 +127,6 @@ public:
 
     [[nodiscard]] tr_bytes_per_second_t speedLimitBps(tr_direction) const;
 
-    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
-    {
-        return bandwidth_.areParentLimitsHonored(TR_UP);
-    }
-
     /// BLOCK INFO
 
     [[nodiscard]] constexpr auto const& blockInfo() const noexcept
@@ -620,6 +615,16 @@ public:
     [[nodiscard]] constexpr auto getPriority() const noexcept
     {
         return bandwidth_.getPriority();
+    }
+
+    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
+    {
+        return bandwidth_.areParentLimitsHonored(TR_UP);
+    }
+
+    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
+    {
+        return bandwidth_.isLimited(dir);
     }
 
     [[nodiscard]] constexpr auto const& bandwidthGroup() const noexcept

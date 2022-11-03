@@ -250,7 +250,7 @@ static void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direct
     tr_variantDictReserve(d, 3);
     tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speedLimitBps(dir));
     tr_variantDictAddBool(d, TR_KEY_use_global_speed_limit, tor->usesSessionLimits());
-    tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tr_torrentUsesSpeedLimit(tor, dir));
+    tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tor->usesSpeedLimit(dir));
 }
 
 static void saveSpeedLimits(tr_variant* dict, tr_torrent const* tor)

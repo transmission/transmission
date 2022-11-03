@@ -138,7 +138,7 @@ bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
 {
     TR_ASSERT(tr_isDirection(direction));
 
-    if (tr_torrentUsesSpeedLimit(this, direction) && this->speedLimitBps(direction) <= 0)
+    if (this->usesSpeedLimit(direction) && this->speedLimitBps(direction) <= 0)
     {
         return false;
     }
@@ -233,7 +233,7 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->bandwidth_.isLimited(dir);
+    return tor->usesSpeedLimit(dir);
 }
 
 void tr_torrentUseSessionLimits(tr_torrent* tor, bool do_use)

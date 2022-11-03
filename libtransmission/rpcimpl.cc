@@ -609,7 +609,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_downloadLimited:
-        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_DOWN));
+        tr_variantInitBool(initme, tor->usesSpeedLimit(TR_DOWN));
         break;
 
     case TR_KEY_error:
@@ -880,7 +880,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_uploadLimited:
-        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_UP));
+        tr_variantInitBool(initme, tor->usesSpeedLimit(TR_UP));
         break;
 
     case TR_KEY_uploadRatio:
