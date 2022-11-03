@@ -43,21 +43,6 @@ protected:
         "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n"
         "Evilcorp:216.88.88.0-216.88.88.255\n";
 
-#if 0
-    void createFileWithContents(char const* path, char const* contents)
-    {
-        auto const dir = tr_sys_path_dirname(path);
-        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700);
-
-        auto const fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
-        blockingFileWrite(fd, contents, strlen(contents));
-        tr_sys_file_close(fd);
-
-        sync();
-    }
-
-#endif
-
     bool addressIsBlocked(char const* address_str)
     {
         auto const addr = tr_address::fromString(address_str);
