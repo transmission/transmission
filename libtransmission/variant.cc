@@ -36,15 +36,9 @@ using namespace std::literals;
 ****
 ***/
 
-static bool tr_variantIsContainer(tr_variant const* v)
+static constexpr bool tr_variantIsContainer(tr_variant const* v)
 {
     return tr_variantIsList(v) || tr_variantIsDict(v);
-}
-
-static void tr_variantInit(tr_variant* v, char type)
-{
-    v->type = type;
-    memset(&v->val, 0, sizeof(v->val));
 }
 
 /***
@@ -93,15 +87,6 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
     auto const sv = tr_quark_get_string_view(quark);
     str->str.str = std::data(sv);
     str->len = std::size(sv);
-}
-
-static void tr_variant_string_set_string_view(struct tr_variant_string* str, std::string_view in)
-{
-    tr_variant_string_clear(str);
-
-    str->type = TR_STRING_TYPE_VIEW;
-    str->len = std::size(in);
-    str->str.str = std::data(in);
 }
 
 static void tr_variant_string_set_string(struct tr_variant_string* str, std::string_view in)
@@ -401,12 +386,6 @@ void tr_variantInitStr(tr_variant* initme, std::string_view str)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
     tr_variant_string_set_string(&initme->val.s, str);
-}
-
-void tr_variantInitStrView(tr_variant* initme, std::string_view str)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string_view(&initme->val.s, str);
 }
 
 void tr_variantInitBool(tr_variant* initme, bool value)

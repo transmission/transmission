@@ -172,9 +172,22 @@ bool tr_variantFromBuf(
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view);
-void tr_variantInitStrView(tr_variant* initme, std::string_view);
 void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
+
+constexpr void tr_variantInit(tr_variant* initme, char type)
+{
+    initme->val = {};
+    initme->type = type;
+}
+
+constexpr void tr_variantInitStrView(tr_variant* initme, std::string_view in)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    initme->val.s.type = TR_STRING_TYPE_VIEW;
+    initme->val.s.len = std::size(in);
+    initme->val.s.str.str = std::data(in);
+}
 
 bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
