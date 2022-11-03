@@ -1045,9 +1045,9 @@ private:
 
     /// other fields
 
-public:
     std::vector<libtransmission::Blocklist> blocklists_;
 
+public:
     struct tr_event_handle* events = nullptr;
 
     // depends-on: announcer_udp_
