@@ -328,7 +328,7 @@ void Blocklist::ensureLoaded() const
     // get the file's size
     tr_error* error = nullptr;
     auto const file_info = tr_sys_path_get_info(bin_file_, 0, &error);
-    if (error)
+    if (error != nullptr)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -445,7 +445,7 @@ bool Blocklist::contains(tr_address const& addr) const
 
     struct Compare
     {
-        [[nodiscard]] auto compare(tr_address const& a, address_range_t const& b) const noexcept // <=>
+        [[nodiscard]] static auto compare(tr_address const& a, address_range_t const& b) noexcept // <=>
         {
             if (a < b.first)
             {
@@ -457,7 +457,7 @@ bool Blocklist::contains(tr_address const& addr) const
             }
             return 0;
         }
-        [[nodiscard]] auto compare(address_range_t const& a, tr_address const& b) const noexcept // <=>
+        [[nodiscard]] static auto compare(address_range_t const& a, tr_address const& b) noexcept // <=>
         {
             return -compare(b, a);
         }
@@ -479,7 +479,7 @@ bool Blocklist::contains(tr_address const& addr) const
 std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled)
 {
     // if we can't parse the file, do nothing
-    auto const rules = parseFile(external_file);
+    auto rules = parseFile(external_file);
     if (std::empty(rules))
     {
         return {};
