@@ -617,9 +617,14 @@ public:
         return bandwidth_.getPriority();
     }
 
-    [[nodiscard]] constexpr tr_interned_string const& bandwidthGroup() const noexcept
+    [[nodiscard]] constexpr auto const& bandwidthGroup() const noexcept
     {
         return bandwidth_group_;
+    }
+
+    [[nodiscard]] constexpr auto idleLimitMode() const noexcept
+    {
+        return idle_limit_mode_;
     }
 
     tr_torrent_metainfo metainfo_;
@@ -724,7 +729,7 @@ public:
     float desiredRatio = 0.0F;
     tr_ratiolimit ratioLimitMode = TR_RATIOLIMIT_GLOBAL;
 
-    tr_idlelimit idleLimitMode = TR_IDLELIMIT_GLOBAL;
+    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
     uint16_t max_connected_peers = TR_DEFAULT_PEER_LIMIT_TORRENT;
 

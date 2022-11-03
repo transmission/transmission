@@ -270,7 +270,7 @@ static void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_idle_limit, 2);
     tr_variantDictAddInt(d, TR_KEY_idle_limit, tr_torrentGetIdleLimit(tor));
-    tr_variantDictAddInt(d, TR_KEY_idle_mode, tr_torrentGetIdleMode(tor));
+    tr_variantDictAddInt(d, TR_KEY_idle_mode, tor->idleLimitMode());
 }
 
 static void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* tor)

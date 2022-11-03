@@ -810,7 +810,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_seedIdleMode:
-        tr_variantInitInt(initme, tr_torrentGetIdleMode(tor));
+        tr_variantInitInt(initme, tor->idleLimitMode());
         break;
 
     case TR_KEY_seedRatioLimit:

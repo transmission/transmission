@@ -377,9 +377,9 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED);
 
-    if (mode != tor->idleLimitMode)
+    if (tor->idle_limit_mode_ != mode)
     {
-        tor->idleLimitMode = mode;
+        tor->idle_limit_mode_ = mode;
 
         tor->setDirty();
     }
@@ -389,7 +389,7 @@ tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->idleLimitMode;
+    return tor->idleLimitMode();
 }
 
 void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes)
@@ -415,7 +415,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idle_minutes)
 {
     auto is_limited = bool{};
 
-    switch (tr_torrentGetIdleMode(tor))
+    switch (tor->idleLimitMode())
     {
     case TR_IDLELIMIT_SINGLE:
         is_limited = true;
