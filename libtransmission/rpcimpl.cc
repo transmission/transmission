@@ -1306,7 +1306,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedRatioMode, &tmp))
         {
-            tr_torrentSetRatioMode(tor, (tr_ratiolimit)tmp);
+            tor->setRatioMode(static_cast<tr_ratiolimit>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))

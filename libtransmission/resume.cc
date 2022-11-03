@@ -327,7 +327,7 @@ static auto loadRatioLimits(tr_variant* dict, tr_torrent* tor)
 
         if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
         {
-            tr_torrentSetRatioMode(tor, tr_ratiolimit(i));
+            tor->setRatioMode(tr_ratiolimit(i));
         }
 
         ret = tr_resume::Ratiolimit;

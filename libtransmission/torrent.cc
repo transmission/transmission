@@ -222,12 +222,7 @@ void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED);
 
-    if (mode != tor->ratioLimitMode)
-    {
-        tor->ratioLimitMode = mode;
-
-        tor->setDirty();
-    }
+    tor->setRatioMode(mode);
 }
 
 tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor)
@@ -721,7 +716,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if ((loaded & tr_resume::Ratiolimit) == 0)
     {
-        tr_torrentSetRatioMode(tor, TR_RATIOLIMIT_GLOBAL);
+        tor->setRatioMode(TR_RATIOLIMIT_GLOBAL);
         tr_torrentSetRatioLimit(tor, tor->session->desiredRatio());
     }
 
@@ -1383,7 +1378,7 @@ static void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     if (tr_torrentIsSeedRatioDone(tor))
     {
         tr_logAddInfoTor(tor, _("Restarted manually -- disabling its seed ratio"));
-        tr_torrentSetRatioMode(tor, TR_RATIOLIMIT_UNLIMITED);
+        tor->setRatioMode(TR_RATIOLIMIT_UNLIMITED);
     }
 
     /* corresponds to the peer_id sent as a tracker request parameter.

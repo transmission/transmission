@@ -680,6 +680,15 @@ public:
         return max_connected_peers_;
     }
 
+    constexpr void setRatioMode(tr_ratiolimit mode) noexcept
+    {
+        if (ratioLimitMode != mode)
+        {
+            ratioLimitMode = mode;
+            setDirty();
+        }
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
