@@ -1121,15 +1121,12 @@ std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
     {
     case TR_VARIANT_FMT_JSON:
         return tr_variantToStrJson(v, false);
-        break;
 
     case TR_VARIANT_FMT_JSON_LEAN:
         return tr_variantToStrJson(v, true);
-        break;
 
     default: // TR_VARIANT_FMT_BENC:
         return tr_variantToStrBenc(v);
-        break;
     }
 }
 
