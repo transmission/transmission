@@ -100,7 +100,7 @@ private:
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
     {
     public:
-        explicit AltSpeedMediator(tr_session& session)
+        explicit AltSpeedMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -118,7 +118,7 @@ private:
     class AnnouncerUdpMediator final : public tr_announcer_udp::Mediator
     {
     public:
-        explicit AnnouncerUdpMediator(tr_session& session)
+        explicit AnnouncerUdpMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -152,7 +152,7 @@ private:
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
     {
     public:
-        explicit PortForwardingMediator(tr_session& session)
+        explicit PortForwardingMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -184,7 +184,7 @@ private:
     class WebMediator final : public tr_web::Mediator
     {
     public:
-        explicit WebMediator(tr_session* session)
+        explicit WebMediator(tr_session* session) noexcept
             : session_{ session }
         {
         }
@@ -205,7 +205,7 @@ private:
     class LpdMediator final : public tr_lpd::Mediator
     {
     public:
-        explicit LpdMediator(tr_session& session)
+        explicit LpdMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }

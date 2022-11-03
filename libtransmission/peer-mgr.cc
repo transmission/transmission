@@ -85,7 +85,7 @@ private:
     }
 
 public:
-    explicit tr_handshake_mediator_impl(tr_session& session)
+    explicit tr_handshake_mediator_impl(tr_session& session) noexcept
         : session_{ session }
     {
     }
