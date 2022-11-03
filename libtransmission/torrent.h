@@ -123,7 +123,13 @@ public:
 
     /// SPEED LIMIT
 
-    void setSpeedLimitBps(tr_direction, tr_bytes_per_second_t bytes_per_second);
+    constexpr void setSpeedLimitBps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
+    {
+        if (bandwidth_.setDesiredSpeedBytesPerSecond(dir, bytes_per_second))
+        {
+            setDirty();
+        }
+    }
 
     [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
     {
