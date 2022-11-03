@@ -536,7 +536,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->blocklists_ = BlocklistFile::loadBlocklists(configDir(), useBlocklist());
+    this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
 
     tr_announcerInit(this);
 
@@ -1621,7 +1621,7 @@ void tr_session::useBlocklist(bool enabled)
     std::for_each(
         std::begin(blocklists_),
         std::end(blocklists_),
-        [enabled](auto& blocklist) { blocklist->setEnabled(enabled); });
+        [enabled](auto& blocklist) { blocklist.setEnabled(enabled); });
 }
 
 bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
@@ -1629,13 +1629,12 @@ bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
     return std::any_of(
         std::begin(blocklists_),
         std::end(blocklists_),
-        [&addr](auto& blocklist) { return blocklist->hasAddress(addr); });
+        [&addr](auto& blocklist) { return blocklist.contains(addr); });
 }
 
 void tr_sessionReloadBlocklists(tr_session* session)
 {
-    session->blocklists_.clear();
-    session->blocklists_ = BlocklistFile::loadBlocklists(session->configDir(), session->useBlocklist());
+    session->blocklists_ = libtransmission::Blocklist::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
 
     if (session->peer_mgr_)
     {
@@ -1648,7 +1647,7 @@ size_t tr_blocklistGetRuleCount(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     auto& src = session->blocklists_;
-    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto& cur) { return sum + cur->getRuleCount(); });
+    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto& cur) { return sum + std::size(cur); });
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
@@ -1676,29 +1675,35 @@ size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
 {
     auto const lock = session->unique_lock();
 
-    // find (or add) the default blocklist
-    auto& src = session->blocklists_;
-    char const* const name = DEFAULT_BLOCKLIST_FILENAME;
-    auto const it = std::find_if(
-        std::begin(src),
-        std::end(src),
-        [&name](auto const& blocklist) { return tr_strvEndsWith(blocklist->filename(), name); });
+    // These rules will replace the default blocklist.
+    // Build the path of the default blocklist .bin file where we'll save these rules.
+    auto const bin_file = tr_pathbuf{ session->blocklist_dir_, '/', DEFAULT_BLOCKLIST_FILENAME };
 
-    BlocklistFile* b = nullptr;
-    if (it == std::end(src))
+    // Try to save it
+    auto added = libtransmission::Blocklist::saveNew(content_filename, bin_file, session->useBlocklist());
+    if (!added)
     {
-        auto path = tr_pathbuf{ session->configDir(), "/blocklists/"sv, name };
-        src.push_back(std::make_unique<BlocklistFile>(path, session->useBlocklist()));
-        b = std::rbegin(src)->get();
+        return 0U;
+    }
+
+    auto const n_rules = std::size(*added);
+
+    // Add (or replace) it in our blocklists_ vector
+    auto& src = session->blocklists_;
+    if (auto iter = std::find_if(
+            std::begin(src),
+            std::end(src),
+            [&bin_file](auto const& candidate) { return bin_file == candidate.binFile(); });
+        iter != std::end(src))
+    {
+        *iter = std::move(*added);
     }
     else
     {
-        b = it->get();
+        src.emplace_back(std::move(*added));
     }
 
-    // set the default blocklist's content
-    auto const rule_count = b->setContent(content_filename);
-    return rule_count;
+    return n_rules;
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
@@ -2210,6 +2215,13 @@ auto makeTorrentDir(std::string_view config_dir)
     return dir;
 }
 
+auto makeBlocklistDir(std::string_view config_dir)
+{
+    auto dir = fmt::format("{:s}/blocklists"sv, config_dir);
+    tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
+    return dir;
+}
+
 auto makeEventBase()
 {
     tr_evthread_init();
@@ -2222,6 +2234,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
+    , blocklist_dir_{ makeBlocklistDir(config_dir) }
     , event_base_{ makeEventBase() }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
