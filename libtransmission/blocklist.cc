@@ -232,7 +232,7 @@ auto parseFile(std::string_view filename)
     while (std::getline(in, line))
     {
         ++line_number;
-        if (auto range = parseLine(line); range)
+        if (auto range = parseLine(line); range && (range->first.type == range->second.type))
         {
             ranges.push_back(*range);
         }
