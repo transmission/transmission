@@ -55,13 +55,13 @@ class tr_port_forwarding;
 class tr_rpc_server;
 class tr_session_thread;
 class tr_web;
-struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
 struct tr_variant;
 
 namespace libtransmission
 {
+class Blocklist;
 class Dns;
 class Timer;
 class TimerMaker;
@@ -1065,9 +1065,9 @@ private:
 
     /// other fields
 
-public:
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+    std::vector<libtransmission::Blocklist> blocklists_;
 
+public:
     // depends-on: announcer_udp_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
