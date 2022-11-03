@@ -268,7 +268,11 @@ tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count);
 tr_variant* tr_variantListChild(tr_variant* list, size_t pos);
 
 bool tr_variantListRemove(tr_variant* list, size_t pos);
-[[nodiscard]] size_t tr_variantListSize(tr_variant const* list);
+
+[[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* list)
+{
+    return tr_variantIsList(list) ? list->val.l.count : 0;
+}
 
 /***
 ****  Dictionaries

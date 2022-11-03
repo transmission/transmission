@@ -158,11 +158,6 @@ static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int typ
     return tr_variantIsType(*setme, type);
 }
 
-size_t tr_variantListSize(tr_variant const* list)
-{
-    return tr_variantIsList(list) ? list->val.l.count : 0;
-}
-
 tr_variant* tr_variantListChild(tr_variant* list, size_t pos)
 {
     if (tr_variantIsList(list) && pos < list->val.l.count)
@@ -970,7 +965,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     }
 }
 
-static size_t tr_variantDictSize(tr_variant const* dict)
+static constexpr size_t tr_variantDictSize(tr_variant const* dict)
 {
     return tr_variantIsDict(dict) ? dict->val.l.count : 0;
 }
