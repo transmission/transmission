@@ -2072,9 +2072,9 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     time_t eta = self.fStat->eta;
     // if there's a regular ETA, the torrent isn't idle
     BOOL fromIdle = NO;
+    // Foundation undocumented behavior: values above INT_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
     if (eta > INT_MAX)
     {
-        // Foundation bug (not fixed in macOS 13.0): values above INT_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451).
         unknown = YES;
     }
     else if (eta == TR_ETA_NOT_AVAIL || eta == TR_ETA_UNKNOWN)
@@ -2100,6 +2100,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         formatter.collapsesLargestUnit = YES;
         formatter.includesTimeRemainingPhrase = YES;
     });
+    // the duration of months being variable, setting the reference date to now (instead of 00:00:00 UTC on 1 January 2001)
+    formatter.referenceDate = NSDate.date;
     NSString* idleString = [formatter stringFromTimeInterval:eta];
 
     if (fromIdle)
