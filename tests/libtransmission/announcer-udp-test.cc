@@ -29,7 +29,7 @@ private:
     {
         ::testing::Test::SetUp();
 
-	tr_net_init();
+        tr_net_init();
         tr_timeUpdate(time(nullptr));
     }
 
