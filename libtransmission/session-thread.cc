@@ -153,10 +153,15 @@ class tr_session_thread_impl final : public tr_session_thread
 public:
     explicit tr_session_thread_impl()
         : evbase_{ makeEventBase() }
+        , work_queue_event_{ event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this), event_free }
     {
-        auto lock = std::unique_lock(work_queue_mutex_);
+        auto lock = std::unique_lock(is_looping_mutex_);
+
         thread_ = std::thread(&tr_session_thread_impl::sessionThreadFunc, this, eventBase());
-        work_queue_cv_.wait(lock, [this] { return thread_id_; });
+        thread_id_ = thread_.get_id();
+
+        // wait for the session thread's main loop to start
+        is_looping_cv_.wait(lock, [this]() { return is_looping_; });
     }
 
     tr_session_thread_impl(tr_session_thread_impl&&) = delete;
@@ -166,26 +171,20 @@ public:
 
     ~tr_session_thread_impl() override
     {
-        auto lock = std::unique_lock(work_queue_mutex_);
+        TR_ASSERT(!amInSessionThread());
+        TR_ASSERT(is_looping_);
 
-        // Exit the first event loop. This is the steady-state loop that runs
+        // Stop the first event loop. This is the steady-state loop that runs
         // continuously, even when there are no events. See: sessionThreadFunc()
         is_shutting_down_ = true;
         event_base_loopexit(eventBase(), nullptr);
 
         // Wait on the second event loop. This is the shutdown loop that exits
-        // as soon as there are no events because it knows we're waiting on it.
-        // Let's wait up to `Deadline` secs for that to happen because we want
-        // to give pending tasks a chance to finish.
-        auto const deadline = std::chrono::steady_clock::now() + Deadline;
-        while (thread_id_ && (deadline > std::chrono::steady_clock::now()))
-        {
-            tr_wait_msec(20);
-        }
-        // The second event loop may have exited already, but let's make sure.
+        // as soon as there are no events. This step is to give pending tasks
+        // a chance to finish.
+        auto lock = std::unique_lock(is_looping_mutex_);
+        is_looping_cv_.wait_for(lock, Deadline, [this]() { return !is_looping_; });
         event_base_loopexit(eventBase(), nullptr);
-
-        // The thread closes right after the loop exits. Wait for it here.
         thread_.join();
     }
 
@@ -196,7 +195,7 @@ public:
 
     [[nodiscard]] bool amInSessionThread() const noexcept override
     {
-        return thread_id_ && *thread_id_ == std::this_thread::get_id();
+        return thread_id_ == std::this_thread::get_id();
     }
 
     void run(std::function<void(void)>&& func) override
@@ -207,11 +206,11 @@ public:
         }
         else
         {
-            auto lock = std::unique_lock(work_queue_mutex_);
+            work_queue_mutex_.lock();
             work_queue_.emplace_back(std::move(func));
-            lock.unlock();
+            work_queue_mutex_.unlock();
 
-            event_active(work_queue_event_, 0, {});
+            event_active(work_queue_event_.get(), 0, {});
         }
     }
 
@@ -225,31 +224,32 @@ private:
         /* Don't exit when writing on a broken socket */
         (void)signal(SIGPIPE, SIG_IGN);
 #endif
-
         tr_evthread_init();
 
-        // initialize the session struct's event fields
-        work_queue_event_ = event_new(evbase, -1, 0, onWorkAvailableStatic, this);
-        thread_id_ = std::this_thread::get_id();
+        constexpr auto toggle_looping = [](evutil_socket_t, short, void* vself)
+        {
+            auto* const self = static_cast<tr_session_thread_impl*>(vself);
+            self->is_looping_mutex_.lock();
+            self->is_looping_ = !self->is_looping_;
+            self->is_looping_mutex_.unlock();
 
-        // tell the constructor that's waiting for us that the thread is ready
-        work_queue_cv_.notify_one();
+            self->is_looping_cv_.notify_one();
+        };
+
+        event_base_once(evbase, -1, EV_TIMEOUT, toggle_looping, this, nullptr);
 
         // Start the first event loop. This is the steady-state loop that runs
-        // continuously, even when there are no events. See: ~~tr_session_thread_impl()
+        // continuously until `this` is destroyed. See: ~tr_session_thread_impl()
         TR_ASSERT(!is_shutting_down_);
         event_base_loop(evbase, EVLOOP_NO_EXIT_ON_EMPTY);
 
-        // Start the second event loop. This is the shutdown loop that exits
-        // as soon as there are no events, since ~tr_session_thread_impl()
-        // is waiting for us in another thread.
+        // Start the second event loop. This is the shutdown loop that exits as
+        // soon as there are no events. It's used to give any remaining events
+        // a chance to finish up before we exit.
         TR_ASSERT(is_shutting_down_);
         event_base_loop(evbase, 0);
 
-        // cleanup
-        event_free(work_queue_event_);
-        work_queue_event_ = nullptr;
-        thread_id_.reset();
+        toggle_looping({}, {}, this);
     }
 
     static void onWorkAvailableStatic(evutil_socket_t /*fd*/, short /*flags*/, void* vself)
@@ -274,14 +274,17 @@ private:
     }
 
     std::unique_ptr<event_base, void (*)(event_base*)> const evbase_;
+    std::unique_ptr<event, void (*)(event*)> const work_queue_event_;
 
     work_queue_t work_queue_;
-    std::condition_variable work_queue_cv_;
     std::mutex work_queue_mutex_;
-    event* work_queue_event_ = nullptr;
 
     std::thread thread_;
-    std::optional<std::thread::id> thread_id_;
+    std::thread::id thread_id_;
+
+    std::mutex is_looping_mutex_;
+    std::condition_variable is_looping_cv_;
+    bool is_looping_ = false;
 
     bool is_shutting_down_ = false;
     static constexpr std::chrono::seconds Deadline = 5s;
