@@ -1489,7 +1489,7 @@ enum
     TR_PEER_FROM_LTEP, /* peer address provided in an LTEP handshake */
     TR_PEER_FROM__MAX
 };
-enum
+enum tr_eta : time_t
 {
     TR_ETA_NOT_AVAIL = -1,
     TR_ETA_UNKNOWN = -2,

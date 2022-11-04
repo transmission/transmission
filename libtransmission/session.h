@@ -53,13 +53,13 @@ class tr_lpd;
 class tr_port_forwarding;
 class tr_rpc_server;
 class tr_web;
-struct BlocklistFile;
 struct struct_utp_context;
 struct tr_announcer;
 struct tr_variant;
 
 namespace libtransmission
 {
+class Blocklist;
 class Dns;
 class Timer;
 class TimerMaker;
@@ -1045,9 +1045,9 @@ private:
 
     /// other fields
 
-public:
-    std::vector<std::unique_ptr<BlocklistFile>> blocklists_;
+    std::vector<libtransmission::Blocklist> blocklists_;
 
+public:
     struct tr_event_handle* events = nullptr;
 
     // depends-on: announcer_udp_

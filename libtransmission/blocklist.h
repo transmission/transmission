@@ -9,146 +9,65 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstddef> // for size_t
-#include <cstdint>
-#include <cstring>
-#include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // for std::pair
 #include <vector>
 
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#else
-#include <netinet/in.h>
-#endif
-
-#include "file.h" // for tr_sys_file_t
-#include "tr-assert.h"
-#include "tr-macros.h"
+#include "net.h" // for tr_address
 
 struct tr_address;
 
-struct BlocklistFile
+namespace libtransmission
+{
+
+class Blocklist
 {
 public:
-    // Prevent moving to protect the fd_ from accidental destruction
-    BlocklistFile(BlocklistFile&&) = delete;
-    BlocklistFile(BlocklistFile const&) = delete;
-    BlocklistFile& operator=(BlocklistFile const&) = delete;
-    BlocklistFile& operator=(BlocklistFile&&) = delete;
+    [[nodiscard]] static std::vector<Blocklist> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
 
-    BlocklistFile(char const* filename, bool isEnabled)
-        : filename_(filename)
-        , is_enabled_(isEnabled)
+    static std::optional<Blocklist> saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled);
+
+    Blocklist() = default;
+
+    Blocklist(std::string_view bin_file, bool is_enabled)
+        : bin_file_{ bin_file }
+        , is_enabled_{ is_enabled }
     {
     }
 
-    ~BlocklistFile()
-    {
-        close();
-    }
+    [[nodiscard]] bool contains(tr_address const& addr) const;
 
-    [[nodiscard]] constexpr auto& filename() const
-    {
-        return filename_;
-    }
-
-    [[nodiscard]] bool exists() const
-    {
-        return tr_sys_path_exists(filename_.c_str(), nullptr);
-    }
-
-    [[nodiscard]] size_t getRuleCount() const
+    [[nodiscard]] auto size() const
     {
         ensureLoaded();
 
         return std::size(rules_);
     }
 
-    [[nodiscard]] constexpr bool isEnabled() const
+    [[nodiscard]] constexpr bool enabled() const noexcept
     {
         return is_enabled_;
     }
 
-    void setEnabled(bool isEnabled)
+    void setEnabled(bool is_enabled) noexcept
     {
-        is_enabled_ = isEnabled;
+        is_enabled_ = is_enabled;
     }
 
-    bool hasAddress(tr_address const& addr);
-
-    /// @brief Read the file of ranges, sort and merge, write to our own file, and reload from it
-    size_t setContent(char const* filename);
-
-    static std::vector<std::unique_ptr<BlocklistFile>> loadBlocklists(std::string_view const config_dir, bool const is_enabled);
+    [[nodiscard]] constexpr auto const& binFile() const noexcept
+    {
+        return bin_file_;
+    }
 
 private:
-    struct AddressRange
-    {
-        uint32_t begin_ = 0;
-        uint32_t end_ = 0;
-        in6_addr begin6_;
-        in6_addr end6_;
-
-        /// @brief Used for std::bsearch of an IPv4 address
-        static int compareIPv4AddressToRange(void const* va, void const* vb)
-        {
-            auto const* a = reinterpret_cast<uint32_t const*>(va);
-            auto const* b = reinterpret_cast<AddressRange const*>(vb);
-
-            if (*a < b->begin_)
-            {
-                return -1;
-            }
-
-            if (*a > b->end_)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-
-        /// @brief Used for std::bsearch of an IPv6 address
-        static int compareIPv6AddressToRange(void const* va, void const* vb)
-        {
-            auto const* a = reinterpret_cast<in6_addr const*>(va);
-            auto const* b = reinterpret_cast<AddressRange const*>(vb);
-
-            if (memcmp(&a->s6_addr, &b->begin6_.s6_addr, sizeof(a->s6_addr)) < 0)
-            {
-                return -1;
-            }
-
-            if (memcmp(&a->s6_addr, &b->end6_.s6_addr, sizeof(a->s6_addr)) > 0)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-    };
-
-    void RewriteBlocklistFile() const;
     void ensureLoaded() const;
-    void load();
-    void close();
 
-    static bool parseLine(char const* line, AddressRange* range);
-    static bool compareAddressRangesByFirstAddress(AddressRange const& a, AddressRange const& b);
+    mutable std::vector<std::pair<tr_address, tr_address>> rules_;
 
-    static bool parseLine1(std::string_view line, struct AddressRange* range);
-    static bool parseLine2(std::string_view line, struct AddressRange* range);
-    static bool parseLine3(char const* line, AddressRange* range);
-
-#ifdef TR_ENABLE_ASSERTS
-    /// @brief Sanity checks: make sure the rules are sorted in ascending order and don't overlap
-    static void assertValidRules(std::vector<AddressRange> const& ranges);
-#endif
-
-    std::string const filename_;
-
+    std::string bin_file_;
     bool is_enabled_ = false;
-    mutable std::vector<AddressRange> rules_;
 };
+
+} // namespace libtransmission

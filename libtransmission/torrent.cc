@@ -1134,7 +1134,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             auto seed_idle_minutes = uint16_t{};
             s->etaIdle = tor->etaSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seed_idle_minutes) ?
                 seed_idle_minutes * 60 - s->idleSecs :
-                static_cast<time_t>(TR_ETA_NOT_AVAIL);
+                TR_ETA_NOT_AVAIL;
         }
 
         break;
