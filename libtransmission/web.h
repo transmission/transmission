@@ -91,7 +91,7 @@ public:
     // Notify tr_web that it's going to be destroyed soon.
     // New fetch() tasks will be rejected, but already-running tasks
     // are left alone so that they can finish.
-    void closeSoon();
+    void startShutdown();
 
     // True when tr_web is ready to be destroyed.
     // Will never be true until after closeSoon() is called.

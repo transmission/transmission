@@ -38,6 +38,7 @@
 #include "session-alt-speeds.h"
 #include "session-id.h"
 #include "session-settings.h"
+#include "session-thread.h"
 #include "stats.h"
 #include "torrents.h"
 #include "tr-lpd.h"
@@ -51,6 +52,7 @@ struct event_base;
 class tr_lpd;
 class tr_port_forwarding;
 class tr_rpc_server;
+class tr_session_thread;
 class tr_web;
 struct struct_utp_context;
 struct tr_announcer;
@@ -272,14 +274,30 @@ public:
         return session_id_.sv();
     }
 
-    [[nodiscard]] event_base* eventBase() noexcept
-    {
-        return event_base_.get();
-    }
-
     [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept
     {
         return *timer_maker_;
+    }
+
+    [[nodiscard]] auto amInSessionThread() noexcept
+    {
+        return session_thread_->amInSessionThread();
+    }
+
+    void runInSessionThread(std::function<void(void)>&& func)
+    {
+        session_thread_->run(std::move(func));
+    }
+
+    template<typename Func, typename... Args>
+    void runInSessionThread(Func&& func, Args&&... args)
+    {
+        session_thread_->run(std::move(func), std::move(args)...);
+    }
+
+    [[nodiscard]] auto eventBase() noexcept
+    {
+        return session_thread_->eventBase();
     }
 
     [[nodiscard]] constexpr auto& torrents()
@@ -880,9 +898,8 @@ private:
     void initImpl(init_data&);
     void setSettings(tr_variant* settings_dict, bool force);
 
-    void closeImplStart();
-    void closeImplWaitForIdleUdp();
-    void closeImplFinish();
+    void closeImplPart1();
+    void closeImplPart2();
 
     void onNowTimer();
 
@@ -976,9 +993,9 @@ private:
     std::string const torrent_dir_;
     std::string const blocklist_dir_;
 
-    std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+    std::unique_ptr<tr_session_thread> const session_thread_;
 
-    // depends-on: event_base_
+    // depends-on: session_thread_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
     /// static fields
@@ -1031,16 +1048,17 @@ private:
 
     tr_session_id session_id_;
 
-    tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
-    tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
+    std::vector<libtransmission::Blocklist> blocklists_;
 
     /// other fields
 
-    std::vector<libtransmission::Blocklist> blocklists_;
+    // depends-on: session_thread_
+    tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
+
+    // depends-on: session_thread_
+    tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
 
 public:
-    struct tr_event_handle* events = nullptr;
-
     // depends-on: announcer_udp_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
@@ -1056,7 +1074,7 @@ private:
     PortForwardingMediator port_forwarding_mediator_{ *this };
     std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
-    // depends-on: events, top_bandwidth_
+    // depends-on: session_thread_, top_bandwidth_
     AltSpeedMediator alt_speed_mediator_{ *this };
     tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
 
@@ -1065,17 +1083,17 @@ private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
-    // depends-on: timer_maker_, top_bandwidth_, torrents_
-    std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
+    // depends-on: settings_, session_thread_, torrents_
+    WebMediator web_mediator_{ this };
+    std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
 public:
     // depends-on: settings_, open_files_, torrents_
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
-    // depends-on: settings_, events, torrents_
-    WebMediator web_mediator_{ this };
-    std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
+    // depends-on: timer_maker_, top_bandwidth_, torrents_, web_
+    std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
     // depends-on: peer_mgr_, torrents_
     LpdMediator lpd_mediator_{ *this };
@@ -1090,11 +1108,11 @@ public:
     // depends-on: announcer_udp_mediator_
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
-    // depends-on: settings_, torrents_, announcer_udp_
+    // depends-on: settings_, torrents_, web_, announcer_udp_
     struct tr_announcer* announcer = nullptr;
 
 private:
-    // depends-on: event_base_, timer_maker_, settings_, torrents_
+    // depends-on: session_thread_, timer_maker_, settings_, torrents_, web_
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
     // depends-on: alt_speeds_, udp_core_, torrents_

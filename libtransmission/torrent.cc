@@ -48,7 +48,6 @@
 #include "torrent-metainfo.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h"
 #include "web-utils.h"
@@ -886,7 +885,7 @@ void tr_torrentManualUpdate(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tr_runInEventThread(tor->session, tr_torrentManualUpdateImpl, tor);
+    tor->session->runInSessionThread(tr_torrentManualUpdateImpl, tor);
 }
 
 bool tr_torrentCanManualUpdate(tr_torrent const* tor)
@@ -1384,7 +1383,7 @@ static void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     tr_torrentUnsetPeerId(tor);
     tor->isRunning = true;
     tor->setDirty();
-    tr_runInEventThread(tor->session, torrentStartImpl, tor);
+    tor->session->runInSessionThread(torrentStartImpl, tor);
 }
 
 void tr_torrentStart(tr_torrent* tor)
@@ -1408,7 +1407,7 @@ void tr_torrentStartNow(tr_torrent* tor)
 
 static void onVerifyDoneThreadFunc(tr_torrent* const tor)
 {
-    TR_ASSERT(tr_amInEventThread(tor->session));
+    TR_ASSERT(tor->session->amInSessionThread());
 
     if (tor->isDeleting)
     {
@@ -1434,12 +1433,12 @@ void tr_torrentOnVerifyDone(tr_torrent* tor, bool aborted)
         return;
     }
 
-    tr_runInEventThread(tor->session, onVerifyDoneThreadFunc, tor);
+    tor->session->runInSessionThread(onVerifyDoneThreadFunc, tor);
 }
 
 static void verifyTorrent(tr_torrent* const tor)
 {
-    TR_ASSERT(tr_amInEventThread(tor->session));
+    TR_ASSERT(tor->session->amInSessionThread());
     auto const lock = tor->unique_lock();
 
     if (tor->isDeleting)
@@ -1470,7 +1469,7 @@ static void verifyTorrent(tr_torrent* const tor)
 
 void tr_torrentVerify(tr_torrent* tor)
 {
-    tr_runInEventThread(tor->session, verifyTorrent, tor);
+    tor->session->runInSessionThread(verifyTorrent, tor);
 }
 
 void tr_torrentSave(tr_torrent* tor)
@@ -1487,7 +1486,7 @@ void tr_torrentSave(tr_torrent* tor)
 static void stopTorrent(tr_torrent* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_amInEventThread(tor->session));
+    TR_ASSERT(tor->session->amInSessionThread());
     auto const lock = tor->unique_lock();
 
     if (!tor->session->isClosing())
@@ -1532,13 +1531,14 @@ void tr_torrentStop(tr_torrent* tor)
     tor->isRunning = false;
     tor->isStopping = false;
     tor->setDirty();
-    tr_runInEventThread(tor->session, stopTorrent, tor);
+    tor->session->runInSessionThread(stopTorrent, tor);
 }
 
-static void closeTorrent(tr_torrent* const tor)
+void tr_torrentFreeInSessionThread(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_amInEventThread(tor->session));
+    TR_ASSERT(tor->session != nullptr);
+    TR_ASSERT(tor->session->amInSessionThread());
 
     if (!tor->session->isClosing())
     {
@@ -1559,26 +1559,12 @@ static void closeTorrent(tr_torrent* const tor)
     freeTorrent(tor);
 }
 
-void tr_torrentFree(tr_torrent* tor)
-{
-    if (tr_isTorrent(tor))
-    {
-        tr_session* session = tor->session;
-
-        TR_ASSERT(session != nullptr);
-
-        auto const lock = tor->unique_lock();
-
-        tr_runInEventThread(session, closeTorrent, tor);
-    }
-}
-
 static bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     return tr_sys_path_remove(filename, error);
 }
 
-static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
+static void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
 {
     auto const lock = tor->unique_lock();
 
@@ -1600,7 +1586,7 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
         tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
 
-    closeTorrent(tor);
+    tr_torrentFreeInSessionThread(tor);
 }
 
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
@@ -1609,7 +1595,7 @@ void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func
 
     tor->isDeleting = true;
 
-    tr_runInEventThread(tor->session, removeTorrentInEventThread, tor, delete_flag, delete_func, user_data);
+    tor->session->runInSessionThread(removeTorrentInSessionThread, tor, delete_flag, delete_func, user_data);
 }
 
 /**
@@ -2059,7 +2045,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
 ///
 
-static void setLocationInEventThread(
+static void setLocationInSessionThread(
     tr_torrent* tor,
     std::string const& path,
     bool move_from_old_path,
@@ -2067,7 +2053,7 @@ static void setLocationInEventThread(
     int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_amInEventThread(tor->session));
+    TR_ASSERT(tor->session->amInSessionThread());
 
     auto ok = bool{ true };
     if (move_from_old_path)
@@ -2125,9 +2111,8 @@ void tr_torrent::setLocation(
         *setme_state = TR_LOC_MOVING;
     }
 
-    tr_runInEventThread(
-        this->session,
-        setLocationInEventThread,
+    this->session->runInSessionThread(
+        setLocationInSessionThread,
         this,
         std::string{ location },
         move_from_old_path,
@@ -2236,7 +2221,7 @@ static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t piece_ind
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_amInEventThread(tor->session));
+    TR_ASSERT(tor->session->amInSessionThread());
 
     bool const block_is_new = !tor->hasBlock(block);
 
@@ -2626,8 +2611,7 @@ void tr_torrent::renamePath(
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
-    tr_runInEventThread(
-        this->session,
+    this->session->runInSessionThread(
         torrentRenamePath,
         this,
         std::string{ oldpath },

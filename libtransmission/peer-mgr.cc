@@ -565,11 +565,11 @@ struct tr_peerMgr
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
         , bandwidth_timer_{ session->timerMaker().create([this]() { bandwidthPulse(); }) }
-        , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
+        , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulse(); }) }
         , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
     {
         bandwidth_timer_->startRepeating(BandwidthPeriod);
-        rechoke_timer_->startSingleShot(RechokePeriod);
+        rechoke_timer_->startRepeating(RechokePeriod);
         refill_upkeep_timer_->startRepeating(RefillUpkeepPeriod);
     }
 
@@ -604,12 +604,6 @@ struct tr_peerMgr
     Handshakes incoming_handshakes;
 
 private:
-    void rechokePulseMarshall()
-    {
-        rechokePulse();
-        rechoke_timer_->startSingleShot(RechokePeriod);
-    }
-
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
     std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;

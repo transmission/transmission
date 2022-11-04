@@ -23,7 +23,6 @@
 #include "platform.h" // TR_PATH_DELIMITER
 #include "quark.h"
 #include "torrent.h"
-#include "trevent.h" // tr_amInEventThread()
 #include "utils.h"
 #include "variant.h"
 
@@ -490,7 +489,7 @@ protected:
     void blockingTorrentVerify(tr_torrent* tor) const
     {
         EXPECT_NE(nullptr, tor->session);
-        EXPECT_FALSE(tr_amInEventThread(tor->session));
+        EXPECT_FALSE(tor->session->amInSessionThread());
         auto const n_previously_verified = std::size(verified_);
         tr_torrentVerify(tor);
         waitFor(
