@@ -30,7 +30,6 @@
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "cache.h"
-#include "dns.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
@@ -140,11 +139,6 @@ private:
             }
 
             return tr_address::fromString(session_.announceIP());
-        }
-
-        [[nodiscard]] libtransmission::Dns& dns() override
-        {
-            return *session_.dns_.get();
         }
 
     private:
@@ -1004,9 +998,6 @@ private:
     // depends-on: session_thread_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    // depends-on: session_thread_
-    std::unique_ptr<libtransmission::Dns> const dns_;
-
     /// static fields
 
     static std::recursive_mutex session_mutex_;
@@ -1057,15 +1048,15 @@ private:
 
     tr_session_id session_id_;
 
+    std::vector<libtransmission::Blocklist> blocklists_;
+
+    /// other fields
+
     // depends-on: session_thread_
     tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
 
     // depends-on: session_thread_
     tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
-
-    /// other fields
-
-    std::vector<libtransmission::Blocklist> blocklists_;
 
 public:
     // depends-on: announcer_udp_
@@ -1110,7 +1101,7 @@ private:
     // depends-on: lpd_mediator_
     std::unique_ptr<tr_lpd> lpd_;
 
-    // depends-on: dns_, udp_core_
+    // depends-on: udp_core_
     AnnouncerUdpMediator announcer_udp_mediator_{ *this };
 
 public:
