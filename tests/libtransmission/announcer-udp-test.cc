@@ -16,6 +16,7 @@
 #include "crypto-utils.h"
 #include "peer-mgr.h" // for tr_pex
 #include "tr-buffer.h"
+#include "utils.h" // for tr_net_init()
 
 #include "test-fixtures.h"
 
@@ -27,6 +28,8 @@ private:
     void SetUp() override
     {
         ::testing::Test::SetUp();
+
+	tr_net_init();
         tr_timeUpdate(time(nullptr));
     }
 
