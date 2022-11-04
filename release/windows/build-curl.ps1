@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:CurlVersion = '7.70.0'
+$global:CurlVersion = '7.86.0'
 
 $global:CurlDeps = @(
     'OpenSsl'
@@ -18,7 +18,7 @@ function global:Build-Curl([string] $PrefixDir, [string] $Arch, [string] $DepsPr
         '-DCMAKE_BUILD_TYPE=RelWithDebInfo'
         "-DCMAKE_INSTALL_PREFIX=${PrefixDir}"
         "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
-        '-DCMAKE_USE_OPENSSL=ON'
+        '-DCURL_USE_OPENSSL=ON'
         '-DCURL_WINDOWS_SSPI=OFF'
         '-DBUILD_CURL_EXE=OFF'
         '-DBUILD_TESTING=OFF'
