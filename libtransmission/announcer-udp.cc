@@ -341,6 +341,11 @@ struct tau_tracker
     {
     }
 
+    tau_tracker(tau_tracker&&) = delete;
+    tau_tracker(tau_tracker const&) = delete;
+    tau_tracker& operator=(tau_tracker&&) = delete;
+    tau_tracker& operator=(tau_tracker const&) = delete;
+
     ~tau_tracker()
     {
         tr_error_clear(&addr_error_);
