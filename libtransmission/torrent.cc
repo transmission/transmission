@@ -1534,9 +1534,10 @@ void tr_torrentStop(tr_torrent* tor)
     tor->session->runInSessionThread(stopTorrent, tor);
 }
 
-static void closeTorrent(tr_torrent* const tor)
+void tr_torrentFreeInSessionThread(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tor->session != nullptr);
     TR_ASSERT(tor->session->amInSessionThread());
 
     if (!tor->session->isClosing())
@@ -1558,26 +1559,12 @@ static void closeTorrent(tr_torrent* const tor)
     freeTorrent(tor);
 }
 
-void tr_torrentFree(tr_torrent* tor)
-{
-    if (tr_isTorrent(tor))
-    {
-        tr_session* session = tor->session;
-
-        TR_ASSERT(session != nullptr);
-
-        auto const lock = tor->unique_lock();
-
-        tor->session->runInSessionThread(closeTorrent, tor);
-    }
-}
-
 static bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     return tr_sys_path_remove(filename, error);
 }
 
-static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
+static void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
 {
     auto const lock = tor->unique_lock();
 
@@ -1599,7 +1586,7 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
         tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
 
-    closeTorrent(tor);
+    tr_torrentFreeInSessionThread(tor);
 }
 
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
@@ -1608,7 +1595,7 @@ void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func
 
     tor->isDeleting = true;
 
-    tor->session->runInSessionThread(removeTorrentInEventThread, tor, delete_flag, delete_func, user_data);
+    tor->session->runInSessionThread(removeTorrentInSessionThread, tor, delete_flag, delete_func, user_data);
 }
 
 /**
@@ -2058,7 +2045,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
 ///
 
-static void setLocationInEventThread(
+static void setLocationInSessionThread(
     tr_torrent* tor,
     std::string const& path,
     bool move_from_old_path,
@@ -2125,7 +2112,7 @@ void tr_torrent::setLocation(
     }
 
     this->session->runInSessionThread(
-        setLocationInEventThread,
+        setLocationInSessionThread,
         this,
         std::string{ location },
         move_from_old_path,

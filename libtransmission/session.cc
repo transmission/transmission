@@ -1198,7 +1198,7 @@ void tr_session::closeImplPart1()
         });
     for (auto* tor : torrents)
     {
-        tr_torrentFree(tor);
+        tr_torrentFreeInSessionThread(tor);
     }
     torrents.clear();
     // ...and now that all the torrents have been closed, any

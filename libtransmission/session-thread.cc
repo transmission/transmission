@@ -226,7 +226,7 @@ private:
 #endif
         tr_evthread_init();
 
-        constexpr auto toggle_looping = [](evutil_socket_t, short, void* vself)
+        constexpr auto ToggleLooping = [](evutil_socket_t, short, void* vself)
         {
             auto* const self = static_cast<tr_session_thread_impl*>(vself);
             self->is_looping_mutex_.lock();
@@ -236,7 +236,7 @@ private:
             self->is_looping_cv_.notify_one();
         };
 
-        event_base_once(evbase, -1, EV_TIMEOUT, toggle_looping, this, nullptr);
+        event_base_once(evbase, -1, EV_TIMEOUT, ToggleLooping, this, nullptr);
 
         // Start the first event loop. This is the steady-state loop that runs
         // continuously until `this` is destroyed. See: ~tr_session_thread_impl()
@@ -249,7 +249,7 @@ private:
         TR_ASSERT(is_shutting_down_);
         event_base_loop(evbase, 0);
 
-        toggle_looping({}, {}, this);
+        ToggleLooping({}, {}, this);
     }
 
     static void onWorkAvailableStatic(evutil_socket_t /*fd*/, short /*flags*/, void* vself)
