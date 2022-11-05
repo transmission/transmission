@@ -14,6 +14,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -77,25 +78,39 @@ class SessionTest;
 struct tr_session
 {
 private:
-    struct tr_bindinfo
+    class BoundSocket
     {
-        explicit tr_bindinfo(tr_address addr)
-            : addr_{ std::move(addr) }
-        {
-        }
+    public:
+        using IncomingCallback = void (*)(tr_socket_t, void*);
+        BoundSocket(
+            struct event_base*,
+            tr_address const& addr,
+            tr_port port,
+            IncomingCallback on_incoming,
+            void* on_incoming_user_data);
+
+        ~BoundSocket();
 
         void bindAndListenForIncomingPeers(tr_session* session);
 
         void close();
+
+        [[nodiscard]] auto const& address() const noexcept
+        {
+            return addr_;
+        }
 
         [[nodiscard]] auto readable() const
         {
             return addr_.readable();
         }
 
+    private:
         tr_address addr_;
-        struct event* ev_ = nullptr;
+        IncomingCallback on_incoming_;
+        void* on_incoming_user_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
+        struct event* ev_ = nullptr;
     };
 
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
@@ -155,7 +170,8 @@ private:
 
         [[nodiscard]] tr_address incomingPeerAddress() const override
         {
-            return session_.bind_ipv4_.addr_;
+            auto [address, is_default] = session_.publicAddress(TR_AF_INET);
+            return address;
         }
 
         [[nodiscard]] tr_port localPeerPort() const override
@@ -625,7 +641,15 @@ public:
     // that Transmission is running on.
     [[nodiscard]] constexpr tr_port localPeerPort() const noexcept
     {
-        return settings_.peer_port;
+        return local_peer_port_;
+    }
+
+    [[nodiscard]] constexpr tr_port udpPort() const noexcept
+    {
+        // Always use the same port number that's used for incoming TCP connections.
+        // This simplifies port forwarding and reduces the chance of confusion,
+        // since incoming UDP and TCP connections will use the same port number
+        return localPeerPort();
     }
 
     // The incoming peer port that's been opened on the public-facing
@@ -635,14 +659,6 @@ public:
     [[nodiscard]] constexpr tr_port advertisedPeerPort() const noexcept
     {
         return advertised_peer_port_;
-    }
-
-    [[nodiscard]] constexpr tr_port udpPort() const noexcept
-    {
-        // Always use the same port number that's used for incoming TCP connections.
-        // This simplifies port forwarding and reduces the chance of confusion,
-        // since incoming UDP and TCP connections will use the same port number
-        return advertisedPeerPort();
     }
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
@@ -888,20 +904,17 @@ private:
 
     void setPeerPort(tr_port port);
 
-    void closePeerPort()
-    {
-        bind_ipv4_.close();
-        bind_ipv6_.close();
-    }
-
     struct init_data;
     void initImpl(init_data&);
     void setSettings(tr_variant* settings_dict, bool force);
+    void setSettings(tr_session_settings settings, bool force);
 
     void closeImplPart1();
     void closeImplPart2();
 
     void onNowTimer();
+
+    static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
     friend class libtransmission::test::SessionTest;
     friend struct tr_bindinfo;
@@ -1028,6 +1041,12 @@ private:
     tr_altSpeedFunc alt_speed_active_changed_func_ = nullptr;
     void* alt_speed_active_changed_func_user_data_ = nullptr;
 
+    // The local peer port that we bind a socket to for listening
+    // to incoming peer connections. Usually the same as
+    // `settings_.peer_port` but can differ if
+    // `settings_.peer_port_random_on_start` is enabled.
+    tr_port local_peer_port_;
+
     // The incoming peer port that's been opened on the public-facing
     // device. This is usually the same as localPeerPort() but can differ,
     // e.g. if the public device is a router that chose to use a different
@@ -1052,11 +1071,11 @@ private:
 
     /// other fields
 
-    // depends-on: session_thread_
-    tr_bindinfo bind_ipv4_ = tr_bindinfo{ tr_inaddr_any };
+    // depends-on: session_thread_, old_settings.bind_address_ipv4, local_peer_port_
+    std::optional<BoundSocket> bound_ipv4_;
 
-    // depends-on: session_thread_
-    tr_bindinfo bind_ipv6_ = tr_bindinfo{ tr_in6addr_any };
+    // depends-on: session_thread_, old_settings.bind_address_ipv6, local_peer_port_
+    std::optional<BoundSocket> bound_ipv6_;
 
 public:
     // depends-on: announcer_udp_
