@@ -271,7 +271,7 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     {
         auto const dir = win32_get_known_folder(*folder_id);
 
-        if (auto const path = tr_pathbuf{ dir, "/Transmission/Web"sv }; isWebClientDir(path))
+        if (auto const path = tr_pathbuf{ dir, "/Transmission/public_html"sv }; isWebClientDir(path))
         {
             return std::string{ path };
         }
@@ -283,7 +283,7 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     auto const module_path = tr_win32_native_to_utf8({ std::data(wide_module_path) });
     if (auto const dir = tr_sys_path_dirname(module_path); !std::empty(dir))
     {
-        if (auto const path = tr_pathbuf{ dir, "/Web"sv }; isWebClientDir(path))
+        if (auto const path = tr_pathbuf{ dir, "/public_html"sv }; isWebClientDir(path))
         {
             return std::string{ path };
         }
