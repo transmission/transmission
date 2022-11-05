@@ -273,10 +273,9 @@ tr_session::BoundSocket::BoundSocket(
     tr_port port,
     IncomingCallback on_incoming,
     void* on_incoming_user_data)
-    : addr_{ addr }
-    , on_incoming_{ on_incoming }
+    : on_incoming_{ on_incoming }
     , on_incoming_user_data_{ on_incoming_user_data }
-    , socket_{ tr_netBindTCP(&addr_, port, false) }
+    , socket_{ tr_netBindTCP(&addr, port, false) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -284,7 +283,7 @@ tr_session::BoundSocket::BoundSocket(
     }
 
     tr_logAddInfo(
-        fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr_.readable(port))));
+        fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr.readable(port))));
 
     ev_ = event_new(
         evbase,

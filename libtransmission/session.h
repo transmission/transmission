@@ -91,7 +91,6 @@ private:
         ~BoundSocket();
 
     private:
-        tr_address addr_;
         IncomingCallback on_incoming_;
         void* on_incoming_user_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
