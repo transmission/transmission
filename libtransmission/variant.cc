@@ -36,15 +36,9 @@ using namespace std::literals;
 ****
 ***/
 
-static bool tr_variantIsContainer(tr_variant const* v)
+static constexpr bool tr_variantIsContainer(tr_variant const* v)
 {
     return tr_variantIsList(v) || tr_variantIsDict(v);
-}
-
-void tr_variantInit(tr_variant* v, char type)
-{
-    v->type = type;
-    memset(&v->val, 0, sizeof(v->val));
 }
 
 /***
@@ -95,15 +89,6 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
     str->len = std::size(sv);
 }
 
-static void tr_variant_string_set_string_view(struct tr_variant_string* str, std::string_view in)
-{
-    tr_variant_string_clear(str);
-
-    str->type = TR_STRING_TYPE_VIEW;
-    str->len = std::size(in);
-    str->str.str = std::data(in);
-}
-
 static void tr_variant_string_set_string(struct tr_variant_string* str, std::string_view in)
 {
     tr_variant_string_clear(str);
@@ -144,7 +129,7 @@ static constexpr char const* getStr(tr_variant const* v)
     return tr_variant_string_get_string(&v->val.s);
 }
 
-static int dictIndexOf(tr_variant const* dict, tr_quark const key)
+static constexpr int dictIndexOf(tr_variant const* dict, tr_quark const key)
 {
     if (tr_variantIsDict(dict))
     {
@@ -162,7 +147,7 @@ static int dictIndexOf(tr_variant const* dict, tr_quark const key)
 
 tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
 {
-    int const i = dictIndexOf(dict, key);
+    auto const i = dictIndexOf(dict, key);
 
     return i < 0 ? nullptr : dict->val.l.vals + i;
 }
@@ -171,11 +156,6 @@ static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int typ
 {
     *setme = tr_variantDictFind(dict, key);
     return tr_variantIsType(*setme, type);
-}
-
-size_t tr_variantListSize(tr_variant const* list)
-{
-    return tr_variantIsList(list) ? list->val.l.count : 0;
 }
 
 tr_variant* tr_variantListChild(tr_variant* list, size_t pos)
@@ -401,30 +381,6 @@ void tr_variantInitStr(tr_variant* initme, std::string_view str)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
     tr_variant_string_set_string(&initme->val.s, str);
-}
-
-void tr_variantInitStrView(tr_variant* initme, std::string_view str)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string_view(&initme->val.s, str);
-}
-
-void tr_variantInitBool(tr_variant* initme, bool value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_BOOL);
-    initme->val.b = value;
-}
-
-void tr_variantInitReal(tr_variant* initme, double value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_REAL);
-    initme->val.d = value;
-}
-
-void tr_variantInitInt(tr_variant* initme, int64_t value)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_INT);
-    initme->val.i = value;
 }
 
 void tr_variantInitList(tr_variant* initme, size_t reserve_count)
@@ -1009,7 +965,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     }
 }
 
-static size_t tr_variantDictSize(tr_variant const* dict)
+static constexpr size_t tr_variantDictSize(tr_variant const* dict)
 {
     return tr_variantIsDict(dict) ? dict->val.l.count : 0;
 }
@@ -1121,15 +1077,12 @@ std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
     {
     case TR_VARIANT_FMT_JSON:
         return tr_variantToStrJson(v, false);
-        break;
 
     case TR_VARIANT_FMT_JSON_LEAN:
         return tr_variantToStrJson(v, true);
-        break;
 
     default: // TR_VARIANT_FMT_BENC:
         return tr_variantToStrBenc(v);
-        break;
     }
 }
 

@@ -217,7 +217,7 @@ static char const* queueMoveBottom(
 
 struct CompareTorrentByQueuePosition
 {
-    bool operator()(tr_torrent const* a, tr_torrent const* b) const
+    constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
         return a->queuePosition < b->queuePosition;
     }
@@ -569,7 +569,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_bandwidthPriority:
-        tr_variantInitInt(initme, tr_torrentGetPriority(tor));
+        tr_variantInitInt(initme, tor->getPriority());
         break;
 
     case TR_KEY_comment:
@@ -609,7 +609,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_downloadLimited:
-        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_DOWN));
+        tr_variantInitBool(initme, tor->usesSpeedLimit(TR_DOWN));
         break;
 
     case TR_KEY_error:
@@ -655,7 +655,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_honorsSessionLimits:
-        tr_variantInitBool(initme, tr_torrentUsesSessionLimits(tor));
+        tr_variantInitBool(initme, tor->usesSessionLimits());
         break;
 
     case TR_KEY_id:
@@ -691,7 +691,8 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_maxConnectedPeers:
-        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
+    case TR_KEY_peer_limit:
+        tr_variantInitInt(initme, tor->peerLimit());
         break;
 
     case TR_KEY_magnetLink:
@@ -712,10 +713,6 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
 
     case TR_KEY_percentDone:
         tr_variantInitReal(initme, st->percentDone);
-        break;
-
-    case TR_KEY_peer_limit:
-        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
         break;
 
     case TR_KEY_peers:
@@ -806,11 +803,11 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_seedIdleLimit:
-        tr_variantInitInt(initme, tr_torrentGetIdleLimit(tor));
+        tr_variantInitInt(initme, tor->idleLimitMinutes());
         break;
 
     case TR_KEY_seedIdleMode:
-        tr_variantInitInt(initme, tr_torrentGetIdleMode(tor));
+        tr_variantInitInt(initme, tor->idleLimitMode());
         break;
 
     case TR_KEY_seedRatioLimit:
@@ -883,7 +880,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_uploadLimited:
-        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_UP));
+        tr_variantInitBool(initme, tor->usesSpeedLimit(TR_UP));
         break;
 
     case TR_KEY_uploadRatio:
@@ -1063,12 +1060,11 @@ static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr
     {
         for (size_t i = 0; i < n; ++i)
         {
-            auto tmp = int64_t{};
-            if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
+            if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
             {
-                if (0 <= tmp && tmp < n_files)
+                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
                 {
-                    files.push_back(tr_file_index_t(tmp));
+                    files.push_back(file_index);
                 }
                 else
                 {
@@ -1093,7 +1089,7 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
     char const* errmsg = nullptr;
 
     auto const n_files = tor->fileCount();
-    size_t const n_items = tr_variantListSize(list);
+    auto const n_items = tr_variantListSize(list);
 
     auto files = std::vector<tr_file_index_t>{};
     files.reserve(n_files);
@@ -1102,12 +1098,11 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
     {
         for (size_t i = 0; i < n_items; ++i)
         {
-            auto file_index = int64_t{};
-            if (tr_variantGetInt(tr_variantListChild(list, i), &file_index))
+            if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
             {
-                if (0 <= file_index && file_index < n_files)
+                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
                 {
-                    files.push_back(static_cast<tr_file_index_t>(file_index));
+                    files.push_back(file_index);
                 }
                 else
                 {
@@ -1276,7 +1271,7 @@ static char const* torrentSet(
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))
         {
-            tr_torrentUseSpeedLimit(tor, TR_DOWN, val);
+            tor->useSpeedLimit(TR_DOWN, val);
         }
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &val))
@@ -1291,12 +1286,12 @@ static char const* torrentSet(
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_uploadLimited, &val))
         {
-            tr_torrentUseSpeedLimit(tor, TR_UP, val);
+            tor->useSpeedLimit(TR_UP, val);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tr_torrentSetIdleLimit(tor, static_cast<uint16_t>(tmp));
+            tor->setIdleLimit(static_cast<uint16_t>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
@@ -1311,7 +1306,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedRatioMode, &tmp))
         {
-            tr_torrentSetRatioMode(tor, (tr_ratiolimit)tmp);
+            tor->setRatioMode(static_cast<tr_ratiolimit>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
@@ -1451,7 +1446,7 @@ static char const* portTest(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    auto const port = session->peerPort();
+    auto const port = session->advertisedPeerPort();
     auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
     session->fetch({ url, onPortTested, idle_data });
     return nullptr;
@@ -1906,12 +1901,12 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_begin, &i))
     {
-        tr_sessionSetAltSpeedBegin(session, static_cast<int>(i));
+        tr_sessionSetAltSpeedBegin(session, static_cast<size_t>(i));
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_end, &i))
     {
-        tr_sessionSetAltSpeedEnd(session, static_cast<int>(i));
+        tr_sessionSetAltSpeedEnd(session, static_cast<size_t>(i));
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_day, &i))
@@ -2290,7 +2285,7 @@ static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_peer_port:
-        tr_variantDictAddInt(d, key, s->peerPort().host());
+        tr_variantDictAddInt(d, key, s->advertisedPeerPort().host());
         break;
 
     case TR_KEY_peer_port_random_on_start:

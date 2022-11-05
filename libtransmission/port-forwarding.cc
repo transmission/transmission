@@ -192,20 +192,20 @@ private:
 
         auto const old_state = state();
 
-        auto const result = natpmp_->pulse(mediator_.privatePeerPort(), is_enabled);
+        auto const result = natpmp_->pulse(mediator_.localPeerPort(), is_enabled);
         natpmp_state_ = result.state;
-        if (!std::empty(result.public_port) && !std::empty(result.private_port))
+        if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
         {
-            mediator_.onPortForwarded(result.public_port, result.private_port);
+            mediator_.onPortForwarded(result.advertised_port);
             tr_logAddInfo(fmt::format(
                 _("Mapped private port {private_port} to public port {public_port}"),
-                fmt::arg("public_port", result.public_port.host()),
-                fmt::arg("private_port", result.private_port.host())));
+                fmt::arg("private_port", result.local_port.host()),
+                fmt::arg("public_port", result.advertised_port.host())));
         }
 
         upnp_state_ = tr_upnpPulse(
             upnp_,
-            mediator_.privatePeerPort(),
+            mediator_.localPeerPort(),
             is_enabled,
             do_check,
             mediator_.incomingPeerAddress().readable());

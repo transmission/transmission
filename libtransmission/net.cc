@@ -37,6 +37,7 @@
 #include "tr-macros.h"
 #include "tr-utp.h"
 #include "utils.h"
+#include "variant.h"
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
@@ -84,61 +85,37 @@ int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
  * TCP sockets
  **********************************************************************/
 
-// RFCs 2474, 3246, 4594 & 8622
-// Service class names are defined in RFC 4594, RFC 5865, and RFC 8622.
-// Not all platforms have these IPTOS_ definitions, so hardcode them here
-static auto constexpr IpTosNames = std::array<std::pair<int, std::string_view>, 28>{ {
-    { 0x00, "cs0" }, // IPTOS_CLASS_CS0
-    { 0x04, "le" },
-    { 0x20, "cs1" }, // IPTOS_CLASS_CS1
-    { 0x28, "af11" }, // IPTOS_DSCP_AF11
-    { 0x30, "af12" }, // IPTOS_DSCP_AF12
-    { 0x38, "af13" }, // IPTOS_DSCP_AF13
-    { 0x40, "cs2" }, // IPTOS_CLASS_CS2
-    { 0x48, "af21" }, // IPTOS_DSCP_AF21
-    { 0x50, "af22" }, // IPTOS_DSCP_AF22
-    { 0x58, "af23" }, // IPTOS_DSCP_AF23
-    { 0x60, "cs3" }, // IPTOS_CLASS_CS3
-    { 0x68, "af31" }, // IPTOS_DSCP_AF31
-    { 0x70, "af32" }, // IPTOS_DSCP_AF32
-    { 0x78, "af33" }, // IPTOS_DSCP_AF33
-    { 0x80, "cs4" }, // IPTOS_CLASS_CS4
-    { 0x88, "af41" }, // IPTOS_DSCP_AF41
-    { 0x90, "af42" }, // IPTOS_DSCP_AF42
-    { 0x98, "af43" }, // IPTOS_DSCP_AF43
-    { 0xa0, "cs5" }, // IPTOS_CLASS_CS5
-    { 0xb8, "ef" }, // IPTOS_DSCP_EF
-    { 0xc0, "cs6" }, // IPTOS_CLASS_CS6
-    { 0xe0, "cs7" }, // IPTOS_CLASS_CS7
-
-    // <netinet/ip.h> lists these TOS names as deprecated,
-    // but keep them defined here for backward compatibility
-    { 0x00, "routine" }, // IPTOS_PREC_ROUTINE
-    { 0x02, "lowcost" }, // IPTOS_LOWCOST
-    { 0x02, "mincost" }, // IPTOS_MINCOST
-    { 0x04, "reliable" }, // IPTOS_RELIABILITY
-    { 0x08, "throughput" }, // IPTOS_THROUGHPUT
-    { 0x10, "lowdelay" }, // IPTOS_LOWDELAY
-} };
-
-std::string tr_netTosToName(int tos)
+[[nodiscard]] std::optional<tr_tos_t> tr_tos_t::fromString(std::string_view name)
 {
-    auto const test = [tos](auto const& pair)
+    auto const needle = tr_strlower(tr_strvStrip(name));
+
+    for (auto const& [value, key] : Names)
     {
-        return pair.first == tos;
-    };
-    auto const it = std::find_if(std::begin(IpTosNames), std::end(IpTosNames), test);
-    return it == std::end(IpTosNames) ? std::to_string(tos) : std::string{ it->second };
+        if (needle == key)
+        {
+            return tr_tos_t(value);
+        }
+    }
+
+    if (auto value = tr_parseNum<int>(needle); value)
+    {
+        return tr_tos_t(*value);
+    }
+
+    return {};
 }
 
-std::optional<int> tr_netTosFromName(std::string_view name)
+std::string tr_tos_t::toString() const
 {
-    auto const test = [&name](auto const& pair)
+    for (auto const& [value, key] : Names)
     {
-        return pair.second == name;
-    };
-    auto const it = std::find_if(std::begin(IpTosNames), std::end(IpTosNames), test);
-    return it != std::end(IpTosNames) ? it->first : tr_parseNum<int>(name);
+        if (value_ == value)
+        {
+            return std::string{ key };
+        }
+    }
+
+    return std::to_string(value_);
 }
 
 void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_address_type type)

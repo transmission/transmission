@@ -45,7 +45,6 @@
 #include "timer.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "trevent.h"
 #include "utils.h"
 #include "variant.h"
 #include "web-utils.h"
@@ -354,7 +353,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const*
     }
 
     /* If whitelist is disabled, no restrictions. */
-    if (!server->isHostWhitelistEnabled)
+    if (!server->is_host_whitelist_enabled_)
     {
         return true;
     }
@@ -382,7 +381,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const*
         return true;
     }
 
-    auto const& src = server->hostWhitelist;
+    auto const& src = server->host_whitelist_;
     return std::any_of(
         std::begin(src),
         std::end(src),
@@ -567,10 +566,10 @@ static char const* tr_rpc_address_to_string(tr_rpc_address const& addr, char* bu
 static std::string tr_rpc_address_with_port(tr_rpc_server const* server)
 {
     auto addr_buf = std::array<char, TrUnixAddrStrLen>{};
-    tr_rpc_address_to_string(*server->bindAddress, std::data(addr_buf), std::size(addr_buf));
+    tr_rpc_address_to_string(*server->bind_address_, std::data(addr_buf), std::size(addr_buf));
 
     std::string addr_port_str = std::data(addr_buf);
-    if (server->bindAddress->type != TR_RPC_AF_UNIX)
+    if (server->bind_address_->type != TR_RPC_AF_UNIX)
     {
         addr_port_str.append(":" + std::to_string(server->port().host()));
     }
@@ -614,7 +613,7 @@ static bool bindUnixSocket(
     [[maybe_unused]] struct event_base* base,
     [[maybe_unused]] struct evhttp* httpd,
     [[maybe_unused]] char const* path,
-    [[maybe_unused]] mode_t socket_mode)
+    [[maybe_unused]] tr_mode_t socket_mode)
 {
 #ifdef _WIN32
     tr_logAddError(fmt::format(
@@ -642,7 +641,7 @@ static bool bindUnixSocket(
         return false;
     }
 
-    if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
+    if (chmod(addr.sun_path, socket_mode) != 0)
     {
         tr_logAddWarn(
             fmt::format(_("Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
@@ -675,7 +674,7 @@ static void rpc_server_start_retry_cancel(tr_rpc_server* server)
 
 static void startServer(tr_rpc_server* server)
 {
-    if (server->httpd != nullptr)
+    if (server->httpd)
     {
         return;
     }
@@ -688,7 +687,7 @@ static void startServer(tr_rpc_server* server)
     auto const address = server->getBindAddress();
     auto const port = server->port();
 
-    bool const success = server->bindAddress->type == TR_RPC_AF_UNIX ?
+    bool const success = server->bind_address_->type == TR_RPC_AF_UNIX ?
         bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_) :
         (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
 
@@ -717,7 +716,7 @@ static void startServer(tr_rpc_server* server)
     else
     {
         evhttp_set_gencb(httpd, handle_request, server);
-        server->httpd = httpd;
+        server->httpd = std::unique_ptr<evhttp, void (*)(evhttp*)>{ httpd, evhttp_free };
 
         tr_logAddInfo(fmt::format(_("Listening for RPC and Web requests on '{address}'"), fmt::arg("address", addr_port_str)));
     }
@@ -731,19 +730,17 @@ static void stopServer(tr_rpc_server* server)
 
     rpc_server_start_retry_cancel(server);
 
-    struct evhttp* httpd = server->httpd;
-
-    if (httpd == nullptr)
+    auto& httpd = server->httpd;
+    if (httpd)
     {
         return;
     }
 
     auto const address = server->getBindAddress();
 
-    server->httpd = nullptr;
-    evhttp_free(httpd);
+    httpd.reset();
 
-    if (server->bindAddress->type == TR_RPC_AF_UNIX)
+    if (server->bind_address_->type == TR_RPC_AF_UNIX)
     {
         unlink(address.c_str() + std::size(TrUnixSocketPrefix));
     }
@@ -757,8 +754,7 @@ void tr_rpc_server::setEnabled(bool is_enabled)
 {
     is_enabled_ = is_enabled;
 
-    tr_runInEventThread(
-        this->session,
+    session->runInSessionThread(
         [this]()
         {
             if (!is_enabled_)
@@ -792,7 +788,7 @@ void tr_rpc_server::setPort(tr_port port) noexcept
 
     if (isEnabled())
     {
-        tr_runInEventThread(session, restartServer, this);
+        session->runInSessionThread(&restartServer, this);
     }
 }
 
@@ -865,7 +861,7 @@ void tr_rpc_server::setPasswordEnabled(bool enabled)
 std::string tr_rpc_server::getBindAddress() const
 {
     auto buf = std::array<char, TrUnixAddrStrLen>{};
-    return tr_rpc_address_to_string(*this->bindAddress, std::data(buf), std::size(buf));
+    return tr_rpc_address_to_string(*this->bind_address_, std::data(buf), std::size(buf));
 }
 
 void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
@@ -882,206 +878,58 @@ void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
 *****  LIFE CYCLE
 ****/
 
-static void missing_settings_key(tr_quark const q)
-{
-    tr_logAddDebug(fmt::format("Couldn't find settings key '{}'", tr_quark_get_string_view(q)));
-}
-
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
-    , bindAddress(std::make_unique<struct tr_rpc_address>())
+    , bind_address_(std::make_unique<struct tr_rpc_address>())
     , session{ session_in }
 {
-    auto i = int64_t{};
-    auto sv = std::string_view{};
+    load(settings);
+}
 
-    auto key = TR_KEY_rpc_enabled;
-
-    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
-    {
-        missing_settings_key(key);
+void tr_rpc_server::load(tr_variant* src)
+{
+#define V(key, field, type, default_value, comment) \
+    if (auto* const child = tr_variantDictFind(src, key); child != nullptr) \
+    { \
+        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(child); val) \
+        { \
+            this->field = *val; \
+        } \
     }
-    else
-    {
-        this->is_enabled_ = val;
-    }
+    RPC_SETTINGS_FIELDS(V)
+#undef V
 
-    key = TR_KEY_rpc_port;
-
-    if (!tr_variantDictFindInt(settings, key, &i))
+    if (!tr_strvEndsWith(url_, '/'))
     {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->port_.setHost(i);
+        url_ = fmt::format(FMT_STRING("{:s}/"), url_);
     }
 
-    key = TR_KEY_rpc_url;
+    this->host_whitelist_ = parseWhitelist(host_whitelist_str_);
+    this->setPasswordEnabled(authentication_required_);
+    this->setWhitelist(whitelist_str_);
+    this->setUsername(username_);
+    this->setPassword(salted_password_);
 
-    if (!tr_variantDictFindStrView(settings, key, &sv))
-    {
-        missing_settings_key(key);
-    }
-    else if (std::empty(sv) || sv.back() != '/')
-    {
-        this->url_ = fmt::format(FMT_STRING("{:s}/"), sv);
-    }
-    else
-    {
-        this->url_ = sv;
-    }
-
-    key = TR_KEY_rpc_whitelist_enabled;
-
-    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->setWhitelistEnabled(val);
-    }
-
-    key = TR_KEY_rpc_host_whitelist_enabled;
-
-    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->isHostWhitelistEnabled = val;
-    }
-
-    key = TR_KEY_rpc_host_whitelist;
-
-    if (!tr_variantDictFindStrView(settings, key, &sv))
-    {
-        missing_settings_key(key);
-    }
-    else if (!std::empty(sv))
-    {
-        this->hostWhitelist = parseWhitelist(sv);
-    }
-
-    key = TR_KEY_rpc_authentication_required;
-
-    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->setPasswordEnabled(val);
-    }
-
-    key = TR_KEY_rpc_whitelist;
-
-    if (!tr_variantDictFindStrView(settings, key, &sv))
-    {
-        missing_settings_key(key);
-    }
-    else if (!std::empty(sv))
-    {
-        this->setWhitelist(sv);
-    }
-
-    key = TR_KEY_rpc_username;
-
-    if (!tr_variantDictFindStrView(settings, key, &sv))
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->setUsername(sv);
-    }
-
-    key = TR_KEY_rpc_password;
-
-    if (!tr_variantDictFindStrView(settings, key, &sv))
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->setPassword(sv);
-    }
-
-    key = TR_KEY_anti_brute_force_enabled;
-
-    if (auto val = bool{}; !tr_variantDictFindBool(settings, key, &val))
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->setAntiBruteForceEnabled(val);
-    }
-
-    key = TR_KEY_anti_brute_force_threshold;
-
-    if (!tr_variantDictFindInt(settings, key, &i))
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->setAntiBruteForceLimit(static_cast<int>(i));
-    }
-
-    key = TR_KEY_rpc_socket_mode;
-    bool is_missing_rpc_socket_mode_key = true;
-
-    if (tr_variantDictFindStrView(settings, key, &sv))
-    {
-        /* Read the socket permission as a string representing an octal number. */
-        is_missing_rpc_socket_mode_key = false;
-        i = tr_parseNum<int>(sv, nullptr, 8).value_or(tr_rpc_server::DefaultRpcSocketMode);
-    }
-    else if (tr_variantDictFindInt(settings, key, &i))
-    {
-        /* Or as a base 10 integer to remain compatible with the old settings format. */
-        is_missing_rpc_socket_mode_key = false;
-    }
-    if (is_missing_rpc_socket_mode_key)
-    {
-        missing_settings_key(key);
-    }
-    else
-    {
-        this->socket_mode_ = static_cast<mode_t>(i);
-    }
-
-    key = TR_KEY_rpc_bind_address;
-
-    if (!tr_variantDictFindStrView(settings, key, &sv))
-    {
-        missing_settings_key(key);
-        bindAddress->set_inaddr_any();
-    }
-    else if (!tr_rpc_address_from_string(*bindAddress, sv))
+    if (!tr_rpc_address_from_string(*bind_address_, bind_address_str_))
     {
         tr_logAddWarn(fmt::format(
             _("The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
-            fmt::format("key", tr_quark_get_string_view(key)),
-            fmt::format("value", sv)));
-        bindAddress->set_inaddr_any();
+            fmt::format("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
+            fmt::format("value", bind_address_str_)));
+        bind_address_->set_inaddr_any();
     }
 
-    if (bindAddress->type == TR_RPC_AF_UNIX)
+    if (bind_address_->type == TR_RPC_AF_UNIX)
     {
         this->setWhitelistEnabled(false);
-        this->isHostWhitelistEnabled = false;
+        this->is_host_whitelist_enabled_ = false;
     }
-
     if (this->isEnabled())
     {
         auto const rpc_uri = tr_rpc_address_with_port(this) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        tr_runInEventThread(session, startServer, this);
+        session->runInSessionThread(startServer, this);
 
         if (this->isWhitelistEnabled())
         {
@@ -1098,6 +946,25 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     {
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests from '{path}'"), fmt::arg("path", web_client_dir_)));
     }
+}
+
+void tr_rpc_server::save(tr_variant* tgt) const
+{
+#define V(key, field, type, default_value, comment) \
+    tr_variantDictRemove(tgt, key); \
+    libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
+    RPC_SETTINGS_FIELDS(V)
+#undef V
+}
+
+void tr_rpc_server::defaultSettings(tr_variant* tgt){
+#define V(key, field, type, default_value, comment) \
+    { \
+        tr_variantDictRemove(tgt, key); \
+        libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), default_value); \
+    }
+    RPC_SETTINGS_FIELDS(V)
+#undef V
 }
 
 tr_rpc_server::~tr_rpc_server()

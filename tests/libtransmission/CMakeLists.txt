@@ -14,7 +14,6 @@ add_executable(libtransmission-test
     crypto-test.cc
     error-test.cc
     dht-test.cc
-    dns-test.cc
     file-piece-map-test.cc
     file-test.cc
     getopt-test.cc
@@ -36,6 +35,8 @@ add_executable(libtransmission-test
     rename-test.cc
     rpc-test.cc
     session-test.cc
+    session-alt-speeds-test.cc
+    settings-test.cc
     strbuf-test.cc
     subprocess-test-script.cmd
     subprocess-test.cc

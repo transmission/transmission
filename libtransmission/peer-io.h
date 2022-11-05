@@ -49,12 +49,6 @@ enum ReadState
     READ_ERR
 };
 
-using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
-
-using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
-
-using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
-
 auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
 
 struct evbuffer_deleter
@@ -144,8 +138,8 @@ public:
 
     void readBufferAdd(void const* data, size_t n_bytes);
 
-    ssize_t flushOutgoingProtocolMsgs();
-    ssize_t flush(tr_direction dir, size_t byte_limit);
+    size_t flushOutgoingProtocolMsgs(tr_error** error = nullptr);
+    size_t flush(tr_direction dir, size_t byte_limit, tr_error** error = nullptr);
 
     void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
@@ -153,7 +147,7 @@ public:
     // This is a destructive add: `buf` is empty after this call.
     void write(libtransmission::Buffer& buf, bool is_piece_data);
 
-    size_t getWriteBufferSpace(uint64_t now) const;
+    [[nodiscard]] size_t getWriteBufferSpace(uint64_t now) const noexcept;
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
@@ -235,7 +229,15 @@ public:
         return torrent_hash_;
     }
 
+    using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+    using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+    using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
     void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
+
+    void clearCallbacks()
+    {
+        setCallbacks(nullptr, nullptr, nullptr, nullptr);
+    }
 
     struct tr_peer_socket socket = {};
 

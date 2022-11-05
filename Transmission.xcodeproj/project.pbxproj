@@ -11,8 +11,6 @@
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
 		0A89346B736DBCF81F3A4850 /* torrent-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */; };
 		0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */; };
-		11524394C75E57E52CD9ADF0 /* dns.h in Headers */ = {isa = PBXBuildFile; fileRef = 11524394C75E57E52CD9ADF1 /* dns.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11524394C75E57E52CD9ADF2 /* dns-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = 11524394C75E57E52CD9ADF3 /* dns-ev.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
@@ -155,8 +153,8 @@
 		A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A242AD9115F05D23002B3A6C /* Localizable.strings */; };
 		A2451E6916ACE4EB00586E0E /* FileRenameSheetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2451E6716ACE4EB00586E0E /* FileRenameSheetController.mm */; };
 		A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */; };
-		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
-		A24621420C769D0900088E81 /* trevent.cc in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* trevent.cc */; };
+		A24621410C769D0900088E81 /* session-thread.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* session-thread.h */; };
+		A24621420C769D0900088E81 /* session-thread.cc in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* session-thread.cc */; };
 		A247A443114C701800547DFC /* InfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A247A442114C701800547DFC /* InfoViewController.h */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -427,6 +425,11 @@
 		C8B27BA428153F6600A22B5D /* edit.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC22807FCE900867D3C /* edit.cc */; };
 		C8B27BA528153F6900A22B5D /* show.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC32807FCE900867D3C /* show.cc */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
+		CCEBA596277340F6DF9F4480 /* session-alt-speeds.cc in Sources */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */; };
+		CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */; };
+		D5C306568A7346FFFB8EFAD0 /* session-settings.cc in Sources */ = {isa = PBXBuildFile; fileRef = D5C306568A7346FFFB8EFAD1 /* session-settings.cc */; };
+		D5C306568A7346FFFB8EFAD2 /* session-settings.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C306568A7346FFFB8EFAD3 /* session-settings.h */; };
+		D9057D68C13B75636539B680 /* variant-converters.cc in Sources */ = {isa = PBXBuildFile; fileRef = D9057D68C13B75636539B681 /* variant-converters.cc */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */ = {isa = PBXBuildFile; fileRef = E71A5564279C2DD600EBFA1E /* tr-assert.mm */; };
@@ -597,8 +600,6 @@
 		0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-metainfo.cc"; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-metainfo.h"; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		11524394C75E57E52CD9ADF1 /* dns.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = dns.h; sourceTree = "<group>"; };
-		11524394C75E57E52CD9ADF3 /* dns-ev.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "dns-ev.h"; sourceTree = "<group>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
@@ -873,8 +874,8 @@
 		A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileRenameSheetController.h; sourceTree = "<group>"; };
 		A2451E6716ACE4EB00586E0E /* FileRenameSheetController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileRenameSheetController.mm; sourceTree = "<group>"; };
 		A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FileRenameSheetController.xib; sourceTree = "<group>"; };
-		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trevent.h; sourceTree = "<group>"; };
-		A24621360C769CF400088E81 /* trevent.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = trevent.cc; sourceTree = "<group>"; };
+		A24621350C769CF400088E81 /* session-thread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = session-thread.h; sourceTree = "<group>"; };
+		A24621360C769CF400088E81 /* session-thread.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = session-thread.cc; sourceTree = "<group>"; };
 		A247A442114C701800547DFC /* InfoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoViewController.h; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		A25485390EB66CBB004539DA /* codelength.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = codelength.h; sourceTree = "<group>"; };
@@ -1183,6 +1184,11 @@
 		C8B27B9028153F3100A22B5D /* transmission-edit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-edit"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B27BA128153F3400A22B5D /* transmission-show */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-show"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
+		CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-alt-speeds.cc"; sourceTree = "<group>"; };
+		CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "session-alt-speeds.h"; sourceTree = "<group>"; };
+		D5C306568A7346FFFB8EFAD1 /* session-settings.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-settings.cc"; sourceTree = "<group>"; };
+		D5C306568A7346FFFB8EFAD3 /* session-settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "session-settings.h"; sourceTree = "<group>"; };
+		D9057D68C13B75636539B681 /* variant-converters.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-converters.cc"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = "<group>"; };
@@ -1685,14 +1691,17 @@
 				C10C644C1D9AF328003C1B4C /* session-id.h */,
 				BEFC1DF60C07861A00B0BB3C /* session.cc */,
 				BEFC1E140C07861A00B0BB3C /* session.h */,
+				CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */,
+				CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */,
+				D5C306568A7346FFFB8EFAD1 /* session-settings.cc */,
+				D5C306568A7346FFFB8EFAD3 /* session-settings.h */,
+				D9057D68C13B75636539B681 /* variant-converters.cc */,
 				A25D2CBB0CF4C7190096A262 /* stats.cc */,
 				A25D2CBA0CF4C7190096A262 /* stats.h */,
 				C11DEA141FCD31C0009E22B9 /* subprocess-posix.cc */,
 				C11DEA151FCD31C0009E22B9 /* subprocess.h */,
 				E975121263DD973CAF4AEBA5 /* timer-ev.cc */,
 				E975121263DD973CAF4AEBA3 /* timer-ev.h */,
-				11524394C75E57E52CD9ADF1 /* dns.h */,
-				11524394C75E57E52CD9ADF3 /* dns-ev.h */,
 				E975121263DD973CAF4AEBA1 /* timer.h */,
 				A20152790D1C26EB0081714F /* torrent-ctor.cc */,
 				A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */,
@@ -1721,8 +1730,8 @@
 				A2679292130E00A000CB7464 /* tr-utp.cc */,
 				A2679293130E00A000CB7464 /* tr-utp.h */,
 				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
-				A24621360C769CF400088E81 /* trevent.cc */,
-				A24621350C769CF400088E81 /* trevent.h */,
+				A24621360C769CF400088E81 /* session-thread.cc */,
+				A24621350C769CF400088E81 /* session-thread.h */,
 				BEFC1DF40C07861A00B0BB3C /* port-forwarding-upnp.cc */,
 				BEFC1DF30C07861A00B0BB3C /* port-forwarding-upnp.h */,
 				BEFC1DF20C07861A00B0BB3C /* utils.cc */,
@@ -2159,13 +2168,15 @@
 				C1425B381EE9C805001DB85F /* peer-socket.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
+				CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */,
+				D5C306568A7346FFFB8EFAD2 /* session-settings.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
 				BEFC1E520C07861A00B0BB3C /* open-files.h in Headers */,
 				ED8A163F2735A8AA000D61F9 /* peer-mgr-active-requests.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
 				A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */,
-				A24621410C769D0900088E81 /* trevent.h in Headers */,
+				A24621410C769D0900088E81 /* session-thread.h in Headers */,
 				4D36BA700CA2F00800A63CA5 /* peer-mse.h in Headers */,
 				C10C644E1D9AF328003C1B4C /* session-id.h in Headers */,
 				4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */,
@@ -2203,8 +2214,6 @@
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
 				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
-				11524394C75E57E52CD9ADF0 /* dns.h in Headers */,
-				11524394C75E57E52CD9ADF2 /* dns-ev.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A263C6B1F6718E2486DB20E0 /* tr-buffer.h in Headers */,
@@ -2877,6 +2886,9 @@
 				A2AAB65C0DE0CF6200E04DDA /* rpc-server.cc in Sources */,
 				ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */,
 				BEFC1E2F0C07861A00B0BB3C /* session.cc in Sources */,
+				CCEBA596277340F6DF9F4480 /* session-alt-speeds.cc in Sources */,
+				D5C306568A7346FFFB8EFAD0 /* session-settings.cc in Sources */,
+				D9057D68C13B75636539B680 /* variant-converters.cc in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.cc in Sources */,
 				2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */,
 				A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */,
@@ -2892,7 +2904,7 @@
 				BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.cc in Sources */,
-				A24621420C769D0900088E81 /* trevent.cc in Sources */,
+				A24621420C769D0900088E81 /* session-thread.cc in Sources */,
 				C11DEA161FCD31C0009E22B9 /* subprocess-posix.cc in Sources */,
 				4D36BA6F0CA2F00800A63CA5 /* peer-mse.cc in Sources */,
 				4D36BA720CA2F00800A63CA5 /* handshake.cc in Sources */,

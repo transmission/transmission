@@ -369,13 +369,19 @@ $video-image: '../img/film.svg';
 @mixin mime-icon($mime-icon) {
   // background-image: url($mime-icon);
   background-color: var(--color-fg-primary);
+  -webkit-mask-image: url($mime-icon);
   mask-image: url($mime-icon);
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 
   &[data-icon-multifile='true'] {
+    -webkit-mask-image: url($mime-icon), url($folder-image);
     mask-image: url($mime-icon), url($folder-image);
+    -webkit-mask-position: top left, bottom right;
     mask-position: top left, bottom right;
+    -webkit-mask-repeat: no-repeat, no-repeat;
     mask-repeat: no-repeat, no-repeat;
+    -webkit-mask-size: 16px, 16px;
     mask-size: 16px, 16px;
   }
 }
@@ -437,6 +443,7 @@ $video-image: '../img/film.svg';
       .icon {
         flex-shrink: 0;
         height: $icon-size;
+        -webkit-mask-size: $icon-size, $icon-size-num * 0.5px;
         mask-size: $icon-size, $icon-size-num * 0.5px;
         width: $icon-size;
 
@@ -973,6 +980,7 @@ $video-image: '../img/film.svg';
     border: 0;
     cursor: pointer;
     height: 1rem;
+    -webkit-mask: url($image-magnet) no-repeat center / 14px;
     mask: url($image-magnet) no-repeat center / 14px;
     vertical-align: middle;
     width: 1rem;
@@ -1127,6 +1135,7 @@ $video-image: '../img/film.svg';
   .encryption {
     &[data-encrypted='true'] {
       background-color: var(--color-border-selected);
+      -webkit-mask: url($image-lock-fill) no-repeat center / 14px;
       mask: url($image-lock-fill) no-repeat center / 14px;
       width: 10px;
     }
@@ -1265,7 +1274,7 @@ $video-image: '../img/film.svg';
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
   min-width: 220px;
-  overflow: scroll;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
   padding: 10px;
   position: absolute;
@@ -1569,6 +1578,17 @@ dialog {
   font-weight: normal;
   margin-left: auto;
   padding-left: 10px;
+}
+
+/// OPEN TORRENT DIALOG
+.open-torrent {
+  input {
+    margin-bottom: 15px;
+  }
+
+  #auto-start-label {
+    margin-left: 5px;
+  }
 }
 
 /// HOTKEYS DIALOG

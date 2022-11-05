@@ -9,8 +9,6 @@
 
 @interface NSString (Private)
 
-+ (NSString*)stringForFileSizeLion:(uint64_t)size showUnitUnless:(NSString*)notAllowedUnit unitsUsed:(NSString**)unitUsed;
-
 + (NSString*)stringForSpeed:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb;
 
 @end
@@ -145,57 +143,6 @@
 @end
 
 @implementation NSString (Private)
-
-+ (NSString*)stringForFileSizeLion:(uint64_t)size showUnitUnless:(NSString*)notAllowedUnit unitsUsed:(NSString**)unitUsed
-{
-    double convertedSize;
-    NSString* unit;
-    NSUInteger decimals;
-    if (size < pow(1000, 2))
-    {
-        convertedSize = size / 1000.0;
-        unit = NSLocalizedString(@"KB", "File size - kilobytes");
-        decimals = convertedSize >= 10.0 ? 0 : 1;
-    }
-    else if (size < pow(1000, 3))
-    {
-        convertedSize = size / powf(1000.0, 2);
-        unit = NSLocalizedString(@"MB", "File size - megabytes");
-        decimals = 1;
-    }
-    else if (size < pow(1000, 4))
-    {
-        convertedSize = size / powf(1000.0, 3);
-        unit = NSLocalizedString(@"GB", "File size - gigabytes");
-        decimals = 2;
-    }
-    else
-    {
-        convertedSize = size / powf(1000.0, 4);
-        unit = NSLocalizedString(@"TB", "File size - terabytes");
-        decimals = 2;
-    }
-
-    //match Finder's behavior
-    NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
-    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
-    numberFormatter.minimumFractionDigits = 0;
-    numberFormatter.maximumFractionDigits = decimals;
-
-    NSString* fileSizeString = [numberFormatter stringFromNumber:@(convertedSize)];
-
-    if (!notAllowedUnit || ![unit isEqualToString:notAllowedUnit])
-    {
-        fileSizeString = [fileSizeString stringByAppendingFormat:@" %@", unit];
-    }
-
-    if (unitUsed)
-    {
-        *unitUsed = unit;
-    }
-
-    return fileSizeString;
-}
 
 + (NSString*)stringForSpeed:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb
 {

@@ -57,7 +57,7 @@ void tr_natpmp::setCommandTime()
     command_time_ = tr_time() + CommandWaitSecs;
 }
 
-tr_natpmp::PulseResult tr_natpmp::pulse(tr_port private_port, bool is_enabled)
+tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
 {
     if (is_enabled && state_ == State::Discover)
     {
@@ -89,14 +89,19 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port private_port, bool is_enabled)
         }
     }
 
-    if ((state_ == State::Idle || state_ == State::Err) && is_mapped_ && (!is_enabled || private_port_ != private_port))
+    if ((state_ == State::Idle || state_ == State::Err) && is_mapped_ && (!is_enabled || local_port_ != local_port))
     {
         state_ = State::SendUnmap;
     }
 
     if (state_ == State::SendUnmap && canSendCommand())
     {
-        auto const val = sendnewportmappingrequest(&natpmp_, NATPMP_PROTOCOL_TCP, private_port_.host(), public_port_.host(), 0);
+        auto const val = sendnewportmappingrequest(
+            &natpmp_,
+            NATPMP_PROTOCOL_TCP,
+            local_port_.host(),
+            advertised_port_.host(),
+            0);
         logVal("sendnewportmappingrequest", val);
         state_ = val < 0 ? State::Err : State::RecvUnmap;
         setCommandTime();
@@ -114,10 +119,10 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port private_port, bool is_enabled)
 
             tr_logAddInfo(fmt::format(_("Port {port} is no longer forwarded"), fmt::arg("port", unmapped_port.host())));
 
-            if (private_port_ == unmapped_port)
+            if (local_port_ == unmapped_port)
             {
-                private_port_.clear();
-                public_port_.clear();
+                local_port_.clear();
+                advertised_port_.clear();
                 state_ = State::Idle;
                 is_mapped_ = false;
             }
@@ -145,8 +150,8 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port private_port, bool is_enabled)
         auto const val = sendnewportmappingrequest(
             &natpmp_,
             NATPMP_PROTOCOL_TCP,
-            private_port.host(),
-            private_port.host(),
+            local_port.host(),
+            local_port.host(),
             LifetimeSecs);
         logVal("sendnewportmappingrequest", val);
         state_ = val < 0 ? State::Err : State::RecvMap;
@@ -164,9 +169,9 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port private_port, bool is_enabled)
             state_ = State::Idle;
             is_mapped_ = true;
             renew_time_ = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
-            private_port_ = tr_port::fromHost(resp.pnu.newportmapping.privateport);
-            public_port_ = tr_port::fromHost(resp.pnu.newportmapping.mappedpublicport);
-            tr_logAddInfo(fmt::format(_("Port {port} forwarded successfully"), fmt::arg("port", private_port_.host())));
+            local_port_ = tr_port::fromHost(resp.pnu.newportmapping.privateport);
+            advertised_port_ = tr_port::fromHost(resp.pnu.newportmapping.mappedpublicport);
+            tr_logAddInfo(fmt::format(_("Port {port} forwarded successfully"), fmt::arg("port", local_port_.host())));
         }
         else if (val != NATPMP_TRYAGAIN)
         {
@@ -177,7 +182,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port private_port, bool is_enabled)
     switch (state_)
     {
     case State::Idle:
-        return { is_mapped_ ? TR_PORT_MAPPED : TR_PORT_UNMAPPED, public_port_, private_port_ };
+        return { is_mapped_ ? TR_PORT_MAPPED : TR_PORT_UNMAPPED, local_port_, advertised_port_ };
 
     case State::Discover:
         return { TR_PORT_UNMAPPED, {}, {} };

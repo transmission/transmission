@@ -372,7 +372,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     while (file_size > 0U)
     {
         size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
-        ssize_t const copied = copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
+        auto const copied = copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
 
         TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
@@ -425,7 +425,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
             while (file_size > 0U)
             {
                 size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
-                ssize_t const copied = sendfile64(out, in, nullptr, chunk_size);
+                auto const copied = sendfile64(out, in, nullptr, chunk_size);
                 TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
                 if (copied == -1)
@@ -641,7 +641,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
 
     bool ret = false;
 
-    ssize_t const my_bytes_read = read(handle, buffer, size);
+    auto const my_bytes_read = read(handle, buffer, size);
     static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
@@ -678,7 +678,7 @@ bool tr_sys_file_read_at(
 
 #ifdef HAVE_PREAD
 
-    ssize_t const my_bytes_read = pread(handle, buffer, size, offset);
+    auto const my_bytes_read = pread(handle, buffer, size, offset);
 
 #else
 
@@ -712,7 +712,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
 
     bool ret = false;
 
-    ssize_t const my_bytes_written = write(handle, buffer, size);
+    auto const my_bytes_written = write(handle, buffer, size);
     static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
@@ -749,7 +749,7 @@ bool tr_sys_file_write_at(
 
 #ifdef HAVE_PWRITE
 
-    ssize_t const my_bytes_written = pwrite(handle, buffer, size, offset);
+    auto const my_bytes_written = pwrite(handle, buffer, size, offset);
 
 #else
 

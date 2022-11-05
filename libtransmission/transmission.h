@@ -35,6 +35,7 @@ using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
 using tr_bytes_per_second_t = size_t;
 using tr_kilobytes_per_second_t = size_t;
+using tr_mode_t = uint16_t;
 
 struct tr_block_span_t
 {
@@ -130,8 +131,10 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 #define TR_DEFAULT_RPC_PORT 9091
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
+#define TR_DEFAULT_PEER_PORT 51413
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
+#define TR_DEFAULT_PEER_LIMIT_GLOBAL 200
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT 50
 
@@ -503,8 +506,7 @@ enum tr_direction
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, tr_bytes_per_second_t bytes_per_second);
-void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t kilo_per_second);
+void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t limit);
 tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
 
 void tr_sessionLimitSpeed(tr_session*, tr_direction, bool);
@@ -514,7 +516,7 @@ bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t kilo_per_second);
+void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t limit);
 tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
 
 void tr_sessionUseAltSpeed(tr_session*, bool);
@@ -523,11 +525,11 @@ bool tr_sessionUsesAltSpeed(tr_session const*);
 void tr_sessionUseAltSpeedTime(tr_session*, bool);
 bool tr_sessionUsesAltSpeedTime(tr_session const*);
 
-void tr_sessionSetAltSpeedBegin(tr_session*, int minutes_since_midnight);
-int tr_sessionGetAltSpeedBegin(tr_session const*);
+void tr_sessionSetAltSpeedBegin(tr_session*, size_t minutes_since_midnight);
+size_t tr_sessionGetAltSpeedBegin(tr_session const*);
 
-void tr_sessionSetAltSpeedEnd(tr_session*, int minutes_since_midnight);
-int tr_sessionGetAltSpeedEnd(tr_session const*);
+void tr_sessionSetAltSpeedEnd(tr_session*, size_t minutes_since_midnight);
+size_t tr_sessionGetAltSpeedEnd(tr_session const*);
 
 enum tr_sched_day
 {
@@ -640,13 +642,13 @@ void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_coun
 **/
 
 /** @brief Set the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
-void tr_sessionSetQueueSize(tr_session*, tr_direction, size_t max_simultaneous_seed_torrents);
+void tr_sessionSetQueueSize(tr_session*, tr_direction, size_t max_simultaneous_torrents);
 
 /** @brief Return the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
 size_t tr_sessionGetQueueSize(tr_session const*, tr_direction);
 
 /** @brief Set whether or not to limit how many torrents can download (TR_DOWN) or seed (TR_UP) at the same time  */
-void tr_sessionSetQueueEnabled(tr_session*, tr_direction, bool do_limit_simultaneous_seed_torrents);
+void tr_sessionSetQueueEnabled(tr_session*, tr_direction, bool do_limit_simultaneous_torrents);
 
 /** @brief Return true if we're limiting how many torrents can concurrently download (TR_DOWN) or seed (TR_UP) at the same time */
 bool tr_sessionGetQueueEnabled(tr_session const*, tr_direction);
@@ -1487,7 +1489,7 @@ enum
     TR_PEER_FROM_LTEP, /* peer address provided in an LTEP handshake */
     TR_PEER_FROM__MAX
 };
-enum
+enum tr_eta : time_t
 {
     TR_ETA_NOT_AVAIL = -1,
     TR_ETA_UNKNOWN = -2,

@@ -1307,7 +1307,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     {
         auto const* tor = torrents.at(i);
 
-        for (int j = 0; j < peerCount[i]; ++j)
+        for (size_t j = 0; j < peerCount[i]; ++j)
         {
             auto const* s = &peers.at(i)[j];
             auto const key = make_key(tor, s);

@@ -172,9 +172,22 @@ bool tr_variantFromBuf(
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view);
-void tr_variantInitStrView(tr_variant* initme, std::string_view);
 void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
+
+constexpr void tr_variantInit(tr_variant* initme, char type)
+{
+    initme->val = {};
+    initme->type = type;
+}
+
+constexpr void tr_variantInitStrView(tr_variant* initme, std::string_view in)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    initme->val.s.type = TR_STRING_TYPE_VIEW;
+    initme->val.s.len = std::size(in);
+    initme->val.s.str.str = std::data(in);
+}
 
 bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
@@ -188,8 +201,13 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
     return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
 }
 
-void tr_variantInitReal(tr_variant* initme, double value);
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
+
+constexpr void tr_variantInitReal(tr_variant* initme, double value)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_REAL);
+    initme->val.d = value;
+}
 
 /***
 ****  Booleans
@@ -200,8 +218,13 @@ bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
     return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
 }
 
-void tr_variantInitBool(tr_variant* initme, bool value);
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
+
+constexpr void tr_variantInitBool(tr_variant* initme, bool value)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_BOOL);
+    initme->val.b = value;
+}
 
 /***
 ****  Ints
@@ -212,8 +235,13 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
 
-void tr_variantInitInt(tr_variant* initme, int64_t value);
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
+
+constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_INT);
+    initme->val.i = value;
+}
 
 /***
 ****  Lists
@@ -240,7 +268,11 @@ tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count);
 tr_variant* tr_variantListChild(tr_variant* list, size_t pos);
 
 bool tr_variantListRemove(tr_variant* list, size_t pos);
-[[nodiscard]] size_t tr_variantListSize(tr_variant const* list);
+
+[[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* list)
+{
+    return tr_variantIsList(list) ? list->val.l.count : 0;
+}
 
 /***
 ****  Dictionaries
@@ -280,5 +312,20 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, std::byte const
 
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
 void tr_variantMergeDicts(tr_variant* dict_target, tr_variant const* dict_source);
+
+namespace libtransmission
+{
+
+struct VariantConverter
+{
+public:
+    template<typename T>
+    static std::optional<T> load(tr_variant* src);
+
+    template<typename T>
+    static void save(tr_variant* tgt, T const& val);
+};
+
+} // namespace libtransmission
 
 /* @} */

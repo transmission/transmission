@@ -527,7 +527,8 @@ private:
 
             if (line_stream.bad() || std::empty(addrstr))
             {
-                tr_logAddWarn(fmt::format(_("Couldn't parse '{filename}' line: '{line}'"),
+                tr_logAddWarn(fmt::format(
+                    _("Couldn't parse '{filename}' line: '{line}'"),
                     fmt::arg("filename", filename),
                     fmt::arg("line", line)));
             }

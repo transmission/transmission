@@ -5,12 +5,16 @@
 
 #include <algorithm> // for std::find_if()
 #include <cerrno> // for errno, EAFNOSUPPORT
-#include <cstring> // for memset()
+#include <cstring> // for memcpy()
 #include <ctime>
 #include <list>
 #include <memory>
 #include <string_view>
 #include <vector>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#endif
 
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -23,6 +27,7 @@
 #include "announcer-common.h"
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
+#include "error.h"
 #include "peer-io.h"
 #include "peer-mgr.h" // for tr_pex::fromCompact4()
 #include "session.h"
@@ -30,6 +35,11 @@
 #include "tr-buffer.h"
 #include "utils.h"
 #include "web-utils.h"
+
+#ifdef _WIN32
+#undef gai_strerror
+#define gai_strerror gai_strerrorA
+#endif
 
 #define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
@@ -331,9 +341,19 @@ struct tau_tracker
     {
     }
 
+    tau_tracker(tau_tracker&&) = delete;
+    tau_tracker(tau_tracker const&) = delete;
+    tau_tracker& operator=(tau_tracker&&) = delete;
+    tau_tracker& operator=(tau_tracker const&) = delete;
+
+    ~tau_tracker()
+    {
+        tr_error_clear(&addr_error_);
+    }
+
     [[nodiscard]] auto isIdle() const noexcept
     {
-        return std::empty(announces) && std::empty(scrapes) && (dns_request_ == 0U);
+        return std::empty(announces) && std::empty(scrapes);
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -374,7 +394,7 @@ struct tau_tracker
     tr_interned_string const host;
     tr_port const port;
 
-    libtransmission::Dns::Tag dns_request_ = {};
+    tr_error* addr_error_ = nullptr;
     std::optional<std::pair<sockaddr_storage, socklen_t>> addr_;
     time_t addr_expires_at_ = 0;
 
@@ -391,29 +411,42 @@ struct tau_tracker
     std::list<tau_scrape_request> scrapes;
 };
 
-static void tau_tracker_upkeep(struct tau_tracker* /*tracker*/);
-
-static void tau_tracker_on_dns(tau_tracker* const tracker, sockaddr const* sa, socklen_t salen, time_t expires_at)
+static std::optional<std::pair<sockaddr_storage, socklen_t>> host2sockaddr(
+    std::string_view host,
+    tr_port port,
+    tr_error** error)
 {
-    tracker->dns_request_ = {};
+    auto const szhost = tr_urlbuf{ host };
 
-    if (sa == nullptr)
+    auto szport = std::array<char, 16>{};
+    *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
+
+    auto hints = addrinfo{};
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_protocol = IPPROTO_UDP;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    addrinfo* info = nullptr;
+    if (int const rc = getaddrinfo(szhost, std::data(szport), &hints, &info); rc != 0)
     {
-        auto const errmsg = fmt::format(_("Couldn't find address of tracker '{host}'"), fmt::arg("host", tracker->host));
-        logwarn(tracker->key, errmsg);
-        tracker->failAll(false, false, errmsg.c_str());
-        tracker->addr_expires_at_ = tr_time() + tau_tracker::DnsRetryIntervalSecs;
+        tr_logAddWarn(fmt::format(
+            _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
+            fmt::arg("address", host),
+            fmt::arg("port", port.host()),
+            fmt::arg("error", gai_strerror(rc)),
+            fmt::arg("error_code", rc)));
+        tr_error_set(error, rc, gai_strerror(rc));
+        return {};
     }
-    else
-    {
-        logdbg(tracker->key, "DNS lookup succeeded");
-        auto ss = sockaddr_storage{};
-        memcpy(&ss, sa, salen);
-        tracker->addr_.emplace(ss, salen);
-        tracker->addr_expires_at_ = expires_at;
-        tau_tracker_upkeep(tracker);
-    }
+
+    auto ss = sockaddr_storage{};
+    auto const len = info->ai_addrlen;
+    memcpy(&ss, info->ai_addr, len);
+    freeaddrinfo(info);
+    return std::make_pair(ss, len);
 }
+
+static void tau_tracker_upkeep(struct tau_tracker* /*tracker*/);
 
 static void tau_tracker_send_request(struct tau_tracker* tracker, void const* payload, size_t payload_len)
 {
@@ -459,7 +492,6 @@ static void tau_tracker_send_requests(tau_tracker* tracker, std::list<T>& reqs)
 
 static void tau_tracker_send_reqs(tau_tracker* tracker)
 {
-    TR_ASSERT(!tracker->dns_request_);
     TR_ASSERT(tracker->addr_);
     TR_ASSERT(tracker->connecting_at == 0);
     TR_ASSERT(tracker->connection_expiration_time > tr_time());
@@ -562,20 +594,20 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         return;
     }
 
-    /* if we don't have an address yet, try & get one now. */
-    if (!closing && !tracker->addr_ && (tracker->dns_request_ == 0U))
+    // if we don't have an address yet, try & get one now
+    if (!closing && !tracker->addr_)
     {
-        auto hints = libtransmission::Dns::Hints{};
-        hints.ai_family = AF_UNSPEC;
-        hints.ai_socktype = SOCK_DGRAM;
-        hints.ai_protocol = IPPROTO_UDP;
-        logtrace(tracker->host, "Trying a new DNS lookup");
-        tracker->dns_request_ = tracker->mediator_.dns().lookup(
-            tracker->host.sv(),
-            [tracker](sockaddr const* sa, socklen_t len, time_t expires_at)
-            { tau_tracker_on_dns(tracker, sa, len, expires_at); },
-            hints);
-        return;
+        if (tracker->addr_expires_at_ <= now)
+        {
+            tr_error_clear(&tracker->addr_error_);
+            tracker->addr_ = host2sockaddr(tracker->host, tracker->port, &tracker->addr_error_);
+            tracker->addr_expires_at_ = now + tau_tracker::DnsRetryIntervalSecs;
+        }
+        if (tracker->addr_error_ != nullptr)
+        {
+            tracker->failAll(false, false, tracker->addr_error_->message);
+            return;
+        }
     }
 
     logtrace(
@@ -684,12 +716,6 @@ public:
 
         for (auto& tracker : trackers_)
         {
-            // if there's a pending DNS request, cancel it
-            if (tracker.dns_request_ != 0U)
-            {
-                mediator_.dns().cancel(tracker.dns_request_);
-            }
-
             tracker.close_at = now + 3;
             tau_tracker_upkeep(&tracker);
         }

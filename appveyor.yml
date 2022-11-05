@@ -9,16 +9,16 @@ environment:
     secure: Bf3x1Iruxg+l3tp+an+g9oE36EHxvyWrE8GTJzZh4Ss=
 
   matrix:
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     TR_ARCH: x86
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     TR_ARCH: x64
 
 for:
 -
   matrix:
     only:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
 
   clone_folder: '%SystemDrive%\%TR_ARCH%-project'
 

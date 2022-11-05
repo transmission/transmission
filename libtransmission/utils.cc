@@ -1013,17 +1013,17 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 void tr_net_init()
 {
+#ifdef _WIN32
     static bool initialized = false;
 
     if (!initialized)
     {
-#ifdef _WIN32
         WSADATA wsaData;
         WSAStartup(MAKEWORD(2, 2), &wsaData);
-#endif
 
         initialized = true;
     }
+#endif
 }
 
 /// mime-type

@@ -13,11 +13,9 @@
 
 #include "transmission.h"
 
-#include "dns-ev.h"
-#include "dns.h"
 #include "file.h"
 #include "timer-ev.h"
-#include "trevent.h" // for tr_evthread_init();
+#include "session-thread.h" // for tr_evthread_init();
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
@@ -384,7 +382,7 @@ protected:
     {
         SandboxedTest::SetUp();
 
-        tr_evthread_init();
+        tr_session_thread::tr_evthread_init();
         event_base_ = event_base_new();
     }
 

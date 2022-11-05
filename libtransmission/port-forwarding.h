@@ -28,10 +28,10 @@ public:
     public:
         virtual ~Mediator() = default;
 
-        [[nodiscard]] virtual tr_port privatePeerPort() const = 0;
+        [[nodiscard]] virtual tr_port localPeerPort() const = 0;
         [[nodiscard]] virtual tr_address incomingPeerAddress() const = 0;
         [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
-        virtual void onPortForwarded(tr_port public_port, tr_port private_port) = 0;
+        virtual void onPortForwarded(tr_port advertised_port) = 0;
     };
 
     [[nodiscard]] static std::unique_ptr<tr_port_forwarding> create(Mediator&);
