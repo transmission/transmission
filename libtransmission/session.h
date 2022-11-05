@@ -88,22 +88,7 @@ private:
             tr_port port,
             IncomingCallback on_incoming,
             void* on_incoming_user_data);
-
         ~BoundSocket();
-
-        void bindAndListenForIncomingPeers(tr_session* session);
-
-        void close();
-
-        [[nodiscard]] auto const& address() const noexcept
-        {
-            return addr_;
-        }
-
-        [[nodiscard]] auto readable() const
-        {
-            return addr_.readable();
-        }
 
     private:
         tr_address addr_;

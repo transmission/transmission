@@ -301,11 +301,6 @@ tr_session::BoundSocket::BoundSocket(
 
 tr_session::BoundSocket::~BoundSocket()
 {
-    close();
-}
-
-void tr_session::BoundSocket::close()
-{
     if (ev_ != nullptr)
     {
         event_free(ev_);
