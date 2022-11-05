@@ -267,14 +267,9 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     }
 }
 
-tr_session::BoundSocket::BoundSocket(
-    struct event_base* evbase,
-    tr_address const& addr,
-    tr_port port,
-    IncomingCallback on_incoming,
-    void* on_incoming_user_data)
-    : on_incoming_{ on_incoming }
-    , on_incoming_user_data_{ on_incoming_user_data }
+tr_session::BoundSocket::BoundSocket(event_base* evbase, tr_address addr, tr_port port, IncomingCallback cb, void* cb_data)
+    : cb_{ cb }
+    , cb_data_{ cb_data }
     , socket_{ tr_netBindTCP(&addr, port, false) }
 {
     if (socket_ == TR_BAD_SOCKET)
@@ -292,7 +287,7 @@ tr_session::BoundSocket::BoundSocket(
         [](evutil_socket_t fd, short, void* vself)
         {
             auto* const self = static_cast<BoundSocket*>(vself);
-            self->on_incoming_(fd, self->on_incoming_user_data_);
+            self->cb_(fd, self->cb_data_);
         },
         this);
     event_add(ev_, nullptr);
@@ -315,15 +310,20 @@ tr_session::BoundSocket::~BoundSocket()
 
 tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) const noexcept
 {
+    if (type == TR_AF_INET)
+    {
+        auto addr = tr_address::fromString(settings_.bind_address_ipv4).value_or(tr_in6addr_any);
+        return { addr, addr == tr_inaddr_any };
+    }
+
     if (type == TR_AF_INET6)
     {
         auto addr = tr_address::fromString(settings_.bind_address_ipv6).value_or(tr_in6addr_any);
         return { addr, addr == tr_in6addr_any };
     }
 
-    // TR_AF_INET
-    auto addr = tr_address::fromString(settings_.bind_address_ipv4).value_or(tr_in6addr_any);
-    return { addr, addr == tr_inaddr_any };
+    TR_ASSERT_MSG(false, "invalid type");
+    return {};
 }
 
 /***
@@ -599,8 +599,6 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
         setDefaultTrackers(val);
     }
 
-    bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
-
     if (auto const& val = new_settings.utp_enabled; force || val != old_settings.utp_enabled)
     {
         tr_sessionSetUTPEnabled(this, val);
@@ -646,6 +644,8 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
     {
         port_forwarding_->localPortChanged();
     }
+
+    bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
 
     if (force || port_changed || dht_changed)
     {

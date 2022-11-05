@@ -14,7 +14,6 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
-#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -82,17 +81,12 @@ private:
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(
-            struct event_base*,
-            tr_address const& addr,
-            tr_port port,
-            IncomingCallback on_incoming,
-            void* on_incoming_user_data);
+        BoundSocket(struct event_base*, tr_address addr, tr_port port, IncomingCallback cb, void* cb_data);
         ~BoundSocket();
 
     private:
-        IncomingCallback on_incoming_;
-        void* on_incoming_user_data_;
+        IncomingCallback cb_;
+        void* cb_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
         struct event* ev_ = nullptr;
     };
@@ -154,8 +148,7 @@ private:
 
         [[nodiscard]] tr_address incomingPeerAddress() const override
         {
-            auto [address, is_default] = session_.publicAddress(TR_AF_INET);
-            return address;
+            return session_.publicAddress(TR_AF_INET).address;
         }
 
         [[nodiscard]] tr_port localPeerPort() const override
@@ -1055,10 +1048,10 @@ private:
 
     /// other fields
 
-    // depends-on: session_thread_, old_settings.bind_address_ipv4, local_peer_port_
+    // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_
     std::optional<BoundSocket> bound_ipv4_;
 
-    // depends-on: session_thread_, old_settings.bind_address_ipv6, local_peer_port_
+    // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_
     std::optional<BoundSocket> bound_ipv6_;
 
 public:
