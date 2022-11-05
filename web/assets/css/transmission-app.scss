@@ -980,6 +980,7 @@ $video-image: '../img/film.svg';
     border: 0;
     cursor: pointer;
     height: 1rem;
+    -webkit-mask: url($image-magnet) no-repeat center / 14px;
     mask: url($image-magnet) no-repeat center / 14px;
     vertical-align: middle;
     width: 1rem;
@@ -1134,6 +1135,7 @@ $video-image: '../img/film.svg';
   .encryption {
     &[data-encrypted='true'] {
       background-color: var(--color-border-selected);
+      -webkit-mask: url($image-lock-fill) no-repeat center / 14px;
       mask: url($image-lock-fill) no-repeat center / 14px;
       width: 10px;
     }
@@ -1272,7 +1274,7 @@ $video-image: '../img/film.svg';
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
   min-width: 220px;
-  overflow: scroll;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
   padding: 10px;
   position: absolute;
