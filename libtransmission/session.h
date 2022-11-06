@@ -90,6 +90,12 @@ private:
         ~BoundSocket();
 
     private:
+        static void onCanRead(tr_socket_t fd, short /*what*/, void* vself)
+        {
+            auto* const self = static_cast<BoundSocket*>(vself);
+            self->cb_(fd, self->cb_data_);
+        }
+
         IncomingCallback cb_;
         void* cb_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;

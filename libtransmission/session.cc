@@ -276,6 +276,7 @@ tr_session::BoundSocket::BoundSocket(
     : cb_{ cb }
     , cb_data_{ cb_data }
     , socket_{ tr_netBindTCP(addr, port, false) }
+    , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -284,17 +285,6 @@ tr_session::BoundSocket::BoundSocket(
 
     tr_logAddInfo(
         fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr.readable(port))));
-
-    ev_.reset(event_new(
-        evbase,
-        socket_,
-        EV_READ | EV_PERSIST,
-        [](evutil_socket_t fd, short /*evtype*/, void* vself)
-        {
-            auto* const self = static_cast<BoundSocket*>(vself);
-            self->cb_(fd, self->cb_data_);
-        },
-        this));
     event_add(ev_.get(), nullptr);
 }
 
