@@ -608,11 +608,6 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
         tr_sessionSetUTPEnabled(this, val);
     }
 
-    if (auto const& val = new_settings.lpd_enabled; force || val != old_settings.lpd_enabled)
-    {
-        tr_sessionSetLPDEnabled(this, val);
-    }
-
     useBlocklist(new_settings.blocklist_enabled);
 
     auto local_peer_port = force && settings_.peer_port_random_on_start ? randomPort() : new_settings.peer_port;
@@ -654,6 +649,20 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
     if (!udp_core_ || force || port_changed || dht_changed)
     {
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+    }
+
+    // Sends out announce messages with advertisedPeerPort(), so this
+    // section neesd be happen here after the peer port settings changes
+    if (auto const& val = new_settings.lpd_enabled; force || val != old_settings.lpd_enabled)
+    {
+        if (val)
+        {
+            lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
+        }
+        else
+        {
+            lpd_.reset();
+        }
     }
 
     // We need to update bandwidth if speed settings changed.
@@ -1438,21 +1447,16 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled == session->allowsLPD())
+    if (enabled != session->allowsLPD())
     {
-        return;
-    }
-
-    session->runInSessionThread(
-        [session, enabled]()
-        {
-            session->lpd_.reset();
-            session->settings_.lpd_enabled = enabled;
-            if (enabled)
+        session->runInSessionThread(
+            [session, enabled]()
             {
-                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->eventBase());
-            }
-        });
+                auto settings = session->settings_;
+                settings.lpd_enabled = enabled;
+                session->setSettings(std::move(settings), false);
+            });
+    }
 }
 
 bool tr_sessionIsLPDEnabled(tr_session const* session)
