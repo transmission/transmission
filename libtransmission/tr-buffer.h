@@ -16,6 +16,7 @@
 
 #include "error.h"
 #include "net.h" // tr_socket_t
+#include "utils-ev.h"
 #include "utils.h"
 
 namespace libtransmission
@@ -359,7 +360,7 @@ public:
     }
 
 private:
-    std::unique_ptr<evbuffer, void (*)(evbuffer*)> buf_{ evbuffer_new(), evbuffer_free };
+    evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
 };
 
 } // namespace libtransmission

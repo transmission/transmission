@@ -42,6 +42,7 @@
 #include "stats.h"
 #include "torrents.h"
 #include "tr-lpd.h"
+#include "utils-ev.h"
 #include "verify.h"
 #include "web.h"
 
@@ -92,7 +93,7 @@ private:
         IncomingCallback cb_;
         void* cb_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
-        struct event* ev_ = nullptr;
+        libtransmission::evhelpers::event_unique_ptr ev_;
     };
 
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
@@ -254,11 +255,11 @@ private:
     private:
         tr_port const udp_port_;
         tr_session& session_;
-        struct event* udp_event_ = nullptr;
-        struct event* udp6_event_ = nullptr;
-        std::optional<in6_addr> udp6_bound_;
         tr_socket_t udp_socket_ = TR_BAD_SOCKET;
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
+        libtransmission::evhelpers::event_unique_ptr udp4_event_;
+        libtransmission::evhelpers::event_unique_ptr udp6_event_;
+        std::optional<in6_addr> udp6_bound_;
 
         void rebind_ipv6(bool);
     };

@@ -21,8 +21,6 @@
 
 #include <curl/curl.h>
 
-#include <event2/buffer.h>
-
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -30,6 +28,7 @@
 #include "log.h"
 #include "peer-io.h"
 #include "tr-assert.h"
+#include "utils-ev.h"
 #include "utils.h"
 #include "web.h"
 
@@ -180,7 +179,7 @@ public:
     class Task
     {
     private:
-        tr_evbuffer_ptr const privbuf = tr_evbuffer_ptr{ evbuffer_new() };
+        libtransmission::evhelpers::evbuffer_unique_ptr privbuf{ evbuffer_new() };
         std::unique_ptr<CURL, void (*)(CURL*)> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
         tr_web::FetchOptions options;
 
