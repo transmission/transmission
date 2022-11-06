@@ -479,10 +479,10 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
     return fd;
 }
 
-tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppress_msgs)
+tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs)
 {
     int unused = 0;
-    return tr_netBindTCPImpl(*addr, port, suppress_msgs, &unused);
+    return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
 bool tr_net_hasIPv6(tr_port port)

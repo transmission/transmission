@@ -81,7 +81,7 @@ private:
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(struct event_base*, tr_address addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocket(struct event_base*, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
         BoundSocket(BoundSocket&&) = delete;
         BoundSocket(BoundSocket const&) = delete;
         BoundSocket operator=(BoundSocket&&) = delete;
@@ -1048,6 +1048,8 @@ private:
 
     tr_session_id session_id_;
 
+    tr_open_files open_files_;
+
     std::vector<libtransmission::Blocklist> blocklists_;
 
     /// other fields
@@ -1070,15 +1072,13 @@ private:
     // depends-on: top_bandwidth_
     std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
-    // depends-on: settings_, timer_maker_
+    // depends-on: timer_maker_, settings_, local_peer_port_
     PortForwardingMediator port_forwarding_mediator_{ *this };
     std::unique_ptr<tr_port_forwarding> port_forwarding_ = tr_port_forwarding::create(port_forwarding_mediator_);
 
     // depends-on: session_thread_, top_bandwidth_
     AltSpeedMediator alt_speed_mediator_{ *this };
     tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
-
-    tr_open_files open_files_;
 
     // depends-on: open_files_
     tr_torrents torrents_;

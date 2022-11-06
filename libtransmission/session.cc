@@ -267,10 +267,15 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     }
 }
 
-tr_session::BoundSocket::BoundSocket(event_base* evbase, tr_address addr, tr_port port, IncomingCallback cb, void* cb_data)
+tr_session::BoundSocket::BoundSocket(
+    event_base* evbase,
+    tr_address const& addr,
+    tr_port port,
+    IncomingCallback cb,
+    void* cb_data)
     : cb_{ cb }
     , cb_data_{ cb_data }
-    , socket_{ tr_netBindTCP(&addr, port, false) }
+    , socket_{ tr_netBindTCP(addr, port, false) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -557,9 +562,7 @@ static void updateBandwidth(tr_session* session, tr_direction dir);
 void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
     TR_ASSERT(amInSessionThread());
-
-    auto* const settings = settings_dict;
-    TR_ASSERT(tr_variantIsDict(settings));
+    TR_ASSERT(tr_variantIsDict(settings_dict));
 
     // load the session settings
     auto new_settings = tr_session_settings{};
@@ -567,8 +570,8 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
     setSettings(std::move(new_settings), force);
 
     // delegate loading out the other settings
-    alt_speeds_.load(settings);
-    rpc_server_->load(settings);
+    alt_speeds_.load(settings_dict);
+    rpc_server_->load(settings_dict);
 }
 
 void tr_session::setSettings(tr_session_settings settings_in, bool force)

@@ -288,7 +288,7 @@ constexpr bool tr_address_is_valid(tr_address const* a)
 
 struct tr_session;
 
-tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppress_msgs);
+tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs);
 
 [[nodiscard]] std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(
     tr_session* session,
