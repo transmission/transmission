@@ -284,7 +284,7 @@ tr_session::BoundSocket::BoundSocket(event_base* evbase, tr_address addr, tr_por
         evbase,
         socket_,
         EV_READ | EV_PERSIST,
-        [](evutil_socket_t fd, short, void* vself)
+        [](evutil_socket_t fd, short /*evtype*/, void* vself)
         {
             auto* const self = static_cast<BoundSocket*>(vself);
             self->cb_(fd, self->cb_data_);
@@ -312,14 +312,16 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
 {
     if (type == TR_AF_INET)
     {
-        auto addr = tr_address::fromString(settings_.bind_address_ipv4).value_or(tr_in6addr_any);
-        return { addr, addr == tr_inaddr_any };
+        static auto constexpr DefaultAddr = tr_address::AnyIPv4();
+        auto addr = tr_address::fromString(settings_.bind_address_ipv4).value_or(DefaultAddr);
+        return { addr, addr == DefaultAddr };
     }
 
     if (type == TR_AF_INET6)
     {
-        auto addr = tr_address::fromString(settings_.bind_address_ipv6).value_or(tr_in6addr_any);
-        return { addr, addr == tr_in6addr_any };
+        static auto constexpr DefaultAddr = tr_address::AnyIPv6();
+        auto addr = tr_address::fromString(settings_.bind_address_ipv6).value_or(DefaultAddr);
+        return { addr, addr == DefaultAddr };
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -559,10 +561,12 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
     auto* const settings = settings_dict;
     TR_ASSERT(tr_variantIsDict(settings));
 
+    // load the session settings
     auto new_settings = tr_session_settings{};
     new_settings.load(settings_dict);
     setSettings(std::move(new_settings), force);
 
+    // delegate loading out the other settings
     alt_speeds_.load(settings);
     rpc_server_->load(settings);
 }
@@ -647,7 +651,7 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
 
     bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
 
-    if (force || port_changed || dht_changed)
+    if (!udp_core_ || force || port_changed || dht_changed)
     {
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
     }
