@@ -82,6 +82,10 @@ private:
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
         BoundSocket(struct event_base*, tr_address addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocket(BoundSocket&&) = delete;
+        BoundSocket(BoundSocket const&) = delete;
+        BoundSocket operator=(BoundSocket&&) = delete;
+        BoundSocket operator=(BoundSocket const&) = delete;
         ~BoundSocket();
 
     private:
