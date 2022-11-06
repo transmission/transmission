@@ -13,8 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include <event2/buffer.h>
-
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -25,6 +23,7 @@
 #include "peer-mgr.h"
 #include "timer.h"
 #include "torrent.h"
+#include "utils-ev.h"
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"
@@ -42,7 +41,7 @@ void on_idle(tr_webseed* w);
 class tr_webseed_task
 {
 private:
-    tr_evbuffer_ptr const content_{ evbuffer_new() };
+    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
 
 public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t blocks_in)
@@ -328,7 +327,7 @@ private:
 struct write_block_data
 {
 private:
-    tr_evbuffer_ptr const content_{ evbuffer_new() };
+    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
 
 public:
     write_block_data(

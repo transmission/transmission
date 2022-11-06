@@ -275,12 +275,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            udp_event_ = event_new(session_.eventBase(), udp_socket_, EV_READ | EV_PERSIST, event_callback, &session_);
-
-            if (udp_event_ == nullptr)
-            {
-                tr_logAddWarn(_("Couldn't allocate IPv4 event"));
-            }
+            udp4_event_.reset(event_new(session_.eventBase(), udp_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
         }
     }
 
@@ -293,12 +288,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
 
     if (udp6_socket_ != TR_BAD_SOCKET)
     {
-        udp6_event_ = event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_);
-
-        if (udp6_event_ == nullptr)
-        {
-            tr_logAddWarn(_("Couldn't allocate IPv6 event"));
-        }
+        udp6_event_.reset(event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
     }
 
     set_socket_buffers();
@@ -309,13 +299,13 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         tr_dhtInit(&session_, udp_socket_, udp6_socket_);
     }
 
-    if (udp_event_ != nullptr)
+    if (udp4_event_)
     {
-        event_add(udp_event_, nullptr);
+        event_add(udp4_event_.get(), nullptr);
     }
-    if (udp6_event_ != nullptr)
+    if (udp6_event_)
     {
-        event_add(udp6_event_, nullptr);
+        event_add(udp6_event_.get(), nullptr);
     }
 }
 
@@ -339,17 +329,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 {
     startShutdown();
 
-    if (udp_socket_ != TR_BAD_SOCKET)
-    {
-        tr_netCloseSocket(udp_socket_);
-        udp_socket_ = TR_BAD_SOCKET;
-    }
-
-    if (udp_event_ != nullptr)
-    {
-        event_free(udp_event_);
-        udp_event_ = nullptr;
-    }
+    udp6_event_.reset();
 
     if (udp6_socket_ != TR_BAD_SOCKET)
     {
@@ -357,10 +337,12 @@ tr_session::tr_udp_core::~tr_udp_core()
         udp6_socket_ = TR_BAD_SOCKET;
     }
 
-    if (udp6_event_ != nullptr)
+    udp4_event_.reset();
+
+    if (udp_socket_ != TR_BAD_SOCKET)
     {
-        event_free(udp6_event_);
-        udp6_event_ = nullptr;
+        tr_netCloseSocket(udp_socket_);
+        udp_socket_ = TR_BAD_SOCKET;
     }
 
     udp6_bound_.reset();
