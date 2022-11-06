@@ -120,7 +120,7 @@ private:
             return;
         }
 
-        if (event_add(event_, nullptr) == -1)
+        if (event_add(event_.get(), nullptr) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
