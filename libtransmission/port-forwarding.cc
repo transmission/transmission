@@ -44,7 +44,7 @@ public:
     tr_port_forwarding_impl& operator=(tr_port_forwarding_impl&&) = delete;
     tr_port_forwarding_impl& operator=(tr_port_forwarding_impl const&) = delete;
 
-    void portChanged() override
+    void localPortChanged() override
     {
         if (!is_enabled_)
         {

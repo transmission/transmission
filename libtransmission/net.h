@@ -263,10 +263,17 @@ struct tr_address
         struct in6_addr addr6;
         struct in_addr addr4;
     } addr;
-};
 
-extern tr_address const tr_inaddr_any;
-extern tr_address const tr_in6addr_any;
+    [[nodiscard]] static auto constexpr AnyIPv4() noexcept
+    {
+        return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
+    }
+
+    [[nodiscard]] static auto constexpr AnyIPv6() noexcept
+    {
+        return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
+    }
+};
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
@@ -281,7 +288,7 @@ constexpr bool tr_address_is_valid(tr_address const* a)
 
 struct tr_session;
 
-tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppress_msgs);
+tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs);
 
 [[nodiscard]] std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(
     tr_session* session,

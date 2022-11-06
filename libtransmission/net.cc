@@ -43,10 +43,6 @@
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
-tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
-
-tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY } } } } };
-
 std::string tr_net_strerror(int err)
 {
 #ifdef _WIN32
@@ -392,13 +388,13 @@ void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
     }
 }
 
-static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppress_msgs, int* err_out)
+static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppress_msgs, int* err_out)
 {
-    TR_ASSERT(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(&addr));
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
 
-    auto const fd = socket(Domains[addr->type], SOCK_STREAM, 0);
+    auto const fd = socket(Domains[addr.type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *err_out = sockerrno;
@@ -418,7 +414,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #ifdef IPV6_V6ONLY
 
-    if (addr->isIPv6() &&
+    if (addr.isIPv6() &&
         (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
         (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
@@ -429,7 +425,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    auto const [sock, addrlen] = addr->toSockaddr(port);
+    auto const [sock, addrlen] = addr.toSockaddr(port);
 
     if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
     {
@@ -441,7 +437,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
                 err == EADDRINUSE ?
                     _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
                     _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
-                fmt::arg("address", addr->readable()),
+                fmt::arg("address", addr.readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(err)),
                 fmt::arg("error_code", err)));
@@ -454,7 +450,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     if (!suppress_msgs)
     {
-        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr->readable()));
+        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr.readable()));
     }
 
 #ifdef TCP_FASTOPEN
@@ -483,7 +479,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     return fd;
 }
 
-tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppress_msgs)
+tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs)
 {
     int unused = 0;
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
@@ -497,7 +493,7 @@ bool tr_net_hasIPv6(tr_port port)
     if (!already_done)
     {
         int err = 0;
-        auto const fd = tr_netBindTCPImpl(&tr_in6addr_any, port, true, &err);
+        auto const fd = tr_netBindTCPImpl(tr_address::AnyIPv4(), port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
         {

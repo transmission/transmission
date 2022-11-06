@@ -65,8 +65,6 @@ using namespace std::literals;
 
 std::recursive_mutex tr_session::session_mutex_;
 
-static auto constexpr DefaultBindAddressIpv4 = "0.0.0.0"sv;
-static auto constexpr DefaultBindAddressIpv6 = "::"sv;
 static auto constexpr SaveIntervalSecs = 360s;
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
@@ -257,7 +255,50 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 ****
 ***/
 
-void tr_session::tr_bindinfo::close()
+void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
+{
+    auto* session = static_cast<tr_session*>(vsession);
+
+    if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
+    {
+        auto const& [addr, port, sock] = *incoming_info;
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
+        session->addIncoming(addr, port, tr_peer_socket_tcp_create(sock));
+    }
+}
+
+tr_session::BoundSocket::BoundSocket(
+    event_base* evbase,
+    tr_address const& addr,
+    tr_port port,
+    IncomingCallback cb,
+    void* cb_data)
+    : cb_{ cb }
+    , cb_data_{ cb_data }
+    , socket_{ tr_netBindTCP(addr, port, false) }
+{
+    if (socket_ == TR_BAD_SOCKET)
+    {
+        return;
+    }
+
+    tr_logAddInfo(
+        fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr.readable(port))));
+
+    ev_ = event_new(
+        evbase,
+        socket_,
+        EV_READ | EV_PERSIST,
+        [](evutil_socket_t fd, short /*evtype*/, void* vself)
+        {
+            auto* const self = static_cast<BoundSocket*>(vself);
+            self->cb_(fd, self->cb_data_);
+        },
+        this);
+    event_add(ev_, nullptr);
+}
+
+tr_session::BoundSocket::~BoundSocket()
 {
     if (ev_ != nullptr)
     {
@@ -272,49 +313,24 @@ void tr_session::tr_bindinfo::close()
     }
 }
 
-static void acceptIncomingPeer(evutil_socket_t fd, short /*what*/, void* vsession)
-{
-    auto* session = static_cast<tr_session*>(vsession);
-
-    if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
-    {
-        auto const& [addr, port, sock] = *incoming_info;
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
-        session->addIncoming(addr, port, tr_peer_socket_tcp_create(sock));
-    }
-}
-
-void tr_session::tr_bindinfo::bindAndListenForIncomingPeers(tr_session* session)
-{
-    TR_ASSERT(session->allowsTCP());
-
-    auto const& port = session->localPeerPort();
-
-    socket_ = tr_netBindTCP(&addr_, port, false);
-
-    if (socket_ != TR_BAD_SOCKET)
-    {
-        tr_logAddInfo(
-            fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr_.readable(port))));
-        ev_ = event_new(session->eventBase(), socket_, EV_READ | EV_PERSIST, acceptIncomingPeer, session);
-        event_add(ev_, nullptr);
-    }
-}
-
 tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) const noexcept
 {
-    switch (type)
+    if (type == TR_AF_INET)
     {
-    case TR_AF_INET:
-        return { bind_ipv4_.addr_, bind_ipv4_.addr_.readable() == DefaultBindAddressIpv4 };
-
-    case TR_AF_INET6:
-        return { bind_ipv6_.addr_, bind_ipv6_.addr_.readable() == DefaultBindAddressIpv6 };
-
-    default:
-        TR_ASSERT_MSG(false, "invalid type");
-        return {};
+        static auto constexpr DefaultAddr = tr_address::AnyIPv4();
+        auto addr = tr_address::fromString(settings_.bind_address_ipv4).value_or(DefaultAddr);
+        return { addr, addr == DefaultAddr };
     }
+
+    if (type == TR_AF_INET6)
+    {
+        static auto constexpr DefaultAddr = tr_address::AnyIPv6();
+        auto addr = tr_address::fromString(settings_.bind_address_ipv6).value_or(DefaultAddr);
+        return { addr, addr == DefaultAddr };
+    }
+
+    TR_ASSERT_MSG(false, "invalid type");
+    return {};
 }
 
 /***
@@ -529,8 +545,6 @@ void tr_session::initImpl(init_data& data)
 
     setSettings(client_settings, true);
 
-    this->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
-
     if (this->allowsLPD())
     {
         this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
@@ -548,14 +562,25 @@ static void updateBandwidth(tr_session* session, tr_direction dir);
 void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
     TR_ASSERT(amInSessionThread());
+    TR_ASSERT(tr_variantIsDict(settings_dict));
 
-    auto* const settings = settings_dict;
-    TR_ASSERT(tr_variantIsDict(settings));
+    // load the session settings
+    auto new_settings = tr_session_settings{};
+    new_settings.load(settings_dict);
+    setSettings(std::move(new_settings), force);
 
-    // update the `settings_` field
-    auto const old_settings = settings_;
-    auto& new_settings = settings_;
-    new_settings.load(settings);
+    // delegate loading out the other settings
+    alt_speeds_.load(settings_dict);
+    rpc_server_->load(settings_dict);
+}
+
+void tr_session::setSettings(tr_session_settings settings_in, bool force)
+{
+    auto const lock = unique_lock();
+
+    std::swap(settings_, settings_in);
+    auto const& new_settings = settings_;
+    auto const& old_settings = settings_in;
 
     // the rest of the func is session_ responding to settings changes
 
@@ -581,51 +606,65 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
         setDefaultTrackers(val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(settings, TR_KEY_dht_enabled, &val))
-    {
-        tr_sessionSetDHTEnabled(this, val);
-    }
-
     if (auto const& val = new_settings.utp_enabled; force || val != old_settings.utp_enabled)
     {
         tr_sessionSetUTPEnabled(this, val);
     }
 
-    if (auto const& val = new_settings.lpd_enabled; force || val != old_settings.lpd_enabled)
-    {
-        tr_sessionSetLPDEnabled(this, val);
-    }
-
     useBlocklist(new_settings.blocklist_enabled);
 
-    /// bound addresses, peer port, port forwarding
+    auto local_peer_port = force && settings_.peer_port_random_on_start ? randomPort() : new_settings.peer_port;
+    bool port_changed = false;
+    if (force || local_peer_port_ != local_peer_port)
     {
-        auto port_needs_update = force;
+        local_peer_port_ = local_peer_port;
+        advertised_peer_port_ = local_peer_port;
+        port_changed = true;
+    }
 
-        if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
+    if (new_settings.tcp_enabled)
+    {
+        if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
-            if (auto const addr = tr_address::fromString(val); addr && addr->isIPv4())
-            {
-                this->bind_ipv4_ = tr_bindinfo{ *addr };
-                port_needs_update |= true;
-            }
+            auto const [addr, is_default] = publicAddress(TR_AF_INET);
+            bound_ipv4_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
         }
 
-        if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
+        if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
-            if (auto const addr = tr_address::fromString(val); addr && addr->isIPv6())
-            {
-                this->bind_ipv6_ = tr_bindinfo{ *addr };
-                port_needs_update |= true;
-            }
+            auto const [addr, is_default] = publicAddress(TR_AF_INET6);
+            bound_ipv6_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
         }
+    }
+    else
+    {
+        bound_ipv4_.reset();
+        bound_ipv6_.reset();
+    }
 
-        port_needs_update |= (new_settings.port_forwarding_enabled != old_settings.port_forwarding_enabled);
+    if (port_changed)
+    {
+        port_forwarding_->localPortChanged();
+    }
 
-        if (port_needs_update)
+    bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
+
+    if (!udp_core_ || force || port_changed || dht_changed)
+    {
+        udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+    }
+
+    // Sends out announce messages with advertisedPeerPort(), so this
+    // section neesd be happen here after the peer port settings changes
+    if (auto const& val = new_settings.lpd_enabled; force || val != old_settings.lpd_enabled)
+    {
+        if (val)
         {
-            setPeerPort(isPortRandom() ? randomPort() : new_settings.peer_port);
-            tr_sessionSetPortForwardingEnabled(this, new_settings.port_forwarding_enabled);
+            lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
+        }
+        else
+        {
+            lpd_.reset();
         }
     }
 
@@ -633,9 +672,6 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
     // It's a harmless call, so just call it instead of checking for settings changes
     updateBandwidth(this, TR_UP);
     updateBandwidth(this, TR_DOWN);
-
-    alt_speeds_.load(settings);
-    rpc_server_->load(settings);
 }
 
 void tr_sessionSet(tr_session* session, tr_variant* settings)
@@ -740,44 +776,20 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 ****  Peer Port
 ***/
 
-void tr_session::setPeerPort(tr_port port_in)
-{
-    auto const in_session_thread = [this](tr_port port)
-    {
-        auto const lock = unique_lock();
-
-        auto& private_peer_port = settings_.peer_port;
-        private_peer_port = port;
-        advertised_peer_port_ = port;
-
-        closePeerPort();
-
-        if (allowsTCP())
-        {
-            bind_ipv4_.bindAndListenForIncomingPeers(this);
-
-            if (tr_net_hasIPv6(private_peer_port))
-            {
-                bind_ipv6_.bindAndListenForIncomingPeers(this);
-            }
-        }
-
-        port_forwarding_->portChanged();
-
-        for (auto* const tor : torrents())
-        {
-            tr_torrentChangeMyPort(tor);
-        }
-    };
-
-    runInSessionThread(in_session_thread, port_in);
-}
-
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setPeerPort(tr_port::fromHost(hport));
+    if (auto const port = tr_port::fromHost(hport); port != session->localPeerPort())
+    {
+        session->runInSessionThread(
+            [session, port]()
+            {
+                auto settings = session->settings_;
+                settings.peer_port = port;
+                session->setSettings(std::move(settings), false);
+            });
+    }
 }
 
 uint16_t tr_sessionGetPeerPort(tr_session const* session)
@@ -1175,7 +1187,8 @@ void tr_session::closeImplPart1()
     rpc_server_.reset();
     lpd_.reset();
     port_forwarding_.reset();
-    closePeerPort();
+    bound_ipv6_.reset();
+    bound_ipv4_.reset();
 
     // tell other items to start shutting down
     udp_core_->startShutdown();
@@ -1389,18 +1402,16 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled == session->allowsDHT())
+    if (enabled != session->allowsDHT())
     {
-        return;
+        session->runInSessionThread(
+            [session, enabled]()
+            {
+                auto settings = session->settings_;
+                settings.dht_enabled = enabled;
+                session->setSettings(std::move(settings), false);
+            });
     }
-
-    session->runInSessionThread(
-        [session, enabled]()
-        {
-            session->udp_core_.reset();
-            session->settings_.dht_enabled = enabled;
-            session->udp_core_ = std::make_unique<tr_session::tr_udp_core>(*session, session->udpPort());
-        });
 }
 
 /***
@@ -1439,21 +1450,16 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    if (enabled == session->allowsLPD())
+    if (enabled != session->allowsLPD())
     {
-        return;
-    }
-
-    session->runInSessionThread(
-        [session, enabled]()
-        {
-            session->lpd_.reset();
-            session->settings_.lpd_enabled = enabled;
-            if (enabled)
+        session->runInSessionThread(
+            [session, enabled]()
             {
-                session->lpd_ = tr_lpd::create(session->lpd_mediator_, session->eventBase());
-            }
-        });
+                auto settings = session->settings_;
+                settings.lpd_enabled = enabled;
+                session->setSettings(std::move(settings), false);
+            });
+    }
 }
 
 bool tr_sessionIsLPDEnabled(tr_session const* session)
