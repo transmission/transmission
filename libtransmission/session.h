@@ -296,7 +296,7 @@ public:
     template<typename Func, typename... Args>
     void runInSessionThread(Func&& func, Args&&... args)
     {
-        session_thread_->run(std::move(func), std::move(args)...);
+        session_thread_->run(std::forward<Func&&>(func), std::forward<Args>(args)...);
     }
 
     [[nodiscard]] auto eventBase() noexcept
