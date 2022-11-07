@@ -47,6 +47,7 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
 
+#ifdef TR_ENABLE_ASSERTS
 [[nodiscard]] static constexpr auto isSupportedSocket(tr_peer_socket const& sock)
 {
 #ifdef WITH_UTP
@@ -55,6 +56,7 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
     return sock.type == TR_PEER_SOCKET_TYPE_TCP;
 #endif
 }
+#endif // TR_ENABLE_ASSERTS
 
 static constexpr size_t guessPacketOverhead(size_t d)
 {

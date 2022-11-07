@@ -59,7 +59,7 @@
 
 using namespace std::literals;
 
-time_t __tr_current_time = 0;
+time_t libtransmission::detail::tr_time::current_time = {};
 
 /**
 ***
