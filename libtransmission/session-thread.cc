@@ -225,7 +225,7 @@ private:
 #endif
         tr_evthread_init();
 
-        constexpr auto ToggleLooping = [](evutil_socket_t, short, void* vself)
+        constexpr auto ToggleLooping = [](evutil_socket_t, short /*evtype*/, void* vself)
         {
             auto* const self = static_cast<tr_session_thread_impl*>(vself);
             self->is_looping_mutex_.lock();
