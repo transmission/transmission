@@ -22,8 +22,6 @@
 #include <string>
 #include <utility> // std::make_pair
 
-#include <event2/buffer.h>
-
 #include "transmission.h"
 
 #include "bandwidth.h"
@@ -32,6 +30,7 @@
 #include "peer-socket.h"
 #include "tr-assert.h"
 #include "tr-buffer.h"
+#include "utils-ev.h"
 
 class tr_peerIo;
 struct tr_bandwidth;
@@ -50,16 +49,6 @@ enum ReadState
 };
 
 auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
-
-struct evbuffer_deleter
-{
-    void operator()(struct evbuffer* buf) const noexcept
-    {
-        evbuffer_free(buf);
-    }
-};
-
-using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
 
 namespace libtransmission::test
 {
@@ -255,8 +244,8 @@ public:
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
 
-    struct event* event_read = nullptr;
-    struct event* event_write = nullptr;
+    libtransmission::evhelpers::event_unique_ptr event_read;
+    libtransmission::evhelpers::event_unique_ptr event_write;
 
     short int pendingEvents = 0;
 

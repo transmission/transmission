@@ -28,6 +28,7 @@
 #include "log.h"
 #include "tr-strbuf.h"
 #include "utils.h" // for _()
+#include "utils-ev.h"
 #include "watchdir-base.h"
 
 namespace libtransmission
@@ -51,11 +52,7 @@ public:
 
     ~KQueueWatchdir() override
     {
-        if (event_ != nullptr)
-        {
-            event_del(event_);
-            event_free(event_);
-        }
+        event_.reset();
 
         if (kq_ != -1)
         {
@@ -112,8 +109,8 @@ private:
         }
 
         // create libevent task for event descriptor
-        event_ = event_new(evbase, kq_, EV_READ | EV_ET | EV_PERSIST, &onKqueueEvent, this);
-        if (event_ == nullptr)
+        event_.reset(event_new(evbase, kq_, EV_READ | EV_ET | EV_PERSIST, &onKqueueEvent, this));
+        if (!event_)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -123,7 +120,7 @@ private:
             return;
         }
 
-        if (event_add(event_, nullptr) == -1)
+        if (event_add(event_.get(), nullptr) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -158,7 +155,7 @@ private:
 
     int kq_ = -1;
     int dirfd_ = -1;
-    struct event* event_ = nullptr;
+    libtransmission::evhelpers::event_unique_ptr event_;
 };
 
 } // namespace

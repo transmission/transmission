@@ -9,27 +9,11 @@
 
 #include <event2/event.h>
 
-#include "tr-assert.h"
 #include "timer-ev.h"
+#include "tr-assert.h"
+#include "utils-ev.h"
 
 using namespace std::literals;
-
-namespace
-{
-
-struct EventDeleter
-{
-    void operator()(struct event* event)
-    {
-        if (event != nullptr)
-        {
-            event_del(event);
-            event_free(event);
-        }
-    }
-};
-
-} // namespace
 
 namespace libtransmission
 {
@@ -118,7 +102,7 @@ private:
     }
 
     struct event_base* const base_;
-    std::unique_ptr<struct event, EventDeleter> evtimer_;
+    evhelpers::event_unique_ptr evtimer_;
 
     std::function<void()> callback_;
     std::chrono::milliseconds interval_ = 100ms;

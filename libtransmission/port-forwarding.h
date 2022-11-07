@@ -40,6 +40,6 @@ public:
     [[nodiscard]] virtual bool isEnabled() const = 0;
     [[nodiscard]] virtual tr_port_forwarding_state state() const = 0;
 
-    virtual void portChanged() = 0;
+    virtual void localPortChanged() = 0;
     virtual void setEnabled(bool enabled) = 0;
 };

@@ -32,6 +32,12 @@ TEST_F(NetTest, conversionsIPv4)
     EXPECT_EQ(Port, addrport->second);
 }
 
+TEST_F(NetTest, trAddress)
+{
+    EXPECT_EQ("0.0.0.0", tr_address::AnyIPv4().readable());
+    EXPECT_EQ("::", tr_address::AnyIPv6().readable());
+}
+
 TEST_F(NetTest, compact4)
 {
     static auto constexpr ExpectedReadable = "10.10.10.5"sv;
