@@ -38,9 +38,6 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
 
 @property(nonatomic) IBOutlet NSPopUpButton* fGroupsButton;
 
-- (void)updateGroupsButton;
-- (void)updateGroups:(NSNotification*)notification;
-
 @end
 
 @implementation FilterBarController

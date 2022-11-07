@@ -16,8 +16,6 @@ static CGFloat const kBetweenPadding = 2.0;
 @property(nonatomic) CGFloat fDownloadRate;
 @property(nonatomic) CGFloat fUploadRate;
 
-- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height;
-
 @end
 
 @implementation BadgeView

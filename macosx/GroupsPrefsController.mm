@@ -31,9 +31,6 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
 @property(nonatomic, weak) IBOutlet NSPredicateEditor* ruleEditor;
 @property(nonatomic, weak) IBOutlet NSLayoutConstraint* ruleEditorHeightConstraint;
 
-- (void)updateSelectedGroup;
-- (void)refreshCustomLocationWithSingleGroup;
-
 @end
 
 @implementation GroupsPrefsController

@@ -4,12 +4,6 @@
 
 #import "StatusBarView.h"
 
-@interface StatusBarView ()
-
-- (void)reload;
-
-@end
-
 @implementation StatusBarView
 
 - (BOOL)mouseDownCanMoveWindow

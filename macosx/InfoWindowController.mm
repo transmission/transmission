@@ -58,9 +58,6 @@ typedef NS_ENUM(unsigned int, tabTag) {
 @property(nonatomic) IBOutlet NSTextField* fBasicInfoField;
 @property(nonatomic) IBOutlet NSTextField* fNoneSelectedField;
 
-- (void)resetInfo;
-- (void)resetInfoForTorrent:(NSNotification*)notification;
-
 @end
 
 @implementation InfoWindowController
