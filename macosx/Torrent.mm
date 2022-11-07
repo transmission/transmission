@@ -2068,25 +2068,16 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (NSString*)etaString
 {
-    BOOL unknown = NO;
     time_t eta = self.fStat->eta;
     // if there's a regular ETA, the torrent isn't idle
     BOOL fromIdle = NO;
-    // Foundation undocumented behavior: values above INT_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
-    if (eta > INT_MAX)
-    {
-        unknown = YES;
-    }
-    else if (eta == TR_ETA_NOT_AVAIL || eta == TR_ETA_UNKNOWN)
+    if (eta == TR_ETA_NOT_AVAIL || eta == TR_ETA_UNKNOWN)
     {
         eta = self.fStat->etaIdle;
         fromIdle = YES;
-        if (eta == TR_ETA_NOT_AVAIL || eta >= kETAIdleDisplaySec)
-        {
-            unknown = YES;
-        }
     }
-    if (unknown)
+    // Foundation undocumented behavior: values above INT_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
+    if (eta < 0 || eta > INT_MAX || (fromIdle && eta >= kETAIdleDisplaySec))
     {
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
     }
