@@ -264,12 +264,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 - (void)update
 {
     //get previous stalled value before update
-    BOOL const wasStalled = self.fStat != NULL && self.stalled;
+    BOOL const wasTransmitting = self.fStat != NULL && self.transmitting;
 
     self.fStat = tr_torrentStat(self.fHandle);
 
-    //make sure the "active" filter is updated when stalled-ness changes
-    if (wasStalled != self.stalled)
+    //make sure the "active" filter is updated when transmitting changes
+    if (wasTransmitting != self.transmitting)
     {
         //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
         [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateQueue" object:self]
@@ -867,6 +867,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     return self.fStat->activity != TR_STATUS_STOPPED && self.fStat->activity != TR_STATUS_DOWNLOAD_WAIT &&
         self.fStat->activity != TR_STATUS_SEED_WAIT;
+}
+
+- (BOOL)isTransmitting
+{
+    return self.fStat->peersGettingFromUs > 0 || self.fStat->peersSendingToUs > 0 || self.fStat->webseedsSendingToUs > 0 ||
+        self.fStat->activity == TR_STATUS_CHECK;
 }
 
 - (BOOL)isSeeding

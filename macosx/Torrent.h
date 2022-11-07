@@ -127,7 +127,10 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) CGFloat availableDesired;
 
+/// True if non-paused. Running.
 @property(nonatomic, getter=isActive, readonly) BOOL active;
+/// True if downloading or uploading.
+@property(nonatomic, getter=isTransmitting, readonly) BOOL transmitting;
 @property(nonatomic, getter=isSeeding, readonly) BOOL seeding;
 @property(nonatomic, getter=isChecking, readonly) BOOL checking;
 @property(nonatomic, getter=isCheckingWaiting, readonly) BOOL checkingWaiting;
@@ -200,6 +203,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) NSInteger secondsSeeding;
 
 @property(nonatomic, readonly) NSInteger stalledMinutes;
+/// True if the torrent is running, but has been idle for long enough to be considered stalled.
 @property(nonatomic, getter=isStalled, readonly) BOOL stalled;
 
 - (void)updateTimeMachineExclude;

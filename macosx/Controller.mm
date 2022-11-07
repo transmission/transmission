@@ -2823,7 +2823,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             //check status
             if (torrent.active && !torrent.checkingWaiting)
             {
-                BOOL const isActive = !torrent.stalled;
+                BOOL const isActive = torrent.transmitting;
                 if (isActive)
                 {
                     std::atomic_fetch_add_explicit(activeRef, 1, std::memory_order_relaxed);
