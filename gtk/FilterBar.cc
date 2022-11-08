@@ -462,7 +462,7 @@ bool test_torrent_activity(tr_torrent* tor, int type)
         return st->activity == TR_STATUS_STOPPED;
 
     case ACTIVITY_FILTER_FINISHED:
-        return st->finished == true;
+        return st->finished;
 
     case ACTIVITY_FILTER_VERIFYING:
         return st->activity == TR_STATUS_CHECK || st->activity == TR_STATUS_CHECK_WAIT;

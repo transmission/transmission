@@ -194,7 +194,7 @@ bool refreshFilesForeach(
             auto const child_priority = child[file_cols.priority];
             auto const child_enabled = child[file_cols.enabled];
 
-            if ((child_enabled != false) && (child_enabled != NOT_SET))
+            if (child_enabled != int{ false } && (child_enabled != NOT_SET))
             {
                 new_size += child_size;
                 new_have += child_have;
@@ -578,7 +578,7 @@ void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator 
 {
     auto const enabled = iter->get_value(file_cols.enabled);
     static_cast<Gtk::CellRendererToggle*>(renderer)->property_inconsistent() = enabled == MIXED;
-    static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == true;
+    static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == int{ true };
 }
 
 void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
