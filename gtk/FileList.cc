@@ -492,7 +492,7 @@ struct PairHash
 
 void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
 {
-    if (torrent_id_ == tor_id && store_ != nullptr && store_->children().size() != 0)
+    if (torrent_id_ == tor_id && store_ != nullptr && !store_->children().empty())
     {
         return;
     }
