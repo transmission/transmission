@@ -174,7 +174,7 @@ TEST_F(TimerTest, repeatingHonorsInterval)
     EXPECT_EQ(DesiredLoops, n_calls);
 }
 
-TEST_F(TimerTest, startAgainDoesRestart)
+TEST_F(TimerTest, restartWithDifferentInterval)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -201,6 +201,35 @@ TEST_F(TimerTest, startAgainDoesRestart)
     test(50ms);
     test(100ms);
     test(50ms);
+}
+
+TEST_F(TimerTest, restartWithSameInterval)
+{
+    auto timer_maker = EvTimerMaker{ evbase_.get() };
+    auto timer = timer_maker.create();
+    EXPECT_TRUE(timer);
+
+    auto n_calls = size_t{ 0U };
+    auto callback = [&n_calls]()
+    {
+        ++n_calls;
+    };
+    timer->setCallback(callback);
+
+    auto const test = [this, &n_calls, &timer](auto interval)
+    {
+        auto const next = n_calls + 1;
+        auto const begin_time = current_time();
+        timer->startSingleShot(interval);
+        waitFor(evbase_.get(), [&n_calls, next]() { return n_calls >= next; });
+        auto const end_time = current_time();
+
+        EXPECT_INTERVAL(interval, AsMSec(end_time - begin_time));
+    };
+
+    test(timer->interval());
+    test(timer->interval());
+    test(timer->interval());
 }
 
 TEST_F(TimerTest, repeatingThenSingleShot)
@@ -301,6 +330,36 @@ TEST_F(TimerTest, repeatingStop)
 
     // wait until the timer has gone past.
     // since we stopped it, callback should not have been called.
+    sleep_msec(Interval);
+    EXPECT_EQ(0U, n_calls);
+}
+
+TEST_F(TimerTest, destroyedTimersStop)
+{
+    auto timer_maker = EvTimerMaker{ evbase_.get() };
+    auto timer = timer_maker.create();
+    EXPECT_TRUE(timer);
+
+    auto n_calls = size_t{ 0U };
+    auto callback = [&n_calls]()
+    {
+        ++n_calls;
+    };
+    timer->setCallback(callback);
+
+    // start a repeating timer
+    static auto constexpr Interval = 200ms;
+    timer->startRepeating(Interval);
+    EXPECT_EQ(Interval, timer->interval());
+    EXPECT_TRUE(timer->isRepeating());
+
+    // wait half the interval, then destroy the timer
+    sleep_msec(Interval / 2);
+    EXPECT_EQ(0U, n_calls);
+    timer.reset();
+
+    // wait until the timer has gone past.
+    // since we destroyed it, callback should not have been called.
     sleep_msec(Interval);
     EXPECT_EQ(0U, n_calls);
 }
