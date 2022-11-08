@@ -36,12 +36,31 @@ public:
 
     void stop() override
     {
-        evtimer_.reset();
+        if (!is_running_)
+        {
+            return;
+        }
+
+        event_del(evtimer_.get());
+
+        is_running_ = false;
     }
 
     void start() override
     {
-        restart();
+        if (is_running_)
+        {
+            return;
+        }
+
+        using namespace std::chrono;
+        auto const secs = duration_cast<seconds>(interval_);
+        auto tv = timeval{};
+        tv.tv_sec = secs.count();
+        tv.tv_usec = static_cast<decltype(tv.tv_usec)>(duration_cast<microseconds>(interval_ - secs).count());
+        evtimer_add(evtimer_.get(), &tv);
+
+        is_running_ = true;
     }
 
     void setCallback(std::function<void()> callback) override
@@ -56,14 +75,15 @@ public:
 
     void setInterval(std::chrono::milliseconds interval) override
     {
-        TR_ASSERT_MSG(interval.count() > 0 || !is_repeating_, "repeating timers must have a positive interval");
+        TR_ASSERT_MSG(interval.count() > 0 || !isRepeating(), "repeating timers must have a positive interval");
+
+        if (interval_ == interval)
+        {
+            return;
+        }
 
         interval_ = interval;
-
-        if (evtimer_) // update the timer if it's already running
-        {
-            restart();
-        }
+        applyChanges();
     }
 
     [[nodiscard]] bool isRepeating() const noexcept override
@@ -73,21 +93,37 @@ public:
 
     void setRepeating(bool repeating) override
     {
+        if (is_repeating_ == repeating)
+        {
+            return;
+        }
+
         is_repeating_ = repeating;
-        evtimer_.reset();
+        applyChanges();
     }
 
 private:
-    void restart()
+    void applyChanges()
     {
-        evtimer_.reset(event_new(base_, -1, EV_TIMEOUT | (isRepeating() ? EV_PERSIST : 0), onTimer, this));
+        auto const old_events = event_get_events(evtimer_.get());
+        auto const new_events = static_cast<short>(EV_TIMEOUT | (isRepeating() ? EV_PERSIST : 0));
+        auto const was_running = isRunning();
 
-        using namespace std::chrono;
-        auto const secs = duration_cast<seconds>(interval_);
-        auto tv = timeval{};
-        tv.tv_sec = secs.count();
-        tv.tv_usec = static_cast<decltype(tv.tv_usec)>(duration_cast<microseconds>(interval_ - secs).count());
-        evtimer_add(evtimer_.get(), &tv);
+        if (was_running)
+        {
+            stop();
+        }
+
+        if (new_events != old_events)
+        {
+            [[maybe_unused]] auto const val = event_assign(evtimer_.get(), base_, -1, new_events, &EvTimer::onTimer, this);
+            TR_ASSERT(val == 0);
+        }
+
+        if (was_running)
+        {
+            start();
+        }
     }
 
     static void onTimer(evutil_socket_t /*unused*/, short /*unused*/, void* vself)
@@ -101,12 +137,18 @@ private:
         callback_();
     }
 
+    [[nodiscard]] constexpr bool isRunning() const noexcept
+    {
+        return is_running_;
+    }
+
     struct event_base* const base_;
-    evhelpers::event_unique_ptr evtimer_;
+    evhelpers::event_unique_ptr const evtimer_{ event_new(base_, -1, EV_TIMEOUT, &EvTimer::onTimer, this) };
 
     std::function<void()> callback_;
     std::chrono::milliseconds interval_ = 100ms;
-    bool is_repeating_ = true;
+    bool is_repeating_ = false;
+    bool is_running_ = false;
 };
 
 std::unique_ptr<Timer> EvTimerMaker::create()
