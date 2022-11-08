@@ -591,7 +591,7 @@ struct tr_peerMgr
 
     void rechokeSoon() noexcept
     {
-        rechoke_timer_->startSingleShot(100ms);
+        rechoke_timer_->setInterval(100ms);
     }
 
     void bandwidthPulse();
@@ -607,7 +607,7 @@ private:
     void rechokePulseMarshall()
     {
         rechokePulse();
-        rechoke_timer_->startSingleShot(RechokePeriod);
+        rechoke_timer_->setInterval(RechokePeriod);
     }
 
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
