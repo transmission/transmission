@@ -24,7 +24,6 @@ public:
     explicit EvTimer(struct event_base* base)
         : base_{ base }
     {
-        setRepeating(is_repeating_);
     }
 
     EvTimer(EvTimer&&) = delete;
@@ -103,10 +102,15 @@ public:
     }
 
 private:
+    [[nodiscard]] constexpr short events(bool is_repeating) noexcept
+    {
+        return static_cast<short>(EV_TIMEOUT | (is_repeating ? EV_PERSIST : 0));
+    }
+
     void applyChanges()
     {
         auto const old_events = event_get_events(evtimer_.get());
-        auto const new_events = static_cast<short>(EV_TIMEOUT | (isRepeating() ? EV_PERSIST : 0));
+        auto const new_events = events(isRepeating());
         auto const was_running = isRunning();
 
         if (was_running)
@@ -131,8 +135,10 @@ private:
         static_cast<EvTimer*>(vself)->handleTimer();
     }
 
-    void handleTimer() const
+    void handleTimer()
     {
+        is_running_ = is_repeating_;
+
         TR_ASSERT(callback_);
         callback_();
     }
@@ -142,13 +148,13 @@ private:
         return is_running_;
     }
 
-    struct event_base* const base_;
-    evhelpers::event_unique_ptr const evtimer_{ event_new(base_, -1, EV_TIMEOUT, &EvTimer::onTimer, this) };
-
-    std::function<void()> callback_;
     std::chrono::milliseconds interval_ = 100ms;
     bool is_repeating_ = false;
     bool is_running_ = false;
+    std::function<void()> callback_;
+
+    struct event_base* const base_;
+    evhelpers::event_unique_ptr const evtimer_{ event_new(base_, -1, events(is_repeating_), &EvTimer::onTimer, this) };
 };
 
 std::unique_ptr<Timer> EvTimerMaker::create()

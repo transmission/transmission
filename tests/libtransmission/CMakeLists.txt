@@ -40,6 +40,7 @@ add_executable(libtransmission-test
     subprocess-test-script.cmd
     subprocess-test.cc
     test-fixtures.h
+    timer-test.cc
     torrent-files-test.cc
     torrent-magnet-test.cc
     torrent-metainfo-test.cc
