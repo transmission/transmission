@@ -3,6 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#endif
+
 #include <algorithm>
 #include <array>
 #include <limits.h> // INT_MAX
@@ -1165,10 +1172,15 @@ void initPeerRow(
         client = "";
     }
 
-    auto q = std::array<int, 4>{};
-    auto const collated_name = sscanf(peer->addr, "%d.%d.%d.%d", &q[0], &q[1], &q[2], &q[3]) != 4 ?
+    auto peer_addr4 = in_addr();
+    auto const collated_name = inet_pton(AF_INET, peer->addr, &peer_addr4) != 1 ?
         peer->addr :
-        fmt::format(FMT_STRING("{:03d}.{:03d}.{:03d}.{:03d}"), q[0], q[1], q[2], q[3]);
+        fmt::format(
+            "{:03}",
+            fmt::join(
+                reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr),
+                reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr) + sizeof(peer_addr4.s_addr),
+                "."));
 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
