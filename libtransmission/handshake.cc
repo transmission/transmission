@@ -243,9 +243,12 @@ static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* 
     walk += HandshakeFlagsLen;
 
     walk = std::copy_n(reinterpret_cast<char const*>(std::data(*info_hash)), std::size(*info_hash), walk);
-    walk = std::copy(std::begin(info->client_peer_id), std::end(info->client_peer_id), walk);
+    [[maybe_unused]] auto const* const walk_end = std::copy(
+        std::begin(info->client_peer_id),
+        std::end(info->client_peer_id),
+        walk);
 
-    TR_ASSERT(walk - buf == HandshakeSize);
+    TR_ASSERT(walk_end - buf == HandshakeSize);
     return true;
 }
 

@@ -61,7 +61,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     _torrent = torrent;
 
-    [self.fFileList setArray:_torrent.fileList];
+    [self.fFileList setArray:torrent.fileList ?: @[]];
 
     self.filterText = nil;
 

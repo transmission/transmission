@@ -24,7 +24,6 @@ public:
     explicit EvTimer(struct event_base* base)
         : base_{ base }
     {
-        setRepeating(is_repeating_);
     }
 
     EvTimer(EvTimer&&) = delete;
@@ -36,12 +35,31 @@ public:
 
     void stop() override
     {
-        evtimer_.reset();
+        if (!is_running_)
+        {
+            return;
+        }
+
+        event_del(evtimer_.get());
+
+        is_running_ = false;
     }
 
     void start() override
     {
-        restart();
+        if (is_running_)
+        {
+            return;
+        }
+
+        using namespace std::chrono;
+        auto const secs = duration_cast<seconds>(interval_);
+        auto tv = timeval{};
+        tv.tv_sec = secs.count();
+        tv.tv_usec = static_cast<decltype(tv.tv_usec)>(duration_cast<microseconds>(interval_ - secs).count());
+        evtimer_add(evtimer_.get(), &tv);
+
+        is_running_ = true;
     }
 
     void setCallback(std::function<void()> callback) override
@@ -56,14 +74,15 @@ public:
 
     void setInterval(std::chrono::milliseconds interval) override
     {
-        TR_ASSERT_MSG(interval.count() > 0 || !is_repeating_, "repeating timers must have a positive interval");
+        TR_ASSERT_MSG(interval.count() > 0 || !isRepeating(), "repeating timers must have a positive interval");
+
+        if (interval_ == interval)
+        {
+            return;
+        }
 
         interval_ = interval;
-
-        if (evtimer_) // update the timer if it's already running
-        {
-            restart();
-        }
+        applyChanges();
     }
 
     [[nodiscard]] bool isRepeating() const noexcept override
@@ -73,21 +92,42 @@ public:
 
     void setRepeating(bool repeating) override
     {
+        if (is_repeating_ == repeating)
+        {
+            return;
+        }
+
         is_repeating_ = repeating;
-        evtimer_.reset();
+        applyChanges();
     }
 
 private:
-    void restart()
+    [[nodiscard]] constexpr short events(bool is_repeating) noexcept
     {
-        evtimer_.reset(event_new(base_, -1, EV_TIMEOUT | (isRepeating() ? EV_PERSIST : 0), onTimer, this));
+        return static_cast<short>(EV_TIMEOUT | (is_repeating ? EV_PERSIST : 0));
+    }
 
-        using namespace std::chrono;
-        auto const secs = duration_cast<seconds>(interval_);
-        auto tv = timeval{};
-        tv.tv_sec = secs.count();
-        tv.tv_usec = static_cast<decltype(tv.tv_usec)>(duration_cast<microseconds>(interval_ - secs).count());
-        evtimer_add(evtimer_.get(), &tv);
+    void applyChanges()
+    {
+        auto const old_events = event_get_events(evtimer_.get());
+        auto const new_events = events(isRepeating());
+        auto const was_running = isRunning();
+
+        if (was_running)
+        {
+            stop();
+        }
+
+        if (new_events != old_events)
+        {
+            [[maybe_unused]] auto const val = event_assign(evtimer_.get(), base_, -1, new_events, &EvTimer::onTimer, this);
+            TR_ASSERT(val == 0);
+        }
+
+        if (was_running)
+        {
+            start();
+        }
     }
 
     static void onTimer(evutil_socket_t /*unused*/, short /*unused*/, void* vself)
@@ -95,18 +135,26 @@ private:
         static_cast<EvTimer*>(vself)->handleTimer();
     }
 
-    void handleTimer() const
+    void handleTimer()
     {
+        is_running_ = is_repeating_;
+
         TR_ASSERT(callback_);
         callback_();
     }
 
-    struct event_base* const base_;
-    evhelpers::event_unique_ptr evtimer_;
+    [[nodiscard]] constexpr bool isRunning() const noexcept
+    {
+        return is_running_;
+    }
 
-    std::function<void()> callback_;
     std::chrono::milliseconds interval_ = 100ms;
-    bool is_repeating_ = true;
+    bool is_repeating_ = false;
+    bool is_running_ = false;
+    std::function<void()> callback_;
+
+    struct event_base* const base_;
+    evhelpers::event_unique_ptr const evtimer_{ event_new(base_, -1, events(is_repeating_), &EvTimer::onTimer, this) };
 };
 
 std::unique_ptr<Timer> EvTimerMaker::create()
