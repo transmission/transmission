@@ -281,7 +281,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     set_socket_buffers();
     set_socket_tos();
 
-    if (udp_event_ != nullptr)
+    if (udp4_event_ != nullptr)
     {
         event_add(udp4_event_.get(), nullptr);
     }
@@ -293,8 +293,6 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
 
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    startShutdown();
-
     udp6_event_.reset();
 
     if (udp6_socket_ != TR_BAD_SOCKET)

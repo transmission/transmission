@@ -642,24 +642,28 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
         port_changed = true;
     }
 
+    bool addr_changed = false;
     if (new_settings.tcp_enabled)
     {
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
             auto const [addr, is_default] = publicAddress(TR_AF_INET);
             bound_ipv4_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
             auto const [addr, is_default] = publicAddress(TR_AF_INET6);
             bound_ipv6_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            addr_changed = true;
         }
     }
     else
     {
         bound_ipv4_.reset();
         bound_ipv6_.reset();
+        addr_changed = true;
     }
 
     if (port_changed)
@@ -686,6 +690,15 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
         {
             lpd_.reset();
         }
+    }
+
+    if (!allowsDHT())
+    {
+        dht_.reset();
+    }
+    else if (force || !dht_ || port_changed || addr_changed || dht_changed)
+    {
+        dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
     }
 
     // We need to update bandwidth if speed settings changed.
@@ -843,6 +856,14 @@ tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->port_forwarding_->state();
+}
+
+void tr_session::onAdvertisedPeerPortChanged()
+{
+    for (auto* const tor : torrents())
+    {
+        tr_torrentChangeMyPort(tor);
+    }
 }
 
 /***
@@ -1205,8 +1226,8 @@ void tr_session::closeImplPart1()
     save_timer_.reset();
     now_timer_.reset();
     rpc_server_.reset();
-    lpd_.reset();
     dht_.reset();
+    lpd_.reset();
 
     port_forwarding_.reset();
     bound_ipv6_.reset();
@@ -1417,16 +1438,6 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->allowsDHT();
-}
-
-void tr_session::rebuildDHT()
-{
-    dht_.reset();
-
-    if (allowsDHT())
-    {
-        dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
-    }
 }
 
 void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)

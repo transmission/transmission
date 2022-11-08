@@ -158,7 +158,7 @@ private:
         {
         }
 
-        ~DhtMediator() noexcept = default;
+        ~DhtMediator() noexcept override = default;
 
         [[nodiscard]] std::vector<tr_torrent_id_t> torrentsAllowingDHT() const override;
 
@@ -679,14 +679,6 @@ public:
         return localPeerPort();
     }
 
-    [[nodiscard]] constexpr tr_port udpPort() const noexcept
-    {
-        // Always use the same port number that's used for incoming TCP connections.
-        // This simplifies port forwarding and reduces the chance of confusion,
-        // since incoming UDP and TCP connections will use the same port number
-        return localPeerPort();
-    }
-
     // The incoming peer port that's been opened on the public-facing
     // device. This is usually the same as localPeerPort() but can differ,
     // e.g. if the public device is a router that chose to use a different
@@ -938,7 +930,6 @@ private:
     [[nodiscard]] tr_port randomPort() const;
 
     void onAdvertisedPeerPortChanged();
-    void rebuildDHT();
 
     struct init_data;
     void initImpl(init_data&);

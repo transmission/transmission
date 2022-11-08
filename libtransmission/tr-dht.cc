@@ -48,7 +48,7 @@
 
 using namespace std::literals;
 
-// the dht library requires the app to implement these:
+// the dht library needs us to implement these:
 extern "C"
 {
 
