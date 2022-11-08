@@ -88,12 +88,12 @@ extern "C"
         {
             return -1;
         }
-        return size;
+        return static_cast<int>(size);
     }
 
     int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr const* to, int tolen)
     {
-        return sendto(sockfd, static_cast<char const*>(buf), len, flags, to, tolen);
+        return static_cast<int>(sendto(sockfd, static_cast<char const*>(buf), len, flags, to, tolen));
     }
 
 #if defined(_WIN32) && !defined(__MINGW32__)
@@ -367,7 +367,7 @@ private:
         periodic_timer_->startSingleShot(interval);
     }
 
-    [[nodiscard]] std::chrono::seconds periodic(void const* buf, size_t buflen, struct sockaddr const* from, int fromlen)
+    [[nodiscard]] std::chrono::seconds periodic(void const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen)
     {
         auto call_again_in_n_secs = time_t{};
 
@@ -375,7 +375,14 @@ private:
         // so let's ensure it's zero terminated here.
         auto szbuf = tr_strbuf<unsigned char, 1500>{ std::string_view{ static_cast<char const*>(buf), buflen } };
 
-        mediator_.api().periodic(std::data(szbuf), std::size(szbuf), from, fromlen, &call_again_in_n_secs, callback, this);
+        mediator_.api().periodic(
+            std::data(szbuf),
+            std::size(szbuf),
+            from,
+            static_cast<int>(fromlen),
+            &call_again_in_n_secs,
+            callback,
+            this);
 
         return std::chrono::seconds{ call_again_in_n_secs };
     }
