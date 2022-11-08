@@ -408,11 +408,9 @@ std::vector<tr_file_index_t> FileList::Impl::getActiveFilesForPath(Gtk::TreeMode
         /* clicked in a selected row... use the current selection */
         return getSelectedFilesAndDescendants();
     }
-    else
-    {
-        /* clicked OUTSIDE of the selected row... just use the clicked row */
-        return getSubtree(path);
-    }
+
+    /* clicked OUTSIDE of the selected row... just use the clicked row */
+    return getSubtree(path);
 }
 
 /***

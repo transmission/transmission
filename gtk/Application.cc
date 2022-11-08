@@ -870,7 +870,8 @@ bool Application::Impl::on_drag_data_received(Glib::ValueBase const& value, doub
         open_files(FileListHandler::slist_to_vector(files_value.get(), Glib::OwnershipType::OWNERSHIP_NONE));
         return true;
     }
-    else if (G_VALUE_HOLDS(value.gobj(), StringValue::value_type()))
+
+    if (G_VALUE_HOLDS(value.gobj(), StringValue::value_type()))
     {
         StringValue string_value;
         string_value.init(value.gobj());
