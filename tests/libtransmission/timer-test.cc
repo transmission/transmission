@@ -92,7 +92,7 @@ TEST_F(TimerTest, singleShotCallsCallback)
     };
     timer->setCallback(callback);
 
-    static auto constexpr Interval = 50ms;
+    static auto constexpr Interval = 100ms;
     timer->startSingleShot(Interval);
 
     waitFor(evbase_.get(), [&called] { return called; });
@@ -112,7 +112,7 @@ TEST_F(TimerTest, repeatingCallsCallback)
     };
     timer->setCallback(callback);
 
-    static auto constexpr Interval = 50ms;
+    static auto constexpr Interval = 100ms;
     timer->startRepeating(Interval);
 
     waitFor(evbase_.get(), [&called] { return called; });
@@ -134,7 +134,7 @@ TEST_F(TimerTest, singleShotHonorsInterval)
 
     // run a single-shot timer
     auto const begin_time = current_time();
-    static auto constexpr Interval = 50ms;
+    static auto constexpr Interval = 100ms;
     timer->startSingleShot(Interval);
     EXPECT_FALSE(timer->isRepeating());
     EXPECT_EQ(Interval, timer->interval());
@@ -161,7 +161,7 @@ TEST_F(TimerTest, repeatingHonorsInterval)
 
     // start a repeating timer
     auto const begin_time = current_time();
-    static auto constexpr Interval = 50ms;
+    static auto constexpr Interval = 100ms;
     static auto constexpr DesiredLoops = 3;
     timer->startRepeating(Interval);
     EXPECT_TRUE(timer->isRepeating());
@@ -198,9 +198,9 @@ TEST_F(TimerTest, restartWithDifferentInterval)
         EXPECT_INTERVAL(interval, AsMSec(end_time - begin_time));
     };
 
-    test(50ms);
     test(100ms);
-    test(50ms);
+    test(200ms);
+    test(100ms);
 }
 
 TEST_F(TimerTest, restartWithSameInterval)
