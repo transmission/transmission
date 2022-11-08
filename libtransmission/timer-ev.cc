@@ -147,7 +147,7 @@ private:
 
     std::function<void()> callback_;
     std::chrono::milliseconds interval_ = 100ms;
-    bool is_repeating_ = false;
+    bool is_repeating_ = true;
     bool is_running_ = false;
 };
 
