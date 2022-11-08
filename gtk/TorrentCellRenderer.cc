@@ -961,7 +961,6 @@ TorrentCellRenderer::Impl::~Impl()
 
 TorrentCellRenderer::TorrentCellRenderer()
     : Glib::ObjectBase(typeid(TorrentCellRenderer))
-    , Gtk::CellRenderer()
     , impl_(std::make_unique<Impl>(*this))
 {
 }
