@@ -396,7 +396,7 @@ void Application::Impl::on_main_window_size_allocated()
     bool const is_maximized = gdk_window != nullptr && (gdk_window->get_state() & Gdk::WINDOW_STATE_MAXIMIZED) != 0;
 #endif
 
-    gtr_pref_int_set(TR_KEY_main_window_is_maximized, is_maximized);
+    gtr_pref_flag_set(TR_KEY_main_window_is_maximized, is_maximized);
 
     if (!is_maximized)
     {

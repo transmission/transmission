@@ -1583,7 +1583,7 @@ void Session::set_pref(tr_quark const key, int newval)
 
 void Session::set_pref(tr_quark const key, double newval)
 {
-    if (gtr_compare_double(newval, gtr_pref_double_get(key), 4))
+    if (gtr_compare_double(newval, gtr_pref_double_get(key), 4) != 0)
     {
         gtr_pref_double_set(key, newval);
         impl_->commit_prefs_change(key);

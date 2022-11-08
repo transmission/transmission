@@ -695,7 +695,7 @@ void TorrentCellRenderer::Impl::render_compact(
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
     auto const percentDone = get_percent_done(tor, st, &seed);
-    bool const sensitive = active || st->error;
+    bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
     {
@@ -799,7 +799,7 @@ void TorrentCellRenderer::Impl::render_full(
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
     auto const percentDone = get_percent_done(tor, st, &seed);
-    bool const sensitive = active || st->error;
+    bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
     {
