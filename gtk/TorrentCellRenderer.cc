@@ -667,7 +667,8 @@ void TorrentCellRenderer::Impl::render_progress_bar(
         area.get_height());
 #endif
 
-    double dx = 0, dy = 0;
+    double dx = 0;
+    double dy = 0;
     context->device_to_user(dx, dy);
 
     adjust_progress_bar_hue(surface, temp_context, color, temp_area, dx - area.get_x(), dy - area.get_y());
