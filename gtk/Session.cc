@@ -91,7 +91,8 @@ public:
     tr_session* close();
 
     Glib::RefPtr<Gtk::ListStore> get_raw_model() const;
-    Glib::RefPtr<Gtk::TreeModelSort> get_model() const;
+    Glib::RefPtr<Gtk::TreeModelSort> get_model();
+    Glib::RefPtr<Gtk::TreeModelSort const> get_model() const;
     tr_session* get_session() const;
 
     size_t get_active_torrent_count() const;
@@ -119,7 +120,7 @@ public:
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
 
-    bool is_busy();
+    bool is_busy() const;
     void add_to_busy(int addMe);
     void inc_busy();
     void dec_busy();
@@ -215,7 +216,12 @@ Glib::RefPtr<Gtk::TreeModel> Session::get_model() const
     return impl_->get_model();
 }
 
-Glib::RefPtr<Gtk::TreeModelSort> Session::Impl::get_model() const
+Glib::RefPtr<Gtk::TreeModelSort> Session::Impl::get_model()
+{
+    return sorted_model_;
+}
+
+Glib::RefPtr<Gtk::TreeModelSort const> Session::Impl::get_model() const
 {
     return sorted_model_;
 }
@@ -234,7 +240,7 @@ tr_session* Session::Impl::get_session() const
 ****  BUSY
 ***/
 
-bool Session::Impl::is_busy()
+bool Session::Impl::is_busy() const
 {
     return busy_count_ > 0;
 }
@@ -1774,7 +1780,7 @@ tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
     return tor;
 }
 
-void Session::open_folder(tr_torrent_id_t torrent_id)
+void Session::open_folder(tr_torrent_id_t torrent_id) const
 {
     auto const* tor = find_torrent(torrent_id);
 

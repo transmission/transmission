@@ -120,7 +120,7 @@ public:
 
     void exec(tr_variant const* benc);
 
-    void open_folder(tr_torrent_id_t torrent_id);
+    void open_folder(tr_torrent_id_t torrent_id) const;
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)>& signal_add_error();
     sigc::signal<void(tr_ctor*)>& signal_add_prompt();
