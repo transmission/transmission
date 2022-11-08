@@ -242,7 +242,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
         [n](auto& res) { notify_callback(res, n); },
         make_variant_tuple(
             Glib::ustring("Transmission"),
-            0u,
+            0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Complete")),
             Glib::ustring(tr_torrentName(tor)),
@@ -276,7 +276,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, tr_torrent_id_t
         [n](auto& res) { notify_callback(res, n); },
         make_variant_tuple(
             Glib::ustring("Transmission"),
-            0u,
+            0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Added")),
             Glib::ustring(tr_torrentName(tor)),
