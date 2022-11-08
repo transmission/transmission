@@ -177,14 +177,14 @@ void gtr_action_activate(Glib::ustring const& name)
     get_action(name)->activate();
 }
 
-void gtr_action_set_sensitive(Glib::ustring const& name, bool b)
+void gtr_action_set_sensitive(Glib::ustring const& name, bool is_sensitive)
 {
-    get_action(name)->set_enabled(b);
+    get_action(name)->set_enabled(is_sensitive);
 }
 
-void gtr_action_set_toggled(Glib::ustring const& name, bool b)
+void gtr_action_set_toggled(Glib::ustring const& name, bool is_toggled)
 {
-    get_action(name)->set_state(Glib::Variant<bool>::create(b));
+    get_action(name)->change_state(is_toggled);
 }
 
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name)

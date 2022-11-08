@@ -103,7 +103,7 @@ public:
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
     int add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(tr_torrent* tor, bool do_notify);
-    bool add_from_url(Glib::ustring const& uri);
+    bool add_from_url(Glib::ustring const& url);
 
     void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant*)> const& response_func);
 
@@ -1212,14 +1212,14 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     return handled;
 }
 
-bool Session::add_from_url(Glib::ustring const& uri)
+bool Session::add_from_url(Glib::ustring const& url)
 {
-    return impl_->add_from_url(uri);
+    return impl_->add_from_url(url);
 }
 
-bool Session::Impl::add_from_url(Glib::ustring const& uri)
+bool Session::Impl::add_from_url(Glib::ustring const& url)
 {
-    auto const file = Gio::File::create_for_uri(uri);
+    auto const file = Gio::File::create_for_uri(url);
     auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
     auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     auto const do_notify = false;
@@ -1265,7 +1265,7 @@ void Session::torrent_changed(tr_torrent_id_t id)
     }
 }
 
-void Session::remove_torrent(tr_torrent_id_t id, bool delete_local_data)
+void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
     auto* tor = find_torrent(id);
 
@@ -1282,7 +1282,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_local_data)
         /* remove the torrent */
         tr_torrentRemove(
             tor,
-            delete_local_data,
+            delete_files,
             [](char const* filename, void* /*user_data*/, tr_error** error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr);
@@ -1731,12 +1731,12 @@ void Session::blocklist_update()
 ****
 ***/
 
-void Session::exec(tr_variant const* top)
+void Session::exec(tr_variant const* request)
 {
     auto const tag = nextTag;
     ++nextTag;
 
-    impl_->send_rpc_request(top, tag, {});
+    impl_->send_rpc_request(request, tag, {});
 }
 
 /***

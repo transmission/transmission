@@ -91,7 +91,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    void set_torrent(tr_torrent_id_t tor_id);
+    void set_torrent(tr_torrent_id_t torrent_id);
 
 private:
     void clearData();
@@ -474,9 +474,9 @@ void buildTree(FileRowNode& node, build_data& build)
 
 } // namespace
 
-void FileList::set_torrent(tr_torrent_id_t tor_id)
+void FileList::set_torrent(tr_torrent_id_t torrent_id)
 {
-    impl_->set_torrent(tor_id);
+    impl_->set_torrent(torrent_id);
 }
 
 struct PairHash
@@ -488,9 +488,9 @@ struct PairHash
     }
 };
 
-void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
+void FileList::Impl::set_torrent(tr_torrent_id_t torrent_id)
 {
-    if (torrent_id_ == tor_id && store_ != nullptr && !store_->children().empty())
+    if (torrent_id_ == torrent_id && store_ != nullptr && !store_->children().empty())
     {
         return;
     }
@@ -500,7 +500,7 @@ void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
 
     /* instantiate the model */
     store_ = Gtk::TreeStore::create(file_cols);
-    torrent_id_ = tor_id;
+    torrent_id_ = torrent_id;
 
     /* populate the model */
     if (torrent_id_ > 0)
