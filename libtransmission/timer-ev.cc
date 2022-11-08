@@ -137,9 +137,10 @@ private:
 
     void handleTimer()
     {
+        is_running_ = is_repeating_;
+
         TR_ASSERT(callback_);
         callback_();
-        is_running_ = is_repeating_;
     }
 
     [[nodiscard]] constexpr bool isRunning() const noexcept
