@@ -1417,8 +1417,8 @@ void Session::start_now(tr_torrent_id_t id)
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-start-now");
 
-    auto args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
-    auto ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
+    auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
+    auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
     exec(&top);
     tr_variantClear(&top);
