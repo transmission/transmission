@@ -1767,11 +1767,11 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
 namespace
 {
 
-auto constexpr ErrMarkupBegin = "<span color=\"red\">"sv;
+auto constexpr ErrMarkupBegin = "<span color='red'>"sv;
 auto constexpr ErrMarkupEnd = "</span>"sv;
-auto constexpr TimeoutMarkupBegin = "<span color=\"#246\">"sv;
+auto constexpr TimeoutMarkupBegin = "<span color='#246'>"sv;
 auto constexpr TimeoutMarkupEnd = "</span>"sv;
-auto constexpr SuccessMarkupBegin = "<span color=\"#080\">"sv;
+auto constexpr SuccessMarkupBegin = "<span color='#080'>"sv;
 auto constexpr SuccessMarkupEnd = "</span>"sv;
 
 std::array<std::string_view, 3> const text_dir_mark = { ""sv, "\u200E"sv, "\u200F"sv };
