@@ -87,7 +87,7 @@ public:
     TR_DISABLE_COPY_MOVE(Impl)
 
 private:
-    void onSourceToggled2(Gtk::CheckButton* tb, PathButton* chooser);
+    void onSourceToggled(Gtk::CheckButton* tb, PathButton* chooser);
     void onChooserChosen(PathButton* chooser);
     void onResponse(int response);
 
@@ -343,16 +343,6 @@ void MakeDialog::Impl::onResponse(int response)
 ****
 ***/
 
-namespace
-{
-
-void onSourceToggled(Gtk::CheckButton* tb, Gtk::Widget* widget)
-{
-    widget->set_sensitive(tb->get_active());
-}
-
-} // namespace
-
 void MakeDialog::Impl::updatePiecesLabel()
 {
     auto const filename = builder_ ? builder_->top() : ""sv;
@@ -410,7 +400,7 @@ void MakeDialog::Impl::onChooserChosen(PathButton* chooser)
     setFilename(chooser->get_filename());
 }
 
-void MakeDialog::Impl::onSourceToggled2(Gtk::CheckButton* tb, PathButton* chooser)
+void MakeDialog::Impl::onSourceToggled(Gtk::CheckButton* tb, PathButton* chooser)
 {
     if (tb->get_active())
     {
@@ -526,14 +516,9 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
 
     destination_chooser_->set_filename(Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP)));
 
-    folder_radio_->set_active(false);
-    folder_radio_->signal_toggled().connect([this]() { onSourceToggled2(folder_radio_, folder_chooser_); });
     folder_radio_->signal_toggled().connect([this]() { onSourceToggled(folder_radio_, folder_chooser_); });
     folder_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(folder_chooser_); });
-    folder_chooser_->set_sensitive(false);
 
-    file_radio_->set_active(true);
-    file_radio_->signal_toggled().connect([this]() { onSourceToggled2(file_radio_, file_chooser_); });
     file_radio_->signal_toggled().connect([this]() { onSourceToggled(file_radio_, file_chooser_); });
     file_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(file_chooser_); });
 
@@ -541,14 +526,6 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
 
     piece_size_scale_->set_visible(false);
     piece_size_scale_->signal_value_changed().connect([this]() { onPieceSizeUpdated(); });
-
-    comment_check_->set_active(false);
-    comment_entry_->set_sensitive(false);
-    comment_check_->signal_toggled().connect([this]() { onSourceToggled(comment_check_, comment_entry_); });
-
-    source_check_->set_active(false);
-    source_entry_->set_sensitive(false);
-    source_check_->signal_toggled().connect([this]() { onSourceToggled(source_check_, source_entry_); });
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     auto drop_controller = Gtk::DropTarget::create(GDK_TYPE_FILE_LIST, Gdk::DragAction::COPY);
