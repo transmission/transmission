@@ -462,7 +462,7 @@ bool test_torrent_activity(tr_torrent* tor, int type)
         return st->activity == TR_STATUS_STOPPED;
 
     case ACTIVITY_FILTER_FINISHED:
-        return st->finished == true;
+        return st->finished;
 
     case ACTIVITY_FILTER_VERIFYING:
         return st->activity == TR_STATUS_CHECK || st->activity == TR_STATUS_CHECK_WAIT;
@@ -774,26 +774,26 @@ FilterBar::FilterBar(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& /*builder*/,
     tr_session* session,
-    Glib::RefPtr<Gtk::TreeModel> const& tmodel)
+    Glib::RefPtr<Gtk::TreeModel> const& torrent_model)
     : Glib::ObjectBase(typeid(FilterBar))
     , Gtk::Box(cast_item)
-    , impl_(std::make_unique<Impl>(*this, session, tmodel))
+    , impl_(std::make_unique<Impl>(*this, session, torrent_model))
 {
 }
 
 FilterBar::~FilterBar() = default;
 
-FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& tmodel)
+FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model)
     : widget_(widget)
     , activity_(get_template_child<Gtk::ComboBox>("activity_combo"))
     , tracker_(get_template_child<Gtk::ComboBox>("tracker_combo"))
     , entry_(get_template_child<Gtk::Entry>("text_entry"))
     , show_lb_(get_template_child<Gtk::Label>("show_label"))
 {
-    activity_combo_box_init(activity_, tmodel);
-    tracker_combo_box_init(tracker_, tmodel);
+    activity_combo_box_init(activity_, torrent_model);
+    tracker_combo_box_init(tracker_, torrent_model);
 
-    filter_model_ = Gtk::TreeModelFilter::create(tmodel);
+    filter_model_ = Gtk::TreeModelFilter::create(torrent_model);
     filter_model_row_deleted_tag_ = filter_model_->signal_row_deleted().connect([this](auto const& /*path*/)
                                                                                 { update_count_label_idle(); });
     filter_model_row_inserted_tag_ = filter_model_->signal_row_inserted().connect(
