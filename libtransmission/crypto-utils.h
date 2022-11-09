@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#pragma once
-
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
@@ -105,14 +103,6 @@ void tr_x509_cert_free(tr_x509_cert_t handle);
  * @brief Fill a buffer with random bytes.
  */
 bool tr_rand_buffer(void* buffer, size_t length);
-
-template<typename T>
-[[nodiscard]] auto tr_randObj()
-{
-    auto ret = T{};
-    tr_rand_buffer(&ret, sizeof(ret));
-    return ret;
-}
 
 /**
  * @brief Generate a SSHA password from its plaintext source.
