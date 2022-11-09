@@ -12,8 +12,6 @@
 @property(nonatomic) IBOutlet NSButton* fOpenButton;
 @property(nonatomic) IBOutlet NSButton* fCancelButton;
 
-- (void)updateOpenButtonForURL:(NSString*)string;
-
 @end
 
 @implementation URLSheetWindowController

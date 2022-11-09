@@ -39,11 +39,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 @property(nonatomic) NSLock* fLock;
 
-- (void)resizeColumn;
-- (BOOL)shouldIncludeMessageForFilter:(NSString*)filterString message:(NSDictionary*)message;
-- (void)updateListForFilter;
-- (NSString*)stringForMessage:(NSDictionary*)message;
-
 @end
 
 @implementation MessageWindowController

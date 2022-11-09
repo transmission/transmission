@@ -41,13 +41,6 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 @property(nonatomic) NSInteger fGroupValue;
 @property(nonatomic) TorrentDeterminationType fGroupDeterminationType;
 
-- (void)confirmAdd;
-
-- (void)setDestinationPath:(NSString*)destination determinationType:(TorrentDeterminationType)determinationType;
-
-- (void)setGroupsMenu;
-- (void)changeGroupValue:(id)sender;
-
 @end
 
 @implementation AddMagnetWindowController

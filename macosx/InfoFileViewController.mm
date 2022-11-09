@@ -20,10 +20,6 @@
 @property(nonatomic) IBOutlet NSButton* fCheckAllButton;
 @property(nonatomic) IBOutlet NSButton* fUncheckAllButton;
 
-- (void)setupInfo;
-
-- (BOOL)canQuickLookFile:(FileListNode*)item;
-
 @end
 
 @implementation InfoFileViewController

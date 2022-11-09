@@ -47,29 +47,6 @@ static int const kETAIdleDisplaySec = 2 * 60;
 
 @property(nonatomic) BOOL fTimeMachineExcludeInitialized;
 
-- (instancetype)initWithPath:(NSString*)path
-                        hash:(NSString*)hashString
-               torrentStruct:(tr_torrent*)torrentStruct
-               magnetAddress:(NSString*)magnetAddress
-                         lib:(tr_session*)lib
-                  groupValue:(NSNumber*)groupValue
-     removeWhenFinishSeeding:(NSNumber*)removeWhenFinishSeeding
-              downloadFolder:(NSString*)downloadFolder
-      legacyIncompleteFolder:(NSString*)incompleteFolder;
-
-- (void)createFileList;
-- (void)insertPathForComponents:(NSArray*)components
-             withComponentIndex:(NSUInteger)componentIndex
-                      forParent:(FileListNode*)parent
-                       fileSize:(uint64_t)size
-                          index:(NSInteger)index
-                       flatList:(NSMutableArray<FileListNode*>*)flatFileList;
-- (void)sortFileList:(NSMutableArray<FileListNode*>*)fileNodes;
-
-- (void)startQueue;
-- (void)ratioLimitHit;
-- (void)idleLimitHit;
-- (void)metadataRetrieved;
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
      completionHandler:(void (^)(BOOL))completionHandler
@@ -78,8 +55,6 @@ static int const kETAIdleDisplaySec = 2 * 60;
 
 @property(nonatomic, readonly) BOOL shouldShowEta;
 @property(nonatomic, readonly) NSString* etaString;
-
-- (void)setTimeMachineExclude:(BOOL)exclude;
 
 @end
 
