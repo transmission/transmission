@@ -27,9 +27,6 @@ static CGFloat const kPaddingExpansionFrame = 2.0;
 @property(nonatomic, readonly) NSMutableDictionary* fTitleAttributes;
 @property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
 
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
-- (NSRect)rectForStatusWithString:(NSAttributedString*)string withTitleRect:(NSRect)titleRect inBounds:(NSRect)bounds;
-
 @end
 
 @implementation FileNameCell

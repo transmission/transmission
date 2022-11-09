@@ -27,20 +27,6 @@ static CGFloat const kCountWidth = 60.0;
 @property(nonatomic, readonly) NSMutableDictionary* fNameAttributes;
 @property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
 
-- (void)loadTrackerIcon:(NSString*)baseAddress;
-
-- (NSRect)imageRectForBounds:(NSRect)bounds;
-- (NSRect)rectForNameWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
-- (NSRect)rectForCountWithString:(NSAttributedString*)string withAboveRect:(NSRect)aboveRect inBounds:(NSRect)bounds;
-- (NSRect)rectForCountLabelWithString:(NSAttributedString*)string withRightRect:(NSRect)rightRect inBounds:(NSRect)bounds;
-- (NSRect)rectForStatusWithString:(NSAttributedString*)string
-                    withAboveRect:(NSRect)aboveRect
-                    withRightRect:(NSRect)rightRect
-                         inBounds:(NSRect)bounds;
-
-- (NSAttributedString*)attributedStatusWithString:(NSString*)statusString;
-- (NSAttributedString*)attributedCount:(NSInteger)count;
-
 @end
 
 @implementation TrackerCell

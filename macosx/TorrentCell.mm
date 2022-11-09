@@ -49,24 +49,6 @@ static NSInteger const kMaxPieces = 18 * 18;
 
 @interface TorrentCell ()
 
-- (void)drawBar:(NSRect)barRect;
-- (void)drawRegularBar:(NSRect)barRect;
-- (void)drawPiecesBar:(NSRect)barRect;
-
-- (NSRect)rectForMinimalStatusWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string
-                  withRightBound:(CGFloat)rightBound
-                        inBounds:(NSRect)bounds
-                         minimal:(BOOL)minimal;
-- (NSRect)rectForProgressWithStringInBounds:(NSRect)bounds;
-- (NSRect)rectForStatusWithStringInBounds:(NSRect)bounds;
-- (NSRect)barRectRegForBounds:(NSRect)bounds;
-- (NSRect)barRectMinForBounds:(NSRect)bounds;
-
-- (NSRect)controlButtonRectForBounds:(NSRect)bounds;
-- (NSRect)revealButtonRectForBounds:(NSRect)bounds;
-- (NSRect)actionButtonRectForBounds:(NSRect)bounds;
-
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
 @property(nonatomic, readonly) NSMutableDictionary* fTitleAttributes;

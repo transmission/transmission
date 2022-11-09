@@ -61,10 +61,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) BOOL fActionPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 
-- (BOOL)pointInGroupStatusRect:(NSPoint)point;
-
-- (void)setGroupStatusColumns;
-
 @end
 
 @implementation TorrentTableView

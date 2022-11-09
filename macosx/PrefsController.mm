@@ -102,10 +102,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
 
-- (void)setPrefView:(id)sender;
-
-- (void)setKeychainPassword:(char const*)password forService:(char const*)service username:(char const*)username;
-
 @end
 
 @implementation PrefsController

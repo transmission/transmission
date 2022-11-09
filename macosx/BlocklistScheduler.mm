@@ -15,8 +15,6 @@ static NSTimeInterval const kFullWait = 60 * 60 * 24 * 7;
 
 @property(nonatomic) NSTimer* fTimer;
 
-- (void)runUpdater;
-
 @end
 
 @implementation BlocklistScheduler
