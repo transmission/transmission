@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#pragma once
+
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
