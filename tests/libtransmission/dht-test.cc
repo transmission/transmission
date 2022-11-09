@@ -20,6 +20,11 @@
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
 
+#ifdef _WIN32
+#undef gai_strerror
+#define gai_strerror gai_strerrorA
+#else
+
 using namespace std::literals;
 
 namespace libtransmission::test
