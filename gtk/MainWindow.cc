@@ -355,7 +355,7 @@ void MainWindow::Impl::onRatioSet(double ratio)
 
 Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions)
 {
-    static double const stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
+    static auto const stockRatios = std::array<double, 7>({ 0.25, 0.5, 0.75, 1, 1.5, 2, 3 });
 
     auto& info = ratio_menu_info_;
 
@@ -459,16 +459,18 @@ void MainWindow::Impl::onOptionsClicked()
 
 Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createStatsMenu()
 {
-    static struct
+    struct StatsModeInfo
     {
         char const* val;
         char const* i18n;
-    } const stats_modes[] = {
+    };
+
+    static auto const stats_modes = std::array<StatsModeInfo, 4>({ {
         { "total-ratio", N_("Total Ratio") },
         { "session-ratio", N_("Session Ratio") },
         { "total-transfer", N_("Total Transfer") },
         { "session-transfer", N_("Session Transfer") },
-    };
+    } });
 
     auto top = Gio::Menu::create();
     auto actions = Gio::SimpleActionGroup::create();
