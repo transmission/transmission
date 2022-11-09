@@ -63,6 +63,7 @@
                 </child>
                 <child>
                   <object class="gtkmm__CustomObject_10PathButton" id="source_folder_button">
+                    <property name="sensitive" bind-source="source_folder_radio" bind-property="active" bind-flags="sync-create">0</property>
                     <property name="hexpand">1</property>
                     <property name="action">select-folder</property>
                     <layout>
@@ -86,6 +87,7 @@
                 </child>
                 <child>
                   <object class="gtkmm__CustomObject_10PathButton" id="source_file_button">
+                    <property name="sensitive" bind-source="source_file_radio" bind-property="active" bind-flags="sync-create">0</property>
                     <property name="hexpand">1</property>
                     <property name="title" translatable="1"></property>
                     <layout>
@@ -219,6 +221,7 @@ To add a new primary URL, add it after a blank line.</property>
                 </child>
                 <child>
                   <object class="GtkEntry" id="comment_entry">
+                    <property name="sensitive" bind-source="comment_check" bind-property="active" bind-flags="sync-create">0</property>
                     <property name="focusable">1</property>
                     <property name="hexpand">1</property>
                     <layout>
@@ -241,6 +244,7 @@ To add a new primary URL, add it after a blank line.</property>
                 </child>
                 <child>
                   <object class="GtkEntry" id="source_entry">
+                    <property name="sensitive" bind-source="source_check" bind-property="active" bind-flags="sync-create">0</property>
                     <property name="focusable">1</property>
                     <property name="hexpand">1</property>
                     <layout>
