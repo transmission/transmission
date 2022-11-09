@@ -91,7 +91,8 @@ public:
     tr_session* close();
 
     Glib::RefPtr<Gtk::ListStore> get_raw_model() const;
-    Glib::RefPtr<Gtk::TreeModelSort> get_model() const;
+    Glib::RefPtr<Gtk::TreeModelSort> get_model();
+    Glib::RefPtr<Gtk::TreeModelSort const> get_model() const;
     tr_session* get_session() const;
 
     size_t get_active_torrent_count() const;
@@ -102,7 +103,7 @@ public:
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
     int add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(tr_torrent* tor, bool do_notify);
-    bool add_from_url(Glib::ustring const& uri);
+    bool add_from_url(Glib::ustring const& url);
 
     void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant*)> const& response_func);
 
@@ -119,7 +120,7 @@ public:
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
 
-    bool is_busy();
+    bool is_busy() const;
     void add_to_busy(int addMe);
     void inc_busy();
     void dec_busy();
@@ -215,7 +216,12 @@ Glib::RefPtr<Gtk::TreeModel> Session::get_model() const
     return impl_->get_model();
 }
 
-Glib::RefPtr<Gtk::TreeModelSort> Session::Impl::get_model() const
+Glib::RefPtr<Gtk::TreeModelSort> Session::Impl::get_model()
+{
+    return sorted_model_;
+}
+
+Glib::RefPtr<Gtk::TreeModelSort const> Session::Impl::get_model() const
 {
     return sorted_model_;
 }
@@ -234,7 +240,7 @@ tr_session* Session::Impl::get_session() const
 ****  BUSY
 ***/
 
-bool Session::Impl::is_busy()
+bool Session::Impl::is_busy() const
 {
     return busy_count_ > 0;
 }
@@ -1206,14 +1212,14 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     return handled;
 }
 
-bool Session::add_from_url(Glib::ustring const& uri)
+bool Session::add_from_url(Glib::ustring const& url)
 {
-    return impl_->add_from_url(uri);
+    return impl_->add_from_url(url);
 }
 
-bool Session::Impl::add_from_url(Glib::ustring const& uri)
+bool Session::Impl::add_from_url(Glib::ustring const& url)
 {
-    auto const file = Gio::File::create_for_uri(uri);
+    auto const file = Gio::File::create_for_uri(url);
     auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
     auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     auto const do_notify = false;
@@ -1259,7 +1265,7 @@ void Session::torrent_changed(tr_torrent_id_t id)
     }
 }
 
-void Session::remove_torrent(tr_torrent_id_t id, bool delete_local_data)
+void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
     auto* tor = find_torrent(id);
 
@@ -1276,7 +1282,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_local_data)
         /* remove the torrent */
         tr_torrentRemove(
             tor,
-            delete_local_data,
+            delete_files,
             [](char const* filename, void* /*user_data*/, tr_error** error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr);
@@ -1411,8 +1417,8 @@ void Session::start_now(tr_torrent_id_t id)
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-start-now");
 
-    auto args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
-    auto ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
+    auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
+    auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
     exec(&top);
     tr_variantClear(&top);
@@ -1577,7 +1583,7 @@ void Session::set_pref(tr_quark const key, int newval)
 
 void Session::set_pref(tr_quark const key, double newval)
 {
-    if (gtr_compare_double(newval, gtr_pref_double_get(key), 4))
+    if (gtr_compare_double(newval, gtr_pref_double_get(key), 4) != 0)
     {
         gtr_pref_double_set(key, newval);
         impl_->commit_prefs_change(key);
@@ -1725,12 +1731,12 @@ void Session::blocklist_update()
 ****
 ***/
 
-void Session::exec(tr_variant const* top)
+void Session::exec(tr_variant const* request)
 {
     auto const tag = nextTag;
     ++nextTag;
 
-    impl_->send_rpc_request(top, tag, {});
+    impl_->send_rpc_request(request, tag, {});
 }
 
 /***
@@ -1774,7 +1780,7 @@ tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
     return tor;
 }
 
-void Session::open_folder(tr_torrent_id_t torrent_id)
+void Session::open_folder(tr_torrent_id_t torrent_id) const
 {
     auto const* tor = find_torrent(torrent_id);
 

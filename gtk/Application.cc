@@ -396,7 +396,7 @@ void Application::Impl::on_main_window_size_allocated()
     bool const is_maximized = gdk_window != nullptr && (gdk_window->get_state() & Gdk::WINDOW_STATE_MAXIMIZED) != 0;
 #endif
 
-    gtr_pref_int_set(TR_KEY_main_window_is_maximized, is_maximized);
+    gtr_pref_flag_set(TR_KEY_main_window_is_maximized, is_maximized);
 
     if (!is_maximized)
     {
@@ -870,7 +870,8 @@ bool Application::Impl::on_drag_data_received(Glib::ValueBase const& value, doub
         open_files(FileListHandler::slist_to_vector(files_value.get(), Glib::OwnershipType::OWNERSHIP_NONE));
         return true;
     }
-    else if (G_VALUE_HOLDS(value.gobj(), StringValue::value_type()))
+
+    if (G_VALUE_HOLDS(value.gobj(), StringValue::value_type()))
     {
         StringValue string_value;
         string_value.init(value.gobj());

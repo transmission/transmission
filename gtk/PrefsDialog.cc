@@ -216,7 +216,7 @@ public:
     TR_DISABLE_COPY_MOVE(DownloadingPage)
 
 private:
-    void on_core_prefs_changed(tr_quark const key);
+    void on_core_prefs_changed(tr_quark key);
 
 private:
     Glib::RefPtr<Session> const core_;
@@ -454,7 +454,8 @@ private:
     void onBlocklistUpdated(int n);
     void onBlocklistUpdate();
     void on_blocklist_url_changed(Gtk::Editable* e);
-    void init_encryption_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark const key);
+
+    static void init_encryption_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark key);
 
 private:
     Glib::RefPtr<Session> core_;
@@ -834,8 +835,8 @@ public:
 private:
     void refreshSchedSensitivity();
 
-    void init_time_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark const key);
-    void init_week_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark const key);
+    static void init_time_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark key);
+    static void init_week_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark key);
 
     static auto get_weekday_string(Glib::Date::Weekday weekday);
 
@@ -1012,7 +1013,7 @@ public:
     TR_DISABLE_COPY_MOVE(NetworkPage)
 
 private:
-    void onCorePrefsChanged(tr_quark const key);
+    void onCorePrefsChanged(tr_quark key);
     void onPortTested(bool isOpen);
     void onPortTest();
 

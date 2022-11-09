@@ -141,14 +141,14 @@ enum class GtrUnicode
 Glib::ustring gtr_get_unicode_string(GtrUnicode);
 
 /* return a human-readable string for the size given in bytes. */
-Glib::ustring tr_strlsize(guint64 size);
+Glib::ustring tr_strlsize(guint64 size_in_bytes);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
 
-std::string tr_format_time_relative(time_t src, time_t tgt);
-std::string tr_format_time_left(time_t seconds);
-std::string tr_format_time(time_t seconds);
+std::string tr_format_time_relative(time_t timestamp, time_t origin);
+std::string tr_format_time_left(time_t timestamp);
+std::string tr_format_time(time_t timestamp);
 
 /***
 ****
