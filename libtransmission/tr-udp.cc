@@ -176,13 +176,16 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     TR_ASSERT(vsession != nullptr);
     TR_ASSERT(type == EV_READ);
 
-    auto buf = std::array<unsigned char, 4096>{};
+    auto buf = std::array<unsigned char, 8192>{};
     auto from = sockaddr_storage{};
-    auto* session = static_cast<tr_session*>(vsession);
-
-    socklen_t fromlen = sizeof(from);
-    auto const
-        rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
+    auto fromlen = socklen_t{ sizeof(from) };
+    auto const rc = recvfrom(
+        s,
+        reinterpret_cast<char*>(std::data(buf)),
+        std::size(buf) - 1,
+        0,
+        reinterpret_cast<sockaddr*>(&from),
+        &fromlen);
 
     /* Since most packets we receive here are µTP, make quick inline
        checks for the other protocols. The logic is as follows:
@@ -191,12 +194,14 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
          is between 0 and 3
        - the above cannot be µTP packets, since these start with a 4-bit
          version number (1). */
+    auto* session = static_cast<tr_session*>(vsession);
     if (rc > 0)
     {
         if (buf[0] == 'd')
         {
             if (session->dht_)
             {
+                buf[rc] = '\0'; // libdht requires zero-terminated messages
                 session->dht_->handleMessage(std::data(buf), rc, reinterpret_cast<sockaddr*>(&from), fromlen);
             }
         }

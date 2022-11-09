@@ -198,9 +198,9 @@ public:
         }
     }
 
-    void handleMessage(unsigned char* buf, size_t buflen, struct sockaddr* from, socklen_t fromlen) override
+    void handleMessage(unsigned char const* msg, size_t msglen, struct sockaddr* from, socklen_t fromlen) override
     {
-        auto const call_again_in_n_secs = periodic(buf, buflen, from, fromlen);
+        auto const call_again_in_n_secs = periodic(msg, msglen, from, fromlen);
 
         // Being slightly late is fine,
         // and has the added benefit of adding some jitter.
@@ -367,23 +367,16 @@ private:
         periodic_timer_->startSingleShot(interval);
     }
 
-    [[nodiscard]] std::chrono::seconds periodic(void const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen)
+    [[nodiscard]] std::chrono::seconds periodic(
+        unsigned char const* msg,
+        size_t msglen,
+        struct sockaddr const* from,
+        socklen_t fromlen)
     {
+        TR_ASSERT_MSG(msglen == 0 || msg[msglen] == '\0', "libdht requires zero-terminated msg");
+
         auto call_again_in_n_secs = time_t{};
-
-        // the only way dht_periodic() fails is if buf isn't zero-terminated,
-        // so let's ensure it's zero terminated here.
-        auto szbuf = tr_strbuf<unsigned char, 1500>{ std::string_view{ static_cast<char const*>(buf), buflen } };
-
-        mediator_.api().periodic(
-            std::data(szbuf),
-            std::size(szbuf),
-            from,
-            static_cast<int>(fromlen),
-            &call_again_in_n_secs,
-            callback,
-            this);
-
+        mediator_.api().periodic(msg, msglen, from, static_cast<int>(fromlen), &call_again_in_n_secs, callback, this);
         return std::chrono::seconds{ call_again_in_n_secs };
     }
 
