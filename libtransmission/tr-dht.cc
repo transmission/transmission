@@ -198,7 +198,7 @@ public:
         }
     }
 
-    void handleMessage(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen) override
+    void handleMessage(unsigned char* buf, size_t buflen, struct sockaddr* from, socklen_t fromlen) override
     {
         auto const call_again_in_n_secs = periodic(buf, buflen, from, fromlen);
 

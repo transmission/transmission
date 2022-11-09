@@ -106,5 +106,5 @@ public:
     virtual ~tr_dht() = default;
 
     virtual void addNode(tr_address const& address, tr_port port) = 0;
-    virtual void handleMessage(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen) = 0;
+    virtual void handleMessage(unsigned char* buf, size_t buflen, struct sockaddr* from, socklen_t fromlen) = 0;
 };
