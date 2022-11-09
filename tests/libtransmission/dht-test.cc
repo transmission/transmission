@@ -23,7 +23,7 @@
 #ifdef _WIN32
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
-#else
+#endif
 
 using namespace std::literals;
 
