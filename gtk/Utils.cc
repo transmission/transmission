@@ -4,10 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <ctype.h> /* isxdigit() */
-#include <errno.h>
 #include <functional>
-#include <limits.h> /* INT_MAX */
 #include <memory>
 #include <utility>
 

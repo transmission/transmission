@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <csignal>
 #include <cstdlib> // exit()
 #include <ctime>
 #include <iterator> // std::back_inserter
@@ -14,9 +15,6 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-
-#include <locale.h>
-#include <signal.h>
 
 #include <fmt/core.h>
 

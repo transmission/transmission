@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <climits> /* USHRT_MAX, INT_MAX */
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -274,7 +274,7 @@ DownloadingPage::DownloadingPage(
         TR_KEY_download_queue_size,
         core_,
         0,
-        INT_MAX,
+        std::numeric_limits<int>::max(),
         1);
 
     init_spin_button(
@@ -282,7 +282,7 @@ DownloadingPage::DownloadingPage(
         TR_KEY_queue_stalled_minutes,
         core_,
         1,
-        INT_MAX,
+        std::numeric_limits<int>::max(),
         15);
 
     init_check_button(
@@ -727,7 +727,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
 
     /* port */
     auto* port_spin = gtr_get_widget<Gtk::SpinButton>(builder, "rpc_port_spin");
-    init_spin_button(*port_spin, TR_KEY_rpc_port, core_, 0, USHRT_MAX, 1);
+    init_spin_button(*port_spin, TR_KEY_rpc_port, core_, 0, std::numeric_limits<uint16_t>::max(), 1);
 
     /* require authentication */
     init_check_button(*auth_tb_, TR_KEY_rpc_authentication_required, core_);
@@ -889,7 +889,7 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
         w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
 
         auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "upload_limit_spin");
-        init_spin_button(*w2, TR_KEY_speed_limit_up, core_, 0, INT_MAX, 5);
+        init_spin_button(*w2, TR_KEY_speed_limit_up, core_, 0, std::numeric_limits<int>::max(), 5);
     }
 
     {
@@ -898,7 +898,7 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
         w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
 
         auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "download_limit_spin");
-        init_spin_button(*w2, TR_KEY_speed_limit_down, core_, 0, INT_MAX, 5);
+        init_spin_button(*w2, TR_KEY_speed_limit_down, core_, 0, std::numeric_limits<int>::max(), 5);
     }
 
     {
@@ -906,7 +906,7 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
         w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
 
         auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "alt_upload_limit_spin");
-        init_spin_button(*w2, TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5);
+        init_spin_button(*w2, TR_KEY_alt_speed_up, core_, 0, std::numeric_limits<int>::max(), 5);
     }
 
     {
@@ -914,7 +914,7 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
         w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
 
         auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "alt_download_limit_spin");
-        init_spin_button(*w2, TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5);
+        init_spin_button(*w2, TR_KEY_alt_speed_down, core_, 0, std::numeric_limits<int>::max(), 5);
     }
 
     {
@@ -1022,7 +1022,7 @@ NetworkPage::NetworkPage(
     , portButton_(gtr_get_widget<Gtk::Button>(builder, "test_listening_port_button"))
     , portSpin_(gtr_get_widget<Gtk::SpinButton>(builder, "listening_port_spin"))
 {
-    init_spin_button(*portSpin_, TR_KEY_peer_port, core_, 1, USHRT_MAX, 1);
+    init_spin_button(*portSpin_, TR_KEY_peer_port, core_, 1, std::numeric_limits<uint16_t>::max(), 1);
 
     portButton_->signal_clicked().connect([this]() { onPortTest(); });
 

@@ -3,8 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <errno.h>
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 #include <map>
 #include <memory>
 
@@ -179,7 +179,7 @@ Glib::ustring gtr_asctime(time_t t)
 
 void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& filename)
 {
-    auto* fp = fopen(filename.c_str(), "w+");
+    auto* fp = std::fopen(filename.c_str(), "w+");
 
     if (fp == nullptr)
     {
@@ -211,7 +211,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
             fmt::print(fp, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }
 
-        fclose(fp);
+        std::fclose(fp);
     }
 }
 
