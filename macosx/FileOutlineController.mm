@@ -40,9 +40,6 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     self.fFileList = [[NSMutableArray alloc] init];
 
-    self.fOutline.doubleAction = @selector(revealFile:);
-    self.fOutline.target = self;
-
     //set table header tool tips
     [self.fOutline tableColumnWithIdentifier:@"Check"].headerToolTip = NSLocalizedString(@"Download", "file table -> header tool tip");
     [self.fOutline tableColumnWithIdentifier:@"Priority"].headerToolTip = NSLocalizedString(@"Priority", "file table -> header tool tip");

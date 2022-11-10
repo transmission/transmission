@@ -153,11 +153,6 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
         frame.size.width -= widthIncrease;
         field.frame = frame;
     }
-
-    //set the click action of the pieces view
-#warning after 2.8 just hook this up in the xib
-    self.fPiecesView.action = @selector(updatePiecesView:);
-    self.fPiecesView.target = self;
 }
 
 - (void)dealloc

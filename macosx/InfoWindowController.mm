@@ -153,9 +153,6 @@ typedef NS_ENUM(unsigned int, tabTag) {
         tag = TAB_GENERAL_TAG;
     }
 
-    self.fTabs.target = self;
-    self.fTabs.action = @selector(setTab:);
-
     self.fTabs.selectedSegment = tag;
     [self setTab:nil];
 

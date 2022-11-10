@@ -82,6 +82,7 @@
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
+                                    <action trigger="doubleAction" selector="revealFile:" target="15" id="HLe-44-iu9"/>
                                     <outlet property="dataSource" destination="15" id="19"/>
                                     <outlet property="delegate" destination="15" id="20"/>
                                 </connections>
