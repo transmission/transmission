@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstdlib> // atoi()
 #include <ctime>
+#include <future>
 #include <iterator> // for std::back_inserter
 #include <list>
 #include <memory>
@@ -1261,31 +1262,13 @@ void tr_sessionClose(tr_session* session)
     delete session;
 }
 
-struct LoadTorrentsData
+static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
 {
-    LoadTorrentsData(tr_session* session_in, tr_ctor* ctor_in)
-        : session{ session_in }
-        , ctor{ ctor_in }
-    {
-    }
-
-    tr_session* session;
-    tr_ctor* ctor;
-
-    std::recursive_mutex done_mutex;
-    std::condition_variable_any done_cv;
-    std::atomic<bool> done = false;
-};
-
-static void sessionLoadTorrents(LoadTorrentsData* const data)
-{
-    TR_ASSERT(data->session != nullptr);
-
-    auto const& dirname = data->session->torrentDir();
+    auto const& dirname = session->torrentDir();
     auto const info = tr_sys_path_get_info(dirname);
     auto const odir = info && info->isFolder() ? tr_sys_dir_open(dirname.c_str()) : TR_BAD_SYS_DIR;
 
-    auto torrents = std::list<tr_torrent*>{};
+    auto n_torrents = size_t{};
     if (odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
@@ -1299,41 +1282,43 @@ static void sessionLoadTorrents(LoadTorrentsData* const data)
             auto const path = tr_pathbuf{ dirname, '/', name };
 
             // is a magnet link?
-            if (!tr_ctorSetMetainfoFromFile(data->ctor, path.sv(), nullptr))
+            if (!tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr))
             {
                 if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
                 {
-                    tr_ctorSetMetainfoFromMagnetLink(data->ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr);
+                    tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr);
                 }
             }
 
-            if (tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr); tor != nullptr)
+            if (tr_torrent* const tor = tr_torrentNew(ctor, nullptr); tor != nullptr)
             {
-                torrents.push_back(tor);
+                ++n_torrents;
             }
         }
 
         tr_sys_dir_close(odir);
     }
 
-    if (auto const n = std::size(torrents); n != 0U)
+    if (n_torrents != 0U)
     {
-        tr_logAddInfo(fmt::format(ngettext("Loaded {count} torrent", "Loaded {count} torrents", n), fmt::arg("count", n)));
+        tr_logAddInfo(fmt::format(
+            ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents),
+            fmt::arg("count", n_torrents)));
     }
 
-    auto done_lock = std::unique_lock(data->done_mutex);
-    data->done = true;
-    data->done_cv.notify_one();
+    loaded_promise->set_value(n_torrents);
 }
 
 size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
 {
-    auto data = LoadTorrentsData{ session, ctor };
-    auto done_lock = std::unique_lock(data.done_mutex);
-    session->runInSessionThread(sessionLoadTorrents, &data);
-    data.done_cv.wait_for(done_lock, 100ms, [&data]() { return data.done.load(); });
+    auto loaded_promise = std::promise<size_t>{};
+    auto loaded_future = loaded_promise.get_future();
 
-    return std::size(session->torrents());
+    session->runInSessionThread(sessionLoadTorrents, session, ctor, &loaded_promise);
+    loaded_future.wait();
+    auto const n_torrents = loaded_future.get();
+
+    return n_torrents;
 }
 
 size_t tr_sessionGetAllTorrents(tr_session* session, tr_torrent** buf, size_t buflen)
