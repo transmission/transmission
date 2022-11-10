@@ -5347,7 +5347,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 break;
 
             case TR_RPC_SESSION_CHANGED:
-                [_prefsController rpcUpdatePrefs];
+                [self.prefsController rpcUpdatePrefs];
                 break;
 
             case TR_RPC_SESSION_CLOSE:
