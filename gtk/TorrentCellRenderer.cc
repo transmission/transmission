@@ -667,7 +667,8 @@ void TorrentCellRenderer::Impl::render_progress_bar(
         area.get_height());
 #endif
 
-    double dx = 0, dy = 0;
+    double dx = 0;
+    double dy = 0;
     context->device_to_user(dx, dy);
 
     adjust_progress_bar_hue(surface, temp_context, color, temp_area, dx - area.get_x(), dy - area.get_y());
@@ -694,7 +695,7 @@ void TorrentCellRenderer::Impl::render_compact(
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
     auto const percentDone = get_percent_done(tor, st, &seed);
-    bool const sensitive = active || st->error;
+    bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
     {
@@ -798,7 +799,7 @@ void TorrentCellRenderer::Impl::render_full(
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
     auto const percentDone = get_percent_done(tor, st, &seed);
-    bool const sensitive = active || st->error;
+    bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
     {
@@ -960,7 +961,6 @@ TorrentCellRenderer::Impl::~Impl()
 
 TorrentCellRenderer::TorrentCellRenderer()
     : Glib::ObjectBase(typeid(TorrentCellRenderer))
-    , Gtk::CellRenderer()
     , impl_(std::make_unique<Impl>(*this))
 {
 }

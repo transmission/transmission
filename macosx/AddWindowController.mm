@@ -52,15 +52,6 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 @property(nonatomic) TorrentDeterminationType fGroupValueDetermination;
 
-- (void)updateFiles;
-
-- (void)confirmAdd;
-
-- (void)setDestinationPath:(NSString*)destination determinationType:(TorrentDeterminationType)determinationType;
-
-- (void)setGroupsMenu;
-- (void)changeGroupValue:(id)sender;
-
 @end
 
 @implementation AddWindowController

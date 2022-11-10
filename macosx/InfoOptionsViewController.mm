@@ -67,10 +67,6 @@ static CGFloat const kStackViewSpacing = 8.0;
 @property(nonatomic, readonly) CGFloat horizLayoutWidth;
 @property(nonatomic, readonly) CGFloat vertLayoutHeight;
 
-- (void)setupInfo;
-- (void)setGlobalLabels;
-- (void)updateOptionsNotification:(NSNotification*)notification;
-
 @end
 
 @implementation InfoOptionsViewController

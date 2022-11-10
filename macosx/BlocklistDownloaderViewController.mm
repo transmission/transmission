@@ -16,9 +16,6 @@
 
 @property(nonatomic, readonly) PrefsController* fPrefsController;
 
-- (instancetype)initWithPrefsController:(PrefsController*)prefsController;
-- (void)startDownload;
-
 @end
 
 @implementation BlocklistDownloaderViewController

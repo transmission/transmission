@@ -16,10 +16,6 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 
 @property(nonatomic) NSTimer* fTimer;
 
-- (void)startProbe:(NSTimer*)timer;
-
-- (void)callBackWithStatus:(port_status_t)status;
-
 @end
 
 @implementation PortChecker

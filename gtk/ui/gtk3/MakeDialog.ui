@@ -129,6 +129,7 @@
                 <child>
                   <object class="GtkFileChooserButton" id="source_folder_button">
                     <property name="visible">True</property>
+                    <property name="sensitive" bind-source="source_folder_radio" bind-property="active" bind-flags="sync-create">False</property>
                     <property name="can-focus">False</property>
                     <property name="hexpand">True</property>
                     <property name="action">select-folder</property>
@@ -159,6 +160,7 @@
                 <child>
                   <object class="GtkFileChooserButton" id="source_file_button">
                     <property name="visible">True</property>
+                    <property name="sensitive" bind-source="source_file_radio" bind-property="active" bind-flags="sync-create">False</property>
                     <property name="can-focus">False</property>
                     <property name="hexpand">True</property>
                     <property name="title" translatable="yes"/>
@@ -344,6 +346,7 @@ To add a new primary URL, add it after a blank line.</property>
                 <child>
                   <object class="GtkEntry" id="comment_entry">
                     <property name="visible">True</property>
+                    <property name="sensitive" bind-source="comment_check" bind-property="active" bind-flags="sync-create">False</property>
                     <property name="can-focus">True</property>
                     <property name="hexpand">True</property>
                   </object>
@@ -370,6 +373,7 @@ To add a new primary URL, add it after a blank line.</property>
                 <child>
                   <object class="GtkEntry" id="source_entry">
                     <property name="visible">True</property>
+                    <property name="sensitive" bind-source="source_check" bind-property="active" bind-flags="sync-create">False</property>
                     <property name="can-focus">True</property>
                     <property name="hexpand">True</property>
                   </object>

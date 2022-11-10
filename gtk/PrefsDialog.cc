@@ -193,11 +193,6 @@ void init_chooser_button(PathButton& button, tr_quark const key, Glib::RefPtr<Se
     button.signal_selection_changed().connect([&button, key, core]() { chosen_cb(&button, key, core); });
 }
 
-void target_cb(Gtk::CheckButton* tb, Gtk::Widget* target)
-{
-    target->set_sensitive(tb->get_active());
-}
-
 } // namespace
 
 /****
@@ -216,7 +211,7 @@ public:
     TR_DISABLE_COPY_MOVE(DownloadingPage)
 
 private:
-    void on_core_prefs_changed(tr_quark const key);
+    void on_core_prefs_changed(tr_quark key);
 
 private:
     Glib::RefPtr<Session> const core_;
@@ -258,8 +253,6 @@ DownloadingPage::DownloadingPage(
         init_check_button(*l, TR_KEY_watch_dir_enabled, core_);
         auto* w = gtr_get_widget_derived<PathButton>(builder, "watch_dir_chooser");
         init_chooser_button(*w, TR_KEY_watch_dir, core_);
-        w->set_sensitive(gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
-        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
     }
 
     init_check_button(
@@ -302,8 +295,6 @@ DownloadingPage::DownloadingPage(
         init_check_button(*l, TR_KEY_incomplete_dir_enabled, core_);
         auto* w = gtr_get_widget_derived<PathButton>(builder, "incomplete_dir_chooser");
         init_chooser_button(*w, TR_KEY_incomplete_dir, core_);
-        w->set_sensitive(gtr_pref_flag_get(TR_KEY_incomplete_dir_enabled));
-        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
     }
 
     {
@@ -311,8 +302,6 @@ DownloadingPage::DownloadingPage(
         init_check_button(*l, TR_KEY_script_torrent_done_enabled, core_);
         auto* w = gtr_get_widget_derived<PathButton>(builder, "download_done_script_chooser");
         init_chooser_button(*w, TR_KEY_script_torrent_done_filename, core_);
-        w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
-        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
     }
 
     on_core_prefs_changed(TR_KEY_download_dir);
@@ -350,8 +339,6 @@ SeedingPage::SeedingPage(
         init_check_button(*w, TR_KEY_ratio_limit_enabled, core_);
         auto* w2 = gtr_get_widget<Gtk::SpinButton>(builder, "stop_seeding_ratio_spin");
         init_spin_button_double(*w2, TR_KEY_ratio_limit, core_, 0, 1000, .05);
-        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_ratio_limit_enabled));
-        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
     }
 
     {
@@ -359,17 +346,13 @@ SeedingPage::SeedingPage(
         init_check_button(*w, TR_KEY_idle_seeding_limit_enabled, core_);
         auto* w2 = gtr_get_widget<Gtk::SpinButton>(builder, "stop_seeding_timeout_spin");
         init_spin_button(*w2, TR_KEY_idle_seeding_limit, core_, 1, 40320, 5);
-        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_idle_seeding_limit_enabled));
-        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
     }
 
     {
         auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "seeding_done_script_check");
         init_check_button(*l, TR_KEY_script_torrent_done_seeding_enabled, core_);
-        auto* w = gtr_get_widget_derived<PathButton>(builder, "seeding_done_script_choose");
+        auto* w = gtr_get_widget_derived<PathButton>(builder, "seeding_done_script_chooser");
         init_chooser_button(*w, TR_KEY_script_torrent_done_seeding_filename, core_);
-        w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_seeding_enabled));
-        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
     }
 }
 
@@ -454,7 +437,8 @@ private:
     void onBlocklistUpdated(int n);
     void onBlocklistUpdate();
     void on_blocklist_url_changed(Gtk::Editable* e);
-    void init_encryption_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark const key);
+
+    static void init_encryption_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark key);
 
 private:
     Glib::RefPtr<Session> core_;
@@ -565,22 +549,16 @@ PrivacyPage::PrivacyPage(
     init_check_button(*check_, TR_KEY_blocklist_enabled, core_);
     auto* const e = gtr_get_widget<Gtk::Entry>(builder, "blocklist_url_entry");
     init_entry(*e, TR_KEY_blocklist_url, core_);
-    check_->signal_toggled().connect([this, e]() { target_cb(check_, e); });
-    target_cb(check_, e);
 
     updateBlocklistText();
     updateBlocklistButton_->set_data("session", core_->get_session());
     updateBlocklistButton_->signal_clicked().connect([this]() { onBlocklistUpdate(); });
-    target_cb(check_, updateBlocklistButton_);
-    check_->signal_toggled().connect([this]() { target_cb(check_, label_); });
-    target_cb(check_, label_);
+    updateBlocklistButton_->set_sensitive(check_->get_active());
     e->signal_changed().connect([this, e]() { on_blocklist_url_changed(e); });
     on_blocklist_url_changed(e);
 
     auto* update_check = gtr_get_widget<Gtk::CheckButton>(builder, "blocklist_autoupdate_check");
     init_check_button(*update_check, TR_KEY_blocklist_updates_enabled, core_);
-    check_->signal_toggled().connect([this, update_check]() { target_cb(check_, update_check); });
-    target_cb(check_, update_check);
 }
 
 } // namespace
@@ -652,7 +630,6 @@ private:
     Gtk::CheckButton* whitelist_tb_;
 
     Glib::RefPtr<Gtk::ListStore> store_;
-    std::vector<Gtk::Widget*> widgets_;
     std::vector<Gtk::Widget*> auth_widgets_;
     std::vector<Gtk::Widget*> whitelist_widgets_;
 };
@@ -713,11 +690,6 @@ void RemotePage::refreshRPCSensitivity()
     auto const have_addr = sel->get_selected();
     auto const n_rules = store_->children().size();
 
-    for (auto* const widget : widgets_)
-    {
-        widget->set_sensitive(rpc_active);
-    }
-
     for (auto* const widget : auth_widgets_)
     {
         widget->set_sensitive(rpc_active && auth_active);
@@ -751,18 +723,14 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
     init_check_button(*rpc_tb_, TR_KEY_rpc_enabled, core_);
     rpc_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
     auto* const open_button = gtr_get_widget<Gtk::Button>(builder, "open_web_client_button");
-    widgets_.push_back(open_button);
     open_button->signal_clicked().connect(&onLaunchClutchCB);
 
     /* port */
     auto* port_spin = gtr_get_widget<Gtk::SpinButton>(builder, "rpc_port_spin");
     init_spin_button(*port_spin, TR_KEY_rpc_port, core_, 0, USHRT_MAX, 1);
-    widgets_.push_back(port_spin);
-    widgets_.push_back(gtr_get_widget<Gtk::Label>(builder, "rpc_port_label"));
 
     /* require authentication */
     init_check_button(*auth_tb_, TR_KEY_rpc_authentication_required, core_);
-    widgets_.push_back(auth_tb_);
     auth_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
     /* username */
@@ -779,7 +747,6 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
 
     /* require authentication */
     init_check_button(*whitelist_tb_, TR_KEY_rpc_whitelist_enabled, core_);
-    widgets_.push_back(whitelist_tb_);
     whitelist_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
     /* access control list */
@@ -832,28 +799,14 @@ public:
     TR_DISABLE_COPY_MOVE(SpeedPage)
 
 private:
-    void refreshSchedSensitivity();
-
-    void init_time_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark const key);
-    void init_week_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark const key);
+    static void init_time_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark key);
+    static void init_week_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark key);
 
     static auto get_weekday_string(Glib::Date::Weekday weekday);
 
 private:
     Glib::RefPtr<Session> core_;
-
-    std::vector<Gtk::Widget*> sched_widgets_;
 };
-
-void SpeedPage::refreshSchedSensitivity()
-{
-    bool const sched_enabled = gtr_pref_flag_get(TR_KEY_alt_speed_time_enabled);
-
-    for (auto* const w : sched_widgets_)
-    {
-        w->set_sensitive(sched_enabled);
-    }
-}
 
 void SpeedPage::init_time_combo(Gtk::ComboBox& combo, Glib::RefPtr<Session> const& core, tr_quark const key)
 {
@@ -937,9 +890,6 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
 
         auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "upload_limit_spin");
         init_spin_button(*w2, TR_KEY_speed_limit_up, core_, 0, INT_MAX, 5);
-        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled));
-
-        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
     }
 
     {
@@ -949,9 +899,6 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
 
         auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "download_limit_spin");
         init_spin_button(*w2, TR_KEY_speed_limit_down, core_, 0, INT_MAX, 5);
-        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled));
-
-        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
     }
 
     {
@@ -973,25 +920,16 @@ SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const
     {
         auto* start_combo = gtr_get_widget<Gtk::ComboBox>(builder, "alt_speed_start_time_combo");
         init_time_combo(*start_combo, core_, TR_KEY_alt_speed_time_begin);
-        sched_widgets_.push_back(start_combo);
-
-        sched_widgets_.push_back(gtr_get_widget<Gtk::Label>(builder, "alt_speed_to_label"));
 
         auto* end_combo = gtr_get_widget<Gtk::ComboBox>(builder, "alt_speed_end_time_combo");
         init_time_combo(*end_combo, core_, TR_KEY_alt_speed_time_end);
-        sched_widgets_.push_back(end_combo);
 
         auto* w = gtr_get_widget<Gtk::CheckButton>(builder, "alt_schedule_time_check");
         init_check_button(*w, TR_KEY_alt_speed_time_enabled, core_);
-        w->signal_toggled().connect([this]() { refreshSchedSensitivity(); });
     }
 
     auto* week_combo = gtr_get_widget<Gtk::ComboBox>(builder, "alt_speed_days_combo");
     init_week_combo(*week_combo, core_, TR_KEY_alt_speed_time_day);
-    sched_widgets_.push_back(week_combo);
-    sched_widgets_.push_back(gtr_get_widget<Gtk::Label>(builder, "alt_speed_days_label"));
-
-    refreshSchedSensitivity();
 }
 
 } // namespace
@@ -1012,7 +950,7 @@ public:
     TR_DISABLE_COPY_MOVE(NetworkPage)
 
 private:
-    void onCorePrefsChanged(tr_quark const key);
+    void onCorePrefsChanged(tr_quark key);
     void onPortTested(bool isOpen);
     void onPortTest();
 

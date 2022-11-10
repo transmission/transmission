@@ -6,6 +6,7 @@
 #pragma once
 
 #include <chrono>
+#include <condition_variable>
 #include <cstdlib> // getenv()
 #include <cstring> // strlen()
 #include <iostream>
@@ -404,19 +405,23 @@ protected:
         Complete
     };
 
-    [[nodiscard]] tr_torrent* createTorrentAndWaitForVerifyDone(tr_ctor* ctor) const
+    [[nodiscard]] tr_torrent* createTorrentAndWaitForVerifyDone(tr_ctor* ctor)
     {
+        auto verified_lock = std::unique_lock(verified_mutex_);
         auto const n_previously_verified = std::size(verified_);
         auto* const tor = tr_torrentNew(ctor, nullptr);
+
+        auto const stop_waiting = [this, tor, n_previously_verified]()
+        {
+            return std::size(verified_) > n_previously_verified && verified_.back() == tor;
+        };
+
         EXPECT_NE(nullptr, tor);
-        waitFor(
-            [this, tor, n_previously_verified]()
-            { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
-            20s);
+        verified_cv_.wait_for(verified_lock, 20s, stop_waiting);
         return tor;
     }
 
-    [[nodiscard]] tr_torrent* zeroTorrentInit(ZeroTorrentState state) const
+    [[nodiscard]] tr_torrent* zeroTorrentInit(ZeroTorrentState state)
     {
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
@@ -486,16 +491,20 @@ protected:
         return tor;
     }
 
-    void blockingTorrentVerify(tr_torrent* tor) const
+    void blockingTorrentVerify(tr_torrent* tor)
     {
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tor->session->amInSessionThread());
+
+        auto verified_lock = std::unique_lock(verified_mutex_);
+
         auto const n_previously_verified = std::size(verified_);
+        auto const stop_waiting = [this, tor, n_previously_verified]()
+        {
+            return std::size(verified_) > n_previously_verified && verified_.back() == tor;
+        };
         tr_torrentVerify(tor);
-        waitFor(
-            [this, tor, n_previously_verified]()
-            { return std::size(verified_) > n_previously_verified && verified_.back() == tor; },
-            20s);
+        verified_cv_.wait_for(verified_lock, 20s, stop_waiting);
     }
 
     tr_session* session_ = nullptr;
@@ -521,8 +530,15 @@ protected:
     {
         SandboxedTest::SetUp();
 
+        auto callback = [this](tr_torrent* tor, bool /*aborted*/)
+        {
+            auto verified_lock = std::scoped_lock(verified_mutex_);
+            verified_.emplace_back(tor);
+            verified_cv_.notify_one();
+        };
+
         session_ = sessionInit(settings());
-        session_->verifier_->addCallback([this](tr_torrent* tor, bool /*aborted*/) { verified_.emplace_back(tor); });
+        session_->verifier_->addCallback(callback);
     }
 
     virtual void TearDown() override
@@ -535,6 +551,8 @@ protected:
     }
 
 private:
+    std::mutex verified_mutex_;
+    std::condition_variable verified_cv_;
     std::vector<tr_torrent*> verified_;
 };
 

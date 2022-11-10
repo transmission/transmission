@@ -57,7 +57,7 @@ public:
      * Load saved state and return number of torrents added.
      * May trigger one or more "error" signals with ERR_ADD_TORRENT
      */
-    void load(bool forcepaused);
+    void load(bool force_paused);
 
     /**
      * Add a list of torrents.
@@ -118,9 +118,9 @@ public:
 
     void blocklist_update();
 
-    void exec(tr_variant const* benc);
+    void exec(tr_variant const* request);
 
-    void open_folder(tr_torrent_id_t torrent_id);
+    void open_folder(tr_torrent_id_t torrent_id) const;
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)>& signal_add_error();
     sigc::signal<void(tr_ctor*)>& signal_add_prompt();
