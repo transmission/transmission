@@ -317,7 +317,7 @@ public:
 
     [[nodiscard]] auto unique_lock() const
     {
-        return std::unique_lock(session_mutex);
+        return std::unique_lock(session_mutex_);
     }
 
     // paths
@@ -1001,10 +1001,6 @@ private:
     // depends-on: session_thread_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    /// static fields
-
-    static inline std::recursive_mutex session_mutex;
-
     /// trivial type fields
 
     tr_session_settings settings_;
@@ -1046,10 +1042,13 @@ private:
     uint16_t peer_count_ = 0;
 
     bool is_closing_ = false;
-    std::atomic<bool> is_closed_ = false;
 
     /// fields that aren't trivial,
-    /// but are self-contained / have no interdependencies
+    /// but are self-contained / don't hold references to others
+
+    std::atomic<bool> is_closed_ = false;
+
+    mutable std::recursive_mutex session_mutex_;
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
 
