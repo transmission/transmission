@@ -1261,14 +1261,23 @@ void tr_sessionClose(tr_session* session)
     delete session;
 }
 
-struct sessionLoadTorrentsData
+struct LoadTorrentsData
 {
+    LoadTorrentsData(tr_session* session_in, tr_ctor* ctor_in)
+        : session{ session_in }
+        , ctor{ ctor_in }
+    {
+    }
+
     tr_session* session;
     tr_ctor* ctor;
-    bool done;
+
+    std::recursive_mutex done_mutex;
+    std::condition_variable_any done_cv;
+    std::atomic<bool> done = false;
 };
 
-static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
+static void sessionLoadTorrents(LoadTorrentsData* const data)
 {
     TR_ASSERT(data->session != nullptr);
 
@@ -1312,20 +1321,17 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
         tr_logAddInfo(fmt::format(ngettext("Loaded {count} torrent", "Loaded {count} torrents", n), fmt::arg("count", n)));
     }
 
+    auto done_lock = std::unique_lock(data->done_mutex);
     data->done = true;
+    data->done_cv.notify_one();
 }
 
 size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
 {
-    auto data = sessionLoadTorrentsData{};
-    data.session = session;
-    data.ctor = ctor;
-    data.done = false;
+    auto data = LoadTorrentsData{ session, ctor };
+    auto done_lock = std::unique_lock(data.done_mutex);
     session->runInSessionThread(sessionLoadTorrents, &data);
-    while (!data.done)
-    {
-        tr_wait_msec(100);
-    }
+    data.done_cv.wait_for(done_lock, 100ms, [&data]() { return data.done.load(); });
 
     return std::size(session->torrents());
 }
