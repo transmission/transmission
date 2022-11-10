@@ -65,8 +65,8 @@ private:
     void init_view(Gtk::TreeView* view, Glib::RefPtr<Gtk::TreeModel> const& model);
 
     Glib::RefPtr<Gio::MenuModel> createOptionsMenu();
-    Glib::RefPtr<Gio::MenuModel> createSpeedMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions, tr_direction dir);
-    Glib::RefPtr<Gio::MenuModel> createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions);
+    Glib::RefPtr<Gio::MenuModel> createSpeedMenu(Glib::RefPtr<Gio::SimpleActionGroup> const& actions, tr_direction dir);
+    Glib::RefPtr<Gio::MenuModel> createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> const& actions);
 
     Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
@@ -292,7 +292,9 @@ void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
     core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, true);
 }
 
-Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions, tr_direction dir)
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(
+    Glib::RefPtr<Gio::SimpleActionGroup> const& actions,
+    tr_direction dir)
 {
     auto& info = speed_menu_info_[dir];
 
@@ -353,7 +355,7 @@ void MainWindow::Impl::onRatioSet(double ratio)
     core_->set_pref(TR_KEY_ratio_limit_enabled, true);
 }
 
-Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> actions)
+Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createRatioMenu(Glib::RefPtr<Gio::SimpleActionGroup> const& actions)
 {
     static auto const stockRatios = std::array<double, 7>({ 0.25, 0.5, 0.75, 1, 1.5, 2, 3 });
 

@@ -2165,12 +2165,15 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         DetailsDialog& parent,
-        Glib::RefPtr<Session> core,
+        Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
 
     TR_DISABLE_COPY_MOVE(EditTrackersDialog)
 
-    static std::unique_ptr<EditTrackersDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+    static std::unique_ptr<EditTrackersDialog> create(
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent const* tor);
 
 private:
     void on_response(int response) override;
@@ -2186,7 +2189,7 @@ EditTrackersDialog::EditTrackersDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
     : Gtk::Dialog(cast_item)
     , parent_(parent)
@@ -2202,7 +2205,7 @@ EditTrackersDialog::EditTrackersDialog(
 
 std::unique_ptr<EditTrackersDialog> EditTrackersDialog::create(
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("EditTrackersDialog.ui"));
@@ -2280,12 +2283,15 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         DetailsDialog& parent,
-        Glib::RefPtr<Session> core,
+        Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
 
     TR_DISABLE_COPY_MOVE(AddTrackerDialog)
 
-    static std::unique_ptr<AddTrackerDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+    static std::unique_ptr<AddTrackerDialog> create(
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent const* tor);
 
 private:
     void on_response(int response) override;
@@ -2301,7 +2307,7 @@ AddTrackerDialog::AddTrackerDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
     : Gtk::Dialog(cast_item)
     , parent_(parent)
@@ -2317,7 +2323,7 @@ AddTrackerDialog::AddTrackerDialog(
 
 std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("AddTrackerDialog.ui"));
