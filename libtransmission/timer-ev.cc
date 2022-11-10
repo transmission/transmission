@@ -102,7 +102,7 @@ public:
     }
 
 private:
-    [[nodiscard]] constexpr short events(bool is_repeating) noexcept
+    [[nodiscard]] static constexpr short events(bool is_repeating) noexcept
     {
         return static_cast<short>(EV_TIMEOUT | (is_repeating ? EV_PERSIST : 0));
     }
