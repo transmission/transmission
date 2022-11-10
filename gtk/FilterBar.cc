@@ -38,7 +38,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
+    [[nodiscard]] Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
 
 private:
     template<typename T>

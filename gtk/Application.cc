@@ -157,9 +157,9 @@ private:
     void on_add_torrent(tr_ctor* ctor);
     void on_prefs_changed(tr_quark key);
 
-    std::vector<tr_torrent_id_t> get_selected_torrent_ids() const;
-    tr_torrent* get_first_selected_torrent() const;
-    counts_data get_selected_torrent_counts() const;
+    [[nodiscard]] std::vector<tr_torrent_id_t> get_selected_torrent_ids() const;
+    [[nodiscard]] tr_torrent* get_first_selected_torrent() const;
+    [[nodiscard]] counts_data get_selected_torrent_counts() const;
 
     void start_all_torrents();
     void pause_all_torrents();

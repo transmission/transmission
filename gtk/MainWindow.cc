@@ -55,7 +55,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
+    [[nodiscard]] Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
 
     void refresh();
 

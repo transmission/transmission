@@ -64,8 +64,8 @@ private:
     void level_combo_changed_cb(Gtk::ComboBox* combo_box);
     void level_combo_init(Gtk::ComboBox* level_combo) const;
 
-    bool is_pinned_to_new() const;
-    bool isRowVisible(Gtk::TreeModel::const_iterator const& iter) const;
+    [[nodiscard]] bool is_pinned_to_new() const;
+    [[nodiscard]] bool isRowVisible(Gtk::TreeModel::const_iterator const& iter) const;
 
 private:
     MessageLogWindow& window_;
