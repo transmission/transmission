@@ -12,6 +12,7 @@
 #define TR_NAME "Transmission"
 
 #include <array>
+#include <atomic>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <memory>
@@ -679,7 +680,7 @@ public:
         return is_closing_;
     }
 
-    [[nodiscard]] constexpr auto isClosed() const noexcept
+    [[nodiscard]] bool isClosed() const noexcept
     {
         return is_closed_;
     }
@@ -897,8 +898,9 @@ private:
     void setSettings(tr_variant* settings_dict, bool force);
     void setSettings(tr_session_settings settings, bool force);
 
-    void closeImplPart1();
-    void closeImplPart2();
+    struct is_closed_data;
+    void closeImplPart1(is_closed_data*);
+    void closeImplPart2(is_closed_data*);
 
     void onNowTimer();
 
@@ -1001,7 +1003,7 @@ private:
 
     /// static fields
 
-    static std::recursive_mutex session_mutex;
+    static inline std::recursive_mutex session_mutex;
 
     /// trivial type fields
 
@@ -1044,7 +1046,7 @@ private:
     uint16_t peer_count_ = 0;
 
     bool is_closing_ = false;
-    bool is_closed_ = false;
+    std::atomic<bool> is_closed_ = false;
 
     /// fields that aren't trivial,
     /// but are self-contained / have no interdependencies

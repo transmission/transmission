@@ -63,8 +63,6 @@
 
 using namespace std::literals;
 
-std::recursive_mutex tr_session::session_mutex;
-
 static auto constexpr SaveIntervalSecs = 360s;
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
@@ -1162,7 +1160,13 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-void tr_session::closeImplPart1()
+struct tr_session::is_closed_data
+{
+    std::mutex is_closed_mutex;
+    std::condition_variable is_closed_cv;
+};
+
+void tr_session::closeImplPart1(is_closed_data* closed_data)
 {
     is_closing_ = true;
 
@@ -1211,11 +1215,11 @@ void tr_session::closeImplPart1()
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
-    save_timer_ = timerMaker().create([this]() { closeImplPart2(); });
+    save_timer_ = timerMaker().create([this, closed_data]() { closeImplPart2(closed_data); });
     save_timer_->startRepeating(50ms);
 }
 
-void tr_session::closeImplPart2()
+void tr_session::closeImplPart2(is_closed_data* closed_data)
 {
     // try to keep the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces
@@ -1234,45 +1238,25 @@ void tr_session::closeImplPart2()
     peer_mgr_.reset();
     tr_utpClose(this);
     openFiles().closeAll();
+
+    // tada we are done!
+    closed_data->is_closed_mutex.lock();
     is_closed_ = true;
+    closed_data->is_closed_mutex.unlock();
+    closed_data->is_closed_cv.notify_one();
 }
 
 void tr_sessionClose(tr_session* session)
 {
     TR_ASSERT(session != nullptr);
-
-    static auto constexpr DeadlineSecs = 10s;
-    auto const deadline = std::chrono::steady_clock::now() + DeadlineSecs;
-    auto const deadline_reached = [deadline]()
-    {
-        return std::chrono::steady_clock::now() >= deadline;
-    };
+    TR_ASSERT(!session->amInSessionThread());
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
 
-    /* close the session */
-    session->runInSessionThread([session]() { session->closeImplPart1(); });
-
-    while (!session->isClosed() && !deadline_reached())
-    {
-        tr_logAddTrace("waiting for the libtransmission thread to finish");
-        tr_wait_msec(10);
-    }
-
-    // There's usually a bit of housekeeping to do during shutdown,
-    // e.g. sending out `event=stopped` announcements to trackers,
-    // so wait a bit for the session thread to close.
-    while (!deadline_reached() && (!session->web_->isClosed() || session->announcer != nullptr || session->announcer_udp_))
-    {
-        tr_logAddTrace(fmt::format(
-            "waiting on port unmap ({}) or announcer ({})... now {}",
-            fmt::ptr(session->port_forwarding_.get()),
-            fmt::ptr(session->announcer),
-            time(nullptr)));
-        tr_wait_msec(50);
-    }
-
-    session->web_.reset();
+    auto closed_data = tr_session::is_closed_data{};
+    auto lock = std::unique_lock{ closed_data.is_closed_mutex };
+    session->runInSessionThread([session, &closed_data]() { session->closeImplPart1(&closed_data); });
+    closed_data.is_closed_cv.wait_for(lock, 12s, [session]() { return session->is_closed_.load(); });
 
     delete session;
 }
