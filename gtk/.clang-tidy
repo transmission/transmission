@@ -1,8 +1,13 @@
 ---
 Checks: >
   -*,
+  modernize-*,
+  -modernize-use-trailing-return-type,
   readability-*,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
   -readability-magic-numbers,
   -readability-redundant-access-specifiers
+
+CheckOptions:
+  modernize-pass-by-value.ValuesOnly: true

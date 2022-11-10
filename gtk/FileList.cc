@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <climits> // INT_MAX
 #include <cstddef>
 #include <list>
 #include <memory>
@@ -99,9 +98,9 @@ private:
 
     bool getAndSelectEventPath(double view_x, double view_y, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path);
 
-    std::vector<tr_file_index_t> getActiveFilesForPath(Gtk::TreeModel::Path const& path) const;
-    std::vector<tr_file_index_t> getSelectedFilesAndDescendants() const;
-    std::vector<tr_file_index_t> getSubtree(Gtk::TreeModel::Path const& path) const;
+    [[nodiscard]] std::vector<tr_file_index_t> getActiveFilesForPath(Gtk::TreeModel::Path const& path) const;
+    [[nodiscard]] std::vector<tr_file_index_t> getSelectedFilesAndDescendants() const;
+    [[nodiscard]] std::vector<tr_file_index_t> getSubtree(Gtk::TreeModel::Path const& path) const;
 
     bool onViewButtonPressed(guint button, TrGdkModifierType state, double view_x, double view_y);
     bool onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel::Path const& path);
