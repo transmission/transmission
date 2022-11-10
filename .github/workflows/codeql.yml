@@ -2,7 +2,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "wip/codeql" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
@@ -28,13 +28,49 @@ jobs:
     steps:
     - name: Checkout repository and submodules
       uses: actions/checkout@v2
-      with: 
+      with:
         submodules: recursive
-      
+
     - name: Update and Install Dependencies
+      if: ${{ matrix.language == 'cpp' }}
       run: |
         sudo apt-get update
-        sudo apt-get install libssl-dev build-essential automake autoconf libtool pkg-config intltool libcurl4-openssl-dev libglib2.0-dev libevent-dev libminiupnpc-dev libgtk-3-dev libappindicator3-dev
+        sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libglibmm-2.4-dev \
+            libgtkmm-3.0-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            pkg-config \
+            qtbase5-dev \
+            qttools5-dev
+
+    - name: Configure Project
+      if: ${{ matrix.language == 'cpp' }}
+      run: |
+        cmake -S . -B _build -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_NLS=OFF \
+            -DRUN_CLANG_TIDY=OFF
+
+    - name: Build Dependencies
+      if: ${{ matrix.language == 'cpp' }}
+      run: |
+        ninja -C _build -t targets |
+            grep -E 'third-party/.*-build:' |
+            cut -d: -f1 |
+            xargs -L1 ninja -C _build
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
@@ -43,15 +79,14 @@ jobs:
         # If you wish to specify custom queries, you can do so here or in a config file.
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
-        
+
         # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
-        
+
     - name: Build Project
+      if: ${{ matrix.language == 'cpp' }}
       run: |
-        mkdir build && cd build
-        cmake -DENABLE_TESTS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-        make
-        
+        ninja -C _build
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
