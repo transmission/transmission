@@ -12,9 +12,9 @@
 #define TR_NAME "Transmission"
 
 #include <array>
-#include <atomic>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
+#include <future>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -680,11 +680,6 @@ public:
         return is_closing_;
     }
 
-    [[nodiscard]] bool isClosed() const noexcept
-    {
-        return is_closed_;
-    }
-
     [[nodiscard]] constexpr auto encryptionMode() const noexcept
     {
         return settings_.encryption_mode;
@@ -898,9 +893,8 @@ private:
     void setSettings(tr_variant* settings_dict, bool force);
     void setSettings(tr_session_settings settings, bool force);
 
-    struct is_closed_data;
-    void closeImplPart1(is_closed_data*);
-    void closeImplPart2(is_closed_data*);
+    void closeImplPart1(std::promise<void>* closed_promise);
+    void closeImplPart2(std::promise<void>* closed_promise);
 
     void onNowTimer();
 
@@ -1045,8 +1039,6 @@ private:
 
     /// fields that aren't trivial,
     /// but are self-contained / don't hold references to others
-
-    std::atomic<bool> is_closed_ = false;
 
     mutable std::recursive_mutex session_mutex_;
 

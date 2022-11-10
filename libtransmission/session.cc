@@ -1152,13 +1152,7 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-struct tr_session::is_closed_data
-{
-    std::mutex is_closed_mutex;
-    std::condition_variable is_closed_cv;
-};
-
-void tr_session::closeImplPart1(is_closed_data* closed_data)
+void tr_session::closeImplPart1(std::promise<void>* closed_promise)
 {
     is_closing_ = true;
 
@@ -1207,11 +1201,11 @@ void tr_session::closeImplPart1(is_closed_data* closed_data)
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
-    save_timer_ = timerMaker().create([this, closed_data]() { closeImplPart2(closed_data); });
+    save_timer_ = timerMaker().create([this, closed_promise]() { closeImplPart2(closed_promise); });
     save_timer_->startRepeating(50ms);
 }
 
-void tr_session::closeImplPart2(is_closed_data* closed_data)
+void tr_session::closeImplPart2(std::promise<void>* closed_promise)
 {
     // try to keep the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces
@@ -1232,10 +1226,7 @@ void tr_session::closeImplPart2(is_closed_data* closed_data)
     openFiles().closeAll();
 
     // tada we are done!
-    closed_data->is_closed_mutex.lock();
-    is_closed_ = true;
-    closed_data->is_closed_mutex.unlock();
-    closed_data->is_closed_cv.notify_one();
+    closed_promise->set_value();
 }
 
 void tr_sessionClose(tr_session* session)
@@ -1245,10 +1236,10 @@ void tr_sessionClose(tr_session* session)
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
 
-    auto closed_data = tr_session::is_closed_data{};
-    auto lock = std::unique_lock{ closed_data.is_closed_mutex };
-    session->runInSessionThread([session, &closed_data]() { session->closeImplPart1(&closed_data); });
-    closed_data.is_closed_cv.wait_for(lock, 12s, [session]() { return session->is_closed_.load(); });
+    auto closed_promise = std::promise<void>{};
+    auto closed_future = closed_promise.get_future();
+    session->runInSessionThread([session, &closed_promise]() { session->closeImplPart1(&closed_promise); });
+    closed_future.wait_for(12s);
 
     delete session;
 }
