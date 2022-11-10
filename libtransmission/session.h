@@ -680,7 +680,7 @@ public:
         return is_closing_;
     }
 
-    [[nodiscard]] constexpr bool isClosed() const noexcept
+    [[nodiscard]] bool isClosed() const noexcept
     {
         return is_closed_;
     }
