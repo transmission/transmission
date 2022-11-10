@@ -82,6 +82,7 @@ set(${PROJECT_NAME}_SOURCES
     MessageWindowController.mm
     NSApplicationAdditions.mm
     NSImageAdditions.mm
+    NSKeyedUnarchiverAdditions.mm
     NSMutableArrayAdditions.mm
     NSStringAdditions.mm
     PeerProgressIndicatorCell.mm
@@ -153,6 +154,7 @@ set(${PROJECT_NAME}_HEADERS
     MessageWindowController.h
     NSApplicationAdditions.h
     NSImageAdditions.h
+    NSKeyedUnarchiverAdditions.h
     NSMutableArrayAdditions.h
     NSStringAdditions.h
     PeerProgressIndicatorCell.h

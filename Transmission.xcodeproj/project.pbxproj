@@ -396,6 +396,7 @@
 		C3D9062727B7E3E800EF2386 /* psl.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061827B7E1DE00EF2386 /* psl.c */; };
 		C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3D9061B27B7E31100EF2386 /* libpsl.h */; };
 		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
+		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
 		C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AE2803EE7C005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
@@ -1176,6 +1177,8 @@
 		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
 		C3D9062127B7E3C900EF2386 /* libpsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C81E411127F5BABD00652F56 /* CocoaCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaCompatibility.h; sourceTree = "<group>"; };
+		C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSKeyedUnarchiverAdditions.h; sourceTree = "<group>"; };
+		C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSKeyedUnarchiverAdditions.mm; sourceTree = "<group>"; };
 		C86BCD9828228A9600F45599 /* SparkleProxy.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SparkleProxy.mm; sourceTree = "<group>"; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C88771AB2803EE53005C7523 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
@@ -1802,14 +1805,16 @@
 		A234D0D40C79FB6000A82373 /* Additions */ = {
 			isa = PBXGroup;
 			children = (
-				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
-				4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */,
 				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
 				A29D84031049C25600D1987A /* NSApplicationAdditions.mm */,
-				A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */,
-				A22BAE271388040500FB022F /* NSMutableArrayAdditions.mm */,
 				A234EA521453563B000F3E97 /* NSImageAdditions.h */,
 				A234EA531453563B000F3E97 /* NSImageAdditions.mm */,
+				C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */,
+				C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */,
+				A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */,
+				A22BAE271388040500FB022F /* NSMutableArrayAdditions.mm */,
+				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
+				4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */,
 			);
 			name = Additions;
 			sourceTree = "<group>";
@@ -3011,6 +3016,7 @@
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
 				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.mm in Sources */,
+				C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */,
 				A22180980D148A71007D09ED /* GroupsPrefsController.mm in Sources */,
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */,
