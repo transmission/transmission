@@ -41,7 +41,7 @@ bool waitFor(struct event_base* event_base, std::chrono::milliseconds msec)
 namespace
 {
 auto constexpr IdLength = size_t{ 20U };
-auto constexpr MockTimerInterval = 10ms;
+auto constexpr MockTimerInterval = 20ms;
 
 } // namespace
 
@@ -637,8 +637,7 @@ TEST_F(DhtTest, callsPeriodicPeriodically)
     auto const baseline = mock_dht.n_periodic_calls_;
     static auto constexpr Periods = 10;
     waitFor(event_base_, std::chrono::duration_cast<std::chrono::milliseconds>(MockTimerInterval * Periods));
-    EXPECT_GE(mock_dht.n_periodic_calls_, baseline + Periods - 2);
-    EXPECT_LE(mock_dht.n_periodic_calls_, baseline + Periods + 2);
+    EXPECT_NEAR(mock_dht.n_periodic_calls_, baseline + Periods, 3);
 }
 
 } // namespace libtransmission::test
