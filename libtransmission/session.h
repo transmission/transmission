@@ -14,6 +14,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
+#include <future>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -355,7 +356,7 @@ public:
 
     [[nodiscard]] auto unique_lock() const
     {
-        return std::unique_lock(session_mutex);
+        return std::unique_lock(session_mutex_);
     }
 
     // paths
@@ -718,11 +719,6 @@ public:
         return is_closing_;
     }
 
-    [[nodiscard]] constexpr auto isClosed() const noexcept
-    {
-        return is_closed_;
-    }
-
     [[nodiscard]] constexpr auto encryptionMode() const noexcept
     {
         return settings_.encryption_mode;
@@ -936,8 +932,8 @@ private:
     void setSettings(tr_variant* settings_dict, bool force);
     void setSettings(tr_session_settings settings, bool force);
 
-    void closeImplPart1();
-    void closeImplPart2();
+    void closeImplPart1(std::promise<void>* closed_promise);
+    void closeImplPart2(std::promise<void>* closed_promise);
 
     void onNowTimer();
 
@@ -1038,10 +1034,6 @@ private:
     // depends-on: session_thread_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
 
-    /// static fields
-
-    static std::recursive_mutex session_mutex;
-
     /// trivial type fields
 
     tr_session_settings settings_;
@@ -1083,10 +1075,11 @@ private:
     uint16_t peer_count_ = 0;
 
     bool is_closing_ = false;
-    bool is_closed_ = false;
 
     /// fields that aren't trivial,
-    /// but are self-contained / have no interdependencies
+    /// but are self-contained / don't hold references to others
+
+    mutable std::recursive_mutex session_mutex_;
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
 
