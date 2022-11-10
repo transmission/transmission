@@ -6,6 +6,7 @@
 #pragma once
 
 #include <chrono>
+#include <condition_variable>
 #include <cstdlib> // getenv()
 #include <cstring> // strlen()
 #include <iostream>
