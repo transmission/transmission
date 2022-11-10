@@ -661,25 +661,16 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
 
 void tr_sessionSet(tr_session* session, tr_variant* settings)
 {
-    // run it in the libtransmission thread
-
-    if (session->amInSessionThread())
-    {
-        session->setSettings(settings, false);
-    }
-    else
-    {
-        auto lock = session->unique_lock();
-
-        auto done_cv = std::condition_variable_any{};
-        session->runInSessionThread(
-            [&session, &settings, &done_cv]()
-            {
-                session->setSettings(settings, false);
-                done_cv.notify_one();
-            });
-        done_cv.wait(lock);
-    }
+    // do the work in the session thread
+    auto done_promise = std::promise<void>{};
+    auto done_future = done_promise.get_future();
+    session->runInSessionThread(
+        [&session, &settings, &done_promise]()
+        {
+            session->setSettings(settings, false);
+            done_promise.set_value();
+        });
+    done_future.wait();
 }
 
 /***
