@@ -490,7 +490,7 @@ bool activity_filter_model_update(Glib::RefPtr<Gtk::ListStore> const& activity_m
 
     activity_model->steal_data(DIRTY_KEY);
 
-    for (auto const& row : activity_model->children())
+    for (auto& row : activity_model->children())
     {
         auto const type = row.get_value(activity_filter_cols.type);
         auto hits = 0;
