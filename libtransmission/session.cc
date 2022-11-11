@@ -108,9 +108,44 @@ tr_peer_id_t tr_peerIdInit()
     return peer_id;
 }
 
-/***
-****
-***/
+///
+
+std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrentsAllowingDHT() const
+{
+    auto ids = std::vector<tr_torrent_id_t>{};
+    auto const& torrents = session_.torrents();
+
+    ids.reserve(std::size(torrents));
+    for (auto const* const tor : torrents)
+    {
+        if (tor->isRunning && tor->allowsDht())
+        {
+            ids.push_back(tor->id());
+        }
+    }
+
+    return ids;
+}
+
+tr_sha1_digest_t tr_session::DhtMediator::torrentInfoHash(tr_torrent_id_t id) const
+{
+    if (auto const* const tor = session_.torrents().get(id); tor != nullptr)
+    {
+        return tor->infoHash();
+    }
+
+    return {};
+}
+
+void tr_session::DhtMediator::addPex(tr_sha1_digest_t const& info_hash, tr_pex const* pex, size_t n_pex)
+{
+    if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
+    {
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n_pex);
+    }
+}
+
+///
 
 bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port)
 {
@@ -468,7 +503,6 @@ void tr_session::onNowTimer()
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(time(nullptr));
-    udp_core_->dhtUpkeep();
     alt_speeds_.checkScheduler();
 
     // TODO: this seems a little silly. Why do we increment this
@@ -607,24 +641,28 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
         port_changed = true;
     }
 
+    bool addr_changed = false;
     if (new_settings.tcp_enabled)
     {
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
             auto const [addr, is_default] = publicAddress(TR_AF_INET);
             bound_ipv4_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
             auto const [addr, is_default] = publicAddress(TR_AF_INET6);
             bound_ipv6_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            addr_changed = true;
         }
     }
     else
     {
         bound_ipv4_.reset();
         bound_ipv6_.reset();
+        addr_changed = true;
     }
 
     if (port_changed)
@@ -651,6 +689,15 @@ void tr_session::setSettings(tr_session_settings settings_in, bool force)
         {
             lpd_.reset();
         }
+    }
+
+    if (!allowsDHT())
+    {
+        dht_.reset();
+    }
+    else if (force || !dht_ || port_changed || addr_changed || dht_changed)
+    {
+        dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
     }
 
     // We need to update bandwidth if speed settings changed.
@@ -799,6 +846,14 @@ tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->port_forwarding_->state();
+}
+
+void tr_session::onAdvertisedPeerPortChanged()
+{
+    for (auto* const tor : torrents())
+    {
+        tr_torrentChangeMyPort(tor);
+    }
 }
 
 /***
@@ -1161,13 +1216,14 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
     save_timer_.reset();
     now_timer_.reset();
     rpc_server_.reset();
+    dht_.reset();
     lpd_.reset();
+
     port_forwarding_.reset();
     bound_ipv6_.reset();
     bound_ipv4_.reset();
 
     // tell other items to start shutting down
-    udp_core_->startShutdown();
     announcer_udp_->startShutdown();
 
     // Close the torrents in order of most active to least active

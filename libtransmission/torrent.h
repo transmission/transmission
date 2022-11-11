@@ -748,9 +748,6 @@ public:
 
     time_t peer_id_creation_time_ = 0;
 
-    time_t dhtAnnounceAt = 0;
-    time_t dhtAnnounce6At = 0;
-
     time_t lpdAnnounceAt = 0;
 
     time_t activityDate = 0;
