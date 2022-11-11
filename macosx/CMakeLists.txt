@@ -392,13 +392,21 @@ add_library(vdkqueue STATIC
 
 set_property(TARGET vdkqueue PROPERTY FOLDER "third-party")
 
+set(BASE_NIB_FILES_RESOURCES_DIR Resources)
+if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+    string(APPEND BASE_NIB_FILES_RESOURCES_DIR /Base.lproj)
+endif()
 set_source_files_properties(${${PROJECT_NAME}_BASE_NIB_FILES} PROPERTIES
-    MACOSX_PACKAGE_LOCATION Resources/Base.lproj)
+    MACOSX_PACKAGE_LOCATION ${BASE_NIB_FILES_RESOURCES_DIR})
 
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+    set(STRINGS_FILES_RESOURCES_DIR Resources)
+    if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+        string(APPEND STRINGS_FILES_RESOURCES_DIR /${LANG}.lproj)
+    endif()
     set_source_files_properties(${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources/${LANG}.lproj)
+        MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
 endforeach()
 
 add_executable(${TR_NAME}-mac MACOSX_BUNDLE
