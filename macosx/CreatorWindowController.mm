@@ -360,20 +360,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (IBAction)incrementOrDecrementPieceSize:(id)sender
 {
-    auto power = [(NSStepper*)sender intValue];
-    if (power >= 32)
-    {
-        // over max piece size
-        [(NSStepper*)sender setIntValue:31];
-        return;
-    }
-    if (power <= 13)
-    {
-        // below min piece size
-        [(NSStepper*)sender setIntValue:14];
-        return;
-    }
-    auto const piece_size = uint32_t(1) << power;
+    uint32_t const piece_size = 1U << [(NSStepper*)sender intValue];
 
     if (self.fBuilder->setPieceSize(piece_size))
     {

@@ -270,7 +270,7 @@ Gw
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bbO-nc-7cI">
                         <rect key="frame" x="672" y="81" width="19" height="28"/>
-                        <stepperCell key="cell" alignment="left" minValue="1" maxValue="1000" doubleValue="1" autorepeat="NO" id="53C-Ri-3gc"/>
+                        <stepperCell key="cell" alignment="left" minValue="14" maxValue="31" doubleValue="14" autorepeat="NO" id="53C-Ri-3gc"/>
                         <connections>
                             <action selector="incrementOrDecrementPieceSize:" target="-2" id="YDm-9R-hMY"/>
                         </connections>
