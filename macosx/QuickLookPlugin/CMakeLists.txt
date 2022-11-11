@@ -36,6 +36,7 @@ set(${PROJECT_NAME}_LANG_STRINGS_FILES
 set(${PROJECT_NAME}_RESOURCES
     style.css
 )
+source_group(Resources FILES ${${PROJECT_NAME}_RESOURCES})
 
 set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
@@ -48,6 +49,7 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         set_source_files_properties(${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
             MACOSX_PACKAGE_LOCATION Resources/${LANG}.lproj)
     endforeach()
+    source_group(Resources/${LANG}.lproj FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
 add_library(${TR_NAME}-mac-ql MODULE

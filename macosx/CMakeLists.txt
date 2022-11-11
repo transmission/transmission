@@ -23,6 +23,7 @@ macro(tr_wrap_xib IFILE OFILE)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         VERBATIM
     )
+    source_group("Generated Files" FILES ${OFILE})
 endmacro()
 
 set(${PROJECT_NAME}_SOURCES
@@ -181,6 +182,7 @@ set(${PROJECT_NAME}_XIB_FILES
     StatusBar.xib
     URLSheetWindow.xib
 )
+source_group(Resources FILES ${${PROJECT_NAME}_XIB_FILES})
 
 set(${PROJECT_NAME}_RESOURCES
     Defaults.plist
@@ -189,6 +191,7 @@ set(${PROJECT_NAME}_RESOURCES
     ../COPYING
     Images/TransmissionDocument.icns
 )
+source_group(Resources FILES ${${PROJECT_NAME}_RESOURCES})
 
 set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources
@@ -296,6 +299,7 @@ add_custom_command(
     DEPENDS ${IMAGE_ASSETS}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+source_group("Generated Files" FILES ${COMPILED_IMAGE_ASSETS} ${APPICON_NAME}.Info.plist)
 
 list(APPEND ${PROJECT_NAME}_RESOURCES ${COMPILED_IMAGE_ASSETS})
 
@@ -359,6 +363,7 @@ foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
     tr_wrap_xib("${F_XIB}" "${F_NIB}")
     list(APPEND ${PROJECT_NAME}_BASE_XIB_FILES "${F_XIB}")
     list(APPEND ${PROJECT_NAME}_BASE_NIB_FILES "${F_NIB}")
+    source_group(Resources/Base.lproj FILES ${F_XIB})
 endforeach()
 
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
@@ -372,6 +377,7 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
         list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
     endforeach()
+    source_group(Resources/${LANG}.lproj FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
 include_directories(
