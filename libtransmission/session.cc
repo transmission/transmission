@@ -1326,7 +1326,7 @@ static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise
                 }
             }
 
-            if (tr_torrent* const tor = tr_torrentNew(ctor, nullptr); tor != nullptr)
+            if (tr_torrentNew(ctor, nullptr) != nullptr)
             {
                 ++n_torrents;
             }
