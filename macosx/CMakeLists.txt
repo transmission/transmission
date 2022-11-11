@@ -1,5 +1,7 @@
 project(trmac)
 
+set(MAC_SIGN_CERT "" CACHE STRING "Application code signing certificate for Mac client")
+
 include_directories(${CMAKE_SOURCE_DIR})
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
@@ -11,6 +13,7 @@ endif()
 add_compile_options(-fmodules -fcxx-modules)
 
 find_program(ACTOOL_EXECUTABLE actool REQUIRED)
+find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
 find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
 
 macro(tr_wrap_xib IFILE OFILE)
@@ -422,6 +425,11 @@ target_link_libraries(${TR_NAME}-mac
     "-framework Quartz"
     "-framework Security"
 )
+
+if(MAC_SIGN_CERT AND NOT CMAKE_GENERATOR STREQUAL Xcode)
+    add_custom_command(TARGET ${TR_NAME}-mac POST_BUILD
+        COMMAND ${CODESIGN_EXECUTABLE} -f -s "${MAC_SIGN_CERT}" $<TARGET_BUNDLE_DIR:${TR_NAME}-mac>)
+endif()
 
 set(MAC_BUNDLE_NAME Transmission)
 
