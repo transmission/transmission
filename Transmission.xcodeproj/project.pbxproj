@@ -396,6 +396,7 @@
 		C3D9062727B7E3E800EF2386 /* psl.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061827B7E1DE00EF2386 /* psl.c */; };
 		C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3D9061B27B7E31100EF2386 /* libpsl.h */; };
 		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
+		C809AEE7291ECFD000BFDBE1 /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
 		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
 		C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
@@ -1176,6 +1177,8 @@
 		C3D9061827B7E1DE00EF2386 /* psl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psl.c; path = src/psl.c; sourceTree = "<group>"; };
 		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
 		C3D9062127B7E3C900EF2386 /* libpsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C809AEE5291ECFD000BFDBE1 /* NSDataAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSDataAdditions.h; sourceTree = "<group>"; };
+		C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSDataAdditions.mm; sourceTree = "<group>"; };
 		C81E411127F5BABD00652F56 /* CocoaCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaCompatibility.h; sourceTree = "<group>"; };
 		C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSKeyedUnarchiverAdditions.h; sourceTree = "<group>"; };
 		C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSKeyedUnarchiverAdditions.mm; sourceTree = "<group>"; };
@@ -1807,6 +1810,8 @@
 			children = (
 				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
 				A29D84031049C25600D1987A /* NSApplicationAdditions.mm */,
+				C809AEE5291ECFD000BFDBE1 /* NSDataAdditions.h */,
+				C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */,
 				A234EA521453563B000F3E97 /* NSImageAdditions.h */,
 				A234EA531453563B000F3E97 /* NSImageAdditions.mm */,
 				C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */,
@@ -3027,6 +3032,7 @@
 				A2725D5D0DE7507C003445E7 /* TrackerTableView.mm in Sources */,
 				A28F4F770E085BDC003A3882 /* ColorTextField.mm in Sources */,
 				A27F0F330E19AD9800B2DB97 /* TorrentGroup.mm in Sources */,
+				C809AEE7291ECFD000BFDBE1 /* NSDataAdditions.mm in Sources */,
 				A222E9870E6B21D9009FB003 /* BlocklistDownloaderViewController.mm in Sources */,
 				A222EA7B0E6C32C4009FB003 /* BlocklistScheduler.mm in Sources */,
 				A232F07E0EEA034A00041646 /* BonjourController.mm in Sources */,
