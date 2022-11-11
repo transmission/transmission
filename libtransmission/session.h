@@ -323,7 +323,7 @@ public:
         return *timer_maker_;
     }
 
-    [[nodiscard]] auto amInSessionThread() noexcept
+    [[nodiscard]] auto amInSessionThread() const noexcept
     {
         return session_thread_->amInSessionThread();
     }
