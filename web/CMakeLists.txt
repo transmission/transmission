@@ -51,15 +51,66 @@ set(TRWEB_IMGS
   assets/img/type.svg
 )
 
-add_custom_target(
-  trweb ALL
-  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package.json" "${CMAKE_CURRENT_BINARY_DIR}/package.json"
-  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/yarn.lock" "${CMAKE_CURRENT_BINARY_DIR}/yarn.lock"
-  COMMAND yarn install
-  COMMAND yarn webpack --config "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js" --context "${CMAKE_CURRENT_SOURCE_DIR}"
-  BYPRODUCTS
-    public_html/transmission-app.js
-    public_html/transmission-app.js.LICENSE.txt
-  DEPENDS ${TRWEB_IMGS}
-  SOURCES ${TRWEB_SRCS}
+set(NODE_PATH "${CMAKE_CURRENT_BINARY_DIR}/node_modules")
+
+add_custom_command(
+  OUTPUT node_modules.timestamp
+  COMMAND "${YARN_EXECUTABLE}"
+    --non-interactive
+    --frozen-lockfile
+    --check-files
+    --cwd "${CMAKE_CURRENT_SOURCE_DIR}"
+    --modules-folder "${NODE_PATH}"
+    install
+  COMMAND "${CMAKE_COMMAND}" -E touch "${NODE_PATH}.timestamp"
+  DEPENDS
+    package.json
+    yarn.lock
 )
+
+add_custom_command(
+  OUTPUT
+    "${CMAKE_CURRENT_BINARY_DIR}/transmission-app.js"
+    "${CMAKE_CURRENT_BINARY_DIR}/transmission-app.js.LICENSE.txt"
+    "${CMAKE_CURRENT_BINARY_DIR}/transmission-app.js.map"
+  COMMAND "${CMAKE_COMMAND}" -E env "NODE_PATH=${NODE_PATH}" "${YARN_EXECUTABLE}"
+    --non-interactive
+    --cwd "${CMAKE_CURRENT_SOURCE_DIR}"
+    --modules-folder "${NODE_PATH}"
+    webpack
+    --resolve-modules "${NODE_PATH}"
+    --resolve-loader-modules "${NODE_PATH}"
+    build
+    --output-path "${CMAKE_CURRENT_BINARY_DIR}"
+  DEPENDS
+    "${NODE_PATH}.timestamp"
+    webpack.config.js
+    ${TRWEB_IMGS}
+    ${TRWEB_SRCS}
+)
+
+add_custom_target(${TR_NAME}-web ALL
+  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/transmission-app.js"
+  SOURCES
+    package.json
+    webpack.config.js
+    yarn.lock
+    ${TRWEB_IMGS}
+    ${TRWEB_SRCS}
+)
+
+set_property(DIRECTORY PROPERTY ADDITIONAL_CLEAN_FILES "${NODE_PATH}")
+
+function(tr_install_web DST_DIR)
+  install(
+    DIRECTORY public_html
+    DESTINATION ${DST_DIR})
+  install(
+    FILES
+      "${CMAKE_CURRENT_BINARY_DIR}/transmission-app.js"
+      "${CMAKE_CURRENT_BINARY_DIR}/transmission-app.js.LICENSE.txt"
+      "${CMAKE_CURRENT_BINARY_DIR}/transmission-app.js.map"
+    DESTINATION ${DST_DIR}/public_html)
+endfunction()
+
+tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})

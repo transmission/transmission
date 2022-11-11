@@ -461,7 +461,11 @@ add_subdirectory(QuickLookPlugin)
 install(TARGETS ${TR_NAME}-mac DESTINATION Applications)
 
 install(DIRECTORY TransmissionHelp DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
-tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
+
+if(ENABLE_WEB)
+    add_dependencies(${TR_NAME}-mac ${TR_NAME}-web)
+    tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
+endif()
 
 install(CODE "
     list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")

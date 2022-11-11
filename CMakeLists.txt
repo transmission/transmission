@@ -41,7 +41,7 @@ set(QT_MINIMUM              5.6)
 tr_auto_option(ENABLE_GTK           "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
-        option(ENABLE_WEB           "Build Web client" OFF)
+tr_auto_option(ENABLE_WEB           "Build Web client" AUTO)
         option(ENABLE_UTILS         "Build utils (create, edit, show)" ON)
         option(ENABLE_CLI           "Build command-line client" OFF)
         option(ENABLE_TESTS         "Build unit tests" ON)
@@ -389,6 +389,19 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
+if(ENABLE_WEB)
+    tr_get_required_flag(ENABLE_WEB WEB_IS_REQUIRED)
+
+    find_program(YARN_EXECUTABLE yarn ${WEB_IS_REQUIRED})
+    if(YARN_EXECUTABLE)
+        set(WEB_FOUND ON)
+    else()
+        set(WEB_FOUND OFF)
+    endif()
+
+    tr_fixup_auto_option(ENABLE_WEB WEB_FOUND WEB_IS_REQUIRED)
+endif()
+
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 tr_add_external_auto_library(DEFLATE libdeflate deflate)
@@ -718,10 +731,6 @@ if(ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
-function(tr_install_web DST_DIR)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html DESTINATION ${DST_DIR})
-endfunction()
-
 add_subdirectory(libtransmission)
 
 set(MAC_PROJECT_DIR macosx)
@@ -741,10 +750,6 @@ foreach(P cli daemon gtk mac qt utils web)
     endif()
 endforeach()
 
-if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
-    tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
-endif()
-
 if(INSTALL_DOC)
     install(FILES AUTHORS COPYING README.md docs/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
     install(DIRECTORY news DESTINATION ${CMAKE_INSTALL_DOCDIR})
@@ -755,7 +760,6 @@ if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUA
 endif()
 
 set(CPACK_SOURCE_GENERATOR TXZ)
-set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_SOURCE_DIR}/cmake/CPackWeb.cmake")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_SEMVER}")
 if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
     # https://semver.org/#spec-item-11
