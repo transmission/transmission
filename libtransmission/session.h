@@ -930,7 +930,7 @@ private:
     struct init_data;
     void initImpl(init_data&);
     void setSettings(tr_variant* settings_dict, bool force);
-    void setSettings(tr_session_settings settings, bool force);
+    void setSettings(tr_session_settings&& settings, bool force);
 
     void closeImplPart1(std::promise<void>* closed_promise);
     void closeImplPart2(std::promise<void>* closed_promise);

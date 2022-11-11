@@ -593,7 +593,7 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
     rpc_server_->load(settings_dict);
 }
 
-void tr_session::setSettings(tr_session_settings settings_in, bool force)
+void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 {
     auto const lock = unique_lock();
 
