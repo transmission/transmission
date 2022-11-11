@@ -374,18 +374,23 @@ struct tau_tracker
 
     void sendto(void const* buf, size_t buflen)
     {
-        auto [ss, sslen] = *addr_;
+        TR_ASSERT(addr_);
 
-        if (ss.ss_family == AF_INET)
+        if (addr_)
         {
-            reinterpret_cast<sockaddr_in*>(&ss)->sin_port = port.network();
-        }
-        else if (ss.ss_family == AF_INET6)
-        {
-            reinterpret_cast<sockaddr_in6*>(&ss)->sin6_port = port.network();
-        }
+            auto [ss, sslen] = *addr_;
 
-        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr*>(&ss), sslen);
+            if (ss.ss_family == AF_INET)
+            {
+                reinterpret_cast<sockaddr_in*>(&ss)->sin_port = port.network();
+            }
+            else if (ss.ss_family == AF_INET6)
+            {
+                reinterpret_cast<sockaddr_in6*>(&ss)->sin6_port = port.network();
+            }
+
+            mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr*>(&ss), sslen);
+        }
     }
 
     Mediator& mediator_;
