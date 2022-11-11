@@ -1317,10 +1317,8 @@ static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise
                 continue;
             }
 
-            auto const path = tr_pathbuf{ dirname, '/', name };
-
             // is a magnet link?
-            if (!tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr))
+            if (auto const path = tr_pathbuf{ dirname, '/', name }; !tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr))
             {
                 if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
                 {
