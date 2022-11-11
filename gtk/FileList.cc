@@ -273,7 +273,7 @@ void gtr_tree_model_foreach_postorder_subtree(
     Gtk::TreeModel::iterator const& parent,
     Gtk::TreeModel::SlotForeachIter const& func)
 {
-    for (auto const& child : parent->children())
+    for (auto& child : parent->children())
     {
         gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(child), func);
     }
@@ -286,7 +286,7 @@ void gtr_tree_model_foreach_postorder_subtree(
 
 void gtr_tree_model_foreach_postorder(Glib::RefPtr<Gtk::TreeModel> const& model, Gtk::TreeModel::SlotForeachIter const& func)
 {
-    for (auto const& iter : model->children())
+    for (auto& iter : model->children())
     {
         gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(iter), func);
     }
