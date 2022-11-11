@@ -358,7 +358,7 @@ tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_me
         char const* name = !std::empty(i->name) ? i->name.c_str() : default_name.c_str();
 
         auto row_it = store->prepend();
-        auto& row = *row_it;
+        auto const& row = *row_it;
         row[message_log_cols.tr_msg] = i;
         row[message_log_cols.name] = name;
         row[message_log_cols.message] = i->message;
