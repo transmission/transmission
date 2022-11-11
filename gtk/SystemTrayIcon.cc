@@ -68,7 +68,7 @@ public:
     void refresh();
 
 private:
-    static void activated();
+    void activated();
     void popup(guint button, guint when);
 
     [[nodiscard]] std::string make_tooltip_text() const;
