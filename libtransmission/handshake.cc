@@ -467,6 +467,12 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
 // A will be able to resynchronize on ENCRYPT(VC)"
 static ReadState readVC(tr_handshake* handshake, tr_peerIo* peer_io)
 {
+    if (!peer_io->torrentHash())
+    {
+        TR_ASSERT_MSG(false, "should not call readVC without torrentHash");
+        return READ_ERR;
+    }
+
     // find the end of PadB by looking for `ENCRYPT(VC)`
     auto needle = VC;
     auto filter = tr_message_stream_encryption::Filter{};
