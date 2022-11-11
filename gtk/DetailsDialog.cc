@@ -1284,7 +1284,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
     }
 
     /* step 2: mark all the peers in the list as not-updated */
-    for (auto const& row : store->children())
+    for (auto& row : store->children())
     {
         row[peer_cols.was_updated] = false;
     }
@@ -1363,7 +1363,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     };
 
     /* step 1: mark all webseeds as not-updated */
-    for (auto const& row : store->children())
+    for (auto& row : store->children())
     {
         row[webseed_cols.was_updated] = false;
     }
@@ -2052,7 +2052,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     }
 
     /* step 2: mark all the trackers in the list as not-updated */
-    for (auto const& row : store->children())
+    for (auto& row : store->children())
     {
         row[tracker_cols.was_updated] = false;
     }
