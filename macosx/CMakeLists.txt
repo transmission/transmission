@@ -393,6 +393,8 @@ add_library(vdkqueue STATIC
     VDKQueue/VDKQueue.h
 )
 
+set_property(TARGET vdkqueue PROPERTY FOLDER "third-party")
+
 set_source_files_properties(${${PROJECT_NAME}_BASE_NIB_FILES} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources/Base.lproj)
 
