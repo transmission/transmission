@@ -375,8 +375,8 @@ void Blocklist::ensureLoaded() const
     {
         // bad binary file; try to rebuild it
         in.close();
-        auto const sz_src_file = std::string{ std::data(bin_file_), std::size(bin_file_) - std::size(BinFileSuffix) };
-        if (tr_sys_path_exists(sz_src_file))
+        if (auto const sz_src_file = std::string{ std::data(bin_file_), std::size(bin_file_) - std::size(BinFileSuffix) };
+            tr_sys_path_exists(sz_src_file))
         {
             rules_ = parseFile(sz_src_file);
             if (!std::empty(rules_))
