@@ -12,13 +12,12 @@
 
 #include <algorithm>
 #include <array>
-#include <limits.h> // INT_MAX
+#include <cstddef>
+#include <cstdlib> // abort()
+#include <limits>
 #include <memory>
 #include <numeric>
 #include <sstream>
-#include <stddef.h>
-#include <stdio.h> // sscanf()
-#include <stdlib.h> // abort()
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -470,7 +469,7 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_downloadLimited, down_limited_check_->get_active()); });
 
-    down_limit_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
+    down_limit_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, std::numeric_limits<int>::max(), 5));
     down_limit_spin_tag_ = down_limit_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_downloadLimit, down_limit_spin_->get_value_as_int()); });
 
@@ -478,7 +477,7 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_uploadLimited, up_limited_check_->get_active()); });
 
-    up_limit_sping_->set_adjustment(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
+    up_limit_sping_->set_adjustment(Gtk::Adjustment::create(0, 0, std::numeric_limits<int>::max(), 5));
     up_limit_spin_tag_ = up_limit_sping_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_uploadLimit, up_limit_sping_->get_value_as_int()); });
 
@@ -1680,7 +1679,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
         }
         else
         {
-            abort();
+            std::abort();
         }
 
         c->set_resizable(false);
@@ -1767,11 +1766,11 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
 namespace
 {
 
-auto constexpr ErrMarkupBegin = "<span color=\"red\">"sv;
+auto constexpr ErrMarkupBegin = "<span color='red'>"sv;
 auto constexpr ErrMarkupEnd = "</span>"sv;
-auto constexpr TimeoutMarkupBegin = "<span color=\"#246\">"sv;
+auto constexpr TimeoutMarkupBegin = "<span color='#246'>"sv;
 auto constexpr TimeoutMarkupEnd = "</span>"sv;
-auto constexpr SuccessMarkupBegin = "<span color=\"#080\">"sv;
+auto constexpr SuccessMarkupBegin = "<span color='#080'>"sv;
 auto constexpr SuccessMarkupEnd = "</span>"sv;
 
 std::array<std::string_view, 3> const text_dir_mark = { ""sv, "\u200E"sv, "\u200F"sv };
@@ -2166,12 +2165,15 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         DetailsDialog& parent,
-        Glib::RefPtr<Session> core,
+        Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
 
     TR_DISABLE_COPY_MOVE(EditTrackersDialog)
 
-    static std::unique_ptr<EditTrackersDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+    static std::unique_ptr<EditTrackersDialog> create(
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent const* tor);
 
 private:
     void on_response(int response) override;
@@ -2187,7 +2189,7 @@ EditTrackersDialog::EditTrackersDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
     : Gtk::Dialog(cast_item)
     , parent_(parent)
@@ -2203,7 +2205,7 @@ EditTrackersDialog::EditTrackersDialog(
 
 std::unique_ptr<EditTrackersDialog> EditTrackersDialog::create(
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("EditTrackersDialog.ui"));
@@ -2281,12 +2283,15 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         DetailsDialog& parent,
-        Glib::RefPtr<Session> core,
+        Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
 
     TR_DISABLE_COPY_MOVE(AddTrackerDialog)
 
-    static std::unique_ptr<AddTrackerDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+    static std::unique_ptr<AddTrackerDialog> create(
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent const* tor);
 
 private:
     void on_response(int response) override;
@@ -2302,7 +2307,7 @@ AddTrackerDialog::AddTrackerDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
     : Gtk::Dialog(cast_item)
     , parent_(parent)
@@ -2318,7 +2323,7 @@ AddTrackerDialog::AddTrackerDialog(
 
 std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("AddTrackerDialog.ui"));

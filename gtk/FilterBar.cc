@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::transform()
+#include <array>
 #include <memory>
 #include <set>
 #include <string>
@@ -37,7 +38,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
+    [[nodiscard]] Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
 
 private:
     template<typename T>
@@ -510,13 +511,15 @@ bool activity_filter_model_update(Glib::RefPtr<Gtk::ListStore> const& activity_m
 
 Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeModel> const& tmodel)
 {
-    static struct
+    struct FilterTypeInfo
     {
         int type;
         char const* context;
         char const* name;
         Glib::ustring icon_name;
-    } const types[] = {
+    };
+
+    static auto const types = std::array<FilterTypeInfo, 9>({ {
         { ACTIVITY_FILTER_ALL, nullptr, N_("All"), {} },
         { ACTIVITY_FILTER_SEPARATOR, nullptr, nullptr, {} },
         { ACTIVITY_FILTER_ACTIVE, nullptr, N_("Active"), "system-run" },
@@ -526,7 +529,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
         { ACTIVITY_FILTER_FINISHED, nullptr, N_("Finished"), "media-playback-stop" },
         { ACTIVITY_FILTER_VERIFYING, "Verb", NC_("Verb", "Verifying"), "view-refresh" },
         { ACTIVITY_FILTER_ERROR, nullptr, N_("Error"), "dialog-error" },
-    };
+    } });
 
     auto const store = Gtk::ListStore::create(activity_filter_cols);
 
