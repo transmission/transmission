@@ -495,17 +495,18 @@ std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std:
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
     tr_sys_path_remove(src_file.c_str());
     tr_error* error = nullptr;
-    if (!tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error))
+    auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
+    if (error != nullptr)
     {
-        if (error != nullptr)
-        {
-            tr_logAddWarn(fmt::format(
-                _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", src_file),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_clear(&error);
-        }
+        tr_logAddWarn(fmt::format(
+            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::arg("path", src_file),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_clear(&error);
+    }
+    if (!copied)
+    {
         return {};
     }
 
