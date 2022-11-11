@@ -336,6 +336,9 @@ void Blocklist::ensureLoaded() const
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_clear(&error);
+    }
+    if (!file_info)
+    {
         return;
     }
 
