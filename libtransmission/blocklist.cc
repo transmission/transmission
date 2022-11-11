@@ -250,11 +250,11 @@ auto parseFile(std::string_view filename)
     }
 
     // safeguard against some joker swapping the begin & end ranges
-    for (auto& range : ranges)
+    for (auto& [low, high] : ranges)
     {
-        if (range.first > range.second)
+        if (low > high)
         {
-            std::swap(range.first, range.second);
+            std::swap(low, high);
         }
     }
 
@@ -279,9 +279,9 @@ auto parseFile(std::string_view filename)
     ranges.resize(keep + 1);
 
 #ifdef TR_ENABLE_ASSERTS
-    for (auto const& range : ranges)
+    for (auto const& [low, high] : ranges)
     {
-        TR_ASSERT(range.first <= range.second);
+        TR_ASSERT(low <= high);
     }
     for (size_t i = 1, n = std::size(ranges); i < n; ++i)
     {
