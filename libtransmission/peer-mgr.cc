@@ -1142,8 +1142,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
     bool success = false;
     auto* manager = static_cast<tr_peerMgr*>(result.userData);
 
-    auto const hash = result.io->torrentHash();
-    tr_swarm* const s = hash ? getExistingSwarm(manager, *hash) : nullptr;
+    tr_swarm* const s = getExistingSwarm(manager, result.io->torrentHash());
 
     auto const [addr, port] = result.io->socketAddress();
 
