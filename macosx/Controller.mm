@@ -3546,11 +3546,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
         else if ([ident isEqualToString:@"DL Image"])
         {
-            return [NSImage imageNamed:@"DownArrowGroupTemplate"];
+            NSImage* image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
+            image.accessibilityDescription = NSLocalizedString(@"DL", "Torrent -> status image");
+            return image;
         }
         else if ([ident isEqualToString:@"UL Image"])
         {
-            return [NSImage imageNamed:[self.fDefaults boolForKey:@"DisplayGroupRowRatio"] ? @"YingYangGroupTemplate" : @"UpArrowGroupTemplate"];
+            if ([self.fDefaults boolForKey:@"DisplayGroupRowRatio"])
+            {
+                NSImage* image = [NSImage imageNamed:@"YingYangGroupTemplate"];
+                image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
+                return image;
+            }
+            else
+            {
+                NSImage* image = [NSImage imageNamed:@"UpArrowGroupTemplate"];
+                image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
+                return image;
+            }
         }
         else
         {
