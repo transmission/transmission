@@ -713,7 +713,6 @@ if(RUN_CLANG_TIDY)
 endif()
 
 if(ENABLE_TESTS)
-    include(CTest)
     enable_testing()
     add_subdirectory(tests)
 endif()
