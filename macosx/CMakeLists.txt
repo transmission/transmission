@@ -439,7 +439,10 @@ target_link_libraries(${TR_NAME}-mac
     "-framework Security"
 )
 
-if(MAC_SIGN_CERT AND NOT CMAKE_GENERATOR STREQUAL Xcode)
+if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+    if(NOT MAC_SIGN_CERT)
+        set(MAC_SIGN_CERT "-")
+    endif()
     add_custom_command(TARGET ${TR_NAME}-mac POST_BUILD
         COMMAND ${CODESIGN_EXECUTABLE} -f -s "${MAC_SIGN_CERT}" $<TARGET_BUNDLE_DIR:${TR_NAME}-mac>)
 endif()
