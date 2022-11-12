@@ -773,7 +773,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, tr_peerIo* peer_io)
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
 
     auto const& info_hash = peer_io->torrentHash();
-    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readCryptoProvide  requires an info_hash");
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readCryptoProvide requires an info_hash");
     peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
 
     auto vc_in = vc_t{};
