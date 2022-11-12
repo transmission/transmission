@@ -918,7 +918,7 @@ struct metadata_callback_data
 
 Gtk::TreeModel::iterator find_row_from_torrent_id(Glib::RefPtr<Gtk::TreeModel> const& model, tr_torrent_id_t id)
 {
-    for (auto const& row : model->children())
+    for (auto& row : model->children())
     {
         if (id == row.get_value(torrent_cols.torrent_id))
         {
