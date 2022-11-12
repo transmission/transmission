@@ -117,7 +117,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
             BUILD_BYPRODUCTS "${${ID}_LIBRARY}"
         )
 
-        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "ThirdParty")
+        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "third-party")
     endif()
 endmacro()
 

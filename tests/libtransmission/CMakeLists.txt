@@ -51,6 +51,8 @@ add_executable(libtransmission-test
     watchdir-test.cc
     web-utils-test.cc)
 
+set_property(TARGET libtransmission-test PROPERTY FOLDER "tests")
+
 target_compile_definitions(libtransmission-test
     PRIVATE
         -DLIBTRANSMISSION_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
@@ -93,6 +95,8 @@ add_custom_command(
 
 add_executable(subprocess-test
     subprocess-test-program.cc)
+
+set_property(TARGET subprocess-test PROPERTY FOLDER "tests")
 
 target_include_directories(subprocess-test
     PRIVATE

@@ -2,18 +2,14 @@ project(trmac)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-if(CMAKE_GENERATOR STREQUAL "Xcode")
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC ON)
-else()
-    add_definitions(-fobjc-arc)
-endif()
+add_compile_options(
+    -fcxx-modules
+    -fmodules
+    -fobjc-arc)
 
-add_compile_options(-fmodules -fcxx-modules)
-
+find_program(ACTOOL_EXECUTABLE actool REQUIRED)
+find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
 find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
-find_program(ICONUTIL_EXECUTABLE iconutil REQUIRED)
-find_program(TIFFUTIL_EXECUTABLE tiffutil REQUIRED)
-find_program(INSTALL_NAME_TOOL_EXECUTABLE install_name_tool REQUIRED)
 
 macro(tr_wrap_xib IFILE OFILE)
     get_filename_component(twx_nib_dir "${OFILE}" DIRECTORY)
@@ -25,19 +21,8 @@ macro(tr_wrap_xib IFILE OFILE)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         VERBATIM
     )
+    source_group("Generated Files" FILES ${OFILE})
 endmacro()
-
-function(tr_tiff_from_pngs OFILE)
-    get_filename_component(ODIR "${OFILE}" DIRECTORY)
-    add_custom_command(
-        OUTPUT ${OFILE}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${ODIR}
-        COMMAND ${TIFFUTIL_EXECUTABLE} -cathidpicheck ${ARGN} -out ${OFILE}
-        DEPENDS ${ARGN}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        VERBATIM
-    )
-endfunction()
 
 set(${PROJECT_NAME}_SOURCES
     AboutWindowController.mm
@@ -195,51 +180,22 @@ set(${PROJECT_NAME}_XIB_FILES
     StatusBar.xib
     URLSheetWindow.xib
 )
-
-set(APPICONSET_DIR "${PROJECT_SOURCE_DIR}/Images/Images.xcassets/AppIcon.appiconset")
-set(APPICON_FILE "${PROJECT_BINARY_DIR}/Transmission.icns")
-add_custom_command(
-    OUTPUT "${APPICON_FILE}"
-    COMMAND "${CMAKE_COMMAND}" -E rm -rf
-        "${PROJECT_BINARY_DIR}/Transmission.iconset"
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${APPICONSET_DIR}"
-        "${PROJECT_BINARY_DIR}/Transmission.iconset"
-    COMMAND "${CMAKE_COMMAND}" -E rm
-        "${PROJECT_BINARY_DIR}/Transmission.iconset/Contents.json"
-    COMMAND "${ICONUTIL_EXECUTABLE}"
-        --convert icns
-        --output "${APPICON_FILE}"
-        "${PROJECT_BINARY_DIR}/Transmission.iconset"
-    DEPENDS
-        "${APPICONSET_DIR}/icon_128x128.png"
-        "${APPICONSET_DIR}/icon_128x128@2x.png"
-        "${APPICONSET_DIR}/icon_16x16.png"
-        "${APPICONSET_DIR}/icon_16x16@2x.png"
-        "${APPICONSET_DIR}/icon_256x256.png"
-        "${APPICONSET_DIR}/icon_256x256@2x.png"
-        "${APPICONSET_DIR}/icon_32x32.png"
-        "${APPICONSET_DIR}/icon_32x32@2x.png"
-        "${APPICONSET_DIR}/icon_512x512.png"
-        "${APPICONSET_DIR}/icon_512x512@2x.png"
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-    VERBATIM
-)
+source_group(Resources FILES ${${PROJECT_NAME}_XIB_FILES})
 
 set(${PROJECT_NAME}_RESOURCES
     Defaults.plist
     Credits.rtf
     sparkle_dsa_pub.pem
     ../COPYING
-    "${APPICON_FILE}"
     Images/TransmissionDocument.icns
 )
+source_group(Resources FILES ${${PROJECT_NAME}_RESOURCES})
 
 set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources
 )
 
-set(${PROJECT_NAME}_HIDPI_IMAGES
+set(${PROJECT_NAME}_IMAGESETS
     ActionHover
     Bandwidth
     CleanupTemplate
@@ -247,8 +203,10 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     CreateLarge
     DownArrowGroupTemplate
     DownArrowTemplate
+    DownloadBadge
     EllipsisTemplate
     FavIcon
+    GearshapeTemplate
     Globe
     Groups
     InfoActivity
@@ -293,38 +251,58 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     Transfers
     UpArrowGroupTemplate
     UpArrowTemplate
+    UploadBadge
     YingYangGroupTemplate
     YingYangTemplate
 )
 
-foreach(IMG ${${PROJECT_NAME}_HIDPI_IMAGES})
-    set(IMG_DIR "Images/Images.xcassets/${IMG}.imageset")
-    list(APPEND ${PROJECT_NAME}_RESOURCES ${IMG_DIR}/${IMG}.png ${IMG_DIR}/${IMG}@2x.png)
-    if(COMBINE_HIDPI_ARTWORK)
-        list(APPEND ${PROJECT_NAME}_RESOURCES ${PROJECT_BINARY_DIR}/Images/${IMG}.tiff)
-        tr_tiff_from_pngs(${PROJECT_BINARY_DIR}/Images/${IMG}.tiff ${IMG_DIR}/${IMG}.png ${IMG_DIR}/${IMG}@2x.png)
-        set_source_files_properties(${PROJECT_BINARY_DIR}/Images/${IMG}.tiff PROPERTIES
-            MACOSX_PACKAGE_LOCATION Resources
-        )
-    else()
-        set_source_files_properties(${IMG_DIR}/${IMG}.png ${IMG_DIR}/${IMG}@2x.png PROPERTIES
-            MACOSX_PACKAGE_LOCATION Resources
-        )
-    endif()
+set(APPICON_NAME AppIcon)
+
+set(IMAGE_ASSETS_DIR Images/Images.xcassets)
+set(APPICONSET_DIR "${IMAGE_ASSETS_DIR}/${APPICON_NAME}.appiconset")
+
+set(IMAGE_ASSETS
+    ${IMAGE_ASSETS_DIR}/Contents.json
+    ${APPICONSET_DIR}/Contents.json)
+
+foreach(IMG IN LISTS ${PROJECT_NAME}_IMAGESETS)
+    set(IMG_DIR "${IMAGE_ASSETS_DIR}/${IMG}.imageset")
+    list(APPEND IMAGE_ASSETS
+        ${IMG_DIR}/${IMG}.png
+        ${IMG_DIR}/${IMG}@2x.png
+        ${IMG_DIR}/Contents.json)
 endforeach()
 
-set(${PROJECT_NAME}_LODPI_IMAGES
-    DownloadBadge
-    UploadBadge
+foreach(SIZE IN ITEMS 16 32 128 256 512)
+    list(APPEND IMAGE_ASSETS
+        ${APPICONSET_DIR}/icon_${SIZE}x${SIZE}.png
+        ${APPICONSET_DIR}/icon_${SIZE}x${SIZE}@2x.png)
+endforeach()
+
+set(COMPILED_IMAGE_ASSETS
+    "${CMAKE_CURRENT_BINARY_DIR}/${APPICON_NAME}.icns"
+    "${CMAKE_CURRENT_BINARY_DIR}/Assets.car")
+
+add_custom_command(
+    OUTPUT
+        ${COMPILED_IMAGE_ASSETS}
+        ${APPICON_NAME}.Info.plist
+    COMMAND ${ACTOOL_EXECUTABLE}
+        --compile "${CMAKE_CURRENT_BINARY_DIR}"
+        --platform macosx
+        --minimum-deployment-target ${CMAKE_OSX_DEPLOYMENT_TARGET}
+        --app-icon ${APPICON_NAME}
+        --output-partial-info-plist "${CMAKE_CURRENT_BINARY_DIR}/${APPICON_NAME}.Info.plist"
+        ${IMAGE_ASSETS_DIR}
+    DEPENDS ${IMAGE_ASSETS}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+source_group("Generated Files" FILES ${COMPILED_IMAGE_ASSETS} ${APPICON_NAME}.Info.plist)
 
-foreach(IMG ${${PROJECT_NAME}_LODPI_IMAGES})
-    set(IMG_DIR "Images/Images.xcassets/${IMG}.imageset")
-    list(APPEND ${PROJECT_NAME}_RESOURCES ${IMG_DIR}/${IMG}.png)
-    set_source_files_properties(${IMG_DIR}/${IMG}.png PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources
-    )
-endforeach()
+list(APPEND ${PROJECT_NAME}_RESOURCES ${COMPILED_IMAGE_ASSETS})
+
+set_source_files_properties(${COMPILED_IMAGE_ASSETS} PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources)
 
 set(${PROJECT_NAME}_LINGUAS
     da
@@ -383,6 +361,7 @@ foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
     tr_wrap_xib("${F_XIB}" "${F_NIB}")
     list(APPEND ${PROJECT_NAME}_BASE_XIB_FILES "${F_XIB}")
     list(APPEND ${PROJECT_NAME}_BASE_NIB_FILES "${F_NIB}")
+    source_group(Resources/Base.lproj FILES ${F_XIB})
 endforeach()
 
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
@@ -396,6 +375,7 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
         list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
     endforeach()
+    source_group(Resources/${LANG}.lproj FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
 include_directories(
@@ -414,13 +394,23 @@ add_library(vdkqueue STATIC
     VDKQueue/VDKQueue.h
 )
 
+set_property(TARGET vdkqueue PROPERTY FOLDER "third-party")
+
+set(BASE_NIB_FILES_RESOURCES_DIR Resources)
+if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+    string(APPEND BASE_NIB_FILES_RESOURCES_DIR /Base.lproj)
+endif()
 set_source_files_properties(${${PROJECT_NAME}_BASE_NIB_FILES} PROPERTIES
-    MACOSX_PACKAGE_LOCATION Resources/Base.lproj)
+    MACOSX_PACKAGE_LOCATION ${BASE_NIB_FILES_RESOURCES_DIR})
 
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+    set(STRINGS_FILES_RESOURCES_DIR Resources)
+    if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+        string(APPEND STRINGS_FILES_RESOURCES_DIR /${LANG}.lproj)
+    endif()
     set_source_files_properties(${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources/${LANG}.lproj)
+        MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
 endforeach()
 
 add_executable(${TR_NAME}-mac MACOSX_BUNDLE
@@ -446,6 +436,11 @@ target_link_libraries(${TR_NAME}-mac
     "-framework Quartz"
     "-framework Security"
 )
+
+if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+    add_custom_command(TARGET ${TR_NAME}-mac POST_BUILD
+        COMMAND ${CODESIGN_EXECUTABLE} -s - -o linker-signed $<TARGET_BUNDLE_DIR:${TR_NAME}-mac>)
+endif()
 
 set(MAC_BUNDLE_NAME Transmission)
 
