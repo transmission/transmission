@@ -973,13 +973,12 @@ TorrentCellRenderer::Impl::Impl(TorrentCellRenderer& renderer)
     , download_speed_KBps(renderer, "piece-download-speed", 0)
     , compact(renderer, "compact", false)
     , renderer_(renderer)
+    , text_renderer_(Gtk::make_managed<Gtk::CellRendererText>())
+    , progress_renderer_(Gtk::make_managed<Gtk::CellRendererProgress>())
+    , icon_renderer_(Gtk::make_managed<Gtk::CellRendererPixbuf>())
 {
-    text_renderer_ = Gtk::make_managed<Gtk::CellRendererText>();
     text_renderer_->property_xpad() = 0;
     text_renderer_->property_ypad() = 0;
-
-    progress_renderer_ = Gtk::make_managed<Gtk::CellRendererProgress>();
-    icon_renderer_ = Gtk::make_managed<Gtk::CellRendererPixbuf>();
 }
 
 Glib::PropertyProxy<gpointer> TorrentCellRenderer::property_torrent()

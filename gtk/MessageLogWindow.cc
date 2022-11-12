@@ -447,6 +447,13 @@ MessageLogWindow::Impl::Impl(
     : window_(window)
     , core_(core)
     , view_(gtr_get_widget<Gtk::TreeView>(builder, "messages_view"))
+    , store_(Gtk::ListStore::create(message_log_cols))
+    , filter_(Gtk::TreeModelFilter::create(store_))
+    , sort_(Gtk::TreeModelSort::create(filter_))
+    , maxLevel_(static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level)))
+    , refresh_tag_(Glib::signal_timeout().connect_seconds(
+          sigc::mem_fun(*this, &Impl::onRefresh),
+          SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
     , level_names_{ {
           { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
           { TR_LOG_ERROR, C_("Logging level", "Error") },
@@ -485,15 +492,10 @@ MessageLogWindow::Impl::Impl(
     ***  messages
     **/
 
-    store_ = Gtk::ListStore::create(message_log_cols);
-
     addMessages(store_, myHead);
     onRefresh(); /* much faster to populate *before* it has listeners */
 
-    filter_ = Gtk::TreeModelFilter::create(store_);
-    sort_ = Gtk::TreeModelSort::create(filter_);
     sort_->set_sort_column(message_log_cols.sequence, TR_GTK_SORT_TYPE(ASCENDING));
-    maxLevel_ = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
     filter_->set_visible_func(sigc::mem_fun(*this, &Impl::isRowVisible));
 
     view_->set_model(sort_);
@@ -504,10 +506,6 @@ MessageLogWindow::Impl::Impl(
     appendColumn(view_, message_log_cols.sequence);
     appendColumn(view_, message_log_cols.name);
     appendColumn(view_, message_log_cols.message);
-
-    refresh_tag_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(*this, &Impl::onRefresh),
-        SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     scroll_to_bottom();
 }
