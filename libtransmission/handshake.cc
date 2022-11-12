@@ -219,8 +219,10 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 
 static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* buf)
 {
-    auto const info_hash = handshake->io->torrentHash();
-    auto const info = info_hash ? handshake->mediator->torrentInfo(*info_hash) : std::nullopt;
+    auto const& info_hash = handshake->io->torrentHash();
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "buildHandshakeMessage requires an info_hash");
+
+    auto const info = handshake->mediator->torrentInfo(info_hash);
     if (!info)
     {
         return false;
@@ -242,7 +244,7 @@ static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* 
     }
     walk += HandshakeFlagsLen;
 
-    walk = std::copy_n(reinterpret_cast<char const*>(std::data(*info_hash)), std::size(*info_hash), walk);
+    walk = std::copy_n(reinterpret_cast<char const*>(std::data(info_hash)), std::size(info_hash), walk);
     [[maybe_unused]] auto const* const walk_end = std::copy(
         std::begin(info->client_peer_id),
         std::end(info->client_peer_id),
@@ -283,10 +285,10 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, tr_peerIo* 
     auto reserved = std::array<uint8_t, HandshakeFlagsLen>{};
     peer_io->readBytes(std::data(reserved), std::size(reserved));
 
-    /* torrent hash */
-    auto hash = tr_sha1_digest_t{};
-    peer_io->readBytes(std::data(hash), std::size(hash));
-    if (auto const torrent_hash = peer_io->torrentHash(); !torrent_hash || *torrent_hash != hash)
+    // torrent hash
+    auto info_hash = tr_sha1_digest_t{};
+    peer_io->readBytes(std::data(info_hash), std::size(info_hash));
+    if (info_hash == tr_sha1_digest_t{} || info_hash != peer_io->torrentHash())
     {
         tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
         return HANDSHAKE_BAD_TORRENT;
@@ -301,7 +303,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, tr_peerIo* 
     auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
     tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}'", peer_id_sv));
 
-    if (auto const info = handshake->mediator->torrentInfo(hash); info && info->client_peer_id == peer_id)
+    if (auto const info = handshake->mediator->torrentInfo(info_hash); info && info->client_peer_id == peer_id)
     {
         tr_logAddTraceHand(handshake, "streuth!  we've connected to ourselves.");
         return HANDSHAKE_PEER_IS_SELF;
@@ -411,16 +413,12 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
     /* HASH('req1', S) */
     outbuf.add(tr_sha1::digest("req1"sv, handshake->dh.secret()));
 
-    auto const info_hash = peer_io->torrentHash();
-    if (!info_hash)
-    {
-        tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
-        return tr_handshakeDone(handshake, false);
-    }
+    auto const& info_hash = peer_io->torrentHash();
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readYb requires an info_hash");
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        auto const req2 = tr_sha1::digest("req2"sv, *info_hash);
+        auto const req2 = tr_sha1::digest("req2"sv, info_hash);
         auto const req3 = tr_sha1::digest("req3"sv, handshake->dh.secret());
         auto x_or = tr_sha1_digest_t{};
         for (size_t i = 0, n = std::size(x_or); i < n; ++i)
@@ -435,7 +433,7 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     peer_io->write(outbuf, false);
-    peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, *info_hash);
+    peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
     outbuf.add(VC);
     outbuf.addUint32(handshake->cryptoProvide());
     outbuf.addUint16(0);
@@ -462,10 +460,13 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
 // A will be able to resynchronize on ENCRYPT(VC)"
 static ReadState readVC(tr_handshake* handshake, tr_peerIo* peer_io)
 {
+    auto const info_hash = peer_io->torrentHash();
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readVC requires an info_hash");
+
     // find the end of PadB by looking for `ENCRYPT(VC)`
     auto needle = VC;
     auto filter = tr_message_stream_encryption::Filter{};
-    filter.encryptInit(true, handshake->dh, *peer_io->torrentHash());
+    filter.encryptInit(true, handshake->dh, info_hash);
     filter.encrypt(std::size(needle), std::data(needle));
 
     for (size_t i = 0; i < PadbMaxlen; ++i)
@@ -481,7 +482,7 @@ static ReadState readVC(tr_handshake* handshake, tr_peerIo* peer_io)
             tr_logAddTraceHand(handshake, "got it!");
             // We already know it's a match; now we just need to
             // consume it from the read buffer.
-            peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, *peer_io->torrentHash());
+            peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
             peer_io->readBytes(std::data(needle), std::size(needle));
             setState(handshake, AWAITING_CRYPTO_SELECT);
             return READ_NOW;
@@ -615,11 +616,9 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
 
         peer_io->setTorrentHash(hash);
     }
-    else /* outgoing */
+    else // outgoing
     {
-        auto const torrent_hash = peer_io->torrentHash();
-
-        if (!torrent_hash || *torrent_hash != hash)
+        if (peer_io->torrentHash() != hash)
         {
             tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
             return tr_handshakeDone(handshake, false);
@@ -665,8 +664,8 @@ static ReadState readPeerId(tr_handshake* handshake, tr_peerIo* peer_io)
         fmt::format("peer-id is '{}' ... isIncoming is {}", std::data(client), handshake->isIncoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
-    auto const hash = peer_io->torrentHash();
-    auto const info = hash ? handshake->mediator->torrentInfo(*hash) : std::nullopt;
+    auto const info_hash = peer_io->torrentHash();
+    auto const info = handshake->mediator->torrentInfo(info_hash);
     auto const connected_to_self = info && info->client_peer_id == peer_id;
 
     return tr_handshakeDone(handshake, !connected_to_self);
@@ -773,7 +772,9 @@ static ReadState readCryptoProvide(tr_handshake* handshake, tr_peerIo* peer_io)
 
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
 
-    peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, *peer_io->torrentHash());
+    auto const& info_hash = peer_io->torrentHash();
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readCryptoProvide requires an info_hash");
+    peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
 
     auto vc_in = vc_t{};
     peer_io->readBytes(std::data(vc_in), std::size(vc_in));
@@ -830,7 +831,9 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
     ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
     **/
 
-    peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, *peer_io->torrentHash());
+    auto const& info_hash = peer_io->torrentHash();
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
+    peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
     auto outbuf = libtransmission::Buffer{};
 
     // send VC
@@ -1054,13 +1057,13 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     {
         // the peer probably doesn't speak µTP.
 
-        auto const hash = io->torrentHash();
-        auto const info = hash ? handshake->mediator->torrentInfo(*hash) : std::nullopt;
+        auto const info_hash = io->torrentHash();
+        auto const info = handshake->mediator->torrentInfo(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
         {
-            handshake->mediator->setUTPFailed(*hash, io->address());
+            handshake->mediator->setUTPFailed(info_hash, io->address());
         }
 
         if (handshake->mediator->allowsTCP() && handshake->io->reconnect() == 0)

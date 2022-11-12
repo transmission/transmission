@@ -301,7 +301,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
     else
     {
-        auto const what = BEV_EVENT_WRITING | (n_written == 0 ? BEV_EVENT_EOF : BEV_EVENT_ERROR);
+        auto const what = BEV_EVENT_WRITING | (error != nullptr ? BEV_EVENT_ERROR : BEV_EVENT_EOF);
 
         tr_logAddDebugIo(
             io,

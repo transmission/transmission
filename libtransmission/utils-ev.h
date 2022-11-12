@@ -45,7 +45,7 @@ using evbase_unique_ptr = std::unique_ptr<struct event_base, EventBaseDeleter>;
 
 struct EventDeleter
 {
-    void operator()(struct event* event)
+    void operator()(struct event* event) const
     {
         if (event != nullptr)
         {

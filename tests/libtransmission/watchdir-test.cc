@@ -181,7 +181,7 @@ TEST_P(WatchDirTest, watch)
     auto names = std::vector<std::string>{};
     auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
     {
-        names.emplace_back(std::string{ basename });
+        names.emplace_back(basename);
         return Watchdir::Action::Done;
     };
     auto watchdir = createWatchDir(dirname, callback);
@@ -229,7 +229,7 @@ TEST_P(WatchDirTest, retry)
     auto names = std::vector<std::string>{};
     auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
     {
-        names.emplace_back(std::string{ basename });
+        names.emplace_back(basename);
         return Watchdir::Action::Retry;
     };
     auto watchdir = createWatchDir(path, callback);

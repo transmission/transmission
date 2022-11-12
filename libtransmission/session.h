@@ -323,7 +323,7 @@ public:
         return *timer_maker_;
     }
 
-    [[nodiscard]] auto amInSessionThread() noexcept
+    [[nodiscard]] auto amInSessionThread() const noexcept
     {
         return session_thread_->amInSessionThread();
     }
@@ -870,7 +870,7 @@ public:
         }
     }
 
-    void fetch(tr_web::FetchOptions options) const
+    void fetch(tr_web::FetchOptions&& options) const
     {
         web_->fetch(std::move(options));
     }
@@ -930,7 +930,7 @@ private:
     struct init_data;
     void initImpl(init_data&);
     void setSettings(tr_variant* settings_dict, bool force);
-    void setSettings(tr_session_settings settings, bool force);
+    void setSettings(tr_session_settings&& settings, bool force);
 
     void closeImplPart1(std::promise<void>* closed_promise);
     void closeImplPart2(std::promise<void>* closed_promise);

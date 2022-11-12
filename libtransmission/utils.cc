@@ -616,7 +616,12 @@ double tr_truncd(double x, int decimal_places)
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    return *tr_parseNum<double>(std::data(buf));
+    if (auto parsed = tr_parseNum<double>(std::data(buf)); parsed)
+    {
+        return *parsed;
+    }
+
+    return {};
 }
 
 std::string tr_strpercent(double x)

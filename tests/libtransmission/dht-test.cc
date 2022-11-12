@@ -637,7 +637,7 @@ TEST_F(DhtTest, callsPeriodicPeriodically)
     auto const baseline = mock_dht.n_periodic_calls_;
     static auto constexpr Periods = 10;
     waitFor(event_base_, std::chrono::duration_cast<std::chrono::milliseconds>(MockTimerInterval * Periods));
-    EXPECT_NEAR(mock_dht.n_periodic_calls_, baseline + Periods, Periods / 2);
+    EXPECT_NEAR(mock_dht.n_periodic_calls_, baseline + Periods, Periods / 2.0);
 }
 
 } // namespace libtransmission::test
