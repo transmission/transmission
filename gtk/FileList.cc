@@ -426,8 +426,8 @@ namespace
 
 struct build_data
 {
-    Gtk::Widget* w;
-    tr_torrent* tor;
+    Gtk::Widget* w = nullptr;
+    tr_torrent* tor = nullptr;
     Gtk::TreeStore::iterator iter;
     Glib::RefPtr<Gtk::TreeStore> store;
 };
@@ -747,7 +747,7 @@ struct rename_data
 {
     Glib::ustring newname;
     Glib::ustring path_string;
-    gpointer impl;
+    gpointer impl = nullptr;
 };
 
 bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
