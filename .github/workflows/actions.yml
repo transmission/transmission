@@ -199,7 +199,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET='10.10' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
@@ -369,7 +368,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET='10.10' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
