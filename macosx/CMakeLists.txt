@@ -1,5 +1,10 @@
 project(trmac)
 
+if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.9)
+    # 10.9 required for actool to produce Assets.car
+    message(FATAL_ERROR "Targeting macOS versions before 10.9 is not supported, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
+endif()
+
 include_directories(${CMAKE_SOURCE_DIR})
 
 add_compile_options(
