@@ -36,18 +36,24 @@ set(${PROJECT_NAME}_LANG_STRINGS_FILES
 set(${PROJECT_NAME}_RESOURCES
     style.css
 )
+source_group(Resources FILES ${${PROJECT_NAME}_RESOURCES})
 
 set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
 
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
+    set(STRINGS_FILES_RESOURCES_DIR Resources)
+    if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+        string(APPEND STRINGS_FILES_RESOURCES_DIR /${LANG}.lproj)
+    endif()
     foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
         list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
         list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
         set_source_files_properties(${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
-            MACOSX_PACKAGE_LOCATION Resources/${LANG}.lproj)
+            MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
     endforeach()
+    source_group(Resources/${LANG}.lproj FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
 add_library(${TR_NAME}-mac-ql MODULE
