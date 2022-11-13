@@ -93,7 +93,7 @@ int main(int argc, char** argv)
         fmt::print(
             stderr,
             _("Run '{program} --help' to see a full list of available command line options.\n"),
-            fmt::arg("program", argv[0]));
+            fmt::arg("program", *argv));
         return 1;
     }
 

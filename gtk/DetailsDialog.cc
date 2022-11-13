@@ -1172,13 +1172,15 @@ void initPeerRow(
     }
 
     auto peer_addr4 = in_addr();
+    auto const* const peer_addr4_octets = reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr);
     auto const collated_name = inet_pton(AF_INET, std::data(peer->addr), &peer_addr4) != 1 ?
         std::data(peer->addr) :
         fmt::format(
             "{:03}",
             fmt::join(
-                reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr),
-                reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr) + sizeof(peer_addr4.s_addr),
+                peer_addr4_octets,
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
                 "."));
 
     (*iter)[peer_cols.address] = std::data(peer->addr);
