@@ -3,8 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cerrno>
-#include <cstdio>
+#include <fstream>
 #include <map>
 #include <memory>
 
@@ -12,6 +11,7 @@
 #include <glibmm/i18n.h>
 
 #include <fmt/core.h>
+#include <fmt/ostream.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
@@ -179,27 +179,12 @@ Glib::ustring gtr_asctime(time_t t)
 
 void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& filename)
 {
-    auto* fp = std::fopen(filename.c_str(), "w+");
+    try
+    {
+        auto stream = std::ofstream();
+        stream.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+        stream.open(Glib::locale_from_utf8(filename), std::ios_base::trunc);
 
-    if (fp == nullptr)
-    {
-        auto const errcode = errno;
-        auto w = std::make_shared<Gtk::MessageDialog>(
-            parent,
-            fmt::format(
-                _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
-                fmt::arg("error", g_strerror(errcode)),
-                fmt::arg("error_code", errcode)),
-            false,
-            TR_GTK_MESSAGE_TYPE(ERROR),
-            TR_GTK_BUTTONS_TYPE(CLOSE));
-        w->set_secondary_text(Glib::strerror(errno));
-        w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
-        w->show();
-    }
-    else
-    {
         for (auto const& row : store_->children())
         {
             auto const* const node = row.get_value(message_log_cols.tr_msg);
@@ -208,10 +193,24 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
             auto const it = level_names_.find(node->level);
             auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
 
-            fmt::print(fp, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
+            fmt::print(stream, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }
-
-        std::fclose(fp);
+    }
+    catch (std::ios_base::failure const& e)
+    {
+        auto w = std::make_shared<Gtk::MessageDialog>(
+            parent,
+            fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", e.code().message()),
+                fmt::arg("error_code", e.code().value())),
+            false,
+            TR_GTK_MESSAGE_TYPE(ERROR),
+            TR_GTK_BUTTONS_TYPE(CLOSE));
+        w->set_secondary_text(e.code().message());
+        w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
+        w->show();
     }
 }
 

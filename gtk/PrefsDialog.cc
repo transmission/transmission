@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <limits>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -68,6 +69,7 @@ class PageBase : public Gtk::Box
 {
 public:
     PageBase(BaseObjectType* cast_item, Glib::RefPtr<Session> const& core);
+    ~PageBase() override;
 
     void init_check_button(Gtk::CheckButton& button, tr_quark key);
 
@@ -100,15 +102,21 @@ private:
 private:
     Glib::RefPtr<Session> const core_;
 
-    static Glib::Quark const IdleDataKey;
+    std::map<tr_quark, std::pair<std::unique_ptr<Glib::Timer>, sigc::connection>> spin_timers_;
 };
-
-Glib::Quark const PageBase::IdleDataKey = "idle-data";
 
 PageBase::PageBase(BaseObjectType* cast_item, Glib::RefPtr<Session> const& core)
     : Gtk::Box(cast_item)
     , core_(core)
 {
+}
+
+PageBase::~PageBase()
+{
+    for (auto& [key, info] : spin_timers_)
+    {
+        info.second.disconnect();
+    }
 }
 
 void PageBase::init_check_button(Gtk::CheckButton& button, tr_quark const key)
@@ -119,47 +127,44 @@ void PageBase::init_check_button(Gtk::CheckButton& button, tr_quark const key)
 
 bool PageBase::spun_cb_idle(Gtk::SpinButton& spin, tr_quark const key, bool isDouble)
 {
-    bool keep_waiting = true;
+    auto const last_change_it = spin_timers_.find(key);
+    g_assert(last_change_it != spin_timers_.end());
 
     /* has the user stopped making changes? */
-    if (auto const* const last_change = static_cast<Glib::Timer*>(spin.get_data(IdleDataKey)); last_change->elapsed() > 0.33)
+    if (last_change_it->second.first->elapsed() < 0.33)
     {
-        /* update the core */
-        if (isDouble)
-        {
-            double const value = spin.get_value();
-            core_->set_pref(key, value);
-        }
-        else
-        {
-            int const value = spin.get_value_as_int();
-            core_->set_pref(key, value);
-        }
-
-        /* cleanup */
-        spin.set_data(IdleDataKey, nullptr);
-        keep_waiting = false;
-        spin.unreference();
+        return true;
     }
 
-    return keep_waiting;
+    /* update the core */
+    if (isDouble)
+    {
+        core_->set_pref(key, spin.get_value());
+    }
+    else
+    {
+        core_->set_pref(key, spin.get_value_as_int());
+    }
+
+    /* cleanup */
+    spin_timers_.erase(last_change_it);
+    return false;
 }
 
 void PageBase::spun_cb(Gtk::SpinButton& w, tr_quark const key, bool isDouble)
 {
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
-    auto* last_change = static_cast<Glib::Timer*>(w.get_data(IdleDataKey));
-
-    if (last_change == nullptr)
+    auto last_change_it = spin_timers_.find(key);
+    if (last_change_it == spin_timers_.end())
     {
-        last_change = new Glib::Timer();
-        w.set_data(IdleDataKey, last_change, [](gpointer p) { delete static_cast<Glib::Timer*>(p); });
-        w.reference();
-        Glib::signal_timeout().connect_seconds([this, &w, key, isDouble]() { return spun_cb_idle(w, key, isDouble); }, 1);
+        auto timeout_tag = Glib::signal_timeout().connect_seconds(
+            [this, &w, key, isDouble]() { return spun_cb_idle(w, key, isDouble); },
+            1);
+        last_change_it = spin_timers_.emplace(key, std::pair(std::make_unique<Glib::Timer>(), timeout_tag)).first;
     }
 
-    last_change->start();
+    last_change_it->second.first->start();
 }
 
 void PageBase::init_spin_button(Gtk::SpinButton& button, tr_quark const key, int low, int high, int step)

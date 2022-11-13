@@ -51,7 +51,7 @@ TrVariantPtr create_variant(tr_variant&& other)
         [](tr_variant* ptr)
         {
             tr_variantClear(ptr);
-            delete ptr;
+            std::default_delete<tr_variant>()(ptr);
         });
     *result = std::move(other);
     tr_variantInitBool(&other, false);
@@ -821,6 +821,7 @@ void Session::Impl::on_pref_changed(tr_quark const key)
 
 Glib::RefPtr<Session> Session::create(tr_session* session)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new Session(session));
 }
 
