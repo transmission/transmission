@@ -83,6 +83,7 @@ class MakeDialog::Impl
 {
 public:
     Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 

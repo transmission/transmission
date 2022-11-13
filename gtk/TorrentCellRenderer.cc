@@ -29,9 +29,6 @@
 ****
 ***/
 
-#define REQ_HEIGHT(Obj) IF_GTKMM4((Obj).get_height(), (Obj).height)
-#define REQ_WIDTH(Obj) IF_GTKMM4((Obj).get_width(), (Obj).width)
-
 namespace
 {
 
@@ -41,6 +38,16 @@ auto const SmallScale = 0.9;
 auto const CompactIconSize = IF_GTKMM4(Gtk::IconSize::NORMAL, Gtk::ICON_SIZE_MENU);
 auto const FullIconSize = IF_GTKMM4(Gtk::IconSize::LARGE, Gtk::ICON_SIZE_DND);
 
+auto get_height(Gtk::Requisition const& req)
+{
+    return req.IF_GTKMM4(get_height(), height);
+}
+
+auto get_width(Gtk::Requisition const& req)
+{
+    return req.IF_GTKMM4(get_width(), width);
+}
+
 auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const* st)
 {
     Glib::ustring gstr;
@@ -48,7 +55,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
     bool const isDone = st->leftUntilDone == 0;
     uint64_t const haveTotal = st->haveUnchecked + st->haveValid;
     bool const isSeed = st->haveValid >= total_size;
-    double seedRatio;
+    double seedRatio = 0;
     bool const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
     if (!isDone) // downloading
@@ -331,20 +338,30 @@ public:
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
 
-public:
-    Glib::Property<gpointer> torrent;
-    Glib::Property<int> bar_height;
+    auto& property_torrent()
+    {
+        return property_torrent_;
+    }
 
-    /* Use this instead of tr_stat.pieceUploadSpeed so that the model can
-       control when the speed displays get updated. This is done to keep
-       the individual torrents' speeds and the status bar's overall speed
-       in sync even if they refresh at slightly different times */
-    Glib::Property<double> upload_speed_KBps;
+    auto& property_bar_height()
+    {
+        return property_bar_height_;
+    }
 
-    /* @see upload_speed_Bps */
-    Glib::Property<double> download_speed_KBps;
+    auto& property_upload_speed_KBps()
+    {
+        return property_upload_speed_KBps_;
+    }
 
-    Glib::Property<bool> compact;
+    auto& property_download_speed_KBps()
+    {
+        return property_download_speed_KBps_;
+    }
+
+    auto& property_compact()
+    {
+        return property_compact_;
+    }
 
 private:
     void render_progress_bar(
@@ -365,6 +382,12 @@ private:
 
 private:
     TorrentCellRenderer& renderer_;
+
+    Glib::Property<gpointer> property_torrent_;
+    Glib::Property<int> property_bar_height_;
+    Glib::Property<double> property_upload_speed_KBps_;
+    Glib::Property<double> property_download_speed_KBps_;
+    Glib::Property<bool> property_compact_;
 
     Gtk::CellRendererText* text_renderer_ = nullptr;
     Gtk::CellRendererProgress* progress_renderer_ = nullptr;
@@ -421,19 +444,23 @@ void TorrentCellRenderer::Impl::set_icon(
 
 void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width, int& height) const
 {
-    int xpad;
-    int ypad;
+    int xpad = 0;
+    int ypad = 0;
     Gtk::Requisition min_size;
     Gtk::Requisition icon_size;
     Gtk::Requisition name_size;
     Gtk::Requisition stat_size;
 
-    auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
+    auto* const tor = static_cast<tr_torrent*>(property_torrent_.get_value());
     auto const* const st = tr_torrentStatCached(tor);
 
     auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
-    auto const gstr_stat = getShortStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
+    auto const gstr_stat = getShortStatusString(
+        tor,
+        st,
+        property_upload_speed_KBps_.get_value(),
+        property_download_speed_KBps_.get_value());
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
@@ -451,27 +478,32 @@ void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width
     *** LAYOUT
     **/
 
-    width = xpad * 2 + REQ_WIDTH(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + REQ_WIDTH(stat_size);
-    height = ypad * 2 + std::max(REQ_HEIGHT(name_size), bar_height.get_value());
+    width = xpad * 2 + get_width(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + get_width(stat_size);
+    height = ypad * 2 + std::max(get_height(name_size), property_bar_height_.get_value());
 }
 
 void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, int& height) const
 {
-    int xpad;
-    int ypad;
+    int xpad = 0;
+    int ypad = 0;
     Gtk::Requisition min_size;
     Gtk::Requisition icon_size;
     Gtk::Requisition name_size;
     Gtk::Requisition stat_size;
     Gtk::Requisition prog_size;
 
-    auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
+    auto* const tor = static_cast<tr_torrent*>(property_torrent_.get_value());
     auto const* const st = tr_torrentStatCached(tor);
     auto const total_size = tr_torrentTotalSize(tor);
 
     auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
-    auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value(), true);
+    auto const gstr_stat = getStatusString(
+        tor,
+        st,
+        property_upload_speed_KBps_.get_value(),
+        property_download_speed_KBps_.get_value(),
+        true);
     auto const gstr_prog = getProgressString(tor, total_size, st);
     renderer_.get_padding(xpad, ypad);
 
@@ -494,19 +526,19 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
     *** LAYOUT
     **/
 
-    width = xpad * 2 + REQ_WIDTH(icon_size) + GUI_PAD + std::max(REQ_WIDTH(prog_size), REQ_WIDTH(stat_size));
-    height = ypad * 2 + REQ_HEIGHT(name_size) + REQ_HEIGHT(prog_size) + GUI_PAD_SMALL + bar_height.get_value() + GUI_PAD_SMALL +
-        REQ_HEIGHT(stat_size);
+    width = xpad * 2 + get_width(icon_size) + GUI_PAD + std::max(get_width(prog_size), get_width(stat_size));
+    height = ypad * 2 + get_height(name_size) + get_height(prog_size) + GUI_PAD_SMALL + property_bar_height_.get_value() +
+        GUI_PAD_SMALL + get_height(stat_size);
 }
 
 void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const
 {
-    if (impl_->torrent.get_value() != nullptr)
+    if (impl_->property_torrent().get_value() != nullptr)
     {
-        int w;
-        int h;
+        int w = 0;
+        int h = 0;
 
-        if (impl_->compact.get_value())
+        if (impl_->property_compact().get_value())
         {
             impl_->get_size_compact(widget, w, h);
         }
@@ -522,12 +554,12 @@ void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& mi
 
 void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& minimum_height, int& natural_height) const
 {
-    if (impl_->torrent.get_value() != nullptr)
+    if (impl_->property_torrent().get_value() != nullptr)
     {
-        int w;
-        int h;
+        int w = 0;
+        int h = 0;
 
-        if (impl_->compact.get_value())
+        if (impl_->property_compact().get_value())
         {
             impl_->get_size_compact(widget, w, h);
         }
@@ -544,22 +576,10 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
 namespace
 {
 
-double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* seed)
+int get_percent_done(tr_torrent const* tor, tr_stat const* st)
 {
-    double d;
-
-    if (st->activity == TR_STATUS_SEED && tr_torrentGetSeedRatio(tor, &d))
-    {
-        *seed = true;
-        d = MAX(0.0, st->seedRatioPercentDone);
-    }
-    else
-    {
-        *seed = false;
-        d = MAX(0.0, st->percentDone);
-    }
-
-    return d;
+    auto const seed = st->activity == TR_STATUS_SEED && tr_torrentGetSeedRatio(tor, nullptr);
+    return static_cast<int>(seed ? std::max(0.0F, st->seedRatioPercentDone) : std::max(0.0F, st->percentDone));
 }
 
 Gdk::RGBA const& get_progress_bar_color(tr_stat const& st)
@@ -683,17 +703,16 @@ void TorrentCellRenderer::Impl::render_compact(
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
 {
-    int xpad;
-    int ypad;
-    int min_width;
-    int width;
-    bool seed;
+    int xpad = 0;
+    int ypad = 0;
+    int min_width = 0;
+    int width = 0;
 
-    auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
+    auto* const tor = static_cast<tr_torrent*>(property_torrent_.get_value());
     auto const* const st = tr_torrentStatCached(tor);
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
-    auto const percentDone = get_percent_done(tor, st, &seed);
+    auto const percent_done = get_percent_done(tor, st);
     bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
@@ -713,7 +732,11 @@ void TorrentCellRenderer::Impl::render_compact(
     auto const icon = get_icon(tor);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const& progress_color = get_progress_bar_color(*st);
-    auto const gstr_stat = getShortStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
+    auto const gstr_stat = getShortStatusString(
+        tor,
+        st,
+        property_upload_speed_KBps_.get_value(),
+        property_download_speed_KBps_.get_value());
     renderer_.get_padding(xpad, ypad);
 
     auto fill_area = background_area;
@@ -764,7 +787,6 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->property_sensitive() = sensitive;
     render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
 
-    auto const percent_done = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
@@ -786,18 +808,17 @@ void TorrentCellRenderer::Impl::render_full(
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
 {
-    int xpad;
-    int ypad;
+    int xpad = 0;
+    int ypad = 0;
     Gtk::Requisition min_size;
     Gtk::Requisition size;
-    bool seed;
 
-    auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
+    auto* const tor = static_cast<tr_torrent*>(property_torrent_.get_value());
     auto const* const st = tr_torrentStatCached(tor);
     auto const total_size = tr_torrentTotalSize(tor);
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
-    auto const percentDone = get_percent_done(tor, st, &seed);
+    auto const percent_done = get_percent_done(tor, st);
     bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
@@ -818,15 +839,19 @@ void TorrentCellRenderer::Impl::render_full(
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const& progress_color = get_progress_bar_color(*st);
     auto const gstr_prog = getProgressString(tor, total_size, st);
-    auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
+    auto const gstr_stat = getStatusString(
+        tor,
+        st,
+        property_upload_speed_KBps_.get_value(),
+        property_download_speed_KBps_.get_value());
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
     Gdk::Rectangle icon_area;
     set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, size);
-    icon_area.set_width(REQ_WIDTH(size));
-    icon_area.set_height(REQ_HEIGHT(size));
+    icon_area.set_width(get_width(size));
+    icon_area.set_height(get_height(size));
 
     Gdk::Rectangle name_area;
     text_renderer_->property_text() = name;
@@ -834,19 +859,19 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(NONE);
     text_renderer_->property_scale() = 1.0;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    name_area.set_height(REQ_HEIGHT(size));
+    name_area.set_height(get_height(size));
 
     Gdk::Rectangle prog_area;
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    prog_area.set_height(REQ_HEIGHT(size));
+    prog_area.set_height(get_height(size));
 
     Gdk::Rectangle stat_area;
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    stat_area.set_height(REQ_HEIGHT(size));
+    stat_area.set_height(get_height(size));
 
     Gdk::Rectangle prct_area;
 
@@ -887,7 +912,7 @@ void TorrentCellRenderer::Impl::render_full(
     prct_area.set_x(prog_area.get_x());
     prct_area.set_y(prog_area.get_y() + prog_area.get_height() + GUI_PAD_SMALL);
     prct_area.set_width(prog_area.get_width());
-    prct_area.set_height(bar_height.get_value());
+    prct_area.set_height(property_bar_height_.get_value());
 
     /* status */
     stat_area.set_x(prct_area.get_x());
@@ -913,7 +938,7 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
     render_impl(*text_renderer_, snapshot, widget, prog_area, prog_area, flags);
 
-    progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
+    progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
     render_progress_bar(snapshot, widget, prct_area, flags, progress_color);
@@ -934,9 +959,9 @@ void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
     widget.set_direction(Gtk::TEXT_DIR_RTL);
 #endif
 
-    if (impl_->torrent.get_value() != nullptr)
+    if (impl_->property_torrent().get_value() != nullptr)
     {
-        if (impl_->compact.get_value())
+        if (impl_->property_compact().get_value())
         {
             impl_->render_compact(snapshot, widget, background_area, flags);
         }
@@ -967,42 +992,41 @@ TorrentCellRenderer::TorrentCellRenderer()
 TorrentCellRenderer::~TorrentCellRenderer() = default;
 
 TorrentCellRenderer::Impl::Impl(TorrentCellRenderer& renderer)
-    : torrent(renderer, "torrent", nullptr)
-    , bar_height(renderer, "bar-height", DefaultBarHeight)
-    , upload_speed_KBps(renderer, "piece-upload-speed", 0)
-    , download_speed_KBps(renderer, "piece-download-speed", 0)
-    , compact(renderer, "compact", false)
-    , renderer_(renderer)
+    : renderer_(renderer)
+    , property_torrent_(renderer, "torrent", nullptr)
+    , property_bar_height_(renderer, "bar-height", DefaultBarHeight)
+    , property_upload_speed_KBps_(renderer, "piece-upload-speed", 0)
+    , property_download_speed_KBps_(renderer, "piece-download-speed", 0)
+    , property_compact_(renderer, "compact", false)
+    , text_renderer_(Gtk::make_managed<Gtk::CellRendererText>())
+    , progress_renderer_(Gtk::make_managed<Gtk::CellRendererProgress>())
+    , icon_renderer_(Gtk::make_managed<Gtk::CellRendererPixbuf>())
 {
-    text_renderer_ = Gtk::make_managed<Gtk::CellRendererText>();
     text_renderer_->property_xpad() = 0;
     text_renderer_->property_ypad() = 0;
-
-    progress_renderer_ = Gtk::make_managed<Gtk::CellRendererProgress>();
-    icon_renderer_ = Gtk::make_managed<Gtk::CellRendererPixbuf>();
 }
 
 Glib::PropertyProxy<gpointer> TorrentCellRenderer::property_torrent()
 {
-    return impl_->torrent.get_proxy();
+    return impl_->property_torrent().get_proxy();
 }
 
 Glib::PropertyProxy<double> TorrentCellRenderer::property_piece_upload_speed()
 {
-    return impl_->upload_speed_KBps.get_proxy();
+    return impl_->property_upload_speed_KBps().get_proxy();
 }
 
 Glib::PropertyProxy<double> TorrentCellRenderer::property_piece_download_speed()
 {
-    return impl_->download_speed_KBps.get_proxy();
+    return impl_->property_download_speed_KBps().get_proxy();
 }
 
 Glib::PropertyProxy<int> TorrentCellRenderer::property_bar_height()
 {
-    return impl_->bar_height.get_proxy();
+    return impl_->property_bar_height().get_proxy();
 }
 
 Glib::PropertyProxy<bool> TorrentCellRenderer::property_compact()
 {
-    return impl_->compact.get_proxy();
+    return impl_->property_compact().get_proxy();
 }

@@ -51,7 +51,7 @@ TrVariantPtr create_variant(tr_variant&& other)
         [](tr_variant* ptr)
         {
             tr_variantClear(ptr);
-            delete ptr;
+            std::default_delete<tr_variant>()(ptr);
         });
     *result = std::move(other);
     tr_variantInitBool(&other, false);
@@ -109,13 +109,35 @@ public:
 
     void commit_prefs_change(tr_quark key);
 
-public:
-    sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error;
-    sigc::signal<void(tr_ctor*)> signal_add_prompt;
-    sigc::signal<void(int)> signal_blocklist_updated;
-    sigc::signal<void(bool)> signal_busy;
-    sigc::signal<void(tr_quark)> signal_prefs_changed;
-    sigc::signal<void(bool)> signal_port_tested;
+    auto& signal_add_error()
+    {
+        return signal_add_error_;
+    }
+
+    auto& signal_add_prompt()
+    {
+        return signal_add_prompt_;
+    }
+
+    auto& signal_blocklist_updated()
+    {
+        return signal_blocklist_updated_;
+    }
+
+    auto& signal_busy()
+    {
+        return signal_busy_;
+    }
+
+    auto& signal_prefs_changed()
+    {
+        return signal_prefs_changed_;
+    }
+
+    auto& signal_port_tested()
+    {
+        return signal_port_tested_;
+    }
 
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
@@ -156,6 +178,13 @@ private:
 
 private:
     Session& core_;
+
+    sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error_;
+    sigc::signal<void(tr_ctor*)> signal_add_prompt_;
+    sigc::signal<void(int)> signal_blocklist_updated_;
+    sigc::signal<void(bool)> signal_busy_;
+    sigc::signal<void(tr_quark)> signal_prefs_changed_;
+    sigc::signal<void(bool)> signal_port_tested_;
 
     Glib::RefPtr<Gio::FileMonitor> monitor_;
     sigc::connection monitor_tag_;
@@ -253,7 +282,7 @@ void Session::Impl::add_to_busy(int addMe)
 
     if (wasBusy != is_busy())
     {
-        signal_busy.emit(is_busy());
+        signal_busy_.emit(is_busy());
     }
 }
 
@@ -304,69 +333,15 @@ int compare_eta(int a, int b)
     return a < b ? 1 : -1;
 }
 
-int compare_double(double a, double b)
+template<typename T>
+int compare_generic(T&& a, T&& b)
 {
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
-}
-
-int compare_uint64(uint64_t a, uint64_t b)
-{
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
-}
-
-int compare_int(int a, int b)
-{
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
+    return a < b ? -1 : (a > b ? 1 : 0);
 }
 
 int compare_ratio(double a, double b)
 {
-    int ret;
+    int ret = 0;
 
     if ((int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF)
     {
@@ -382,27 +357,7 @@ int compare_ratio(double a, double b)
     }
     else
     {
-        ret = compare_double(a, b);
-    }
-
-    return ret;
-}
-
-int compare_time(time_t a, time_t b)
-{
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
+        ret = compare_generic(a, b);
     }
 
     return ret;
@@ -452,13 +407,13 @@ int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
     auto const bUp = b->get_value(torrent_cols.speed_up);
     auto const bDown = b->get_value(torrent_cols.speed_down);
 
-    ret = compare_double(aUp + aDown, bUp + bDown);
+    ret = compare_generic(aUp + aDown, bUp + bDown);
 
     if (ret == 0)
     {
         auto const* const sa = tr_torrentStatCached(ta);
         auto const* const sb = tr_torrentStatCached(tb);
-        ret = compare_uint64(sa->peersSendingToUs + sa->peersGettingFromUs, sb->peersSendingToUs + sb->peersGettingFromUs);
+        ret = compare_generic(sa->peersSendingToUs + sa->peersGettingFromUs, sb->peersSendingToUs + sb->peersGettingFromUs);
     }
 
     if (ret == 0)
@@ -473,7 +428,7 @@ int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::cons
 {
     auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
     auto* const tb = static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent));
-    int ret = compare_time(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
+    int ret = compare_generic(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
 
     if (ret == 0)
     {
@@ -487,7 +442,7 @@ int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::con
 {
     auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const size_b = tr_torrentTotalSize(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-    int ret = compare_uint64(size_a, size_b);
+    int ret = compare_generic(size_a, size_b);
 
     if (ret == 0)
     {
@@ -501,11 +456,11 @@ int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-    int ret = compare_double(sa->percentComplete, sb->percentComplete);
+    int ret = compare_generic(sa->percentComplete, sb->percentComplete);
 
     if (ret == 0)
     {
-        ret = compare_double(sa->seedRatioPercentDone, sb->seedRatioPercentDone);
+        ret = compare_generic(sa->seedRatioPercentDone, sb->seedRatioPercentDone);
     }
 
     if (ret == 0)
@@ -534,7 +489,7 @@ int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::co
 {
     auto const sa = a->get_value(torrent_cols.activity);
     auto const sb = b->get_value(torrent_cols.activity);
-    int ret = compare_int(sa, sb);
+    int ret = compare_generic(sa, sb);
 
     if (ret == 0)
     {
@@ -638,13 +593,12 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     }
     catch (Glib::Error const& e)
     {
-        auto const errmsg = fmt::format(
+        gtr_message(fmt::format(
             _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
             fmt::arg("old_path", old_name),
             fmt::arg("path", new_name),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code()));
-        g_message("%s", errmsg.c_str());
+            fmt::arg("error_code", e.code())));
     }
 }
 
@@ -821,6 +775,7 @@ void Session::Impl::on_pref_changed(tr_quark const key)
 
 Glib::RefPtr<Session> Session::create(tr_session* session)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new Session(session));
 }
 
@@ -847,7 +802,7 @@ Session::Impl::Impl(Session& core, tr_session* session)
     on_pref_changed(TR_KEY_watch_dir_enabled);
     on_pref_changed(TR_KEY_peer_limit_global);
     on_pref_changed(TR_KEY_inhibit_desktop_hibernation);
-    signal_prefs_changed.connect([this](auto key) { on_pref_changed(key); });
+    signal_prefs_changed_.connect([this](auto key) { on_pref_changed(key); });
 
     tr_sessionSetMetadataCallback(
         session,
@@ -1065,7 +1020,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
         {
-            signal_add_error.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
+            signal_add_error_.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
         }
 
         tr_ctorFree(ctor);
@@ -1080,7 +1035,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         return 0;
     }
 
-    signal_add_prompt.emit(ctor);
+    signal_add_prompt_.emit(ctor);
     return 0;
 }
 
@@ -1131,15 +1086,14 @@ void Session::Impl::add_file_async_callback(
     bool do_prompt,
     bool do_notify)
 {
-    gsize length;
-    char* contents;
-
     try
     {
+        gsize length = 0;
+        char* contents = nullptr;
+
         if (!file->load_contents_finish(result, contents, length))
         {
-            auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name()));
-            g_message("%s", errmsg.c_str());
+            gtr_message(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name())));
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
@@ -1152,12 +1106,11 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        auto const errmsg = fmt::format(
+        gtr_message(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", file->get_parse_name()),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code()));
-        g_message("%s", errmsg.c_str());
+            fmt::arg("error_code", e.code())));
     }
 
     dec_busy();
@@ -1252,7 +1205,7 @@ void Session::torrents_added()
 void Session::Impl::torrents_added()
 {
     update();
-    signal_add_error.emit(ERR_NO_MORE_TORRENTS, {});
+    signal_add_error_.emit(ERR_NO_MORE_TORRENTS, {});
 }
 
 void Session::torrent_changed(tr_torrent_id_t id)
@@ -1550,7 +1503,7 @@ void Session::Impl::maybe_inhibit_hibernation()
 
 void Session::Impl::commit_prefs_change(tr_quark const key)
 {
-    signal_prefs_changed.emit(key);
+    signal_prefs_changed_.emit(key);
     gtr_pref_save(session_);
 }
 
@@ -1620,7 +1573,7 @@ bool core_read_rpc_response_idle(TrVariantPtr const& response)
         }
         else
         {
-            g_warning("%s", fmt::format(_("Couldn't find pending RPC request for tag {tag}"), fmt::arg("tag", tag)).c_str());
+            gtr_warning(fmt::format(_("Couldn't find pending RPC request for tag {tag}"), fmt::arg("tag", tag)));
         }
     }
 
@@ -1642,7 +1595,7 @@ void Session::Impl::send_rpc_request(
 {
     if (session_ == nullptr)
     {
-        g_error("GTK+ client doesn't support connections to remote servers yet.");
+        gtr_error("GTK+ client doesn't support connections to remote servers yet.");
     }
     else
     {
@@ -1651,7 +1604,7 @@ void Session::Impl::send_rpc_request(
 
         /* make the request */
 #ifdef DEBUG_RPC
-        g_message("%s", fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)).c_str());
+        gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
 #endif
 
         tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);
@@ -1676,8 +1629,8 @@ void Session::port_test()
         tag,
         [this](auto* response)
         {
-            tr_variant* args;
-            bool is_open;
+            tr_variant* args = nullptr;
+            bool is_open = false;
 
             if (!tr_variantDictFindDict(response, TR_KEY_arguments, &args) ||
                 !tr_variantDictFindBool(args, TR_KEY_port_is_open, &is_open))
@@ -1685,7 +1638,7 @@ void Session::port_test()
                 is_open = false;
             }
 
-            impl_->signal_port_tested.emit(is_open);
+            impl_->signal_port_tested().emit(is_open);
         });
     tr_variantClear(&request);
 }
@@ -1708,8 +1661,8 @@ void Session::blocklist_update()
         tag,
         [this](auto* response)
         {
-            tr_variant* args;
-            int64_t ruleCount;
+            tr_variant* args = nullptr;
+            int64_t ruleCount = 0;
 
             if (!tr_variantDictFindDict(response, TR_KEY_arguments, &args) ||
                 !tr_variantDictFindInt(args, TR_KEY_blocklist_size, &ruleCount))
@@ -1722,7 +1675,7 @@ void Session::blocklist_update()
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated.emit(ruleCount);
+            impl_->signal_blocklist_updated().emit(ruleCount);
         });
     tr_variantClear(&request);
 }
@@ -1802,30 +1755,30 @@ void Session::open_folder(tr_torrent_id_t torrent_id) const
 
 sigc::signal<void(Session::ErrorCode, Glib::ustring const&)>& Session::signal_add_error()
 {
-    return impl_->signal_add_error;
+    return impl_->signal_add_error();
 }
 
 sigc::signal<void(tr_ctor*)>& Session::signal_add_prompt()
 {
-    return impl_->signal_add_prompt;
+    return impl_->signal_add_prompt();
 }
 
 sigc::signal<void(int)>& Session::signal_blocklist_updated()
 {
-    return impl_->signal_blocklist_updated;
+    return impl_->signal_blocklist_updated();
 }
 
 sigc::signal<void(bool)>& Session::signal_busy()
 {
-    return impl_->signal_busy;
+    return impl_->signal_busy();
 }
 
 sigc::signal<void(tr_quark)>& Session::signal_prefs_changed()
 {
-    return impl_->signal_prefs_changed;
+    return impl_->signal_prefs_changed();
 }
 
 sigc::signal<void(bool)>& Session::signal_port_tested()
 {
-    return impl_->signal_port_tested;
+    return impl_->signal_port_tested();
 }

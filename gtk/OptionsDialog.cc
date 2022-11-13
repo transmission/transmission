@@ -66,6 +66,7 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -289,7 +290,7 @@ OptionsDialog::Impl::Impl(
     destination_chooser->signal_selection_changed().connect([this, destination_chooser]()
                                                             { downloadDirChanged(destination_chooser); });
 
-    bool flag;
+    bool flag = false;
     if (!tr_ctorGetPaused(ctor_.get(), TR_FORCE, &flag))
     {
         g_assert_not_reached();

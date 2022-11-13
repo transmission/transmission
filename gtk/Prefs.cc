@@ -129,7 +129,7 @@ tr_variant* gtr_pref_get_all()
 
 int64_t gtr_pref_int_get(tr_quark const key)
 {
-    int64_t i;
+    int64_t i = 0;
 
     return tr_variantDictFindInt(getPrefs(), key, &i) ? i : 0;
 }
@@ -141,7 +141,7 @@ void gtr_pref_int_set(tr_quark const key, int64_t value)
 
 double gtr_pref_double_get(tr_quark const key)
 {
-    double d;
+    double d = 0;
 
     return tr_variantDictFindReal(getPrefs(), key, &d) ? d : 0.0;
 }
@@ -157,7 +157,7 @@ void gtr_pref_double_set(tr_quark const key, double value)
 
 bool gtr_pref_flag_get(tr_quark const key)
 {
-    bool boolVal;
+    bool boolVal = false;
 
     return tr_variantDictFindBool(getPrefs(), key, &boolVal) ? boolVal : false;
 }

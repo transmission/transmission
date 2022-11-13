@@ -130,6 +130,18 @@ extern char const* const speed_M_str;
 extern char const* const speed_G_str;
 extern char const* const speed_T_str;
 
+/***
+****
+***/
+
+void gtr_message(std::string const& message);
+void gtr_warning(std::string const& message);
+void gtr_error(std::string const& message);
+
+/***
+****
+***/
+
 enum class GtrUnicode
 {
     Up,
@@ -166,6 +178,8 @@ Glib::ustring gtr_get_help_uri();
 
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible(Gtk::Widget&, bool);
+
+Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget);
 
 void gtr_window_set_skip_taskbar_hint(Gtk::Window& window, bool value);
 void gtr_window_set_urgency_hint(Gtk::Window& window, bool value);

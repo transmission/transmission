@@ -87,6 +87,7 @@ class Application::Impl
 {
 public:
     Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -293,10 +294,9 @@ bool Application::Impl::refresh_actions()
         size_t const total = core_->get_torrent_count();
         size_t const active = core_->get_active_torrent_count();
         auto const torrent_count = core_->get_model()->children().size();
-        bool has_selection;
 
         auto const sel_counts = get_selected_torrent_counts();
-        has_selection = sel_counts.total_count > 0;
+        bool const has_selection = sel_counts.total_count > 0;
 
         gtr_action_set_sensitive("select-all", torrent_count != 0);
         gtr_action_set_sensitive("deselect-all", torrent_count != 0);
@@ -366,12 +366,11 @@ void register_magnet_link_handler()
     }
     catch (Gio::Error const& e)
     {
-        auto const msg = fmt::format(
+        gtr_warning(fmt::format(
             _("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"),
             fmt::arg("content_type", content_type),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code()));
-        g_warning("%s", msg.c_str());
+            fmt::arg("error_code", e.code())));
     }
 }
 
@@ -399,15 +398,15 @@ void Application::Impl::on_main_window_size_allocated()
     if (!is_maximized)
     {
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-        int x;
-        int y;
+        int x = 0;
+        int y = 0;
         wind_->get_position(x, y);
         gtr_pref_int_set(TR_KEY_main_window_x, x);
         gtr_pref_int_set(TR_KEY_main_window_y, y);
 #endif
 
-        int w;
-        int h;
+        int w = 0;
+        int h = 0;
 #if GTKMM_CHECK_VERSION(4, 0, 0)
         wind_->get_default_size(w, h);
 #else
@@ -449,9 +448,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
     case TR_RPC_SESSION_CHANGED:
         {
             tr_variant tmp;
-            tr_variant* newval;
+            tr_variant* newval = nullptr;
             tr_variant* oldvals = gtr_pref_get_all();
-            tr_quark key;
+            tr_quark key = TR_KEY_NONE;
             std::vector<tr_quark> changed_keys;
             auto const* const session = core_->get_session();
             tr_variantInitDict(&tmp, 100);
@@ -459,13 +458,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
 
             for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
-                bool changed;
+                bool changed = true;
 
-                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval == nullptr)
-                {
-                    changed = true;
-                }
-                else
+                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval != nullptr)
                 {
                     auto const a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC);
                     auto const b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC);
@@ -529,7 +524,7 @@ namespace
 
 gboolean signal_handler(gpointer user_data)
 {
-    g_message(_("Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."));
+    gtr_message(_("Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."));
     gtr_actions_handler("quit", user_data);
     return G_SOURCE_REMOVE;
 }
@@ -567,7 +562,7 @@ void Application::Impl::on_startup()
     std::ignore = FilterBar();
     std::ignore = PathButton();
 
-    tr_session* session;
+    tr_session* session = nullptr;
 
 #ifdef G_OS_UNIX
     g_unix_signal_add(SIGINT, &signal_handler, this);
@@ -976,8 +971,7 @@ void Application::Impl::on_app_exit()
     refresh_actions_tag_.disconnect();
 
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    auto* c = static_cast<Gtk::Container*>(wind_.get());
-    c->remove(*static_cast<Gtk::Bin*>(c)->get_child());
+    wind_->remove();
 #endif
 
     wind_->set_show_menubar(false);
@@ -989,7 +983,7 @@ void Application::Impl::on_app_exit()
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     wind_->set_child(*p);
 #else
-    c->add(*p);
+    wind_->add(*p);
 #endif
 
     auto* icon = Gtk::make_managed<Gtk::Image>();
@@ -1427,15 +1421,13 @@ void Application::Impl::show_about_dialog()
 bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method)
 {
     tr_variant top;
-    tr_variant* args;
-    tr_variant* ids;
     bool invoked = false;
     auto* session = core_->get_session();
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, method);
-    args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
-    ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
+    auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
+    auto* const ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
     sel_->selected_foreach(
         [ids](auto const& /*path*/, auto const& iter)
         {
@@ -1667,7 +1659,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else
     {
-        g_error("%s", fmt::format("Unhandled action: {}", action_name).c_str());
+        gtr_error(fmt::format("Unhandled action: {}", action_name));
     }
 
     if (changed)

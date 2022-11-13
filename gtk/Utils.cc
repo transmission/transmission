@@ -6,6 +6,7 @@
 #include <array>
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 #include <giomm.h> /* g_file_trash() */
@@ -55,6 +56,28 @@ char const* const speed_K_str = N_("kB/s");
 char const* const speed_M_str = N_("MB/s");
 char const* const speed_G_str = N_("GB/s");
 char const* const speed_T_str = N_("TB/s");
+
+/***
+****
+***/
+
+void gtr_message(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_message("%s", message.c_str());
+}
+
+void gtr_warning(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_warning("%s", message.c_str());
+}
+
+void gtr_error(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_error("%s", message.c_str());
+}
 
 /***
 ****
@@ -223,30 +246,9 @@ std::string tr_format_time_relative(time_t timestamp, time_t origin)
     return timestamp < origin ? tr_format_future_time(origin - timestamp) : tr_format_past_time(timestamp - origin);
 }
 
-namespace
-{
-
-Gtk::Window* getWindow(Gtk::Widget* w)
-{
-    if (w == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (auto* const window = dynamic_cast<Gtk::Window*>(w); window != nullptr)
-    {
-        return window;
-    }
-
-    return static_cast<Gtk::Window*>(w->get_ancestor(Gtk::Window::get_type()));
-}
-
-} // namespace
-
 void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torrent, std::string const& filename)
 {
     Glib::ustring secondary;
-    auto* win = getWindow(&child);
 
     if (duplicate_torrent != nullptr)
     {
@@ -261,7 +263,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
-        *win,
+        gtr_widget_get_window(child),
         _("Couldn't open torrent"),
         false,
         TR_GTK_MESSAGE_TYPE(ERROR),
@@ -390,14 +392,11 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message(
-                "%s",
-                fmt::format(
-                    _("Couldn't move '{path}' to trash: {error} ({error_code})"),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                    fmt::arg("error_code", e.code()))
-                    .c_str());
+            gtr_message(fmt::format(
+                _("Couldn't move '{path}' to trash: {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
         }
     }
@@ -410,14 +409,11 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message(
-                "%s",
-                fmt::format(
-                    _("Couldn't remove '{path}': {error} ({error_code})"),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                    fmt::arg("error_code", e.code()))
-                    .c_str());
+            gtr_message(fmt::format(
+                _("Couldn't remove '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
             tr_error_clear(error);
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             result = false;
@@ -469,7 +465,7 @@ void gtr_open_uri(Glib::ustring const& uri)
 
         if (!opened)
         {
-            g_message("%s", fmt::format(_("Couldn't open '{url}'"), fmt::arg("url", uri)).c_str());
+            gtr_message(fmt::format(_("Couldn't open '{url}'"), fmt::arg("url", uri)));
         }
     }
 }
@@ -630,6 +626,20 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
     w.set_visible(b);
 }
 
+Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget)
+{
+    if (auto* const window = dynamic_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(widget)); window != nullptr)
+    {
+        return *window;
+    }
+
+#if defined(G_DISABLE_ASSERT)
+    throw std::logic_error("Supplied widget doesn't have a window");
+#else
+    g_assert_not_reached();
+#endif
+}
+
 void gtr_window_set_skip_taskbar_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
 {
 #if GTK_CHECK_VERSION(4, 0, 0)
@@ -671,12 +681,10 @@ void gtr_window_raise([[maybe_unused]] Gtk::Window& window)
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 {
-    auto* window = getWindow(&parent);
-
     Glib::ustring gstr;
 
     auto w = std::make_shared<Gtk::MessageDialog>(
-        *window,
+        gtr_widget_get_window(parent),
         fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url)),
         false /*use markup*/,
         TR_GTK_MESSAGE_TYPE(ERROR),
