@@ -1,6 +1,10 @@
 ---
 Checks: >
   -*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-narrowing-conversions,
   modernize-*,
   -modernize-use-trailing-return-type,
   readability-*,
