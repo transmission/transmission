@@ -14,6 +14,7 @@ class PathButton::Impl
 {
 public:
     explicit Impl(PathButton& widget);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 

@@ -34,6 +34,7 @@ class PrefsDialog::Impl
 {
 public:
     Impl(PrefsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -70,6 +71,8 @@ class PageBase : public Gtk::Box
 public:
     PageBase(BaseObjectType* cast_item, Glib::RefPtr<Session> const& core);
     ~PageBase() override;
+
+    TR_DISABLE_COPY_MOVE(PageBase)
 
     void init_check_button(Gtk::CheckButton& button, tr_quark key);
 
@@ -428,6 +431,7 @@ class SeedingPage : public PageBase
 {
 public:
     SeedingPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    ~SeedingPage() override = default;
 
     TR_DISABLE_COPY_MOVE(SeedingPage)
 };
@@ -468,6 +472,7 @@ class DesktopPage : public PageBase
 {
 public:
     DesktopPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    ~DesktopPage() override = default;
 
     TR_DISABLE_COPY_MOVE(DesktopPage)
 };
@@ -648,6 +653,7 @@ class RemotePage : public PageBase
 
 public:
     RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    ~RemotePage() override = default;
 
     TR_DISABLE_COPY_MOVE(RemotePage)
 
@@ -857,6 +863,7 @@ class SpeedPage : public PageBase
 {
 public:
     SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    ~SpeedPage() override = default;
 
     TR_DISABLE_COPY_MOVE(SpeedPage)
 };

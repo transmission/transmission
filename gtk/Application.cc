@@ -87,6 +87,7 @@ class Application::Impl
 {
 public:
     Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 

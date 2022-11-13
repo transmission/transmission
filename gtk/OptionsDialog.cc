@@ -66,6 +66,7 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 

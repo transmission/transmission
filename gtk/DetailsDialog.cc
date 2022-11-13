@@ -2167,6 +2167,7 @@ public:
         DetailsDialog& parent,
         Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
+    ~EditTrackersDialog() override = default;
 
     TR_DISABLE_COPY_MOVE(EditTrackersDialog)
 
@@ -2285,6 +2286,7 @@ public:
         DetailsDialog& parent,
         Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
+    ~AddTrackerDialog() override = default;
 
     TR_DISABLE_COPY_MOVE(AddTrackerDialog)
 
