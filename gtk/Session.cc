@@ -942,7 +942,7 @@ bool is_torrent_active(tr_stat const* st)
 
 void Session::add_torrent(tr_torrent* tor, bool do_notify)
 {
-    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
+    ScopedModelSortBlocker const disable_sort(*impl_->get_model().get());
     impl_->add_torrent(tor, do_notify);
 }
 
@@ -1032,7 +1032,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 
     if (!do_prompt)
     {
-        ScopedModelSortBlocker disable_sort(*sorted_model_.get());
+        ScopedModelSortBlocker const disable_sort(*sorted_model_.get());
         add_torrent(create_new_torrent(ctor), do_notify);
         tr_ctorFree(ctor);
         return 0;
@@ -1260,7 +1260,7 @@ void Session::load(bool force_paused)
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
     tr_ctorFree(ctor);
 
-    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
+    ScopedModelSortBlocker const disable_sort(*impl_->get_model().get());
 
     auto torrents = std::vector<tr_torrent*>{};
     torrents.resize(n_torrents);
