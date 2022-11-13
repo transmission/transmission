@@ -109,13 +109,35 @@ public:
 
     void commit_prefs_change(tr_quark key);
 
-public:
-    sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error;
-    sigc::signal<void(tr_ctor*)> signal_add_prompt;
-    sigc::signal<void(int)> signal_blocklist_updated;
-    sigc::signal<void(bool)> signal_busy;
-    sigc::signal<void(tr_quark)> signal_prefs_changed;
-    sigc::signal<void(bool)> signal_port_tested;
+    auto& signal_add_error()
+    {
+        return signal_add_error_;
+    }
+
+    auto& signal_add_prompt()
+    {
+        return signal_add_prompt_;
+    }
+
+    auto& signal_blocklist_updated()
+    {
+        return signal_blocklist_updated_;
+    }
+
+    auto& signal_busy()
+    {
+        return signal_busy_;
+    }
+
+    auto& signal_prefs_changed()
+    {
+        return signal_prefs_changed_;
+    }
+
+    auto& signal_port_tested()
+    {
+        return signal_port_tested_;
+    }
 
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
@@ -156,6 +178,13 @@ private:
 
 private:
     Session& core_;
+
+    sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error_;
+    sigc::signal<void(tr_ctor*)> signal_add_prompt_;
+    sigc::signal<void(int)> signal_blocklist_updated_;
+    sigc::signal<void(bool)> signal_busy_;
+    sigc::signal<void(tr_quark)> signal_prefs_changed_;
+    sigc::signal<void(bool)> signal_port_tested_;
 
     Glib::RefPtr<Gio::FileMonitor> monitor_;
     sigc::connection monitor_tag_;
@@ -253,7 +282,7 @@ void Session::Impl::add_to_busy(int addMe)
 
     if (wasBusy != is_busy())
     {
-        signal_busy.emit(is_busy());
+        signal_busy_.emit(is_busy());
     }
 }
 
@@ -774,7 +803,7 @@ Session::Impl::Impl(Session& core, tr_session* session)
     on_pref_changed(TR_KEY_watch_dir_enabled);
     on_pref_changed(TR_KEY_peer_limit_global);
     on_pref_changed(TR_KEY_inhibit_desktop_hibernation);
-    signal_prefs_changed.connect([this](auto key) { on_pref_changed(key); });
+    signal_prefs_changed_.connect([this](auto key) { on_pref_changed(key); });
 
     tr_sessionSetMetadataCallback(
         session,
@@ -992,7 +1021,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
         {
-            signal_add_error.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
+            signal_add_error_.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
         }
 
         tr_ctorFree(ctor);
@@ -1007,7 +1036,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         return 0;
     }
 
-    signal_add_prompt.emit(ctor);
+    signal_add_prompt_.emit(ctor);
     return 0;
 }
 
@@ -1179,7 +1208,7 @@ void Session::torrents_added()
 void Session::Impl::torrents_added()
 {
     update();
-    signal_add_error.emit(ERR_NO_MORE_TORRENTS, {});
+    signal_add_error_.emit(ERR_NO_MORE_TORRENTS, {});
 }
 
 void Session::torrent_changed(tr_torrent_id_t id)
@@ -1477,7 +1506,7 @@ void Session::Impl::maybe_inhibit_hibernation()
 
 void Session::Impl::commit_prefs_change(tr_quark const key)
 {
-    signal_prefs_changed.emit(key);
+    signal_prefs_changed_.emit(key);
     gtr_pref_save(session_);
 }
 
@@ -1612,7 +1641,7 @@ void Session::port_test()
                 is_open = false;
             }
 
-            impl_->signal_port_tested.emit(is_open);
+            impl_->signal_port_tested().emit(is_open);
         });
     tr_variantClear(&request);
 }
@@ -1649,7 +1678,7 @@ void Session::blocklist_update()
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated.emit(ruleCount);
+            impl_->signal_blocklist_updated().emit(ruleCount);
         });
     tr_variantClear(&request);
 }
@@ -1729,30 +1758,30 @@ void Session::open_folder(tr_torrent_id_t torrent_id) const
 
 sigc::signal<void(Session::ErrorCode, Glib::ustring const&)>& Session::signal_add_error()
 {
-    return impl_->signal_add_error;
+    return impl_->signal_add_error();
 }
 
 sigc::signal<void(tr_ctor*)>& Session::signal_add_prompt()
 {
-    return impl_->signal_add_prompt;
+    return impl_->signal_add_prompt();
 }
 
 sigc::signal<void(int)>& Session::signal_blocklist_updated()
 {
-    return impl_->signal_blocklist_updated;
+    return impl_->signal_blocklist_updated();
 }
 
 sigc::signal<void(bool)>& Session::signal_busy()
 {
-    return impl_->signal_busy;
+    return impl_->signal_busy();
 }
 
 sigc::signal<void(tr_quark)>& Session::signal_prefs_changed()
 {
-    return impl_->signal_prefs_changed;
+    return impl_->signal_prefs_changed();
 }
 
 sigc::signal<void(bool)>& Session::signal_port_tested()
 {
-    return impl_->signal_port_tested;
+    return impl_->signal_port_tested();
 }
