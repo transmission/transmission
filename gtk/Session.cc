@@ -593,13 +593,12 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     }
     catch (Glib::Error const& e)
     {
-        auto const errmsg = fmt::format(
+        gtr_message(fmt::format(
             _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
             fmt::arg("old_path", old_name),
             fmt::arg("path", new_name),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code()));
-        g_message("%s", errmsg.c_str());
+            fmt::arg("error_code", e.code())));
     }
 }
 
@@ -1094,8 +1093,7 @@ void Session::Impl::add_file_async_callback(
 
         if (!file->load_contents_finish(result, contents, length))
         {
-            auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name()));
-            g_message("%s", errmsg.c_str());
+            gtr_message(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name())));
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
@@ -1108,12 +1106,11 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        auto const errmsg = fmt::format(
+        gtr_message(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", file->get_parse_name()),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code()));
-        g_message("%s", errmsg.c_str());
+            fmt::arg("error_code", e.code())));
     }
 
     dec_busy();
@@ -1576,7 +1573,7 @@ bool core_read_rpc_response_idle(TrVariantPtr const& response)
         }
         else
         {
-            g_warning("%s", fmt::format(_("Couldn't find pending RPC request for tag {tag}"), fmt::arg("tag", tag)).c_str());
+            gtr_warning(fmt::format(_("Couldn't find pending RPC request for tag {tag}"), fmt::arg("tag", tag)));
         }
     }
 
@@ -1598,7 +1595,7 @@ void Session::Impl::send_rpc_request(
 {
     if (session_ == nullptr)
     {
-        g_error("GTK+ client doesn't support connections to remote servers yet.");
+        gtr_error("GTK+ client doesn't support connections to remote servers yet.");
     }
     else
     {
@@ -1607,7 +1604,7 @@ void Session::Impl::send_rpc_request(
 
         /* make the request */
 #ifdef DEBUG_RPC
-        g_message("%s", fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)).c_str());
+        gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
 #endif
 
         tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);

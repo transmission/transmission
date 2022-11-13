@@ -366,12 +366,11 @@ void register_magnet_link_handler()
     }
     catch (Gio::Error const& e)
     {
-        auto const msg = fmt::format(
+        gtr_warning(fmt::format(
             _("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"),
             fmt::arg("content_type", content_type),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code()));
-        g_warning("%s", msg.c_str());
+            fmt::arg("error_code", e.code())));
     }
 }
 
@@ -525,7 +524,7 @@ namespace
 
 gboolean signal_handler(gpointer user_data)
 {
-    g_message(_("Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."));
+    gtr_message(_("Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."));
     gtr_actions_handler("quit", user_data);
     return G_SOURCE_REMOVE;
 }
@@ -1661,7 +1660,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     }
     else
     {
-        g_error("%s", fmt::format("Unhandled action: {}", action_name).c_str());
+        gtr_error(fmt::format("Unhandled action: {}", action_name));
     }
 
     if (changed)

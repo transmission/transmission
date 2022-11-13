@@ -375,7 +375,7 @@ tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_me
                 gstr += fmt::format(" ({})", message.name.c_str());
             }
 
-            g_warning("%s", gstr.c_str());
+            gtr_warning(gstr);
         }
     }
 

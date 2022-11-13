@@ -130,6 +130,18 @@ extern char const* const speed_M_str;
 extern char const* const speed_G_str;
 extern char const* const speed_T_str;
 
+/***
+****
+***/
+
+void gtr_message(std::string const& message);
+void gtr_warning(std::string const& message);
+void gtr_error(std::string const& message);
+
+/***
+****
+***/
+
 enum class GtrUnicode
 {
     Up,

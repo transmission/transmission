@@ -60,6 +60,28 @@ char const* const speed_T_str = N_("TB/s");
 ****
 ***/
 
+void gtr_message(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_message("%s", message.c_str());
+}
+
+void gtr_warning(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_warning("%s", message.c_str());
+}
+
+void gtr_error(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_error("%s", message.c_str());
+}
+
+/***
+****
+***/
+
 Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
 {
     switch (uni)
@@ -390,14 +412,11 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message(
-                "%s",
-                fmt::format(
-                    _("Couldn't move '{path}' to trash: {error} ({error_code})"),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                    fmt::arg("error_code", e.code()))
-                    .c_str());
+            gtr_message(fmt::format(
+                _("Couldn't move '{path}' to trash: {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
         }
     }
@@ -410,14 +429,11 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message(
-                "%s",
-                fmt::format(
-                    _("Couldn't remove '{path}': {error} ({error_code})"),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                    fmt::arg("error_code", e.code()))
-                    .c_str());
+            gtr_message(fmt::format(
+                _("Couldn't remove '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
             tr_error_clear(error);
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             result = false;
@@ -469,7 +485,7 @@ void gtr_open_uri(Glib::ustring const& uri)
 
         if (!opened)
         {
-            g_message("%s", fmt::format(_("Couldn't open '{url}'"), fmt::arg("url", uri)).c_str());
+            gtr_message(fmt::format(_("Couldn't open '{url}'"), fmt::arg("url", uri)));
         }
     }
 }
