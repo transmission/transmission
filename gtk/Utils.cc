@@ -6,6 +6,7 @@
 #include <array>
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 #include <giomm.h> /* g_file_trash() */
@@ -245,30 +246,9 @@ std::string tr_format_time_relative(time_t timestamp, time_t origin)
     return timestamp < origin ? tr_format_future_time(origin - timestamp) : tr_format_past_time(timestamp - origin);
 }
 
-namespace
-{
-
-Gtk::Window* getWindow(Gtk::Widget* w)
-{
-    if (w == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (auto* const window = dynamic_cast<Gtk::Window*>(w); window != nullptr)
-    {
-        return window;
-    }
-
-    return static_cast<Gtk::Window*>(w->get_ancestor(Gtk::Window::get_type()));
-}
-
-} // namespace
-
 void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torrent, std::string const& filename)
 {
     Glib::ustring secondary;
-    auto* win = getWindow(&child);
 
     if (duplicate_torrent != nullptr)
     {
@@ -283,7 +263,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
-        *win,
+        gtr_widget_get_window(child),
         _("Couldn't open torrent"),
         false,
         TR_GTK_MESSAGE_TYPE(ERROR),
@@ -646,6 +626,20 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
     w.set_visible(b);
 }
 
+Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget)
+{
+    if (auto* const window = dynamic_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(widget)); window != nullptr)
+    {
+        return *window;
+    }
+
+#if defined(G_DISABLE_ASSERT)
+    throw std::logic_error("Supplied widget doesn't have a window");
+#else
+    g_assert_not_reached();
+#endif
+}
+
 void gtr_window_set_skip_taskbar_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
 {
 #if GTK_CHECK_VERSION(4, 0, 0)
@@ -687,12 +681,10 @@ void gtr_window_raise([[maybe_unused]] Gtk::Window& window)
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 {
-    auto* window = getWindow(&parent);
-
     Glib::ustring gstr;
 
     auto w = std::make_shared<Gtk::MessageDialog>(
-        *window,
+        gtr_widget_get_window(parent),
         fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url)),
         false /*use markup*/,
         TR_GTK_MESSAGE_TYPE(ERROR),

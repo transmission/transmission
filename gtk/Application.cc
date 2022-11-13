@@ -971,8 +971,7 @@ void Application::Impl::on_app_exit()
     refresh_actions_tag_.disconnect();
 
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    auto* c = static_cast<Gtk::Container*>(wind_.get());
-    c->remove(*static_cast<Gtk::Bin*>(c)->get_child());
+    wind_->remove();
 #endif
 
     wind_->set_show_menubar(false);
@@ -984,7 +983,7 @@ void Application::Impl::on_app_exit()
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     wind_->set_child(*p);
 #else
-    c->add(*p);
+    wind_->add(*p);
 #endif
 
     auto* icon = Gtk::make_managed<Gtk::Image>();

@@ -586,7 +586,7 @@ void PrivacyPage::onBlocklistUpdated(int n)
 void PrivacyPage::onBlocklistUpdate()
 {
     updateBlocklistDialog_ = std::make_unique<Gtk::MessageDialog>(
-        *static_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(*this)),
+        gtr_widget_get_window(*this),
         _("Update Blocklist"),
         false,
         TR_GTK_MESSAGE_TYPE(INFO),

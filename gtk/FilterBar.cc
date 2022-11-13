@@ -794,7 +794,7 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     filter_model_row_inserted_tag_ = filter_model_->signal_row_inserted().connect(
         [this](auto const& /*path*/, auto const& /*iter*/) { update_count_label_idle(); });
 
-    static_cast<Gtk::TreeStore*>(tracker_->get_model().get())->set_data(SESSION_KEY, session);
+    gtr_ptr_dynamic_cast<Gtk::TreeStore>(tracker_->get_model())->set_data(SESSION_KEY, session);
 
     filter_model_->set_visible_func(sigc::mem_fun(*this, &Impl::is_row_visible));
 

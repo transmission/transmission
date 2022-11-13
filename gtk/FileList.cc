@@ -575,13 +575,27 @@ namespace
 
 void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
+    auto* const toggle_renderer = dynamic_cast<Gtk::CellRendererToggle*>(renderer);
+    g_assert(toggle_renderer != nullptr);
+    if (toggle_renderer == nullptr)
+    {
+        return;
+    }
+
     auto const enabled = iter->get_value(file_cols.enabled);
-    static_cast<Gtk::CellRendererToggle*>(renderer)->property_inconsistent() = enabled == MIXED;
-    static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == static_cast<int>(true);
+    toggle_renderer->property_inconsistent() = enabled == MIXED;
+    toggle_renderer->property_active() = enabled == static_cast<int>(true);
 }
 
 void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
+    auto* const text_renderer = dynamic_cast<Gtk::CellRendererText*>(renderer);
+    g_assert(text_renderer != nullptr);
+    if (text_renderer == nullptr)
+    {
+        return;
+    }
+
     Glib::ustring text;
 
     switch (auto const priority = iter->get_value(file_cols.priority); priority)
@@ -603,7 +617,7 @@ void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator 
         break;
     }
 
-    static_cast<Gtk::CellRendererText*>(renderer)->property_text() = text;
+    text_renderer->property_text() = text;
 }
 
 /* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
@@ -772,7 +786,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
     else
     {
         auto w = std::make_shared<Gtk::MessageDialog>(
-            *static_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(widget_)),
+            gtr_widget_get_window(widget_),
             fmt::format(
                 _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
                 fmt::arg("old_path", path_string),
