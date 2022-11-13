@@ -1172,8 +1172,8 @@ void initPeerRow(
     }
 
     auto peer_addr4 = in_addr();
-    auto const collated_name = inet_pton(AF_INET, peer->addr, &peer_addr4) != 1 ?
-        peer->addr :
+    auto const collated_name = inet_pton(AF_INET, std::data(peer->addr), &peer_addr4) != 1 ?
+        std::data(peer->addr) :
         fmt::format(
             "{:03}",
             fmt::join(
@@ -1181,7 +1181,7 @@ void initPeerRow(
                 reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr) + sizeof(peer_addr4.s_addr),
                 "."));
 
-    (*iter)[peer_cols.address] = peer->addr;
+    (*iter)[peer_cols.address] = std::data(peer->addr);
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
@@ -1251,7 +1251,7 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     (*iter)[peer_cols.download_rate_string] = down_speed;
     (*iter)[peer_cols.upload_rate_double] = peer->rateToPeer_KBps;
     (*iter)[peer_cols.upload_rate_string] = up_speed;
-    (*iter)[peer_cols.flags] = peer->flagStr;
+    (*iter)[peer_cols.flags] = std::data(peer->flagStr);
     (*iter)[peer_cols.was_updated] = true;
     (*iter)[peer_cols.blocks_downloaded_count_int] = (int)peer->blocksToClient;
     (*iter)[peer_cols.blocks_downloaded_count_string] = blocks_to_client;
@@ -1813,7 +1813,7 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
                 // {markup_begin} and {markup_end} should surround the error
                 _("Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"),
                 fmt::arg("markup_begin", ErrMarkupBegin),
-                fmt::arg("error", Glib::Markup::escape_text(tracker.lastAnnounceResult)),
+                fmt::arg("error", Glib::Markup::escape_text(std::data(tracker.lastAnnounceResult))),
                 fmt::arg("markup_end", ErrMarkupEnd),
                 fmt::arg("time_span_ago", time_span_ago));
         }
@@ -1885,7 +1885,7 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
             gstr << fmt::format(
                 // {markup_begin} and {markup_end} should surround the error text
                 _("Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"),
-                fmt::arg("error", Glib::Markup::escape_text(tracker.lastScrapeResult)),
+                fmt::arg("error", Glib::Markup::escape_text(std::data(tracker.lastScrapeResult))),
                 fmt::arg("time_span_ago", time_span_ago),
                 fmt::arg("markup_begin", ErrMarkupBegin),
                 fmt::arg("markup_end", ErrMarkupEnd));

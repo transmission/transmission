@@ -185,7 +185,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
         for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
         {
             auto const view = tr_torrentTracker(tor, i);
-            torrent_sites_and_hosts.try_emplace(view.sitename, view.host);
+            torrent_sites_and_hosts.try_emplace(std::data(view.sitename), view.host);
         }
 
         for (auto const& [sitename, host] : torrent_sites_and_hosts)
@@ -391,7 +391,7 @@ bool test_tracker(tr_torrent const* tor, int active_tracker_type, Glib::ustring 
 
     for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
     {
-        if (tr_torrentTracker(tor, i).sitename == host)
+        if (auto const tracker = tr_torrentTracker(tor, i); std::data(tracker.sitename) == host)
         {
             return true;
         }
