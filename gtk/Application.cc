@@ -294,10 +294,9 @@ bool Application::Impl::refresh_actions()
         size_t const total = core_->get_torrent_count();
         size_t const active = core_->get_active_torrent_count();
         auto const torrent_count = core_->get_model()->children().size();
-        bool has_selection;
 
         auto const sel_counts = get_selected_torrent_counts();
-        has_selection = sel_counts.total_count > 0;
+        bool const has_selection = sel_counts.total_count > 0;
 
         gtr_action_set_sensitive("select-all", torrent_count != 0);
         gtr_action_set_sensitive("deselect-all", torrent_count != 0);
@@ -400,15 +399,15 @@ void Application::Impl::on_main_window_size_allocated()
     if (!is_maximized)
     {
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-        int x;
-        int y;
+        int x = 0;
+        int y = 0;
         wind_->get_position(x, y);
         gtr_pref_int_set(TR_KEY_main_window_x, x);
         gtr_pref_int_set(TR_KEY_main_window_y, y);
 #endif
 
-        int w;
-        int h;
+        int w = 0;
+        int h = 0;
 #if GTKMM_CHECK_VERSION(4, 0, 0)
         wind_->get_default_size(w, h);
 #else
@@ -450,9 +449,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
     case TR_RPC_SESSION_CHANGED:
         {
             tr_variant tmp;
-            tr_variant* newval;
+            tr_variant* newval = nullptr;
             tr_variant* oldvals = gtr_pref_get_all();
-            tr_quark key;
+            tr_quark key = TR_KEY_NONE;
             std::vector<tr_quark> changed_keys;
             auto const* const session = core_->get_session();
             tr_variantInitDict(&tmp, 100);
@@ -460,13 +459,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
 
             for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
-                bool changed;
+                bool changed = true;
 
-                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval == nullptr)
-                {
-                    changed = true;
-                }
-                else
+                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval != nullptr)
                 {
                     auto const a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC);
                     auto const b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC);
@@ -568,7 +563,7 @@ void Application::Impl::on_startup()
     std::ignore = FilterBar();
     std::ignore = PathButton();
 
-    tr_session* session;
+    tr_session* session = nullptr;
 
 #ifdef G_OS_UNIX
     g_unix_signal_add(SIGINT, &signal_handler, this);
@@ -1428,15 +1423,13 @@ void Application::Impl::show_about_dialog()
 bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method)
 {
     tr_variant top;
-    tr_variant* args;
-    tr_variant* ids;
     bool invoked = false;
     auto* session = core_->get_session();
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, method);
-    args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
-    ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
+    auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
+    auto* const ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
     sel_->selected_foreach(
         [ids](auto const& /*path*/, auto const& iter)
         {

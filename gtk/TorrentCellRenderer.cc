@@ -48,7 +48,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
     bool const isDone = st->leftUntilDone == 0;
     uint64_t const haveTotal = st->haveUnchecked + st->haveValid;
     bool const isSeed = st->haveValid >= total_size;
-    double seedRatio;
+    double seedRatio = 0;
     bool const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
     if (!isDone) // downloading
@@ -421,8 +421,8 @@ void TorrentCellRenderer::Impl::set_icon(
 
 void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width, int& height) const
 {
-    int xpad;
-    int ypad;
+    int xpad = 0;
+    int ypad = 0;
     Gtk::Requisition min_size;
     Gtk::Requisition icon_size;
     Gtk::Requisition name_size;
@@ -457,8 +457,8 @@ void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width
 
 void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, int& height) const
 {
-    int xpad;
-    int ypad;
+    int xpad = 0;
+    int ypad = 0;
     Gtk::Requisition min_size;
     Gtk::Requisition icon_size;
     Gtk::Requisition name_size;
@@ -503,8 +503,8 @@ void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& mi
 {
     if (impl_->torrent.get_value() != nullptr)
     {
-        int w;
-        int h;
+        int w = 0;
+        int h = 0;
 
         if (impl_->compact.get_value())
         {
@@ -524,8 +524,8 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
 {
     if (impl_->torrent.get_value() != nullptr)
     {
-        int w;
-        int h;
+        int w = 0;
+        int h = 0;
 
         if (impl_->compact.get_value())
         {
@@ -544,22 +544,10 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
 namespace
 {
 
-double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* seed)
+int get_percent_done(tr_torrent const* tor, tr_stat const* st)
 {
-    double d;
-
-    if (st->activity == TR_STATUS_SEED && tr_torrentGetSeedRatio(tor, &d))
-    {
-        *seed = true;
-        d = MAX(0.0, st->seedRatioPercentDone);
-    }
-    else
-    {
-        *seed = false;
-        d = MAX(0.0, st->percentDone);
-    }
-
-    return d;
+    auto const seed = st->activity == TR_STATUS_SEED && tr_torrentGetSeedRatio(tor, nullptr);
+    return static_cast<int>(seed ? std::max(0.0F, st->seedRatioPercentDone) : std::max(0.0F, st->percentDone));
 }
 
 Gdk::RGBA const& get_progress_bar_color(tr_stat const& st)
@@ -683,17 +671,16 @@ void TorrentCellRenderer::Impl::render_compact(
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
 {
-    int xpad;
-    int ypad;
-    int min_width;
-    int width;
-    bool seed;
+    int xpad = 0;
+    int ypad = 0;
+    int min_width = 0;
+    int width = 0;
 
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
-    auto const percentDone = get_percent_done(tor, st, &seed);
+    auto const percent_done = get_percent_done(tor, st);
     bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
@@ -764,7 +751,6 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->property_sensitive() = sensitive;
     render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
 
-    auto const percent_done = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
@@ -786,18 +772,17 @@ void TorrentCellRenderer::Impl::render_full(
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
 {
-    int xpad;
-    int ypad;
+    int xpad = 0;
+    int ypad = 0;
     Gtk::Requisition min_size;
     Gtk::Requisition size;
-    bool seed;
 
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
     auto const total_size = tr_torrentTotalSize(tor);
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
-    auto const percentDone = get_percent_done(tor, st, &seed);
+    auto const percent_done = get_percent_done(tor, st);
     bool const sensitive = active || st->error != 0;
 
     if (st->activity == TR_STATUS_STOPPED)
@@ -913,7 +898,7 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
     render_impl(*text_renderer_, snapshot, widget, prog_area, prog_area, flags);
 
-    progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
+    progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
     render_progress_bar(snapshot, widget, prct_area, flags, progress_color);

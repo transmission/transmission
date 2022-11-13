@@ -304,69 +304,15 @@ int compare_eta(int a, int b)
     return a < b ? 1 : -1;
 }
 
-int compare_double(double a, double b)
+template<typename T>
+int compare_generic(T&& a, T&& b)
 {
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
-}
-
-int compare_uint64(uint64_t a, uint64_t b)
-{
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
-}
-
-int compare_int(int a, int b)
-{
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
+    return a < b ? -1 : (a > b ? 1 : 0);
 }
 
 int compare_ratio(double a, double b)
 {
-    int ret;
+    int ret = 0;
 
     if ((int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF)
     {
@@ -382,27 +328,7 @@ int compare_ratio(double a, double b)
     }
     else
     {
-        ret = compare_double(a, b);
-    }
-
-    return ret;
-}
-
-int compare_time(time_t a, time_t b)
-{
-    int ret;
-
-    if (a < b)
-    {
-        ret = -1;
-    }
-    else if (a > b)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
+        ret = compare_generic(a, b);
     }
 
     return ret;
@@ -452,13 +378,13 @@ int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
     auto const bUp = b->get_value(torrent_cols.speed_up);
     auto const bDown = b->get_value(torrent_cols.speed_down);
 
-    ret = compare_double(aUp + aDown, bUp + bDown);
+    ret = compare_generic(aUp + aDown, bUp + bDown);
 
     if (ret == 0)
     {
         auto const* const sa = tr_torrentStatCached(ta);
         auto const* const sb = tr_torrentStatCached(tb);
-        ret = compare_uint64(sa->peersSendingToUs + sa->peersGettingFromUs, sb->peersSendingToUs + sb->peersGettingFromUs);
+        ret = compare_generic(sa->peersSendingToUs + sa->peersGettingFromUs, sb->peersSendingToUs + sb->peersGettingFromUs);
     }
 
     if (ret == 0)
@@ -473,7 +399,7 @@ int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::cons
 {
     auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
     auto* const tb = static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent));
-    int ret = compare_time(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
+    int ret = compare_generic(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
 
     if (ret == 0)
     {
@@ -487,7 +413,7 @@ int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::con
 {
     auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const size_b = tr_torrentTotalSize(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-    int ret = compare_uint64(size_a, size_b);
+    int ret = compare_generic(size_a, size_b);
 
     if (ret == 0)
     {
@@ -501,11 +427,11 @@ int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-    int ret = compare_double(sa->percentComplete, sb->percentComplete);
+    int ret = compare_generic(sa->percentComplete, sb->percentComplete);
 
     if (ret == 0)
     {
-        ret = compare_double(sa->seedRatioPercentDone, sb->seedRatioPercentDone);
+        ret = compare_generic(sa->seedRatioPercentDone, sb->seedRatioPercentDone);
     }
 
     if (ret == 0)
@@ -534,7 +460,7 @@ int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::co
 {
     auto const sa = a->get_value(torrent_cols.activity);
     auto const sb = b->get_value(torrent_cols.activity);
-    int ret = compare_int(sa, sb);
+    int ret = compare_generic(sa, sb);
 
     if (ret == 0)
     {
@@ -1132,11 +1058,11 @@ void Session::Impl::add_file_async_callback(
     bool do_prompt,
     bool do_notify)
 {
-    gsize length;
-    char* contents;
-
     try
     {
+        gsize length = 0;
+        char* contents = nullptr;
+
         if (!file->load_contents_finish(result, contents, length))
         {
             auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name()));
@@ -1677,8 +1603,8 @@ void Session::port_test()
         tag,
         [this](auto* response)
         {
-            tr_variant* args;
-            bool is_open;
+            tr_variant* args = nullptr;
+            bool is_open = false;
 
             if (!tr_variantDictFindDict(response, TR_KEY_arguments, &args) ||
                 !tr_variantDictFindBool(args, TR_KEY_port_is_open, &is_open))
@@ -1709,8 +1635,8 @@ void Session::blocklist_update()
         tag,
         [this](auto* response)
         {
-            tr_variant* args;
-            int64_t ruleCount;
+            tr_variant* args = nullptr;
+            int64_t ruleCount = 0;
 
             if (!tr_variantDictFindDict(response, TR_KEY_arguments, &args) ||
                 !tr_variantDictFindInt(args, TR_KEY_blocklist_size, &ruleCount))

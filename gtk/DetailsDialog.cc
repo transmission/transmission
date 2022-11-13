@@ -1533,7 +1533,7 @@ namespace
 void setPeerViewColumns(Gtk::TreeView* peer_view)
 {
     std::vector<Gtk::TreeModelColumnBase const*> view_columns;
-    Gtk::TreeViewColumn* c;
+    Gtk::TreeViewColumn* c = nullptr;
     bool const more = gtr_pref_flag_get(TR_KEY_show_extra_peer_details);
 
     view_columns.push_back(&peer_cols.encryption_stock_id);
@@ -2346,14 +2346,12 @@ void AddTrackerDialog::on_response(int response)
             if (tr_urlIsValidTracker(url.c_str()))
             {
                 tr_variant top;
-                tr_variant* args;
-                tr_variant* trackers;
 
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
-                args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+                auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddInt(args, TR_KEY_id, torrent_id_);
-                trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
+                auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
                 tr_variantListAddStr(trackers, url.raw());
 
                 core_->exec(&top);
@@ -2397,14 +2395,12 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         auto const torrent_id = iter->get_value(tracker_cols.torrent_id);
         auto const tracker_id = iter->get_value(tracker_cols.tracker_id);
         tr_variant top;
-        tr_variant* args;
-        tr_variant* trackers;
 
         tr_variantInitDict(&top, 2);
         tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
-        args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+        auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
         tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
-        trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
+        auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
         tr_variantListAddInt(trackers, tracker_id);
 
         core_->exec(&top);

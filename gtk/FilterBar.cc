@@ -696,25 +696,17 @@ bool FilterBar::Impl::update_count_label()
     auto const visibleCount = static_cast<int>(filter_model_->children().size());
 
     /* get the tracker count */
-    int trackerCount;
+    int trackerCount = 0;
     if (auto const iter = tracker_->get_active(); iter)
     {
         trackerCount = iter->get_value(tracker_filter_cols.count);
     }
-    else
-    {
-        trackerCount = 0;
-    }
 
     /* get the activity count */
-    int activityCount;
+    int activityCount = 0;
     if (auto const iter = activity_->get_active(); iter)
     {
         activityCount = iter->get_value(activity_filter_cols.count);
-    }
-    else
-    {
-        activityCount = 0;
     }
 
     /* set the text */

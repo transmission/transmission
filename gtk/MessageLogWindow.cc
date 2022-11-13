@@ -37,7 +37,7 @@ public:
     Gtk::TreeModelColumn<unsigned int> sequence;
     Gtk::TreeModelColumn<Glib::ustring> name;
     Gtk::TreeModelColumn<Glib::ustring> message;
-    Gtk::TreeModelColumn<tr_log_message*> tr_msg;
+    Gtk::TreeModelColumn<tr_log_message const*> tr_msg;
 };
 
 MessageLogColumnsModel const message_log_cols;
@@ -295,7 +295,7 @@ void renderTime(Gtk::CellRendererText* renderer, Gtk::TreeModel::const_iterator 
 
 void appendColumn(Gtk::TreeView* view, Gtk::TreeModelColumnBase const& col)
 {
-    Gtk::TreeViewColumn* c;
+    Gtk::TreeViewColumn* c = nullptr;
 
     if (col == message_log_cols.name)
     {
@@ -348,36 +348,38 @@ namespace
 
 tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_message* head)
 {
-    tr_log_message* i;
     static unsigned int sequence = 0;
     auto const default_name = Glib::get_application_name();
 
-    for (i = head; i != nullptr && i->next != nullptr; i = i->next)
+    while (head != nullptr && head->next != nullptr)
     {
-        char const* name = !std::empty(i->name) ? i->name.c_str() : default_name.c_str();
+        auto const& message = *head;
+        head = head->next;
+
+        char const* name = !std::empty(message.name) ? message.name.c_str() : default_name.c_str();
 
         auto row_it = store->prepend();
         auto& row = *row_it;
-        row[message_log_cols.tr_msg] = i;
+        row[message_log_cols.tr_msg] = &message;
         row[message_log_cols.name] = name;
-        row[message_log_cols.message] = i->message;
+        row[message_log_cols.message] = message.message;
         row[message_log_cols.sequence] = ++sequence;
 
         /* if it's an error message, dump it to the terminal too */
-        if (i->level == TR_LOG_ERROR)
+        if (message.level == TR_LOG_ERROR)
         {
-            auto gstr = fmt::format("{}:{} {}", i->file, i->line, i->message);
+            auto gstr = fmt::format("{}:{} {}", message.file, message.line, message.message);
 
-            if (!std::empty(i->name))
+            if (!std::empty(message.name))
             {
-                gstr += fmt::format(" ({})", i->name.c_str());
+                gstr += fmt::format(" ({})", message.name.c_str());
             }
 
             g_warning("%s", gstr.c_str());
         }
     }
 
-    return i; /* tail */
+    return head; /* tail */
 }
 
 } // namespace

@@ -302,8 +302,8 @@ void FileList::Impl::refresh()
     }
     else
     {
-        Gtk::SortType order;
-        int sort_column_id;
+        Gtk::SortType order = TR_GTK_SORT_TYPE(ASCENDING);
+        int sort_column_id = 0;
         store_->get_sort_column_id(sort_column_id, order);
 
         RefreshData refresh_data{ sort_column_id, false, tor };
@@ -710,8 +710,8 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
  */
 bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path)
 {
-    int cell_x;
-    int cell_y;
+    int cell_x = 0;
+    int cell_y = 0;
 
     if (view_->get_path_at_pos(view_x, view_y, path, col, cell_x, cell_y))
     {
@@ -729,7 +729,7 @@ bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::Tr
 
 bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, double view_x, double view_y)
 {
-    Gtk::TreeViewColumn* col;
+    Gtk::TreeViewColumn* col = nullptr;
     Gtk::TreeModel::Path path;
     bool handled = false;
 
@@ -931,8 +931,8 @@ FileList::Impl::Impl(
     {
         /* add "progress" column */
         auto const* title = _("Have");
-        int width;
-        int height;
+        int width = 0;
+        int height = 0;
         view_->create_pango_layout(title)->get_pixel_size(width, height);
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererProgress>();
@@ -948,8 +948,8 @@ FileList::Impl::Impl(
     {
         /* add "enabled" column */
         auto const* title = _("Download");
-        int width;
-        int height;
+        int width = 0;
+        int height = 0;
         view_->create_pango_layout(title)->get_pixel_size(width, height);
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererToggle>();
@@ -965,8 +965,8 @@ FileList::Impl::Impl(
     {
         /* add priority column */
         auto const* title = _("Priority");
-        int width;
-        int height;
+        int width = 0;
+        int height = 0;
         view_->create_pango_layout(title)->get_pixel_size(width, height);
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererText>();
