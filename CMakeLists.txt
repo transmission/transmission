@@ -6,8 +6,8 @@ endif()
 
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
-if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
+if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X version to target for deployment" FORCE)
 endif()
 
 project(transmission)
