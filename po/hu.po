@@ -9,6 +9,7 @@
 # Balázs Meskó <meskobalazs@mailbox.org>, 2022
 # c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2022
 # Béla Bajza, 2022
+# Anon, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
@@ -16,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
@@ -28,55 +29,55 @@ msgstr ""
 
 #: ../cli/cli.cc:105 ../gtk/Utils.cc:114 ../libtransmission/utils.cc:646
 msgid "None"
-msgstr "Egyik sem"
+msgstr "Nincs"
 
 #: ../cli/cli.cc:110
 msgid "Inf"
-msgstr "∞"
+msgstr "Inf"
 
 #: ../daemon/daemon.cc:232 ../gtk/Session.cc:1113 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:78 ../libtransmission/utils.cc:98 ../libtransmission/utils.cc:110 ../libtransmission/watchdir.cc:121 ../libtransmission/watchdir.cc:148
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr "A(z) „{path}” nem olvasható: {error} ({error_code})"
+msgstr "'{path}' nem olvasható: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:258 ../gtk/Session.cc:1164 ../gtk/Utils.cc:262 ../libtransmission/watchdir.cc:97
 msgid "Couldn't add torrent file '{path}'"
-msgstr "A(z) „{path}” torrentfájl nem adható hozzá"
+msgstr "'{path}' torrent fájl nem adható hozzá"
 
 #: ../daemon/daemon.cc:269
 msgid "Removing torrent file '{path}'"
-msgstr "A(z) „{path}” torrentfájl eltávolítása"
+msgstr "'{path}' torrent fájl eltávolítása"
 
 #: ../daemon/daemon.cc:274 ../gtk/Utils.cc:413 ../libtransmission/utils.cc:706
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr "A(z) „{path}” nem távolítható el: {error} ({error_code})"
+msgstr "'{path}' nem távolítható el: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:602
 msgid "Couldn't parse log level '{level}'"
-msgstr "A(z) „{level}” naplózási szint nem dolgozható fel"
+msgstr "'{level}' naplózási szint nem dolgozható fel"
 
 #: ../daemon/daemon.cc:643
 msgid "Deferring reload until session is fully started."
-msgstr "Az újratöltés késleltetése, amíg a munkamenet nem indul el teljesen."
+msgstr "Újratöltés késleltetése, amíg a munkamenet nem indul el teljesen."
 
 #: ../daemon/daemon.cc:658
 msgid "Reloading settings from '{path}'"
-msgstr "A beállítások újratöltése innen: „{path}”"
+msgstr "Beállítások újratöltése innen: '{path}'"
 
 #: ../daemon/daemon.cc:694
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr "Nem sikerült a démon előkészítése: {error} ({error_code})"
+msgstr "Nem sikerült a démon elindítása: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:707
 msgid "Loading settings from '{path}'"
-msgstr "A beállítások betöltése innen: „{path}”"
+msgstr "A beállítások betöltése innen: '{path}'"
 
 #: ../daemon/daemon.cc:727
 msgid "Saved pidfile '{path}'"
-msgstr "PID-fájl mentve: „{path}”"
+msgstr "PID-fájl mentve: '{path}'"
 
 #: ../daemon/daemon.cc:733 ../gtk/MessageLogWindow.cc:204 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1516 ../libtransmission/torrent.cc:757 ../libtransmission/torrent.cc:1969 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” mentése: {error} ({error_code})"
+msgstr "Nem sikerült '{path}' mentése: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:743
 msgid "Requiring authentication"
@@ -84,7 +85,7 @@ msgstr "Hitelesítés megkövetelése"
 
 #: ../daemon/daemon.cc:764
 msgid "Watching '{path}' for new torrent files"
-msgstr "A(z) „{path}” figyelése új torrentfájlokat keresve"
+msgstr "'{path}' figyelése új torrent fájlokat keresve"
 
 #: ../daemon/daemon.cc:808 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
@@ -96,11 +97,11 @@ msgstr "Nem sikerült az esemény hozzáadása: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:832
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr "Nem sikerült démon eseményciklusának elindítása: {error} ({error_code})"
+msgstr "Daemon eseményciklusának elindítása nem sikerült: {error} ({error_code})"
 
 #: ../gtk/Application.cc:370
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr "Nem sikerült a Transmission regisztrációja a(z) {content_type} tartalomtípus kezelőjeként: {error} ({error_code})"
+msgstr "Nem sikerült a Transmission regisztrációja {content_type} tartalomtípus kezelőjeként: {error} ({error_code})"
 
 #: ../gtk/Application.cc:527
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
@@ -116,7 +117,7 @@ msgstr "_Mégse"
 
 #: ../gtk/Application.cc:761
 msgid "I _Agree"
-msgstr "_Elfogadás"
+msgstr "_Elfogadom"
 
 #: ../gtk/Application.cc:995
 msgid "Closing Connections…"
@@ -124,7 +125,7 @@ msgstr "Kapcsolatok lezárása…"
 
 #: ../gtk/Application.cc:1000
 msgid "Sending upload/download totals to tracker…"
-msgstr "Feltöltési/letöltési összesítések elküldése a követőnek…"
+msgstr "Feltöltési/letöltési összesítések elküldése a trackernek…"
 
 #: ../gtk/Application.cc:1005
 msgid "_Quit Now"
@@ -134,7 +135,7 @@ msgstr "_Kilépés most"
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "A sérült torrent hozzáadása sikertelen"
-msgstr[1] "A sérült torrentek hozzáadása sikertelen"
+msgstr[1] "Nem sikerült a sérült torrentek hozzáadása"
 
 #: ../gtk/Application.cc:1074
 msgid "Couldn't add duplicate torrent"
@@ -144,7 +145,7 @@ msgstr[1] "A már meglévő torrentek hozzáadása sikertelen"
 
 #: ../gtk/Application.cc:1397
 msgid "A fast and easy BitTorrent client"
-msgstr "Gyors és egyszerű BitTorrent-kliens"
+msgstr "Egy gyors és egyszerű BitTorrent-kliens"
 
 #: ../gtk/Application.cc:1398
 msgid "Copyright © The Transmission Project"
@@ -212,7 +213,7 @@ msgstr "Megosztás befejezése, ha N percig inaktív:"
 
 #: ../gtk/DetailsDialog.cc:542 ../gtk/TorrentCellRenderer.cc:172
 msgid "Queued for verification"
-msgstr "Ellenőrzéshez sorba állítva"
+msgstr "Sorbaállítva ellenőrzéshez"
 
 #: ../gtk/DetailsDialog.cc:545
 msgid "Verifying local data"
@@ -229,7 +230,7 @@ msgstr "Letöltés"
 
 #: ../gtk/DetailsDialog.cc:554 ../gtk/TorrentCellRenderer.cc:178
 msgid "Queued for seeding"
-msgstr "Megosztáshoz sorba állítva"
+msgstr "Sorbaállítva megosztáshoz"
 
 #: ../gtk/DetailsDialog.cc:557 ../gtk/FilterBar.cc:527
 msgctxt "Verb"
@@ -242,11 +243,11 @@ msgstr "Elkészült"
 
 #: ../gtk/DetailsDialog.cc:560 ../gtk/FilterBar.cc:528 ../gtk/TorrentCellRenderer.cc:169
 msgid "Paused"
-msgstr "Felfüggesztett"
+msgstr "Szüneteltetett"
 
 #: ../gtk/DetailsDialog.cc:581 ../gtk/DetailsDialog.cc:586 ../gtk/DetailsDialog.cc:700
 msgid "N/A"
-msgstr "Nincs adat"
+msgstr "N/A"
 
 #: ../gtk/DetailsDialog.cc:595 ../gtk/FileList.cc:616
 msgid "Mixed"
@@ -258,7 +259,7 @@ msgstr "Nincs torrent kiválasztva"
 
 #: ../gtk/DetailsDialog.cc:625
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr "Privát torrent – DHT és PEX kikapcsolva"
+msgstr "Privát ezen tracker számára -- DHT és PEX letiltva "
 
 #: ../gtk/DetailsDialog.cc:625
 msgid "Public torrent"
@@ -328,7 +329,7 @@ msgstr "Most aktív"
 
 #: ../gtk/DetailsDialog.cc:1462
 msgid "Optimistic unchoke"
-msgstr "Optimista engedélyezés"
+msgstr "Optimista feloldás"
 
 #: ../gtk/DetailsDialog.cc:1466
 msgid "Downloading from this peer"
@@ -336,7 +337,7 @@ msgstr "Letöltés ettől a partnertől"
 
 #: ../gtk/DetailsDialog.cc:1470
 msgid "We would download from this peer if they would let us"
-msgstr "Letöltés ettől a partnertől, ha hagyná"
+msgstr "Letöltenénk ettől a partnertől, ha hagyná"
 
 #: ../gtk/DetailsDialog.cc:1474
 msgid "Uploading to peer"
@@ -348,11 +349,11 @@ msgstr "Feltöltés a partnernek, ha kérné"
 
 #: ../gtk/DetailsDialog.cc:1482
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "A partner hajlandó küldeni, de nem érdeklődünk"
+msgstr "A partner feloldott minket, de nem érdeklődünk"
 
 #: ../gtk/DetailsDialog.cc:1486
 msgid "We unchoked this peer, but they're not interested"
-msgstr "A partnernek hajlandók vagyunk küldeni, de nem érdeklődik"
+msgstr "A partnert feloldottuk, de nem érdeklődik"
 
 #: ../gtk/DetailsDialog.cc:1490
 msgid "Encrypted connection"
@@ -360,7 +361,7 @@ msgstr "Titkosított kapcsolat"
 
 #: ../gtk/DetailsDialog.cc:1494
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr "A partner partnercsere (PEX) segítségével lett megtalálva"
+msgstr "A partner Partnercsere (PEX) segítségével lett megtalálva"
 
 #: ../gtk/DetailsDialog.cc:1498
 msgid "Peer was found through DHT"
@@ -368,11 +369,11 @@ msgstr "A partner DHT segítségével lett megtalálva"
 
 #: ../gtk/DetailsDialog.cc:1502
 msgid "Peer is an incoming connection"
-msgstr "A partner egy beérkező kapcsolat"
+msgstr "Bejövő kapcsolatú partner"
 
 #: ../gtk/DetailsDialog.cc:1506
 msgid "Peer is connected over µTP"
-msgstr "A partner µTP-n keresztül csatlakozik"
+msgstr "Partner µTP-n keresztül kapcsolódik"
 
 #: ../gtk/DetailsDialog.cc:1592
 msgid "Address"
@@ -441,7 +442,7 @@ msgstr "A partnerlista kérése során {markup_begin}időtúllépés történt{m
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1817
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "„{markup_begin}{error}{markup_end}” hiba fogadva {time_span_ago}"
+msgstr "'{markup_begin}{error}{markup_end}' hiba fogadva {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1830
 msgid "No updates scheduled"
@@ -463,7 +464,7 @@ msgstr "További partnerek kérve {markup_begin}{time_span_ago}{markup_end}"
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1877
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "A követő  {time_span_ago} ennyi felhasználóról tudott: {markup_begin}{seeder_count} {seeder_or_seeders} és {leecher_count} {leecher_or_leechers}."
+msgstr "A tracker {time_span_ago} ennyi felhasználóról tudott: {markup_begin}{seeder_count} {seeder_or_seeders} és {leecher_count} {leecher_or_leechers}{markup_end}."
 
 #: ../gtk/DetailsDialog.cc:1879
 msgid "seeder"
@@ -480,7 +481,7 @@ msgstr[1] "letöltő"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1890
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "„{markup_begin}{error}{markup_end}” feldolgozási hiba fogadva {time_span_ago}"
+msgstr "'{markup_begin}{error}{markup_end}' scrape hiba fogadva {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1907
 msgid "Asking for peer counts in {time_span_from_now}"
@@ -496,7 +497,7 @@ msgstr "Partnerek száma lekérve {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2204
 msgid "{torrent_name} - Edit Trackers"
-msgstr "{torrent_name} – Követők szerkesztése"
+msgstr "{torrent_name} - Trackerek szerkesztése"
 
 #: ../gtk/DetailsDialog.cc:2238
 msgid "List contains invalid URLs"
@@ -508,41 +509,39 @@ msgstr "Javítsa a hibákat és próbálja újra."
 
 #: ../gtk/DetailsDialog.cc:2323
 msgid "{torrent_name} - Add Tracker"
-msgstr "{torrent_name} – Követő hozzáadása"
+msgstr "{torrent_name} - Tracker hozzáadása"
 
 #: ../gtk/DetailsDialog.cc:2436 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
 msgid "Trackers"
-msgstr "Követők"
+msgstr "Trackerek"
 
 #: ../gtk/DetailsDialog.cc:2616
 msgid "{torrent_name} Properties"
-msgstr "{torrent_name} – Tulajdonságok"
+msgstr "{torrent_name} Tulajdonságok"
 
 #: ../gtk/DetailsDialog.cc:2621
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] "Tulajdonságok – {torrent_count:L} torrent"
-msgstr[1] "Tulajdonságok – {torrent_count:L} torrent"
+msgstr[1] "Tulajdonságok - {torrent_count:L} torrent"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Eltávolítja a torrentet?"
-msgstr[1] "Eltávolít %d torrentet?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Törli a torrent letöltött fájljait?"
-msgstr[1] "Törli %d torrent letöltött fájljait?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "Ha törölte, az átvitel folytatásához szüksége lesz a torrentfájlra vagy a mágneslinkre."
-msgstr[1] "Ha törölte, az átvitelek folytatásához szüksége lesz a torrentfájlokra vagy a mágneslinkekre."
+msgstr[1] "Ha törölte, az átvitelek folytatásához szüksége lesz a torrent fájlokra vagy a magnet linkekre."
 
 #: ../gtk/Dialogs.cc:71
 msgid "This torrent has not finished downloading."
@@ -554,13 +553,13 @@ msgstr[1] "A torrentek letöltése még nem fejeződött be."
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "Ez a torrent partnerekhez csatlakozik."
-msgstr[1] "Ezek a torrentek partnerekhez csatlakoznak."
+msgstr[1] "Ezek a torrentek partnerekhez kapcsolódnak."
 
 #: ../gtk/Dialogs.cc:84
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "A torrentek egyike partnerekhez csatlakozik."
-msgstr[1] "Néhány torrent partnerekhez csatlakozik."
+msgstr[1] "Ezen torrentek némelyike partnerekhez kapcsolódik."
 
 #: ../gtk/Dialogs.cc:97
 msgid "One of these torrents has not finished downloading."
@@ -582,7 +581,7 @@ msgstr "Magas"
 
 #: ../gtk/FileList.cc:608 ../gtk/Utils.cc:572
 msgid "Normal"
-msgstr "Közepes"
+msgstr "Normál"
 
 #: ../gtk/FileList.cc:612 ../gtk/Utils.cc:573
 msgid "Low"
@@ -590,7 +589,7 @@ msgstr "Alacsony"
 
 #: ../gtk/FileList.cc:791 ../gtk/Session.cc:600
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{old_path}” átnevezése erre: „{path}”: {error} ({error_code})"
+msgstr "Nem sikerült '{old_path}' átnevezése erre: '{path}': {error} ({error_code})"
 
 #: ../gtk/FileList.cc:908 ../gtk/MessageLogWindow.cc:303
 msgid "Name"
@@ -694,11 +693,11 @@ msgstr "Munkamenet aránya"
 
 #: ../gtk/MainWindow.cc:473
 msgid "Total Transfer"
-msgstr "Összes átvitel"
+msgstr "Összes forgalom"
 
 #: ../gtk/MainWindow.cc:474
 msgid "Session Transfer"
-msgstr "Munkamenet átvitele"
+msgstr "Munkamenet forgalma"
 
 #: ../gtk/MainWindow.cc:639 ../gtk/MainWindow.cc:660 ../gtk/TorrentCellRenderer.cc:191
 msgid "Ratio: {ratio}"
@@ -724,15 +723,15 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MakeDialog.cc:164
 msgid "Creating '{path}'"
-msgstr "„{path}” létrehozása"
+msgstr "'{path}' létrehozása"
 
 #: ../gtk/MakeDialog.cc:177
 msgid "Created '{path}'"
-msgstr "„{path}” létrehozva"
+msgstr "'{path}' létrehozva"
 
 #: ../gtk/MakeDialog.cc:183 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
 msgid "Couldn't create '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” létrehozása: {error} ({error_code})"
+msgstr "Nem sikerült '{path}' létrehozása: {error} ({error_code})"
 
 #: ../gtk/MakeDialog.cc:202
 msgid "Scanned {file_size}"
@@ -761,32 +760,32 @@ msgstr "Idő"
 #: ../gtk/MessageLogWindow.cc:459
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Kritikus"
 
 #: ../gtk/MessageLogWindow.cc:460
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Hiba"
 
 #: ../gtk/MessageLogWindow.cc:461
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Figyelmeztetés"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Információ"
 
 #: ../gtk/MessageLogWindow.cc:463
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Hibakeresés"
 
 #: ../gtk/MessageLogWindow.cc:464
 msgctxt "Logging level"
 msgid "Trace"
-msgstr ""
+msgstr "Nyomkövetés"
 
 #: ../gtk/Notify.cc:140
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
@@ -814,7 +813,7 @@ msgstr "Torrent hozzáadva"
 
 #: ../gtk/OptionsDialog.cc:220
 msgid "Torrent files"
-msgstr "Torrentfájlok"
+msgstr "Torrent fájlok"
 
 #: ../gtk/OptionsDialog.cc:225
 msgid "All files"
@@ -830,15 +829,15 @@ msgstr "_Megnyitás"
 
 #: ../gtk/OptionsDialog.cc:378
 msgid "Show options dialog"
-msgstr ""
+msgstr "Beállítások ablak megjelenítése"
 
 #: ../gtk/PathButton.cc:136
 msgid "Select a File"
-msgstr ""
+msgstr "Fájl kiválasztása"
 
 #: ../gtk/PathButton.cc:193
 msgid "(None)"
-msgstr ""
+msgstr "(Nincs)"
 
 #: ../gtk/PrefsDialog.cc:247
 msgid "Allow encryption"
@@ -904,7 +903,7 @@ msgstr "TCP-port tesztelése…"
 
 #: ../gtk/RelocateDialog.cc:81
 msgid "Moving '{torrent_name}'"
-msgstr "A(z) „{torrent_name}” áthelyezése"
+msgstr "'{torrent_name}' áthelyezése"
 
 #: ../gtk/RelocateDialog.cc:93
 msgid "Couldn't move torrent"
@@ -916,7 +915,7 @@ msgstr "Ez eltarthat egy ideig…"
 
 #: ../gtk/Session.cc:1099 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
-msgstr "Nem sikerült a(z) „{path}” olvasása"
+msgstr "Nem sikerült '{path}' olvasása"
 
 #. logging
 #: ../gtk/Session.cc:1434
@@ -925,7 +924,7 @@ msgstr "Hibernálás megakadályozása"
 
 #: ../gtk/Session.cc:1440 ../gtk/Session.cc:1465
 msgid "Couldn't inhibit desktop hibernation: {error}"
-msgstr "Nem sikerült a hibernálás megakadályozása"
+msgstr "Nem sikerült a hibernálás megakadályozása: {error}"
 
 #. logging
 #: ../gtk/Session.cc:1461
@@ -944,7 +943,7 @@ msgstr[1] "Elindítva {count:L} alkalommal"
 
 #: ../gtk/StatsDialog.cc:100
 msgid "Reset your statistics?"
-msgstr "Visszaállítja a statisztikákat?"
+msgstr "Lenullázza a statisztikákat?"
 
 #: ../gtk/StatsDialog.cc:106 ../gtk/ui/gtk3/StatsDialog.ui:22 ../gtk/ui/gtk4/StatsDialog.ui:245
 msgid "_Reset"
@@ -952,7 +951,7 @@ msgstr "_Visszaállítás"
 
 #: ../gtk/StatsDialog.cc:108
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
-msgstr "Ezek a statisztikák csak tájékoztató jellegűek. A visszaállítás nem érinti a BitTorrent követők által naplózott statisztikát."
+msgstr "Ezek a statisztikák csak tájékoztató jellegűek. A nullázás nem érinti a BitTorrent trackerek által naplózott statisztikát."
 
 #: ../gtk/SystemTrayIcon.cc:205
 msgid "{upload_speed} ▲ {download_speed} ▼"
@@ -995,26 +994,26 @@ msgstr "Elakadt"
 #: ../gtk/TorrentCellRenderer.cc:183
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr "Helyi adatok ellenőrzése ({percent_done}% tesztelve)"
+msgstr "Helyi adatok ellenőrzése ({percent_done}% ellenőrizve)"
 
 #: ../gtk/TorrentCellRenderer.cc:203 ../libtransmission/torrent.cc:481
 msgid "Tracker warning: '{warning}'"
-msgstr "Követő figyelmeztetése: „{warning}”"
+msgstr "Tracker figyelmeztetés: '{warning}'"
 
 #: ../gtk/TorrentCellRenderer.cc:206
 msgid "Tracker Error: '{error}'"
-msgstr "Követő hibája: „{error}”"
+msgstr "Tracker hiba: '{error}'"
 
 #: ../gtk/TorrentCellRenderer.cc:209
 msgid "Local error: '{error}'"
-msgstr "Helyi hiba: „{error}”"
+msgstr "Helyi hiba: '{error}'"
 
 #: ../gtk/TorrentCellRenderer.cc:237
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Metaadatok letöltése {active_count} kapcsolódó partnertől ({percent_done:d}% kész)"
+msgstr[1] "Metaadatok letöltése {active_count} kapcsolódó partnertől ({percent_done:d}% kész)"
 
 #: ../gtk/TorrentCellRenderer.cc:248
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -1190,7 +1189,7 @@ msgstr[1] "{seconds_left:L} másodperc van hátra"
 
 #: ../gtk/Utils.cc:256
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
-msgstr "A(z) „{path}” torrentfájlt már használja a(z) „{torrent_name}” torrent."
+msgstr "'{path}' torrent fájlt már használja a '{torrent_name}' torrent."
 
 #: ../gtk/Utils.cc:267
 msgid "Couldn't open torrent"
@@ -1206,16 +1205,16 @@ msgstr ""
 
 #: ../gtk/Utils.cc:688 ../libtransmission/announcer.cc:1201 ../libtransmission/announcer.cc:1433
 msgid "Unsupported URL: '{url}'"
-msgstr "Nem támogatott webcím: „{url}”"
+msgstr "Nem támogatott webcím: '{url}'"
 
 #. modal
 #: ../gtk/Utils.cc:694
 msgid "Transmission doesn't know how to use '{url}'"
-msgstr "A Transmission nem tudja hogyan használja a(z) „{url}” webcímet"
+msgstr "A Transmission nem tudja hogyan használja a '{url}' webcímet"
 
 #: ../gtk/Utils.cc:699
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr "Úgy néz ki, hogy ez a mágneslink nem BitTorrenthez készült."
+msgstr "Úgy néz ki, hogy ez a magnet link nem BitTorrenthez készült."
 
 #: ../gtk/main.cc:52 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1228,7 +1227,7 @@ msgstr "Hol keresse a beállításfájlokat"
 
 #: ../gtk/main.cc:69
 msgid "Start with all torrents paused"
-msgstr "Az összes torrent indítása felfüggesztettként"
+msgstr "Az összes torrent indítása szüneteltetve"
 
 #: ../gtk/main.cc:70
 msgid "Start minimized in notification area"
@@ -1240,7 +1239,7 @@ msgstr "Verziószám megjelenítése és kilépés"
 
 #: ../gtk/main.cc:79
 msgid "[torrent files or urls]"
-msgstr "[torrentfájlok vagy webcímek]"
+msgstr "[torrent fájlok vagy webcímek]"
 
 #: ../gtk/main.cc:95
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
@@ -1277,11 +1276,11 @@ msgstr "Torrent megnyitása"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "_URL megnyitása…"
+msgstr "_Webcím megnyitása…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "URL megnyitása…"
+msgstr "Webcím megnyitása…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
@@ -1297,11 +1296,11 @@ msgstr "Összes torrent elindítása"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr "Összes _megállítása"
+msgstr "Összes _szüneteltetése"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr "Összes torrent megállítása"
+msgstr "Összes torrent szüneteltetése"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
@@ -1357,11 +1356,11 @@ msgstr "Torrent indítása most"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr "Több partner kérése a kö_vetőtől"
+msgstr "Több partner kérése a tr_ackertől"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr "_Sor"
+msgstr "_Sorrend"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1381,11 +1380,11 @@ msgstr "Mozgatás az _aljára"
 
 #: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:55 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
-msgstr "_Megállítás"
+msgstr "_Szüneteltetés"
 
 #: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:53 ../gtk/ui/gtk4/MainWindow.ui:52
 msgid "Pause torrent"
-msgstr "Torrent megállítása"
+msgstr "Torrent szüneteltetése"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
@@ -1397,7 +1396,7 @@ msgstr "_Helyi adatok ellenőrzése"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "_Mágnes link másolása a vágólapra"
+msgstr "_Magnet link másolása a vágólapra"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:63
 msgid "Remove torrent"
@@ -1441,11 +1440,11 @@ msgstr "_Név szerinti rendezés"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr "_Haladás szerinti rendezés"
+msgstr "_Folyamat szerinti rendezés"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr "_Sor szerinti rendezés"
+msgstr "_Sorrend szerinti rendezés"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
@@ -1489,7 +1488,7 @@ msgstr "_Tartalom"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr "_Rólunk"
+msgstr "_Névjegy"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
@@ -1509,7 +1508,7 @@ msgstr "_Hozzáadás"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/AddTrackerDialog.ui:18
 msgid "Tracker"
-msgstr "Követő"
+msgstr "Tracker"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:88 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
@@ -1525,7 +1524,7 @@ msgstr "Aktivitás"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:80 ../gtk/ui/gtk4/DetailsDialog.ui:39
 msgid "Torrent size:"
-msgstr "Torrent mérete:"
+msgstr "Torrent méret:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:92 ../gtk/ui/gtk4/DetailsDialog.ui:49
 msgid "Have:"
@@ -1601,7 +1600,7 @@ msgstr "Partnerek"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:738 ../gtk/ui/gtk4/DetailsDialog.ui:536
 msgid "Show _backup trackers"
-msgstr "Tartalék kö_vetők megjelenítése"
+msgstr "Tartalék tr_ackerek megjelenítése"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:799 ../gtk/ui/gtk4/DetailsDialog.ui:576
 msgid "File listing not available for combined torrent properties"
@@ -1657,7 +1656,7 @@ msgstr "Beállítások"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:18
 msgid "Tracker Announce URLs"
-msgstr "Követő bejelentési webcímei"
+msgstr "Tracker bejelentési webcímek"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:88 ../gtk/ui/gtk3/MakeDialog.ui:315 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:199
 msgid ""
@@ -1669,7 +1668,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:123 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr "Továbbá nézze meg az Alapértelmezett nyilvános követőket a Szerkesztés > Beállítások > Hálózat alatt"
+msgstr "Továbbá nézze meg az Alapértelmezett nyilvános trackereket a Szerkesztés > Beállítások > Hálózat alatt"
 
 #: ../gtk/ui/gtk3/MainWindow.ui:143 ../gtk/ui/gtk4/MainWindow.ui:130
 msgid "Torrent"
@@ -1689,7 +1688,7 @@ msgstr "_Új"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:91 ../gtk/ui/gtk4/MakeDialog.ui:33
 msgid "Sa_ve to:"
-msgstr "Me_ntés:"
+msgstr "Me_ntés ide:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:116 ../gtk/ui/gtk4/MakeDialog.ui:55
 msgid "Source F_older:"
@@ -1709,7 +1708,7 @@ msgstr "Tulajdonságok"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:270 ../gtk/ui/gtk4/MakeDialog.ui:165
 msgid "_Trackers:"
-msgstr "_Követők:"
+msgstr "_Trackerek:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:333 ../gtk/ui/gtk4/MakeDialog.ui:212
 msgid "Co_mment:"
@@ -1753,7 +1752,7 @@ msgstr "Torrentbeállítások"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:67 ../gtk/ui/gtk4/OptionsDialog.ui:19
 msgid "_Torrent file:"
-msgstr "_Torrentfájl:"
+msgstr "_Torrent fájl:"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:82 ../gtk/ui/gtk4/OptionsDialog.ui:32
 msgid "Select Source File"
@@ -1773,7 +1772,7 @@ msgstr "_Elindítás hozzáadáskor"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:478 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
-msgstr "Torrentfájl áthelyezése a _kukába"
+msgstr "Torrent fájl áthelyezése a _kukába"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:8 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
@@ -1831,7 +1830,7 @@ msgstr "Hozzáadás"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:429 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
-msgstr "Torrentfájlok automatikus hozzáadása _innen:"
+msgstr "Torrent fájlok automatikus hozzáadása _innen:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:444 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
@@ -1859,11 +1858,11 @@ msgstr "Az utolsó _N percben adatokat megosztó letöltések legyenek aktívak:
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:676 ../gtk/ui/gtk4/PrefsDialog.ui:457
 msgid "Incomplete"
-msgstr "Hiányos"
+msgstr "Befejezetlen"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:698 ../gtk/ui/gtk4/PrefsDialog.ui:471
 msgid "Append \"._part\" to incomplete files' names"
-msgstr "„._part” hozzáfűzése a befejezetlen fájlok nevéhez"
+msgstr "\"._part\" hozzáfűzése a befejezetlen fájlok nevéhez"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:715 ../gtk/ui/gtk4/PrefsDialog.ui:485
 msgid "Keep _incomplete torrents in:"
@@ -1925,7 +1924,7 @@ msgstr "_Frissítés"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1165 ../gtk/ui/gtk4/PrefsDialog.ui:806
 msgid "Listening Port"
-msgstr "Figyelőport"
+msgstr "Használt port"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1189 ../gtk/ui/gtk4/PrefsDialog.ui:820
 msgid "_Port used for incoming connections:"
@@ -1957,11 +1956,11 @@ msgstr "_Partnerek száma összesen:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "µ_TP engedélyezése partner kommunikációhoz"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "Az µTP a hálózati torlódás csökkentésére használt eszköz."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
 msgid "Use PE_X to find more peers"
@@ -1969,7 +1968,7 @@ msgstr "PE_X használata partnerek kereséséhez"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1459 ../gtk/ui/gtk4/PrefsDialog.ui:1011
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr "A PEX a csatlakozott partnerek partnerlistáinak cseréjére szolgál."
+msgstr "A PEX a kapcsolódó partnerek partnerlistáinak cseréjére szolgál."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1473 ../gtk/ui/gtk4/PrefsDialog.ui:1024
 msgid "Use _DHT to find more peers"
@@ -1977,7 +1976,7 @@ msgstr "_DHT használata partnerek kereséséhez"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1477 ../gtk/ui/gtk4/PrefsDialog.ui:1026
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr "A DHT egy a partnerek követő nélküli megtalálására szolgáló eszköz."
+msgstr "A DHT egy a partnerek tracker nélküli megtalálására szolgáló eszköz."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1491 ../gtk/ui/gtk4/PrefsDialog.ui:1039
 msgid "Use _Local Peer Discovery to find more peers"
@@ -1985,11 +1984,11 @@ msgstr "_Helyi partnerek felderítésének használata"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1495 ../gtk/ui/gtk4/PrefsDialog.ui:1041
 msgid "LPD is a tool for finding peers on your local network."
-msgstr "A HPF a helyi hálózaton levő partnerek megtalálására szolgál."
+msgstr "Az LPD a helyi hálózaton levő partnerek megtalálására szolgál."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1530 ../gtk/ui/gtk4/PrefsDialog.ui:1061
 msgid "Default Public Trackers"
-msgstr "Alapértelmezett nyilvános követők"
+msgstr "Alapértelmezett nyilvános trackerek"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1562 ../gtk/ui/gtk4/PrefsDialog.ui:1084
 msgid ""
@@ -1998,9 +1997,9 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
-"Az összes nyilvános torrent esetén használandó követők.\n"
+"Az összes nyilvános torrent esetén használandó trackerek.\n"
 "\n"
-"Tartalék webcím hozzáadásához vegye fel az egy elsődleges webcímet követő sorba.\n"
+"Tartalék webcím hozzáadásához vegye fel az egy elsődleges webcímet tracker sorba.\n"
 "Másik elsődleges webcímet egy üres sor után vehet fel."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1591 ../gtk/ui/gtk4/PrefsDialog.ui:1103
@@ -2109,15 +2108,15 @@ msgstr "Jelenlegi munkamenet"
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:142 ../gtk/ui/gtk3/StatsDialog.ui:300 ../gtk/ui/gtk4/StatsDialog.ui:75 ../gtk/ui/gtk4/StatsDialog.ui:193
 msgid "Ratio:"
-msgstr "Ratio:"
+msgstr "Arány:"
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:167 ../gtk/ui/gtk3/StatsDialog.ui:325 ../gtk/ui/gtk4/StatsDialog.ui:96 ../gtk/ui/gtk4/StatsDialog.ui:214
 msgid "Duration:"
-msgstr "Duration:"
+msgstr "Időtartam:"
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:212 ../gtk/ui/gtk4/StatsDialog.ui:125
 msgid "Total"
-msgstr "Total"
+msgstr "Összesen"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:8 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
 msgid "Open URL"
@@ -2137,7 +2136,7 @@ msgstr "Nem sikerült feldolgozni a bejelentés válaszát: {error} ({error_code
 
 #: ../libtransmission/announcer-http.cc:601
 msgid "Couldn't parse scrape response: {error} ({error_code})"
-msgstr "Nem sikerült feldolgozni a lekérdezés válaszát: {error} ({error_code})"
+msgstr "Nem sikerült feldolgozni a scrape választ: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:146 ../libtransmission/announcer-udp.cc:244
 msgid "Unknown error"
@@ -2145,7 +2144,7 @@ msgstr "Ismeretlen hiba"
 
 #: ../libtransmission/announcer-udp.cc:439 ../libtransmission/tr-dht.cc:558
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
-msgstr "Nem sikerült felkeresni a(z) „{address}:{port}” címet: {error} ({error_code})"
+msgstr "Nem sikerült lekérni a '{address}:{port}' címet: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:522
 msgid "Connection failed"
@@ -2163,11 +2162,11 @@ msgstr[1] "Bejelentési hiba: {error} (Újrapróbálkozás {count} másodperc m�
 
 #: ../libtransmission/announcer.cc:1036 ../libtransmission/announcer.cc:1364
 msgid "Could not connect to tracker"
-msgstr "Nem sikerült kapcsolódni a követőhöz"
+msgstr "Nem sikerült kapcsolódni a trackerhez"
 
 #: ../libtransmission/announcer.cc:1040 ../libtransmission/announcer.cc:1368
 msgid "Tracker did not respond"
-msgstr "A követő nem válaszolt"
+msgstr "A tracker nem válaszolt"
 
 #: ../libtransmission/announcer.cc:1101
 msgid "Success"
@@ -2177,16 +2176,16 @@ msgstr "Sikeres"
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] "A(z) „{path}” tiltólista {count} elemet tartalmaz"
-msgstr[1] "A(z) „{path}” tiltólista {count} elemet tartalmaz"
+msgstr[1] "A(z) '{path}' tiltólista {count} elemet tartalmaz"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:242
 msgid "Couldn't parse line: '{line}'"
-msgstr "Nem sikerült a sor feldolgozása: „{line}”"
+msgstr "Nem sikerült a sor feldolgozása: '{line}'"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Régi tiltólista fájl formátum átírása az új formátumra"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:75 ../libtransmission/crypto-utils-cyassl.cc:69 ../libtransmission/crypto-utils-openssl.cc:64 ../libtransmission/crypto-utils-polarssl.cc:66
 msgid "{crypto_library} error: {error} ({error_code})"
@@ -2194,7 +2193,7 @@ msgstr "{crypto_library} hiba: {error} ({error_code})"
 
 #: ../libtransmission/inout.cc:148
 msgid "Couldn't get '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” lekérése: {error} ({error_code})"
+msgstr "Nem sikerült '{path}' lekérése: {error} ({error_code})"
 
 #: ../libtransmission/log.cc:292
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2202,39 +2201,39 @@ msgstr "Túl sok ilyen üzenet! Ebben a munkamenetben többet nem lesz naplózva
 
 #: ../libtransmission/makemeta.cc:75 ../libtransmission/watchdir.cc:53
 msgid "Skipping '{path}': {error} ({error_code})"
-msgstr "A(z) „{path}” kihagyása: {error} ({error_code})"
+msgstr "'{path}' kihagyása: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:221
 msgid "Couldn't create socket: {error} ({error_code})"
-msgstr "Nem sikerült a foglalat létrehozása: {error} ({error_code})"
+msgstr "Nem sikerült a socket létrehozása: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:300
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
-msgstr "Nem sikerült a(z) {address} forráscím beállítás a(z) {socket} foglalaton: {error} ({error_code})"
+msgstr "Nem sikerült a {address} forráscím beállítása a következő socketen: {socket}. Hiba: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:319
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
-msgstr "Nem sikerült a(z) {socket} foglalat hozzákapcsolása a(z) {address}:{port} címhez: {error} ({error_code})"
+msgstr "Nem sikerült a {socket} socket hozzákapcsolása a {address}:{port} címhez: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:438
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
-msgstr "Nem sikerült a(z) {port} kötése a(z) {address} címen: {error} ({error_code}) – Már fut a Transmission egy másik példánya?"
+msgstr "Nem sikerült a {port} lefoglalása a {address} címen: {error} ({error_code}) -- Már fut a Transmission egy másik példánya?"
 
 #: ../libtransmission/net.cc:439
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
-msgstr "Nem sikerült a(z) {port} kötése a(z) {address} címen: {error} ({error_code})"
+msgstr "Nem sikerült a {port} lefoglalása a {address} címen: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:184
 msgid "Couldn't open '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” megnyitása: {error} ({error_code})"
+msgstr "Nem sikerült a '{path}' megnyitása: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:213
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” előre lefoglalása: {error} ({error_code})"
+msgstr "Nem sikerült a '{path}' előre lefoglalása: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:233
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” csonkolása: {error} ({error_code})"
+msgstr "Nem sikerült a '{path}' feldarabolása: {error} ({error_code})"
 
 #: ../libtransmission/peer-io.cc:393
 msgid "Unknown state: {state}"
@@ -2242,43 +2241,43 @@ msgstr "Ismeretlen állapot: {state}"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:83
 msgid "Found public address '{address}'"
-msgstr "Talált nyilvános cím: „{address}”"
+msgstr "Talált nyilvános cím: '{address}'"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:120
 msgid "Port {port} is no longer forwarded"
-msgstr "A(z) {port}. számú port már nincs továbbítva"
+msgstr "{port} számú port már nincs továbbítva"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:174
 msgid "Port {port} forwarded successfully"
-msgstr "A(z) {port}. számú port továbbítása sikeres"
+msgstr "{port} számú port továbbítása sikeres"
 
 #: ../libtransmission/port-forwarding-upnp.cc:290
 msgid "Found Internet Gateway Device '{url}'"
-msgstr "A(z) „{url}” internetes átjáróeszköz megtalálva"
+msgstr "Internetes átjáróeszköz megtalálva: '{url}' "
 
 #: ../libtransmission/port-forwarding-upnp.cc:291
 msgid "Local Address is '{address}'"
-msgstr "A helyi cím: „{address}”"
+msgstr "A helyi cím: '{address}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:315
 msgid "Port {port} is not forwarded"
-msgstr "A(z) {port}. számú port nincs továbbítva"
+msgstr "Port {port} nincs továbbítva"
 
 #: ../libtransmission/port-forwarding-upnp.cc:325
 msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr "A(z) „{url}” címen keresztüli porttovábbítás leállítása, szolgáltatás: „{type}”"
+msgstr "'{url}' címen keresztüli porttovábbítás leállítása, szolgáltatás: '{type}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:357
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
-msgstr "Porttovábbítás a(z) „{url}” címen keresztül, szolgáltatás: „{type}”. (helyi cím: {address}:{port})"
+msgstr "Porttovábbítás '{url}' címen keresztül, szolgáltatás: '{type}'. (helyi cím: {address}:{port})"
 
 #: ../libtransmission/port-forwarding-upnp.cc:365
 msgid "Port {port} is forwarded"
-msgstr "A(z) {port}. számú port továbbítva van"
+msgstr "{port} port továbbítva van"
 
 #: ../libtransmission/port-forwarding-upnp.cc:371
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
-msgstr "Ha a routere támogatja az UPnP-t, akkor győződjön meg róla, hogy engedélyezett-e."
+msgstr "Ha a routere támogatja az UPnP-t, akkor győződjön meg róla, hogy engedélyezve van-e."
 
 #: ../libtransmission/port-forwarding.cc:163
 msgid "Starting"
@@ -2298,53 +2297,53 @@ msgstr "Nincs továbbítva"
 
 #: ../libtransmission/port-forwarding.cc:201
 msgid "Mapped private port {private_port} to public port {public_port}"
-msgstr "A(z) {private_port}. számú privát port hozzárendelve a(z) {public_port}. számú nyilvános porthoz"
+msgstr "{private_port} számú privát port hozzárendelve a {public_port} számú nyilvános porthoz"
 
 #: ../libtransmission/port-forwarding.cc:216
 msgid "State changed from '{old_state}' to '{state}'"
-msgstr "A(z) „{old_state}” állapot erre változott: „{state}”"
+msgstr "'{old_state}' állapot erre változott: '{state}'"
 
 #: ../libtransmission/rpc-server.cc:586
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
-msgstr "A Unix-foglalat útvonalának {count} karakternél rövidebbnek kell lennie (a(z) „{prefix}” előtagot is beleértve)"
+msgstr "Unix-foglalat útvonalának {count} karakternél rövidebbnek kell lennie (a '{prefix}' előtagot is beleértve)"
 
 #: ../libtransmission/rpc-server.cc:620
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
-msgstr "A Unix-foglalatok nem támogatottak Windowson. Módosítsa a(z) „{key}” értékét a beállításokban."
+msgstr "Unix-foglalatok nem támogatottak Windowson. Módosítsa a '{key}' értékét a beállításokban."
 
 #: ../libtransmission/rpc-server.cc:647
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
-msgstr "Nem sikerült az RPC-foglalat módját erre állítani: {mode:#o}, visszaállás 0755-re"
+msgstr "Nem sikerült az RPC-socket módját erre állítani: {mode:#o}, visszaállás 0755-re"
 
 #: ../libtransmission/rpc-server.cc:710
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "{count} próbálkozás után nem sikerült a kötés a(z) {address} címen, feladás"
-msgstr[1] "{count} próbálkozás után sem sikerült a kötés a(z) {address} címen, feladás"
+msgstr[1] "{count} próbálkozás után sem sikerült a {address} cím lefoglalása, feladás"
 
 #: ../libtransmission/rpc-server.cc:721
 msgid "Listening for RPC and Web requests on '{address}'"
-msgstr "A(z) „{address}” címre érkező RPC és webes kérések figyelése"
+msgstr "RPC és webes kérések figyelése a következő címen: '{address}'"
 
 #: ../libtransmission/rpc-server.cc:749
 msgid "Stopped listening for RPC and Web requests on '{address}'"
-msgstr "A(z) „{address}” címre érkező RPC és webes kérések figyelése leállítva"
+msgstr "RPC és webes kérések figyelése leállítva a következő címen: '{address}' "
 
 #: ../libtransmission/rpc-server.cc:815
 msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-msgstr "„{entry}” hozzáadva a gazda fehérlistájára, viszont „+”-t vagy „-”-t tartalmaz. Véletlenül nem egy régi ACL-t használ?"
+msgstr "'{entry}' hozzáadva a kiszolgáló fehérlistájára, viszont '+'-t vagy '-'-t tartalmaz. Véletlenül nem egy régi ACL-t használ?"
 
 #: ../libtransmission/rpc-server.cc:820
 msgid "Added '{entry}' to host whitelist"
-msgstr "„{entry}” hozzáadva a gazda fehérlistájára"
+msgstr "'{entry}'  hozzáadva a kiszolgáló fehérlistájára"
 
 #: ../libtransmission/rpc-server.cc:917
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
-msgstr "A(z) „{key}” beállítása „{value}”, viszont IPv4 vagy IPv6-címnek kell lennie, vagy egy Unix-foglalat útvonalának. Az alapértelmezés használata: „0.0.0.0”."
+msgstr "A '{key}' beállítása '{value}'. Viszont ennek IPv4 vagy IPv6-címnek, vagy egy Unix-socket útvonalának kell lennie. Az alapértelmezés használata: '0.0.0.0'."
 
 #: ../libtransmission/rpc-server.cc:931
 msgid "Serving RPC and Web requests on {address}"
-msgstr "A(z) „{address}” címre érkező RPC és webes kérések kiszolgálása"
+msgstr "RPC és webes kérések kiszolgálása a következő címen: '{address}'"
 
 #: ../libtransmission/rpc-server.cc:936
 msgid "Whitelist enabled"
@@ -2356,7 +2355,7 @@ msgstr "Jelszó szükséges"
 
 #: ../libtransmission/rpc-server.cc:947
 msgid "Serving RPC and Web requests from '{path}'"
-msgstr "A(z) „{path}” útvonalra érkező RPC és webes kérések kiszolgálása"
+msgstr "RPC és webes kérések kiszolgálása a következő útvonalon: '{path}'"
 
 #: ../libtransmission/rpcimpl.cc:1431
 msgid "Couldn't test port: {error} ({error_code})"
@@ -2380,11 +2379,11 @@ msgstr "Ideje bekapcsolni a teknős módot"
 
 #: ../libtransmission/session-id.cc:155
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” munkamenetzárolási-fájl megnyitása: {error} ({error_code})"
+msgstr "Nem sikerült a '{path}' munkamenetzárolási-fájl megnyitása: {error} ({error_code})"
 
 #: ../libtransmission/session.cc:321
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Bejövő kapcsolatok figyelése a {hostport} porton"
 
 #: ../libtransmission/session.cc:563
 msgid "Transmission version {version} starting"
@@ -2404,15 +2403,15 @@ msgstr[1] "{count} torrent betöltve"
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] "A mágneslink metainformációi nem dolgozhatók fel: „{error}”. {piece_count} szelet újbóli letöltése."
-msgstr[1] "A mágneslink metainformációi nem dolgozhatók fel: „{error}”. {piece_count} szelet újbóli letöltése."
+msgstr[1] "A magnet link meta információi nem dolgozhatók fel: \"{error}\". {piece_count} szelet újbóli letöltése"
 
 #: ../libtransmission/torrent-metainfo.cc:678
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
-msgstr "A torrentfájl átköltöztetve innen: „{old_path}”, ide: „{path}”"
+msgstr "Torrent fájl átköltöztetve innen: '{old_path}', ide: '{path}'"
 
 #: ../libtransmission/torrent.cc:124
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Nem lehetett használni a metainfót innen: '{path}' ami a következőhöz tartozik: '{magnet}'. Hiba: {error}({error_code})"
 
 #: ../libtransmission/torrent.cc:432
 msgid "Seed ratio reached; pausing torrent"
@@ -2424,7 +2423,7 @@ msgstr "Az inaktivitási korlát elérve; a torrent szüneteltetése"
 
 #: ../libtransmission/torrent.cc:581
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-msgstr "Nem található adat! Ellenőrizze, hogy csatolta-e a meghajtót vagy válassza a „Hely megadása” lehetőséget. Újbóli letöltéshez távolítsa el, majd adja hozzá újra a torrent fájlt."
+msgstr "Nem található adat! Ellenőrizze, hogy csatolta-e a meghajtót vagy válassza a \"Hely megadása\" lehetőséget. Újbóli letöltéshez távolítsa el, majd adja hozzá újra a torrent fájlt."
 
 #: ../libtransmission/torrent.cc:1372
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2440,15 +2439,15 @@ msgstr "Torrent eltávolítása"
 
 #: ../libtransmission/torrent.cc:1686
 msgid "Calling script '{path}'"
-msgstr "A(z) „{path}” parancsfájl meghívása"
+msgstr "Parancsfájl meghívása: '{path}'"
 
 #: ../libtransmission/torrent.cc:1695
 msgid "Couldn't call script '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” parancsfájl meghívása: {error} ({error_code})"
+msgstr "Parancsfájl '{path}' meghívása nem sikerült: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:2073 ../libtransmission/torrent.cc:2193
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{old_path}” áthelyezése ide: „{path}”: {error} ({error_code})"
+msgstr "'{old_path}' áthelyezése nem sikerült ide: '{path}': {error} ({error_code})"
 
 #: ../libtransmission/tr-dht.cc:532
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2460,36 +2459,36 @@ msgstr "Nem sikerült az LPD előkészítése: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:156
 msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-msgstr "Nem sikerült a(z) {address} IPv6-foglalat újbóli kötése: {error} ({error_code})"
+msgstr "Nem sikerült a {address} IPv6-foglalat újbóli lefoglalása: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:241
 msgid "Couldn't create IPv4 socket"
-msgstr "Nem sikerült az IPv4-foglalat létrehozása"
+msgstr "Nem sikerült az IPv4-socket létrehozása"
 
 #: ../libtransmission/tr-udp.cc:261
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
-msgstr "Nem sikerült a(z) {address} IPv4-foglalat kötése: {error} ({error_code})"
+msgstr "IPv4-socket lefoglalása nem sikerült {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:100
 msgid "Unknown socket family"
-msgstr "Ismeretlen foglalatcsalád"
+msgstr "Ismeretlen socket család"
 
 #: ../libtransmission/utils.cc:88
 msgid "Couldn't read '{path}': Not a regular file"
-msgstr "A(z) „{path}” nem olvasható: nem szabályos fájl"
+msgstr "Nem sikerült '{path}' olvasása: Nem egy hagyományos fájl"
 
 #: ../libtransmission/variant-json.cc:95
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
-msgstr "Nem sikerült a JSON feldolgozása a(z) {position}. pozícióban: „{text}”: {error} ({error_code})"
+msgstr "Nem sikerült a JSON feldolgozása a {position} pozícióban: '{text}': {error} ({error_code})"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/variant.cc:870
 msgid "Invalid metadata"
-msgstr "Érvénytelen metaadatok"
+msgstr "Érvénytelen metaadat"
 
 #: ../libtransmission/watchdir-inotify.cc:79 ../libtransmission/watchdir-inotify.cc:91 ../libtransmission/watchdir-inotify.cc:103 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:89 ../libtransmission/watchdir-kqueue.cc:104
 msgid "Couldn't watch '{path}': {error} ({error_code})"
-msgstr "Nem sikerült a(z) „{path}” figyelése: {error} ({error_code})"
+msgstr "Nem sikerült a '{path}' figyelése: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:135 ../libtransmission/watchdir-kqueue.cc:147 ../libtransmission/watchdir-win32.cc:271
 msgid "Couldn't read event: {error} ({error_code})"
@@ -2509,11 +2508,11 @@ msgstr "Nem sikerült a fájlnév olvasása: {expected_size} volt várva, de {ac
 
 #: ../libtransmission/watchdir-win32.cc:142
 msgid "Couldn't convert '{path}' to native path"
-msgstr "Nem sikerült a(z) „{path}” útvonalat natív elérési úttá alakítani"
+msgstr "Nem sikerült a '{path}' útvonalat natív elérési úttá alakítani"
 
 #: ../libtransmission/watchdir-win32.cc:171
 msgid "Couldn't create pipe: {error} ({error_code})"
-msgstr "Nem sikerült a csővezeték létrehozása: {error} ({error_code})"
+msgstr "Nem sikerült a pipe létrehozása: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create thread"
@@ -2529,15 +2528,15 @@ msgstr "Nem sikerült a könyvtár változásait megvárni"
 
 #: ../libtransmission/web.cc:126
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
-msgstr "A követők tanúsítványainak ellenőrzése a CURL_CA_BUNDLE környezeti változó használatával: {bundle}"
+msgstr "Tracker tanúsítványainak ellenőrzése a CURL_CA_BUNDLE környezeti változó használatával: {bundle}"
 
 #: ../libtransmission/web.cc:127
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
-msgstr "MEGJEGYZÉS: ez csak akkor működik, ha a libcurl openssl-lel vagy gnutls-sel lett lefordítva, NEM nss-sel"
+msgstr "NB: ez csak akkor működik, ha a libcurl openssl-lel vagy gnutls-sel lett lefordítva, NEM nss-sel"
 
 #: ../libtransmission/web.cc:128
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
-msgstr "MEGJEGYZÉS: az érvénytelen tanúsítványok (más hibákhoz hasonlóan) „Nem sikerült kapcsolódni a követőhöz” üzenetként fognak megjelenni"
+msgstr "NB: az érvénytelen tanúsítványok (más hibákhoz hasonlóan) 'Nem sikerült kapcsolódni a trackerhez' üzenetként fognak megjelenni"
 
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
@@ -2574,33 +2573,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "A parancssori kapcsolók teljes listájáért adja ki a „%s --help” parancsot.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "Nem sikerült az IPv4-esemény lefoglalása"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "Nem sikerült az IPv6-esemény lefoglalása"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Nem található a(z) „{host}” követő címe: {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Nem sikerült a partnernek írni"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "A következő szignál érkezett: %d; kísérlet a leállítására. Ha elakad, próbálja újra."
-
-#~ msgid "Initializing DHT"
-#~ msgstr "DHT előkészítése"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "Nem sikerült a torrentet bejelenteni a DHT-be a(z) {type} típussal: {error} ({error_code}); az állapot: {state}"

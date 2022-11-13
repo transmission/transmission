@@ -7,19 +7,19 @@
 # Валерий Дмиртиевич Степанов <valera1111@yandex.ru>, 2017
 # Stas Solovey <whats_up@tut.by>, 2022
 # hlm hlmfn, 2022
+# Andrei Stepanov, 2022
 # Виктор, 2022
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Andrei Stepanov, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Andrei Stepanov, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Russian (https://www.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -105,7 +105,7 @@ msgstr "Не удалось зарегистрировать Transmission в к�
 
 #: ../gtk/Application.cc:527
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Получен сигнал завершения, попытка завершить работу корректно. Повторите это, если возникнет ошибка."
 
 #: ../gtk/Application.cc:754
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -162,7 +162,7 @@ msgstr "Авторское право © The Transmission Project"
 msgid "translator-credits"
 msgstr ""
 "Stas Solovey <whats_up@tut.by>, 2010-2017\n"
-"Victor <github.com/ViktorOn>, 2022\n"
+"Viсtor github.com/ViktorOn, 2022\n"
 "Andrei Stepanov, 2015-2022"
 
 #: ../gtk/DetailsDialog.cc:491 ../gtk/DetailsDialog.cc:509
@@ -512,22 +512,20 @@ msgstr[2] "Свойства {torrent_count:L} торрентов"
 msgstr[3] "Свойства {torrent_count:L} торрентов"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
 msgstr[0] "Удалить торрент?"
-msgstr[1] "Удалить %d торрента?"
-msgstr[2] "Удалить %d торрентов?"
-msgstr[3] "Удалить %d торрентов?"
+msgstr[1] "Удалить {count:L} торрента?"
+msgstr[2] "Удалить {count:L} торрентов?"
+msgstr[3] "Удалить {count:L} торрентов?"
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Удалить загруженные файлы этого торрента?"
-msgstr[1] "Удалить загруженные файлы этих %d торрентов?"
-msgstr[2] "Удалить загруженные файлы этих %d торрентов?"
-msgstr[3] "Удалить загруженные файлы этих %d торрентов?"
+msgstr[0] "Удалить эти загруженные файлы торрента?"
+msgstr[1] "Удалить эти {count:L} загруженных файла торрента?"
+msgstr[2] "Удалить эти {count:L} загруженных файлов торрента?"
+msgstr[3] "Удалить эти {count:L} загруженных файлов торрента?"
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -777,7 +775,7 @@ msgstr "Предупреждение"
 #: ../gtk/MessageLogWindow.cc:462
 msgctxt "Logging level"
 msgid "Information"
-msgstr "Сведения"
+msgstr "Информация"
 
 #: ../gtk/MessageLogWindow.cc:463
 msgctxt "Logging level"
@@ -791,7 +789,7 @@ msgstr "Отслеживающий"
 
 #: ../gtk/Notify.cc:140
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось создать прокси для \"{bus}\": {error} ({error_code})"
 
 #: ../gtk/Notify.cc:225
 msgid "Open File"
@@ -883,7 +881,7 @@ msgstr "Не удалось обновить чёрный список"
 
 #: ../gtk/PrefsDialog.cc:590
 msgid "Update Blocklist"
-msgstr "Обновление чёрного списка"
+msgstr "Обновить чёрный список"
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
@@ -937,7 +935,7 @@ msgstr "Разрешение ухода в спящий режим"
 
 #: ../gtk/Session.cc:1579
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Не удалось найти ожидающий запрос RPC для тега {tag}"
 
 #: ../gtk/StatsDialog.cc:66
 msgid "Started {count:L} time"
@@ -1237,7 +1235,7 @@ msgstr[3] "{seconds_left:L} секунд осталось"
 
 #: ../gtk/Utils.cc:256
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
-msgstr "Торрент-файл «{path}» уже используется «{torrent_name}»."
+msgstr "Торрент-файл \"{path}\" уже используется \"{torrent_name}\"."
 
 #: ../gtk/Utils.cc:267
 msgid "Couldn't open torrent"
@@ -1245,11 +1243,11 @@ msgstr "Не удалось открыть торрент"
 
 #: ../gtk/Utils.cc:396
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось переместить \"{path}\" в корзину: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:468
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Не удалось открыть \"{url}\""
 
 #: ../gtk/Utils.cc:688 ../libtransmission/announcer.cc:1201 ../libtransmission/announcer.cc:1433
 msgid "Unsupported URL: '{url}'"
@@ -1291,7 +1289,7 @@ msgstr "[торрент-файлы или ссылки]"
 
 #: ../gtk/main.cc:95
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Выполните «{program} --help», чтобы увидеть список всех доступных параметров командной строки.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1308,11 +1306,11 @@ msgstr "торренты;скачивание;загрузка;раздать;р
 
 #: ../gtk/transmission-gtk.desktop.in:21
 msgid "Start Transmission with All Torrents Paused"
-msgstr "Запускать Transmission с приостановленными торрентами"
+msgstr "Запустить Transmission с приостановленными торрентами"
 
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
-msgstr "Сворачивать Transmission при запуске"
+msgstr "Запустить Transmission в свернутом виде"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
@@ -1636,7 +1634,7 @@ msgstr "Комментарий:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
 msgid "Information"
-msgstr "Сведения"
+msgstr "Информация"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
 msgid "Show _more details"
@@ -2453,7 +2451,7 @@ msgid_plural "Loaded {count} torrents"
 msgstr[0] "Загружен {count} торрент"
 msgstr[1] "Загружено {count} торрента"
 msgstr[2] "Загружено {count} торрентов"
-msgstr[3] "Загружено {count} торрента"
+msgstr[3] "Загружено {count} торрентов"
 
 #: ../libtransmission/torrent-magnet.cc:323
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
@@ -2473,11 +2471,11 @@ msgstr "Не удалось использовать метаинформаци�
 
 #: ../libtransmission/torrent.cc:432
 msgid "Seed ratio reached; pausing torrent"
-msgstr "Рейтинг раздачи достигнут; торрент приостанавливается"
+msgstr "Рейтинг раздачи достигнут; приостановка торрента"
 
 #: ../libtransmission/torrent.cc:439
 msgid "Seeding idle limit reached; pausing torrent"
-msgstr "Простой раздачи достигнут; торрент приостанавливается"
+msgstr "Простой раздачи достигнут; приостановка торрента"
 
 #: ../libtransmission/torrent.cc:581
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
@@ -2599,18 +2597,18 @@ msgstr "NB: Недействительные сертификаты будут �
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{file_count:L} файл, {total_size}\n"
+msgstr[1] "{file_count:L} файла, {total_size}\n"
+msgstr[2] "{file_count:L} файлов, {total_size}\n"
+msgstr[3] "{file_count:L} файлов, {total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{piece_count:L} часть, {piece_size}\n"
+msgstr[1] "{piece_count:L} части, {piece_size} каждая\n"
+msgstr[2] "{piece_count:L} частей, {piece_size} каждая\n"
+msgstr[3] "{piece_count:L} частей, {piece_size} каждая\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2643,47 +2641,3 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Выполните «%s --help», чтобы увидеть список всех доступных команд командной строки.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "Не удалось разместить событие IPv4"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "Не удалось разместить событие IPv6"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Не удалось найти адрес трекера «{host}»: {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Не удалась запись участнику"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Получен сигнал %d; при попытке выключения. При необходимости повторите."
-
-#~ msgid "Initializing DHT"
-#~ msgstr "Инициализация DHT"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "Не удаётся анонсировать торрент в DHT с {type}: {error} ({error_code}); состояние — {state}"
-
-#~ msgid "{file_count:L} files, {total_size}\n"
-#~ msgid_plural "{file_count:L} file, {total_size}\n"
-#~ msgstr[0] "{file_count:L} файл, {total_size}\n"
-#~ msgstr[1] "{file_count:L} файла, {total_size}\n"
-#~ msgstr[2] "{file_count:L} файлов, {total_size}\n"
-#~ msgstr[3] "{file_count:L} файлов, {total_size}\n"
-
-#~ msgid "{piece_count:L} pieces, {piece_size} each\n"
-#~ msgid_plural "{piece_count:L} piece, {piece_size}\n"
-#~ msgstr[0] "{piece_count:L} часть, {piece_size} каждая\n"
-#~ msgstr[1] "{piece_count:L} части, {piece_size} каждая\n"
-#~ msgstr[2] "{piece_count:L} частей, {piece_size} каждая\n"
-#~ msgstr[3] "{piece_count:L} частей, {piece_size}\n"

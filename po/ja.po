@@ -5,17 +5,17 @@
 #
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # maboroshin, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: maboroshin, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Japanese (https://www.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -483,16 +483,14 @@ msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] "プロパティ― - {torrent_count:L} トレント"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "%d 個のトレントを削除しますか?"
+msgstr[0] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "%d 個のトレントのダウンロード済みファイルを削除しますか？"
+msgstr[0] ""
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -2491,33 +2489,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "'%s --help' で利用できるすべてのコマンドラインのオプションが表示されます。\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "IPv4 イベントを割り当てできません"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "IPv6 イベントを割り当てできません"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "トラッカーのアドレスを発見できません「{host}」: {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "ピアに書き込めません"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "シグナル %d を取得; すみやかなシャットダウンを試行します。もし固まった場合、再度お試しください。"
-
-#~ msgid "Initializing DHT"
-#~ msgstr "DHTの初期化中"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "{type}でのDHTでトレントをアナウンスできません: {error} ({error_code});  状態 {state}"

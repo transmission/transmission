@@ -9,17 +9,17 @@
 # 依云 <lilydjwg@gmail.com>, 2022
 # 玉堂白鹤 <yjwork@qq.com>, 2022
 # Dingzhong Chen <wsxy162@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # pluwen <pluwen@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: pluwen <pluwen@gmail.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -528,16 +528,14 @@ msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] "属性—{torrent_count:L} 个种子"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "移除 %d 个种子？"
+msgstr[0] "移除 {count:L} 个 Torrents？"
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "删除这 %d 个种子对应的已下载文件？"
+msgstr[0] ""
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -2510,7 +2508,7 @@ msgstr "特别注意：无效证书会像其他很多错误一样显示为“无
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
+msgstr[0] "{file_count:L} 个文件，{total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} piece, {piece_size}\n"
@@ -2536,41 +2534,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "运行 %s --help 查看可以命令行选项的完整列表。\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "无法分配 IPv4 事件"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "无法分配 IPv6 事件"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "无法找到 tracker“{host”的地址：{error}（{error_code}）"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "无法写入对等网络用户"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "收到信号 %d，尝试进行正常退出。如果没有成功关闭则请重试。"
-
-#~ msgid "Initializing DHT"
-#~ msgstr "正在初始化 DHT"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "无法在 DHT 中公告 {type} 的种子：{error}（{error_code}）；状态为 {state}"
-
-#~ msgid "{file_count:L} files, {total_size}\n"
-#~ msgid_plural "{file_count:L} file, {total_size}\n"
-#~ msgstr[0] "{file_count:L} 个文件，{total_size}\n"
-
-#~ msgid "{piece_count:L} pieces, {piece_size} each\n"
-#~ msgid_plural "{piece_count:L} piece, {piece_size}\n"
-#~ msgstr[0] "{piece_count:L} 个分片，{piece_size}\n"

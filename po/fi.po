@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Finnish (https://www.transifex.com/transmissionbt/teams/33778/fi/)\n"
@@ -514,18 +514,16 @@ msgstr[0] "Ominaisuudet - {torrent_count:L} torrent"
 msgstr[1] "Ominaisuudet - {torrent_count:L} torrentia"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Poistetaanko torrent?"
-msgstr[1] "Poistetaanko %d torrenttia?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Poistetaanko tämän torrentin ladatut tiedostot?"
-msgstr[1] "Poistetaanko näiden %d torrentin ladatut tiedostot?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -2563,33 +2561,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "päivä"
 msgstr[1] "päivää"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Suorita ”%s --help” nähdäksesi täyden luettelon komentorivivalitsimista.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "IPv4-tapahtumaa ei voitu varata"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "IPv6-tapahtumaa ei voitu varata"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Jäljittimen osoitetta ei löytynyt '{host}': {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Ei voinut kirjoittaa koneelle"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Vastaanotettiin signaali %d; yritetään sammuttamista siististi. Yritä uudelleen jos tämä ei valmistu."
-
-#~ msgid "Initializing DHT"
-#~ msgstr "Alustetaan DHT"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "Torrentin julkaiseminen DHT:ssa ei onnistu {type}: {error} ({error_code}); tila on {state}"

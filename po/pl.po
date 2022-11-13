@@ -5,17 +5,17 @@
 #
 # Translators:
 # Piotr Drąg <piotrdrag@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Marek Adamski, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Marek Adamski, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -101,7 +101,7 @@ msgstr "Nie można zarejestrować programu Transmission do obsługi plików typu
 
 #: ../gtk/Application.cc:527
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Otrzymano sygnał zakończenia. Próbowanie czystego wyłączenia. Proszę to zrobić ponownie, jeśli się zatnie."
 
 #: ../gtk/Application.cc:754
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -549,22 +549,20 @@ msgstr[2] "Właściwości — {torrent_count:L} torrentów"
 msgstr[3] "Właściwości — {torrent_count:L} torrentów"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
 msgstr[0] "Usunąć torrent?"
-msgstr[1] "Usunąć %d torrenty?"
-msgstr[2] "Usunąć %d torrentów?"
-msgstr[3] "Usunąć %d torrentów?"
+msgstr[1] "Usunąć {count:L} torrenty?"
+msgstr[2] "Usunąć {count:L} torrentów?"
+msgstr[3] "Usunąć {count:L} torrentów?"
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
 msgstr[0] "Usunąć pobrane pliki tego torrenta?"
-msgstr[1] "Usunąć pobrane pliki %d torrentów?"
-msgstr[2] "Usunąć pobrane pliki %d torrentów?"
-msgstr[3] "Usunąć pobrane pliki %d torrentów?"
+msgstr[1] "Usunąć pobrane pliki tych {count:L} torrentów?"
+msgstr[2] "Usunąć pobrane pliki tych {count:L} torrentów?"
+msgstr[3] "Usunąć pobrane pliki tych {count:L} torrentów?"
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -828,7 +826,7 @@ msgstr "Śledzenie"
 
 #: ../gtk/Notify.cc:140
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Nie można utworzyć proxy dla „{bus}”: {error} ({error_code})"
 
 #: ../gtk/Notify.cc:225
 msgid "Open File"
@@ -974,7 +972,7 @@ msgstr "Zezwolenie na hibernację"
 
 #: ../gtk/Session.cc:1579
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Nie można znaleźć oczekującego żądania RPC dotyczącego tagu {tag}"
 
 #: ../gtk/StatsDialog.cc:66
 msgid "Started {count:L} time"
@@ -1282,11 +1280,11 @@ msgstr "Nie można otworzyć torrenta"
 
 #: ../gtk/Utils.cc:396
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Nie można przenieść „{path}” do kosza: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:468
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Nie można otworzyć „{url}”"
 
 #: ../gtk/Utils.cc:688 ../libtransmission/announcer.cc:1201 ../libtransmission/announcer.cc:1433
 msgid "Unsupported URL: '{url}'"
@@ -1328,7 +1326,7 @@ msgstr "[pliki torrent lub adresy URL]"
 
 #: ../gtk/main.cc:95
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Uruchom polecenie „{program} --help”, aby zobaczyć pełną listę dostępnych opcji wiersza poleceń.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -2636,18 +2634,18 @@ msgstr "Uwaga: nieprawidłowe certyfikaty będą wyświetlane jako „Nie można
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{file_count:L} plik, {total_size}\n"
+msgstr[1] "{file_count:L} pliki, {total_size}\n"
+msgstr[2] "{file_count:L} plików, {total_size}\n"
+msgstr[3] "{file_count:L} plików, {total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{piece_count:L} część, {piece_size}\n"
+msgstr[1] "{piece_count:L} części, {piece_size} każda\n"
+msgstr[2] "{piece_count:L} części, {piece_size} każda\n"
+msgstr[3] "{piece_count:L} części, {piece_size} każda\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2680,47 +2678,3 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Polecenie „%s --help” wyświetli pełną listę dostępnych opcji wiersza poleceń.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "Nie można przydzielić zdarzenia IPv4"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "Nie można przydzielić zdarzenia IPv6"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Nie można odnaleźć adresu serwera śledzącego „{host}”: {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Nie można zapisać u partnera"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Otrzymano sygnał %d. Próbowanie czystego wyłączenia. Proszę to zrobić ponownie, jeśli się zatnie."
-
-#~ msgid "Initializing DHT"
-#~ msgstr "Inicjowanie DHT"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "Nie można ogłosić torrenta w DHT za pomocą {type}: {error} ({error_code}), stan to {state}"
-
-#~ msgid "{file_count:L} files, {total_size}\n"
-#~ msgid_plural "{file_count:L} file, {total_size}\n"
-#~ msgstr[0] "{file_count:L} pliki, {total_size}\n"
-#~ msgstr[1] "{file_count:L} pliki, {total_size}\n"
-#~ msgstr[2] "{file_count:L} plików, {total_size}\n"
-#~ msgstr[3] "{file_count:L} plik, {total_size}\n"
-
-#~ msgid "{piece_count:L} pieces, {piece_size} each\n"
-#~ msgid_plural "{piece_count:L} piece, {piece_size}\n"
-#~ msgstr[0] "{piece_count:L} części, {piece_size} każda\n"
-#~ msgstr[1] "{piece_count:L} części, {piece_size} each\n"
-#~ msgstr[2] "{piece_count:L} części, {piece_size} each\n"
-#~ msgstr[3] "{piece_count:L} część, {piece_size}\n"

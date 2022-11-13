@@ -64,9 +64,9 @@
     <message numerus="yes">
         <location line="+105"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>טורנט הושלם</numerusform>
+            <numerusform>טורנטים הושלמו</numerusform>
         </translation>
     </message>
     <message>
@@ -218,7 +218,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>העמית מחובר דרך µTP</translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -276,7 +276,7 @@
     <message>
         <location line="+391"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>הוספת כתובות</translation>
     </message>
     <message>
         <location line="+97"/>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>שינוי שם…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>חיפוש…</translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;המקום הפנוי מחושב…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;פתיחה…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;חדש…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1161,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>הח&amp;לפת הפעלה…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>ה&amp;גדרת מיקום…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>פתיחת &amp;כתובת…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1740,7 +1740,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>פתחת ה־TCP נבדקת…</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2003,12 +2003,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP הוא כלי להפחתת העומס ברשת.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>הפעלת µTP לחיבור &amp;עמיתים</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2098,15 +2098,15 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;העדכון הצליח!&lt;/b&gt;&lt;p&gt;ברשימת החסימה יש כעת כלל אחד.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;העדכון הצליח!&lt;/b&gt;&lt;p&gt;ברשימת החסימה יש כעת %Ln כללים.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;עדכון רשימת החסימה&lt;/b&gt;&lt;p&gt;מתקבלת רשימת חסימה חדשה…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2576,7 +2576,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>בקשה לספירת עמיתים כעת… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2612,7 +2612,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>בקשה לעמיתים נוספים כעת… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>

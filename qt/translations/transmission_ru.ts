@@ -361,7 +361,7 @@
     <message>
         <location line="+16"/>
         <source>Information</source>
-        <translation>Сведения</translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -446,7 +446,7 @@
     <message>
         <location line="+7"/>
         <source>Origin:</source>
-        <translation>Происхождение:</translation>
+        <translation>Источник:</translation>
     </message>
     <message>
         <location line="+78"/>
@@ -2034,7 +2034,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Трекеры для использования на всех общедоступных торрентах.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt; Чтобы добавить резервный адрес, добавьте его в следующую строку после основного адреса.&lt;/p&gt;&lt;p&gt; Чтобы добавить новый основной адрес, добавьте его после пустой строки.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Трекеры для использования на всех общедоступных торрентах.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Чтобы добавить резервный адрес, добавьте его в следующую строку после основного адреса.&lt;/p&gt;&lt;p&gt;Чтобы добавить новый основной адрес, добавьте его после пустой строки.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>

@@ -5,10 +5,10 @@
 #
 # Translators:
 # Xabier Martin <Iparra@iparra.eus>, 2020
-# Iñigo Zendegi Urzelai, 2022
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2022
 # Sendoa Sojo <sendoasojo@gmail.com>, 2022
 # Alexander Gabilondo <alexgabi@disroot.org>, 2022
+# Iñigo Zendegi Urzelai, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Xabier Aramendi <azpidatziak@gmail.com>, 2022
 #
@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Xabier Aramendi <azpidatziak@gmail.com>, 2022\n"
 "Language-Team: Basque (https://www.transifex.com/transmissionbt/teams/33778/eu/)\n"
@@ -105,7 +105,7 @@ msgstr "Ezin izan da Transmission {content_type} kudeatzaile gisa erregistratu: 
 
 #: ../gtk/Application.cc:527
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Amaitzeko seinalea jaso da, modu garbian amaitzen saiatzen. Trabatuta geratuz gero berriz ere egin ezazu."
 
 #: ../gtk/Application.cc:754
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -503,18 +503,16 @@ msgstr[0] "Ezaugarriak - {torrent_count:L} Torrent"
 msgstr[1] "Ezaugarriak - {torrent_count:L} Torrent"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
 msgstr[0] "Kendu torrent-a?"
-msgstr[1] "Kendu %d torrent?"
+msgstr[1] "Kendu {count:L} torrent?"
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
 msgstr[0] "Ezabatu torrent honek deskargatutako fitxategiak?"
-msgstr[1] "Ezabatu torrent honek deskargatutako %d fitxategiak?"
+msgstr[1] "Ezabatu {count:L} torrent hauek deskargatutako fitxategiak?"
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -739,36 +737,36 @@ msgstr "Ordua"
 #: ../gtk/MessageLogWindow.cc:459
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Kritikoa"
 
 #: ../gtk/MessageLogWindow.cc:460
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Errorea"
 
 #: ../gtk/MessageLogWindow.cc:461
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Oharra"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Informazioa"
 
 #: ../gtk/MessageLogWindow.cc:463
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Arazketa"
 
 #: ../gtk/MessageLogWindow.cc:464
 msgctxt "Logging level"
 msgid "Trace"
-msgstr ""
+msgstr "Arrastoa"
 
 #: ../gtk/Notify.cc:140
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan da '{bus}'(r)entzako proxya sortu: {error} ({error_code})"
 
 #: ../gtk/Notify.cc:225
 msgid "Open File"
@@ -808,15 +806,15 @@ msgstr "_Zabaldu"
 
 #: ../gtk/OptionsDialog.cc:378
 msgid "Show options dialog"
-msgstr ""
+msgstr "Erakutsi aukeren mezua"
 
 #: ../gtk/PathButton.cc:136
 msgid "Select a File"
-msgstr ""
+msgstr "Aukeratu fitxategi bat"
 
 #: ../gtk/PathButton.cc:193
 msgid "(None)"
-msgstr ""
+msgstr "(Bat ere ez)"
 
 #: ../gtk/PrefsDialog.cc:247
 msgid "Allow encryption"
@@ -912,7 +910,7 @@ msgstr "Mahaigainaren hibernatzea onartzen"
 
 #: ../gtk/Session.cc:1579
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Ezin izan da aurkitu {tag}(r)entzako zain dagoen RPC eskaera"
 
 #: ../gtk/StatsDialog.cc:66
 msgid "Started {count:L} time"
@@ -1176,11 +1174,11 @@ msgstr "Ezin da torrent-a ireki"
 
 #: ../gtk/Utils.cc:396
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan da '{path}' zakarrontzira mugitu: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:468
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Ezin izan da '{url}' ireki"
 
 #: ../gtk/Utils.cc:688 ../libtransmission/announcer.cc:1201 ../libtransmission/announcer.cc:1433
 msgid "Unsupported URL: '{url}'"
@@ -1222,7 +1220,7 @@ msgstr "[torrent fitxategiak edo URLak]"
 
 #: ../gtk/main.cc:95
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Exekutatu '{program} --help' eskuragarri dagoen komando-lerro bidezko aukeren zerrenda osoa ikusteko.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1935,11 +1933,11 @@ msgstr "Gehienezko kide-kopurua _guztira:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Gaitu µ_TP kideen komunikaziorako"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP sarearen pilaketa txikiagotzeko tresna bat da."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
 msgid "Use PE_X to find more peers"
@@ -2164,7 +2162,7 @@ msgstr "Ezin izan da errenkada aztertu: '{line}'"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Blokeo-zerrendaren fitxategiaren formatua formatu berrira egokitzen"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:75 ../libtransmission/crypto-utils-cyassl.cc:69 ../libtransmission/crypto-utils-openssl.cc:64 ../libtransmission/crypto-utils-polarssl.cc:66
 msgid "{crypto_library} error: {error} ({error_code})"
@@ -2390,7 +2388,7 @@ msgstr "Torrent-fitxategia '{old_path}' bidetik '{path}' bidera migratu da"
 
 #: ../libtransmission/torrent.cc:124
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan da '{path}'(e)ko metainformazioa erabili '{magnet}'(e)rako: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:432
 msgid "Seed ratio reached; pausing torrent"
@@ -2520,14 +2518,14 @@ msgstr "NB: Ziurtagiri baliogabeak 'Ezin izan da aztarnariarekin konektatu' gisa
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} fitxategi, {total_size}\n"
+msgstr[1] "{file_count:L} fitxategi, {total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} zati, {piece_size}\n"
+msgstr[1] "{piece_count:L} zati, {piece_size} bakoitzak\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2552,33 +2550,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Exekutatu '%s --help' agindu-lerroko aukera guztiak zerrendatzeko.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "Ezin izan da IPv4 ekitaldia esleitu"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "Ezin izan da IPv6 ekitaldia esleitu"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Ezin izan da aztarnariaren helbidea aurkitu '{host}': {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Ezin izan da kidean idatzi"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "%d seinalea jaso da; modu garbian ixten saiatzen. Egin berriro trabatzen bada."
-
-#~ msgid "Initializing DHT"
-#~ msgstr "DHT abiarazten"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "Ezin izan da torrent-a DHTn {type}(e)kin iragarri: {error} ({error_code}); egoera {state} da"

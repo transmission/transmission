@@ -6,18 +6,18 @@
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
+# Jonatan Nyberg <jonatan@autistici.org>, 2022
 # Josef Andersson <josef.andersson@fripost.org>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Jonatan Nyberg <jonatan@autistici.org>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:06+0000\n"
+"POT-Creation-Date: 2022-11-13 21:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Swedish (https://www.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -103,7 +103,7 @@ msgstr "Det gick inte att registrera överföring som en {content_type}-hanterar
 
 #: ../gtk/Application.cc:527
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Fick stängningssignal, försöker stänga av rent. Gör det igen om det fastnar."
 
 #: ../gtk/Application.cc:754
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -491,18 +491,16 @@ msgstr[0] "Egenskaper - {torrent_count:L} torrent"
 msgstr[1] "Egenskaper - {torrent_count:L} torrenter"
 
 #: ../gtk/Dialogs.cc:56
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
 msgstr[0] "Ta bort torrent?"
-msgstr[1] "Ta bort %d torrenter?"
+msgstr[1] "Ta bort {count:L} torrenter?"
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Ta bort hämtade filer för denna torrent?"
-msgstr[1] "Ta bort hämtade filer för dessa %d torrenter?"
+msgstr[0] "Ta bort den här torrentens hämtade filer?"
+msgstr[1] "Ta bort dessa {count:L} torrenters hämtade filer?"
 
 #: ../gtk/Dialogs.cc:64
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -756,7 +754,7 @@ msgstr "Spåra"
 
 #: ../gtk/Notify.cc:140
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Det gick inte att skapa proxy för '{bus}': {error} ({error_code})"
 
 #: ../gtk/Notify.cc:225
 msgid "Open File"
@@ -900,7 +898,7 @@ msgstr "Tillåter skrivbordsviloläge"
 
 #: ../gtk/Session.cc:1579
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Det gick inte att hitta väntande RPC-begäran för taggen {tag}"
 
 #: ../gtk/StatsDialog.cc:66
 msgid "Started {count:L} time"
@@ -1164,11 +1162,11 @@ msgstr "Det gick inte att öppna torrent"
 
 #: ../gtk/Utils.cc:396
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Det gick inte att flytta '{path}' till papperskorgen: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:468
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Det gick inte att öppna '{url}'"
 
 #: ../gtk/Utils.cc:688 ../libtransmission/announcer.cc:1201 ../libtransmission/announcer.cc:1433
 msgid "Unsupported URL: '{url}'"
@@ -1210,7 +1208,7 @@ msgstr "[torrentfiler eller webbadresser]"
 
 #: ../gtk/main.cc:95
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Kör '{program} --help' för att se en fullständig lista över tillgängliga kommandoradsalternativ.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -2508,14 +2506,14 @@ msgstr "OBS: Ogiltiga certifikat kommer att visas som \"Det gick inte att anslut
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} fil, {total_size}\n"
+msgstr[1] "{file_count:L} filer, {total_size}\n"
 
 #: ../utils/create.cc:231
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} del, {piece_size}\n"
+msgstr[1] "{piece_count:L} delar, {piece_size} var\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2540,43 +2538,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagar"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Kör \"%s --help\" för att se en komplett lista över tillgängliga kommandoradsflaggor.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "Det gick inte att allokera IPv4-händelse"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "Det gick inte att allokera IPv6-händelse"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Det gick inte att hitta adressen till spåraren '{host}': {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Det gick inte att skriva till jämlike"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Mottog signalen %d; försöker stänga av rent. Gör det igen om det fastnar."
-
-#~ msgid "Initializing DHT"
-#~ msgstr "Initialiserar DHT"
-
-#~ msgid "Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"
-#~ msgstr "Det går inte att annonsera torrent i DHT med {type}: {error} ({error_code}); tillståndet är {state}"
-
-#~ msgid "{file_count:L} files, {total_size}\n"
-#~ msgid_plural "{file_count:L} file, {total_size}\n"
-#~ msgstr[0] "{file_count:L} filer, {total_size}\n"
-#~ msgstr[1] "{file_count:L} fil, {total_size}\n"
-
-#~ msgid "{piece_count:L} pieces, {piece_size} each\n"
-#~ msgid_plural "{piece_count:L} piece, {piece_size}\n"
-#~ msgstr[0] "{piece_count:L} delar, {piece_size} var\n"
-#~ msgstr[1] "{piece_count:L} del, {piece_size}\n"
