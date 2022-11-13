@@ -29,9 +29,6 @@
 ****
 ***/
 
-#define REQ_HEIGHT(Obj) IF_GTKMM4((Obj).get_height(), (Obj).height)
-#define REQ_WIDTH(Obj) IF_GTKMM4((Obj).get_width(), (Obj).width)
-
 namespace
 {
 
@@ -40,6 +37,16 @@ auto const CompactBarWidth = 50;
 auto const SmallScale = 0.9;
 auto const CompactIconSize = IF_GTKMM4(Gtk::IconSize::NORMAL, Gtk::ICON_SIZE_MENU);
 auto const FullIconSize = IF_GTKMM4(Gtk::IconSize::LARGE, Gtk::ICON_SIZE_DND);
+
+auto get_height(Gtk::Requisition const& req)
+{
+    return req.IF_GTKMM4(get_height(), height);
+}
+
+auto get_width(Gtk::Requisition const& req)
+{
+    return req.IF_GTKMM4(get_width(), width);
+}
 
 auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const* st)
 {
@@ -451,8 +458,8 @@ void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width
     *** LAYOUT
     **/
 
-    width = xpad * 2 + REQ_WIDTH(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + REQ_WIDTH(stat_size);
-    height = ypad * 2 + std::max(REQ_HEIGHT(name_size), bar_height.get_value());
+    width = xpad * 2 + get_width(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + get_width(stat_size);
+    height = ypad * 2 + std::max(get_height(name_size), bar_height.get_value());
 }
 
 void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, int& height) const
@@ -494,9 +501,9 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
     *** LAYOUT
     **/
 
-    width = xpad * 2 + REQ_WIDTH(icon_size) + GUI_PAD + std::max(REQ_WIDTH(prog_size), REQ_WIDTH(stat_size));
-    height = ypad * 2 + REQ_HEIGHT(name_size) + REQ_HEIGHT(prog_size) + GUI_PAD_SMALL + bar_height.get_value() + GUI_PAD_SMALL +
-        REQ_HEIGHT(stat_size);
+    width = xpad * 2 + get_width(icon_size) + GUI_PAD + std::max(get_width(prog_size), get_width(stat_size));
+    height = ypad * 2 + get_height(name_size) + get_height(prog_size) + GUI_PAD_SMALL + bar_height.get_value() + GUI_PAD_SMALL +
+        get_height(stat_size);
 }
 
 void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const
@@ -810,8 +817,8 @@ void TorrentCellRenderer::Impl::render_full(
     Gdk::Rectangle icon_area;
     set_icon(*icon_renderer_, icon, FullIconSize);
     icon_renderer_->get_preferred_size(widget, min_size, size);
-    icon_area.set_width(REQ_WIDTH(size));
-    icon_area.set_height(REQ_HEIGHT(size));
+    icon_area.set_width(get_width(size));
+    icon_area.set_height(get_height(size));
 
     Gdk::Rectangle name_area;
     text_renderer_->property_text() = name;
@@ -819,19 +826,19 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(NONE);
     text_renderer_->property_scale() = 1.0;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    name_area.set_height(REQ_HEIGHT(size));
+    name_area.set_height(get_height(size));
 
     Gdk::Rectangle prog_area;
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    prog_area.set_height(REQ_HEIGHT(size));
+    prog_area.set_height(get_height(size));
 
     Gdk::Rectangle stat_area;
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    stat_area.set_height(REQ_HEIGHT(size));
+    stat_area.set_height(get_height(size));
 
     Gdk::Rectangle prct_area;
 
