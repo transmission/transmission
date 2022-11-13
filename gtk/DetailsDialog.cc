@@ -1172,6 +1172,7 @@ void initPeerRow(
     }
 
     auto peer_addr4 = in_addr();
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     auto const* const peer_addr4_octets = reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr);
     auto const collated_name = inet_pton(AF_INET, std::data(peer->addr), &peer_addr4) != 1 ?
         std::data(peer->addr) :

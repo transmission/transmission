@@ -847,6 +847,8 @@ T* FilterBar::Impl::get_template_child(char const* name) const
     auto full_type_name = std::string("gtkmm__CustomObject_");
     Glib::append_canonical_typename(full_type_name, typeid(FilterBar).name());
 
-    return Glib::wrap(reinterpret_cast<typename T::BaseObjectType*>(
-        gtk_widget_get_template_child(GTK_WIDGET(widget_.gobj()), g_type_from_name(full_type_name.c_str()), name)));
+    return Glib::wrap(G_TYPE_CHECK_INSTANCE_CAST(
+        gtk_widget_get_template_child(GTK_WIDGET(widget_.gobj()), g_type_from_name(full_type_name.c_str()), name),
+        T::get_base_type(),
+        typename T::BaseObjectType));
 }
