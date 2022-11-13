@@ -400,9 +400,6 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "De : traceur";
 
-/* File size - gigabytes */
-"GB" = "Go";
-
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "Go/s";
 
@@ -477,9 +474,6 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Il semble que le ficher « %1$@ » de %2$@ n’est pas un fichier torrent.";
 
-/* File size - kilobytes */
-"KB" = "ko";
-
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "ko/s";
 
@@ -516,9 +510,6 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Transfert magnétisé";
-
-/* File size - megabytes */
-"MB" = "Mo";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "Mo/s";
@@ -916,9 +907,6 @@
 
 /* Donation beg -> title */
 "Support open-source indie software" = "Soutenez les logiciels indépendants à code source ouvert";
-
-/* File size - terabytes */
-"TB" = "To";
 
 /* Transfer speed (terabytes per second) */
 "TB/s" = "To/s";

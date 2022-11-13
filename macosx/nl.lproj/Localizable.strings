@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minuten";
 
 /* stats window -> times opened */
-"%llu times" = "";
+/* "%llu times" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu cache";
@@ -400,9 +400,6 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "Van: tracker";
 
-/* File size - gigabytes */
-"GB" = "GB";
-
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "GB/s";
 
@@ -477,9 +474,6 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Bestand ‘%1$@’ van %2$@ lijkt geen torrentbestand te zijn.";
 
-/* File size - kilobytes */
-"KB" = "KB";
-
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
 
@@ -516,9 +510,6 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Gemagnetiseerde overdracht";
-
-/* File size - megabytes */
-"MB" = "MB";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "MB/s";
@@ -917,9 +908,6 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Steun openbronsoftware";
 
-/* File size - terabytes */
-"TB" = "TB";
-
 /* Transfer speed (terabytes per second) */
 "TB/s" = "TB/s";
 
@@ -1041,7 +1029,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Trace" = "";
+/* "Trace" = ""; */
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1120,7 +1108,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warning" = "";
+/* "Warning" = ""; */
 
 /* Drag overlay -> url */
 "Web Address" = "Webadres";
