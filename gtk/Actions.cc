@@ -112,7 +112,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
 {
     myBuilder = builder.get();
 
-    auto const action_group = Gio::SimpleActionGroup::create();
+    auto action_group = Gio::SimpleActionGroup::create();
 
     auto const match = gtr_pref_string_get(TR_KEY_sort_mode);
 
