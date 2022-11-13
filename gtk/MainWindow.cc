@@ -296,7 +296,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(
     Glib::RefPtr<Gio::SimpleActionGroup> const& actions,
     tr_direction dir)
 {
-    auto& info = speed_menu_info_[dir];
+    auto& info = speed_menu_info_.at(dir);
 
     auto m = Gio::Menu::create();
 

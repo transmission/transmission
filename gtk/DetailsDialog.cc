@@ -1777,7 +1777,7 @@ std::array<std::string_view, 3> const text_dir_mark = { ""sv, "\u200E"sv, "\u200
 
 void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
-    auto const dir_mark = text_dir_mark[static_cast<int>(direction)];
+    auto const dir_mark = text_dir_mark.at(static_cast<int>(direction));
 
     if (tracker.hasAnnounced && tracker.announceState != TR_TRACKER_INACTIVE)
     {
@@ -1859,7 +1859,7 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
 
 void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
-    auto const dir_mark = text_dir_mark[static_cast<int>(direction)];
+    auto const dir_mark = text_dir_mark.at(static_cast<int>(direction));
 
     if (tracker.hasScraped)
     {
@@ -1934,7 +1934,7 @@ void buildTrackerSummary(
     Gtk::TextDirection direction)
 {
     // hostname
-    gstr << text_dir_mark[static_cast<int>(direction)];
+    gstr << text_dir_mark.at(static_cast<int>(direction));
     gstr << (tracker.isBackup ? "<i>" : "<b>");
     gstr << Glib::Markup::escape_text(!key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host, key) : tracker.host);
     gstr << (tracker.isBackup ? "</i>" : "</b>");

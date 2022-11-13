@@ -35,7 +35,7 @@ struct favicon_data
 
 Glib::ustring get_url(std::string const& host, size_t image_type)
 {
-    return fmt::format("http://{}/favicon.{}", host, image_types[image_type]);
+    return fmt::format("http://{}/favicon.{}", host, image_types.at(image_type));
 }
 
 std::string favicon_get_cache_dir()
