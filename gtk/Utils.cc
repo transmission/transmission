@@ -6,6 +6,7 @@
 #include <array>
 #include <functional>
 #include <memory>
+#include <stack>
 #include <stdexcept>
 #include <utility>
 
@@ -585,45 +586,54 @@ auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 
 } // namespace
 
-void gtr_widget_set_visible(Gtk::Widget& w, bool b)
+void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)
 {
-    /* toggle the transient children, too */
-    if (auto const* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
+    auto* const widget_as_window = dynamic_cast<Gtk::Window*>(&widget);
+    if (widget_as_window == nullptr)
     {
-        auto top_levels = Gtk::Window::list_toplevels();
-
-        for (auto top_level_it = top_levels.begin(); top_level_it != top_levels.end();)
-        {
-            auto* const l = *top_level_it++;
-
-            if (l->get_transient_for() != window)
-            {
-                continue;
-            }
-
-            if (l->get_visible() == b)
-            {
-                continue;
-            }
-
-            if (b && l->get_data(ChildHiddenKey) != nullptr)
-            {
-                l->steal_data(ChildHiddenKey);
-                gtr_widget_set_visible(*l, true);
-            }
-            else if (!b)
-            {
-                l->set_data(ChildHiddenKey, GINT_TO_POINTER(1));
-                gtr_widget_set_visible(*l, false);
-
-                // Retrieve updated top-levels list in case hiding the window resulted in its destruction
-                top_levels = Gtk::Window::list_toplevels();
-                top_level_it = top_levels.begin();
-            }
-        }
+        widget.set_visible(is_visible);
+        return;
     }
 
-    w.set_visible(b);
+    /* toggle the transient children, too */
+    auto windows = std::stack<Gtk::Window*>();
+    windows.push(widget_as_window);
+
+    while (!windows.empty())
+    {
+        auto* const window = windows.top();
+        bool transient_child_found = false;
+
+        for (auto* const top_level_window : Gtk::Window::list_toplevels())
+        {
+            if (top_level_window->get_transient_for() != window || top_level_window->get_visible() == is_visible)
+            {
+                continue;
+            }
+
+            windows.push(top_level_window);
+            transient_child_found = true;
+            break;
+        }
+
+        if (transient_child_found)
+        {
+            continue;
+        }
+
+        if (is_visible && window->get_data(ChildHiddenKey) != nullptr)
+        {
+            window->steal_data(ChildHiddenKey);
+            window->set_visible(true);
+        }
+        else if (!is_visible)
+        {
+            window->set_data(ChildHiddenKey, GINT_TO_POINTER(1));
+            window->set_visible(false);
+        }
+
+        windows.pop();
+    }
 }
 
 Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget)
