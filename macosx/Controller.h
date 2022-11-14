@@ -33,7 +33,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add;
 - (void)openCreatedFile:(NSNotification*)notification;
 - (void)openFilesWithDict:(NSDictionary*)dictionary;
-- (void)openShowSheet:(id)sender;
+- (IBAction)openShowSheet:(id)sender;
 
 - (void)openMagnet:(NSString*)address;
 - (void)askOpenMagnetConfirmed:(AddMagnetWindowController*)addController add:(BOOL)add;
@@ -44,62 +44,62 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)duplicateOpenMagnetAlert:(NSString*)address transferName:(NSString*)name;
 
 - (void)openURL:(NSString*)urlString;
-- (void)openURLShowSheet:(id)sender;
+- (IBAction)openURLShowSheet:(id)sender;
 
 @property(nonatomic, readonly) tr_session* sessionHandle;
 
-- (void)createFile:(id)sender;
+- (IBAction)createFile:(id)sender;
 
-- (void)resumeSelectedTorrents:(id)sender;
-- (void)resumeAllTorrents:(id)sender;
+- (IBAction)resumeSelectedTorrents:(id)sender;
+- (IBAction)resumeAllTorrents:(id)sender;
 - (void)resumeTorrents:(NSArray*)torrents;
 
-- (void)resumeSelectedTorrentsNoWait:(id)sender;
-- (void)resumeWaitingTorrents:(id)sender;
+- (IBAction)resumeSelectedTorrentsNoWait:(id)sender;
+- (IBAction)resumeWaitingTorrents:(id)sender;
 - (void)resumeTorrentsNoWait:(NSArray<Torrent*>*)torrents;
 
-- (void)stopSelectedTorrents:(id)sender;
-- (void)stopAllTorrents:(id)sender;
+- (IBAction)stopSelectedTorrents:(id)sender;
+- (IBAction)stopAllTorrents:(id)sender;
 - (void)stopTorrents:(NSArray<Torrent*>*)torrents;
 
 - (void)removeTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
 - (void)confirmRemoveTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
-- (void)removeNoDelete:(id)sender;
-- (void)removeDeleteData:(id)sender;
+- (IBAction)removeNoDelete:(id)sender;
+- (IBAction)removeDeleteData:(id)sender;
 
-- (void)clearCompleted:(id)sender;
+- (IBAction)clearCompleted:(id)sender;
 
-- (void)moveDataFilesSelected:(id)sender;
+- (IBAction)moveDataFilesSelected:(id)sender;
 - (void)moveDataFiles:(NSArray<Torrent*>*)torrents;
 
-- (void)copyTorrentFiles:(id)sender;
+- (IBAction)copyTorrentFiles:(id)sender;
 - (void)copyTorrentFileForTorrents:(NSMutableArray<Torrent*>*)torrents;
 
-- (void)copyMagnetLinks:(id)sender;
+- (IBAction)copyMagnetLinks:(id)sender;
 
-- (void)revealFile:(id)sender;
+- (IBAction)revealFile:(id)sender;
 
 - (IBAction)renameSelected:(id)sender;
 
-- (void)announceSelectedTorrents:(id)sender;
+- (IBAction)announceSelectedTorrents:(id)sender;
 
-- (void)verifySelectedTorrents:(id)sender;
+- (IBAction)verifySelectedTorrents:(id)sender;
 - (void)verifyTorrents:(NSArray*)torrents;
 
 @property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
 
 @property(nonatomic, readonly) PrefsController* prefsController;
-- (void)showPreferenceWindow:(id)sender;
+- (IBAction)showPreferenceWindow:(id)sender;
 
-- (void)showAboutWindow:(id)sender;
+- (IBAction)showAboutWindow:(id)sender;
 
-- (void)showInfo:(id)sender;
+- (IBAction)showInfo:(id)sender;
 - (void)resetInfo;
-- (void)setInfoTab:(id)sender;
+- (IBAction)setInfoTab:(id)sender;
 
 @property(nonatomic, readonly) MessageWindowController* messageWindowController;
-- (void)showMessageWindow:(id)sender;
-- (void)showStatsWindow:(id)sender;
+- (IBAction)showMessageWindow:(id)sender;
+- (IBAction)showStatsWindow:(id)sender;
 
 - (void)updateUI;
 - (void)fullUpdateUI;
@@ -122,18 +122,18 @@ typedef NS_ENUM(unsigned int, addType) { //
                          forParent:(id)parent
                withSortDescriptors:(NSArray*)descriptors
                   beganTableUpdate:(BOOL*)beganTableUpdate;
-- (void)setSort:(id)sender;
-- (void)setSortByGroup:(id)sender;
-- (void)setSortReverse:(id)sender;
+- (IBAction)setSort:(id)sender;
+- (IBAction)setSortByGroup:(id)sender;
+- (IBAction)setSortReverse:(id)sender;
 
-- (void)switchFilter:(id)sender;
+- (IBAction)switchFilter:(id)sender;
 
 - (IBAction)showGlobalPopover:(id)sender;
 
 - (void)setGroup:(id)sender; //used by delegate-generated menu items
 
-- (void)toggleSpeedLimit:(id)sender;
-- (void)speedLimitChanged:(id)sender;
+- (IBAction)toggleSpeedLimit:(id)sender;
+- (IBAction)speedLimitChanged:(id)sender;
 - (void)altSpeedToggledCallbackIsLimited:(NSDictionary*)dict;
 
 - (void)changeAutoImport;
@@ -147,12 +147,12 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (void)torrentTableViewSelectionDidChange:(NSNotification*)notification;
 
-- (void)toggleSmallView:(id)sender;
-- (void)togglePiecesBar:(id)sender;
-- (void)toggleAvailabilityBar:(id)sender;
+- (IBAction)toggleSmallView:(id)sender;
+- (IBAction)togglePiecesBar:(id)sender;
+- (IBAction)toggleAvailabilityBar:(id)sender;
 
-- (void)toggleStatusBar:(id)sender;
-- (void)toggleFilterBar:(id)sender;
+- (IBAction)toggleStatusBar:(id)sender;
+- (IBAction)toggleFilterBar:(id)sender;
 - (void)focusFilterField;
 
 - (void)allToolbarClicked:(id)sender;
@@ -172,14 +172,14 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (void)updateForExpandCollapse;
 
-- (void)showMainWindow:(id)sender;
+- (IBAction)showMainWindow:(id)sender;
 
-- (void)toggleQuickLook:(id)sender;
+- (IBAction)toggleQuickLook:(id)sender;
 
-- (void)linkHomepage:(id)sender;
-- (void)linkForums:(id)sender;
-- (void)linkGitHub:(id)sender;
-- (void)linkDonate:(id)sender;
+- (IBAction)linkHomepage:(id)sender;
+- (IBAction)linkForums:(id)sender;
+- (IBAction)linkGitHub:(id)sender;
+- (IBAction)linkDonate:(id)sender;
 
 - (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct;
 - (void)rpcAddTorrentStruct:(struct tr_torrent*)torrentStruct;

@@ -10,6 +10,6 @@
 
 @property(nonatomic, class, readonly) StatsWindowController* statsWindow;
 
-- (void)resetStats:(id)sender;
+- (IBAction)resetStats:(id)sender;
 
 @end
