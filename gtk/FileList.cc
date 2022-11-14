@@ -175,7 +175,7 @@ bool refreshFilesForeach(
         auto const file = tr_torrentFile(refresh_data.tor, index);
 
         new_enabled = static_cast<int>(file.wanted);
-        new_priority = file.priority;
+        new_priority = int{ file.priority };
         new_have = file.have;
         new_size = file.length;
         new_progress = static_cast<int>(100 * file.progress);
