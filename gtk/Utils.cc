@@ -278,8 +278,8 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
    if the row they right-click on isn't selected, select it. */
 bool on_tree_view_button_pressed(
     Gtk::TreeView& view,
-    double view_x,
-    double view_y,
+    double event_x,
+    double event_y,
     bool context_menu_requested,
     std::function<void(double, double)> const& callback)
 {
@@ -288,7 +288,7 @@ bool on_tree_view_button_pressed(
         Gtk::TreeModel::Path path;
 
         if (auto const selection = view.get_selection();
-            view.get_path_at_pos((int)view_x, (int)view_y, path) && !selection->is_selected(path))
+            view.get_path_at_pos(static_cast<int>(event_x), static_cast<int>(event_y), path) && !selection->is_selected(path))
         {
             selection->unselect_all();
             selection->select(path);
@@ -296,7 +296,7 @@ bool on_tree_view_button_pressed(
 
         if (callback)
         {
-            callback(view_x, view_y);
+            callback(event_x, event_y);
         }
 
         return true;
@@ -307,9 +307,9 @@ bool on_tree_view_button_pressed(
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y)
+bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double event_y)
 {
-    if (Gtk::TreeModel::Path path; !view.get_path_at_pos((int)view_x, (int)view_y, path))
+    if (Gtk::TreeModel::Path path; !view.get_path_at_pos(static_cast<int>(event_x), static_cast<int>(event_y), path))
     {
         view.get_selection()->unselect_all();
     }
@@ -329,10 +329,15 @@ void setup_tree_view_button_event_handling(
     if (press_callback)
     {
         controller->signal_pressed().connect(
-            [&view, press_callback, controller](int /*n_press*/, double event_x, double event_y)
+            [&view, press_callback, controller](int /*n_press*/, double view_x, double view_y)
             {
+                int event_x = 0;
+                int event_y = 0;
+                view.convert_widget_to_bin_window_coords(static_cast<int>(view_x), static_cast<int>(view_y), event_x, event_y);
+
                 auto* const sequence = controller->get_current_sequence();
                 auto const event = controller->get_last_event(sequence);
+
                 if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_PRESS) &&
                     press_callback(
                         event->get_button(),
@@ -349,10 +354,15 @@ void setup_tree_view_button_event_handling(
     if (release_callback)
     {
         controller->signal_released().connect(
-            [&view, release_callback, controller](int /*n_press*/, double event_x, double event_y)
+            [&view, release_callback, controller](int /*n_press*/, double view_x, double view_y)
             {
+                int event_x = 0;
+                int event_y = 0;
+                view.convert_widget_to_bin_window_coords(static_cast<int>(view_x), static_cast<int>(view_y), event_x, event_y);
+
                 auto* const sequence = controller->get_current_sequence();
                 auto const event = controller->get_last_event(sequence);
+
                 if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_RELEASE) && release_callback(event_x, event_y))
                 {
                     controller->set_sequence_state(sequence, Gtk::EventSequenceState::CLAIMED);

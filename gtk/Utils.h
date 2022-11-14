@@ -211,13 +211,13 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& window_or_child, tr_torrent* dupl
    if the row they right-click on isn't selected, select it. */
 bool on_tree_view_button_pressed(
     Gtk::TreeView& view,
-    double view_x,
-    double view_y,
+    double event_x,
+    double event_y,
     bool context_menu_requested,
     std::function<void(double, double)> const& callback = {});
 
 /* if the click didn't specify a row, clear the selection */
-bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y);
+bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double event_y);
 
 using TrGdkModifierType = IF_GTKMM4(Gdk::ModifierType, guint);
 
