@@ -7,5 +7,3 @@ General rule is that new localizations are only included in next release if they
 Translations for Mac, Qt and GTK+ clients are managed on Transifex. To help localize, or add your new localization, you'll need to [register on Transifex and join the translation team](https://docs.transifex.com/getting-started/translators) for [Transmission project](https://www.transifex.com/transmissionbt/transmissionbt).
 
 _GTK+ client translations were previously managed on [Launchpad](https://translations.launchpad.net/transmission/trunk/+pots/transmission), but this is no longer the case. No phrases will be updated there, and none of your translations made there will be integrated back into Transmission._
-
-_Mac client translations are almost entirely accessible on Transifex, but we are still in the process of including plural forms support and phrases currently only present in .xib files._
