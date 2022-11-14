@@ -7,7 +7,6 @@ Checks: >
   -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-narrowing-conversions,
   cert-*,
-  -cert-err58-cpp,
   clang-analyzer-*,
   cppcoreguidelines-avoid-const-or-ref-data-members,
   cppcoreguidelines-avoid-goto,
