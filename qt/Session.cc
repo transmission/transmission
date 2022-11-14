@@ -484,7 +484,7 @@ void Session::torrentRenamePath(torrent_ids_t const& torrent_ids, QString const&
 
     q->add(
         [this, &args]() { return exec("torrent-rename-path", &args); },
-        [](RpcResponse const& r)
+        [=](RpcResponse const& r)
         {
             auto str = dictFind<QString>(r.args.get(), TR_KEY_path);
             auto const path = str ? *str : QStringLiteral("(unknown)");
@@ -1018,7 +1018,7 @@ void Session::addTorrent(AddData add_me, tr_variant* args_dict, bool trash_origi
 
     q->add(
         [this, args_dict]() { return exec("torrent-add", args_dict); },
-        [add_me](RpcResponse const& r)
+        [=, &add_me](RpcResponse const& r)
         {
             auto* d = new QMessageBox(
                 QMessageBox::Warning,
