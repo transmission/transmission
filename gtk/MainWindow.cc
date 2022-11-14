@@ -118,7 +118,7 @@ private:
 ****
 ***/
 
-void MainWindow::Impl::on_popup_menu([[maybe_unused]] double view_x, [[maybe_unused]] double view_y)
+void MainWindow::Impl::on_popup_menu([[maybe_unused]] double event_x, [[maybe_unused]] double event_y)
 {
     if (popup_menu_ == nullptr)
     {
@@ -136,6 +136,9 @@ void MainWindow::Impl::on_popup_menu([[maybe_unused]] double view_x, [[maybe_unu
     }
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
+    int view_x = 0;
+    int view_y = 0;
+    view_->convert_bin_window_to_widget_coords(static_cast<int>(event_x), static_cast<int>(event_y), view_x, view_y);
     double window_x = 0;
     double window_y = 0;
     view_->translate_coordinates(window_, view_x, view_y, window_x, window_y);
