@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Neu…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1161,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sitzung wechseln…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ort festlegen…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Adresse öffnen…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1740,7 +1740,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP Port überprüfen…</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2254,9 +2254,9 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n doppelte Torrentdatei konnten nicht hinzugefügt werden</numerusform>
+            <numerusform>%n doppelte Torrentdateien konnten nicht hinzugefügt werden</numerusform>
         </translation>
     </message>
 </context>

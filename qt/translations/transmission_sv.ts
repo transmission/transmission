@@ -2247,8 +2247,8 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Duplicera torrent</numerusform>
-            <numerusform>Duplicera torrenter</numerusform>
+            <numerusform>Torrentdubblett</numerusform>
+            <numerusform>Torrentdubbletter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
