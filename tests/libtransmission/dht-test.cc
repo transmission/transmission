@@ -235,8 +235,8 @@ protected:
         std::vector<Pinged> pinged_;
         std::vector<Searched> searched_;
         std::array<char, IdLength> id_ = {};
-        int dht_socket_ = TR_BAD_SOCKET;
-        int dht_socket6_ = TR_BAD_SOCKET;
+        tr_socket_t dht_socket_ = TR_BAD_SOCKET;
+        tr_socket_t dht_socket6_ = TR_BAD_SOCKET;
     };
 
     // Creates real timers, but with shortened intervals so that tests can run faster
