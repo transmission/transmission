@@ -35,8 +35,6 @@
 @property(nonatomic) IBOutlet NSTextField* fWhereSectionLabel;
 @property(nonatomic) IBOutlet NSScrollView* fCommentScrollView;
 
-- (void)setupInfo;
-
 @end
 
 @implementation InfoGeneralViewController

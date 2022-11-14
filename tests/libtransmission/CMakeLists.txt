@@ -13,7 +13,7 @@ add_executable(libtransmission-test
     crypto-test-ref.h
     crypto-test.cc
     error-test.cc
-    dns-test.cc
+    dht-test.cc
     file-piece-map-test.cc
     file-test.cc
     getopt-test.cc
@@ -41,6 +41,7 @@ add_executable(libtransmission-test
     subprocess-test-script.cmd
     subprocess-test.cc
     test-fixtures.h
+    timer-test.cc
     torrent-files-test.cc
     torrent-magnet-test.cc
     torrent-metainfo-test.cc
@@ -49,6 +50,8 @@ add_executable(libtransmission-test
     variant-test.cc
     watchdir-test.cc
     web-utils-test.cc)
+
+set_property(TARGET libtransmission-test PROPERTY FOLDER "tests")
 
 target_compile_definitions(libtransmission-test
     PRIVATE
@@ -65,6 +68,7 @@ target_include_directories(libtransmission-test SYSTEM
         ${WIDE_INTEGER_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
+        ${DHT_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS})
 
 target_compile_options(libtransmission-test
@@ -91,6 +95,8 @@ add_custom_command(
 
 add_executable(subprocess-test
     subprocess-test-program.cc)
+
+set_property(TARGET subprocess-test PROPERTY FOLDER "tests")
 
 target_include_directories(subprocess-test
     PRIVATE

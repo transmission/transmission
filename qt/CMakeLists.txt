@@ -1,5 +1,10 @@
 project(trqt)
 
+set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
+set_property(GLOBAL PROPERTY AUTOMOC_SOURCE_GROUP "Generated Files")
+set_property(GLOBAL PROPERTY AUTORCC_SOURCE_GROUP "Generated Files")
+set_property(GLOBAL PROPERTY AUTOUIC_SOURCE_GROUP "Generated Files")
+
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc
     AddData.cc
@@ -120,7 +125,7 @@ set(${PROJECT_NAME}_HEADERS
     WatchDir.h
 )
 
-tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES
+set(${PROJECT_NAME}_UI_FILES
     AboutDialog.ui
     DetailsDialog.ui
     LicenseDialog.ui
@@ -134,13 +139,19 @@ tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES
     StatsDialog.ui
     TrackersDialog.ui
 )
+source_group(Ui FILES ${${PROJECT_NAME}_UI_FILES})
+
+tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES ${${PROJECT_NAME}_UI_FILES})
+source_group("Generated Files" FILES ${${PROJECT_NAME}_UI_SOURCES})
 
 set(${PROJECT_NAME}_QRC_FILES application.qrc)
 if(WIN32 OR APPLE)
     list(APPEND ${PROJECT_NAME}_QRC_FILES icons/Faenza/Faenza.qrc)
 endif()
+source_group(Resources FILES ${${PROJECT_NAME}_QRC_FILES})
 
 tr_qt_add_resources(${PROJECT_NAME}_QRC_SOURCES ${${PROJECT_NAME}_QRC_FILES})
+source_group("Generated Files" FILES ${${PROJECT_NAME}_QRC_SOURCES})
 
 set(${PROJECT_NAME}_LINGUAS
     af
@@ -188,6 +199,7 @@ endforeach()
 
 if(${PROJECT_NAME}_TS_FILES)
     tr_qt_add_translation(${PROJECT_NAME}_QM_FILES ${${PROJECT_NAME}_TS_FILES})
+    source_group("Generated Files" FILES ${${PROJECT_NAME}_QM_FILES})
 endif()
 
 include_directories(

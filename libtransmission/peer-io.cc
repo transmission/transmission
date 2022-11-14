@@ -47,6 +47,7 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
 
+#ifdef TR_ENABLE_ASSERTS
 [[nodiscard]] static constexpr auto isSupportedSocket(tr_peer_socket const& sock)
 {
 #ifdef WITH_UTP
@@ -55,6 +56,7 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
     return sock.type == TR_PEER_SOCKET_TYPE_TCP;
 #endif
 }
+#endif // TR_ENABLE_ASSERTS
 
 static constexpr size_t guessPacketOverhead(size_t d)
 {
@@ -299,7 +301,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     }
     else
     {
-        auto const what = BEV_EVENT_WRITING | (n_written == 0 ? BEV_EVENT_EOF : BEV_EVENT_ERROR);
+        auto const what = BEV_EVENT_WRITING | (error != nullptr ? BEV_EVENT_ERROR : BEV_EVENT_EOF);
 
         tr_logAddDebugIo(
             io,
@@ -480,7 +482,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     struct tr_peer_socket const socket)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(session->events != nullptr);
     auto lock = session->unique_lock();
 
     TR_ASSERT(isSupportedSocket(socket));
@@ -503,8 +504,8 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     {
     case TR_PEER_SOCKET_TYPE_TCP:
         tr_logAddTraceIo(io, fmt::format("socket (tcp) is {}", socket.handle.tcp));
-        io->event_read = event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, io.get());
-        io->event_write = event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, io.get());
+        io->event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, io.get()));
+        io->event_write.reset(event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, io.get()));
         break;
 
 #ifdef WITH_UTP
@@ -596,15 +597,10 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
 static void event_enable(tr_peerIo* io, short event)
 {
     TR_ASSERT(io->session != nullptr);
-    TR_ASSERT(io->session->events != nullptr);
 
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
-
-    if (need_events)
-    {
-        TR_ASSERT(event_initialized(io->event_read));
-        TR_ASSERT(event_initialized(io->event_write));
-    }
+    TR_ASSERT(!need_events || io->event_read);
+    TR_ASSERT(!need_events || io->event_write);
 
     if ((event & EV_READ) != 0 && (io->pendingEvents & EV_READ) == 0)
     {
@@ -612,7 +608,7 @@ static void event_enable(tr_peerIo* io, short event)
 
         if (need_events)
         {
-            event_add(io->event_read, nullptr);
+            event_add(io->event_read.get(), nullptr);
         }
 
         io->pendingEvents |= EV_READ;
@@ -624,7 +620,7 @@ static void event_enable(tr_peerIo* io, short event)
 
         if (need_events)
         {
-            event_add(io->event_write, nullptr);
+            event_add(io->event_write.get(), nullptr);
         }
 
         io->pendingEvents |= EV_WRITE;
@@ -633,15 +629,9 @@ static void event_enable(tr_peerIo* io, short event)
 
 static void event_disable(tr_peerIo* io, short event)
 {
-    TR_ASSERT(io->session->events != nullptr);
-
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
-
-    if (need_events)
-    {
-        TR_ASSERT(event_initialized(io->event_read));
-        TR_ASSERT(event_initialized(io->event_write));
-    }
+    TR_ASSERT(!need_events || io->event_read);
+    TR_ASSERT(!need_events || io->event_write);
 
     if ((event & EV_READ) != 0 && (io->pendingEvents & EV_READ) != 0)
     {
@@ -649,7 +639,7 @@ static void event_disable(tr_peerIo* io, short event)
 
         if (need_events)
         {
-            event_del(io->event_read);
+            event_del(io->event_read.get());
         }
 
         io->pendingEvents &= ~EV_READ;
@@ -661,7 +651,7 @@ static void event_disable(tr_peerIo* io, short event)
 
         if (need_events)
         {
-            event_del(io->event_write);
+            event_del(io->event_write.get());
         }
 
         io->pendingEvents &= ~EV_WRITE;
@@ -712,25 +702,14 @@ static void io_close_socket(tr_peerIo* io)
         tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
 
+    io->event_write.reset();
+    io->event_read.reset();
     io->socket = {};
-
-    if (io->event_read != nullptr)
-    {
-        event_free(io->event_read);
-        io->event_read = nullptr;
-    }
-
-    if (io->event_write != nullptr)
-    {
-        event_free(io->event_write);
-        io->event_write = nullptr;
-    }
 }
 
 tr_peerIo::~tr_peerIo()
 {
     auto const lock = session->unique_lock();
-    TR_ASSERT(session->events != nullptr);
 
     clearCallbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
@@ -778,8 +757,8 @@ int tr_peerIo::reconnect()
         return -1;
     }
 
-    this->event_read = event_new(session->eventBase(), this->socket.handle.tcp, EV_READ, event_read_cb, this);
-    this->event_write = event_new(session->eventBase(), this->socket.handle.tcp, EV_WRITE, event_write_cb, this);
+    this->event_read.reset(event_new(session->eventBase(), this->socket.handle.tcp, EV_READ, event_read_cb, this));
+    this->event_write.reset(event_new(session->eventBase(), this->socket.handle.tcp, EV_WRITE, event_write_cb, this));
 
     event_enable(this, pending_events);
     this->session->setSocketTOS(this->socket.handle.tcp, addr.type);
@@ -805,7 +784,7 @@ static size_t getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now)
     return std::max(ceiling, current_speed_bytes_per_second * period);
 }
 
-size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const
+size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const noexcept
 {
     size_t const desired_len = getDesiredOutputBufferSize(this, now);
     size_t const current_len = std::size(outbuf);

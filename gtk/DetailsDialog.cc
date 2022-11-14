@@ -3,15 +3,21 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#endif
+
 #include <algorithm>
 #include <array>
-#include <limits.h> // INT_MAX
+#include <cstddef>
+#include <cstdlib> // abort()
+#include <limits>
 #include <memory>
 #include <numeric>
 #include <sstream>
-#include <stddef.h>
-#include <stdio.h> // sscanf()
-#include <stdlib.h> // abort()
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -463,7 +469,7 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_downloadLimited, down_limited_check_->get_active()); });
 
-    down_limit_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
+    down_limit_spin_->set_adjustment(Gtk::Adjustment::create(0, 0, std::numeric_limits<int>::max(), 5));
     down_limit_spin_tag_ = down_limit_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_downloadLimit, down_limit_spin_->get_value_as_int()); });
 
@@ -471,7 +477,7 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_uploadLimited, up_limited_check_->get_active()); });
 
-    up_limit_sping_->set_adjustment(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
+    up_limit_sping_->set_adjustment(Gtk::Adjustment::create(0, 0, std::numeric_limits<int>::max(), 5));
     up_limit_spin_tag_ = up_limit_sping_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_uploadLimit, up_limit_sping_->get_value_as_int()); });
 
@@ -1165,12 +1171,20 @@ void initPeerRow(
         client = "";
     }
 
-    auto q = std::array<int, 4>{};
-    auto const collated_name = sscanf(peer->addr, "%d.%d.%d.%d", &q[0], &q[1], &q[2], &q[3]) != 4 ?
-        peer->addr :
-        fmt::format(FMT_STRING("{:03d}.{:03d}.{:03d}.{:03d}"), q[0], q[1], q[2], q[3]);
+    auto peer_addr4 = in_addr();
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    auto const* const peer_addr4_octets = reinterpret_cast<uint8_t const*>(&peer_addr4.s_addr);
+    auto const collated_name = inet_pton(AF_INET, std::data(peer->addr), &peer_addr4) != 1 ?
+        std::data(peer->addr) :
+        fmt::format(
+            "{:03}",
+            fmt::join(
+                peer_addr4_octets,
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
+                "."));
 
-    (*iter)[peer_cols.address] = peer->addr;
+    (*iter)[peer_cols.address] = std::data(peer->addr);
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
@@ -1240,7 +1254,7 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     (*iter)[peer_cols.download_rate_string] = down_speed;
     (*iter)[peer_cols.upload_rate_double] = peer->rateToPeer_KBps;
     (*iter)[peer_cols.upload_rate_string] = up_speed;
-    (*iter)[peer_cols.flags] = peer->flagStr;
+    (*iter)[peer_cols.flags] = std::data(peer->flagStr);
     (*iter)[peer_cols.was_updated] = true;
     (*iter)[peer_cols.blocks_downloaded_count_int] = (int)peer->blocksToClient;
     (*iter)[peer_cols.blocks_downloaded_count_string] = blocks_to_client;
@@ -1522,7 +1536,7 @@ namespace
 void setPeerViewColumns(Gtk::TreeView* peer_view)
 {
     std::vector<Gtk::TreeModelColumnBase const*> view_columns;
-    Gtk::TreeViewColumn* c;
+    Gtk::TreeViewColumn* c = nullptr;
     bool const more = gtr_pref_flag_get(TR_KEY_show_extra_peer_details);
 
     view_columns.push_back(&peer_cols.encryption_stock_id);
@@ -1668,7 +1682,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
         }
         else
         {
-            abort();
+            std::abort();
         }
 
         c->set_resizable(false);
@@ -1755,18 +1769,18 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
 namespace
 {
 
-auto constexpr ErrMarkupBegin = "<span color=\"red\">"sv;
+auto constexpr ErrMarkupBegin = "<span color='red'>"sv;
 auto constexpr ErrMarkupEnd = "</span>"sv;
-auto constexpr TimeoutMarkupBegin = "<span color=\"#246\">"sv;
+auto constexpr TimeoutMarkupBegin = "<span color='#246'>"sv;
 auto constexpr TimeoutMarkupEnd = "</span>"sv;
-auto constexpr SuccessMarkupBegin = "<span color=\"#080\">"sv;
+auto constexpr SuccessMarkupBegin = "<span color='#080'>"sv;
 auto constexpr SuccessMarkupEnd = "</span>"sv;
 
 std::array<std::string_view, 3> const text_dir_mark = { ""sv, "\u200E"sv, "\u200F"sv };
 
 void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
-    auto const dir_mark = text_dir_mark[static_cast<int>(direction)];
+    auto const dir_mark = text_dir_mark.at(static_cast<int>(direction));
 
     if (tracker.hasAnnounced && tracker.announceState != TR_TRACKER_INACTIVE)
     {
@@ -1802,7 +1816,7 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
                 // {markup_begin} and {markup_end} should surround the error
                 _("Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"),
                 fmt::arg("markup_begin", ErrMarkupBegin),
-                fmt::arg("error", Glib::Markup::escape_text(tracker.lastAnnounceResult)),
+                fmt::arg("error", Glib::Markup::escape_text(std::data(tracker.lastAnnounceResult))),
                 fmt::arg("markup_end", ErrMarkupEnd),
                 fmt::arg("time_span_ago", time_span_ago));
         }
@@ -1848,7 +1862,7 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
 
 void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
-    auto const dir_mark = text_dir_mark[static_cast<int>(direction)];
+    auto const dir_mark = text_dir_mark.at(static_cast<int>(direction));
 
     if (tracker.hasScraped)
     {
@@ -1874,7 +1888,7 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
             gstr << fmt::format(
                 // {markup_begin} and {markup_end} should surround the error text
                 _("Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"),
-                fmt::arg("error", Glib::Markup::escape_text(tracker.lastScrapeResult)),
+                fmt::arg("error", Glib::Markup::escape_text(std::data(tracker.lastScrapeResult))),
                 fmt::arg("time_span_ago", time_span_ago),
                 fmt::arg("markup_begin", ErrMarkupBegin),
                 fmt::arg("markup_end", ErrMarkupEnd));
@@ -1923,7 +1937,7 @@ void buildTrackerSummary(
     Gtk::TextDirection direction)
 {
     // hostname
-    gstr << text_dir_mark[static_cast<int>(direction)];
+    gstr << text_dir_mark.at(static_cast<int>(direction));
     gstr << (tracker.isBackup ? "<i>" : "<b>");
     gstr << Glib::Markup::escape_text(!key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host, key) : tracker.host);
     gstr << (tracker.isBackup ? "</i>" : "</b>");
@@ -2154,12 +2168,16 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         DetailsDialog& parent,
-        Glib::RefPtr<Session> core,
+        Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
+    ~EditTrackersDialog() override = default;
 
     TR_DISABLE_COPY_MOVE(EditTrackersDialog)
 
-    static std::unique_ptr<EditTrackersDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+    static std::unique_ptr<EditTrackersDialog> create(
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent const* tor);
 
 private:
     void on_response(int response) override;
@@ -2175,7 +2193,7 @@ EditTrackersDialog::EditTrackersDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
     : Gtk::Dialog(cast_item)
     , parent_(parent)
@@ -2191,7 +2209,7 @@ EditTrackersDialog::EditTrackersDialog(
 
 std::unique_ptr<EditTrackersDialog> EditTrackersDialog::create(
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("EditTrackersDialog.ui"));
@@ -2269,12 +2287,16 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         DetailsDialog& parent,
-        Glib::RefPtr<Session> core,
+        Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
+    ~AddTrackerDialog() override = default;
 
     TR_DISABLE_COPY_MOVE(AddTrackerDialog)
 
-    static std::unique_ptr<AddTrackerDialog> create(DetailsDialog& parent, Glib::RefPtr<Session> core, tr_torrent const* tor);
+    static std::unique_ptr<AddTrackerDialog> create(
+        DetailsDialog& parent,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent const* tor);
 
 private:
     void on_response(int response) override;
@@ -2290,7 +2312,7 @@ AddTrackerDialog::AddTrackerDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
     : Gtk::Dialog(cast_item)
     , parent_(parent)
@@ -2306,7 +2328,7 @@ AddTrackerDialog::AddTrackerDialog(
 
 std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(
     DetailsDialog& parent,
-    Glib::RefPtr<Session> core,
+    Glib::RefPtr<Session> const& core,
     tr_torrent const* torrent)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("AddTrackerDialog.ui"));
@@ -2327,14 +2349,12 @@ void AddTrackerDialog::on_response(int response)
             if (tr_urlIsValidTracker(url.c_str()))
             {
                 tr_variant top;
-                tr_variant* args;
-                tr_variant* trackers;
 
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
-                args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+                auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddInt(args, TR_KEY_id, torrent_id_);
-                trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
+                auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
                 tr_variantListAddStr(trackers, url.raw());
 
                 core_->exec(&top);
@@ -2378,14 +2398,12 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         auto const torrent_id = iter->get_value(tracker_cols.torrent_id);
         auto const tracker_id = iter->get_value(tracker_cols.tracker_id);
         tr_variant top;
-        tr_variant* args;
-        tr_variant* trackers;
 
         tr_variantInitDict(&top, 2);
         tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
-        args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+        auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
         tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
-        trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
+        auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
         tr_variantListAddInt(trackers, tracker_id);
 
         core_->exec(&top);

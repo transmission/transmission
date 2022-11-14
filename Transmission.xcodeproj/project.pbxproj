@@ -11,8 +11,6 @@
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
 		0A89346B736DBCF81F3A4850 /* torrent-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */; };
 		0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */; };
-		11524394C75E57E52CD9ADF0 /* dns.h in Headers */ = {isa = PBXBuildFile; fileRef = 11524394C75E57E52CD9ADF1 /* dns.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11524394C75E57E52CD9ADF2 /* dns-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = 11524394C75E57E52CD9ADF3 /* dns-ev.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
@@ -155,8 +153,8 @@
 		A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A242AD9115F05D23002B3A6C /* Localizable.strings */; };
 		A2451E6916ACE4EB00586E0E /* FileRenameSheetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2451E6716ACE4EB00586E0E /* FileRenameSheetController.mm */; };
 		A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */; };
-		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
-		A24621420C769D0900088E81 /* trevent.cc in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* trevent.cc */; };
+		A24621410C769D0900088E81 /* session-thread.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* session-thread.h */; };
+		A24621420C769D0900088E81 /* session-thread.cc in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* session-thread.cc */; };
 		A247A443114C701800547DFC /* InfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A247A442114C701800547DFC /* InfoViewController.h */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -288,6 +286,7 @@
 		BE1183700CE160D50002D0F3 /* miniupnpc.c in Sources */ = {isa = PBXBuildFile; fileRef = BE1183680CE160D50002D0F3 /* miniupnpc.c */; };
 		BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1183480CE160960002D0F3 /* libminiupnp.a */; };
 		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
+		BE7AA337F6752914B0C416B0 /* utils-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = BE7AA337F6752914B0C416B1 /* utils-ev.h */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1C1A0C07756200B0BB3C /* daemon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.cc */; };
 		BEFC1D050C07825A00B0BB3C /* remote.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C140C07756200B0BB3C /* remote.cc */; };
@@ -397,6 +396,7 @@
 		C3D9062727B7E3E800EF2386 /* psl.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061827B7E1DE00EF2386 /* psl.c */; };
 		C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3D9061B27B7E31100EF2386 /* libpsl.h */; };
 		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
+		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
 		C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AE2803EE7C005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
@@ -602,8 +602,6 @@
 		0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-metainfo.cc"; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-metainfo.h"; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		11524394C75E57E52CD9ADF1 /* dns.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = dns.h; sourceTree = "<group>"; };
-		11524394C75E57E52CD9ADF3 /* dns-ev.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "dns-ev.h"; sourceTree = "<group>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
@@ -878,8 +876,8 @@
 		A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileRenameSheetController.h; sourceTree = "<group>"; };
 		A2451E6716ACE4EB00586E0E /* FileRenameSheetController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileRenameSheetController.mm; sourceTree = "<group>"; };
 		A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FileRenameSheetController.xib; sourceTree = "<group>"; };
-		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = trevent.h; sourceTree = "<group>"; };
-		A24621360C769CF400088E81 /* trevent.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = trevent.cc; sourceTree = "<group>"; };
+		A24621350C769CF400088E81 /* session-thread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "session-thread.h"; sourceTree = "<group>"; };
+		A24621360C769CF400088E81 /* session-thread.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-thread.cc"; sourceTree = "<group>"; };
 		A247A442114C701800547DFC /* InfoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoViewController.h; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		A25485390EB66CBB004539DA /* codelength.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = codelength.h; sourceTree = "<group>"; };
@@ -1065,6 +1063,7 @@
 		BE1183670CE160D50002D0F3 /* upnpcommands.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = upnpcommands.c; sourceTree = "<group>"; };
 		BE1183680CE160D50002D0F3 /* miniupnpc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = miniupnpc.c; sourceTree = "<group>"; };
 		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE7AA337F6752914B0C416B1 /* utils-ev.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "utils-ev.h"; sourceTree = "<group>"; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0E0C07756200B0BB3C /* daemon.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = daemon.cc; sourceTree = "<group>"; };
 		BEFC1C140C07756200B0BB3C /* remote.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = remote.cc; sourceTree = "<group>"; };
@@ -1178,6 +1177,8 @@
 		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
 		C3D9062127B7E3C900EF2386 /* libpsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C81E411127F5BABD00652F56 /* CocoaCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaCompatibility.h; sourceTree = "<group>"; };
+		C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSKeyedUnarchiverAdditions.h; sourceTree = "<group>"; };
+		C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSKeyedUnarchiverAdditions.mm; sourceTree = "<group>"; };
 		C86BCD9828228A9600F45599 /* SparkleProxy.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SparkleProxy.mm; sourceTree = "<group>"; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C88771AB2803EE53005C7523 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
@@ -1706,8 +1707,6 @@
 				C11DEA151FCD31C0009E22B9 /* subprocess.h */,
 				E975121263DD973CAF4AEBA5 /* timer-ev.cc */,
 				E975121263DD973CAF4AEBA3 /* timer-ev.h */,
-				11524394C75E57E52CD9ADF1 /* dns.h */,
-				11524394C75E57E52CD9ADF3 /* dns-ev.h */,
 				E975121263DD973CAF4AEBA1 /* timer.h */,
 				A20152790D1C26EB0081714F /* torrent-ctor.cc */,
 				A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */,
@@ -1736,8 +1735,9 @@
 				A2679292130E00A000CB7464 /* tr-utp.cc */,
 				A2679293130E00A000CB7464 /* tr-utp.h */,
 				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
-				A24621360C769CF400088E81 /* trevent.cc */,
-				A24621350C769CF400088E81 /* trevent.h */,
+				A24621360C769CF400088E81 /* session-thread.cc */,
+				A24621350C769CF400088E81 /* session-thread.h */,
+				BE7AA337F6752914B0C416B1 /* utils-ev.h */,
 				BEFC1DF40C07861A00B0BB3C /* port-forwarding-upnp.cc */,
 				BEFC1DF30C07861A00B0BB3C /* port-forwarding-upnp.h */,
 				BEFC1DF20C07861A00B0BB3C /* utils.cc */,
@@ -1805,14 +1805,16 @@
 		A234D0D40C79FB6000A82373 /* Additions */ = {
 			isa = PBXGroup;
 			children = (
-				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
-				4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */,
 				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
 				A29D84031049C25600D1987A /* NSApplicationAdditions.mm */,
-				A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */,
-				A22BAE271388040500FB022F /* NSMutableArrayAdditions.mm */,
 				A234EA521453563B000F3E97 /* NSImageAdditions.h */,
 				A234EA531453563B000F3E97 /* NSImageAdditions.mm */,
+				C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */,
+				C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */,
+				A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */,
+				A22BAE271388040500FB022F /* NSMutableArrayAdditions.mm */,
+				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
+				4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */,
 			);
 			name = Additions;
 			sourceTree = "<group>";
@@ -2163,6 +2165,7 @@
 				C1077A51183EB29600634C22 /* file.h in Headers */,
 				BEFC1E290C07861A00B0BB3C /* version.h in Headers */,
 				BEFC1E2A0C07861A00B0BB3C /* utils.h in Headers */,
+				BE7AA337F6752914B0C416B0 /* utils-ev.h in Headers */,
 				BEFC1E2C0C07861A00B0BB3C /* port-forwarding-upnp.h in Headers */,
 				A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */,
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
@@ -2182,7 +2185,7 @@
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
 				A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */,
-				A24621410C769D0900088E81 /* trevent.h in Headers */,
+				A24621410C769D0900088E81 /* session-thread.h in Headers */,
 				4D36BA700CA2F00800A63CA5 /* peer-mse.h in Headers */,
 				C10C644E1D9AF328003C1B4C /* session-id.h in Headers */,
 				4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */,
@@ -2220,8 +2223,6 @@
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
 				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
-				11524394C75E57E52CD9ADF0 /* dns.h in Headers */,
-				11524394C75E57E52CD9ADF2 /* dns-ev.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A263C6B1F6718E2486DB20E0 /* tr-buffer.h in Headers */,
@@ -2912,7 +2913,7 @@
 				BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.cc in Sources */,
-				A24621420C769D0900088E81 /* trevent.cc in Sources */,
+				A24621420C769D0900088E81 /* session-thread.cc in Sources */,
 				C11DEA161FCD31C0009E22B9 /* subprocess-posix.cc in Sources */,
 				4D36BA6F0CA2F00800A63CA5 /* peer-mse.cc in Sources */,
 				4D36BA720CA2F00800A63CA5 /* handshake.cc in Sources */,
@@ -3015,6 +3016,7 @@
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
 				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.mm in Sources */,
+				C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */,
 				A22180980D148A71007D09ED /* GroupsPrefsController.mm in Sources */,
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */,
@@ -3539,6 +3541,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
@@ -3767,6 +3770,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -3777,6 +3781,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -3787,6 +3792,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -3963,6 +3969,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
@@ -3974,6 +3981,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
@@ -3985,6 +3993,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
@@ -4215,6 +4224,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
@@ -4227,6 +4237,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = utp;
 			};
 			name = Debug;
@@ -4237,6 +4248,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = utp;
 			};
 			name = "Release - Debug";
@@ -4250,6 +4262,7 @@
 					NS_BLOCK_ASSERTIONS,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = utp;
 			};
 			name = Release;
@@ -4349,6 +4362,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = miniupnp;
 			};
 			name = Release;
@@ -4358,6 +4372,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = miniupnp;
 			};
 			name = "Release - Debug";
@@ -4367,6 +4382,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = miniupnp;
 			};
 			name = Debug;
@@ -4378,6 +4394,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
@@ -4438,6 +4455,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -4447,6 +4465,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = "Release - Debug";
@@ -4456,6 +4475,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -4466,6 +4486,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libdeflate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4477,6 +4498,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libdeflate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4488,6 +4510,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libdeflate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4498,6 +4521,7 @@
 			buildSettings = {
 				CLANG_WARN_COMMA = NO;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4508,6 +4532,7 @@
 			buildSettings = {
 				CLANG_WARN_COMMA = NO;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4518,6 +4543,7 @@
 			buildSettings = {
 				CLANG_WARN_COMMA = NO;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

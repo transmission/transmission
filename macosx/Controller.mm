@@ -2823,7 +2823,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             //check status
             if (torrent.active && !torrent.checkingWaiting)
             {
-                BOOL const isActive = !torrent.stalled;
+                BOOL const isActive = torrent.transmitting;
                 if (isActive)
                 {
                     std::atomic_fetch_add_explicit(activeRef, 1, std::memory_order_relaxed);
@@ -3546,11 +3546,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
         else if ([ident isEqualToString:@"DL Image"])
         {
-            return [NSImage imageNamed:@"DownArrowGroupTemplate"];
+            NSImage* image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
+            image.accessibilityDescription = NSLocalizedString(@"DL", "Torrent -> status image");
+            return image;
         }
         else if ([ident isEqualToString:@"UL Image"])
         {
-            return [NSImage imageNamed:[self.fDefaults boolForKey:@"DisplayGroupRowRatio"] ? @"YingYangGroupTemplate" : @"UpArrowGroupTemplate"];
+            if ([self.fDefaults boolForKey:@"DisplayGroupRowRatio"])
+            {
+                NSImage* image = [NSImage imageNamed:@"YingYangGroupTemplate"];
+                image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
+                return image;
+            }
+            else
+            {
+                NSImage* image = [NSImage imageNamed:@"UpArrowGroupTemplate"];
+                image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
+                return image;
+            }
         }
         else
         {
@@ -5347,7 +5360,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 break;
 
             case TR_RPC_SESSION_CHANGED:
-                [_prefsController rpcUpdatePrefs];
+                [self.prefsController rpcUpdatePrefs];
                 break;
 
             case TR_RPC_SESSION_CLOSE:

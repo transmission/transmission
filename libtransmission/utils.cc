@@ -59,7 +59,7 @@
 
 using namespace std::literals;
 
-time_t __tr_current_time = 0;
+time_t libtransmission::detail::tr_time::current_time = {};
 
 /**
 ***
@@ -616,7 +616,12 @@ double tr_truncd(double x, int decimal_places)
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    return *tr_parseNum<double>(std::data(buf));
+    if (auto parsed = tr_parseNum<double>(std::data(buf)); parsed)
+    {
+        return *parsed;
+    }
+
+    return {};
 }
 
 std::string tr_strpercent(double x)
@@ -1013,17 +1018,17 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 void tr_net_init()
 {
+#ifdef _WIN32
     static bool initialized = false;
 
     if (!initialized)
     {
-#ifdef _WIN32
         WSADATA wsaData;
         WSAStartup(MAKEWORD(2, 2), &wsaData);
-#endif
 
         initialized = true;
     }
+#endif
 }
 
 /// mime-type

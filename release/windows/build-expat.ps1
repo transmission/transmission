@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:ExpatVersion = '2.2.9'
+$global:ExpatVersion = '2.5.0'
 
 $global:ExpatDeps = @()
 

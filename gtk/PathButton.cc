@@ -14,6 +14,7 @@ class PathButton::Impl
 {
 public:
     explicit Impl(PathButton& widget);
+    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -133,7 +134,7 @@ void PathButton::Impl::show_dialog()
     auto const title = title_.get_value();
 
     auto dialog = std::make_shared<Gtk::FileChooserDialog>(!title.empty() ? title : _("Select a File"), action_.get_value());
-    dialog->set_transient_for(*static_cast<Gtk::Window*>(widget_.get_root()));
+    dialog->set_transient_for(gtr_widget_get_window(widget_));
     dialog->add_button(_("_Cancel"), Gtk::ResponseType::CANCEL);
     dialog->add_button(_("_Open"), Gtk::ResponseType::ACCEPT);
     dialog->set_modal(true);

@@ -13,8 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include <event2/buffer.h>
-
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -25,7 +23,7 @@
 #include "peer-mgr.h"
 #include "timer.h"
 #include "torrent.h"
-#include "trevent.h" // tr_runInEventThread()
+#include "utils-ev.h"
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"
@@ -43,7 +41,7 @@ void on_idle(tr_webseed* w);
 class tr_webseed_task
 {
 private:
-    tr_evbuffer_ptr const content_{ evbuffer_new() };
+    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
 
 public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t blocks_in)
@@ -329,7 +327,7 @@ private:
 struct write_block_data
 {
 private:
-    tr_evbuffer_ptr const content_{ evbuffer_new() };
+    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
 
 public:
     write_block_data(
@@ -396,7 +394,7 @@ void useFetchedBlocks(tr_webseed_task* task)
             block_buf->resize(block_size);
             evbuffer_remove(task->content(), std::data(*block_buf), std::size(*block_buf));
             auto* const data = new write_block_data{ session, tor->id(), task->loc.block, block_buf, webseed };
-            tr_runInEventThread(session, &write_block_data::write_block_func, data);
+            session->runInSessionThread(&write_block_data::write_block_func, data);
         }
 
         task->loc = tor->byteLoc(task->loc.byte + block_size);

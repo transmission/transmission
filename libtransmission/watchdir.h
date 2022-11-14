@@ -42,12 +42,12 @@ public:
 
     [[nodiscard]] static auto genericRescanInterval() noexcept
     {
-        return generic_rescan_interval_;
+        return generic_rescan_interval;
     }
 
     static void setGenericRescanInterval(std::chrono::milliseconds interval) noexcept
     {
-        generic_rescan_interval_ = interval;
+        generic_rescan_interval = interval;
     }
 
     [[nodiscard]] static std::unique_ptr<Watchdir> create(
@@ -60,11 +60,11 @@ public:
         std::string_view dirname,
         Callback callback,
         libtransmission::TimerMaker& timer_maker,
-        std::chrono::milliseconds rescan_interval = generic_rescan_interval_);
+        std::chrono::milliseconds rescan_interval = generic_rescan_interval);
 
 private:
     static constexpr std::chrono::milliseconds DefaultGenericRescanInterval{ 1000 };
-    static std::chrono::milliseconds generic_rescan_interval_;
+    static std::chrono::milliseconds generic_rescan_interval;
 };
 
 } // namespace libtransmission

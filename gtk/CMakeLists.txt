@@ -94,6 +94,8 @@ if(ENABLE_NLS)
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in
         VERBATIM
     )
+
+    source_group("Generated Files" FILES ${${PROJECT_NAME}_DESKTOP_FILE} ${${PROJECT_NAME}_METAINFO_FILE})
 endif()
 
 set(${PROJECT_NAME}_SOURCES

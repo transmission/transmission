@@ -15,7 +15,7 @@ If building from source is too daunting for you, check out the [nightly builds](
 (Note: These are untested snapshots. Use them with care.)
 
 ### Building the native app with Xcode ###
-Transmission has an Xcode project file for building in Xcode. 
+Transmission has an Xcode project file for building in Xcode.
 - Open Transmission.xcodeproj
 - Run the Transmission scheme
 
@@ -38,53 +38,35 @@ ninja -C build transmission-gtk
 
 ## On Unix ##
 ### Prerequisites ###
+
+#### Debian 11 / Bullseye ####
+On Debian, you can build transmission with a few dependencies on top of a base installation.
+
+For building transmission-daemon you will need basic dependencies
+```console
+$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev
+```
+You likely want to install transmission as a native GUI application. There are two options, GTK and QT.
+
+For GTK 3 client, two additional packages are required
+```console
+$ sudo apt install libgtkmm-3.0-dev gettext
+```
+For QT client, one additional package is needed on top of basic dependencies
+```console
+$ sudo apt install qttools5-dev
+```
+
+Then you can begin [building.](#building-transmission-from-git-first-time)
+
 #### Ubuntu ####
-On Ubuntu, you can install the required development tools with this command:
+On Ubuntu, you can install the required development tools for GTK with this command:
 
 ```console
 $ sudo apt-get install build-essential automake autoconf libtool pkg-config intltool libcurl4-openssl-dev libglib2.0-dev libevent-dev libminiupnpc-dev libgtk-3-dev libappindicator3-dev
 ```
 
-_After you install those you can skip [to this section](#building-from-a-tarball)._
-
-#### Debian Squeeze ####
-Sometimes you have a need to stay current with upstream releases, even though you would like to rely on the stability of your base distribution. Here is how this can be accomplished in a "quick and dirty" fashion. Lines starting with a # have to be executed as root, lines starting with $ should be run as a regular user.
-
-1. Dependencies
-   First let us install every dependency Transmission needs and for which there is a usable version in the Debian repository.
-   ```console
-   # apt-get install ca-certificates libcurl4-openssl-dev libssl-dev pkg-config build-essential checkinstall
-   ```
-
-2. libevent
-   Traditionally libevent is also needed, but Transmission depends on version numbers only rarely found in Debian. So let us start by compiling libevent in a directory of your choice. Browse to https://libevent.org/ and get the latest version.
-   ```console
-   $ cd /var/tmp
-   $ wget https://github.com/downloads/libevent/libevent/libevent-2.0.18-stable.tar.gz
-   $ tar xf libevent-2.0.18-stable.tar.gz
-   $ cd libevent-2.0.18-stable
-   $ CFLAGS="-Os -march=native" ./configure && make
-   ```
-
-   Now, we would really like to be able to upgrade to a new version in the future, so there should be a mechanism other than the classic "make install" which keeps count of what went where (and ideally this is not a piece of paper). So we build a very simple Debian package from the compiled files and install it. Basically you just enter the following command and hit return until a nice text message tells you that all is done.
-
-   ```console
-   # checkinstall
-   ```
-
-3. Transmission
-   Now we need to prepare Transmission for compilation by configuring the source, just as with libevent.
-
-   ```console
-   $ cd /var/tmp
-   $ wget https://download-origin.transmissionbt.com/files/transmission-2.51.tar.bz2
-   $ tar xf transmission-2.51.tar.bz2
-   $ cd transmission-2.51
-   $ CFLAGS="-Os -march=native" ./configure && make
-   # checkinstall
-   ```
-
-_Thanks to josen at https://falkhusemann.de/blog/2012/05/compiling-transmission-bittorrent-for-debiand/ for the original Debian Squeeze HowTo section._
+Then you can begin [building.](#building-transmission-from-git-first-time)
 
 #### CentOS 5.4 ####
 The packages you need are:
@@ -110,38 +92,6 @@ However, Transmission needs other packages unavailable in `yum`:
 Before building Transmission, you need to set the pkgconfig environment setting:
 ```console
 $ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-```
-
-_After you install those you can skip [to this section](#building-from-a-tarball)._
-
-#### Normal ####
-If this is your first time compiling on Unix, you will need a few basic tools:
- * gcc
- * libtool
- * gettext 0.14.1 or newer
- * intltool 0.40 or newer
-
-If you are planning to build from source:
- * automake 1.9 or newer
- * autoconf 2.54 or newer
-
-Once you have got the basics out of the way, here are the libraries that Transmission needs to have in order to build:
- * OpenSSL 0.9.8 or newer, preferably SSL or GnuTLS support.
- * libcurl 7.16.3 or newer
- * GTK+ 2.6 or newer (only needed by the GTK+ GUI)
- * libnotify 0.4.4 (optional and only needed by the GTK+ GUI)
- * DBUS 0.70 (optional and only needed by the GTK+ GUI)
-
-#### RPM users ####
-
-_You will also have to install the corresponding `-devel` packages._
-
-### Building from a tarball ###
-```console
-$ tar xf transmission-1.76.tar.bz2
-$ cd transmission-1.76
-$ ./configure -q && make -s
-# make install
 ```
 
 ### Building Transmission from Git (first time) ###
@@ -193,18 +143,3 @@ Version 2.83, no need to add quota.h, Cygwin added it.
 With a MinGW https://mingw.org/ development environment, the GTK and the Qt GUI applications can be built.  The CLI tools can also be built and in general work fine, but may fail if you use foreign characters as parameters (MinGW uses latin1 for parameters).
 
 The procedure is documented at [Building Transmission Qt on Windows](https://trac.transmissionbt.com/wiki/BuildingTransmissionQtWindows).
-
-## Switches ##
-The Transmission `./configure` (or `./autogen.sh`) script allows you to switch on/off certain parts. To use these, you will either use `--enable-*` or `--disable-*`, e.g. to disable the GTK client: `--disable-gtk`.
-
-The switches that are available are:
- * **gtk** = enables GTK+ client (default)
- * **daemon** = enables transmission-daemon and *-remote client (default)
- * **cli** = enables cli client (default. deprecated, consider using the daemon)
- * **libnotify** = enables lib notify (default)
- * **nls** = enables native language support (default)
- * **mac** = enables Mac client (default, if possible)
- * **wx** = enables wxWidgets client (unsupported)
- * **beos** = enables BeOS client (unsupported)
-
-Note: _`--disable-nls` removes the dependency on gettext and intltool. It is designed for and should only be used on [HeadlessUsage embedded devices]. If you do have GTK+ installed on your box, you must also specify `--disable-gtk`._

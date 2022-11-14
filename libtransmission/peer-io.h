@@ -18,11 +18,8 @@
 #include <ctime>
 #include <deque>
 #include <memory>
-#include <optional>
 #include <string>
 #include <utility> // std::make_pair
-
-#include <event2/buffer.h>
 
 #include "transmission.h"
 
@@ -32,6 +29,7 @@
 #include "peer-socket.h"
 #include "tr-assert.h"
 #include "tr-buffer.h"
+#include "utils-ev.h"
 
 class tr_peerIo;
 struct tr_bandwidth;
@@ -50,16 +48,6 @@ enum ReadState
 };
 
 auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
-
-struct evbuffer_deleter
-{
-    void operator()(struct evbuffer* buf) const noexcept
-    {
-        evbuffer_free(buf);
-    }
-};
-
-using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
 
 namespace libtransmission::test
 {
@@ -147,7 +135,7 @@ public:
     // This is a destructive add: `buf` is empty after this call.
     void write(libtransmission::Buffer& buf, bool is_piece_data);
 
-    size_t getWriteBufferSpace(uint64_t now) const;
+    [[nodiscard]] size_t getWriteBufferSpace(uint64_t now) const noexcept;
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
@@ -255,8 +243,8 @@ public:
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
 
-    struct event* event_read = nullptr;
-    struct event* event_write = nullptr;
+    libtransmission::evhelpers::event_unique_ptr event_read;
+    libtransmission::evhelpers::event_unique_ptr event_write;
 
     short int pendingEvents = 0;
 
@@ -319,15 +307,12 @@ private:
         : session{ session_in }
         , time_created{ current_time }
         , bandwidth_{ parent_bandwidth }
+        , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
         , addr_{ addr }
         , port_{ port }
         , is_seed_{ is_seed }
         , is_incoming_{ is_incoming }
     {
-        if (torrent_hash != nullptr)
-        {
-            torrent_hash_ = *torrent_hash;
-        }
     }
 
     Filter& filter()
@@ -344,7 +329,7 @@ private:
 
     std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
 
-    std::optional<tr_sha1_digest_t> torrent_hash_;
+    tr_sha1_digest_t torrent_hash_;
 
     tr_address const addr_;
     tr_port const port_;

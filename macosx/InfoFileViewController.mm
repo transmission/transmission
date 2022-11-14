@@ -20,10 +20,6 @@
 @property(nonatomic) IBOutlet NSButton* fCheckAllButton;
 @property(nonatomic) IBOutlet NSButton* fUncheckAllButton;
 
-- (void)setupInfo;
-
-- (BOOL)canQuickLookFile:(FileListNode*)item;
-
 @end
 
 @implementation InfoFileViewController
@@ -232,6 +228,7 @@
 - (void)setupInfo
 {
     self.fFileFilterField.stringValue = @"";
+    [self setFileFilterText:self.fFileFilterField];
 
     if (self.fTorrents.count == 1)
     {

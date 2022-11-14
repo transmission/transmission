@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <atomic>
 #include <array>
 #include <condition_variable>
 #include <list>
@@ -21,8 +22,6 @@
 
 #include <curl/curl.h>
 
-#include <event2/buffer.h>
-
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -30,6 +29,7 @@
 #include "log.h"
 #include "peer-io.h"
 #include "tr-assert.h"
+#include "utils-ev.h"
 #include "utils.h"
 #include "web.h"
 
@@ -43,6 +43,7 @@ using namespace std::literals;
 ****
 ***/
 
+#ifdef _WIN32
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
     auto const cert_store = tr_ssl_get_x509_store(ssl_ctx);
@@ -50,8 +51,6 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     {
         return CURLE_OK;
     }
-
-#ifdef _WIN32
 
     curl_version_info_data const* const curl_ver = curl_version_info(CURLVERSION_NOW);
     if (curl_ver->age >= 0 && strncmp(curl_ver->ssl_version, "Schannel", 8) == 0)
@@ -95,10 +94,9 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
         CertCloseStore(sys_cert_store, 0);
     }
 
-#endif
-
     return CURLE_OK;
 }
+#endif
 
 /***
 ****
@@ -154,7 +152,7 @@ public:
         curl_thread->join();
     }
 
-    void closeSoon()
+    void startShutdown()
     {
         run_mode = RunMode::CloseSoon;
         queued_tasks_cv.notify_one();
@@ -180,7 +178,7 @@ public:
     class Task
     {
     private:
-        tr_evbuffer_ptr const privbuf = tr_evbuffer_ptr{ evbuffer_new() };
+        libtransmission::evhelpers::evbuffer_unique_ptr privbuf{ evbuffer_new() };
         std::unique_ptr<CURL, void (*)(CURL*)> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
         tr_web::FetchOptions options;
 
@@ -308,7 +306,7 @@ public:
         CloseNow // exit now even if tasks are running
     };
 
-    RunMode run_mode = RunMode::Run;
+    std::atomic<RunMode> run_mode = RunMode::Run;
 
     static size_t onDataReceived(void* data, size_t size, size_t nmemb, void* vtask)
     {
@@ -389,11 +387,15 @@ public:
         }
         else
         {
+#ifdef _WIN32
             (void)curl_easy_setopt(e, CURLOPT_SSL_CTX_FUNCTION, ssl_context_func);
+#endif
         }
 
         if (!impl->curl_proxy_ssl_verify)
         {
+            (void)curl_easy_setopt(e, CURLOPT_CAINFO, NULL);
+            (void)curl_easy_setopt(e, CURLOPT_CAPATH, NULL);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
         }
@@ -596,7 +598,7 @@ public:
 
     static std::once_flag curl_init_flag;
 
-    bool is_closed_ = false;
+    std::atomic<bool> is_closed_ = false;
 
     std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
 
@@ -635,7 +637,7 @@ bool tr_web::isClosed() const noexcept
     return impl_->isClosed();
 }
 
-void tr_web::closeSoon()
+void tr_web::startShutdown()
 {
-    impl_->closeSoon();
+    impl_->startShutdown();
 }

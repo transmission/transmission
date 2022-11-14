@@ -130,6 +130,18 @@ extern char const* const speed_M_str;
 extern char const* const speed_G_str;
 extern char const* const speed_T_str;
 
+/***
+****
+***/
+
+void gtr_message(std::string const& message);
+void gtr_warning(std::string const& message);
+void gtr_error(std::string const& message);
+
+/***
+****
+***/
+
 enum class GtrUnicode
 {
     Up,
@@ -141,14 +153,14 @@ enum class GtrUnicode
 Glib::ustring gtr_get_unicode_string(GtrUnicode);
 
 /* return a human-readable string for the size given in bytes. */
-Glib::ustring tr_strlsize(guint64 size);
+Glib::ustring tr_strlsize(guint64 size_in_bytes);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
 
-std::string tr_format_time_relative(time_t src, time_t tgt);
-std::string tr_format_time_left(time_t seconds);
-std::string tr_format_time(time_t seconds);
+std::string tr_format_time_relative(time_t timestamp, time_t origin);
+std::string tr_format_time_left(time_t timestamp);
+std::string tr_format_time(time_t timestamp);
 
 /***
 ****
@@ -166,6 +178,8 @@ Glib::ustring gtr_get_help_uri();
 
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible(Gtk::Widget&, bool);
+
+Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget);
 
 void gtr_window_set_skip_taskbar_hint(Gtk::Window& window, bool value);
 void gtr_window_set_urgency_hint(Gtk::Window& window, bool value);

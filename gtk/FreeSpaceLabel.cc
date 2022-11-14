@@ -56,8 +56,7 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
 }
 
 FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir)
-    : Gtk::Label()
-    , impl_(std::make_unique<Impl>(*this, core, dir))
+    : impl_(std::make_unique<Impl>(*this, core, dir))
 {
 }
 

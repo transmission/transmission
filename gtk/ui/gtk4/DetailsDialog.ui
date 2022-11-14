@@ -659,6 +659,7 @@
                         </child>
                         <child>
                           <object class="GtkSpinButton" id="download_limit_spin">
+                            <property name="sensitive" bind-source="download_limit_check" bind-property="active" bind-flags="sync-create">0</property>
                             <property name="focusable">1</property>
                             <property name="hexpand">1</property>
                             <layout>
@@ -669,6 +670,7 @@
                         </child>
                         <child>
                           <object class="GtkSpinButton" id="upload_limit_spin">
+                            <property name="sensitive" bind-source="upload_limit_check" bind-property="active" bind-flags="sync-create">0</property>
                             <property name="focusable">1</property>
                             <property name="hexpand">1</property>
                             <layout>

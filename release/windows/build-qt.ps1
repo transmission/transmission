@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:QtVersion = '5.14.2'
+$global:QtVersion = '6.4.0'
 
 $global:QtDeps = @(
     'DBus'
@@ -21,6 +21,8 @@ function global:Build-Qt([string] $PrefixDir, [string] $Arch, [string] $DepsPref
         (Join-Path $ArchiveBase qttranslations '*')
         (Join-Path $ArchiveBase qtwinextras '*')
         (Join-Path $ArchiveBase .gitmodules)
+        (Join-Path $ArchiveBase cmake)
+        (Join-Path $ArchiveBase CMakeLists.txt)
         (Join-Path $ArchiveBase configure.bat)
         (Join-Path $ArchiveBase configure.json)
         (Join-Path $ArchiveBase qt.pro)
@@ -46,23 +48,20 @@ function global:Build-Qt([string] $PrefixDir, [string] $Arch, [string] $DepsPref
         '-qt-libpng'
         '-qt-libjpeg'
         '-no-opengl'
-        '-no-direct2d'
         '-no-freetype'
         '-no-harfbuzz'
-        '-no-sql-db2'
-        '-no-sql-ibase'
-        '-no-sql-mysql'
-        '-no-sql-oci'
-        '-no-sql-odbc'
-        '-no-sql-psql'
-        '-no-sql-sqlite'
-        '-no-sql-sqlite2'
-        '-no-sql-tds'
+        '-no-feature-androiddeployqt'
+        '-no-feature-assistant' # No need in GUI tools
+        '-no-feature-clang'
+        '-no-feature-clangcpp'
+        '-no-feature-designer' # No need in GUI tools
+        '-no-feature-schannel'
+        '-no-feature-sql'
+        '-no-feature-testlib'
         '-nomake'; 'examples'
         '-nomake'; 'tests'
-        '-nomake'; 'tools'
-        '-I'; (Join-Path $DepsPrefixDir include)
-        '-L'; (Join-Path $DepsPrefixDir lib)
+        '-I'; (Join-Path $DepsPrefixDir include).Replace('\', '/')
+        '-L'; (Join-Path $DepsPrefixDir lib).Replace('\', '/')
     )
 
     if ($env:LDFLAGS) {
@@ -71,9 +70,7 @@ function global:Build-Qt([string] $PrefixDir, [string] $Arch, [string] $DepsPref
     }
 
     # No need in GUI tools
-    Edit-TextFile (Join-Path $SourceDir qttools src src.pro) 'qtHaveModule[(]gui[)]' 'qtHaveModule(hughey)'
-    Edit-TextFile (Join-Path $SourceDir qttools src src.pro) 'qtHaveModule[(]widgets[)]' 'qtHaveModule(digits)'
-    Edit-TextFile (Join-Path $SourceDir qttools src linguist linguist.pro) 'qtHaveModule[(]widgets[)]' 'qtHaveModule(digits)'
+    Edit-TextFile (Join-Path $SourceDir qttools src linguist CMakeLists.txt) 'add_subdirectory[(]linguist[)]' ''
 
     Invoke-NativeCommand cmake -E remove_directory $BuildDir
     $env:PATH = @(
@@ -86,8 +83,8 @@ function global:Build-Qt([string] $PrefixDir, [string] $Arch, [string] $DepsPref
     New-Item -Path $BuildDir -ItemType Directory -ErrorAction Ignore | Out-Null
     Push-Location -Path $BuildDir
     Invoke-VcEnvCommand (Join-Path $SourceDir configure) @ConfigOptions
-    Invoke-VcEnvCommand jom
-    Invoke-VcEnvCommand jom install
+    Invoke-VcEnvCommand cmake --build . --parallel
+    Invoke-VcEnvCommand cmake --install .
     Pop-Location
 
     # install target doesn't copy PDBs for release DLLs

@@ -45,7 +45,6 @@
 #include "timer.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "trevent.h"
 #include "utils.h"
 #include "variant.h"
 #include "web-utils.h"
@@ -755,8 +754,7 @@ void tr_rpc_server::setEnabled(bool is_enabled)
 {
     is_enabled_ = is_enabled;
 
-    tr_runInEventThread(
-        this->session,
+    session->runInSessionThread(
         [this]()
         {
             if (!is_enabled_)
@@ -790,7 +788,7 @@ void tr_rpc_server::setPort(tr_port port) noexcept
 
     if (isEnabled())
     {
-        tr_runInEventThread(session, restartServer, this);
+        session->runInSessionThread(&restartServer, this);
     }
 }
 
@@ -931,7 +929,7 @@ void tr_rpc_server::load(tr_variant* src)
     {
         auto const rpc_uri = tr_rpc_address_with_port(this) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        tr_runInEventThread(session, startServer, this);
+        session->runInSessionThread(startServer, this);
 
         if (this->isWhitelistEnabled())
         {

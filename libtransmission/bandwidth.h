@@ -191,7 +191,7 @@ public:
     /**
      * @return nonzero if this bandwidth throttles its peer-ios speeds
      */
-    [[nodiscard]] constexpr bool isLimited(tr_direction dir) const
+    [[nodiscard]] constexpr bool isLimited(tr_direction dir) const noexcept
     {
         return this->band_[dir].is_limited_;
     }

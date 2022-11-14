@@ -27,10 +27,6 @@ static NSTimeInterval const kUpdateSeconds = 1.0;
 @property(nonatomic) IBOutlet NSButton* fResetButton;
 @property(nonatomic) NSTimer* fTimer;
 
-- (void)updateStats;
-
-- (void)performResetStats;
-
 @end
 
 @implementation StatsWindowController

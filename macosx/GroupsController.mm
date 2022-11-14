@@ -4,6 +4,7 @@
 
 #import "GroupsController.h"
 #import "NSImageAdditions.h"
+#import "NSKeyedUnarchiverAdditions.h"
 #import "NSMutableArrayAdditions.h"
 
 static CGFloat const kIconWidth = 16.0;
@@ -13,12 +14,6 @@ static CGFloat const kIconWidthSmall = 12.0;
 @interface GroupsController ()
 
 @property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
-
-- (void)saveGroups;
-
-- (NSImage*)imageForGroup:(NSMutableDictionary*)dict;
-
-- (BOOL)torrent:(Torrent*)torrent doesMatchRulesForGroupAtIndex:(NSInteger)index;
 
 @end
 
@@ -54,7 +49,7 @@ GroupsController* fGroupsInstance = nil;
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
-            _fGroups = [NSUnarchiver unarchiveObjectWithData:data];
+            _fGroups = [NSKeyedUnarchiver deprecatedUnarchiveObjectWithData:data];
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
             [self saveGroups];
         }

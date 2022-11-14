@@ -4,11 +4,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <ctype.h> /* isxdigit() */
-#include <errno.h>
 #include <functional>
-#include <limits.h> /* INT_MAX */
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 #include <giomm.h> /* g_file_trash() */
@@ -63,6 +61,28 @@ char const* const speed_T_str = N_("TB/s");
 ****
 ***/
 
+void gtr_message(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_message("%s", message.c_str());
+}
+
+void gtr_warning(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_warning("%s", message.c_str());
+}
+
+void gtr_error(std::string const& message)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    g_error("%s", message.c_str());
+}
+
+/***
+****
+***/
+
 Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
 {
     switch (uni)
@@ -89,9 +109,9 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlsize(guint64 bytes)
+Glib::ustring tr_strlsize(guint64 size_in_bytes)
 {
-    return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
+    return size_in_bytes == 0 ? Q_("None") : tr_formatter_size_B(size_in_bytes);
 }
 
 namespace
@@ -163,24 +183,24 @@ std::string tr_format_past_time(time_t seconds)
 
 } // namespace
 
-std::string tr_format_time(time_t secs)
+std::string tr_format_time(time_t timestamp)
 {
-    if (auto const days = secs / 86400U; days > 0U)
+    if (auto const days = timestamp / 86400U; days > 0U)
     {
         return fmt::format(ngettext("{days:L} day", "{days:L} days", days), fmt::arg("days", days));
     }
 
-    if (auto const hours = (secs % 86400U) / 3600U; hours > 0U)
+    if (auto const hours = (timestamp % 86400U) / 3600U; hours > 0U)
     {
         return fmt::format(ngettext("{hours:L} hour", "{hours:L} hours", hours), fmt::arg("hours", hours));
     }
 
-    if (auto const minutes = (secs % 3600U) / 60U; minutes > 0U)
+    if (auto const minutes = (timestamp % 3600U) / 60U; minutes > 0U)
     {
         return fmt::format(ngettext("{minutes:L} minute", "{minutes:L} minutes", minutes), fmt::arg("minutes", minutes));
     }
 
-    if (auto const seconds = secs % 60U; seconds > 0U)
+    if (auto const seconds = timestamp % 60U; seconds > 0U)
     {
         return fmt::format(ngettext("{seconds:L} second", "{seconds:L} seconds", seconds), fmt::arg("seconds", seconds));
     }
@@ -188,30 +208,30 @@ std::string tr_format_time(time_t secs)
     return _("now");
 }
 
-std::string tr_format_time_left(time_t seconds)
+std::string tr_format_time_left(time_t timestamp)
 {
-    if (auto const days_left = seconds / 86400U; days_left > 0U)
+    if (auto const days_left = timestamp / 86400U; days_left > 0U)
     {
         return fmt::format(
             ngettext("{days_left:L} day left", "{days_left:L} days left", days_left),
             fmt::arg("days_left", days_left));
     }
 
-    if (auto const hours_left = (seconds % 86400U) / 3600U; hours_left > 0U)
+    if (auto const hours_left = (timestamp % 86400U) / 3600U; hours_left > 0U)
     {
         return fmt::format(
             ngettext("{hours_left:L} hour left", "{hours_left:L} hours left", hours_left),
             fmt::arg("hours_left", hours_left));
     }
 
-    if (auto const minutes_left = (seconds % 3600U) / 60U; minutes_left > 0U)
+    if (auto const minutes_left = (timestamp % 3600U) / 60U; minutes_left > 0U)
     {
         return fmt::format(
             ngettext("{minutes_left:L} minute left", "{minutes_left:L} minutes left", minutes_left),
             fmt::arg("minutes_left", minutes_left));
     }
 
-    if (auto const seconds_left = seconds % 60U; seconds_left > 0U)
+    if (auto const seconds_left = timestamp % 60U; seconds_left > 0U)
     {
         return fmt::format(
             ngettext("{seconds_left:L} second left", "{seconds_left:L} seconds left", seconds_left),
@@ -221,35 +241,14 @@ std::string tr_format_time_left(time_t seconds)
     return _("now");
 }
 
-std::string tr_format_time_relative(time_t src, time_t dst)
+std::string tr_format_time_relative(time_t timestamp, time_t origin)
 {
-    return src < dst ? tr_format_future_time(dst - src) : tr_format_past_time(src - dst);
+    return timestamp < origin ? tr_format_future_time(origin - timestamp) : tr_format_past_time(timestamp - origin);
 }
-
-namespace
-{
-
-Gtk::Window* getWindow(Gtk::Widget* w)
-{
-    if (w == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (auto* const window = dynamic_cast<Gtk::Window*>(w); window != nullptr)
-    {
-        return window;
-    }
-
-    return static_cast<Gtk::Window*>(w->get_ancestor(Gtk::Window::get_type()));
-}
-
-} // namespace
 
 void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torrent, std::string const& filename)
 {
     Glib::ustring secondary;
-    auto* win = getWindow(&child);
 
     if (duplicate_torrent != nullptr)
     {
@@ -264,7 +263,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
-        *win,
+        gtr_widget_get_window(child),
         _("Couldn't open torrent"),
         false,
         TR_GTK_MESSAGE_TYPE(ERROR),
@@ -393,14 +392,11 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message(
-                "%s",
-                fmt::format(
-                    _("Couldn't move '{path}' to trash: {error} ({error_code})"),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                    fmt::arg("error_code", e.code()))
-                    .c_str());
+            gtr_message(fmt::format(
+                _("Couldn't move '{path}' to trash: {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
         }
     }
@@ -413,14 +409,11 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
-            g_message(
-                "%s",
-                fmt::format(
-                    _("Couldn't remove '{path}': {error} ({error_code})"),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                    fmt::arg("error_code", e.code()))
-                    .c_str());
+            gtr_message(fmt::format(
+                _("Couldn't remove '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
             tr_error_clear(error);
             tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             result = false;
@@ -472,7 +465,7 @@ void gtr_open_uri(Glib::ustring const& uri)
 
         if (!opened)
         {
-            g_message("%s", fmt::format(_("Couldn't open '{url}'"), fmt::arg("url", uri)).c_str());
+            gtr_message(fmt::format(_("Couldn't open '{url}'"), fmt::arg("url", uri)));
         }
     }
 }
@@ -527,7 +520,7 @@ void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo_box, int value)
 
 Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>> const& items)
 {
-    auto w = Gtk::make_managed<Gtk::ComboBox>();
+    auto* w = Gtk::make_managed<Gtk::ComboBox>();
     gtr_combo_box_set_enum(*w, items);
     return w;
 }
@@ -565,7 +558,7 @@ int gtr_combo_box_get_active_enum(Gtk::ComboBox const& combo_box)
 
 Gtk::ComboBox* gtr_priority_combo_new()
 {
-    auto w = Gtk::make_managed<Gtk::ComboBox>();
+    auto* w = Gtk::make_managed<Gtk::ComboBox>();
     gtr_priority_combo_init(*w);
     return w;
 }
@@ -633,6 +626,20 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
     w.set_visible(b);
 }
 
+Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget)
+{
+    if (auto* const window = dynamic_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(widget)); window != nullptr)
+    {
+        return *window;
+    }
+
+#if defined(G_DISABLE_ASSERT)
+    throw std::logic_error("Supplied widget doesn't have a window");
+#else
+    g_assert_not_reached();
+#endif
+}
+
 void gtr_window_set_skip_taskbar_hint([[maybe_unused]] Gtk::Window& window, [[maybe_unused]] bool value)
 {
 #if GTK_CHECK_VERSION(4, 0, 0)
@@ -674,12 +681,10 @@ void gtr_window_raise([[maybe_unused]] Gtk::Window& window)
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 {
-    auto* window = getWindow(&parent);
-
     Glib::ustring gstr;
 
     auto w = std::make_shared<Gtk::MessageDialog>(
-        *window,
+        gtr_widget_get_window(parent),
         fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url)),
         false /*use markup*/,
         TR_GTK_MESSAGE_TYPE(ERROR),
@@ -748,11 +753,11 @@ void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 ****
 ***/
 
-void gtr_label_set_text(Gtk::Label& lb, Glib::ustring const& newstr)
+void gtr_label_set_text(Gtk::Label& lb, Glib::ustring const& text)
 {
-    if (lb.get_text() != newstr)
+    if (lb.get_text() != text)
     {
-        lb.set_text(newstr);
+        lb.set_text(text);
     }
 }
 

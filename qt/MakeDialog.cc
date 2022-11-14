@@ -322,6 +322,11 @@ void MakeDialog::updatePiecesLabel()
 void MakeDialog::onPieceSizeUpdated(int value)
 {
     auto new_size = static_cast<uint64_t>(pow(2, value));
-    builder_->setPieceSize(new_size);
+
+    if (builder_)
+    {
+        builder_->setPieceSize(new_size);
+    }
+
     updatePiecesLabel();
 }
