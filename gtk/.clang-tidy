@@ -5,6 +5,7 @@ Checks: >
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
+  misc-*,
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
@@ -15,4 +16,5 @@ Checks: >
   -readability-redundant-access-specifiers
 
 CheckOptions:
+  misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
   modernize-pass-by-value.ValuesOnly: true
