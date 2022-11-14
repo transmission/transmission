@@ -56,7 +56,7 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     return 0;
 }
 
-bool tr_verify_worker::verifyTorrent(tr_torrent* tor, bool const* stop_flag)
+bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_flag)
 {
     auto const begin = tr_time();
 
@@ -74,7 +74,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, bool const* stop_flag)
 
     tr_logAddDebugTor(tor, "verifying torrent...");
 
-    while (!*stop_flag && piece < tor->pieceCount())
+    while (!stop_flag && piece < tor->pieceCount())
     {
         auto const file_length = tor->fileSize(file_index);
 
@@ -184,7 +184,12 @@ void tr_verify_worker::verifyThreadFunc()
         {
             auto const lock = std::lock_guard(verify_mutex_);
 
-            stop_current_ = false;
+            if (stop_current_)
+            {
+                stop_current_ = false;
+                stop_current_cv_.notify_one();
+            }
+
             if (std::empty(todo_))
             {
                 current_node_.reset();
@@ -200,7 +205,7 @@ void tr_verify_worker::verifyThreadFunc()
         auto* const tor = current_node_->torrent;
         tr_logAddTraceTor(tor, "Verifying torrent");
         tor->setVerifyState(TR_VERIFY_NOW);
-        auto const changed = verifyTorrent(tor, &stop_current_);
+        auto const changed = verifyTorrent(tor, stop_current_);
         tor->setVerifyState(TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
@@ -238,18 +243,12 @@ void tr_verify_worker::remove(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    verify_mutex_.lock();
+    auto lock = std::unique_lock(verify_mutex_);
 
     if (current_node_ && current_node_->torrent == tor)
     {
         stop_current_ = true;
-
-        while (stop_current_)
-        {
-            verify_mutex_.unlock();
-            tr_wait_msec(100);
-            verify_mutex_.lock();
-        }
+        stop_current_cv_.wait(lock, [this]() { return !stop_current_; });
     }
     else
     {
@@ -266,8 +265,6 @@ void tr_verify_worker::remove(tr_torrent* tor)
             todo_.erase(iter);
         }
     }
-
-    verify_mutex_.unlock();
 }
 
 tr_verify_worker::~tr_verify_worker()
