@@ -31,7 +31,6 @@ Checks: >
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
-  -performance-no-int-to-ptr,
   readability-*,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
