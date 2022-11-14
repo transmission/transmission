@@ -37,8 +37,6 @@ public:
     {
     }
 
-    ~MyMediator() override = default;
-
     [[nodiscard]] tr_port port() const override
     {
         return port_;
