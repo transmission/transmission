@@ -965,10 +965,10 @@ static void printDetails(tr_variant* top)
             {
                 fmt::print("  Labels: ");
 
-                size_t child_pos = 0;
-                tr_variant const* child;
-                while ((child = tr_variantListChild(l, child_pos++)))
+                for (auto child_pos = size_t{}, n_children = tr_variantListSize(l); child_pos < n_children; ++child_pos)
                 {
+                    auto const* child = tr_variantListChild(l, child_pos);
+
                     if (tr_variantGetStrView(child, &sv))
                     {
                         fmt::print(child_pos == 1 ? "{:s}" : ", {:s}", sv);
@@ -2054,18 +2054,14 @@ static void filterIds(tr_variant* top, Config& config)
             case 'l': // label
                 if (tr_variant * l; tr_variantDictFindList(d, TR_KEY_labels, &l))
                 {
-                    size_t child_pos = 0;
-                    tr_variant const* child;
-                    std::string_view sv;
-                    while ((child = tr_variantListChild(l, child_pos++)))
+                    for (auto child_pos = size_t{}, n_children = tr_variantListSize(l); child_pos < n_children; ++child_pos)
                     {
-                        if (tr_variantGetStrView(child, &sv))
+                        auto const* child = tr_variantListChild(l, child_pos);
+
+                        if (auto sv = std::string_view{}; tr_variantGetStrView(child, &sv) && arg == sv)
                         {
-                            if (arg == sv)
-                            {
-                                include = !include;
-                                break;
-                            }
+                            include = !include;
+                            break;
                         }
                     }
                 }
