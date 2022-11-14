@@ -259,7 +259,7 @@ TEST_F(TimerTest, repeatingThenSingleShot)
     // now restart it as a single shot
     auto const baseline = n_calls;
     begin_time = currentTime();
-    static auto constexpr SingleShotInterval = 25ms;
+    static auto constexpr SingleShotInterval = 80ms;
     timer->startSingleShot(SingleShotInterval);
     EXPECT_EQ(SingleShotInterval, timer->interval());
     EXPECT_FALSE(timer->isRepeating());
