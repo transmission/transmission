@@ -349,7 +349,7 @@ TEST_F(CompletionTest, createPieceBitfield)
     // serialize it to a raw bitfield, read it back into a bitfield,
     // and test that the new bitfield matches
     auto const pieces_raw_bitfield = completion.createPieceBitfield();
-    tr_bitfield pieces{ size_t(block_info.pieceCount()) };
+    tr_bitfield pieces{ size_t{ block_info.pieceCount() } };
     pieces.setRaw(std::data(pieces_raw_bitfield), std::size(pieces_raw_bitfield));
     for (uint64_t i = 0; i < block_info.pieceCount(); ++i)
     {

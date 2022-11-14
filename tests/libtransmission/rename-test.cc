@@ -432,7 +432,7 @@ TEST_F(RenameTest, partialFile)
     auto constexpr PieceCount = uint32_t{ 33 };
     auto constexpr PieceSize = uint32_t{ 32768 };
     auto constexpr Length = std::array<uint32_t, 3>{ 1048576, 4096, 512 };
-    auto constexpr TotalSize = uint64_t(Length[0]) + Length[1] + Length[2];
+    auto constexpr TotalSize = uint64_t{ Length[0] } + Length[1] + Length[2];
 
     /***
     ****  create our test torrent with an incomplete .part file

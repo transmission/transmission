@@ -110,7 +110,7 @@ protected:
                 slash_pos = p + strlen(p) - 1;
             }
 
-            auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
+            auto const path_part = std::string{ path, static_cast<size_t>(slash_pos - path + 1) };
             auto const info = tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW);
             if (!info || (!info->isFile() && !info->isFolder()))
             {

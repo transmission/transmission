@@ -90,7 +90,7 @@ protected:
     static void expectEqual(tr_scrape_request const& expected, std::vector<tr_sha1_digest_t> const& actual)
     {
         EXPECT_EQ(expected.info_hash_count, std::size(actual));
-        for (size_t i = 0; i < std::min(size_t(expected.info_hash_count), std::size(actual)); ++i)
+        for (size_t i = 0; i < std::min(static_cast<size_t>(expected.info_hash_count), std::size(actual)); ++i)
         {
             EXPECT_EQ(expected.info_hash[i], actual[i]);
         }
