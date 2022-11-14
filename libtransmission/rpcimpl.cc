@@ -1799,12 +1799,12 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
         {
             tr_variant* dict = tr_variantListAddDict(list, 5);
             auto limits = group->getLimits();
-            tr_variantDictAddStr(dict, TR_KEY_name, name);
-            tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
-            tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
-            tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
-            tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
             tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
+            tr_variantDictAddStr(dict, TR_KEY_name, name);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit_KBps);
+            tr_variantDictAddBool(dict, TR_KEY_speed_limit_down_enabled, limits.down_limited);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit_KBps);
+            tr_variantDictAddBool(dict, TR_KEY_speed_limit_up_enabled, limits.up_limited);
         }
     }
 
