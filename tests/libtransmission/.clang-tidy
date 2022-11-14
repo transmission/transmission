@@ -12,7 +12,6 @@ Checks: >
   -cert-err33-c,
   -cert-err58-cpp,
   clang-analyzer-optin*,
-  -clang-diagnostic-c++98*,
   -clang-diagnostic-global-constructors,
   -clang-diagnostic-missing-prototypes,
   -clang-diagnostic-nonportable-system-include-path,
