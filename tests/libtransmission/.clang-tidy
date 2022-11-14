@@ -3,7 +3,6 @@
 # cleaned up yet. Pull requests welcomed.
 Checks: >
   bugprone-*,
-  -bugprone-branch-clone,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
   cert-*,
