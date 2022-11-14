@@ -1810,8 +1810,9 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
             NSArray* pathComponents = fullPath.pathComponents;
             while (pathComponents.count <= 1)
             {
-                // file.name isn't a path
-                pathComponents = [pathComponents arrayByAddingObject:NSString.ellipsis];
+                // file.name isn't a path: append an arbitrary empty component until we have two components.
+                // Invalid filenames and duplicate filenames don't need to be handled here.
+                pathComponents = [pathComponents arrayByAddingObject:@""];
             }
 
             if (!tempNode)
