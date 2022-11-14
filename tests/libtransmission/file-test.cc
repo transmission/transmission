@@ -1254,7 +1254,7 @@ TEST_F(FileTest, filePreallocate)
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
-    prealloc_size = 500 * 1024 * 1024;
+    prealloc_size = size_t{ 500U } * 1024U * 1024U;
     if (tr_sys_file_preallocate(fd, prealloc_size, TR_SYS_FILE_PREALLOC_SPARSE, &err))
     {
         EXPECT_EQ(nullptr, err) << *err;

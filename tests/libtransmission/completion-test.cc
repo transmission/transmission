@@ -31,7 +31,7 @@ struct TestTorrent : public tr_completion::torrent_view
     }
 };
 
-auto constexpr BlockSize = uint64_t{ 16 * 1024 };
+auto constexpr BlockSize = uint64_t{ 16 } * 1024U;
 
 } // namespace
 
@@ -278,7 +278,7 @@ TEST_F(CompletionTest, leftUntilDone)
     // check that dnd-flagging a piece we DON'T already have adjusts by block_info.pieceSize()
     torrent.dnd_pieces.insert(1);
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize() * 2, completion.leftUntilDone());
+    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize() * uint64_t{ 2U }, completion.leftUntilDone());
     torrent.dnd_pieces.clear();
     completion.invalidateSizeWhenDone();
 
@@ -323,7 +323,7 @@ TEST_F(CompletionTest, sizeWhenDone)
         torrent.dnd_pieces.insert(i);
     }
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.totalSize() - 16 * block_info.pieceSize(), completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize() - uint64_t{ 16U } * block_info.pieceSize(), completion.sizeWhenDone());
 }
 
 TEST_F(CompletionTest, createPieceBitfield)

@@ -142,12 +142,12 @@ TEST(Crypto, ssha1)
         std::string_view ssha1;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 2>{ {
+    static auto constexpr Tests = std::array<LocalTest, 2>{ {
         { "test"sv, "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy"sv },
         { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)"sv, "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL"sv },
     } };
 
-    auto constexpr HashCount = size_t{ 4 * 1024 };
+    static auto constexpr HashCount = size_t{ 4U } * 1024U;
 
     for (auto const& [plain_text, ssha1] : Tests)
     {
