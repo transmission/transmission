@@ -20,7 +20,6 @@ Checks: >
   google-readability-*,
   google-runtime-operator,
   hicpp-*,
-  -hicpp-multiway-paths-covered,
   -hicpp-signed-bitwise,
   misc-*,
   -misc-non-private-member-variables-in-classes,
