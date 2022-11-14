@@ -142,7 +142,7 @@ TEST_P(JSONTest, test1)
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
 
     auto sv = std::string_view{};
-    int64_t i;
+    auto i = int64_t{};
     EXPECT_TRUE(tr_variantIsDict(&top));
     auto* headers = tr_variantDictFind(&top, tr_quark_new("headers"sv));
     EXPECT_NE(nullptr, headers);

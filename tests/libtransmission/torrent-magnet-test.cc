@@ -15,9 +15,7 @@
 
 #include "test-fixtures.h"
 
-namespace libtransmission
-{
-namespace test
+namespace libtransmission::test
 {
 
 using TorrentMagnetTest = SessionTest;
@@ -55,5 +53,4 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
     EXPECT_EQ(tor->pieceHash(0), torrent_metainfo.pieceHash(0));
 }
 
-} // namespace test
-} // namespace libtransmission
+} // namespace libtransmission::test

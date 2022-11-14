@@ -19,9 +19,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-namespace test
+namespace libtransmission::test
 {
 
 using LpdTest = SessionTest;
@@ -36,8 +34,6 @@ public:
         : session_{ session }
     {
     }
-
-    ~MyMediator() override = default;
 
     [[nodiscard]] tr_port port() const override
     {
@@ -208,5 +204,4 @@ TEST_F(LpdTest, DoesNotReannounceTooSoon)
     }
 }
 
-} // namespace test
-} // namespace libtransmission
+} // namespace libtransmission::test

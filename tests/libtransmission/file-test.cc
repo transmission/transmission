@@ -39,10 +39,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 class FileTest : public SessionTest
@@ -113,7 +110,7 @@ protected:
                 slash_pos = p + strlen(p) - 1;
             }
 
-            auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
+            auto const path_part = std::string{ path, static_cast<size_t>(slash_pos - path + 1) };
             auto const info = tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW);
             if (!info || (!info->isFile() && !info->isFolder()))
             {
@@ -178,9 +175,14 @@ protected:
         EXPECT_NE(TR_BAD_SYS_DIR, dd);
         EXPECT_EQ(nullptr, err) << *err;
 
-        char const* name;
-        while ((name = tr_sys_dir_read_name(dd, &err)) != nullptr)
+        for (;;)
         {
+            char const* name = tr_sys_dir_read_name(dd, &err);
+            if (name == nullptr)
+            {
+                break;
+            }
+
             EXPECT_EQ(nullptr, err) << *err;
 
             if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
@@ -295,7 +297,7 @@ TEST_F(FileTest, getInfo)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 }
 
@@ -394,7 +396,7 @@ TEST_F(FileTest, pathExists)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 }
 
@@ -591,7 +593,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     path3.assign(test_dir, "/c"sv);
@@ -631,7 +633,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     if (createSymlink(path2, path1, false) && createHardlink(path3, path1))
@@ -641,7 +643,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path3);
@@ -678,7 +680,7 @@ TEST_F(FileTest, pathResolve)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path2);
@@ -948,7 +950,7 @@ TEST_F(FileTest, pathRename)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     if (createHardlink(path2, path1))
@@ -969,7 +971,7 @@ TEST_F(FileTest, pathRename)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run hardlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path1);
@@ -1237,7 +1239,12 @@ TEST_F(FileTest, filePreallocate)
     else
     {
         EXPECT_NE(nullptr, err);
-        fprintf(stderr, "WARNING: [%s] unable to preallocate file (full): %s (%d)\n", __FUNCTION__, err->message, err->code);
+        fmt::print(
+            stderr,
+            "WARNING: [{:s}] unable to preallocate file (full): {:s} ({:d})\n",
+            __FUNCTION__,
+            err->message,
+            err->code);
         tr_error_clear(&err);
     }
 
@@ -1247,7 +1254,7 @@ TEST_F(FileTest, filePreallocate)
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
-    prealloc_size = 500 * 1024 * 1024;
+    prealloc_size = size_t{ 500U } * 1024U * 1024U;
     if (tr_sys_file_preallocate(fd, prealloc_size, TR_SYS_FILE_PREALLOC_SPARSE, &err))
     {
         EXPECT_EQ(nullptr, err) << *err;
@@ -1258,7 +1265,12 @@ TEST_F(FileTest, filePreallocate)
     else
     {
         EXPECT_NE(nullptr, err) << *err;
-        fprintf(stderr, "WARNING: [%s] unable to preallocate file (sparse): %s (%d)\n", __FUNCTION__, err->message, err->code);
+        fmt::print(
+            stderr,
+            "WARNING: [{:s}] unable to preallocate file (sparse): {:s} ({:d})\n",
+            __FUNCTION__,
+            err->message,
+            err->code);
         tr_error_clear(&err);
     }
 
@@ -1341,8 +1353,8 @@ TEST_F(FileTest, dirRead)
     auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
     auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
-    bool have1;
-    bool have2;
+    auto have1 = bool{};
+    auto have2 = bool{};
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_FALSE(have1);
     EXPECT_FALSE(have2);
@@ -1403,6 +1415,4 @@ TEST_F(FileTest, dirOpen)
     EXPECT_EQ(nullptr, err) << *err;
 }
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

@@ -212,7 +212,7 @@ TEST_F(VariantTest, parse)
     auto benc = "i64e"sv;
     auto i = int64_t{};
     auto val = tr_variant{};
-    char const* end;
+    char const* end = nullptr;
     auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
     EXPECT_TRUE(ok);
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
@@ -296,7 +296,7 @@ TEST_F(VariantTest, bencSortWhenSerializing)
     auto constexpr ExpectedOut = "lld1:ai64e1:bi32eeee"sv;
 
     tr_variant val;
-    char const* end;
+    char const* end = nullptr;
     auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
     EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(In), end);
@@ -311,7 +311,7 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
     auto constexpr ExpectedOut = "le"sv;
 
     tr_variant val;
-    char const* end;
+    char const* end = nullptr;
     auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
     EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), end);
@@ -395,7 +395,7 @@ TEST_F(VariantTest, merge)
 
     tr_variantMergeDicts(&dest, /*const*/ &src);
 
-    int64_t i;
+    auto i = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&dest, i1, &i));
     EXPECT_EQ(1, i);
     EXPECT_TRUE(tr_variantDictFindInt(&dest, i2, &i));
@@ -425,7 +425,7 @@ TEST_F(VariantTest, stackSmash)
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
     // confirm that it fails instead of crashing
-    char const* end;
+    char const* end = nullptr;
     tr_variant val;
     tr_error* error = nullptr;
     auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end, &error);
@@ -443,7 +443,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     auto const key3 = tr_quark_new("key3"sv);
     auto const key4 = tr_quark_new("key4"sv);
 
-    tr_variant top;
+    auto top = tr_variant{};
     tr_variantInitDict(&top, 10);
     tr_variantDictAddBool(&top, key1, false);
     tr_variantDictAddBool(&top, key2, 0); // NOLINT modernize-use-bool-literals
@@ -451,7 +451,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     tr_variantDictAddInt(&top, key4, 1);
 
     // confirm we can read both bools and ints as bools
-    bool b;
+    auto b = bool{};
     EXPECT_TRUE(tr_variantDictFindBool(&top, key1, &b));
     EXPECT_FALSE(b);
     EXPECT_TRUE(tr_variantDictFindBool(&top, key2, &b));
@@ -462,7 +462,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     EXPECT_TRUE(b);
 
     // confirm we can read both bools and ints as ints
-    int64_t i;
+    auto i = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&top, key1, &i));
     EXPECT_EQ(0, i);
     EXPECT_TRUE(tr_variantDictFindInt(&top, key2, &i));

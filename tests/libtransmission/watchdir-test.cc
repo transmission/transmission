@@ -36,10 +36,7 @@ static auto constexpr RetryDuration = 100ms;
 static auto constexpr ProcessEventsTimeout = 300ms;
 static_assert(ProcessEventsTimeout > GenericRescanInterval);
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 enum class WatchMode
@@ -259,6 +256,4 @@ INSTANTIATE_TEST_SUITE_P( //
         WatchMode::NATIVE,
         WatchMode::GENERIC));
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

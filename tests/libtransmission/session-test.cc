@@ -252,7 +252,7 @@ TEST_F(SessionTest, sessionId)
 
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
-    current_time_mock::set(3600U * 2U);
+    current_time_mock::set(7200U);
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
 
@@ -265,7 +265,7 @@ TEST_F(SessionTest, sessionId)
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
 
-    current_time_mock::set(60U * 60U * 10U);
+    current_time_mock::set(36000U);
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_3));
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));

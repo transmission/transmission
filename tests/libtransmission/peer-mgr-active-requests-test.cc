@@ -30,7 +30,7 @@ TEST_F(PeerMgrActiveRequestsTest, requestsAreNotAddedTwice)
 
     auto const block = tr_block_index_t{ 100 };
     auto const peer = static_cast<tr_peer*>(nullptr);
-    auto const when = time_t(0);
+    auto const when = time_t{};
     EXPECT_TRUE(requests.add(block, peer, when));
     EXPECT_FALSE(requests.add(block, peer, when));
     EXPECT_FALSE(requests.add(block, peer, when));
@@ -62,7 +62,7 @@ TEST_F(PeerMgrActiveRequestsTest, requestsAreRemoved)
 
     auto const block = tr_block_index_t{ 100 };
     auto const peer = static_cast<tr_peer*>(nullptr);
-    auto const when = time_t(0);
+    auto const when = time_t{};
 
     EXPECT_TRUE(requests.add(block, peer, when));
     EXPECT_EQ(1U, requests.count(block));
@@ -86,7 +86,7 @@ TEST_F(PeerMgrActiveRequestsTest, peersAreRemoved)
 
     auto const block = tr_block_index_t{ 100 };
     auto const peer = static_cast<tr_peer*>(nullptr);
-    auto const when = time_t(0);
+    auto const when = time_t{};
 
     // setup: add a request
     EXPECT_TRUE(requests.add(block, peer, when));

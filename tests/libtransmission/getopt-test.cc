@@ -39,8 +39,8 @@ protected:
         auto n = int{};
         tr_optind = 1;
 
-        int c;
-        char const* argstr;
+        auto c = int{};
+        char const* argstr = nullptr;
         while ((c = tr_getopt("summary", argc, argv, Options.data(), &argstr)) != TR_OPT_DONE)
         {
             EXPECT_LT(n, expected_n);
