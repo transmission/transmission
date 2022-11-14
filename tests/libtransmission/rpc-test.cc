@@ -24,7 +24,7 @@ using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
 {
-    int64_t i;
+    auto i = int64_t{};
     auto sv = std::string_view{};
     tr_variant top;
 
@@ -86,7 +86,7 @@ TEST_F(RpcTest, sessionGet)
     tr_variantClear(&request);
 
     EXPECT_TRUE(tr_variantIsDict(&response));
-    tr_variant* args;
+    tr_variant* args = nullptr;
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
@@ -154,9 +154,9 @@ TEST_F(RpcTest, sessionGet)
 
     // what we got
     std::set<tr_quark> actual_keys;
-    tr_quark key;
-    tr_variant* val;
-    size_t n = 0;
+    auto key = tr_quark{};
+    tr_variant* val = nullptr;
+    auto n = size_t{};
     while ((tr_variantDictChild(args, n++, &key, &val)))
     {
         actual_keys.insert(key);

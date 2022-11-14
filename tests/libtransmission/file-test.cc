@@ -175,9 +175,14 @@ protected:
         EXPECT_NE(TR_BAD_SYS_DIR, dd);
         EXPECT_EQ(nullptr, err) << *err;
 
-        char const* name;
-        while ((name = tr_sys_dir_read_name(dd, &err)) != nullptr)
+        for (;;)
         {
+            char const* name = tr_sys_dir_read_name(dd, &err);
+            if (name == nullptr)
+            {
+                break;
+            }
+
             EXPECT_EQ(nullptr, err) << *err;
 
             if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
@@ -1348,8 +1353,8 @@ TEST_F(FileTest, dirRead)
     auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
     auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
-    bool have1;
-    bool have2;
+    auto have1 = bool{};
+    auto have2 = bool{};
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_FALSE(have1);
     EXPECT_FALSE(have2);
