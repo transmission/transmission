@@ -295,7 +295,7 @@ TEST_F(FileTest, getInfo)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 }
 
@@ -394,7 +394,7 @@ TEST_F(FileTest, pathExists)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 }
 
@@ -591,7 +591,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     path3.assign(test_dir, "/c"sv);
@@ -631,7 +631,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     if (createSymlink(path2, path1, false) && createHardlink(path3, path1))
@@ -641,7 +641,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path3);
@@ -678,7 +678,7 @@ TEST_F(FileTest, pathResolve)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path2);
@@ -948,7 +948,7 @@ TEST_F(FileTest, pathRename)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
     }
 
     if (createHardlink(path2, path1))
@@ -969,7 +969,7 @@ TEST_F(FileTest, pathRename)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
+        fmt::print(stderr, "WARNING: [{:s}] unable to run hardlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path1);
@@ -1237,7 +1237,12 @@ TEST_F(FileTest, filePreallocate)
     else
     {
         EXPECT_NE(nullptr, err);
-        fprintf(stderr, "WARNING: [%s] unable to preallocate file (full): %s (%d)\n", __FUNCTION__, err->message, err->code);
+        fmt::print(
+            stderr,
+            "WARNING: [{:s}] unable to preallocate file (full): {:s} ({:d})\n",
+            __FUNCTION__,
+            err->message,
+            err->code);
         tr_error_clear(&err);
     }
 
@@ -1258,7 +1263,12 @@ TEST_F(FileTest, filePreallocate)
     else
     {
         EXPECT_NE(nullptr, err) << *err;
-        fprintf(stderr, "WARNING: [%s] unable to preallocate file (sparse): %s (%d)\n", __FUNCTION__, err->message, err->code);
+        fmt::print(
+            stderr,
+            "WARNING: [{:s}] unable to preallocate file (sparse): {:s} ({:d})\n",
+            __FUNCTION__,
+            err->message,
+            err->code);
         tr_error_clear(&err);
     }
 
