@@ -87,6 +87,7 @@ static SortType const SortTypeTracker = @"Tracker";
 static SortType const SortTypeOrder = @"Order";
 static SortType const SortTypeActivity = @"Activity";
 static SortType const SortTypeSize = @"Size";
+static SortType const SortTypeETA = @"ETA";
 
 typedef NS_ENUM(unsigned int, sortTag) {
     SORT_ORDER_TAG = 0,
@@ -96,7 +97,8 @@ typedef NS_ENUM(unsigned int, sortTag) {
     SORT_STATE_TAG = 4,
     SORT_TRACKER_TAG = 5,
     SORT_ACTIVITY_TAG = 6,
-    SORT_SIZE_TAG = 7
+    SORT_SIZE_TAG = 7,
+    SORT_ETA_TAG = 8
 };
 
 typedef NS_ENUM(unsigned int, sortOrderTag) { //
@@ -2712,6 +2714,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     case SORT_SIZE_TAG:
         sortType = SortTypeSize;
         break;
+    case SORT_ETA_TAG:
+        sortType = SortTypeETA;
+        break;
     default:
         NSAssert1(NO, @"Unknown sort tag received: %ld", senderMenuItem.tag);
         return;
@@ -2771,6 +2776,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         NSSortDescriptor* ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"ratio" ascending:asc];
 
         descriptors = @[ progressDescriptor, ratioProgressDescriptor, ratioDescriptor, nameDescriptor ];
+    }
+    else if ([sortType isEqualToString:SortTypeETA])
+    {
+        NSSortDescriptor* etaDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"eta" ascending:asc];
+        // falling back on sort by progress
+        NSSortDescriptor* progressDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"progress" ascending:asc];
+        NSSortDescriptor* ratioProgressDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"progressStopRatio" ascending:asc];
+        NSSortDescriptor* ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"ratio" ascending:asc];
+
+        descriptors = @[ etaDescriptor, progressDescriptor, ratioProgressDescriptor, ratioDescriptor, nameDescriptor ];
     }
     else if ([sortType isEqualToString:SortTypeTracker])
     {
@@ -4714,6 +4729,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             break;
         case SORT_SIZE_TAG:
             sortType = SortTypeSize;
+            break;
+        case SORT_ETA_TAG:
+            sortType = SortTypeETA;
             break;
         default:
             NSAssert1(NO, @"Unknown sort tag received: %ld", [menuItem tag]);
