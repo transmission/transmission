@@ -105,7 +105,7 @@
         }
         else
         {
-            fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Drag overlay -> torrents"), fileCount];
+            fileString = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu files", "Drag overlay -> torrents"), fileCount];
         }
         secondString = [NSString stringWithFormat:@"%@, %@", fileString, secondString];
     }
@@ -117,7 +117,7 @@
     }
     else
     {
-        name = [NSString stringWithFormat:NSLocalizedString(@"%lu Torrent Files", "Drag overlay -> torrents"), count];
+        name = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu Torrent Files", "Drag overlay -> torrents"), count];
         secondString = [secondString stringByAppendingString:@" total"];
         icon = [NSImage imageNamed:@"TransmissionDocument.icns"];
     }

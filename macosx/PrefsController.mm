@@ -607,8 +607,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     if (exists)
     {
         self.fBlocklistMessageField.stringValue = [NSString
-            stringWithFormat:NSLocalizedString(@"%lu IP address rules in list", "Prefs -> blocklist -> message"),
-                             tr_blocklistGetRuleCount(self.fHandle)];
+            localizedStringWithFormat:NSLocalizedString(@"%lu IP address rules in list", "Prefs -> blocklist -> message"),
+                                      tr_blocklistGetRuleCount(self.fHandle)];
     }
     else
     {

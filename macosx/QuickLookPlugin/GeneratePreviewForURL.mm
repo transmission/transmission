@@ -86,7 +86,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     if (is_multifile)
     {
         NSString* fileCountString = [NSString
-            stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu files", nil, bundle, "quicklook file count"), n_files];
+            localizedStringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu files", nil, bundle, "quicklook file count"), n_files];
         fileSizeString = [NSString stringWithFormat:@"%@, %@", fileCountString, fileSizeString];
     }
     [htmlString appendFormat:@"<p>%@</p>", fileSizeString];
@@ -143,7 +143,8 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
         NSString* headerTitleString = n_webseeds == 1 ?
             NSLocalizedStringFromTableInBundle(@"1 Web Seed", nil, bundle, "quicklook web seed header") :
-            [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Web Seeds", nil, bundle, "quicklook web seed header"), n_webseeds];
+            [NSString localizedStringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Web Seeds", nil, bundle, "quicklook web seed header"),
+                                                n_webseeds];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", headerTitleString];
 
         for (size_t i = 0; i < n_webseeds; ++i)
@@ -165,7 +166,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         auto const n = std::size(announce_list);
         NSString* headerTitleString = n == 1 ?
             NSLocalizedStringFromTableInBundle(@"1 Tracker", nil, bundle, "quicklook tracker header") :
-            [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Trackers", nil, bundle, "quicklook tracker header"), n];
+            [NSString localizedStringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Trackers", nil, bundle, "quicklook tracker header"), n];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", headerTitleString];
 
 #warning handle tiers?
@@ -185,7 +186,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [listSection appendString:@"<table>"];
 
         NSString* fileTitleString = [NSString
-            stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Files", nil, bundle, "quicklook file header"), n_files];
+            localizedStringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Files", nil, bundle, "quicklook file header"), n_files];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
 #warning display folders?
