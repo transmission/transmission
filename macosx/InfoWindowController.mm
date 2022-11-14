@@ -504,7 +504,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
             self.fImageView.image = [NSImage imageNamed:NSImageNameMultipleDocuments];
 
             self.fNameField.stringValue = [NSString
-                stringWithFormat:NSLocalizedString(@"%lu Torrents Selected", "Inspector -> selected torrents"), numberSelected];
+                localizedStringWithFormat:NSLocalizedString(@"%lu Torrents Selected", "Inspector -> selected torrents"), numberSelected];
             self.fNameField.hidden = NO;
 
             uint64_t size = 0;
@@ -529,7 +529,8 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
+                    fileString = [NSString
+                        localizedStringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
                 }
                 [fileStrings addObject:fileString];
             }
@@ -543,7 +544,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 else
                 {
                     magnetString = [NSString
-                        stringWithFormat:NSLocalizedString(@"%lu magnetized transfers", "Inspector -> selected torrents"), magnetCount];
+                        localizedStringWithFormat:NSLocalizedString(@"%lu magnetized transfers", "Inspector -> selected torrents"), magnetCount];
                 }
                 [fileStrings addObject:magnetString];
             }
@@ -606,7 +607,8 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
+                    fileString = [NSString
+                        localizedStringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
                 }
                 basicString = [NSString stringWithFormat:@"%@, %@", fileString, basicString];
             }

@@ -25,12 +25,6 @@
     return [self stringByAppendingString:NSString.ellipsis];
 }
 
-#warning use localizedStringWithFormat: directly when 10.9-only and stringsdict translations are in place
-+ (NSString*)formattedUInteger:(NSUInteger)value
-{
-    return [NSString localizedStringWithFormat:@"%lu", value];
-}
-
 // Maximum supported localization is 9.22 EB, which is the maximum supported filesystem size by macOS, 8 EiB.
 // https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/APFS_Guide/VolumeFormatComparison/VolumeFormatComparison.html
 + (NSString*)stringForFileSize:(uint64_t)size
@@ -44,7 +38,7 @@
 {
     NSByteCountFormatter* fileSizeFormatter = [[NSByteCountFormatter alloc] init];
 
-    NSString* fullString = [fileSizeFormatter stringFromByteCount:fullSize];
+    NSString* fullSizeString = [fileSizeFormatter stringFromByteCount:fullSize];
 
     //figure out the magnitude of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
     BOOL partialUnitsSame;
@@ -61,9 +55,9 @@
     }
 
     fileSizeFormatter.includesUnit = !partialUnitsSame;
-    NSString* partialString = [fileSizeFormatter stringFromByteCount:partialSize];
+    NSString* partialSizeString = [fileSizeFormatter stringFromByteCount:partialSize];
 
-    return [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", "file size string"), partialString, fullString];
+    return [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", "file size string"), partialSizeString, fullSizeString];
 }
 
 + (NSString*)stringForSpeed:(CGFloat)speed

@@ -49,7 +49,7 @@
     NSParameterAssert(torrent != nil);
 
     [self.fHashes addObject:torrent.hashString];
-    NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
+    NSApp.dockTile.badgeLabel = [NSString localizedStringWithFormat:@"%lu", self.fHashes.count];
 }
 
 - (void)removeTorrent:(Torrent*)torrent
@@ -59,7 +59,7 @@
         [self.fHashes removeObject:torrent.hashString];
         if (self.fHashes.count > 0)
         {
-            NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
+            NSApp.dockTile.badgeLabel = [NSString localizedStringWithFormat:@"%lu", self.fHashes.count];
         }
         else
         {

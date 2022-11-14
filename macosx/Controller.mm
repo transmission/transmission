@@ -969,11 +969,11 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             @"There is an active transfer that will be paused on quit."
              " The transfer will automatically resume on the next launch.",
             "Confirm Quit panel -> message") :
-        [NSString stringWithFormat:NSLocalizedString(
-                                       @"There are %lu active transfers that will be paused on quit."
-                                        " The transfers will automatically resume on the next launch.",
-                                       "Confirm Quit panel -> message"),
-                                   active];
+        [NSString localizedStringWithFormat:NSLocalizedString(
+                                                @"There are %lu active transfers that will be paused on quit."
+                                                 " The transfers will automatically resume on the next launch.",
+                                                "Confirm Quit panel -> message"),
+                                            active];
     [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Confirm Quit panel -> button")];
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
     alert.showsSuppressionButton = YES;
@@ -1787,30 +1787,30 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 if (deleteData)
                 {
-                    title = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"Are you sure you want to remove %lu transfers from the transfer list"
-                                                            " and trash the data files?",
-                                                           "Removal confirm panel -> title"),
-                                                       selected];
+                    title = [NSString localizedStringWithFormat:NSLocalizedString(
+                                                                    @"Are you sure you want to remove %lu transfers from the transfer list"
+                                                                     " and trash the data files?",
+                                                                    "Removal confirm panel -> title"),
+                                                                selected];
                 }
                 else
                 {
-                    title = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"Are you sure you want to remove %lu transfers from the transfer list?",
-                                                           "Removal confirm panel -> title"),
-                                                       selected];
+                    title = [NSString localizedStringWithFormat:NSLocalizedString(
+                                                                    @"Are you sure you want to remove %lu transfers from the transfer list?",
+                                                                    "Removal confirm panel -> title"),
+                                                                selected];
                 }
 
                 if (selected == active)
                 {
-                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %lu active transfers.", "Removal confirm panel -> message part 1"),
-                                                         active];
+                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %lu active transfers.", "Removal confirm panel -> message part 1"),
+                                                                  active];
                 }
                 else
                 {
-                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).", "Removal confirm panel -> message part 1"),
-                                                         selected,
-                                                         active];
+                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).", "Removal confirm panel -> message part 1"),
+                                                                  selected,
+                                                                  active];
                 }
                 message = [message stringByAppendingFormat:@" %@",
                                                            NSLocalizedString(
@@ -1983,10 +1983,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
         else
         {
-            message = [NSString stringWithFormat:NSLocalizedString(
-                                                     @"Are you sure you want to remove %lu completed transfers from the transfer list?",
-                                                     "Remove completed confirm panel -> title"),
-                                                 torrents.count];
+            message = [NSString localizedStringWithFormat:NSLocalizedString(
+                                                              @"Are you sure you want to remove %lu completed transfers from the transfer list?",
+                                                              "Remove completed confirm panel -> title"),
+                                                          torrents.count];
 
             info = NSLocalizedString(
                 @"Once removed, continuing the transfers will require the torrent files or magnet links.",
@@ -2040,7 +2040,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     else
     {
         panel.message = [NSString
-            stringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.", "Move torrent -> select destination folder"), count];
+            localizedStringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.", "Move torrent -> select destination folder"),
+                                      count];
     }
 
     [panel beginSheetModalForWindow:self.fWindow completionHandler:^(NSInteger result) {
@@ -2314,7 +2315,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSUInteger totalCount = self.fTorrents.count;
     if (totalCount != 1)
     {
-        totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Status bar transfer count"), totalCount];
+        totalTorrentsString = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu transfers", "Status bar transfer count"), totalCount];
     }
     else
     {
@@ -2330,7 +2331,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", "Status bar transfer count"),
-                                                         [NSString formattedUInteger:count],
+                                                         [NSString localizedStringWithFormat:@"%lu", count],
                                                          totalTorrentsString];
     }
 
@@ -4971,13 +4972,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     if (seeding > 0)
     {
-        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Seeding", "Dock item - Seeding"), seeding];
+        NSString* title = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu Seeding", "Dock item - Seeding"), seeding];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 
     if (downloading > 0)
     {
-        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Downloading", "Dock item - Downloading"), downloading];
+        NSString* title = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu Downloading", "Dock item - Downloading"), downloading];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 

@@ -297,7 +297,8 @@ NSMutableSet* fTrackerIconLoading;
 
 - (NSAttributedString*)attributedCount:(NSInteger)count
 {
-    NSString* countString = count != -1 ? [NSString stringWithFormat:@"%ld", count] : NSLocalizedString(@"N/A", "tracker peer stat");
+    NSString* countString = count != -1 ? [NSString localizedStringWithFormat:@"%ld", count] :
+                                          NSLocalizedString(@"N/A", "tracker peer stat");
     return [[NSAttributedString alloc] initWithString:countString attributes:self.fStatusAttributes];
 }
 
