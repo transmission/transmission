@@ -17,10 +17,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 using RpcTest = SessionTest;
@@ -188,6 +185,4 @@ TEST_F(RpcTest, sessionGet)
     tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

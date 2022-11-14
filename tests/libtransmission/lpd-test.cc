@@ -19,9 +19,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-namespace test
+namespace libtransmission::test
 {
 
 using LpdTest = SessionTest;
@@ -206,5 +204,4 @@ TEST_F(LpdTest, DoesNotReannounceTooSoon)
     }
 }
 
-} // namespace test
-} // namespace libtransmission
+} // namespace libtransmission::test

@@ -13,10 +13,7 @@
 
 #include "test-fixtures.h"
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 class CopyTest : public SandboxedTest
@@ -86,6 +83,4 @@ TEST_F(CopyTest, copy)
     testImpl(filename1, filename2, random_file_length);
 }
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

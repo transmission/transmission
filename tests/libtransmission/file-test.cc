@@ -39,10 +39,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 class FileTest : public SessionTest
@@ -1413,6 +1410,4 @@ TEST_F(FileTest, dirOpen)
     EXPECT_EQ(nullptr, err) << *err;
 }
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

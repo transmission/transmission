@@ -22,10 +22,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 class RenameTest : public SessionTest
@@ -484,6 +481,4 @@ TEST_F(RenameTest, partialFile)
     torrentRemoveAndWait(tor, 0);
 }
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test
