@@ -285,8 +285,7 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
 
 int64_t RpcClient::parseResponseTag(tr_variant& response) const
 {
-    auto const tag = dictFind<int>(&response, TR_KEY_tag);
-    return tag ? *tag : -1;
+    return dictFind<int>(&response, TR_KEY_tag).value_or(-1);
 }
 
 RpcResponse RpcClient::parseResponseData(tr_variant& response) const
