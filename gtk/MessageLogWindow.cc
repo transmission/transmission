@@ -26,7 +26,7 @@
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {
 public:
-    MessageLogColumnsModel()
+    MessageLogColumnsModel() noexcept
     {
         add(sequence);
         add(name);

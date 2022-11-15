@@ -33,8 +33,6 @@ using namespace std::literals;
 namespace
 {
 
-auto const ColumnIdKey = Glib::Quark("tr-model-column-id-key");
-
 enum
 {
     /* these two fields could be any number at all so long as they're not
@@ -46,7 +44,7 @@ enum
 class FileModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    FileModelColumns()
+    FileModelColumns() noexcept
     {
         add(icon);
         add(label);
@@ -175,7 +173,7 @@ bool refreshFilesForeach(
         auto const file = tr_torrentFile(refresh_data.tor, index);
 
         new_enabled = static_cast<int>(file.wanted);
-        new_priority = file.priority;
+        new_priority = int{ file.priority };
         new_have = file.have;
         new_size = file.length;
         new_progress = static_cast<int>(100 * file.progress);
@@ -694,7 +692,7 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
 
     bool handled = false;
 
-    auto const cid = GPOINTER_TO_INT(col->get_data(ColumnIdKey));
+    auto const cid = col->get_sort_column_id();
     auto* tor = core_->find_torrent(torrent_id_);
 
     if (tor != nullptr && (cid == file_cols.priority.index() || cid == file_cols.enabled.index()))
@@ -986,7 +984,6 @@ FileList::Impl::Impl(
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererToggle>();
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.enabled.index()));
         col->set_fixed_width(width);
         col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_cell_data_func(*rend, sigc::ptr_fun(&renderDownload));
@@ -1005,7 +1002,6 @@ FileList::Impl::Impl(
         rend->property_xalign() = 0.5F;
         rend->property_yalign() = 0.5F;
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.priority.index()));
         col->set_fixed_width(width);
         col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_sort_column(file_cols.priority);

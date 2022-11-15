@@ -65,7 +65,7 @@ using StringValue = Glib::Value<Glib::ustring>;
 namespace
 {
 
-auto const AppIconName = Glib::ustring("transmission"s);
+auto const AppIconName = "transmission"sv; // TODO(C++20): Use ""s
 
 char const* const LICENSE =
     "Copyright 2005-2022. All code is copyrighted by the respective authors.\n"
@@ -549,7 +549,7 @@ void Application::Impl::on_startup()
 {
     IF_GTKMM4(Gtk::IconTheme::get_for_display(Gdk::Display::get_default()), Gtk::IconTheme::get_default())
         ->add_resource_path(gtr_get_full_resource_path("icons"s));
-    Gtk::Window::set_default_icon_name(AppIconName);
+    Gtk::Window::set_default_icon_name(std::string(AppIconName));
 
     /* Add style provider to the window. */
     auto css_provider = Gtk::CssProvider::create();
@@ -1396,7 +1396,7 @@ void Application::Impl::show_about_dialog()
     d->set_authors(authors);
     d->set_comments(_("A fast and easy BitTorrent client"));
     d->set_copyright(_("Copyright © The Transmission Project"));
-    d->set_logo_icon_name(AppIconName);
+    d->set_logo_icon_name(std::string(AppIconName));
     d->set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
        to have it appear in the credits in the "About"

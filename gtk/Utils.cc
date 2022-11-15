@@ -491,7 +491,7 @@ namespace
 class EnumComboModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    EnumComboModelColumns()
+    EnumComboModelColumns() noexcept
     {
         add(value);
         add(label);
@@ -589,15 +589,10 @@ void gtr_priority_combo_init(Gtk::ComboBox& combo)
 ****
 ***/
 
-namespace
-{
-
-auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
-
-} // namespace
-
 void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)
 {
+    static auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
+
     auto* const widget_as_window = dynamic_cast<Gtk::Window*>(&widget);
     if (widget_as_window == nullptr)
     {
