@@ -731,7 +731,7 @@ static void stopServer(tr_rpc_server* server)
     rpc_server_start_retry_cancel(server);
 
     auto& httpd = server->httpd;
-    if (httpd)
+    if (!httpd)
     {
         return;
     }
