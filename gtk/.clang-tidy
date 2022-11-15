@@ -1,6 +1,8 @@
 ---
 Checks: >
   -*,
+  bugprone-*,
+  -bugprone-narrowing-conversions,
   cert-*,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,
