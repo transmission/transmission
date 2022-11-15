@@ -2331,7 +2331,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
     size_t current = 0;
     auto const old_pos = tor->queuePosition;
 
-    tor->queuePosition = static_cast<size_t>(-1);
+    tor->queuePosition = -1;
 
     for (auto* const walk : tor->session->torrents())
     {

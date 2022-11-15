@@ -14,9 +14,9 @@
 
 #include "announcer.h"
 #include "crypto-utils.h"
+#include "dns.h"
 #include "peer-mgr.h" // for tr_pex
 #include "tr-buffer.h"
-#include "utils.h" // for tr_net_init()
 
 #include "test-fixtures.h"
 
@@ -28,20 +28,58 @@ private:
     void SetUp() override
     {
         ::testing::Test::SetUp();
-
-        tr_net_init();
         tr_timeUpdate(time(nullptr));
     }
 
 protected:
+    class MockDns final : public libtransmission::Dns
+    {
+    public:
+        [[nodiscard]] std::optional<std::pair<struct sockaddr const*, socklen_t>> cached(
+            std::string_view /*address*/,
+            Hints /*hints*/ = {}) const override
+        {
+            return {};
+        }
+
+        Tag lookup(std::string_view address, Callback&& callback, Hints /*hints*/) override
+        {
+            auto const addr = tr_address::fromString(address); // mock has no actual DNS, just parsing e.g. inet_pton
+            auto [ss, sslen] = addr->toSockaddr(Port);
+            callback(reinterpret_cast<sockaddr const*>(&ss), sslen, tr_time() + 3600); // 1hr ttl
+            return {};
+        }
+
+        void cancel(Tag /*tag*/) override
+        {
+        }
+
+        static auto constexpr Port = tr_port::fromHost(443);
+    };
+
     class MockMediator final : public tr_announcer_udp::Mediator
     {
     public:
+        MockMediator()
+            : event_base_{ event_base_new(), event_base_free }
+        {
+        }
+
         void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
         {
             auto target = tr_address::fromSockaddr(sa);
             ASSERT_TRUE(target);
             sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
+        }
+
+        [[nodiscard]] auto* eventBase()
+        {
+            return event_base_.get();
+        }
+
+        [[nodiscard]] libtransmission::Dns& dns() override
+        {
+            return dns_;
         }
 
         [[nodiscard]] std::optional<tr_address> announceIP() const override
@@ -66,6 +104,10 @@ protected:
         };
 
         std::deque<Sent> sent_;
+
+        std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+
+        MockDns dns_;
     };
 
     static void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)
@@ -158,7 +200,7 @@ protected:
     [[nodiscard]] static auto waitForAnnouncerToSendMessage(MockMediator& mediator)
     {
         EXPECT_FALSE(std::empty(mediator.sent_));
-        libtransmission::test::waitFor([&mediator]() { return !std::empty(mediator.sent_); }, 5s);
+        libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
         auto buf = libtransmission::Buffer(mediator.sent_.back().buf_);
         mediator.sent_.pop_back();
         return buf;
@@ -221,8 +263,8 @@ protected:
         EXPECT_EQ(expected.up, actual.uploaded);
         // EXPECT_EQ(foo, actual.event); ; // 0: none; 1: completed; 2: started; 3: stopped // FIXME
         // EXPECT_EQ(foo, actual.ip_address); // FIXME
-        EXPECT_EQ(expected.key, static_cast<decltype(expected.key)>(actual.key));
-        EXPECT_EQ(expected.numwant, static_cast<decltype(expected.numwant)>(actual.num_want));
+        EXPECT_EQ(expected.key, actual.key);
+        EXPECT_EQ(expected.numwant, actual.num_want);
         EXPECT_EQ(expected.port.host(), actual.port);
     }
 
@@ -368,7 +410,7 @@ TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
     // Inspect that request for validity.
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto const connect_transaction_id = parseConnectionRequest(sent);
-    EXPECT_NE(0U, connect_transaction_id);
+    EXPECT_NE(0, connect_transaction_id);
 
     // now just end the test before responding to the request.
     // the announcer and mediator will go out-of-scope & be destroyed.
