@@ -240,8 +240,7 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 
         while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
         {
-            auto sv = std::string_view{};
-            if (tr_variantGetStrView(node, &sv) && sv == url)
+            if (auto sv = std::string_view{}; tr_variantGetStrView(node, &sv) && sv == url)
             {
                 return true;
             }
