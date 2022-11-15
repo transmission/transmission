@@ -297,6 +297,96 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
+  windows:
+    needs: [ what-to-make ]
+    runs-on: windows-2022
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Build Tools
+        run: |
+          $DepsPrefix = (Join-Path (Get-Item .).Root.Name "${{ matrix.arch }}-prefix")
+          "DEPS_PREFIX=${DepsPrefix}" | Out-File $Env:GITHUB_ENV -Append
+          (Join-Path $DepsPrefix bin) | Out-File $Env:GITHUB_PATH -Append
+
+          choco install `
+            jom `
+            nasm
+          choco uninstall `
+            openssl.light
+          (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
+
+          Install-Module -Name Pscx -RequiredVersion 4.0.0-beta4 -AllowPrerelease -Force
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Get Cache Key
+        id: cache-key
+        run: |
+          try {
+              $DepsHash = & (Join-Path . src release windows main.ps1) -Mode DepsHash -BuildArch ${{ matrix.arch }}
+              "hash=${DepsHash}" | Out-File $Env:GITHUB_OUTPUT -Append
+          } catch {
+              Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
+              exit 1
+          }
+      - name: Get Cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ env.DEPS_PREFIX }}
+          key: ${{ github.job }}-${{ matrix.arch }}-${{ steps.cache-key.outputs.hash }}
+      - name: Build Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          try {
+              & (Join-Path . src release windows main.ps1) -Mode Build -BuildArch ${{ matrix.arch }} -BuildPart Deps
+          } catch {
+              Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
+              exit 1
+          }
+      - name: Configure
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
+          cmake `
+            -S src `
+            -B obj `
+            -G Ninja `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DCMAKE_INSTALL_PREFIX=pfx `
+            -DCMAKE_PREFIX_PATH="${Env:DepsPrefix}" `
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_GTK=OFF `
+            -DENABLE_MAC=OFF `
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_TESTS=ON `
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_WEB=OFF `
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
+          cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure --timeout 600
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
+          path: pfx/**/*
+
   make-source-tarball:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
