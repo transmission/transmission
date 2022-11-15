@@ -51,6 +51,7 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 
 #endif
 
+using namespace std::literals;
 using libtransmission::Watchdir;
 
 static char constexpr MyName[] = "transmission-daemon";
@@ -199,7 +200,7 @@ static std::string getConfigDir(int argc, char const* const* argv)
     return tr_getDefaultConfigDir(MyName);
 }
 
-static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
+static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
     auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
