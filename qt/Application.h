@@ -21,13 +21,12 @@
 #include "Utils.h" // std::hash<QString>
 
 class AddData;
+class MainWindow;
 class Prefs;
 class Session;
 class Torrent;
 class TorrentModel;
-class MainWindow;
 class WatchDir;
-class Torrent;
 
 class Application : public QApplication
 {
