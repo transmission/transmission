@@ -921,7 +921,7 @@ EXIT_EARLY:
     return false;
 }
 
-void tr_daemon::handle_error(tr_error* error)
+void tr_daemon::handle_error(tr_error* error) const
 {
     auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
     printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
