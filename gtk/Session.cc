@@ -313,6 +313,7 @@ bool is_valid_eta(int t)
     return t != TR_ETA_NOT_AVAIL && t != TR_ETA_UNKNOWN;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_eta(int a, int b)
 {
     bool const a_valid = is_valid_eta(a);
@@ -337,11 +338,13 @@ int compare_eta(int a, int b)
 }
 
 template<typename T>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_generic(T&& a, T&& b)
 {
     return a < b ? -1 : (a > b ? 1 : 0);
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_ratio(double a, double b)
 {
     int ret = 0;
@@ -366,11 +369,13 @@ int compare_ratio(double a, double b)
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_name(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     return a->get_value(torrent_cols.name_collated).compare(b->get_value(torrent_cols.name_collated));
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_queue(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -379,6 +384,7 @@ int compare_by_queue(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::co
     return sb->queuePosition - sa->queuePosition;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_ratio(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
@@ -399,6 +405,7 @@ int compare_by_ratio(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::co
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
@@ -427,6 +434,7 @@ int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
@@ -441,6 +449,7 @@ int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::cons
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -455,6 +464,7 @@ int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::con
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -474,6 +484,7 @@ int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_eta(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -488,6 +499,7 @@ int compare_by_eta(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::cons
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const sa = a->get_value(torrent_cols.activity);
@@ -1283,6 +1295,7 @@ void Session::clear()
 namespace
 {
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int gtr_compare_double(double const a, double const b, int decimal_places)
 {
     auto const ia = int64_t(a * pow(10, decimal_places));
