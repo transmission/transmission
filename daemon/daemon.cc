@@ -51,6 +51,7 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 
 #endif
 
+using namespace std::literals;
 using libtransmission::Watchdir;
 
 static char constexpr MyName[] = "transmission-daemon";
@@ -199,7 +200,7 @@ static std::string getConfigDir(int argc, char const* const* argv)
     return tr_getDefaultConfigDir(MyName);
 }
 
-static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
+static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
     auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
@@ -921,7 +922,7 @@ EXIT_EARLY:
     return false;
 }
 
-void tr_daemon::handle_error(tr_error* error)
+void tr_daemon::handle_error(tr_error* error) const
 {
     auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
     printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);

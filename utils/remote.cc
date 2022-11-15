@@ -907,11 +907,11 @@ static std::string getStatusString(tr_variant* t)
     }
 }
 
-static char const* bandwidthPriorityNames[] = {
-    "Low",
-    "Normal",
-    "High",
-    "Invalid",
+static auto constexpr bandwidth_priority_names = std::array<std::string_view, 4>{
+    "Low"sv,
+    "Normal"sv,
+    "High"sv,
+    "Invalid"sv,
 };
 
 static char* format_date(char* buf, size_t buflen, time_t now)
@@ -1241,7 +1241,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_bandwidthPriority, &i))
             {
-                fmt::print("  Bandwidth Priority: {:s}\n", bandwidthPriorityNames[(i + 1) & 3]);
+                fmt::print("  Bandwidth Priority: {:s}\n", bandwidth_priority_names[(i + 1) & 3]);
             }
 
             fmt::print("\n");

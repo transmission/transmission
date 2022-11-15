@@ -156,9 +156,8 @@ void FileTreeView::keyPressEvent(QKeyEvent* event)
 
 void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    auto const index = currentIndex();
-
-    if (!index.isValid() || index.column() == FileTreeModel::COL_WANTED || index.column() == FileTreeModel::COL_PRIORITY)
+    if (auto const index = currentIndex();
+        !index.isValid() || index.column() == FileTreeModel::COL_WANTED || index.column() == FileTreeModel::COL_PRIORITY)
     {
         return;
     }
@@ -173,9 +172,7 @@ void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void FileTreeView::contextMenuEvent(QContextMenuEvent* event)
 {
-    QModelIndex const root_index = model_->index(0, 0);
-
-    if (!root_index.isValid())
+    if (auto const root_index = model_->index(0, 0); !root_index.isValid())
     {
         return;
     }
