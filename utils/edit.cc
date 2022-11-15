@@ -172,7 +172,7 @@ static std::string replaceSubstr(std::string_view str, std::string_view oldval, 
     {
         auto const pos = str.find(oldval);
         ret += str.substr(0, pos);
-        if (pos == str.npos)
+        if (pos == std::string_view::npos)
         {
             break;
         }
