@@ -5,7 +5,7 @@
 
 #include "StyleHelper.h"
 
-QIcon::Mode StyleHelper::getIconMode(QStyle::State state)
+QIcon::Mode StyleHelper::getIconMode(QStyle::State const& state)
 {
     if (!state.testFlag(QStyle::State_Enabled))
     {

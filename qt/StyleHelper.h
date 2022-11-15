@@ -11,5 +11,5 @@
 class StyleHelper
 {
 public:
-    static QIcon::Mode getIconMode(QStyle::State state);
+    static QIcon::Mode getIconMode(QStyle::State const& state);
 };
