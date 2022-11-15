@@ -146,8 +146,9 @@ private:
         return promise.future();
     }
 
-    Tag const tag_;
-    static Tag next_tag;
+    static inline Tag next_tag = {};
+
+    Tag const tag_ = next_tag++;
     bool tolerate_errors_ = {};
     QFutureInterface<RpcResponse> promise_;
     QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;
