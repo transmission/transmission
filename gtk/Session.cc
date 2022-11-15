@@ -206,7 +206,7 @@ private:
     tr_session* session_ = nullptr;
 };
 
-TorrentModelColumns::TorrentModelColumns()
+TorrentModelColumns::TorrentModelColumns() noexcept
 {
     add(name_collated);
     add(torrent);
@@ -1399,9 +1399,9 @@ void Session::Impl::update()
 namespace
 {
 
-auto const SessionManagerServiceName = Glib::ustring("org.gnome.SessionManager"s);
-auto const SessionManagerInterface = Glib::ustring("org.gnome.SessionManager"s);
-auto const SessionManagerObjectPath = Glib::ustring("/org/gnome/SessionManager"s);
+auto const SessionManagerServiceName = "org.gnome.SessionManager"sv; // TODO(C++20): Use ""s
+auto const SessionManagerInterface = "org.gnome.SessionManager"sv; // TODO(C++20): Use ""s
+auto const SessionManagerObjectPath = "/org/gnome/SessionManager"sv; // TODO(C++20): Use ""s
 
 bool gtr_inhibit_hibernation(guint32& cookie)
 {
@@ -1416,8 +1416,8 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         auto response = connection->call_sync(
-            SessionManagerObjectPath,
-            SessionManagerInterface,
+            std::string(SessionManagerObjectPath),
+            std::string(SessionManagerInterface),
             "Inhibit",
             Glib::VariantContainerBase::create_tuple({
                 Glib::Variant<Glib::ustring>::create(application),
@@ -1425,7 +1425,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
                 Glib::Variant<Glib::ustring>::create(reason),
                 Glib::Variant<guint32>::create(flags),
             }),
-            SessionManagerServiceName,
+            std::string(SessionManagerServiceName),
             1000);
 
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
@@ -1450,11 +1450,11 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
         auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         connection->call_sync(
-            SessionManagerObjectPath,
-            SessionManagerInterface,
+            std::string(SessionManagerObjectPath),
+            std::string(SessionManagerInterface),
             "Uninhibit",
             Glib::VariantContainerBase::create_tuple({ Glib::Variant<guint32>::create(inhibit_cookie) }),
-            SessionManagerServiceName,
+            std::string(SessionManagerServiceName),
             1000);
 
         /* logging */

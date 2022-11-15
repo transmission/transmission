@@ -27,9 +27,9 @@ using UInt32VariantType = Glib::Variant<guint32>;
 namespace
 {
 
-auto const NotificationsDbusName = Glib::ustring("org.freedesktop.Notifications"s);
-auto const NotificationsDbusCoreObject = Glib::ustring("/org/freedesktop/Notifications"s);
-auto const NotificationsDbusCoreInterface = Glib::ustring("org.freedesktop.Notifications"s);
+auto const NotificationsDbusName = "org.freedesktop.Notifications"sv; // TODO(C++20): Use ""s
+auto const NotificationsDbusCoreObject = "/org/freedesktop/Notifications"sv; // TODO(C++20): Use ""s
+auto const NotificationsDbusCoreInterface = "org.freedesktop.Notifications"sv; // TODO(C++20): Use ""s
 
 struct TrNotification
 {
@@ -154,9 +154,9 @@ void gtr_notify_init()
 {
     Gio::DBus::Proxy::create_for_bus(
         TR_GIO_DBUS_BUS_TYPE(SESSION),
-        NotificationsDbusName,
-        NotificationsDbusCoreObject,
-        NotificationsDbusCoreInterface,
+        std::string(NotificationsDbusName),
+        std::string(NotificationsDbusCoreObject),
+        std::string(NotificationsDbusCoreInterface),
         &dbus_proxy_ready_callback,
         {},
         TR_GIO_DBUS_PROXY_FLAGS(DO_NOT_LOAD_PROPERTIES));
