@@ -140,26 +140,30 @@ protected:
 
     struct XnameTestData
     {
-        char const* input;
-        char const* output;
+        std::string_view input;
+        std::string_view output;
     };
 
-    static void testPathXname(XnameTestData const* data, size_t data_size, std::string (*func)(std::string_view, tr_error**))
+    static void testPathXname(
+        XnameTestData const* data,
+        size_t data_size,
+        std::string_view (*func)(std::string_view, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
             tr_error* err = nullptr;
-            auto const name = func(data[i].input, &err);
+            auto const& [input, output] = data[i];
+            auto const name = func(input, &err);
 
-            if (data[i].output != nullptr)
+            if (!std::empty(data[i].output))
             {
                 EXPECT_NE(""sv, name);
                 EXPECT_EQ(nullptr, err) << *err;
-                EXPECT_EQ(data[i].output, name);
+                EXPECT_EQ(output, name) << " in [" << input << ']';
             }
             else
             {
-                EXPECT_EQ(""sv, name);
+                EXPECT_EQ(""sv, name) << " in [" << input << ']';
                 EXPECT_NE(nullptr, err);
                 tr_error_clear(&err);
             }
@@ -720,30 +724,30 @@ TEST_F(FileTest, pathBasename)
 #ifdef _WIN32
         { "\\", "/" },
         /* Invalid paths */
-        { "\\\\\\", nullptr },
-        { "123:", nullptr },
+        { "\\\\\\", "" },
+        { "123:", "" },
         /* Reserved characters */
-        { "<", nullptr },
-        { ">", nullptr },
-        { ":", nullptr },
-        { "\"", nullptr },
-        { "|", nullptr },
-        { "?", nullptr },
-        { "*", nullptr },
-        { "a\\<", nullptr },
-        { "a\\>", nullptr },
-        { "a\\:", nullptr },
-        { "a\\\"", nullptr },
-        { "a\\|", nullptr },
-        { "a\\?", nullptr },
-        { "a\\*", nullptr },
-        { "c:\\a\\b<c\\d", nullptr },
-        { "c:\\a\\b>c\\d", nullptr },
-        { "c:\\a\\b:c\\d", nullptr },
-        { "c:\\a\\b\"c\\d", nullptr },
-        { "c:\\a\\b|c\\d", nullptr },
-        { "c:\\a\\b?c\\d", nullptr },
-        { "c:\\a\\b*c\\d", nullptr },
+        { "<", "" },
+        { ">", "" },
+        { ":", "" },
+        { "\"", "" },
+        { "|", "" },
+        { "?", "" },
+        { "*", "" },
+        { "a\\<", "" },
+        { "a\\>", "" },
+        { "a\\:", "" },
+        { "a\\\"", "" },
+        { "a\\|", "" },
+        { "a\\?", "" },
+        { "a\\*", "" },
+        { "c:\\a\\b<c\\d", "" },
+        { "c:\\a\\b>c\\d", "" },
+        { "c:\\a\\b:c\\d", "" },
+        { "c:\\a\\b\"c\\d", "" },
+        { "c:\\a\\b|c\\d", "" },
+        { "c:\\a\\b?c\\d", "" },
+        { "c:\\a\\b*c\\d", "" },
 #else
         { "////", "/" },
 #endif

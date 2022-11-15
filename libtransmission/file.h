@@ -237,7 +237,7 @@ std::string tr_sys_path_resolve(std::string_view path, struct tr_error** error =
  * @return base name (last path component; parent path removed) on success,
  *         or empty string otherwise (with `error` set accordingly).
  */
-std::string tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
+std::string_view tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `dirname()`.
