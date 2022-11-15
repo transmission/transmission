@@ -327,7 +327,7 @@ TEST_F(SettingsTest, canSaveSizeT)
     settings.save(&dict);
     auto val = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&dict, Key, &val));
-    EXPECT_EQ(expected_value, static_cast<size_t>(val));
+    EXPECT_EQ(expected_value, val);
     tr_variantClear(&dict);
 }
 
