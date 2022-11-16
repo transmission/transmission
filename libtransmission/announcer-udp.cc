@@ -93,6 +93,31 @@ static auto constexpr TauRequestTtl = int{ 60 };
 
 struct tau_scrape_request
 {
+    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func callback_in, void* user_data_in)
+        : callback{ callback_in }
+        , user_data{ user_data_in }
+    {
+        this->response.scrape_url = in.scrape_url;
+        this->response.row_count = in.info_hash_count;
+        for (int i = 0; i < this->response.row_count; ++i)
+        {
+            this->response.rows[i].seeders = -1;
+            this->response.rows[i].leechers = -1;
+            this->response.rows[i].downloads = -1;
+            this->response.rows[i].info_hash = in.info_hash[i];
+        }
+
+        // build the payload
+        auto buf = libtransmission::Buffer{};
+        buf.addUint32(TAU_ACTION_SCRAPE);
+        buf.addUint32(transaction_id);
+        for (int i = 0; i < in.info_hash_count; ++i)
+        {
+            buf.add(in.info_hash[i]);
+        }
+        this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
+    }
+
     void requestFinished()
     {
         if (callback != nullptr)
@@ -140,53 +165,14 @@ struct tau_scrape_request
 
     std::vector<std::byte> payload;
 
-    time_t sent_at;
-    time_t created_at;
-    tau_transaction_t transaction_id;
+    time_t sent_at = 0;
+    time_t created_at = tr_time();
+    tau_transaction_t transaction_id = tau_transaction_new();
 
-    tr_scrape_response response;
+    tr_scrape_response response = {};
     tr_scrape_response_func callback;
     void* user_data;
 };
-
-static tau_scrape_request make_tau_scrape_request(
-    tr_scrape_request const& in,
-    tr_scrape_response_func callback,
-    void* user_data)
-{
-    tau_transaction_t const transaction_id = tau_transaction_new();
-
-    /* build the payload */
-    auto buf = libtransmission::Buffer{};
-    buf.addUint32(TAU_ACTION_SCRAPE);
-    buf.addUint32(transaction_id);
-    for (int i = 0; i < in.info_hash_count; ++i)
-    {
-        buf.add(in.info_hash[i]);
-    }
-
-    // build the tau_scrape_request
-    auto req = tau_scrape_request{};
-    req.callback = callback;
-    req.created_at = tr_time();
-    req.transaction_id = transaction_id;
-    req.callback = callback;
-    req.user_data = user_data;
-    req.response.scrape_url = in.scrape_url;
-    req.response.row_count = in.info_hash_count;
-    req.payload.insert(std::end(req.payload), std::begin(buf), std::end(buf));
-
-    for (int i = 0; i < req.response.row_count; ++i)
-    {
-        req.response.rows[i].seeders = -1;
-        req.response.rows[i].leechers = -1;
-        req.response.rows[i].downloads = -1;
-        req.response.rows[i].info_hash = in.info_hash[i];
-    }
-
-    /* cleanup */
-    return req;
-}
 
 /****
 *****
@@ -664,7 +650,7 @@ public:
             return;
         }
 
-        tracker->scrapes.push_back(make_tau_scrape_request(request, response_func, user_data));
+        tracker->scrapes.emplace_back(request, response_func, user_data);
         tau_tracker_upkeep_ex(tracker, false);
     }
 
