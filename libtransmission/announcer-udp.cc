@@ -37,6 +37,7 @@
 
 using namespace std::literals;
 
+// size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
@@ -49,7 +50,7 @@ static tau_transaction_t tau_transaction_new()
     return tmp;
 }
 
-/* used in the "action" field of a request */
+// used in the "action" field of a request. Values defined in bep 15.
 enum tau_action_t
 {
     TAU_ACTION_CONNECT = 0,
@@ -58,12 +59,8 @@ enum tau_action_t
     TAU_ACTION_ERROR = 3
 };
 
-static auto constexpr TauRequestTtl = int{ 60 };
-
 /****
-*****
 *****  SCRAPE
-*****
 ****/
 
 struct tau_scrape_request
@@ -157,9 +154,7 @@ private:
 };
 
 /****
-*****
 *****  ANNOUNCE
-*****
 ****/
 
 struct tau_announce_request
@@ -281,9 +276,7 @@ private:
 };
 
 /****
-*****
-*****  TRACKERS
-*****
+*****  TRACKER
 ****/
 
 struct tau_tracker
@@ -578,12 +571,11 @@ private:
     time_t addr_expires_at_ = 0;
 
     static time_t constexpr DnsRetryIntervalSecs = 60 * 60;
+    static auto constexpr TauRequestTtl = int{ 60 };
 };
 
 /****
-*****
 *****  SESSION
-*****
 ****/
 
 class tr_announcer_udp_impl final : public tr_announcer_udp
