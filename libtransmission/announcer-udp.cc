@@ -291,10 +291,10 @@ struct tau_tracker
     using Mediator = tr_announcer_udp::Mediator;
 
     tau_tracker(Mediator& mediator, tr_interned_string key_in, tr_interned_string host_in, tr_port port_in)
-        : mediator_{ mediator }
-        , key{ key_in }
+        : key{ key_in }
         , host{ host_in }
         , port{ port_in }
+        , mediator_{ mediator }
     {
     }
 
@@ -346,12 +346,7 @@ struct tau_tracker
         this->upkeep();
     }
 
-    void upkeep()
-    {
-        upkeep_ex(true);
-    }
-
-    void upkeep_ex(bool timeout_reqs)
+    void upkeep(bool timeout_reqs = true)
     {
         time_t const now = tr_time();
         bool const closing = this->close_at != 0;
@@ -384,7 +379,7 @@ struct tau_tracker
             hints.ai_socktype = SOCK_DGRAM;
             hints.ai_protocol = IPPROTO_UDP;
             logtrace(this->host, "Trying a new DNS lookup");
-            this->dns_request_ = this->mediator_.dns().lookup(
+            this->dns_request_ = mediator_.dns().lookup(
                 this->host.sv(),
                 [this](sockaddr const* sa, socklen_t len, time_t expires_at) { this->on_dns(sa, len, expires_at); },
                 hints);
@@ -468,6 +463,8 @@ private:
         }
     }
 
+    ///
+
     void timeout_requests()
     {
         time_t const now = time(nullptr);
@@ -479,42 +476,30 @@ private:
             on_connection_response(TAU_ACTION_ERROR, empty_buf);
         }
 
-        if (auto& reqs = this->announces; !std::empty(reqs))
-        {
-            for (auto it = std::begin(reqs); it != std::end(reqs);)
-            {
-                auto& req = *it;
-                if (cancel_all || req.created_at + TauRequestTtl < now)
-                {
-                    logtrace(this->key, fmt::format("timeout announce req {}", fmt::ptr(&req)));
-                    req.fail(false, true, "");
-                    it = reqs.erase(it);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-        }
+        timeout_requests(this->announces, now, cancel_all, "announce");
+        timeout_requests(this->scrapes, now, cancel_all, "scrape");
+    }
 
-        if (auto& reqs = this->scrapes; !std::empty(reqs))
+    template<typename T>
+    void timeout_requests(std::list<T>& requests, time_t now, bool cancel_all, std::string_view name)
+    {
+        for (auto it = std::begin(requests); it != std::end(requests);)
         {
-            for (auto it = std::begin(reqs); it != std::end(reqs);)
+            auto& req = *it;
+            if (cancel_all || req.created_at + TauRequestTtl < now)
             {
-                auto& req = *it;
-                if (cancel_all || req.created_at + TauRequestTtl < now)
-                {
-                    logtrace(this->key, fmt::format("timeout scrape req {}", fmt::ptr(&req)));
-                    req.fail(false, true, "");
-                    it = reqs.erase(it);
-                }
-                else
-                {
-                    ++it;
-                }
+                logtrace(this->key, fmt::format("timeout {} req {}", name, fmt::ptr(&req)));
+                req.fail(false, true, "");
+                it = requests.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
     }
+
+    ///
 
     void send_requests()
     {
@@ -570,20 +555,16 @@ private:
     }
 
 public:
-    Mediator& mediator_;
-
     tr_interned_string const key;
     tr_interned_string const host;
     tr_port const port;
 
     libtransmission::Dns::Tag dns_request_ = {};
-    std::optional<std::pair<sockaddr_storage, socklen_t>> addr_;
-    time_t addr_expires_at_ = 0;
 
     time_t connecting_at = 0;
     time_t connection_expiration_time = 0;
-    tau_connection_t connection_id = 0;
-    tau_transaction_t connection_transaction_id = 0;
+    tau_connection_t connection_id = {};
+    tau_transaction_t connection_transaction_id = {};
 
     time_t close_at = 0;
 
@@ -591,6 +572,11 @@ public:
     std::list<tau_scrape_request> scrapes;
 
 private:
+    Mediator& mediator_;
+
+    std::optional<std::pair<sockaddr_storage, socklen_t>> addr_;
+    time_t addr_expires_at_ = 0;
+
     static time_t constexpr DnsRetryIntervalSecs = 60 * 60;
 };
 
@@ -620,7 +606,7 @@ public:
         auto const addr = mediator_.announceIP();
         uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
         tracker->announces.emplace_back(announce_ip, request, response_func, user_data);
-        tracker->upkeep_ex(false);
+        tracker->upkeep(false);
     }
 
     void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) override
@@ -632,7 +618,7 @@ public:
         }
 
         tracker->scrapes.emplace_back(request, response_func, user_data);
-        tracker->upkeep_ex(false);
+        tracker->upkeep(false);
     }
 
     void upkeep() override
