@@ -1540,6 +1540,20 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 ****
 ***/
 
+void tr_sessionSetPartialHashCheck(tr_session* session, bool enabled, size_t ratio, bool recheck)
+{
+    
+    TR_ASSERT(session != nullptr);
+    // Runtime modification is safe
+    session->settings_.partial_hash_check_enabled = enabled;
+    session->settings_.partial_hash_check_ratio = ratio;
+    session->settings_.partial_hash_check_recheck = recheck;
+}
+
+/***
+****
+***/
+
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
     session->runInSessionThread([session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
