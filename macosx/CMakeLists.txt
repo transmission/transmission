@@ -399,7 +399,7 @@ add_definitions(
 )
 
 add_library(vdkqueue STATIC
-    VDKQueue/VDKQueue.m
+    VDKQueue/VDKQueue.mm
     VDKQueue/VDKQueue.h
 )
 
