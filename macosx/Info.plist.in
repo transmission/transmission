@@ -61,11 +61,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>@TR_VCS_REVISION@</string>
+	<string>14714.@TR_VERSION_MAJOR@.@TR_VERSION_MINOR@.@TR_VERSION_PATCH@</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.7.0</string>
+	<string>@CMAKE_OSX_DEPLOYMENT_TARGET@</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSAppTransportSecurity</key>
