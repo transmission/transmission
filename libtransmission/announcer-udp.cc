@@ -438,7 +438,7 @@ private:
                     fmt::arg("address", host.sv()),
                     fmt::arg("port", port.host()),
                     fmt::arg("error", gai_strerror(rc)),
-                    fmt::arg("error_code", rc)));
+                    fmt::arg("error_code", static_cast<int>(rc))));
             return {};
         }
 

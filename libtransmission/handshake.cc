@@ -903,8 +903,8 @@ static ReadState readPayloadStream(tr_handshake* handshake, tr_peerIo* peer_io)
     }
 
     /* parse the handshake ... */
-    handshake_parse_err_t const i = parseHandshake(handshake, peer_io);
-    tr_logAddTraceHand(handshake, fmt::format("parseHandshake returned {}", i));
+    auto const i = parseHandshake(handshake, peer_io);
+    tr_logAddTraceHand(handshake, fmt::format("parseHandshake returned {}", static_cast<int>(i)));
 
     if (i != HANDSHAKE_OK)
     {
@@ -989,7 +989,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled handshake state {:d}"), handshake->state));
+            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled handshake state {:d}"), static_cast<int>(handshake->state)));
 #else
             ret = READ_ERR;
             break;

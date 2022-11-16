@@ -518,7 +518,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 #endif
 
     default:
-        TR_ASSERT_MSG(false, fmt::format("unsupported peer socket type {:d}", socket.type));
+        TR_ASSERT_MSG(false, fmt::format("unsupported peer socket type {:d}", static_cast<int>(socket.type)));
     }
 
     return io;
@@ -699,7 +699,7 @@ static void io_close_socket(tr_peerIo* io)
 #endif
 
     default:
-        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
+        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", static_cast<int>(io->socket.type)));
     }
 
     io->event_write.reset();
@@ -1010,7 +1010,9 @@ size_t tr_peerIo::flush(tr_direction dir, size_t limit, tr_error** error)
     TR_ASSERT(tr_isDirection(dir));
 
     auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit, error) : tr_peerIoTryWrite(this, limit, error);
-    tr_logAddTraceIo(this, fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", dir, limit, bytes_used));
+    tr_logAddTraceIo(
+        this,
+        fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", static_cast<int>(dir), limit, bytes_used));
     return bytes_used;
 }
 
