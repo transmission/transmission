@@ -144,14 +144,14 @@ struct tau_scrape_request
     std::vector<std::byte> payload;
 
     time_t sent_at = 0;
-    time_t created_at = tr_time();
-    tau_transaction_t transaction_id = tau_transaction_new();
+    time_t const created_at = tr_time();
+    tau_transaction_t const transaction_id = tau_transaction_new();
 
     tr_scrape_response response = {};
 
 private:
-    tr_scrape_response_func callback_;
-    void* user_data_;
+    tr_scrape_response_func const callback_;
+    void* const user_data_;
 };
 
 /****
@@ -247,9 +247,9 @@ struct tau_announce_request
 
     std::vector<std::byte> payload;
 
-    time_t created_at = tr_time();
+    time_t const created_at = tr_time();
     time_t sent_at = 0;
-    tau_transaction_t transaction_id = tau_transaction_new();
+    tau_transaction_t const transaction_id = tau_transaction_new();
 
     tr_announce_response response = {};
 
@@ -272,8 +272,8 @@ private:
         }
     }
 
-    tr_announce_response_func callback_ = nullptr;
-    void* user_data_ = nullptr;
+    tr_announce_response_func const callback_;
+    void* const user_data_;
 };
 
 /****
@@ -358,7 +358,7 @@ struct tau_tracker
         }
 
         // if DNS lookup *recently* failed for this host, do nothing
-        if (!this->addr_ && now < this->addr_expires_at_)
+        if (!addr_ && now < addr_expires_at_)
         {
             return;
         }
@@ -380,7 +380,7 @@ struct tau_tracker
                 this->connecting_at));
 
         /* also need a valid connection ID... */
-        if (this->addr_ && this->connection_expiration_time <= now && this->connecting_at == 0)
+        if (addr_ && this->connection_expiration_time <= now && this->connecting_at == 0)
         {
             this->connecting_at = now;
             this->connection_transaction_id = tau_transaction_new();
@@ -402,7 +402,7 @@ struct tau_tracker
             timeout_requests();
         }
 
-        if (this->addr_ && this->connection_expiration_time > now)
+        if (addr_ && this->connection_expiration_time > now)
         {
             send_requests();
         }
@@ -501,8 +501,8 @@ private:
 
     void send_requests()
     {
-        TR_ASSERT(!this->addr_pending_dns_);
-        TR_ASSERT(this->addr_);
+        TR_ASSERT(!addr_pending_dns_);
+        TR_ASSERT(addr_);
         TR_ASSERT(this->connecting_at == 0);
         TR_ASSERT(this->connection_expiration_time > tr_time());
 
