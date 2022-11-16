@@ -13,6 +13,12 @@
 #include <string_view>
 #include <vector>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#undef gai_strerror
+#define gai_strerror gai_strerrorA
+#endif
+
 #include <fmt/core.h>
 #include <fmt/format.h>
 

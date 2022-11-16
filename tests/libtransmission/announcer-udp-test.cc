@@ -27,6 +27,8 @@ class AnnouncerUdpTest : public ::testing::Test
 private:
     void SetUp() override
     {
+        tr_net_init();
+
         ::testing::Test::SetUp();
         tr_timeUpdate(time(nullptr));
     }
@@ -230,8 +232,8 @@ protected:
         EXPECT_EQ(expected.up, actual.uploaded);
         // EXPECT_EQ(foo, actual.event); ; // 0: none; 1: completed; 2: started; 3: stopped // FIXME
         // EXPECT_EQ(foo, actual.ip_address); // FIXME
-        EXPECT_EQ(expected.key, actual.key);
-        EXPECT_EQ(expected.numwant, actual.num_want);
+        EXPECT_EQ(expected.key, static_cast<int>(actual.key));
+        EXPECT_EQ(expected.numwant, static_cast<int>(actual.num_want));
         EXPECT_EQ(expected.port.host(), actual.port);
     }
 
@@ -389,7 +391,7 @@ TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
     // Inspect that request for validity.
     auto sent = waitForAnnouncerToSendMessage(mediator);
     auto const connect_transaction_id = parseConnectionRequest(sent);
-    EXPECT_NE(0, connect_transaction_id);
+    EXPECT_NE(0U, connect_transaction_id);
 
     // now just end the test before responding to the request.
     // the announcer and mediator will go out-of-scope & be destroyed.
