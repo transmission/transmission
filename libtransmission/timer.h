@@ -64,14 +64,14 @@ public:
     virtual ~TimerMaker() = default;
     [[nodiscard]] virtual std::unique_ptr<Timer> create() = 0;
 
-    [[nodiscard]] virtual std::unique_ptr<Timer> create(std::function<void()> callback)
+    [[nodiscard]] std::unique_ptr<Timer> create(std::function<void()> callback)
     {
         auto timer = create();
         timer->setCallback(std::move(callback));
         return timer;
     }
 
-    [[nodiscard]] virtual std::unique_ptr<Timer> create(Timer::CStyleCallback callback, void* user_data)
+    [[nodiscard]] std::unique_ptr<Timer> create(Timer::CStyleCallback callback, void* user_data)
     {
         auto timer = create();
         timer->setCallback(callback, user_data);
