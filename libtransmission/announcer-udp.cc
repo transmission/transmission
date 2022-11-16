@@ -429,7 +429,7 @@ private:
                 logname,
                 fmt::format(
                     _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
-                    fmt::arg("address", host),
+                    fmt::arg("address", host.sv()),
                     fmt::arg("port", port.host()),
                     fmt::arg("error", gai_strerror(rc)),
                     fmt::arg("error_code", rc)));
