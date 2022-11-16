@@ -93,9 +93,9 @@ static auto constexpr TauRequestTtl = int{ 60 };
 
 struct tau_scrape_request
 {
-    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func callback_in, void* user_data_in)
-        : callback{ callback_in }
-        , user_data{ user_data_in }
+    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func callback, void* user_data)
+        : callback_{ callback }
+        , user_data_{ user_data }
     {
         this->response.scrape_url = in.scrape_url;
         this->response.row_count = in.info_hash_count;
@@ -118,11 +118,16 @@ struct tau_scrape_request
         this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
     }
 
+    [[nodiscard]] constexpr auto hasCallback() const noexcept
+    {
+        return callback_ != nullptr;
+    }
+
     void requestFinished()
     {
-        if (callback != nullptr)
+        if (callback_ != nullptr)
         {
-            callback(&response, user_data);
+            callback_(&response, user_data_);
         }
     }
 
@@ -170,8 +175,10 @@ struct tau_scrape_request
     tau_transaction_t transaction_id = tau_transaction_new();
 
     tr_scrape_response response = {};
-    tr_scrape_response_func callback;
-    void* user_data;
+
+private:
+    tr_scrape_response_func callback_;
+    void* user_data_;
 };
 
 /****
@@ -182,11 +189,46 @@ struct tau_scrape_request
 
 struct tau_announce_request
 {
+    tau_announce_request(
+        uint32_t announce_ip,
+        tr_announce_request const& in,
+        tr_announce_response_func callback,
+        void* user_data)
+        : callback_{ callback }
+        , user_data_{ user_data }
+    {
+        response.seeders = -1;
+        response.leechers = -1;
+        response.downloads = -1;
+        response.info_hash = in.info_hash;
+
+        // build the payload
+        auto buf = libtransmission::Buffer{};
+        buf.addUint32(TAU_ACTION_ANNOUNCE);
+        buf.addUint32(transaction_id);
+        buf.add(in.info_hash);
+        buf.add(in.peer_id);
+        buf.addUint64(in.down);
+        buf.addUint64(in.leftUntilComplete);
+        buf.addUint64(in.up);
+        buf.addUint32(get_tau_announce_event(in.event));
+        buf.addUint32(announce_ip);
+        buf.addUint32(in.key);
+        buf.addUint32(in.numwant);
+        buf.addPort(in.port);
+        payload.insert(std::end(payload), std::begin(buf), std::end(buf));
+    }
+
+    [[nodiscard]] constexpr auto hasCallback() const noexcept
+    {
+        return callback_ != nullptr;
+    }
+
     void requestFinished()
     {
-        if (this->callback != nullptr)
+        if (callback_ != nullptr)
         {
-            this->callback(&this->response, this->user_data);
+            callback_(&this->response, user_data_);
         }
     }
 
@@ -222,82 +264,46 @@ struct tau_announce_request
         }
     }
 
+    enum tau_announce_event
+    {
+        // Used in the "event" field of an announce request.
+        // These values come from BEP 15
+        TAU_ANNOUNCE_EVENT_NONE = 0,
+        TAU_ANNOUNCE_EVENT_COMPLETED = 1,
+        TAU_ANNOUNCE_EVENT_STARTED = 2,
+        TAU_ANNOUNCE_EVENT_STOPPED = 3
+    };
+
     std::vector<std::byte> payload;
 
-    time_t created_at = 0;
+    time_t created_at = tr_time();
     time_t sent_at = 0;
-    tau_transaction_t transaction_id = 0;
+    tau_transaction_t transaction_id = tau_transaction_new();
 
     tr_announce_response response = {};
 
-    tr_announce_response_func callback = nullptr;
-    void* user_data = nullptr;
-};
-
-enum tau_announce_event
-{
-    /* used in the "event" field of an announce request */
-    TAU_ANNOUNCE_EVENT_NONE = 0,
-    TAU_ANNOUNCE_EVENT_COMPLETED = 1,
-    TAU_ANNOUNCE_EVENT_STARTED = 2,
-    TAU_ANNOUNCE_EVENT_STOPPED = 3
-};
-
-static tau_announce_event get_tau_announce_event(tr_announce_event e)
-{
-    switch (e)
+private:
+    [[nodiscard]] static constexpr tau_announce_event get_tau_announce_event(tr_announce_event e)
     {
-    case TR_ANNOUNCE_EVENT_COMPLETED:
-        return TAU_ANNOUNCE_EVENT_COMPLETED;
+        switch (e)
+        {
+        case TR_ANNOUNCE_EVENT_COMPLETED:
+            return TAU_ANNOUNCE_EVENT_COMPLETED;
 
-    case TR_ANNOUNCE_EVENT_STARTED:
-        return TAU_ANNOUNCE_EVENT_STARTED;
+        case TR_ANNOUNCE_EVENT_STARTED:
+            return TAU_ANNOUNCE_EVENT_STARTED;
 
-    case TR_ANNOUNCE_EVENT_STOPPED:
-        return TAU_ANNOUNCE_EVENT_STOPPED;
+        case TR_ANNOUNCE_EVENT_STOPPED:
+            return TAU_ANNOUNCE_EVENT_STOPPED;
 
-    default:
-        return TAU_ANNOUNCE_EVENT_NONE;
+        default:
+            return TAU_ANNOUNCE_EVENT_NONE;
+        }
     }
-}
 
-static tau_announce_request make_tau_announce_request(
-    uint32_t announce_ip,
-    tr_announce_request const& in,
-    tr_announce_response_func callback,
-    void* user_data)
-{
-    tau_transaction_t const transaction_id = tau_transaction_new();
-
-    /* build the payload */
-    auto buf = libtransmission::Buffer{};
-    buf.addUint32(TAU_ACTION_ANNOUNCE);
-    buf.addUint32(transaction_id);
-    buf.add(in.info_hash);
-    buf.add(in.peer_id);
-    buf.addUint64(in.down);
-    buf.addUint64(in.leftUntilComplete);
-    buf.addUint64(in.up);
-    buf.addUint32(get_tau_announce_event(in.event));
-    buf.addUint32(announce_ip);
-    buf.addUint32(in.key);
-    buf.addUint32(in.numwant);
-    buf.addPort(in.port);
-
-    /* build the tau_announce_request */
-    auto req = tau_announce_request();
-    req.created_at = tr_time();
-    req.transaction_id = transaction_id;
-    req.callback = callback;
-    req.user_data = user_data;
-    req.payload.insert(std::end(req.payload), std::begin(buf), std::end(buf));
-    req.response.seeders = -1;
-    req.response.leechers = -1;
-    req.response.downloads = -1;
-    req.response.info_hash = in.info_hash;
-
-    return req;
-}
+    tr_announce_response_func callback_ = nullptr;
+    void* user_data_ = nullptr;
+};
 
 /****
 *****
@@ -438,7 +444,7 @@ static void tau_tracker_send_requests(tau_tracker* tracker, std::list<T>& reqs)
         req.sent_at = now;
         tau_tracker_send_request(tracker, std::data(req.payload), std::size(req.payload));
 
-        if (req.callback != nullptr)
+        if (req.hasCallback())
         {
             ++it;
             continue;
@@ -638,7 +644,7 @@ public:
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
         auto const addr = mediator_.announceIP();
         uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
-        tracker->announces.push_back(make_tau_announce_request(announce_ip, request, response_func, user_data));
+        tracker->announces.emplace_back(announce_ip, request, response_func, user_data);
         tau_tracker_upkeep_ex(tracker, false);
     }
 
