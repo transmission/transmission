@@ -136,8 +136,6 @@ endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
     ${PROJECT_BINARY_DIR}/version.h
-    dns-ev.h
-    dns.h
     error-types.h
     error.h
     file.h

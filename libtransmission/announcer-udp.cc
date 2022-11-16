@@ -7,6 +7,7 @@
 #include <cerrno> // for errno, EAFNOSUPPORT
 #include <cstring> // for memset()
 #include <ctime>
+#include <future>
 #include <list>
 #include <memory>
 #include <string_view>
@@ -293,7 +294,7 @@ struct tau_tracker
 
     [[nodiscard]] auto isIdle() const noexcept
     {
-        return std::empty(announces) && std::empty(scrapes) && (dns_request_ == 0U);
+        return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
     }
 
     void sendto(void const* buf, size_t buflen)
@@ -304,18 +305,8 @@ struct tau_tracker
             return;
         }
 
-        auto [ss, sslen] = *addr_;
-
-        if (ss.ss_family == AF_INET)
-        {
-            reinterpret_cast<sockaddr_in*>(&ss)->sin_port = port.network();
-        }
-        else if (ss.ss_family == AF_INET6)
-        {
-            reinterpret_cast<sockaddr_in6*>(&ss)->sin6_port = port.network();
-        }
-
-        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr*>(&ss), sslen);
+        auto const& [ss, sslen] = *addr_;
+        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
     void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
@@ -344,15 +335,23 @@ struct tau_tracker
         time_t const now = tr_time();
         bool const closing = this->close_at != 0;
 
-        /* if the address info is too old, expire it */
-        if (this->addr_ && (closing || this->addr_expires_at_ <= now))
+        // do we have a DNS request that's ready?
+        if (addr_pending_dns_ && addr_pending_dns_->wait_for(0ms) == std::future_status::ready)
         {
-            logtrace(this->host, "Expiring old DNS result");
-            this->addr_.reset();
-            this->addr_expires_at_ = 0;
+            addr_ = addr_pending_dns_->get();
+            addr_pending_dns_.reset();
+            addr_expires_at_ = now + DnsRetryIntervalSecs;
         }
 
-        /* are there any requests pending? */
+        // if the address info is too old, expire it
+        if (addr_ && (closing || addr_expires_at_ <= now))
+        {
+            logtrace(this->host, "Expiring old DNS result");
+            addr_.reset();
+            addr_expires_at_ = 0;
+        }
+
+        // are there any requests pending?
         if (this->isIdle())
         {
             return;
@@ -364,18 +363,10 @@ struct tau_tracker
             return;
         }
 
-        /* if we don't have an address yet, try & get one now. */
-        if (!closing && !this->addr_ && (this->dns_request_ == 0U))
+        // if we don't have an address yet, try & get one now.
+        if (!closing && !addr_ && !addr_pending_dns_)
         {
-            auto hints = libtransmission::Dns::Hints{};
-            hints.ai_family = AF_UNSPEC;
-            hints.ai_socktype = SOCK_DGRAM;
-            hints.ai_protocol = IPPROTO_UDP;
-            logtrace(this->host, "Trying a new DNS lookup");
-            this->dns_request_ = mediator_.dns().lookup(
-                this->host.sv(),
-                [this](sockaddr const* sa, socklen_t len, time_t expires_at) { this->on_dns(sa, len, expires_at); },
-                hints);
+            addr_pending_dns_ = std::async(std::launch::async, lookup, this->host, this->port, this->key);
             return;
         }
 
@@ -418,6 +409,42 @@ struct tau_tracker
     }
 
 private:
+    using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
+    using MaybeSockaddr = std::optional<Sockaddr>;
+
+    [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
+    {
+        auto szport = std::array<char, 16>{};
+        *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
+
+        auto hints = addrinfo{};
+        hints.ai_family = AF_UNSPEC;
+        hints.ai_protocol = IPPROTO_UDP;
+        hints.ai_socktype = SOCK_DGRAM;
+
+        addrinfo* info = nullptr;
+        if (int const rc = getaddrinfo(host.c_str(), std::data(szport), &hints, &info); rc != 0)
+        {
+            logwarn(
+                logname,
+                fmt::format(
+                    _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
+                    fmt::arg("address", host),
+                    fmt::arg("port", port.host()),
+                    fmt::arg("error", gai_strerror(rc)),
+                    fmt::arg("error_code", rc)));
+            return {};
+        }
+
+        auto ss = sockaddr_storage{};
+        auto const len = info->ai_addrlen;
+        memcpy(&ss, info->ai_addr, len);
+        freeaddrinfo(info);
+
+        logdbg(logname, "DNS lookup succeeded");
+        return std::make_pair(ss, len);
+    }
+
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
     {
         for (auto& req : this->scrapes)
@@ -432,28 +459,6 @@ private:
 
         this->scrapes.clear();
         this->announces.clear();
-    }
-
-    void on_dns(sockaddr const* sa, socklen_t salen, time_t expires_at)
-    {
-        this->dns_request_ = {};
-
-        if (sa == nullptr)
-        {
-            auto const errmsg = fmt::format(_("Couldn't find address of tracker '{host}'"), fmt::arg("host", this->host));
-            logwarn(this->key, errmsg);
-            this->failAll(false, false, errmsg.c_str());
-            this->addr_expires_at_ = tr_time() + tau_tracker::DnsRetryIntervalSecs;
-        }
-        else
-        {
-            logdbg(this->key, "DNS lookup succeeded");
-            auto ss = sockaddr_storage{};
-            memcpy(&ss, sa, salen);
-            this->addr_.emplace(ss, salen);
-            this->addr_expires_at_ = expires_at;
-            upkeep();
-        }
     }
 
     ///
@@ -496,7 +501,7 @@ private:
 
     void send_requests()
     {
-        TR_ASSERT(!this->dns_request_);
+        TR_ASSERT(!this->addr_pending_dns_);
         TR_ASSERT(this->addr_);
         TR_ASSERT(this->connecting_at == 0);
         TR_ASSERT(this->connection_expiration_time > tr_time());
@@ -552,8 +557,6 @@ public:
     tr_interned_string const host;
     tr_port const port;
 
-    libtransmission::Dns::Tag dns_request_ = {};
-
     time_t connecting_at = 0;
     time_t connection_expiration_time = 0;
     tau_connection_t connection_id = {};
@@ -567,7 +570,9 @@ public:
 private:
     Mediator& mediator_;
 
-    std::optional<std::pair<sockaddr_storage, socklen_t>> addr_;
+    std::optional<std::future<MaybeSockaddr>> addr_pending_dns_ = {};
+
+    MaybeSockaddr addr_ = {};
     time_t addr_expires_at_ = 0;
 
     static time_t constexpr DnsRetryIntervalSecs = 60 * 60;
@@ -635,12 +640,6 @@ public:
 
         for (auto& tracker : trackers_)
         {
-            // if there's a pending DNS request, cancel it
-            if (tracker.dns_request_ != 0U)
-            {
-                mediator_.dns().cancel(tracker.dns_request_);
-            }
-
             tracker.close_at = now + 3;
             tracker.upkeep();
         }
