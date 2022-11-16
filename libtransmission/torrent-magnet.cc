@@ -77,7 +77,9 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    int const n = (size <= 0 || size > INT_MAX) ? -1 : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
+    int const n = (size <= 0 || size > INT_MAX) ?
+        -1 :
+        static_cast<int>(size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0));
 
     tr_logAddDebugTor(tor, fmt::format("metadata is {} bytes in {} pieces", size, n));
 

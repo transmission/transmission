@@ -146,7 +146,7 @@ void tr_bandwidth::allocateBandwidth(
     /* set the available bandwidth */
     if (this->band_[dir].is_limited_)
     {
-        uint64_t const next_pulse_speed = this->band_[dir].desired_speed_bps_;
+        auto const next_pulse_speed = this->band_[dir].desired_speed_bps_;
         this->band_[dir].bytes_left_ = next_pulse_speed * period_msec / 1000U;
     }
 
@@ -252,7 +252,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 ****
 ***/
 
-unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_count) const
+size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) const
 {
     TR_ASSERT(tr_isDirection(dir));
 

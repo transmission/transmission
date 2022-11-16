@@ -238,7 +238,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
     return std::nullopt;
 }
 
-unsigned int tr_session::WebMediator::clamp(int torrent_id, unsigned int byte_count) const
+size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
 {
     auto const lock = session_->unique_lock();
 
@@ -1894,7 +1894,7 @@ bool tr_sessionGetQueueStalledEnabled(tr_session const* session)
     return session->queueStalledEnabled();
 }
 
-int tr_sessionGetQueueStalledMinutes(tr_session const* session)
+size_t tr_sessionGetQueueStalledMinutes(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
@@ -1973,7 +1973,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
     /* count how many torrents are active */
     auto active_count = size_t{};
     bool const stalled_enabled = queueStalledEnabled();
-    int const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
+    auto const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
     time_t const now = tr_time();
     for (auto const* const tor : torrents())
     {

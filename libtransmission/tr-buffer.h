@@ -52,12 +52,12 @@ public:
             return *reinterpret_cast<value_type*>(iov_.iov_base);
         }
 
-        [[nodiscard]] Iterator operator+(int n_bytes)
+        [[nodiscard]] Iterator operator+(size_t n_bytes)
         {
             return Iterator(buf_, offset_ + n_bytes);
         }
 
-        [[nodiscard]] Iterator operator-(int n_bytes)
+        [[nodiscard]] Iterator operator-(size_t n_bytes)
         {
             return Iterator(buf_, offset_ - n_bytes);
         }
@@ -82,7 +82,7 @@ public:
             return *this;
         }
 
-        Iterator& operator+=(int n_bytes)
+        Iterator& operator+=(size_t n_bytes)
         {
             setOffset(offset_ + n_bytes);
             return *this;

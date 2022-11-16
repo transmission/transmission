@@ -119,9 +119,16 @@ public:
 
     void add(void const* data, size_t data_length) override
     {
+        uint8_t const* shaData = (uint8_t const*)data;
+        while (data_length > UINT32_MAX)
+        {
+            CC_SHA1_Update(&handle_, shaData, UINT32_MAX);
+            data_length -= UINT32_MAX;
+            shaData += UINT32_MAX;
+        }
         if (data_length > 0U)
         {
-            CC_SHA1_Update(&handle_, data, data_length);
+            CC_SHA1_Update(&handle_, shaData, static_cast<CC_LONG>(data_length));
         }
     }
 
@@ -154,9 +161,16 @@ public:
 
     void add(void const* data, size_t data_length) override
     {
+        uint8_t const* shaData = (uint8_t const*)data;
+        while (data_length > UINT32_MAX)
+        {
+            CC_SHA256_Update(&handle_, shaData, UINT32_MAX);
+            data_length -= UINT32_MAX;
+            shaData += UINT32_MAX;
+        }
         if (data_length > 0U)
         {
-            CC_SHA256_Update(&handle_, data, data_length);
+            CC_SHA256_Update(&handle_, shaData, static_cast<CC_LONG>(data_length));
         }
     }
 

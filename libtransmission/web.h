@@ -143,7 +143,7 @@ public:
         }
 
         // Return the number of bytes that should be allowed. See tr_bandwidth::clamp()
-        [[nodiscard]] virtual unsigned int clamp([[maybe_unused]] int bandwidth_tag, unsigned int byte_count) const
+        [[nodiscard]] virtual size_t clamp([[maybe_unused]] int bandwidth_tag, size_t byte_count) const
         {
             return byte_count;
         }
