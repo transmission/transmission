@@ -1165,6 +1165,20 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 ****
 ***/
 
+void tr_sessionSetPartialVerification(tr_session* session, bool enabled, size_t ratio, bool recheck)
+{
+    
+    TR_ASSERT(session != nullptr);
+    // Runtime modification is safe
+    session->settings_.partial_verification_enabled = enabled;
+    session->settings_.partial_verification_ratio = ratio;
+    session->settings_.partial_verification_recheck = recheck;
+}
+
+/***
+****
+***/
+
 void tr_sessionSetPaused(tr_session* session, bool is_paused)
 {
     TR_ASSERT(session != nullptr);
@@ -1534,20 +1548,6 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
     auto& [group_name, group] = groups.emplace_back(name, std::make_unique<tr_bandwidth>(new tr_bandwidth(&top_bandwidth_)));
     return *group;
-}
-
-/***
-****
-***/
-
-void tr_sessionSetPartialHashCheck(tr_session* session, bool enabled, size_t ratio, bool recheck)
-{
-    
-    TR_ASSERT(session != nullptr);
-    // Runtime modification is safe
-    session->settings_.partial_hash_check_enabled = enabled;
-    session->settings_.partial_hash_check_ratio = ratio;
-    session->settings_.partial_hash_check_recheck = recheck;
 }
 
 /***

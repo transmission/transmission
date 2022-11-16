@@ -58,110 +58,149 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
 
 bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_flag)
 {
+    bool partial_verification_enabled = tor->session->PartialVerificationEnabled();
+    size_t partial_verification_ratio = tor->session->PartialVerificationRatio();
+    bool partial_verification_recheck = tor->session->PartialVerificationRecheck();
+    bool is_recheck = false;
+    bool has_mismatch_piece = false;
+    if(partial_verification_ratio < 2) {
+        partial_verification_enabled = false;
+    }
     auto const begin = tr_time();
 
-    tr_sys_file_t fd = TR_BAD_SYS_FILE;
-    uint64_t file_pos = 0;
-    bool changed = false;
-    bool had_piece = false;
-    time_t last_slept_at = 0;
-    uint32_t piece_pos = 0;
-    tr_file_index_t file_index = 0;
-    tr_file_index_t prev_file_index = ~file_index;
-    tr_piece_index_t piece = 0;
-    auto buffer = std::vector<std::byte>(1024 * 256);
-    auto sha = tr_sha1::create();
+    while(true) {
+        tr_sys_file_t fd = TR_BAD_SYS_FILE;
+        uint64_t file_pos = 0;
+        bool changed = false;
+        bool had_piece = false;
+        time_t last_slept_at = 0;
+        uint32_t piece_pos = 0;
+        tr_file_index_t file_index = 0;
+        tr_file_index_t prev_file_index = ~file_index;
+        tr_piece_index_t piece = 0;
+        tr_piece_index_t next_partial_check_piece = 0;
+        auto buffer = std::vector<std::byte>(1024 * 256);
+        auto sha = tr_sha1::create();
 
-    tr_logAddDebugTor(tor, "verifying torrent...");
+        tr_logAddDebugTor(tor, "verifying torrent...");
 
-    while (!stop_flag && piece < tor->pieceCount())
-    {
-        auto const file_length = tor->fileSize(file_index);
-
-        /* if we're starting a new piece... */
-        if (piece_pos == 0)
+        while (!stop_flag && piece < tor->pieceCount())
         {
-            had_piece = tor->hasPiece(piece);
-        }
+            auto const file_length = tor->fileSize(file_index);
 
-        /* if we're starting a new file... */
-        if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
-        {
-            auto const found = tor->findFile(file_index);
-            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
-            prev_file_index = file_index;
-        }
-
-        /* figure out how much we can read this pass */
-        uint64_t left_in_piece = tor->pieceSize(piece) - piece_pos;
-        uint64_t left_in_file = file_length - file_pos;
-        uint64_t bytes_this_pass = std::min(left_in_file, left_in_piece);
-        bytes_this_pass = std::min(bytes_this_pass, uint64_t(std::size(buffer)));
-
-        /* read a bit */
-        if (fd != TR_BAD_SYS_FILE)
-        {
-            auto num_read = uint64_t{};
-            if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
+            /* if we're starting a new piece... */
+            if (piece_pos == 0)
             {
-                bytes_this_pass = num_read;
-                sha->add(std::data(buffer), bytes_this_pass);
-                tr_sys_file_advise(fd, file_pos, bytes_this_pass, TR_SYS_FILE_ADVICE_DONT_NEED);
-            }
-        }
-
-        /* move our offsets */
-        left_in_piece -= bytes_this_pass;
-        left_in_file -= bytes_this_pass;
-        piece_pos += bytes_this_pass;
-        file_pos += bytes_this_pass;
-
-        /* if we're finishing a piece... */
-        if (left_in_piece == 0)
-        {
-            auto const has_piece = sha->finish() == tor->pieceHash(piece);
-
-            if (has_piece || had_piece)
-            {
-                tor->setHasPiece(piece, has_piece);
-                changed |= has_piece != had_piece;
+                had_piece = tor->hasPiece(piece);
             }
 
-            tor->checked_pieces_.set(piece, true);
-            tor->markChanged();
-
-            /* sleeping even just a few msec per second goes a long
-             * way towards reducing IO load... */
-            if (auto const now = tr_time(); last_slept_at != now)
+            /* if we're starting a new file... */
+            if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
             {
-                last_slept_at = now;
-                tr_wait_msec(MsecToSleepPerSecondDuringVerify);
+                auto const found = tor->findFile(file_index);
+                fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+                prev_file_index = file_index;
             }
 
-            sha->clear();
-            ++piece;
-            tor->setVerifyProgress(piece / float(tor->pieceCount()));
-            piece_pos = 0;
-        }
+            /* figure out how much we can read this pass */
+            uint64_t left_in_piece = tor->pieceSize(piece) - piece_pos;
+            uint64_t left_in_file = file_length - file_pos;
+            uint64_t bytes_this_pass = std::min(left_in_file, left_in_piece);
+            bytes_this_pass = std::min(bytes_this_pass, uint64_t(std::size(buffer)));
 
-        /* if we're finishing a file... */
-        if (left_in_file == 0)
-        {
+            /* calculate the next piece that needs to be verified */
+            if(next_partial_check_piece != piece && (file_pos <= tor->pieceSize() || left_in_file <= tor->pieceSize()))
+            {
+                if(piece_pos == 0) 
+                {
+                    next_partial_check_piece = piece;
+                } 
+                else
+                {
+                    next_partial_check_piece = piece+1;
+                }
+            }
+            /* check partial hash is enabled */
+            bool is_partial_ignore_piece = partial_verification_enabled && !is_recheck;
+            /* check is bad file */
+            is_partial_ignore_piece = is_partial_ignore_piece && fd != TR_BAD_SYS_FILE;
+            /* check if it is a sampled piece */
+            is_partial_ignore_piece = is_partial_ignore_piece && piece % partial_verification_ratio != 0;
+            is_partial_ignore_piece = is_partial_ignore_piece && piece != next_partial_check_piece;
+
+            /* read a bit */
             if (fd != TR_BAD_SYS_FILE)
             {
-                tr_sys_file_close(fd);
-                fd = TR_BAD_SYS_FILE;
+                auto num_read = uint64_t{};
+                if (!is_partial_ignore_piece && tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
+                {
+                    bytes_this_pass = num_read;
+                    sha->add(std::data(buffer), bytes_this_pass);
+                    tr_sys_file_advise(fd, file_pos, bytes_this_pass, TR_SYS_FILE_ADVICE_DONT_NEED);
+                }
             }
 
-            ++file_index;
-            file_pos = 0;
-        }
-    }
+            /* move our offsets */
+            left_in_piece -= bytes_this_pass;
+            left_in_file -= bytes_this_pass;
+            piece_pos += bytes_this_pass;
+            file_pos += bytes_this_pass;
+    
+            /* if we're finishing a piece... */
+            if (left_in_piece == 0)
+            {
+                auto const has_piece = is_partial_ignore_piece || sha->finish() == tor->pieceHash(piece);
+                has_mismatch_piece |= !has_piece;
 
-    /* cleanup */
-    if (fd != TR_BAD_SYS_FILE)
-    {
-        tr_sys_file_close(fd);
+                if (has_piece || had_piece)
+                {
+                    tor->setHasPiece(piece, has_piece);
+                    changed |= has_piece != had_piece;
+                }
+
+                tor->checked_pieces_.set(piece, true);
+                tor->markChanged();
+
+                /* sleeping even just a few msec per second goes a long
+                * way towards reducing IO load... */
+                if (auto const now = tr_time(); last_slept_at != now)
+                {
+                    last_slept_at = now;
+                    tr_wait_msec(MsecToSleepPerSecondDuringVerify);
+                }
+
+                sha->clear();
+                ++piece;
+                tor->setVerifyProgress(piece / float(tor->pieceCount()));
+                piece_pos = 0;
+            }
+
+            /* if we're finishing a file... */
+            if (left_in_file == 0)
+            {
+                if (fd != TR_BAD_SYS_FILE)
+                {
+                    tr_sys_file_close(fd);
+                    fd = TR_BAD_SYS_FILE;
+                }
+
+                ++file_index;
+                file_pos = 0;
+            }
+        }
+
+        /* cleanup */
+        if (fd != TR_BAD_SYS_FILE)
+        {
+            tr_sys_file_close(fd);
+        }
+        /* recheck if mismatch */
+        if(!is_recheck && partial_verification_enabled && has_mismatch_piece) 
+        {
+            is_recheck = true;
+            continue;
+        }
+        break;
     }
 
     /* stopwatch */
@@ -169,6 +208,8 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
     tr_logAddDebugTor(
         tor,
         fmt::format(
+            partial_verification_enabled ?
+            "Partial Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)" :
             "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
             end - begin,
             tor->totalSize(),
