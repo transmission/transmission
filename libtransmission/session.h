@@ -781,17 +781,17 @@ public:
         return settings_.idle_seeding_limit_minutes;
     }
 
-    [[nodiscard]] constexpr bool PartialVerificationEnabled() const noexcept
+    [[nodiscard]] constexpr bool partialVerificationEnabled() const noexcept
     {
         return settings_.partial_verification_enabled;
     }
 
-    [[nodiscard]] constexpr size_t PartialVerificationRatio() const noexcept
+    [[nodiscard]] constexpr size_t partialVerificationRatio() const noexcept
     {
         return settings_.partial_verification_ratio;
     }
 
-    [[nodiscard]] constexpr bool PartialVerificationRecheck() const noexcept
+    [[nodiscard]] constexpr bool partialVerificationRecheck() const noexcept
     {
         return settings_.partial_verification_recheck;
     }
