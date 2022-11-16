@@ -63,15 +63,18 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
     bool partial_verification_recheck = tor->session->PartialVerificationRecheck();
     bool is_recheck = false;
     bool has_mismatch_piece = false;
-    if(partial_verification_ratio < 2) {
+    if (partial_verification_ratio < 2)
+    {
         partial_verification_enabled = false;
     }
     auto const begin = tr_time();
+    bool changed = false;
 
-    while(true) {
+    while (true)
+    {
         tr_sys_file_t fd = TR_BAD_SYS_FILE;
         uint64_t file_pos = 0;
-        bool changed = false;
+        changed = false;
         bool had_piece = false;
         time_t last_slept_at = 0;
         uint32_t piece_pos = 0;
@@ -98,7 +101,8 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
             if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
             {
                 auto const found = tor->findFile(file_index);
-                fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+                fd = !found ? TR_BAD_SYS_FILE :
+                              tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
                 prev_file_index = file_index;
             }
 
@@ -109,15 +113,15 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
             bytes_this_pass = std::min(bytes_this_pass, uint64_t(std::size(buffer)));
 
             /* calculate the next piece that needs to be verified */
-            if(next_partial_check_piece != piece && (file_pos <= tor->pieceSize() || left_in_file <= tor->pieceSize()))
+            if (next_partial_check_piece != piece && (file_pos <= tor->pieceSize() || left_in_file <= tor->pieceSize()))
             {
-                if(piece_pos == 0) 
+                if (piece_pos == 0)
                 {
                     next_partial_check_piece = piece;
-                } 
+                }
                 else
                 {
-                    next_partial_check_piece = piece+1;
+                    next_partial_check_piece = piece + 1;
                 }
             }
             /* check partial hash is enabled */
@@ -132,7 +136,8 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
             if (fd != TR_BAD_SYS_FILE)
             {
                 auto num_read = uint64_t{};
-                if (!is_partial_ignore_piece && tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
+                if (!is_partial_ignore_piece &&
+                    tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
                 {
                     bytes_this_pass = num_read;
                     sha->add(std::data(buffer), bytes_this_pass);
@@ -145,7 +150,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
             left_in_file -= bytes_this_pass;
             piece_pos += bytes_this_pass;
             file_pos += bytes_this_pass;
-    
+
             /* if we're finishing a piece... */
             if (left_in_piece == 0)
             {
@@ -195,7 +200,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
             tr_sys_file_close(fd);
         }
         /* recheck if mismatch */
-        if(!is_recheck && partial_verification_enabled && has_mismatch_piece) 
+        if (!is_recheck && partial_verification_enabled && has_mismatch_piece)
         {
             is_recheck = true;
             continue;
@@ -209,8 +214,8 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_fl
         tor,
         fmt::format(
             partial_verification_enabled ?
-            "Partial Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)" :
-            "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
+                "Partial Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)" :
+                "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
             end - begin,
             tor->totalSize(),
             tor->totalSize() / (1 + (end - begin))));

@@ -1167,7 +1167,7 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 
 void tr_sessionSetPartialVerification(tr_session* session, bool enabled, size_t ratio, bool recheck)
 {
-    
+
     TR_ASSERT(session != nullptr);
     // Runtime modification is safe
     session->settings_.partial_verification_enabled = enabled;

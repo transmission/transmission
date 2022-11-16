@@ -796,7 +796,6 @@ public:
         return settings_.partial_verification_recheck;
     }
 
-
     [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
     {
         return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
@@ -1025,7 +1024,7 @@ private:
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeed(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled);
-    friend void tr_sessionSetPartialVerification(tr_session* session, bool enabled, size_t ratio, bool recheck)
+    friend void tr_sessionSetPartialVerification(tr_session* session, bool enabled, size_t ratio, bool recheck);
 
 public:
     /// constexpr fields

@@ -36,9 +36,17 @@ struct tr_variant;
     V(TR_KEY_incomplete_dir_enabled, incomplete_dir_enabled, bool, false, "") \
     V(TR_KEY_lpd_enabled, lpd_enabled, bool, true, "") \
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO, "") \
-    V(TR_KEY_partial_verification_enabled, partial_verification_enabled, bool, false, "Globally enable partial hash verification (for seeding homebrew and reposted torrents)") \
+    V(TR_KEY_partial_verification_enabled, \
+      partial_verification_enabled, \
+      bool, \
+      false, \
+      "Globally enable partial hash verification (for seeding homebrew and reposted torrents)") \
     V(TR_KEY_partial_verification_ratio, partial_verification_ratio, size_t, 256, "The default sampling ratio is 1/256") \
-    V(TR_KEY_partial_verification_recheck, partial_verification_recheck, bool, true, "Recheck all pieces when there is a hash mismatch for the pieces") \
+    V(TR_KEY_partial_verification_recheck, \
+      partial_verification_recheck, \
+      bool, \
+      true, \
+      "Recheck all pieces when there is a hash mismatch for the pieces") \
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "", "") \
     V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U, "") \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL, "") \

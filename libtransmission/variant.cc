@@ -55,7 +55,7 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
 {
     if (str->type == TR_STRING_TYPE_HEAP)
     {
-        delete[]((char*)(str->str.str));
+        delete[] ((char*)(str->str.str));
     }
 
     *str = StringInit;
