@@ -561,7 +561,7 @@ namespace
 int get_percent_done(tr_torrent const* tor, tr_stat const* st)
 {
     auto const seed = st->activity == TR_STATUS_SEED && tr_torrentGetSeedRatio(tor, nullptr);
-    return static_cast<int>(seed ? std::max(0.0F, st->seedRatioPercentDone) : std::max(0.0F, st->percentDone));
+    return static_cast<int>((seed ? std::max(0.0F, st->seedRatioPercentDone) : std::max(0.0F, st->percentDone)) * 100);
 }
 
 Gdk::RGBA const& get_progress_bar_color(tr_stat const& st)
