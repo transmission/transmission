@@ -1302,89 +1302,90 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     for (int i = 0; i < response->row_count; ++i)
     {
         auto const& row = response->rows[i];
+
         auto* const tor = session->torrents().get(row.info_hash);
-
-        if (tor != nullptr)
+        if (tor == nullptr)
         {
-            auto* tier = tor->torrent_announcer->getTierFromScrape(response->scrape_url);
+            continue;
+        }
 
-            if (tier == nullptr)
-            {
-                continue;
-            }
+        auto* tier = tor->torrent_announcer->getTierFromScrape(response->scrape_url);
+        if (tier == nullptr)
+        {
+            continue;
+        }
 
-            tr_logAddTraceTier(
-                tier,
-                fmt::format(
-                    "scraped url:{} "
-                    " -- "
-                    "did_connect:{} "
-                    "did_timeout:{} "
-                    "seeders:{} "
-                    "leechers:{} "
-                    "downloads:{} "
-                    "downloaders:{} "
-                    "min_request_interval:{} "
-                    "err:{} ",
-                    response->scrape_url.sv(),
-                    response->did_connect,
-                    response->did_timeout,
-                    row.seeders,
-                    row.leechers,
-                    row.downloads,
-                    row.downloaders,
-                    response->min_request_interval,
-                    std::empty(response->errmsg) ? "none"sv : response->errmsg));
+        tr_logAddTraceTier(
+            tier,
+            fmt::format(
+                "scraped url:{} "
+                " -- "
+                "did_connect:{} "
+                "did_timeout:{} "
+                "seeders:{} "
+                "leechers:{} "
+                "downloads:{} "
+                "downloaders:{} "
+                "min_request_interval:{} "
+                "err:{} ",
+                response->scrape_url.sv(),
+                response->did_connect,
+                response->did_timeout,
+                row.seeders,
+                row.leechers,
+                row.downloads,
+                row.downloaders,
+                response->min_request_interval,
+                std::empty(response->errmsg) ? "none"sv : response->errmsg));
 
-            tier->isScraping = false;
-            tier->lastScrapeTime = now;
-            tier->lastScrapeSucceeded = false;
-            tier->lastScrapeTimedOut = response->did_timeout;
+        tier->isScraping = false;
+        tier->lastScrapeTime = now;
+        tier->lastScrapeSucceeded = false;
+        tier->lastScrapeTimedOut = response->did_timeout;
 
-            if (!response->did_connect)
-            {
-                on_scrape_error(session, tier, _("Could not connect to tracker"));
-            }
-            else if (response->did_timeout)
-            {
-                on_scrape_error(session, tier, _("Tracker did not respond"));
-            }
-            else if (!std::empty(response->errmsg))
-            {
-                on_scrape_error(session, tier, response->errmsg.c_str());
-            }
-            else
-            {
-                tier->lastScrapeSucceeded = true;
-                tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
-                tier->scheduleNextScrape();
-                tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
+        if (!response->did_connect)
+        {
+            on_scrape_error(session, tier, _("Could not connect to tracker"));
+        }
+        else if (response->did_timeout)
+        {
+            on_scrape_error(session, tier, _("Tracker did not respond"));
+        }
+        else if (!std::empty(response->errmsg))
+        {
+            on_scrape_error(session, tier, response->errmsg.c_str());
+        }
+        else
+        {
+            tier->lastScrapeSucceeded = true;
+            tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
+            tier->scheduleNextScrape();
+            tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
 
-                if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
+            if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
+            {
+                if (row.seeders >= 0)
                 {
-                    if (row.seeders >= 0)
-                    {
-                        tracker->seeder_count = row.seeders;
-                    }
-
-                    if (row.leechers >= 0)
-                    {
-                        tracker->leecher_count = row.leechers;
-                    }
-
-                    if (row.downloads >= 0)
-                    {
-                        tracker->download_count = row.downloads;
-                    }
-
-                    tracker->downloader_count = row.downloaders;
-                    tracker->consecutive_failures = 0;
+                    tracker->seeder_count = row.seeders;
                 }
 
-                if (row.seeders >= 0 && row.leechers >= 0 && row.downloads >= 0)
+                if (row.leechers >= 0)
                 {
-                    publishPeerCounts(tier, row.seeders, row.leechers);
+                    tracker->leecher_count = row.leechers;
                 }
+
+                if (row.downloads >= 0)
+                {
+                    tracker->download_count = row.downloads;
+                }
+
+                tracker->downloader_count = row.downloaders;
+                tracker->consecutive_failures = 0;
+            }
+
+            if (row.seeders >= 0 && row.leechers >= 0 && row.downloads >= 0)
+            {
+                publishPeerCounts(tier, row.seeders, row.leechers);
             }
         }
     }
