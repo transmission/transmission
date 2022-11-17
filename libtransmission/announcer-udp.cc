@@ -303,7 +303,7 @@ struct tau_tracker
         return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
     }
 
-    void sendto(void const* buf, size_t buflen)
+    void sendto(std::byte const* buf, size_t buflen)
     {
         TR_ASSERT(addr_);
         if (!addr_)
@@ -367,13 +367,13 @@ struct tau_tracker
             this->key,
             fmt::format(
                 "connected {} ({} {}) -- connecting_at {}",
-                this->connection_expiration_time > now,
+                is_connected(now),
                 this->connection_expiration_time,
                 now,
                 this->connecting_at));
 
         /* also need a valid connection ID... */
-        if (addr_ && this->connection_expiration_time <= now && this->connecting_at == 0)
+        if (addr_ && !is_connected(now) && this->connecting_at == 0)
         {
             this->connecting_at = now;
             this->connection_transaction_id = tau_transaction_new();
@@ -390,10 +390,10 @@ struct tau_tracker
 
         if (timeout_reqs)
         {
-            timeout_requests();
+            timeout_requests(now);
         }
 
-        if (addr_)
+        if (addr_ && is_connected(now))
         {
             send_requests();
         }
@@ -402,6 +402,11 @@ struct tau_tracker
 private:
     using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using MaybeSockaddr = std::optional<Sockaddr>;
+
+    [[nodiscard]] constexpr bool is_connected(time_t now) const noexcept
+    {
+        return connection_id != tau_connection_t{} && now < connection_expiration_time;
+    }
 
     [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
     {
@@ -454,9 +459,8 @@ private:
 
     ///
 
-    void timeout_requests()
+    void timeout_requests(time_t now)
     {
-        time_t const now = time(nullptr);
         bool const cancel_all = this->close_at != 0 && (this->close_at <= now);
 
         if (this->connecting_at != 0 && this->connecting_at + TauRequestTtl < now)
@@ -531,7 +535,7 @@ private:
         }
     }
 
-    void send_request(void const* payload, size_t payload_len)
+    void send_request(std::byte const* payload, size_t payload_len)
     {
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
