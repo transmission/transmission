@@ -301,7 +301,7 @@ struct tr_tier
         return &trackers[*current_tracker_index_];
     }
 
-    [[nodiscard]] constexpr tr_tracker const* currentTracker() const
+    [[nodiscard]] tr_tracker const* currentTracker() const
     {
         if (!current_tracker_index_)
         {
@@ -317,14 +317,14 @@ struct tr_tier
         return !isAnnouncing && !isScraping && announceAt != 0 && announceAt <= now && !std::empty(announce_events);
     }
 
-    [[nodiscard]] constexpr bool needsToScrape(time_t now) const
+    [[nodiscard]] bool needsToScrape(time_t now) const
     {
         auto const* const tracker = currentTracker();
 
         return !isScraping && scrapeAt != 0 && scrapeAt <= now && tracker != nullptr && tracker->scrape_info != nullptr;
     }
 
-    [[nodiscard]] constexpr auto countDownloaders() const
+    [[nodiscard]] auto countDownloaders() const
     {
         auto const* const tracker = currentTracker();
 
@@ -1486,7 +1486,7 @@ static void flushCloseMessages(tr_announcer* announcer)
     stops.clear();
 }
 
-static constexpr int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
+static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
 {
     /* prefer higher-priority events */
     if (auto const priority_a = a->announce_event_priority, priority_b = b->announce_event_priority; priority_a != priority_b)
