@@ -290,7 +290,7 @@ struct tr_tier
         scrapeSoon();
     }
 
-    [[nodiscard]] tr_tracker* currentTracker()
+    [[nodiscard]] constexpr tr_tracker* currentTracker()
     {
         if (!current_tracker_index_)
         {
@@ -301,7 +301,7 @@ struct tr_tier
         return &trackers[*current_tracker_index_];
     }
 
-    [[nodiscard]] tr_tracker const* currentTracker() const
+    [[nodiscard]] constexpr tr_tracker const* currentTracker() const
     {
         if (!current_tracker_index_)
         {
@@ -317,14 +317,14 @@ struct tr_tier
         return !isAnnouncing && !isScraping && announceAt != 0 && announceAt <= now && !std::empty(announce_events);
     }
 
-    [[nodiscard]] bool needsToScrape(time_t now) const
+    [[nodiscard]] constexpr bool needsToScrape(time_t now) const
     {
         auto const* const tracker = currentTracker();
 
         return !isScraping && scrapeAt != 0 && scrapeAt <= now && tracker != nullptr && tracker->scrape_info != nullptr;
     }
 
-    [[nodiscard]] auto countDownloaders() const
+    [[nodiscard]] constexpr auto countDownloaders() const
     {
         auto const* const tracker = currentTracker();
 
