@@ -43,7 +43,23 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
 tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed);
 
-std::string_view tr_announce_event_get_string(tr_announce_event);
+[[nodiscard]] constexpr std::string_view tr_announce_event_get_string(tr_announce_event e)
+{
+    switch (e)
+    {
+    case TR_ANNOUNCE_EVENT_COMPLETED:
+        return "completed";
+
+    case TR_ANNOUNCE_EVENT_STARTED:
+        return "started";
+
+    case TR_ANNOUNCE_EVENT_STOPPED:
+        return "stopped";
+
+    default:
+        return "";
+    }
+}
 
 struct tr_announce_request
 {
