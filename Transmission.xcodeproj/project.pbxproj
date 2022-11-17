@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -2778,11 +2778,11 @@
 /* Begin PBXShellScriptBuildPhase section */
 		4DC4AA3D0B05673D0005DB76 /* Generate version file */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/CMakeLists.txt",
 			);
 			name = "Generate version file";
 			outputPaths = (
