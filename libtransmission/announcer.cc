@@ -1486,7 +1486,7 @@ static void flushCloseMessages(tr_announcer* announcer)
     stops.clear();
 }
 
-static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
+static constexpr int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
 {
     /* prefer higher-priority events */
     if (auto const priority_a = a->announce_event_priority, priority_b = b->announce_event_priority; priority_a != priority_b)
