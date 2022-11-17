@@ -778,16 +778,29 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             opts.has_local_data = has_local_data;
             torrentStart(tor, opts);
         }
-        else if (isNewTorrentASeed(tor) && !tor->session->partialVerificationEnabled())
+        else if (isNewTorrentASeed(tor))
         {
-            tor->completion.setHasAll();
-            tor->doneDate = tor->addedDate;
-            tor->recheckCompleteness();
+            if (tor->session->partialVerificationEnabled())
+            {
+                tor->startAfterVerify = do_start;
+                tr_torrentVerify(tor);
+            }
+            else
+            {
+                tor->completion.setHasAll();
+                tor->doneDate = tor->addedDate;
+                tor->recheckCompleteness();
+            }
         }
         else
         {
+            // It's not newly-added seed
+            tor->disablePartialVerificationForce = true;
+
             tor->startAfterVerify = do_start;
             tr_torrentVerify(tor);
+
+            tor->disablePartialVerificationForce = false;
         }
     }
     else if (do_start)

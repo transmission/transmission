@@ -814,6 +814,8 @@ public:
 
     bool magnetVerify = false;
 
+    bool disablePartialVerificationForce = false;
+
 private:
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
     float verify_progress_ = -1;

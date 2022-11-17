@@ -58,7 +58,7 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
 
 bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_flag)
 {
-    bool partial_verification_enabled = tor->session->partialVerificationEnabled();
+    bool partial_verification_enabled = tor->session->partialVerificationEnabled() && !tor->disablePartialVerificationForce;
     size_t partial_verification_ratio = tor->session->partialVerificationRatio();
     bool partial_verification_recheck = tor->session->partialVerificationRecheck();
     bool is_recheck = false;
