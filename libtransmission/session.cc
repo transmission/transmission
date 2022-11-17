@@ -1986,7 +1986,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
         /* is it stalled? */
         if (stalled_enabled)
         {
-            auto const idle_secs = int(difftime(now, std::max(tor->startDate, tor->activityDate)));
+            auto const idle_secs = static_cast<size_t>(difftime(now, std::max(tor->startDate, tor->activityDate)));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
             {
                 continue;
