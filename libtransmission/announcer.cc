@@ -73,7 +73,7 @@ namespace
 
 struct StopsCompare
 {
-    [[nodiscard]] static int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
+    [[nodiscard]] static constexpr int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
     {
         // primary key: volume of data transferred
         auto const ax = a->up + a->down;
@@ -110,9 +110,9 @@ struct StopsCompare
         return 0;
     }
 
-    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b) const noexcept // less than
+    [[nodiscard]] constexpr bool operator()(tr_announce_request const* one, tr_announce_request const* two) const noexcept
     {
-        return compare(a, b) < 0;
+        return compare(one, two) < 0;
     }
 };
 
@@ -318,14 +318,14 @@ struct tr_tier
         return !isAnnouncing && !isScraping && announceAt != 0 && announceAt <= now && !std::empty(announce_events);
     }
 
-    [[nodiscard]] bool needsToScrape(time_t now) const
+    [[nodiscard]] constexpr bool needsToScrape(time_t now) const
     {
         auto const* const tracker = currentTracker();
 
         return !isScraping && scrapeAt != 0 && scrapeAt <= now && tracker != nullptr && tracker->scrape_info != nullptr;
     }
 
-    [[nodiscard]] auto countDownloaders() const
+    [[nodiscard]] constexpr auto countDownloaders() const
     {
         auto const* const tracker = currentTracker();
 
