@@ -324,7 +324,7 @@ struct tr_tier
         return !isScraping && scrapeAt != 0 && scrapeAt <= now && tracker != nullptr && tracker->scrape_info != nullptr;
     }
 
-    [[nodiscard]] constexpr auto countDownloaders() const
+    [[nodiscard]] auto countDownloaders() const
     {
         auto const* const tracker = currentTracker();
 
