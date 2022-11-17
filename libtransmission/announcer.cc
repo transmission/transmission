@@ -280,7 +280,6 @@ struct tr_tier
 {
     tr_tier(tr_announcer* announcer, tr_torrent* tor_in, std::vector<tr_announce_list::tracker_info const*> const& infos)
         : tor{ tor_in }
-        , id{ next_key++ }
     {
         trackers.reserve(std::size(infos));
         for (auto const* info : infos)
@@ -432,7 +431,7 @@ struct tr_tier
     time_t lastAnnounceStartTime = 0;
     time_t lastAnnounceTime = 0;
 
-    int const id;
+    int const id = next_key++;
 
     int announce_event_priority = 0;
 
@@ -473,10 +472,8 @@ private:
         return ret;
     }
 
-    static int next_key;
+    static inline int next_key = 0;
 };
-
-int tr_tier::next_key = 0;
 
 /***
 ****
