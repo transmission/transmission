@@ -144,9 +144,9 @@ static void canReadWrapper(tr_peerIo* io_in)
     while (!done && !err)
     {
         size_t piece = 0;
-        size_t const old_len = io->readBufferSize();
-        int const ret = io->canRead(io.get(), io->userData, &piece);
-        size_t const used = old_len - io->readBufferSize();
+        auto const old_len = io->readBufferSize();
+        auto const read_state = io->canRead == nullptr ? READ_ERR : io->canRead(io.get(), io->userData, &piece);
+        auto const used = old_len - io->readBufferSize();
         auto const overhead = guessPacketOverhead(used);
 
         if (piece != 0 || piece != used)
@@ -167,7 +167,7 @@ static void canReadWrapper(tr_peerIo* io_in)
             io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
         }
 
-        switch (ret)
+        switch (read_state)
         {
         case READ_NOW:
             if (io->readBufferSize() != 0)
