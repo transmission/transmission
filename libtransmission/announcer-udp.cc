@@ -349,29 +349,16 @@ struct tau_tracker
             addr_expires_at_ = now + DnsRetryIntervalSecs;
         }
 
-        // if the address info is too old, expire it
-        if (addr_ && (closing || addr_expires_at_ <= now))
-        {
-            logtrace(this->host, "Expiring old DNS result");
-            addr_.reset();
-            addr_expires_at_ = 0;
-        }
-
         // are there any requests pending?
         if (this->isIdle())
         {
             return;
         }
 
-        // if DNS lookup *recently* failed for this host, do nothing
-        if (!addr_ && now < addr_expires_at_)
+        // update the addr if our lookup is past its shelf date
+        if (!closing && !addr_pending_dns_ && addr_expires_at_ <= now)
         {
-            return;
-        }
-
-        // if we don't have an address yet, try & get one now.
-        if (!closing && !addr_ && !addr_pending_dns_)
-        {
+            addr_.reset();
             addr_pending_dns_ = std::async(std::launch::async, lookup, this->host, this->port, this->key);
             return;
         }
@@ -399,8 +386,6 @@ struct tau_tracker
 
             auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
             this->sendto(std::data(contiguous), std::size(contiguous));
-
-            return;
         }
 
         if (timeout_reqs)
@@ -408,7 +393,7 @@ struct tau_tracker
             timeout_requests();
         }
 
-        if (addr_ && this->connection_expiration_time > now)
+        if (addr_)
         {
             send_requests();
         }
