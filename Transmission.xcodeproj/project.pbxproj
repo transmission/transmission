@@ -220,7 +220,7 @@
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
 		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.cc */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
-		A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AB883C16A399A6008FAD50 /* VDKQueue.m */; };
+		A2AB883E16A399A6008FAD50 /* VDKQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2AB883C16A399A6008FAD50 /* VDKQueue.mm */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.mm */; };
 		A2AF23C816B44FA0003BC59E /* log.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2AF23C616B44FA0003BC59E /* log.cc */; };
 		A2AF23C916B44FA0003BC59E /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AF23C716B44FA0003BC59E /* log.h */; };
@@ -976,7 +976,7 @@
 		A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "rpc-server.h"; sourceTree = "<group>"; };
 		A2AAB65B0DE0CF6200E04DDA /* rpcimpl.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rpcimpl.cc; sourceTree = "<group>"; };
 		A2AB883B16A399A6008FAD50 /* VDKQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
-		A2AB883C16A399A6008FAD50 /* VDKQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VDKQueue.m; sourceTree = "<group>"; };
+		A2AB883C16A399A6008FAD50 /* VDKQueue.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = VDKQueue.mm; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileOutlineView.mm; sourceTree = "<group>"; };
 		A2AF23C616B44FA0003BC59E /* log.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = log.cc; sourceTree = "<group>"; };
@@ -1843,7 +1843,7 @@
 			isa = PBXGroup;
 			children = (
 				A2AB883B16A399A6008FAD50 /* VDKQueue.h */,
-				A2AB883C16A399A6008FAD50 /* VDKQueue.m */,
+				A2AB883C16A399A6008FAD50 /* VDKQueue.mm */,
 			);
 			path = VDKQueue;
 			sourceTree = "<group>";
@@ -3056,7 +3056,7 @@
 				A22BAE281388040500FB022F /* NSMutableArrayAdditions.mm in Sources */,
 				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.mm in Sources */,
 				A234EA541453563B000F3E97 /* NSImageAdditions.mm in Sources */,
-				A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */,
+				A2AB883E16A399A6008FAD50 /* VDKQueue.mm in Sources */,
 				A2451E6916ACE4EB00586E0E /* FileRenameSheetController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
