@@ -58,7 +58,14 @@ struct tr_tracker_event
 
 using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
 
-std::shared_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
+class tr_announcer
+{
+public:
+    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session);
+    virtual ~tr_announcer() = default;
+};
+
+std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
 /**
 ***  For torrent customers
