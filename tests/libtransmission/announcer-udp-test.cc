@@ -10,9 +10,12 @@
 
 #include <fmt/format.h>
 
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
+
 #include "transmission.h"
 
 #include "announcer.h"
+#include "announcer-common.h"
 #include "crypto-utils.h"
 #include "peer-mgr.h" // for tr_pex
 #include "timer-ev.h"
