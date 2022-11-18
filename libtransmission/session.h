@@ -58,7 +58,6 @@ class tr_rpc_server;
 class tr_session_thread;
 class tr_web;
 struct struct_utp_context;
-struct tr_announcer;
 struct tr_variant;
 
 namespace libtransmission

@@ -140,8 +140,9 @@ static void flushCloseMessages(tr_announcer* announcer);
 /**
  * "global" (per-tr_session) fields
  */
-struct tr_announcer
+class tr_announcer
 {
+public:
     explicit tr_announcer(tr_session* session_in)
         : session{ session_in }
         , upkeep_timer{ session_in->timerMaker().create() }

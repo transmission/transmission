@@ -20,7 +20,7 @@
 #include "interned-string.h"
 #include "net.h"
 
-struct tr_announcer;
+class tr_announcer;
 struct tr_torrent_announcer;
 
 /**
@@ -66,9 +66,9 @@ std::shared_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
 struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback callback, void* callback_data);
 
-void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
+void tr_announcerResetTorrent(tr_announcer*, tr_torrent*);
 
-void tr_announcerRemoveTorrent(struct tr_announcer*, tr_torrent*);
+void tr_announcerRemoveTorrent(tr_announcer*, tr_torrent*);
 
 void tr_announcerChangeMyPort(tr_torrent*);
 
