@@ -1151,7 +1151,7 @@ public:
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
     // depends-on: settings_, torrents_, web_, announcer_udp_
-    struct tr_announcer* announcer = nullptr;
+    std::shared_ptr<tr_announcer> announcer_ = tr_announcerCreate(this);
 
     // depends-on: public_peer_port_, udp_core_, dht_mediator_
     std::unique_ptr<tr_dht> dht_;

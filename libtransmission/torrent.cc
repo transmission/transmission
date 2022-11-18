@@ -1263,7 +1263,7 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_peerMgrRemoveTorrent(tor);
 
-    tr_announcerRemoveTorrent(session->announcer, tor);
+    tr_announcerRemoveTorrent(session->announcer_.get(), tor);
 
     session->torrents().remove(tor, tr_time());
 
@@ -1991,7 +1991,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
     }
 
     /* tell the announcer to reload this torrent's tracker list */
-    tr_announcerResetTorrent(this->session->announcer, this);
+    tr_announcerResetTorrent(this->session->announcer_.get(), this);
 
     return true;
 }

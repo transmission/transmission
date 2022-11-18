@@ -58,13 +58,7 @@ struct tr_tracker_event
 
 using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
 
-/**
-***  Session ctor/dtor
-**/
-
-void tr_announcerInit(tr_session*);
-
-void tr_announcerClose(tr_session*);
+std::shared_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
 /**
 ***  For torrent customers

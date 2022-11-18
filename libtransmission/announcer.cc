@@ -135,6 +135,8 @@ struct tr_scrape_info
     }
 };
 
+static void flushCloseMessages(tr_announcer* announcer);
+
 /**
  * "global" (per-tr_session) fields
  */
@@ -148,7 +150,11 @@ struct tr_announcer
         upkeep_timer->startRepeating(UpkeepInterval);
     }
 
-    ~tr_announcer() = default;
+    ~tr_announcer()
+    {
+        flushCloseMessages(this);
+    }
+
     tr_announcer(tr_announcer&&) = delete;
     tr_announcer(tr_announcer const&) = delete;
     tr_announcer& operator=(tr_announcer&&) = delete;
@@ -167,6 +173,13 @@ struct tr_announcer
     int const key = tr_rand_int(INT_MAX);
 };
 
+std::shared_ptr<tr_announcer> tr_announcerCreate(tr_session* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return std::make_shared<tr_announcer>(session);
+}
+
 static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_interned_string url)
 {
     if (std::empty(url))
@@ -177,27 +190,6 @@ static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_int
     auto& scrapes = announcer->scrape_info;
     auto const [it, is_new] = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
     return &it->second;
-}
-
-void tr_announcerInit(tr_session* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    auto* a = new tr_announcer{ session };
-
-    session->announcer = a;
-}
-
-static void flushCloseMessages(tr_announcer* announcer);
-
-void tr_announcerClose(tr_session* session)
-{
-    tr_announcer* announcer = session->announcer;
-
-    flushCloseMessages(announcer);
-
-    session->announcer = nullptr;
-    delete announcer;
 }
 
 /***
@@ -673,7 +665,7 @@ tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callbac
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto* ta = new tr_torrent_announcer(tor->session->announcer, tor);
+    auto* ta = new tr_torrent_announcer(tor->session->announcer_.get(), tor);
     ta->callback = callback;
     ta->callback_data = callback_data;
     return ta;
@@ -962,7 +954,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
 static void onAnnounceDone(tr_announce_response const* response, void* vdata)
 {
     auto* const data = static_cast<announce_data*>(vdata);
-    tr_announcer* announcer = data->session->announcer;
+    auto* const announcer = data->session->announcer_.get();
 
     tr_tier* const tier = getTier(announcer, response->info_hash, data->tier_id);
     if (tier == nullptr)
@@ -1297,7 +1289,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 {
     auto const now = tr_time();
     auto* const session = static_cast<tr_session*>(vsession);
-    auto* const announcer = session->announcer;
+    auto* const announcer = session->announcer_.get();
 
     for (int i = 0; i < response->row_count; ++i)
     {
@@ -1739,7 +1731,7 @@ void tr_announcerResetTorrent(tr_announcer* /*announcer*/, tr_torrent* tor)
 {
     // make a new tr_announcer_tier
     auto* const older = tor->torrent_announcer;
-    tor->torrent_announcer = new tr_torrent_announcer(tor->session->announcer, tor);
+    tor->torrent_announcer = new tr_torrent_announcer{ tor->session->announcer_.get(), tor };
     auto* const newer = tor->torrent_announcer;
 
     // copy the tracker counts into the new replacementa
