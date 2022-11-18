@@ -22,6 +22,7 @@
 #include "net.h"
 
 class tr_announcer;
+class tr_announcer_udp;
 struct tr_torrent_announcer;
 
 /**
@@ -62,7 +63,7 @@ using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* ev
 class tr_announcer
 {
 public:
-    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session);
+    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session, tr_announcer_udp&);
     virtual ~tr_announcer() = default;
 
     virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;

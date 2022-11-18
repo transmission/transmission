@@ -138,8 +138,9 @@ struct tr_scrape_info
 class tr_announcer_impl final : public tr_announcer
 {
 public:
-    explicit tr_announcer_impl(tr_session* session_in)
+    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp)
         : session{ session_in }
+        , announcer_udp_{ announcer_udp }
         , upkeep_timer_{ session_in->timerMaker().create() }
     {
         upkeep_timer_->setCallback([this]() { this->upkeep(); });
@@ -162,7 +163,6 @@ public:
     void resetTorrent(tr_torrent* tor) override;
     void removeTorrent(tr_torrent* tor) override;
 
-    void flushCloseMessages();
     void upkeep();
 
     void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
@@ -179,11 +179,57 @@ public:
         return &it->second;
     }
 
+    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response)
+    {
+        if (auto const scrape_sv = request.scrape_url.sv();
+            tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
+        {
+            tr_tracker_http_scrape(session, request, std::move(on_response));
+        }
+        else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
+        {
+            announcer_udp_.scrape(request, std::move(on_response));
+        }
+        else
+        {
+            tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
+        }
+    }
+
+    void announce(tr_announce_request const& request, tr_announce_response_func on_response)
+    {
+        if (auto const announce_sv = request.announce_url.sv();
+            tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
+        {
+            tr_tracker_http_announce(session, request, std::move(on_response));
+        }
+        else if (tr_strvStartsWith(announce_sv, "udp://"sv))
+        {
+            announcer_udp_.announce(request, std::move(on_response));
+        }
+        else
+        {
+            tr_logAddWarn(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", announce_sv)));
+        }
+    }
+
     tr_session* const session;
 
     int const key = tr_rand_int(INT_MAX);
 
 private:
+    void flushCloseMessages()
+    {
+        for (auto& stop : stops_)
+        {
+            announce(stop, {});
+        }
+
+        stops_.clear();
+    }
+
+    tr_announcer_udp& announcer_udp_;
+
     std::map<tr_interned_string, tr_scrape_info> scrape_info_;
 
     std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
@@ -191,11 +237,11 @@ private:
     std::set<tr_announce_request, StopsCompare> stops_;
 };
 
-std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session)
+std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
 {
     TR_ASSERT(session != nullptr);
 
-    return std::make_unique<tr_announcer_impl>(session);
+    return std::make_unique<tr_announcer_impl>(session, announcer_udp);
 }
 
 /***
@@ -1126,38 +1172,6 @@ void tr_announcer_impl::onAnnounceDone(
     }
 }
 
-static void announce_request_delegate(
-    tr_announcer_impl* announcer,
-    tr_announce_request const& request,
-    tr_announce_response_func on_response)
-{
-    tr_session* session = announcer->session;
-
-#if 0
-
-    fprintf(stderr, "ANNOUNCE: event %s isPartialSeed %d port %d key %d numwant %d up %" PRIu64 " down %" PRIu64
-        " corrupt %" PRIu64 " left %" PRIu64 " url [%s] tracker_id_str [%s] peer_id [%20.20s]\n",
-        tr_announce_event_get_string(request->event), (int)request->partial_seed, (int)request->port, request->key,
-        request->numwant, request->up, request->down, request->corrupt, request->leftUntilComplete, request->url,
-        request->tracker_id_str, request->peer_id);
-
-#endif
-
-    if (auto const announce_sv = request.announce_url.sv();
-        tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
-    {
-        tr_tracker_http_announce(session, request, std::move(on_response));
-    }
-    else if (tr_strvStartsWith(announce_sv, "udp://"sv))
-    {
-        session->announcer_udp_->announce(request, std::move(on_response));
-    }
-    else
-    {
-        tr_logAddWarn(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", announce_sv)));
-    }
-}
-
 static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
 {
     TR_ASSERT(!tier->isAnnouncing);
@@ -1176,8 +1190,7 @@ static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
     auto tier_id = tier->id;
     auto is_running_on_success = tor->isRunning;
 
-    announce_request_delegate(
-        announcer,
+    announcer->announce(
         req,
         [announcer, tier_id, event, is_running_on_success](tr_announce_response const& response)
         { announcer->onAnnounceDone(tier_id, event, is_running_on_success, response); });
@@ -1367,29 +1380,6 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
     checkMultiscrapeMax(this, response);
 }
 
-static void scrape_request_delegate(
-    tr_announcer_impl* announcer,
-    tr_scrape_request const& request,
-    tr_scrape_response_func on_response)
-{
-    tr_session* session = announcer->session;
-
-    auto const scrape_sv = request.scrape_url.sv();
-
-    if (tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
-    {
-        tr_tracker_http_scrape(session, request, std::move(on_response));
-    }
-    else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
-    {
-        session->announcer_udp_->scrape(request, std::move(on_response));
-    }
-    else
-    {
-        tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
-    }
-}
-
 static void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tiers)
 {
     auto const now = tr_time();
@@ -1445,21 +1435,8 @@ static void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> cons
     /* send the requests we just built */
     for (size_t i = 0; i < request_count; ++i)
     {
-        scrape_request_delegate(
-            announcer,
-            requests[i],
-            [announcer](tr_scrape_response const& response) { announcer->onScrapeDone(response); });
+        announcer->scrape(requests[i], [announcer](tr_scrape_response const& response) { announcer->onScrapeDone(response); });
     }
-}
-
-void tr_announcer_impl::flushCloseMessages()
-{
-    for (auto& stop : stops_)
-    {
-        announce_request_delegate(this, stop, {});
-    }
-
-    stops_.clear();
 }
 
 static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
@@ -1562,7 +1539,7 @@ void tr_announcer_impl::upkeep()
         scrapeAndAnnounceMore(this);
     }
 
-    session->announcer_udp_->upkeep();
+    announcer_udp_.upkeep();
 }
 
 /***
