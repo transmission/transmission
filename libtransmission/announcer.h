@@ -66,6 +66,8 @@ public:
     virtual ~tr_announcer() = default;
 
     virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;
+    virtual void startTorrent(tr_torrent* tor) = 0;
+    virtual void stopTorrent(tr_torrent* tor) = 0;
     virtual void resetTorrent(tr_torrent* tor) = 0;
     virtual void removeTorrent(tr_torrent* tor) = 0;
 };
@@ -82,8 +84,6 @@ bool tr_announcerCanManualAnnounce(tr_torrent const*);
 
 void tr_announcerManualAnnounce(tr_torrent*);
 
-void tr_announcerTorrentStarted(tr_torrent*);
-void tr_announcerTorrentStopped(tr_torrent*);
 void tr_announcerTorrentCompleted(tr_torrent*);
 
 enum

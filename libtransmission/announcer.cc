@@ -157,6 +157,8 @@ public:
     tr_announcer_impl& operator=(tr_announcer_impl const&) = delete;
 
     tr_torrent_announcer* addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data) override;
+    void startTorrent(tr_torrent* tor) override;
+    void stopTorrent(tr_torrent* tor) override;
     void resetTorrent(tr_torrent* tor) override;
     void removeTorrent(tr_torrent* tor) override;
 
@@ -166,14 +168,23 @@ public:
     void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
     void onScrapeDone(tr_scrape_response const& response);
 
-    std::map<tr_interned_string, tr_scrape_info> scrape_info;
+    [[nodiscard]] tr_scrape_info* scrape_info(tr_interned_string url)
+    {
+        if (std::empty(url))
+        {
+            return nullptr;
+        }
+
+        auto const [it, is_new] = scrape_info_.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+        return &it->second;
+    }
 
     tr_session* const session;
 
     int const key = tr_rand_int(INT_MAX);
 
 private:
-    time_t tau_upkeep_at = 0;
+    std::map<tr_interned_string, tr_scrape_info> scrape_info_;
 
     std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
 
@@ -187,18 +198,6 @@ std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session)
     return std::make_unique<tr_announcer_impl>(session);
 }
 
-static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer_impl* announcer, tr_interned_string url)
-{
-    if (std::empty(url))
-    {
-        return nullptr;
-    }
-
-    auto& scrapes = announcer->scrape_info;
-    auto const [it, is_new] = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
-    return &it->second;
-}
-
 /***
 ****
 ***/
@@ -210,7 +209,7 @@ struct tr_tracker
         : host{ info.host }
         , announce_url{ info.announce }
         , sitename{ info.sitename }
-        , scrape_info{ std::empty(info.scrape) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape) }
+        , scrape_info{ std::empty(info.scrape) ? nullptr : announcer->scrape_info(info.scrape) }
         , id{ info.id }
     {
     }
@@ -801,7 +800,7 @@ static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t anno
     }
 }
 
-void tr_announcerTorrentStarted(tr_torrent* tor)
+void tr_announcer_impl::startTorrent(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STARTED, tr_time());
 }
@@ -811,7 +810,7 @@ void tr_announcerManualAnnounce(tr_torrent* tor)
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_NONE, tr_time());
 }
 
-void tr_announcerTorrentStopped(tr_torrent* tor)
+void tr_announcer_impl::stopTorrent(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STOPPED, tr_time());
 }
@@ -823,7 +822,7 @@ void tr_announcerTorrentCompleted(tr_torrent* tor)
 
 void tr_announcerChangeMyPort(tr_torrent* tor)
 {
-    tr_announcerTorrentStarted(tor);
+    torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STARTED, tr_time());
 }
 
 /***
@@ -1239,7 +1238,7 @@ static void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response
     }
 
     auto const& url = response.scrape_url;
-    auto* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
+    auto* const scrape_info = announcer->scrape_info(url);
     if (scrape_info == nullptr)
     {
         return;
@@ -1554,14 +1553,11 @@ void tr_announcer_impl::upkeep()
 {
     auto const lock = session->unique_lock();
 
-    auto const is_closing = session->isClosing();
-    auto const now = tr_time();
-
-    /* maybe send out some "stopped" messages for closed torrents */
+    // maybe send out some "stopped" messages for closed torrents
     flushCloseMessages();
 
-    /* maybe kick off some scrapes / announces whose time has come */
-    if (!is_closing)
+    // maybe kick off some scrapes / announces whose time has come
+    if (!session->isClosing())
     {
         scrapeAndAnnounceMore(this);
     }

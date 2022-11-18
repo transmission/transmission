@@ -1311,7 +1311,7 @@ static void torrentStartImpl(tr_torrent* const tor)
     tor->finishedSeedingByIdle = false;
 
     tr_torrentResetTransferStats(tor);
-    tr_announcerTorrentStarted(tor);
+    tor->session->announcer_->startTorrent(tor);
     tor->lpdAnnounceAt = now;
     tr_peerMgrStartTorrent(tor);
 }
@@ -1495,7 +1495,7 @@ static void stopTorrent(tr_torrent* const tor)
     tor->session->verifyRemove(tor);
 
     tr_peerMgrStopTorrent(tor);
-    tr_announcerTorrentStopped(tor);
+    tor->session->announcer_->stopTorrent(tor);
 
     tor->session->closeTorrentFiles(tor);
 
