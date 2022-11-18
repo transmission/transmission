@@ -962,17 +962,17 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
 static void onAnnounceDone(tr_announce_response const* response, void* vdata)
 {
     auto* const data = static_cast<announce_data*>(vdata);
-
     tr_announcer* announcer = data->session->announcer;
-    tr_tier* tier = getTier(announcer, response->info_hash, data->tier_id);
-    time_t const now = tr_time();
-    tr_announce_event const event = data->event;
 
+    tr_tier* const tier = getTier(announcer, response->info_hash, data->tier_id);
     if (tier == nullptr)
     {
         delete data;
         return;
     }
+
+    auto const now = tr_time();
+    tr_announce_event const event = data->event;
 
     tr_logAddTraceTier(
         tier,
@@ -1309,7 +1309,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
             continue;
         }
 
-        auto* tier = tor->torrent_announcer->getTierFromScrape(response->scrape_url);
+        auto* const tier = tor->torrent_announcer->getTierFromScrape(response->scrape_url);
         if (tier == nullptr)
         {
             continue;
