@@ -159,6 +159,7 @@ public:
     tr_announcer_impl& operator=(tr_announcer_impl&&) = delete;
     tr_announcer_impl& operator=(tr_announcer_impl const&) = delete;
 
+    tr_torrent_announcer* addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data) override;
     void resetTorrent(tr_torrent* tor) override;
     void removeTorrent(tr_torrent* tor) override;
 
@@ -664,11 +665,11 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vecto
 ****
 ***/
 
-tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data)
+tr_torrent_announcer* tr_announcer_impl::addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto* ta = new tr_torrent_announcer(dynamic_cast<tr_announcer_impl*>(tor->session->announcer_.get()), tor);
+    auto* ta = new tr_torrent_announcer{ this, tor };
     ta->callback = callback;
     ta->callback_data = callback_data;
     return ta;

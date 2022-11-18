@@ -762,7 +762,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         }
     }
 
-    tor->torrent_announcer = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
+    tor->torrent_announcer = session->announcer_->addTorrent(tor, onTrackerResponse, nullptr);
 
     if (is_new_torrent)
     {
