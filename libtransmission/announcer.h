@@ -63,6 +63,8 @@ class tr_announcer
 public:
     [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session);
     virtual ~tr_announcer() = default;
+
+    virtual void removeTorrent(tr_torrent* tor) = 0;
 };
 
 std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
@@ -74,8 +76,6 @@ std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback callback, void* callback_data);
 
 void tr_announcerResetTorrent(tr_announcer*, tr_torrent*);
-
-void tr_announcerRemoveTorrent(tr_announcer*, tr_torrent*);
 
 void tr_announcerChangeMyPort(tr_torrent*);
 

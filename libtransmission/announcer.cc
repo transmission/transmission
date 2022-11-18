@@ -159,6 +159,8 @@ public:
     tr_announcer_impl& operator=(tr_announcer_impl&&) = delete;
     tr_announcer_impl& operator=(tr_announcer_impl const&) = delete;
 
+    void removeTorrent(tr_torrent* tor) override;
+
     void flushCloseMessages();
     void upkeep();
 
@@ -865,10 +867,9 @@ static tr_announce_request* announce_request_new(
     return req;
 }
 
-void tr_announcerRemoveTorrent(tr_announcer* announcer_in, tr_torrent* tor)
+void tr_announcer_impl::removeTorrent(tr_torrent* tor)
 {
     // FIXME(ckerr)
-    auto* const announcer = dynamic_cast<tr_announcer_impl*>(announcer_in);
     auto* const ta = tor->torrent_announcer;
     if (ta == nullptr)
     {
@@ -880,15 +881,15 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer_in, tr_torrent* tor)
         if (tier.isRunning)
         {
             auto const e = TR_ANNOUNCE_EVENT_STOPPED;
-            auto* req = announce_request_new(announcer, tor, &tier, e);
+            auto* req = announce_request_new(this, tor, &tier, e);
 
-            if (announcer->stops.count(req) != 0U)
+            if (stops.count(req) != 0U)
             {
                 delete req;
             }
             else
             {
-                announcer->stops.insert(req);
+                stops.insert(req);
             }
         }
     }

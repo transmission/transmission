@@ -1263,7 +1263,7 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_peerMgrRemoveTorrent(tor);
 
-    tr_announcerRemoveTorrent(session->announcer_.get(), tor);
+    session->announcer_->removeTorrent(tor);
 
     session->torrents().remove(tor, tr_time());
 
