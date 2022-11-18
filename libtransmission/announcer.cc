@@ -159,6 +159,7 @@ public:
     tr_announcer_impl& operator=(tr_announcer_impl&&) = delete;
     tr_announcer_impl& operator=(tr_announcer_impl const&) = delete;
 
+    void resetTorrent(tr_torrent* tor) override;
     void removeTorrent(tr_torrent* tor) override;
 
     void flushCloseMessages();
@@ -1729,11 +1730,11 @@ tr_tracker_view tr_announcerTracker(tr_torrent const* tor, size_t nth)
 
 // called after the torrent's announceList was rebuilt --
 // so announcer needs to update the tr_tier / tr_trackers to match
-void tr_announcerResetTorrent(tr_announcer* announcer, tr_torrent* tor)
+void tr_announcer_impl::resetTorrent(tr_torrent* tor)
 {
     // make a new tr_announcer_tier
     auto* const older = tor->torrent_announcer;
-    tor->torrent_announcer = new tr_torrent_announcer{ dynamic_cast<tr_announcer_impl*>(announcer), tor };
+    tor->torrent_announcer = new tr_torrent_announcer{ this, tor };
     auto* const newer = tor->torrent_announcer;
 
     // copy the tracker counts into the new replacementa

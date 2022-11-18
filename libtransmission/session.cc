@@ -1501,7 +1501,7 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
         {
             if (tor->isPublic())
             {
-                tr_announcerResetTorrent(announcer_.get(), tor);
+                announcer_->resetTorrent(tor);
             }
         }
     }

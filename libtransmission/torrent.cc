@@ -1991,7 +1991,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
     }
 
     /* tell the announcer to reload this torrent's tracker list */
-    tr_announcerResetTorrent(this->session->announcer_.get(), this);
+    this->session->announcer_->resetTorrent(this);
 
     return true;
 }
