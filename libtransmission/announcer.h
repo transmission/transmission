@@ -24,34 +24,34 @@ struct tr_announcer;
 struct tr_torrent_announcer;
 
 /**
- * ***  Tracker Publish / Subscribe
- * **/
-
-enum TrackerEventType
-{
-    TR_TRACKER_WARNING,
-    TR_TRACKER_ERROR,
-    TR_TRACKER_ERROR_CLEAR,
-    TR_TRACKER_PEERS,
-    TR_TRACKER_COUNTS,
-};
+***  Tracker Publish / Subscribe
+**/
 
 struct tr_pex;
 
 /** @brief Notification object to tell listeners about announce or scrape occurrences */
 struct tr_tracker_event
 {
-    /* what type of event this is */
-    TrackerEventType messageType;
+    enum class Type
+    {
+        Error,
+        ErrorClear,
+        Counts,
+        Peers,
+        Warning,
+    };
 
-    /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
+    // What type of event this is
+    Type type;
+
+    // for Warning and Error events
     std::string_view text;
     tr_interned_string announce_url;
 
-    /* for TR_TRACKER_PEERS */
+    // for Peers events
     std::vector<tr_pex> pex;
 
-    /* for TR_TRACKER_PEERS and TR_TRACKER_COUNTS */
+    // for Peers and Counts events
     int leechers;
     int seeders;
 };

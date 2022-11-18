@@ -462,14 +462,14 @@ static void tr_torrentClearError(tr_torrent* tor)
 
 static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
 {
-    switch (event->messageType)
+    switch (event->type)
     {
-    case TR_TRACKER_PEERS:
+    case tr_tracker_event::Type::Peers:
         tr_logAddTraceTor(tor, fmt::format("Got {} peers from tracker", std::size(event->pex)));
         tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, std::data(event->pex), std::size(event->pex));
         break;
 
-    case TR_TRACKER_COUNTS:
+    case tr_tracker_event::Type::Counts:
         if (tor->isPrivate() && (event->leechers == 0))
         {
             tr_peerMgrSetSwarmIsAllSeeds(tor);
@@ -477,20 +477,20 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
 
         break;
 
-    case TR_TRACKER_WARNING:
+    case tr_tracker_event::Type::Warning:
         tr_logAddWarnTor(tor, fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", event->text)));
         tor->error = TR_STAT_TRACKER_WARNING;
         tor->error_announce_url = event->announce_url;
         tor->error_string = event->text;
         break;
 
-    case TR_TRACKER_ERROR:
+    case tr_tracker_event::Type::Error:
         tor->error = TR_STAT_TRACKER_ERROR;
         tor->error_announce_url = event->announce_url;
         tor->error_string = event->text;
         break;
 
-    case TR_TRACKER_ERROR_CLEAR:
+    case tr_tracker_event::Type::ErrorClear:
         if (tor->error != TR_STAT_LOCAL_ERROR)
         {
             tr_torrentClearError(tor);

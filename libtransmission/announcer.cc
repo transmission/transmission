@@ -596,14 +596,14 @@ static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_ha
 ****  PUBLISH
 ***/
 
-static void publishMessage(tr_tier* tier, std::string_view msg, TrackerEventType type)
+static void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event::Type type)
 {
     if (tier != nullptr && tier->tor != nullptr && tier->tor->torrent_announcer != nullptr &&
         tier->tor->torrent_announcer->callback != nullptr)
     {
         auto* const ta = tier->tor->torrent_announcer;
         auto event = tr_tracker_event{};
-        event.messageType = type;
+        event.type = type;
         event.text = msg;
 
         if (auto const* const current_tracker = tier->currentTracker(); current_tracker != nullptr)
@@ -617,17 +617,17 @@ static void publishMessage(tr_tier* tier, std::string_view msg, TrackerEventType
 
 static void publishErrorClear(tr_tier* tier)
 {
-    publishMessage(tier, ""sv, TR_TRACKER_ERROR_CLEAR);
+    publishMessage(tier, ""sv, tr_tracker_event::Type::ErrorClear);
 }
 
 static void publishWarning(tr_tier* tier, std::string_view msg)
 {
-    publishMessage(tier, msg, TR_TRACKER_WARNING);
+    publishMessage(tier, msg, tr_tracker_event::Type::Warning);
 }
 
 static void publishError(tr_tier* tier, std::string_view msg)
 {
-    publishMessage(tier, msg, TR_TRACKER_ERROR);
+    publishMessage(tier, msg, tr_tracker_event::Type::Error);
 }
 
 static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
@@ -635,7 +635,7 @@ static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
         auto e = tr_tracker_event{};
-        e.messageType = TR_TRACKER_COUNTS;
+        e.type = tr_tracker_event::Type::Counts;
         e.seeders = seeders;
         e.leechers = leechers;
         tr_logAddDebugTier(tier, fmt::format("peer counts: {} seeders, {} leechers.", seeders, leechers));
@@ -649,7 +649,7 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vecto
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
         auto e = tr_tracker_event{};
-        e.messageType = TR_TRACKER_PEERS;
+        e.type = tr_tracker_event::Type::Peers;
         e.seeders = seeders;
         e.leechers = leechers;
         e.pex = pex;
