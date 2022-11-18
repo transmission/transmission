@@ -12,6 +12,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t
 #include <ctime>
+#include <functional>
 #include <string_view>
 #include <vector>
 
@@ -64,7 +65,7 @@ public:
     [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session);
     virtual ~tr_announcer() = default;
 
-    virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data);
+    virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;
     virtual void resetTorrent(tr_torrent* tor) = 0;
     virtual void removeTorrent(tr_torrent* tor) = 0;
 };
@@ -115,13 +116,14 @@ enum tr_announce_event
 
 struct tr_announce_request;
 struct tr_announce_response;
-using tr_announce_response_func = void (*)(tr_announce_response const* response, void* userdata);
 
 struct tr_scrape_request;
 struct tr_scrape_response;
-using tr_scrape_response_func = void (*)(tr_scrape_response const* response, void* user_data);
 
 /// UDP ANNOUNCER
+
+using tr_scrape_response_func = std::function<void(tr_scrape_response const&)>;
+using tr_announce_response_func = std::function<void(tr_announce_response const&)>;
 
 class tr_announcer_udp
 {
@@ -140,9 +142,9 @@ public:
 
     [[nodiscard]] virtual bool isIdle() const noexcept = 0;
 
-    virtual void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) = 0;
+    virtual void announce(tr_announce_request const& request, tr_announce_response_func on_response) = 0;
 
-    virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) = 0;
+    virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) = 0;
 
     virtual void upkeep() = 0;
 

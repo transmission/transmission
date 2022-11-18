@@ -46,19 +46,18 @@ using namespace std::literals;
 *****
 ****/
 
-static std::string_view get_event_string(tr_announce_request const* req)
+[[nodiscard]] static constexpr std::string_view get_event_string(tr_announce_request const& req)
 {
-    return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused"sv :
-                                                                            tr_announce_event_get_string(req->event);
+    return req.partial_seed && (req.event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused"sv : tr_announce_event_get_string(req.event);
 }
 
-static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_request const* req)
+static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_request const& req)
 {
     url.clear();
     auto out = std::back_inserter(url);
 
     auto escaped_info_hash = tr_urlbuf{};
-    tr_urlPercentEncode(std::back_inserter(escaped_info_hash), req->info_hash);
+    tr_urlPercentEncode(std::back_inserter(escaped_info_hash), req.info_hash);
 
     fmt::format_to(
         out,
@@ -73,25 +72,25 @@ static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_annou
         "&key={key}"
         "&compact=1"
         "&supportcrypto=1",
-        fmt::arg("url", req->announce_url),
-        fmt::arg("sep", tr_strvContains(req->announce_url.sv(), '?') ? '&' : '?'),
+        fmt::arg("url", req.announce_url),
+        fmt::arg("sep", tr_strvContains(req.announce_url.sv(), '?') ? '&' : '?'),
         fmt::arg("info_hash", std::data(escaped_info_hash)),
-        fmt::arg("peer_id", std::string_view{ std::data(req->peer_id), std::size(req->peer_id) }),
-        fmt::arg("port", req->port.host()),
-        fmt::arg("uploaded", req->up),
-        fmt::arg("downloaded", req->down),
-        fmt::arg("left", req->leftUntilComplete),
-        fmt::arg("numwant", req->numwant),
-        fmt::arg("key", req->key));
+        fmt::arg("peer_id", std::string_view{ std::data(req.peer_id), std::size(req.peer_id) }),
+        fmt::arg("port", req.port.host()),
+        fmt::arg("uploaded", req.up),
+        fmt::arg("downloaded", req.down),
+        fmt::arg("left", req.leftUntilComplete),
+        fmt::arg("numwant", req.numwant),
+        fmt::arg("key", req.key));
 
     if (session->encryptionMode() == TR_ENCRYPTION_REQUIRED)
     {
         fmt::format_to(out, "&requirecrypto=1");
     }
 
-    if (req->corrupt != 0)
+    if (req.corrupt != 0)
     {
-        fmt::format_to(out, "&corrupt={}", req->corrupt);
+        fmt::format_to(out, "&corrupt={}", req.corrupt);
     }
 
     if (auto const str = get_event_string(req); !std::empty(str))
@@ -99,9 +98,9 @@ static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_annou
         fmt::format_to(out, "&event={}", str);
     }
 
-    if (!std::empty(req->tracker_id))
+    if (!std::empty(req.tracker_id))
     {
-        fmt::format_to(out, "&trackerid={}", req->tracker_id);
+        fmt::format_to(out, "&trackerid={}", req.tracker_id);
     }
 }
 
@@ -298,11 +297,17 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
 struct http_announce_data
 {
+    http_announce_data(tr_sha1_digest_t info_hash_in, tr_announce_response_func on_response_in, std::string_view log_name_in)
+        : info_hash{ info_hash_in }
+        , on_response{ std::move(on_response_in) }
+        , log_name{ log_name_in }
+    {
+    }
+
     tr_sha1_digest_t info_hash = {};
     std::optional<tr_announce_response> previous_response;
 
-    tr_announce_response_func response_func = nullptr;
-    void* response_func_user_data = nullptr;
+    tr_announce_response_func on_response;
     bool http_success = false;
 
     uint8_t requests_sent_count = {};
@@ -352,7 +357,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 
     // If another request already succeeded (or we don't have a registered callback),
     // skip processing this response:
-    if (!data->http_success && data->response_func != nullptr)
+    if (!data->http_success && data->on_response)
     {
         tr_announce_response response;
         response.info_hash = data->info_hash;
@@ -361,7 +366,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 
         if (data->http_success)
         {
-            data->response_func(&response, data->response_func_user_data);
+            data->on_response(response);
         }
         else if (data->requests_answered_count == data->requests_sent_count)
         {
@@ -374,7 +379,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
                 response_used = &*data->previous_response;
             }
 
-            data->response_func(response_used, data->response_func_user_data);
+            data->on_response(*response_used);
         }
         else
         {
@@ -399,15 +404,10 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 
 void tr_tracker_http_announce(
     tr_session const* session,
-    tr_announce_request const* request,
-    tr_announce_response_func response_func,
-    void* response_func_user_data)
+    tr_announce_request const& request,
+    tr_announce_response_func on_response)
 {
-    auto* const d = new http_announce_data();
-    d->response_func = response_func;
-    d->response_func_user_data = response_func_user_data;
-    d->info_hash = request->info_hash;
-    d->log_name = request->log_name;
+    auto* const d = new http_announce_data{ request.info_hash, std::move(on_response), request.log_name };
 
     /* There are two alternative techniques for announcing both IPv4 and
        IPv6 addresses. Previous version of BEP-7 suggests adding "ipv4="
@@ -431,7 +431,7 @@ void tr_tracker_http_announce(
 
     auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& opt)
     {
-        tr_logAddTrace(fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, opt.url), request->log_name);
+        tr_logAddTrace(fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, opt.url), request.log_name);
         session->fetch(std::move(opt));
     };
 
@@ -606,25 +606,50 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     }
 }
 
-struct scrape_data
+class scrape_data
 {
-    tr_scrape_response response = {};
-    tr_scrape_response_func response_func = nullptr;
-    void* response_func_user_data = nullptr;
-    std::string log_name;
+public:
+    scrape_data(tr_scrape_response_func response_func, std::string_view log_name)
+        : response_func_{ std::move(response_func) }
+        , log_name_{ log_name }
+    {
+    }
+
+    [[nodiscard]] constexpr auto& response() noexcept
+    {
+        return response_;
+    }
+
+    [[nodiscard]] constexpr auto const& log_name() const noexcept
+    {
+        return log_name_;
+    }
+
+    void invoke_callback()
+    {
+        if (response_func_)
+        {
+            response_func_(response_);
+        }
+    }
+
+private:
+    tr_scrape_response response_ = {};
+    tr_scrape_response_func response_func_ = {};
+    std::string log_name_;
 };
 
 static void onScrapeDone(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
-    auto* const data = static_cast<struct scrape_data*>(vdata);
+    auto* const data = static_cast<scrape_data*>(vdata);
 
-    tr_scrape_response& response = data->response;
+    auto& response = data->response();
     response.did_connect = did_connect;
     response.did_timeout = did_timeout;
 
     auto const scrape_url_sv = response.scrape_url.sv();
-    tr_logAddTrace(fmt::format("Got scrape response for '{}'", scrape_url_sv), data->log_name);
+    tr_logAddTrace(fmt::format("Got scrape response for '{}'", scrape_url_sv), data->log_name());
 
     if (status != HTTP_OK)
     {
@@ -633,55 +658,44 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     }
     else if (!std::empty(body))
     {
-        tr_announcerParseHttpScrapeResponse(response, body, data->log_name);
+        tr_announcerParseHttpScrapeResponse(response, body, data->log_name());
     }
 
-    if (data->response_func != nullptr)
-    {
-        data->response_func(&data->response, data->response_func_user_data);
-    }
-
+    data->invoke_callback();
     delete data;
 }
 
-static void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const* req)
+static void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const& req)
 {
-    scrape_url = req->scrape_url.sv();
+    scrape_url = req.scrape_url.sv();
     char delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
 
-    for (int i = 0; i < req->info_hash_count; ++i)
+    for (int i = 0; i < req.info_hash_count; ++i)
     {
         scrape_url.append(delimiter, "info_hash=");
-        tr_urlPercentEncode(std::back_inserter(scrape_url), req->info_hash[i]);
+        tr_urlPercentEncode(std::back_inserter(scrape_url), req.info_hash[i]);
         delimiter = '&';
     }
 }
 
-void tr_tracker_http_scrape(
-    tr_session const* session,
-    tr_scrape_request const* request,
-    tr_scrape_response_func response_func,
-    void* response_func_user_data)
+void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& request, tr_scrape_response_func on_response)
 {
-    auto* d = new scrape_data();
-    d->response.scrape_url = request->scrape_url;
-    d->response_func = response_func;
-    d->response_func_user_data = response_func_user_data;
-    d->response.row_count = request->info_hash_count;
+    auto* d = new scrape_data{ std::move(on_response), request.log_name };
 
-    for (int i = 0; i < d->response.row_count; ++i)
+    auto& response = d->response();
+    response.scrape_url = request.scrape_url;
+    response.row_count = request.info_hash_count;
+    for (int i = 0; i < response.row_count; ++i)
     {
-        d->response.rows[i].info_hash = request->info_hash[i];
-        d->response.rows[i].seeders = -1;
-        d->response.rows[i].leechers = -1;
-        d->response.rows[i].downloads = -1;
+        response.rows[i].info_hash = request.info_hash[i];
+        response.rows[i].seeders = -1;
+        response.rows[i].leechers = -1;
+        response.rows[i].downloads = -1;
     }
-
-    d->log_name = request->log_name;
 
     auto scrape_url = tr_pathbuf{};
     scrape_url_new(scrape_url, request);
-    tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", scrape_url), request->log_name);
+    tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", scrape_url), request.log_name);
     auto options = tr_web::FetchOptions{ scrape_url, onScrapeDone, d };
     options.timeout_secs = 30L;
     options.sndbuf = 4096;
