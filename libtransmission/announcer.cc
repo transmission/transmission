@@ -290,7 +290,7 @@ struct tr_tier
         scrapeSoon();
     }
 
-    [[nodiscard]] constexpr tr_tracker* currentTracker()
+    [[nodiscard]] tr_tracker* currentTracker()
     {
         if (!current_tracker_index_)
         {
