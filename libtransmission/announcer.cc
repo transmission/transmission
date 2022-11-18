@@ -70,7 +70,7 @@ namespace
 
 struct StopsCompare
 {
-    [[nodiscard]] static int compare(tr_announce_request const& one, tr_announce_request const& two) noexcept // <=>
+    [[nodiscard]] static constexpr auto compare(tr_announce_request const& one, tr_announce_request const& two) noexcept // <=>
     {
         // primary key: volume of data transferred
         auto const ax = one.up + one.down;
@@ -85,13 +85,12 @@ struct StopsCompare
         }
 
         // secondary key: the torrent's info_hash
-        if (one.info_hash < two.info_hash)
+        for (size_t i = 0, n = sizeof(tr_sha1_digest_t); i < n; ++i)
         {
-            return -1;
-        }
-        if (one.info_hash > two.info_hash)
-        {
-            return 1;
+            if (one.info_hash[i] != two.info_hash[i])
+            {
+                return one.info_hash[i] < two.info_hash[i] ? -1 : 1;
+            }
         }
 
         // tertiary key: the tracker's announce url
@@ -107,7 +106,7 @@ struct StopsCompare
         return 0;
     }
 
-    [[nodiscard]] bool operator()(tr_announce_request const& one, tr_announce_request const& two) const noexcept
+    [[nodiscard]] constexpr auto operator()(tr_announce_request const& one, tr_announce_request const& two) const noexcept
     {
         return compare(one, two) < 0;
     }
@@ -125,7 +124,7 @@ struct tr_scrape_info
 
     tr_interned_string scrape_url;
 
-    tr_scrape_info(tr_interned_string scrape_url_in, int const multiscrape_max_in)
+    constexpr tr_scrape_info(tr_interned_string scrape_url_in, int const multiscrape_max_in)
         : multiscrape_max{ multiscrape_max_in }
         , scrape_url{ scrape_url_in }
     {
