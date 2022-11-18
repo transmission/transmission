@@ -58,9 +58,6 @@ static auto constexpr UpkeepInterval = 500ms;
 static auto constexpr MaxAnnouncesPerUpkeep = int{ 20 };
 static auto constexpr MaxScrapesPerUpkeep = int{ 20 };
 
-/* this is how often to call the UDP tracker upkeep */
-static auto constexpr TauUpkeepIntervalSecs = int{ 5 };
-
 /* how many infohashes to remove when we get a scrape-too-long error */
 static auto constexpr TrMultiscrapeStep = int{ 5 };
 
@@ -143,10 +140,10 @@ class tr_announcer_impl final : public tr_announcer
 public:
     explicit tr_announcer_impl(tr_session* session_in)
         : session{ session_in }
-        , upkeep_timer{ session_in->timerMaker().create() }
+        , upkeep_timer_{ session_in->timerMaker().create() }
     {
-        upkeep_timer->setCallback([this]() { this->upkeep(); });
-        upkeep_timer->startRepeating(UpkeepInterval);
+        upkeep_timer_->setCallback([this]() { this->upkeep(); });
+        upkeep_timer_->startRepeating(UpkeepInterval);
     }
 
     ~tr_announcer_impl() override
@@ -169,15 +166,18 @@ public:
     void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
     void onScrapeDone(tr_scrape_response const& response);
 
-    std::set<tr_announce_request, StopsCompare> stops;
     std::map<tr_interned_string, tr_scrape_info> scrape_info;
 
     tr_session* const session;
-    std::unique_ptr<libtransmission::Timer> const upkeep_timer;
-
-    time_t tau_upkeep_at = 0;
 
     int const key = tr_rand_int(INT_MAX);
+
+private:
+    time_t tau_upkeep_at = 0;
+
+    std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
+
+    std::set<tr_announce_request, StopsCompare> stops_;
 };
 
 std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session)
@@ -885,13 +885,7 @@ void tr_announcer_impl::removeTorrent(tr_torrent* tor)
     {
         if (tier.isRunning)
         {
-            auto const e = TR_ANNOUNCE_EVENT_STOPPED;
-            auto req = create_announce_request(this, tor, &tier, e);
-
-            if (stops.count(req) == 0U)
-            {
-                stops.insert(req);
-            }
+            stops_.emplace(create_announce_request(this, tor, &tier, TR_ANNOUNCE_EVENT_STOPPED));
         }
     }
 
@@ -1461,12 +1455,12 @@ static void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> cons
 
 void tr_announcer_impl::flushCloseMessages()
 {
-    for (auto& stop : stops)
+    for (auto& stop : stops_)
     {
         announce_request_delegate(this, stop, {});
     }
 
-    stops.clear();
+    stops_.clear();
 }
 
 static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
@@ -1572,12 +1566,7 @@ void tr_announcer_impl::upkeep()
         scrapeAndAnnounceMore(this);
     }
 
-    /* TAU upkeep */
-    if (this->tau_upkeep_at <= now)
-    {
-        this->tau_upkeep_at = now + TauUpkeepIntervalSecs;
-        session->announcer_udp_->upkeep();
-    }
+    session->announcer_udp_->upkeep();
 }
 
 /***
