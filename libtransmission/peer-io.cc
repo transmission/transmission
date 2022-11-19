@@ -61,7 +61,7 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 static constexpr size_t guessPacketOverhead(size_t d)
 {
     /**
-     * http://sd.wareonearth.com/~phil/net/overhead/
+     * https://web.archive.org/web/20140912230020/http://sd.wareonearth.com:80/~phil/net/overhead/
      *
      * TCP over Ethernet:
      * Assuming no header compression (e.g. not PPP)
@@ -74,7 +74,7 @@ static constexpr size_t guessPacketOverhead(size_t d)
      * (1500-52)/ (42+1500) = 93.9040 %  802.1q, IPv4, TCP timestamps
      * (1500-60)/ (38+1500) = 93.6281 %  IPv6, minimal headers
      * (1500-72)/ (38+1500) = 92.8479 %  IPv6, TCP timestamps
-     * (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, ICP timestamps
+     * (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, TCP timestamps
      */
     double const assumed_payload_data_rate = 94.0;
 
