@@ -65,7 +65,7 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 
     if (icon.isNull())
     {
-        icon = fallback;
+        icon = std::move(fallback);
     }
 
     return icon;
