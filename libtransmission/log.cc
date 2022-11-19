@@ -247,10 +247,12 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
 {
     TR_ASSERT(!std::empty(msg));
 
+    auto name_fallback = std::string{};
     if (std::empty(name))
     {
         auto const base = tr_sys_path_basename(file);
-        name = fmt::format(FMT_STRING("{}:{}"), !std::empty(base) ? base : "?", line);
+        name_fallback = fmt::format(FMT_STRING("{}:{}"), !std::empty(base) ? base : "?", line);
+        name = name_fallback;
     }
 
     // message logging shouldn't affect errno
