@@ -197,7 +197,6 @@ bool isValidUtf8(QByteArray const& byteArray)
 
     auto const* const codec = QTextCodec::codecForName("UTF-8");
     auto state = QTextCodec::ConverterState{};
-    auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
     return state.invalidChars == 0;
 
 #endif

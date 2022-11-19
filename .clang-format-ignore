@@ -13,9 +13,6 @@ third-party/*
 # maintained at https://github.com/sparkle-project/Sparkle
 macosx/Sparkle.framework/*
 
-# maintained at https://github.com/bdkjones/VDKQueue
-macosx/VDKQueue/*
-
 # maintained at https://github.com/mnunberg/jsonsl
 libtransmission/jsonsl.*
 

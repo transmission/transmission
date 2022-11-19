@@ -58,9 +58,6 @@ static auto constexpr UpkeepInterval = 500ms;
 static auto constexpr MaxAnnouncesPerUpkeep = int{ 20 };
 static auto constexpr MaxScrapesPerUpkeep = int{ 20 };
 
-/* this is how often to call the UDP tracker upkeep */
-static auto constexpr TauUpkeepIntervalSecs = int{ 5 };
-
 /* how many infohashes to remove when we get a scrape-too-long error */
 static auto constexpr TrMultiscrapeStep = int{ 5 };
 
@@ -68,34 +65,16 @@ static auto constexpr TrMultiscrapeStep = int{ 5 };
 ****
 ***/
 
-std::string_view tr_announce_event_get_string(tr_announce_event e)
-{
-    switch (e)
-    {
-    case TR_ANNOUNCE_EVENT_COMPLETED:
-        return "completed"sv;
-
-    case TR_ANNOUNCE_EVENT_STARTED:
-        return "started"sv;
-
-    case TR_ANNOUNCE_EVENT_STOPPED:
-        return "stopped"sv;
-
-    default:
-        return ""sv;
-    }
-}
-
 namespace
 {
 
 struct StopsCompare
 {
-    [[nodiscard]] static int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
+    [[nodiscard]] static constexpr auto compare(tr_announce_request const& one, tr_announce_request const& two) noexcept // <=>
     {
         // primary key: volume of data transferred
-        auto const ax = a->up + a->down;
-        auto const bx = b->up + b->down;
+        auto const ax = one.up + one.down;
+        auto const bx = two.up + two.down;
         if (ax < bx)
         {
             return -1;
@@ -106,21 +85,20 @@ struct StopsCompare
         }
 
         // secondary key: the torrent's info_hash
-        if (a->info_hash < b->info_hash)
+        for (size_t i = 0, n = sizeof(tr_sha1_digest_t); i < n; ++i)
         {
-            return -1;
-        }
-        if (a->info_hash > b->info_hash)
-        {
-            return 1;
+            if (one.info_hash[i] != two.info_hash[i])
+            {
+                return one.info_hash[i] < two.info_hash[i] ? -1 : 1;
+            }
         }
 
         // tertiary key: the tracker's announce url
-        if (a->announce_url < b->announce_url)
+        if (one.announce_url < two.announce_url)
         {
             return -1;
         }
-        if (a->announce_url > b->announce_url)
+        if (one.announce_url > two.announce_url)
         {
             return 1;
         }
@@ -128,9 +106,9 @@ struct StopsCompare
         return 0;
     }
 
-    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b) const noexcept // less than
+    [[nodiscard]] constexpr auto operator()(tr_announce_request const& one, tr_announce_request const& two) const noexcept
     {
-        return compare(a, b) < 0;
+        return compare(one, two) < 0;
     }
 };
 
@@ -146,7 +124,7 @@ struct tr_scrape_info
 
     tr_interned_string scrape_url;
 
-    tr_scrape_info(tr_interned_string scrape_url_in, int const multiscrape_max_in)
+    constexpr tr_scrape_info(tr_interned_string scrape_url_in, int const multiscrape_max_in)
         : multiscrape_max{ multiscrape_max_in }
         , scrape_url{ scrape_url_in }
     {
@@ -156,66 +134,113 @@ struct tr_scrape_info
 /**
  * "global" (per-tr_session) fields
  */
-struct tr_announcer
+class tr_announcer_impl final : public tr_announcer
 {
-    explicit tr_announcer(tr_session* session_in)
+public:
+    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp)
         : session{ session_in }
-        , upkeep_timer{ session_in->timerMaker().create() }
+        , announcer_udp_{ announcer_udp }
+        , upkeep_timer_{ session_in->timerMaker().create() }
     {
-        upkeep_timer->setCallback([this]() { this->upkeep(); });
-        upkeep_timer->startRepeating(UpkeepInterval);
+        upkeep_timer_->setCallback([this]() { this->upkeep(); });
+        upkeep_timer_->startRepeating(UpkeepInterval);
     }
 
-    ~tr_announcer() = default;
-    tr_announcer(tr_announcer&&) = delete;
-    tr_announcer(tr_announcer const&) = delete;
-    tr_announcer& operator=(tr_announcer&&) = delete;
-    tr_announcer& operator=(tr_announcer const&) = delete;
+    ~tr_announcer_impl() override
+    {
+        flushCloseMessages();
+    }
+
+    tr_announcer_impl(tr_announcer_impl&&) = delete;
+    tr_announcer_impl(tr_announcer_impl const&) = delete;
+    tr_announcer_impl& operator=(tr_announcer_impl&&) = delete;
+    tr_announcer_impl& operator=(tr_announcer_impl const&) = delete;
+
+    tr_torrent_announcer* addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data) override;
+    void startTorrent(tr_torrent* tor) override;
+    void stopTorrent(tr_torrent* tor) override;
+    void resetTorrent(tr_torrent* tor) override;
+    void removeTorrent(tr_torrent* tor) override;
 
     void upkeep();
 
-    std::set<tr_announce_request*, StopsCompare> stops;
-    std::map<tr_interned_string, tr_scrape_info> scrape_info;
+    void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
+    void onScrapeDone(tr_scrape_response const& response);
 
-    tr_session* const session;
-    std::unique_ptr<libtransmission::Timer> const upkeep_timer;
-
-    time_t tau_upkeep_at = 0;
-
-    int const key = tr_rand_int(INT_MAX);
-};
-
-static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_interned_string url)
-{
-    if (std::empty(url))
+    [[nodiscard]] tr_scrape_info* scrape_info(tr_interned_string url)
     {
-        return nullptr;
+        if (std::empty(url))
+        {
+            return nullptr;
+        }
+
+        auto const [it, is_new] = scrape_info_.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+        return &it->second;
     }
 
-    auto& scrapes = announcer->scrape_info;
-    auto const [it, is_new] = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
-    return &it->second;
-}
+    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response)
+    {
+        if (auto const scrape_sv = request.scrape_url.sv();
+            tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
+        {
+            tr_tracker_http_scrape(session, request, std::move(on_response));
+        }
+        else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
+        {
+            announcer_udp_.scrape(request, std::move(on_response));
+        }
+        else
+        {
+            tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
+        }
+    }
 
-void tr_announcerInit(tr_session* session)
+    void announce(tr_announce_request const& request, tr_announce_response_func on_response)
+    {
+        if (auto const announce_sv = request.announce_url.sv();
+            tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
+        {
+            tr_tracker_http_announce(session, request, std::move(on_response));
+        }
+        else if (tr_strvStartsWith(announce_sv, "udp://"sv))
+        {
+            announcer_udp_.announce(request, std::move(on_response));
+        }
+        else
+        {
+            tr_logAddWarn(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", announce_sv)));
+        }
+    }
+
+    tr_session* const session;
+
+    int const key = tr_rand_int(INT_MAX);
+
+private:
+    void flushCloseMessages()
+    {
+        for (auto& stop : stops_)
+        {
+            announce(stop, {});
+        }
+
+        stops_.clear();
+    }
+
+    tr_announcer_udp& announcer_udp_;
+
+    std::map<tr_interned_string, tr_scrape_info> scrape_info_;
+
+    std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
+
+    std::set<tr_announce_request, StopsCompare> stops_;
+};
+
+std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
 {
     TR_ASSERT(session != nullptr);
 
-    auto* a = new tr_announcer{ session };
-
-    session->announcer = a;
-}
-
-static void flushCloseMessages(tr_announcer* announcer);
-
-void tr_announcerClose(tr_session* session)
-{
-    tr_announcer* announcer = session->announcer;
-
-    flushCloseMessages(announcer);
-
-    session->announcer = nullptr;
-    delete announcer;
+    return std::make_unique<tr_announcer_impl>(session, announcer_udp);
 }
 
 /***
@@ -225,11 +250,11 @@ void tr_announcerClose(tr_session* session)
 /* a row in tr_tier's list of trackers */
 struct tr_tracker
 {
-    explicit tr_tracker(tr_announcer* announcer, tr_announce_list::tracker_info const& info)
+    explicit tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
         : host{ info.host }
         , announce_url{ info.announce }
         , sitename{ info.sitename }
-        , scrape_info{ std::empty(info.scrape) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape) }
+        , scrape_info{ std::empty(info.scrape) ? nullptr : announcer->scrape_info(info.scrape) }
         , id{ info.id }
     {
     }
@@ -296,9 +321,8 @@ tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed)
 /** @brief A group of trackers in a single tier, as per the multitracker spec */
 struct tr_tier
 {
-    tr_tier(tr_announcer* announcer, tr_torrent* tor_in, std::vector<tr_announce_list::tracker_info const*> const& infos)
+    tr_tier(tr_announcer_impl* announcer, tr_torrent* tor_in, std::vector<tr_announce_list::tracker_info const*> const& infos)
         : tor{ tor_in }
-        , id{ next_key++ }
     {
         trackers.reserve(std::size(infos));
         for (auto const* info : infos)
@@ -450,7 +474,7 @@ struct tr_tier
     time_t lastAnnounceStartTime = 0;
     time_t lastAnnounceTime = 0;
 
-    int const id;
+    int const id = next_key++;
 
     int announce_event_priority = 0;
 
@@ -491,10 +515,8 @@ private:
         return ret;
     }
 
-    static int next_key;
+    static inline int next_key = 0;
 };
-
-int tr_tier::next_key = 0;
 
 /***
 ****
@@ -507,7 +529,7 @@ int tr_tier::next_key = 0;
  */
 struct tr_torrent_announcer
 {
-    tr_torrent_announcer(tr_announcer* announcer, tr_torrent* tor)
+    tr_torrent_announcer(tr_announcer_impl* announcer, tr_torrent* tor)
     {
         // build the trackers
         auto tier_to_infos = std::map<tr_tracker_tier_t, std::vector<tr_announce_list::tracker_info const*>>{};
@@ -597,7 +619,7 @@ private:
     }
 };
 
-static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_hash, int tier_id)
+static tr_tier* getTier(tr_announcer_impl* announcer, tr_sha1_digest_t const& info_hash, int tier_id)
 {
     if (announcer == nullptr)
     {
@@ -617,14 +639,14 @@ static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_ha
 ****  PUBLISH
 ***/
 
-static void publishMessage(tr_tier* tier, std::string_view msg, TrackerEventType type)
+static void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event::Type type)
 {
     if (tier != nullptr && tier->tor != nullptr && tier->tor->torrent_announcer != nullptr &&
         tier->tor->torrent_announcer->callback != nullptr)
     {
         auto* const ta = tier->tor->torrent_announcer;
         auto event = tr_tracker_event{};
-        event.messageType = type;
+        event.type = type;
         event.text = msg;
 
         if (auto const* const current_tracker = tier->currentTracker(); current_tracker != nullptr)
@@ -638,17 +660,17 @@ static void publishMessage(tr_tier* tier, std::string_view msg, TrackerEventType
 
 static void publishErrorClear(tr_tier* tier)
 {
-    publishMessage(tier, ""sv, TR_TRACKER_ERROR_CLEAR);
+    publishMessage(tier, ""sv, tr_tracker_event::Type::ErrorClear);
 }
 
 static void publishWarning(tr_tier* tier, std::string_view msg)
 {
-    publishMessage(tier, msg, TR_TRACKER_WARNING);
+    publishMessage(tier, msg, tr_tracker_event::Type::Warning);
 }
 
 static void publishError(tr_tier* tier, std::string_view msg)
 {
-    publishMessage(tier, msg, TR_TRACKER_ERROR);
+    publishMessage(tier, msg, tr_tracker_event::Type::Error);
 }
 
 static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
@@ -656,7 +678,7 @@ static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
         auto e = tr_tracker_event{};
-        e.messageType = TR_TRACKER_COUNTS;
+        e.type = tr_tracker_event::Type::Counts;
         e.seeders = seeders;
         e.leechers = leechers;
         tr_logAddDebugTier(tier, fmt::format("peer counts: {} seeders, {} leechers.", seeders, leechers));
@@ -670,7 +692,7 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vecto
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
         auto e = tr_tracker_event{};
-        e.messageType = TR_TRACKER_PEERS;
+        e.type = tr_tracker_event::Type::Peers;
         e.seeders = seeders;
         e.leechers = leechers;
         e.pex = pex;
@@ -690,11 +712,11 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vecto
 ****
 ***/
 
-tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data)
+tr_torrent_announcer* tr_announcer_impl::addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto* ta = new tr_torrent_announcer(tor->session->announcer, tor);
+    auto* ta = new tr_torrent_announcer{ this, tor };
     ta->callback = callback;
     ta->callback_data = callback_data;
     return ta;
@@ -823,7 +845,7 @@ static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t anno
     }
 }
 
-void tr_announcerTorrentStarted(tr_torrent* tor)
+void tr_announcer_impl::startTorrent(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STARTED, tr_time());
 }
@@ -833,7 +855,7 @@ void tr_announcerManualAnnounce(tr_torrent* tor)
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_NONE, tr_time());
 }
 
-void tr_announcerTorrentStopped(tr_torrent* tor)
+void tr_announcer_impl::stopTorrent(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STOPPED, tr_time());
 }
@@ -845,7 +867,7 @@ void tr_announcerTorrentCompleted(tr_torrent* tor)
 
 void tr_announcerChangeMyPort(tr_torrent* tor)
 {
-    tr_announcerTorrentStarted(tor);
+    torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STARTED, tr_time());
 }
 
 /***
@@ -867,35 +889,36 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
 ****
 ***/
 
-static tr_announce_request* announce_request_new(
-    tr_announcer const* announcer,
-    tr_torrent* tor,
-    tr_tier const* tier,
-    tr_announce_event event)
+[[nodiscard]] static tr_announce_request create_announce_request(
+    tr_announcer_impl const* const announcer,
+    tr_torrent* const tor,
+    tr_tier const* const tier,
+    tr_announce_event const event)
 {
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
 
-    auto* const req = new tr_announce_request();
-    req->port = announcer->session->advertisedPeerPort();
-    req->announce_url = current_tracker->announce_url;
-    req->tracker_id = current_tracker->tracker_id;
-    req->info_hash = tor->infoHash();
-    req->peer_id = tr_torrentGetPeerId(tor);
-    req->up = tier->byteCounts[TR_ANN_UP];
-    req->down = tier->byteCounts[TR_ANN_DOWN];
-    req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req->leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
-    req->event = event;
-    req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
-    req->key = announcer->key;
-    req->partial_seed = tor->isPartialSeed();
-    tier->buildLogName(req->log_name, sizeof(req->log_name));
+    auto req = tr_announce_request{};
+    req.port = announcer->session->advertisedPeerPort();
+    req.announce_url = current_tracker->announce_url;
+    req.tracker_id = current_tracker->tracker_id;
+    req.info_hash = tor->infoHash();
+    req.peer_id = tr_torrentGetPeerId(tor);
+    req.up = tier->byteCounts[TR_ANN_UP];
+    req.down = tier->byteCounts[TR_ANN_DOWN];
+    req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
+    req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
+    req.event = event;
+    req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
+    req.key = announcer->key;
+    req.partial_seed = tor->isPartialSeed();
+    tier->buildLogName(req.log_name, sizeof(req.log_name));
     return req;
 }
 
-void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
+void tr_announcer_impl::removeTorrent(tr_torrent* tor)
 {
+    // FIXME(ckerr)
     auto* const ta = tor->torrent_announcer;
     if (ta == nullptr)
     {
@@ -906,34 +929,13 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
     {
         if (tier.isRunning)
         {
-            auto const e = TR_ANNOUNCE_EVENT_STOPPED;
-            auto* req = announce_request_new(announcer, tor, &tier, e);
-
-            if (announcer->stops.count(req) != 0U)
-            {
-                delete req;
-            }
-            else
-            {
-                announcer->stops.insert(req);
-            }
+            stops_.emplace(create_announce_request(this, tor, &tier, TR_ANNOUNCE_EVENT_STOPPED));
         }
     }
 
     tor->torrent_announcer = nullptr;
     delete ta;
 }
-
-struct announce_data
-{
-    int tier_id = 0;
-    time_t time_sent = {};
-    tr_announce_event event = {};
-    tr_session* session = nullptr;
-
-    /** If the request succeeds, the value for tier's "isRunning" flag */
-    bool is_running_on_success = false;
-};
 
 static bool isUnregistered(char const* errmsg)
 {
@@ -980,249 +982,217 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     }
 }
 
-static void onAnnounceDone(tr_announce_response const* response, void* vdata)
+void tr_announcer_impl::onAnnounceDone(
+    int tier_id,
+    tr_announce_event event,
+    bool is_running_on_success,
+    tr_announce_response const& response)
 {
-    auto* const data = static_cast<announce_data*>(vdata);
-
-    tr_announcer* announcer = data->session->announcer;
-    tr_tier* tier = getTier(announcer, response->info_hash, data->tier_id);
-    time_t const now = tr_time();
-    tr_announce_event const event = data->event;
-
-    if (tier != nullptr)
+    auto* const tier = getTier(this, response.info_hash, tier_id);
+    if (tier == nullptr)
     {
-        tr_logAddTraceTier(
-            tier,
-            fmt::format(
-                "Got announce response: "
-                "connected:{} "
-                "timeout:{} "
-                "seeders:{} "
-                "leechers:{} "
-                "downloads:{} "
-                "interval:{} "
-                "min_interval:{} "
-                "tracker_id_str:{} "
-                "pex:{} "
-                "pex6:{} "
-                "err:{} "
-                "warn:{}",
-                response->did_connect,
-                response->did_timeout,
-                response->seeders,
-                response->leechers,
-                response->downloads,
-                response->interval,
-                response->min_interval,
-                (!std::empty(response->tracker_id) ? response->tracker_id.c_str() : "none"),
-                std::size(response->pex),
-                std::size(response->pex6),
-                (!std::empty(response->errmsg) ? response->errmsg.c_str() : "none"),
-                (!std::empty(response->warning) ? response->warning.c_str() : "none")));
-
-        tier->lastAnnounceTime = now;
-        tier->lastAnnounceTimedOut = response->did_timeout;
-        tier->lastAnnounceSucceeded = false;
-        tier->isAnnouncing = false;
-        tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
-
-        if (response->external_ip)
-        {
-            data->session->setExternalIP(*response->external_ip);
-        }
-
-        if (!response->did_connect)
-        {
-            on_announce_error(tier, _("Could not connect to tracker"), event);
-        }
-        else if (response->did_timeout)
-        {
-            on_announce_error(tier, _("Tracker did not respond"), event);
-        }
-        else if (!std::empty(response->errmsg))
-        {
-            /* If the torrent's only tracker returned an error, publish it.
-               Don't bother publishing if there are other trackers -- it's
-               all too common for people to load up dozens of dead trackers
-               in a torrent's metainfo... */
-            if (tier->tor->trackerCount() < 2)
-            {
-                publishError(tier, response->errmsg);
-            }
-
-            on_announce_error(tier, response->errmsg.c_str(), event);
-        }
-        else
-        {
-            auto const is_stopped = event == TR_ANNOUNCE_EVENT_STOPPED;
-            auto leechers = int{};
-            auto scrape_fields = int{};
-            auto seeders = int{};
-
-            publishErrorClear(tier);
-
-            auto* const tracker = tier->currentTracker();
-            if (tracker != nullptr)
-            {
-                tracker->consecutive_failures = 0;
-
-                if (response->seeders >= 0)
-                {
-                    tracker->seeder_count = seeders = response->seeders;
-                    ++scrape_fields;
-                }
-
-                if (response->leechers >= 0)
-                {
-                    tracker->leecher_count = leechers = response->leechers;
-                    ++scrape_fields;
-                }
-
-                if (response->downloads >= 0)
-                {
-                    tracker->download_count = response->downloads;
-                    ++scrape_fields;
-                }
-
-                if (!std::empty(response->tracker_id))
-                {
-                    tracker->tracker_id = response->tracker_id;
-                }
-            }
-
-            if (auto const& warning = response->warning; !std::empty(warning))
-            {
-                tier->last_announce_str = warning;
-                tr_logAddTraceTier(tier, fmt::format("tracker gave '{}'", warning));
-                publishWarning(tier, warning);
-            }
-            else
-            {
-                tier->last_announce_str = _("Success");
-            }
-
-            if (response->min_interval != 0)
-            {
-                tier->announceMinIntervalSec = response->min_interval;
-            }
-
-            if (response->interval != 0)
-            {
-                tier->announceIntervalSec = response->interval;
-            }
-
-            if (!std::empty(response->pex))
-            {
-                publishPeersPex(tier, seeders, leechers, response->pex);
-            }
-
-            if (!std::empty(response->pex6))
-            {
-                publishPeersPex(tier, seeders, leechers, response->pex6);
-            }
-
-            publishPeerCounts(tier, seeders, leechers);
-
-            tier->isRunning = data->is_running_on_success;
-
-            /* if the tracker included scrape fields in its announce response,
-               then a separate scrape isn't needed */
-            if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
-            {
-                tr_logAddTraceTier(
-                    tier,
-                    fmt::format(
-                        "Announce response has scrape info; bumping next scrape to {} seconds from now.",
-                        tier->scrapeIntervalSec));
-                tier->scheduleNextScrape();
-                tier->lastScrapeTime = now;
-                tier->lastScrapeSucceeded = true;
-            }
-            else if (tier->lastScrapeTime + tier->scrapeIntervalSec <= now)
-            {
-                tier->scrapeSoon();
-            }
-
-            tier->lastAnnounceSucceeded = true;
-            tier->lastAnnouncePeerCount = std::size(response->pex) + std::size(response->pex6);
-
-            if (is_stopped)
-            {
-                /* now that we've successfully stopped the torrent,
-                 * we can reset the up/down/corrupt count we've kept
-                 * for this tracker */
-                tier->byteCounts[TR_ANN_UP] = 0;
-                tier->byteCounts[TR_ANN_DOWN] = 0;
-                tier->byteCounts[TR_ANN_CORRUPT] = 0;
-            }
-
-            if (!is_stopped && std::empty(tier->announce_events))
-            {
-                /* the queue is empty, so enqueue a periodic update */
-                int const i = tier->announceIntervalSec;
-                tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
-                tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
-            }
-        }
+        return;
     }
 
-    delete data;
-}
+    auto const now = tr_time();
 
-static void announce_request_delegate(
-    tr_announcer* announcer,
-    tr_announce_request* request,
-    tr_announce_response_func callback,
-    announce_data* callback_data)
-{
-    tr_session* session = announcer->session;
+    tr_logAddTraceTier(
+        tier,
+        fmt::format(
+            "Got announce response: "
+            "connected:{} "
+            "timeout:{} "
+            "seeders:{} "
+            "leechers:{} "
+            "downloads:{} "
+            "interval:{} "
+            "min_interval:{} "
+            "tracker_id_str:{} "
+            "pex:{} "
+            "pex6:{} "
+            "err:{} "
+            "warn:{}",
+            response.did_connect,
+            response.did_timeout,
+            response.seeders,
+            response.leechers,
+            response.downloads,
+            response.interval,
+            response.min_interval,
+            (!std::empty(response.tracker_id) ? response.tracker_id.c_str() : "none"),
+            std::size(response.pex),
+            std::size(response.pex6),
+            (!std::empty(response.errmsg) ? response.errmsg.c_str() : "none"),
+            (!std::empty(response.warning) ? response.warning.c_str() : "none")));
 
-#if 0
+    tier->lastAnnounceTime = now;
+    tier->lastAnnounceTimedOut = response.did_timeout;
+    tier->lastAnnounceSucceeded = false;
+    tier->isAnnouncing = false;
+    tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
-    fprintf(stderr, "ANNOUNCE: event %s isPartialSeed %d port %d key %d numwant %d up %" PRIu64 " down %" PRIu64
-        " corrupt %" PRIu64 " left %" PRIu64 " url [%s] tracker_id_str [%s] peer_id [%20.20s]\n",
-        tr_announce_event_get_string(request->event), (int)request->partial_seed, (int)request->port, request->key,
-        request->numwant, request->up, request->down, request->corrupt, request->leftUntilComplete, request->url,
-        request->tracker_id_str, request->peer_id);
-
-#endif
-
-    if (auto const announce_sv = request->announce_url.sv();
-        tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
+    if (response.external_ip)
     {
-        tr_tracker_http_announce(session, request, callback, callback_data);
+        session->setExternalIP(*response.external_ip);
     }
-    else if (tr_strvStartsWith(announce_sv, "udp://"sv))
+
+    if (!response.did_connect)
     {
-        session->announcer_udp_->announce(*request, callback, callback_data);
+        on_announce_error(tier, _("Could not connect to tracker"), event);
+    }
+    else if (response.did_timeout)
+    {
+        on_announce_error(tier, _("Tracker did not respond"), event);
+    }
+    else if (!std::empty(response.errmsg))
+    {
+        /* If the torrent's only tracker returned an error, publish it.
+           Don't bother publishing if there are other trackers -- it's
+           all too common for people to load up dozens of dead trackers
+           in a torrent's metainfo... */
+        if (tier->tor->trackerCount() < 2)
+        {
+            publishError(tier, response.errmsg);
+        }
+
+        on_announce_error(tier, response.errmsg.c_str(), event);
     }
     else
     {
-        tr_logAddWarn(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", announce_sv)));
-        delete callback_data;
-    }
+        auto const is_stopped = event == TR_ANNOUNCE_EVENT_STOPPED;
+        auto leechers = int{};
+        auto scrape_fields = int{};
+        auto seeders = int{};
 
-    delete request;
+        publishErrorClear(tier);
+
+        auto* const tracker = tier->currentTracker();
+        if (tracker != nullptr)
+        {
+            tracker->consecutive_failures = 0;
+
+            if (response.seeders >= 0)
+            {
+                tracker->seeder_count = seeders = response.seeders;
+                ++scrape_fields;
+            }
+
+            if (response.leechers >= 0)
+            {
+                tracker->leecher_count = leechers = response.leechers;
+                ++scrape_fields;
+            }
+
+            if (response.downloads >= 0)
+            {
+                tracker->download_count = response.downloads;
+                ++scrape_fields;
+            }
+
+            if (!std::empty(response.tracker_id))
+            {
+                tracker->tracker_id = response.tracker_id;
+            }
+        }
+
+        if (auto const& warning = response.warning; !std::empty(warning))
+        {
+            tier->last_announce_str = warning;
+            tr_logAddTraceTier(tier, fmt::format("tracker gave '{}'", warning));
+            publishWarning(tier, warning);
+        }
+        else
+        {
+            tier->last_announce_str = _("Success");
+        }
+
+        if (response.min_interval != 0)
+        {
+            tier->announceMinIntervalSec = response.min_interval;
+        }
+
+        if (response.interval != 0)
+        {
+            tier->announceIntervalSec = response.interval;
+        }
+
+        if (!std::empty(response.pex))
+        {
+            publishPeersPex(tier, seeders, leechers, response.pex);
+        }
+
+        if (!std::empty(response.pex6))
+        {
+            publishPeersPex(tier, seeders, leechers, response.pex6);
+        }
+
+        publishPeerCounts(tier, seeders, leechers);
+
+        tier->isRunning = is_running_on_success;
+
+        /* if the tracker included scrape fields in its announce response,
+           then a separate scrape isn't needed */
+        if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
+        {
+            tr_logAddTraceTier(
+                tier,
+                fmt::format(
+                    "Announce response has scrape info; bumping next scrape to {} seconds from now.",
+                    tier->scrapeIntervalSec));
+            tier->scheduleNextScrape();
+            tier->lastScrapeTime = now;
+            tier->lastScrapeSucceeded = true;
+        }
+        else if (tier->lastScrapeTime + tier->scrapeIntervalSec <= now)
+        {
+            tier->scrapeSoon();
+        }
+
+        tier->lastAnnounceSucceeded = true;
+        tier->lastAnnouncePeerCount = std::size(response.pex) + std::size(response.pex6);
+
+        if (is_stopped)
+        {
+            /* now that we've successfully stopped the torrent,
+             * we can reset the up/down/corrupt count we've kept
+             * for this tracker */
+            tier->byteCounts[TR_ANN_UP] = 0;
+            tier->byteCounts[TR_ANN_DOWN] = 0;
+            tier->byteCounts[TR_ANN_CORRUPT] = 0;
+        }
+
+        if (!is_stopped && std::empty(tier->announce_events))
+        {
+            /* the queue is empty, so enqueue a periodic update */
+            int const i = tier->announceIntervalSec;
+            tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
+            tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
+        }
+    }
 }
 
-static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
+static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
 {
     TR_ASSERT(!tier->isAnnouncing);
     TR_ASSERT(!std::empty(tier->announce_events));
     TR_ASSERT(tier->currentTracker() != nullptr);
 
-    time_t const now = tr_time();
+    auto const now = tr_time();
 
     tr_torrent* tor = tier->tor;
-    tr_announce_event const announce_event = tier_announce_event_pull(tier);
-    tr_announce_request* req = announce_request_new(announcer, tor, tier, announce_event);
-
-    auto* const data = new announce_data{ tier->id, now, announce_event, announcer->session, tor->isRunning };
+    auto const event = tier_announce_event_pull(tier);
+    auto const req = create_announce_request(announcer, tor, tier, event);
 
     tier->isAnnouncing = true;
     tier->lastAnnounceStartTime = now;
 
-    announce_request_delegate(announcer, req, onAnnounceDone, data);
+    auto tier_id = tier->id;
+    auto is_running_on_success = tor->isRunning;
+
+    announcer->announce(
+        req,
+        [announcer, tier_id, event, is_running_on_success](tr_announce_response const& response)
+        { announcer->onAnnounceDone(tier_id, event, is_running_on_success, response); });
 }
 
 /***
@@ -1272,15 +1242,15 @@ static void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char c
     tier->scheduleNextScrape(interval);
 }
 
-static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response const* response)
+static void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const& response)
 {
-    if (!multiscrape_too_big(response->errmsg))
+    if (!multiscrape_too_big(response.errmsg))
     {
         return;
     }
 
-    auto const& url = response->scrape_url;
-    auto* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
+    auto const& url = response.scrape_url;
+    auto* const scrape_info = announcer->scrape_info(url);
     if (scrape_info == nullptr)
     {
         return;
@@ -1290,7 +1260,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
     // error. So if N parallel multiscrapes all have the same `max`
     // and error out, lower the value once for that batch, not N times.
     int& multiscrape_max = scrape_info->multiscrape_max;
-    if (multiscrape_max < response->row_count)
+    if (multiscrape_max < response.row_count)
     {
         return;
     }
@@ -1311,130 +1281,105 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
     }
 }
 
-static void on_scrape_done(tr_scrape_response const* response, void* vsession)
+void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
 {
     auto const now = tr_time();
-    auto* const session = static_cast<tr_session*>(vsession);
-    auto* const announcer = session->announcer;
 
-    for (int i = 0; i < response->row_count; ++i)
+    for (int i = 0; i < response.row_count; ++i)
     {
-        auto const& row = response->rows[i];
+        auto const& row = response.rows[i];
+
         auto* const tor = session->torrents().get(row.info_hash);
-
-        if (tor != nullptr)
+        if (tor == nullptr)
         {
-            auto* tier = tor->torrent_announcer->getTierFromScrape(response->scrape_url);
+            continue;
+        }
 
-            if (tier == nullptr)
-            {
-                continue;
-            }
+        auto* const tier = tor->torrent_announcer->getTierFromScrape(response.scrape_url);
+        if (tier == nullptr)
+        {
+            continue;
+        }
 
-            tr_logAddTraceTier(
-                tier,
-                fmt::format(
-                    "scraped url:{} "
-                    " -- "
-                    "did_connect:{} "
-                    "did_timeout:{} "
-                    "seeders:{} "
-                    "leechers:{} "
-                    "downloads:{} "
-                    "downloaders:{} "
-                    "min_request_interval:{} "
-                    "err:{} ",
-                    response->scrape_url.sv(),
-                    response->did_connect,
-                    response->did_timeout,
-                    row.seeders,
-                    row.leechers,
-                    row.downloads,
-                    row.downloaders,
-                    response->min_request_interval,
-                    std::empty(response->errmsg) ? "none"sv : response->errmsg));
+        tr_logAddTraceTier(
+            tier,
+            fmt::format(
+                "scraped url:{} "
+                " -- "
+                "did_connect:{} "
+                "did_timeout:{} "
+                "seeders:{} "
+                "leechers:{} "
+                "downloads:{} "
+                "downloaders:{} "
+                "min_request_interval:{} "
+                "err:{} ",
+                response.scrape_url.sv(),
+                response.did_connect,
+                response.did_timeout,
+                row.seeders,
+                row.leechers,
+                row.downloads,
+                row.downloaders,
+                response.min_request_interval,
+                std::empty(response.errmsg) ? "none"sv : response.errmsg));
 
-            tier->isScraping = false;
-            tier->lastScrapeTime = now;
-            tier->lastScrapeSucceeded = false;
-            tier->lastScrapeTimedOut = response->did_timeout;
+        tier->isScraping = false;
+        tier->lastScrapeTime = now;
+        tier->lastScrapeSucceeded = false;
+        tier->lastScrapeTimedOut = response.did_timeout;
 
-            if (!response->did_connect)
-            {
-                on_scrape_error(session, tier, _("Could not connect to tracker"));
-            }
-            else if (response->did_timeout)
-            {
-                on_scrape_error(session, tier, _("Tracker did not respond"));
-            }
-            else if (!std::empty(response->errmsg))
-            {
-                on_scrape_error(session, tier, response->errmsg.c_str());
-            }
-            else
-            {
-                tier->lastScrapeSucceeded = true;
-                tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
-                tier->scheduleNextScrape();
-                tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
+        if (!response.did_connect)
+        {
+            on_scrape_error(session, tier, _("Could not connect to tracker"));
+        }
+        else if (response.did_timeout)
+        {
+            on_scrape_error(session, tier, _("Tracker did not respond"));
+        }
+        else if (!std::empty(response.errmsg))
+        {
+            on_scrape_error(session, tier, response.errmsg.c_str());
+        }
+        else
+        {
+            tier->lastScrapeSucceeded = true;
+            tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response.min_request_interval);
+            tier->scheduleNextScrape();
+            tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
 
-                if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
+            if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
+            {
+                if (row.seeders >= 0)
                 {
-                    if (row.seeders >= 0)
-                    {
-                        tracker->seeder_count = row.seeders;
-                    }
-
-                    if (row.leechers >= 0)
-                    {
-                        tracker->leecher_count = row.leechers;
-                    }
-
-                    if (row.downloads >= 0)
-                    {
-                        tracker->download_count = row.downloads;
-                    }
-
-                    tracker->downloader_count = row.downloaders;
-                    tracker->consecutive_failures = 0;
+                    tracker->seeder_count = row.seeders;
                 }
 
-                if (row.seeders >= 0 && row.leechers >= 0 && row.downloads >= 0)
+                if (row.leechers >= 0)
                 {
-                    publishPeerCounts(tier, row.seeders, row.leechers);
+                    tracker->leecher_count = row.leechers;
                 }
+
+                if (row.downloads >= 0)
+                {
+                    tracker->download_count = row.downloads;
+                }
+
+                tracker->downloader_count = row.downloaders;
+                tracker->consecutive_failures = 0;
+            }
+
+            if (row.seeders >= 0 && row.leechers >= 0 && row.downloads >= 0)
+            {
+                publishPeerCounts(tier, row.seeders, row.leechers);
             }
         }
     }
 
-    checkMultiscrapeMax(announcer, response);
+    checkMultiscrapeMax(this, response);
 }
 
-static void scrape_request_delegate(
-    tr_announcer* announcer,
-    tr_scrape_request const* request,
-    tr_scrape_response_func callback,
-    void* callback_data)
-{
-    tr_session* session = announcer->session;
-
-    auto const scrape_sv = request->scrape_url.sv();
-
-    if (tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
-    {
-        tr_tracker_http_scrape(session, request, callback, callback_data);
-    }
-    else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
-    {
-        session->announcer_udp_->scrape(*request, callback, callback_data);
-    }
-    else
-    {
-        tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
-    }
-}
-
-static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& tiers)
+static void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tiers)
 {
     auto const now = tr_time();
     auto requests = std::array<tr_scrape_request, MaxScrapesPerUpkeep>{};
@@ -1489,18 +1434,8 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
     /* send the requests we just built */
     for (size_t i = 0; i < request_count; ++i)
     {
-        scrape_request_delegate(announcer, &requests[i], on_scrape_done, announcer->session);
+        announcer->scrape(requests[i], [announcer](tr_scrape_response const& response) { announcer->onScrapeDone(response); });
     }
-}
-
-static void flushCloseMessages(tr_announcer* announcer)
-{
-    auto& stops = announcer->stops;
-    std::for_each(
-        std::begin(stops),
-        std::end(stops),
-        [&announcer](auto* stop) { announce_request_delegate(announcer, stop, nullptr, nullptr); });
-    stops.clear();
 }
 
 static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
@@ -1542,7 +1477,7 @@ static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     return a < b ? -1 : 1;
 }
 
-static void scrapeAndAnnounceMore(tr_announcer* announcer)
+static void scrapeAndAnnounceMore(tr_announcer_impl* announcer)
 {
     time_t const now = tr_time();
 
@@ -1590,28 +1525,20 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     }
 }
 
-void tr_announcer::upkeep()
+void tr_announcer_impl::upkeep()
 {
     auto const lock = session->unique_lock();
 
-    auto const is_closing = session->isClosing();
-    auto const now = tr_time();
+    // maybe send out some "stopped" messages for closed torrents
+    flushCloseMessages();
 
-    /* maybe send out some "stopped" messages for closed torrents */
-    flushCloseMessages(this);
-
-    /* maybe kick off some scrapes / announces whose time has come */
-    if (!is_closing)
+    // maybe kick off some scrapes / announces whose time has come
+    if (!session->isClosing())
     {
         scrapeAndAnnounceMore(this);
     }
 
-    /* TAU upkeep */
-    if (this->tau_upkeep_at <= now)
-    {
-        this->tau_upkeep_at = now + TauUpkeepIntervalSecs;
-        session->announcer_udp_->upkeep();
-    }
+    announcer_udp_.upkeep();
 }
 
 /***
@@ -1752,11 +1679,11 @@ tr_tracker_view tr_announcerTracker(tr_torrent const* tor, size_t nth)
 
 // called after the torrent's announceList was rebuilt --
 // so announcer needs to update the tr_tier / tr_trackers to match
-void tr_announcerResetTorrent(tr_announcer* /*announcer*/, tr_torrent* tor)
+void tr_announcer_impl::resetTorrent(tr_torrent* tor)
 {
     // make a new tr_announcer_tier
     auto* const older = tor->torrent_announcer;
-    tor->torrent_announcer = new tr_torrent_announcer(tor->session->announcer, tor);
+    tor->torrent_announcer = new tr_torrent_announcer{ this, tor };
     auto* const newer = tor->torrent_announcer;
 
     // copy the tracker counts into the new replacementa

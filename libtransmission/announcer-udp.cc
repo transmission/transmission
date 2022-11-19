@@ -72,9 +72,8 @@ enum tau_action_t
 
 struct tau_scrape_request
 {
-    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func callback, void* user_data)
-        : callback_{ callback }
-        , user_data_{ user_data }
+    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func on_response)
+        : on_response_{ std::move(on_response) }
     {
         this->response.scrape_url = in.scrape_url;
         this->response.row_count = in.info_hash_count;
@@ -97,16 +96,16 @@ struct tau_scrape_request
         this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] constexpr auto hasCallback() const noexcept
+    [[nodiscard]] auto has_callback() const noexcept
     {
-        return callback_ != nullptr;
+        return !!on_response_;
     }
 
     void requestFinished()
     {
-        if (callback_ != nullptr)
+        if (on_response_)
         {
-            callback_(&response, user_data_);
+            on_response_(response);
         }
     }
 
@@ -156,8 +155,7 @@ struct tau_scrape_request
     tr_scrape_response response = {};
 
 private:
-    tr_scrape_response_func const callback_;
-    void* const user_data_;
+    tr_scrape_response_func on_response_;
 };
 
 /****
@@ -166,13 +164,8 @@ private:
 
 struct tau_announce_request
 {
-    tau_announce_request(
-        uint32_t announce_ip,
-        tr_announce_request const& in,
-        tr_announce_response_func callback,
-        void* user_data)
-        : callback_{ callback }
-        , user_data_{ user_data }
+    tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
+        : on_response_{ std::move(on_response) }
     {
         response.seeders = -1;
         response.leechers = -1;
@@ -196,16 +189,16 @@ struct tau_announce_request
         payload.insert(std::end(payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] constexpr auto hasCallback() const noexcept
+    [[nodiscard]] auto has_callback() const noexcept
     {
-        return callback_ != nullptr;
+        return !!on_response_;
     }
 
     void requestFinished()
     {
-        if (callback_ != nullptr)
+        if (on_response_)
         {
-            callback_(&this->response, user_data_);
+            on_response_(this->response);
         }
     }
 
@@ -278,8 +271,7 @@ private:
         }
     }
 
-    tr_announce_response_func const callback_;
-    void* const user_data_;
+    tr_announce_response_func on_response_;
 };
 
 /****
@@ -303,7 +295,7 @@ struct tau_tracker
         return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
     }
 
-    void sendto(void const* buf, size_t buflen)
+    void sendto(std::byte const* buf, size_t buflen)
     {
         TR_ASSERT(addr_);
         if (!addr_)
@@ -349,29 +341,16 @@ struct tau_tracker
             addr_expires_at_ = now + DnsRetryIntervalSecs;
         }
 
-        // if the address info is too old, expire it
-        if (addr_ && (closing || addr_expires_at_ <= now))
-        {
-            logtrace(this->host, "Expiring old DNS result");
-            addr_.reset();
-            addr_expires_at_ = 0;
-        }
-
         // are there any requests pending?
         if (this->isIdle())
         {
             return;
         }
 
-        // if DNS lookup *recently* failed for this host, do nothing
-        if (!addr_ && now < addr_expires_at_)
+        // update the addr if our lookup is past its shelf date
+        if (!closing && !addr_pending_dns_ && addr_expires_at_ <= now)
         {
-            return;
-        }
-
-        // if we don't have an address yet, try & get one now.
-        if (!closing && !addr_ && !addr_pending_dns_)
-        {
+            addr_.reset();
             addr_pending_dns_ = std::async(std::launch::async, lookup, this->host, this->port, this->key);
             return;
         }
@@ -380,13 +359,13 @@ struct tau_tracker
             this->key,
             fmt::format(
                 "connected {} ({} {}) -- connecting_at {}",
-                this->connection_expiration_time > now,
+                is_connected(now),
                 this->connection_expiration_time,
                 now,
                 this->connecting_at));
 
         /* also need a valid connection ID... */
-        if (addr_ && this->connection_expiration_time <= now && this->connecting_at == 0)
+        if (addr_ && !is_connected(now) && this->connecting_at == 0)
         {
             this->connecting_at = now;
             this->connection_transaction_id = tau_transaction_new();
@@ -399,16 +378,14 @@ struct tau_tracker
 
             auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
             this->sendto(std::data(contiguous), std::size(contiguous));
-
-            return;
         }
 
         if (timeout_reqs)
         {
-            timeout_requests();
+            timeout_requests(now);
         }
 
-        if (addr_ && this->connection_expiration_time > now)
+        if (addr_ && is_connected(now))
         {
             send_requests();
         }
@@ -417,6 +394,11 @@ struct tau_tracker
 private:
     using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using MaybeSockaddr = std::optional<Sockaddr>;
+
+    [[nodiscard]] constexpr bool is_connected(time_t now) const noexcept
+    {
+        return connection_id != tau_connection_t{} && now < connection_expiration_time;
+    }
 
     [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
     {
@@ -469,9 +451,8 @@ private:
 
     ///
 
-    void timeout_requests()
+    void timeout_requests(time_t now)
     {
-        time_t const now = time(nullptr);
         bool const cancel_all = this->close_at != 0 && (this->close_at <= now);
 
         if (this->connecting_at != 0 && this->connecting_at + TauRequestTtl < now)
@@ -535,7 +516,7 @@ private:
             req.sent_at = now;
             send_request(std::data(req.payload), std::size(req.payload));
 
-            if (req.hasCallback())
+            if (req.has_callback())
             {
                 ++it;
                 continue;
@@ -546,7 +527,7 @@ private:
         }
     }
 
-    void send_request(void const* payload, size_t payload_len)
+    void send_request(std::byte const* payload, size_t payload_len)
     {
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
@@ -597,7 +578,7 @@ public:
     {
     }
 
-    void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) override
+    void announce(tr_announce_request const& request, tr_announce_response_func on_response) override
     {
         auto* const tracker = getTrackerFromUrl(request.announce_url);
         if (tracker == nullptr)
@@ -608,11 +589,11 @@ public:
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
         auto const addr = mediator_.announceIP();
         uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
-        tracker->announces.emplace_back(announce_ip, request, response_func, user_data);
+        tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
         tracker->upkeep(false);
     }
 
-    void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) override
+    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) override
     {
         auto* const tracker = getTrackerFromUrl(request.scrape_url);
         if (tracker == nullptr)
@@ -620,7 +601,7 @@ public:
             return;
         }
 
-        tracker->scrapes.emplace_back(request, response_func, user_data);
+        tracker->scrapes.emplace_back(request, std::move(on_response));
         tracker->upkeep(false);
     }
 

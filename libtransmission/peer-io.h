@@ -238,6 +238,14 @@ public:
     tr_net_error_cb gotError = nullptr;
     void* userData = nullptr;
 
+    void call_error_callback(short what)
+    {
+        if (gotError != nullptr)
+        {
+            gotError(this, what, userData);
+        }
+    }
+
     libtransmission::Buffer inbuf;
     libtransmission::Buffer outbuf;
 

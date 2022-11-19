@@ -16,6 +16,7 @@
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
+#import "NSDataAdditions.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
 
@@ -45,7 +46,7 @@ static int const kETAIdleDisplaySec = 2 * 60;
 
 @property(nonatomic) BOOL fResumeOnWake;
 
-@property(nonatomic) BOOL fTimeMachineExcludeInitialized;
+@property(nonatomic) dispatch_queue_t timeMachineExcludeQueue;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
@@ -251,12 +252,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
                                                  postingStyle:NSPostASAP
                                                  coalesceMask:NSNotificationCoalescingOnName
                                                      forModes:nil];
-    }
-
-    //when the torrent is first loaded, update the time machine exclusion
-    if (!self.fTimeMachineExcludeInitialized)
-    {
-        [self updateTimeMachineExclude];
     }
 }
 
@@ -1772,8 +1767,9 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
                                                name:@"GroupValueRemoved"
                                              object:nil];
 
-    _fTimeMachineExcludeInitialized = NO;
+    _timeMachineExcludeQueue = dispatch_queue_create("updateTimeMachineExclude", DISPATCH_QUEUE_CONCURRENT);
     [self update];
+    [self updateTimeMachineExclude];
 
     return self;
 }
@@ -1793,8 +1789,26 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         {
             auto const file = tr_torrentFile(self.fHandle, i);
 
+            // UTF-8 encoding
             NSString* fullPath = @(file.name);
+            if (!fullPath)
+            {
+                // autodetection of the encoding (#3434)
+                NSData* data = [NSData dataWithBytes:(void const*)file.name length:sizeof(unsigned char) * strlen(file.name)];
+                [NSString stringEncodingForData:data encodingOptions:nil convertedString:&fullPath usedLossyConversion:nil];
+                if (!fullPath)
+                {
+                    // hexa encoding
+                    fullPath = data.hexString;
+                }
+            }
             NSArray* pathComponents = fullPath.pathComponents;
+            while (pathComponents.count <= 1)
+            {
+                // file.name isn't a path: append an arbitrary empty component until we have two components.
+                // Invalid filenames and duplicate filenames don't need to be handled here.
+                pathComponents = [pathComponents arrayByAddingObject:@""];
+            }
 
             if (!tempNode)
             {
@@ -2094,8 +2108,10 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     NSString* path;
     if ((path = self.dataLocation))
     {
-        CSBackupSetItemExcluded((__bridge CFURLRef)[NSURL fileURLWithPath:path], exclude, false);
-        self.fTimeMachineExcludeInitialized = YES;
+        dispatch_async(_timeMachineExcludeQueue, ^{
+            CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:path];
+            CSBackupSetItemExcluded(url, exclude, false);
+        });
     }
 }
 
