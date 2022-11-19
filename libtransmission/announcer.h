@@ -12,6 +12,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t
 #include <ctime>
+#include <functional>
 #include <string_view>
 #include <vector>
 
@@ -20,61 +21,63 @@
 #include "interned-string.h"
 #include "net.h"
 
-struct tr_announcer;
+class tr_announcer;
+class tr_announcer_udp;
 struct tr_torrent_announcer;
 
 /**
- * ***  Tracker Publish / Subscribe
- * **/
-
-enum TrackerEventType
-{
-    TR_TRACKER_WARNING,
-    TR_TRACKER_ERROR,
-    TR_TRACKER_ERROR_CLEAR,
-    TR_TRACKER_PEERS,
-    TR_TRACKER_COUNTS,
-};
+***  Tracker Publish / Subscribe
+**/
 
 struct tr_pex;
 
 /** @brief Notification object to tell listeners about announce or scrape occurrences */
 struct tr_tracker_event
 {
-    /* what type of event this is */
-    TrackerEventType messageType;
+    enum class Type
+    {
+        Error,
+        ErrorClear,
+        Counts,
+        Peers,
+        Warning,
+    };
 
-    /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
+    // What type of event this is
+    Type type;
+
+    // for Warning and Error events
     std::string_view text;
     tr_interned_string announce_url;
 
-    /* for TR_TRACKER_PEERS */
+    // for Peers events
     std::vector<tr_pex> pex;
 
-    /* for TR_TRACKER_PEERS and TR_TRACKER_COUNTS */
+    // for Peers and Counts events
     int leechers;
     int seeders;
 };
 
 using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
 
-/**
-***  Session ctor/dtor
-**/
+class tr_announcer
+{
+public:
+    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session, tr_announcer_udp&);
+    virtual ~tr_announcer() = default;
 
-void tr_announcerInit(tr_session*);
+    virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;
+    virtual void startTorrent(tr_torrent* tor) = 0;
+    virtual void stopTorrent(tr_torrent* tor) = 0;
+    virtual void resetTorrent(tr_torrent* tor) = 0;
+    virtual void removeTorrent(tr_torrent* tor) = 0;
+};
 
-void tr_announcerClose(tr_session*);
+std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
 /**
 ***  For torrent customers
 **/
-
-struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback callback, void* callback_data);
-
-void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
-
-void tr_announcerRemoveTorrent(struct tr_announcer*, tr_torrent*);
 
 void tr_announcerChangeMyPort(tr_torrent*);
 
@@ -82,8 +85,6 @@ bool tr_announcerCanManualAnnounce(tr_torrent const*);
 
 void tr_announcerManualAnnounce(tr_torrent*);
 
-void tr_announcerTorrentStarted(tr_torrent*);
-void tr_announcerTorrentStopped(tr_torrent*);
 void tr_announcerTorrentCompleted(tr_torrent*);
 
 enum
@@ -116,13 +117,14 @@ enum tr_announce_event
 
 struct tr_announce_request;
 struct tr_announce_response;
-using tr_announce_response_func = void (*)(tr_announce_response const* response, void* userdata);
 
 struct tr_scrape_request;
 struct tr_scrape_response;
-using tr_scrape_response_func = void (*)(tr_scrape_response const* response, void* user_data);
 
 /// UDP ANNOUNCER
+
+using tr_scrape_response_func = std::function<void(tr_scrape_response const&)>;
+using tr_announce_response_func = std::function<void(tr_announce_response const&)>;
 
 class tr_announcer_udp
 {
@@ -141,9 +143,9 @@ public:
 
     [[nodiscard]] virtual bool isIdle() const noexcept = 0;
 
-    virtual void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) = 0;
+    virtual void announce(tr_announce_request const& request, tr_announce_response_func on_response) = 0;
 
-    virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) = 0;
+    virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) = 0;
 
     virtual void upkeep() = 0;
 

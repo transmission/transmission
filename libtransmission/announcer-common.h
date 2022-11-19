@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstdint> // uint64_t
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -25,17 +26,9 @@
 
 struct tr_url_parsed_t;
 
-void tr_tracker_http_scrape(
-    tr_session const* session,
-    tr_scrape_request const* req,
-    tr_scrape_response_func response_func,
-    void* user_data);
+void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& req, tr_scrape_response_func on_response);
 
-void tr_tracker_http_announce(
-    tr_session const* session,
-    tr_announce_request const* req,
-    tr_announce_response_func response_func,
-    void* user_data);
+void tr_tracker_http_announce(tr_session const* session, tr_announce_request const& req, tr_announce_response_func on_response);
 
 void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, std::string_view log_name);
 

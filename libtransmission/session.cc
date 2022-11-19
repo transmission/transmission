@@ -558,8 +558,6 @@ void tr_session::initImpl(init_data& data)
 
     this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
 
-    tr_announcerInit(this);
-
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
     setSettings(client_settings, true);
@@ -1248,7 +1246,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
     // remaining `event=stopped` announce messages are queued in
     // the announcer. The announcer's destructor sends all those
     // out via `web_`...
-    tr_announcerClose(this);
+    this->announcer_.reset();
     // ...and now that those are queued, tell web_ that we're
     // shutting down soon. This leaves the `event=stopped` messages
     // in the queue but refuses to take any _new_ tasks
@@ -1503,7 +1501,7 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
         {
             if (tor->isPublic())
             {
-                tr_announcerResetTorrent(announcer, tor);
+                announcer_->resetTorrent(tor);
             }
         }
     }
