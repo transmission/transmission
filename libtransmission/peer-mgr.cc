@@ -2422,8 +2422,6 @@ struct ComparePeerByActivity
 
 void closeBadPeers(tr_swarm* s, time_t const now_sec)
 {
-    auto const lock = s->unique_lock();
-
     for (auto* peer : getPeersToClose(s, now_sec))
     {
         closePeer(peer);
@@ -2480,6 +2478,7 @@ void tr_peerMgr::reconnectPulse()
 {
     using namespace disconnect_helpers;
 
+    auto const lock = session->unique_lock();
     auto const now_sec = tr_time();
 
     // remove crappy peers
