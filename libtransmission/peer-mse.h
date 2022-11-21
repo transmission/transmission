@@ -49,7 +49,10 @@ public:
 
     // By default, a private key is randomly generated.
     // Providing a predefined one is useful for reproducible unit tests.
-    DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept;
+    constexpr DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept
+        : private_key_{ private_key }
+    {
+    }
 
     // Returns our own public key to be shared with a peer.
     [[nodiscard]] key_bigend_t publicKey() noexcept;

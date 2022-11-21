@@ -81,11 +81,6 @@ namespace tr_message_stream_encryption
     return wi::export_bits(public_key_wi);
 }
 
-DH::DH(private_key_bigend_t const& private_key) noexcept
-    : private_key_{ private_key }
-{
-}
-
 DH::key_bigend_t DH::publicKey() noexcept
 {
     if (public_key_ == key_bigend_t{})

@@ -54,7 +54,6 @@ static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
 static auto constexpr Numwant = int{ 80 };
 
 /* how often to announce & scrape */
-static auto constexpr UpkeepInterval = 500ms;
 static auto constexpr MaxAnnouncesPerUpkeep = int{ 20 };
 static auto constexpr MaxScrapesPerUpkeep = int{ 20 };
 
@@ -234,6 +233,8 @@ private:
     std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
 
     std::set<tr_announce_request, StopsCompare> stops_;
+
+    static auto constexpr UpkeepInterval = 500ms;
 };
 
 std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
