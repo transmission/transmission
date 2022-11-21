@@ -352,10 +352,7 @@ public:
     {
         auto str = std::string{};
         str.reserve(size());
-        for (auto const& by : *this)
-        {
-            str.push_back(*reinterpret_cast<char const*>(&by));
-        }
+        evbuffer_copyout(buf_.get(), std::data(str), std::size(str));
         return str;
     }
 
