@@ -44,27 +44,27 @@ public:
 
         [[nodiscard]] value_type& operator*() noexcept
         {
-            return *reinterpret_cast<value_type*>(iov_.iov_base);
+            return reinterpret_cast<value_type*>(iov_.iov_base)[iov_offset_];
         }
 
         [[nodiscard]] value_type operator*() const noexcept
         {
-            return *reinterpret_cast<value_type*>(iov_.iov_base);
+            return reinterpret_cast<value_type*>(iov_.iov_base)[iov_offset_];
         }
 
         [[nodiscard]] Iterator operator+(size_t n_bytes)
         {
-            return Iterator{ buf_, ptr_.pos + n_bytes };
+            return Iterator{ buf_, offset() + n_bytes };
         }
 
         [[nodiscard]] Iterator operator-(size_t n_bytes)
         {
-            return Iterator{ buf_, ptr_.pos - n_bytes };
+            return Iterator{ buf_, offset() - n_bytes };
         }
 
         [[nodiscard]] constexpr auto operator-(Iterator const& that) const noexcept
         {
-            return ptr_.pos - that.ptr_.pos;
+            return offset() - that.offset();
         }
 
         Iterator& operator++() noexcept
@@ -75,11 +75,9 @@ public:
 
         Iterator& operator+=(size_t n_bytes)
         {
-            if (n_bytes < iov_.iov_len)
+            if (iov_offset_ + n_bytes < iov_.iov_len)
             {
-                iov_.iov_len -= n_bytes;
-                iov_.iov_base = reinterpret_cast<value_type*>(iov_.iov_base) + n_bytes;
-                evbuffer_ptr_set(buf_, &ptr_, n_bytes, EVBUFFER_PTR_ADD);
+                iov_offset_ += n_bytes;
             }
             else
             {
@@ -91,37 +89,51 @@ public:
 
         Iterator& operator--() noexcept
         {
-            // TODO(ckerr) inefficient; calls evbuffer_ptr_peek() every time
-            setOffset(ptr_.pos - 1);
+            if (iov_offset_ > 0)
+            {
+                --iov_offset_;
+            }
+            else
+            {
+                setOffset(offset() - 1);
+            }
             return *this;
         }
 
         [[nodiscard]] constexpr bool operator==(Iterator const& that) const noexcept
         {
-            return ptr_.pos == that.ptr_.pos;
+            return offset() == that.offset();
         }
 
         [[nodiscard]] constexpr bool operator!=(Iterator const& that) const noexcept
         {
-            return !(*this == that);
+            return offset() != that.offset();
         }
 
     private:
+        [[nodiscard]] constexpr size_t offset() const noexcept
+        {
+            return ptr_.pos + iov_offset_;
+        }
+
         void incOffset(size_t increment)
         {
-            evbuffer_ptr_set(buf_, &ptr_, increment, EVBUFFER_PTR_ADD);
+            evbuffer_ptr_set(buf_, &ptr_, iov_offset_ + increment, EVBUFFER_PTR_ADD);
             evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
+            iov_offset_ = 0;
         }
 
         void setOffset(size_t offset)
         {
             evbuffer_ptr_set(buf_, &ptr_, offset, EVBUFFER_PTR_SET);
             evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
+            iov_offset_ = 0;
         }
 
         evbuffer* buf_;
         evbuffer_ptr ptr_ = {};
         Iovec iov_ = {};
+        size_t iov_offset_ = 0;
     };
 
     Buffer() = default;
