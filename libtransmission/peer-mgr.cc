@@ -2431,9 +2431,8 @@ void closeBadPeers(tr_swarm* s, time_t const now_sec)
 void enforceTorrentPeerLimit(tr_swarm* swarm)
 {
     // do we have too many peers?
-    auto const n = swarm->peerCount();
     auto const max = swarm->tor->peerLimit();
-    if (n <= max)
+    if (auto const n = swarm->peerCount(); n <= max)
     {
         return;
     }
