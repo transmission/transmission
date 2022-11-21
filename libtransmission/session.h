@@ -228,7 +228,7 @@ private:
         [[nodiscard]] std::optional<std::string> publicAddressV4() const override;
         [[nodiscard]] std::optional<std::string> publicAddressV6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
-        [[nodiscard]] unsigned int clamp(int torrent_id, unsigned int byte_count) const override;
+        [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;

@@ -203,7 +203,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     io->pendingEvents &= ~EV_READ;
 
     auto const curlen = io->readBufferSize();
-    auto howmuch = static_cast<unsigned int>(curlen >= max ? 0 : max - curlen);
+    auto howmuch = curlen >= max ? 0 : max - curlen;
     howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
 
     tr_logAddTraceIo(io, "libevent says this peer is ready to read");
@@ -339,7 +339,7 @@ void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 
 static size_t utp_get_rb_size(tr_peerIo* const io)
 {
-    size_t const bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
+    auto const bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
 
     tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
     return UtpReadBufferSize - bytes;

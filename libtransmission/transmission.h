@@ -661,7 +661,7 @@ bool tr_sessionGetQueueEnabled(tr_session const*, tr_direction);
 void tr_sessionSetQueueStalledMinutes(tr_session*, int minutes);
 
 /** @return the number of minutes a torrent can be idle before being considered as stalled */
-int tr_sessionGetQueueStalledMinutes(tr_session const*);
+size_t tr_sessionGetQueueStalledMinutes(tr_session const*);
 
 /** @brief Set whether or not to count torrents idle for over N minutes as 'stalled' */
 void tr_sessionSetQueueStalledEnabled(tr_session*, bool);
@@ -1349,7 +1349,7 @@ struct tr_tracker_view
     int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
-    int tier; // which tier this tracker is in
+    size_t tier; // which tier this tracker is in
     tr_torrent_id_t id; // unique transmission-generated ID for use in libtransmission API
 
     tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.

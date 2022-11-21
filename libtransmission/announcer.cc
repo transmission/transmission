@@ -1545,7 +1545,7 @@ void tr_announcer_impl::upkeep()
 ****
 ***/
 
-static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tier const& tier, tr_tracker const& tracker)
+static tr_tracker_view trackerView(tr_torrent const& tor, size_t tier_index, tr_tier const& tier, tr_tracker const& tracker)
 {
     auto const now = tr_time();
     auto view = tr_tracker_view{};
