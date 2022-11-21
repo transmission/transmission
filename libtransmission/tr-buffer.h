@@ -54,12 +54,12 @@ public:
 
         [[nodiscard]] Iterator operator+(int n_bytes)
         {
-            return Iterator(buf_, offset_ + n_bytes);
+            return Iterator{ buf_, offset_ + n_bytes };
         }
 
         [[nodiscard]] Iterator operator-(int n_bytes)
         {
-            return Iterator(buf_, offset_ - n_bytes);
+            return Iterator{ buf_, offset_ - n_bytes };
         }
 
         [[nodiscard]] constexpr auto operator-(Iterator const& that) const noexcept
@@ -351,7 +351,7 @@ public:
     [[nodiscard]] std::string toString() const
     {
         auto str = std::string{};
-        str.reserve(size());
+        str.resize(size());
         evbuffer_copyout(buf_.get(), std::data(str), std::size(str));
         return str;
     }
