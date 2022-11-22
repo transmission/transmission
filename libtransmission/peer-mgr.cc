@@ -2556,7 +2556,7 @@ void tr_peerMgr::bandwidthPulse()
     pumpAllPeers(this);
 
     /* allocate bandwidth to the peers */
-    auto const msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
+    static auto constexpr msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
     session->top_bandwidth_.allocate(TR_UP, msec);
     session->top_bandwidth_.allocate(TR_DOWN, msec);
 
