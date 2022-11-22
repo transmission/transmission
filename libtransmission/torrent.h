@@ -731,6 +731,37 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto secondsDownloading(time_t now) const noexcept
+    {
+        auto n_secs = seconds_downloading_before_current_start_;
+
+        if (isRunning)
+        {
+            if (doneDate > startDate)
+            {
+                n_secs += doneDate - startDate;
+            }
+            else if (doneDate == 0)
+            {
+                n_secs += now - startDate;
+            }
+        }
+
+        return n_secs;
+    }
+
+    [[nodiscard]] constexpr auto secondsSeeding(time_t now) const noexcept
+    {
+        auto n_secs = seconds_seeding_before_current_start_;
+
+        if (isRunning)
+        {
+            n_secs += now - std::max(doneDate, startDate);
+        }
+
+        return n_secs;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -818,8 +849,8 @@ public:
 
     tr_bytes_per_second_t etaSpeed_Bps = 0;
 
-    time_t secondsDownloading = 0;
-    time_t secondsSeeding = 0;
+    time_t seconds_downloading_before_current_start_ = 0;
+    time_t seconds_seeding_before_current_start_ = 0;
 
     size_t queuePosition = 0;
 
