@@ -190,7 +190,7 @@ struct peer_atom
         return value;
     }
 
-    [[nodiscard]] int getReconnectIntervalSecs(time_t const now) const noexcept
+    [[nodiscard]] constexpr int getReconnectIntervalSecs(time_t const now) const noexcept
     {
         auto sec = int{};
         bool const unreachable = (this->flags2 & MyflagUnreachable) != 0;
@@ -246,7 +246,6 @@ struct peer_atom
             }
         }
 
-        tr_logAddTrace(fmt::format("reconnect interval for {} is {} seconds", this->readable(), sec));
         return sec;
     }
 
