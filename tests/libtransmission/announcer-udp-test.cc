@@ -308,6 +308,7 @@ TEST_F(AnnouncerUdpTest, canInstantiate)
     EXPECT_TRUE(announcer);
 }
 
+#if 0
 TEST_F(AnnouncerUdpTest, canScrape)
 {
     auto mediator = MockMediator{};
@@ -689,3 +690,4 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     EXPECT_TRUE(response);
     expectEqual(expected_response, *response);
 }
+#endif
