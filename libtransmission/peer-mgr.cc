@@ -2734,10 +2734,11 @@ struct peer_candidate
     /* count how many peers and atoms we've got */
     auto atom_count = size_t{};
     auto peer_count = size_t{};
-    for (auto const* tor : session->torrents())
+    for (auto const* const tor : session->torrents())
     {
-        atom_count += std::size(tor->swarm->pool);
-        peer_count += tor->swarm->peerCount();
+        auto const* const swarm = tor->swarm;
+        atom_count += std::size(swarm->pool);
+        peer_count += swarm->peerCount();
     }
 
     /* don't start any new handshakes if we're full up */
@@ -2751,9 +2752,11 @@ struct peer_candidate
 
     /* populate the candidate array */
     auto salter = tr_salt_shaker{};
-    for (auto* tor : session->torrents())
+    for (auto* const tor : session->torrents())
     {
-        if (!tor->swarm->is_running)
+        auto* const swarm = tor->swarm;
+
+        if (!swarm->is_running)
         {
             continue;
         }
@@ -2761,13 +2764,13 @@ struct peer_candidate
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
         bool const seeding = tor->isDone();
-        if (seeding && tor->swarm->isAllSeeds() && tor->isPrivate())
+        if (seeding && swarm->isAllSeeds() && tor->isPrivate())
         {
             continue;
         }
 
         /* if we've already got enough peers in this torrent... */
-        if (tor->peerLimit() <= tor->swarm->peerCount())
+        if (tor->peerLimit() <= swarm->peerCount())
         {
             continue;
         }
@@ -2778,7 +2781,7 @@ struct peer_candidate
             continue;
         }
 
-        for (auto& atom : tor->swarm->pool)
+        for (auto& atom : swarm->pool)
         {
             if (isPeerCandidate(tor, atom, now))
             {
