@@ -511,7 +511,7 @@ public:
     uint16_t interested_count = 0;
     uint16_t max_peers = 0;
 
-    tr_swarm_stats stats = {};
+    mutable tr_swarm_stats stats = {};
 
     uint8_t optimistic_unchoke_time_scaler = 0;
 
@@ -1580,8 +1580,9 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm)
 {
     TR_ASSERT(swarm != nullptr);
-
-    return swarm->stats;
+    auto& stats = swarm->stats;
+    stats.active_webseed_count = swarm->countActiveWebseeds(tr_time_msec());
+    return stats;
 }
 
 void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active)
@@ -2562,7 +2563,6 @@ void tr_peerMgr::bandwidthPulse()
     session->top_bandwidth_.allocate(TR_DOWN, msec);
 
     /* torrent upkeep */
-    auto const now = tr_time_msec();
     for (auto* const tor : session->torrents())
     {
         auto* const swarm = tor->swarm;
@@ -2580,9 +2580,6 @@ void tr_peerMgr::bandwidthPulse()
         {
             tr_torrentStop(tor);
         }
-
-        /* update the torrent's stats */
-        swarm->stats.active_webseed_count = swarm->countActiveWebseeds(now);
     }
 
     /* pump the queues */
