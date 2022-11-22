@@ -25,8 +25,6 @@ protected:
     class MockMediator final : public tr_session_alt_speeds::Mediator
     {
     public:
-        ~MockMediator() override = default;
-
         void isActiveChanged(bool is_active, ChangeReason reason) override
         {
             changelog_.emplace_back(is_active, reason, time());

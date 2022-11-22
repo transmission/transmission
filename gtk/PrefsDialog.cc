@@ -257,7 +257,7 @@ void PageBase::init_time_combo(Gtk::ComboBox& combo, tr_quark const key)
     class TimeModelColumns : public Gtk::TreeModelColumnRecord
     {
     public:
-        TimeModelColumns()
+        TimeModelColumns() noexcept
         {
             add(offset);
             add(title);
@@ -641,7 +641,7 @@ class RemotePage : public PageBase
     class WhitelistModelColumns : public Gtk::TreeModelColumnRecord
     {
     public:
-        WhitelistModelColumns()
+        WhitelistModelColumns() noexcept
         {
             add(address);
         }
@@ -725,6 +725,7 @@ void RemotePage::refreshWhitelist()
     core_->set_pref(TR_KEY_rpc_whitelist, str);
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void RemotePage::onAddressEdited(Glib::ustring const& path, Glib::ustring const& address)
 {
     if (auto const iter = store_->get_iter(path); iter)
@@ -836,7 +837,7 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
 
         /* ip address column */
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-        r->signal_edited().connect([this](auto const& path, auto const& new_text) { onAddressEdited(path, new_text); });
+        r->signal_edited().connect(sigc::mem_fun(*this, &RemotePage::onAddressEdited));
         r->property_editable() = true;
         auto* c = Gtk::make_managed<Gtk::TreeViewColumn>("", *r);
         c->add_attribute(r->property_text(), whitelist_cols.address);

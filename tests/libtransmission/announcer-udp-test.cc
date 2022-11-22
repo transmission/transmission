@@ -10,13 +10,16 @@
 
 #include <fmt/format.h>
 
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
+
 #include "transmission.h"
 
 #include "announcer.h"
+#include "announcer-common.h"
 #include "crypto-utils.h"
 #include "peer-mgr.h" // for tr_pex
+#include "timer-ev.h"
 #include "tr-buffer.h"
-#include "utils.h" // for tr_net_init()
 
 #include "test-fixtures.h"
 
@@ -27,9 +30,9 @@ class AnnouncerUdpTest : public ::testing::Test
 private:
     void SetUp() override
     {
-        ::testing::Test::SetUp();
-
         tr_net_init();
+
+        ::testing::Test::SetUp();
         tr_timeUpdate(time(nullptr));
     }
 
@@ -37,11 +40,21 @@ protected:
     class MockMediator final : public tr_announcer_udp::Mediator
     {
     public:
+        MockMediator()
+            : event_base_{ event_base_new(), event_base_free }
+        {
+        }
+
         void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
         {
             auto target = tr_address::fromSockaddr(sa);
             ASSERT_TRUE(target);
             sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
+        }
+
+        [[nodiscard]] auto* eventBase()
+        {
+            return event_base_.get();
         }
 
         [[nodiscard]] std::optional<tr_address> announceIP() const override
@@ -66,6 +79,8 @@ protected:
         };
 
         std::deque<Sent> sent_;
+
+        std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
     };
 
     static void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)
@@ -90,7 +105,7 @@ protected:
     static void expectEqual(tr_scrape_request const& expected, std::vector<tr_sha1_digest_t> const& actual)
     {
         EXPECT_EQ(expected.info_hash_count, std::size(actual));
-        for (size_t i = 0; i < std::min(size_t(expected.info_hash_count), std::size(actual)); ++i)
+        for (size_t i = 0; i < std::min(static_cast<size_t>(expected.info_hash_count), std::size(actual)); ++i)
         {
             EXPECT_EQ(expected.info_hash[i], actual[i]);
         }
@@ -157,8 +172,7 @@ protected:
 
     [[nodiscard]] static auto waitForAnnouncerToSendMessage(MockMediator& mediator)
     {
-        EXPECT_FALSE(std::empty(mediator.sent_));
-        libtransmission::test::waitFor([&mediator]() { return !std::empty(mediator.sent_); }, 5s);
+        libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
         auto buf = libtransmission::Buffer(mediator.sent_.back().buf_);
         mediator.sent_.pop_back();
         return buf;
@@ -221,8 +235,8 @@ protected:
         EXPECT_EQ(expected.up, actual.uploaded);
         // EXPECT_EQ(foo, actual.event); ; // 0: none; 1: completed; 2: started; 3: stopped // FIXME
         // EXPECT_EQ(foo, actual.ip_address); // FIXME
-        EXPECT_EQ(expected.key, static_cast<decltype(expected.key)>(actual.key));
-        EXPECT_EQ(expected.numwant, static_cast<decltype(expected.numwant)>(actual.num_want));
+        EXPECT_EQ(expected.key, static_cast<int>(actual.key));
+        EXPECT_EQ(expected.numwant, static_cast<int>(actual.num_want));
         EXPECT_EQ(expected.port.host(), actual.port);
     }
 
@@ -267,6 +281,16 @@ protected:
         return req;
     }
 
+    // emulate the upkeep timer that tr_announcer runs in production
+    static auto createUpkeepTimer(MockMediator& mediator, std::unique_ptr<tr_announcer_udp>& announcer)
+    {
+        auto timer_maker = libtransmission::EvTimerMaker{ mediator.eventBase() };
+        auto timer = timer_maker.create();
+        timer->setCallback([&announcer]() { announcer->upkeep(); });
+        timer->startRepeating(200ms);
+        return timer;
+    }
+
     // https://www.bittorrent.org/beps/bep_0015.html
     static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
     static auto constexpr ConnectAction = uint32_t{ 0 };
@@ -288,15 +312,12 @@ TEST_F(AnnouncerUdpTest, canScrape)
 {
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     // tell announcer to scrape
     auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(
-        request,
-        [](tr_scrape_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
-        &response);
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
     EXPECT_FALSE(announcer->isIdle());
 
     // The announcer should have sent a UDP connection request.
@@ -337,11 +358,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // Since the timestamp hasn't changed, the connection should be good
     // and announcer-udp should skip the `connect` step, going straight to the scrape.
     response.reset();
-    announcer->scrape(
-        request,
-        [](tr_scrape_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
-        &response);
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -354,15 +371,12 @@ TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
 {
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     // tell announcer to scrape
     auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(
-        request,
-        [](tr_scrape_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
-        &response);
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -378,6 +392,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
 {
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
@@ -390,11 +405,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
 
     auto request = buildScrapeRequestFromResponse(expected_response);
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(
-        request,
-        [](tr_scrape_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
-        &response);
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
     // Announcer will request a connection. Verify and grant the request
     auto sent = waitForAnnouncerToSendMessage(mediator);
@@ -449,14 +460,11 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     // build the announcer
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     // tell announcer to scrape
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(
-        request,
-        [](tr_scrape_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
-        &response);
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -498,14 +506,13 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     // build the announcer
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     // tell the announcer to scrape
     auto response = std::optional<tr_scrape_response>{};
     announcer->scrape(
         buildScrapeRequestFromResponse(expected_response),
-        [](tr_scrape_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
-        &response);
+        [&response](tr_scrape_response const& resp) { response = resp; });
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -531,14 +538,11 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     // build the announcer
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     // tell the announcer to scrape
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(
-        request,
-        [](tr_scrape_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
-        &response);
+    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -616,13 +620,10 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     // build the announcer
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
+    auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     auto response = std::optional<tr_announce_response>{};
-    announcer->announce(
-        request,
-        [](tr_announce_response const* resp, void* vresponse)
-        { *static_cast<std::optional<tr_announce_response>*>(vresponse) = *resp; },
-        &response);
+    announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
 
     // Announcer will request a connection. Verify and grant the request
     auto sent = waitForAnnouncerToSendMessage(mediator);

@@ -111,8 +111,6 @@ void BaseWatchdir::processFile(std::string_view basename)
 
 void BaseWatchdir::scan()
 {
-    auto new_dir_entries = std::set<std::string>{};
-
     tr_error* error = nullptr;
     auto const dir = tr_sys_dir_open(dirname_.c_str(), &error);
     if (dir == TR_BAD_SYS_DIR)

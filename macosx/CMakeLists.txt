@@ -71,6 +71,7 @@ set(${PROJECT_NAME}_SOURCES
     main.mm
     MessageWindowController.mm
     NSApplicationAdditions.mm
+    NSDataAdditions.mm
     NSImageAdditions.mm
     NSKeyedUnarchiverAdditions.mm
     NSMutableArrayAdditions.mm
@@ -143,6 +144,7 @@ set(${PROJECT_NAME}_HEADERS
     InfoWindowController.h
     MessageWindowController.h
     NSApplicationAdditions.h
+    NSDataAdditions.h
     NSImageAdditions.h
     NSKeyedUnarchiverAdditions.h
     NSMutableArrayAdditions.h
@@ -397,7 +399,7 @@ add_definitions(
 )
 
 add_library(vdkqueue STATIC
-    VDKQueue/VDKQueue.m
+    VDKQueue/VDKQueue.mm
     VDKQueue/VDKQueue.h
 )
 

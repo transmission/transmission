@@ -260,17 +260,17 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
 
 } // namespace
 
-int tr_ioRead(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t* setme)
+int tr_ioRead(tr_torrent* tor, tr_block_info::Location loc, size_t len, uint8_t* setme)
 {
     return readOrWritePiece(tor, IoMode::Read, loc, setme, len);
 }
 
-int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location loc, uint32_t len)
+int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location loc, size_t len)
 {
     return readOrWritePiece(tor, IoMode::Prefetch, loc, nullptr, len);
 }
 
-int tr_ioWrite(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t const* writeme)
+int tr_ioWrite(tr_torrent* tor, tr_block_info::Location loc, size_t len, uint8_t const* writeme)
 {
     return readOrWritePiece(tor, IoMode::Write, loc, const_cast<uint8_t*>(writeme), len);
 }

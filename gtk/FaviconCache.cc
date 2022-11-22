@@ -141,6 +141,13 @@ void gtr_get_favicon_from_url(
     Glib::ustring const& url,
     std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func)
 {
-    auto const host = std::string{ tr_urlParse(url.c_str())->host };
-    gtr_get_favicon(session, host, pixbuf_ready_func);
+    if (auto const parsed_url = tr_urlParse(url.c_str()); parsed_url.has_value())
+    {
+        auto const host = std::string{ parsed_url->host };
+        gtr_get_favicon(session, host, pixbuf_ready_func);
+    }
+    else
+    {
+        pixbuf_ready_func({});
+    }
 }

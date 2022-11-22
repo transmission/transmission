@@ -85,7 +85,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
 
 static void ensure_sound_cmd_is_a_list(tr_variant* dict)
 {
-    tr_quark key = TR_KEY_torrent_complete_sound_command;
+    tr_quark const key = TR_KEY_torrent_complete_sound_command;
     tr_variant* list = nullptr;
     if (tr_variantDictFindList(dict, key, &list))
     {

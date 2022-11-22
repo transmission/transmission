@@ -400,9 +400,6 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "Источник: трекер";
 
-/* File size - gigabytes */
-"GB" = "ГБ";
-
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "ГБ/с";
 
@@ -477,9 +474,6 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Файл «%1$@» из %2$@ не является торрент-файлом.";
 
-/* File size - kilobytes */
-"KB" = "КБ";
-
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "КБ/с";
 
@@ -516,9 +510,6 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Magnet-раздача";
-
-/* File size - megabytes */
-"MB" = "МБ";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "МБ/с";
@@ -916,9 +907,6 @@
 
 /* Donation beg -> title */
 "Support open-source indie software" = "Поддержите независимую программу с открытым исходным кодом";
-
-/* File size - terabytes */
-"TB" = "ТБ";
 
 /* Transfer speed (terabytes per second) */
 "TB/s" = "ТБ/с";

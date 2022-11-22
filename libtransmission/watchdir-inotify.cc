@@ -153,7 +153,7 @@ private:
 
             // consume entire name into buffer
             name.resize(ev.len);
-            nread = bufferevent_read(event, std::data(name), ev.len);
+            nread = bufferevent_read(event, name.data(), ev.len);
             if (nread == static_cast<size_t>(-1))
             {
                 auto const error_code = errno;

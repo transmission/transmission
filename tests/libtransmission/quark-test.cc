@@ -18,7 +18,7 @@ protected:
     template<typename T>
     std::string quarkGetString(T i)
     {
-        return std::string{ tr_quark_get_string_view(tr_quark(i)) };
+        return std::string{ tr_quark_get_string_view(tr_quark{ i }) };
     }
 };
 

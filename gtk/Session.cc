@@ -206,7 +206,7 @@ private:
     tr_session* session_ = nullptr;
 };
 
-TorrentModelColumns::TorrentModelColumns()
+TorrentModelColumns::TorrentModelColumns() noexcept
 {
     add(name_collated);
     add(torrent);
@@ -313,6 +313,7 @@ bool is_valid_eta(int t)
     return t != TR_ETA_NOT_AVAIL && t != TR_ETA_UNKNOWN;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_eta(int a, int b)
 {
     bool const a_valid = is_valid_eta(a);
@@ -337,11 +338,13 @@ int compare_eta(int a, int b)
 }
 
 template<typename T>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_generic(T&& a, T&& b)
 {
     return a < b ? -1 : (a > b ? 1 : 0);
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_ratio(double a, double b)
 {
     int ret = 0;
@@ -366,11 +369,13 @@ int compare_ratio(double a, double b)
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_name(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     return a->get_value(torrent_cols.name_collated).compare(b->get_value(torrent_cols.name_collated));
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_queue(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -379,6 +384,7 @@ int compare_by_queue(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::co
     return sb->queuePosition - sa->queuePosition;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_ratio(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
@@ -399,6 +405,7 @@ int compare_by_ratio(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::co
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     int ret = 0;
@@ -427,6 +434,7 @@ int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
@@ -441,6 +449,7 @@ int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::cons
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -455,6 +464,7 @@ int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::con
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -474,6 +484,7 @@ int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel:
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_eta(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
@@ -488,6 +499,7 @@ int compare_by_eta(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::cons
     return ret;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
 {
     auto const sa = a->get_value(torrent_cols.activity);
@@ -942,7 +954,7 @@ bool is_torrent_active(tr_stat const* st)
 
 void Session::add_torrent(tr_torrent* tor, bool do_notify)
 {
-    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
+    ScopedModelSortBlocker const disable_sort(*impl_->get_model().get());
     impl_->add_torrent(tor, do_notify);
 }
 
@@ -1032,7 +1044,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 
     if (!do_prompt)
     {
-        ScopedModelSortBlocker disable_sort(*sorted_model_.get());
+        ScopedModelSortBlocker const disable_sort(*sorted_model_.get());
         add_torrent(create_new_torrent(ctor), do_notify);
         tr_ctorFree(ctor);
         return 0;
@@ -1260,7 +1272,7 @@ void Session::load(bool force_paused)
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
     tr_ctorFree(ctor);
 
-    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
+    ScopedModelSortBlocker const disable_sort(*impl_->get_model().get());
 
     auto torrents = std::vector<tr_torrent*>{};
     torrents.resize(n_torrents);
@@ -1283,6 +1295,7 @@ void Session::clear()
 namespace
 {
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int gtr_compare_double(double const a, double const b, int decimal_places)
 {
     auto const ia = int64_t(a * pow(10, decimal_places));
@@ -1399,9 +1412,9 @@ void Session::Impl::update()
 namespace
 {
 
-auto const SessionManagerServiceName = Glib::ustring("org.gnome.SessionManager"s);
-auto const SessionManagerInterface = Glib::ustring("org.gnome.SessionManager"s);
-auto const SessionManagerObjectPath = Glib::ustring("/org/gnome/SessionManager"s);
+auto const SessionManagerServiceName = "org.gnome.SessionManager"sv; // TODO(C++20): Use ""s
+auto const SessionManagerInterface = "org.gnome.SessionManager"sv; // TODO(C++20): Use ""s
+auto const SessionManagerObjectPath = "/org/gnome/SessionManager"sv; // TODO(C++20): Use ""s
 
 bool gtr_inhibit_hibernation(guint32& cookie)
 {
@@ -1416,8 +1429,8 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         auto response = connection->call_sync(
-            SessionManagerObjectPath,
-            SessionManagerInterface,
+            std::string(SessionManagerObjectPath),
+            std::string(SessionManagerInterface),
             "Inhibit",
             Glib::VariantContainerBase::create_tuple({
                 Glib::Variant<Glib::ustring>::create(application),
@@ -1425,7 +1438,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
                 Glib::Variant<Glib::ustring>::create(reason),
                 Glib::Variant<guint32>::create(flags),
             }),
-            SessionManagerServiceName,
+            std::string(SessionManagerServiceName),
             1000);
 
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
@@ -1450,11 +1463,11 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
         auto const connection = Gio::DBus::Connection::get_sync(TR_GIO_DBUS_BUS_TYPE(SESSION));
 
         connection->call_sync(
-            SessionManagerObjectPath,
-            SessionManagerInterface,
+            std::string(SessionManagerObjectPath),
+            std::string(SessionManagerInterface),
             "Uninhibit",
             Glib::VariantContainerBase::create_tuple({ Glib::Variant<guint32>::create(inhibit_cookie) }),
-            SessionManagerServiceName,
+            std::string(SessionManagerServiceName),
             1000);
 
         /* logging */

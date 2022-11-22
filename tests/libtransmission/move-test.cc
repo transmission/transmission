@@ -22,10 +22,7 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 auto constexpr MaxWaitMsec = 5000;
@@ -190,6 +187,4 @@ TEST_F(MoveTest, setLocation)
     tr_torrentRemove(tor, true, nullptr, nullptr);
 }
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

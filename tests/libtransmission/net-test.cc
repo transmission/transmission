@@ -115,7 +115,7 @@ TEST_F(NetTest, compact6)
     auto compact6 = std::array<std::byte, 18>{};
     auto out = std::data(compact6);
     out = addr.toCompact6(out, port);
-    EXPECT_EQ(std::size(Compact6), out - std::data(compact6));
+    EXPECT_EQ(std::size(Compact6), static_cast<size_t>(out - std::data(compact6)));
     EXPECT_EQ(Compact6, compact6);
 
     /// sockaddr --> compact

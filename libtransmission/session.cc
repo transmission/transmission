@@ -238,7 +238,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
     return std::nullopt;
 }
 
-unsigned int tr_session::WebMediator::clamp(int torrent_id, unsigned int byte_count) const
+size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
 {
     auto const lock = session_->unique_lock();
 
@@ -557,8 +557,6 @@ void tr_session::initImpl(init_data& data)
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
     this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
-
-    tr_announcerInit(this);
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
@@ -1248,7 +1246,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
     // remaining `event=stopped` announce messages are queued in
     // the announcer. The announcer's destructor sends all those
     // out via `web_`...
-    tr_announcerClose(this);
+    this->announcer_.reset();
     // ...and now that those are queued, tell web_ that we're
     // shutting down soon. This leaves the `event=stopped` messages
     // in the queue but refuses to take any _new_ tasks
@@ -1503,7 +1501,7 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
         {
             if (tor->isPublic())
             {
-                tr_announcerResetTorrent(announcer, tor);
+                announcer_->resetTorrent(tor);
             }
         }
     }
@@ -1894,7 +1892,7 @@ bool tr_sessionGetQueueStalledEnabled(tr_session const* session)
     return session->queueStalledEnabled();
 }
 
-int tr_sessionGetQueueStalledMinutes(tr_session const* session)
+size_t tr_sessionGetQueueStalledMinutes(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
@@ -1973,7 +1971,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
     /* count how many torrents are active */
     auto active_count = size_t{};
     bool const stalled_enabled = queueStalledEnabled();
-    int const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
+    auto const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
     time_t const now = tr_time();
     for (auto const* const tor : torrents())
     {
@@ -1986,7 +1984,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
         /* is it stalled? */
         if (stalled_enabled)
         {
-            auto const idle_secs = int(difftime(now, std::max(tor->startDate, tor->activityDate)));
+            auto const idle_secs = static_cast<size_t>(difftime(now, std::max(tor->startDate, tor->activityDate)));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
             {
                 continue;

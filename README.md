@@ -78,6 +78,10 @@ You would want to setup your editor to make use of the .clang-format file locate
 
 If for some reason you are unwilling or unable to do so, there is a shell script which you can use: `./code_style.sh`
 
+### Translations
+
+See [language translations](docs/Translating.md).
+
 ## Sponsors
 
 <table>

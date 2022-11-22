@@ -109,9 +109,11 @@ static constexpr auto stat_to_sys_path_info(DWORD attributes, DWORD size_low, DW
     return info;
 }
 
+static auto constexpr Slashes = "\\/"sv;
+
 static constexpr bool is_slash(char c)
 {
-    return c == '\\' || c == '/';
+    return tr_strvContains(Slashes, c);
 }
 
 static constexpr bool is_unc_path(std::string_view path)
@@ -547,11 +549,11 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
     return {};
 }
 
-std::string tr_sys_path_basename(std::string_view path, tr_error** error)
+std::string_view tr_sys_path_basename(std::string_view path, tr_error** error)
 {
     if (std::empty(path))
     {
-        return ".";
+        return "."sv;
     }
 
     if (!is_valid_path(path))
@@ -560,32 +562,23 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
         return {};
     }
 
-    char const* const begin = std::data(path);
-    char const* end = begin + std::size(path);
-
-    while (end > begin && is_slash(*(end - 1)))
+    // Remove all trailing slashes.
+    // If nothing is left, return "/"
+    if (auto const pos = path.find_last_not_of(Slashes); pos != std::string_view::npos)
     {
-        --end;
+        path = path.substr(0, pos + 1);
+    }
+    else // all slashes
+    {
+        return "/"sv;
     }
 
-    if (end == begin)
+    if (auto pos = path.find_last_of("\\/:"); pos != std::string_view::npos)
     {
-        return "/";
+        path.remove_prefix(pos + 1);
     }
 
-    char const* name = end;
-
-    while (name > begin && *(name - 1) != ':' && !is_slash(*(name - 1)))
-    {
-        --name;
-    }
-
-    if (name == end)
-    {
-        return "/";
-    }
-
-    return { name, size_t(end - name) };
+    return !std::empty(path) ? path : "/"sv;
 }
 
 [[nodiscard]] static bool isWindowsDeviceRoot(char ch) noexcept

@@ -61,7 +61,7 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 static constexpr size_t guessPacketOverhead(size_t d)
 {
     /**
-     * http://sd.wareonearth.com/~phil/net/overhead/
+     * https://web.archive.org/web/20140912230020/http://sd.wareonearth.com:80/~phil/net/overhead/
      *
      * TCP over Ethernet:
      * Assuming no header compression (e.g. not PPP)
@@ -74,7 +74,7 @@ static constexpr size_t guessPacketOverhead(size_t d)
      * (1500-52)/ (42+1500) = 93.9040 %  802.1q, IPv4, TCP timestamps
      * (1500-60)/ (38+1500) = 93.6281 %  IPv6, minimal headers
      * (1500-72)/ (38+1500) = 92.8479 %  IPv6, TCP timestamps
-     * (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, ICP timestamps
+     * (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, TCP timestamps
      */
     double const assumed_payload_data_rate = 94.0;
 
@@ -144,9 +144,9 @@ static void canReadWrapper(tr_peerIo* io_in)
     while (!done && !err)
     {
         size_t piece = 0;
-        size_t const old_len = io->readBufferSize();
-        int const ret = io->canRead(io.get(), io->userData, &piece);
-        size_t const used = old_len - io->readBufferSize();
+        auto const old_len = io->readBufferSize();
+        auto const read_state = io->canRead == nullptr ? READ_ERR : io->canRead(io.get(), io->userData, &piece);
+        auto const used = old_len - io->readBufferSize();
         auto const overhead = guessPacketOverhead(used);
 
         if (piece != 0 || piece != used)
@@ -167,7 +167,7 @@ static void canReadWrapper(tr_peerIo* io_in)
             io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
         }
 
-        switch (ret)
+        switch (read_state)
         {
         case READ_NOW:
             if (io->readBufferSize() != 0)
@@ -203,7 +203,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     io->pendingEvents &= ~EV_READ;
 
     auto const curlen = io->readBufferSize();
-    auto howmuch = static_cast<unsigned int>(curlen >= max ? 0 : max - curlen);
+    auto howmuch = curlen >= max ? 0 : max - curlen;
     howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
 
     tr_logAddTraceIo(io, "libevent says this peer is ready to read");
@@ -246,10 +246,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
                 fmt::format("event_read_cb err: res:{}, what:{}, errno:{} ({})", res, what, error->code, error->message));
         }
 
-        if (io->gotError != nullptr)
-        {
-            io->gotError(io, what, io->userData);
-        }
+        io->call_error_callback(what);
     }
 
     tr_error_clear(&error);
@@ -312,10 +309,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
                 (error != nullptr ? error->code : 0),
                 (error != nullptr ? error->message : "EOF")));
 
-        if (io->gotError != nullptr)
-        {
-            io->gotError(io, what, io->userData);
-        }
+        io->call_error_callback(what);
     }
 
     tr_error_clear(&error);
@@ -345,7 +339,7 @@ void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 
 static size_t utp_get_rb_size(tr_peerIo* const io)
 {
-    size_t const bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
+    auto const bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
 
     tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
     return UtpReadBufferSize - bytes;
@@ -379,10 +373,7 @@ static void utp_on_state_change(tr_peerIo* const io, int const state)
     }
     else if (state == UTP_STATE_EOF)
     {
-        if (io->gotError != nullptr)
-        {
-            io->gotError(io, BEV_EVENT_EOF, io->userData);
-        }
+        io->call_error_callback(BEV_EVENT_EOF);
     }
     else if (state == UTP_STATE_DESTROYING)
     {
@@ -401,7 +392,7 @@ static void utp_on_error(tr_peerIo* const io, int const errcode)
     if (io->gotError != nullptr)
     {
         errno = errcode;
-        io->gotError(io, BEV_EVENT_ERROR, io->userData);
+        io->call_error_callback(BEV_EVENT_ERROR);
     }
 }
 
@@ -518,7 +509,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 #endif
 
     default:
-        TR_ASSERT_MSG(false, fmt::format("unsupported peer socket type {:d}", socket.type));
+        TR_ASSERT_MSG(false, fmt::format("unsupported peer socket type {:d}", static_cast<int>(socket.type)));
     }
 
     return io;
@@ -699,7 +690,7 @@ static void io_close_socket(tr_peerIo* io)
 #endif
 
     default:
-        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
+        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", static_cast<int>(io->socket.type)));
     }
 
     io->event_write.reset();
@@ -797,16 +788,13 @@ size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const noexcept
 
 void tr_peerIo::write(libtransmission::Buffer& buf, bool is_piece_data)
 {
-    auto const n_bytes = std::size(buf);
-
-    auto const old_size = std::size(outbuf);
-    outbuf.add(buf);
-    for (auto iter = std::begin(outbuf) + old_size, end = std::end(outbuf); iter != end; ++iter)
+    for (auto& ch : buf)
     {
-        encrypt(1, &*iter);
+        encrypt(1, &ch);
     }
 
-    outbuf_info.emplace_back(n_bytes, is_piece_data);
+    outbuf_info.emplace_back(std::size(buf), is_piece_data);
+    outbuf.add(buf);
 }
 
 void tr_peerIo::writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data)
@@ -907,10 +895,7 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
                     my_error->message);
                 tr_logAddTraceIo(io, msg);
 
-                if (io->gotError != nullptr)
-                {
-                    io->gotError(io, what, io->userData);
-                }
+                io->call_error_callback(what);
 
                 tr_error_propagate(error, &my_error);
             }
@@ -973,10 +958,7 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
                         my_error->code,
                         my_error->message));
 
-                if (io->gotError != nullptr)
-                {
-                    io->gotError(io, What, io->userData);
-                }
+                io->call_error_callback(What);
 
                 tr_error_propagate(error, &my_error);
             }
@@ -1010,7 +992,9 @@ size_t tr_peerIo::flush(tr_direction dir, size_t limit, tr_error** error)
     TR_ASSERT(tr_isDirection(dir));
 
     auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit, error) : tr_peerIoTryWrite(this, limit, error);
-    tr_logAddTraceIo(this, fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", dir, limit, bytes_used));
+    tr_logAddTraceIo(
+        this,
+        fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", static_cast<int>(dir), limit, bytes_used));
     return bytes_used;
 }
 

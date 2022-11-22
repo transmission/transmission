@@ -324,8 +324,8 @@ public:
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    void get_size_compact(Gtk::Widget& widget, int& width, int& height) const;
-    void get_size_full(Gtk::Widget& widget, int& width, int& height) const;
+    Gtk::Requisition get_size_compact(Gtk::Widget& widget) const;
+    Gtk::Requisition get_size_full(Gtk::Widget& widget) const;
 
     void render_compact(
         SnapshotPtr const& snapshot,
@@ -442,7 +442,7 @@ void TorrentCellRenderer::Impl::set_icon(
 #endif
 }
 
-void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width, int& height) const
+Gtk::Requisition TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget) const
 {
     int xpad = 0;
     int ypad = 0;
@@ -478,11 +478,11 @@ void TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget, int& width
     *** LAYOUT
     **/
 
-    width = xpad * 2 + get_width(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + get_width(stat_size);
-    height = ypad * 2 + std::max(get_height(name_size), property_bar_height_.get_value());
+    return { xpad * 2 + get_width(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + get_width(stat_size),
+             ypad * 2 + std::max(get_height(name_size), property_bar_height_.get_value()) };
 }
 
-void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, int& height) const
+Gtk::Requisition TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget) const
 {
     int xpad = 0;
     int ypad = 0;
@@ -526,29 +526,20 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
     *** LAYOUT
     **/
 
-    width = xpad * 2 + get_width(icon_size) + GUI_PAD + std::max(get_width(prog_size), get_width(stat_size));
-    height = ypad * 2 + get_height(name_size) + get_height(prog_size) + GUI_PAD_SMALL + property_bar_height_.get_value() +
-        GUI_PAD_SMALL + get_height(stat_size);
+    return { xpad * 2 + get_width(icon_size) + GUI_PAD + std::max(get_width(prog_size), get_width(stat_size)),
+             ypad * 2 + get_height(name_size) + get_height(prog_size) + GUI_PAD_SMALL + property_bar_height_.get_value() +
+                 GUI_PAD_SMALL + get_height(stat_size) };
 }
 
 void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const
 {
     if (impl_->property_torrent().get_value() != nullptr)
     {
-        int w = 0;
-        int h = 0;
+        auto const size = impl_->property_compact().get_value() ? impl_->get_size_compact(widget) :
+                                                                  impl_->get_size_full(widget);
 
-        if (impl_->property_compact().get_value())
-        {
-            impl_->get_size_compact(widget, w, h);
-        }
-        else
-        {
-            impl_->get_size_full(widget, w, h);
-        }
-
-        minimum_width = w;
-        natural_width = w;
+        minimum_width = get_width(size);
+        natural_width = minimum_width;
     }
 }
 
@@ -556,20 +547,11 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
 {
     if (impl_->property_torrent().get_value() != nullptr)
     {
-        int w = 0;
-        int h = 0;
+        auto const size = impl_->property_compact().get_value() ? impl_->get_size_compact(widget) :
+                                                                  impl_->get_size_full(widget);
 
-        if (impl_->property_compact().get_value())
-        {
-            impl_->get_size_compact(widget, w, h);
-        }
-        else
-        {
-            impl_->get_size_full(widget, w, h);
-        }
-
-        minimum_height = h;
-        natural_height = h;
+        minimum_height = get_height(size);
+        natural_height = minimum_height;
     }
 }
 
@@ -579,7 +561,7 @@ namespace
 int get_percent_done(tr_torrent const* tor, tr_stat const* st)
 {
     auto const seed = st->activity == TR_STATUS_SEED && tr_torrentGetSeedRatio(tor, nullptr);
-    return static_cast<int>(seed ? std::max(0.0F, st->seedRatioPercentDone) : std::max(0.0F, st->percentDone));
+    return static_cast<int>((seed ? std::max(0.0F, st->seedRatioPercentDone) : std::max(0.0F, st->percentDone)) * 100);
 }
 
 Gdk::RGBA const& get_progress_bar_color(tr_stat const& st)

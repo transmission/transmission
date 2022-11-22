@@ -320,7 +320,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
         NSUInteger count = self.torrent.fileCount;
         if (count != 1)
         {
-            fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Add torrent -> info"), count];
+            fileString = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu files", "Add torrent -> info"), count];
         }
         else
         {

@@ -187,7 +187,8 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
         }
         else
         {
-            connectedText = [NSString stringWithFormat:NSLocalizedString(@"%lu Connected", "Inspector -> Peers tab -> peers"), connected];
+            connectedText = [NSString
+                localizedStringWithFormat:NSLocalizedString(@"%lu Connected", "Inspector -> Peers tab -> peers"), connected];
         }
 
         if (connected > 0)
@@ -196,12 +197,12 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
             if (toUs > 0)
             {
                 [upDownComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"DL from %lu", "Inspector -> Peers tab -> peers"), toUs]];
+                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"DL from %lu", "Inspector -> Peers tab -> peers"), toUs]];
             }
             if (fromUs > 0)
             {
                 [upDownComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"UL to %lu", "Inspector -> Peers tab -> peers"), fromUs]];
+                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"UL to %lu", "Inspector -> Peers tab -> peers"), fromUs]];
             }
             if (upDownComponents.count > 0)
             {
@@ -211,38 +212,38 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
             NSMutableArray* fromComponents = [NSMutableArray arrayWithCapacity:7];
             if (tracker > 0)
             {
-                [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu tracker", "Inspector -> Peers tab -> peers"), tracker]];
+                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu tracker", "Inspector -> Peers tab -> peers"),
+                                                                              tracker]];
             }
             if (incoming > 0)
             {
-                [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu incoming", "Inspector -> Peers tab -> peers"), incoming]];
+                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu incoming", "Inspector -> Peers tab -> peers"),
+                                                                              incoming]];
             }
             if (cache > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu cache", "Inspector -> Peers tab -> peers"), cache]];
+                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu cache", "Inspector -> Peers tab -> peers"), cache]];
             }
             if (lpd > 0)
             {
-                [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu local discovery", "Inspector -> Peers tab -> peers"), lpd]];
+                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu local discovery", "Inspector -> Peers tab -> peers"),
+                                                                              lpd]];
             }
             if (pex > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu PEX", "Inspector -> Peers tab -> peers"), pex]];
+                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu PEX", "Inspector -> Peers tab -> peers"), pex]];
             }
             if (dht > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu DHT", "Inspector -> Peers tab -> peers"), dht]];
+                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu DHT", "Inspector -> Peers tab -> peers"), dht]];
             }
             if (ltep > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu LTEP", "Inspector -> Peers tab -> peers"), ltep]];
+                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu LTEP", "Inspector -> Peers tab -> peers"), ltep]];
             }
 
             connectedText = [connectedText stringByAppendingFormat:@"\n%@", [fromComponents componentsJoinedByString:@", "]];

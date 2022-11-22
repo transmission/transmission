@@ -24,10 +24,7 @@
 #define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
 #endif
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 std::string getTestProgramPath(std::string const& filename)
@@ -296,6 +293,4 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values( //
             getTestProgramPath("subprocess-test"))));
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

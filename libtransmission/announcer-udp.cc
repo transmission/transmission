@@ -5,8 +5,9 @@
 
 #include <algorithm> // for std::find_if()
 #include <cerrno> // for errno, EAFNOSUPPORT
-#include <cstring> // for memcpy()
+#include <cstring> // for memset()
 #include <ctime>
+#include <future>
 #include <list>
 #include <memory>
 #include <string_view>
@@ -14,6 +15,8 @@
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
+#undef gai_strerror
+#define gai_strerror gai_strerrorA
 #endif
 
 #include <fmt/core.h>
@@ -27,7 +30,6 @@
 #include "announcer-common.h"
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
-#include "error.h"
 #include "peer-io.h"
 #include "peer-mgr.h" // for tr_pex::fromCompact4()
 #include "session.h"
@@ -36,17 +38,13 @@
 #include "utils.h"
 #include "web-utils.h"
 
-#ifdef _WIN32
-#undef gai_strerror
-#define gai_strerror gai_strerrorA
-#endif
-
 #define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
 #define logtrace(interned, msg) tr_logAddTrace(msg, (interned).sv())
 
 using namespace std::literals;
 
+// size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
@@ -59,7 +57,7 @@ static tau_transaction_t tau_transaction_new()
     return tmp;
 }
 
-/* used in the "action" field of a request */
+// used in the "action" field of a request. Values defined in bep 15.
 enum tau_action_t
 {
     TAU_ACTION_CONNECT = 0,
@@ -68,46 +66,46 @@ enum tau_action_t
     TAU_ACTION_ERROR = 3
 };
 
-static bool is_tau_response_message(tau_action_t action, size_t msglen)
-{
-    if (action == TAU_ACTION_CONNECT)
-    {
-        return msglen == 16;
-    }
-
-    if (action == TAU_ACTION_ANNOUNCE)
-    {
-        return msglen >= 20;
-    }
-
-    if (action == TAU_ACTION_SCRAPE)
-    {
-        return msglen >= 20;
-    }
-
-    if (action == TAU_ACTION_ERROR)
-    {
-        return msglen >= 8;
-    }
-
-    return false;
-}
-
-static auto constexpr TauRequestTtl = int{ 60 };
-
 /****
-*****
 *****  SCRAPE
-*****
 ****/
 
 struct tau_scrape_request
 {
+    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func on_response)
+        : on_response_{ std::move(on_response) }
+    {
+        this->response.scrape_url = in.scrape_url;
+        this->response.row_count = in.info_hash_count;
+        for (int i = 0; i < this->response.row_count; ++i)
+        {
+            this->response.rows[i].seeders = -1;
+            this->response.rows[i].leechers = -1;
+            this->response.rows[i].downloads = -1;
+            this->response.rows[i].info_hash = in.info_hash[i];
+        }
+
+        // build the payload
+        auto buf = libtransmission::Buffer{};
+        buf.addUint32(TAU_ACTION_SCRAPE);
+        buf.addUint32(transaction_id);
+        for (int i = 0; i < in.info_hash_count; ++i)
+        {
+            buf.add(in.info_hash[i]);
+        }
+        this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
+    }
+
+    [[nodiscard]] auto has_callback() const noexcept
+    {
+        return !!on_response_;
+    }
+
     void requestFinished()
     {
-        if (callback != nullptr)
+        if (on_response_)
         {
-            callback(&response, user_data);
+            on_response_(response);
         }
     }
 
@@ -150,67 +148,57 @@ struct tau_scrape_request
 
     std::vector<std::byte> payload;
 
-    time_t sent_at;
-    time_t created_at;
-    tau_transaction_t transaction_id;
-
-    tr_scrape_response response;
-    tr_scrape_response_func callback;
-    void* user_data;
-};
-
-static tau_scrape_request make_tau_scrape_request(
-    tr_scrape_request const& in,
-    tr_scrape_response_func callback,
-    void* user_data)
-{
+    time_t sent_at = 0;
+    time_t const created_at = tr_time();
     tau_transaction_t const transaction_id = tau_transaction_new();
 
-    /* build the payload */
-    auto buf = libtransmission::Buffer{};
-    buf.addUint32(TAU_ACTION_SCRAPE);
-    buf.addUint32(transaction_id);
-    for (int i = 0; i < in.info_hash_count; ++i)
-    {
-        buf.add(in.info_hash[i]);
-    }
+    tr_scrape_response response = {};
 
-    // build the tau_scrape_request
-    auto req = tau_scrape_request{};
-    req.callback = callback;
-    req.created_at = tr_time();
-    req.transaction_id = transaction_id;
-    req.callback = callback;
-    req.user_data = user_data;
-    req.response.scrape_url = in.scrape_url;
-    req.response.row_count = in.info_hash_count;
-    req.payload.insert(std::end(req.payload), std::begin(buf), std::end(buf));
-
-    for (int i = 0; i < req.response.row_count; ++i)
-    {
-        req.response.rows[i].seeders = -1;
-        req.response.rows[i].leechers = -1;
-        req.response.rows[i].downloads = -1;
-        req.response.rows[i].info_hash = in.info_hash[i];
-    }
-
-    /* cleanup */
-    return req;
-}
+private:
+    tr_scrape_response_func on_response_;
+};
 
 /****
-*****
 *****  ANNOUNCE
-*****
 ****/
 
 struct tau_announce_request
 {
+    tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
+        : on_response_{ std::move(on_response) }
+    {
+        response.seeders = -1;
+        response.leechers = -1;
+        response.downloads = -1;
+        response.info_hash = in.info_hash;
+
+        // build the payload
+        auto buf = libtransmission::Buffer{};
+        buf.addUint32(TAU_ACTION_ANNOUNCE);
+        buf.addUint32(transaction_id);
+        buf.add(in.info_hash);
+        buf.add(in.peer_id);
+        buf.addUint64(in.down);
+        buf.addUint64(in.leftUntilComplete);
+        buf.addUint64(in.up);
+        buf.addUint32(get_tau_announce_event(in.event));
+        buf.addUint32(announce_ip);
+        buf.addUint32(in.key);
+        buf.addUint32(in.numwant);
+        buf.addPort(in.port);
+        payload.insert(std::end(payload), std::begin(buf), std::end(buf));
+    }
+
+    [[nodiscard]] auto has_callback() const noexcept
+    {
+        return !!on_response_;
+    }
+
     void requestFinished()
     {
-        if (this->callback != nullptr)
+        if (on_response_)
         {
-            this->callback(&this->response, this->user_data);
+            on_response_(this->response);
         }
     }
 
@@ -246,87 +234,48 @@ struct tau_announce_request
         }
     }
 
+    enum tau_announce_event
+    {
+        // Used in the "event" field of an announce request.
+        // These values come from BEP 15
+        TAU_ANNOUNCE_EVENT_NONE = 0,
+        TAU_ANNOUNCE_EVENT_COMPLETED = 1,
+        TAU_ANNOUNCE_EVENT_STARTED = 2,
+        TAU_ANNOUNCE_EVENT_STOPPED = 3
+    };
+
     std::vector<std::byte> payload;
 
-    time_t created_at = 0;
+    time_t const created_at = tr_time();
     time_t sent_at = 0;
-    tau_transaction_t transaction_id = 0;
+    tau_transaction_t const transaction_id = tau_transaction_new();
 
     tr_announce_response response = {};
 
-    tr_announce_response_func callback = nullptr;
-    void* user_data = nullptr;
-};
-
-enum tau_announce_event
-{
-    /* used in the "event" field of an announce request */
-    TAU_ANNOUNCE_EVENT_NONE = 0,
-    TAU_ANNOUNCE_EVENT_COMPLETED = 1,
-    TAU_ANNOUNCE_EVENT_STARTED = 2,
-    TAU_ANNOUNCE_EVENT_STOPPED = 3
-};
-
-static tau_announce_event get_tau_announce_event(tr_announce_event e)
-{
-    switch (e)
+private:
+    [[nodiscard]] static constexpr tau_announce_event get_tau_announce_event(tr_announce_event e)
     {
-    case TR_ANNOUNCE_EVENT_COMPLETED:
-        return TAU_ANNOUNCE_EVENT_COMPLETED;
+        switch (e)
+        {
+        case TR_ANNOUNCE_EVENT_COMPLETED:
+            return TAU_ANNOUNCE_EVENT_COMPLETED;
 
-    case TR_ANNOUNCE_EVENT_STARTED:
-        return TAU_ANNOUNCE_EVENT_STARTED;
+        case TR_ANNOUNCE_EVENT_STARTED:
+            return TAU_ANNOUNCE_EVENT_STARTED;
 
-    case TR_ANNOUNCE_EVENT_STOPPED:
-        return TAU_ANNOUNCE_EVENT_STOPPED;
+        case TR_ANNOUNCE_EVENT_STOPPED:
+            return TAU_ANNOUNCE_EVENT_STOPPED;
 
-    default:
-        return TAU_ANNOUNCE_EVENT_NONE;
+        default:
+            return TAU_ANNOUNCE_EVENT_NONE;
+        }
     }
-}
 
-static tau_announce_request make_tau_announce_request(
-    uint32_t announce_ip,
-    tr_announce_request const& in,
-    tr_announce_response_func callback,
-    void* user_data)
-{
-    tau_transaction_t const transaction_id = tau_transaction_new();
-
-    /* build the payload */
-    auto buf = libtransmission::Buffer{};
-    buf.addUint32(TAU_ACTION_ANNOUNCE);
-    buf.addUint32(transaction_id);
-    buf.add(in.info_hash);
-    buf.add(in.peer_id);
-    buf.addUint64(in.down);
-    buf.addUint64(in.leftUntilComplete);
-    buf.addUint64(in.up);
-    buf.addUint32(get_tau_announce_event(in.event));
-    buf.addUint32(announce_ip);
-    buf.addUint32(in.key);
-    buf.addUint32(in.numwant);
-    buf.addPort(in.port);
-
-    /* build the tau_announce_request */
-    auto req = tau_announce_request();
-    req.created_at = tr_time();
-    req.transaction_id = transaction_id;
-    req.callback = callback;
-    req.user_data = user_data;
-    req.payload.insert(std::end(req.payload), std::begin(buf), std::end(buf));
-    req.response.seeders = -1;
-    req.response.leechers = -1;
-    req.response.downloads = -1;
-    req.response.info_hash = in.info_hash;
-
-    return req;
-}
+    tr_announce_response_func on_response_;
+};
 
 /****
-*****
-*****  TRACKERS
-*****
+*****  TRACKER
 ****/
 
 struct tau_tracker
@@ -334,26 +283,154 @@ struct tau_tracker
     using Mediator = tr_announcer_udp::Mediator;
 
     tau_tracker(Mediator& mediator, tr_interned_string key_in, tr_interned_string host_in, tr_port port_in)
-        : mediator_{ mediator }
-        , key{ key_in }
+        : key{ key_in }
         , host{ host_in }
         , port{ port_in }
+        , mediator_{ mediator }
     {
-    }
-
-    tau_tracker(tau_tracker&&) = delete;
-    tau_tracker(tau_tracker const&) = delete;
-    tau_tracker& operator=(tau_tracker&&) = delete;
-    tau_tracker& operator=(tau_tracker const&) = delete;
-
-    ~tau_tracker()
-    {
-        tr_error_clear(&addr_error_);
     }
 
     [[nodiscard]] auto isIdle() const noexcept
     {
-        return std::empty(announces) && std::empty(scrapes);
+        return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
+    }
+
+    void sendto(std::byte const* buf, size_t buflen)
+    {
+        TR_ASSERT(addr_);
+        if (!addr_)
+        {
+            return;
+        }
+
+        auto const& [ss, sslen] = *addr_;
+        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
+    }
+
+    void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
+    {
+        this->connecting_at = 0;
+        this->connection_transaction_id = 0;
+
+        if (action == TAU_ACTION_CONNECT)
+        {
+            this->connection_id = buf.toUint64();
+            this->connection_expiration_time = tr_time() + TauConnectionTtlSecs;
+            logdbg(this->key, fmt::format("Got a new connection ID from tracker: {}", this->connection_id));
+        }
+        else if (action == TAU_ACTION_ERROR)
+        {
+            std::string const errmsg = !std::empty(buf) ? buf.toString() : _("Connection failed");
+            logdbg(this->key, errmsg);
+            this->failAll(true, false, errmsg);
+        }
+
+        this->upkeep();
+    }
+
+    void upkeep(bool timeout_reqs = true)
+    {
+        time_t const now = tr_time();
+        bool const closing = this->close_at != 0;
+
+        // do we have a DNS request that's ready?
+        if (addr_pending_dns_ && addr_pending_dns_->wait_for(0ms) == std::future_status::ready)
+        {
+            addr_ = addr_pending_dns_->get();
+            addr_pending_dns_.reset();
+            addr_expires_at_ = now + DnsRetryIntervalSecs;
+        }
+
+        // are there any requests pending?
+        if (this->isIdle())
+        {
+            return;
+        }
+
+        // update the addr if our lookup is past its shelf date
+        if (!closing && !addr_pending_dns_ && addr_expires_at_ <= now)
+        {
+            addr_.reset();
+            addr_pending_dns_ = std::async(std::launch::async, lookup, this->host, this->port, this->key);
+            return;
+        }
+
+        logtrace(
+            this->key,
+            fmt::format(
+                "connected {} ({} {}) -- connecting_at {}",
+                is_connected(now),
+                this->connection_expiration_time,
+                now,
+                this->connecting_at));
+
+        /* also need a valid connection ID... */
+        if (addr_ && !is_connected(now) && this->connecting_at == 0)
+        {
+            this->connecting_at = now;
+            this->connection_transaction_id = tau_transaction_new();
+            logtrace(this->key, fmt::format("Trying to connect. Transaction ID is {}", this->connection_transaction_id));
+
+            auto buf = libtransmission::Buffer{};
+            buf.addUint64(0x41727101980LL);
+            buf.addUint32(TAU_ACTION_CONNECT);
+            buf.addUint32(this->connection_transaction_id);
+
+            auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
+            this->sendto(std::data(contiguous), std::size(contiguous));
+        }
+
+        if (timeout_reqs)
+        {
+            timeout_requests(now);
+        }
+
+        if (addr_ && is_connected(now))
+        {
+            send_requests();
+        }
+    }
+
+private:
+    using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
+    using MaybeSockaddr = std::optional<Sockaddr>;
+
+    [[nodiscard]] constexpr bool is_connected(time_t now) const noexcept
+    {
+        return connection_id != tau_connection_t{} && now < connection_expiration_time;
+    }
+
+    [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
+    {
+        auto szport = std::array<char, 16>{};
+        *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
+
+        auto hints = addrinfo{};
+        hints.ai_family = AF_UNSPEC;
+        hints.ai_protocol = IPPROTO_UDP;
+        hints.ai_socktype = SOCK_DGRAM;
+
+        addrinfo* info = nullptr;
+        if (int const rc = getaddrinfo(host.c_str(), std::data(szport), &hints, &info); rc != 0)
+        {
+            logwarn(
+                logname,
+                fmt::format(
+                    _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
+                    fmt::arg("address", host.sv()),
+                    fmt::arg("port", port.host()),
+                    fmt::arg("error", gai_strerror(rc)),
+                    fmt::arg("error_code", static_cast<int>(rc))));
+            return {};
+        }
+
+        auto ss = sockaddr_storage{};
+        auto const len = info->ai_addrlen;
+        memcpy(&ss, info->ai_addr, len);
+        freeaddrinfo(info);
+
+        logdbg(logname, "DNS lookup succeeded");
+        return std::make_pair(ss, len);
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -372,297 +449,125 @@ struct tau_tracker
         this->announces.clear();
     }
 
-    void sendto(void const* buf, size_t buflen)
+    ///
+
+    void timeout_requests(time_t now)
     {
-        TR_ASSERT(addr_);
-        if (!addr_)
+        bool const cancel_all = this->close_at != 0 && (this->close_at <= now);
+
+        if (this->connecting_at != 0 && this->connecting_at + TauRequestTtl < now)
         {
-            return;
+            auto empty_buf = libtransmission::Buffer{};
+            on_connection_response(TAU_ACTION_ERROR, empty_buf);
         }
 
-        auto [ss, sslen] = *addr_;
-
-        if (ss.ss_family == AF_INET)
-        {
-            reinterpret_cast<sockaddr_in*>(&ss)->sin_port = port.network();
-        }
-        else if (ss.ss_family == AF_INET6)
-        {
-            reinterpret_cast<sockaddr_in6*>(&ss)->sin6_port = port.network();
-        }
-
-        mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr*>(&ss), sslen);
+        timeout_requests(this->announces, now, cancel_all, "announce");
+        timeout_requests(this->scrapes, now, cancel_all, "scrape");
     }
 
-    Mediator& mediator_;
+    template<typename T>
+    void timeout_requests(std::list<T>& requests, time_t now, bool cancel_all, std::string_view name)
+    {
+        for (auto it = std::begin(requests); it != std::end(requests);)
+        {
+            auto& req = *it;
+            if (cancel_all || req.created_at + TauRequestTtl < now)
+            {
+                logtrace(this->key, fmt::format("timeout {} req {}", name, fmt::ptr(&req)));
+                req.fail(false, true, "");
+                it = requests.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
 
+    ///
+
+    void send_requests()
+    {
+        TR_ASSERT(!addr_pending_dns_);
+        TR_ASSERT(addr_);
+        TR_ASSERT(this->connecting_at == 0);
+        TR_ASSERT(this->connection_expiration_time > tr_time());
+
+        send_requests(this->announces);
+        send_requests(this->scrapes);
+    }
+
+    template<typename T>
+    void send_requests(std::list<T>& reqs)
+    {
+        auto const now = tr_time();
+
+        for (auto it = std::begin(reqs); it != std::end(reqs);)
+        {
+            auto& req = *it;
+
+            if (req.sent_at != 0) // it's already been sent; we're awaiting a response
+            {
+                ++it;
+                continue;
+            }
+
+            logdbg(this->key, fmt::format("sending req {}", fmt::ptr(&req)));
+            req.sent_at = now;
+            send_request(std::data(req.payload), std::size(req.payload));
+
+            if (req.has_callback())
+            {
+                ++it;
+                continue;
+            }
+
+            // no response needed, so we can remove it now
+            it = reqs.erase(it);
+        }
+    }
+
+    void send_request(std::byte const* payload, size_t payload_len)
+    {
+        logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
+
+        auto buf = libtransmission::Buffer{};
+        buf.addUint64(this->connection_id);
+        buf.add(payload, payload_len);
+
+        auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
+        this->sendto(std::data(contiguous), std::size(contiguous));
+    }
+
+public:
     tr_interned_string const key;
     tr_interned_string const host;
     tr_port const port;
 
-    tr_error* addr_error_ = nullptr;
-    std::optional<std::pair<sockaddr_storage, socklen_t>> addr_;
-    time_t addr_expires_at_ = 0;
-
     time_t connecting_at = 0;
     time_t connection_expiration_time = 0;
-    tau_connection_t connection_id = 0;
-    tau_transaction_t connection_transaction_id = 0;
+    tau_connection_t connection_id = {};
+    tau_transaction_t connection_transaction_id = {};
 
     time_t close_at = 0;
 
-    static time_t constexpr DnsRetryIntervalSecs = 60 * 60;
-
     std::list<tau_announce_request> announces;
     std::list<tau_scrape_request> scrapes;
+
+private:
+    Mediator& mediator_;
+
+    std::optional<std::future<MaybeSockaddr>> addr_pending_dns_ = {};
+
+    MaybeSockaddr addr_ = {};
+    time_t addr_expires_at_ = 0;
+
+    static time_t constexpr DnsRetryIntervalSecs = 60 * 60;
+    static auto constexpr TauRequestTtl = int{ 60 };
 };
 
-static std::optional<std::pair<sockaddr_storage, socklen_t>> host2sockaddr(
-    std::string_view host,
-    tr_port port,
-    tr_error** error)
-{
-    auto const szhost = tr_urlbuf{ host };
-
-    auto szport = std::array<char, 16>{};
-    *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
-
-    auto hints = addrinfo{};
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_protocol = IPPROTO_UDP;
-    hints.ai_socktype = SOCK_DGRAM;
-
-    addrinfo* info = nullptr;
-    if (int const rc = getaddrinfo(szhost, std::data(szport), &hints, &info); rc != 0)
-    {
-        tr_logAddWarn(fmt::format(
-            _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
-            fmt::arg("address", host),
-            fmt::arg("port", port.host()),
-            fmt::arg("error", gai_strerror(rc)),
-            fmt::arg("error_code", rc)));
-        tr_error_set(error, rc, gai_strerror(rc));
-        return {};
-    }
-
-    auto ss = sockaddr_storage{};
-    auto const len = info->ai_addrlen;
-    memcpy(&ss, info->ai_addr, len);
-    freeaddrinfo(info);
-    return std::make_pair(ss, len);
-}
-
-static void tau_tracker_upkeep(struct tau_tracker* /*tracker*/);
-
-static void tau_tracker_send_request(struct tau_tracker* tracker, void const* payload, size_t payload_len)
-{
-    logdbg(tracker->key, fmt::format("sending request w/connection id {}", tracker->connection_id));
-
-    auto buf = libtransmission::Buffer{};
-    buf.addUint64(tracker->connection_id);
-    buf.add(payload, payload_len);
-
-    auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
-    tracker->sendto(std::data(contiguous), std::size(contiguous));
-}
-
-template<typename T>
-static void tau_tracker_send_requests(tau_tracker* tracker, std::list<T>& reqs)
-{
-    auto const now = tr_time();
-
-    for (auto it = std::begin(reqs); it != std::end(reqs);)
-    {
-        auto& req = *it;
-
-        if (req.sent_at != 0) // it's already been sent; we're awaiting a response
-        {
-            ++it;
-            continue;
-        }
-
-        logdbg(tracker->key, fmt::format("sending req {}", fmt::ptr(&req)));
-        req.sent_at = now;
-        tau_tracker_send_request(tracker, std::data(req.payload), std::size(req.payload));
-
-        if (req.callback != nullptr)
-        {
-            ++it;
-            continue;
-        }
-
-        // no response needed, so we can remove it now
-        it = reqs.erase(it);
-    }
-}
-
-static void tau_tracker_send_reqs(tau_tracker* tracker)
-{
-    TR_ASSERT(tracker->addr_);
-    TR_ASSERT(tracker->connecting_at == 0);
-    TR_ASSERT(tracker->connection_expiration_time > tr_time());
-
-    tau_tracker_send_requests(tracker, tracker->announces);
-    tau_tracker_send_requests(tracker, tracker->scrapes);
-}
-
-static void on_tracker_connection_response(struct tau_tracker& tracker, tau_action_t action, libtransmission::Buffer& buf)
-{
-    tracker.connecting_at = 0;
-    tracker.connection_transaction_id = 0;
-
-    if (action == TAU_ACTION_CONNECT)
-    {
-        tracker.connection_id = buf.toUint64();
-        tracker.connection_expiration_time = tr_time() + TauConnectionTtlSecs;
-        logdbg(tracker.key, fmt::format("Got a new connection ID from tracker: {}", tracker.connection_id));
-    }
-    else if (action == TAU_ACTION_ERROR)
-    {
-        std::string const errmsg = !std::empty(buf) ? buf.toString() : _("Connection failed");
-        logdbg(tracker.key, errmsg);
-        tracker.failAll(true, false, errmsg);
-    }
-
-    tau_tracker_upkeep(&tracker);
-}
-
-static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
-{
-    time_t const now = time(nullptr);
-    bool const cancel_all = tracker->close_at != 0 && (tracker->close_at <= now);
-
-    if (tracker->connecting_at != 0 && tracker->connecting_at + TauRequestTtl < now)
-    {
-        auto empty_buf = libtransmission::Buffer{};
-        on_tracker_connection_response(*tracker, TAU_ACTION_ERROR, empty_buf);
-    }
-
-    if (auto& reqs = tracker->announces; !std::empty(reqs))
-    {
-        for (auto it = std::begin(reqs); it != std::end(reqs);)
-        {
-            auto& req = *it;
-            if (cancel_all || req.created_at + TauRequestTtl < now)
-            {
-                logtrace(tracker->key, fmt::format("timeout announce req {}", fmt::ptr(&req)));
-                req.fail(false, true, "");
-                it = reqs.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
-
-    if (auto& reqs = tracker->scrapes; !std::empty(reqs))
-    {
-        for (auto it = std::begin(reqs); it != std::end(reqs);)
-        {
-            auto& req = *it;
-            if (cancel_all || req.created_at + TauRequestTtl < now)
-            {
-                logtrace(tracker->key, fmt::format("timeout scrape req {}", fmt::ptr(&req)));
-                req.fail(false, true, "");
-                it = reqs.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
-}
-
-static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs)
-{
-    time_t const now = tr_time();
-    bool const closing = tracker->close_at != 0;
-
-    /* if the address info is too old, expire it */
-    if (tracker->addr_ && (closing || tracker->addr_expires_at_ <= now))
-    {
-        logtrace(tracker->host, "Expiring old DNS result");
-        tracker->addr_.reset();
-        tracker->addr_expires_at_ = 0;
-    }
-
-    /* are there any requests pending? */
-    if (tracker->isIdle())
-    {
-        return;
-    }
-
-    // if DNS lookup *recently* failed for this host, do nothing
-    if (!tracker->addr_ && now < tracker->addr_expires_at_)
-    {
-        return;
-    }
-
-    // if we don't have an address yet, try & get one now
-    if (!closing && !tracker->addr_)
-    {
-        if (tracker->addr_expires_at_ <= now)
-        {
-            tr_error_clear(&tracker->addr_error_);
-            tracker->addr_ = host2sockaddr(tracker->host, tracker->port, &tracker->addr_error_);
-            tracker->addr_expires_at_ = now + tau_tracker::DnsRetryIntervalSecs;
-        }
-        if (tracker->addr_error_ != nullptr)
-        {
-            tracker->failAll(false, false, tracker->addr_error_->message);
-            return;
-        }
-    }
-
-    logtrace(
-        tracker->key,
-        fmt::format(
-            "connected {} ({} {}) -- connecting_at {}",
-            tracker->connection_expiration_time > now,
-            tracker->connection_expiration_time,
-            now,
-            tracker->connecting_at));
-
-    /* also need a valid connection ID... */
-    if (tracker->addr_ && tracker->connection_expiration_time <= now && tracker->connecting_at == 0)
-    {
-        tracker->connecting_at = now;
-        tracker->connection_transaction_id = tau_transaction_new();
-        logtrace(tracker->key, fmt::format("Trying to connect. Transaction ID is {}", tracker->connection_transaction_id));
-
-        auto buf = libtransmission::Buffer{};
-        buf.addUint64(0x41727101980LL);
-        buf.addUint32(TAU_ACTION_CONNECT);
-        buf.addUint32(tracker->connection_transaction_id);
-
-        auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
-        tracker->sendto(std::data(contiguous), std::size(contiguous));
-
-        return;
-    }
-
-    if (timeout_reqs)
-    {
-        tau_tracker_timeout_reqs(tracker);
-    }
-
-    if (tracker->addr_ && tracker->connection_expiration_time > now)
-    {
-        tau_tracker_send_reqs(tracker);
-    }
-}
-
-static void tau_tracker_upkeep(struct tau_tracker* tracker)
-{
-    tau_tracker_upkeep_ex(tracker, true);
-}
-
 /****
-*****
 *****  SESSION
-*****
 ****/
 
 class tr_announcer_udp_impl final : public tr_announcer_udp
@@ -673,7 +578,7 @@ public:
     {
     }
 
-    void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) override
+    void announce(tr_announce_request const& request, tr_announce_response_func on_response) override
     {
         auto* const tracker = getTrackerFromUrl(request.announce_url);
         if (tracker == nullptr)
@@ -684,11 +589,11 @@ public:
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
         auto const addr = mediator_.announceIP();
         uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
-        tracker->announces.push_back(make_tau_announce_request(announce_ip, request, response_func, user_data));
-        tau_tracker_upkeep_ex(tracker, false);
+        tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
+        tracker->upkeep(false);
     }
 
-    void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) override
+    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) override
     {
         auto* const tracker = getTrackerFromUrl(request.scrape_url);
         if (tracker == nullptr)
@@ -696,15 +601,15 @@ public:
             return;
         }
 
-        tracker->scrapes.push_back(make_tau_scrape_request(request, response_func, user_data));
-        tau_tracker_upkeep_ex(tracker, false);
+        tracker->scrapes.emplace_back(request, std::move(on_response));
+        tracker->upkeep(false);
     }
 
     void upkeep() override
     {
         for (auto& tracker : trackers_)
         {
-            tau_tracker_upkeep(&tracker);
+            tracker.upkeep();
         }
     }
 
@@ -723,7 +628,7 @@ public:
         for (auto& tracker : trackers_)
         {
             tracker.close_at = now + 3;
-            tau_tracker_upkeep(&tracker);
+            tracker.upkeep();
         }
     }
 
@@ -741,7 +646,7 @@ public:
         buf.add(msg, msglen);
         auto const action_id = static_cast<tau_action_t>(buf.toUint32());
 
-        if (!is_tau_response_message(action_id, msglen))
+        if (!isResponseMessage(action_id, msglen))
         {
             return false;
         }
@@ -755,7 +660,7 @@ public:
             if (tracker.connecting_at != 0 && transaction_id == tracker.connection_transaction_id)
             {
                 logtrace(tracker.key, fmt::format("{} is my connection request!", transaction_id));
-                on_tracker_connection_response(tracker, action_id, buf);
+                tracker.on_connection_response(action_id, buf);
                 return true;
             }
 
@@ -826,6 +731,31 @@ private:
         auto* const tracker = &trackers_.back();
         logtrace(tracker->key, "New tau_tracker created");
         return tracker;
+    }
+
+    [[nodiscard]] static constexpr bool isResponseMessage(tau_action_t action, size_t msglen) noexcept
+    {
+        if (action == TAU_ACTION_CONNECT)
+        {
+            return msglen == 16;
+        }
+
+        if (action == TAU_ACTION_ANNOUNCE)
+        {
+            return msglen >= 20;
+        }
+
+        if (action == TAU_ACTION_SCRAPE)
+        {
+            return msglen >= 20;
+        }
+
+        if (action == TAU_ACTION_ERROR)
+        {
+            return msglen >= 8;
+        }
+
+        return false;
     }
 
     std::list<tau_tracker> trackers_;

@@ -49,7 +49,10 @@ public:
 
     // By default, a private key is randomly generated.
     // Providing a predefined one is useful for reproducible unit tests.
-    DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept;
+    constexpr DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept
+        : private_key_{ private_key }
+    {
+    }
 
     // Returns our own public key to be shared with a peer.
     [[nodiscard]] key_bigend_t publicKey() noexcept;
@@ -78,27 +81,34 @@ class Filter
 public:
     void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
-    void decrypt(size_t buf_len, void* buf)
+    constexpr void decrypt(size_t buf_len, void* buf)
     {
-        if (dec_key_)
+        if (dec_active_)
         {
-            dec_key_->process(buf, buf, buf_len);
+            dec_key_.process(buf, buf, buf_len);
         }
     }
 
     void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
-    void encrypt(size_t buf_len, void* buf)
+    constexpr void encrypt(size_t buf_len, void* buf)
     {
-        if (enc_key_)
+        if (enc_active_)
         {
-            enc_key_->process(buf, buf, buf_len);
+            enc_key_.process(buf, buf, buf_len);
         }
     }
 
+    [[nodiscard]] constexpr auto is_active() const noexcept
+    {
+        return dec_active_ || enc_active_;
+    }
+
 private:
-    std::unique_ptr<tr_arc4> dec_key_;
-    std::unique_ptr<tr_arc4> enc_key_;
+    tr_arc4 dec_key_ = {};
+    tr_arc4 enc_key_ = {};
+    bool dec_active_ = false;
+    bool enc_active_ = false;
 };
 
 } // namespace tr_message_stream_encryption

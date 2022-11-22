@@ -6,6 +6,7 @@
 #include <array>
 #include <functional>
 #include <memory>
+#include <stack>
 #include <stdexcept>
 #include <utility>
 
@@ -277,8 +278,8 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
    if the row they right-click on isn't selected, select it. */
 bool on_tree_view_button_pressed(
     Gtk::TreeView& view,
-    double view_x,
-    double view_y,
+    double event_x,
+    double event_y,
     bool context_menu_requested,
     std::function<void(double, double)> const& callback)
 {
@@ -287,7 +288,7 @@ bool on_tree_view_button_pressed(
         Gtk::TreeModel::Path path;
 
         if (auto const selection = view.get_selection();
-            view.get_path_at_pos((int)view_x, (int)view_y, path) && !selection->is_selected(path))
+            view.get_path_at_pos(static_cast<int>(event_x), static_cast<int>(event_y), path) && !selection->is_selected(path))
         {
             selection->unselect_all();
             selection->select(path);
@@ -295,7 +296,7 @@ bool on_tree_view_button_pressed(
 
         if (callback)
         {
-            callback(view_x, view_y);
+            callback(event_x, event_y);
         }
 
         return true;
@@ -306,9 +307,9 @@ bool on_tree_view_button_pressed(
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-bool on_tree_view_button_released(Gtk::TreeView& view, double view_x, double view_y)
+bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double event_y)
 {
-    if (Gtk::TreeModel::Path path; !view.get_path_at_pos((int)view_x, (int)view_y, path))
+    if (Gtk::TreeModel::Path path; !view.get_path_at_pos(static_cast<int>(event_x), static_cast<int>(event_y), path))
     {
         view.get_selection()->unselect_all();
     }
@@ -328,10 +329,15 @@ void setup_tree_view_button_event_handling(
     if (press_callback)
     {
         controller->signal_pressed().connect(
-            [&view, press_callback, controller](int /*n_press*/, double event_x, double event_y)
+            [&view, press_callback, controller](int /*n_press*/, double view_x, double view_y)
             {
+                int event_x = 0;
+                int event_y = 0;
+                view.convert_widget_to_bin_window_coords(static_cast<int>(view_x), static_cast<int>(view_y), event_x, event_y);
+
                 auto* const sequence = controller->get_current_sequence();
                 auto const event = controller->get_last_event(sequence);
+
                 if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_PRESS) &&
                     press_callback(
                         event->get_button(),
@@ -348,10 +354,15 @@ void setup_tree_view_button_event_handling(
     if (release_callback)
     {
         controller->signal_released().connect(
-            [&view, release_callback, controller](int /*n_press*/, double event_x, double event_y)
+            [&view, release_callback, controller](int /*n_press*/, double view_x, double view_y)
             {
+                int event_x = 0;
+                int event_y = 0;
+                view.convert_widget_to_bin_window_coords(static_cast<int>(view_x), static_cast<int>(view_y), event_x, event_y);
+
                 auto* const sequence = controller->get_current_sequence();
                 auto const event = controller->get_last_event(sequence);
+
                 if (event->get_event_type() == TR_GDK_EVENT_TYPE(BUTTON_RELEASE) && release_callback(event_x, event_y))
                 {
                     controller->set_sequence_state(sequence, Gtk::EventSequenceState::CLAIMED);
@@ -480,7 +491,7 @@ namespace
 class EnumComboModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    EnumComboModelColumns()
+    EnumComboModelColumns() noexcept
     {
         add(value);
         add(label);
@@ -578,52 +589,56 @@ void gtr_priority_combo_init(Gtk::ComboBox& combo)
 ****
 ***/
 
-namespace
+void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)
 {
+    static auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 
-auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
-
-} // namespace
-
-void gtr_widget_set_visible(Gtk::Widget& w, bool b)
-{
-    /* toggle the transient children, too */
-    if (auto const* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
+    auto* const widget_as_window = dynamic_cast<Gtk::Window*>(&widget);
+    if (widget_as_window == nullptr)
     {
-        auto top_levels = Gtk::Window::list_toplevels();
-
-        for (auto top_level_it = top_levels.begin(); top_level_it != top_levels.end();)
-        {
-            auto* const l = *top_level_it++;
-
-            if (l->get_transient_for() != window)
-            {
-                continue;
-            }
-
-            if (l->get_visible() == b)
-            {
-                continue;
-            }
-
-            if (b && l->get_data(ChildHiddenKey) != nullptr)
-            {
-                l->steal_data(ChildHiddenKey);
-                gtr_widget_set_visible(*l, true);
-            }
-            else if (!b)
-            {
-                l->set_data(ChildHiddenKey, GINT_TO_POINTER(1));
-                gtr_widget_set_visible(*l, false);
-
-                // Retrieve updated top-levels list in case hiding the window resulted in its destruction
-                top_levels = Gtk::Window::list_toplevels();
-                top_level_it = top_levels.begin();
-            }
-        }
+        widget.set_visible(is_visible);
+        return;
     }
 
-    w.set_visible(b);
+    /* toggle the transient children, too */
+    auto windows = std::stack<Gtk::Window*>();
+    windows.push(widget_as_window);
+
+    while (!windows.empty())
+    {
+        auto* const window = windows.top();
+        bool transient_child_found = false;
+
+        for (auto* const top_level_window : Gtk::Window::list_toplevels())
+        {
+            if (top_level_window->get_transient_for() != window || top_level_window->get_visible() == is_visible)
+            {
+                continue;
+            }
+
+            windows.push(top_level_window);
+            transient_child_found = true;
+            break;
+        }
+
+        if (transient_child_found)
+        {
+            continue;
+        }
+
+        if (is_visible && window->get_data(ChildHiddenKey) != nullptr)
+        {
+            window->steal_data(ChildHiddenKey);
+            window->set_visible(true);
+        }
+        else if (!is_visible)
+        {
+            window->set_data(ChildHiddenKey, GINT_TO_POINTER(1));
+            window->set_visible(false);
+        }
+
+        windows.pop();
+    }
 }
 
 Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget)

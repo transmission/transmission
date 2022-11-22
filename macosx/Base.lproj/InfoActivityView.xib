@@ -136,6 +136,9 @@
                                         <constraint firstAttribute="width" constant="93" id="euA-Qi-kqQ"/>
                                     </constraints>
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="axesIndependently" id="40"/>
+                                    <connections>
+                                        <action selector="updatePiecesView:" target="-2" id="lAc-eh-g8B"/>
+                                    </connections>
                                 </imageView>
                                 <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="29">
                                     <rect key="frame" x="-2" y="120" width="73" height="14"/>
