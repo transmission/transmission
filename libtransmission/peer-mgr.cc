@@ -2482,13 +2482,15 @@ void tr_peerMgr::reconnectPulse()
     // remove crappy peers
     for (auto* const tor : session->torrents())
     {
-        if (!tor->swarm->is_running)
+        auto* const swarm = tor->swarm;
+
+        if (!swarm->is_running)
         {
-            tor->swarm->removeAllPeers();
+            swarm->removeAllPeers();
         }
         else
         {
-            closeBadPeers(tor->swarm, now_sec);
+            closeBadPeers(swarm, now_sec);
         }
     }
 
