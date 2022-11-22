@@ -42,14 +42,14 @@ public:
             setOffset(offset);
         }
 
-        [[nodiscard]] value_type& operator*() noexcept
+        [[nodiscard]] constexpr value_type& operator*() noexcept
         {
-            return reinterpret_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
         }
 
-        [[nodiscard]] value_type operator*() const noexcept
+        [[nodiscard]] constexpr value_type operator*() const noexcept
         {
-            return reinterpret_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
         }
 
         [[nodiscard]] Iterator operator+(size_t n_bytes)
@@ -172,32 +172,32 @@ public:
 
     [[nodiscard]] auto begin() noexcept
     {
-        return Iterator(buf_.get(), 0U);
+        return Iterator{ buf_.get(), 0U };
     }
 
     [[nodiscard]] auto end() noexcept
     {
-        return Iterator(buf_.get(), size());
+        return Iterator{ buf_.get(), size() };
     }
 
     [[nodiscard]] auto begin() const noexcept
     {
-        return Iterator(buf_.get(), 0U);
+        return Iterator{ buf_.get(), 0U };
     }
 
     [[nodiscard]] auto end() const noexcept
     {
-        return Iterator(buf_.get(), size());
+        return Iterator{ buf_.get(), size() };
     }
 
     [[nodiscard]] auto cbegin() const noexcept
     {
-        return Iterator(buf_.get(), 0U);
+        return Iterator{ buf_.get(), 0U };
     }
 
     [[nodiscard]] auto cend() const noexcept
     {
-        return Iterator(buf_.get(), size());
+        return Iterator{ buf_.get(), size() };
     }
 
     template<typename T>
