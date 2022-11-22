@@ -967,7 +967,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->leftUntilDone = tor->completion.leftUntilDone();
     s->sizeWhenDone = tor->completion.sizeWhenDone();
 
-    auto const now_sec = tr_time();
     auto const verify_progress = tor->verifyProgress();
     s->recheckProgress = verify_progress ? *verify_progress : 0.0F;
     s->activityDate = tor->activityDate;
@@ -975,8 +974,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->doneDate = tor->doneDate;
     s->editDate = tor->editDate;
     s->startDate = tor->startDate;
-    s->secondsSeeding = tor->secondsSeeding(now_sec);
-    s->secondsDownloading = tor->secondsDownloading(now_sec);
+    s->secondsSeeding = tor->secondsSeeding;
+    s->secondsDownloading = tor->secondsDownloading;
 
     s->corruptEver = tor->corruptCur + tor->corruptPrev;
     s->downloadedEver = tor->downloadedCur + tor->downloadedPrev;
