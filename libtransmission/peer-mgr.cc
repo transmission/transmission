@@ -2565,10 +2565,12 @@ void tr_peerMgr::bandwidthPulse()
     auto const now = tr_time_msec();
     for (auto* const tor : session->torrents())
     {
+        auto* const swarm = tor->swarm;
+
         /* run the completeness check for any torrents that need it */
-        if (tor->swarm->needs_completeness_check)
+        if (swarm->needs_completeness_check)
         {
-            tor->swarm->needs_completeness_check = false;
+            swarm->needs_completeness_check = false;
             tor->recheckCompleteness();
         }
 
@@ -2580,7 +2582,7 @@ void tr_peerMgr::bandwidthPulse()
         }
 
         /* update the torrent's stats */
-        tor->swarm->stats.active_webseed_count = tor->swarm->countActiveWebseeds(now);
+        swarm->stats.active_webseed_count = swarm->countActiveWebseeds(now);
     }
 
     /* pump the queues */
