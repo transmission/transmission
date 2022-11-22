@@ -639,35 +639,37 @@ public:
 
     [[nodiscard]] constexpr auto activity() const noexcept
     {
-        auto ret = TR_STATUS_STOPPED;
-
         bool const is_seed = this->isDone();
 
         if (this->verifyState() == TR_VERIFY_NOW)
         {
-            ret = TR_STATUS_CHECK;
+            return TR_STATUS_CHECK;
         }
-        else if (this->verifyState() == TR_VERIFY_WAIT)
+
+        if (this->verifyState() == TR_VERIFY_WAIT)
         {
-            ret = TR_STATUS_CHECK_WAIT;
+            return TR_STATUS_CHECK_WAIT;
         }
-        else if (this->isRunning)
+
+        if (this->isRunning)
         {
-            ret = is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+            return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
-        else if (this->isQueued())
+
+        if (this->isQueued())
         {
             if (is_seed && this->session->queueEnabled(TR_UP))
             {
-                ret = TR_STATUS_SEED_WAIT;
+                return TR_STATUS_SEED_WAIT;
             }
-            else if (!is_seed && this->session->queueEnabled(TR_DOWN))
+
+            if (!is_seed && this->session->queueEnabled(TR_DOWN))
             {
-                ret = TR_STATUS_DOWNLOAD_WAIT;
+                return TR_STATUS_DOWNLOAD_WAIT;
             }
         }
 
-        return ret;
+        return TR_STATUS_STOPPED;
     }
 
     void setLabels(std::vector<tr_quark> const& new_labels);
