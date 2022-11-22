@@ -677,13 +677,10 @@ static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address cons
     return it != std::end(swarm->pool) ? &*it : nullptr;
 }
 
-static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
+static bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
 {
-    auto const* const s = const_cast<tr_swarm*>(cs);
-    auto const lock = s->unique_lock();
-
-    return atom->is_connected || s->outgoing_handshakes.contains(atom->addr) ||
-        s->manager->incoming_handshakes.contains(atom->addr);
+    return atom->is_connected || swarm->outgoing_handshakes.contains(atom->addr) ||
+        swarm->manager->incoming_handshakes.contains(atom->addr);
 }
 
 static void swarmFree(tr_swarm* s)
@@ -2861,6 +2858,8 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 void tr_peerMgr::makeNewPeerConnections(size_t max)
 {
     using namespace connect_helpers;
+
+    auto const lock = session->unique_lock();
 
     for (auto& candidate : getPeerCandidates(session, max))
     {
