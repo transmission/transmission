@@ -255,7 +255,7 @@ struct peer_atom
         blocklisted_.reset();
     }
 
-    std::optional<bool> isReachable() const
+    [[nodiscard]] constexpr std::optional<bool> isReachable() const
     {
         if ((flags2 & MyflagUnreachable) != 0)
         {
