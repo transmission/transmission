@@ -665,7 +665,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         "Main window -> 3rd bottom left button (remove all) tooltip");
 
     [self.fTableView registerForDraggedTypes:@[ kTorrentTableViewDataType ]];
-    [self.fWindow registerForDraggedTypes:@[ NSFilenamesPboardType, NSURLPboardType ]];
+    [self.fWindow registerForDraggedTypes:@[ NSPasteboardTypeFileURL, NSPasteboardTypeURL ]];
 
     //sort the sort menu items (localization is from strings file)
     NSMutableArray* sortMenuItems = [NSMutableArray arrayWithCapacity:7];
@@ -1184,12 +1184,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
-- (void)application:(NSApplication*)app openFiles:(NSArray*)filenames
+- (void)application:(NSApplication*)app openFiles:(NSArray<NSString*>*)filenames
 {
     [self openFiles:filenames addType:ADD_MANUAL forcePath:nil];
 }
 
-- (void)openFiles:(NSArray*)filenames addType:(addType)type forcePath:(NSString*)path
+- (void)openFiles:(NSArray<NSString*>*)filenames addType:(addType)type forcePath:(NSString*)path
 {
     BOOL deleteTorrentFile, canToggleDelete = NO;
     switch (type)
@@ -1695,7 +1695,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self resumeTorrents:torrents];
 }
 
-- (void)resumeTorrents:(NSArray*)torrents
+- (void)resumeTorrents:(NSArray<Torrent*>*)torrents
 {
     for (Torrent* torrent in torrents)
     {
@@ -3896,25 +3896,31 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)info
 {
     NSPasteboard* pasteboard = info.draggingPasteboard;
-    if ([pasteboard.types containsObject:NSFilenamesPboardType])
+    if ([pasteboard.types containsObject:NSPasteboardTypeFileURL])
     {
         //check if any torrent files can be added
         BOOL torrent = NO;
-        NSArray* files = [pasteboard propertyListForType:NSFilenamesPboardType];
-        for (NSString* file in files)
+        NSArray<NSURL*>* files = [pasteboard readObjectsForClasses:@[ NSURL.class ]
+                                                           options:@{ NSPasteboardURLReadingFileURLsOnlyKey : @YES }];
+        for (NSURL* file in files)
         {
-            if ([[NSWorkspace.sharedWorkspace typeOfFile:file error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
+            if ([[NSWorkspace.sharedWorkspace typeOfFile:file.path error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
                 [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(file.UTF8String))
+                if (metainfo.parseTorrentFile(file.path.UTF8String))
                 {
                     if (!self.fOverlayWindow)
                     {
                         self.fOverlayWindow = [[DragOverlayWindow alloc] initWithLib:self.fLib forWindow:self.fWindow];
                     }
-                    [self.fOverlayWindow setTorrents:files];
+                    NSMutableArray<NSString*>* filesToOpen = [NSMutableArray arrayWithCapacity:files.count];
+                    for (NSURL* file in files)
+                    {
+                        [filesToOpen addObject:file.path];
+                    }
+                    [self.fOverlayWindow setTorrents:filesToOpen];
 
                     return NSDragOperationCopy;
                 }
@@ -3933,7 +3939,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             return NSDragOperationCopy;
         }
     }
-    else if ([pasteboard.types containsObject:NSURLPboardType])
+    else if ([pasteboard.types containsObject:NSPasteboardTypeURL])
     {
         if (!self.fOverlayWindow)
         {
@@ -3963,23 +3969,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     NSPasteboard* pasteboard = info.draggingPasteboard;
-    if ([pasteboard.types containsObject:NSFilenamesPboardType])
+    if ([pasteboard.types containsObject:NSPasteboardTypeFileURL])
     {
         BOOL torrent = NO, accept = YES;
 
         //create an array of files that can be opened
-        NSArray* files = [pasteboard propertyListForType:NSFilenamesPboardType];
-        NSMutableArray* filesToOpen = [NSMutableArray arrayWithCapacity:files.count];
-        for (NSString* file in files)
+        NSArray<NSURL*>* files = [pasteboard readObjectsForClasses:@[ NSURL.class ]
+                                                           options:@{ NSPasteboardURLReadingFileURLsOnlyKey : @YES }];
+        NSMutableArray<NSString*>* filesToOpen = [NSMutableArray arrayWithCapacity:files.count];
+        for (NSURL* file in files)
         {
-            if ([[NSWorkspace.sharedWorkspace typeOfFile:file error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
+            if ([[NSWorkspace.sharedWorkspace typeOfFile:file.path error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
                 [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(file.UTF8String))
+                if (metainfo.parseTorrentFile(file.path.UTF8String))
                 {
-                    [filesToOpen addObject:file];
+                    [filesToOpen addObject:file.path];
                 }
             }
         }
@@ -3992,7 +3999,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             if (!torrent && files.count == 1)
             {
-                [CreatorWindowController createTorrentFile:self.fLib forFile:[NSURL fileURLWithPath:files[0]]];
+                [CreatorWindowController createTorrentFile:self.fLib forFile:files[0]];
             }
             else
             {
@@ -4002,7 +4009,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         return accept;
     }
-    else if ([pasteboard.types containsObject:NSURLPboardType])
+    else if ([pasteboard.types containsObject:NSPasteboardTypeURL])
     {
         NSURL* url;
         if ((url = [NSURL URLFromPasteboard:pasteboard]))
@@ -4094,7 +4101,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self.fWindow.toolbar validateVisibleItems];
 }
 
-- (NSArray*)quickLookableTorrents
+- (NSArray<Torrent*>*)quickLookableTorrents
 {
     NSArray* selectedTorrents = self.fTableView.selectedTorrents;
     NSMutableArray* qlArray = [NSMutableArray arrayWithCapacity:selectedTorrents.count];

@@ -10,7 +10,7 @@
 
 - (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window;
 
-- (void)setTorrents:(NSArray*)files;
+- (void)setTorrents:(NSArray<NSString*>*)files;
 - (void)setFile:(NSString*)file;
 - (void)setURL:(NSString*)url;
 
