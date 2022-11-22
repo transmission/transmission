@@ -72,8 +72,9 @@ enum tau_action_t
 
 struct tau_scrape_request
 {
-    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func on_response)
+    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func on_response, void* user_data)
         : on_response_{ std::move(on_response) }
+        , user_data_{ user_data }
     {
         this->response.scrape_url = in.scrape_url;
         this->response.row_count = in.info_hash_count;
@@ -105,7 +106,7 @@ struct tau_scrape_request
     {
         if (on_response_)
         {
-            on_response_(response);
+            on_response_(response, user_data_);
         }
     }
 
@@ -156,6 +157,7 @@ struct tau_scrape_request
 
 private:
     tr_scrape_response_func on_response_;
+    void* const user_data_;
 };
 
 /****
@@ -164,8 +166,13 @@ private:
 
 struct tau_announce_request
 {
-    tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
+    tau_announce_request(
+        uint32_t announce_ip,
+        tr_announce_request const& in,
+        tr_announce_response_func on_response,
+        void* user_data)
         : on_response_{ std::move(on_response) }
+        , user_data_{ user_data }
     {
         response.seeders = -1;
         response.leechers = -1;
@@ -198,7 +205,7 @@ struct tau_announce_request
     {
         if (on_response_)
         {
-            on_response_(this->response);
+            on_response_(this->response, user_data_);
         }
     }
 
@@ -272,6 +279,7 @@ private:
     }
 
     tr_announce_response_func on_response_;
+    void* const user_data_;
 };
 
 /****
@@ -578,7 +586,7 @@ public:
     {
     }
 
-    void announce(tr_announce_request const& request, tr_announce_response_func on_response) override
+    void announce(tr_announce_request const& request, tr_announce_response_func on_response, void* user_data) override
     {
         auto* const tracker = getTrackerFromUrl(request.announce_url);
         if (tracker == nullptr)
@@ -589,11 +597,11 @@ public:
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
         auto const addr = mediator_.announceIP();
         uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
-        tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
+        tracker->announces.emplace_back(announce_ip, request, std::move(on_response), user_data);
         tracker->upkeep(false);
     }
 
-    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) override
+    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response, void* user_data) override
     {
         auto* const tracker = getTrackerFromUrl(request.scrape_url);
         if (tracker == nullptr)
@@ -601,7 +609,7 @@ public:
             return;
         }
 
-        tracker->scrapes.emplace_back(request, std::move(on_response));
+        tracker->scrapes.emplace_back(request, std::move(on_response), user_data);
         tracker->upkeep(false);
     }
 

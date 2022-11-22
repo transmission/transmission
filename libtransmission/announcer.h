@@ -73,7 +73,12 @@ public:
     virtual void removeTorrent(tr_torrent* tor) = 0;
 };
 
-std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
+/**
+***  Session ctor/dtor
+**/
+
+void tr_announcerInit(tr_session*, tr_announcer_udp&);
+void tr_announcerClose(tr_session*);
 
 /**
 ***  For torrent customers
@@ -123,8 +128,8 @@ struct tr_scrape_response;
 
 /// UDP ANNOUNCER
 
-using tr_scrape_response_func = std::function<void(tr_scrape_response const&)>;
-using tr_announce_response_func = std::function<void(tr_announce_response const&)>;
+using tr_scrape_response_func = std::function<void(tr_scrape_response const&, void*)>;
+using tr_announce_response_func = std::function<void(tr_announce_response const&, void*)>;
 
 class tr_announcer_udp
 {
@@ -143,9 +148,9 @@ public:
 
     [[nodiscard]] virtual bool isIdle() const noexcept = 0;
 
-    virtual void announce(tr_announce_request const& request, tr_announce_response_func on_response) = 0;
+    virtual void announce(tr_announce_request const& request, tr_announce_response_func on_response, void* user_data) = 0;
 
-    virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) = 0;
+    virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response, void* user_data) = 0;
 
     virtual void upkeep() = 0;
 

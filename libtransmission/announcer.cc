@@ -105,9 +105,9 @@ struct StopsCompare
         return 0;
     }
 
-    [[nodiscard]] constexpr auto operator()(tr_announce_request const& one, tr_announce_request const& two) const noexcept
+    [[nodiscard]] constexpr auto operator()(tr_announce_request const* one, tr_announce_request const* two) const noexcept
     {
-        return compare(one, two) < 0;
+        return compare(*one, *two) < 0;
     }
 };
 
@@ -163,9 +163,6 @@ public:
 
     void upkeep();
 
-    void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
-    void onScrapeDone(tr_scrape_response const& response);
-
     [[nodiscard]] tr_scrape_info* scrape_info(tr_interned_string url)
     {
         if (std::empty(url))
@@ -177,52 +174,21 @@ public:
         return &it->second;
     }
 
-    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response)
-    {
-        if (auto const scrape_sv = request.scrape_url.sv();
-            tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
-        {
-            tr_tracker_http_scrape(session, request, std::move(on_response));
-        }
-        else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
-        {
-            announcer_udp_.scrape(request, std::move(on_response));
-        }
-        else
-        {
-            tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
-        }
-    }
-
-    void announce(tr_announce_request const& request, tr_announce_response_func on_response)
-    {
-        if (auto const announce_sv = request.announce_url.sv();
-            tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
-        {
-            tr_tracker_http_announce(session, request, std::move(on_response));
-        }
-        else if (tr_strvStartsWith(announce_sv, "udp://"sv))
-        {
-            announcer_udp_.announce(request, std::move(on_response));
-        }
-        else
-        {
-            tr_logAddWarn(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", announce_sv)));
-        }
-    }
-
     tr_session* const session;
 
     int const key = tr_rand_int(INT_MAX);
 
-private:
     void flushCloseMessages()
     {
-        for (auto& stop : stops_)
-        {
-            announce(stop, {});
-        }
-
+        auto& stops = stops_;
+        std::for_each(
+            std::begin(stops),
+            std::end(stops),
+            [this](auto* stop)
+            {
+                announce_request_delegate(this, *stop, nullptr, nullptr);
+                delete (stop);
+            });
         stops_.clear();
     }
 
@@ -232,16 +198,84 @@ private:
 
     std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
 
-    std::set<tr_announce_request, StopsCompare> stops_;
+    std::set<tr_announce_request*, StopsCompare> stops_;
 
+private:
     static auto constexpr UpkeepInterval = 500ms;
 };
 
-std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
+void tr_announcerInit(tr_session* session, tr_announcer_udp& announcer_udp)
 {
     TR_ASSERT(session != nullptr);
 
-    return std::make_unique<tr_announcer_impl>(session, announcer_udp);
+    session->announcer_ = new tr_announcer_impl{ session, announcer_udp };
+}
+
+void tr_announcerClose(tr_session* session)
+{
+    tr_announcer* announcer = session->announcer_;
+
+    session->announcer_ = nullptr;
+    delete announcer;
+}
+
+struct announce_data
+{
+    int tier_id = 0;
+    time_t time_sent = {};
+    tr_announce_event event = {};
+    tr_session* session = nullptr;
+
+    /** If the request succeeds, the value for tier's "isRunning" flag */
+    bool is_running_on_success = false;
+};
+
+static void scrape_request_delegate(
+    tr_announcer_impl* announcer,
+    tr_scrape_request const& request,
+    tr_scrape_response_func callback,
+    void* callback_data)
+{
+    tr_session* session = announcer->session;
+
+    auto const scrape_sv = request.scrape_url.sv();
+
+    if (tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
+    {
+        tr_tracker_http_scrape(session, request, callback, callback_data);
+    }
+    else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
+    {
+        session->announcer_udp_->scrape(request, callback, callback_data);
+    }
+    else
+    {
+        tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
+    }
+}
+
+static void announce_request_delegate(
+    tr_announcer_impl* announcer,
+    tr_announce_request& request,
+    tr_announce_response_func callback,
+    announce_data* callback_data)
+{
+    tr_session* session = announcer->session;
+
+    if (auto const announce_sv = request.announce_url.sv();
+        tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
+    {
+        tr_tracker_http_announce(session, request, callback, callback_data);
+    }
+    else if (tr_strvStartsWith(announce_sv, "udp://"sv))
+    {
+        session->announcer_udp_->announce(request, callback, callback_data);
+    }
+    else
+    {
+        tr_logAddWarn(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", announce_sv)));
+        delete callback_data;
+    }
 }
 
 /***
@@ -890,7 +924,7 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
 ****
 ***/
 
-[[nodiscard]] static tr_announce_request create_announce_request(
+[[nodiscard]] static tr_announce_request* announce_request_new(
     tr_announcer_impl const* const announcer,
     tr_torrent* const tor,
     tr_tier const* const tier,
@@ -899,21 +933,21 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
 
-    auto req = tr_announce_request{};
-    req.port = announcer->session->advertisedPeerPort();
-    req.announce_url = current_tracker->announce_url;
-    req.tracker_id = current_tracker->tracker_id;
-    req.info_hash = tor->infoHash();
-    req.peer_id = tr_torrentGetPeerId(tor);
-    req.up = tier->byteCounts[TR_ANN_UP];
-    req.down = tier->byteCounts[TR_ANN_DOWN];
-    req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
-    req.event = event;
-    req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
-    req.key = announcer->key;
-    req.partial_seed = tor->isPartialSeed();
-    tier->buildLogName(req.log_name, sizeof(req.log_name));
+    auto* const req = new tr_announce_request();
+    req->port = announcer->session->advertisedPeerPort();
+    req->announce_url = current_tracker->announce_url;
+    req->tracker_id = current_tracker->tracker_id;
+    req->info_hash = tor->infoHash();
+    req->peer_id = tr_torrentGetPeerId(tor);
+    req->up = tier->byteCounts[TR_ANN_UP];
+    req->down = tier->byteCounts[TR_ANN_DOWN];
+    req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
+    req->leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
+    req->event = event;
+    req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
+    req->key = announcer->key;
+    req->partial_seed = tor->isPartialSeed();
+    tier->buildLogName(req->log_name, sizeof(req->log_name));
     return req;
 }
 
@@ -930,7 +964,16 @@ void tr_announcer_impl::removeTorrent(tr_torrent* tor)
     {
         if (tier.isRunning)
         {
-            stops_.emplace(create_announce_request(this, tor, &tier, TR_ANNOUNCE_EVENT_STOPPED));
+            auto* req = announce_request_new(this, tor, &tier, TR_ANNOUNCE_EVENT_STOPPED);
+
+            if (this->stops_.count(req) != 0U)
+            {
+                delete req;
+            }
+            else
+            {
+                this->stops_.insert(req);
+            }
         }
     }
 
@@ -983,15 +1026,19 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     }
 }
 
-void tr_announcer_impl::onAnnounceDone(
-    int tier_id,
-    tr_announce_event event,
-    bool is_running_on_success,
-    tr_announce_response const& response)
+static void onAnnounceDone(tr_announce_response const& response, void* vdata)
 {
-    auto* const tier = getTier(this, response.info_hash, tier_id);
+    auto* const data = static_cast<announce_data*>(vdata);
+    auto session = data->session;
+    auto announcer = (tr_announcer_impl*)session->announcer_;
+    auto tier_id = data->tier_id;
+    auto event = data->event;
+    auto is_running_on_success = data->is_running_on_success;
+
+    auto const tier = getTier(announcer, response.info_hash, tier_id);
     if (tier == nullptr)
     {
+        delete data;
         return;
     }
 
@@ -1170,6 +1217,8 @@ void tr_announcer_impl::onAnnounceDone(
             tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
         }
     }
+
+    delete data;
 }
 
 static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
@@ -1182,7 +1231,7 @@ static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
 
     tr_torrent* tor = tier->tor;
     auto const event = tier_announce_event_pull(tier);
-    auto const req = create_announce_request(announcer, tor, tier, event);
+    auto const req = announce_request_new(announcer, tor, tier, event);
 
     tier->isAnnouncing = true;
     tier->lastAnnounceStartTime = now;
@@ -1190,10 +1239,9 @@ static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
     auto tier_id = tier->id;
     auto is_running_on_success = tor->isRunning;
 
-    announcer->announce(
-        req,
-        [announcer, tier_id, event, is_running_on_success](tr_announce_response const& response)
-        { announcer->onAnnounceDone(tier_id, event, is_running_on_success, response); });
+    auto* const data = new announce_data{ tier_id, now, event, announcer->session, is_running_on_success };
+    announce_request_delegate(announcer, *req, onAnnounceDone, data);
+    delete req;
 }
 
 /***
@@ -1282,8 +1330,9 @@ static void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response
     }
 }
 
-void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
+static void on_scrape_done(tr_scrape_response const& response, void* vsession)
 {
+    auto* const session = static_cast<tr_session*>(vsession);
     auto const now = tr_time();
 
     for (int i = 0; i < response.row_count; ++i)
@@ -1377,7 +1426,7 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
         }
     }
 
-    checkMultiscrapeMax(this, response);
+    checkMultiscrapeMax(static_cast<tr_announcer_impl*>(session->announcer_), response);
 }
 
 static void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tiers)
@@ -1435,7 +1484,7 @@ static void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> cons
     /* send the requests we just built */
     for (size_t i = 0; i < request_count; ++i)
     {
-        announcer->scrape(requests[i], [announcer](tr_scrape_response const& response) { announcer->onScrapeDone(response); });
+        scrape_request_delegate(announcer, requests[i], on_scrape_done, announcer->session);
     }
 }
 
@@ -1539,7 +1588,7 @@ void tr_announcer_impl::upkeep()
         scrapeAndAnnounceMore(this);
     }
 
-    announcer_udp_.upkeep();
+    session->announcer_udp_->upkeep();
 }
 
 /***

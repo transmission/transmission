@@ -308,6 +308,7 @@ struct http_announce_data
     std::optional<tr_announce_response> previous_response;
 
     tr_announce_response_func on_response;
+    void* response_func_user_data = nullptr;
     bool http_success = false;
 
     uint8_t requests_sent_count = {};
@@ -366,7 +367,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 
         if (data->http_success)
         {
-            data->on_response(response);
+            data->on_response(response, data->response_func_user_data);
         }
         else if (data->requests_answered_count == data->requests_sent_count)
         {
@@ -379,7 +380,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
                 response_used = &*data->previous_response;
             }
 
-            data->on_response(*response_used);
+            data->on_response(*response_used, data->response_func_user_data);
         }
         else
         {
@@ -405,9 +406,11 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 void tr_tracker_http_announce(
     tr_session const* session,
     tr_announce_request const& request,
-    tr_announce_response_func on_response)
+    tr_announce_response_func on_response,
+    void* response_func_user_data)
 {
     auto* const d = new http_announce_data{ request.info_hash, std::move(on_response), request.log_name };
+    d->response_func_user_data = response_func_user_data;
 
     /* There are two alternative techniques for announcing both IPv4 and
        IPv6 addresses. Previous version of BEP-7 suggests adding "ipv4="
@@ -629,9 +632,11 @@ public:
     {
         if (response_func_)
         {
-            response_func_(response_);
+            response_func_(response_, response_func_user_data);
         }
     }
+
+    void* response_func_user_data = nullptr;
 
 private:
     tr_scrape_response response_ = {};
@@ -678,10 +683,14 @@ static void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const& req)
     }
 }
 
-void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& request, tr_scrape_response_func on_response)
+void tr_tracker_http_scrape(
+    tr_session const* session,
+    tr_scrape_request const& request,
+    tr_scrape_response_func on_response,
+    void* response_func_user_data)
 {
     auto* d = new scrape_data{ std::move(on_response), request.log_name };
-
+    d->response_func_user_data = response_func_user_data;
     auto& response = d->response();
     response.scrape_url = request.scrape_url;
     response.row_count = request.info_hash_count;

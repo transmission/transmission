@@ -317,7 +317,11 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // tell announcer to scrape
     auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
     EXPECT_FALSE(announcer->isIdle());
 
     // The announcer should have sent a UDP connection request.
@@ -358,7 +362,11 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // Since the timestamp hasn't changed, the connection should be good
     // and announcer-udp should skip the `connect` step, going straight to the scrape.
     response.reset();
-    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -376,7 +384,11 @@ TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
     // tell announcer to scrape
     auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -405,7 +417,11 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
 
     auto request = buildScrapeRequestFromResponse(expected_response);
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
 
     // Announcer will request a connection. Verify and grant the request
     auto sent = waitForAnnouncerToSendMessage(mediator);
@@ -464,7 +480,11 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 
     // tell announcer to scrape
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -512,7 +532,9 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     auto response = std::optional<tr_scrape_response>{};
     announcer->scrape(
         buildScrapeRequestFromResponse(expected_response),
-        [&response](tr_scrape_response const& resp) { response = resp; });
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -542,7 +564,11 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
 
     // tell the announcer to scrape
     auto response = std::optional<tr_scrape_response>{};
-    announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
+    announcer->scrape(
+        request,
+        [](tr_scrape_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_scrape_response>*>(vresponse) = *resp; },
+        &response);
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
@@ -623,7 +649,11 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     auto upkeep_timer = createUpkeepTimer(mediator, announcer);
 
     auto response = std::optional<tr_announce_response>{};
-    announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
+    announcer->announce(
+        request,
+        [](tr_announce_response const* resp, void* vresponse)
+        { *static_cast<std::optional<tr_announce_response>*>(vresponse) = *resp; },
+        &response);
 
     // Announcer will request a connection. Verify and grant the request
     auto sent = waitForAnnouncerToSendMessage(mediator);
