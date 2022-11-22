@@ -223,7 +223,7 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
     using namespace hex_impl;
 
     auto str = std::string(std::size(digest) * 2, '?');
-    tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
+    tr_binary_to_hex(digest.data(), str.data(), std::size(digest));
     return str;
 }
 
@@ -232,7 +232,7 @@ std::string tr_sha256_to_string(tr_sha256_digest_t const& digest)
     using namespace hex_impl;
 
     auto str = std::string(std::size(digest) * 2, '?');
-    tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
+    tr_binary_to_hex(digest.data(), str.data(), std::size(digest));
     return str;
 }
 

@@ -26,7 +26,14 @@
 class tr_arc4
 {
 public:
+    constexpr tr_arc4() = default;
+
     constexpr tr_arc4(void const* key, size_t key_length)
+    {
+        init(key, key_length);
+    }
+
+    constexpr void init(void const* key, size_t key_length)
     {
         for (size_t i = 0; i < 256; ++i)
         {
@@ -74,7 +81,7 @@ private:
         return s_[static_cast<uint8_t>(s_[i_] + s_[j_])];
     }
 
+    std::array<uint8_t, 256> s_ = {};
     uint8_t i_ = 0;
     uint8_t j_ = 0;
-    std::array<uint8_t, 256> s_ = {};
 };

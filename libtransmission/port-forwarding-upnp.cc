@@ -288,7 +288,7 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
             UPNP_IGD_VALID_CONNECTED)
         {
             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
-            tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", std::data(handle->lanaddr))));
+            tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", handle->lanaddr.data())));
             handle->state = UpnpState::Idle;
             handle->hasDiscovered = true;
             handle->lanaddr = std::data(lanaddr);
