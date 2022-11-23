@@ -461,14 +461,14 @@ void tr_bitfield::bitwise_or(tr_bitfield const& that) noexcept
 {
     TR_ASSERT(size() == std::size(that));
 
-    if (that.hasAll())
+    if (hasAll() || that.hasNone())
     {
-        setHasAll();
         return;
     }
 
-    if (hasAll() || that.hasNone())
+    if (that.hasAll())
     {
+        setHasAll();
         return;
     }
 
