@@ -805,7 +805,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         {
             str = mixed;
         }
-        else if (baseline == TR_ETA_NOT_AVAIL || baseline == TR_ETA_UNKNOWN)
+        else if (baseline < 0)
         {
             str = _("Unknown");
         }
