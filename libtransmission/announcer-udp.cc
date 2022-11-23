@@ -101,7 +101,7 @@ struct tau_scrape_request
         return !!on_response_;
     }
 
-    void requestFinished()
+    void requestFinished() const
     {
         if (on_response_)
         {
@@ -194,7 +194,7 @@ struct tau_announce_request
         return !!on_response_;
     }
 
-    void requestFinished()
+    void requestFinished() const
     {
         if (on_response_)
         {
