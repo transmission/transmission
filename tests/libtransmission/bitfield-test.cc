@@ -385,3 +385,63 @@ TEST(Bitfield, bitwise_or)
     a.bitwise_or(b);
     EXPECT_TRUE(a.hasAll());
 }
+
+TEST(Bitfield, bitwise_and)
+{
+    auto a = tr_bitfield{ 100 };
+    auto b = tr_bitfield{ 100 };
+
+    a.setHasAll();
+    b.setHasNone();
+    a.bitwise_and(b);
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    b.setHasAll();
+    a.bitwise_and(b);
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasAll();
+    b.setHasAll();
+    a.bitwise_and(b);
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasNone();
+    a.setSpan(0, std::size(a) / 2U);
+    b.setSpan(std::size(a) / 2U, std::size(a));
+    EXPECT_EQ(0.5, a.percent());
+    EXPECT_EQ(0.5, b.percent());
+    a.bitwise_and(b);
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    b.setHasNone();
+    for (size_t i = 0; i < std::size(a); ++i)
+    {
+        if ((i % 2U) != 0U)
+        {
+            a.set(i);
+        }
+        else
+        {
+            b.set(i);
+        }
+    }
+    a.bitwise_and(b);
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    a.setSpan(0U, std::size(a) / 10U);
+    b.setHasNone();
+    b.setSpan(0U, std::size(a) / 20U);
+    a.bitwise_and(b);
+    EXPECT_NEAR(0.05F, a.percent(), 0.01);
+
+    a.setHasNone();
+    a.setSpan(0U, std::size(a) / 10U);
+    b.setHasNone();
+    b.setSpan(0U, std::size(a) / 20U);
+    b.bitwise_and(a);
+    EXPECT_NEAR(0.1F, a.percent(), 0.01);
+}

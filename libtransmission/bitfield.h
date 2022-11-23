@@ -111,6 +111,7 @@ public:
     }
 
     void bitwise_or(tr_bitfield const& that) noexcept;
+    void bitwise_and(tr_bitfield const& that) noexcept;
 
 private:
     [[nodiscard]] size_t countFlags() const noexcept;

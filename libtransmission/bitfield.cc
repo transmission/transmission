@@ -487,3 +487,28 @@ void tr_bitfield::bitwise_or(tr_bitfield const& that) noexcept
 
     rebuildTrueCount();
 }
+
+void tr_bitfield::bitwise_and(tr_bitfield const& that) noexcept
+{
+    TR_ASSERT(size() == std::size(that));
+
+    if (hasNone() || that.hasAll())
+    {
+        return;
+    }
+
+    if (that.hasNone() || hasAll())
+    {
+        *this = that;
+        return;
+    }
+
+    flags_.resize(std::min(std::size(flags_), std::size(that.flags_)));
+
+    for (size_t i = 0, n = std::size(flags_); i < n; ++i)
+    {
+        flags_[i] &= that.flags_[i];
+    }
+
+    rebuildTrueCount();
+}
