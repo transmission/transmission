@@ -1621,7 +1621,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     auto available = swarm->peers.front()->has();
     for (auto const* const peer : swarm->peers)
     {
-        available.bitwise_or(peer->has());
+        available |= peer->has();
     }
 
     if (available.hasAll())

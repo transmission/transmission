@@ -457,19 +457,19 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
     }
 }
 
-void tr_bitfield::bitwise_or(tr_bitfield const& that) noexcept
+tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
 {
     TR_ASSERT(size() == std::size(that));
 
     if (hasAll() || that.hasNone())
     {
-        return;
+        return *this;
     }
 
     if (that.hasAll() || hasNone())
     {
         *this = that;
-        return;
+        return *this;
     }
 
     flags_.resize(std::max(std::size(flags_), std::size(that.flags_)));
@@ -480,21 +480,22 @@ void tr_bitfield::bitwise_or(tr_bitfield const& that) noexcept
     }
 
     rebuildTrueCount();
+    return *this;
 }
 
-void tr_bitfield::bitwise_and(tr_bitfield const& that) noexcept
+tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
 {
     TR_ASSERT(size() == std::size(that));
 
     if (hasNone() || that.hasAll())
     {
-        return;
+        return *this;
     }
 
     if (that.hasNone() || hasAll())
     {
         *this = that;
-        return;
+        return *this;
     }
 
     flags_.resize(std::min(std::size(flags_), std::size(that.flags_)));
@@ -505,4 +506,5 @@ void tr_bitfield::bitwise_and(tr_bitfield const& that) noexcept
     }
 
     rebuildTrueCount();
+    return *this;
 }

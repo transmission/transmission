@@ -344,17 +344,17 @@ TEST(Bitfield, bitwise_or)
 
     a.setHasAll();
     b.setHasNone();
-    a.bitwise_or(b);
+    a |= b;
     EXPECT_TRUE(a.hasAll());
 
     a.setHasNone();
     b.setHasAll();
-    a.bitwise_or(b);
+    a |= b;
     EXPECT_TRUE(a.hasAll());
 
     a.setHasNone();
     b.setHasNone();
-    a.bitwise_or(b);
+    a |= b;
     EXPECT_TRUE(a.hasNone());
 
     a.setHasNone();
@@ -363,7 +363,7 @@ TEST(Bitfield, bitwise_or)
     b.setSpan(std::size(a) / 2U, std::size(a));
     EXPECT_EQ(0.5, a.percent());
     EXPECT_EQ(0.5, b.percent());
-    a.bitwise_or(b);
+    a |= b;
     EXPECT_EQ(1.0, a.percent());
     EXPECT_TRUE(a.hasAll());
 
@@ -382,7 +382,7 @@ TEST(Bitfield, bitwise_or)
     }
     EXPECT_NEAR(0.5F, a.percent(), 0.01);
     EXPECT_NEAR(0.5F, b.percent(), 0.01);
-    a.bitwise_or(b);
+    a |= b;
     EXPECT_TRUE(a.hasAll());
 }
 
@@ -393,17 +393,17 @@ TEST(Bitfield, bitwise_and)
 
     a.setHasAll();
     b.setHasNone();
-    a.bitwise_and(b);
+    a &= b;
     EXPECT_TRUE(a.hasNone());
 
     a.setHasNone();
     b.setHasAll();
-    a.bitwise_and(b);
+    a &= b;
     EXPECT_TRUE(a.hasNone());
 
     a.setHasAll();
     b.setHasAll();
-    a.bitwise_and(b);
+    a &= b;
     EXPECT_TRUE(a.hasAll());
 
     a.setHasNone();
@@ -412,7 +412,7 @@ TEST(Bitfield, bitwise_and)
     b.setSpan(std::size(a) / 2U, std::size(a));
     EXPECT_EQ(0.5, a.percent());
     EXPECT_EQ(0.5, b.percent());
-    a.bitwise_and(b);
+    a &= b;
     EXPECT_TRUE(a.hasNone());
 
     a.setHasNone();
@@ -428,20 +428,20 @@ TEST(Bitfield, bitwise_and)
             b.set(i);
         }
     }
-    a.bitwise_and(b);
+    a &= b;
     EXPECT_TRUE(a.hasNone());
 
     a.setHasNone();
     a.setSpan(0U, std::size(a) / 10U);
     b.setHasNone();
     b.setSpan(0U, std::size(a) / 20U);
-    a.bitwise_and(b);
+    a &= b;
     EXPECT_NEAR(0.05F, a.percent(), 0.01);
 
     a.setHasNone();
     a.setSpan(0U, std::size(a) / 10U);
     b.setHasNone();
     b.setSpan(0U, std::size(a) / 20U);
-    b.bitwise_and(a);
+    b &= a;
     EXPECT_NEAR(0.1F, a.percent(), 0.01);
 }

@@ -110,8 +110,8 @@ public:
         return static_cast<float>(count()) / size();
     }
 
-    void bitwise_or(tr_bitfield const& that) noexcept;
-    void bitwise_and(tr_bitfield const& that) noexcept;
+    tr_bitfield& operator|=(tr_bitfield const& that) noexcept;
+    tr_bitfield& operator&=(tr_bitfield const& that) noexcept;
 
 private:
     [[nodiscard]] size_t countFlags() const noexcept;
