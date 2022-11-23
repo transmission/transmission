@@ -60,8 +60,6 @@ public:
 
     virtual void pulse() = 0;
 
-    [[nodiscard]] virtual float percentDone() const noexcept = 0;
-    [[nodiscard]] virtual bool isSeed() const noexcept = 0;
     virtual void onTorrentGotMetainfo() = 0;
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
