@@ -390,7 +390,7 @@ public:
         return tor->unique_lock();
     }
 
-    [[nodiscard]] size_t countActiveWebseeds(uint64_t now) const noexcept
+    [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
     {
         if (!tor->isRunning || tor->isDone())
         {
