@@ -110,34 +110,7 @@ public:
         return static_cast<float>(count()) / size();
     }
 
-    void bitwise_or(tr_bitfield const& that) noexcept
-    {
-        if (that.hasAll())
-        {
-            setHasAll();
-            return;
-        }
-
-        if (hasAll() || that.hasNone())
-        {
-            return;
-        }
-
-        if (hasNone())
-        {
-            *this = that;
-            return;
-        }
-
-        flags_.resize(std::max(std::size(flags_), std::size(that.flags_)));
-
-        for (size_t i = 0, n = std::size(flags_); i < n; ++i)
-        {
-            flags_[i] |= that.flags_[i];
-        }
-
-        rebuildTrueCount();
-    }
+    void bitwise_or(tr_bitfield const& that) noexcept;
 
 private:
     [[nodiscard]] size_t countFlags() const noexcept;
