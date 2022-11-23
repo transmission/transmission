@@ -2545,12 +2545,10 @@ void tr_peerMgr::bandwidthPulse()
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
     {
-        auto* const swarm = tor->swarm;
-
-        /* run the completeness check for any torrents that need it */
-        if (swarm->needs_completeness_check)
+        // run the completeness check for any torrents that need it
+        if (auto& needs_check = tor->swarm->needs_completeness_check; needs_check)
         {
-            swarm->needs_completeness_check = false;
+            needs_check = false;
             tor->recheckCompleteness();
         }
 
