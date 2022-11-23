@@ -336,3 +336,52 @@ TEST(Bitfield, percent)
     field.setSpan(0, std::size(field) / 4U);
     EXPECT_NEAR(0.25F, field.percent(), 0.01);
 }
+
+TEST(Bitfield, bitwise_or)
+{
+    auto a = tr_bitfield{ 100 };
+    auto b = tr_bitfield{ 100 };
+
+    a.setHasAll();
+    b.setHasNone();
+    a.bitwise_or(b);
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasAll();
+    a.bitwise_or(b);
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasNone();
+    a.bitwise_or(b);
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    b.setHasNone();
+    a.setSpan(0, std::size(a) / 2U);
+    b.setSpan(std::size(a) / 2U, std::size(a));
+    EXPECT_EQ(0.5, a.percent());
+    EXPECT_EQ(0.5, b.percent());
+    a.bitwise_or(b);
+    EXPECT_EQ(1.0, a.percent());
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasNone();
+    for (size_t i = 0; i < std::size(a); ++i)
+    {
+        if ((i % 2U) != 0U)
+        {
+            a.set(i);
+        }
+        else
+        {
+            b.set(i);
+        }
+    }
+    EXPECT_NEAR(0.5F, a.percent(), 0.01);
+    EXPECT_NEAR(0.5F, b.percent(), 0.01);
+    a.bitwise_or(b);
+    EXPECT_TRUE(a.hasAll());
+}
