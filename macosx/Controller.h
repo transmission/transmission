@@ -28,7 +28,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 @interface Controller
     : NSObject<NSApplicationDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
 
-- (void)openFiles:(NSArray*)filenames addType:(addType)type forcePath:(NSString*)path;
+- (void)openFiles:(NSArray<NSString*>*)filenames addType:(addType)type forcePath:(NSString*)path;
 
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add;
 - (void)openCreatedFile:(NSNotification*)notification;
@@ -52,7 +52,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (IBAction)resumeSelectedTorrents:(id)sender;
 - (IBAction)resumeAllTorrents:(id)sender;
-- (void)resumeTorrents:(NSArray*)torrents;
+- (void)resumeTorrents:(NSArray<Torrent*>*)torrents;
 
 - (IBAction)resumeSelectedTorrentsNoWait:(id)sender;
 - (IBAction)resumeWaitingTorrents:(id)sender;
@@ -84,7 +84,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (IBAction)announceSelectedTorrents:(id)sender;
 
 - (IBAction)verifySelectedTorrents:(id)sender;
-- (void)verifyTorrents:(NSArray*)torrents;
+- (void)verifyTorrents:(NSArray<Torrent*>*)torrents;
 
 @property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
 
