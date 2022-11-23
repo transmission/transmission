@@ -319,3 +319,20 @@ TEST(Bitfield, hasAllNone)
         EXPECT_TRUE(!field.hasNone());
     }
 }
+
+TEST(Bitfield, percent)
+{
+    auto field = tr_bitfield{ 100 };
+    field.setHasAll();
+    EXPECT_NEAR(1.0F, field.percent(), 0.01);
+
+    field.setHasNone();
+    EXPECT_NEAR(0.0F, field.percent(), 0.01);
+
+    field.setSpan(0, std::size(field) / 2U);
+    EXPECT_NEAR(0.5F, field.percent(), 0.01);
+
+    field.setHasNone();
+    field.setSpan(0, std::size(field) / 4U);
+    EXPECT_NEAR(0.25F, field.percent(), 0.01);
+}

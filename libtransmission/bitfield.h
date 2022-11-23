@@ -95,6 +95,21 @@ public:
 
     [[nodiscard]] bool isValid() const;
 
+    [[nodiscard]] constexpr auto percent() const noexcept
+    {
+        if (hasAll())
+        {
+            return 1.0F;
+        }
+
+        if (hasNone() || empty())
+        {
+            return 0.0F;
+        }
+
+        return static_cast<float>(count()) / size();
+    }
+
 private:
     [[nodiscard]] size_t countFlags() const noexcept;
     [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
