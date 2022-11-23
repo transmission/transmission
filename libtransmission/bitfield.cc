@@ -466,13 +466,7 @@ void tr_bitfield::bitwise_or(tr_bitfield const& that) noexcept
         return;
     }
 
-    if (that.hasAll())
-    {
-        setHasAll();
-        return;
-    }
-
-    if (hasNone())
+    if (that.hasAll() || hasNone())
     {
         *this = that;
         return;
