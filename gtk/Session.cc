@@ -308,13 +308,13 @@ void Session::Impl::dec_busy()
 namespace
 {
 
-bool is_valid_eta(int t)
+constexpr bool is_valid_eta(time_t t)
 {
     return t != TR_ETA_NOT_AVAIL && t != TR_ETA_UNKNOWN;
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_eta(int a, int b)
+int compare_eta(time_t a, time_t b)
 {
     bool const a_valid = is_valid_eta(a);
     bool const b_valid = is_valid_eta(b);
