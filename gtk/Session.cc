@@ -308,13 +308,30 @@ void Session::Impl::dec_busy()
 namespace
 {
 
+template<typename T>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+constexpr int compare_generic(T const& a, T const& b)
+{
+    if (a < b)
+    {
+        return 1;
+    }
+
+    if (a > b)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 constexpr bool is_valid_eta(time_t t)
 {
     return t != TR_ETA_NOT_AVAIL && t != TR_ETA_UNKNOWN;
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_eta(time_t a, time_t b)
+constexpr int compare_eta(time_t a, time_t b)
 {
     bool const a_valid = is_valid_eta(a);
     bool const b_valid = is_valid_eta(b);
@@ -334,28 +351,11 @@ int compare_eta(time_t a, time_t b)
         return 1;
     }
 
-    return a < b ? 1 : -1;
-}
-
-template<typename T>
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_generic(T const& a, T const& b)
-{
-    if (a < b)
-    {
-        return 1;
-    }
-
-    if (a > b)
-    {
-        return 1;
-    }
-
-    return 0;
+    return compare_generic(a, b);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_ratio(double a, double b)
+constexpr int compare_ratio(double a, double b)
 {
     if (static_cast<int>(a) == TR_RATIO_INF && static_cast<int>(b) == TR_RATIO_INF)
     {
