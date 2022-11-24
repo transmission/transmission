@@ -339,7 +339,7 @@ int compare_eta(int a, int b)
 
 template<typename T>
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_generic(T&& a, T&& b)
+int compare_generic(T const& a, T const& b)
 {
     return a < b ? -1 : (a > b ? 1 : 0);
 }
