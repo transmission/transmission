@@ -314,7 +314,7 @@ constexpr int compare_generic(T const& a, T const& b)
 {
     if (a < b)
     {
-        return 1;
+        return -1;
     }
 
     if (a > b)
@@ -351,7 +351,7 @@ constexpr int compare_eta(time_t a, time_t b)
         return 1;
     }
 
-    return compare_generic(a, b);
+    return -compare_generic(a, b);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
