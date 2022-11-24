@@ -94,14 +94,11 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
         auto* const session = fav->session;
         auto const next_url = get_url(fav->host, fav->type);
         tr_sessionFetch(session, { next_url.raw(), favicon_web_done_cb, fav.release() });
+        return false;
     }
 
     // Not released into the next web request, means we're done trying (even if `pixbuf` is still invalid)
-    if (fav != nullptr)
-    {
-        fav->func(pixbuf);
-    }
-
+    fav->func(pixbuf);
     return false;
 }
 

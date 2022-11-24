@@ -85,7 +85,7 @@ int FileTreeItem::row() const
     if (parent_ != nullptr)
     {
         i = parent_->getMyChildRows().value(name(), -1);
-        assert(this == parent_->children_[i]);
+        assert(i == -1 || this == parent_->children_[i]);
     }
 
     return i;

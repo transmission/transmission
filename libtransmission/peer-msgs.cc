@@ -1767,15 +1767,17 @@ static int clientGotBlock(
     TR_ASSERT(msgs != nullptr);
 
     tr_torrent* const tor = msgs->torrent;
+    auto const n_expected = msgs->torrent->blockSize(block);
 
-    if (!block_data || std::size(*block_data) != msgs->torrent->blockSize(block))
+    if (!block_data)
     {
-        logdbg(
-            msgs,
-            fmt::format(
-                FMT_STRING("wrong block size -- expected {:d}, got {:d}"),
-                msgs->torrent->blockSize(block),
-                block_data ? std::size(*block_data) : 0U));
+        logdbg(msgs, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, 0));
+        return EMSGSIZE;
+    }
+
+    if (std::size(*block_data) != msgs->torrent->blockSize(block))
+    {
+        logdbg(msgs, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, std::size(*block_data)));
         block_data->clear();
         return EMSGSIZE;
     }

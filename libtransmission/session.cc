@@ -2169,7 +2169,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
-    , peer_mgr_{ tr_peerMgrNew(this), tr_peerMgrFree }
+    , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }
     , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
