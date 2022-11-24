@@ -341,32 +341,38 @@ template<typename T>
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_generic(T const& a, T const& b)
 {
-    return a < b ? -1 : (a > b ? 1 : 0);
+    if (a < b)
+    {
+        return 1;
+    }
+
+    if (a > b)
+    {
+        return 1;
+    }
+
+    return 0;
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_ratio(double a, double b)
 {
-    int ret = 0;
-
-    if ((int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF)
+    if (static_cast<int>(a) == TR_RATIO_INF && static_cast<int>(b) == TR_RATIO_INF)
     {
-        ret = 0;
-    }
-    else if ((int)a == TR_RATIO_INF)
-    {
-        ret = 1;
-    }
-    else if ((int)b == TR_RATIO_INF)
-    {
-        ret = -1;
-    }
-    else
-    {
-        ret = compare_generic(a, b);
+        return 0;
     }
 
-    return ret;
+    if (static_cast<int>(a) == TR_RATIO_INF)
+    {
+        return 1;
+    }
+
+    if (static_cast<int>(b) == TR_RATIO_INF)
+    {
+        return -1;
+    }
+
+    return compare_generic(a, b);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
