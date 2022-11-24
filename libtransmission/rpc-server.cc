@@ -230,7 +230,7 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server const* server, 
     evbuffer_free(response);
 }
 
-static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
+static void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
 {
     if (std::empty(server->web_client_dir_))
     {
