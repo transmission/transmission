@@ -62,8 +62,12 @@ struct tr_announce_request
     /* the port we listen for incoming peers on */
     tr_port port;
 
-    /* per-session key */
-    int key = 0;
+    /* Per-session key. BEP 0015 defines this key as a 32-bit number and
+     * explains its purpose: "Clients that resolve hostnames to v4 and v6
+     * and then announce to both should use the same key for both so that
+     * trackers that care about accurate statistics-keeping can match the
+     * two announces." */
+    uint32_t key;
 
     /* the number of peers we'd like to get back in the response */
     int numwant = 0;
