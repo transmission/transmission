@@ -9,7 +9,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // tr_rand_buffer()
+#include "crypto-utils.h" // tr_rand_obj()
 #include "clients.h"
 
 #include "gtest/gtest.h"
@@ -76,8 +76,7 @@ TEST(Client, clientForId)
 
     for (auto const& test : Tests)
     {
-        auto peer_id = tr_peer_id_t{};
-        tr_rand_buffer(std::data(peer_id), std::size(peer_id));
+        auto peer_id = tr_rand_obj<tr_peer_id_t>();
         std::copy(std::begin(test.peer_id), std::end(test.peer_id), std::begin(peer_id));
 
         auto buf = std::array<char, 128>{};
@@ -107,8 +106,7 @@ TEST(Client, clientForIdFuzz)
 {
     for (size_t i = 0; i < 10000; ++i)
     {
-        auto peer_id = tr_peer_id_t{};
-        tr_rand_buffer(std::data(peer_id), std::size(peer_id));
+        auto peer_id = tr_rand_obj<tr_peer_id_t>();
         auto buf = std::array<char, 128>{};
         tr_clientForId(buf.data(), buf.size(), peer_id);
     }

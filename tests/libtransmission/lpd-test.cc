@@ -11,7 +11,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h"
+#include "crypto-utils.h" // tr_rand_obj()
 #include "session.h"
 #include "tr-lpd.h"
 
@@ -83,9 +83,7 @@ public:
 
 auto makeRandomHash()
 {
-    auto buf = std::array<char, 256>{};
-    tr_rand_buffer(std::data(buf), std::size(buf));
-    return tr_sha1::digest(buf);
+    return tr_sha1::digest(tr_rand_obj<std::array<char, 256>>());
 }
 
 auto makeRandomHashString()

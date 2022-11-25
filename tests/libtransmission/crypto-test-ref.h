@@ -17,6 +17,7 @@
 #define tr_rand_buffer tr_rand_buffer_
 #define tr_rand_int tr_rand_int_
 #define tr_rand_int_weak tr_rand_int_weak_
+#define tr_rand_obj tr_rand_obj_
 #define tr_salt_shaker tr_salt_shaker_
 #define tr_sha1 tr_sha1_
 #define tr_sha1_from_string tr_sha1_from_string_
@@ -49,6 +50,7 @@
 #undef tr_rand_buffer
 #undef tr_rand_int
 #undef tr_rand_int_weak
+#undef tr_rand_obj
 #undef tr_salt_shaker
 #undef tr_sha1
 #undef tr_sha1_from_string
@@ -76,6 +78,7 @@
 #define tr_rand_buffer_ tr_rand_buffer
 #define tr_rand_int_ tr_rand_int
 #define tr_rand_int_weak_ tr_rand_int_weak
+#define tr_rand_obj_ tr_rand_obj
 #define tr_salt_shaker_ tr_salt_shaker
 #define tr_sha1_ tr_sha1
 #define tr_sha1_ctx_t_ tr_sha1_ctx_t

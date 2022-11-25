@@ -16,7 +16,7 @@
 
 #include "announcer.h"
 #include "announcer-common.h"
-#include "crypto-utils.h"
+#include "crypto-utils.h" // for tr_rand_obj()
 #include "peer-mgr.h" // for tr_pex
 #include "timer-ev.h"
 #include "tr-buffer.h"
@@ -111,14 +111,6 @@ protected:
         }
     }
 
-    template<typename T>
-    [[nodiscard]] static auto randomFilled()
-    {
-        auto tmp = T{};
-        tr_rand_buffer(&tmp, sizeof(tmp));
-        return tmp;
-    }
-
     [[nodiscard]] static uint32_t parseConnectionRequest(libtransmission::Buffer& buf)
     {
         EXPECT_EQ(ProtocolId, buf.toUint64());
@@ -144,7 +136,7 @@ protected:
         response.did_connect = true;
         response.did_timeout = false;
         response.row_count = 1;
-        response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
+        response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
         response.rows[0].seeders = 1;
         response.rows[0].leechers = 2;
         response.rows[0].downloads = 3;
@@ -194,7 +186,7 @@ protected:
 
     [[nodiscard]] static auto sendConnectionResponse(tr_announcer_udp& announcer, uint32_t transaction_id)
     {
-        auto const connection_id = randomFilled<uint64_t>();
+        auto const connection_id = tr_rand_obj<uint64_t>();
         auto buf = libtransmission::Buffer{};
         buf.addUint32(ConnectAction);
         buf.addUint32(transaction_id);
@@ -398,8 +390,8 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 2;
-    expected_response.rows[0] = { randomFilled<tr_sha1_digest_t>(), 1, 2, 3, 0 };
-    expected_response.rows[1] = { randomFilled<tr_sha1_digest_t>(), 4, 5, 6, 0 };
+    expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, 0 };
+    expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, 0 };
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
 
@@ -445,7 +437,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
+    expected_response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
     expected_response.rows[0].seeders = -1;
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
@@ -494,7 +486,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
-    expected_response.rows[0].info_hash = randomFilled<tr_sha1_digest_t>();
+    expected_response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
     expected_response.rows[0].seeders = -1; // -1 here & on next lines means error
     expected_response.rows[0].leechers = -1;
     expected_response.rows[0].downloads = -1;
@@ -533,7 +525,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     auto request = tr_scrape_request{};
     request.scrape_url = DefaultScrapeUrl;
     request.info_hash_count = 1;
-    request.info_hash[0] = randomFilled<tr_sha1_digest_t>();
+    request.info_hash[0] = tr_rand_obj<tr_sha1_digest_t>();
 
     // build the announcer
     auto mediator = MockMediator{};
@@ -553,7 +545,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     auto buf = libtransmission::Buffer{};
     buf.addUint32(ConnectAction);
     buf.addUint32(transaction_id + 1);
-    buf.addUint64(randomFilled<uint64_t>());
+    buf.addUint64(tr_rand_obj<uint64_t>());
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.toBuf(std::data(arr), response_size);
@@ -563,7 +555,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     buf.clear();
     buf.addUint32(ScrapeAction);
     buf.addUint32(transaction_id);
-    buf.addUint64(randomFilled<uint64_t>());
+    buf.addUint64(tr_rand_obj<uint64_t>());
     response_size = std::size(buf);
     buf.toBuf(std::data(arr), response_size);
     EXPECT_FALSE(announcer->handleMessage(std::data(arr), response_size));
@@ -597,7 +589,7 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     request.announce_url = "https://127.0.0.1/announce";
     request.tracker_id = "fnord";
     request.peer_id = tr_peerIdInit();
-    request.info_hash = randomFilled<tr_sha1_digest_t>();
+    request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
 
     auto expected_response = tr_announce_response{};
     expected_response.info_hash = request.info_hash;
