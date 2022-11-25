@@ -387,20 +387,14 @@ static void utp_on_state_change(tr_peerIo* const io, int const state)
 
 static void utp_on_error(tr_peerIo* const io, int const errcode)
 {
-    switch (errcode)
+    if (errcode == UTP_ETIMEDOUT)
     {
-    case UTP_ETIMEDOUT:
-        tr_logAddTraceIo(io, fmt::format("utp_on_error -- timed out"));
-        break;
-    case UTP_ECONNRESET:
-        tr_logAddDebugIo(io, fmt::format("utp_on_error -- connection reset"));
-        break;
-    case UTP_ECONNREFUSED:
-        tr_logAddDebugIo(io, fmt::format("utp_on_error -- connection refused"));
-        break;
-    default:
-        tr_logAddDebugIo(io, fmt::format("utp_on_error -- errcode is {}", errcode));
-        break;
+        // high frequency error: we log as trace
+        tr_logAddTraceIo(io, fmt::format("utp_on_error -- UTP_ETIMEDOUT"));
+    }
+    else
+    {
+        tr_logAddDebugIo(io, fmt::format("utp_on_error -- {}", utp_error_code_names[errcode]));
     }
 
     if (io->gotError != nullptr)
