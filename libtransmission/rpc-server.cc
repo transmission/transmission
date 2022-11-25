@@ -32,7 +32,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_buffer(), tr_ssha1_matches() */
+#include "crypto-utils.h" /* tr_ssha1_matches() */
 #include "error.h"
 #include "log.h"
 #include "net.h"

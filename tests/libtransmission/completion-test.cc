@@ -11,7 +11,7 @@
 #include "transmission.h"
 
 #include "block-info.h"
-#include "crypto-utils.h" // tr_rand_buffer()
+#include "crypto-utils.h" // for tr_rand_obj()
 #include "completion.h"
 
 #include "gtest/gtest.h"
@@ -335,9 +335,8 @@ TEST_F(CompletionTest, createPieceBitfield)
 
     // make a completion object that has a random assortment of pieces
     auto completion = tr_completion(&torrent, &block_info);
-    auto buf = std::array<char, 65>{};
+    auto buf = tr_rand_obj<std::array<char, 65>>();
     ASSERT_EQ(std::size(buf), block_info.pieceCount());
-    EXPECT_TRUE(tr_rand_buffer(std::data(buf), std::size(buf)));
     for (uint64_t i = 0; i < block_info.pieceCount(); ++i)
     {
         if ((buf[i] % 2) != 0)

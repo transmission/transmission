@@ -196,8 +196,7 @@ public:
 
     static auto makeRandomPeerId()
     {
-        auto peer_id = tr_peer_id_t{};
-        tr_rand_buffer(std::data(peer_id), std::size(peer_id));
+        auto peer_id = tr_rand_obj<tr_peer_id_t>();
         auto const peer_id_prefix = "-UW110Q-"sv;
         std::copy(std::begin(peer_id_prefix), std::end(peer_id_prefix), std::begin(peer_id));
         return peer_id;

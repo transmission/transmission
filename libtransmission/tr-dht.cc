@@ -458,8 +458,7 @@ private:
     {
         // Note that DHT ids need to be distributed uniformly,
         // so it should be something truly random
-        auto id = Id{};
-        tr_rand_buffer(std::data(id), std::size(id));
+        auto id = tr_rand_obj<Id>();
 
         auto nodes = Nodes{};
 

@@ -69,9 +69,7 @@ namespace tr_message_stream_encryption
 
 [[nodiscard]] DH::private_key_bigend_t DH::randomPrivateKey() noexcept
 {
-    auto key = DH::private_key_bigend_t{};
-    tr_rand_buffer(std::data(key), std::size(key));
-    return key;
+    return tr_rand_obj<DH::private_key_bigend_t>();
 }
 
 [[nodiscard]] auto generatePublicKey(DH::private_key_bigend_t const& private_key) noexcept
