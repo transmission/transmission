@@ -16,7 +16,7 @@ typedef NS_ENUM(NSUInteger, LevelButtonLevel) {
     LevelButtonLevelWarn = 1,
     LevelButtonLevelInfo = 2,
     LevelButtonLevelDebug = 3,
-    LevelButtonLevelTrace = 4,
+    // we do not support LevelButtonLevelTrace, as it would overwhelm everything (#4233)
 };
 
 static NSTimeInterval const kUpdateSeconds = 0.75;
@@ -71,12 +71,10 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     [self.fLevelButton itemAtIndex:LevelButtonLevelWarn].title = NSLocalizedString(@"Warning", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LevelButtonLevelInfo].title = NSLocalizedString(@"Info", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LevelButtonLevelDebug].title = NSLocalizedString(@"Debug", "Message window -> level string");
-    [self.fLevelButton itemAtIndex:LevelButtonLevelTrace].title = NSLocalizedString(@"Trace", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LevelButtonLevelError].image = [self.class iconForLevel:TR_LOG_ERROR];
     [self.fLevelButton itemAtIndex:LevelButtonLevelWarn].image = [self.class iconForLevel:TR_LOG_WARN];
     [self.fLevelButton itemAtIndex:LevelButtonLevelInfo].image = [self.class iconForLevel:TR_LOG_INFO];
     [self.fLevelButton itemAtIndex:LevelButtonLevelDebug].image = [self.class iconForLevel:TR_LOG_DEBUG];
-    [self.fLevelButton itemAtIndex:LevelButtonLevelTrace].image = [self.class iconForLevel:TR_LOG_TRACE];
 
     CGFloat const levelButtonOldWidth = NSWidth(self.fLevelButton.frame);
     [self.fLevelButton sizeToFit];
@@ -127,10 +125,8 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
         [self.fLevelButton selectItemAtIndex:LevelButtonLevelInfo];
         break;
     case TR_LOG_DEBUG:
-        [self.fLevelButton selectItemAtIndex:LevelButtonLevelDebug];
-        break;
     case TR_LOG_TRACE:
-        [self.fLevelButton selectItemAtIndex:LevelButtonLevelTrace];
+        [self.fLevelButton selectItemAtIndex:LevelButtonLevelDebug];
         break;
     default: //safety
         [NSUserDefaults.standardUserDefaults setInteger:TR_LOG_ERROR forKey:@"MessageLevel"];
@@ -400,9 +396,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
         break;
     case LevelButtonLevelDebug:
         level = TR_LOG_DEBUG;
-        break;
-    case LevelButtonLevelTrace:
-        level = TR_LOG_TRACE;
         break;
     default:
         NSAssert1(NO, @"Unknown message log level: %ld", [self.fLevelButton indexOfSelectedItem]);

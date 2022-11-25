@@ -49,7 +49,6 @@
                                     <menuItem title="Warn" image="NSStatusPartiallyAvailable" id="menuItemWarn"/>
                                     <menuItem title="Info" image="NSStatusAvailable" id="menuItemInfo"/>
                                     <menuItem title="Debug" image="NSStatusNone" id="menuItemDebug"/>
-                                    <menuItem title="Trace" image="NSStatusNone" id="menuItemTracer"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
