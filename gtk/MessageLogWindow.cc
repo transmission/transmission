@@ -461,15 +461,13 @@ MessageLogWindow::Impl::Impl(
     , refresh_tag_(Glib::signal_timeout().connect_seconds(
           sigc::mem_fun(*this, &Impl::onRefresh),
           SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
-    , level_names_{
-        {
-            { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
-            { TR_LOG_ERROR, C_("Logging level", "Error") },
-            { TR_LOG_WARN, C_("Logging level", "Warning") },
-            { TR_LOG_INFO, C_("Logging level", "Information") },
-            { TR_LOG_DEBUG, C_("Logging level", "Debug") },
-        },
-    }
+    , level_names_{ {
+          { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
+          { TR_LOG_ERROR, C_("Logging level", "Error") },
+          { TR_LOG_WARN, C_("Logging level", "Warning") },
+          { TR_LOG_INFO, C_("Logging level", "Information") },
+          { TR_LOG_DEBUG, C_("Logging level", "Debug") },
+      } }
 {
     /**
     ***  toolbar
