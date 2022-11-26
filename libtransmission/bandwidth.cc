@@ -144,11 +144,10 @@ void tr_bandwidth::allocateBandwidth(
     tr_priority_t const priority = std::max(parent_priority, this->priority_);
 
     /* set the available bandwidth */
-    auto bandwidth = &this->band_[dir];
-    if (bandwidth->is_limited_)
+    if (auto& bandwidth = band_[dir]; bandwidth.is_limited_)
     {
-        auto const next_pulse_speed = bandwidth->desired_speed_bps_;
-        bandwidth->bytes_left_ = next_pulse_speed * period_msec / 1000U;
+        auto const next_pulse_speed = bandwidth.desired_speed_bps_;
+        bandwidth.bytes_left_ = next_pulse_speed * period_msec / 1000U;
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */
@@ -272,19 +271,19 @@ size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) co
 
             auto const current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
             auto const desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
-            auto const r = desired >= 1 ? double(current) / desired : 0;
+            auto const r = desired >= 1 ? static_cast<double>(current) / desired : 0.0;
 
             if (r > 1.0)
             {
-                byte_count = 0;
+                byte_count = 0; // none left
             }
             else if (r > 0.9)
             {
-                byte_count = static_cast<unsigned int>(byte_count * 0.8);
+                byte_count -= (byte_count / 5U); // cap at 80%
             }
             else if (r > 0.8)
             {
-                byte_count = static_cast<unsigned int>(byte_count * 0.9);
+                byte_count -= (byte_count / 10U); // cap at 90%
             }
         }
     }

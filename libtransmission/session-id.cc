@@ -17,7 +17,7 @@
 
 #include "session-id.h"
 
-#include "crypto-utils.h" // for tr_rand_buf()
+#include "crypto-utils.h" // for tr_rand_obj()
 #include "error-types.h"
 #include "error.h"
 #include "file.h"
@@ -103,8 +103,7 @@ auto constexpr WouldBlock = ERROR_LOCK_VIOLATION;
 
 tr_session_id::session_id_t tr_session_id::make_session_id()
 {
-    auto session_id = session_id_t{};
-    tr_rand_buffer(std::data(session_id), std::size(session_id));
+    auto session_id = tr_rand_obj<session_id_t>();
     static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
     for (auto& chr : session_id)
     {

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -399,6 +399,7 @@
 		C809AEE7291ECFD000BFDBE1 /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
 		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
+		C87369652809984200573C90 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87369642809984200573C90 /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AE2803EE7C005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AF2803EE7D005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
@@ -1183,6 +1184,7 @@
 		C841A27F29197724009F18E8 /* NSKeyedUnarchiverAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSKeyedUnarchiverAdditions.h; sourceTree = "<group>"; };
 		C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSKeyedUnarchiverAdditions.mm; sourceTree = "<group>"; };
 		C86BCD9828228A9600F45599 /* SparkleProxy.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SparkleProxy.mm; sourceTree = "<group>"; };
+		C87369642809984200573C90 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C88771AB2803EE53005C7523 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		C887BEC02807FCE900867D3C /* create.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = create.cc; sourceTree = "<group>"; };
@@ -1239,6 +1241,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C87369652809984200573C90 /* UserNotifications.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */,
 				4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */,
@@ -1873,6 +1876,7 @@
 		A2F35BBA15C5A0A100EBF632 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C87369642809984200573C90 /* UserNotifications.framework */,
 				55869925257074EC00F77A43 /* libcurl.tbd */,
 				C88771AB2803EE53005C7523 /* libiconv.tbd */,
 				C88771A92803EE42005C7523 /* libz.tbd */,

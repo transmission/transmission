@@ -444,11 +444,12 @@ target_link_libraries(${TR_NAME}-mac
     "-framework IOKit"
     "-framework Quartz"
     "-framework Security"
+    "-weak_framework UserNotifications"
 )
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)
     add_custom_command(TARGET ${TR_NAME}-mac POST_BUILD
-        COMMAND ${CODESIGN_EXECUTABLE} -s - -o linker-signed $<TARGET_BUNDLE_DIR:${TR_NAME}-mac>)
+        COMMAND ${CODESIGN_EXECUTABLE} -s - $<TARGET_BUNDLE_DIR:${TR_NAME}-mac>)
 endif()
 
 set(MAC_BUNDLE_NAME Transmission)

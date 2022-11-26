@@ -13,7 +13,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // tr_rand_buffer()
+#include "crypto-utils.h" // for tr_salt_shaker
 #include "peer-mgr-wishlist.h"
 #include "tr-assert.h"
 

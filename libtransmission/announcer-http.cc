@@ -625,7 +625,7 @@ public:
         return log_name_;
     }
 
-    void invoke_callback()
+    void invoke_callback() const
     {
         if (response_func_)
         {

@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cinttypes> // PRIu64
 #include <climits> // INT_MAX
 #include <cstdio>
 #include <ctime>
@@ -213,7 +212,7 @@ public:
 
     tr_session* const session;
 
-    int const key = tr_rand_int(INT_MAX);
+    uint32_t const key = tr_rand_obj<uint32_t>();
 
 private:
     void flushCloseMessages()
@@ -1192,8 +1191,13 @@ static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
 
     announcer->announce(
         req,
-        [announcer, tier_id, event, is_running_on_success](tr_announce_response const& response)
-        { announcer->onAnnounceDone(tier_id, event, is_running_on_success, response); });
+        [session = announcer->session, announcer, tier_id, event, is_running_on_success](tr_announce_response const& response)
+        {
+            if (session->announcer_)
+            {
+                announcer->onAnnounceDone(tier_id, event, is_running_on_success, response);
+            }
+        });
 }
 
 /***
@@ -1435,7 +1439,15 @@ static void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> cons
     /* send the requests we just built */
     for (size_t i = 0; i < request_count; ++i)
     {
-        announcer->scrape(requests[i], [announcer](tr_scrape_response const& response) { announcer->onScrapeDone(response); });
+        announcer->scrape(
+            requests[i],
+            [session = announcer->session, announcer](tr_scrape_response const& response)
+            {
+                if (session->announcer_)
+                {
+                    announcer->onScrapeDone(response);
+                }
+            });
     }
 }
 
@@ -1634,7 +1646,6 @@ static tr_tracker_view trackerView(tr_torrent const& tor, size_t tier_index, tr_
         }
     }
 
-    TR_ASSERT(0 <= view.tier);
     return view;
 }
 

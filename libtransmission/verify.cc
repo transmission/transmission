@@ -56,7 +56,7 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     return 0;
 }
 
-bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool>& stop_flag)
+bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& stop_flag)
 {
     auto const begin = tr_time();
 

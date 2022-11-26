@@ -104,6 +104,14 @@ void tr_x509_cert_free(tr_x509_cert_t handle);
  */
 bool tr_rand_buffer(void* buffer, size_t length);
 
+template<typename T>
+T tr_rand_obj()
+{
+    auto t = T{};
+    tr_rand_buffer(&t, sizeof(T));
+    return t;
+}
+
 /**
  * @brief Generate a SSHA password from its plaintext source.
  */

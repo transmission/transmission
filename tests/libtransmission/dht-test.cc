@@ -53,7 +53,7 @@ protected:
     {
         // Fake data to be written to the test state file
 
-        std::array<char, IdLength> id_ = tr_randObj<std::array<char, IdLength>>();
+        std::array<char, IdLength> const id_ = tr_rand_obj<std::array<char, IdLength>>();
 
         std::vector<std::pair<tr_address, tr_port>> ipv4_nodes_ = {
             std::make_pair(*tr_address::fromString("10.10.10.1"), tr_port::fromHost(128)),
@@ -597,7 +597,7 @@ TEST_F(DhtTest, announcesTorrents)
 {
     auto constexpr Id = tr_torrent_id_t{ 1 };
     auto constexpr PeerPort = tr_port::fromHost(999);
-    auto const info_hash = tr_randObj<tr_sha1_digest_t>();
+    auto const info_hash = tr_rand_obj<tr_sha1_digest_t>();
 
     tr_timeUpdate(time(nullptr));
 

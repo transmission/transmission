@@ -456,3 +456,55 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
         decrementTrueCount(old_count);
     }
 }
+
+tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
+{
+    TR_ASSERT(size() == std::size(that));
+
+    if (hasAll() || that.hasNone())
+    {
+        return *this;
+    }
+
+    if (that.hasAll() || hasNone())
+    {
+        *this = that;
+        return *this;
+    }
+
+    flags_.resize(std::max(std::size(flags_), std::size(that.flags_)));
+
+    for (size_t i = 0, n = std::size(flags_); i < n; ++i)
+    {
+        flags_[i] |= that.flags_[i];
+    }
+
+    rebuildTrueCount();
+    return *this;
+}
+
+tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
+{
+    TR_ASSERT(size() == std::size(that));
+
+    if (hasNone() || that.hasAll())
+    {
+        return *this;
+    }
+
+    if (that.hasNone() || hasAll())
+    {
+        *this = that;
+        return *this;
+    }
+
+    flags_.resize(std::min(std::size(flags_), std::size(that.flags_)));
+
+    for (size_t i = 0, n = std::size(flags_); i < n; ++i)
+    {
+        flags_[i] &= that.flags_[i];
+    }
+
+    rebuildTrueCount();
+    return *this;
+}

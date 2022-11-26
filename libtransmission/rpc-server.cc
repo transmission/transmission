@@ -32,7 +32,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_buffer(), tr_ssha1_matches() */
+#include "crypto-utils.h" /* tr_ssha1_matches() */
 #include "error.h"
 #include "log.h"
 #include "net.h"
@@ -230,7 +230,7 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server const* server, 
     evbuffer_free(response);
 }
 
-static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
+static void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
 {
     if (std::empty(server->web_client_dir_))
     {
@@ -716,7 +716,7 @@ static void startServer(tr_rpc_server* server)
     else
     {
         evhttp_set_gencb(httpd, handle_request, server);
-        server->httpd = std::unique_ptr<evhttp, void (*)(evhttp*)>{ httpd, evhttp_free };
+        server->httpd = std::unique_ptr<evhttp, void (*)(evhttp*)>{ httpd, &evhttp_free };
 
         tr_logAddInfo(fmt::format(_("Listening for RPC and Web requests on '{address}'"), fmt::arg("address", addr_port_str)));
     }

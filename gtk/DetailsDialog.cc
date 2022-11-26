@@ -795,8 +795,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        int const baseline = stats.front()->eta;
-        bool const is_uniform = std::all_of(
+        auto const baseline = stats.front()->eta;
+        auto const is_uniform = std::all_of(
             stats.begin(),
             stats.end(),
             [baseline](auto const* st) { return baseline == st->eta; });
@@ -811,7 +811,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else
         {
-            str = tr_format_time_relative(now, baseline);
+            str = tr_format_time_left(baseline);
         }
     }
 
@@ -1111,17 +1111,17 @@ public:
         add(upload_rate_string);
         add(client);
         add(progress);
-        add(upload_request_count_int);
+        add(upload_request_count_number);
         add(upload_request_count_string);
-        add(download_request_count_int);
+        add(download_request_count_number);
         add(download_request_count_string);
-        add(blocks_downloaded_count_int);
+        add(blocks_downloaded_count_number);
         add(blocks_downloaded_count_string);
-        add(blocks_uploaded_count_int);
+        add(blocks_uploaded_count_number);
         add(blocks_uploaded_count_string);
-        add(reqs_cancelled_by_client_count_int);
+        add(reqs_cancelled_by_client_count_number);
         add(reqs_cancelled_by_client_count_string);
-        add(reqs_cancelled_by_peer_count_int);
+        add(reqs_cancelled_by_peer_count_number);
         add(reqs_cancelled_by_peer_count_string);
         add(encryption_stock_id);
         add(flags);
@@ -1138,17 +1138,17 @@ public:
     Gtk::TreeModelColumn<Glib::ustring> upload_rate_string;
     Gtk::TreeModelColumn<Glib::ustring> client;
     Gtk::TreeModelColumn<int> progress;
-    Gtk::TreeModelColumn<int> upload_request_count_int;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToClient)> upload_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> upload_request_count_string;
-    Gtk::TreeModelColumn<int> download_request_count_int;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::activeReqsToPeer)> download_request_count_number;
     Gtk::TreeModelColumn<Glib::ustring> download_request_count_string;
-    Gtk::TreeModelColumn<int> blocks_downloaded_count_int;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToClient)> blocks_downloaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_downloaded_count_string;
-    Gtk::TreeModelColumn<int> blocks_uploaded_count_int;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::blocksToPeer)> blocks_uploaded_count_number;
     Gtk::TreeModelColumn<Glib::ustring> blocks_uploaded_count_string;
-    Gtk::TreeModelColumn<int> reqs_cancelled_by_client_count_int;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToPeer)> reqs_cancelled_by_client_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_client_count_string;
-    Gtk::TreeModelColumn<int> reqs_cancelled_by_peer_count_int;
+    Gtk::TreeModelColumn<decltype(tr_peer_stat::cancelsToClient)> reqs_cancelled_by_peer_count_number;
     Gtk::TreeModelColumn<Glib::ustring> reqs_cancelled_by_peer_count_string;
     Gtk::TreeModelColumn<Glib::ustring> encryption_stock_id;
     Gtk::TreeModelColumn<Glib::ustring> flags;
@@ -1245,10 +1245,10 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
         cancelled_by_peer = std::to_string(peer->cancelsToClient);
     }
 
-    (*iter)[peer_cols.progress] = (int)(100.0 * peer->progress);
-    (*iter)[peer_cols.upload_request_count_int] = peer->activeReqsToClient;
+    (*iter)[peer_cols.progress] = static_cast<int>(100.0 * peer->progress);
+    (*iter)[peer_cols.upload_request_count_number] = peer->activeReqsToClient;
     (*iter)[peer_cols.upload_request_count_string] = up_count;
-    (*iter)[peer_cols.download_request_count_int] = peer->activeReqsToPeer;
+    (*iter)[peer_cols.download_request_count_number] = peer->activeReqsToPeer;
     (*iter)[peer_cols.download_request_count_string] = down_count;
     (*iter)[peer_cols.download_rate_double] = peer->rateToClient_KBps;
     (*iter)[peer_cols.download_rate_string] = down_speed;
@@ -1256,13 +1256,13 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     (*iter)[peer_cols.upload_rate_string] = up_speed;
     (*iter)[peer_cols.flags] = std::data(peer->flagStr);
     (*iter)[peer_cols.was_updated] = true;
-    (*iter)[peer_cols.blocks_downloaded_count_int] = (int)peer->blocksToClient;
+    (*iter)[peer_cols.blocks_downloaded_count_number] = peer->blocksToClient;
     (*iter)[peer_cols.blocks_downloaded_count_string] = blocks_to_client;
-    (*iter)[peer_cols.blocks_uploaded_count_int] = (int)peer->blocksToPeer;
+    (*iter)[peer_cols.blocks_uploaded_count_number] = peer->blocksToPeer;
     (*iter)[peer_cols.blocks_uploaded_count_string] = blocks_to_peer;
-    (*iter)[peer_cols.reqs_cancelled_by_client_count_int] = (int)peer->cancelsToPeer;
+    (*iter)[peer_cols.reqs_cancelled_by_client_count_number] = peer->cancelsToPeer;
     (*iter)[peer_cols.reqs_cancelled_by_client_count_string] = cancelled_by_client;
-    (*iter)[peer_cols.reqs_cancelled_by_peer_count_int] = (int)peer->cancelsToClient;
+    (*iter)[peer_cols.reqs_cancelled_by_peer_count_number] = peer->cancelsToClient;
     (*iter)[peer_cols.reqs_cancelled_by_peer_count_string] = cancelled_by_peer;
 }
 
@@ -1615,42 +1615,42 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             auto* r = Gtk::make_managed<Gtk::CellRendererText>();
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Dn Reqs"), *r);
             c->add_attribute(r->property_text(), *col);
-            sort_col = &peer_cols.download_request_count_int;
+            sort_col = &peer_cols.download_request_count_number;
         }
         else if (*col == peer_cols.upload_request_count_string)
         {
             auto* r = Gtk::make_managed<Gtk::CellRendererText>();
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Up Reqs"), *r);
             c->add_attribute(r->property_text(), *col);
-            sort_col = &peer_cols.upload_request_count_int;
+            sort_col = &peer_cols.upload_request_count_number;
         }
         else if (*col == peer_cols.blocks_downloaded_count_string)
         {
             auto* r = Gtk::make_managed<Gtk::CellRendererText>();
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Dn Blocks"), *r);
             c->add_attribute(r->property_text(), *col);
-            sort_col = &peer_cols.blocks_downloaded_count_int;
+            sort_col = &peer_cols.blocks_downloaded_count_number;
         }
         else if (*col == peer_cols.blocks_uploaded_count_string)
         {
             auto* r = Gtk::make_managed<Gtk::CellRendererText>();
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Up Blocks"), *r);
             c->add_attribute(r->property_text(), *col);
-            sort_col = &peer_cols.blocks_uploaded_count_int;
+            sort_col = &peer_cols.blocks_uploaded_count_number;
         }
         else if (*col == peer_cols.reqs_cancelled_by_client_count_string)
         {
             auto* r = Gtk::make_managed<Gtk::CellRendererText>();
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("We Cancelled"), *r);
             c->add_attribute(r->property_text(), *col);
-            sort_col = &peer_cols.reqs_cancelled_by_client_count_int;
+            sort_col = &peer_cols.reqs_cancelled_by_client_count_number;
         }
         else if (*col == peer_cols.reqs_cancelled_by_peer_count_string)
         {
             auto* r = Gtk::make_managed<Gtk::CellRendererText>();
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("They Cancelled"), *r);
             c->add_attribute(r->property_text(), *col);
-            sort_col = &peer_cols.reqs_cancelled_by_peer_count_int;
+            sort_col = &peer_cols.reqs_cancelled_by_peer_count_number;
         }
         else if (*col == peer_cols.download_rate_string)
         {

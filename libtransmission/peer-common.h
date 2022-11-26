@@ -187,9 +187,24 @@ public:
 
     virtual bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const = 0;
 
+    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept
+    {
+        return has().test(piece);
+    }
+
+    [[nodiscard]] float percentDone() const noexcept
+    {
+        return has().percent();
+    }
+
+    [[nodiscard]] bool isSeed() const noexcept
+    {
+        return has().hasAll();
+    }
+
     [[nodiscard]] virtual std::string readable() const = 0;
 
-    [[nodiscard]] virtual bool hasPiece(tr_piece_index_t piece) const noexcept = 0;
+    [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
 
     [[nodiscard]] virtual tr_bandwidth& bandwidth() noexcept = 0;
 

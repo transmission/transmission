@@ -43,14 +43,6 @@ namespace libtransmission
 namespace test
 {
 
-template<typename T>
-[[nodiscard]] static auto tr_randObj()
-{
-    auto ret = T{};
-    tr_rand_buffer(&ret, sizeof(ret));
-    return ret;
-}
-
 using file_func_t = std::function<void(char const* filename)>;
 
 static void depthFirstWalk(char const* path, file_func_t func)

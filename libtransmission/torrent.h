@@ -79,8 +79,6 @@ enum tr_verify_state : uint8_t
     TR_VERIFY_NOW
 };
 
-tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
-
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
@@ -637,6 +635,41 @@ public:
         {
             this->anyDate = t;
         }
+    }
+
+    [[nodiscard]] constexpr auto activity() const noexcept
+    {
+        bool const is_seed = this->isDone();
+
+        if (this->verifyState() == TR_VERIFY_NOW)
+        {
+            return TR_STATUS_CHECK;
+        }
+
+        if (this->verifyState() == TR_VERIFY_WAIT)
+        {
+            return TR_STATUS_CHECK_WAIT;
+        }
+
+        if (this->isRunning)
+        {
+            return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+        }
+
+        if (this->isQueued())
+        {
+            if (is_seed && this->session->queueEnabled(TR_UP))
+            {
+                return TR_STATUS_SEED_WAIT;
+            }
+
+            if (!is_seed && this->session->queueEnabled(TR_DOWN))
+            {
+                return TR_STATUS_DOWNLOAD_WAIT;
+            }
+        }
+
+        return TR_STATUS_STOPPED;
     }
 
     void setLabels(std::vector<tr_quark> const& new_labels);

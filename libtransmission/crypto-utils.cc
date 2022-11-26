@@ -91,8 +91,7 @@ std::string tr_ssha1(std::string_view plaintext)
     auto constexpr Salter = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ./"sv;
     static_assert(std::size(Salter) == 64);
     auto constexpr SaltSize = size_t{ 8 };
-    auto salt = std::array<char, SaltSize>{};
-    tr_rand_buffer(std::data(salt), std::size(salt));
+    auto salt = tr_rand_obj<std::array<char, SaltSize>>();
     std::transform(
         std::begin(salt),
         std::end(salt),

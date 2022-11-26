@@ -190,7 +190,7 @@ struct peer_atom
         return value;
     }
 
-    [[nodiscard]] int getReconnectIntervalSecs(time_t const now) const noexcept
+    [[nodiscard]] constexpr int getReconnectIntervalSecs(time_t const now) const noexcept
     {
         auto sec = int{};
         bool const unreachable = (this->flags2 & MyflagUnreachable) != 0;
@@ -246,7 +246,6 @@ struct peer_atom
             }
         }
 
-        tr_logAddTrace(fmt::format("reconnect interval for {} is {} seconds", this->readable(), sec));
         return sec;
     }
 
@@ -255,7 +254,7 @@ struct peer_atom
         blocklisted_.reset();
     }
 
-    std::optional<bool> isReachable() const
+    [[nodiscard]] constexpr std::optional<bool> isReachable() const
     {
         if ((flags2 & MyflagUnreachable) != 0)
         {
@@ -391,14 +390,12 @@ public:
         return tor->unique_lock();
     }
 
-    [[nodiscard]] size_t countActiveWebseeds() const noexcept
+    [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
     {
         if (!tor->isRunning || tor->isDone())
         {
             return {};
         }
-
-        auto const now = tr_time_msec();
 
         return std::count_if(
             std::begin(webseeds),
@@ -513,7 +510,7 @@ public:
     uint16_t interested_count = 0;
     uint16_t max_peers = 0;
 
-    tr_swarm_stats stats = {};
+    mutable tr_swarm_stats stats = {};
 
     uint8_t optimistic_unchoke_time_scaler = 0;
 
@@ -680,13 +677,10 @@ static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address cons
     return it != std::end(swarm->pool) ? &*it : nullptr;
 }
 
-static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
+static bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
 {
-    auto const* const s = const_cast<tr_swarm*>(cs);
-    auto const lock = s->unique_lock();
-
-    return atom->is_connected || s->outgoing_handshakes.contains(atom->addr) ||
-        s->manager->incoming_handshakes.contains(atom->addr);
+    return atom->is_connected || swarm->outgoing_handshakes.contains(atom->addr) ||
+        swarm->manager->incoming_handshakes.contains(atom->addr);
 }
 
 static void swarmFree(tr_swarm* s)
@@ -1582,8 +1576,9 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm)
 {
     TR_ASSERT(swarm != nullptr);
-
-    return swarm->stats;
+    auto& stats = swarm->stats;
+    stats.active_webseed_count = swarm->countActiveWebseeds(tr_time_msec());
+    return stats;
 }
 
 void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active)
@@ -1617,46 +1612,28 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         return 0;
     }
 
-    tr_swarm const* const s = tor->swarm;
-    if (s == nullptr || !s->is_running)
+    tr_swarm const* const swarm = tor->swarm;
+    if (swarm == nullptr || swarm->peerCount() == 0U)
     {
         return 0;
     }
 
-    auto const n_peers = s->peerCount();
-    if (n_peers == 0)
+    auto available = swarm->peers.front()->has();
+    for (auto const* const peer : swarm->peers)
     {
-        return 0;
+        available |= peer->has();
     }
 
-    for (auto const* const peer : s->peers)
+    if (available.hasAll())
     {
-        if (peer->atom != nullptr && peer->atom->isSeed())
-        {
-            return tor->leftUntilDone();
-        }
+        return tor->leftUntilDone();
     }
-
-    // do it the hard way
 
     auto desired_available = uint64_t{};
-    auto const n_pieces = tor->pieceCount();
-    auto have = std::vector<bool>(n_pieces);
 
-    for (auto const* const peer : s->peers)
+    for (tr_piece_index_t i = 0, n = tor->pieceCount(); i < n; ++i)
     {
-        for (tr_piece_index_t j = 0; j < n_pieces; ++j)
-        {
-            if (peer->hasPiece(j))
-            {
-                have[j] = true;
-            }
-        }
-    }
-
-    for (tr_piece_index_t i = 0; i < n_pieces; ++i)
-    {
-        if (tor->pieceIsWanted(i) && have.at(i))
+        if (tor->pieceIsWanted(i) && available.test(i))
         {
             desired_available += tor->countMissingBytesInPiece(i);
         }
@@ -2483,13 +2460,15 @@ void tr_peerMgr::reconnectPulse()
     // remove crappy peers
     for (auto* const tor : session->torrents())
     {
-        if (!tor->swarm->is_running)
+        auto* const swarm = tor->swarm;
+
+        if (!swarm->is_running)
         {
-            tor->swarm->removeAllPeers();
+            swarm->removeAllPeers();
         }
         else
         {
-            closeBadPeers(tor->swarm, now_sec);
+            closeBadPeers(swarm, now_sec);
         }
     }
 
@@ -2559,17 +2538,17 @@ void tr_peerMgr::bandwidthPulse()
     pumpAllPeers(this);
 
     /* allocate bandwidth to the peers */
-    auto const msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
-    session->top_bandwidth_.allocate(TR_UP, msec);
-    session->top_bandwidth_.allocate(TR_DOWN, msec);
+    static auto constexpr Msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
+    session->top_bandwidth_.allocate(TR_UP, Msec);
+    session->top_bandwidth_.allocate(TR_DOWN, Msec);
 
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
     {
-        /* run the completeness check for any torrents that need it */
-        if (tor->swarm->needs_completeness_check)
+        // run the completeness check for any torrents that need it
+        if (auto& needs_check = tor->swarm->needs_completeness_check; needs_check)
         {
-            tor->swarm->needs_completeness_check = false;
+            needs_check = false;
             tor->recheckCompleteness();
         }
 
@@ -2579,9 +2558,6 @@ void tr_peerMgr::bandwidthPulse()
         {
             tr_torrentStop(tor);
         }
-
-        /* update the torrent's stats */
-        tor->swarm->stats.active_webseed_count = tor->swarm->countActiveWebseeds();
     }
 
     /* pump the queues */
@@ -2736,10 +2712,11 @@ struct peer_candidate
     /* count how many peers and atoms we've got */
     auto atom_count = size_t{};
     auto peer_count = size_t{};
-    for (auto const* tor : session->torrents())
+    for (auto const* const tor : session->torrents())
     {
-        atom_count += std::size(tor->swarm->pool);
-        peer_count += tor->swarm->peerCount();
+        auto const* const swarm = tor->swarm;
+        atom_count += std::size(swarm->pool);
+        peer_count += swarm->peerCount();
     }
 
     /* don't start any new handshakes if we're full up */
@@ -2753,9 +2730,11 @@ struct peer_candidate
 
     /* populate the candidate array */
     auto salter = tr_salt_shaker{};
-    for (auto* tor : session->torrents())
+    for (auto* const tor : session->torrents())
     {
-        if (!tor->swarm->is_running)
+        auto* const swarm = tor->swarm;
+
+        if (!swarm->is_running)
         {
             continue;
         }
@@ -2763,13 +2742,13 @@ struct peer_candidate
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
         bool const seeding = tor->isDone();
-        if (seeding && tor->swarm->isAllSeeds() && tor->isPrivate())
+        if (seeding && swarm->isAllSeeds() && tor->isPrivate())
         {
             continue;
         }
 
         /* if we've already got enough peers in this torrent... */
-        if (tor->peerLimit() <= tor->swarm->peerCount())
+        if (tor->peerLimit() <= swarm->peerCount())
         {
             continue;
         }
@@ -2780,7 +2759,7 @@ struct peer_candidate
             continue;
         }
 
-        for (auto& atom : tor->swarm->pool)
+        for (auto& atom : swarm->pool)
         {
             if (isPeerCandidate(tor, atom, now))
             {
@@ -2859,6 +2838,8 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 void tr_peerMgr::makeNewPeerConnections(size_t max)
 {
     using namespace connect_helpers;
+
+    auto const lock = session->unique_lock();
 
     for (auto& candidate : getPeerCandidates(session, max))
     {
