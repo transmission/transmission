@@ -550,27 +550,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+257"/>
+        <location line="+254"/>
         <source>Low</source>
         <translation>Baixa</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-257"/>
-        <location line="+255"/>
+        <location filename="../FileTreeView.cc" line="-254"/>
+        <location line="+252"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-255"/>
-        <location line="+256"/>
+        <location filename="../FileTreeView.cc" line="-252"/>
+        <location line="+253"/>
         <source>Normal</source>
         <translation>Normal</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-255"/>
+        <location filename="../FileTreeView.cc" line="-252"/>
         <source>Mixed</source>
         <translation>Variado</translation>
     </message>
@@ -606,7 +606,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+247"/>
+        <location filename="../FileTreeView.cc" line="+244"/>
         <source>Check Selected</source>
         <translation>Marcar Selecionadas</translation>
     </message>
@@ -2224,7 +2224,7 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+496"/>
+        <location filename="../Session.cc" line="+494"/>
         <source>Error Renaming Path</source>
         <translation>Erro ao Renomear Caminho</translation>
     </message>
