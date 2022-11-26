@@ -142,30 +142,19 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 
 void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
 {
-    auto const current_level = gtr_pref_int_get(TR_KEY_message_level);
     auto const default_level = TR_LOG_INFO;
+    auto const pref_level = gtr_pref_int_get(TR_KEY_message_level);
 
-    auto current_row = std::optional<int>{};
-    auto default_row = int{ 0 };
-
+    auto has_pref_level = false;
     auto items = std::vector<std::pair<Glib::ustring, int>>{};
     for (auto const& [level, name] : level_names_)
     {
-        if (level == current_level)
-        {
-            current_row = std::size(items);
-        }
-
-        if (level == default_level)
-        {
-            default_row = std::size(items);
-        }
-
         items.emplace_back(name, level);
+        has_pref_level |= level == pref_level;
     }
 
     gtr_combo_box_set_enum(*level_combo, items);
-    level_combo->set_active(current_row ? *current_row : default_row);
+    gtr_combo_box_set_active_enum(*level_combo, has_pref_level ? pref_level : default_level);
 }
 
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
@@ -473,11 +462,13 @@ MessageLogWindow::Impl::Impl(
     , refresh_tag_(Glib::signal_timeout().connect_seconds(
           sigc::mem_fun(*this, &Impl::onRefresh),
           SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
-    , level_names_{ { { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
-                      { TR_LOG_ERROR, C_("Logging level", "Error") },
-                      { TR_LOG_WARN, C_("Logging level", "Warning") },
-                      { TR_LOG_INFO, C_("Logging level", "Information") },
-                      { TR_LOG_DEBUG, C_("Logging level", "Debug") } } }
+    , level_names_{
+        { { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
+          { TR_LOG_ERROR, C_("Logging level", "Error") },
+          { TR_LOG_WARN, C_("Logging level", "Warning") },
+          { TR_LOG_INFO, C_("Logging level", "Information") },
+          { TR_LOG_DEBUG, C_("Logging level", "Debug") } },
+    }
 {
     /**
     ***  toolbar
