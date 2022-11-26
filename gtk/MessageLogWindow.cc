@@ -6,7 +6,6 @@
 #include <fstream>
 #include <map>
 #include <memory>
-#include <optional>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -142,12 +141,10 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 
 void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
 {
-    auto const current_level = gtr_pref_int_get(TR_KEY_message_level);
+    auto const pref_level = gtr_pref_int_get(TR_KEY_message_level);
     auto const default_level = TR_LOG_INFO;
 
-    auto current_row = std::optional<int>{};
-    auto default_row = int{ 0 };
-
+    auto has_pref_level = false;
     auto items = std::vector<std::pair<Glib::ustring, int>>{};
     for (auto const& [level, name] : level_names_)
     {
