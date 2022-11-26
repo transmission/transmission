@@ -369,6 +369,9 @@ void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictiona
     session->settings_.save(setme_dictionary);
     session->alt_speeds_.save(setme_dictionary);
     session->rpc_server_->save(setme_dictionary);
+
+    tr_variantDictRemove(setme_dictionary, TR_KEY_message_level);
+    tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
 }
 
 static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char const* appname)
