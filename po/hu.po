@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-13 21:20+0000\n"
+"POT-Creation-Date: 2022-11-26 15:09+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.cc:105 ../gtk/Utils.cc:114 ../libtransmission/utils.cc:646
+#: ../cli/cli.cc:105 ../gtk/Utils.cc:115 ../libtransmission/utils.cc:646
 msgid "None"
 msgstr "Nincs"
 
@@ -35,67 +35,67 @@ msgstr "Nincs"
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:232 ../gtk/Session.cc:1113 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:78 ../libtransmission/utils.cc:98 ../libtransmission/utils.cc:110 ../libtransmission/watchdir.cc:121 ../libtransmission/watchdir.cc:148
+#: ../daemon/daemon.cc:233 ../gtk/Session.cc:1131 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:78 ../libtransmission/utils.cc:98 ../libtransmission/utils.cc:110 ../libtransmission/watchdir.cc:119 ../libtransmission/watchdir.cc:146
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "'{path}' nem olvasható: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:258 ../gtk/Session.cc:1164 ../gtk/Utils.cc:262 ../libtransmission/watchdir.cc:97
+#: ../daemon/daemon.cc:259 ../gtk/Session.cc:1182 ../gtk/Utils.cc:263 ../libtransmission/watchdir.cc:97
 msgid "Couldn't add torrent file '{path}'"
 msgstr "'{path}' torrent fájl nem adható hozzá"
 
-#: ../daemon/daemon.cc:269
+#: ../daemon/daemon.cc:270
 msgid "Removing torrent file '{path}'"
 msgstr "'{path}' torrent fájl eltávolítása"
 
-#: ../daemon/daemon.cc:274 ../gtk/Utils.cc:413 ../libtransmission/utils.cc:706
+#: ../daemon/daemon.cc:275 ../gtk/Utils.cc:424 ../libtransmission/utils.cc:706
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "'{path}' nem távolítható el: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:602
+#: ../daemon/daemon.cc:603
 msgid "Couldn't parse log level '{level}'"
 msgstr "'{level}' naplózási szint nem dolgozható fel"
 
-#: ../daemon/daemon.cc:643
+#: ../daemon/daemon.cc:644
 msgid "Deferring reload until session is fully started."
 msgstr "Újratöltés késleltetése, amíg a munkamenet nem indul el teljesen."
 
-#: ../daemon/daemon.cc:658
+#: ../daemon/daemon.cc:659
 msgid "Reloading settings from '{path}'"
 msgstr "Beállítások újratöltése innen: '{path}'"
 
-#: ../daemon/daemon.cc:694
+#: ../daemon/daemon.cc:695
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr "Nem sikerült a démon elindítása: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:707
+#: ../daemon/daemon.cc:708
 msgid "Loading settings from '{path}'"
 msgstr "A beállítások betöltése innen: '{path}'"
 
-#: ../daemon/daemon.cc:727
+#: ../daemon/daemon.cc:728
 msgid "Saved pidfile '{path}'"
 msgstr "PID-fájl mentve: '{path}'"
 
-#: ../daemon/daemon.cc:733 ../gtk/MessageLogWindow.cc:204 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1516 ../libtransmission/torrent.cc:757 ../libtransmission/torrent.cc:1969 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:734 ../gtk/MessageLogWindow.cc:210 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1516 ../libtransmission/torrent.cc:757 ../libtransmission/torrent.cc:1936 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Nem sikerült '{path}' mentése: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:743
+#: ../daemon/daemon.cc:744
 msgid "Requiring authentication"
 msgstr "Hitelesítés megkövetelése"
 
-#: ../daemon/daemon.cc:764
+#: ../daemon/daemon.cc:765
 msgid "Watching '{path}' for new torrent files"
 msgstr "'{path}' figyelése új torrent fájlokat keresve"
 
-#: ../daemon/daemon.cc:808 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:809 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr "Nem sikerült az esemény létrehozása: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:818 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:819 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr "Nem sikerült az esemény hozzáadása: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:832
+#: ../daemon/daemon.cc:833
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr "Daemon eseményciklusának elindítása nem sikerült: {error} ({error_code})"
 
@@ -111,7 +111,7 @@ msgstr ""
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr "A Transmission egy fájlmegosztó program. Egy torrent futtatása során a hozzá tartozó adatok elérhetővé válnak más felhasználók számára is. Minden megosztott tartalomért kizárólag Ön tartozik felelősséggel."
 
-#: ../gtk/Application.cc:760 ../gtk/Dialogs.cc:116 ../gtk/MessageLogWindow.cc:230 ../gtk/OptionsDialog.cc:366 ../gtk/PathButton.cc:138 ../gtk/StatsDialog.cc:105 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
+#: ../gtk/Application.cc:760 ../gtk/Dialogs.cc:116 ../gtk/MessageLogWindow.cc:236 ../gtk/OptionsDialog.cc:368 ../gtk/PathButton.cc:138 ../gtk/StatsDialog.cc:105 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
 msgstr "_Mégse"
 
@@ -223,7 +223,7 @@ msgstr "Helyi adatok ellenőrzése"
 msgid "Queued for download"
 msgstr "Letöltéshez sorba állítva"
 
-#: ../gtk/DetailsDialog.cc:551 ../gtk/FilterBar.cc:526
+#: ../gtk/DetailsDialog.cc:551 ../gtk/FilterBar.cc:535
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Letöltés"
@@ -232,16 +232,16 @@ msgstr "Letöltés"
 msgid "Queued for seeding"
 msgstr "Sorbaállítva megosztáshoz"
 
-#: ../gtk/DetailsDialog.cc:557 ../gtk/FilterBar.cc:527
+#: ../gtk/DetailsDialog.cc:557 ../gtk/FilterBar.cc:536
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Megosztás"
 
-#: ../gtk/DetailsDialog.cc:560 ../gtk/FilterBar.cc:529 ../gtk/TorrentCellRenderer.cc:169
+#: ../gtk/DetailsDialog.cc:560 ../gtk/FilterBar.cc:538 ../gtk/TorrentCellRenderer.cc:169
 msgid "Finished"
 msgstr "Elkészült"
 
-#: ../gtk/DetailsDialog.cc:560 ../gtk/FilterBar.cc:528 ../gtk/TorrentCellRenderer.cc:169
+#: ../gtk/DetailsDialog.cc:560 ../gtk/FilterBar.cc:537 ../gtk/TorrentCellRenderer.cc:169
 msgid "Paused"
 msgstr "Szüneteltetett"
 
@@ -249,7 +249,7 @@ msgstr "Szüneteltetett"
 msgid "N/A"
 msgstr "N/A"
 
-#: ../gtk/DetailsDialog.cc:595 ../gtk/FileList.cc:616
+#: ../gtk/DetailsDialog.cc:595 ../gtk/FileList.cc:632
 msgid "Mixed"
 msgstr "Vegyes"
 
@@ -281,13 +281,13 @@ msgstr "Létrehozva: {date}"
 msgid "Unknown"
 msgstr "Ismeretlen"
 
-#: ../gtk/DetailsDialog.cc:847 ../gtk/MakeDialog.cc:361
+#: ../gtk/DetailsDialog.cc:847 ../gtk/MakeDialog.cc:364
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] "{total_size} {file_count:L} fájlban"
 msgstr[1] "{total_size} {file_count:L} fájlban"
 
-#: ../gtk/DetailsDialog.cc:862 ../gtk/MakeDialog.cc:367
+#: ../gtk/DetailsDialog.cc:862 ../gtk/MakeDialog.cc:370
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] "({piece_count} BitTorrent-szelet @ {piece_size})"
@@ -503,7 +503,7 @@ msgstr "{torrent_name} - Trackerek szerkesztése"
 msgid "List contains invalid URLs"
 msgstr "A lista érvénytelen webcímeket tartalmaz"
 
-#: ../gtk/DetailsDialog.cc:2243 ../gtk/FileList.cc:800
+#: ../gtk/DetailsDialog.cc:2243 ../gtk/FileList.cc:816
 msgid "Please correct the errors and try again."
 msgstr "Javítsa a hibákat és próbálja újra."
 
@@ -575,67 +575,67 @@ msgstr "_Törlés"
 msgid "_Remove"
 msgstr "_Eltávolítás"
 
-#: ../gtk/FileList.cc:604 ../gtk/Utils.cc:571
+#: ../gtk/FileList.cc:620 ../gtk/Utils.cc:582
 msgid "High"
 msgstr "Magas"
 
-#: ../gtk/FileList.cc:608 ../gtk/Utils.cc:572
+#: ../gtk/FileList.cc:624 ../gtk/Utils.cc:583
 msgid "Normal"
 msgstr "Normál"
 
-#: ../gtk/FileList.cc:612 ../gtk/Utils.cc:573
+#: ../gtk/FileList.cc:628 ../gtk/Utils.cc:584
 msgid "Low"
 msgstr "Alacsony"
 
-#: ../gtk/FileList.cc:791 ../gtk/Session.cc:600
+#: ../gtk/FileList.cc:807 ../gtk/Session.cc:618
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "Nem sikerült '{old_path}' átnevezése erre: '{path}': {error} ({error_code})"
 
-#: ../gtk/FileList.cc:908 ../gtk/MessageLogWindow.cc:303
+#: ../gtk/FileList.cc:924 ../gtk/MessageLogWindow.cc:309
 msgid "Name"
 msgstr "Név"
 
-#: ../gtk/FileList.cc:938
+#: ../gtk/FileList.cc:954
 msgid "Size"
 msgstr "Méret"
 
 #. add "progress" column
-#: ../gtk/FileList.cc:947
+#: ../gtk/FileList.cc:963
 msgid "Have"
 msgstr "Meglévő"
 
 #. add "enabled" column
-#: ../gtk/FileList.cc:964
+#: ../gtk/FileList.cc:980
 msgid "Download"
 msgstr "Letöltés"
 
 #. add priority column
-#: ../gtk/FileList.cc:981
+#: ../gtk/FileList.cc:996
 msgid "Priority"
 msgstr "Prioritás"
 
-#: ../gtk/FilterBar.cc:294 ../gtk/FilterBar.cc:523
+#: ../gtk/FilterBar.cc:315 ../gtk/FilterBar.cc:532
 msgid "All"
 msgstr "Összes"
 
-#: ../gtk/FilterBar.cc:525
+#: ../gtk/FilterBar.cc:534
 msgid "Active"
 msgstr "Aktív"
 
-#: ../gtk/FilterBar.cc:530
+#: ../gtk/FilterBar.cc:539
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Ellenőrzés"
 
-#: ../gtk/FilterBar.cc:531 ../gtk/FreeSpaceLabel.cc:52
+#: ../gtk/FilterBar.cc:540 ../gtk/FreeSpaceLabel.cc:52
 msgid "Error"
 msgstr "Hiba"
 
-#: ../gtk/FilterBar.cc:715 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
+#: ../gtk/FilterBar.cc:712 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
 msgstr "_Megjelenítés:"
 
-#: ../gtk/FilterBar.cc:716
+#: ../gtk/FilterBar.cc:713
 msgid "_Show {count:L} of:"
 msgstr "{count} meg_jelenítése ennyiből:"
 
@@ -643,7 +643,7 @@ msgstr "{count} meg_jelenítése ennyiből:"
 msgid "{disk_space} free"
 msgstr "{disk_space} szabad"
 
-#: ../gtk/MainWindow.cc:259
+#: ../gtk/MainWindow.cc:262
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -651,7 +651,7 @@ msgstr ""
 "Kattintson az alternatív sebességkorlátok kikapcsolásához\n"
 " ({download_speed} le, {upload_speed} fel)"
 
-#: ../gtk/MainWindow.cc:260
+#: ../gtk/MainWindow.cc:263
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -659,133 +659,128 @@ msgstr ""
 "Kattintson az alternatív sebességkorlátok bekapcsolásához\n"
 " ({download_speed} le, {upload_speed} fel)"
 
-#: ../gtk/MainWindow.cc:312
+#: ../gtk/MainWindow.cc:315
 msgid "Unlimited"
 msgstr "Korlátlan"
 
-#: ../gtk/MainWindow.cc:375
+#: ../gtk/MainWindow.cc:378
 msgid "Seed Forever"
 msgstr "Megosztás folyamatosan"
 
-#: ../gtk/MainWindow.cc:414
+#: ../gtk/MainWindow.cc:417
 msgid "Limit Download Speed"
 msgstr "Letöltési sebesség korlátozása"
 
-#: ../gtk/MainWindow.cc:415
+#: ../gtk/MainWindow.cc:418
 msgid "Limit Upload Speed"
 msgstr "Feltöltési sebesség korlátozása"
 
-#: ../gtk/MainWindow.cc:419
+#: ../gtk/MainWindow.cc:422
 msgid "Stop Seeding at Ratio"
 msgstr "Megosztás megállítása ekkora aránynál"
 
-#: ../gtk/MainWindow.cc:458
+#: ../gtk/MainWindow.cc:461
 msgid "Stop at Ratio ({ratio})"
 msgstr "Megosztás adott arányig ({ratio})"
 
-#: ../gtk/MainWindow.cc:471
+#: ../gtk/MainWindow.cc:474
 msgid "Total Ratio"
 msgstr "Összesített arány"
 
-#: ../gtk/MainWindow.cc:472
+#: ../gtk/MainWindow.cc:475
 msgid "Session Ratio"
 msgstr "Munkamenet aránya"
 
-#: ../gtk/MainWindow.cc:473
+#: ../gtk/MainWindow.cc:476
 msgid "Total Transfer"
 msgstr "Összes forgalom"
 
-#: ../gtk/MainWindow.cc:474
+#: ../gtk/MainWindow.cc:477
 msgid "Session Transfer"
 msgstr "Munkamenet forgalma"
 
-#: ../gtk/MainWindow.cc:639 ../gtk/MainWindow.cc:660 ../gtk/TorrentCellRenderer.cc:191
+#: ../gtk/MainWindow.cc:642 ../gtk/MainWindow.cc:663 ../gtk/TorrentCellRenderer.cc:191
 msgid "Ratio: {ratio}"
 msgstr "Arány: {ratio}"
 
-#: ../gtk/MainWindow.cc:645
+#: ../gtk/MainWindow.cc:648
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "Le: {downloaded_size}, fel: {uploaded_size}"
 
-#: ../gtk/MainWindow.cc:653
+#: ../gtk/MainWindow.cc:656
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "Le: {downloaded_size}, fel: {uploaded_size}"
 
-#: ../gtk/MainWindow.cc:686
+#: ../gtk/MainWindow.cc:689
 msgid "{download_speed} ▼"
 msgstr "{download_speed} ▼"
 
-#: ../gtk/MainWindow.cc:689 ../gtk/TorrentCellRenderer.cc:149
+#: ../gtk/MainWindow.cc:692 ../gtk/TorrentCellRenderer.cc:149
 msgid "{upload_speed} ▲"
 msgstr "{upload_speed} ▲"
 
-#: ../gtk/MakeDialog.cc:164
+#: ../gtk/MakeDialog.cc:166
 msgid "Creating '{path}'"
 msgstr "'{path}' létrehozása"
 
-#: ../gtk/MakeDialog.cc:177
+#: ../gtk/MakeDialog.cc:179
 msgid "Created '{path}'"
 msgstr "'{path}' létrehozva"
 
-#: ../gtk/MakeDialog.cc:183 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
+#: ../gtk/MakeDialog.cc:185 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
 msgid "Couldn't create '{path}': {error} ({error_code})"
 msgstr "Nem sikerült '{path}' létrehozása: {error} ({error_code})"
 
-#: ../gtk/MakeDialog.cc:202
+#: ../gtk/MakeDialog.cc:204
 msgid "Scanned {file_size}"
 msgstr "{file_size} átvizsgálva"
 
-#: ../gtk/MakeDialog.cc:355 ../gtk/MakeDialog.cc:526 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
+#: ../gtk/MakeDialog.cc:358 ../gtk/MakeDialog.cc:521 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
 msgid "No source selected"
 msgstr "Nincs forrás kiválasztva"
 
-#: ../gtk/MessageLogWindow.cc:229
+#: ../gtk/MessageLogWindow.cc:235
 msgid "Save Log"
 msgstr "Napló mentése"
 
-#: ../gtk/MessageLogWindow.cc:231 ../gtk/ui/gtk3/EditTrackersDialog.ui:35 ../gtk/ui/gtk4/EditTrackersDialog.ui:92
+#: ../gtk/MessageLogWindow.cc:237 ../gtk/ui/gtk3/EditTrackersDialog.ui:35 ../gtk/ui/gtk4/EditTrackersDialog.ui:92
 msgid "_Save"
 msgstr "_Mentés"
 
-#: ../gtk/MessageLogWindow.cc:312
+#: ../gtk/MessageLogWindow.cc:318
 msgid "Message"
 msgstr "Üzenet"
 
-#: ../gtk/MessageLogWindow.cc:321
+#: ../gtk/MessageLogWindow.cc:327
 msgid "Time"
 msgstr "Idő"
 
-#: ../gtk/MessageLogWindow.cc:459
+#: ../gtk/MessageLogWindow.cc:465
 msgctxt "Logging level"
 msgid "Critical"
 msgstr "Kritikus"
 
-#: ../gtk/MessageLogWindow.cc:460
+#: ../gtk/MessageLogWindow.cc:466
 msgctxt "Logging level"
 msgid "Error"
 msgstr "Hiba"
 
-#: ../gtk/MessageLogWindow.cc:461
+#: ../gtk/MessageLogWindow.cc:467
 msgctxt "Logging level"
 msgid "Warning"
 msgstr "Figyelmeztetés"
 
-#: ../gtk/MessageLogWindow.cc:462
+#: ../gtk/MessageLogWindow.cc:468
 msgctxt "Logging level"
 msgid "Information"
 msgstr "Információ"
 
-#: ../gtk/MessageLogWindow.cc:463
+#: ../gtk/MessageLogWindow.cc:469
 msgctxt "Logging level"
 msgid "Debug"
 msgstr "Hibakeresés"
-
-#: ../gtk/MessageLogWindow.cc:464
-msgctxt "Logging level"
-msgid "Trace"
-msgstr "Nyomkövetés"
 
 #: ../gtk/Notify.cc:140
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
@@ -811,23 +806,23 @@ msgstr "Indítás most"
 msgid "Torrent Added"
 msgstr "Torrent hozzáadva"
 
-#: ../gtk/OptionsDialog.cc:220
+#: ../gtk/OptionsDialog.cc:222
 msgid "Torrent files"
 msgstr "Torrent fájlok"
 
-#: ../gtk/OptionsDialog.cc:225
+#: ../gtk/OptionsDialog.cc:227
 msgid "All files"
 msgstr "Összes fájl"
 
-#: ../gtk/OptionsDialog.cc:362
+#: ../gtk/OptionsDialog.cc:364
 msgid "Open a Torrent"
 msgstr "Torrent megnyitása"
 
-#: ../gtk/OptionsDialog.cc:367 ../gtk/PathButton.cc:139 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:25 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
+#: ../gtk/OptionsDialog.cc:369 ../gtk/PathButton.cc:139 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:25 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
 msgid "_Open"
 msgstr "_Megnyitás"
 
-#: ../gtk/OptionsDialog.cc:378
+#: ../gtk/OptionsDialog.cc:380
 msgid "Show options dialog"
 msgstr "Beállítások ablak megjelenítése"
 
@@ -885,19 +880,19 @@ msgstr "Tiltólista frissítése"
 msgid "Getting new blocklist…"
 msgstr "Új tiltólista beszerzése…"
 
-#: ../gtk/PrefsDialog.cc:955 ../gtk/ui/gtk3/PrefsDialog.ui:1266 ../gtk/ui/gtk4/PrefsDialog.ui:885
+#: ../gtk/PrefsDialog.cc:956 ../gtk/ui/gtk3/PrefsDialog.ui:1266 ../gtk/ui/gtk4/PrefsDialog.ui:885
 msgid "Status unknown"
 msgstr "Állapot ismeretlen"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Port is {markup_begin}closed{markup_end}"
 msgstr "A port {markup_begin}zárva van{markup_end}"
 
-#: ../gtk/PrefsDialog.cc:977
+#: ../gtk/PrefsDialog.cc:978
 msgid "Port is {markup_begin}open{markup_end}"
 msgstr "A port {markup_begin}nyitva van{markup_end}"
 
-#: ../gtk/PrefsDialog.cc:988
+#: ../gtk/PrefsDialog.cc:989
 msgid "Testing TCP port…"
 msgstr "TCP-port tesztelése…"
 
@@ -913,25 +908,25 @@ msgstr "Nem sikerült a torrent áthelyezése"
 msgid "This may take a moment…"
 msgstr "Ez eltarthat egy ideig…"
 
-#: ../gtk/Session.cc:1099 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
+#: ../gtk/Session.cc:1117 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
 msgstr "Nem sikerült '{path}' olvasása"
 
 #. logging
-#: ../gtk/Session.cc:1434
+#: ../gtk/Session.cc:1453
 msgid "Inhibiting desktop hibernation"
 msgstr "Hibernálás megakadályozása"
 
-#: ../gtk/Session.cc:1440 ../gtk/Session.cc:1465
+#: ../gtk/Session.cc:1459 ../gtk/Session.cc:1484
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "Nem sikerült a hibernálás megakadályozása: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1461
+#: ../gtk/Session.cc:1480
 msgid "Allowing desktop hibernation"
 msgstr "Számítógép hibernálásának engedélyezése"
 
-#: ../gtk/Session.cc:1579
+#: ../gtk/Session.cc:1598
 msgid "Couldn't find pending RPC request for tag {tag}"
 msgstr ""
 
@@ -1039,209 +1034,209 @@ msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] "Megosztás {active_count} / {connected_count} kapcsolódó partnernek"
 msgstr[1] "Megosztás {active_count} / {connected_count} kapcsolódó partnernek"
 
-#: ../gtk/Utils.cc:43
+#: ../gtk/Utils.cc:44
 msgid "KiB"
 msgstr "KiB"
 
-#: ../gtk/Utils.cc:44
+#: ../gtk/Utils.cc:45
 msgid "MiB"
 msgstr "MiB"
 
-#: ../gtk/Utils.cc:45
+#: ../gtk/Utils.cc:46
 msgid "GiB"
 msgstr "GiB"
 
-#: ../gtk/Utils.cc:46
+#: ../gtk/Utils.cc:47
 msgid "TiB"
 msgstr "TiB"
 
-#: ../gtk/Utils.cc:49
+#: ../gtk/Utils.cc:50
 msgid "kB"
 msgstr "kB"
 
-#: ../gtk/Utils.cc:50
+#: ../gtk/Utils.cc:51
 msgid "MB"
 msgstr "MB"
 
-#: ../gtk/Utils.cc:51
+#: ../gtk/Utils.cc:52
 msgid "GB"
 msgstr "GB"
 
-#: ../gtk/Utils.cc:52
+#: ../gtk/Utils.cc:53
 msgid "TB"
 msgstr "TB"
 
-#: ../gtk/Utils.cc:55
+#: ../gtk/Utils.cc:56
 msgid "kB/s"
 msgstr "kB/s"
 
-#: ../gtk/Utils.cc:56
+#: ../gtk/Utils.cc:57
 msgid "MB/s"
 msgstr "MB/s"
 
-#: ../gtk/Utils.cc:57
+#: ../gtk/Utils.cc:58
 msgid "GB/s"
 msgstr "GB/s"
 
-#: ../gtk/Utils.cc:58
+#: ../gtk/Utils.cc:59
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/Utils.cc:125
+#: ../gtk/Utils.cc:126
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
 msgstr[0] "{days_from_now:L} nap múlva"
 msgstr[1] "{days_from_now:L} nap múlva"
 
-#: ../gtk/Utils.cc:132
+#: ../gtk/Utils.cc:133
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
 msgstr[0] "{hours_from_now:L} óra múlva"
 msgstr[1] "{hours_from_now:L} óra múlva"
 
-#: ../gtk/Utils.cc:139
+#: ../gtk/Utils.cc:140
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
 msgstr[0] "{minutes_from_now:L} perc múlva"
 msgstr[1] "{minutes_from_now:L} perc múlva"
 
-#: ../gtk/Utils.cc:146
+#: ../gtk/Utils.cc:147
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
 msgstr[0] "{seconds_from_now:L} másodperc múlva"
 msgstr[1] "{seconds_from_now:L} másodperc múlva"
 
-#: ../gtk/Utils.cc:150 ../gtk/Utils.cc:181 ../gtk/Utils.cc:208 ../gtk/Utils.cc:241
+#: ../gtk/Utils.cc:151 ../gtk/Utils.cc:182 ../gtk/Utils.cc:209 ../gtk/Utils.cc:242
 msgid "now"
 msgstr "most"
 
-#: ../gtk/Utils.cc:157
+#: ../gtk/Utils.cc:158
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
 msgstr[0] "{days_ago:L} napja"
 msgstr[1] "{days_ago:L} napja"
 
-#: ../gtk/Utils.cc:163
+#: ../gtk/Utils.cc:164
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
 msgstr[0] "{hours_ago:L} órája"
 msgstr[1] "{hours_ago:L} órája"
 
-#: ../gtk/Utils.cc:170
+#: ../gtk/Utils.cc:171
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
 msgstr[0] "{minutes_ago:L} perce"
 msgstr[1] "{minutes_ago:L} perce"
 
-#: ../gtk/Utils.cc:177
+#: ../gtk/Utils.cc:178
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
 msgstr[0] "{seconds_ago:L} másodperce"
 msgstr[1] "{seconds_ago:L} másodperce"
 
-#: ../gtk/Utils.cc:190
+#: ../gtk/Utils.cc:191
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] "{days:L} nap"
 msgstr[1] "{days:L} nap"
 
-#: ../gtk/Utils.cc:195
+#: ../gtk/Utils.cc:196
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
 msgstr[0] "{hours:L} óra"
 msgstr[1] "{hours:L} óra"
 
-#: ../gtk/Utils.cc:200
+#: ../gtk/Utils.cc:201
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
 msgstr[0] "{minutes:L} perc"
 msgstr[1] "{minutes:L} perc"
 
-#: ../gtk/Utils.cc:205
+#: ../gtk/Utils.cc:206
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
 msgstr[0] "{seconds:L} másodperc"
 msgstr[1] "{seconds:L} másodperc"
 
-#: ../gtk/Utils.cc:216
+#: ../gtk/Utils.cc:217
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
 msgstr[0] "{days_left:L} nap van hátra"
 msgstr[1] "{days_left:L} nap van hátra"
 
-#: ../gtk/Utils.cc:223
+#: ../gtk/Utils.cc:224
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
 msgstr[0] "{hours_left:L} óra van hátra"
 msgstr[1] "{hours_left:L} óra van hátra"
 
-#: ../gtk/Utils.cc:230
+#: ../gtk/Utils.cc:231
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
 msgstr[0] "{minutes_left:L} perc van hátra"
 msgstr[1] "{minutes_left:L} perc van hátra"
 
-#: ../gtk/Utils.cc:237
+#: ../gtk/Utils.cc:238
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
 msgstr[0] "{seconds_left:L} másodperc van hátra"
 msgstr[1] "{seconds_left:L} másodperc van hátra"
 
-#: ../gtk/Utils.cc:256
+#: ../gtk/Utils.cc:257
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
 msgstr "'{path}' torrent fájlt már használja a '{torrent_name}' torrent."
 
-#: ../gtk/Utils.cc:267
+#: ../gtk/Utils.cc:268
 msgid "Couldn't open torrent"
 msgstr "Nem sikerült megnyitni a torrentet"
 
-#: ../gtk/Utils.cc:396
+#: ../gtk/Utils.cc:407
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Utils.cc:468
+#: ../gtk/Utils.cc:479
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:688 ../libtransmission/announcer.cc:1201 ../libtransmission/announcer.cc:1433
+#: ../gtk/Utils.cc:703 ../libtransmission/announcer.cc:192 ../libtransmission/announcer.cc:209
 msgid "Unsupported URL: '{url}'"
 msgstr "Nem támogatott webcím: '{url}'"
 
 #. modal
-#: ../gtk/Utils.cc:694
+#: ../gtk/Utils.cc:709
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr "A Transmission nem tudja hogyan használja a '{url}' webcímet"
 
-#: ../gtk/Utils.cc:699
+#: ../gtk/Utils.cc:714
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr "Úgy néz ki, hogy ez a magnet link nem BitTorrenthez készült."
 
-#: ../gtk/main.cc:52 ../gtk/transmission-gtk.desktop.in:3
+#: ../gtk/main.cc:54 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.cc:68
+#: ../gtk/main.cc:70
 msgid "Where to look for configuration files"
 msgstr "Hol keresse a beállításfájlokat"
 
-#: ../gtk/main.cc:69
+#: ../gtk/main.cc:71
 msgid "Start with all torrents paused"
 msgstr "Az összes torrent indítása szüneteltetve"
 
-#: ../gtk/main.cc:70
+#: ../gtk/main.cc:72
 msgid "Start minimized in notification area"
 msgstr "Indítás az értesítési területen, kis méretben"
 
-#: ../gtk/main.cc:71
+#: ../gtk/main.cc:73
 msgid "Show version number and exit"
 msgstr "Verziószám megjelenítése és kilépés"
 
-#: ../gtk/main.cc:79
+#: ../gtk/main.cc:81
 msgid "[torrent files or urls]"
 msgstr "[torrent fájlok vagy webcímek]"
 
-#: ../gtk/main.cc:95
+#: ../gtk/main.cc:97
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
 msgstr ""
 
@@ -2130,7 +2125,7 @@ msgstr "Torrent megnyitása webcímről"
 msgid "_URL"
 msgstr "_Webcím"
 
-#: ../libtransmission/announcer-http.cc:291
+#: ../libtransmission/announcer-http.cc:290
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "Nem sikerült feldolgozni a bejelentés válaszát: {error} ({error_code})"
 
@@ -2138,37 +2133,37 @@ msgstr "Nem sikerült feldolgozni a bejelentés válaszát: {error} ({error_code
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "Nem sikerült feldolgozni a scrape választ: {error} ({error_code})"
 
-#: ../libtransmission/announcer-udp.cc:146 ../libtransmission/announcer-udp.cc:244
+#: ../libtransmission/announcer-udp.cc:142 ../libtransmission/announcer-udp.cc:230
 msgid "Unknown error"
 msgstr "Ismeretlen hiba"
 
-#: ../libtransmission/announcer-udp.cc:439 ../libtransmission/tr-dht.cc:558
-msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
-msgstr "Nem sikerült lekérni a '{address}:{port}' címet: {error} ({error_code})"
-
-#: ../libtransmission/announcer-udp.cc:522
+#: ../libtransmission/announcer-udp.cc:321
 msgid "Connection failed"
 msgstr "Csatlakozás sikertelen"
 
-#: ../libtransmission/announcer.cc:964
+#: ../libtransmission/announcer-udp.cc:417 ../libtransmission/tr-dht.cc:557
+msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
+msgstr "Nem sikerült lekérni a '{address}:{port}' címet: {error} ({error_code})"
+
+#: ../libtransmission/announcer.cc:966
 msgid "Announce error: {error}"
 msgstr "Bejelentési hiba: {error}"
 
-#: ../libtransmission/announcer.cc:974
+#: ../libtransmission/announcer.cc:976
 msgid "Announce error: {error} (Retrying in {count} second)"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] "Bejelentési hiba: {error} (Újrapróbálkozás {count} másodperc múlva)"
 msgstr[1] "Bejelentési hiba: {error} (Újrapróbálkozás {count} másodperc múlva)"
 
-#: ../libtransmission/announcer.cc:1036 ../libtransmission/announcer.cc:1364
+#: ../libtransmission/announcer.cc:1041 ../libtransmission/announcer.cc:1339
 msgid "Could not connect to tracker"
 msgstr "Nem sikerült kapcsolódni a trackerhez"
 
-#: ../libtransmission/announcer.cc:1040 ../libtransmission/announcer.cc:1368
+#: ../libtransmission/announcer.cc:1045 ../libtransmission/announcer.cc:1343
 msgid "Tracker did not respond"
 msgstr "A tracker nem válaszolt"
 
-#: ../libtransmission/announcer.cc:1101
+#: ../libtransmission/announcer.cc:1106
 msgid "Success"
 msgstr "Sikeres"
 
@@ -2235,7 +2230,7 @@ msgstr "Nem sikerült a '{path}' előre lefoglalása: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Nem sikerült a '{path}' feldarabolása: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:393
+#: ../libtransmission/peer-io.cc:384
 msgid "Unknown state: {state}"
 msgstr "Ismeretlen állapot: {state}"
 
@@ -2377,7 +2372,7 @@ msgstr "Ideje kikapcsolni a teknős módot"
 msgid "Time to turn on turtle mode"
 msgstr "Ideje bekapcsolni a teknős módot"
 
-#: ../libtransmission/session-id.cc:155
+#: ../libtransmission/session-id.cc:154
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr "Nem sikerült a '{path}' munkamenetzárolási-fájl megnyitása: {error} ({error_code})"
 
@@ -2385,21 +2380,21 @@ msgstr "Nem sikerült a '{path}' munkamenetzárolási-fájl megnyitása: {error}
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Bejövő kapcsolatok figyelése a {hostport} porton"
 
-#: ../libtransmission/session.cc:563
+#: ../libtransmission/session.cc:564
 msgid "Transmission version {version} starting"
 msgstr "A Transmission {version} indul"
 
-#: ../libtransmission/session.cc:1293
+#: ../libtransmission/session.cc:1294
 msgid "Transmission version {version} shutting down"
 msgstr "A Transmission {version} leáll"
 
-#: ../libtransmission/session.cc:1341
+#: ../libtransmission/session.cc:1342
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} torrent betöltve"
 msgstr[1] "{count} torrent betöltve"
 
-#: ../libtransmission/torrent-magnet.cc:323
+#: ../libtransmission/torrent-magnet.cc:325
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] "A mágneslink metainformációi nem dolgozhatók fel: „{error}”. {piece_count} szelet újbóli letöltése."
@@ -2425,35 +2420,35 @@ msgstr "Az inaktivitási korlát elérve; a torrent szüneteltetése"
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "Nem található adat! Ellenőrizze, hogy csatolta-e a meghajtót vagy válassza a \"Hely megadása\" lehetőséget. Újbóli letöltéshez távolítsa el, majd adja hozzá újra a torrent fájlt."
 
-#: ../libtransmission/torrent.cc:1372
+#: ../libtransmission/torrent.cc:1339
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Kézzel újraindítva – a megosztási arány kikapcsolása"
 
-#: ../libtransmission/torrent.cc:1492
+#: ../libtransmission/torrent.cc:1459
 msgid "Pausing torrent"
 msgstr "Torrent szüneteltetése"
 
-#: ../libtransmission/torrent.cc:1543
+#: ../libtransmission/torrent.cc:1510
 msgid "Removing torrent"
 msgstr "Torrent eltávolítása"
 
-#: ../libtransmission/torrent.cc:1686
+#: ../libtransmission/torrent.cc:1653
 msgid "Calling script '{path}'"
 msgstr "Parancsfájl meghívása: '{path}'"
 
-#: ../libtransmission/torrent.cc:1695
+#: ../libtransmission/torrent.cc:1662
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Parancsfájl '{path}' meghívása nem sikerült: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:2073 ../libtransmission/torrent.cc:2193
+#: ../libtransmission/torrent.cc:2040 ../libtransmission/torrent.cc:2160
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "'{old_path}' áthelyezése nem sikerült ide: '{path}': {error} ({error_code})"
 
-#: ../libtransmission/tr-dht.cc:532
+#: ../libtransmission/tr-dht.cc:531
 msgid "Couldn't parse '{filename}' line: '{line}'"
 msgstr ""
 
-#: ../libtransmission/tr-lpd.cc:259
+#: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr "Nem sikerült az LPD előkészítése: {error} ({error_code})"
 
@@ -2526,15 +2521,15 @@ msgstr "Nem sikerült a könyvtár változásainak olvasása"
 msgid "Couldn't wait for directory changes"
 msgstr "Nem sikerült a könyvtár változásait megvárni"
 
-#: ../libtransmission/web.cc:126
+#: ../libtransmission/web.cc:124
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "Tracker tanúsítványainak ellenőrzése a CURL_CA_BUNDLE környezeti változó használatával: {bundle}"
 
-#: ../libtransmission/web.cc:127
+#: ../libtransmission/web.cc:125
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "NB: ez csak akkor működik, ha a libcurl openssl-lel vagy gnutls-sel lett lefordítva, NEM nss-sel"
 
-#: ../libtransmission/web.cc:128
+#: ../libtransmission/web.cc:126
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "NB: az érvénytelen tanúsítványok (más hibákhoz hasonlóan) 'Nem sikerült kapcsolódni a trackerhez' üzenetként fognak megjelenni"
 
@@ -2573,3 +2568,7 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
+
+#~ msgctxt "Logging level"
+#~ msgid "Trace"
+#~ msgstr "Nyomkövetés"

@@ -295,6 +295,7 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "DL" = "↓";
 
@@ -730,6 +731,7 @@
 
 /* Stats window -> label
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string
    Torrent table -> group row -> tooltip */
 "Ratio" = "Ratio";
@@ -1027,8 +1029,7 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Descarga total";
 
-/* Message window -> level
-   Message window -> level string */
+/* Message window -> level */
 "Trace" = "Traza";
 
 /* Filter Bar -> filter menu */
@@ -1067,6 +1068,7 @@
 
 /* inspector -> peer table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "UL" = "↑";
 
