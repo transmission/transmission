@@ -141,7 +141,7 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 
 void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
 {
-    auto const pref_level = gtr_pref_int_get(TR_KEY_message_level);
+    auto const pref_level = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
     auto const default_level = TR_LOG_INFO;
 
     auto has_pref_level = false;
