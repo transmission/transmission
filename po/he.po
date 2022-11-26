@@ -5,9 +5,9 @@
 #
 # Translators:
 # Omer I.S. <omeritzicschwartz@gmail.com>, 2022
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2022
 # Avi Markovitz <avi.markovitz@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-26 15:09+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2022\n"
 "Language-Team: Hebrew (https://www.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -2518,7 +2518,7 @@ msgstr "לא ניתן להעביר את ‚{old_path}’ אל ‚{path}’: {err
 
 #: ../libtransmission/tr-dht.cc:531
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "לא ניתן לפענח את ‚{filename}’ בשורה: ‚{line}’"
 
 #: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"

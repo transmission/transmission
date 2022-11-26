@@ -6,9 +6,9 @@
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
-# Jonatan Nyberg <jonatan@autistici.org>, 2022
 # Josef Andersson <josef.andersson@fripost.org>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Jonatan Nyberg <jonatan@autistici.org>, 2022
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-26 15:09+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2022\n"
 "Language-Team: Swedish (https://www.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -2411,7 +2411,7 @@ msgstr "Det gick inte att flytta '{old_path}' till '{path}': {error} ({error_cod
 
 #: ../libtransmission/tr-dht.cc:531
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Det gick inte att tolka '{filename}' rad: '{line}'"
 
 #: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"

@@ -5,8 +5,8 @@
 #
 # Translators:
 # Piotr Drąg <piotrdrag@gmail.com>, 2022
-# Marek Adamski, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Marek Adamski, 2022
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-26 15:09+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Marek Adamski, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -2539,7 +2539,7 @@ msgstr "Nie można przenieść „{old_path}” do „{path}”: {error} ({error
 
 #: ../libtransmission/tr-dht.cc:531
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Nie można przetworzyć wiersza „{filename}”: „{line}”"
 
 #: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"
