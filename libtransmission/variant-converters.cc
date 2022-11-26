@@ -101,16 +101,7 @@ std::optional<tr_encryption_mode> VariantConverter::load<tr_encryption_mode>(tr_
 template<>
 void VariantConverter::save<tr_encryption_mode>(tr_variant* tgt, tr_encryption_mode const& val)
 {
-    using namespace EncryptionHelpers;
-
-    for (auto const& [key, value] : Keys)
-    {
-        if (value == val)
-        {
-            tr_variantInitStrView(tgt, key);
-            return;
-        }
-    }
+    tr_variantInitInt(tgt, val);
 }
 
 ///
@@ -165,16 +156,7 @@ std::optional<tr_log_level> VariantConverter::load<tr_log_level>(tr_variant* src
 template<>
 void VariantConverter::save<tr_log_level>(tr_variant* tgt, tr_log_level const& val)
 {
-    using namespace LogLevelHelpers;
-
-    for (auto const& [key, value] : Keys)
-    {
-        if (value == val)
-        {
-            tr_variantInitStrView(tgt, key);
-            return;
-        }
-    }
+    tr_variantInitInt(tgt, val);
 }
 
 ///
@@ -273,16 +255,7 @@ std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mod
 template<>
 void VariantConverter::save<tr_preallocation_mode>(tr_variant* tgt, tr_preallocation_mode const& val)
 {
-    using namespace PreallocationModeHelpers;
-
-    for (auto const& [key, value] : Keys)
-    {
-        if (value == val)
-        {
-            tr_variantInitStrView(tgt, key);
-            return;
-        }
-    }
+    tr_variantInitInt(tgt, val);
 }
 
 ///
