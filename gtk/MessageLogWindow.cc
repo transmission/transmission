@@ -6,6 +6,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <optional>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -141,13 +142,30 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 
 void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
 {
+    auto const current_level = gtr_pref_int_get(TR_KEY_message_level);
+    auto const default_level = TR_LOG_INFO;
+
+    auto current_row = std::optional<int>{};
+    auto default_row = int{ 0 };
+
     auto items = std::vector<std::pair<Glib::ustring, int>>{};
     for (auto const& [level, name] : level_names_)
     {
+        if (level == current_level)
+        {
+            current_row = std::size(items);
+        }
+
+        if (level == default_level)
+        {
+            default_row = std::size(items);
+        }
+
         items.emplace_back(name, level);
     }
+
     gtr_combo_box_set_enum(*level_combo, items);
-    gtr_combo_box_set_active_enum(*level_combo, gtr_pref_int_get(TR_KEY_message_level));
+    level_combo->set_active(current_row ? *current_row : default_row);
 }
 
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
@@ -455,14 +473,11 @@ MessageLogWindow::Impl::Impl(
     , refresh_tag_(Glib::signal_timeout().connect_seconds(
           sigc::mem_fun(*this, &Impl::onRefresh),
           SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
-    , level_names_{ {
-          { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
-          { TR_LOG_ERROR, C_("Logging level", "Error") },
-          { TR_LOG_WARN, C_("Logging level", "Warning") },
-          { TR_LOG_INFO, C_("Logging level", "Information") },
-          { TR_LOG_DEBUG, C_("Logging level", "Debug") },
-          { TR_LOG_TRACE, C_("Logging level", "Trace") },
-      } }
+    , level_names_{ { { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
+                      { TR_LOG_ERROR, C_("Logging level", "Error") },
+                      { TR_LOG_WARN, C_("Logging level", "Warning") },
+                      { TR_LOG_INFO, C_("Logging level", "Information") },
+                      { TR_LOG_DEBUG, C_("Logging level", "Debug") } } }
 {
     /**
     ***  toolbar
@@ -507,6 +522,8 @@ MessageLogWindow::Impl::Impl(
     appendColumn(view_, message_log_cols.sequence);
     appendColumn(view_, message_log_cols.name);
     appendColumn(view_, message_log_cols.message);
+
+    level_combo_changed_cb(level_combo);
 
     scroll_to_bottom();
 }
