@@ -210,7 +210,11 @@ if(TARGET CURL::libcurl)
     set(CURL_INCLUDE_DIRS)
 endif()
 
-find_package(ICONV)
+if(NOT WIN32)
+    find_package(ICONV)
+else()
+    set(ICONV_FOUND OFF)
+endif()
 
 set(CRYPTO_PKG "")
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "ccrypto")
