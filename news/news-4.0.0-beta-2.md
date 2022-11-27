@@ -18,38 +18,33 @@
 * Improved DHT bootstrapping on startup. ([#4122](https://github.com/transmission/transmission/pull/4122))
 * Made host lookups slightly more efficient for users that disable CA verification. ([#4159](https://github.com/transmission/transmission/pull/4159))
 * Fix 4.0.0-beta.1 bug that returned an incorrect key in group-get RPC responses. ([#4171](https://github.com/transmission/transmission/pull/4171))
+* refactor: log UTP_ETIMEDOUT errors to 'trace' messages ([#4237](https://github.com/transmission/transmission/pull/4237))
 * Updated the mime-types list from https://github.com/jshttp/mime-db. ([#4246](https://github.com/transmission/transmission/pull/4246))
 
 ## macOS Client
 
 * Support UserNotifications framework ([#3040](https://github.com/transmission/transmission/pull/3040))
-* Fix "Capture of autoreleasing out parameter inside autorelease pool that may exit before method returns" ([#3886](https://github.com/transmission/transmission/pull/3886))
-* Rollback #3871 ([#3889](https://github.com/transmission/transmission/pull/3889))
 * macos: Hide Title (App Name) on BigSur and later. ([#3919](https://github.com/transmission/transmission/pull/3919))
-* Sort order by activity is reversed ([#3924](https://github.com/transmission/transmission/pull/3924))
-* Fixed various XCode and CMake build issues. ([#3940](https://github.com/transmission/transmission/pull/3940), [#3946](https://github.com/transmission/transmission/pull/3946), [#3951](https://github.com/transmission/transmission/pull/3951), [#4156](https://github.com/transmission/transmission/pull/4156), [#4195](https://github.com/transmission/transmission/pull/4195), [#4231](https://github.com/transmission/transmission/pull/4231), [#4234](https://github.com/transmission/transmission/pull/4234))
+* Fixed sort order when sorting by activity was reversed. ([#3924](https://github.com/transmission/transmission/pull/3924))
+* Upgrade Xcode Project Settings ([#3940](https://github.com/transmission/transmission/pull/3940))
 * feat: Align active filter macOS ([#3944](https://github.com/transmission/transmission/pull/3944))
+* Fixed various XCode and CMake build issues. ([#3946](https://github.com/transmission/transmission/pull/3946), [#3951](https://github.com/transmission/transmission/pull/3951), [#4195](https://github.com/transmission/transmission/pull/4195), [#4231](https://github.com/transmission/transmission/pull/4231))
 * Fixed macOS API deprecation warnings. ([#3950](https://github.com/transmission/transmission/pull/3950), [#4112](https://github.com/transmission/transmission/pull/4112), [#4190](https://github.com/transmission/transmission/pull/4190), [#4221](https://github.com/transmission/transmission/pull/4221))
-* Update to the message log window on macOS ([#3962](https://github.com/transmission/transmission/pull/3962))
+* Improved sizing and alignment of the Message Log window. ([#3962](https://github.com/transmission/transmission/pull/3962))
 * Remove preprocessor defines from macOS client ([#3974](https://github.com/transmission/transmission/pull/3974))
 * macOS fix a potential hang when updating the blocklist ([#4010](https://github.com/transmission/transmission/pull/4010))
-* Fix "User-facing text should use localized string macro" ([#4030](https://github.com/transmission/transmission/pull/4030))
-* Fix "(arm64)  could not find object file symbol for symbol" ([#4031](https://github.com/transmission/transmission/pull/4031))
-* macOS: Change BadgeView.mm so that up is up and down is down ([#4055](https://github.com/transmission/transmission/pull/4055))
-* Auto enlarge search field when editing ([#4067](https://github.com/transmission/transmission/pull/4067))
-* Fix "nil passed to a callee that requires a non-null 1st parameter" ([#4084](https://github.com/transmission/transmission/pull/4084))
-* Fix: values above INT_MAX (68 years) are interpreted as negative values ([#4085](https://github.com/transmission/transmission/pull/4085))
-* Adopt localizedStringWithFormat for displayed quantities ([#4109](https://github.com/transmission/transmission/pull/4109))
-* ignoring deprecation warning on NSUnarchiver ([#4113](https://github.com/transmission/transmission/pull/4113))
-* hook action in the xib ([#4135](https://github.com/transmission/transmission/pull/4135))
-* Fixed `4.0.0-beta.1` Inspector selection bug. ([#4138](https://github.com/transmission/transmission/pull/4138))
+* Changed Badge display so that upload is up and download is down. ([#4055](https://github.com/transmission/transmission/pull/4055))
+* Auto enlarge search field on macOS. ([#4067](https://github.com/transmission/transmission/pull/4067))
+* Fix values above 68 years (INT_MAX seconds) were displayed as negative values. ([#4085](https://github.com/transmission/transmission/pull/4085))
+* Corrected the display in user locale of some quantities above 1000 in the macOS app. ([#4109](https://github.com/transmission/transmission/pull/4109))
+* Fixed `4.0.0-beta.1` Inspector filter crash. ([#4138](https://github.com/transmission/transmission/pull/4138))
 * Fixed `4.0.0-beta.1` regression that could crash when displaying some torrents that contain invalid UTF-8. ([#4144](https://github.com/transmission/transmission/pull/4144))
-* Fix create torrent out-of-range piece size ([#4145](https://github.com/transmission/transmission/pull/4145))
-* Accessibility description for images ([#4149](https://github.com/transmission/transmission/pull/4149))
+* Fixed a UI glitch when users attempted to set piece size too high or too low. ([#4145](https://github.com/transmission/transmission/pull/4145))
+* Fix default/minimum `CMAKE_OSX_DEPLOYMENT_TARGET` handling ([#4156](https://github.com/transmission/transmission/pull/4156))
 * Fixed missing `4.0.0-beta.1` macOS translations. ([#4161](https://github.com/transmission/transmission/pull/4161))
-* Fix cmake CFBundleVersion and LSMinimumSystemVersion ([#4185](https://github.com/transmission/transmission/pull/4185))
-* Appropriate and improve VDKQueue ([#4202](https://github.com/transmission/transmission/pull/4202))
-* fixed a long-standing bug that could freeze the UI on startup while Time Machine was active. ([#4208](https://github.com/transmission/transmission/pull/4208))
+* Fixed various Xcode and CMake build issues. ([#4185](https://github.com/transmission/transmission/pull/4185), [#4234](https://github.com/transmission/transmission/pull/4234))
+* Fixed various macOS API warnings. ([#4202](https://github.com/transmission/transmission/pull/4202))
+* Fixed a long-standing bug that could freeze the UI on startup while Time Machine was active. ([#4208](https://github.com/transmission/transmission/pull/4208))
 
 ## GTK Client
 
@@ -115,12 +110,12 @@ Last but certainly not least, a big ***Thank You*** to these contributors:
   * Code review for [#3886](https://github.com/transmission/transmission/pull/3886), [#4084](https://github.com/transmission/transmission/pull/4084)
   * Remove preprocessor defines from macOS client [#3974](https://github.com/transmission/transmission/pull/3974)
 * [@GaryElshaw (Gary Elshaw)](https://github.com/GaryElshaw):
-  * macOS: Change BadgeView.mm so that up is up and down is down [#4055](https://github.com/transmission/transmission/pull/4055)
+  * Changed Badge display so that upload is up and download is down. [#4055](https://github.com/transmission/transmission/pull/4055)
 * [@sweetppro (SweetPPro)](https://github.com/sweetppro):
   * Code review for [#3919](https://github.com/transmission/transmission/pull/3919), [#4055](https://github.com/transmission/transmission/pull/4055)
   * macOS fix a potential hang when updating the blocklist [#4010](https://github.com/transmission/transmission/pull/4010)
 * [@uiryuu (Yuze Jiang)](https://github.com/uiryuu):
-  * Update to the message log window on macOS [#3962](https://github.com/transmission/transmission/pull/3962)
+  * Improved sizing and alignment of the Message Log window. [#3962](https://github.com/transmission/transmission/pull/3962)
 
 ### Contributions to `GTK Client`:
 
