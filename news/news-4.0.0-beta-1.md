@@ -484,7 +484,7 @@ These release notes were compiled manually. Since 4.0.0 has been in development 
   - Fix various user-facing and non-user-facing typos ([#3743](https://github.com/transmission/transmission/pull/3743))
 - [mlopezfm](https://github.com/mlopezfm) (Michael Lopez):
   - Fix man pages listing invalid cli options ([#2549](https://github.com/transmission/transmission/pull/2549))
-- [Petrprogs](https://github.com/Petrprogs) (Pwrwe):
+- [Petrprogs](https://github.com/Petrprogs) (Peter):
   - Lots of improvements in docs/, e.g. fixing broken markdown (
      [#3456](https://github.com/transmission/transmission/pull/3456),
      [#3475](https://github.com/transmission/transmission/pull/3475),
