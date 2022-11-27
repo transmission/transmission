@@ -266,6 +266,11 @@ public:
         return iov;
     }
 
+    [[nodiscard]] std::pair<std::byte*, size_t> pullup()
+    {
+        return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
+    }
+
     void commit(Iovec iov)
     {
         evbuffer_commit_space(buf_.get(), &iov, 1);
