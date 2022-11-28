@@ -1161,7 +1161,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
 
 static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
-    auto const* const tor = msgs->torrent;
+    auto* const tor = msgs->torrent;
     if (!tor->allowsPex())
     {
         return;
@@ -1766,7 +1766,7 @@ static int clientGotBlock(
 {
     TR_ASSERT(msgs != nullptr);
 
-    tr_torrent* const tor = msgs->torrent;
+    tr_torrent const* const tor = msgs->torrent;
     auto const n_expected = msgs->torrent->blockSize(block);
 
     if (!block_data)
