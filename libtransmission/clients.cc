@@ -211,8 +211,7 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     // replaced exbc with FUTB. The encoding for BitComet Peer IDs changed
     // to Azureus-style as of BitComet version 0.59.
     auto mod = std::string_view{};
-    auto const lead = std::string_view{ std::data(peer_id), std::min(std::size(peer_id), size_t{ 4 }) };
-    if (lead == "exbc")
+    if (auto const lead = std::string_view{ std::data(peer_id), std::min(std::size(peer_id), size_t{ 4 }) }; lead == "exbc")
     {
         mod = ""sv;
     }

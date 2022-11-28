@@ -134,8 +134,7 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
     auto const info_dict_size = tor->infoDictSize();
     TR_ASSERT(info_dict_size > 0);
     auto const offset_in_info_dict = static_cast<uint64_t>(piece) * METADATA_PIECE_SIZE;
-    auto const offset_in_file = tor->infoDictOffset() + offset_in_info_dict;
-    if (!in.seekg(offset_in_file))
+    if (auto const offset_in_file = tor->infoDictOffset() + offset_in_info_dict; !in.seekg(offset_in_file))
     {
         return {};
     }

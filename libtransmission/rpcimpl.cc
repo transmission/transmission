@@ -1129,8 +1129,8 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
     for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
     {
         auto announce = std::string_view();
-        auto const* const val = tr_variantListChild(urls, i);
-        if (val == nullptr || !tr_variantGetStrView(val, &announce))
+
+        if (auto const* const val = tr_variantListChild(urls, i); val == nullptr || !tr_variantGetStrView(val, &announce))
         {
             continue;
         }
@@ -1181,8 +1181,8 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     for (size_t i = 0, n = tr_variantListSize(ids); i < n; ++i)
     {
         auto id = int64_t{};
-        auto const* const val = tr_variantListChild(ids, i);
-        if (val == nullptr || !tr_variantGetInt(val, &id))
+
+        if (auto const* const val = tr_variantListChild(ids, i); val == nullptr || !tr_variantGetInt(val, &id))
         {
             continue;
         }

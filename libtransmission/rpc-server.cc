@@ -449,8 +449,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         if (req->type == EVHTTP_REQ_OPTIONS)
         {
-            char const* headers = evhttp_find_header(req->input_headers, "Access-Control-Request-Headers");
-            if (headers != nullptr)
+            if (char const* headers = evhttp_find_header(req->input_headers, "Access-Control-Request-Headers");
+                headers != nullptr)
             {
                 evhttp_add_header(req->output_headers, "Access-Control-Allow-Headers", headers);
             }

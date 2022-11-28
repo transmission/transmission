@@ -426,8 +426,7 @@ private:
 
         // If it doesn't look like a BEP14 message, discard it
         auto const msg = std::string_view{ std::data(foreign_msg), static_cast<size_t>(res) };
-        static auto constexpr SearchKey = "BT-SEARCH * HTTP/"sv;
-        if (msg.find(SearchKey) == std::string_view::npos)
+        if (static auto constexpr SearchKey = "BT-SEARCH * HTTP/"sv; msg.find(SearchKey) == std::string_view::npos)
         {
             return;
         }

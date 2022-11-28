@@ -2317,8 +2317,7 @@ static int flush(char const* rpcurl, tr_variant* benc, Config& config)
         fmt::print(stderr, "posting:\n--------\n{:s}\n--------\n", json);
     }
 
-    auto const res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
+    if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
     {
         tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
         status |= EXIT_FAILURE;
