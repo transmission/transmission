@@ -121,7 +121,7 @@ public:
 
     [[nodiscard]] bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const override
     {
-        auto* const tor = session_.torrents().get(tor_id);
+        auto const* const tor = session_.torrents().get(tor_id);
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
