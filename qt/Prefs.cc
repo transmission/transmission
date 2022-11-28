@@ -352,7 +352,7 @@ Prefs::~Prefs()
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                auto const& [mode, mode_str] = it == std::end(SortModes) ? SortModes.front() : *it;
+                auto const& [mode_val, mode_str] = it == std::end(SortModes) ? SortModes.front() : *it;
                 dictAdd(&current_settings, key, mode_str);
                 break;
             }
@@ -366,7 +366,7 @@ Prefs::~Prefs()
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                auto const& [mode, mode_str] = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                auto const& [mode_val, mode_str] = it == std::end(FilterModes) ? FilterModes.front() : *it;
                 dictAdd(&current_settings, key, mode_str);
                 break;
             }
