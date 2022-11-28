@@ -807,18 +807,8 @@ static auto parseWhitelist(std::string_view whitelist)
         auto const pos = whitelist.find_first_of(" ,;"sv);
         auto const token = tr_strvStrip(whitelist.substr(0, pos));
         list.emplace_back(token);
+        tr_logAddInfo(fmt::format(_("Added '{entry}' to host whitelist"), fmt::arg("entry", token)));
         whitelist = pos == std::string_view::npos ? ""sv : whitelist.substr(pos + 1);
-
-        if (token.find_first_of("+-"sv) != std::string_view::npos)
-        {
-            tr_logAddWarn(fmt::format(
-                _("Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"),
-                fmt::arg("entry", token)));
-        }
-        else
-        {
-            tr_logAddInfo(fmt::format(_("Added '{entry}' to host whitelist"), fmt::arg("entry", token)));
-        }
     }
 
     return list;
