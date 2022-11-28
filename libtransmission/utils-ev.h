@@ -11,8 +11,19 @@
 
 #include <memory>
 
-#include <event2/buffer.h>
-#include <event2/event.h>
+extern "C"
+{
+    struct evbuffer;
+    struct event;
+    struct event_base;
+    struct evhttp;
+
+    void evbuffer_free(struct evbuffer*);
+    void event_base_free(struct event_base*);
+    int event_del(struct event*);
+    void event_free(struct event*);
+    void evhttp_free(struct evhttp*);
+}
 
 namespace libtransmission::evhelpers
 {
@@ -56,5 +67,18 @@ struct EventDeleter
 };
 
 using event_unique_ptr = std::unique_ptr<struct event, EventDeleter>;
+
+struct EvhttpDeleter
+{
+    void operator()(struct evhttp* evh) const noexcept
+    {
+        if (evh != nullptr)
+        {
+            evhttp_free(evh);
+        }
+    }
+};
+
+using evhttp_unique_ptr = std::unique_ptr<struct evhttp, EvhttpDeleter>;
 
 } // namespace libtransmission::evhelpers

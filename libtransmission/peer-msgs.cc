@@ -1002,6 +1002,8 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len)
         return;
     }
 
+    fmt::print("{:s}\n", tr_variantToStr(&val, TR_VARIANT_FMT_JSON));
+
     logtrace(msgs, fmt::format(FMT_STRING("here is the base64-encoded handshake: [{:s}]"), tr_base64_encode(handshake_sv)));
 
     /* does the peer prefer encrypted connections? */

@@ -17,6 +17,7 @@
 #include "transmission.h"
 
 #include "net.h"
+#include "utils-ev.h"
 
 struct evhttp;
 struct tr_variant;
@@ -155,8 +156,7 @@ public:
     std::unique_ptr<struct tr_rpc_address> bind_address_;
 
     std::unique_ptr<libtransmission::Timer> start_retry_timer;
-    std::unique_ptr<struct evhttp, void (*)(struct evhttp*)> httpd{ nullptr, [](evhttp*) {
-                                                                   } };
+    libtransmission::evhelpers::evhttp_unique_ptr httpd;
     tr_session* const session;
 
     size_t login_attempts_ = 0U;
