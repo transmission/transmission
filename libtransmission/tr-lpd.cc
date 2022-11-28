@@ -18,6 +18,7 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
+#include <event2/event.h>
 #include <event2/util.h>
 
 #include <fmt/format.h>

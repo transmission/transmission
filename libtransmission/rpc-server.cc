@@ -716,7 +716,7 @@ static void startServer(tr_rpc_server* server)
     else
     {
         evhttp_set_gencb(httpd, handle_request, server);
-        server->httpd = std::unique_ptr<evhttp, void (*)(evhttp*)>{ httpd, &evhttp_free };
+        server->httpd.reset(httpd);
 
         tr_logAddInfo(fmt::format(_("Listening for RPC and Web requests on '{address}'"), fmt::arg("address", addr_port_str)));
     }
