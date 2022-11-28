@@ -861,7 +861,7 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
     if (auto const must_send_rej = msgs->io->supportsFEXT(); must_send_rej)
     {
-        for (auto& req : msgs->peer_requested_)
+        for (auto const& req : msgs->peer_requested_)
         {
             protocolSendReject(msgs, &req);
         }
@@ -1161,7 +1161,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
 
 static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
-    tr_torrent* tor = msgs->torrent;
+    auto const* const tor = msgs->torrent;
     if (!tor->allowsPex())
     {
         return;
