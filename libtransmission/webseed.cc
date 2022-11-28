@@ -288,7 +288,7 @@ public:
             return {};
         }
 
-        if (auto* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
+        if (auto const* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
         {
             return {};
         }
