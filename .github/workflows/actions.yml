@@ -27,6 +27,7 @@ jobs:
       - name: Check State
         id: check-state
         run: |
+          set -x
           if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then \
             echo "::set-output name=is-main-push::1"; \
           else \
