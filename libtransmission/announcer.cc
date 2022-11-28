@@ -539,9 +539,9 @@ struct tr_torrent_announcer
             tier_to_infos[info.tier].emplace_back(&info);
         }
 
-        for (auto const& tt : tier_to_infos)
+        for (auto const& [tier_num, infos] : tier_to_infos)
         {
-            tiers.emplace_back(announcer, tor, tt.second);
+            tiers.emplace_back(announcer, tor, infos);
         }
     }
 
