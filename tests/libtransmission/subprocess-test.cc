@@ -63,11 +63,11 @@ protected:
 
     std::string self_path_;
 
-    static void waitForFileToExist(std::string const& path)
+    static void waitForFileToBeReadable(std::string const& path)
     {
-        auto const test = [path]()
+        auto const test = [&path]()
         {
-            return tr_sys_path_exists(path.data());
+            return std::ifstream{ path, std::ios_base::in }.is_open();
         };
         EXPECT_TRUE(waitFor(test, 30000));
     }
@@ -118,10 +118,10 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
     EXPECT_TRUE(ret) << args[0] << ' ' << args[1];
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
+    waitForFileToBeReadable(result_path);
 
     auto in = std::ifstream{ result_path, std::ios_base::in };
-    EXPECT_TRUE(in.is_open());
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
     auto line = std::string{};
     EXPECT_TRUE(std::getline(in, line));
@@ -187,10 +187,10 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
+    waitForFileToBeReadable(result_path);
 
     auto in = std::ifstream{ result_path, std::ios_base::in };
-    EXPECT_TRUE(in.is_open());
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
     auto line = std::string{};
     EXPECT_TRUE(std::getline(in, line));
@@ -219,17 +219,17 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto const test_dir = sandbox_.path();
     auto const result_path = buildSandboxPath("result.txt");
 
-    auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
+    auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.c_str(), arg_dump_cwd_.c_str(), nullptr };
 
     tr_error* error = nullptr;
     bool const ret = tr_spawn_async(std::data(args), {}, test_dir, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
+    waitForFileToBeReadable(result_path);
 
     auto in = std::ifstream{ result_path, std::ios_base::in };
-    EXPECT_TRUE(in.is_open());
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
     auto line = std::string{};
     EXPECT_TRUE(std::getline(in, line));
@@ -254,10 +254,10 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
+    waitForFileToBeReadable(result_path);
 
     auto in = std::ifstream{ result_path, std::ios_base::in };
-    EXPECT_TRUE(in.is_open());
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
     auto line = std::string{};
     EXPECT_TRUE(std::getline(in, line));
