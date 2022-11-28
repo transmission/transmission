@@ -1023,13 +1023,13 @@ NetworkPage::NetworkPage(
         *gtr_get_widget<Gtk::SpinButton>(builder, "max_torrent_peers_spin"),
         TR_KEY_peer_limit_per_torrent,
         1,
-        FD_SETSIZE,
+        INT_MAX,
         5);
     init_spin_button(
         *gtr_get_widget<Gtk::SpinButton>(builder, "max_total_peers_spin"),
         TR_KEY_peer_limit_global,
         1,
-        FD_SETSIZE,
+        INT_MAX,
         5);
 
 #ifdef WITH_UTP
