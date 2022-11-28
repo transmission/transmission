@@ -181,8 +181,6 @@ if(WIN32)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DUNICODE -D_UNICODE")
         # Ignore various deprecation and security warnings (at least for now)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS")
-        # Increase maximum FD_SET size
-        set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DFD_SETSIZE=1024")
         if(MSVC)
             # Reduce noise (at least for now)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /wd4244 /wd4267")
