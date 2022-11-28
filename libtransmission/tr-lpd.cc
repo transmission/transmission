@@ -521,7 +521,7 @@ private:
         }
 
         auto const next_announce_after = now + TorrentAnnounceIntervalSec;
-        for (auto& info_hash_string : info_hash_strings)
+        for (auto const& info_hash_string : info_hash_strings)
         {
             mediator_.setNextAnnounceTime(info_hash_string, next_announce_after);
         }

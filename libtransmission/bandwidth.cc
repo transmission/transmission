@@ -211,7 +211,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * 2. accumulate an array of all the peerIos from b and its subtree. */
     this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, refs);
 
-    for (auto& io : refs)
+    for (auto const& io : refs)
     {
         io->flushOutgoingProtocolMsgs();
 
@@ -242,7 +242,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
-    for (auto& io : refs)
+    for (auto const& io : refs)
     {
         io->setEnabled(dir, io->hasBandwidthLeft(dir));
     }
