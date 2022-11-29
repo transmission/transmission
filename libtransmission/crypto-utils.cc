@@ -27,11 +27,41 @@ extern "C"
 
 using namespace std::literals;
 
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer(IntType upper_bound);
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer_weak(IntType upper_bound);
+
 /***
 ****
 ***/
 
-int tr_rand_int(int upper_bound)
+template<>
+[[nodiscard]] int tr_rand_int<int>(int upper_bound)
+{
+    return tr_rand_integer<int>(upper_bound);
+}
+
+template<>
+[[nodiscard]] size_t tr_rand_int<size_t>(size_t upper_bound)
+{
+    return tr_rand_integer<size_t>(upper_bound);
+}
+
+template<>
+[[nodiscard]] int tr_rand_int_weak<int>(int upper_bound)
+{
+    return tr_rand_integer_weak<int>(upper_bound);
+}
+
+template<>
+[[nodiscard]] size_t tr_rand_int_weak<size_t>(size_t upper_bound)
+{
+    return tr_rand_integer_weak<size_t>(upper_bound);
+}
+
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer(IntType upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
 
@@ -40,20 +70,21 @@ int tr_rand_int(int upper_bound)
         return noise % upper_bound;
     }
 
-    /* fall back to a weaker implementation... */
-    return tr_rand_int_weak(upper_bound);
+    // rare fall back to a weaker implementation when CCRandomGenerateBytes is failing
+    return tr_rand_integer_weak(upper_bound);
 }
 
-int tr_rand_int_weak(int upper_bound)
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer_weak(IntType upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
 
     thread_local auto random_engine = std::mt19937{ std::random_device{}() };
-    using distribution_type = std::uniform_int_distribution<>;
+    using distribution_type = std::uniform_int_distribution<IntType>;
     thread_local distribution_type distribution;
 
     // Upper bound is inclusive in std::uniform_int_distribution.
-    return distribution(random_engine, distribution_type::param_type{ 0, upper_bound - 1 });
+    return distribution(random_engine, typename distribution_type::param_type{ 0, upper_bound - 1 });
 }
 
 /***
