@@ -31,13 +31,31 @@ using namespace std::literals;
 ****
 ***/
 
-int tr_rand_int(int upper_bound)
+int tr_rand_int(int upper_bound_integer)
 {
-    TR_ASSERT(upper_bound > 0);
+    TR_ASSERT(upper_bound_integer > 0);
 
-    if (unsigned int noise = 0; tr_rand_buffer(&noise, sizeof(noise)))
+    using UIntType = std::make_unsigned_t<int>;
+    auto upper_bound = static_cast<UIntType>(upper_bound_integer);
+
+    // random uniform algorithm for unsigned type
+    // (https://github.com/openbsd/src/blob/master/lib/libc/crypt/arc4random_uniform.c)
+    if (upper_bound < 2)
     {
-        return noise % upper_bound;
+        return 0;
+    }
+    UIntType min = -upper_bound % upper_bound;
+    UIntType noise = 0;
+    for (;;)
+    {
+        if (!tr_rand_buffer(&noise, sizeof(noise)))
+        {
+            break;
+        }
+        if (noise >= min)
+        {
+            return noise % upper_bound;
+        }
     }
 
     /* fall back to a weaker implementation... */
