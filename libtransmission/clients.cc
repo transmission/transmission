@@ -668,10 +668,10 @@ void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
         }
     };
 
-    auto eq = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
-    if (eq.first != std::end(Clients) && eq.first != eq.second)
+    if (auto const [eq_begin, eq_end] = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
+        eq_begin != std::end(Clients) && eq_begin != eq_end)
     {
-        eq.first->formatter(buf, buflen, eq.first->name, peer_id);
+        eq_begin->formatter(buf, buflen, eq_begin->name, peer_id);
         return;
     }
 
