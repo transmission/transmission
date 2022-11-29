@@ -365,8 +365,8 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         // print it out
         tr_variant top;
         auto* const begin = (char const*)evbuffer_pullup(buf, -1);
-        auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
-        if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
+        if (auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
+            !tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
         {
             fmt::print("error parsing scrape response\n");
             continue;

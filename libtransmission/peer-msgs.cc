@@ -924,8 +924,8 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // It also adds "metadata_size" to the handshake message (not the
     // "m" dictionary) specifying an integer value of the number of
     // bytes of the metadata.
-    auto const info_dict_size = msgs->torrent->infoDictSize();
-    if (allow_metadata_xfer && msgs->torrent->hasMetainfo() && info_dict_size > 0)
+    if (auto const info_dict_size = msgs->torrent->infoDictSize();
+        allow_metadata_xfer && msgs->torrent->hasMetainfo() && info_dict_size > 0)
     {
         tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_size);
     }
@@ -1979,8 +1979,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Metadata Pieces
     **/
 
-    auto piece = int{};
-    if (msgs->io->getWriteBufferSpace(now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
+    if (auto piece = int{}; msgs->io->getWriteBufferSpace(now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
     {
         auto ok = bool{ false };
 

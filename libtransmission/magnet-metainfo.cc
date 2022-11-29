@@ -202,8 +202,8 @@ void tr_magnet_metainfo::addWebseed(std::string_view webseed)
     }
 
     auto& urls = webseed_urls_;
-    auto const it = std::find(std::begin(urls), std::end(urls), webseed);
-    if (it != std::end(urls))
+
+    if (auto const it = std::find(std::begin(urls), std::end(urls), webseed); it != std::end(urls))
     {
         return;
     }
