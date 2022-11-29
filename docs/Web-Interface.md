@@ -50,7 +50,7 @@ Click on "Remote" tab.
 
 Once enabled, open a web browser and direct it to http://ip_address_of_machine_running_transmission:9091/
 If the web browser and the Transmission daemon are on the machine you can use http://127.0.0.1:9091/
-9091 is the default remote control port specified in [Transmission configuration](Editing-Configuration-Files.md) or in preferences of [Windows](https://github.com/transmission/transmission/blob/main/docs/Web-Interface.md#1-for-windows) or [Linux](https://github.com/transmission/transmission/blob/main/docs/Web-Interface.md#2-for-linux) client.
+9091 is the default remote control port specified in [Transmission configuration](Editing-Configuration-Files.md) or in preferences of [Windows](https://github.com/transmission/transmission/blob/main/docs/Web-Interface.md#1-for-windows), [Linux](https://github.com/transmission/transmission/blob/main/docs/Web-Interface.md#2-for-linux) or [macOS](https://github.com/transmission/transmission/blob/main/docs/Web-Interface.md#2-for-macos) client.
 
 ## Web Interface Overview
 
