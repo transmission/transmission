@@ -2138,7 +2138,7 @@ static void peerPulse(void* vmsgs)
     }
 }
 
-static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
+static void gotError(tr_peerIo* io, short what, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
@@ -2147,11 +2147,13 @@ static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
         logdbg(msgs, fmt::format(FMT_STRING("libevent got a timeout, what={:d}"), what));
     }
 
-    if ((what & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) != 0)
+    if ((what & BEV_EVENT_EOF) != 0)
     {
-        logdbg(
-            msgs,
-            fmt::format(FMT_STRING("libevent got an error! what={:d}, errno={:d} ({:s})"), what, errno, tr_strerror(errno)));
+        logdbg(msgs, fmt::format("peer closed connection. {:s}", io->addrStr()));
+    }
+    else if ((what & BEV_EVENT_ERROR) != 0)
+    {
+        logdbg(msgs, fmt::format("libevent got an error! what={:d}, errno={:d} ({:s})", what, errno, tr_strerror(errno)));
     }
 
     msgs->publish(tr_peer_event::GotError(ENOTCONN));
