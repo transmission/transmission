@@ -388,7 +388,7 @@ public:
     // if unset: steady-state, all is good
     // if set: do not accept new tasks
     // if set and deadline reached: kill all remaining tasks
-    std::atomic<std::chrono::time_point<std::chrono::steady_clock>> deadline_;
+    std::atomic<std::chrono::time_point<std::chrono::steady_clock>> deadline_ = {};
 
     [[nodiscard]] auto deadline() const
     {

@@ -138,8 +138,8 @@ public:
     explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp, std::atomic<size_t>& n_pending_stops)
         : session{ session_in }
         , announcer_udp_{ announcer_udp }
-        , n_pending_stops_{ n_pending_stops }
         , upkeep_timer_{ session_in->timerMaker().create() }
+        , n_pending_stops_{ n_pending_stops }
     {
         upkeep_timer_->setCallback([this]() { this->upkeep(); });
         upkeep_timer_->startRepeating(UpkeepInterval);
