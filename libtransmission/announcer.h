@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <atomic>
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t
 #include <ctime>
@@ -63,7 +64,10 @@ using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* ev
 class tr_announcer
 {
 public:
-    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session, tr_announcer_udp&);
+    [[nodiscard]] static std::unique_ptr<tr_announcer> create(
+        tr_session* session,
+        tr_announcer_udp&,
+        std::atomic<size_t>& n_pending_stops);
     virtual ~tr_announcer() = default;
 
     virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;
@@ -71,9 +75,7 @@ public:
     virtual void stopTorrent(tr_torrent* tor) = 0;
     virtual void resetTorrent(tr_torrent* tor) = 0;
     virtual void removeTorrent(tr_torrent* tor) = 0;
-
     virtual void startShutdown() = 0;
-    [[nodiscard]] virtual size_t pendingAnnounces() const = 0;
 };
 
 std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);

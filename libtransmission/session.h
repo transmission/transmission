@@ -933,8 +933,8 @@ private:
     void setSettings(tr_variant* settings_dict, bool force);
     void setSettings(tr_session_settings&& settings, bool force);
 
-    void closeImplPart1(std::promise<void>* closed_promise);
-    void closeImplPart2(std::promise<void>* closed_promise);
+    void closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
+    void closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
 
     void onNowTimer();
 
@@ -967,7 +967,7 @@ private:
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
-    friend void tr_sessionClose(tr_session* session);
+    friend void tr_sessionClose(tr_session* session, size_t timeout_secs);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
@@ -1080,6 +1080,10 @@ private:
     /// fields that aren't trivial,
     /// but are self-contained / don't hold references to others
 
+    // used during shutdown:
+    // how many &event=stopped announces are still being sent to trackers
+    std::atomic<size_t> n_pending_stops_ = {};
+
     mutable std::recursive_mutex session_mutex_;
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
@@ -1152,7 +1156,7 @@ public:
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
     // depends-on: settings_, torrents_, web_, announcer_udp_
-    std::unique_ptr<tr_announcer> announcer_ = tr_announcer::create(this, *announcer_udp_);
+    std::unique_ptr<tr_announcer> announcer_ = tr_announcer::create(this, *announcer_udp_, n_pending_stops_);
 
     // depends-on: public_peer_port_, udp_core_, dht_mediator_
     std::unique_ptr<tr_dht> dht_;
