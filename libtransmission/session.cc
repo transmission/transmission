@@ -1250,7 +1250,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
     // ...and now that those are queued, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
-    this->web_->startShutdown();
+    this->web_->startShutdown(10s);
     this->cache.reset();
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
