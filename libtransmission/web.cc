@@ -199,14 +199,14 @@ public:
 
     ~Impl()
     {
-        deadline_ = std::chrono::steady_clock::now();
+        deadline_ = tr_time();
         queued_tasks_cv_.notify_one();
         curl_thread->join();
     }
 
     void startShutdown(std::chrono::milliseconds deadline)
     {
-        deadline_ = std::chrono::steady_clock::now() + deadline;
+        deadline_ = tr_time() + std::chrono::duration_cast<std::chrono::seconds>(deadline).count();
         queued_tasks_cv_.notify_one();
     }
 
@@ -388,7 +388,7 @@ public:
     // if unset: steady-state, all is good
     // if set: do not accept new tasks
     // if set and deadline reached: kill all remaining tasks
-    std::atomic<std::chrono::time_point<std::chrono::steady_clock>> deadline_ = {};
+    std::atomic<time_t> deadline_ = {};
 
     [[nodiscard]] auto deadline() const
     {
@@ -397,12 +397,12 @@ public:
 
     [[nodiscard]] bool deadline_exists() const
     {
-        return deadline() != std::chrono::time_point<std::chrono::steady_clock>{};
+        return deadline() != time_t{};
     }
 
     [[nodiscard]] bool deadline_reached() const
     {
-        return deadline_exists() && deadline() <= std::chrono::steady_clock::now();
+        return deadline_exists() && deadline() <= tr_time();
     }
 
     [[nodiscard]] CURL* get_easy(std::string_view host)
