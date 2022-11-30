@@ -347,9 +347,8 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
     if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
     {
         auto const [ss, sslen] = addr->toSockaddr(port);
-        auto* const socket = utp_create_socket(session->utp_context);
 
-        if (socket != nullptr)
+        if (auto* const socket = utp_create_socket(session->utp_context); socket != nullptr)
         {
             if (utp_connect(socket, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
             {

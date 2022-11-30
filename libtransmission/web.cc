@@ -233,6 +233,8 @@ public:
             response.user_data = options.done_func_user_data;
         }
 
+        // Some of the curl_easy_setopt() args took a pointer to this task.
+        // Disable moving so that we don't accidentally invalidate those pointers.
         Task(Task&&) = delete;
         Task(Task const&) = delete;
         Task& operator=(Task&&) = delete;
@@ -363,7 +365,7 @@ public:
 
         tr_web::FetchOptions options;
 
-        CURL* easy_ = nullptr;
+        CURL* const easy_;
     };
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
