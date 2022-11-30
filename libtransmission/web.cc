@@ -172,7 +172,7 @@ public:
             this->user_agent = *ua;
         }
 
-        auto const lock = std::unique_lock(tasks_mutex_);
+        auto const lock = std::unique_lock{ tasks_mutex_ };
         curl_thread = std::make_unique<std::thread>(curlThreadFunc, this);
     }
 
@@ -201,12 +201,12 @@ public:
 
     void fetch(FetchOptions&& options)
     {
-        if (hasDeadline())
+        if (deadline_exists())
         {
             return;
         }
 
-        auto const lock = std::unique_lock(tasks_mutex_);
+        auto const lock = std::unique_lock{ tasks_mutex_ };
         queued_tasks_.emplace_back(*this, std::move(options));
         queued_tasks_cv_.notify_one();
     }
@@ -382,14 +382,14 @@ public:
         return deadline_.load();
     }
 
-    [[nodiscard]] bool hasDeadline() const noexcept
+    [[nodiscard]] bool deadline_exists() const noexcept
     {
         return deadline() != std::chrono::time_point<std::chrono::steady_clock>{};
     }
 
-    [[nodiscard]] bool deadlineReached() const noexcept
+    [[nodiscard]] bool deadline_reached() const noexcept
     {
-        return hasDeadline() && deadline() <= std::chrono::steady_clock::now();
+        return deadline_exists() && deadline() <= std::chrono::steady_clock::now();
     }
 
     [[nodiscard]] CURL* get_easy(std::string_view host)
@@ -574,7 +574,7 @@ public:
 
     void remove_task(Task& task)
     {
-        auto lock = std::unique_lock(tasks_mutex_);
+        auto const lock = std::unique_lock{ tasks_mutex_ };
         auto const iter = std::find(std::begin(running_tasks_), std::end(running_tasks_), task);
         TR_ASSERT(iter != std::end(running_tasks_));
         if (iter == std::end(running_tasks_))
@@ -598,39 +598,34 @@ public:
     {
         auto const multi = std::unique_ptr<CURLM, CURLMcode (*)(CURLM*)>(curl_multi_init(), curl_multi_cleanup);
 
-        //auto running_tasks = int{ 0 };
         auto repeats = unsigned{};
         for (;;)
         {
-            if (impl->hasDeadline())
+            if (impl->deadline_reached())
             {
-                if (impl->deadlineReached())
+                while (!std::empty(impl->running_tasks_))
                 {
-                    while (!std::empty(impl->running_tasks_))
-                    {
-                        auto& task = impl->running_tasks_.front();
-                        curl_multi_remove_handle(multi.get(), task.easy());
-                        impl->timeout_task(task);
-                    }
-                }
-
-                if (impl->is_idle())
-                {
-                    break;
+                    auto& task = impl->running_tasks_.front();
+                    curl_multi_remove_handle(multi.get(), task.easy());
+                    impl->timeout_task(task);
                 }
             }
 
+            if (impl->deadline_exists() && impl->is_idle())
             {
-                auto lock = std::unique_lock(impl->tasks_mutex_);
+                break;
+            }
 
+            if (auto lock = std::unique_lock{ impl->tasks_mutex_ }; lock.owns_lock())
+            {
                 // sleep until there's something to do
-                auto const has_work = [impl]()
+                auto const stop_waiting = [impl]()
                 {
-                    return !impl->is_idle() || !impl->hasDeadline();
+                    return !impl->is_idle() || !impl->deadline_exists();
                 };
-                if (!has_work())
+                if (!stop_waiting())
                 {
-                    impl->queued_tasks_cv_.wait(lock, has_work);
+                    impl->queued_tasks_cv_.wait(lock, stop_waiting);
                 }
 
                 // add queued tasks
@@ -697,11 +692,6 @@ public:
                 }
             }
         }
-
-        // Clean up any remaining tasks.
-        // This shouldn't happen, but do it just in case.
-        impl->queued_tasks_.clear();
-        impl->running_tasks_.clear();
 
         impl->is_closed_ = true;
     }

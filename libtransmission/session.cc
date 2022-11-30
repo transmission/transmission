@@ -1294,7 +1294,7 @@ void tr_sessionClose(tr_session* session)
     auto closed_promise = std::promise<void>{};
     auto closed_future = closed_promise.get_future();
     session->runInSessionThread([session, &closed_promise]() { session->closeImplPart1(&closed_promise); });
-    closed_future.wait_for(12s);
+    closed_future.wait();
 
     delete session;
 }
