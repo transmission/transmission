@@ -48,9 +48,9 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-static auto constexpr TauConnectionTtlSecs = int{ 60 };
+static constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
-static tau_transaction_t tau_transaction_new()
+static auto tau_transaction_new()
 {
     return tr_rand_obj<tau_transaction_t>();
 }
@@ -144,15 +144,21 @@ struct tau_scrape_request
         }
     }
 
+    [[nodiscard]] auto expiresAt() const noexcept
+    {
+        return created_at_ + TR_SCRAPE_TIMEOUT_SEC.count();
+    }
+
     std::vector<std::byte> payload;
 
     time_t sent_at = 0;
-    time_t const created_at = tr_time();
     tau_transaction_t const transaction_id = tau_transaction_new();
 
     tr_scrape_response response = {};
 
 private:
+    time_t const created_at_ = tr_time();
+
     tr_scrape_response_func on_response_;
 };
 
@@ -232,6 +238,11 @@ struct tau_announce_request
         }
     }
 
+    [[nodiscard]] auto expiresAt() const noexcept
+    {
+        return created_at_ + TR_ANNOUNCE_TIMEOUT_SEC.count();
+    }
+
     enum tau_announce_event
     {
         // Used in the "event" field of an announce request.
@@ -244,7 +255,6 @@ struct tau_announce_request
 
     std::vector<std::byte> payload;
 
-    time_t const created_at = tr_time();
     time_t sent_at = 0;
     tau_transaction_t const transaction_id = tau_transaction_new();
 
@@ -268,6 +278,8 @@ private:
             return TAU_ANNOUNCE_EVENT_NONE;
         }
     }
+
+    time_t const created_at_ = tr_time();
 
     tr_announce_response_func on_response_;
 };
@@ -453,7 +465,7 @@ private:
     {
         bool const cancel_all = this->close_at != 0 && (this->close_at <= now);
 
-        if (this->connecting_at != 0 && this->connecting_at + TauRequestTtl < now)
+        if (this->connecting_at != 0 && this->connecting_at + ConnectionRequestTtl < now)
         {
             auto empty_buf = libtransmission::Buffer{};
             on_connection_response(TAU_ACTION_ERROR, empty_buf);
@@ -468,8 +480,7 @@ private:
     {
         for (auto it = std::begin(requests); it != std::end(requests);)
         {
-            auto& req = *it;
-            if (cancel_all || req.created_at + TauRequestTtl < now)
+            if (auto& req = *it; cancel_all || req.expiresAt() <= now)
             {
                 logtrace(this->key, fmt::format("timeout {} req {}", name, fmt::ptr(&req)));
                 req.fail(false, true, "");
@@ -560,8 +571,8 @@ private:
     MaybeSockaddr addr_ = {};
     time_t addr_expires_at_ = 0;
 
-    static time_t constexpr DnsRetryIntervalSecs = 60 * 60;
-    static auto constexpr TauRequestTtl = int{ 60 };
+    static inline constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
+    static inline constexpr auto ConnectionRequestTtl = int{ 30 };
 };
 
 /****
