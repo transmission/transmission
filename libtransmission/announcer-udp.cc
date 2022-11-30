@@ -32,7 +32,6 @@
 #include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h" // for tr_pex::fromCompact4()
-#include "session.h"
 #include "tr-assert.h"
 #include "tr-buffer.h"
 #include "utils.h"
@@ -300,11 +299,6 @@ struct tau_tracker
     {
     }
 
-    [[nodiscard]] auto isIdle() const noexcept
-    {
-        return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
-    }
-
     void sendto(std::byte const* buf, size_t buflen)
     {
         TR_ASSERT(addr_);
@@ -341,7 +335,6 @@ struct tau_tracker
     void upkeep(bool timeout_reqs = true)
     {
         time_t const now = tr_time();
-        bool const closing = this->close_at != 0;
 
         // do we have a DNS request that's ready?
         if (addr_pending_dns_ && addr_pending_dns_->wait_for(0ms) == std::future_status::ready)
@@ -358,7 +351,7 @@ struct tau_tracker
         }
 
         // update the addr if our lookup is past its shelf date
-        if (!closing && !addr_pending_dns_ && addr_expires_at_ <= now)
+        if (!addr_pending_dns_ && addr_expires_at_ <= now)
         {
             addr_.reset();
             addr_pending_dns_ = std::async(std::launch::async, lookup, this->host, this->port, this->key);
@@ -443,6 +436,11 @@ private:
         return std::make_pair(ss, len);
     }
 
+    [[nodiscard]] bool isIdle() const noexcept
+    {
+        return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
+    }
+
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
     {
         for (auto& req : this->scrapes)
@@ -463,24 +461,22 @@ private:
 
     void timeout_requests(time_t now)
     {
-        bool const cancel_all = this->close_at != 0 && (this->close_at <= now);
-
         if (this->connecting_at != 0 && this->connecting_at + ConnectionRequestTtl < now)
         {
             auto empty_buf = libtransmission::Buffer{};
             on_connection_response(TAU_ACTION_ERROR, empty_buf);
         }
 
-        timeout_requests(this->announces, now, cancel_all, "announce");
-        timeout_requests(this->scrapes, now, cancel_all, "scrape");
+        timeout_requests(this->announces, now, "announce");
+        timeout_requests(this->scrapes, now, "scrape");
     }
 
     template<typename T>
-    void timeout_requests(std::list<T>& requests, time_t now, bool cancel_all, std::string_view name)
+    void timeout_requests(std::list<T>& requests, time_t now, std::string_view name)
     {
         for (auto it = std::begin(requests); it != std::end(requests);)
         {
-            if (auto& req = *it; cancel_all || req.expiresAt() <= now)
+            if (auto& req = *it; req.expiresAt() <= now)
             {
                 logtrace(this->key, fmt::format("timeout {} req {}", name, fmt::ptr(&req)));
                 req.fail(false, true, "");
@@ -558,8 +554,6 @@ public:
     tau_connection_t connection_id = {};
     tau_transaction_t connection_transaction_id = {};
 
-    time_t close_at = 0;
-
     std::list<tau_announce_request> announces;
     std::list<tau_scrape_request> scrapes;
 
@@ -618,25 +612,6 @@ public:
     {
         for (auto& tracker : trackers_)
         {
-            tracker.upkeep();
-        }
-    }
-
-    [[nodiscard]] bool isIdle() const noexcept override
-    {
-        return std::all_of(std::begin(trackers_), std::end(trackers_), [](auto const& tracker) { return tracker.isIdle(); });
-    }
-
-    // Start shutting down.
-    // This doesn't destroy everything if there are requests,
-    // but sets a deadline on how much longer to wait for the remaining ones.
-    void startShutdown() override
-    {
-        auto const now = time(nullptr);
-
-        for (auto& tracker : trackers_)
-        {
-            tracker.close_at = now + 3;
             tracker.upkeep();
         }
     }
