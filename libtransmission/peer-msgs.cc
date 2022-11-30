@@ -2151,8 +2151,14 @@ static void gotError(tr_peerIo* io, short what, void* vmsgs)
     {
         logdbg(msgs, fmt::format("peer closed connection. {:s}", io->addrStr()));
     }
+    else if (what == BEV_EVENT_ERROR)
+    {
+        // exact BEV_EVENT_ERROR are high frequency errors from utp_on_error which were already logged appropriately
+        logtrace(msgs, fmt::format("libevent got an error! what={:d}, errno={:d} ({:s})", what, errno, tr_strerror(errno)));
+    }
     else if ((what & BEV_EVENT_ERROR) != 0)
     {
+        // read or write error
         logdbg(msgs, fmt::format("libevent got an error! what={:d}, errno={:d} ({:s})", what, errno, tr_strerror(errno)));
     }
 

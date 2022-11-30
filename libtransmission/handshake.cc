@@ -1092,7 +1092,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     {
         tr_logAddTraceHand(
             handshake,
-            fmt::format("libevent got an error what=={}, errno={} ({})", what, errcode, tr_strerror(errcode)));
+            fmt::format("libevent got an error: what={:d}, errno={:d} ({:s})", what, errcode, tr_strerror(errcode)));
         tr_handshakeDone(handshake, false);
     }
 }
