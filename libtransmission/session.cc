@@ -1224,9 +1224,6 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
     bound_ipv6_.reset();
     bound_ipv4_.reset();
 
-    // tell other items to start shutting down
-    announcer_udp_->startShutdown();
-
     // Close the torrents in order of most active to least active
     // so that the most important announce=stopped events are
     // fired out first...
@@ -1245,14 +1242,14 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
         tr_torrentFreeInSessionThread(tor);
     }
     torrents.clear();
-    // ...and now that all the torrents have been closed, any
-    // remaining `event=stopped` announce messages are queued in
-    // the announcer. The announcer's destructor sends all those
-    // out via `web_`...
-    this->announcer_.reset();
-    // ...and now that those are queued, tell web_ that we're
-    // shutting down soon. This leaves the `event=stopped` messages
-    // in the queue but refuses to take any _new_ tasks
+    // ...now that all the torrents have been closed, any remaining
+    // `&event=stopped` announce messages are queued in the announcer.
+    // Tell the announcer to start shutdown, which sends out the stop
+    // events and stops scraping.
+    this->announcer_->startShutdown();
+    // ...and now that those are queued, tell web_ that we're shutting
+    // down soon. This leaves the `event=stopped` going but refuses any
+    // new tasks.
     this->web_->startShutdown();
     this->cache.reset();
 
@@ -1266,7 +1263,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise)
 {
     // try to keep the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces
-    if (announcer_udp_ && !announcer_udp_->isIdle())
+    if (announcer_->pendingAnnounces() != 0U)
     {
         announcer_udp_->upkeep();
         return;
@@ -1274,6 +1271,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise)
 
     save_timer_.reset();
 
+    this->announcer_.reset();
     this->announcer_udp_.reset();
     this->udp_core_.reset();
 

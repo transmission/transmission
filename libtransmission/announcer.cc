@@ -160,6 +160,17 @@ public:
     void resetTorrent(tr_torrent* tor) override;
     void removeTorrent(tr_torrent* tor) override;
 
+    void startShutdown() override
+    {
+        is_shutting_down_ = true;
+        flushCloseMessages();
+    }
+
+    [[nodiscard]] size_t pendingAnnounces() const override
+    {
+        return pending_announces_;
+    }
+
     void upkeep();
 
     void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
@@ -178,6 +189,8 @@ public:
 
     void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response)
     {
+        TR_ASSERT(!is_shutting_down_);
+
         if (auto const scrape_sv = request.scrape_url.sv();
             tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
         {
@@ -195,14 +208,25 @@ public:
 
     void announce(tr_announce_request const& request, tr_announce_response_func on_response)
     {
+        TR_ASSERT(!is_shutting_down_ || request.event == TR_ANNOUNCE_EVENT_STOPPED);
+
+        auto callback = [this, on_response = std::move(on_response)](tr_announce_response const& response)
+        {
+            TR_ASSERT(pending_announces_ > 0U);
+            --pending_announces_;
+            on_response(response);
+        };
+
         if (auto const announce_sv = request.announce_url.sv();
             tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
         {
-            tr_tracker_http_announce(session, request, std::move(on_response));
+            ++pending_announces_;
+            tr_tracker_http_announce(session, request, std::move(callback));
         }
         else if (tr_strvStartsWith(announce_sv, "udp://"sv))
         {
-            announcer_udp_.announce(request, std::move(on_response));
+            ++pending_announces_;
+            announcer_udp_.announce(request, std::move(callback));
         }
         else
         {
@@ -225,6 +249,8 @@ private:
         stops_.clear();
     }
 
+    static auto constexpr UpkeepInterval = 500ms;
+
     tr_announcer_udp& announcer_udp_;
 
     std::map<tr_interned_string, tr_scrape_info> scrape_info_;
@@ -233,7 +259,9 @@ private:
 
     std::set<tr_announce_request, StopsCompare> stops_;
 
-    static auto constexpr UpkeepInterval = 500ms;
+    size_t pending_announces_ = {};
+
+    bool is_shutting_down_ = false;
 };
 
 std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
@@ -1546,7 +1574,7 @@ void tr_announcer_impl::upkeep()
     flushCloseMessages();
 
     // maybe kick off some scrapes / announces whose time has come
-    if (!session->isClosing())
+    if (!is_shutting_down_)
     {
         scrapeAndAnnounceMore(this);
     }
