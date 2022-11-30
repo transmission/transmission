@@ -83,6 +83,11 @@ Glib::RefPtr<Gdk::Pixbuf> favicon_load_from_cache(std::string const& host)
 
 void favicon_web_done_cb(tr_web::FetchResponse const& response);
 
+constexpr bool should_keep_trying(long code)
+{
+    return code != 0 && code <= 500;
+}
+
 bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
 {
     Glib::RefPtr<Gdk::Pixbuf> pixbuf;
@@ -93,7 +98,7 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
         pixbuf = favicon_load_from_cache(fav->host);
     }
 
-    if (fav->code == 404 && pixbuf == nullptr && ++fav->type < ImageTypes.size()) /* keep trying */
+    if (pixbuf == nullptr && should_keep_trying(fav->code) && ++fav->type < ImageTypes.size()) /* keep trying */
     {
         fav->contents.clear();
         auto* const session = fav->session;
