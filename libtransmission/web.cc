@@ -4,14 +4,14 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <atomic>
 #include <array>
+#include <atomic>
 #include <condition_variable>
 #include <list>
 #include <map>
 #include <memory>
-#include <stack>
 #include <mutex>
+#include <stack>
 #include <string>
 #include <thread>
 #include <utility>
@@ -63,6 +63,22 @@ struct ShareDeleter
 };
 
 using shared_unique_ptr = std::unique_ptr<CURLSH, ShareDeleter>;
+
+struct MultiDeleter
+{
+    void operator()(CURLM* multi)
+    {
+        if (multi == nullptr)
+        {
+            return;
+        }
+
+        [[maybe_unused]] auto const status = curl_multi_cleanup(multi);
+        TR_ASSERT(status == CURLM_OK);
+    }
+};
+
+using multi_unique_ptr = std::unique_ptr<CURLM, MultiDeleter>;
 
 struct EasyDeleter
 {
@@ -173,7 +189,7 @@ public:
         }
 
         auto const lock = std::unique_lock{ tasks_mutex_ };
-        curl_thread = std::make_unique<std::thread>(curlThreadFunc, this);
+        curl_thread = std::make_unique<std::thread>(&Impl::curlThreadFunc, this);
     }
 
     Impl(Impl&&) = delete;
@@ -192,11 +208,6 @@ public:
     {
         deadline_ = std::chrono::steady_clock::now() + deadline;
         queued_tasks_cv_.notify_one();
-    }
-
-    [[nodiscard]] bool isClosed() const noexcept
-    {
-        return is_closed_;
     }
 
     void fetch(FetchOptions&& options)
@@ -340,7 +351,7 @@ public:
             if (auto const url = tr_urlParse(options.url); url)
             {
                 curl_easy_reset(easy);
-                impl.easy_pool_[std::string(url->host)].emplace(easy);
+                impl.easy_pool_[std::string{ url->host }].emplace(easy);
             }
             else
             {
@@ -377,17 +388,17 @@ public:
     // if set and deadline reached: kill all remaining tasks
     std::atomic<std::chrono::time_point<std::chrono::steady_clock>> deadline_;
 
-    [[nodiscard]] auto deadline() const noexcept
+    [[nodiscard]] auto deadline() const
     {
         return deadline_.load();
     }
 
-    [[nodiscard]] bool deadline_exists() const noexcept
+    [[nodiscard]] bool deadline_exists() const
     {
         return deadline() != std::chrono::time_point<std::chrono::steady_clock>{};
     }
 
-    [[nodiscard]] bool deadline_reached() const noexcept
+    [[nodiscard]] bool deadline_reached() const
     {
         return deadline_exists() && deadline() <= std::chrono::steady_clock::now();
     }
@@ -458,12 +469,12 @@ public:
     }
 #endif
 
-    static void initEasy(tr_web::Impl* impl, Task& task)
+    void initEasy(Task& task)
     {
-        TR_ASSERT(std::this_thread::get_id() == impl->curl_thread->get_id());
+        TR_ASSERT(std::this_thread::get_id() == curl_thread->get_id());
         auto* const e = task.easy();
 
-        (void)curl_easy_setopt(e, CURLOPT_SHARE, impl->shared());
+        (void)curl_easy_setopt(e, CURLOPT_SHARE, shared());
         (void)curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, DnsCacheTimeoutSecs);
         (void)curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
         (void)curl_easy_setopt(e, CURLOPT_ENCODING, "");
@@ -478,14 +489,14 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, &task);
 #endif
 
-        if (!impl->curl_ssl_verify)
+        if (!curl_ssl_verify)
         {
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
         }
-        else if (!std::empty(impl->curl_ca_bundle))
+        else if (!std::empty(curl_ca_bundle))
         {
-            (void)curl_easy_setopt(e, CURLOPT_CAINFO, impl->curl_ca_bundle.c_str());
+            (void)curl_easy_setopt(e, CURLOPT_CAINFO, curl_ca_bundle.c_str());
         }
         else
         {
@@ -494,26 +505,26 @@ public:
 #endif
         }
 
-        if (!impl->curl_proxy_ssl_verify)
+        if (!curl_proxy_ssl_verify)
         {
             (void)curl_easy_setopt(e, CURLOPT_CAINFO, NULL);
             (void)curl_easy_setopt(e, CURLOPT_CAPATH, NULL);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
         }
-        else if (!std::empty(impl->curl_ca_bundle))
+        else if (!std::empty(curl_ca_bundle))
         {
-            (void)curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, impl->curl_ca_bundle.c_str());
+            (void)curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, curl_ca_bundle.c_str());
         }
 
-        if (auto const& ua = impl->user_agent; !std::empty(ua))
+        if (auto const& ua = user_agent; !std::empty(ua))
         {
             (void)curl_easy_setopt(e, CURLOPT_USERAGENT, ua.c_str());
         }
 
         (void)curl_easy_setopt(e, CURLOPT_TIMEOUT, static_cast<long>(task.timeoutSecs().count()));
         (void)curl_easy_setopt(e, CURLOPT_URL, task.url().c_str());
-        (void)curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
+        (void)curl_easy_setopt(e, CURLOPT_VERBOSE, curl_verbose ? 1L : 0L);
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, &task);
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
@@ -528,7 +539,7 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_COOKIE, cookies->c_str());
         }
 
-        if (auto const& file = impl->cookie_file; !std::empty(file))
+        if (auto const& file = cookie_file; !std::empty(file))
         {
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
         }
@@ -575,6 +586,7 @@ public:
     void remove_task(Task& task)
     {
         auto const lock = std::unique_lock{ tasks_mutex_ };
+
         auto const iter = std::find(std::begin(running_tasks_), std::end(running_tasks_), task);
         TR_ASSERT(iter != std::end(running_tasks_));
         if (iter == std::end(running_tasks_))
@@ -588,60 +600,60 @@ public:
 
     void timeout_task(Task& task)
     {
-        task.response.status = 408; // request timeout
+        task.response.status = 408; // request timed out
         task.response.did_timeout = true;
         remove_task(task);
     }
 
     // the thread started by Impl.curl_thread runs this function
-    static void curlThreadFunc(Impl* impl)
+    void curlThreadFunc()
     {
-        auto const multi = std::unique_ptr<CURLM, CURLMcode (*)(CURLM*)>(curl_multi_init(), curl_multi_cleanup);
+        auto const multi = curl_helpers::multi_unique_ptr{ curl_multi_init() };
 
         auto repeats = unsigned{};
         for (;;)
         {
-            if (impl->deadline_reached())
+            if (deadline_reached())
             {
-                while (!std::empty(impl->running_tasks_))
+                while (!std::empty(running_tasks_))
                 {
-                    auto& task = impl->running_tasks_.front();
+                    auto& task = running_tasks_.front();
                     curl_multi_remove_handle(multi.get(), task.easy());
-                    impl->timeout_task(task);
+                    timeout_task(task);
                 }
             }
 
-            if (impl->deadline_exists() && impl->is_idle())
+            if (deadline_exists() && is_idle())
             {
                 break;
             }
 
-            if (auto lock = std::unique_lock{ impl->tasks_mutex_ }; lock.owns_lock())
+            if (auto lock = std::unique_lock{ tasks_mutex_ }; lock.owns_lock())
             {
                 // sleep until there's something to do
-                auto const stop_waiting = [impl]()
+                auto const stop_waiting = [this]()
                 {
-                    return !impl->is_idle() || !impl->deadline_exists();
+                    return !is_idle() || !deadline_exists();
                 };
                 if (!stop_waiting())
                 {
-                    impl->queued_tasks_cv_.wait(lock, stop_waiting);
+                    queued_tasks_cv_.wait(lock, stop_waiting);
                 }
 
                 // add queued tasks
-                if (!std::empty(impl->queued_tasks_))
+                if (!std::empty(queued_tasks_))
                 {
-                    for (auto& task : impl->queued_tasks_)
+                    for (auto& task : queued_tasks_)
                     {
-                        initEasy(impl, task);
+                        initEasy(task);
                         curl_multi_add_handle(multi.get(), task.easy());
                     }
 
-                    impl->running_tasks_.splice(std::end(impl->running_tasks_), impl->queued_tasks_);
+                    running_tasks_.splice(std::end(running_tasks_), queued_tasks_);
                 }
             }
 
-            impl->resumePausedTasks();
+            resumePausedTasks();
 
             // Adapted from https://curl.se/libcurl/c/curl_multi_wait.html docs.
             // 'numfds' being zero means either a timeout or no file descriptors to
@@ -688,12 +700,10 @@ public:
                     task->response.did_timeout = task->response.status == 0 &&
                         std::chrono::duration<double>(total_time) >= task->timeoutSecs();
                     curl_multi_remove_handle(multi.get(), e);
-                    impl->remove_task(*task);
+                    remove_task(*task);
                 }
             }
         }
-
-        impl->is_closed_ = true;
     }
 
     curl_helpers::shared_unique_ptr const curlsh_{ curl_share_init() };
@@ -732,8 +742,6 @@ public:
 
     static std::once_flag curl_init_flag;
 
-    std::atomic<bool> is_closed_ = false;
-
     std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
 
     static void curlInit()
@@ -764,11 +772,6 @@ std::unique_ptr<tr_web> tr_web::create(Mediator& mediator)
 void tr_web::fetch(FetchOptions&& options)
 {
     impl_->fetch(std::move(options));
-}
-
-bool tr_web::isClosed() const noexcept
-{
-    return impl_->isClosed();
 }
 
 void tr_web::startShutdown(std::chrono::milliseconds deadline)
