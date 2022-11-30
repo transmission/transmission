@@ -409,7 +409,7 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_USERAGENT, ua.c_str());
         }
 
-        (void)curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
+        (void)curl_easy_setopt(e, CURLOPT_TIMEOUT, static_cast<long>(task->timeoutSecs().count()));
         (void)curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
         (void)curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
@@ -550,7 +550,8 @@ public:
                     curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                     curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->response.status);
                     task->response.did_connect = task->response.status > 0 || req_bytes_sent > 0;
-                    task->response.did_timeout = task->response.status == 0 && total_time >= task->timeoutSecs();
+                    task->response.did_timeout = task->response.status == 0 &&
+                        std::chrono::duration<double>(total_time) >= task->timeoutSecs();
                     curl_multi_remove_handle(multi.get(), e);
                     task->done();
                     delete task;
