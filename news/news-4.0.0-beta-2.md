@@ -117,6 +117,8 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 * [@DevilDimon (Dmitry Serov)](https://github.com/DevilDimon):
   * Code review for [#3886](https://github.com/transmission/transmission/pull/3886), [#4084](https://github.com/transmission/transmission/pull/4084)
   * Removed preprocessor defines from macOS client. ([#3974](https://github.com/transmission/transmission/pull/3974))
+* [@GaryElshaw (Gary Elshaw)](https://github.com/GaryElshaw):
+  * Changed Badge display so that upload is up and download is down. ([#4055](https://github.com/transmission/transmission/pull/4055))
 * [@subdan (Daniil Subbotin)](https://github.com/subdan):
   * Fixed deleting previously selected torrent when attempting to clear search field using ⌘⌫. ([#4245](https://github.com/transmission/transmission/pull/4245))
 * [@sweetppro (SweetPPro)](https://github.com/sweetppro):
