@@ -32,12 +32,13 @@ static CGFloat const kCountWidth = 60.0;
 @implementation TrackerCell
 
 //make the favicons accessible to all tracker cells
-NSCache* fTrackerIconCache;
+NSCache<NSString*, id>* fTrackerIconCache;
 NSMutableSet* fTrackerIconLoading;
 
 + (void)initialize
 {
     fTrackerIconCache = [[NSCache alloc] init];
+    fTrackerIconCache.evictsObjectsWithDiscardedContent = NO;
     fTrackerIconLoading = [[NSMutableSet alloc] init];
 }
 
