@@ -27,33 +27,82 @@ extern "C"
 
 using namespace std::literals;
 
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer(IntType upper_bound);
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer_weak(IntType upper_bound);
+
 /***
 ****
 ***/
 
-int tr_rand_int(int upper_bound)
+template<>
+[[nodiscard]] int tr_rand_int<int>(int upper_bound)
 {
-    TR_ASSERT(upper_bound > 0);
-
-    if (unsigned int noise = 0; tr_rand_buffer(&noise, sizeof(noise)))
-    {
-        return noise % upper_bound;
-    }
-
-    /* fall back to a weaker implementation... */
-    return tr_rand_int_weak(upper_bound);
+    return tr_rand_integer<int>(upper_bound);
 }
 
-int tr_rand_int_weak(int upper_bound)
+template<>
+[[nodiscard]] size_t tr_rand_int<size_t>(size_t upper_bound)
+{
+    return tr_rand_integer<size_t>(upper_bound);
+}
+
+template<>
+[[nodiscard]] int tr_rand_int_weak<int>(int upper_bound)
+{
+    return tr_rand_integer_weak<int>(upper_bound);
+}
+
+template<>
+[[nodiscard]] size_t tr_rand_int_weak<size_t>(size_t upper_bound)
+{
+    return tr_rand_integer_weak<size_t>(upper_bound);
+}
+
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer(IntType upper_bound_integer)
+{
+    TR_ASSERT(upper_bound_integer > 0);
+
+    using UIntType = std::make_unsigned_t<IntType>;
+    auto upper_bound = static_cast<UIntType>(upper_bound_integer);
+
+    // random uniform algorithm for unsigned type
+    // (https://github.com/openbsd/src/blob/master/lib/libc/crypt/arc4random_uniform.c)
+    if (upper_bound < 2)
+    {
+        return 0;
+    }
+    UIntType min = -upper_bound % upper_bound;
+    UIntType noise = 0;
+    for (;;)
+    {
+        if (!tr_rand_buffer(&noise, sizeof(noise)))
+        {
+            break;
+        }
+        if (noise >= min)
+        {
+            return noise % upper_bound;
+        }
+    }
+
+    // rare fall back to a weaker implementation when CCRandomGenerateBytes is failing
+    return tr_rand_integer_weak(upper_bound);
+}
+
+template<class IntType>
+[[nodiscard]] IntType tr_rand_integer_weak(IntType upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
 
     thread_local auto random_engine = std::mt19937{ std::random_device{}() };
-    using distribution_type = std::uniform_int_distribution<>;
+    using distribution_type = std::uniform_int_distribution<IntType>;
     thread_local distribution_type distribution;
 
     // Upper bound is inclusive in std::uniform_int_distribution.
-    return distribution(random_engine, distribution_type::param_type{ 0, upper_bound - 1 });
+    return distribution(random_engine, typename distribution_type::param_type{ 0, upper_bound - 1 });
 }
 
 /***
