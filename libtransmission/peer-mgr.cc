@@ -1244,7 +1244,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port 
     {
         auto* const handshake = tr_handshakeNew(
             std::make_unique<tr_handshake_mediator_impl>(*session),
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, &addr, port, tr_time(), socket),
+            tr_peerIo::newIncoming(session, &session->top_bandwidth_, &addr, port, socket),
             session->encryptionMode(),
             on_handshake_done,
             manager);
@@ -2085,13 +2085,6 @@ struct ChokeData
     }
 };
 
-/* is this a new connection? */
-[[nodiscard]] bool isNew(tr_peerMsgs const* msgs)
-{
-    auto constexpr CutoffSecs = time_t{ 45 };
-    return msgs != nullptr && !msgs->is_connection_older_than(tr_time() - CutoffSecs);
-}
-
 /* get a rate for deciding which peers to choke and unchoke. */
 [[nodiscard]] auto getRateBps(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
 {
@@ -2213,12 +2206,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         {
             if (choked[i].is_interested)
             {
-                int const x = isNew(choked[i].msgs) ? 3 : 1;
-
-                for (int y = 0; y < x; ++y)
-                {
-                    rand_pool.push_back(&choked[i]);
-                }
+                rand_pool.push_back(&choked[i]);
             }
         }
 
@@ -2807,7 +2795,6 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
         &mgr->session->top_bandwidth_,
         &atom.addr,
         atom.port,
-        tr_time(),
         s->tor->infoHash(),
         s->tor->completeness == TR_SEED,
         utp);
