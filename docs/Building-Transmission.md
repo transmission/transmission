@@ -120,6 +120,90 @@ $ sudo make install
 ```
 
 ## On Windows ##
+
+## Building transmission-daemon
+You need the following installed:
+
+* Visual Studio 2017 (the Community Edition is sufficient - just make sure its C[++] compiler, MSVC, is installed)
+* [ActivePerl](https://www.activestate.com/products/activeperl/) or [StrawberryPerl](https://strawberryperl.com)
+* [CMake](https://cmake.org/download/) (choose to add CMake to your path)
+* Possibly [Git for Windows](https://git-scm.com/download/win) to have tools like `patch` present
+* [jom](https://wiki.qt.io/Jom) (very recommended, esp. for OpenSSL compilation which can take ages on a single core. If you want to use `nmake`, use "NMake Makefiles" as the CMake generator & don't add `/FS` to CFLAGS)
+
+### Set up the environment
+
+Open a Command Prompt and run the following:
+
+```
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
+set "TPDIR=C:\3rd-party-msvc64"
+set "PATH=%TPDIR%\bin;%PATH%"
+set "TPCFLAGS=/nologo /MP /GS /GL /Gy /Oi /Oy /O2 /DWIN32 /D_WINDOWS"
+set "TPLDFLAGS=/NOLOGO /DYNAMICBASE /NXCOMPAT /LTCG /INCREMENTAL:NO /OPT:REF /OPT:ICF /machine:x64"
+set "CFLAGS=%TPCFLAGS%"
+set "LDFLAGS=%TPLDFLAGS%"
+
+mkdir "%TPDIR%" & cd "%TPDIR%"
+```
+
+### Build zlib
+
+Run the following to build and install zlib into %TPDIR%:
+
+```
+mkdir build & cd build
+cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%TPDIR%" -DCMAKE_SHARED_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_C_FLAGS="%CFLAGS%" -DBUILD_SHARED_LIBS=ON -DSKIP_INSTALL_FILES=ON -DAMD64=ON
+nmake
+nmake install/fast
+```
+
+### Build OpenSSL
+
+[Download OpenSSL](https://www.openssl.org/source/), extract the contents of it into %TPDIR% and **`cd` into the extracted OpenSSL folder**.
+
+Run the following to build and install OpenSSL into %TPDIR%:
+
+```
+set "CFLAGS=%TPCFLAGS% /I"%TPDIR%\include" /FS"
+set "LDFLAGS=%TPLDFLAGS% /DEBUG:FASTLINK"
+perl Configure --prefix="%TPDIR%" --openssldir="C:\Program Files\Transmission\ssl" VC-WIN64A-masm zlib-dynamic
+REM possibly install dmake - I did
+jom
+nmake install_sw
+set "CFLAGS=%TPCFLAGS%"
+set "LDFLAGS=%TPLDFLAGS%"
+```
+
+### Build curl
+
+[Download curl](https://curl.haxx.se/download.html), extract the contents of it into %TPDIR% and **`cd` into the extracted curl folder**.
+
+Run the following to build and install curl into %TPDIR%:
+
+```
+mkdir build & cd build
+cmake .. -G "NMake Makefiles JOM" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%TPDIR%" -DCMAKE_SHARED_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_EXE_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_C_FLAGS="%CFLAGS%" -DBUILD_CURL_EXE=OFF -DUSE_WIN32_LDAP=OFF -DBUILD_TESTING=OFF -DCMAKE_USE_OPENSSL=ON -DCURL_WINDOWS_SSPI=OFF -DBUILD_TESTING=OFF -DCURL_DISABLE_DICT=ON -DCURL_DISABLE_GOPHER=ON -DCURL_DISABLE_IMAP=ON -DCURL_DISABLE_SMTP=ON -DCURL_DISABLE_POP3=ON -DCURL_DISABLE_RTSP=ON -DCURL_DISABLE_TFTP=ON -DCURL_DISABLE_TELNET=ON -DCURL_DISABLE_LDAP=ON -DCURL_DISABLE_LDAPS=ON -DENABLE_MANUAL=OFF
+jom
+nmake install/fast
+```
+
+### Build Transmission
+
+Download Transmission, be this a tarball from the official website or Git master and **`cd` into the extracted transmission folder**. 
+
+Run the following to build and install Transmission into %TPDIR%
+
+```
+set "CXXFLAGS=%TPCFLAGS% /GR /EHsc"
+mkdir build & cd build
+cmake .. -G "NMake Makefiles JOM" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%TPDIR%" -DCMAKE_SHARED_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_STATIC_LINKER_FLAGS="/NOLOGO /LTCG /machine:x64" -DCMAKE_EXE_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_C_FLAGS="%CFLAGS%" -DCMAKE_CXX_FLAGS="%CXXFLAGS%" -DENABLE_CLI=ON -DENABLE_GTK=OFF -DENABLE_QT=OFF -DENABLE_MAC=OFF -DENABLE_TESTS=OFF -DINSTALL_DOC=OFF
+jom
+nmake install/fast
+```
+
+You should now have Transmission and the DLL files required to run it in %TPDIR%\bin.
+
+You can replace the files in your installed version of Transmission with the ones from bin. Don't forget to do the same with %TPDIR%\share\transmission\web.
 For Windows XP and above there are several choices:
 
 ### Cygwin environment ###
