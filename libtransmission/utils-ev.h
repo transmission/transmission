@@ -9,21 +9,11 @@
 
 #pragma once
 
+#include <event2/buffer.h>
+#include <event2/event.h>
+#include <event2/http.h>
+
 #include <memory>
-
-extern "C"
-{
-    struct evbuffer;
-    struct event;
-    struct event_base;
-    struct evhttp;
-
-    void evbuffer_free(struct evbuffer*);
-    void event_base_free(struct event_base*);
-    int event_del(struct event*);
-    void event_free(struct event*);
-    void evhttp_free(struct evhttp*);
-}
 
 namespace libtransmission::evhelpers
 {
