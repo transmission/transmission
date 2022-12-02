@@ -407,11 +407,6 @@ public:
         set_active(direction, calculate_active(direction));
     }
 
-    [[nodiscard]] bool is_connection_older_than(time_t timestamp) const noexcept override
-    {
-        return io->time_created < timestamp;
-    }
-
     [[nodiscard]] std::pair<tr_address, tr_port> socketAddress() const override
     {
         return io->socketAddress();

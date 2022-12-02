@@ -84,7 +84,10 @@ jobs:
           submodules: recursive
       - name: Get Dependencies
         run: |
-          sudo apt-get install clang-format-12 npm yarn
+          set -ex
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
+          sudo apt-get install -y clang-format-15 npm yarn
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .

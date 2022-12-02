@@ -98,8 +98,7 @@
 
 //  Logical OR these values into the u_int that you pass in the -addPath:notifyingAbout: method
 //  to specify the types of notifications you're interested in. Pass the default value to receive all of them.
-typedef NS_OPTIONS(u_int, VDKQueueNotify)
-{
+typedef NS_OPTIONS(u_int, VDKQueueNotify) {
     VDKQueueNotifyAboutRename = NOTE_RENAME, ///< Item was renamed.
     VDKQueueNotifyAboutWrite = NOTE_WRITE, ///< Item contents changed (also folder contents changed).
     VDKQueueNotifyAboutDelete = NOTE_DELETE, ///< Item was removed.
