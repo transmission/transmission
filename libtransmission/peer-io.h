@@ -70,7 +70,6 @@ public:
         tr_bandwidth* parent,
         struct tr_address const* addr,
         tr_port port,
-        time_t current_time,
         tr_sha1_digest_t const& torrent_hash,
         bool is_seed,
         bool utp);
@@ -80,7 +79,6 @@ public:
         tr_bandwidth* parent,
         struct tr_address const* addr,
         tr_port port,
-        time_t current_time,
         struct tr_peer_socket const socket);
 
     void clear();
@@ -231,8 +229,6 @@ public:
 
     tr_session* const session;
 
-    time_t const time_created;
-
     tr_can_read_cb canRead = nullptr;
     tr_did_write_cb didWrite = nullptr;
     tr_net_error_cb gotError = nullptr;
@@ -297,7 +293,6 @@ private:
         tr_bandwidth* parent,
         tr_address const* addr,
         tr_port port,
-        time_t current_time,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
         bool is_seed,
@@ -310,10 +305,8 @@ private:
         tr_address const& addr,
         tr_port port,
         bool is_seed,
-        time_t current_time,
         tr_bandwidth* parent_bandwidth)
         : session{ session_in }
-        , time_created{ current_time }
         , bandwidth_{ parent_bandwidth }
         , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
         , addr_{ addr }
