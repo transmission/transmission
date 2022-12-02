@@ -124,104 +124,31 @@ $ sudo make install
 ## Building transmission-daemon
 You need the following installed:
 
-* Visual Studio 2017 (the Community Edition is sufficient - just make sure its C[++] compiler, MSVC, is installed)
+* Visual Studio 2019 or greater(the Community Edition is sufficient - just make sure its C++ compiler, MSVC, is installed)
 * [ActivePerl](https://www.activestate.com/products/activeperl/) or [StrawberryPerl](https://strawberryperl.com)
 * [CMake](https://cmake.org/download/) (choose to add CMake to your path)
-* Possibly [Git for Windows](https://git-scm.com/download/win) to have tools like `patch` present
-* [jom](https://wiki.qt.io/Jom) (very recommended, esp. for OpenSSL compilation which can take ages on a single core. If you want to use `nmake`, use "NMake Makefiles" as the CMake generator & don't add `/FS` to CFLAGS)
+* Possibly [Git for Windows](https://git-scm.com/download/win)
+* [Vcpkg](https://github.com/microsoft/vcpkg#quick-start-windows)
 
-### Set up the environment
 
-Open a Command Prompt and run the following:
-
-```
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
-set "TPDIR=C:\3rd-party-msvc64"
-set "PATH=%TPDIR%\bin;%PATH%"
-set "TPCFLAGS=/nologo /MP /GS /GL /Gy /Oi /Oy /O2 /DWIN32 /D_WINDOWS"
-set "TPLDFLAGS=/NOLOGO /DYNAMICBASE /NXCOMPAT /LTCG /INCREMENTAL:NO /OPT:REF /OPT:ICF /machine:x64"
-set "CFLAGS=%TPCFLAGS%"
-set "LDFLAGS=%TPLDFLAGS%"
-
-mkdir "%TPDIR%" & cd "%TPDIR%"
-```
-
-### Build zlib
-
-Run the following to build and install zlib into %TPDIR%:
+### Install all dependencies through vcpkg
 
 ```
-mkdir build & cd build
-cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%TPDIR%" -DCMAKE_SHARED_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_C_FLAGS="%CFLAGS%" -DBUILD_SHARED_LIBS=ON -DSKIP_INSTALL_FILES=ON -DAMD64=ON
-nmake
-nmake install/fast
+vcpkg integrate install
+vcpkg install curl
+vcpkg install zlib
+vcpkg install openssl
 ```
 
-### Build OpenSSL
-
-[Download OpenSSL](https://www.openssl.org/source/), extract the contents of it into %TPDIR% and **`cd` into the extracted OpenSSL folder**.
-
-Run the following to build and install OpenSSL into %TPDIR%:
-
+### Get Transmission source and build it
 ```
-set "CFLAGS=%TPCFLAGS% /I"%TPDIR%\include" /FS"
-set "LDFLAGS=%TPLDFLAGS% /DEBUG:FASTLINK"
-perl Configure --prefix="%TPDIR%" --openssldir="C:\Program Files\Transmission\ssl" VC-WIN64A-masm zlib-dynamic
-REM possibly install dmake - I did
-jom
-nmake install_sw
-set "CFLAGS=%TPCFLAGS%"
-set "LDFLAGS=%TPLDFLAGS%"
+git clone https://github.com/transmission/transmission
+cd transmission
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE=*vcpkg root*/scripts/buildsystems/vcpkg.cmake ..
+./transmission.sln
 ```
-
-### Build curl
-
-[Download curl](https://curl.haxx.se/download.html), extract the contents of it into %TPDIR% and **`cd` into the extracted curl folder**.
-
-Run the following to build and install curl into %TPDIR%:
-
-```
-mkdir build & cd build
-cmake .. -G "NMake Makefiles JOM" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%TPDIR%" -DCMAKE_SHARED_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_EXE_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_C_FLAGS="%CFLAGS%" -DBUILD_CURL_EXE=OFF -DUSE_WIN32_LDAP=OFF -DBUILD_TESTING=OFF -DCMAKE_USE_OPENSSL=ON -DCURL_WINDOWS_SSPI=OFF -DBUILD_TESTING=OFF -DCURL_DISABLE_DICT=ON -DCURL_DISABLE_GOPHER=ON -DCURL_DISABLE_IMAP=ON -DCURL_DISABLE_SMTP=ON -DCURL_DISABLE_POP3=ON -DCURL_DISABLE_RTSP=ON -DCURL_DISABLE_TFTP=ON -DCURL_DISABLE_TELNET=ON -DCURL_DISABLE_LDAP=ON -DCURL_DISABLE_LDAPS=ON -DENABLE_MANUAL=OFF
-jom
-nmake install/fast
-```
-
-### Build Transmission
-
-Download Transmission, be this a tarball from the official website or Git master and **`cd` into the extracted transmission folder**. 
-
-Run the following to build and install Transmission into %TPDIR%
-
-```
-set "CXXFLAGS=%TPCFLAGS% /GR /EHsc"
-mkdir build & cd build
-cmake .. -G "NMake Makefiles JOM" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%TPDIR%" -DCMAKE_SHARED_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_STATIC_LINKER_FLAGS="/NOLOGO /LTCG /machine:x64" -DCMAKE_EXE_LINKER_FLAGS="%LDFLAGS%" -DCMAKE_C_FLAGS="%CFLAGS%" -DCMAKE_CXX_FLAGS="%CXXFLAGS%" -DENABLE_CLI=ON -DENABLE_GTK=OFF -DENABLE_QT=OFF -DENABLE_MAC=OFF -DENABLE_TESTS=OFF -DINSTALL_DOC=OFF
-jom
-nmake install/fast
-```
-
-You should now have Transmission and the DLL files required to run it in %TPDIR%\bin.
-
-You can replace the files in your installed version of Transmission with the ones from bin. Don't forget to do the same with %TPDIR%\share\transmission\web.
-For Windows XP and above there are several choices:
-
-### Cygwin environment ###
-With Cygwin https://cygwin.com/ installed, the CLI tools (transmission-remote, transmission-cli, etc.) and the daemon can be built easily.
-
-No patches needed(\*), all the recent versions of Transmission build almost out-of-the-box (you need to install the prerequisites), and the CLI tools work better under Cygwin than those built with MinGW.
-
-(\*) At the release time of version 2.0, **libevent** is not bundled and it is also not in the Cygwin distribution (but was added later)... so you need to build it (which is as easy as ./configure, make install). To build Transmission you may need to add LDFLAGS="-L/usr/local/lib" to the configure script (LIBEVENT_LIBS does not seem to work when it comes to build all the test programs).  Additionally **libutp** needs deleting -ansi on the Makefile.
-
-With version 2.51 miniupnpc fails to build, see https://miniupnp.tuxfamily.org/forum/viewtopic.php?t#1130.
-
-Version 2.80 breaks building on Cygwin, adding this https://github.com/adaptivecomputing/torque/blob/master/src/resmom/cygwin/quota.h file to Cygwin's /usr/include/sys solves the problem.  This is no longer needed after version 2.82 (Cygwin added the header).
-
-Version 2.81 with the above workaround needs a one line patch, see ticket #5692.
-
-Version 2.82, same as 2.81.
-
-Version 2.83, no need to add quota.h, Cygwin added it.
+Then build project from Visual Studio.
 
 ### Native Windows ###
 With a MinGW https://mingw.org/ development environment, the GTK and the Qt GUI applications can be built.  The CLI tools can also be built and in general work fine, but may fail if you use foreign characters as parameters (MinGW uses latin1 for parameters).
