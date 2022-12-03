@@ -124,7 +124,7 @@ $ sudo make install
 ## Building transmission-daemon
 You need the following installed:
 
-* Visual Studio 2019 or greater(the Community Edition is sufficient - just make sure its C++ compiler, MSVC, is installed)
+* Visual Studio 2019 or greater (the Community Edition is sufficient - just make sure its C++ compiler, MSVC, is installed)
 * [ActivePerl](https://www.activestate.com/products/activeperl/) or [StrawberryPerl](https://strawberryperl.com)
 * [CMake](https://cmake.org/download/) (choose to add CMake to your path)
 * Possibly [Git for Windows](https://git-scm.com/download/win)
