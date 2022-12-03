@@ -74,21 +74,33 @@ public:
 
     TR_DISABLE_COPY_MOVE(PageBase)
 
-    void init_check_button(Gtk::CheckButton& button, tr_quark key);
+    Gtk::CheckButton* init_check_button(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark key);
+    Gtk::SpinButton* init_spin_button(
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::ustring const& name,
+        tr_quark key,
+        int low,
+        int high,
+        int step);
+    Gtk::SpinButton* init_spin_button_double(
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::ustring const& name,
+        tr_quark key,
+        double low,
+        double high,
+        double step);
+    Gtk::Entry* init_entry(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark key);
+    Gtk::TextView* init_text_view(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark key);
+    PathButton* init_chooser_button(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark key);
+    Gtk::ComboBox* init_encryption_combo(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark key);
+    Gtk::ComboBox* init_time_combo(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark key);
+    Gtk::ComboBox* init_week_combo(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark key);
 
-    void init_spin_button(Gtk::SpinButton& button, tr_quark key, int low, int high, int step);
-    void init_spin_button_double(Gtk::SpinButton& button, tr_quark key, double low, double high, double step);
-
-    void init_entry(Gtk::Entry& entry, tr_quark key);
-
-    void init_text_view(Gtk::TextView& view, tr_quark key);
-
-    void init_chooser_button(PathButton& button, tr_quark key);
-
-    void init_encryption_combo(Gtk::ComboBox& combo, tr_quark key);
-
-    void init_time_combo(Gtk::ComboBox& combo, tr_quark key);
-    void init_week_combo(Gtk::ComboBox& combo, tr_quark key);
+    template<typename T, typename... ArgTs>
+    static void localize_label(T& widget, ArgTs&&... args)
+    {
+        widget.set_label(fmt::format(widget.get_label().raw(), std::forward<ArgTs>(args)...));
+    }
 
 private:
     bool spun_cb_idle(Gtk::SpinButton& spin, tr_quark key, bool isDouble);
@@ -122,10 +134,15 @@ PageBase::~PageBase()
     }
 }
 
-void PageBase::init_check_button(Gtk::CheckButton& button, tr_quark const key)
+Gtk::CheckButton* PageBase::init_check_button(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key)
 {
-    button.set_active(gtr_pref_flag_get(key));
-    button.signal_toggled().connect([this, &button, key]() { core_->set_pref(key, button.get_active()); });
+    auto* button = gtr_get_widget<Gtk::CheckButton>(builder, name);
+    button->set_active(gtr_pref_flag_get(key));
+    button->signal_toggled().connect([this, button, key]() { core_->set_pref(key, button->get_active()); });
+    return button;
 }
 
 bool PageBase::spun_cb_idle(Gtk::SpinButton& spin, tr_quark const key, bool isDouble)
@@ -170,18 +187,34 @@ void PageBase::spun_cb(Gtk::SpinButton& w, tr_quark const key, bool isDouble)
     last_change_it->second.first->start();
 }
 
-void PageBase::init_spin_button(Gtk::SpinButton& button, tr_quark const key, int low, int high, int step)
+Gtk::SpinButton* PageBase::init_spin_button(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key,
+    int low,
+    int high,
+    int step)
 {
-    button.set_adjustment(Gtk::Adjustment::create(gtr_pref_int_get(key), low, high, step));
-    button.set_digits(0);
-    button.signal_value_changed().connect([this, &button, key]() { spun_cb(button, key, false); });
+    auto* button = gtr_get_widget<Gtk::SpinButton>(builder, name);
+    button->set_adjustment(Gtk::Adjustment::create(gtr_pref_int_get(key), low, high, step));
+    button->set_digits(0);
+    button->signal_value_changed().connect([this, button, key]() { spun_cb(*button, key, false); });
+    return button;
 }
 
-void PageBase::init_spin_button_double(Gtk::SpinButton& button, tr_quark const key, double low, double high, double step)
+Gtk::SpinButton* PageBase::init_spin_button_double(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key,
+    double low,
+    double high,
+    double step)
 {
-    button.set_adjustment(Gtk::Adjustment::create(gtr_pref_double_get(key), low, high, step));
-    button.set_digits(2);
-    button.signal_value_changed().connect([this, &button, key]() { spun_cb(button, key, true); });
+    auto* button = gtr_get_widget<Gtk::SpinButton>(builder, name);
+    button->set_adjustment(Gtk::Adjustment::create(gtr_pref_double_get(key), low, high, step));
+    button->set_digits(2);
+    button->signal_value_changed().connect([this, button, key]() { spun_cb(*button, key, true); });
+    return button;
 }
 
 void PageBase::entry_changed_cb(Gtk::Entry& w, tr_quark const key)
@@ -189,19 +222,27 @@ void PageBase::entry_changed_cb(Gtk::Entry& w, tr_quark const key)
     core_->set_pref(key, w.get_text());
 }
 
-void PageBase::init_entry(Gtk::Entry& entry, tr_quark const key)
+Gtk::Entry* PageBase::init_entry(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, tr_quark const key)
 {
+    auto* const entry = gtr_get_widget<Gtk::Entry>(builder, name);
+
     if (auto const value = gtr_pref_string_get(key); !value.empty())
     {
-        entry.set_text(value);
+        entry->set_text(value);
     }
 
-    entry.signal_changed().connect([this, &entry, key]() { entry_changed_cb(entry, key); });
+    entry->signal_changed().connect([this, entry, key]() { entry_changed_cb(*entry, key); });
+    return entry;
 }
 
-void PageBase::init_text_view(Gtk::TextView& view, tr_quark const key)
+Gtk::TextView* PageBase::init_text_view(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key)
 {
-    auto buffer = view.get_buffer();
+    auto* const view = gtr_get_widget<Gtk::TextView>(builder, name);
+
+    auto buffer = view->get_buffer();
     buffer->set_text(gtr_pref_string_get(key));
 
     auto const save_buffer = [this, buffer, key]()
@@ -212,11 +253,13 @@ void PageBase::init_text_view(Gtk::TextView& view, tr_quark const key)
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     auto focus_controller = Gtk::EventControllerFocus::create();
     focus_controller->signal_leave().connect(save_buffer);
-    view.add_controller(focus_controller);
+    view->add_controller(focus_controller);
 #else
-    view.add_events(Gdk::FOCUS_CHANGE_MASK);
-    view.signal_focus_out_event().connect_notify(sigc::hide<0>(save_buffer));
+    view->add_events(Gdk::FOCUS_CHANGE_MASK);
+    view->signal_focus_out_event().connect_notify(sigc::hide<0>(save_buffer));
 #endif
+
+    return view;
 }
 
 void PageBase::chosen_cb(PathButton& w, tr_quark const key)
@@ -224,14 +267,20 @@ void PageBase::chosen_cb(PathButton& w, tr_quark const key)
     core_->set_pref(key, w.get_filename());
 }
 
-void PageBase::init_chooser_button(PathButton& button, tr_quark const key)
+PathButton* PageBase::init_chooser_button(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key)
 {
+    auto* const button = gtr_get_widget_derived<PathButton>(builder, name);
+
     if (auto const path = gtr_pref_string_get(key); !path.empty())
     {
-        button.set_filename(path);
+        button->set_filename(path);
     }
 
-    button.signal_selection_changed().connect([this, &button, key]() { chosen_cb(button, key); });
+    button->signal_selection_changed().connect([this, button, key]() { chosen_cb(*button, key); });
+    return button;
 }
 
 void PageBase::onIntComboChanged(Gtk::ComboBox& combo_box, tr_quark const key)
@@ -239,20 +288,28 @@ void PageBase::onIntComboChanged(Gtk::ComboBox& combo_box, tr_quark const key)
     core_->set_pref(key, gtr_combo_box_get_active_enum(combo_box));
 }
 
-void PageBase::init_encryption_combo(Gtk::ComboBox& combo, tr_quark const key)
+Gtk::ComboBox* PageBase::init_encryption_combo(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key)
 {
+    auto* const combo = gtr_get_widget<Gtk::ComboBox>(builder, name);
     gtr_combo_box_set_enum(
-        combo,
+        *combo,
         {
             { _("Allow encryption"), TR_CLEAR_PREFERRED },
             { _("Prefer encryption"), TR_ENCRYPTION_PREFERRED },
             { _("Require encryption"), TR_ENCRYPTION_REQUIRED },
         });
-    gtr_combo_box_set_active_enum(combo, gtr_pref_int_get(key));
-    combo.signal_changed().connect([this, &combo, key]() { onIntComboChanged(combo, key); });
+    gtr_combo_box_set_active_enum(*combo, gtr_pref_int_get(key));
+    combo->signal_changed().connect([this, combo, key]() { onIntComboChanged(*combo, key); });
+    return combo;
 }
 
-void PageBase::init_time_combo(Gtk::ComboBox& combo, tr_quark const key)
+Gtk::ComboBox* PageBase::init_time_combo(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key)
 {
     class TimeModelColumns : public Gtk::TreeModelColumnRecord
     {
@@ -280,19 +337,21 @@ void PageBase::init_time_combo(Gtk::ComboBox& combo, tr_quark const key)
     }
 
     /* build the widget */
-    combo.set_model(store);
+    auto* const combo = gtr_get_widget<Gtk::ComboBox>(builder, name);
+    combo->set_model(store);
     auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-    combo.pack_start(*r, true);
-    combo.add_attribute(r->property_text(), time_cols.title);
-    combo.set_active(gtr_pref_int_get(key) / 15);
-    combo.signal_changed().connect(
-        [this, &combo, key]()
+    combo->pack_start(*r, true);
+    combo->add_attribute(r->property_text(), time_cols.title);
+    combo->set_active(gtr_pref_int_get(key) / 15);
+    combo->signal_changed().connect(
+        [this, combo, key]()
         {
-            if (auto const iter = combo.get_active(); iter)
+            if (auto const iter = combo->get_active(); iter)
             {
                 core_->set_pref(key, iter->get_value(time_cols.offset));
             }
         });
+    return combo;
 }
 
 auto PageBase::get_weekday_string(Glib::Date::Weekday weekday)
@@ -303,10 +362,14 @@ auto PageBase::get_weekday_string(Glib::Date::Weekday weekday)
     return date.format_string("%A");
 }
 
-void PageBase::init_week_combo(Gtk::ComboBox& combo, tr_quark const key)
+Gtk::ComboBox* PageBase::init_week_combo(
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Glib::ustring const& name,
+    tr_quark const key)
 {
+    auto* const combo = gtr_get_widget<Gtk::ComboBox>(builder, name);
     gtr_combo_box_set_enum(
-        combo,
+        *combo,
         {
             { _("Every Day"), TR_SCHED_ALL },
             { _("Weekdays"), TR_SCHED_WEEKDAY },
@@ -319,8 +382,9 @@ void PageBase::init_week_combo(Gtk::ComboBox& combo, tr_quark const key)
             { get_weekday_string(Glib::Date::Weekday::SATURDAY), TR_SCHED_SAT },
             { get_weekday_string(Glib::Date::Weekday::SUNDAY), TR_SCHED_SUN },
         });
-    gtr_combo_box_set_active_enum(combo, gtr_pref_int_get(key));
-    combo.signal_changed().connect([this, &combo, key]() { onIntComboChanged(combo, key); });
+    gtr_combo_box_set_active_enum(*combo, gtr_pref_int_get(key));
+    combo->signal_changed().connect([this, combo, key]() { onIntComboChanged(*combo, key); });
+    return combo;
 }
 
 /****
@@ -373,52 +437,19 @@ DownloadingPage::DownloadingPage(
 {
     core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &DownloadingPage::on_core_prefs_changed));
 
-    {
-        auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "watch_dir_check");
-        init_check_button(*l, TR_KEY_watch_dir_enabled);
-        auto* w = gtr_get_widget_derived<PathButton>(builder, "watch_dir_chooser");
-        init_chooser_button(*w, TR_KEY_watch_dir);
-    }
-
-    init_check_button(*gtr_get_widget<Gtk::CheckButton>(builder, "show_options_dialog_check"), TR_KEY_show_options_window);
-
-    init_check_button(*gtr_get_widget<Gtk::CheckButton>(builder, "start_on_add_check"), TR_KEY_start_added_torrents);
-
-    init_check_button(*gtr_get_widget<Gtk::CheckButton>(builder, "trash_on_add_check"), TR_KEY_trash_original_torrent_files);
-
-    init_chooser_button(*gtr_get_widget_derived<PathButton>(builder, "download_dir_chooser"), TR_KEY_download_dir);
-
-    init_spin_button(
-        *gtr_get_widget<Gtk::SpinButton>(builder, "max_active_downloads_spin"),
-        TR_KEY_download_queue_size,
-        0,
-        std::numeric_limits<int>::max(),
-        1);
-
-    init_spin_button(
-        *gtr_get_widget<Gtk::SpinButton>(builder, "max_inactive_time_spin"),
-        TR_KEY_queue_stalled_minutes,
-        1,
-        std::numeric_limits<int>::max(),
-        15);
-
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "append_suffix_to_incomplete_check"),
-        TR_KEY_rename_partial_files);
-
-    {
-        auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "incomplete_dir_check");
-        init_check_button(*l, TR_KEY_incomplete_dir_enabled);
-        auto* w = gtr_get_widget_derived<PathButton>(builder, "incomplete_dir_chooser");
-        init_chooser_button(*w, TR_KEY_incomplete_dir);
-    }
-
-    {
-        auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "download_done_script_check");
-        init_check_button(*l, TR_KEY_script_torrent_done_enabled);
-        auto* w = gtr_get_widget_derived<PathButton>(builder, "download_done_script_chooser");
-        init_chooser_button(*w, TR_KEY_script_torrent_done_filename);
-    }
+    init_check_button(builder, "watch_dir_check", TR_KEY_watch_dir_enabled);
+    init_chooser_button(builder, "watch_dir_chooser", TR_KEY_watch_dir);
+    init_check_button(builder, "show_options_dialog_check", TR_KEY_show_options_window);
+    init_check_button(builder, "start_on_add_check", TR_KEY_start_added_torrents);
+    init_check_button(builder, "trash_on_add_check", TR_KEY_trash_original_torrent_files);
+    init_chooser_button(builder, "download_dir_chooser", TR_KEY_download_dir);
+    init_spin_button(builder, "max_active_downloads_spin", TR_KEY_download_queue_size, 0, std::numeric_limits<int>::max(), 1);
+    init_spin_button(builder, "max_inactive_time_spin", TR_KEY_queue_stalled_minutes, 1, std::numeric_limits<int>::max(), 15);
+    init_check_button(builder, "append_suffix_to_incomplete_check", TR_KEY_rename_partial_files);
+    init_check_button(builder, "incomplete_dir_check", TR_KEY_incomplete_dir_enabled);
+    init_chooser_button(builder, "incomplete_dir_chooser", TR_KEY_incomplete_dir);
+    init_check_button(builder, "download_done_script_check", TR_KEY_script_torrent_done_enabled);
+    init_chooser_button(builder, "download_done_script_chooser", TR_KEY_script_torrent_done_filename);
 
     on_core_prefs_changed(TR_KEY_download_dir);
 }
@@ -442,26 +473,12 @@ SeedingPage::SeedingPage(
     Glib::RefPtr<Session> const& core)
     : PageBase(cast_item, core)
 {
-    {
-        auto* w = gtr_get_widget<Gtk::CheckButton>(builder, "stop_seeding_ratio_check");
-        init_check_button(*w, TR_KEY_ratio_limit_enabled);
-        auto* w2 = gtr_get_widget<Gtk::SpinButton>(builder, "stop_seeding_ratio_spin");
-        init_spin_button_double(*w2, TR_KEY_ratio_limit, 0, 1000, .05);
-    }
-
-    {
-        auto* w = gtr_get_widget<Gtk::CheckButton>(builder, "stop_seeding_timeout_check");
-        init_check_button(*w, TR_KEY_idle_seeding_limit_enabled);
-        auto* w2 = gtr_get_widget<Gtk::SpinButton>(builder, "stop_seeding_timeout_spin");
-        init_spin_button(*w2, TR_KEY_idle_seeding_limit, 1, 40320, 5);
-    }
-
-    {
-        auto* l = gtr_get_widget<Gtk::CheckButton>(builder, "seeding_done_script_check");
-        init_check_button(*l, TR_KEY_script_torrent_done_seeding_enabled);
-        auto* w = gtr_get_widget_derived<PathButton>(builder, "seeding_done_script_chooser");
-        init_chooser_button(*w, TR_KEY_script_torrent_done_seeding_filename);
-    }
+    init_check_button(builder, "stop_seeding_ratio_check", TR_KEY_ratio_limit_enabled);
+    init_spin_button_double(builder, "stop_seeding_ratio_spin", TR_KEY_ratio_limit, 0, 1000, 0.05);
+    init_check_button(builder, "stop_seeding_timeout_check", TR_KEY_idle_seeding_limit_enabled);
+    init_spin_button(builder, "stop_seeding_timeout_spin", TR_KEY_idle_seeding_limit, 1, 40320, 5);
+    init_check_button(builder, "seeding_done_script_check", TR_KEY_script_torrent_done_seeding_enabled);
+    init_chooser_button(builder, "seeding_done_script_chooser", TR_KEY_script_torrent_done_seeding_filename);
 }
 
 /****
@@ -483,31 +500,20 @@ DesktopPage::DesktopPage(
     Glib::RefPtr<Session> const& core)
     : PageBase(cast_item, core)
 {
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "inhibit_hibernation_check"),
-        TR_KEY_inhibit_desktop_hibernation);
+    init_check_button(builder, "inhibit_hibernation_check", TR_KEY_inhibit_desktop_hibernation);
 
-    if (auto* const show_systray_icon_check = gtr_get_widget<Gtk::CheckButton>(builder, "show_systray_icon_check");
-        SystemTrayIcon::is_available())
+    if (SystemTrayIcon::is_available())
     {
-        init_check_button(*show_systray_icon_check, TR_KEY_show_notification_area_icon);
+        init_check_button(builder, "show_systray_icon_check", TR_KEY_show_notification_area_icon);
     }
     else
     {
-        show_systray_icon_check->hide();
+        gtr_get_widget<Gtk::CheckButton>(builder, "show_systray_icon_check")->hide();
     }
 
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "notify_on_torrent_add_check"),
-        TR_KEY_torrent_added_notification_enabled);
-
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "notify_on_torrent_finish_check"),
-        TR_KEY_torrent_complete_notification_enabled);
-
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "ding_no_torrent_finish_check"),
-        TR_KEY_torrent_complete_sound_enabled);
+    init_check_button(builder, "notify_on_torrent_add_check", TR_KEY_torrent_added_notification_enabled);
+    init_check_button(builder, "notify_on_torrent_finish_check", TR_KEY_torrent_complete_notification_enabled);
+    init_check_button(builder, "ding_no_torrent_finish_check", TR_KEY_torrent_complete_sound_enabled);
 }
 
 /****
@@ -613,23 +619,21 @@ PrivacyPage::PrivacyPage(
     , core_(core)
     , updateBlocklistButton_(gtr_get_widget<Gtk::Button>(builder, "update_blocklist_button"))
     , label_(gtr_get_widget<Gtk::Label>(builder, "blocklist_stats_label"))
-    , check_(gtr_get_widget<Gtk::CheckButton>(builder, "blocklist_check"))
+    , check_(init_check_button(builder, "blocklist_check", TR_KEY_blocklist_enabled))
 {
-    init_encryption_combo(*gtr_get_widget<Gtk::ComboBox>(builder, "encryption_mode_combo"), TR_KEY_encryption);
+    init_encryption_combo(builder, "encryption_mode_combo", TR_KEY_encryption);
 
-    init_check_button(*check_, TR_KEY_blocklist_enabled);
-    auto* const e = gtr_get_widget<Gtk::Entry>(builder, "blocklist_url_entry");
-    init_entry(*e, TR_KEY_blocklist_url);
+    auto* const blocklist_url_entry = init_entry(builder, "blocklist_url_entry", TR_KEY_blocklist_url);
 
     updateBlocklistText();
     updateBlocklistButton_->set_data("session", core_->get_session());
     updateBlocklistButton_->signal_clicked().connect([this]() { onBlocklistUpdate(); });
     updateBlocklistButton_->set_sensitive(check_->get_active());
-    e->signal_changed().connect([this, e]() { on_blocklist_url_changed(e); });
-    on_blocklist_url_changed(e);
+    blocklist_url_entry->signal_changed().connect([this, blocklist_url_entry]()
+                                                  { on_blocklist_url_changed(blocklist_url_entry); });
+    on_blocklist_url_changed(blocklist_url_entry);
 
-    auto* update_check = gtr_get_widget<Gtk::CheckButton>(builder, "blocklist_autoupdate_check");
-    init_check_button(*update_check, TR_KEY_blocklist_updates_enabled);
+    init_check_button(builder, "blocklist_autoupdate_check", TR_KEY_blocklist_updates_enabled);
 }
 
 /****
@@ -787,41 +791,28 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
     , core_(core)
     , view_(gtr_get_widget<Gtk::TreeView>(builder, "rpc_whitelist_view"))
     , remove_button_(gtr_get_widget<Gtk::Button>(builder, "remove_from_rpc_whistlist_button"))
-    , rpc_tb_(gtr_get_widget<Gtk::CheckButton>(builder, "enable_rpc_check"))
-    , auth_tb_(gtr_get_widget<Gtk::CheckButton>(builder, "enable_rpc_auth_check"))
-    , whitelist_tb_(gtr_get_widget<Gtk::CheckButton>(builder, "rpc_whitelist_check"))
+    , rpc_tb_(init_check_button(builder, "enable_rpc_check", TR_KEY_rpc_enabled))
+    , auth_tb_(init_check_button(builder, "enable_rpc_auth_check", TR_KEY_rpc_authentication_required))
+    , whitelist_tb_(init_check_button(builder, "rpc_whitelist_check", TR_KEY_rpc_whitelist_enabled))
 {
-    /* "enabled" checkbutton */
-    init_check_button(*rpc_tb_, TR_KEY_rpc_enabled);
     rpc_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
     auto* const open_button = gtr_get_widget<Gtk::Button>(builder, "open_web_client_button");
     open_button->signal_clicked().connect(&RemotePage::onLaunchClutchCB);
 
-    /* port */
-    auto* port_spin = gtr_get_widget<Gtk::SpinButton>(builder, "rpc_port_spin");
-    init_spin_button(*port_spin, TR_KEY_rpc_port, 0, std::numeric_limits<uint16_t>::max(), 1);
+    init_spin_button(builder, "rpc_port_spin", TR_KEY_rpc_port, 0, std::numeric_limits<uint16_t>::max(), 1);
 
-    /* require authentication */
-    init_check_button(*auth_tb_, TR_KEY_rpc_authentication_required);
     auth_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
-    /* username */
-    auto* username_entry = gtr_get_widget<Gtk::Entry>(builder, "rpc_username_entry");
-    init_entry(*username_entry, TR_KEY_rpc_username);
+    auto* const username_entry = init_entry(builder, "rpc_username_entry", TR_KEY_rpc_username);
     auth_widgets_.push_back(username_entry);
     auth_widgets_.push_back(gtr_get_widget<Gtk::Label>(builder, "rpc_username_label"));
 
-    /* password */
-    auto* password_entry = gtr_get_widget<Gtk::Entry>(builder, "rpc_password_entry");
-    init_entry(*password_entry, TR_KEY_rpc_password);
+    auto* const password_entry = init_entry(builder, "rpc_password_entry", TR_KEY_rpc_password);
     auth_widgets_.push_back(password_entry);
     auth_widgets_.push_back(gtr_get_widget<Gtk::Label>(builder, "rpc_password_label"));
 
-    /* require authentication */
-    init_check_button(*whitelist_tb_, TR_KEY_rpc_whitelist_enabled);
     whitelist_tb_->signal_toggled().connect([this]() { refreshRPCSensitivity(); });
 
-    /* access control list */
     {
         store_ = whitelist_tree_model_new(gtr_pref_string_get(TR_KEY_rpc_whitelist));
 
@@ -835,7 +826,6 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
         auto const sel = view_->get_selection();
         sel->signal_changed().connect([this]() { refreshRPCSensitivity(); });
 
-        /* ip address column */
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
         r->signal_edited().connect(sigc::mem_fun(*this, &RemotePage::onAddressEdited));
         r->property_editable() = true;
@@ -872,53 +862,26 @@ public:
 SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : PageBase(cast_item, core)
 {
-    {
-        auto* const w = gtr_get_widget<Gtk::CheckButton>(builder, "upload_limit_check");
-        init_check_button(*w, TR_KEY_speed_limit_up_enabled);
-        w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
+    localize_label(
+        *init_check_button(builder, "upload_limit_check", TR_KEY_speed_limit_up_enabled),
+        fmt::arg("speed_units", speed_K_str));
+    init_spin_button(builder, "upload_limit_spin", TR_KEY_speed_limit_up, 0, std::numeric_limits<int>::max(), 5);
 
-        auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "upload_limit_spin");
-        init_spin_button(*w2, TR_KEY_speed_limit_up, 0, std::numeric_limits<int>::max(), 5);
-    }
+    localize_label(
+        *init_check_button(builder, "download_limit_check", TR_KEY_speed_limit_down_enabled),
+        fmt::arg("speed_units", speed_K_str));
+    init_spin_button(builder, "download_limit_spin", TR_KEY_speed_limit_down, 0, std::numeric_limits<int>::max(), 5);
 
-    {
-        auto* const w = gtr_get_widget<Gtk::CheckButton>(builder, "download_limit_check");
-        init_check_button(*w, TR_KEY_speed_limit_down_enabled);
-        w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
+    localize_label(*gtr_get_widget<Gtk::Label>(builder, "alt_upload_limit_label"), fmt::arg("speed_units", speed_K_str));
+    init_spin_button(builder, "alt_upload_limit_spin", TR_KEY_alt_speed_up, 0, std::numeric_limits<int>::max(), 5);
 
-        auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "download_limit_spin");
-        init_spin_button(*w2, TR_KEY_speed_limit_down, 0, std::numeric_limits<int>::max(), 5);
-    }
+    localize_label(*gtr_get_widget<Gtk::Label>(builder, "alt_download_limit_label"), fmt::arg("speed_units", speed_K_str));
+    init_spin_button(builder, "alt_download_limit_spin", TR_KEY_alt_speed_down, 0, std::numeric_limits<int>::max(), 5);
 
-    {
-        auto* const w = gtr_get_widget<Gtk::Label>(builder, "alt_upload_limit_label");
-        w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
-
-        auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "alt_upload_limit_spin");
-        init_spin_button(*w2, TR_KEY_alt_speed_up, 0, std::numeric_limits<int>::max(), 5);
-    }
-
-    {
-        auto* const w = gtr_get_widget<Gtk::Label>(builder, "alt_download_limit_label");
-        w->set_label(fmt::format(w->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
-
-        auto* const w2 = gtr_get_widget<Gtk::SpinButton>(builder, "alt_download_limit_spin");
-        init_spin_button(*w2, TR_KEY_alt_speed_down, 0, std::numeric_limits<int>::max(), 5);
-    }
-
-    {
-        auto* start_combo = gtr_get_widget<Gtk::ComboBox>(builder, "alt_speed_start_time_combo");
-        init_time_combo(*start_combo, TR_KEY_alt_speed_time_begin);
-
-        auto* end_combo = gtr_get_widget<Gtk::ComboBox>(builder, "alt_speed_end_time_combo");
-        init_time_combo(*end_combo, TR_KEY_alt_speed_time_end);
-
-        auto* w = gtr_get_widget<Gtk::CheckButton>(builder, "alt_schedule_time_check");
-        init_check_button(*w, TR_KEY_alt_speed_time_enabled);
-    }
-
-    auto* week_combo = gtr_get_widget<Gtk::ComboBox>(builder, "alt_speed_days_combo");
-    init_week_combo(*week_combo, TR_KEY_alt_speed_time_day);
+    init_time_combo(builder, "alt_speed_start_time_combo", TR_KEY_alt_speed_time_begin);
+    init_time_combo(builder, "alt_speed_end_time_combo", TR_KEY_alt_speed_time_end);
+    init_check_button(builder, "alt_schedule_time_check", TR_KEY_alt_speed_time_enabled);
+    init_week_combo(builder, "alt_speed_days_combo", TR_KEY_alt_speed_time_day);
 }
 
 /****
@@ -1004,47 +967,27 @@ NetworkPage::NetworkPage(
     , core_(core)
     , portLabel_(gtr_get_widget<Gtk::Label>(builder, "listening_port_status_label"))
     , portButton_(gtr_get_widget<Gtk::Button>(builder, "test_listening_port_button"))
-    , portSpin_(gtr_get_widget<Gtk::SpinButton>(builder, "listening_port_spin"))
+    , portSpin_(init_spin_button(builder, "listening_port_spin", TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1))
 {
-    init_spin_button(*portSpin_, TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1);
-
     portButton_->signal_clicked().connect([this]() { onPortTest(); });
 
     prefsTag_ = core_->signal_prefs_changed().connect([this](auto key) { onCorePrefsChanged(key); });
 
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "pick_random_listening_port_at_start_check"),
-        TR_KEY_peer_port_random_on_start);
-    init_check_button(
-        *gtr_get_widget<Gtk::CheckButton>(builder, "enable_listening_port_forwarding_check"),
-        TR_KEY_port_forwarding_enabled);
-
-    init_spin_button(
-        *gtr_get_widget<Gtk::SpinButton>(builder, "max_torrent_peers_spin"),
-        TR_KEY_peer_limit_per_torrent,
-        1,
-        INT_MAX,
-        5);
-    init_spin_button(
-        *gtr_get_widget<Gtk::SpinButton>(builder, "max_total_peers_spin"),
-        TR_KEY_peer_limit_global,
-        1,
-        INT_MAX,
-        5);
+    init_check_button(builder, "pick_random_listening_port_at_start_check", TR_KEY_peer_port_random_on_start);
+    init_check_button(builder, "enable_listening_port_forwarding_check", TR_KEY_port_forwarding_enabled);
+    init_spin_button(builder, "max_torrent_peers_spin", TR_KEY_peer_limit_per_torrent, 1, INT_MAX, 5);
+    init_spin_button(builder, "max_total_peers_spin", TR_KEY_peer_limit_global, 1, INT_MAX, 5);
 
 #ifdef WITH_UTP
-    init_check_button(*gtr_get_widget<Gtk::CheckButton>(builder, "enable_utp_check"), TR_KEY_utp_enabled);
+    init_check_button(builder, "enable_utp_check", TR_KEY_utp_enabled);
 #else
     gtr_get_widget<Gtk::CheckButton>(builder, "enable_utp_check")->hide();
 #endif
 
-    init_check_button(*gtr_get_widget<Gtk::CheckButton>(builder, "enable_pex_check"), TR_KEY_pex_enabled);
-
-    init_check_button(*gtr_get_widget<Gtk::CheckButton>(builder, "enable_dht_check"), TR_KEY_dht_enabled);
-
-    init_check_button(*gtr_get_widget<Gtk::CheckButton>(builder, "enable_lpd_check"), TR_KEY_lpd_enabled);
-
-    init_text_view(*gtr_get_widget<Gtk::TextView>(builder, "default_trackers_view"), TR_KEY_default_trackers);
+    init_check_button(builder, "enable_pex_check", TR_KEY_pex_enabled);
+    init_check_button(builder, "enable_dht_check", TR_KEY_dht_enabled);
+    init_check_button(builder, "enable_lpd_check", TR_KEY_lpd_enabled);
+    init_text_view(builder, "default_trackers_view", TR_KEY_default_trackers);
 }
 
 } // namespace
