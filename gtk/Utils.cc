@@ -434,6 +434,38 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
     return result;
 }
 
+namespace
+{
+
+void object_signal_notify_callback(GObject* object, GParamSpec* /*param_spec*/, gpointer data)
+{
+    if (object != nullptr && data != nullptr)
+    {
+        if (auto const* const slot = Glib::SignalProxyBase::data_to_slot(data); slot != nullptr)
+        {
+            (*static_cast<sigc::slot<TrObjectSignalNotifyCallback> const*>(slot))(Glib::wrap(object, true));
+        }
+    }
+}
+
+} // namespace
+
+Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::ObjectBase& object)
+{
+    static auto const object_signal_notify_info = Glib::SignalProxyInfo{
+        .signal_name = "notify",
+        .callback = reinterpret_cast<GCallback>(&object_signal_notify_callback),
+        .notify_callback = reinterpret_cast<GCallback>(&object_signal_notify_callback),
+    };
+
+    return { &object, &object_signal_notify_info };
+}
+
+void gtr_object_notify_emit(Glib::ObjectBase& object)
+{
+    g_signal_emit_by_name(object.gobj(), "notify", nullptr);
+}
+
 Glib::ustring gtr_get_help_uri()
 {
     static auto const uri = fmt::format("https://transmissionbt.com/help/gtk/{}.{}x", MAJOR_VERSION, MINOR_VERSION / 10);
