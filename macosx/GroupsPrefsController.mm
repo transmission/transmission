@@ -93,7 +93,8 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
 - (BOOL)tableView:(NSTableView*)tableView writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard
 {
     [pboard declareTypes:@[ kGroupTableViewDataType ] owner:self];
-    [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes] forType:kGroupTableViewDataType];
+    [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes requiringSecureCoding:YES error:nil]
+            forType:kGroupTableViewDataType];
     return YES;
 }
 
