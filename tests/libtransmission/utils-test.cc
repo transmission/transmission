@@ -22,7 +22,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // tr_rand_int_weak()
+#include "crypto-utils.h" // tr_rand_int()
 #include "platform.h"
 #include "tr-strbuf.h"
 #include "utils.h"

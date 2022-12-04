@@ -12,7 +12,7 @@
 #include "transmission.h"
 
 #include "bandwidth.h"
-#include "crypto-utils.h" // tr_rand_int_weak()
+#include "crypto-utils.h" // tr_rand_int()
 #include "log.h"
 #include "peer-io.h"
 #include "tr-assert.h"
@@ -175,7 +175,7 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction di
     auto n = peer_array.size();
     while (n > 0)
     {
-        auto const i = tr_rand_int_weak(n); /* pick a peer at random */
+        auto const i = tr_rand_int(n); /* pick a peer at random */
 
         // value of 3000 bytes chosen so that when using µTP we'll send a full-size
         // frame right away and leave enough buffered data for the next frame to go

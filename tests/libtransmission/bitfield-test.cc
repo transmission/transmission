@@ -20,21 +20,21 @@ TEST(Bitfield, count)
 
     for (auto i = 0; i < IterCount; ++i)
     {
-        int const bit_count = 100 + tr_rand_int_weak(1000);
+        int const bit_count = 100 + tr_rand_int(1000);
 
         // generate a random bitfield
         tr_bitfield bf(bit_count);
 
-        for (int j = 0, n = tr_rand_int_weak(bit_count); j < n; ++j)
+        for (int j = 0, n = tr_rand_int(bit_count); j < n; ++j)
         {
-            bf.set(tr_rand_int_weak(bit_count));
+            bf.set(tr_rand_int(bit_count));
         }
 
-        int begin = tr_rand_int_weak(bit_count);
+        int begin = tr_rand_int(bit_count);
         int end = 0;
         do
         {
-            end = tr_rand_int_weak(bit_count);
+            end = tr_rand_int(bit_count);
         } while (end == begin);
 
         // ensure end <= begin
