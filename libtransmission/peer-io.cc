@@ -649,22 +649,7 @@ void tr_peerIo::setEnabled(tr_direction dir, bool is_enabled)
 
 static void io_close_socket(tr_peerIo* io)
 {
-    if (io->socket.is_tcp())
-    {
-        tr_netClose(io->session, io->socket.handle.tcp);
-    }
-#ifdef WITH_UTP
-    else if (io->socket.is_utp())
-    {
-        utp_set_userdata(io->socket.handle.utp, nullptr);
-        utp_close(io->socket.handle.utp);
-    }
-#endif
-    else
-    {
-        tr_logAddDebugIo(io, "unsupported peer socket type");
-    }
-
+    io->socket.close(io->session);
     io->event_write.reset();
     io->event_read.reset();
     io->socket = {};

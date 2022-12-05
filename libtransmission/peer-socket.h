@@ -14,10 +14,8 @@
 #include "net.h"
 #include "tr-assert.h"
 
-extern "C"
-{
-    struct UTPSocket;
-}
+struct UTPSocket;
+struct tr_session;
 
 struct tr_peer_socket
 {
@@ -40,6 +38,8 @@ struct tr_peer_socket
         TR_ASSERT(sock != nullptr);
         handle.utp = sock;
     }
+
+    void close(tr_session* session);
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
     {
@@ -111,11 +111,5 @@ private:
     enum Type type_ = Type::None;
 };
 
-struct tr_session;
-struct tr_address;
-
 struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
-
 struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
-
-void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket);

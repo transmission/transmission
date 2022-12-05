@@ -41,6 +41,7 @@ set(PROJECT_FILES
   peer-mgr.cc
   peer-mse.cc
   peer-msgs.cc
+  peer-socket.cc
   platform-quota.cc
   platform.cc
   port-forwarding-natpmp.cc
