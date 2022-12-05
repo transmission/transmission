@@ -163,7 +163,7 @@ public:
             &session->top_bandwidth_,
             &DefaultPeerAddr,
             DefaultPeerPort,
-            tr_peer_socket{ sockpair[0] });
+            tr_peer_socket{ DefaultPeerAddr, DefaultPeerPort, sockpair[0] });
         return std::make_pair(io, sockpair[1]);
     }
 
@@ -179,7 +179,7 @@ public:
             &info_hash,
             false /*is_incoming*/,
             false /*is_seed*/,
-            tr_peer_socket{ sockpair[0] });
+            tr_peer_socket{ DefaultPeerAddr, DefaultPeerPort, sockpair[0] });
         return std::make_pair(io, sockpair[1]);
     }
 

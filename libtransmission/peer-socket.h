@@ -23,28 +23,62 @@ struct tr_peer_socket
 {
     tr_peer_socket() = default;
 
-    tr_peer_socket(tr_socket_t sock)
+    tr_peer_socket(tr_address const& address, tr_port port, tr_socket_t sock)
         : handle{ sock }
-        , type{ Type::TCP }
+        , address_{ address }
+        , port_{ port }
+        , type_{ Type::TCP }
     {
         TR_ASSERT(sock != TR_BAD_SOCKET);
     }
 
-    tr_peer_socket(struct UTPSocket* const sock)
-        : type{ Type::UTP }
+    tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock)
+        : address_{ address }
+        , port_{ port }
+        , type_{ Type::UTP }
     {
         TR_ASSERT(sock != nullptr);
         handle.utp = sock;
     }
 
+    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    {
+        return std::make_pair(address_, port_);
+    }
+
+    [[nodiscard]] constexpr auto const& address() const noexcept
+    {
+        return address_;
+    }
+
+    [[nodiscard]] constexpr auto const& port() const noexcept
+    {
+        return port_;
+    }
+
+    template<typename OutputIt> OutputIt readable(OutputIt out)
+    {
+        return address_.readable(out, port_);
+    }
+
+    [[nodiscard]] std::string_view readable(char* out, size_t outlen) const
+    {
+        return address_.readable(out, outlen, port_);
+    }
+
+    [[nodiscard]] std::string readable() const
+    {
+        return address_.readable(port_);
+    }
+
     [[nodiscard]] constexpr auto is_utp() const noexcept
     {
-        return type == Type::UTP;
+        return type_ == Type::UTP;
     }
 
     [[nodiscard]] constexpr auto is_tcp() const noexcept
     {
-        return type == Type::TCP;
+        return type_ == Type::TCP;
     }
 
     [[nodiscard]] constexpr auto is_valid() const noexcept
@@ -70,7 +104,10 @@ private:
         UTP
     };
 
-    enum Type type = Type::None;
+    tr_address address_;
+    tr_port port_;
+
+    enum Type type_ = Type::None;
 };
 
 struct tr_session;

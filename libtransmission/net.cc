@@ -328,7 +328,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     }
     else
     {
-        ret = tr_peer_socket{ s };
+        ret = tr_peer_socket{ *addr, port, s };
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr->readable(port)));
@@ -352,7 +352,7 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
         {
             if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
             {
-                ret = tr_peer_socket{ sock };
+                ret = tr_peer_socket{ *addr, port, sock };
             }
             else
             {
