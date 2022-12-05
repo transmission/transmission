@@ -9,6 +9,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string>
+#include <string_view>
+#include <utility> // for std::make_pair()
+
 #include "transmission.h"
 
 #include "net.h"
@@ -111,5 +115,5 @@ private:
     enum Type type_ = Type::None;
 };
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);

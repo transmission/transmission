@@ -2796,7 +2796,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     auto io = tr_peerIo::newOutgoing(
         mgr->session,
         &mgr->session->top_bandwidth_,
-        &atom.addr,
+        atom.addr,
         atom.port,
         s->tor->infoHash(),
         s->tor->completeness == TR_SEED,

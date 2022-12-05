@@ -23,4 +23,7 @@ void tr_peer_socket::close(tr_session* session)
         utp_close(handle.utp);
     }
 #endif
+
+    type_ = Type::None;
+    handle = {};
 }

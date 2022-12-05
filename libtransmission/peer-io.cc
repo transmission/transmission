@@ -528,14 +528,14 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(tr_session* session, tr_bandwi
 std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address const* addr,
+    tr_address const& addr,
     tr_port port,
     tr_sha1_digest_t const& torrent_hash,
     bool is_seed,
     bool utp)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(&addr));
     TR_ASSERT(utp || session->allowsTCP());
 
     auto socket = tr_peer_socket{};
@@ -692,8 +692,8 @@ int tr_peerIo::reconnect()
 
     io_close_socket(this);
 
-    auto const [addr, port] = this->socketAddress();
-    this->socket = tr_netOpenPeerSocket(session, &addr, port, this->isSeed());
+    auto const [addr, port] = socketAddress();
+    this->socket = tr_netOpenPeerSocket(session, addr, port, this->isSeed());
 
     if (!this->socket.is_tcp())
     {

@@ -67,7 +67,7 @@ public:
     static std::shared_ptr<tr_peerIo> newOutgoing(
         tr_session* session,
         tr_bandwidth* parent,
-        struct tr_address const* addr,
+        tr_address const& addr,
         tr_port port,
         tr_sha1_digest_t const& torrent_hash,
         bool is_seed,
