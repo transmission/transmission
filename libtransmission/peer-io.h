@@ -97,17 +97,20 @@ public:
 
     void setEnabled(tr_direction dir, bool is_enabled);
 
-    [[nodiscard]] constexpr tr_address const& address() const noexcept
+    [[nodiscard]] constexpr auto const& address() const noexcept
     {
-        return addr_;
+        return socket.address();
     }
 
-    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    [[nodiscard]] constexpr auto socketAddress() const noexcept
     {
-        return std::make_pair(addr_, port_);
+        return socket.socketAddress();
     }
 
-    std::string addrStr() const;
+    [[nodiscard]] auto addrStr() const
+    {
+        return socket.readable();
+    }
 
     void readBufferDrain(size_t byte_count);
 

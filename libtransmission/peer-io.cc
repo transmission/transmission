@@ -689,11 +689,6 @@ tr_peerIo::~tr_peerIo()
     io_close_socket(this);
 }
 
-std::string tr_peerIo::addrStr() const
-{
-    return tr_isPeerIo(this) ? this->addr_.readable(this->port_) : "error";
-}
-
 void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
 {
     this->canRead = readcb;

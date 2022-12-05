@@ -56,7 +56,8 @@ struct tr_peer_socket
         return port_;
     }
 
-    template<typename OutputIt> OutputIt readable(OutputIt out)
+    template<typename OutputIt>
+    OutputIt readable(OutputIt out)
     {
         return address_.readable(out, port_);
     }
