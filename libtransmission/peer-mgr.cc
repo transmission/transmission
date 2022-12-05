@@ -1237,11 +1237,11 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port 
     if (session->addressIsBlocked(addr))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr.readable(port)));
-        tr_netClosePeerSocket(session, socket);
+        socket.close(session);
     }
     else if (manager->incoming_handshakes.contains(addr))
     {
-        tr_netClosePeerSocket(session, socket);
+        socket.close(session);
     }
     else /* we don't have a connection to them yet... */
     {
