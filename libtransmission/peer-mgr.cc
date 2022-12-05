@@ -561,6 +561,7 @@ struct tr_peerMgr
 {
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
+        , handshake_mediator_{ *session }
         , bandwidth_timer_{ session->timerMaker().create([this]() { bandwidthPulse(); }) }
         , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
         , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
@@ -599,6 +600,8 @@ struct tr_peerMgr
 
     tr_session* const session;
     Handshakes incoming_handshakes;
+
+    tr_handshake_mediator_impl handshake_mediator_;
 
 private:
     void rechokePulseMarshall()
@@ -1243,7 +1246,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port 
     else /* we don't have a connection to them yet... */
     {
         auto* const handshake = tr_handshakeNew(
-            std::make_unique<tr_handshake_mediator_impl>(*session),
+            manager->handshake_mediator_,
             tr_peerIo::newIncoming(session, &session->top_bandwidth_, &addr, port, socket),
             session->encryptionMode(),
             on_handshake_done,
@@ -2808,7 +2811,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     else
     {
         auto* const handshake = tr_handshakeNew(
-            std::make_unique<tr_handshake_mediator_impl>(*mgr->session),
+            mgr->handshake_mediator_,
             std::move(io),
             mgr->session->encryptionMode(),
             on_handshake_done,

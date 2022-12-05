@@ -82,7 +82,7 @@ using tr_handshake_done_func = bool (*)(tr_handshake_result const& result);
 
 /** @brief create a new handshake */
 tr_handshake* tr_handshakeNew(
-    std::unique_ptr<tr_handshake_mediator> mediator,
+    tr_handshake_mediator& mediator,
     std::shared_ptr<tr_peerIo> io,
     tr_encryption_mode encryption_mode,
     tr_handshake_done_func done_func,
