@@ -461,12 +461,10 @@ static uint64 utp_callback(utp_callback_arguments* args)
 std::shared_ptr<tr_peerIo> tr_peerIo::create(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address const* addr,
-    tr_port port,
     tr_sha1_digest_t const* torrent_hash,
     bool is_incoming,
     bool is_seed,
-    struct tr_peer_socket const socket)
+    tr_peer_socket socket)
 {
     TR_ASSERT(session != nullptr);
     auto lock = session->unique_lock();
@@ -476,12 +474,11 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 
     if (socket.is_tcp())
     {
-        session->setSocketTOS(socket.handle.tcp, addr->type);
+        session->setSocketTOS(socket.handle.tcp, socket.address().type);
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto io = std::shared_ptr<tr_peerIo>{ new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, parent } };
-    io->socket = socket;
+    auto io = std::make_shared<tr_peerIo>(session, torrent_hash, is_incoming, is_seed, parent, socket);
     io->bandwidth().setPeer(io);
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
 
@@ -521,17 +518,11 @@ void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 #endif
 }
 
-std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(
-    tr_session* session,
-    tr_bandwidth* parent,
-    tr_address const* addr,
-    tr_port port,
-    struct tr_peer_socket const socket)
+std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_address_is_valid(addr));
 
-    return tr_peerIo::create(session, parent, addr, port, nullptr, true, false, socket);
+    return tr_peerIo::create(session, parent, nullptr, true, false, socket);
 }
 
 std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
@@ -565,7 +556,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
         return nullptr;
     }
 
-    return create(session, parent, addr, port, &torrent_hash, false, is_seed, socket);
+    return create(session, parent, &torrent_hash, false, is_seed, socket);
 }
 
 /***

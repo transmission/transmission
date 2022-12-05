@@ -161,8 +161,6 @@ public:
         auto io = tr_peerIo::newIncoming(
             session,
             &session->top_bandwidth_,
-            &DefaultPeerAddr,
-            DefaultPeerPort,
             tr_peer_socket{ DefaultPeerAddr, DefaultPeerPort, sockpair[0] });
         return std::make_pair(io, sockpair[1]);
     }
@@ -174,8 +172,6 @@ public:
         auto io = tr_peerIo::create(
             session,
             &session->top_bandwidth_,
-            &DefaultPeerAddr,
-            DefaultPeerPort,
             &info_hash,
             false /*is_incoming*/,
             false /*is_seed*/,

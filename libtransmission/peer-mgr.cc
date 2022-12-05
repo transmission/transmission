@@ -1247,7 +1247,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port 
     {
         auto* const handshake = tr_handshakeNew(
             manager->handshake_mediator_,
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, &addr, port, socket),
+            tr_peerIo::newIncoming(session, &session->top_bandwidth_, socket),
             session->encryptionMode(),
             on_handshake_done,
             manager);
