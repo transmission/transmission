@@ -9,6 +9,9 @@ endif()
 if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
     set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X version to target for deployment" FORCE)
 endif()
+if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.13)
+    message(FATAL_ERROR "Targeting macOS versions before 10.13 is not supported, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
+endif()
 
 project(transmission)
 
