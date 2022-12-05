@@ -158,8 +158,12 @@ public:
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
-        auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
-        auto io = tr_peerIo::newIncoming(session, &session->top_bandwidth_, &DefaultPeerAddr, DefaultPeerPort, peer_socket);
+        auto io = tr_peerIo::newIncoming(
+            session,
+            &session->top_bandwidth_,
+            &DefaultPeerAddr,
+            DefaultPeerPort,
+            tr_peer_socket{ sockpair[0] });
         return std::make_pair(io, sockpair[1]);
     }
 
@@ -167,7 +171,6 @@ public:
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
-        auto const peer_socket = tr_peer_socket_tcp_create(sockpair[0]);
         auto io = tr_peerIo::create(
             session,
             &session->top_bandwidth_,
@@ -176,7 +179,7 @@ public:
             &info_hash,
             false /*is_incoming*/,
             false /*is_seed*/,
-            peer_socket);
+            tr_peer_socket{ sockpair[0] });
         return std::make_pair(io, sockpair[1]);
     }
 

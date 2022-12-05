@@ -328,7 +328,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     }
     else
     {
-        ret = tr_peer_socket_tcp_create(s);
+        ret = tr_peer_socket{ s };
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr->readable(port)));
@@ -348,15 +348,15 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
     {
         auto const [ss, sslen] = addr->toSockaddr(port);
 
-        if (auto* const socket = utp_create_socket(session->utp_context); socket != nullptr)
+        if (auto* const sock = utp_create_socket(session->utp_context); sock != nullptr)
         {
-            if (utp_connect(socket, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
+            if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
             {
-                ret = tr_peer_socket_utp_create(socket);
+                ret = tr_peer_socket{ sock };
             }
             else
             {
-                utp_close(socket);
+                utp_close(sock);
             }
         }
     }
@@ -366,24 +366,20 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(
 
 void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
 {
-    switch (socket.type)
+    if (socket.is_tcp())
     {
-    case TR_PEER_SOCKET_TYPE_NONE:
-        break;
-
-    case TR_PEER_SOCKET_TYPE_TCP:
         tr_netClose(session, socket.handle.tcp);
-        break;
-
+    }
 #ifdef WITH_UTP
-    case TR_PEER_SOCKET_TYPE_UTP:
+    else if (socket.is_utp())
+    {
         utp_set_userdata(socket.handle.utp, nullptr);
         utp_close(socket.handle.utp);
-        break;
+    }
 #endif
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported peer socket type {:d}"), static_cast<int>(socket.type)));
+    else
+    {
+        TR_ASSERT_MSG(false, "unsupported peer socket type");
     }
 }
 
@@ -764,22 +760,6 @@ bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
     return !std::empty(port) && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
         !isMartianAddr(addr);
-}
-
-struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)
-{
-    TR_ASSERT(handle != TR_BAD_SOCKET);
-
-    return { TR_PEER_SOCKET_TYPE_TCP, { handle } };
-}
-
-struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
-{
-    TR_ASSERT(handle != nullptr);
-
-    auto ret = tr_peer_socket{ TR_PEER_SOCKET_TYPE_UTP, {} };
-    ret.handle.utp = handle;
-    return ret;
 }
 
 /// tr_port
