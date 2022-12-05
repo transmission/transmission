@@ -222,7 +222,7 @@ public:
         setCallbacks(nullptr, nullptr, nullptr, nullptr);
     }
 
-    struct tr_peer_socket socket = {};
+    tr_peer_socket socket = {};
 
     tr_session* const session;
 
@@ -286,15 +286,7 @@ public:
         bool is_incoming,
         bool is_seed,
         tr_bandwidth* parent_bandwidth,
-        tr_peer_socket sock)
-        : socket{ sock }
-        , session{ session_in }
-        , bandwidth_{ parent_bandwidth }
-        , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
-        , is_seed_{ is_seed }
-        , is_incoming_{ is_incoming }
-    {
-    }
+        tr_peer_socket sock);
 
 private:
     friend class libtransmission::test::HandshakeTest;

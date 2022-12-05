@@ -3,12 +3,40 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <fmt/format.h>
+
 #include <libutp/utp.h>
 
 #include "transmission.h"
 
 #include "peer-socket.h"
 #include "net.h"
+#include "session.h"
+
+tr_peer_socket::tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock)
+    : handle{ sock }
+    , address_{ address }
+    , port_{ port }
+    , type_{ Type::TCP }
+{
+    TR_ASSERT(sock != TR_BAD_SOCKET);
+
+    session->setSocketTOS(sock, address_.type);
+
+    if (auto const& algo = session->peerCongestionAlgorithm(); !std::empty(algo))
+    {
+        tr_netSetCongestionControl(sock, algo.c_str());
+    }
+}
+
+tr_peer_socket::tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock)
+    : address_{ address }
+    , port_{ port }
+    , type_{ Type::UTP }
+{
+    TR_ASSERT(sock != nullptr);
+    handle.utp = sock;
+}
 
 void tr_peer_socket::close(tr_session* session)
 {

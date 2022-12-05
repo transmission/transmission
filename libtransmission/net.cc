@@ -256,7 +256,7 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
     return sockfd;
 }
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
 {
     TR_ASSERT(tr_address_is_valid(&addr));
 
@@ -328,7 +328,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     }
     else
     {
-        ret = tr_peer_socket{ addr, port, s };
+        ret = tr_peer_socket{ session, addr, port, s };
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.readable(port)));
@@ -336,11 +336,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     return ret;
 }
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(
-    tr_session* session,
-    tr_address const& addr,
-    tr_port port,
-    bool /*client_is_seed*/)
+tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& addr, tr_port port, bool /*client_is_seed*/)
 {
     auto ret = tr_peer_socket{};
 
