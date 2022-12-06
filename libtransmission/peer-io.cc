@@ -47,17 +47,6 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
 
-#ifdef TR_ENABLE_ASSERTS
-[[nodiscard]] static constexpr auto isSupportedSocket(tr_peer_socket const& sock)
-{
-#ifdef WITH_UTP
-    return sock.type == TR_PEER_SOCKET_TYPE_TCP || sock.type == TR_PEER_SOCKET_TYPE_UTP;
-#else
-    return sock.type == TR_PEER_SOCKET_TYPE_TCP;
-#endif
-}
-#endif // TR_ENABLE_ASSERTS
-
 static constexpr size_t guessPacketOverhead(size_t d)
 {
     /**
@@ -93,7 +82,7 @@ static void didWriteWrapper(tr_peerIo* io, size_t bytes_transferred)
 
         size_t const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
         /* For µTP sockets, the overhead is computed in utp_on_overhead. */
-        size_t const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
+        size_t const overhead = io->socket.is_tcp() ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
         io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);
@@ -194,7 +183,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
+    TR_ASSERT(io->socket.is_tcp());
 
     /* Limit the input buffer to 256K, so it doesn't grow too large */
     tr_direction const dir = TR_DOWN;
@@ -264,7 +253,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
+    TR_ASSERT(io->socket.is_tcp());
 
     io->pendingEvents &= ~EV_WRITE;
 
@@ -472,49 +461,43 @@ static uint64 utp_callback(utp_callback_arguments* args)
 std::shared_ptr<tr_peerIo> tr_peerIo::create(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address const* addr,
-    tr_port port,
     tr_sha1_digest_t const* torrent_hash,
     bool is_incoming,
     bool is_seed,
-    struct tr_peer_socket const socket)
+    tr_peer_socket socket)
 {
     TR_ASSERT(session != nullptr);
     auto lock = session->unique_lock();
 
-    TR_ASSERT(isSupportedSocket(socket));
-    TR_ASSERT(session->allowsTCP() || socket.type != TR_PEER_SOCKET_TYPE_TCP);
+    TR_ASSERT(socket.is_valid());
+    TR_ASSERT(session->allowsTCP() || !socket.is_tcp());
 
-    if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
+    if (socket.is_tcp())
     {
-        session->setSocketTOS(socket.handle.tcp, addr->type);
+        session->setSocketTOS(socket.handle.tcp, socket.address().type);
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto io = std::shared_ptr<tr_peerIo>{ new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, parent } };
-    io->socket = socket;
+    auto io = std::make_shared<tr_peerIo>(session, torrent_hash, is_incoming, is_seed, parent, socket);
     io->bandwidth().setPeer(io);
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
 
-    switch (socket.type)
+    if (socket.is_tcp())
     {
-    case TR_PEER_SOCKET_TYPE_TCP:
         tr_logAddTraceIo(io, fmt::format("socket (tcp) is {}", socket.handle.tcp));
         io->event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, io.get()));
         io->event_write.reset(event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, io.get()));
-        break;
-
+    }
 #ifdef WITH_UTP
-
-    case TR_PEER_SOCKET_TYPE_UTP:
+    else if (socket.is_utp())
+    {
         tr_logAddTraceIo(io, fmt::format("socket (µTP) is {}", fmt::ptr(socket.handle.utp)));
         utp_set_userdata(socket.handle.utp, io.get());
-        break;
-
+    }
 #endif
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format("unsupported peer socket type {:d}", static_cast<int>(socket.type)));
+    else
+    {
+        TR_ASSERT_MSG(false, "unsupported peer socket type");
     }
 
     return io;
@@ -535,17 +518,11 @@ void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 #endif
 }
 
-std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(
-    tr_session* session,
-    tr_bandwidth* parent,
-    tr_address const* addr,
-    tr_port port,
-    struct tr_peer_socket const socket)
+std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_address_is_valid(addr));
 
-    return tr_peerIo::create(session, parent, addr, port, nullptr, true, false, socket);
+    return tr_peerIo::create(session, parent, nullptr, true, false, socket);
 }
 
 std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
@@ -568,20 +545,18 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
         socket = tr_netOpenPeerUTPSocket(session, addr, port, is_seed);
     }
 
-    if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
+    if (!socket.is_valid())
     {
         socket = tr_netOpenPeerSocket(session, addr, port, is_seed);
-        tr_logAddDebug(fmt::format(
-            "tr_netOpenPeerSocket returned {}",
-            socket.type != TR_PEER_SOCKET_TYPE_NONE ? socket.handle.tcp : TR_BAD_SOCKET));
+        tr_logAddDebug(fmt::format("tr_netOpenPeerSocket returned {}", socket.is_tcp() ? socket.handle.tcp : TR_BAD_SOCKET));
     }
 
-    if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
+    if (!socket.is_valid())
     {
         return nullptr;
     }
 
-    return create(session, parent, addr, port, &torrent_hash, false, is_seed, socket);
+    return create(session, parent, &torrent_hash, false, is_seed, socket);
 }
 
 /***
@@ -592,7 +567,7 @@ static void event_enable(tr_peerIo* io, short event)
 {
     TR_ASSERT(io->session != nullptr);
 
-    bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
+    bool const need_events = io->socket.is_tcp();
     TR_ASSERT(!need_events || io->event_read);
     TR_ASSERT(!need_events || io->event_write);
 
@@ -623,7 +598,7 @@ static void event_enable(tr_peerIo* io, short event)
 
 static void event_disable(tr_peerIo* io, short event)
 {
-    bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
+    bool const need_events = io->socket.is_tcp();
     TR_ASSERT(!need_events || io->event_read);
     TR_ASSERT(!need_events || io->event_write);
 
@@ -674,28 +649,7 @@ void tr_peerIo::setEnabled(tr_direction dir, bool is_enabled)
 
 static void io_close_socket(tr_peerIo* io)
 {
-    switch (io->socket.type)
-    {
-    case TR_PEER_SOCKET_TYPE_NONE:
-        break;
-
-    case TR_PEER_SOCKET_TYPE_TCP:
-        tr_netClose(io->session, io->socket.handle.tcp);
-        break;
-
-#ifdef WITH_UTP
-
-    case TR_PEER_SOCKET_TYPE_UTP:
-        utp_set_userdata(io->socket.handle.utp, nullptr);
-        utp_close(io->socket.handle.utp);
-        break;
-
-#endif
-
-    default:
-        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", static_cast<int>(io->socket.type)));
-    }
-
+    io->socket.close(io->session);
     io->event_write.reset();
     io->event_read.reset();
     io->socket = {};
@@ -709,11 +663,6 @@ tr_peerIo::~tr_peerIo()
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
     event_disable(this, EV_READ | EV_WRITE);
     io_close_socket(this);
-}
-
-std::string tr_peerIo::addrStr() const
-{
-    return tr_isPeerIo(this) ? this->addr_.readable(this->port_) : "error";
 }
 
 void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
@@ -746,7 +695,7 @@ int tr_peerIo::reconnect()
     auto const [addr, port] = this->socketAddress();
     this->socket = tr_netOpenPeerSocket(session, &addr, port, this->isSeed());
 
-    if (this->socket.type != TR_PEER_SOCKET_TYPE_TCP)
+    if (!this->socket.is_tcp())
     {
         return -1;
     }
@@ -868,8 +817,8 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
         return n_read;
     }
 
-    TR_ASSERT(isSupportedSocket(io->socket));
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_TCP)
+    TR_ASSERT(io->socket.is_valid());
+    if (io->socket.is_tcp())
     {
         tr_error* my_error = nullptr;
         n_read = io->inbuf.addSocket(io->socket.handle.tcp, howmuch, &my_error);
@@ -902,7 +851,7 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
         }
     }
 #ifdef WITH_UTP
-    else if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
+    else if (io->socket.is_utp())
     {
         // UTP_RBDrained notifies libutp that your read buffer is empty.
         // It opens up the congestion window by sending an ACK (soonish)
@@ -930,7 +879,7 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
         return n_written;
     }
 
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_TCP)
+    if (io->socket.is_tcp())
     {
         tr_error* my_error = nullptr;
         n_written = io->outbuf.toSocket(io->socket.handle.tcp, howmuch, &my_error);
@@ -965,7 +914,7 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
         }
     }
 #ifdef WITH_UTP
-    else if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
+    else if (io->socket.is_utp())
     {
         auto iov = io->outbuf.vecs(howmuch);
         errno = 0;

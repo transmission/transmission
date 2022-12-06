@@ -1048,7 +1048,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int const errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)
+    if (io->socket.is_utp() && !io->isIncoming() && handshake->state == AWAITING_YB)
     {
         // the peer probably doesn't speak µTP.
 

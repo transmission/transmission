@@ -64,7 +64,6 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 public:
     ~tr_peerIo();
 
-    // TODO: 8 constructor args is too many; maybe a builder object?
     static std::shared_ptr<tr_peerIo> newOutgoing(
         tr_session* session,
         tr_bandwidth* parent,
@@ -74,12 +73,7 @@ public:
         bool is_seed,
         bool utp);
 
-    static std::shared_ptr<tr_peerIo> newIncoming(
-        tr_session* session,
-        tr_bandwidth* parent,
-        struct tr_address const* addr,
-        tr_port port,
-        struct tr_peer_socket const socket);
+    static std::shared_ptr<tr_peerIo> newIncoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
 
     void clear();
 
@@ -97,17 +91,20 @@ public:
 
     void setEnabled(tr_direction dir, bool is_enabled);
 
-    [[nodiscard]] constexpr tr_address const& address() const noexcept
+    [[nodiscard]] constexpr auto const& address() const noexcept
     {
-        return addr_;
+        return socket.address();
     }
 
-    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    [[nodiscard]] constexpr auto socketAddress() const noexcept
     {
-        return std::make_pair(addr_, port_);
+        return socket.socketAddress();
     }
 
-    std::string addrStr() const;
+    [[nodiscard]] auto addrStr() const
+    {
+        return socket.readable();
+    }
 
     void readBufferDrain(size_t byte_count);
 
@@ -283,6 +280,22 @@ public:
 
     static void utpInit(struct_utp_context* ctx);
 
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        bool is_seed,
+        tr_bandwidth* parent_bandwidth,
+        tr_peer_socket sock)
+        : socket{ sock }
+        , session{ session_in }
+        , bandwidth_{ parent_bandwidth }
+        , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
+        , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
+    {
+    }
+
 private:
     friend class libtransmission::test::HandshakeTest;
 
@@ -291,39 +304,16 @@ private:
     static std::shared_ptr<tr_peerIo> create(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_address const* addr,
-        tr_port port,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
         bool is_seed,
-        struct tr_peer_socket const socket);
-
-    tr_peerIo(
-        tr_session* session_in,
-        tr_sha1_digest_t const* torrent_hash,
-        bool is_incoming,
-        tr_address const& addr,
-        tr_port port,
-        bool is_seed,
-        tr_bandwidth* parent_bandwidth)
-        : session{ session_in }
-        , bandwidth_{ parent_bandwidth }
-        , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
-        , addr_{ addr }
-        , port_{ port }
-        , is_seed_{ is_seed }
-        , is_incoming_{ is_incoming }
-    {
-    }
+        tr_peer_socket socket);
 
     tr_bandwidth bandwidth_;
 
     Filter filter_;
 
     tr_sha1_digest_t torrent_hash_;
-
-    tr_address const addr_;
-    tr_port const port_;
 
     bool const is_seed_;
     bool const is_incoming_;
