@@ -13,6 +13,11 @@
 #include "net.h"
 #include "session.h"
 
+#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->readable())
+#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->readable())
+#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->readable())
+#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->readable())
+
 tr_peer_socket::tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock)
     : handle{ sock }
     , address_{ address }
@@ -27,6 +32,8 @@ tr_peer_socket::tr_peer_socket(tr_session* session, tr_address const& address, t
     {
         tr_netSetCongestionControl(sock, algo.c_str());
     }
+
+    tr_logAddTraceIo(this, fmt::format("socket (tcp) is {}", handle.tcp));
 }
 
 tr_peer_socket::tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock)
@@ -36,6 +43,8 @@ tr_peer_socket::tr_peer_socket(tr_address const& address, tr_port port, struct U
 {
     TR_ASSERT(sock != nullptr);
     handle.utp = sock;
+
+    tr_logAddTraceIo(this, fmt::format("socket (µTP) is {}", fmt::ptr(handle.utp)));
 }
 
 void tr_peer_socket::close(tr_session* session)

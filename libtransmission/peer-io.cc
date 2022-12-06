@@ -466,14 +466,12 @@ tr_peerIo::tr_peerIo(
 {
     if (socket.is_tcp())
     {
-        tr_logAddTraceIo(this, fmt::format("socket (tcp) is {}", socket.handle.tcp));
         event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, this));
         event_write.reset(event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, this));
     }
 #ifdef WITH_UTP
     else if (socket.is_utp())
     {
-        tr_logAddTraceIo(this, fmt::format("socket (µTP) is {}", fmt::ptr(socket.handle.utp)));
         utp_set_userdata(socket.handle.utp, this);
     }
 #endif
