@@ -254,8 +254,8 @@ Prefs::Prefs(QString config_dir)
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
-                values_[i] = QVariant::fromValue(SortMode(pair.first));
+                auto const& [mode, mode_str] = it == std::end(SortModes) ? SortModes.front() : *it;
+                values_[i] = QVariant::fromValue(SortMode{ mode });
             }
             break;
 
@@ -268,8 +268,8 @@ Prefs::Prefs(QString config_dir)
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
-                values_[i] = QVariant::fromValue(FilterMode(pair.first));
+                auto const& [mode, mode_str] = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                values_[i] = QVariant::fromValue(FilterMode{ mode });
             }
             break;
 
@@ -352,8 +352,8 @@ Prefs::~Prefs()
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
-                dictAdd(&current_settings, key, pair.second);
+                auto const& [mode_val, mode_str] = it == std::end(SortModes) ? SortModes.front() : *it;
+                dictAdd(&current_settings, key, mode_str);
                 break;
             }
 
@@ -366,8 +366,8 @@ Prefs::~Prefs()
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
-                dictAdd(&current_settings, key, pair.second);
+                auto const& [mode_val, mode_str] = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                dictAdd(&current_settings, key, mode_str);
                 break;
             }
 

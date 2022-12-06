@@ -278,7 +278,7 @@ using Buffer = libtransmission::Buffer;
 static void saveIntFunc(tr_variant const* val, void* vout)
 {
     auto buf = std::array<char, 64>{};
-    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
+    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
     static_cast<Buffer*>(vout)->add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
 }
 
@@ -291,7 +291,7 @@ static void saveStringImpl(Buffer* tgt, std::string_view sv)
 {
     // `${sv.size()}:${sv}`
     auto prefix = std::array<char, 32>{};
-    auto out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
+    auto const* const out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
     tgt->add(std::data(prefix), out - std::data(prefix));
     tgt->add(sv);
 }
@@ -308,7 +308,7 @@ static void saveRealFunc(tr_variant const* val, void* vout)
     // the benc spec doesn't handle floats; save it as a string.
 
     auto buf = std::array<char, 64>{};
-    auto out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
+    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
     saveStringImpl(static_cast<Buffer*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 

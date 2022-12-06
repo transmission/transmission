@@ -234,9 +234,15 @@ void tr_sessionSet(tr_session* session, struct tr_variant* settings);
            reload whatever blocklist files are found there */
 void tr_sessionReloadBlocklists(tr_session* session);
 
-/** @brief End a libtransmission session
-    @see tr_sessionInit() */
-void tr_sessionClose(tr_session*);
+/**
+ * @brief End a libtransmission session.
+ * @see tr_sessionInit()
+ *
+ * This may take some time while &event=stopped announces are sent to trackers.
+ *
+ * @param `timeout_secs` specifies how long to wait on these announces.
+ */
+void tr_sessionClose(tr_session*, size_t timeout_secs = 15);
 
 /**
  * @brief Return the session's configuration directory.

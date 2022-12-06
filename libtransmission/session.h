@@ -21,8 +21,10 @@
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <utility> // std::pair
+#include <utility> // for std::pair
 #include <vector>
+
+#include <event2/util.h> // for evutil_socket_t
 
 #include "transmission.h"
 
@@ -53,6 +55,7 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 
 class tr_lpd;
+class tr_peer_socket;
 class tr_port_forwarding;
 class tr_rpc_server;
 class tr_session_thread;
@@ -879,7 +882,7 @@ public:
         return bandwidth_groups_;
     }
 
-    void addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
+    void addIncoming(tr_peer_socket&& socket);
 
     void addTorrent(tr_torrent* tor);
 
@@ -931,8 +934,8 @@ private:
     void setSettings(tr_variant* settings_dict, bool force);
     void setSettings(tr_session_settings&& settings, bool force);
 
-    void closeImplPart1(std::promise<void>* closed_promise);
-    void closeImplPart2(std::promise<void>* closed_promise);
+    void closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
+    void closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
 
     void onNowTimer();
 
@@ -965,7 +968,7 @@ private:
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
-    friend void tr_sessionClose(tr_session* session);
+    friend void tr_sessionClose(tr_session* session, size_t timeout_secs);
     friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
@@ -1078,6 +1081,10 @@ private:
     /// fields that aren't trivial,
     /// but are self-contained / don't hold references to others
 
+    // used during shutdown:
+    // how many &event=stopped announces are still being sent to trackers
+    std::atomic<size_t> n_pending_stops_ = {};
+
     mutable std::recursive_mutex session_mutex_;
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
@@ -1118,6 +1125,10 @@ private:
     AltSpeedMediator alt_speed_mediator_{ *this };
     tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
 
+public:
+    struct struct_utp_context* utp_context = nullptr;
+
+private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
@@ -1150,7 +1161,7 @@ public:
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
     // depends-on: settings_, torrents_, web_, announcer_udp_
-    std::unique_ptr<tr_announcer> announcer_ = tr_announcer::create(this, *announcer_udp_);
+    std::unique_ptr<tr_announcer> announcer_ = tr_announcer::create(this, *announcer_udp_, n_pending_stops_);
 
     // depends-on: public_peer_port_, udp_core_, dht_mediator_
     std::unique_ptr<tr_dht> dht_;
@@ -1168,7 +1179,6 @@ private:
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
 
 public:
-    struct struct_utp_context* utp_context = nullptr;
     std::unique_ptr<libtransmission::Timer> utp_timer;
 };
 

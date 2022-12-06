@@ -141,13 +141,19 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 
 void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
 {
+    auto const pref_level = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
+    auto const default_level = TR_LOG_INFO;
+
+    auto has_pref_level = false;
     auto items = std::vector<std::pair<Glib::ustring, int>>{};
     for (auto const& [level, name] : level_names_)
     {
         items.emplace_back(name, level);
+        has_pref_level |= level == pref_level;
     }
+
     gtr_combo_box_set_enum(*level_combo, items);
-    gtr_combo_box_set_active_enum(*level_combo, gtr_pref_int_get(TR_KEY_message_level));
+    gtr_combo_box_set_active_enum(*level_combo, has_pref_level ? pref_level : default_level);
 }
 
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
@@ -461,7 +467,6 @@ MessageLogWindow::Impl::Impl(
           { TR_LOG_WARN, C_("Logging level", "Warning") },
           { TR_LOG_INFO, C_("Logging level", "Information") },
           { TR_LOG_DEBUG, C_("Logging level", "Debug") },
-          { TR_LOG_TRACE, C_("Logging level", "Trace") },
       } }
 {
     /**
@@ -507,6 +512,8 @@ MessageLogWindow::Impl::Impl(
     appendColumn(view_, message_log_cols.sequence);
     appendColumn(view_, message_log_cols.name);
     appendColumn(view_, message_log_cols.message);
+
+    level_combo_changed_cb(level_combo);
 
     scroll_to_bottom();
 }

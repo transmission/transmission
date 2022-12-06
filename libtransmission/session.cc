@@ -297,7 +297,7 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     {
         auto const& [addr, port, sock] = *incoming_info;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
-        session->addIncoming(addr, port, tr_peer_socket_tcp_create(sock));
+        session->addIncoming(tr_peer_socket{ session, addr, port, sock });
     }
 }
 
@@ -369,6 +369,9 @@ void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictiona
     session->settings_.save(setme_dictionary);
     session->alt_speeds_.save(setme_dictionary);
     session->rpc_server_->save(setme_dictionary);
+
+    tr_variantDictRemove(setme_dictionary, TR_KEY_message_level);
+    tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
 }
 
 static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char const* appname)
@@ -1205,11 +1208,12 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-void tr_session::closeImplPart1(std::promise<void>* closed_promise)
+void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
 {
     is_closing_ = true;
 
     // close the low-hanging fruit that can be closed immediately w/o consequences
+    utp_timer.reset();
     verifier_.reset();
     save_timer_.reset();
     now_timer_.reset();
@@ -1220,9 +1224,6 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
     port_forwarding_.reset();
     bound_ipv6_.reset();
     bound_ipv4_.reset();
-
-    // tell other items to start shutting down
-    announcer_udp_->startShutdown();
 
     // Close the torrents in order of most active to least active
     // so that the most important announce=stopped events are
@@ -1242,28 +1243,29 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise)
         tr_torrentFreeInSessionThread(tor);
     }
     torrents.clear();
-    // ...and now that all the torrents have been closed, any
-    // remaining `event=stopped` announce messages are queued in
-    // the announcer. The announcer's destructor sends all those
-    // out via `web_`...
-    this->announcer_.reset();
-    // ...and now that those are queued, tell web_ that we're
-    // shutting down soon. This leaves the `event=stopped` messages
-    // in the queue but refuses to take any _new_ tasks
-    this->web_->startShutdown();
+    tr_utpClose(this);
+    // ...now that all the torrents have been closed, any remaining
+    // `&event=stopped` announce messages are queued in the announcer.
+    // Tell the announcer to start shutdown, which sends out the stop
+    // events and stops scraping.
+    this->announcer_->startShutdown();
+    // ...and now that those are queued, tell web_ that we're shutting
+    // down soon. This leaves the `event=stopped` going but refuses any
+    // new tasks.
+    this->web_->startShutdown(10s);
     this->cache.reset();
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
-    save_timer_ = timerMaker().create([this, closed_promise]() { closeImplPart2(closed_promise); });
+    save_timer_ = timerMaker().create([this, closed_promise, deadline]() { closeImplPart2(closed_promise, deadline); });
     save_timer_->startRepeating(50ms);
 }
 
-void tr_session::closeImplPart2(std::promise<void>* closed_promise)
+void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
 {
     // try to keep the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces
-    if (announcer_udp_ && !announcer_udp_->isIdle())
+    if (n_pending_stops_ != 0U && std::chrono::steady_clock::now() < deadline)
     {
         announcer_udp_->upkeep();
         return;
@@ -1271,19 +1273,19 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise)
 
     save_timer_.reset();
 
+    this->announcer_.reset();
     this->announcer_udp_.reset();
     this->udp_core_.reset();
 
     stats().saveIfDirty();
     peer_mgr_.reset();
-    tr_utpClose(this);
     openFiles().closeAll();
 
     // tada we are done!
     closed_promise->set_value();
 }
 
-void tr_sessionClose(tr_session* session)
+void tr_sessionClose(tr_session* session, size_t timeout_secs)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->amInSessionThread());
@@ -1292,8 +1294,9 @@ void tr_sessionClose(tr_session* session)
 
     auto closed_promise = std::promise<void>{};
     auto closed_future = closed_promise.get_future();
-    session->runInSessionThread([session, &closed_promise]() { session->closeImplPart1(&closed_promise); });
-    closed_future.wait_for(12s);
+    auto const deadline = std::chrono::steady_clock::now() + std::chrono::seconds{ timeout_secs };
+    session->runInSessionThread([&closed_promise, deadline, session]() { session->closeImplPart1(&closed_promise, deadline); });
+    closed_future.wait();
 
     delete session;
 }
@@ -2193,9 +2196,9 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     verifier_->addCallback(tr_torrentOnVerifyDone);
 }
 
-void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
+void tr_session::addIncoming(tr_peer_socket&& socket)
 {
-    tr_peerMgrAddIncoming(peer_mgr_.get(), addr, port, socket);
+    tr_peerMgrAddIncoming(peer_mgr_.get(), std::move(socket));
 }
 
 void tr_session::addTorrent(tr_torrent* tor)

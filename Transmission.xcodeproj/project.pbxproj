@@ -331,7 +331,8 @@
 		C1305EBE186A13B100F03351 /* file.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.cc */; };
 		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
 		C1425B371EE9C705001DB85F /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B341EE9C5EA001DB85F /* tr-macros.h */; };
-		C1425B381EE9C805001DB85F /* peer-socket.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B351EE9C5EA001DB85F /* peer-socket.h */; };
+		C1425B381EE9C805001DB850 /* peer-socket.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B381EE9C805001DB851 /* peer-socket.h */; };
+		C1425B381EE9C805001DB852 /* peer-socket.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1425B381EE9C805001DB853 /* peer-socket.cc */; };
 		C16089EF1F092A1E00CEFC36 /* utp_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C16089E41F092A1E00CEFC36 /* utp_api.cpp */; };
 		C16089F01F092A1E00CEFC36 /* utp_callbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C16089E51F092A1E00CEFC36 /* utp_callbacks.cpp */; };
 		C16089F11F092A1E00CEFC36 /* utp_callbacks.h in Headers */ = {isa = PBXBuildFile; fileRef = C16089E61F092A1E00CEFC36 /* utp_callbacks.h */; };
@@ -1094,6 +1095,7 @@
 		BEFC1E1D0C07861A00B0BB3C /* completion.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = completion.cc; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = clients.h; sourceTree = "<group>"; };
 		BEFC1E1F0C07861A00B0BB3C /* clients.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = clients.cc; sourceTree = "<group>"; };
+		C1425B381EE9C805001DB853 /* peer-socket.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-socket.cc"; sourceTree = "<group>"; };
 		C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils-fallback.cc"; sourceTree = "<group>"; };
 		C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils-ccrypto.cc"; sourceTree = "<group>"; };
 		C1033E051A3279B800EF44D8 /* crypto-utils.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils.cc"; sourceTree = "<group>"; };
@@ -1112,7 +1114,7 @@
 		C1425B321EE9C5EA001DB85F /* tr-assert.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-assert.cc"; sourceTree = "<group>"; };
 		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-assert.h"; sourceTree = "<group>"; };
 		C1425B341EE9C5EA001DB85F /* tr-macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-macros.h"; sourceTree = "<group>"; };
-		C1425B351EE9C5EA001DB85F /* peer-socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-socket.h"; sourceTree = "<group>"; };
+		C1425B381EE9C805001DB851 /* peer-socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-socket.h"; sourceTree = "<group>"; };
 		C16089E41F092A1E00CEFC36 /* utp_api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utp_api.cpp; sourceTree = "<group>"; };
 		C16089E51F092A1E00CEFC36 /* utp_callbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utp_callbacks.cpp; sourceTree = "<group>"; };
 		C16089E61F092A1E00CEFC36 /* utp_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utp_callbacks.h; sourceTree = "<group>"; };
@@ -1683,7 +1685,8 @@
 				4D36BA610CA2F00800A63CA5 /* peer-mse.h */,
 				4D36BA6A0CA2F00800A63CA5 /* peer-msgs.cc */,
 				4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */,
-				C1425B351EE9C5EA001DB85F /* peer-socket.h */,
+				C1425B381EE9C805001DB851 /* peer-socket.h */,
+				C1425B381EE9C805001DB853 /* peer-socket.cc */,
 				A23FAE52178BC2950053DC5B /* platform-quota.cc */,
 				A23FAE53178BC2950053DC5B /* platform-quota.h */,
 				BEFC1E030C07861A00B0BB3C /* platform.cc */,
@@ -2183,7 +2186,7 @@
 				C1425B361EE9C605001DB85F /* tr-assert.h in Headers */,
 				C1425B371EE9C705001DB85F /* tr-macros.h in Headers */,
 				888A256631B3DE536FEB8B00 /* tr-strbuf.h in Headers */,
-				C1425B381EE9C805001DB85F /* peer-socket.h in Headers */,
+				C1425B381EE9C805001DB850 /* peer-socket.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
 				CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */,
@@ -2921,6 +2924,7 @@
 				C1FEE5781C3223CC00D62832 /* watchdir-generic.cc in Sources */,
 				BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */,
+				C1425B381EE9C805001DB852 /* peer-socket.cc in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.cc in Sources */,
 				A24621420C769D0900088E81 /* session-thread.cc in Sources */,
 				C11DEA161FCD31C0009E22B9 /* subprocess-posix.cc in Sources */,

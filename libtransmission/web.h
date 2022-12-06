@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -22,11 +23,11 @@ public:
     // when a fetch() finishes.
     struct FetchResponse
     {
-        long status; // http server response, e.g. 200
+        long status = 0; // http server response, e.g. 200
         std::string body;
-        bool did_connect;
-        bool did_timeout;
-        void* user_data;
+        bool did_connect = false;
+        bool did_timeout = false;
+        void* user_data = nullptr;
     };
 
     // Callback to invoke when fetch() is done
@@ -42,10 +43,15 @@ public:
             V6,
         };
 
-        FetchOptions(std::string_view url_in, FetchDoneFunc&& done_func_in, void* done_func_user_data_in)
+        FetchOptions(
+            std::string_view url_in,
+            FetchDoneFunc&& done_func_in,
+            void* done_func_user_data_in,
+            std::chrono::seconds timeout_secs_in = DefaultTimeoutSecs)
             : url{ url_in }
             , done_func{ std::move(done_func_in) }
             , done_func_user_data{ done_func_user_data_in }
+            , timeout_secs{ timeout_secs_in }
         {
         }
 
@@ -73,7 +79,7 @@ public:
         std::optional<int> rcvbuf;
 
         // Maximum time to wait before timeout
-        int timeout_secs = DefaultTimeoutSecs;
+        std::chrono::seconds timeout_secs = DefaultTimeoutSecs;
 
         // If provided, this buffer will be used to hold the response body.
         // Provided for webseeds, which need to set low-level callbacks on
@@ -83,7 +89,7 @@ public:
         // IP protocol to use when making the request
         IPProtocol ip_proto = IPProtocol::ANY;
 
-        static constexpr int DefaultTimeoutSecs = 120;
+        static auto inline constexpr DefaultTimeoutSecs = std::chrono::seconds{ 120 };
     };
 
     void fetch(FetchOptions&& options);
@@ -91,11 +97,7 @@ public:
     // Notify tr_web that it's going to be destroyed soon.
     // New fetch() tasks will be rejected, but already-running tasks
     // are left alone so that they can finish.
-    void startShutdown();
-
-    // True when tr_web is ready to be destroyed.
-    // Will never be true until after closeSoon() is called.
-    [[nodiscard]] bool isClosed() const noexcept;
+    void startShutdown(std::chrono::milliseconds);
 
     // If you want to give running tasks a chance to finish, call closeSoon()
     // before destroying the tr_web object. Deleting the object will cancel

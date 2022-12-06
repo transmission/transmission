@@ -55,7 +55,7 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
 {
     if (str->type == TR_STRING_TYPE_HEAP)
     {
-        delete[]((char*)(str->str.str));
+        delete[] ((char*)(str->str.str));
     }
 
     *str = StringInit;
@@ -393,9 +393,7 @@ static tr_variant* containerReserve(tr_variant* v, size_t count)
 {
     TR_ASSERT(tr_variantIsContainer(v));
 
-    size_t const needed = v->val.l.count + count;
-
-    if (needed > v->val.l.alloc)
+    if (size_t const needed = v->val.l.count + count; needed > v->val.l.alloc)
     {
         /* scale the alloc size in powers-of-2 */
         size_t n = v->val.l.alloc != 0 ? v->val.l.alloc : 8;

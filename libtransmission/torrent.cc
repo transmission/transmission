@@ -968,7 +968,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->sizeWhenDone = tor->completion.sizeWhenDone();
 
     auto const verify_progress = tor->verifyProgress();
-    s->recheckProgress = verify_progress ? *verify_progress : 0.0F;
+    s->recheckProgress = verify_progress.value_or(0.0);
     s->activityDate = tor->activityDate;
     s->addedDate = tor->addedDate;
     s->doneDate = tor->doneDate;
@@ -1593,7 +1593,7 @@ static std::string buildLabelsString(tr_torrent const* tor)
 
     for (auto it = std::begin(tor->labels), end = std::end(tor->labels); it != end;)
     {
-        buf << *it;
+        buf << tr_quark_get_string_view(*it);
 
         if (++it != end)
         {

@@ -162,9 +162,8 @@ static auto loadDND(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
     tr_variant* list = nullptr;
-    auto const n = tor->fileCount();
 
-    if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
+    if (auto const n = tor->fileCount(); tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
     {
         auto wanted = std::vector<tr_file_index_t>{};
         auto unwanted = std::vector<tr_file_index_t>{};

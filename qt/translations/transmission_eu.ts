@@ -550,27 +550,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+257"/>
+        <location line="+254"/>
         <source>Low</source>
         <translation>Baxua</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-257"/>
-        <location line="+255"/>
+        <location filename="../FileTreeView.cc" line="-254"/>
+        <location line="+252"/>
         <source>High</source>
         <translation>Altua</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-255"/>
-        <location line="+256"/>
+        <location filename="../FileTreeView.cc" line="-252"/>
+        <location line="+253"/>
         <source>Normal</source>
         <translation>Normala</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-255"/>
+        <location filename="../FileTreeView.cc" line="-252"/>
         <source>Mixed</source>
         <translation>Nahastua</translation>
     </message>
@@ -606,7 +606,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+247"/>
+        <location filename="../FileTreeView.cc" line="+244"/>
         <source>Check Selected</source>
         <translation>Aukeratu Hautatua</translation>
     </message>
@@ -2224,7 +2224,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+496"/>
+        <location filename="../Session.cc" line="+494"/>
         <source>Error Renaming Path</source>
         <translation>Akatsa Bidea Berrizendatzerakoan</translation>
     </message>

@@ -288,7 +288,7 @@ public:
             return {};
         }
 
-        if (auto* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
+        if (auto const* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
         {
             return {};
         }
@@ -352,7 +352,7 @@ public:
 
     void write_block_func()
     {
-        if (auto* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
+        if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
             session_->cache->writeBlock(tor_id_, block_, data_);
             webseed_->publish(tr_peer_event::GotBlock(tor->blockInfo(), block_));
@@ -510,7 +510,7 @@ void makeUrl(tr_webseed const* const webseed, std::string_view name, OutputIt ou
 void task_request_next_chunk(tr_webseed_task* task)
 {
     auto* const webseed = task->webseed;
-    auto* const tor = webseed->getTorrent();
+    auto const* const tor = webseed->getTorrent();
     if (tor == nullptr)
     {
         return;

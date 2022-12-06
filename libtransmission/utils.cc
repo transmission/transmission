@@ -152,8 +152,7 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
     }
 
     // If we saved it to disk successfully, move it from '.tmp' to the correct filename
-    auto const szfilename = tr_pathbuf{ filename };
-    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, szfilename, error))
+    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, tr_pathbuf{ filename }, error))
     {
         return false;
     }
@@ -616,12 +615,7 @@ double tr_truncd(double x, int decimal_places)
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    if (auto parsed = tr_parseNum<double>(std::data(buf)); parsed)
-    {
-        return *parsed;
-    }
-
-    return {};
+    return tr_parseNum<double>(std::data(buf)).value_or(0.0);
 }
 
 std::string tr_strpercent(double x)

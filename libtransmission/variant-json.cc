@@ -329,8 +329,7 @@ static void action_callback_POP(
         if ((state->special_flags & JSONSL_SPECIALf_NUMNOINT) != 0)
         {
             auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
-            auto const val = tr_parseNum<double>(sv);
-            tr_variantInitReal(get_node(jsn), val ? *val : double{});
+            tr_variantInitReal(get_node(jsn), tr_parseNum<double>(sv).value_or(0.0));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {
@@ -498,7 +497,7 @@ static void jsonPopParent(struct JsonWalk* data)
 static void jsonIntFunc(tr_variant const* val, void* vdata)
 {
     auto buf = std::array<char, 64>{};
-    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
+    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
     auto* const data = static_cast<JsonWalk*>(vdata);
     data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     jsonChildFunc(data);
@@ -527,13 +526,13 @@ static void jsonRealFunc(tr_variant const* val, void* vdata)
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
         auto buf = std::array<char, 64>{};
-        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
+        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
         data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
     else
     {
         auto buf = std::array<char, 64>{};
-        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
+        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
         data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
 

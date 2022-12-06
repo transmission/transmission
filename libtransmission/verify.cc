@@ -119,9 +119,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
         /* if we're finishing a piece... */
         if (left_in_piece == 0)
         {
-            auto const has_piece = sha->finish() == tor->pieceHash(piece);
-
-            if (has_piece || had_piece)
+            if (auto const has_piece = sha->finish() == tor->pieceHash(piece); has_piece || had_piece)
             {
                 tor->setHasPiece(piece, has_piece);
                 changed |= has_piece != had_piece;

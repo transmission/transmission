@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <atomic>
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t
 #include <ctime>
@@ -63,7 +64,10 @@ using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* ev
 class tr_announcer
 {
 public:
-    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session, tr_announcer_udp&);
+    [[nodiscard]] static std::unique_ptr<tr_announcer> create(
+        tr_session* session,
+        tr_announcer_udp&,
+        std::atomic<size_t>& n_pending_stops);
     virtual ~tr_announcer() = default;
 
     virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;
@@ -71,6 +75,7 @@ public:
     virtual void stopTorrent(tr_torrent* tor) = 0;
     virtual void resetTorrent(tr_torrent* tor) = 0;
     virtual void removeTorrent(tr_torrent* tor) = 0;
+    virtual void startShutdown() = 0;
 };
 
 std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
@@ -141,15 +146,11 @@ public:
 
     [[nodiscard]] static std::unique_ptr<tr_announcer_udp> create(Mediator&);
 
-    [[nodiscard]] virtual bool isIdle() const noexcept = 0;
-
     virtual void announce(tr_announce_request const& request, tr_announce_response_func on_response) = 0;
 
     virtual void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) = 0;
 
     virtual void upkeep() = 0;
-
-    virtual void startShutdown() = 0;
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise

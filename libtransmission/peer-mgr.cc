@@ -121,7 +121,7 @@ public:
 
     [[nodiscard]] bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const override
     {
-        auto* const tor = session_.torrents().get(tor_id);
+        auto const* const tor = session_.torrents().get(tor_id);
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
@@ -561,6 +561,7 @@ struct tr_peerMgr
 {
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
+        , handshake_mediator_{ *session }
         , bandwidth_timer_{ session->timerMaker().create([this]() { bandwidthPulse(); }) }
         , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
         , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
@@ -599,6 +600,8 @@ struct tr_peerMgr
 
     tr_session* const session;
     Handshakes incoming_handshakes;
+
+    tr_handshake_mediator_impl handshake_mediator_;
 
 private:
     void rechokePulseMarshall()
@@ -1187,7 +1190,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
         /* In principle, this flag specifies whether the peer groks µTP,
            not whether it's currently connected over µTP. */
-        if (result.io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
+        if (result.io->socket.is_utp())
         {
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
@@ -1224,31 +1227,33 @@ static bool on_handshake_done(tr_handshake_result const& result)
     return success;
 }
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
 {
     TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
 
     tr_session* session = manager->session;
 
-    if (session->addressIsBlocked(addr))
+    if (session->addressIsBlocked(socket.address()))
     {
-        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr.readable(port)));
-        tr_netClosePeerSocket(session, socket);
+        tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.readable()));
+        socket.close(session);
     }
-    else if (manager->incoming_handshakes.contains(addr))
+    else if (manager->incoming_handshakes.contains(socket.address()))
     {
-        tr_netClosePeerSocket(session, socket);
+        socket.close(session);
     }
     else /* we don't have a connection to them yet... */
     {
-        auto* const handshake = tr_handshakeNew(
-            std::make_unique<tr_handshake_mediator_impl>(*session),
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, &addr, port, tr_time(), socket),
-            session->encryptionMode(),
-            on_handshake_done,
-            manager);
-        manager->incoming_handshakes.add(addr, handshake);
+        auto address = socket.address();
+        manager->incoming_handshakes.add(
+            address,
+            tr_handshakeNew(
+                manager->handshake_mediator_,
+                tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
+                session->encryptionMode(),
+                on_handshake_done,
+                manager));
     }
 }
 
@@ -2085,13 +2090,6 @@ struct ChokeData
     }
 };
 
-/* is this a new connection? */
-[[nodiscard]] bool isNew(tr_peerMsgs const* msgs)
-{
-    auto constexpr CutoffSecs = time_t{ 45 };
-    return msgs != nullptr && !msgs->is_connection_older_than(tr_time() - CutoffSecs);
-}
-
 /* get a rate for deciding which peers to choke and unchoke. */
 [[nodiscard]] auto getRateBps(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
 {
@@ -2213,12 +2211,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         {
             if (choked[i].is_interested)
             {
-                int const x = isNew(choked[i].msgs) ? 3 : 1;
-
-                for (int y = 0; y < x; ++y)
-                {
-                    rand_pool.push_back(&choked[i]);
-                }
+                rand_pool.push_back(&choked[i]);
             }
         }
 
@@ -2805,9 +2798,8 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     auto io = tr_peerIo::newOutgoing(
         mgr->session,
         &mgr->session->top_bandwidth_,
-        &atom.addr,
+        atom.addr,
         atom.port,
-        tr_time(),
         s->tor->infoHash(),
         s->tor->completeness == TR_SEED,
         utp);
@@ -2821,7 +2813,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     else
     {
         auto* const handshake = tr_handshakeNew(
-            std::make_unique<tr_handshake_mediator_impl>(*mgr->session),
+            mgr->handshake_mediator_,
             std::move(io),
             mgr->session->encryptionMode(),
             on_handshake_done,

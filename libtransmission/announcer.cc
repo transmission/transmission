@@ -135,10 +135,11 @@ struct tr_scrape_info
 class tr_announcer_impl final : public tr_announcer
 {
 public:
-    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp)
+    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp, std::atomic<size_t>& n_pending_stops)
         : session{ session_in }
         , announcer_udp_{ announcer_udp }
         , upkeep_timer_{ session_in->timerMaker().create() }
+        , n_pending_stops_{ n_pending_stops }
     {
         upkeep_timer_->setCallback([this]() { this->upkeep(); });
         upkeep_timer_->startRepeating(UpkeepInterval);
@@ -160,6 +161,12 @@ public:
     void resetTorrent(tr_torrent* tor) override;
     void removeTorrent(tr_torrent* tor) override;
 
+    void startShutdown() override
+    {
+        is_shutting_down_ = true;
+        flushCloseMessages();
+    }
+
     void upkeep();
 
     void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
@@ -178,6 +185,8 @@ public:
 
     void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response)
     {
+        TR_ASSERT(!is_shutting_down_);
+
         if (auto const scrape_sv = request.scrape_url.sv();
             tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
         {
@@ -195,6 +204,23 @@ public:
 
     void announce(tr_announce_request const& request, tr_announce_response_func on_response)
     {
+        auto const is_stop = request.event == TR_ANNOUNCE_EVENT_STOPPED;
+        TR_ASSERT(!is_shutting_down_ || is_stop);
+
+        if (is_stop)
+        {
+            ++n_pending_stops_;
+
+            on_response =
+                [&n_stops = n_pending_stops_, on_response = std::move(on_response)](tr_announce_response const& response)
+            {
+                TR_ASSERT(n_stops > 0U);
+                --n_stops;
+
+                on_response(response);
+            };
+        }
+
         if (auto const announce_sv = request.announce_url.sv();
             tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
         {
@@ -219,11 +245,13 @@ private:
     {
         for (auto& stop : stops_)
         {
-            announce(stop, {});
+            announce(stop, [](tr_announce_response const&) {});
         }
 
         stops_.clear();
     }
+
+    static auto constexpr UpkeepInterval = 500ms;
 
     tr_announcer_udp& announcer_udp_;
 
@@ -233,14 +261,19 @@ private:
 
     std::set<tr_announce_request, StopsCompare> stops_;
 
-    static auto constexpr UpkeepInterval = 500ms;
+    std::atomic<size_t>& n_pending_stops_;
+
+    bool is_shutting_down_ = false;
 };
 
-std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
+std::unique_ptr<tr_announcer> tr_announcer::create(
+    tr_session* session,
+    tr_announcer_udp& announcer_udp,
+    std::atomic<size_t>& n_pending_stops)
 {
     TR_ASSERT(session != nullptr);
 
-    return std::make_unique<tr_announcer_impl>(session, announcer_udp);
+    return std::make_unique<tr_announcer_impl>(session, announcer_udp, n_pending_stops);
 }
 
 /***
@@ -539,9 +572,9 @@ struct tr_torrent_announcer
             tier_to_infos[info.tier].emplace_back(&info);
         }
 
-        for (auto const& tt : tier_to_infos)
+        for (auto const& [tier_num, infos] : tier_to_infos)
         {
-            tiers.emplace_back(announcer, tor, tt.second);
+            tiers.emplace_back(announcer, tor, infos);
         }
     }
 
@@ -927,7 +960,7 @@ void tr_announcer_impl::removeTorrent(tr_torrent* tor)
 
     for (auto const& tier : ta->tiers)
     {
-        if (tier.isRunning)
+        if (tier.isRunning && tier.lastAnnounceSucceeded)
         {
             stops_.emplace(create_announce_request(this, tor, &tier, TR_ANNOUNCE_EVENT_STOPPED));
         }
@@ -1546,7 +1579,7 @@ void tr_announcer_impl::upkeep()
     flushCloseMessages();
 
     // maybe kick off some scrapes / announces whose time has come
-    if (!session->isClosing())
+    if (!is_shutting_down_)
     {
         scrapeAndAnnounceMore(this);
     }

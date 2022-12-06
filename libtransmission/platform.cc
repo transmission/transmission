@@ -152,8 +152,8 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 static std::string getXdgEntryFromUserDirs(std::string_view key)
 {
     auto content = std::vector<char>{};
-    auto const filename = fmt::format("{:s}/{:s}"sv, xdgConfigHome(), "user-dirs.dirs"sv);
-    if (!tr_sys_path_exists(filename) || !tr_loadFile(filename, content) || std::empty(content))
+    if (auto const filename = fmt::format("{:s}/{:s}"sv, xdgConfigHome(), "user-dirs.dirs"sv);
+        !tr_sys_path_exists(filename) || !tr_loadFile(filename, content) || std::empty(content))
     {
         return {};
     }

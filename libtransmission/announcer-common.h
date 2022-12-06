@@ -10,6 +10,7 @@
 #endif
 
 #include <array>
+#include <chrono>
 #include <cstdint> // uint64_t
 #include <functional>
 #include <optional>
@@ -163,6 +164,9 @@ struct tr_announce_response
  * length, announcer will incrementally lower the batch size.
  */
 auto inline constexpr TR_MULTISCRAPE_MAX = 60;
+
+auto inline constexpr TR_ANNOUNCE_TIMEOUT_SEC = std::chrono::seconds{ 45 };
+auto inline constexpr TR_SCRAPE_TIMEOUT_SEC = std::chrono::seconds{ 30 };
 
 struct tr_scrape_request
 {

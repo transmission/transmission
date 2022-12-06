@@ -175,22 +175,7 @@ static std::string strlratio2(double ratio)
 
 static std::string strlratio(int64_t numerator, int64_t denominator)
 {
-    double ratio;
-
-    if (denominator != 0)
-    {
-        ratio = numerator / (double)denominator;
-    }
-    else if (numerator != 0)
-    {
-        ratio = TR_RATIO_INF;
-    }
-    else
-    {
-        ratio = TR_RATIO_NA;
-    }
-
-    return strlratio2(ratio);
+    return strlratio2(tr_getRatio(numerator, denominator));
 }
 
 static std::string strlmem(int64_t bytes)
@@ -2332,8 +2317,7 @@ static int flush(char const* rpcurl, tr_variant* benc, Config& config)
         fmt::print(stderr, "posting:\n--------\n{:s}\n--------\n", json);
     }
 
-    auto const res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
+    if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
     {
         tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
         status |= EXIT_FAILURE;

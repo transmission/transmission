@@ -33,10 +33,6 @@ using tr_sys_file_t = int;
 #define TR_BAD_SYS_FILE (-1)
 /** @brief Platform-specific directory descriptor type. */
 using tr_sys_dir_t = void*;
-/** @brief Platform-specific end-of-line sequence. */
-#define TR_NATIVE_EOL_STR "\n"
-/** @brief Platform-specific end-of-line sequence length. */
-#define TR_NATIVE_EOL_STR_SIZE 1
 
 #else
 
@@ -44,8 +40,6 @@ using tr_sys_file_t = HANDLE;
 #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
 struct tr_sys_dir_win32;
 using tr_sys_dir_t = tr_sys_dir_win32*;
-#define TR_NATIVE_EOL_STR "\r\n"
-#define TR_NATIVE_EOL_STR_SIZE 2
 
 #endif
 

@@ -256,22 +256,22 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
     return sockfd;
 }
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed)
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
 {
-    TR_ASSERT(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(&addr));
 
     if (!session->allowsTCP())
     {
         return {};
     }
 
-    if (!tr_address_is_valid_for_peers(addr, port))
+    if (!tr_address_is_valid_for_peers(&addr, port))
     {
         return {};
     }
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(session, Domains[addr->type], SOCK_STREAM);
+    auto const s = createSocket(session, Domains[addr.type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -288,10 +288,10 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         }
     }
 
-    auto const [sock, addrlen] = addr->toSockaddr(port);
+    auto const [sock, addrlen] = addr.toSockaddr(port);
 
     // set source address
-    auto const [source_addr, is_default_addr] = session->publicAddress(addr->type);
+    auto const [source_addr, is_default_addr] = session->publicAddress(addr.type);
     auto const [source_sock, sourcelen] = source_addr.toSockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
@@ -313,12 +313,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 #endif
         sockerrno != EINPROGRESS)
     {
-        if (auto const tmperrno = sockerrno; (tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->isIPv4())
+        if (auto const tmperrno = sockerrno; (tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.isIPv4())
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
-                fmt::arg("address", addr->readable()),
+                fmt::arg("address", addr.readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(tmperrno)),
                 fmt::arg("error_code", tmperrno)));
@@ -328,64 +328,36 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     }
     else
     {
-        ret = tr_peer_socket_tcp_create(s);
+        ret = tr_peer_socket{ session, addr, port, s };
     }
 
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr->readable(port)));
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.readable(port)));
 
     return ret;
 }
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(
-    tr_session* session,
-    tr_address const* addr,
-    tr_port port,
-    bool /*client_is_seed*/)
+tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& addr, tr_port port, bool /*client_is_seed*/)
 {
     auto ret = tr_peer_socket{};
 
-    if (session->utp_context != nullptr && tr_address_is_valid_for_peers(addr, port))
+    if (session->utp_context != nullptr && tr_address_is_valid_for_peers(&addr, port))
     {
-        auto const [ss, sslen] = addr->toSockaddr(port);
-        auto* const socket = utp_create_socket(session->utp_context);
+        auto const [ss, sslen] = addr.toSockaddr(port);
 
-        if (socket != nullptr)
+        if (auto* const sock = utp_create_socket(session->utp_context); sock != nullptr)
         {
-            if (utp_connect(socket, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
+            if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
             {
-                ret = tr_peer_socket_utp_create(socket);
+                ret = tr_peer_socket{ addr, port, sock };
             }
             else
             {
-                utp_close(socket);
+                utp_close(sock);
             }
         }
     }
 
     return ret;
-}
-
-void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
-{
-    switch (socket.type)
-    {
-    case TR_PEER_SOCKET_TYPE_NONE:
-        break;
-
-    case TR_PEER_SOCKET_TYPE_TCP:
-        tr_netClose(session, socket.handle.tcp);
-        break;
-
-#ifdef WITH_UTP
-    case TR_PEER_SOCKET_TYPE_UTP:
-        utp_set_userdata(socket.handle.utp, nullptr);
-        utp_close(socket.handle.utp);
-        break;
-#endif
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported peer socket type {:d}"), static_cast<int>(socket.type)));
-    }
 }
 
 static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppress_msgs, int* err_out)
@@ -765,22 +737,6 @@ bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
     return !std::empty(port) && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
         !isMartianAddr(addr);
-}
-
-struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)
-{
-    TR_ASSERT(handle != TR_BAD_SOCKET);
-
-    return { TR_PEER_SOCKET_TYPE_TCP, { handle } };
-}
-
-struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
-{
-    TR_ASSERT(handle != nullptr);
-
-    auto ret = tr_peer_socket{ TR_PEER_SOCKET_TYPE_UTP, {} };
-    ret.handle.utp = handle;
-    return ret;
 }
 
 /// tr_port

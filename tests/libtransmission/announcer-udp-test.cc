@@ -310,22 +310,18 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
     announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
-    EXPECT_FALSE(announcer->isIdle());
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
     auto sent = waitForAnnouncerToSendMessage(mediator);
-    EXPECT_FALSE(announcer->isIdle());
     auto connect_transaction_id = parseConnectionRequest(sent);
 
     // Have the tracker respond to the request
     auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id);
-    EXPECT_FALSE(announcer->isIdle());
 
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
     sent = waitForAnnouncerToSendMessage(mediator);
-    EXPECT_FALSE(announcer->isIdle());
     auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
     expectEqual(request, info_hashes);
 
@@ -340,7 +336,6 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto arr = std::array<uint8_t, 256>{};
     buf.toBuf(std::data(arr), response_size);
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
-    EXPECT_TRUE(announcer->isIdle());
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response);

@@ -264,6 +264,13 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
     [self.view.window makeFirstResponder:self.fSearchField];
 }
 
+- (BOOL)isFocused
+{
+    NSTextView* textView = (NSTextView*)self.fSearchField.window.firstResponder;
+    return [self.fSearchField.window.firstResponder isKindOfClass:NSTextView.class] &&
+        [self.fSearchField.window fieldEditor:NO forObject:nil] != nil && [self.fSearchField isEqualTo:textView.delegate];
+}
+
 - (void)searchFieldDidStartSearching:(NSSearchField*)sender
 {
     [self.fSearchFieldMinWidthConstraint animator].constant = 95;

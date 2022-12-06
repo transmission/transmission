@@ -1484,10 +1484,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     NSUInteger count = indexSet.count;
     tr_file_index_t* files = static_cast<tr_file_index_t*>(malloc(count * sizeof(tr_file_index_t)));
-    for (NSUInteger index = indexSet.firstIndex, i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index], i++)
-    {
-        files[i] = index;
-    }
+    [indexSet getIndexes:files maxCount:count inIndexRange:nil];
 
     tr_torrentSetFileDLs(self.fHandle, files, count, state != NSControlStateValueOff);
     free(files);

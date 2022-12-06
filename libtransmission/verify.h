@@ -52,9 +52,9 @@ private:
         }
     };
 
-    void callCallback(tr_torrent* tor, bool aborted)
+    void callCallback(tr_torrent* tor, bool aborted) const
     {
-        for (auto& callback : callbacks_)
+        for (auto const& callback : callbacks_)
         {
             callback(tor, aborted);
         }

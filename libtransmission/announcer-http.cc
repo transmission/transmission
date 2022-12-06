@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::copy_n()
 #include <cctype>
+#include <chrono>
 #include <cstdio> /* fprintf() */
 #include <iomanip>
 #include <iostream>
@@ -319,11 +320,11 @@ struct http_announce_data
 static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response* const response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
-    auto* data = static_cast<struct http_announce_data*>(vdata);
+    auto const& log_name = static_cast<http_announce_data const*>(vdata)->log_name;
 
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    tr_logAddTrace("Got announce response", data->log_name);
+    tr_logAddTrace("Got announce response", log_name);
 
     if (status != HTTP_OK)
     {
@@ -333,16 +334,16 @@ static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr
         return false;
     }
 
-    tr_announcerParseHttpAnnounceResponse(*response, body, data->log_name);
+    tr_announcerParseHttpAnnounceResponse(*response, body, log_name);
 
     if (!std::empty(response->pex6))
     {
-        tr_logAddTrace(fmt::format("got a peers6 length of {}", std::size(response->pex6)), data->log_name);
+        tr_logAddTrace(fmt::format("got a peers6 length of {}", std::size(response->pex6)), log_name);
     }
 
     if (!std::empty(response->pex))
     {
-        tr_logAddTrace(fmt::format("got a peers length of {}", std::size(response->pex)), data->log_name);
+        tr_logAddTrace(fmt::format("got a peers length of {}", std::size(response->pex)), log_name);
     }
 
     return true;
@@ -425,7 +426,7 @@ void tr_tracker_http_announce(
     auto url = tr_urlbuf{};
     announce_url_new(url, session, request);
     auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
-    options.timeout_secs = 45L;
+    options.timeout_secs = TR_ANNOUNCE_TIMEOUT_SEC;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
 
@@ -697,7 +698,7 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
     scrape_url_new(scrape_url, request);
     tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", scrape_url), request.log_name);
     auto options = tr_web::FetchOptions{ scrape_url, onScrapeDone, d };
-    options.timeout_secs = 30L;
+    options.timeout_secs = TR_SCRAPE_TIMEOUT_SEC;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
     session->fetch(std::move(options));
