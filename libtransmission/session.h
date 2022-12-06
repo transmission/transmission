@@ -1125,6 +1125,10 @@ private:
     AltSpeedMediator alt_speed_mediator_{ *this };
     tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
 
+public:
+    struct struct_utp_context* utp_context = nullptr;
+
+private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
@@ -1175,7 +1179,6 @@ private:
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
 
 public:
-    struct struct_utp_context* utp_context = nullptr;
     std::unique_ptr<libtransmission::Timer> utp_timer;
 };
 
