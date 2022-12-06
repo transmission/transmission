@@ -9,6 +9,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string>
+#include <string_view>
+#include <utility> // for std::make_pair()
+
 #include "transmission.h"
 
 #include "net.h"
@@ -17,27 +21,17 @@
 struct UTPSocket;
 struct tr_session;
 
-struct tr_peer_socket
+class tr_peer_socket
 {
+public:
     tr_peer_socket() = default;
-
-    tr_peer_socket(tr_address const& address, tr_port port, tr_socket_t sock)
-        : handle{ sock }
-        , address_{ address }
-        , port_{ port }
-        , type_{ Type::TCP }
-    {
-        TR_ASSERT(sock != TR_BAD_SOCKET);
-    }
-
-    tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock)
-        : address_{ address }
-        , port_{ port }
-        , type_{ Type::UTP }
-    {
-        TR_ASSERT(sock != nullptr);
-        handle.utp = sock;
-    }
+    tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock);
+    tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock);
+    tr_peer_socket(tr_peer_socket&&) = default;
+    tr_peer_socket(tr_peer_socket const&) = delete;
+    tr_peer_socket& operator=(tr_peer_socket&&) = default;
+    tr_peer_socket& operator=(tr_peer_socket const&) = delete;
+    ~tr_peer_socket() = default;
 
     void close(tr_session* session);
 
@@ -111,5 +105,5 @@ private:
     enum Type type_ = Type::None;
 };
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
+tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);

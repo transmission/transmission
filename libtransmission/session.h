@@ -55,6 +55,7 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 
 class tr_lpd;
+class tr_peer_socket;
 class tr_port_forwarding;
 class tr_rpc_server;
 class tr_session_thread;
@@ -881,7 +882,7 @@ public:
         return bandwidth_groups_;
     }
 
-    void addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
+    void addIncoming(tr_peer_socket&& socket);
 
     void addTorrent(tr_torrent* tor);
 

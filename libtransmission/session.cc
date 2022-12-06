@@ -297,7 +297,7 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     {
         auto const& [addr, port, sock] = *incoming_info;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.readable(port)));
-        session->addIncoming(addr, port, tr_peer_socket{ addr, port, sock });
+        session->addIncoming(tr_peer_socket{ session, addr, port, sock });
     }
 }
 
@@ -2196,9 +2196,9 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     verifier_->addCallback(tr_torrentOnVerifyDone);
 }
 
-void tr_session::addIncoming(tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
+void tr_session::addIncoming(tr_peer_socket&& socket)
 {
-    tr_peerMgrAddIncoming(peer_mgr_.get(), addr, port, socket);
+    tr_peerMgrAddIncoming(peer_mgr_.get(), std::move(socket));
 }
 
 void tr_session::addTorrent(tr_torrent* tor)

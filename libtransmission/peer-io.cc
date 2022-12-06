@@ -308,14 +308,6 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 ***
 **/
 
-static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& algorithm)
-{
-    if (!std::empty(algorithm))
-    {
-        tr_netSetCongestionControl(socket, algorithm.c_str());
-    }
-}
-
 #ifdef WITH_UTP
 /* µTP callbacks */
 
@@ -458,48 +450,54 @@ static uint64 utp_callback(utp_callback_arguments* args)
 
 #endif /* #ifdef WITH_UTP */
 
-std::shared_ptr<tr_peerIo> tr_peerIo::create(
-    tr_session* session,
-    tr_bandwidth* parent,
+tr_peerIo::tr_peerIo(
+    tr_session* session_in,
     tr_sha1_digest_t const* torrent_hash,
     bool is_incoming,
     bool is_seed,
-    tr_peer_socket socket)
+    tr_bandwidth* parent_bandwidth,
+    tr_peer_socket sock)
+    : socket{ std::move(sock) }
+    , session{ session_in }
+    , bandwidth_{ parent_bandwidth }
+    , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
+    , is_seed_{ is_seed }
+    , is_incoming_{ is_incoming }
 {
-    TR_ASSERT(session != nullptr);
-    auto lock = session->unique_lock();
-
-    TR_ASSERT(socket.is_valid());
-    TR_ASSERT(session->allowsTCP() || !socket.is_tcp());
-
     if (socket.is_tcp())
     {
-        session->setSocketTOS(socket.handle.tcp, socket.address().type);
-        maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
-    }
-
-    auto io = std::make_shared<tr_peerIo>(session, torrent_hash, is_incoming, is_seed, parent, socket);
-    io->bandwidth().setPeer(io);
-    tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
-
-    if (socket.is_tcp())
-    {
-        tr_logAddTraceIo(io, fmt::format("socket (tcp) is {}", socket.handle.tcp));
-        io->event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, io.get()));
-        io->event_write.reset(event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, io.get()));
+        event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, this));
+        event_write.reset(event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, this));
     }
 #ifdef WITH_UTP
     else if (socket.is_utp())
     {
-        tr_logAddTraceIo(io, fmt::format("socket (µTP) is {}", fmt::ptr(socket.handle.utp)));
-        utp_set_userdata(socket.handle.utp, io.get());
+        utp_set_userdata(socket.handle.utp, this);
     }
 #endif
     else
     {
         TR_ASSERT_MSG(false, "unsupported peer socket type");
     }
+}
 
+std::shared_ptr<tr_peerIo> tr_peerIo::create(
+    tr_session* session,
+    tr_bandwidth* parent,
+    tr_sha1_digest_t const* torrent_hash,
+    bool is_incoming,
+    bool is_seed,
+    tr_peer_socket sock)
+{
+    TR_ASSERT(session != nullptr);
+    auto lock = session->unique_lock();
+
+    TR_ASSERT(sock.is_valid());
+    TR_ASSERT(session->allowsTCP() || !sock.is_tcp());
+
+    auto io = std::make_shared<tr_peerIo>(session, torrent_hash, is_incoming, is_seed, parent, std::move(sock));
+    io->bandwidth().setPeer(io);
+    tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
     return io;
 }
 
@@ -522,20 +520,20 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(tr_session* session, tr_bandwi
 {
     TR_ASSERT(session != nullptr);
 
-    return tr_peerIo::create(session, parent, nullptr, true, false, socket);
+    return tr_peerIo::create(session, parent, nullptr, true, false, std::move(socket));
 }
 
 std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address const* addr,
+    tr_address const& addr,
     tr_port port,
     tr_sha1_digest_t const& torrent_hash,
     bool is_seed,
     bool utp)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(&addr));
     TR_ASSERT(utp || session->allowsTCP());
 
     auto socket = tr_peer_socket{};
@@ -556,7 +554,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
         return nullptr;
     }
 
-    return create(session, parent, &torrent_hash, false, is_seed, socket);
+    return create(session, parent, &torrent_hash, false, is_seed, std::move(socket));
 }
 
 /***
@@ -692,8 +690,8 @@ int tr_peerIo::reconnect()
 
     io_close_socket(this);
 
-    auto const [addr, port] = this->socketAddress();
-    this->socket = tr_netOpenPeerSocket(session, &addr, port, this->isSeed());
+    auto const [addr, port] = socketAddress();
+    this->socket = tr_netOpenPeerSocket(session, addr, port, this->isSeed());
 
     if (!this->socket.is_tcp())
     {
@@ -704,8 +702,6 @@ int tr_peerIo::reconnect()
     this->event_write.reset(event_new(session->eventBase(), this->socket.handle.tcp, EV_WRITE, event_write_cb, this));
 
     event_enable(this, pending_events);
-    this->session->setSocketTOS(this->socket.handle.tcp, addr.type);
-    maybeSetCongestionAlgorithm(this->socket.handle.tcp, session->peerCongestionAlgorithm());
 
     return 0;
 }
