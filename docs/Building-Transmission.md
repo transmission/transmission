@@ -143,6 +143,7 @@ vcpkg install openssl
 ```
 git clone https://github.com/transmission/transmission
 cd transmission
+git submodule update --init --recursive
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE="$($VCPKG_ROOT)\scripts\buildsystems\vcpkg.cmake"
 cmake --build build --config RelWithDebInfo
 ```
