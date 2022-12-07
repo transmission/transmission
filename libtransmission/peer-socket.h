@@ -9,36 +9,101 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string>
+#include <string_view>
+#include <utility> // for std::make_pair()
+
+#include "transmission.h"
+
 #include "net.h"
+#include "tr-assert.h"
 
-enum tr_peer_socket_type
-{
-    TR_PEER_SOCKET_TYPE_NONE,
-    TR_PEER_SOCKET_TYPE_TCP,
-    TR_PEER_SOCKET_TYPE_UTP
-};
-
-union tr_peer_socket_handle
-{
-    tr_socket_t tcp;
-    struct UTPSocket* utp;
-};
-
-struct tr_peer_socket
-{
-    enum tr_peer_socket_type type = TR_PEER_SOCKET_TYPE_NONE;
-    union tr_peer_socket_handle handle;
-};
-
-struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle);
-
-struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle);
-
+struct UTPSocket;
 struct tr_session;
-struct tr_address;
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
+class tr_peer_socket
+{
+public:
+    tr_peer_socket() = default;
+    tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock);
+    tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock);
+    tr_peer_socket(tr_peer_socket&&) = default;
+    tr_peer_socket(tr_peer_socket const&) = delete;
+    tr_peer_socket& operator=(tr_peer_socket&&) = default;
+    tr_peer_socket& operator=(tr_peer_socket const&) = delete;
+    ~tr_peer_socket() = default;
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool client_is_seed);
+    void close(tr_session* session);
 
-void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket);
+    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    {
+        return std::make_pair(address_, port_);
+    }
+
+    [[nodiscard]] constexpr auto const& address() const noexcept
+    {
+        return address_;
+    }
+
+    [[nodiscard]] constexpr auto const& port() const noexcept
+    {
+        return port_;
+    }
+
+    template<typename OutputIt>
+    OutputIt readable(OutputIt out)
+    {
+        return address_.readable(out, port_);
+    }
+
+    [[nodiscard]] std::string_view readable(char* out, size_t outlen) const
+    {
+        return address_.readable(out, outlen, port_);
+    }
+
+    [[nodiscard]] std::string readable() const
+    {
+        return address_.readable(port_);
+    }
+
+    [[nodiscard]] constexpr auto is_utp() const noexcept
+    {
+        return type_ == Type::UTP;
+    }
+
+    [[nodiscard]] constexpr auto is_tcp() const noexcept
+    {
+        return type_ == Type::TCP;
+    }
+
+    [[nodiscard]] constexpr auto is_valid() const noexcept
+    {
+#ifdef WITH_UTP
+        return is_tcp() || is_utp();
+#else
+        return is_tcp();
+#endif
+    }
+
+    union
+    {
+        tr_socket_t tcp;
+        struct UTPSocket* utp;
+    } handle = {};
+
+private:
+    enum class Type
+    {
+        None,
+        TCP,
+        UTP
+    };
+
+    tr_address address_;
+    tr_port port_;
+
+    enum Type type_ = Type::None;
+};
+
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
+tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
