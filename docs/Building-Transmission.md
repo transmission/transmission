@@ -146,9 +146,3 @@ cd transmission
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE="$($VCPKG_ROOT)\scripts\buildsystems\vcpkg.cmake"
 cmake --build build --config RelWithDebInfo
 ```
-Then build project from Visual Studio.
-
-### Native Windows ###
-With a MinGW https://mingw.org/ development environment, the GTK and the Qt GUI applications can be built.  The CLI tools can also be built and in general work fine, but may fail if you use foreign characters as parameters (MinGW uses latin1 for parameters).
-
-The procedure is documented at [Building Transmission Qt on Windows](https://trac.transmissionbt.com/wiki/BuildingTransmissionQtWindows).
