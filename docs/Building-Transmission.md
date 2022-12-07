@@ -143,7 +143,7 @@ vcpkg install openssl
 ```
 git clone https://github.com/transmission/transmission
 cd transmission
-cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE=*vcpkg root*/scripts/buildsystems/vcpkg.cmake
+cmake --build build --config RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE=*vcpkg root*/scripts/buildsystems/vcpkg.cmake
 ./build/transmission.sln
 ```
 Then build project from Visual Studio.
