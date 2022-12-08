@@ -14,6 +14,7 @@ jobs:
     outputs:
       make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' }}
       make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' }}
+      make-dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' }}
       make-docs: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.docs-changed == '1' }}
       make-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' }}
       make-mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' }}
@@ -56,6 +57,7 @@ jobs:
           get_changes any-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
           get_changes our-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
           get_changes daemon   CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
+          get_changes dist     dist
           get_changes docs     docs
           get_changes gtk      CMakeLists.txt third-party libtransmission gtk
           get_changes mac      CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
@@ -300,7 +302,7 @@ jobs:
   windows:
     needs: [ what-to-make ]
     runs-on: windows-2022
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -322,6 +324,7 @@ jobs:
           choco uninstall `
             openssl.light
           (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
+          (Join-Path ${Env:ProgramFiles(x86)} 'WiX Toolset v3.11' bin) | Out-File $Env:GITHUB_PATH -Append
 
           Install-Module -Name Pscx -RequiredVersion 4.0.0-beta4 -AllowPrerelease -Force
       - name: Get Source
@@ -365,12 +368,12 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx `
             -DCMAKE_PREFIX_PATH="${Env:DepsPrefix}" `
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_GTK=OFF `
             -DENABLE_MAC=OFF `
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_TESTS=ON `
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WEB=OFF `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -382,10 +385,18 @@ jobs:
         run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
+      - name: Package
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
+          cmake --build obj --config RelWithDebInfo --target pack-msi
       - uses: actions/upload-artifact@v3
         with:
           name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.arch }}-msi
+          path: obj/dist/msi/*.msi
 
   make-source-tarball:
     runs-on: ubuntu-22.04
