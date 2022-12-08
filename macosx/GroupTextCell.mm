@@ -17,12 +17,14 @@
     return titleFrame;
 }
 
-- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     //set font size and color
     NSRect titleRect = [self titleRectForBounds:cellFrame];
     NSMutableAttributedString* string = [[self attributedStringValue] mutableCopy];
-    NSDictionary* attributes = [NSDictionary dictionaryWithObjects:@[[NSFont boldSystemFontOfSize:11.0], [NSColor secondaryLabelColor]] forKeys:@[NSFontAttributeName, NSForegroundColorAttributeName]];
+    NSDictionary* attributes = [NSDictionary
+        dictionaryWithObjects:@[ [NSFont boldSystemFontOfSize:11.0], [NSColor secondaryLabelColor] ]
+                      forKeys:@[ NSFontAttributeName, NSForegroundColorAttributeName ]];
     [string addAttributes:attributes range:NSMakeRange(0, string.length)];
     [string drawInRect:titleRect];
 }

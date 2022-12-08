@@ -163,7 +163,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 {
     //return no and style the groupItem cell manually in willDisplayCell
     //otherwise we get unwanted padding before each group header
-    return NO;;
+    return NO;
 }
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
@@ -181,7 +181,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     else
     {
         NSString* ident = tableColumn.identifier;
-        NSArray* imageColumns = @[@"Color", @"DL Image", @"UL Image"];
+        NSArray* imageColumns = @[ @"Color", @"DL Image", @"UL Image" ];
         if (![imageColumns containsObject:ident])
         {
             return group ? self.fGroupTextCell : nil;
@@ -218,7 +218,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 //see isGroupItem
 - (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect
 {
-    NSColor *highlightColor = nil;
+    NSColor* highlightColor = nil;
 
     id item = [self itemAtRow:row];
 
@@ -235,7 +235,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             highlightColor = [NSColor disabledControlTextColor];
         }
 
-        NSIndexSet *selectedRowIndexes = [self selectedRowIndexes];
+        NSIndexSet* selectedRowIndexes = [self selectedRowIndexes];
         if ([selectedRowIndexes containsIndex:row])
         {
             [highlightColor setFill];
