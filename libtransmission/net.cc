@@ -258,7 +258,7 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
 
 tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
 {
-    TR_ASSERT(tr_address_is_valid(&addr));
+    TR_ASSERT(addr.is_valid());
 
     if (!session->allowsTCP())
     {
@@ -362,7 +362,7 @@ tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& ad
 
 static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppress_msgs, int* err_out)
 {
-    TR_ASSERT(tr_address_is_valid(&addr));
+    TR_ASSERT(addr.is_valid());
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
 
@@ -700,35 +700,36 @@ std::optional<in6_addr> tr_globalIPv6(tr_session const* session)
 ****
 ***/
 
-static bool isIPv4MappedAddress(tr_address const* addr)
+namespace is_valid_for_peers_helpers
+{
+
+[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const* addr)
 {
     return addr->isIPv6() && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
 }
 
-static bool isIPv6LinkLocalAddress(tr_address const* addr)
+[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const* addr)
 {
     return addr->isIPv6() && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
 }
 
 /* isMartianAddr was written by Juliusz Chroboczek,
    and is covered under the same license as third-party/dht/dht.c. */
-static bool isMartianAddr(struct tr_address const* a)
+[[nodiscard]] auto is_martian_addr(tr_address const& addr)
 {
-    TR_ASSERT(tr_address_is_valid(a));
-
     static auto constexpr Zeroes = std::array<unsigned char, 16>{};
 
-    switch (a->type)
+    switch (addr.type)
     {
     case TR_AF_INET:
         {
-            auto const* const address = (unsigned char const*)&a->addr.addr4;
+            auto const* const address = (unsigned char const*)&addr.addr.addr4;
             return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
         }
 
     case TR_AF_INET6:
         {
-            auto const* const address = (unsigned char const*)&a->addr.addr6;
+            auto const* const address = (unsigned char const*)&addr.addr.addr6;
             return address[0] == 0xFF ||
                 (memcmp(address, std::data(Zeroes), 15) == 0 && (address[15] == 0 || address[15] == 1));
         }
@@ -738,10 +739,14 @@ static bool isMartianAddr(struct tr_address const* a)
     }
 }
 
+} // namespace is_valid_for_peers_helpers
+
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
-    return !std::empty(port) && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
-        !isMartianAddr(addr);
+    using namespace is_valid_for_peers_helpers;
+
+    return addr != nullptr && addr->is_valid() && !std::empty(port) && !is_ipv6_link_local_address(addr) &&
+        !is_ipv4_mapped_address(addr) && !is_martian_addr(*addr);
 }
 
 /// tr_port

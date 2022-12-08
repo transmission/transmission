@@ -273,14 +273,14 @@ struct tr_address
     {
         return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
     }
+
+    [[nodiscard]] constexpr auto is_valid() const noexcept
+    {
+        return type == TR_AF_INET || type == TR_AF_INET6;
+    }
 };
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
-
-constexpr bool tr_address_is_valid(tr_address const* a)
-{
-    return a != nullptr && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
-}
 
 /***********************************************************************
  * Sockets

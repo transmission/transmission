@@ -533,7 +533,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
     bool utp)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_address_is_valid(&addr));
+    TR_ASSERT(addr.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
     auto socket = tr_peer_socket{};

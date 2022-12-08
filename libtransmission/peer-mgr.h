@@ -151,7 +151,7 @@ struct tr_pex
 
 constexpr bool tr_isPex(tr_pex const* pex)
 {
-    return pex && tr_address_is_valid(&pex->addr);
+    return pex != nullptr && pex->addr.is_valid();
 }
 
 [[nodiscard]] tr_peerMgr* tr_peerMgrNew(tr_session* session);

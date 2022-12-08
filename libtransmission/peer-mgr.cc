@@ -164,7 +164,7 @@ struct peer_atom
 #ifdef TR_ENABLE_ASSERTS
     [[nodiscard]] bool isValid() const noexcept
     {
-        return fromFirst < TR_PEER_FROM__MAX && fromBest < TR_PEER_FROM__MAX && tr_address_is_valid(&addr);
+        return fromFirst < TR_PEER_FROM__MAX && fromBest < TR_PEER_FROM__MAX && addr.is_valid());
     }
 #endif
 
@@ -1086,7 +1086,7 @@ static struct peer_atom* ensureAtomExists(
     uint8_t const flags,
     uint8_t const from)
 {
-    TR_ASSERT(tr_address_is_valid(&addr));
+    TR_ASSERT(addr.is_valid());
     TR_ASSERT(from < TR_PEER_FROM__MAX);
 
     struct peer_atom* a = getExistingAtom(s, addr);
@@ -1479,7 +1479,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
         if (atom->addr.type == address_type)
         {
-            TR_ASSERT(tr_address_is_valid(&atom->addr));
+            TR_ASSERT(atom->addr.is_valid());
             pex.emplace_back(atom->addr, atom->port, atom->flags);
         }
     }

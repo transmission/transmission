@@ -439,7 +439,7 @@ std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklis
 
 bool Blocklist::contains(tr_address const& addr) const
 {
-    TR_ASSERT(tr_address_is_valid(&addr));
+    TR_ASSERT(addr.is_valid());
 
     if (!is_enabled_)
     {
