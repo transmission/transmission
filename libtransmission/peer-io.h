@@ -317,5 +317,5 @@ private:
 
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != nullptr && io->address().is_valid());
+    return io != nullptr && io->address().is_valid();
 }

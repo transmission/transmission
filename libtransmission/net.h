@@ -217,12 +217,12 @@ struct tr_address
         return toCompact(out, reinterpret_cast<struct sockaddr*>(ss));
     }
 
-    [[nodiscard]] constexpr auto isIPv4() const noexcept
+    [[nodiscard]] constexpr auto is_ipv4() const noexcept
     {
         return type == TR_AF_INET;
     }
 
-    [[nodiscard]] constexpr auto isIPv6() const noexcept
+    [[nodiscard]] constexpr auto is_ipv6() const noexcept
     {
         return type == TR_AF_INET6;
     }

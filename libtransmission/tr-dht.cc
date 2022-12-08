@@ -180,7 +180,7 @@ public:
 
     void addNode(tr_address const& addr, tr_port port) override
     {
-        if (addr.isIPv4())
+        if (addr.is_ipv4())
         {
             auto sin = sockaddr_in{};
             sin.sin_family = AF_INET;
@@ -188,7 +188,7 @@ public:
             sin.sin_port = port.network();
             mediator_.api().ping_node((struct sockaddr*)&sin, sizeof(sin));
         }
-        else if (addr.isIPv6())
+        else if (addr.is_ipv6())
         {
             auto sin6 = sockaddr_in6{};
             sin6.sin6_family = AF_INET6;

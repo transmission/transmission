@@ -174,7 +174,7 @@ std::optional<address_range_t> parseCidrLine(std::string_view line)
         return {};
     }
 
-    if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr && addr->isIPv4())
+    if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr && addr->is_ipv4())
     {
         addrpair.first = *addr;
     }

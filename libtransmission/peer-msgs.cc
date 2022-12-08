@@ -284,7 +284,7 @@ public:
         if (session->allowsDHT() && io->supportsDHT())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
-            if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
+            if (io->address().is_ipv4() || tr_globalIPv6(nullptr).has_value())
             {
                 protocolSendPort(this, session->udpPort());
             }

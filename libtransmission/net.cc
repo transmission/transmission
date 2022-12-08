@@ -245,7 +245,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
 #endif
         sockerrno != EINPROGRESS)
     {
-        if (auto const tmperrno = sockerrno; (tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.isIPv4())
+        if (auto const tmperrno = sockerrno; (tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
@@ -318,7 +318,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
 #ifdef IPV6_V6ONLY
 
-    if (addr.isIPv6() &&
+    if (addr.is_ipv6() &&
         (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
         (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
@@ -637,12 +637,12 @@ namespace is_valid_for_peers_helpers
 
 [[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const* addr)
 {
-    return addr->isIPv6() && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
+    return addr->is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
 }
 
 [[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const* addr)
 {
-    return addr->isIPv6() && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
+    return addr->is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
 }
 
 /* isMartianAddr was written by Juliusz Chroboczek,
@@ -722,7 +722,7 @@ std::string_view tr_address::display_name(char* out, size_t outlen, tr_port port
 {
     if (std::empty(port))
     {
-        return isIPv4() ? evutil_inet_ntop(AF_INET, &addr, out, outlen) : evutil_inet_ntop(AF_INET6, &addr, out, outlen);
+        return is_ipv4() ? evutil_inet_ntop(AF_INET, &addr, out, outlen) : evutil_inet_ntop(AF_INET6, &addr, out, outlen);
     }
 
     auto buf = std::array<char, INET6_ADDRSTRLEN>{};
@@ -806,7 +806,7 @@ std::pair<sockaddr_storage, socklen_t> tr_address::toSockaddr(tr_port port) cons
 {
     auto ss = sockaddr_storage{};
 
-    if (isIPv4())
+    if (is_ipv4())
     {
         auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
         ss4->sin_addr = addr.addr4;
@@ -828,11 +828,11 @@ static int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
     // IPv6 addresses are always "greater than" IPv4
     if (a->type != b->type)
     {
-        return a->isIPv4() ? 1 : -1;
+        return a->is_ipv4() ? 1 : -1;
     }
 
-    return a->isIPv4() ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-                         memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
+    return a->is_ipv4() ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
+                          memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
 }
 
 int tr_address::compare(tr_address const& that) const noexcept // <=>
