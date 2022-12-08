@@ -28,10 +28,10 @@ jobs:
         id: check-main-push
         run: |
           set -x
-          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then \
-            echo "::set-output name=is-main-push::1"; \
-          else \
-            echo "::set-output name=is-main-push::0"; \
+          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
+            echo is-main-push=1 >> "$GITHUB_OUTPUT"
+          else
+            echo is-main-push=0 >> "$GITHUB_OUTPUT"
           fi
       - name: Get Source
         id: get-source
@@ -44,29 +44,24 @@ jobs:
         id: check-diffs
         run: |
           set +e
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
-          echo "::set-output name=cli-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
-          echo "::set-output name=any-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
-          echo "::set-output name=our-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
-          echo "::set-output name=daemon-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- docs
-          echo "::set-output name=docs-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission gtk
-          echo "::set-output name=gtk-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
-          echo "::set-output name=mac-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission qt
-          echo "::set-output name=qt-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission utils tests
-          echo "::set-output name=tests-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission utils
-          echo "::set-output name=utils-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission web
-          echo "::set-output name=web-changed::$?"
-          set -e
+          MERGE_BASE=`git merge-base origin/main HEAD`
+          function get_changes() { # name, paths...
+            local name="$1"
+            shift
+            git -C "$GITHUB_WORKSPACE/src" diff --exit-code "$MERGE_BASE" -- "$@"
+            echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
+          }
+          get_changes cli      CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
+          get_changes any-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
+          get_changes our-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes daemon   CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
+          get_changes docs     docs
+          get_changes gtk      CMakeLists.txt third-party libtransmission gtk
+          get_changes mac      CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
+          get_changes qt       CMakeLists.txt third-party libtransmission qt
+          get_changes tests    CMakeLists.txt third-party libtransmission utils tests
+          get_changes utils    CMakeLists.txt third-party libtransmission utils
+          get_changes web      CMakeLists.txt third-party libtransmission web
 
   code-style:
     runs-on: ubuntu-22.04
