@@ -223,7 +223,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
                 __FILE__, \
                 __LINE__, \
                 (level), \
-                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->addrStr(), (msgs)->client, text), \
+                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->to_text(), (msgs)->client, text), \
                 (msgs)->torrent->name()); \
         } \
     } while (0)
@@ -2144,7 +2144,7 @@ static void gotError(tr_peerIo* io, short what, void* vmsgs)
 
     if ((what & BEV_EVENT_EOF) != 0)
     {
-        logdbg(msgs, fmt::format("peer closed connection. {:s}", io->addrStr()));
+        logdbg(msgs, fmt::format("peer closed connection. {:s}", io->to_text()));
     }
     else if (what == BEV_EVENT_ERROR)
     {

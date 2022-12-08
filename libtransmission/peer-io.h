@@ -101,7 +101,7 @@ public:
         return socket.socketAddress();
     }
 
-    [[nodiscard]] auto addrStr() const
+    [[nodiscard]] auto to_text() const
     {
         return socket.to_text();
     }
