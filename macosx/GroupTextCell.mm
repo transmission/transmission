@@ -12,7 +12,7 @@
 {
     NSRect titleFrame = [super titleRectForBounds:theRect];
     NSSize titleSize = [[self attributedStringValue] size];
-    titleFrame.origin.y = theRect.origin.y - 1.0 + (theRect.size.height - titleSize.height) / 2.0;
+    titleFrame.origin.y = NSMidY(theRect) - (CGFloat)1.0 - titleSize.height * (CGFloat)0.5;
     titleFrame.origin.x = theRect.origin.x;
     return titleFrame;
 }
