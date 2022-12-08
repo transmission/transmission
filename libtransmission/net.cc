@@ -58,25 +58,6 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
-/*
- * Compare two tr_address structures.
- * Returns:
- * <0 if a < b
- * >0 if a > b
- * 0  if a == b
- */
-int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
-{
-    // IPv6 addresses are always "greater than" IPv4
-    if (a->type != b->type)
-    {
-        return a->isIPv4() ? 1 : -1;
-    }
-
-    return a->isIPv4() ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-                         memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
-}
-
 /***********************************************************************
  * TCP sockets
  **********************************************************************/
@@ -157,55 +138,6 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
     }
 
 #endif
-}
-
-std::optional<std::pair<tr_address, tr_port>> tr_address::fromSockaddr(struct sockaddr const* from)
-{
-    if (from == nullptr)
-    {
-        return {};
-    }
-
-    if (from->sa_family == AF_INET)
-    {
-        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET;
-        addr.addr.addr4 = sin->sin_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin->sin_port));
-    }
-
-    if (from->sa_family == AF_INET6)
-    {
-        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET6;
-        addr.addr.addr6 = sin6->sin6_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin6->sin6_port));
-    }
-
-    return {};
-}
-
-std::pair<sockaddr_storage, socklen_t> tr_address::toSockaddr(tr_port port) const noexcept
-{
-    auto ss = sockaddr_storage{};
-
-    if (isIPv4())
-    {
-        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
-        ss4->sin_addr = addr.addr4;
-        ss4->sin_family = AF_INET;
-        ss4->sin_port = port.network();
-        return { ss, sizeof(sockaddr_in) };
-    }
-
-    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
-    ss6->sin6_addr = addr.addr6;
-    ss6->sin6_family = AF_INET6;
-    ss6->sin6_flowinfo = 0;
-    ss6->sin6_port = port.network();
-    return { ss, sizeof(sockaddr_in6) };
 }
 
 static tr_socket_t createSocket(tr_session* session, int domain, int type)
@@ -840,6 +772,67 @@ std::pair<tr_address, std::byte const*> tr_address::fromCompact6(std::byte const
     compact += Addr6Len;
 
     return std::make_pair(address, compact);
+}
+
+std::optional<std::pair<tr_address, tr_port>> tr_address::fromSockaddr(struct sockaddr const* from)
+{
+    if (from == nullptr)
+    {
+        return {};
+    }
+
+    if (from->sa_family == AF_INET)
+    {
+        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET;
+        addr.addr.addr4 = sin->sin_addr;
+        return std::make_pair(addr, tr_port::fromNetwork(sin->sin_port));
+    }
+
+    if (from->sa_family == AF_INET6)
+    {
+        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET6;
+        addr.addr.addr6 = sin6->sin6_addr;
+        return std::make_pair(addr, tr_port::fromNetwork(sin6->sin6_port));
+    }
+
+    return {};
+}
+
+std::pair<sockaddr_storage, socklen_t> tr_address::toSockaddr(tr_port port) const noexcept
+{
+    auto ss = sockaddr_storage{};
+
+    if (isIPv4())
+    {
+        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
+        ss4->sin_addr = addr.addr4;
+        ss4->sin_family = AF_INET;
+        ss4->sin_port = port.network();
+        return { ss, sizeof(sockaddr_in) };
+    }
+
+    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
+    ss6->sin6_addr = addr.addr6;
+    ss6->sin6_family = AF_INET6;
+    ss6->sin6_flowinfo = 0;
+    ss6->sin6_port = port.network();
+    return { ss, sizeof(sockaddr_in6) };
+}
+
+static int tr_address_compare(tr_address const* a, tr_address const* b) noexcept // <=>
+{
+    // IPv6 addresses are always "greater than" IPv4
+    if (a->type != b->type)
+    {
+        return a->isIPv4() ? 1 : -1;
+    }
+
+    return a->isIPv4() ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
+                         memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
 }
 
 int tr_address::compare(tr_address const& that) const noexcept // <=>
