@@ -412,10 +412,10 @@ public:
         return io->socketAddress();
     }
 
-    [[nodiscard]] std::string readable() const override
+    [[nodiscard]] std::string to_text() const override
     {
         auto const [addr, port] = socketAddress();
-        return addr.readable(port);
+        return addr.to_text(port);
     }
 
     [[nodiscard]] tr_bitfield const& has() const noexcept override

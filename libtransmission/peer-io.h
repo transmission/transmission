@@ -103,7 +103,7 @@ public:
 
     [[nodiscard]] auto addrStr() const
     {
-        return socket.readable();
+        return socket.to_text();
     }
 
     void readBufferDrain(size_t byte_count);
