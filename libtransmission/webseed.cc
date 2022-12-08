@@ -230,7 +230,7 @@ public:
         return {};
     }
 
-    [[nodiscard]] std::string to_text() const override
+    [[nodiscard]] std::string display_name() const override
     {
         if (auto const parsed = tr_urlParse(base_url); parsed)
         {

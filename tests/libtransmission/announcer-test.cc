@@ -80,7 +80,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].to_text());
+        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].display_name());
     }
 }
 
@@ -119,7 +119,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[8.8.4.4]:53"sv, response.pex[0].to_text());
+        EXPECT_EQ("[8.8.4.4]:53"sv, response.pex[0].display_name());
     }
 }
 

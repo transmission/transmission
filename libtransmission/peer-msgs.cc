@@ -223,7 +223,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
                 __FILE__, \
                 __LINE__, \
                 (level), \
-                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->to_text(), (msgs)->client, text), \
+                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->client, text), \
                 (msgs)->torrent->name()); \
         } \
     } while (0)
@@ -412,10 +412,10 @@ public:
         return io->socketAddress();
     }
 
-    [[nodiscard]] std::string to_text() const override
+    [[nodiscard]] std::string display_name() const override
     {
         auto const [addr, port] = socketAddress();
-        return addr.to_text(port);
+        return addr.display_name(port);
     }
 
     [[nodiscard]] tr_bitfield const& has() const noexcept override
@@ -2144,7 +2144,7 @@ static void gotError(tr_peerIo* io, short what, void* vmsgs)
 
     if ((what & BEV_EVENT_EOF) != 0)
     {
-        logdbg(msgs, fmt::format("peer closed connection. {:s}", io->to_text()));
+        logdbg(msgs, fmt::format("peer closed connection. {:s}", io->display_name()));
     }
     else if (what == BEV_EVENT_ERROR)
     {

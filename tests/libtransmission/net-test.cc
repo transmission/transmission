@@ -20,7 +20,7 @@ TEST_F(NetTest, conversionsIPv4)
 
     auto addr = tr_address::fromString(AddrStr);
     EXPECT_TRUE(addr);
-    EXPECT_EQ(AddrStr, addr->to_text());
+    EXPECT_EQ(AddrStr, addr->display_name());
 
     auto [ss, sslen] = addr->toSockaddr(Port);
     EXPECT_EQ(AF_INET, ss.ss_family);
@@ -34,8 +34,8 @@ TEST_F(NetTest, conversionsIPv4)
 
 TEST_F(NetTest, trAddress)
 {
-    EXPECT_EQ("0.0.0.0", tr_address::AnyIPv4().to_text());
-    EXPECT_EQ("::", tr_address::AnyIPv6().to_text());
+    EXPECT_EQ("0.0.0.0", tr_address::AnyIPv4().display_name());
+    EXPECT_EQ("::", tr_address::AnyIPv6().display_name());
 }
 
 TEST_F(NetTest, compact4)
@@ -54,7 +54,7 @@ TEST_F(NetTest, compact4)
     std::tie(addr, in) = tr_address::fromCompact4(in);
     std::tie(port, in) = tr_port::fromCompact(in);
     EXPECT_EQ(std::data(Compact4) + std::size(Compact4), in);
-    EXPECT_EQ(ExpectedReadable, addr.to_text());
+    EXPECT_EQ(ExpectedReadable, addr.display_name());
     EXPECT_EQ(ExpectedPort, port);
 
     // ...serialize it back again
@@ -108,7 +108,7 @@ TEST_F(NetTest, compact6)
     std::tie(addr, in) = tr_address::fromCompact6(in);
     std::tie(port, in) = tr_port::fromCompact(in);
     EXPECT_EQ(std::data(Compact6) + std::size(Compact6), in);
-    EXPECT_EQ(ExpectedReadable, addr.to_text());
+    EXPECT_EQ(ExpectedReadable, addr.display_name());
     EXPECT_EQ(ExpectedPort, port);
 
     // ...serialize it back again

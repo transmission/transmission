@@ -160,9 +160,9 @@ struct tr_address
 
     // write the text form of the address, e.g. inet_ntop()
     template<typename OutputIt>
-    OutputIt to_text(OutputIt out, tr_port port = {}) const;
-    std::string_view to_text(char* out, size_t outlen, tr_port port = {}) const;
-    [[nodiscard]] std::string to_text(tr_port port = {}) const;
+    OutputIt display_name(OutputIt out, tr_port port = {}) const;
+    std::string_view display_name(char* out, size_t outlen, tr_port port = {}) const;
+    [[nodiscard]] std::string display_name(tr_port port = {}) const;
 
     template<typename OutputIt>
     static OutputIt toCompact4(OutputIt out, in_addr const* addr4, tr_port port)
