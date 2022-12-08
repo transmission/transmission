@@ -214,7 +214,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
 }
 
-//we override row highlightling because we are custom drawing the group rows
+//we override row highlighting because we are custom drawing the group rows
 //see isGroupItem
 - (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect
 {
