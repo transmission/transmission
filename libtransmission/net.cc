@@ -520,17 +520,18 @@ void tr_netClose(tr_session* session, tr_socket_t sockfd)
     session->decPeerCount();
 }
 
-/*
-   get_source_address() and global_unicast_address() were written by
-   Juliusz Chroboczek, and are covered under the same license as dht.c.
-   Please feel free to copy them into your software if it can help
-   unbreaking the double-stack Internet. */
+// code in global_ipv6_herlpers is written by Juliusz Chroboczek
+// and is covered under the same license as dht.cc.
+// Please feel free to copy them into your software if it can help
+// unbreaking the double-stack Internet.
+namespace global_ipv6_helpers
+{
 
 /* Get the source address used for a given destination address. Since
    there is no official interface to get this information, we create
    a connected UDP socket (connected UDP... hmm...) and check its source
    address. */
-static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, struct sockaddr* src, socklen_t* src_len)
+[[nodiscard]] int get_source_address(struct sockaddr const* dst, socklen_t dst_len, struct sockaddr* src, socklen_t* src_len)
 {
     tr_socket_t const s = socket(dst->sa_family, SOCK_DGRAM, 0);
     if (s == TR_BAD_SOCKET)
@@ -552,7 +553,7 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
 }
 
 /* We all hate NATs. */
-static int global_unicast_address(struct sockaddr_storage* ss)
+[[nodiscard]] int global_unicast_address(struct sockaddr_storage* ss)
 {
     if (ss->ss_family == AF_INET)
     {
@@ -578,7 +579,7 @@ static int global_unicast_address(struct sockaddr_storage* ss)
     return -1;
 }
 
-static int tr_globalAddress(int af, void* addr, int* addr_len)
+[[nodiscard]] int global_address(int af, void* addr, int* addr_len)
 {
     auto ss = sockaddr_storage{};
     socklen_t sslen = sizeof(ss);
@@ -650,9 +651,13 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
     }
 }
 
+} // namespace global_ipv6_helpers
+
 /* Return our global IPv6 address, with caching. */
 std::optional<in6_addr> tr_globalIPv6(tr_session const* session)
 {
+    using namespace global_ipv6_helpers;
+
     static auto ipv6 = in6_addr{};
     static time_t last_time = 0;
     static bool have_ipv6 = false;
@@ -661,7 +666,7 @@ std::optional<in6_addr> tr_globalIPv6(tr_session const* session)
     if (auto const now = tr_time(); last_time < now - 1800)
     {
         int addrlen = sizeof(ipv6);
-        int const rc = tr_globalAddress(AF_INET6, &ipv6, &addrlen);
+        int const rc = global_address(AF_INET6, &ipv6, &addrlen);
         have_ipv6 = rc >= 0 && addrlen == sizeof(ipv6);
         last_time = now;
     }
