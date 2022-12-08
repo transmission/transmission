@@ -1637,9 +1637,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
         {
             logtrace(msgs, "Got a BtPeerMsgs::Port");
 
-            auto nport = uint16_t{};
-            msgs->io->readUint16(&nport);
-            if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
+            auto hport = uint16_t{};
+            msgs->io->readUint16(&hport); // readUint16 performs ntoh
+            if (auto const dht_port = tr_port::fromHost(hport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
                 msgs->session->addDhtNode(msgs->io->address(), msgs->dht_port);
