@@ -158,11 +158,11 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, std::byte const*> fromCompact4(std::byte const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, std::byte const*> fromCompact6(std::byte const* compact) noexcept;
 
-    // human-readable formatting
+    // write the text form of the address, e.g. inet_ntop()
     template<typename OutputIt>
-    OutputIt readable(OutputIt out, tr_port port = {}) const;
-    std::string_view readable(char* out, size_t outlen, tr_port port = {}) const;
-    [[nodiscard]] std::string readable(tr_port port = {}) const;
+    OutputIt display_name(OutputIt out, tr_port port = {}) const;
+    std::string_view display_name(char* out, size_t outlen, tr_port port = {}) const;
+    [[nodiscard]] std::string display_name(tr_port port = {}) const;
 
     template<typename OutputIt>
     static OutputIt toCompact4(OutputIt out, in_addr const* addr4, tr_port port)

@@ -76,12 +76,12 @@ protected:
             auto str = std::string{};
             for (auto const& [addr, port] : ipv4_nodes_)
             {
-                str += addr.readable(port);
+                str += addr.display_name(port);
                 str += ',';
             }
             for (auto const& [addr, port] : ipv6_nodes_)
             {
-                str += addr.readable(port);
+                str += addr.display_name(port);
                 str += ',';
             }
             return str;
@@ -457,7 +457,7 @@ TEST_F(DhtTest, loadsStateFromStateFile)
     auto actual_nodes_str = std::string{};
     for (auto const& [addr, port, timestamp] : pinged)
     {
-        actual_nodes_str += addr.readable(port);
+        actual_nodes_str += addr.display_name(port);
         actual_nodes_str += ',';
     }
 
@@ -573,7 +573,7 @@ TEST_F(DhtTest, usesBootstrapFile)
     auto const actual = pinged.front();
     EXPECT_EQ(expected.first, actual.address);
     EXPECT_EQ(expected.second, actual.port);
-    EXPECT_EQ(expected.first.readable(expected.second), actual.address.readable(actual.port));
+    EXPECT_EQ(expected.first.display_name(expected.second), actual.address.display_name(actual.port));
 }
 
 TEST_F(DhtTest, pingsAddedNodes)

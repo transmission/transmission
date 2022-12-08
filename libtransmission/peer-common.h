@@ -202,7 +202,7 @@ public:
         return has().hasAll();
     }
 
-    [[nodiscard]] virtual std::string readable() const = 0;
+    [[nodiscard]] virtual std::string display_name() const = 0;
 
     [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
 

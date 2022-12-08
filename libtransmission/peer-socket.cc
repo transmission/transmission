@@ -13,10 +13,10 @@
 #include "net.h"
 #include "session.h"
 
-#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->readable())
-#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->readable())
-#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->readable())
-#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->readable())
+#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
+#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())
+#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
+#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
 tr_peer_socket::tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock)
     : handle{ sock }
