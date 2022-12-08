@@ -5223,6 +5223,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
                                                                                        metrics:nil
                                                                                          views:views];
+
+            //redraw table to avoid empty cells
+            [self.fTableView reloadData];
         }
 
         //add height constraint to fStackView
