@@ -388,12 +388,12 @@ private:
 
         if (event == DHT_EVENT_VALUES)
         {
-            auto const pex = tr_pex::fromCompact4(data, data_len, nullptr, 0);
+            auto const pex = tr_pex::from_compact_ipv4(data, data_len, nullptr, 0);
             self->mediator_.addPex(hash, std::data(pex), std::size(pex));
         }
         else if (event == DHT_EVENT_VALUES6)
         {
-            auto const pex = tr_pex::fromCompact6(data, data_len, nullptr, 0);
+            auto const pex = tr_pex::from_compact_ipv6(data, data_len, nullptr, 0);
             self->mediator_.addPex(hash, std::data(pex), std::size(pex));
         }
     }
@@ -480,7 +480,7 @@ private:
                 {
                     auto addr = tr_address{};
                     auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::fromCompact4(walk);
+                    std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
                     std::tie(port, walk) = tr_port::fromCompact(walk);
                     nodes.emplace_back(addr, port);
                 }
@@ -494,7 +494,7 @@ private:
                 {
                     auto addr = tr_address{};
                     auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::fromCompact6(walk);
+                    std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
                     std::tie(port, walk) = tr_port::fromCompact(walk);
                     nodes.emplace_back(addr, port);
                 }
@@ -564,7 +564,7 @@ private:
 
         for (auto* infop = info; infop != nullptr; infop = infop->ai_next)
         {
-            if (auto addrport = tr_address::fromSockaddr(infop->ai_addr); addrport)
+            if (auto addrport = tr_address::from_sockaddr(infop->ai_addr); addrport)
             {
                 nodes.emplace_back(addrport->first, addrport->second);
             }

@@ -171,15 +171,15 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "peers"sv)
             {
-                response_.pex = tr_pex::fromCompact4(std::data(value), std::size(value), nullptr, 0);
+                response_.pex = tr_pex::from_compact_ipv4(std::data(value), std::size(value), nullptr, 0);
             }
             else if (key == "peers6"sv)
             {
-                response_.pex6 = tr_pex::fromCompact6(std::data(value), std::size(value), nullptr, 0);
+                response_.pex6 = tr_pex::from_compact_ipv6(std::data(value), std::size(value), nullptr, 0);
             }
             else if (key == "ip")
             {
-                if (auto const addr = tr_address::fromString(value); addr)
+                if (auto const addr = tr_address::from_string(value); addr)
                 {
                     pex_.addr = *addr;
                 }
@@ -190,7 +190,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "external ip"sv && std::size(value) == 4)
             {
-                auto const [addr, out] = tr_address::fromCompact4(reinterpret_cast<std::byte const*>(std::data(value)));
+                auto const [addr, out] = tr_address::from_compact_ipv4(reinterpret_cast<std::byte const*>(std::data(value)));
                 response_.external_ip = addr;
             }
             else

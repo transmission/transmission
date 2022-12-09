@@ -227,7 +227,7 @@ struct tau_announce_request
             response.seeders = buf.toUint32();
 
             auto const contiguous = std::vector<std::byte>{ std::begin(buf), std::end(buf) };
-            response.pex = tr_pex::fromCompact4(std::data(contiguous), std::size(contiguous), nullptr, 0);
+            response.pex = tr_pex::from_compact_ipv4(std::data(contiguous), std::size(contiguous), nullptr, 0);
             requestFinished();
         }
         else

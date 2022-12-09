@@ -62,7 +62,7 @@ std::string tr_net_strerror(int err)
  * TCP sockets
  **********************************************************************/
 
-[[nodiscard]] std::optional<tr_tos_t> tr_tos_t::fromString(std::string_view name)
+[[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
 {
     auto const needle = tr_strlower(tr_strvStrip(name));
 
@@ -220,11 +220,11 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
         }
     }
 
-    auto const [sock, addrlen] = addr.toSockaddr(port);
+    auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
     auto const [source_addr, is_default_addr] = session->publicAddress(addr.type);
-    auto const [source_sock, sourcelen] = source_addr.toSockaddr({});
+    auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
@@ -274,7 +274,7 @@ tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& ad
 
     if (session->utp_context != nullptr && tr_address_is_valid_for_peers(&addr, port))
     {
-        auto const [ss, sslen] = addr.toSockaddr(port);
+        auto const [ss, sslen] = addr.to_sockaddr(port);
 
         if (auto* const sock = utp_create_socket(session->utp_context); sock != nullptr)
         {
@@ -329,7 +329,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
 #endif
 
-    auto const [sock, addrlen] = addr.toSockaddr(port);
+    auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
     {
@@ -397,7 +397,7 @@ bool tr_net_hasIPv6(tr_port port)
     if (!already_done)
     {
         int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::AnyIPv4(), port, true, &err);
+        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv4(), port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
         {
@@ -431,7 +431,7 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    auto const addrport = tr_address::fromSockaddr(reinterpret_cast<struct sockaddr*>(&sock));
+    auto const addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
     if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || !session->incPeerCount())
     {
         tr_netCloseSocket(sockfd);
@@ -697,7 +697,7 @@ std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compa
 
 /// tr_address
 
-std::optional<tr_address> tr_address::fromString(std::string_view address_sv)
+std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {
     auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
 
@@ -749,7 +749,7 @@ template char* tr_address::display_name<char*>(char*, tr_port) const;
     return buf;
 }
 
-std::pair<tr_address, std::byte const*> tr_address::fromCompact4(std::byte const* compact) noexcept
+std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte const* compact) noexcept
 {
     static auto constexpr Addr4Len = size_t{ 4 };
 
@@ -762,7 +762,7 @@ std::pair<tr_address, std::byte const*> tr_address::fromCompact4(std::byte const
     return std::make_pair(address, compact);
 }
 
-std::pair<tr_address, std::byte const*> tr_address::fromCompact6(std::byte const* compact) noexcept
+std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte const* compact) noexcept
 {
     static auto constexpr Addr6Len = size_t{ 16 };
 
@@ -774,7 +774,7 @@ std::pair<tr_address, std::byte const*> tr_address::fromCompact6(std::byte const
     return std::make_pair(address, compact);
 }
 
-std::optional<std::pair<tr_address, tr_port>> tr_address::fromSockaddr(struct sockaddr const* from)
+std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct sockaddr const* from)
 {
     if (from == nullptr)
     {
@@ -802,7 +802,7 @@ std::optional<std::pair<tr_address, tr_port>> tr_address::fromSockaddr(struct so
     return {};
 }
 
-std::pair<sockaddr_storage, socklen_t> tr_address::toSockaddr(tr_port port) const noexcept
+std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) const noexcept
 {
     auto ss = sockaddr_storage{};
 

@@ -47,7 +47,7 @@ protected:
 
         void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
         {
-            auto target = tr_address::fromSockaddr(sa);
+            auto target = tr_address::from_sockaddr(sa);
             ASSERT_TRUE(target);
             sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
         }
@@ -567,9 +567,9 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     static auto constexpr Leechers = uint32_t{ 10 };
     static auto constexpr Seeders = uint32_t{ 20 };
     auto const addresses = std::array<std::pair<tr_address, tr_port>, 3>{
-        std::make_pair(tr_address::fromString("10.10.10.5").value_or(tr_address{}), tr_port::fromHost(128)),
-        std::make_pair(tr_address::fromString("192.168.1.2").value_or(tr_address{}), tr_port::fromHost(2021)),
-        std::make_pair(tr_address::fromString("192.168.1.3").value_or(tr_address{}), tr_port::fromHost(2022)),
+        std::make_pair(tr_address::from_string("10.10.10.5").value_or(tr_address{}), tr_port::fromHost(128)),
+        std::make_pair(tr_address::from_string("192.168.1.2").value_or(tr_address{}), tr_port::fromHost(2021)),
+        std::make_pair(tr_address::from_string("192.168.1.3").value_or(tr_address{}), tr_port::fromHost(2022)),
     };
 
     auto request = tr_announce_request{};

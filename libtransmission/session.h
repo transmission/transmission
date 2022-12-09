@@ -146,7 +146,7 @@ private:
                 return {};
             }
 
-            return tr_address::fromString(session_.announceIP());
+            return tr_address::from_string(session_.announceIP());
         }
 
     private:

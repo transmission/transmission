@@ -94,7 +94,7 @@ std::optional<address_range_t> parsePeerGuardianLine(std::string_view line)
     }
 
     auto addrpair = address_range_t{};
-    if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
+    if (auto const addr = tr_address::from_string(line.substr(0, pos)); addr)
     {
         addrpair.first = *addr;
     }
@@ -106,7 +106,7 @@ std::optional<address_range_t> parsePeerGuardianLine(std::string_view line)
     line = line.substr(pos + 1);
 
     // parse the trailing 'y.y.y.y'
-    if (auto const addr = tr_address::fromString(line); addr)
+    if (auto const addr = tr_address::from_string(line); addr)
     {
         addrpair.second = *addr;
     }
@@ -133,7 +133,7 @@ std::optional<address_range_t> parseEmuleLine(std::string_view line)
 
     auto addrpair = address_range_t{};
 
-    if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
+    if (auto const addr = tr_address::from_string(line.substr(0, pos)); addr)
     {
         addrpair.first = *addr;
     }
@@ -149,7 +149,7 @@ std::optional<address_range_t> parseEmuleLine(std::string_view line)
         return {};
     }
 
-    if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr)
+    if (auto const addr = tr_address::from_string(line.substr(0, pos)); addr)
     {
         addrpair.second = *addr;
     }
@@ -174,7 +174,7 @@ std::optional<address_range_t> parseCidrLine(std::string_view line)
         return {};
     }
 
-    if (auto const addr = tr_address::fromString(line.substr(0, pos)); addr && addr->is_ipv4())
+    if (auto const addr = tr_address::from_string(line.substr(0, pos)); addr && addr->is_ipv4())
     {
         addrpair.first = *addr;
     }
