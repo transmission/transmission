@@ -284,7 +284,7 @@ public:
         if (session->allowsDHT() && io->supportsDHT())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
-            if (io->address().isIPv4() || tr_globalIPv6(nullptr).has_value())
+            if (io->address().is_ipv4() || tr_globalIPv6(nullptr).has_value())
             {
                 protocolSendPort(this, session->udpPort());
             }
@@ -1180,7 +1180,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
                 added_f = nullptr;
             }
 
-            auto pex = tr_pex::fromCompact4(added, added_len, added_f, added_f_len);
+            auto pex = tr_pex::from_compact_ipv4(added, added_len, added_f, added_f_len);
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
@@ -1195,7 +1195,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
                 added_f = nullptr;
             }
 
-            auto pex = tr_pex::fromCompact6(added, added_len, added_f, added_f_len);
+            auto pex = tr_pex::from_compact_ipv6(added, added_len, added_f, added_f_len);
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
@@ -2264,7 +2264,7 @@ void tr_peerMsgsImpl::sendPex()
     {
         // "added"
         tmpbuf.clear();
-        tr_pex::toCompact4(std::back_inserter(tmpbuf), std::data(added), std::size(added));
+        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(added), std::size(added));
         TR_ASSERT(std::size(tmpbuf) == std::size(added) * 6);
         tr_variantDictAddRaw(&val, TR_KEY_added, std::data(tmpbuf), std::size(tmpbuf));
 
@@ -2286,7 +2286,7 @@ void tr_peerMsgsImpl::sendPex()
     {
         // "dropped"
         tmpbuf.clear();
-        tr_pex::toCompact4(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
+        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
         TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * 6);
         tr_variantDictAddRaw(&val, TR_KEY_dropped, std::data(tmpbuf), std::size(tmpbuf));
     }
@@ -2294,7 +2294,7 @@ void tr_peerMsgsImpl::sendPex()
     if (!std::empty(added6))
     {
         tmpbuf.clear();
-        tr_pex::toCompact6(std::back_inserter(tmpbuf), std::data(added6), std::size(added6));
+        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(added6), std::size(added6));
         TR_ASSERT(std::size(tmpbuf) == std::size(added6) * 18);
         tr_variantDictAddRaw(&val, TR_KEY_added6, std::data(tmpbuf), std::size(tmpbuf));
 
@@ -2316,7 +2316,7 @@ void tr_peerMsgsImpl::sendPex()
     {
         // "dropped6"
         tmpbuf.clear();
-        tr_pex::toCompact6(std::back_inserter(tmpbuf), std::data(dropped6), std::size(dropped6));
+        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(dropped6), std::size(dropped6));
         TR_ASSERT(std::size(tmpbuf) == std::size(dropped6) * 18);
         tr_variantDictAddRaw(&val, TR_KEY_dropped6, std::data(tmpbuf), std::size(tmpbuf));
     }

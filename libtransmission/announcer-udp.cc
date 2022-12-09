@@ -227,7 +227,7 @@ struct tau_announce_request
             response.seeders = buf.toUint32();
 
             auto const contiguous = std::vector<std::byte>{ std::begin(buf), std::end(buf) };
-            response.pex = tr_pex::fromCompact4(std::data(contiguous), std::size(contiguous), nullptr, 0);
+            response.pex = tr_pex::from_compact_ipv4(std::data(contiguous), std::size(contiguous), nullptr, 0);
             requestFinished();
         }
         else
@@ -591,7 +591,7 @@ public:
 
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
         auto const addr = mediator_.announceIP();
-        uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
+        uint32_t const announce_ip = addr && addr->is_ipv4() ? addr->addr.addr4.s_addr : 0;
         tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
         tracker->upkeep(false);
     }

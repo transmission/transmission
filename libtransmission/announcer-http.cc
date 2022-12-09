@@ -52,84 +52,6 @@ using namespace std::literals;
     return req.partial_seed && (req.event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused"sv : tr_announce_event_get_string(req.event);
 }
 
-static void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_request const& req)
-{
-    url.clear();
-    auto out = std::back_inserter(url);
-
-    auto escaped_info_hash = tr_urlbuf{};
-    tr_urlPercentEncode(std::back_inserter(escaped_info_hash), req.info_hash);
-
-    fmt::format_to(
-        out,
-        "{url}"
-        "{sep}info_hash={info_hash}"
-        "&peer_id={peer_id}"
-        "&port={port}"
-        "&uploaded={uploaded}"
-        "&downloaded={downloaded}"
-        "&left={left}"
-        "&numwant={numwant}"
-        "&key={key}"
-        "&compact=1"
-        "&supportcrypto=1",
-        fmt::arg("url", req.announce_url),
-        fmt::arg("sep", tr_strvContains(req.announce_url.sv(), '?') ? '&' : '?'),
-        fmt::arg("info_hash", std::data(escaped_info_hash)),
-        fmt::arg("peer_id", std::string_view{ std::data(req.peer_id), std::size(req.peer_id) }),
-        fmt::arg("port", req.port.host()),
-        fmt::arg("uploaded", req.up),
-        fmt::arg("downloaded", req.down),
-        fmt::arg("left", req.leftUntilComplete),
-        fmt::arg("numwant", req.numwant),
-        fmt::arg("key", req.key));
-
-    if (session->encryptionMode() == TR_ENCRYPTION_REQUIRED)
-    {
-        fmt::format_to(out, "&requirecrypto=1");
-    }
-
-    if (req.corrupt != 0)
-    {
-        fmt::format_to(out, "&corrupt={}", req.corrupt);
-    }
-
-    if (auto const str = get_event_string(req); !std::empty(str))
-    {
-        fmt::format_to(out, "&event={}", str);
-    }
-
-    if (!std::empty(req.tracker_id))
-    {
-        fmt::format_to(out, "&trackerid={}", req.tracker_id);
-    }
-}
-
-static std::string format_ipv4_url_arg(tr_address const& ipv4_address)
-{
-    auto readable = std::array<char, INET_ADDRSTRLEN>{};
-    evutil_inet_ntop(AF_INET, &ipv4_address.addr, readable.data(), readable.size());
-    return "&ipv4="s + readable.data();
-}
-
-static std::string format_ipv6_url_arg(in6_addr const addr)
-{
-    auto readable = std::array<char, INET6_ADDRSTRLEN>{};
-    evutil_inet_ntop(AF_INET6, &addr, std::data(readable), std::size(readable));
-
-    auto arg = "&ipv6="s;
-    tr_urlPercentEncode(std::back_inserter(arg), readable.data());
-
-    return arg;
-}
-
-static std::string format_ip_arg(std::string_view ip)
-{
-    auto arg = std::string{ "&ip="sv };
-    arg += ip;
-    return arg;
-}
-
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
     auto& out = std::cerr;
@@ -190,7 +112,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             BasicHandler::EndDict(context);
 
-            if (tr_address_is_valid_for_peers(&pex_.addr, pex_.port))
+            if (pex_.is_valid_for_peers())
             {
                 response_.pex.push_back(pex_);
                 pex_ = {};
@@ -249,15 +171,15 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "peers"sv)
             {
-                response_.pex = tr_pex::fromCompact4(std::data(value), std::size(value), nullptr, 0);
+                response_.pex = tr_pex::from_compact_ipv4(std::data(value), std::size(value), nullptr, 0);
             }
             else if (key == "peers6"sv)
             {
-                response_.pex6 = tr_pex::fromCompact6(std::data(value), std::size(value), nullptr, 0);
+                response_.pex6 = tr_pex::from_compact_ipv6(std::data(value), std::size(value), nullptr, 0);
             }
             else if (key == "ip")
             {
-                if (auto const addr = tr_address::fromString(value); addr)
+                if (auto const addr = tr_address::from_string(value); addr)
                 {
                     pex_.addr = *addr;
                 }
@@ -268,7 +190,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "external ip"sv && std::size(value) == 4)
             {
-                auto const [addr, out] = tr_address::fromCompact4(reinterpret_cast<std::byte const*>(std::data(value)));
+                auto const [addr, out] = tr_address::from_compact_ipv4(reinterpret_cast<std::byte const*>(std::data(value)));
                 response_.external_ip = addr;
             }
             else
@@ -403,11 +325,96 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     }
 }
 
+namespace tr_tracker_announce_helpers
+{
+
+void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_request const& req)
+{
+    url.clear();
+    auto out = std::back_inserter(url);
+
+    auto escaped_info_hash = tr_urlbuf{};
+    tr_urlPercentEncode(std::back_inserter(escaped_info_hash), req.info_hash);
+
+    fmt::format_to(
+        out,
+        "{url}"
+        "{sep}info_hash={info_hash}"
+        "&peer_id={peer_id}"
+        "&port={port}"
+        "&uploaded={uploaded}"
+        "&downloaded={downloaded}"
+        "&left={left}"
+        "&numwant={numwant}"
+        "&key={key}"
+        "&compact=1"
+        "&supportcrypto=1",
+        fmt::arg("url", req.announce_url),
+        fmt::arg("sep", tr_strvContains(req.announce_url.sv(), '?') ? '&' : '?'),
+        fmt::arg("info_hash", std::data(escaped_info_hash)),
+        fmt::arg("peer_id", std::string_view{ std::data(req.peer_id), std::size(req.peer_id) }),
+        fmt::arg("port", req.port.host()),
+        fmt::arg("uploaded", req.up),
+        fmt::arg("downloaded", req.down),
+        fmt::arg("left", req.leftUntilComplete),
+        fmt::arg("numwant", req.numwant),
+        fmt::arg("key", req.key));
+
+    if (session->encryptionMode() == TR_ENCRYPTION_REQUIRED)
+    {
+        fmt::format_to(out, "&requirecrypto=1");
+    }
+
+    if (req.corrupt != 0)
+    {
+        fmt::format_to(out, "&corrupt={}", req.corrupt);
+    }
+
+    if (auto const str = get_event_string(req); !std::empty(str))
+    {
+        fmt::format_to(out, "&event={}", str);
+    }
+
+    if (!std::empty(req.tracker_id))
+    {
+        fmt::format_to(out, "&trackerid={}", req.tracker_id);
+    }
+}
+
+[[nodiscard]] std::string format_ipv4_url_arg(tr_address const& addr)
+{
+    auto buf = std::array<char, TR_ADDRSTRLEN>{};
+    auto display_name = addr.display_name(std::data(buf), std::size(buf));
+    return fmt::format("&ipv4={:s}", display_name);
+}
+
+[[nodiscard]] std::string format_ipv6_url_arg(in6_addr const addr)
+{
+    auto readable = std::array<char, INET6_ADDRSTRLEN>{};
+    evutil_inet_ntop(AF_INET6, &addr, std::data(readable), std::size(readable));
+
+    auto arg = "&ipv6="s;
+    tr_urlPercentEncode(std::back_inserter(arg), readable.data());
+
+    return arg;
+}
+
+[[nodiscard]] std::string format_ip_arg(std::string_view ip)
+{
+    auto arg = std::string{ "&ip="sv };
+    arg += ip;
+    return arg;
+}
+
+} // namespace tr_tracker_announce_helpers
+
 void tr_tracker_http_announce(
     tr_session const* session,
     tr_announce_request const& request,
     tr_announce_response_func on_response)
 {
+    using namespace tr_tracker_announce_helpers;
+
     auto* const d = new http_announce_data{ request.info_hash, std::move(on_response), request.log_name };
 
     /* There are two alternative techniques for announcing both IPv4 and

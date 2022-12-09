@@ -34,7 +34,7 @@ using namespace std::literals;
 
 bool tr_addressIsIP(char const* address)
 {
-    return address != nullptr && tr_address::fromString(address).has_value();
+    return address != nullptr && tr_address::from_string(address).has_value();
 }
 
 char const* tr_webGetResponseStr(long code)
@@ -249,7 +249,7 @@ std::string_view getSiteName(std::string_view host)
     }
 
     // is it an IP?
-    if (auto const addr = tr_address::fromString(host); addr)
+    if (auto const addr = tr_address::from_string(host); addr)
     {
         return host;
     }

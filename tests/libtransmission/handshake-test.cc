@@ -143,7 +143,7 @@ public:
     static auto constexpr ReservedBytesNoExtensions = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
     static auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
 
-    tr_address const DefaultPeerAddr = *tr_address::fromString("127.0.0.1"sv);
+    tr_address const DefaultPeerAddr = *tr_address::from_string("127.0.0.1"sv);
     tr_port const DefaultPeerPort = tr_port::fromHost(8080);
     tr_handshake_mediator::torrent_info const TorrentWeAreSeeding{ tr_sha1::digest("abcde"sv),
                                                                    tr_peerIdInit(),

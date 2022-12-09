@@ -164,7 +164,7 @@ struct peer_atom
 #ifdef TR_ENABLE_ASSERTS
     [[nodiscard]] bool isValid() const noexcept
     {
-        return fromFirst < TR_PEER_FROM__MAX && fromBest < TR_PEER_FROM__MAX && tr_address_is_valid(&addr);
+        return fromFirst < TR_PEER_FROM__MAX && fromBest < TR_PEER_FROM__MAX && addr.is_valid();
     }
 #endif
 
@@ -1086,7 +1086,7 @@ static struct peer_atom* ensureAtomExists(
     uint8_t const flags,
     uint8_t const from)
 {
-    TR_ASSERT(tr_address_is_valid(&addr));
+    TR_ASSERT(addr.is_valid());
     TR_ASSERT(from < TR_PEER_FROM__MAX);
 
     struct peer_atom* a = getExistingAtom(s, addr);
@@ -1285,7 +1285,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->session->addressIsBlocked(pex->addr) && tr_address_is_valid_for_peers(&pex->addr, pex->port))
+            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers())
         {
             ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
             ++n_used;
@@ -1295,7 +1295,11 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
     return n_used;
 }
 
-std::vector<tr_pex> tr_pex::fromCompact4(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
+std::vector<tr_pex> tr_pex::from_compact_ipv4(
+    void const* compact,
+    size_t compact_len,
+    uint8_t const* added_f,
+    size_t added_f_len)
 {
     size_t const n = compact_len / 6;
     auto const* walk = static_cast<std::byte const*>(compact);
@@ -1303,7 +1307,7 @@ std::vector<tr_pex> tr_pex::fromCompact4(void const* compact, size_t compact_len
 
     for (size_t i = 0; i < n; ++i)
     {
-        std::tie(pex[i].addr, walk) = tr_address::fromCompact4(walk);
+        std::tie(pex[i].addr, walk) = tr_address::from_compact_ipv4(walk);
         std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
 
         if (added_f != nullptr && n == added_f_len)
@@ -1315,7 +1319,11 @@ std::vector<tr_pex> tr_pex::fromCompact4(void const* compact, size_t compact_len
     return pex;
 }
 
-std::vector<tr_pex> tr_pex::fromCompact6(void const* compact, size_t compact_len, uint8_t const* added_f, size_t added_f_len)
+std::vector<tr_pex> tr_pex::from_compact_ipv6(
+    void const* compact,
+    size_t compact_len,
+    uint8_t const* added_f,
+    size_t added_f_len)
 {
     size_t const n = compact_len / 18;
     auto const* walk = static_cast<std::byte const*>(compact);
@@ -1323,7 +1331,7 @@ std::vector<tr_pex> tr_pex::fromCompact6(void const* compact, size_t compact_len
 
     for (size_t i = 0; i < n; ++i)
     {
-        std::tie(pex[i].addr, walk) = tr_address::fromCompact6(walk);
+        std::tie(pex[i].addr, walk) = tr_address::from_compact_ipv6(walk);
         std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
 
         if (added_f != nullptr && n == added_f_len)
@@ -1479,7 +1487,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
         if (atom->addr.type == address_type)
         {
-            TR_ASSERT(tr_address_is_valid(&atom->addr));
+            TR_ASSERT(atom->addr.is_valid());
             pex.emplace_back(atom->addr, atom->port, atom->flags);
         }
     }
