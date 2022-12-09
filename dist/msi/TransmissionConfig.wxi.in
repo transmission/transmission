@@ -5,4 +5,8 @@
   <?define TrVersionMsi = "${VERSION_MSI}" ?>
   <?define TrVersionFull = "${VERSION_FULL}" ?>
 
+  <?define VcVerMajor = "${MSVC_TOOLSET_VERSION_MAJOR}" ?>
+  <?define VcVerMinor = "${MSVC_TOOLSET_VERSION_MINOR}" ?>
+  <?define VsVerMajor = "${MSVS_VERSION}" ?>
+
 </Include>

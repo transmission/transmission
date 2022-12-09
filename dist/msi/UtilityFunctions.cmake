@@ -7,16 +7,6 @@ function(find_msvc_crt_msm OUTPUT_VAR)
 
     message(STATUS "Looking for a CRT MSM:")
 
-    if(NOT MSVC_TOOLSET_VERSION)
-        if(MSVC_VERSION GREATER_EQUAL 1920)
-            set(MSVC_TOOLSET_VERSION 142)
-        elseif(MSVC_VERSION GREATER_EQUAL 1910)
-            set(MSVC_TOOLSET_VERSION 141)
-        elseif(MSVC_VERSION GREATER_EQUAL 1900)
-            set(MSVC_TOOLSET_VERSION 140)
-        endif()
-    endif()
-
     set(MSM_FILE "Microsoft_VC${MSVC_TOOLSET_VERSION}_CRT_${ARCH}.msm")
     message(STATUS "  * File name: ${MSM_FILE}")
 
