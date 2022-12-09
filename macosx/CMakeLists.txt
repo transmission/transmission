@@ -57,6 +57,7 @@ set(${PROJECT_NAME}_SOURCES
     FilterBarView.mm
     FilterButton.mm
     GlobalOptionsPopoverViewController.mm
+    GroupTextCell.mm
     GroupToolbarItem.mm
     GroupsController.mm
     GroupsPrefsController.mm
