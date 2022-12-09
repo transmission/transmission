@@ -276,9 +276,9 @@ struct tr_address
     {
         return type == TR_AF_INET || type == TR_AF_INET6;
     }
-};
 
-bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
+    [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
+};
 
 /***********************************************************************
  * Sockets

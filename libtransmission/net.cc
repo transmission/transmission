@@ -197,7 +197,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
         return {};
     }
 
-    if (!tr_address_is_valid_for_peers(&addr, port))
+    if (!addr.is_valid_for_peers(port))
     {
         return {};
     }
@@ -272,7 +272,7 @@ tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& ad
 {
     auto ret = tr_peer_socket{};
 
-    if (session->utp_context != nullptr && tr_address_is_valid_for_peers(&addr, port))
+    if (session->utp_context != nullptr && addr.is_valid_for_peers(port))
     {
         auto const [ss, sslen] = addr.to_sockaddr(port);
 
@@ -673,12 +673,12 @@ namespace is_valid_for_peers_helpers
 
 } // namespace is_valid_for_peers_helpers
 
-bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
+bool tr_address::is_valid_for_peers(tr_port port) const noexcept
 {
     using namespace is_valid_for_peers_helpers;
 
-    return addr != nullptr && addr->is_valid() && !std::empty(port) && !is_ipv6_link_local_address(addr) &&
-        !is_ipv4_mapped_address(addr) && !is_martian_addr(*addr);
+    return is_valid() && !std::empty(port) && !is_ipv6_link_local_address(this) && !is_ipv4_mapped_address(this) &&
+        !is_martian_addr(*this);
 }
 
 /// tr_port

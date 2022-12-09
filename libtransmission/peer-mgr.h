@@ -144,6 +144,11 @@ struct tr_pex
         return compare(that) < 0;
     }
 
+    [[nodiscard]] bool is_valid_for_peers() const noexcept
+    {
+        return addr.is_valid_for_peers(port);
+    }
+
     tr_address addr = {};
     tr_port port = {}; /* this field is in network byte order */
     uint8_t flags = 0;
