@@ -459,8 +459,6 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
 
 tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
 {
-    TR_ASSERT(size() == std::size(that));
-
     if (hasAll() || that.hasNone())
     {
         return *this;
@@ -485,8 +483,6 @@ tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
 
 tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
 {
-    TR_ASSERT(size() == std::size(that));
-
     if (hasNone() || that.hasAll())
     {
         return *this;
