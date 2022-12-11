@@ -196,6 +196,10 @@ add_definitions(
     ${GTK${GTK_VERSION}_CFLAGS_OTHER}
 )
 
+if(ENABLE_UTP)
+    add_definitions(-DWITH_UTP)
+endif()
+
 if(WITH_APPINDICATOR)
     set_property(SOURCE SystemTrayIcon.cc APPEND PROPERTY COMPILE_DEFINITIONS HAVE_APPINDICATOR)
     if(APPINDICATOR_IS_AYATANA)
