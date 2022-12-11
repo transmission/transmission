@@ -85,15 +85,15 @@ inline auto constexpr Recents = "-recents"sv;
 namespace SortMode
 {
 
-inline char const* const Activity = "sort-by-activity";
-inline char const* const Age = "sort-by-age";
-inline char const* const Name = "sort-by-name";
-inline char const* const Progress = "sort-by-progress";
-inline char const* const Queue = "sort-by-queue";
-inline char const* const Ratio = "sort-by-ratio";
-inline char const* const Size = "sort-by-size";
-inline char const* const State = "sort-by-state";
-inline char const* const TimeLeft = "sort-by-time-left";
+inline char const* const Activity = "activity";
+inline char const* const Age = "age";
+inline char const* const Name = "name";
+inline char const* const Progress = "progress";
+inline char const* const Queue = "queue";
+inline char const* const Ratio = "ratio";
+inline char const* const Size = "size";
+inline char const* const State = "state";
+inline char const* const TimeLeft = "time-left";
 
 } // namespace SortMode
 

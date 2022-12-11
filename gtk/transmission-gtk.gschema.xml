@@ -72,17 +72,17 @@
     </key>
     <key name="sort-mode" type="s">
       <choices>
-        <choice value="sort-by-activity" />
-        <choice value="sort-by-age" />
-        <choice value="sort-by-name" />
-        <choice value="sort-by-progress" />
-        <choice value="sort-by-queue" />
-        <choice value="sort-by-ratio" />
-        <choice value="sort-by-size" />
-        <choice value="sort-by-state" />
-        <choice value="sort-by-time-left" />
+        <choice value="activity" />
+        <choice value="age" />
+        <choice value="name" />
+        <choice value="progress" />
+        <choice value="queue" />
+        <choice value="ratio" />
+        <choice value="size" />
+        <choice value="state" />
+        <choice value="time-left" />
       </choices>
-      <default>"sort-by-name"</default>
+      <default>"name"</default>
     </key>
     <key name="sort-reversed" type="b">
       <default>false</default>
