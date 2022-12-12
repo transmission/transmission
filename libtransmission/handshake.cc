@@ -151,15 +151,25 @@ public:
         return io->display_name();
     }
 
+    [[nodiscard]] constexpr auto state() const noexcept
+    {
+        return this->state_;
+    }
+
+    [[nodiscard]] constexpr auto is_state(State state) const noexcept
+    {
+        return this->state_ == state;
+    }
+
     void set_state(tr_handshake::State state_in)
     {
         tr_logAddTraceHand(this, fmt::format("setting to state [{}]", state_string(state_in)));
-        this->state = state_in;
+        this->state_ = state_in;
     }
 
     [[nodiscard]] constexpr std::string_view state_string() const
     {
-        return state_string(state);
+        return state_string(state_);
     }
 
     Mediator& mediator;
@@ -168,7 +178,6 @@ public:
     bool have_sent_bittorrent_handshake = false;
     std::shared_ptr<tr_peerIo> io;
     DH dh = {};
-    State state = State::AwaitingHandshake;
     tr_encryption_mode encryption_mode;
     uint16_t pad_c_len = {};
     uint16_t pad_d_len = {};
@@ -237,6 +246,8 @@ private:
     std::unique_ptr<libtransmission::Timer> const timeout_timer_;
 
     DoneFunc done_func_;
+
+    State state_ = State::AwaitingHandshake;
 };
 
 /**
@@ -964,7 +975,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
     ReadState ret = READ_NOW;
     while (ready_for_more)
     {
-        switch (handshake->state)
+        switch (handshake->state())
         {
         case tr_handshake::State::AwaitingHandshake:
             ret = readHandshake(handshake, peer_io);
@@ -1016,7 +1027,9 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled handshake state {:d}"), static_cast<int>(handshake->state)));
+            TR_ASSERT_MSG(
+                false,
+                fmt::format(FMT_STRING("unhandled handshake state {:d}"), static_cast<int>(handshake->state())));
 #else
             ret = READ_ERR;
             break;
@@ -1027,15 +1040,15 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
         {
             ready_for_more = false;
         }
-        else if (handshake->state == tr_handshake::State::AwaitingPadC)
+        else if (handshake->is_state(tr_handshake::State::AwaitingPadC))
         {
             ready_for_more = peer_io->readBufferSize() >= handshake->pad_c_len;
         }
-        else if (handshake->state == tr_handshake::State::AwaitingPadD)
+        else if (handshake->is_state(tr_handshake::State::AwaitingPadD))
         {
             ready_for_more = peer_io->readBufferSize() >= handshake->pad_d_len;
         }
-        else if (handshake->state == tr_handshake::State::AwaitingIa)
+        else if (handshake->is_state(tr_handshake::State::AwaitingIa))
         {
             ready_for_more = peer_io->readBufferSize() >= handshake->ia_len;
         }
@@ -1049,7 +1062,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int const errcode = errno;
     auto* handshake = static_cast<tr_handshake_impl*>(vhandshake);
 
-    if (io->socket.is_utp() && !io->isIncoming() && handshake->state == tr_handshake::State::AwaitingYb)
+    if (io->socket.is_utp() && !io->isIncoming() && handshake->is_state(tr_handshake::State::AwaitingYb))
     {
         // the peer probably doesn't speak µTP.
 
@@ -1075,7 +1088,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     /* if the error happened while we were sending a public key, we might
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
-    if ((handshake->state == tr_handshake::State::AwaitingYb || handshake->state == tr_handshake::State::AwaitingVc) &&
+    if ((handshake->is_state(tr_handshake::State::AwaitingYb) || handshake->is_state(tr_handshake::State::AwaitingVc)) &&
         handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && handshake->mediator.allows_tcp() && io->reconnect() == 0)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
