@@ -98,7 +98,7 @@ public:
 
     [[nodiscard]] constexpr auto socketAddress() const noexcept
     {
-        return socket.socketAddress();
+        return std::make_pair(address_, port_);
     }
 
     [[nodiscard]] auto display_name() const
@@ -300,6 +300,9 @@ private:
         bool is_incoming,
         bool is_seed,
         tr_peer_socket socket);
+
+    tr_address const address_;
+    tr_port const port_;
 
     tr_bandwidth bandwidth_;
 

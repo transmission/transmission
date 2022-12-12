@@ -457,13 +457,15 @@ tr_peerIo::tr_peerIo(
     bool is_seed,
     tr_bandwidth* parent_bandwidth,
     tr_peer_socket sock)
-    : socket{ std::move(sock) }
+    : address_{ sock.address() }
+    , port_{ sock.port() }
     , session{ session_in }
     , bandwidth_{ parent_bandwidth }
     , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
     , is_seed_{ is_seed }
     , is_incoming_{ is_incoming }
 {
+    socket = std::move(sock);
     if (socket.is_tcp())
     {
         event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, this));
