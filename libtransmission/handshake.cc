@@ -181,7 +181,7 @@ struct tr_handshake
 ***
 **/
 
-#define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->io->addrStr())
+#define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->io->display_name())
 
 static constexpr std::string_view getStateName(handshake_state_t const state)
 {

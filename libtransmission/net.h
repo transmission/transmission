@@ -73,8 +73,6 @@ enum tr_address_type
 
 struct tr_address;
 
-[[nodiscard]] int tr_address_compare(tr_address const* a, tr_address const* b) noexcept;
-
 /**
  * Literally just a port number.
  *
@@ -153,19 +151,19 @@ private:
 
 struct tr_address
 {
-    [[nodiscard]] static std::optional<tr_address> fromString(std::string_view address_sv);
-    [[nodiscard]] static std::optional<std::pair<tr_address, tr_port>> fromSockaddr(struct sockaddr const*);
-    [[nodiscard]] static std::pair<tr_address, std::byte const*> fromCompact4(std::byte const* compact) noexcept;
-    [[nodiscard]] static std::pair<tr_address, std::byte const*> fromCompact6(std::byte const* compact) noexcept;
+    [[nodiscard]] static std::optional<tr_address> from_string(std::string_view address_sv);
+    [[nodiscard]] static std::optional<std::pair<tr_address, tr_port>> from_sockaddr(struct sockaddr const*);
+    [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
-    // human-readable formatting
+    // write the text form of the address, e.g. inet_ntop()
     template<typename OutputIt>
-    OutputIt readable(OutputIt out, tr_port port = {}) const;
-    std::string_view readable(char* out, size_t outlen, tr_port port = {}) const;
-    [[nodiscard]] std::string readable(tr_port port = {}) const;
+    OutputIt display_name(OutputIt out, tr_port port = {}) const;
+    std::string_view display_name(char* out, size_t outlen, tr_port port = {}) const;
+    [[nodiscard]] std::string display_name(tr_port port = {}) const;
 
     template<typename OutputIt>
-    static OutputIt toCompact4(OutputIt out, in_addr const* addr4, tr_port port)
+    static OutputIt to_compact_ipv4(OutputIt out, in_addr const* addr4, tr_port port)
     {
         auto const nport = port.network();
         out = std::copy_n(reinterpret_cast<std::byte const*>(addr4), sizeof(*addr4), out);
@@ -174,13 +172,13 @@ struct tr_address
     }
 
     template<typename OutputIt>
-    static OutputIt toCompact4(OutputIt out, sockaddr_in const* sa4)
+    static OutputIt to_compact_ipv4(OutputIt out, sockaddr_in const* sa4)
     {
-        return toCompact4(out, &sa4->sin_addr, tr_port::fromNetwork(sa4->sin_port));
+        return to_compact_ipv4(out, &sa4->sin_addr, tr_port::fromNetwork(sa4->sin_port));
     }
 
     template<typename OutputIt>
-    static OutputIt toCompact6(OutputIt out, in6_addr const* addr6, tr_port port)
+    static OutputIt to_compact_ipv6(OutputIt out, in6_addr const* addr6, tr_port port)
     {
         auto const nport = port.network();
         out = std::copy_n(reinterpret_cast<std::byte const*>(addr6), sizeof(*addr6), out);
@@ -189,42 +187,42 @@ struct tr_address
     }
 
     template<typename OutputIt>
-    static OutputIt toCompact6(OutputIt out, sockaddr_in6 const* sa6)
+    static OutputIt to_compact_ipv6(OutputIt out, sockaddr_in6 const* sa6)
     {
-        return toCompact6(out, &sa6->sin6_addr, tr_port::fromNetwork(sa6->sin6_port));
+        return to_compact_ipv6(out, &sa6->sin6_addr, tr_port::fromNetwork(sa6->sin6_port));
     }
 
     template<typename OutputIt>
-    OutputIt toCompact4(OutputIt out, tr_port port) const
+    OutputIt to_compact_ipv4(OutputIt out, tr_port port) const
     {
-        return toCompact4(out, &this->addr.addr4, port);
+        return to_compact_ipv4(out, &this->addr.addr4, port);
     }
 
     template<typename OutputIt>
-    OutputIt toCompact6(OutputIt out, tr_port port) const
+    OutputIt to_compact_ipv6(OutputIt out, tr_port port) const
     {
-        return toCompact6(out, &this->addr.addr6, port);
+        return to_compact_ipv6(out, &this->addr.addr6, port);
     }
 
     template<typename OutputIt>
-    static OutputIt toCompact(OutputIt out, sockaddr const* saddr)
+    static OutputIt to_compact(OutputIt out, sockaddr const* saddr)
     {
-        return saddr->sa_family == AF_INET ? toCompact4(out, reinterpret_cast<sockaddr_in const*>(saddr)) :
-                                             toCompact6(out, reinterpret_cast<sockaddr_in6 const*>(saddr));
+        return saddr->sa_family == AF_INET ? to_compact_ipv4(out, reinterpret_cast<sockaddr_in const*>(saddr)) :
+                                             to_compact_ipv6(out, reinterpret_cast<sockaddr_in6 const*>(saddr));
     }
 
     template<typename OutputIt>
-    static OutputIt toCompact(OutputIt out, struct sockaddr_storage* ss)
+    static OutputIt to_compact(OutputIt out, struct sockaddr_storage* ss)
     {
-        return toCompact(out, reinterpret_cast<struct sockaddr*>(ss));
+        return to_compact(out, reinterpret_cast<struct sockaddr*>(ss));
     }
 
-    [[nodiscard]] constexpr auto isIPv4() const noexcept
+    [[nodiscard]] constexpr auto is_ipv4() const noexcept
     {
         return type == TR_AF_INET;
     }
 
-    [[nodiscard]] constexpr auto isIPv6() const noexcept
+    [[nodiscard]] constexpr auto is_ipv6() const noexcept
     {
         return type == TR_AF_INET6;
     }
@@ -255,7 +253,7 @@ struct tr_address
 
     //
 
-    [[nodiscard]] std::pair<sockaddr_storage, socklen_t> toSockaddr(tr_port port) const noexcept;
+    [[nodiscard]] std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_port port) const noexcept;
 
     tr_address_type type;
     union
@@ -264,23 +262,23 @@ struct tr_address
         struct in_addr addr4;
     } addr;
 
-    [[nodiscard]] static auto constexpr AnyIPv4() noexcept
+    [[nodiscard]] static auto constexpr any_ipv4() noexcept
     {
         return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
     }
 
-    [[nodiscard]] static auto constexpr AnyIPv6() noexcept
+    [[nodiscard]] static auto constexpr any_ipv6() noexcept
     {
         return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
     }
+
+    [[nodiscard]] constexpr auto is_valid() const noexcept
+    {
+        return type == TR_AF_INET || type == TR_AF_INET6;
+    }
+
+    [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
-
-bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
-
-constexpr bool tr_address_is_valid(tr_address const* a)
-{
-    return a != nullptr && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
-}
 
 /***********************************************************************
  * Sockets
@@ -305,7 +303,7 @@ bool tr_net_hasIPv6(tr_port);
 /// TOS / DSCP
 
 /**
- * A toString() / fromString() convenience wrapper around the TOS int value
+ * A toString() / from_string() convenience wrapper around the TOS int value
  */
 class tr_tos_t
 {
@@ -322,7 +320,7 @@ public:
         return value_;
     }
 
-    [[nodiscard]] static std::optional<tr_tos_t> fromString(std::string_view);
+    [[nodiscard]] static std::optional<tr_tos_t> from_string(std::string_view);
 
     [[nodiscard]] std::string toString() const;
 

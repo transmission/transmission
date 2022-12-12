@@ -101,9 +101,9 @@ public:
         return socket.socketAddress();
     }
 
-    [[nodiscard]] auto addrStr() const
+    [[nodiscard]] auto display_name() const
     {
-        return socket.readable();
+        return socket.display_name();
     }
 
     void readBufferDrain(size_t byte_count);
@@ -317,5 +317,5 @@ private:
 
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != nullptr && tr_address_is_valid(&io->address());
+    return io != nullptr && io->address().is_valid();
 }

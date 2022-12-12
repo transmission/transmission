@@ -120,26 +120,30 @@ $ sudo make install
 ```
 
 ## On Windows ##
-For Windows XP and above there are several choices:
 
-### Cygwin environment ###
-With Cygwin https://cygwin.com/ installed, the CLI tools (transmission-remote, transmission-cli, etc.) and the daemon can be built easily.
+### Building transmission-daemon
+You need the following installed:
 
-No patches needed(\*), all the recent versions of Transmission build almost out-of-the-box (you need to install the prerequisites), and the CLI tools work better under Cygwin than those built with MinGW.
+* Visual Studio 2019 or greater (the Community Edition is sufficient - just make sure its C++ compiler, MSVC, is installed)
+* [CMake](https://cmake.org/download/) (choose to add CMake to your path)
+* [Git for Windows](https://git-scm.com/download/win)
+* [Vcpkg](https://github.com/microsoft/vcpkg#quick-start-windows)
 
-(\*) At the release time of version 2.0, **libevent** is not bundled and it is also not in the Cygwin distribution (but was added later)... so you need to build it (which is as easy as ./configure, make install). To build Transmission you may need to add LDFLAGS="-L/usr/local/lib" to the configure script (LIBEVENT_LIBS does not seem to work when it comes to build all the test programs).  Additionally **libutp** needs deleting -ansi on the Makefile.
 
-With version 2.51 miniupnpc fails to build, see https://miniupnp.tuxfamily.org/forum/viewtopic.php?t#1130.
+### Install all dependencies through vcpkg
 
-Version 2.80 breaks building on Cygwin, adding this https://github.com/adaptivecomputing/torque/blob/master/src/resmom/cygwin/quota.h file to Cygwin's /usr/include/sys solves the problem.  This is no longer needed after version 2.82 (Cygwin added the header).
+```
+vcpkg integrate install
+vcpkg install curl
+vcpkg install zlib
+vcpkg install openssl
+```
 
-Version 2.81 with the above workaround needs a one line patch, see ticket #5692.
-
-Version 2.82, same as 2.81.
-
-Version 2.83, no need to add quota.h, Cygwin added it.
-
-### Native Windows ###
-With a MinGW https://mingw.org/ development environment, the GTK and the Qt GUI applications can be built.  The CLI tools can also be built and in general work fine, but may fail if you use foreign characters as parameters (MinGW uses latin1 for parameters).
-
-The procedure is documented at [Building Transmission Qt on Windows](https://trac.transmissionbt.com/wiki/BuildingTransmissionQtWindows).
+### Get Transmission source and build it
+```
+git clone https://github.com/transmission/transmission
+cd transmission
+git submodule update --init --recursive
+cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE="$($VCPKG_ROOT)\scripts\buildsystems\vcpkg.cmake"
+cmake --build build --config RelWithDebInfo
+```

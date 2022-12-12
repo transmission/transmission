@@ -42,10 +42,10 @@
 
 static constexpr auto UtpReadBufferSize = 256 * 1024;
 
-#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->addrStr())
-#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->addrStr())
-#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
-#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
+#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
+#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())
+#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
+#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
 static constexpr size_t guessPacketOverhead(size_t d)
 {
@@ -533,7 +533,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
     bool utp)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_address_is_valid(&addr));
+    TR_ASSERT(addr.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
     auto socket = tr_peer_socket{};

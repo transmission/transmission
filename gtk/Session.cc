@@ -740,15 +740,27 @@ void Session::Impl::watchdir_update()
         monitor_.reset();
     }
 
-    if (is_enabled && monitor_ == nullptr)
+    if (!is_enabled || monitor_ != nullptr)
     {
-        auto const m = dir->monitor_directory();
-        watchdir_scan();
-
-        monitor_ = m;
-        monitor_dir_ = dir;
-        monitor_tag_ = m->signal_changed().connect(sigc::mem_fun(*this, &Impl::on_file_changed_in_watchdir));
+        return;
     }
+
+    auto monitor = Glib::RefPtr<Gio::FileMonitor>();
+
+    try
+    {
+        monitor = dir->monitor_directory();
+    }
+    catch (Glib::Error const&)
+    {
+        return;
+    }
+
+    watchdir_scan();
+
+    monitor_ = monitor;
+    monitor_dir_ = dir;
+    monitor_tag_ = monitor_->signal_changed().connect(sigc::mem_fun(*this, &Impl::on_file_changed_in_watchdir));
 }
 
 /***

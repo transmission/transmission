@@ -13,6 +13,7 @@
 #import "Torrent.h"
 #import "TorrentCell.h"
 #import "TorrentGroup.h"
+#import "GroupTextCell.h"
 
 CGFloat const kGroupSeparatorHeight = 18.0;
 
@@ -38,6 +39,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) IBOutlet Controller* fController;
 
 @property(nonatomic) TorrentCell* fTorrentCell;
+@property(nonatomic) GroupTextCell* fGroupTextCell;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
@@ -73,6 +75,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         _fDefaults = NSUserDefaults.standardUserDefaults;
 
         _fTorrentCell = [[TorrentCell alloc] init];
+        _fGroupTextCell = [[GroupTextCell alloc] init];
 
         NSData* groupData;
         if ((groupData = [_fDefaults dataForKey:@"CollapsedGroupIndexes"]))
@@ -120,6 +123,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
     [self setGroupStatusColumns];
 
+    //disable highlight color and set manually in drawRow
+    [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
+
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
 }
 
@@ -155,7 +161,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
 {
-    return ![item isKindOfClass:[Torrent class]];
+    //return no and style the groupItem cell manually in willDisplayCell
+    //otherwise we get unwanted padding before each group header
+    return NO;
 }
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
@@ -172,7 +180,16 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     else
     {
-        return group ? [tableColumn dataCellForRow:[self rowForItem:item]] : nil;
+        NSString* ident = tableColumn.identifier;
+        NSArray* imageColumns = @[ @"Color", @"DL Image", @"UL Image" ];
+        if (![imageColumns containsObject:ident])
+        {
+            return group ? self.fGroupTextCell : nil;
+        }
+        else
+        {
+            return group ? [tableColumn dataCellForRow:[self rowForItem:item]] : nil;
+        }
     }
 }
 
@@ -195,6 +212,38 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             torrentCell.hoverAction = (row == self.actionButtonHoverRow);
         }
     }
+}
+
+//we override row highlighting because we are custom drawing the group rows
+//see isGroupItem
+- (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect
+{
+    NSColor* highlightColor = nil;
+
+    id item = [self itemAtRow:row];
+
+    //we only highlight torrent cells
+    if ([item isKindOfClass:[Torrent class]])
+    {
+        //use system highlight color when Transmission is active
+        if (self == [self.window firstResponder] && [self.window isMainWindow] && [self.window isKeyWindow])
+        {
+            highlightColor = [NSColor alternateSelectedControlColor];
+        }
+        else
+        {
+            highlightColor = [NSColor disabledControlTextColor];
+        }
+
+        NSIndexSet* selectedRowIndexes = [self selectedRowIndexes];
+        if ([selectedRowIndexes containsIndex:row])
+        {
+            [highlightColor setFill];
+            NSRectFill([self rectOfRow:row]);
+        }
+    }
+
+    [super drawRow:row clipRect:clipRect];
 }
 
 - (NSRect)frameOfCellAtColumn:(NSInteger)column row:(NSInteger)row

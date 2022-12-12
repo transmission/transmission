@@ -14,6 +14,7 @@ jobs:
     outputs:
       make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' }}
       make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' }}
+      make-dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' }}
       make-docs: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.docs-changed == '1' }}
       make-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' }}
       make-mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' }}
@@ -28,10 +29,10 @@ jobs:
         id: check-main-push
         run: |
           set -x
-          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then \
-            echo "::set-output name=is-main-push::1"; \
-          else \
-            echo "::set-output name=is-main-push::0"; \
+          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
+            echo is-main-push=1 >> "$GITHUB_OUTPUT"
+          else
+            echo is-main-push=0 >> "$GITHUB_OUTPUT"
           fi
       - name: Get Source
         id: get-source
@@ -44,29 +45,26 @@ jobs:
         id: check-diffs
         run: |
           set +e
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
-          echo "::set-output name=cli-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
-          echo "::set-output name=any-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
-          echo "::set-output name=our-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
-          echo "::set-output name=daemon-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- docs
-          echo "::set-output name=docs-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission gtk
-          echo "::set-output name=gtk-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
-          echo "::set-output name=mac-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission qt
-          echo "::set-output name=qt-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission utils tests
-          echo "::set-output name=tests-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission utils
-          echo "::set-output name=utils-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission web
-          echo "::set-output name=web-changed::$?"
-          set -e
+          cd src
+          MERGE_BASE=`git merge-base origin/main HEAD`
+          function get_changes() { # name, paths...
+            local name="$1"
+            shift
+            git diff --exit-code "$MERGE_BASE" -- "$@"
+            echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
+          }
+          get_changes cli      CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
+          get_changes any-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
+          get_changes our-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes daemon   CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
+          get_changes dist     dist
+          get_changes docs     docs
+          get_changes gtk      CMakeLists.txt third-party libtransmission gtk
+          get_changes mac      CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
+          get_changes qt       CMakeLists.txt third-party libtransmission qt
+          get_changes tests    CMakeLists.txt third-party libtransmission utils tests
+          get_changes utils    CMakeLists.txt third-party libtransmission utils
+          get_changes web      CMakeLists.txt third-party libtransmission web
 
   code-style:
     runs-on: ubuntu-22.04
@@ -304,7 +302,7 @@ jobs:
   windows:
     needs: [ what-to-make ]
     runs-on: windows-2022
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -326,6 +324,7 @@ jobs:
           choco uninstall `
             openssl.light
           (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
+          (Join-Path ${Env:ProgramFiles(x86)} 'WiX Toolset v3.11' bin) | Out-File $Env:GITHUB_PATH -Append
 
           Install-Module -Name Pscx -RequiredVersion 4.0.0-beta4 -AllowPrerelease -Force
       - name: Get Source
@@ -369,12 +368,12 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx `
             -DCMAKE_PREFIX_PATH="${Env:DepsPrefix}" `
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_GTK=OFF `
             -DENABLE_MAC=OFF `
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_TESTS=ON `
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WEB=OFF `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -386,10 +385,18 @@ jobs:
         run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
+      - name: Package
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
+          cmake --build obj --config RelWithDebInfo --target pack-msi
       - uses: actions/upload-artifact@v3
         with:
           name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.arch }}-msi
+          path: obj/dist/msi/*.msi
 
   make-source-tarball:
     runs-on: ubuntu-22.04

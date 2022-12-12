@@ -303,7 +303,7 @@ std::optional<tr_tos_t> VariantConverter::load<tr_tos_t>(tr_variant* src)
 {
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
-        return tr_tos_t::fromString(val);
+        return tr_tos_t::from_string(val);
     }
 
     if (auto val = int64_t{}; tr_variantGetInt(src, &val))
