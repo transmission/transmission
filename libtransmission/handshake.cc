@@ -151,6 +151,17 @@ public:
         return io->display_name();
     }
 
+    void set_state(tr_handshake::State state_in)
+    {
+        tr_logAddTraceHand(this, fmt::format("setting to state [{}]", state_string(state_in)));
+        this->state = state_in;
+    }
+
+    [[nodiscard]] constexpr std::string_view state_string() const
+    {
+        return state_string(state);
+    }
+
     Mediator& mediator;
 
     bool have_read_anything_from_peer = false;
@@ -168,6 +179,41 @@ public:
     std::optional<tr_peer_id_t> peer_id;
 
 private:
+    [[nodiscard]] static constexpr std::string_view state_string(State state)
+    {
+        using State = tr_handshake::State;
+
+        switch (state)
+        {
+        case State::AwaitingHandshake:
+            return "awaiting handshake"sv;
+        case State::AwaitingPeerId:
+            return "awaiting peer id"sv;
+        case State::AwaitingYa:
+            return "awaiting ya"sv;
+        case State::AwaitingPadA:
+            return "awaiting pad a"sv;
+        case State::AwaitingCryptoProvide:
+            return "awaiting crypto provide"sv;
+        case State::AwaitingPadC:
+            return "awaiting pad c"sv;
+        case State::AwaitingIa:
+            return "awaiting ia"sv;
+        case State::AwaitingPayloadStream:
+            return "awaiting payload stream"sv;
+
+        // outgoing
+        case State::AwaitingYb:
+            return "awaiting yb"sv;
+        case State::AwaitingVc:
+            return "awaiting vc"sv;
+        case State::AwaitingCryptoSelect:
+            return "awaiting crypto select"sv;
+        case State::AwaitingPadD:
+            return "awaiting pad d"sv;
+        }
+    }
+
     bool fire_done(bool is_connected)
     {
         if (!done_func_)
@@ -197,50 +243,9 @@ private:
 ***
 **/
 
-static constexpr std::string_view getStateName(tr_handshake::State state)
-{
-    using State = tr_handshake::State;
-
-    switch (state)
-    {
-    case State::AwaitingHandshake:
-        return "awaiting handshake"sv;
-    case State::AwaitingPeerId:
-        return "awaiting peer id"sv;
-    case State::AwaitingYa:
-        return "awaiting ya"sv;
-    case State::AwaitingPadA:
-        return "awaiting pad a"sv;
-    case State::AwaitingCryptoProvide:
-        return "awaiting crypto provide"sv;
-    case State::AwaitingPadC:
-        return "awaiting pad c"sv;
-    case State::AwaitingIa:
-        return "awaiting ia"sv;
-    case State::AwaitingPayloadStream:
-        return "awaiting payload stream"sv;
-
-    // outgoing
-    case State::AwaitingYb:
-        return "awaiting yb"sv;
-    case State::AwaitingVc:
-        return "awaiting vc"sv;
-    case State::AwaitingCryptoSelect:
-        return "awaiting crypto select"sv;
-    case State::AwaitingPadD:
-        return "awaiting pad d"sv;
-    }
-}
-
-static void setState(tr_handshake_impl* handshake, tr_handshake::State state)
-{
-    tr_logAddTraceHand(handshake, fmt::format("setting to state [{}]", getStateName(state)));
-    handshake->state = state;
-}
-
 static void setReadState(tr_handshake_impl* handshake, tr_handshake::State state)
 {
-    setState(handshake, state);
+    handshake->set_state(state);
 }
 
 static bool buildHandshakeMessage(tr_handshake_impl const* const handshake, tr_peerIo* io, uint8_t* buf)
@@ -420,7 +425,7 @@ static ReadState readYb(tr_handshake_impl* handshake, tr_peerIo* peer_io)
 
     if (!is_encrypted)
     {
-        setState(handshake, tr_handshake::State::AwaitingHandshake);
+        handshake->set_state(tr_handshake::State::AwaitingHandshake);
         return READ_NOW;
     }
 
@@ -508,7 +513,7 @@ static ReadState readVC(tr_handshake_impl* handshake, tr_peerIo* peer_io)
             // consume it from the read buffer.
             peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
             peer_io->readBytes(std::data(needle), std::size(needle));
-            setState(handshake, tr_handshake::State::AwaitingCryptoSelect);
+            handshake->set_state(tr_handshake::State::AwaitingCryptoSelect);
             return READ_NOW;
         }
 
@@ -549,7 +554,7 @@ static ReadState readCryptoSelect(tr_handshake_impl* handshake, tr_peerIo* peer_
 
     handshake->pad_d_len = pad_d_len;
 
-    setState(handshake, tr_handshake::State::AwaitingPadD);
+    handshake->set_state(tr_handshake::State::AwaitingPadD);
     return READ_NOW;
 }
 
@@ -566,7 +571,7 @@ static ReadState readPadD(tr_handshake_impl* handshake, tr_peerIo* peer_io)
 
     peer_io->readBufferDrain(needlen);
 
-    setState(handshake, tr_handshake::State::AwaitingHandshake);
+    handshake->set_state(tr_handshake::State::AwaitingHandshake);
     return READ_NOW;
 }
 
@@ -600,7 +605,7 @@ static ReadState readHandshake(tr_handshake_impl* handshake, tr_peerIo* peer_io)
         if (handshake->is_incoming())
         {
             tr_logAddTraceHand(handshake, "I think peer is sending us an encrypted handshake...");
-            setState(handshake, tr_handshake::State::AwaitingYa);
+            handshake->set_state(tr_handshake::State::AwaitingYa);
             return READ_NOW;
         }
     }
@@ -734,7 +739,7 @@ static ReadState readPadA(tr_handshake_impl* handshake, tr_peerIo* peer_io)
         {
             tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
             peer_io->readBufferDrain(std::size(needle));
-            setState(handshake, tr_handshake::State::AwaitingCryptoProvide);
+            handshake->set_state(tr_handshake::State::AwaitingCryptoProvide);
             return READ_NOW;
         }
 
@@ -814,7 +819,7 @@ static ReadState readCryptoProvide(tr_handshake_impl* handshake, tr_peerIo* peer
     }
 
     handshake->pad_c_len = padc_len;
-    setState(handshake, tr_handshake::State::AwaitingPadC);
+    handshake->set_state(tr_handshake::State::AwaitingPadC);
     return READ_NOW;
 }
 
@@ -834,7 +839,7 @@ static ReadState readPadC(tr_handshake_impl* handshake, tr_peerIo* peer_io)
     peer_io->readUint16(&ia_len);
     tr_logAddTraceHand(handshake, fmt::format("ia_len is {}", ia_len));
     handshake->ia_len = ia_len;
-    setState(handshake, tr_handshake::State::AwaitingIa);
+    handshake->set_state(tr_handshake::State::AwaitingIa);
     return READ_NOW;
 }
 
@@ -907,7 +912,7 @@ static ReadState readIA(tr_handshake_impl* handshake, tr_peerIo* peer_io)
     peer_io->write(outbuf, false);
 
     /* now await the handshake */
-    setState(handshake, tr_handshake::State::AwaitingPayloadStream);
+    handshake->set_state(tr_handshake::State::AwaitingPayloadStream);
     return READ_NOW;
 }
 
@@ -954,7 +959,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
     /* no piece data in handshake */
     *piece = 0;
 
-    tr_logAddTraceHand(handshake, fmt::format("handling canRead; state is [{}]", getStateName(handshake->state)));
+    tr_logAddTraceHand(handshake, fmt::format("handling canRead; state is [{}]", handshake->state_string()));
 
     ReadState ret = READ_NOW;
     while (ready_for_more)
