@@ -10,6 +10,7 @@
 #endif
 
 #include <cstddef> // for size_t
+#include <functional>
 #include <optional>
 #include <memory>
 
@@ -34,12 +35,10 @@ struct tr_handshake;
 
 struct tr_handshake_result
 {
-    struct tr_handshake* handshake;
     std::shared_ptr<tr_peerIo> io;
-    bool readAnythingFromPeer;
-    bool isConnected;
-    void* userData;
     std::optional<tr_peer_id_t> peer_id;
+    bool read_anything_from_peer;
+    bool is_connected;
 };
 
 class tr_handshake_mediator
@@ -78,15 +77,14 @@ public:
 };
 
 /* returns true on success, false on error */
-using tr_handshake_done_func = bool (*)(tr_handshake_result const& result);
+using tr_handshake_done_func = std::function<bool(tr_handshake_result const&)>;
 
 /** @brief create a new handshake */
 tr_handshake* tr_handshakeNew(
     tr_handshake_mediator& mediator,
     std::shared_ptr<tr_peerIo> io,
     tr_encryption_mode encryption_mode,
-    tr_handshake_done_func done_func,
-    void* done_func_user_data);
+    tr_handshake_done_func done_func);
 
 void tr_handshakeAbort(tr_handshake* handshake);
 

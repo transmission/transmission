@@ -204,13 +204,15 @@ public:
     {
         auto result = std::optional<tr_handshake_result>{};
 
-        static auto const DoneCallback = [](auto const& resin)
-        {
-            *static_cast<std::optional<tr_handshake_result>*>(resin.userData) = resin;
-            return true;
-        };
-
-        tr_handshakeNew(mediator, std::move(io), encryption_mode, DoneCallback, &result);
+        tr_handshakeNew(
+            mediator,
+            std::move(io),
+            encryption_mode,
+            [&result](auto const& resin)
+            {
+                result = resin;
+                return true;
+            });
 
         waitFor([&result]() { return result.has_value(); }, MaxWaitMsec);
 
@@ -243,8 +245,8 @@ TEST_F(HandshakeTest, incomingPlaintext)
 
     // check the results
     EXPECT_TRUE(res);
-    EXPECT_TRUE(res->isConnected);
-    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_TRUE(res->is_connected);
+    EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(peer_id, res->peer_id);
@@ -270,8 +272,8 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
 
     // check the results
     EXPECT_TRUE(res);
-    EXPECT_FALSE(res->isConnected);
-    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_FALSE(res->is_connected);
+    EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
     EXPECT_FALSE(res->peer_id);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrentHash());
@@ -295,8 +297,8 @@ TEST_F(HandshakeTest, outgoingPlaintext)
 
     // check the results
     EXPECT_TRUE(res);
-    EXPECT_TRUE(res->isConnected);
-    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_TRUE(res->is_connected);
+    EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(peer_id, res->peer_id);
@@ -333,8 +335,8 @@ TEST_F(HandshakeTest, incomingEncrypted)
 
     // check the results
     EXPECT_TRUE(res);
-    EXPECT_TRUE(res->isConnected);
-    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_TRUE(res->is_connected);
+    EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(ExpectedPeerId, res->peer_id);
@@ -370,8 +372,8 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
 
     // check the results
     EXPECT_TRUE(res);
-    EXPECT_FALSE(res->isConnected);
-    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_FALSE(res->is_connected);
+    EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrentHash());
 
     evutil_closesocket(sock);
@@ -409,8 +411,8 @@ TEST_F(HandshakeTest, outgoingEncrypted)
 
     // check the results
     EXPECT_TRUE(res);
-    EXPECT_TRUE(res->isConnected);
-    EXPECT_TRUE(res->readAnythingFromPeer);
+    EXPECT_TRUE(res->is_connected);
+    EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(ExpectedPeerId, res->peer_id);

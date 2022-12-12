@@ -118,11 +118,16 @@ enum handshake_state_t
 
 struct tr_handshake
 {
-    tr_handshake(tr_handshake_mediator& mediator_in, std::shared_ptr<tr_peerIo> io_in, tr_encryption_mode encryption_mode_in)
+    tr_handshake(
+        tr_handshake_mediator& mediator_in,
+        tr_handshake_done_func done_func,
+        std::shared_ptr<tr_peerIo> io_in,
+        tr_encryption_mode encryption_mode_in)
         : mediator{ mediator_in }
         , io{ std::move(io_in) }
         , dh{ mediator.privateKey() }
         , encryption_mode{ encryption_mode_in }
+        , done_func_{ std::move(done_func) }
     {
     }
 
@@ -156,6 +161,19 @@ struct tr_handshake
         return provide;
     }
 
+    bool fire_done(bool is_connected)
+    {
+        if (!done_func_)
+        {
+            return false;
+        }
+
+        auto tmp = tr_handshake_done_func{};
+        std::swap(tmp, done_func_);
+        bool const success = (tmp)(tr_handshake_result{ io, peer_id, haveReadAnythingFromPeer, is_connected });
+        return success;
+    }
+
     tr_handshake_mediator& mediator;
 
     bool haveReadAnythingFromPeer = false;
@@ -173,8 +191,7 @@ struct tr_handshake
 
     std::optional<tr_peer_id_t> peer_id;
 
-    tr_handshake_done_func done_func = nullptr;
-    void* done_func_user_data = nullptr;
+    tr_handshake_done_func done_func_;
 };
 
 /**
@@ -1012,25 +1029,12 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
     return ret;
 }
 
-static bool fireDoneFunc(tr_handshake* handshake, bool is_connected)
-{
-    auto result = tr_handshake_result{};
-    result.handshake = handshake;
-    result.io = handshake->io;
-    result.readAnythingFromPeer = handshake->haveReadAnythingFromPeer;
-    result.isConnected = is_connected;
-    result.userData = handshake->done_func_user_data;
-    result.peer_id = handshake->peer_id;
-    bool const success = (*handshake->done_func)(result);
-    return success;
-}
-
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool is_connected)
 {
     tr_logAddTraceHand(handshake, is_connected ? "handshakeDone: connected" : "handshakeDone: aborting");
     handshake->io->clearCallbacks();
 
-    bool const success = fireDoneFunc(handshake, is_connected);
+    bool const success = handshake->fire_done(is_connected);
     delete handshake;
     return success ? READ_LATER : READ_ERR;
 }
@@ -1102,12 +1106,9 @@ tr_handshake* tr_handshakeNew(
     tr_handshake_mediator& mediator,
     std::shared_ptr<tr_peerIo> io,
     tr_encryption_mode encryption_mode,
-    tr_handshake_done_func done_func,
-    void* done_func_user_data)
+    tr_handshake_done_func done_func)
 {
-    auto* const handshake = new tr_handshake{ mediator, std::move(io), encryption_mode };
-    handshake->done_func = done_func;
-    handshake->done_func_user_data = done_func_user_data;
+    auto* const handshake = new tr_handshake{ mediator, std::move(done_func), std::move(io), encryption_mode };
     handshake->timeout_timer = handshake->mediator.timerMaker().create([handshake]() { tr_handshakeAbort(handshake); });
     handshake->timeout_timer->startSingleShot(HandshakeTimeoutSec);
 

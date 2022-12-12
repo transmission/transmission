@@ -1133,13 +1133,12 @@ static void createBitTorrentPeer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io,
 }
 
 /* FIXME: this is kind of a mess. */
-static bool on_handshake_done(tr_handshake_result const& result)
+static bool on_handshake_done(tr_peerMgr* manager, tr_handshake_result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
-    bool const ok = result.isConnected;
+    bool const ok = result.is_connected;
     bool success = false;
-    auto* manager = static_cast<tr_peerMgr*>(result.userData);
 
     tr_swarm* const s = getExistingSwarm(manager, result.io->torrentHash());
 
@@ -1166,7 +1165,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
             {
                 ++atom->num_fails;
 
-                if (!result.readAnythingFromPeer)
+                if (!result.read_anything_from_peer)
                 {
                     tr_logAddTraceSwarm(
                         s,
@@ -1257,8 +1256,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
                 manager->handshake_mediator_,
                 tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
                 session->encryptionMode(),
-                on_handshake_done,
-                manager));
+                [manager](tr_handshake_result const& result) { return on_handshake_done(manager, result); }));
     }
 }
 
@@ -2830,13 +2828,13 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     }
     else
     {
-        auto* const handshake = tr_handshakeNew(
-            mgr->handshake_mediator_,
-            std::move(io),
-            mgr->session->encryptionMode(),
-            on_handshake_done,
-            mgr);
-        s->outgoing_handshakes.add(atom.addr, handshake);
+        s->outgoing_handshakes.add(
+            atom.addr,
+            tr_handshakeNew(
+                mgr->handshake_mediator_,
+                std::move(io),
+                mgr->session->encryptionMode(),
+                [mgr](tr_handshake_result const& result) { return on_handshake_done(mgr, result); }));
     }
 
     atom.lastConnectionAttemptAt = now;
