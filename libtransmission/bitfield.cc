@@ -472,7 +472,7 @@ tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
 
     flags_.resize(std::max(std::size(flags_), std::size(that.flags_)));
 
-    for (size_t i = 0, n = std::size(flags_); i < n; ++i)
+    for (size_t i = 0, n = std::size(that.flags_); i < n; ++i)
     {
         flags_[i] |= that.flags_[i];
     }
