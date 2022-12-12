@@ -31,61 +31,56 @@ class tr_peerIo;
 
 /** @brief opaque struct holding handshake state information.
            freed when the handshake is completed. */
-struct tr_handshake;
 
-struct tr_handshake_result
-{
-    std::shared_ptr<tr_peerIo> io;
-    std::optional<tr_peer_id_t> peer_id;
-    bool read_anything_from_peer;
-    bool is_connected;
-};
-
-class tr_handshake_mediator
+class tr_handshake
 {
 public:
-    struct torrent_info
+    struct Result
     {
-        tr_sha1_digest_t info_hash;
-        tr_peer_id_t client_peer_id;
-        tr_torrent_id_t id;
-        bool is_done;
+        std::shared_ptr<tr_peerIo> io;
+        std::optional<tr_peer_id_t> peer_id;
+        bool read_anything_from_peer;
+        bool is_connected;
     };
 
-    virtual ~tr_handshake_mediator() = default;
+    using DoneFunc = std::function<bool(Result const&)>;
 
-    [[nodiscard]] virtual std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const = 0;
-
-    [[nodiscard]] virtual std::optional<torrent_info> torrentInfoFromObfuscated(tr_sha1_digest_t const& info_hash) const = 0;
-
-    [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
-
-    [[nodiscard]] virtual bool allowsDHT() const = 0;
-
-    [[nodiscard]] virtual bool allowsTCP() const = 0;
-
-    [[nodiscard]] virtual bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const = 0;
-
-    [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
-
-    [[nodiscard]] virtual tr_message_stream_encryption::DH::private_key_bigend_t privateKey() const
+    class Mediator
     {
-        return tr_message_stream_encryption::DH::randomPrivateKey();
-    }
+    public:
+        struct TorrentInfo
+        {
+            tr_sha1_digest_t info_hash;
+            tr_peer_id_t client_peer_id;
+            tr_torrent_id_t id;
+            bool is_done;
+        };
 
-    virtual void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address) = 0;
+        virtual ~Mediator() = default;
+
+        [[nodiscard]] virtual std::optional<TorrentInfo> torrent_info(tr_sha1_digest_t const& info_hash) const = 0;
+        [[nodiscard]] virtual std::optional<TorrentInfo> torrent_info_from_obfuscated(
+            tr_sha1_digest_t const& info_hash) const = 0;
+        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+        [[nodiscard]] virtual bool allows_dht() const = 0;
+        [[nodiscard]] virtual bool allows_tcp() const = 0;
+        [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address addr) const = 0;
+        [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
+        [[nodiscard]] virtual tr_message_stream_encryption::DH::private_key_bigend_t private_key() const
+        {
+            return tr_message_stream_encryption::DH::randomPrivateKey();
+        }
+
+        virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address) = 0;
+    };
+
+    virtual ~tr_handshake() = default;
+
+    static std::unique_ptr<tr_handshake> create(
+        Mediator& mediator,
+        std::shared_ptr<tr_peerIo> const& peer_io,
+        tr_encryption_mode mode,
+        DoneFunc done_func);
 };
-
-/* returns true on success, false on error */
-using tr_handshake_done_func = std::function<bool(tr_handshake_result const&)>;
-
-/** @brief create a new handshake */
-tr_handshake* tr_handshakeNew(
-    tr_handshake_mediator& mediator,
-    std::shared_ptr<tr_peerIo> io,
-    tr_encryption_mode encryption_mode,
-    tr_handshake_done_func done_func);
-
-void tr_handshakeAbort(tr_handshake* handshake);
 
 /** @} */

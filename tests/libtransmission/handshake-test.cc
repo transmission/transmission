@@ -35,7 +35,7 @@ auto constexpr MaxWaitMsec = int{ 5000 };
 class HandshakeTest : public SessionTest
 {
 public:
-    class MediatorMock final : public tr_handshake_mediator
+    class MediatorMock final : public tr_handshake::Mediator
     {
     public:
         explicit MediatorMock(tr_session* session)
@@ -43,7 +43,7 @@ public:
         {
         }
 
-        [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
+        [[nodiscard]] std::optional<TorrentInfo> torrent_info(tr_sha1_digest_t const& info_hash) const override
         {
             if (auto const iter = torrents.find(info_hash); iter != std::end(torrents))
             {
@@ -53,7 +53,7 @@ public:
             return {};
         }
 
-        [[nodiscard]] std::optional<torrent_info> torrentInfoFromObfuscated(tr_sha1_digest_t const& obfuscated) const override
+        [[nodiscard]] std::optional<TorrentInfo> torrent_info_from_obfuscated(tr_sha1_digest_t const& obfuscated) const override
         {
             for (auto const& [info_hash, info] : torrents)
             {
@@ -66,22 +66,22 @@ public:
             return {};
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_->timerMaker();
         }
 
-        [[nodiscard]] bool allowsDHT() const override
+        [[nodiscard]] bool allows_dht() const override
         {
             return false;
         }
 
-        [[nodiscard]] bool allowsTCP() const override
+        [[nodiscard]] bool allows_tcp() const override
         {
             return true;
         }
 
-        [[nodiscard]] bool isPeerKnownSeed(tr_torrent_id_t /*tor_id*/, tr_address /*addr*/) const override
+        [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t /*tor_id*/, tr_address /*addr*/) const override
         {
             return false;
         }
@@ -94,12 +94,12 @@ public:
             return len;
         }
 
-        [[nodiscard]] tr_message_stream_encryption::DH::private_key_bigend_t privateKey() const override
+        [[nodiscard]] tr_message_stream_encryption::DH::private_key_bigend_t private_key() const override
         {
             return private_key_;
         }
 
-        void setUTPFailed(tr_sha1_digest_t const& /*info_hash*/, tr_address /*addr*/) override
+        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_address /*addr*/) override
         {
         }
 
@@ -111,7 +111,7 @@ public:
         }
 
         tr_session* const session_;
-        std::map<tr_sha1_digest_t, torrent_info> torrents;
+        std::map<tr_sha1_digest_t, TorrentInfo> torrents;
         tr_message_stream_encryption::DH::private_key_bigend_t private_key_ = {};
     };
 
@@ -145,11 +145,11 @@ public:
 
     tr_address const DefaultPeerAddr = *tr_address::from_string("127.0.0.1"sv);
     tr_port const DefaultPeerPort = tr_port::fromHost(8080);
-    tr_handshake_mediator::torrent_info const TorrentWeAreSeeding{ tr_sha1::digest("abcde"sv),
+    tr_handshake::Mediator::TorrentInfo const TorrentWeAreSeeding{ tr_sha1::digest("abcde"sv),
                                                                    tr_peerIdInit(),
                                                                    tr_torrent_id_t{ 100 },
                                                                    true /*is_done*/ };
-    tr_handshake_mediator::torrent_info const UbuntuTorrent{ *tr_sha1_from_string("2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
+    tr_handshake::Mediator::TorrentInfo const UbuntuTorrent{ *tr_sha1_from_string("2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
                                                              tr_peerIdInit(),
                                                              tr_torrent_id_t{ 101 },
                                                              false /*is_done*/ };
@@ -158,25 +158,27 @@ public:
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
-        auto io = tr_peerIo::newIncoming(
-            session,
-            &session->top_bandwidth_,
-            tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0]));
-        return std::make_pair(io, sockpair[1]);
+        return std::make_pair(
+            tr_peerIo::newIncoming(
+                session,
+                &session->top_bandwidth_,
+                tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0])),
+            sockpair[1]);
     }
 
     auto createOutgoingIo(tr_session* session, tr_sha1_digest_t const& info_hash)
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
-        auto io = tr_peerIo::create(
-            session,
-            &session->top_bandwidth_,
-            &info_hash,
-            false /*is_incoming*/,
-            false /*is_seed*/,
-            tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0]));
-        return std::make_pair(io, sockpair[1]);
+        return std::make_pair(
+            tr_peerIo::create(
+                session,
+                &session->top_bandwidth_,
+                &info_hash,
+                false /*is_incoming*/,
+                false /*is_seed*/,
+                tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0])),
+            sockpair[1]);
     }
 
     static constexpr auto makePeerId(std::string_view sv)
@@ -198,15 +200,15 @@ public:
     }
 
     static auto runHandshake(
-        tr_handshake_mediator& mediator,
-        std::shared_ptr<tr_peerIo> io,
+        tr_handshake::Mediator& mediator,
+        std::shared_ptr<tr_peerIo> const& peer_io,
         tr_encryption_mode encryption_mode = TR_CLEAR_PREFERRED)
     {
-        auto result = std::optional<tr_handshake_result>{};
+        auto result = std::optional<tr_handshake::Result>{};
 
-        tr_handshakeNew(
+        auto handshake = tr_handshake::create(
             mediator,
-            std::move(io),
+            peer_io,
             encryption_mode,
             [&result](auto const& resin)
             {
@@ -215,7 +217,7 @@ public:
             });
 
         waitFor([&result]() { return result.has_value(); }, MaxWaitMsec);
-
+        handshake.reset();
         return result;
     }
 };
