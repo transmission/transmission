@@ -35,6 +35,25 @@ class tr_peerIo;
 class tr_handshake
 {
 public:
+    enum class State
+    {
+        // incoming
+        AwaitingHandshake,
+        AwaitingPeerId,
+        AwaitingYa,
+        AwaitingPadA,
+        AwaitingCryptoProvide,
+        AwaitingPadC,
+        AwaitingIa,
+        AwaitingPayloadStream,
+
+        // outgoing
+        AwaitingYb,
+        AwaitingVc,
+        AwaitingCryptoSelect,
+        AwaitingPadD
+    };
+
     struct Result
     {
         std::shared_ptr<tr_peerIo> io;
