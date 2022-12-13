@@ -191,23 +191,11 @@ tr_handshake::ParseResult tr_handshake::parseHandshake(tr_peerIo* peer_io)
 ****
 ***/
 
-template<size_t PadMax>
-static void sendPublicKeyAndPad(tr_handshake* handshake, tr_peerIo* io)
-{
-    auto const public_key = handshake->dh_.publicKey();
-    auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
-    auto const data = std::data(outbuf);
-    auto walk = data;
-    walk = std::copy(std::begin(public_key), std::end(public_key), walk);
-    walk += handshake->pad(walk, PadMax);
-    io->writeBytes(data, walk - data, false);
-}
-
 // 1 A->B: our public key (Ya) and some padding (PadA)
-static void sendYa(tr_handshake* handshake, tr_peerIo* io)
+void tr_handshake::sendYa(tr_peerIo* io)
 {
-    sendPublicKeyAndPad<PadaMaxlen>(handshake, io);
-    handshake->set_state(tr_handshake::State::AwaitingYb);
+    sendPublicKeyAndPad<PadaMaxlen>(io);
+    set_state(tr_handshake::State::AwaitingYb);
 }
 
 static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, uint32_t crypto_provide)
@@ -550,7 +538,7 @@ ReadState tr_handshake::readYa(tr_peerIo* peer_io)
 
     // send our public key to the peer
     tr_logAddTraceHand(this, "sending B->A: Diffie Hellman Yb, PadB");
-    sendPublicKeyAndPad<PadbMaxlen>(this, peer_io);
+    sendPublicKeyAndPad<PadbMaxlen>(peer_io);
 
     set_state(State::AwaitingPadA);
     return READ_NOW;
@@ -934,17 +922,16 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-tr_handshake::tr_handshake(
-    Mediator* mediator,
-    std::shared_ptr<tr_peerIo> peer_io,
-    tr_encryption_mode mode_in,
-    DoneFunc done_func)
+tr_handshake::tr_handshake(Mediator* mediator,
+                           std::shared_ptr<tr_peerIo> peer_io,
+                           tr_encryption_mode mode_in,
+                           DoneFunc done_func)
     : dh_{ mediator->private_key() }
-    , encryption_mode_{ mode_in }
-    , mediator_{ mediator }
-    , peer_io_{ std::move(peer_io) }
     , done_func_{ std::move(done_func) }
+    , peer_io_{ std::move(peer_io) }
     , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
+    , mediator_{ mediator }
+    , encryption_mode_{ mode_in }
 {
     timeout_timer_->startSingleShot(HandshakeTimeoutSec);
 
@@ -956,7 +943,7 @@ tr_handshake::tr_handshake(
     }
     else if (encryption_mode_ != TR_CLEAR_PREFERRED)
     {
-        sendYa(this, peer_io_.get());
+        sendYa(peer_io_.get());
     }
     else
     {

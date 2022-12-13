@@ -37,25 +37,6 @@ class tr_handshake
 public:
     using DH = tr_message_stream_encryption::DH;
 
-    enum class State
-    {
-        // incoming
-        AwaitingHandshake,
-        AwaitingPeerId,
-        AwaitingYa,
-        AwaitingPadA,
-        AwaitingCryptoProvide,
-        AwaitingPadC,
-        AwaitingIa,
-        AwaitingPayloadStream,
-
-        // outgoing
-        AwaitingYb,
-        AwaitingVc,
-        AwaitingCryptoSelect,
-        AwaitingPadD
-    };
-
     struct Result
     {
         std::shared_ptr<tr_peerIo> io;
@@ -97,7 +78,25 @@ public:
 
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func);
 
-    virtual ~tr_handshake() = default;
+private:
+    enum class State
+    {
+        // incoming
+        AwaitingHandshake,
+        AwaitingPeerId,
+        AwaitingYa,
+        AwaitingPadA,
+        AwaitingCryptoProvide,
+        AwaitingPadC,
+        AwaitingIa,
+        AwaitingPayloadStream,
+
+        // outgoing
+        AwaitingYb,
+        AwaitingVc,
+        AwaitingCryptoSelect,
+        AwaitingPadD
+    };
 
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
 
@@ -113,6 +112,8 @@ public:
     ReadState readVC(tr_peerIo* peer_io);
     ReadState readYa(tr_peerIo* peer_io);
     ReadState readYb(tr_peerIo* peer_io);
+
+    void sendYa(tr_peerIo* io);
 
     enum class ParseResult
     {
@@ -242,19 +243,6 @@ public:
         return provide;
     }
 
-    static auto constexpr CryptoProvidePlaintext = int{ 1 };
-    static auto constexpr CryptoProvideCrypto = int{ 2 };
-
-    bool have_sent_bittorrent_handshake_ = false;
-    DH dh_ = {};
-    tr_encryption_mode encryption_mode_;
-    uint16_t pad_c_len_ = {};
-    uint16_t pad_d_len_ = {};
-    uint16_t ia_len_ = {};
-    uint32_t crypto_select_ = {};
-    uint32_t crypto_provide_ = {};
-
-protected:
     bool fire_done(bool is_connected)
     {
         if (!done_func_)
@@ -272,7 +260,6 @@ protected:
         return success;
     }
 
-private:
     static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
 
     [[nodiscard]] static constexpr std::string_view state_string(State state)
@@ -310,15 +297,44 @@ private:
         }
     }
 
-    Mediator* mediator_ = nullptr;
+    template<size_t PadMax>
+    void sendPublicKeyAndPad(tr_peerIo* io)
+    {
+        auto const public_key = dh_.publicKey();
+        auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
+        auto const data = std::data(outbuf);
+        auto walk = data;
+        walk = std::copy(std::begin(public_key), std::end(public_key), walk);
+        walk += pad(walk, PadMax);
+        io->writeBytes(data, walk - data, false);
+    }
+
+    static auto constexpr CryptoProvidePlaintext = int{ 1 };
+    static auto constexpr CryptoProvideCrypto = int{ 2 };
+
+    DH dh_ = {};
+
+    DoneFunc done_func_;
+
+    std::optional<tr_peer_id_t> peer_id_;
 
     std::shared_ptr<tr_peerIo> peer_io_;
 
-    std::optional<tr_peer_id_t> peer_id_;
-    bool have_read_anything_from_peer_ = false;
-    DoneFunc done_func_;
+    std::unique_ptr<libtransmission::Timer> timeout_timer_;
+
+    Mediator* mediator_ = nullptr;
 
     State state_ = State::AwaitingHandshake;
 
-    std::unique_ptr<libtransmission::Timer> timeout_timer_;
+    tr_encryption_mode encryption_mode_;
+
+    uint32_t crypto_select_ = {};
+    uint32_t crypto_provide_ = {};
+    uint16_t pad_c_len_ = {};
+    uint16_t pad_d_len_ = {};
+    uint16_t ia_len_ = {};
+
+    bool have_read_anything_from_peer_ = false;
+
+    bool have_sent_bittorrent_handshake_ = false;
 };
