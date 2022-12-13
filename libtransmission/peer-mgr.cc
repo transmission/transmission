@@ -1244,7 +1244,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         auto address = socket.address();
         manager->incoming_handshakes.add(
             address,
-            tr_handshake::create(
+            std::make_unique<tr_handshake>(
                 &manager->handshake_mediator_,
                 tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
                 session->encryptionMode(),
@@ -2822,7 +2822,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     {
         s->outgoing_handshakes.add(
             atom.addr,
-            tr_handshake::create(
+            std::make_unique<tr_handshake>(
                 &mgr->handshake_mediator_,
                 peer_io,
                 mgr->session->encryptionMode(),

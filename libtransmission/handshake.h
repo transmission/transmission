@@ -95,24 +95,9 @@ public:
         virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const&) = 0;
     };
 
-    tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func)
-        : dh{ mediator->private_key() }
-        , encryption_mode{ mode_in }
-        , mediator_{ mediator }
-        , peer_io_{ std::move(peer_io) }
-        , done_func_{ std::move(done_func) }
-        , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
-    {
-        timeout_timer_->startSingleShot(HandshakeTimeoutSec);
-    }
+    tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func);
 
     virtual ~tr_handshake() = default;
-
-    static std::unique_ptr<tr_handshake> create(
-        Mediator* mediator,
-        std::shared_ptr<tr_peerIo> const& peer_io,
-        tr_encryption_mode mode,
-        DoneFunc done_func);
 
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {

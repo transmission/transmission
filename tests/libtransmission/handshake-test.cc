@@ -206,7 +206,7 @@ public:
     {
         auto result = std::optional<tr_handshake::Result>{};
 
-        auto handshake = tr_handshake::create(
+        auto handshake = tr_handshake{
             mediator,
             peer_io,
             encryption_mode,
@@ -214,10 +214,9 @@ public:
             {
                 result = resin;
                 return true;
-            });
+            }};
 
         waitFor([&result]() { return result.has_value(); }, MaxWaitMsec);
-        handshake.reset();
         return result;
     }
 };

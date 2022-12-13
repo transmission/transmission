@@ -956,33 +956,33 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-std::unique_ptr<tr_handshake> tr_handshake::create(
-    Mediator* mediator,
-    std::shared_ptr<tr_peerIo> const& peer_io,
-    tr_encryption_mode encryption_mode,
-    DoneFunc done_func)
+tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func)
+    : dh{ mediator->private_key() }
+    , encryption_mode{ mode_in }
+    , mediator_{ mediator }
+    , peer_io_{ std::move(peer_io) }
+    , done_func_{ std::move(done_func) }
+    , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
 {
-    auto handshake = std::make_unique<tr_handshake>(mediator, peer_io, encryption_mode, std::move(done_func));
+    timeout_timer_->startSingleShot(HandshakeTimeoutSec);
 
-    peer_io->setCallbacks(canRead, nullptr, gotError, handshake.get());
+    peer_io_->setCallbacks(canRead, nullptr, gotError, this);
 
-    if (handshake->is_incoming())
+    if (is_incoming())
     {
-        setReadState(handshake.get(), tr_handshake::State::AwaitingHandshake);
+        setReadState(this, tr_handshake::State::AwaitingHandshake);
     }
     else if (encryption_mode != TR_CLEAR_PREFERRED)
     {
-        sendYa(handshake.get(), peer_io.get());
+        sendYa(this, peer_io_.get());
     }
     else
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
-        buildHandshakeMessage(handshake.get(), peer_io.get(), std::data(msg));
+        buildHandshakeMessage(this, peer_io_.get(), std::data(msg));
 
-        handshake->have_sent_bittorrent_handshake = true;
-        setReadState(handshake.get(), tr_handshake::State::AwaitingHandshake);
-        peer_io->writeBytes(std::data(msg), std::size(msg), false);
+        have_sent_bittorrent_handshake = true;
+        setReadState(this, tr_handshake::State::AwaitingHandshake);
+        peer_io_->writeBytes(std::data(msg), std::size(msg), false);
     }
-
-    return handshake;
 }
