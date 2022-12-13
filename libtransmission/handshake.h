@@ -113,7 +113,7 @@ private:
     ReadState read_ya(tr_peerIo* peer_io);
     ReadState read_yb(tr_peerIo* peer_io);
 
-    void sendYa(tr_peerIo* io);
+    void send_ya(tr_peerIo* io);
 
     enum class ParseResult
     {
@@ -123,7 +123,7 @@ private:
         PeerIsSelf,
     };
 
-    ParseResult parseHandshake(tr_peerIo* peer_io);
+    ParseResult parse_handshake(tr_peerIo* peer_io);
 
     static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
     static void on_error(tr_peerIo* io, short what, void* vhandshake);

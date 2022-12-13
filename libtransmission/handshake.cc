@@ -132,7 +132,7 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     return true;
 }
 
-tr_handshake::ParseResult tr_handshake::parseHandshake(tr_peerIo* peer_io)
+tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
 {
     tr_logAddTraceHand(this, fmt::format("payload: need {}, got {}", HandshakeSize, peer_io->readBufferSize()));
 
@@ -192,7 +192,7 @@ tr_handshake::ParseResult tr_handshake::parseHandshake(tr_peerIo* peer_io)
 ***/
 
 // 1 A->B: our public key (Ya) and some padding (PadA)
-void tr_handshake::sendYa(tr_peerIo* io)
+void tr_handshake::send_ya(tr_peerIo* io)
 {
     send_public_key_and_pad<PadaMaxlen>(io);
     set_state(tr_handshake::State::AwaitingYb);
@@ -742,9 +742,7 @@ ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
 {
     size_t const needlen = HandshakeSize;
 
-    tr_logAddTraceHand(
-        this,
-        fmt::format("reading payload stream... have {}, need {}", peer_io->readBufferSize(), needlen));
+    tr_logAddTraceHand(this, fmt::format("reading payload stream... have {}, need {}", peer_io->readBufferSize(), needlen));
 
     if (peer_io->readBufferSize() < needlen)
     {
@@ -752,7 +750,7 @@ ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
     }
 
     /* parse the handshake ... */
-    auto const i = parseHandshake(peer_io);
+    auto const i = parse_handshake(peer_io);
     tr_logAddTraceHand(this, fmt::format("parseHandshake returned {}", static_cast<int>(i)));
 
     if (i != ParseResult::Ok)
@@ -922,10 +920,11 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-tr_handshake::tr_handshake(Mediator* mediator,
-                           std::shared_ptr<tr_peerIo> peer_io,
-                           tr_encryption_mode mode_in,
-                           DoneFunc done_func)
+tr_handshake::tr_handshake(
+    Mediator* mediator,
+    std::shared_ptr<tr_peerIo> peer_io,
+    tr_encryption_mode mode_in,
+    DoneFunc done_func)
     : dh_{ mediator->private_key() }
     , done_func_{ std::move(done_func) }
     , peer_io_{ std::move(peer_io) }
@@ -943,7 +942,7 @@ tr_handshake::tr_handshake(Mediator* mediator,
     }
     else if (encryption_mode_ != TR_CLEAR_PREFERRED)
     {
-        sendYa(peer_io_.get());
+        send_ya(peer_io_.get());
     }
     else
     {
