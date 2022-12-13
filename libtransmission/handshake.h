@@ -9,11 +9,15 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
+#include <array>
 #include <chrono>
+#include <cstdint> // for uintX_t
 #include <cstddef> // for size_t
 #include <functional>
 #include <memory>
 #include <optional>
+#include <string_view>
 
 #include "transmission.h"
 
