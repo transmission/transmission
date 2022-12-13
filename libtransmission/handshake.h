@@ -100,18 +100,18 @@ private:
 
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
 
-    ReadState readCryptoProvide(tr_peerIo* peer_io);
-    ReadState readCryptoSelect(tr_peerIo* peer_io);
-    ReadState readHandshake(tr_peerIo* peer_io);
-    ReadState readIA(tr_peerIo* peer_io);
-    ReadState readPadA(tr_peerIo* peer_io);
-    ReadState readPadC(tr_peerIo* peer_io);
-    ReadState readPadD(tr_peerIo* peer_io);
-    ReadState readPayloadStream(tr_peerIo* peer_io);
-    ReadState readPeerId(tr_peerIo* peer_io);
-    ReadState readVC(tr_peerIo* peer_io);
-    ReadState readYa(tr_peerIo* peer_io);
-    ReadState readYb(tr_peerIo* peer_io);
+    ReadState read_crypto_provide(tr_peerIo* peer_io);
+    ReadState read_crypto_select(tr_peerIo* peer_io);
+    ReadState read_handshake(tr_peerIo* peer_io);
+    ReadState read_ia(tr_peerIo* peer_io);
+    ReadState read_pad_a(tr_peerIo* peer_io);
+    ReadState read_pad_c(tr_peerIo* peer_io);
+    ReadState read_pad_d(tr_peerIo* peer_io);
+    ReadState read_payload_stream(tr_peerIo* peer_io);
+    ReadState read_peer_id(tr_peerIo* peer_io);
+    ReadState read_vc(tr_peerIo* peer_io);
+    ReadState read_ya(tr_peerIo* peer_io);
+    ReadState read_yb(tr_peerIo* peer_io);
 
     void sendYa(tr_peerIo* io);
 
@@ -179,7 +179,7 @@ private:
         return state_string(state_);
     }
 
-    [[nodiscard]] constexpr uint32_t cryptoProvide() const
+    [[nodiscard]] constexpr uint32_t crypto_provide() const
     {
         uint32_t provide = 0;
 
@@ -253,7 +253,7 @@ private:
     }
 
     template<size_t PadMax>
-    void sendPublicKeyAndPad(tr_peerIo* io)
+    void send_public_key_and_pad(tr_peerIo* io)
     {
         auto const public_key = dh_.publicKey();
         auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};

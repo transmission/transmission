@@ -194,7 +194,7 @@ tr_handshake::ParseResult tr_handshake::parseHandshake(tr_peerIo* peer_io)
 // 1 A->B: our public key (Ya) and some padding (PadA)
 void tr_handshake::sendYa(tr_peerIo* io)
 {
-    sendPublicKeyAndPad<PadaMaxlen>(io);
+    send_public_key_and_pad<PadaMaxlen>(io);
     set_state(tr_handshake::State::AwaitingYb);
 }
 
@@ -231,7 +231,7 @@ static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, ui
     return 0;
 }
 
-ReadState tr_handshake::readYb(tr_peerIo* peer_io)
+ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
 {
     if (peer_io->readBufferSize() < std::size(HandshakeName))
     {
@@ -288,7 +288,7 @@ ReadState tr_handshake::readYb(tr_peerIo* peer_io)
     peer_io->write(outbuf, false);
     peer_io->encryptInit(peer_io->isIncoming(), dh_, info_hash);
     outbuf.add(VC);
-    outbuf.addUint32(cryptoProvide());
+    outbuf.addUint32(crypto_provide());
     outbuf.addUint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
@@ -311,7 +311,7 @@ ReadState tr_handshake::readYb(tr_peerIo* peer_io)
 
 // MSE spec: "Since the length of [PadB is] unknown,
 // A will be able to resynchronize on ENCRYPT(VC)"
-ReadState tr_handshake::readVC(tr_peerIo* peer_io)
+ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
 {
     auto const info_hash = peer_io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readVC requires an info_hash");
@@ -348,7 +348,7 @@ ReadState tr_handshake::readVC(tr_peerIo* peer_io)
     return done(false);
 }
 
-ReadState tr_handshake::readCryptoSelect(tr_peerIo* peer_io)
+ReadState tr_handshake::read_crypto_select(tr_peerIo* peer_io)
 {
     if (static size_t constexpr NeedLen = sizeof(uint32_t) + sizeof(uint16_t); peer_io->readBufferSize() < NeedLen)
     {
@@ -360,7 +360,7 @@ ReadState tr_handshake::readCryptoSelect(tr_peerIo* peer_io)
     crypto_select_ = crypto_select;
     tr_logAddTraceHand(this, fmt::format("crypto select is {}", crypto_select));
 
-    if ((crypto_select & cryptoProvide()) == 0)
+    if ((crypto_select & crypto_provide()) == 0)
     {
         tr_logAddTraceHand(this, "peer selected an encryption option we didn't offer");
         return done(false);
@@ -382,7 +382,7 @@ ReadState tr_handshake::readCryptoSelect(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-ReadState tr_handshake::readPadD(tr_peerIo* peer_io)
+ReadState tr_handshake::read_pad_d(tr_peerIo* peer_io)
 {
     size_t const needlen = pad_d_len_;
 
@@ -405,7 +405,7 @@ ReadState tr_handshake::readPadD(tr_peerIo* peer_io)
 ****
 ***/
 
-ReadState tr_handshake::readHandshake(tr_peerIo* peer_io)
+ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
 {
     tr_logAddTraceHand(this, fmt::format("payload: need {}, got {}", IncomingHandshakeLen, peer_io->readBufferSize()));
 
@@ -497,7 +497,7 @@ ReadState tr_handshake::readHandshake(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-ReadState tr_handshake::readPeerId(tr_peerIo* peer_io)
+ReadState tr_handshake::read_peer_id(tr_peerIo* peer_io)
 {
     // read the peer_id
     auto peer_id = tr_peer_id_t{};
@@ -520,7 +520,7 @@ ReadState tr_handshake::readPeerId(tr_peerIo* peer_io)
     return done(!connected_to_self);
 }
 
-ReadState tr_handshake::readYa(tr_peerIo* peer_io)
+ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
 {
     auto peer_public_key = DH::key_bigend_t{};
     tr_logAddTraceHand(
@@ -538,13 +538,13 @@ ReadState tr_handshake::readYa(tr_peerIo* peer_io)
 
     // send our public key to the peer
     tr_logAddTraceHand(this, "sending B->A: Diffie Hellman Yb, PadB");
-    sendPublicKeyAndPad<PadbMaxlen>(peer_io);
+    send_public_key_and_pad<PadbMaxlen>(peer_io);
 
     set_state(State::AwaitingPadA);
     return READ_NOW;
 }
 
-ReadState tr_handshake::readPadA(tr_peerIo* peer_io)
+ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 {
     // find the end of PadA by looking for HASH('req1', S)
     auto const needle = tr_sha1::digest("req1"sv, dh_.secret());
@@ -572,7 +572,7 @@ ReadState tr_handshake::readPadA(tr_peerIo* peer_io)
     return done(false);
 }
 
-ReadState tr_handshake::readCryptoProvide(tr_peerIo* peer_io)
+ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 {
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
 
@@ -645,7 +645,7 @@ ReadState tr_handshake::readCryptoProvide(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-ReadState tr_handshake::readPadC(tr_peerIo* peer_io)
+ReadState tr_handshake::read_pad_c(tr_peerIo* peer_io)
 {
     if (auto const needlen = pad_c_len_ + sizeof(uint16_t); peer_io->readBufferSize() < needlen)
     {
@@ -665,7 +665,7 @@ ReadState tr_handshake::readPadC(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-ReadState tr_handshake::readIA(tr_peerIo* peer_io)
+ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
 {
     size_t const needlen = ia_len_;
 
@@ -738,7 +738,7 @@ ReadState tr_handshake::readIA(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-ReadState tr_handshake::readPayloadStream(tr_peerIo* peer_io)
+ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
 {
     size_t const needlen = HandshakeSize;
 
@@ -789,51 +789,51 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
         switch (handshake->state())
         {
         case State::AwaitingHandshake:
-            ret = handshake->readHandshake(peer_io);
+            ret = handshake->read_handshake(peer_io);
             break;
 
         case State::AwaitingPeerId:
-            ret = handshake->readPeerId(peer_io);
+            ret = handshake->read_peer_id(peer_io);
             break;
 
         case State::AwaitingYa:
-            ret = handshake->readYa(peer_io);
+            ret = handshake->read_ya(peer_io);
             break;
 
         case State::AwaitingPadA:
-            ret = handshake->readPadA(peer_io);
+            ret = handshake->read_pad_a(peer_io);
             break;
 
         case State::AwaitingCryptoProvide:
-            ret = handshake->readCryptoProvide(peer_io);
+            ret = handshake->read_crypto_provide(peer_io);
             break;
 
         case State::AwaitingPadC:
-            ret = handshake->readPadC(peer_io);
+            ret = handshake->read_pad_c(peer_io);
             break;
 
         case State::AwaitingIa:
-            ret = handshake->readIA(peer_io);
+            ret = handshake->read_ia(peer_io);
             break;
 
         case State::AwaitingPayloadStream:
-            ret = handshake->readPayloadStream(peer_io);
+            ret = handshake->read_payload_stream(peer_io);
             break;
 
         case State::AwaitingYb:
-            ret = handshake->readYb(peer_io);
+            ret = handshake->read_yb(peer_io);
             break;
 
         case State::AwaitingVc:
-            ret = handshake->readVC(peer_io);
+            ret = handshake->read_vc(peer_io);
             break;
 
         case State::AwaitingCryptoSelect:
-            ret = handshake->readCryptoSelect(peer_io);
+            ret = handshake->read_crypto_select(peer_io);
             break;
 
         case State::AwaitingPadD:
-            ret = handshake->readPadD(peer_io);
+            ret = handshake->read_pad_d(peer_io);
             break;
 
         default:
