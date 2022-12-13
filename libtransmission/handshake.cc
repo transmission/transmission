@@ -185,8 +185,6 @@ public:
     uint32_t crypto_select = {};
     uint32_t crypto_provide = {};
 
-    std::optional<tr_peer_id_t> peer_id;
-
 private:
     [[nodiscard]] static constexpr std::string_view state_string(State state)
     {
@@ -236,7 +234,7 @@ private:
         auto peer_io = std::shared_ptr<tr_peerIo>{};
         std::swap(peer_io, this->io);
 
-        bool const success = (cb)(Result{ std::move(peer_io), peer_id, have_read_anything_from_peer, is_connected });
+        bool const success = (cb)(Result{ std::move(peer_io), peer_id(), have_read_anything_from_peer, is_connected });
         return success;
     }
 
@@ -337,7 +335,7 @@ static ParseResult parseHandshake(tr_handshake_impl* handshake, tr_peerIo* peer_
     // peer_id
     auto peer_id = tr_peer_id_t{};
     peer_io->readBytes(std::data(peer_id), std::size(peer_id));
-    handshake->peer_id = peer_id;
+    handshake->set_peer_id(peer_id);
 
     /* peer id */
     auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
@@ -693,7 +691,7 @@ static ReadState readPeerId(tr_handshake_impl* handshake, tr_peerIo* peer_io)
         return READ_LATER;
     }
     peer_io->readBytes(std::data(peer_id), std::size(peer_id));
-    handshake->peer_id = peer_id;
+    handshake->set_peer_id(peer_id);
 
     auto client = std::array<char, 128>{};
     tr_clientForId(std::data(client), std::size(client), peer_id);

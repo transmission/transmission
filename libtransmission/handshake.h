@@ -100,6 +100,19 @@ public:
         std::shared_ptr<tr_peerIo> const& peer_io,
         tr_encryption_mode mode,
         DoneFunc done_func);
+
+    [[nodiscard]] constexpr auto const& peer_id() const noexcept
+    {
+        return peer_id_;
+    }
+
+    void set_peer_id(tr_peer_id_t const& id) noexcept
+    {
+        peer_id_ = id;
+    }
+
+private:
+    std::optional<tr_peer_id_t> peer_id_;
 };
 
 /** @} */
