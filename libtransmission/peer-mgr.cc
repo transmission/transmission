@@ -111,7 +111,7 @@ public:
         return session_.allowsTCP();
     }
 
-    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address addr) override
+    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const& addr) override
     {
         if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
         {
@@ -119,7 +119,7 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address addr) const override
+    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const override
     {
         auto const* const tor = session_.torrents().get(tor_id);
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
@@ -1245,7 +1245,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         manager->incoming_handshakes.add(
             address,
             tr_handshake::create(
-                manager->handshake_mediator_,
+                &manager->handshake_mediator_,
                 tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
                 session->encryptionMode(),
                 [manager](tr_handshake::Result const& result) { return on_handshake_done(manager, result); }));
@@ -2823,7 +2823,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
         s->outgoing_handshakes.add(
             atom.addr,
             tr_handshake::create(
-                mgr->handshake_mediator_,
+                &mgr->handshake_mediator_,
                 peer_io,
                 mgr->session->encryptionMode(),
                 [mgr](tr_handshake::Result const& result) { return on_handshake_done(mgr, result); }));

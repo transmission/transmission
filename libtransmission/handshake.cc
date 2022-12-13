@@ -98,13 +98,11 @@ using DH = tr_message_stream_encryption::DH;
 class tr_handshake_impl final : public tr_handshake
 {
 public:
-    tr_handshake_impl(Mediator& mediator_in, DoneFunc done_func, std::shared_ptr<tr_peerIo> io_in, tr_encryption_mode mode_in)
-        : mediator{ mediator_in }
-        , io{ std::move(io_in) }
-        , dh{ mediator.private_key() }
+    tr_handshake_impl(Mediator* mediator, DoneFunc done_func, std::shared_ptr<tr_peerIo> const& io, tr_encryption_mode mode_in)
+        : tr_handshake{ mediator, io, std::move(done_func) }
+        , dh{ mediator->private_key() }
         , encryption_mode{ mode_in }
-        , timeout_timer_{ mediator.timer_maker().create([this]() { fire_done(false); }) }
-        , done_func_{ std::move(done_func) }
+        , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
     {
         timeout_timer_->startSingleShot(HandshakeTimeoutSec);
     }
@@ -117,7 +115,7 @@ public:
 
     [[nodiscard]] auto is_incoming() const noexcept
     {
-        return io->isIncoming();
+        return peer_io()->isIncoming();
     }
 
     [[nodiscard]] constexpr uint32_t cryptoProvide() const
@@ -137,18 +135,6 @@ public:
         }
 
         return provide;
-    }
-
-    ReadState done(bool is_connected)
-    {
-        tr_logAddTraceHand(this, is_connected ? "handshakeDone: connected" : "handshakeDone: aborting");
-        io->clearCallbacks();
-        return fire_done(is_connected) ? READ_LATER : READ_ERR;
-    }
-
-    [[nodiscard]] std::string display_name() const
-    {
-        return io->display_name();
     }
 
     [[nodiscard]] constexpr auto state() const noexcept
@@ -172,10 +158,7 @@ public:
         return state_string(state_);
     }
 
-    Mediator& mediator;
-
     bool have_sent_bittorrent_handshake = false;
-    std::shared_ptr<tr_peerIo> io;
     DH dh = {};
     tr_encryption_mode encryption_mode;
     uint16_t pad_c_len = {};
@@ -220,29 +203,10 @@ private:
         }
     }
 
-    bool fire_done(bool is_connected)
-    {
-        if (!done_func_)
-        {
-            return false;
-        }
-
-        auto cb = DoneFunc{};
-        std::swap(cb, done_func_);
-
-        auto peer_io = std::shared_ptr<tr_peerIo>{};
-        std::swap(peer_io, this->io);
-
-        bool const success = (cb)(Result{ std::move(peer_io), peer_id(), have_read_anything_from_peer(), is_connected });
-        return success;
-    }
-
     // how long to wait before giving up on a handshake
     static auto constexpr HandshakeTimeoutSec = 30s;
 
     std::unique_ptr<libtransmission::Timer> const timeout_timer_;
-
-    DoneFunc done_func_;
 
     State state_ = State::AwaitingHandshake;
 };
@@ -261,7 +225,7 @@ static bool buildHandshakeMessage(tr_handshake_impl const* const handshake, tr_p
     auto const& info_hash = io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "buildHandshakeMessage requires an info_hash");
 
-    auto const info = handshake->mediator.torrent_info(info_hash);
+    auto const info = handshake->torrent_info(info_hash);
     if (!info)
     {
         return false;
@@ -277,7 +241,7 @@ static bool buildHandshakeMessage(tr_handshake_impl const* const handshake, tr_p
     /* Note that this doesn't depend on whether the torrent is private.
      * We don't accept DHT peers for a private torrent,
      * but we participate in the DHT regardless. */
-    if (handshake->mediator.allows_dht())
+    if (handshake->allows_dht())
     {
         HANDSHAKE_SET_DHT(walk);
     }
@@ -340,7 +304,7 @@ static ParseResult parseHandshake(tr_handshake_impl* handshake, tr_peerIo* peer_
     auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
     tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}'", peer_id_sv));
 
-    if (auto const info = handshake->mediator.torrent_info(info_hash); info && info->client_peer_id == peer_id)
+    if (auto const info = handshake->torrent_info(info_hash); info && info->client_peer_id == peer_id)
     {
         tr_logAddTraceHand(handshake, "streuth!  we've connected to ourselves.");
         return ParseResult::PeerIsSelf;
@@ -371,7 +335,7 @@ static void sendPublicKeyAndPad(tr_handshake_impl* handshake, tr_peerIo* io)
     auto const data = std::data(outbuf);
     auto walk = data;
     walk = std::copy(std::begin(public_key), std::end(public_key), walk);
-    walk += handshake->mediator.pad(walk, PadMax);
+    walk += handshake->pad(walk, PadMax);
     io->writeBytes(data, walk - data, false);
 }
 
@@ -643,7 +607,7 @@ static ReadState readHandshake(tr_handshake_impl* handshake, tr_peerIo* peer_io)
 
     if (handshake->is_incoming())
     {
-        if (!handshake->mediator.torrent_info(hash))
+        if (!handshake->torrent_info(hash))
         {
             tr_logAddTraceHand(handshake, "peer is trying to connect to us for a torrent we don't have.");
             return handshake->done(false);
@@ -700,7 +664,7 @@ static ReadState readPeerId(tr_handshake_impl* handshake, tr_peerIo* peer_io)
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const info_hash = peer_io->torrentHash();
-    auto const info = handshake->mediator.torrent_info(info_hash);
+    auto const info = handshake->torrent_info(info_hash);
     auto const connected_to_self = info && info->client_peer_id == peer_id;
 
     return handshake->done(!connected_to_self);
@@ -786,10 +750,10 @@ static ReadState readCryptoProvide(tr_handshake_impl* handshake, tr_peerIo* peer
         obfuscated_hash[i] = req2[i] ^ req3[i];
     }
 
-    if (auto const info = handshake->mediator.torrent_info_from_obfuscated(obfuscated_hash); info)
+    if (auto const info = handshake->torrent_info_from_obfuscated(obfuscated_hash); info)
     {
         bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = handshake->mediator.is_peer_known_seed(info->id, peer_io->address());
+        bool const peer_is_seed = handshake->is_peer_known_seed(info->id, peer_io->address());
         tr_logAddTraceHand(handshake, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->setTorrentHash(info->info_hash);
 
@@ -1064,15 +1028,15 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
         // the peer probably doesn't speak µTP.
 
         auto const info_hash = io->torrentHash();
-        auto const info = handshake->mediator.torrent_info(info_hash);
+        auto const info = handshake->torrent_info(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
         {
-            handshake->mediator.set_utp_failed(info_hash, io->address());
+            handshake->set_utp_failed(info_hash, io->address());
         }
 
-        if (handshake->mediator.allows_tcp() && io->reconnect() == 0)
+        if (handshake->allows_tcp() && io->reconnect() == 0)
         {
             auto msg = std::array<uint8_t, HandshakeSize>{};
             buildHandshakeMessage(handshake, io, std::data(msg));
@@ -1086,7 +1050,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
     if ((handshake->is_state(tr_handshake::State::AwaitingYb) || handshake->is_state(tr_handshake::State::AwaitingVc)) &&
-        handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && handshake->mediator.allows_tcp() && io->reconnect() == 0)
+        handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && handshake->allows_tcp() && io->reconnect() == 0)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
@@ -1109,7 +1073,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 **/
 
 std::unique_ptr<tr_handshake> tr_handshake::create(
-    Mediator& mediator,
+    Mediator* mediator,
     std::shared_ptr<tr_peerIo> const& peer_io,
     tr_encryption_mode encryption_mode,
     DoneFunc done_func)

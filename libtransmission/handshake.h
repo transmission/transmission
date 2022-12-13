@@ -18,9 +18,7 @@
 
 #include "net.h" // tr_address
 #include "peer-mse.h" // tr_message_stream_encryption::DH
-
-/** @addtogroup peers Peers
-    @{ */
+#include "peer-io.h"
 
 namespace libtransmission
 {
@@ -83,33 +81,23 @@ public:
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual bool allows_dht() const = 0;
         [[nodiscard]] virtual bool allows_tcp() const = 0;
-        [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address addr) const = 0;
+        [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const = 0;
         [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
         [[nodiscard]] virtual tr_message_stream_encryption::DH::private_key_bigend_t private_key() const
         {
             return tr_message_stream_encryption::DH::randomPrivateKey();
         }
 
-        virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address) = 0;
+        virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const&) = 0;
     };
 
     virtual ~tr_handshake() = default;
 
     static std::unique_ptr<tr_handshake> create(
-        Mediator& mediator,
+        Mediator* mediator,
         std::shared_ptr<tr_peerIo> const& peer_io,
         tr_encryption_mode mode,
         DoneFunc done_func);
-
-    [[nodiscard]] constexpr auto const& peer_id() const noexcept
-    {
-        return peer_id_;
-    }
-
-    [[nodiscard]] constexpr auto have_read_anything_from_peer() const noexcept
-    {
-        return have_read_anything_from_peer_;
-    }
 
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
@@ -121,9 +109,98 @@ public:
         have_read_anything_from_peer_ = val;
     }
 
+    ReadState done(bool is_connected)
+    {
+        peer_io_->clearCallbacks();
+        return fire_done(is_connected) ? READ_LATER : READ_ERR;
+    }
+
+    [[nodiscard]] auto* peer_id() noexcept
+    {
+        return peer_io_.get();
+    }
+
+    [[nodiscard]] auto torrent_info(tr_sha1_digest_t const& info_hash) const
+    {
+        return mediator_->torrent_info(info_hash);
+    }
+
+    [[nodiscard]] auto torrent_info_from_obfuscated(tr_sha1_digest_t const& info_hash) const
+    {
+        return mediator_->torrent_info_from_obfuscated(info_hash);
+    }
+
+    [[nodiscard]] auto allows_dht() const
+    {
+        return mediator_->allows_dht();
+    }
+
+    [[nodiscard]] auto allows_tcp() const
+    {
+        return mediator_->allows_tcp();
+    }
+
+    [[nodiscard]] auto is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const
+    {
+        return mediator_->is_peer_known_seed(tor_id, addr);
+    }
+
+    [[nodiscard]] auto pad(void* setme, size_t max_bytes) const
+    {
+        return mediator_->pad(setme, max_bytes);
+    }
+
+    [[nodiscard]] auto* peer_io() noexcept
+    {
+        return peer_io_.get();
+    }
+
+    [[nodiscard]] auto const* peer_io() const noexcept
+    {
+        return peer_io_.get();
+    }
+
+    [[nodiscard]] auto display_name() const
+    {
+        return peer_io_->display_name();
+    }
+
+    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const& addr)
+    {
+        mediator_->set_utp_failed(info_hash, addr);
+    }
+
+protected:
+    tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, DoneFunc done_func)
+        : mediator_{ mediator }
+        , peer_io_{ std::move(peer_io) }
+        , done_func_{ std::move(done_func) }
+    {
+    }
+
+    bool fire_done(bool is_connected)
+    {
+        if (!done_func_)
+        {
+            return false;
+        }
+
+        auto cb = DoneFunc{};
+        std::swap(cb, done_func_);
+
+        auto peer_io = std::shared_ptr<tr_peerIo>{};
+        std::swap(peer_io, peer_io_);
+
+        bool const success = (cb)(Result{ std::move(peer_io), peer_id_, have_read_anything_from_peer_, is_connected });
+        return success;
+    }
+
 private:
+    Mediator* mediator_ = nullptr;
+
+    std::shared_ptr<tr_peerIo> peer_io_;
+
     std::optional<tr_peer_id_t> peer_id_;
     bool have_read_anything_from_peer_ = false;
+    DoneFunc done_func_;
 };
-
-/** @} */
