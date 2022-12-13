@@ -106,13 +106,24 @@ public:
         return peer_id_;
     }
 
+    [[nodiscard]] constexpr auto have_read_anything_from_peer() const noexcept
+    {
+        return have_read_anything_from_peer_;
+    }
+
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
         peer_id_ = id;
     }
 
+    void set_have_read_anything_from_peer(bool val) noexcept
+    {
+        have_read_anything_from_peer_ = val;
+    }
+
 private:
     std::optional<tr_peer_id_t> peer_id_;
+    bool have_read_anything_from_peer_ = false;
 };
 
 /** @} */

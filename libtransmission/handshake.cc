@@ -174,7 +174,6 @@ public:
 
     Mediator& mediator;
 
-    bool have_read_anything_from_peer = false;
     bool have_sent_bittorrent_handshake = false;
     std::shared_ptr<tr_peerIo> io;
     DH dh = {};
@@ -234,7 +233,7 @@ private:
         auto peer_io = std::shared_ptr<tr_peerIo>{};
         std::swap(peer_io, this->io);
 
-        bool const success = (cb)(Result{ std::move(peer_io), peer_id(), have_read_anything_from_peer, is_connected });
+        bool const success = (cb)(Result{ std::move(peer_io), peer_id(), have_read_anything_from_peer(), is_connected });
         return success;
     }
 
@@ -438,7 +437,7 @@ static ReadState readYb(tr_handshake_impl* handshake, tr_peerIo* peer_io)
         return READ_NOW;
     }
 
-    handshake->have_read_anything_from_peer = true;
+    handshake->set_have_read_anything_from_peer(true);
 
     // get the peer's public key
     peer_io->readBytes(std::data(peer_public_key), std::size(peer_public_key));
@@ -599,7 +598,7 @@ static ReadState readHandshake(tr_handshake_impl* handshake, tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    handshake->have_read_anything_from_peer = true;
+    handshake->set_have_read_anything_from_peer(true);
 
     if (peer_io->readBufferStartsWith(HandshakeName)) // unencrypted
     {
