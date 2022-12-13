@@ -168,7 +168,6 @@ private:
     Glib::Quark const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
 
     static guint last_page_;
-    sigc::connection last_page_tag_;
 };
 
 guint DetailsDialog::Impl::last_page_ = 0;
@@ -2502,7 +2501,6 @@ void DetailsDialog::Impl::on_details_window_size_allocated()
 DetailsDialog::Impl::~Impl()
 {
     periodic_refresh_tag_.disconnect();
-    last_page_tag_.disconnect();
 }
 
 std::unique_ptr<DetailsDialog> DetailsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
@@ -2589,7 +2587,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
 
     auto* const n = gtr_get_widget<Gtk::Notebook>(builder, "dialog_pages");
     n->set_current_page(last_page_);
-    last_page_tag_ = n->signal_switch_page().connect([](Widget*, guint page) { DetailsDialog::Impl::last_page_ = page; });
+    n->signal_switch_page().connect([](Gtk::Widget* /*page*/, guint page_number) { last_page_ = page_number; });
 }
 
 void DetailsDialog::set_torrents(std::vector<tr_torrent_id_t> const& ids)

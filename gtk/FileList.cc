@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <list>
 #include <memory>
+#include <queue>
 #include <stack>
 #include <string>
 #include <string_view>
@@ -106,7 +107,8 @@ private:
     bool onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel::Path const& path);
     void onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeViewColumn* col);
     void cell_edited_callback(Glib::ustring const& path_string, Glib::ustring const& newname);
-    bool on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error);
+    void on_rename_done(Glib::ustring const& path_string, Glib::ustring const& newname, int error);
+    void on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error);
 
 private:
     FileList& widget_;
@@ -117,20 +119,24 @@ private:
     Glib::RefPtr<Gtk::TreeStore> store_;
     tr_torrent_id_t torrent_id_ = {};
     sigc::connection timeout_tag_;
+    std::queue<sigc::connection> rename_done_tags_;
 };
 
 void FileList::Impl::clearData()
 {
     torrent_id_ = -1;
 
-    if (timeout_tag_.connected())
-    {
-        timeout_tag_.disconnect();
-    }
+    timeout_tag_.disconnect();
 }
 
 FileList::Impl::~Impl()
 {
+    while (!rename_done_tags_.empty())
+    {
+        rename_done_tags_.front().disconnect();
+        rename_done_tags_.pop();
+    }
+
     clearData();
 }
 
@@ -780,7 +786,18 @@ struct rename_data
     gpointer impl = nullptr;
 };
 
-bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
+void FileList::Impl::on_rename_done(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
+{
+    rename_done_tags_.push(Glib::signal_idle().connect(
+        [this, path_string, newname, error]()
+        {
+            rename_done_tags_.pop();
+            on_rename_done_idle(path_string, newname, error);
+            return false;
+        }));
+}
+
+void FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
 {
     if (error == 0)
     {
@@ -817,8 +834,6 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
         w->show();
     }
-
-    return false;
 }
 
 void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib::ustring const& newname)
@@ -864,10 +879,8 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
         static_cast<tr_torrent_rename_done_func>(
             [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, gpointer data)
             {
-                Glib::signal_idle().connect(
-                    [rdata = std::shared_ptr<struct rename_data>(static_cast<struct rename_data*>(data)), error]() {
-                        return static_cast<Impl*>(rdata->impl)->on_rename_done_idle(rdata->path_string, rdata->newname, error);
-                    });
+                auto const data_grave = std::unique_ptr<struct rename_data>(static_cast<struct rename_data*>(data));
+                static_cast<Impl*>(data_grave->impl)->on_rename_done(data_grave->path_string, data_grave->newname, error);
             }),
         rename_data.release());
 }
