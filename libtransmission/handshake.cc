@@ -104,12 +104,12 @@ static void setReadState(tr_handshake* handshake, tr_handshake::State state)
     handshake->set_state(state);
 }
 
-static bool buildHandshakeMessage(tr_handshake const* const handshake, tr_peerIo* io, uint8_t* buf)
+bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
 {
     auto const& info_hash = io->torrentHash();
-    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "buildHandshakeMessage requires an info_hash");
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "build_handshake_message requires an info_hash");
 
-    auto const info = handshake->torrent_info(info_hash);
+    auto const info = torrent_info(info_hash);
     if (!info)
     {
         return false;
@@ -125,7 +125,7 @@ static bool buildHandshakeMessage(tr_handshake const* const handshake, tr_peerIo
     /* Note that this doesn't depend on whether the torrent is private.
      * We don't accept DHT peers for a private torrent,
      * but we participate in the DHT regardless. */
-    if (handshake->allows_dht())
+    if (allows_dht())
     {
         HANDSHAKE_SET_DHT(walk);
     }
@@ -324,7 +324,7 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
     outbuf.addUint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
-    if (auto msg = std::array<uint8_t, HandshakeSize>{}; buildHandshakeMessage(handshake, peer_io, std::data(msg)))
+    if (auto msg = std::array<uint8_t, HandshakeSize>{}; handshake->build_handshake_message(peer_io, std::data(msg)))
     {
         outbuf.addUint16(std::size(msg));
         outbuf.add(msg);
@@ -516,7 +516,7 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
 
-        if (!buildHandshakeMessage(handshake, peer_io, std::data(msg)))
+        if (!handshake->build_handshake_message(peer_io, std::data(msg)))
         {
             return handshake->done(false);
         }
@@ -754,7 +754,7 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
     tr_logAddTraceHand(handshake, "sending handshake");
 
     /* send our handshake */
-    if (auto msg = std::array<uint8_t, HandshakeSize>{}; buildHandshakeMessage(handshake, peer_io, std::data(msg)))
+    if (auto msg = std::array<uint8_t, HandshakeSize>{}; handshake->build_handshake_message(peer_io, std::data(msg)))
     {
         outbuf.add(msg);
         handshake->have_sent_bittorrent_handshake = true;
@@ -923,7 +923,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
         if (handshake->allows_tcp() && io->reconnect() == 0)
         {
             auto msg = std::array<uint8_t, HandshakeSize>{};
-            buildHandshakeMessage(handshake, io, std::data(msg));
+            handshake->build_handshake_message(io, std::data(msg));
             handshake->have_sent_bittorrent_handshake = true;
             setReadState(handshake, tr_handshake::State::AwaitingHandshake);
             io->writeBytes(std::data(msg), std::size(msg), false);
@@ -938,7 +938,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
-        buildHandshakeMessage(handshake, io, std::data(msg));
+        handshake->build_handshake_message(io, std::data(msg));
         handshake->have_sent_bittorrent_handshake = true;
         setReadState(handshake, tr_handshake::State::AwaitingHandshake);
         io->writeBytes(std::data(msg), std::size(msg), false);
@@ -956,7 +956,11 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func)
+tr_handshake::tr_handshake(
+    Mediator* mediator,
+    std::shared_ptr<tr_peerIo> peer_io,
+    tr_encryption_mode mode_in,
+    DoneFunc done_func)
     : dh{ mediator->private_key() }
     , encryption_mode{ mode_in }
     , mediator_{ mediator }
@@ -979,7 +983,7 @@ tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_i
     else
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
-        buildHandshakeMessage(this, peer_io_.get(), std::data(msg));
+        build_handshake_message(peer_io_.get(), std::data(msg));
 
         have_sent_bittorrent_handshake = true;
         setReadState(this, tr_handshake::State::AwaitingHandshake);

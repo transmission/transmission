@@ -99,6 +99,8 @@ public:
 
     virtual ~tr_handshake() = default;
 
+    bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
+
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
         peer_id_ = id;
