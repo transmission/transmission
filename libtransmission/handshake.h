@@ -9,11 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <algorithm>
+#include <algorithm> // for std::copy()
 #include <array>
 #include <chrono>
 #include <cstdint> // for uintX_t
-#include <cstddef> // for size_t
+#include <cstddef> // for std::byte, size_t
 #include <functional>
 #include <memory>
 #include <optional>
@@ -36,8 +36,8 @@ public:
     {
         std::shared_ptr<tr_peerIo> io;
         std::optional<tr_peer_id_t> peer_id;
-        bool read_anything_from_peer;
-        bool is_connected;
+        bool read_anything_from_peer = false;
+        bool is_connected = false;
     };
 
     using DoneFunc = std::function<bool(Result const&)>;
@@ -55,9 +55,8 @@ public:
 
         virtual ~Mediator() = default;
 
-        [[nodiscard]] virtual std::optional<TorrentInfo> torrent_info(tr_sha1_digest_t const& info_hash) const = 0;
-        [[nodiscard]] virtual std::optional<TorrentInfo> torrent_info_from_obfuscated(
-            tr_sha1_digest_t const& info_hash) const = 0;
+        [[nodiscard]] virtual std::optional<TorrentInfo> torrent(tr_sha1_digest_t const& info_hash) const = 0;
+        [[nodiscard]] virtual std::optional<TorrentInfo> torrent_from_obfuscated(tr_sha1_digest_t const& info_hash) const = 0;
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual bool allows_dht() const = 0;
         [[nodiscard]] virtual bool allows_tcp() const = 0;
@@ -71,7 +70,7 @@ public:
         virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const&) = 0;
     };
 
-    tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func);
+    tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc on_done);
 
 private:
     enum class ParseResult
@@ -103,6 +102,14 @@ private:
 
     ///
 
+    [[nodiscard]] static std::string_view state_string(State state) noexcept;
+
+    [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
+
+    static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
+
+    static void on_error(tr_peerIo* io, short what, void* vhandshake);
+
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
 
     ReadState read_crypto_provide(tr_peerIo*);
@@ -121,9 +128,6 @@ private:
     void send_ya(tr_peerIo*);
 
     ParseResult parse_handshake(tr_peerIo* peer_io);
-
-    static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
-    static void on_error(tr_peerIo* io, short what, void* vhandshake);
 
     constexpr void set_peer_id(tr_peer_id_t const& id) noexcept
     {
@@ -161,18 +165,12 @@ private:
         state_ = state;
     }
 
-    [[nodiscard]] static std::string_view state_string(State state) noexcept;
-
     [[nodiscard]] std::string_view state_string() const noexcept
     {
         return state_string(state_);
     }
 
     [[nodiscard]] uint32_t crypto_provide() const noexcept;
-
-    [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
-
-    bool fire_done(bool is_connected);
 
     template<size_t PadMax>
     void send_public_key_and_pad(tr_peerIo* io)
@@ -186,19 +184,48 @@ private:
         io->writeBytes(data, walk - data, false);
     }
 
+    bool fire_done(bool is_connected);
+
     ///
 
     static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
 
-    // MSE constatnts.
-    // http://wiki.vuze.com/w/Message_Stream_Encryption
-    // crypto_provide and crypto_select are a 32bit bitfields.
-    // As of now 0x01 means plaintext, 0x02 means RC4. (see Functions)
-    // The remaining bits are reserved for future use.
-    static auto constexpr CryptoProvidePlaintext = size_t{ 1U };
-    static auto constexpr CryptoProvideCrypto = size_t{ 2U };
+    // bittorrent handshake constants
+    // https://www.bittorrent.org/beps/bep_0003.html#peer-protocol
+    // https://wiki.theory.org/BitTorrentSpecification#Handshake
 
-    // MSE constatnts.
+    // > The handshake starts with character ninteen (decimal) followed by the string
+    // > 'BitTorrent protocol'. The leading character is a length prefix.
+    static auto constexpr HandshakeName = std::array<std::byte, 20>{
+        std::byte{ 19 },  std::byte{ 'B' }, std::byte{ 'i' }, std::byte{ 't' }, std::byte{ 'T' },
+        std::byte{ 'o' }, std::byte{ 'r' }, std::byte{ 'r' }, std::byte{ 'e' }, std::byte{ 'n' },
+        std::byte{ 't' }, std::byte{ ' ' }, std::byte{ 'p' }, std::byte{ 'r' }, std::byte{ 'o' },
+        std::byte{ 't' }, std::byte{ 'o' }, std::byte{ 'c' }, std::byte{ 'o' }, std::byte{ 'l' }
+    };
+    // [Next comes] eight reserved bytes [used for enabling ltep, dht, fext]
+    static auto constexpr HandshakeFlagsLen = size_t{ 8 };
+    // Next comes the 20 byte sha1 info_hash and the 20-byte peer_id
+    static auto constexpr HandshakeSize = sizeof(HandshakeName) + HandshakeFlagsLen + sizeof(tr_sha1_digest_t) +
+        sizeof(tr_peer_id_t);
+    static_assert(HandshakeSize == 68);
+
+    // Length of handhshake up through the info_hash. From theory.org:
+    // > The recipient may wait for the initiator's handshake... however,
+    // > the recipient must respond as soon as it sees the info_hash part
+    // > of the handshake (the peer id will presumably be sent after the
+    // > recipient sends its own handshake).
+    static auto constexpr IncomingHandshakeLen = sizeof(HandshakeName) + HandshakeFlagsLen + sizeof(tr_sha1_digest_t);
+    static_assert(IncomingHandshakeLen == 48);
+
+    // MSE constants.
+    // http://wiki.vuze.com/w/Message_Stream_Encryption
+    // > crypto_provide and crypto_select are a 32bit bitfields.
+    // > As of now 0x01 means plaintext, 0x02 means RC4. (see Functions)
+    // > The remaining bits are reserved for future use.
+    static auto constexpr CryptoProvidePlaintext = size_t{ 0x01 };
+    static auto constexpr CryptoProvideCrypto = size_t{ 0x02 };
+
+    // MSE constants.
     // http://wiki.vuze.com/w/Message_Stream_Encryption
     // > PadA, PadB: Random data with a random length of 0 to 512 bytes each
     // > PadC, PadD: Arbitrary data with a length of 0 to 512 bytes
@@ -206,11 +233,18 @@ private:
     static auto constexpr PadbMaxlen = int{ 512 };
     static auto constexpr PadcMaxlen = int{ 512 };
 
+    // "VC is a verification constant that is used to verify whether the
+    // other side knows S and SKEY and thus defeats replay attacks of the
+    // SKEY hash. As of this version VC is a String of 8 bytes set to 0x00."
+    // https://wiki.vuze.com/w/Message_Stream_Encryption
+    using vc_t = std::array<std::byte, 8>;
+    static auto constexpr VC = vc_t{};
+
     ///
 
     DH dh_ = {};
 
-    DoneFunc done_func_;
+    DoneFunc on_done_;
 
     std::optional<tr_peer_id_t> peer_id_;
 

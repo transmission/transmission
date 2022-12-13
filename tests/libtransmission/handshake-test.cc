@@ -43,7 +43,7 @@ public:
         {
         }
 
-        [[nodiscard]] std::optional<TorrentInfo> torrent_info(tr_sha1_digest_t const& info_hash) const override
+        [[nodiscard]] std::optional<TorrentInfo> torrent(tr_sha1_digest_t const& info_hash) const override
         {
             if (auto const iter = torrents.find(info_hash); iter != std::end(torrents))
             {
@@ -53,7 +53,7 @@ public:
             return {};
         }
 
-        [[nodiscard]] std::optional<TorrentInfo> torrent_info_from_obfuscated(tr_sha1_digest_t const& obfuscated) const override
+        [[nodiscard]] std::optional<TorrentInfo> torrent_from_obfuscated(tr_sha1_digest_t const& obfuscated) const override
         {
             for (auto const& [info_hash, info] : torrents)
             {

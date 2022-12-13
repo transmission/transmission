@@ -24,6 +24,11 @@
 #include "tr-buffer.h"
 #include "utils.h"
 
+// https://www.bittorrent.org/beps/bep_0004.html
+// reserved[5] 0x10  LTEP (Libtorrent Extension Protocol)
+// reserved[7] 0x01  BitTorrent DHT
+// reserved[7] 0x04  suggest, haveall, havenone, reject request, and allow fast extensions
+
 /* enable LibTransmission extension protocol */
 #define ENABLE_LTEP
 /* fast extensions */
@@ -60,36 +65,12 @@
 using namespace std::literals;
 using DH = tr_message_stream_encryption::DH;
 
-namespace
-{
-
-auto constexpr HandshakeName = std::array<std::byte, 20>{
-    std::byte{ 19 },  std::byte{ 'B' }, std::byte{ 'i' }, std::byte{ 't' }, std::byte{ 'T' },
-    std::byte{ 'o' }, std::byte{ 'r' }, std::byte{ 'r' }, std::byte{ 'e' }, std::byte{ 'n' },
-    std::byte{ 't' }, std::byte{ ' ' }, std::byte{ 'p' }, std::byte{ 'r' }, std::byte{ 'o' },
-    std::byte{ 't' }, std::byte{ 'o' }, std::byte{ 'c' }, std::byte{ 'o' }, std::byte{ 'l' }
-};
-
-// bittorrent handshake constants
-auto constexpr HandshakeFlagsLen = int{ 8 };
-auto constexpr HandshakeSize = int{ 68 };
-auto constexpr IncomingHandshakeLen = int{ 48 };
-
-// "VC is a verification constant that is used to verify whether the
-// other side knows S and SKEY and thus defeats replay attacks of the
-// SKEY hash. As of this version VC is a String of 8 bytes set to 0x00."
-// https://wiki.vuze.com/w/Message_Stream_Encryption
-using vc_t = std::array<std::byte, 8>;
-auto constexpr VC = vc_t{};
-
-} // namespace
-
 bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
 {
     auto const& info_hash = io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "build_handshake_message requires an info_hash");
 
-    auto const info = mediator_->torrent_info(info_hash);
+    auto const info = mediator_->torrent(info_hash);
     if (!info)
     {
         return false;
@@ -160,7 +141,7 @@ tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
     auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
     tr_logAddTraceHand(this, fmt::format("peer-id is '{}'", peer_id_sv));
 
-    if (auto const info = mediator_->torrent_info(info_hash); info && info->client_peer_id == peer_id)
+    if (auto const info = mediator_->torrent(info_hash); info && info->client_peer_id == peer_id)
     {
         tr_logAddTraceHand(this, "streuth!  we've connected to ourselves.");
         return ParseResult::PeerIsSelf;
@@ -374,9 +355,7 @@ ReadState tr_handshake::read_crypto_select(tr_peerIo* peer_io)
 ReadState tr_handshake::read_pad_d(tr_peerIo* peer_io)
 {
     size_t const needlen = pad_d_len_;
-
     tr_logAddTraceHand(this, fmt::format("pad d: need {}, got {}", needlen, peer_io->readBufferSize()));
-
     if (peer_io->readBufferSize() < needlen)
     {
         return READ_LATER;
@@ -396,9 +375,9 @@ ReadState tr_handshake::read_pad_d(tr_peerIo* peer_io)
 
 ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
 {
-    tr_logAddTraceHand(this, fmt::format("payload: need {}, got {}", IncomingHandshakeLen, peer_io->readBufferSize()));
-
-    if (peer_io->readBufferSize() < IncomingHandshakeLen)
+    static auto constexpr Needlen = IncomingHandshakeLen;
+    tr_logAddTraceHand(this, fmt::format("payload: need {}, got {}", Needlen, peer_io->readBufferSize()));
+    if (peer_io->readBufferSize() < Needlen)
     {
         return READ_LATER;
     }
@@ -448,7 +427,7 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
 
     if (is_incoming())
     {
-        if (!mediator_->torrent_info(hash))
+        if (!mediator_->torrent(hash))
         {
             tr_logAddTraceHand(this, "peer is trying to connect to us for a torrent we don't have.");
             return done(false);
@@ -503,7 +482,7 @@ ReadState tr_handshake::read_peer_id(tr_peerIo* peer_io)
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const info_hash = peer_io_->torrentHash();
-    auto const info = mediator_->torrent_info(info_hash);
+    auto const info = mediator_->torrent(info_hash);
     auto const connected_to_self = info && info->client_peer_id == peer_id;
 
     return done(!connected_to_self);
@@ -589,7 +568,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
         obfuscated_hash[i] = req2[i] ^ req3[i];
     }
 
-    if (auto const info = mediator_->torrent_info_from_obfuscated(obfuscated_hash); info)
+    if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info)
     {
         bool const client_is_seed = info->is_done;
         bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->address());
@@ -729,11 +708,9 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
 
 ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
 {
-    size_t const needlen = HandshakeSize;
-
-    tr_logAddTraceHand(this, fmt::format("reading payload stream... have {}, need {}", peer_io->readBufferSize(), needlen));
-
-    if (peer_io->readBufferSize() < needlen)
+    static auto constexpr Needlen = HandshakeSize;
+    tr_logAddTraceHand(this, fmt::format("reading payload stream... have {}, need {}", peer_io->readBufferSize(), Needlen));
+    if (peer_io->readBufferSize() < Needlen)
     {
         return READ_LATER;
     }
@@ -741,7 +718,6 @@ ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
     /* parse the handshake ... */
     auto const i = parse_handshake(peer_io);
     tr_logAddTraceHand(this, fmt::format("parseHandshake returned {}", static_cast<int>(i)));
-
     if (i != ParseResult::Ok)
     {
         return done(false);
@@ -857,7 +833,7 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
 
 void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
 {
-    int const errcode = errno;
+    auto const errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
     if (io->socket.is_utp() && !io->isIncoming() && handshake->is_state(State::AwaitingYb))
@@ -865,7 +841,7 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
         // the peer probably doesn't speak µTP.
 
         auto const info_hash = io->torrentHash();
-        auto const info = handshake->mediator_->torrent_info(info_hash);
+        auto const info = handshake->mediator_->torrent(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
@@ -907,13 +883,16 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
 
 bool tr_handshake::fire_done(bool is_connected)
 {
-    if (!done_func_)
+    if (!on_done_)
     {
         return false;
     }
 
+    // handshake could get destroyed inside on_done,
+    // so handle all our housekeeping *before* calling it
+
     auto cb = DoneFunc{};
-    std::swap(cb, done_func_);
+    std::swap(cb, on_done_);
 
     auto peer_io = std::shared_ptr<tr_peerIo>{};
     std::swap(peer_io, peer_io_);
@@ -978,17 +957,13 @@ uint32_t tr_handshake::crypto_provide() const noexcept
 ***
 **/
 
-tr_handshake::tr_handshake(
-    Mediator* mediator,
-    std::shared_ptr<tr_peerIo> peer_io,
-    tr_encryption_mode mode_in,
-    DoneFunc done_func)
+tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode, DoneFunc on_done)
     : dh_{ mediator->private_key() }
-    , done_func_{ std::move(done_func) }
+    , on_done_{ std::move(on_done) }
     , peer_io_{ std::move(peer_io) }
     , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
     , mediator_{ mediator }
-    , encryption_mode_{ mode_in }
+    , encryption_mode_{ mode }
 {
     timeout_timer_->startSingleShot(HandshakeTimeoutSec);
 
