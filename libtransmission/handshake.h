@@ -170,6 +170,26 @@ public:
         mediator_->set_utp_failed(info_hash, addr);
     }
 
+    [[nodiscard]] constexpr auto state() const noexcept
+    {
+        return state_;
+    }
+
+    [[nodiscard]] constexpr auto is_state(State state) const noexcept
+    {
+        return state_ == state;
+    }
+
+    constexpr void set_state(State state)
+    {
+        state_ = state;
+    }
+
+    [[nodiscard]] constexpr std::string_view state_string() const
+    {
+        return state_string(state_);
+    }
+
 protected:
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, DoneFunc done_func)
         : mediator_{ mediator }
@@ -196,6 +216,41 @@ protected:
     }
 
 private:
+    [[nodiscard]] static constexpr std::string_view state_string(State state)
+    {
+        using State = tr_handshake::State;
+
+        switch (state)
+        {
+        case State::AwaitingHandshake:
+            return "awaiting handshake";
+        case State::AwaitingPeerId:
+            return "awaiting peer id";
+        case State::AwaitingYa:
+            return "awaiting ya";
+        case State::AwaitingPadA:
+            return "awaiting pad a";
+        case State::AwaitingCryptoProvide:
+            return "awaiting crypto provide";
+        case State::AwaitingPadC:
+            return "awaiting pad c";
+        case State::AwaitingIa:
+            return "awaiting ia";
+        case State::AwaitingPayloadStream:
+            return "awaiting payload stream";
+
+        // outgoing
+        case State::AwaitingYb:
+            return "awaiting yb";
+        case State::AwaitingVc:
+            return "awaiting vc";
+        case State::AwaitingCryptoSelect:
+            return "awaiting crypto select";
+        case State::AwaitingPadD:
+            return "awaiting pad d";
+        }
+    }
+
     Mediator* mediator_ = nullptr;
 
     std::shared_ptr<tr_peerIo> peer_io_;
@@ -203,4 +258,6 @@ private:
     std::optional<tr_peer_id_t> peer_id_;
     bool have_read_anything_from_peer_ = false;
     DoneFunc done_func_;
+
+    State state_ = State::AwaitingHandshake;
 };

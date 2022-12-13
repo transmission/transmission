@@ -137,27 +137,6 @@ public:
         return provide;
     }
 
-    [[nodiscard]] constexpr auto state() const noexcept
-    {
-        return this->state_;
-    }
-
-    [[nodiscard]] constexpr auto is_state(State state) const noexcept
-    {
-        return this->state_ == state;
-    }
-
-    void set_state(tr_handshake::State state_in)
-    {
-        tr_logAddTraceHand(this, fmt::format("setting to state [{}]", state_string(state_in)));
-        this->state_ = state_in;
-    }
-
-    [[nodiscard]] constexpr std::string_view state_string() const
-    {
-        return state_string(state_);
-    }
-
     bool have_sent_bittorrent_handshake = false;
     DH dh = {};
     tr_encryption_mode encryption_mode;
@@ -168,47 +147,10 @@ public:
     uint32_t crypto_provide = {};
 
 private:
-    [[nodiscard]] static constexpr std::string_view state_string(State state)
-    {
-        using State = tr_handshake::State;
-
-        switch (state)
-        {
-        case State::AwaitingHandshake:
-            return "awaiting handshake"sv;
-        case State::AwaitingPeerId:
-            return "awaiting peer id"sv;
-        case State::AwaitingYa:
-            return "awaiting ya"sv;
-        case State::AwaitingPadA:
-            return "awaiting pad a"sv;
-        case State::AwaitingCryptoProvide:
-            return "awaiting crypto provide"sv;
-        case State::AwaitingPadC:
-            return "awaiting pad c"sv;
-        case State::AwaitingIa:
-            return "awaiting ia"sv;
-        case State::AwaitingPayloadStream:
-            return "awaiting payload stream"sv;
-
-        // outgoing
-        case State::AwaitingYb:
-            return "awaiting yb"sv;
-        case State::AwaitingVc:
-            return "awaiting vc"sv;
-        case State::AwaitingCryptoSelect:
-            return "awaiting crypto select"sv;
-        case State::AwaitingPadD:
-            return "awaiting pad d"sv;
-        }
-    }
-
     // how long to wait before giving up on a handshake
     static auto constexpr HandshakeTimeoutSec = 30s;
 
     std::unique_ptr<libtransmission::Timer> const timeout_timer_;
-
-    State state_ = State::AwaitingHandshake;
 };
 
 /**
