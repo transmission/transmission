@@ -149,51 +149,6 @@ private:
         return peer_io_->isIncoming();
     }
 
-    [[nodiscard]] auto* peer_id() noexcept
-    {
-        return peer_io_.get();
-    }
-
-    [[nodiscard]] auto torrent_info(tr_sha1_digest_t const& info_hash) const
-    {
-        return mediator_->torrent_info(info_hash);
-    }
-
-    [[nodiscard]] auto torrent_info_from_obfuscated(tr_sha1_digest_t const& info_hash) const
-    {
-        return mediator_->torrent_info_from_obfuscated(info_hash);
-    }
-
-    [[nodiscard]] auto allows_dht() const
-    {
-        return mediator_->allows_dht();
-    }
-
-    [[nodiscard]] auto allows_tcp() const
-    {
-        return mediator_->allows_tcp();
-    }
-
-    [[nodiscard]] auto is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const
-    {
-        return mediator_->is_peer_known_seed(tor_id, addr);
-    }
-
-    [[nodiscard]] auto pad(void* setme, size_t max_bytes) const
-    {
-        return mediator_->pad(setme, max_bytes);
-    }
-
-    [[nodiscard]] auto* peer_io() noexcept
-    {
-        return peer_io_.get();
-    }
-
-    [[nodiscard]] auto const* peer_io() const noexcept
-    {
-        return peer_io_.get();
-    }
-
     [[nodiscard]] auto display_name() const
     {
         return peer_io_->display_name();
@@ -305,7 +260,7 @@ private:
         auto const data = std::data(outbuf);
         auto walk = data;
         walk = std::copy(std::begin(public_key), std::end(public_key), walk);
-        walk += pad(walk, PadMax);
+        walk += mediator_->pad(walk, PadMax);
         io->writeBytes(data, walk - data, false);
     }
 

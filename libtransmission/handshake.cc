@@ -100,7 +100,7 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     auto const& info_hash = io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "build_handshake_message requires an info_hash");
 
-    auto const info = torrent_info(info_hash);
+    auto const info = mediator_->torrent_info(info_hash);
     if (!info)
     {
         return false;
@@ -116,7 +116,7 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     /* Note that this doesn't depend on whether the torrent is private.
      * We don't accept DHT peers for a private torrent,
      * but we participate in the DHT regardless. */
-    if (allows_dht())
+    if (mediator_->allows_dht())
     {
         HANDSHAKE_SET_DHT(walk);
     }
@@ -171,7 +171,7 @@ tr_handshake::ParseResult tr_handshake::parseHandshake(tr_peerIo* peer_io)
     auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
     tr_logAddTraceHand(this, fmt::format("peer-id is '{}'", peer_id_sv));
 
-    if (auto const info = torrent_info(info_hash); info && info->client_peer_id == peer_id)
+    if (auto const info = mediator_->torrent_info(info_hash); info && info->client_peer_id == peer_id)
     {
         tr_logAddTraceHand(this, "streuth!  we've connected to ourselves.");
         return ParseResult::PeerIsSelf;
@@ -459,7 +459,7 @@ ReadState tr_handshake::readHandshake(tr_peerIo* peer_io)
 
     if (is_incoming())
     {
-        if (!torrent_info(hash))
+        if (!mediator_->torrent_info(hash))
         {
             tr_logAddTraceHand(this, "peer is trying to connect to us for a torrent we don't have.");
             return done(false);
@@ -514,7 +514,7 @@ ReadState tr_handshake::readPeerId(tr_peerIo* peer_io)
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const info_hash = peer_io_->torrentHash();
-    auto const info = torrent_info(info_hash);
+    auto const info = mediator_->torrent_info(info_hash);
     auto const connected_to_self = info && info->client_peer_id == peer_id;
 
     return done(!connected_to_self);
@@ -600,10 +600,10 @@ ReadState tr_handshake::readCryptoProvide(tr_peerIo* peer_io)
         obfuscated_hash[i] = req2[i] ^ req3[i];
     }
 
-    if (auto const info = torrent_info_from_obfuscated(obfuscated_hash); info)
+    if (auto const info = mediator_->torrent_info_from_obfuscated(obfuscated_hash); info)
     {
         bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = is_peer_known_seed(info->id, peer_io->address());
+        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->address());
         tr_logAddTraceHand(this, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->setTorrentHash(info->info_hash);
 
@@ -878,7 +878,7 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
         // the peer probably doesn't speak µTP.
 
         auto const info_hash = io->torrentHash();
-        auto const info = handshake->torrent_info(info_hash);
+        auto const info = handshake->mediator_->torrent_info(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
@@ -886,7 +886,7 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
             handshake->set_utp_failed(info_hash, io->address());
         }
 
-        if (handshake->allows_tcp() && io->reconnect() == 0)
+        if (handshake->mediator_->allows_tcp() && io->reconnect() == 0)
         {
             auto msg = std::array<uint8_t, HandshakeSize>{};
             handshake->build_handshake_message(io, std::data(msg));
@@ -900,7 +900,7 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
     if ((handshake->is_state(State::AwaitingYb) || handshake->is_state(State::AwaitingVc)) &&
-        handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->allows_tcp() && io->reconnect() == 0)
+        handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect() == 0)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
