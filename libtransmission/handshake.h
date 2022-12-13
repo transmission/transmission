@@ -9,17 +9,18 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <chrono>
 #include <cstddef> // for size_t
 #include <functional>
-#include <optional>
 #include <memory>
+#include <optional>
 
 #include "transmission.h"
 
 #include "net.h" // tr_address
 #include "peer-mse.h" // tr_message_stream_encryption::DH
 #include "peer-io.h"
-
+#include "timer.h"
 namespace libtransmission
 {
 class TimerMaker;
@@ -115,6 +116,11 @@ public:
         return fire_done(is_connected) ? READ_LATER : READ_ERR;
     }
 
+    [[nodiscard]] auto is_incoming() const noexcept
+    {
+        return peer_io_->isIncoming();
+    }
+
     [[nodiscard]] auto* peer_id() noexcept
     {
         return peer_io_.get();
@@ -195,7 +201,9 @@ protected:
         : mediator_{ mediator }
         , peer_io_{ std::move(peer_io) }
         , done_func_{ std::move(done_func) }
+        , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
     {
+        timeout_timer_->startSingleShot(HandshakeTimeoutSec);
     }
 
     bool fire_done(bool is_connected)
@@ -216,6 +224,8 @@ protected:
     }
 
 private:
+    static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
+
     [[nodiscard]] static constexpr std::string_view state_string(State state)
     {
         using State = tr_handshake::State;
@@ -260,4 +270,6 @@ private:
     DoneFunc done_func_;
 
     State state_ = State::AwaitingHandshake;
+
+    std::unique_ptr<libtransmission::Timer> const timeout_timer_;
 };

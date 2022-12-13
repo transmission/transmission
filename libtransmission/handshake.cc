@@ -102,21 +102,10 @@ public:
         : tr_handshake{ mediator, io, std::move(done_func) }
         , dh{ mediator->private_key() }
         , encryption_mode{ mode_in }
-        , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
     {
-        timeout_timer_->startSingleShot(HandshakeTimeoutSec);
     }
 
-    tr_handshake_impl(tr_handshake_impl&&) = delete;
-    tr_handshake_impl(tr_handshake_impl const&) = delete;
-    tr_handshake_impl& operator=(tr_handshake_impl&&) = delete;
-    tr_handshake_impl& operator=(tr_handshake_impl const&) = delete;
     ~tr_handshake_impl() override = default;
-
-    [[nodiscard]] auto is_incoming() const noexcept
-    {
-        return peer_io()->isIncoming();
-    }
 
     [[nodiscard]] constexpr uint32_t cryptoProvide() const
     {
@@ -145,12 +134,6 @@ public:
     uint16_t ia_len = {};
     uint32_t crypto_select = {};
     uint32_t crypto_provide = {};
-
-private:
-    // how long to wait before giving up on a handshake
-    static auto constexpr HandshakeTimeoutSec = 30s;
-
-    std::unique_ptr<libtransmission::Timer> const timeout_timer_;
 };
 
 /**
