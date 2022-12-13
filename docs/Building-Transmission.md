@@ -102,6 +102,7 @@ $ git submodule update --init --recursive
 $ mkdir build
 $ cd build
 $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+$ # add -DENABLE_GTK=ON to build transmission-gtk as well
 $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 $ make
 $ sudo make install
