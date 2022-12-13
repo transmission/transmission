@@ -21,6 +21,7 @@
 #include "peer-mse.h" // tr_message_stream_encryption::DH
 #include "peer-io.h"
 #include "timer.h"
+
 namespace libtransmission
 {
 class TimerMaker;
@@ -34,6 +35,8 @@ class tr_peerIo;
 class tr_handshake
 {
 public:
+    using DH = tr_message_stream_encryption::DH;
+
     enum class State
     {
         // incoming
@@ -84,13 +87,24 @@ public:
         [[nodiscard]] virtual bool allows_tcp() const = 0;
         [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const = 0;
         [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
-        [[nodiscard]] virtual tr_message_stream_encryption::DH::private_key_bigend_t private_key() const
+        [[nodiscard]] virtual DH::private_key_bigend_t private_key() const
         {
-            return tr_message_stream_encryption::DH::randomPrivateKey();
+            return DH::randomPrivateKey();
         }
 
         virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const&) = 0;
     };
+
+    tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func)
+        : dh{ mediator->private_key() }
+        , encryption_mode{ mode_in }
+        , mediator_{ mediator }
+        , peer_io_{ std::move(peer_io) }
+        , done_func_{ std::move(done_func) }
+        , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
+    {
+        timeout_timer_->startSingleShot(HandshakeTimeoutSec);
+    }
 
     virtual ~tr_handshake() = default;
 
@@ -196,16 +210,38 @@ public:
         return state_string(state_);
     }
 
-protected:
-    tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, DoneFunc done_func)
-        : mediator_{ mediator }
-        , peer_io_{ std::move(peer_io) }
-        , done_func_{ std::move(done_func) }
-        , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
+    [[nodiscard]] constexpr uint32_t cryptoProvide() const
     {
-        timeout_timer_->startSingleShot(HandshakeTimeoutSec);
+        uint32_t provide = 0;
+
+        switch (encryption_mode)
+        {
+        case TR_ENCRYPTION_REQUIRED:
+        case TR_ENCRYPTION_PREFERRED:
+            provide |= CryptoProvideCrypto;
+            break;
+
+        case TR_CLEAR_PREFERRED:
+            provide |= CryptoProvideCrypto | CryptoProvidePlaintext;
+            break;
+        }
+
+        return provide;
     }
 
+    static auto constexpr CryptoProvidePlaintext = int{ 1 };
+    static auto constexpr CryptoProvideCrypto = int{ 2 };
+
+    bool have_sent_bittorrent_handshake = false;
+    DH dh = {};
+    tr_encryption_mode encryption_mode;
+    uint16_t pad_c_len = {};
+    uint16_t pad_d_len = {};
+    uint16_t ia_len = {};
+    uint32_t crypto_select = {};
+    uint32_t crypto_provide = {};
+
+protected:
     bool fire_done(bool is_connected)
     {
         if (!done_func_)
