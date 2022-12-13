@@ -97,6 +97,8 @@ private:
         AwaitingPadD
     };
 
+    ///
+
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
 
     ReadState read_crypto_provide(tr_peerIo*);
@@ -155,81 +157,16 @@ private:
         state_ = state;
     }
 
-    [[nodiscard]] constexpr std::string_view state_string() const
+    [[nodiscard]] static std::string_view state_string(State state) noexcept;
+
+    [[nodiscard]] std::string_view state_string() const noexcept
     {
         return state_string(state_);
     }
 
-    [[nodiscard]] constexpr auto crypto_provide() const
-    {
-        auto provide = uint32_t{};
+    [[nodiscard]] uint32_t crypto_provide() const noexcept;
 
-        switch (encryption_mode_)
-        {
-        case TR_ENCRYPTION_REQUIRED:
-        case TR_ENCRYPTION_PREFERRED:
-            provide |= CryptoProvideCrypto;
-            break;
-
-        case TR_CLEAR_PREFERRED:
-            provide |= CryptoProvideCrypto | CryptoProvidePlaintext;
-            break;
-        }
-
-        return provide;
-    }
-
-    bool fire_done(bool is_connected)
-    {
-        if (!done_func_)
-        {
-            return false;
-        }
-
-        auto cb = DoneFunc{};
-        std::swap(cb, done_func_);
-
-        auto peer_io = std::shared_ptr<tr_peerIo>{};
-        std::swap(peer_io, peer_io_);
-
-        bool const success = (cb)(Result{ std::move(peer_io), peer_id_, have_read_anything_from_peer_, is_connected });
-        return success;
-    }
-
-    [[nodiscard]] static constexpr std::string_view state_string(State state) noexcept
-    {
-        using State = tr_handshake::State;
-
-        switch (state)
-        {
-        case State::AwaitingHandshake:
-            return "awaiting handshake";
-        case State::AwaitingPeerId:
-            return "awaiting peer id";
-        case State::AwaitingYa:
-            return "awaiting ya";
-        case State::AwaitingPadA:
-            return "awaiting pad a";
-        case State::AwaitingCryptoProvide:
-            return "awaiting crypto provide";
-        case State::AwaitingPadC:
-            return "awaiting pad c";
-        case State::AwaitingIa:
-            return "awaiting ia";
-        case State::AwaitingPayloadStream:
-            return "awaiting payload stream";
-
-        // outgoing
-        case State::AwaitingYb:
-            return "awaiting yb";
-        case State::AwaitingVc:
-            return "awaiting vc";
-        case State::AwaitingCryptoSelect:
-            return "awaiting crypto select";
-        case State::AwaitingPadD:
-            return "awaiting pad d";
-        }
-    }
+    bool fire_done(bool is_connected);
 
     template<size_t PadMax>
     void send_public_key_and_pad(tr_peerIo* io)
@@ -243,10 +180,14 @@ private:
         io->writeBytes(data, walk - data, false);
     }
 
+    ///
+
     static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
 
     static auto constexpr CryptoProvidePlaintext = int{ 1 };
     static auto constexpr CryptoProvideCrypto = int{ 2 };
+
+    ///
 
     DH dh_ = {};
 
