@@ -191,6 +191,14 @@ private:
     static auto constexpr CryptoProvidePlaintext = int{ 1 };
     static auto constexpr CryptoProvideCrypto = int{ 2 };
 
+    // MSE constatnts.
+    // http://wiki.vuze.com/w/Message_Stream_Encryption
+    // > PadA, PadB: Random data with a random length of 0 to 512 bytes each
+    // > PadC, PadD: Arbitrary data with a length of 0 to 512 bytes
+    static auto constexpr PadaMaxlen = int{ 512 };
+    static auto constexpr PadbMaxlen = int{ 512 };
+    static auto constexpr PadcMaxlen = int{ 512 };
+
     ///
 
     DH dh_ = {};

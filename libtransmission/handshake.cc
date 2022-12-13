@@ -24,40 +24,12 @@
 #include "tr-buffer.h"
 #include "utils.h"
 
-using namespace std::literals;
-
 /* enable LibTransmission extension protocol */
 #define ENABLE_LTEP
 /* fast extensions */
 #define ENABLE_FAST
 /* DHT */
 #define ENABLE_DHT
-
-static auto constexpr HandshakeName = std::array<std::byte, 20>{
-    std::byte{ 19 },  std::byte{ 'B' }, std::byte{ 'i' }, std::byte{ 't' }, std::byte{ 'T' },
-    std::byte{ 'o' }, std::byte{ 'r' }, std::byte{ 'r' }, std::byte{ 'e' }, std::byte{ 'n' },
-    std::byte{ 't' }, std::byte{ ' ' }, std::byte{ 'p' }, std::byte{ 'r' }, std::byte{ 'o' },
-    std::byte{ 't' }, std::byte{ 'o' }, std::byte{ 'c' }, std::byte{ 'o' }, std::byte{ 'l' }
-};
-
-// bittorrent handshake constants
-static auto constexpr HandshakeFlagsLen = int{ 8 };
-static auto constexpr HandshakeSize = int{ 68 };
-static auto constexpr IncomingHandshakeLen = int{ 48 };
-
-// encryption constants
-static auto constexpr PadaMaxlen = int{ 512 };
-static auto constexpr PadbMaxlen = int{ 512 };
-static auto constexpr PadcMaxlen = int{ 512 };
-static auto constexpr CryptoProvidePlaintext = int{ 1 };
-static auto constexpr CryptoProvideCrypto = int{ 2 };
-
-// "VC is a verification constant that is used to verify whether the
-// other side knows S and SKEY and thus defeats replay attacks of the
-// SKEY hash. As of this version VC is a String of 8 bytes set to 0x00."
-// https://wiki.vuze.com/w/Message_Stream_Encryption
-using vc_t = std::array<std::byte, 8>;
-static auto constexpr VC = vc_t{};
 
 #ifdef ENABLE_LTEP
 #define HANDSHAKE_HAS_LTEP(bits) (((bits)[5] & 0x10) != 0)
@@ -83,17 +55,38 @@ static auto constexpr VC = vc_t{};
 #define HANDSHAKE_SET_DHT(bits) ((void)0)
 #endif
 
-/**
-***
-**/
-
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
+using namespace std::literals;
 using DH = tr_message_stream_encryption::DH;
 
-/**
-***
-**/
+namespace
+{
+
+auto constexpr HandshakeName = std::array<std::byte, 20>{
+    std::byte{ 19 },  std::byte{ 'B' }, std::byte{ 'i' }, std::byte{ 't' }, std::byte{ 'T' },
+    std::byte{ 'o' }, std::byte{ 'r' }, std::byte{ 'r' }, std::byte{ 'e' }, std::byte{ 'n' },
+    std::byte{ 't' }, std::byte{ ' ' }, std::byte{ 'p' }, std::byte{ 'r' }, std::byte{ 'o' },
+    std::byte{ 't' }, std::byte{ 'o' }, std::byte{ 'c' }, std::byte{ 'o' }, std::byte{ 'l' }
+};
+
+// bittorrent handshake constants
+auto constexpr HandshakeFlagsLen = int{ 8 };
+auto constexpr HandshakeSize = int{ 68 };
+auto constexpr IncomingHandshakeLen = int{ 48 };
+
+// encryption constants
+auto constexpr CryptoProvidePlaintext = int{ 1 };
+auto constexpr CryptoProvideCrypto = int{ 2 };
+
+// "VC is a verification constant that is used to verify whether the
+// other side knows S and SKEY and thus defeats replay attacks of the
+// SKEY hash. As of this version VC is a String of 8 bytes set to 0x00."
+// https://wiki.vuze.com/w/Message_Stream_Encryption
+using vc_t = std::array<std::byte, 8>;
+auto constexpr VC = vc_t{};
+
+} // namespace
 
 bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
 {
