@@ -87,7 +87,7 @@ static auto constexpr VC = vc_t{};
 ***
 **/
 
-#define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->display_name())
+#define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
 using DH = tr_message_stream_encryption::DH;
 
@@ -881,7 +881,7 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
         {
-            handshake->set_utp_failed(info_hash, io->address());
+            handshake->mediator_->set_utp_failed(info_hash, io->address());
         }
 
         if (handshake->mediator_->allows_tcp() && io->reconnect() == 0)

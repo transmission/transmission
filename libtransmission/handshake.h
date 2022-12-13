@@ -17,21 +17,12 @@
 
 #include "transmission.h"
 
-#include "net.h" // tr_address
+#include "net.h"
 #include "peer-mse.h" // tr_message_stream_encryption::DH
 #include "peer-io.h"
 #include "timer.h"
 
-namespace libtransmission
-{
-class TimerMaker;
-}
-
-class tr_peerIo;
-
-/** @brief opaque struct holding handshake state information.
-           freed when the handshake is completed. */
-
+// short-term class which manages the handshake phase of a tr_peerIo
 class tr_handshake
 {
 public:
@@ -100,20 +91,20 @@ private:
 
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
 
-    ReadState read_crypto_provide(tr_peerIo* peer_io);
-    ReadState read_crypto_select(tr_peerIo* peer_io);
-    ReadState read_handshake(tr_peerIo* peer_io);
-    ReadState read_ia(tr_peerIo* peer_io);
-    ReadState read_pad_a(tr_peerIo* peer_io);
-    ReadState read_pad_c(tr_peerIo* peer_io);
-    ReadState read_pad_d(tr_peerIo* peer_io);
-    ReadState read_payload_stream(tr_peerIo* peer_io);
-    ReadState read_peer_id(tr_peerIo* peer_io);
-    ReadState read_vc(tr_peerIo* peer_io);
-    ReadState read_ya(tr_peerIo* peer_io);
-    ReadState read_yb(tr_peerIo* peer_io);
+    ReadState read_crypto_provide(tr_peerIo*);
+    ReadState read_crypto_select(tr_peerIo*);
+    ReadState read_handshake(tr_peerIo*);
+    ReadState read_ia(tr_peerIo*);
+    ReadState read_pad_a(tr_peerIo*);
+    ReadState read_pad_c(tr_peerIo*);
+    ReadState read_pad_d(tr_peerIo*);
+    ReadState read_payload_stream(tr_peerIo*);
+    ReadState read_peer_id(tr_peerIo*);
+    ReadState read_vc(tr_peerIo*);
+    ReadState read_ya(tr_peerIo*);
+    ReadState read_yb(tr_peerIo*);
 
-    void send_ya(tr_peerIo* io);
+    void send_ya(tr_peerIo*);
 
     enum class ParseResult
     {
@@ -147,16 +138,6 @@ private:
     [[nodiscard]] auto is_incoming() const noexcept
     {
         return peer_io_->isIncoming();
-    }
-
-    [[nodiscard]] auto display_name() const
-    {
-        return peer_io_->display_name();
-    }
-
-    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const& addr)
-    {
-        mediator_->set_utp_failed(info_hash, addr);
     }
 
     [[nodiscard]] constexpr auto state() const noexcept
