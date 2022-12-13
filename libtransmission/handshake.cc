@@ -141,17 +141,9 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     return true;
 }
 
-enum class ParseResult
+tr_handshake::ParseResult tr_handshake::parseHandshake(tr_peerIo* peer_io)
 {
-    Ok,
-    EncryptionWrong,
-    BadTorrent,
-    PeerIsSelf,
-};
-
-static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
-{
-    tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", HandshakeSize, peer_io->readBufferSize()));
+    tr_logAddTraceHand(this, fmt::format("payload: need {}, got {}", HandshakeSize, peer_io->readBufferSize()));
 
     if (peer_io->readBufferSize() < HandshakeSize)
     {
@@ -175,29 +167,26 @@ static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     peer_io->readBytes(std::data(info_hash), std::size(info_hash));
     if (info_hash == tr_sha1_digest_t{} || info_hash != peer_io->torrentHash())
     {
-        tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
+        tr_logAddTraceHand(this, "peer returned the wrong hash. wtf?");
         return ParseResult::BadTorrent;
     }
 
     // peer_id
     auto peer_id = tr_peer_id_t{};
     peer_io->readBytes(std::data(peer_id), std::size(peer_id));
-    handshake->set_peer_id(peer_id);
+    set_peer_id(peer_id);
 
     /* peer id */
     auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
-    tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}'", peer_id_sv));
+    tr_logAddTraceHand(this, fmt::format("peer-id is '{}'", peer_id_sv));
 
-    if (auto const info = handshake->torrent_info(info_hash); info && info->client_peer_id == peer_id)
+    if (auto const info = torrent_info(info_hash); info && info->client_peer_id == peer_id)
     {
-        tr_logAddTraceHand(handshake, "streuth!  we've connected to ourselves.");
+        tr_logAddTraceHand(this, "streuth!  we've connected to ourselves.");
         return ParseResult::PeerIsSelf;
     }
 
-    /**
-    *** Extensions
-    **/
-
+    // extensions
     peer_io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
     peer_io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
     peer_io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
@@ -380,7 +369,7 @@ ReadState tr_handshake::readVC(tr_peerIo* peer_io)
     return done(false);
 }
 
-static ReadState readCryptoSelect(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readCryptoSelect(tr_peerIo* peer_io)
 {
     if (static size_t constexpr NeedLen = sizeof(uint32_t) + sizeof(uint16_t); peer_io->readBufferSize() < NeedLen)
     {
@@ -389,36 +378,36 @@ static ReadState readCryptoSelect(tr_handshake* handshake, tr_peerIo* peer_io)
 
     auto crypto_select = uint32_t{};
     peer_io->readUint32(&crypto_select);
-    handshake->crypto_select_ = crypto_select;
-    tr_logAddTraceHand(handshake, fmt::format("crypto select is {}", crypto_select));
+    crypto_select_ = crypto_select;
+    tr_logAddTraceHand(this, fmt::format("crypto select is {}", crypto_select));
 
-    if ((crypto_select & handshake->cryptoProvide()) == 0)
+    if ((crypto_select & cryptoProvide()) == 0)
     {
-        tr_logAddTraceHand(handshake, "peer selected an encryption option we didn't offer");
-        return handshake->done(false);
+        tr_logAddTraceHand(this, "peer selected an encryption option we didn't offer");
+        return done(false);
     }
 
     uint16_t pad_d_len = 0;
     peer_io->readUint16(&pad_d_len);
-    tr_logAddTraceHand(handshake, fmt::format("pad_d_len is {}", pad_d_len));
+    tr_logAddTraceHand(this, fmt::format("pad_d_len is {}", pad_d_len));
 
     if (pad_d_len > 512)
     {
-        tr_logAddTraceHand(handshake, "encryption handshake: pad_d_len is too long");
-        return handshake->done(false);
+        tr_logAddTraceHand(this, "encryption handshake: pad_d_len is too long");
+        return done(false);
     }
 
-    handshake->pad_d_len_ = pad_d_len;
+    pad_d_len_ = pad_d_len;
 
-    handshake->set_state(tr_handshake::State::AwaitingPadD);
+    set_state(tr_handshake::State::AwaitingPadD);
     return READ_NOW;
 }
 
-static ReadState readPadD(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readPadD(tr_peerIo* peer_io)
 {
-    size_t const needlen = handshake->pad_d_len_;
+    size_t const needlen = pad_d_len_;
 
-    tr_logAddTraceHand(handshake, fmt::format("pad d: need {}, got {}", needlen, peer_io->readBufferSize()));
+    tr_logAddTraceHand(this, fmt::format("pad d: need {}, got {}", needlen, peer_io->readBufferSize()));
 
     if (peer_io->readBufferSize() < needlen)
     {
@@ -427,7 +416,7 @@ static ReadState readPadD(tr_handshake* handshake, tr_peerIo* peer_io)
 
     peer_io->readBufferDrain(needlen);
 
-    handshake->set_state(tr_handshake::State::AwaitingHandshake);
+    set_state(tr_handshake::State::AwaitingHandshake);
     return READ_NOW;
 }
 
@@ -437,31 +426,31 @@ static ReadState readPadD(tr_handshake* handshake, tr_peerIo* peer_io)
 ****
 ***/
 
-static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readHandshake(tr_peerIo* peer_io)
 {
-    tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", IncomingHandshakeLen, peer_io->readBufferSize()));
+    tr_logAddTraceHand(this, fmt::format("payload: need {}, got {}", IncomingHandshakeLen, peer_io->readBufferSize()));
 
     if (peer_io->readBufferSize() < IncomingHandshakeLen)
     {
         return READ_LATER;
     }
 
-    handshake->set_have_read_anything_from_peer(true);
+    set_have_read_anything_from_peer(true);
 
     if (peer_io->readBufferStartsWith(HandshakeName)) // unencrypted
     {
-        if (handshake->encryption_mode_ == TR_ENCRYPTION_REQUIRED)
+        if (encryption_mode_ == TR_ENCRYPTION_REQUIRED)
         {
-            tr_logAddTraceHand(handshake, "peer is unencrypted, and we're disallowing that");
-            return handshake->done(false);
+            tr_logAddTraceHand(this, "peer is unencrypted, and we're disallowing that");
+            return done(false);
         }
     }
     else // either encrypted or corrupt
     {
-        if (handshake->is_incoming())
+        if (is_incoming())
         {
-            tr_logAddTraceHand(handshake, "I think peer is sending us an encrypted handshake...");
-            handshake->set_state(tr_handshake::State::AwaitingYa);
+            tr_logAddTraceHand(this, "I think peer is sending us an encrypted handshake...");
+            set_state(tr_handshake::State::AwaitingYa);
             return READ_NOW;
         }
     }
@@ -470,7 +459,7 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     peer_io->readBytes(std::data(name), std::size(name));
     if (name != HandshakeName)
     {
-        return handshake->done(false);
+        return done(false);
     }
 
     /* reserved bytes */
@@ -489,12 +478,12 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     auto hash = tr_sha1_digest_t{};
     peer_io->readBytes(std::data(hash), std::size(hash));
 
-    if (handshake->is_incoming())
+    if (is_incoming())
     {
-        if (!handshake->torrent_info(hash))
+        if (!torrent_info(hash))
         {
-            tr_logAddTraceHand(handshake, "peer is trying to connect to us for a torrent we don't have.");
-            return handshake->done(false);
+            tr_logAddTraceHand(this, "peer is trying to connect to us for a torrent we don't have.");
+            return done(false);
         }
 
         peer_io->setTorrentHash(hash);
@@ -503,8 +492,8 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     {
         if (peer_io->torrentHash() != hash)
         {
-            tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
-            return handshake->done(false);
+            tr_logAddTraceHand(this, "peer returned the wrong hash. wtf?");
+            return done(false);
         }
     }
 
@@ -512,20 +501,20 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     ***  If it's an incoming message, we need to send a response handshake
     **/
 
-    if (!handshake->have_sent_bittorrent_handshake_)
+    if (!have_sent_bittorrent_handshake_)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
 
-        if (!handshake->build_handshake_message(peer_io, std::data(msg)))
+        if (!build_handshake_message(peer_io, std::data(msg)))
         {
-            return handshake->done(false);
+            return done(false);
         }
 
         peer_io->writeBytes(std::data(msg), std::size(msg), false);
-        handshake->have_sent_bittorrent_handshake_ = true;
+        have_sent_bittorrent_handshake_ = true;
     }
 
-    setReadState(handshake, tr_handshake::State::AwaitingPeerId);
+    setReadState(this, tr_handshake::State::AwaitingPeerId);
     return READ_NOW;
 }
 
@@ -770,12 +759,12 @@ ReadState tr_handshake::readIA(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-static ReadState readPayloadStream(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readPayloadStream(tr_peerIo* peer_io)
 {
     size_t const needlen = HandshakeSize;
 
     tr_logAddTraceHand(
-        handshake,
+        this,
         fmt::format("reading payload stream... have {}, need {}", peer_io->readBufferSize(), needlen));
 
     if (peer_io->readBufferSize() < needlen)
@@ -784,16 +773,16 @@ static ReadState readPayloadStream(tr_handshake* handshake, tr_peerIo* peer_io)
     }
 
     /* parse the handshake ... */
-    auto const i = parseHandshake(handshake, peer_io);
-    tr_logAddTraceHand(handshake, fmt::format("parseHandshake returned {}", static_cast<int>(i)));
+    auto const i = parseHandshake(peer_io);
+    tr_logAddTraceHand(this, fmt::format("parseHandshake returned {}", static_cast<int>(i)));
 
     if (i != ParseResult::Ok)
     {
-        return handshake->done(false);
+        return done(false);
     }
 
     /* we've completed the BT handshake... pass the work on to peer-msgs */
-    return handshake->done(true);
+    return done(true);
 }
 
 /***
@@ -802,7 +791,7 @@ static ReadState readPayloadStream(tr_handshake* handshake, tr_peerIo* peer_io)
 ****
 ***/
 
-static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
+ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
 {
     TR_ASSERT(tr_isPeerIo(peer_io));
 
@@ -821,7 +810,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
         switch (handshake->state())
         {
         case tr_handshake::State::AwaitingHandshake:
-            ret = readHandshake(handshake, peer_io);
+            ret = handshake->readHandshake(peer_io);
             break;
 
         case tr_handshake::State::AwaitingPeerId:
@@ -849,7 +838,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
             break;
 
         case tr_handshake::State::AwaitingPayloadStream:
-            ret = readPayloadStream(handshake, peer_io);
+            ret = handshake->readPayloadStream(peer_io);
             break;
 
         case tr_handshake::State::AwaitingYb:
@@ -861,11 +850,11 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
             break;
 
         case tr_handshake::State::AwaitingCryptoSelect:
-            ret = readCryptoSelect(handshake, peer_io);
+            ret = handshake->readCryptoSelect(peer_io);
             break;
 
         case tr_handshake::State::AwaitingPadD:
-            ret = readPadD(handshake, peer_io);
+            ret = handshake->readPadD(peer_io);
             break;
 
         default:
@@ -900,7 +889,7 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
     return ret;
 }
 
-static void gotError(tr_peerIo* io, short what, void* vhandshake)
+void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
 {
     int const errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
@@ -968,7 +957,7 @@ tr_handshake::tr_handshake(
 {
     timeout_timer_->startSingleShot(HandshakeTimeoutSec);
 
-    peer_io_->setCallbacks(canRead, nullptr, gotError, this);
+    peer_io_->setCallbacks(&tr_handshake::can_read, nullptr, &tr_handshake::on_error, this);
 
     if (is_incoming())
     {

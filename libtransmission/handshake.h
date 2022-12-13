@@ -100,14 +100,32 @@ public:
     virtual ~tr_handshake() = default;
 
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
+
     ReadState readCryptoProvide(tr_peerIo* peer_io);
-    ReadState readPadA(tr_peerIo* peer_io);
-    ReadState readVC(tr_peerIo* peer_io);
-    ReadState readYb(tr_peerIo* peer_io);
-    ReadState readYa(tr_peerIo* peer_io);
+    ReadState readCryptoSelect(tr_peerIo* peer_io);
+    ReadState readHandshake(tr_peerIo* peer_io);
     ReadState readIA(tr_peerIo* peer_io);
+    ReadState readPadA(tr_peerIo* peer_io);
     ReadState readPadC(tr_peerIo* peer_io);
+    ReadState readPadD(tr_peerIo* peer_io);
+    ReadState readPayloadStream(tr_peerIo* peer_io);
     ReadState readPeerId(tr_peerIo* peer_io);
+    ReadState readVC(tr_peerIo* peer_io);
+    ReadState readYa(tr_peerIo* peer_io);
+    ReadState readYb(tr_peerIo* peer_io);
+
+    enum class ParseResult
+    {
+        Ok,
+        EncryptionWrong,
+        BadTorrent,
+        PeerIsSelf,
+    };
+
+    ParseResult parseHandshake(tr_peerIo* peer_io);
+
+    static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
+    static void on_error(tr_peerIo* io, short what, void* vhandshake);
 
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
