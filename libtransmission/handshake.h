@@ -292,5 +292,5 @@ private:
 
     State state_ = State::AwaitingHandshake;
 
-    std::unique_ptr<libtransmission::Timer> const timeout_timer_;
+    std::unique_ptr<libtransmission::Timer> timeout_timer_;
 };

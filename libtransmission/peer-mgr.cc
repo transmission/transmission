@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <ctime> // time_t
 #include <deque>
+#include <map>
 #include <iterator> // std::back_inserter
 #include <memory>
 #include <numeric> // std::accumulate
@@ -296,50 +297,7 @@ private:
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 };
 
-// a container for keeping track of tr_handshakes
-class Handshakes
-{
-public:
-    void add(tr_address const& address, std::unique_ptr<tr_handshake> handshake)
-    {
-        TR_ASSERT(!contains(address));
-
-        handshakes_.emplace_back(address, std::move(handshake));
-    }
-
-    [[nodiscard]] bool contains(tr_address const& address) const noexcept
-    {
-        return std::any_of(
-            std::begin(handshakes_),
-            std::end(handshakes_),
-            [&address](auto const& pair) { return pair.first == address; });
-    }
-
-    void erase(tr_address const& address)
-    {
-        for (auto iter = std::begin(handshakes_), end = std::end(handshakes_); iter != end; ++iter)
-        {
-            if (iter->first == address)
-            {
-                handshakes_.erase(iter);
-                return;
-            }
-        }
-    }
-
-    [[nodiscard]] auto empty() const noexcept
-    {
-        return std::empty(handshakes_);
-    }
-
-    void abortAll()
-    {
-        handshakes_.clear();
-    }
-
-private:
-    std::vector<std::pair<tr_address, std::unique_ptr<tr_handshake>>> handshakes_;
-};
+using Handshakes = std::map<tr_address, tr_handshake>;
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
@@ -406,7 +364,7 @@ public:
 
         is_running = false;
         removeAllPeers();
-        outgoing_handshakes.abortAll();
+        outgoing_handshakes.clear();
     }
 
     void removePeer(tr_peer* peer)
@@ -578,7 +536,7 @@ struct tr_peerMgr
     ~tr_peerMgr()
     {
         auto const lock = unique_lock();
-        incoming_handshakes.abortAll();
+        incoming_handshakes.clear();
     }
 
     void rechokeSoon() noexcept
@@ -676,8 +634,8 @@ static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address cons
 
 static bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
 {
-    return atom->is_connected || swarm->outgoing_handshakes.contains(atom->addr) ||
-        swarm->manager->incoming_handshakes.contains(atom->addr);
+    return atom->is_connected || swarm->outgoing_handshakes.count(atom->addr) != 0U ||
+        swarm->manager->incoming_handshakes.count(atom->addr) != 0U;
 }
 
 static void swarmFree(tr_swarm* s)
@@ -1235,20 +1193,19 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.display_name()));
         socket.close(session);
     }
-    else if (manager->incoming_handshakes.contains(socket.address()))
+    else if (manager->incoming_handshakes.count(socket.address()) != 0U)
     {
         socket.close(session);
     }
     else /* we don't have a connection to them yet... */
     {
         auto address = socket.address();
-        manager->incoming_handshakes.add(
+        manager->incoming_handshakes.try_emplace(
             address,
-            std::make_unique<tr_handshake>(
-                &manager->handshake_mediator_,
-                tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
-                session->encryptionMode(),
-                [manager](tr_handshake::Result const& result) { return on_handshake_done(manager, result); }));
+            &manager->handshake_mediator_,
+            tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
+            session->encryptionMode(),
+            [manager](tr_handshake::Result const& result) { return on_handshake_done(manager, result); });
     }
 }
 
@@ -2820,13 +2777,12 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     }
     else
     {
-        s->outgoing_handshakes.add(
+        s->outgoing_handshakes.try_emplace(
             atom.addr,
-            std::make_unique<tr_handshake>(
-                &mgr->handshake_mediator_,
-                peer_io,
-                mgr->session->encryptionMode(),
-                [mgr](tr_handshake::Result const& result) { return on_handshake_done(mgr, result); }));
+            &mgr->handshake_mediator_,
+            peer_io,
+            mgr->session->encryptionMode(),
+            [mgr](tr_handshake::Result const& result) { return on_handshake_done(mgr, result); });
     }
 
     atom.lastConnectionAttemptAt = now;
