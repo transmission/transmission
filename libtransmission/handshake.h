@@ -70,6 +70,14 @@ public:
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc done_func);
 
 private:
+    enum class ParseResult
+    {
+        Ok,
+        EncryptionWrong,
+        BadTorrent,
+        PeerIsSelf,
+    };
+
     enum class State
     {
         // incoming
@@ -106,25 +114,17 @@ private:
 
     void send_ya(tr_peerIo*);
 
-    enum class ParseResult
-    {
-        Ok,
-        EncryptionWrong,
-        BadTorrent,
-        PeerIsSelf,
-    };
-
     ParseResult parse_handshake(tr_peerIo* peer_io);
 
     static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
     static void on_error(tr_peerIo* io, short what, void* vhandshake);
 
-    void set_peer_id(tr_peer_id_t const& id) noexcept
+    constexpr void set_peer_id(tr_peer_id_t const& id) noexcept
     {
         peer_id_ = id;
     }
 
-    void set_have_read_anything_from_peer(bool val) noexcept
+    constexpr void set_have_read_anything_from_peer(bool val) noexcept
     {
         have_read_anything_from_peer_ = val;
     }
@@ -150,7 +150,7 @@ private:
         return state_ == state;
     }
 
-    constexpr void set_state(State state)
+    constexpr void set_state(State state) noexcept
     {
         state_ = state;
     }
@@ -160,9 +160,9 @@ private:
         return state_string(state_);
     }
 
-    [[nodiscard]] constexpr uint32_t crypto_provide() const
+    [[nodiscard]] constexpr auto crypto_provide() const
     {
-        uint32_t provide = 0;
+        auto provide = uint32_t{};
 
         switch (encryption_mode_)
         {
@@ -196,9 +196,7 @@ private:
         return success;
     }
 
-    static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
-
-    [[nodiscard]] static constexpr std::string_view state_string(State state)
+    [[nodiscard]] static constexpr std::string_view state_string(State state) noexcept
     {
         using State = tr_handshake::State;
 
@@ -244,6 +242,8 @@ private:
         walk += mediator_->pad(walk, PadMax);
         io->writeBytes(data, walk - data, false);
     }
+
+    static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
 
     static auto constexpr CryptoProvidePlaintext = int{ 1 };
     static auto constexpr CryptoProvideCrypto = int{ 2 };
