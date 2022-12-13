@@ -214,7 +214,7 @@ static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
 template<size_t PadMax>
 static void sendPublicKeyAndPad(tr_handshake* handshake, tr_peerIo* io)
 {
-    auto const public_key = handshake->dh.publicKey();
+    auto const public_key = handshake->dh_.publicKey();
     auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
     auto const data = std::data(outbuf);
     auto walk = data;
@@ -263,7 +263,7 @@ static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, ui
     return 0;
 }
 
-static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readYb(tr_peerIo* peer_io)
 {
     if (peer_io->readBufferSize() < std::size(HandshakeName))
     {
@@ -277,26 +277,26 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    tr_logAddTraceHand(handshake, is_encrypted ? "got an encrypted handshake" : "got a plain handshake");
+    tr_logAddTraceHand(this, is_encrypted ? "got an encrypted handshake" : "got a plain handshake");
 
     if (!is_encrypted)
     {
-        handshake->set_state(tr_handshake::State::AwaitingHandshake);
+        set_state(tr_handshake::State::AwaitingHandshake);
         return READ_NOW;
     }
 
-    handshake->set_have_read_anything_from_peer(true);
+    set_have_read_anything_from_peer(true);
 
     // get the peer's public key
     peer_io->readBytes(std::data(peer_public_key), std::size(peer_public_key));
-    handshake->dh.setPeerPublicKey(peer_public_key);
+    dh_.setPeerPublicKey(peer_public_key);
 
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
     auto outbuf = libtransmission::Buffer{};
 
     /* HASH('req1', S) */
-    outbuf.add(tr_sha1::digest("req1"sv, handshake->dh.secret()));
+    outbuf.add(tr_sha1::digest("req1"sv, dh_.secret()));
 
     auto const& info_hash = peer_io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readYb requires an info_hash");
@@ -304,7 +304,7 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
         auto const req2 = tr_sha1::digest("req2"sv, info_hash);
-        auto const req3 = tr_sha1::digest("req3"sv, handshake->dh.secret());
+        auto const req3 = tr_sha1::digest("req3"sv, dh_.secret());
         auto x_or = tr_sha1_digest_t{};
         for (size_t i = 0, n = std::size(x_or); i < n; ++i)
         {
@@ -318,32 +318,32 @@ static ReadState readYb(tr_handshake* handshake, tr_peerIo* peer_io)
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     peer_io->write(outbuf, false);
-    peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
+    peer_io->encryptInit(peer_io->isIncoming(), dh_, info_hash);
     outbuf.add(VC);
-    outbuf.addUint32(handshake->cryptoProvide());
+    outbuf.addUint32(cryptoProvide());
     outbuf.addUint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
-    if (auto msg = std::array<uint8_t, HandshakeSize>{}; handshake->build_handshake_message(peer_io, std::data(msg)))
+    if (auto msg = std::array<uint8_t, HandshakeSize>{}; build_handshake_message(peer_io, std::data(msg)))
     {
         outbuf.addUint16(std::size(msg));
         outbuf.add(msg);
-        handshake->have_sent_bittorrent_handshake = true;
+        have_sent_bittorrent_handshake_ = true;
     }
     else
     {
-        return handshake->done(false);
+        return done(false);
     }
 
     /* send it */
-    setReadState(handshake, tr_handshake::State::AwaitingVc);
+    setReadState(this, tr_handshake::State::AwaitingVc);
     peer_io->write(outbuf, false);
     return READ_NOW;
 }
 
 // MSE spec: "Since the length of [PadB is] unknown,
 // A will be able to resynchronize on ENCRYPT(VC)"
-static ReadState readVC(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readVC(tr_peerIo* peer_io)
 {
     auto const info_hash = peer_io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readVC requires an info_hash");
@@ -351,33 +351,33 @@ static ReadState readVC(tr_handshake* handshake, tr_peerIo* peer_io)
     // find the end of PadB by looking for `ENCRYPT(VC)`
     auto needle = VC;
     auto filter = tr_message_stream_encryption::Filter{};
-    filter.encryptInit(true, handshake->dh, info_hash);
+    filter.encryptInit(true, dh_, info_hash);
     filter.encrypt(std::size(needle), std::data(needle));
 
     for (size_t i = 0; i < PadbMaxlen; ++i)
     {
         if (peer_io->readBufferSize() < std::size(needle))
         {
-            tr_logAddTraceHand(handshake, "not enough bytes... returning read_more");
+            tr_logAddTraceHand(this, "not enough bytes... returning read_more");
             return READ_LATER;
         }
 
         if (peer_io->readBufferStartsWith(needle))
         {
-            tr_logAddTraceHand(handshake, "got it!");
+            tr_logAddTraceHand(this, "got it!");
             // We already know it's a match; now we just need to
             // consume it from the read buffer.
-            peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
+            peer_io->decryptInit(peer_io->isIncoming(), dh_, info_hash);
             peer_io->readBytes(std::data(needle), std::size(needle));
-            handshake->set_state(tr_handshake::State::AwaitingCryptoSelect);
+            set_state(tr_handshake::State::AwaitingCryptoSelect);
             return READ_NOW;
         }
 
         peer_io->readBufferDrain(1);
     }
 
-    tr_logAddTraceHand(handshake, "couldn't find ENCRYPT(VC)");
-    return handshake->done(false);
+    tr_logAddTraceHand(this, "couldn't find ENCRYPT(VC)");
+    return done(false);
 }
 
 static ReadState readCryptoSelect(tr_handshake* handshake, tr_peerIo* peer_io)
@@ -387,9 +387,9 @@ static ReadState readCryptoSelect(tr_handshake* handshake, tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    uint32_t crypto_select = 0;
+    auto crypto_select = uint32_t{};
     peer_io->readUint32(&crypto_select);
-    handshake->crypto_select = crypto_select;
+    handshake->crypto_select_ = crypto_select;
     tr_logAddTraceHand(handshake, fmt::format("crypto select is {}", crypto_select));
 
     if ((crypto_select & handshake->cryptoProvide()) == 0)
@@ -408,7 +408,7 @@ static ReadState readCryptoSelect(tr_handshake* handshake, tr_peerIo* peer_io)
         return handshake->done(false);
     }
 
-    handshake->pad_d_len = pad_d_len;
+    handshake->pad_d_len_ = pad_d_len;
 
     handshake->set_state(tr_handshake::State::AwaitingPadD);
     return READ_NOW;
@@ -416,7 +416,7 @@ static ReadState readCryptoSelect(tr_handshake* handshake, tr_peerIo* peer_io)
 
 static ReadState readPadD(tr_handshake* handshake, tr_peerIo* peer_io)
 {
-    size_t const needlen = handshake->pad_d_len;
+    size_t const needlen = handshake->pad_d_len_;
 
     tr_logAddTraceHand(handshake, fmt::format("pad d: need {}, got {}", needlen, peer_io->readBufferSize()));
 
@@ -450,7 +450,7 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
 
     if (peer_io->readBufferStartsWith(HandshakeName)) // unencrypted
     {
-        if (handshake->encryption_mode == TR_ENCRYPTION_REQUIRED)
+        if (handshake->encryption_mode_ == TR_ENCRYPTION_REQUIRED)
         {
             tr_logAddTraceHand(handshake, "peer is unencrypted, and we're disallowing that");
             return handshake->done(false);
@@ -512,7 +512,7 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     ***  If it's an incoming message, we need to send a response handshake
     **/
 
-    if (!handshake->have_sent_bittorrent_handshake)
+    if (!handshake->have_sent_bittorrent_handshake_)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
 
@@ -522,14 +522,14 @@ static ReadState readHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
         }
 
         peer_io->writeBytes(std::data(msg), std::size(msg), false);
-        handshake->have_sent_bittorrent_handshake = true;
+        handshake->have_sent_bittorrent_handshake_ = true;
     }
 
     setReadState(handshake, tr_handshake::State::AwaitingPeerId);
     return READ_NOW;
 }
 
-static ReadState readPeerId(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readPeerId(tr_peerIo* peer_io)
 {
     // read the peer_id
     auto peer_id = tr_peer_id_t{};
@@ -538,27 +538,25 @@ static ReadState readPeerId(tr_handshake* handshake, tr_peerIo* peer_io)
         return READ_LATER;
     }
     peer_io->readBytes(std::data(peer_id), std::size(peer_id));
-    handshake->set_peer_id(peer_id);
+    set_peer_id(peer_id);
 
     auto client = std::array<char, 128>{};
     tr_clientForId(std::data(client), std::size(client), peer_id);
-    tr_logAddTraceHand(
-        handshake,
-        fmt::format("peer-id is '{}' ... isIncoming is {}", std::data(client), handshake->is_incoming()));
+    tr_logAddTraceHand(this, fmt::format("peer-id is '{}' ... isIncoming is {}", std::data(client), is_incoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
-    auto const info_hash = peer_io->torrentHash();
-    auto const info = handshake->torrent_info(info_hash);
+    auto const info_hash = peer_io_->torrentHash();
+    auto const info = torrent_info(info_hash);
     auto const connected_to_self = info && info->client_peer_id == peer_id;
 
-    return handshake->done(!connected_to_self);
+    return done(!connected_to_self);
 }
 
-static ReadState readYa(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readYa(tr_peerIo* peer_io)
 {
     auto peer_public_key = DH::key_bigend_t{};
     tr_logAddTraceHand(
-        handshake,
+        this,
         fmt::format("in readYa... need {}, have {}", std::size(peer_public_key), peer_io->readBufferSize()));
 
     if (peer_io->readBufferSize() < std::size(peer_public_key))
@@ -568,45 +566,45 @@ static ReadState readYa(tr_handshake* handshake, tr_peerIo* peer_io)
 
     /* read the incoming peer's public key */
     peer_io->readBytes(std::data(peer_public_key), std::size(peer_public_key));
-    handshake->dh.setPeerPublicKey(peer_public_key);
+    dh_.setPeerPublicKey(peer_public_key);
 
     // send our public key to the peer
-    tr_logAddTraceHand(handshake, "sending B->A: Diffie Hellman Yb, PadB");
-    sendPublicKeyAndPad<PadbMaxlen>(handshake, peer_io);
+    tr_logAddTraceHand(this, "sending B->A: Diffie Hellman Yb, PadB");
+    sendPublicKeyAndPad<PadbMaxlen>(this, peer_io);
 
-    setReadState(handshake, tr_handshake::State::AwaitingPadA);
+    setReadState(this, tr_handshake::State::AwaitingPadA);
     return READ_NOW;
 }
 
-static ReadState readPadA(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readPadA(tr_peerIo* peer_io)
 {
     // find the end of PadA by looking for HASH('req1', S)
-    auto const needle = tr_sha1::digest("req1"sv, handshake->dh.secret());
+    auto const needle = tr_sha1::digest("req1"sv, dh_.secret());
 
     for (size_t i = 0; i < PadaMaxlen; ++i)
     {
         if (peer_io->readBufferSize() < std::size(needle))
         {
-            tr_logAddTraceHand(handshake, "not enough bytes... returning read_more");
+            tr_logAddTraceHand(this, "not enough bytes... returning read_more");
             return READ_LATER;
         }
 
         if (peer_io->readBufferStartsWith(needle))
         {
-            tr_logAddTraceHand(handshake, "found it... looking setting to awaiting_crypto_provide");
+            tr_logAddTraceHand(this, "found it... looking setting to awaiting_crypto_provide");
             peer_io->readBufferDrain(std::size(needle));
-            handshake->set_state(tr_handshake::State::AwaitingCryptoProvide);
+            set_state(tr_handshake::State::AwaitingCryptoProvide);
             return READ_NOW;
         }
 
         peer_io->readBufferDrain(1U);
     }
 
-    tr_logAddTraceHand(handshake, "couldn't find HASH('req', S)");
-    return handshake->done(false);
+    tr_logAddTraceHand(this, "couldn't find HASH('req', S)");
+    return done(false);
 }
 
-static ReadState readCryptoProvide(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readCryptoProvide(tr_peerIo* peer_io)
 {
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
 
@@ -624,86 +622,86 @@ static ReadState readCryptoProvide(tr_handshake* handshake, tr_peerIo* peer_io)
     /* This next piece is HASH('req2', SKEY) xor HASH('req3', S) ...
      * we can get the first half of that (the obfuscatedTorrentHash)
      * by building the latter and xor'ing it with what the peer sent us */
-    tr_logAddTraceHand(handshake, "reading obfuscated torrent hash...");
+    tr_logAddTraceHand(this, "reading obfuscated torrent hash...");
     auto req2 = tr_sha1_digest_t{};
     peer_io->readBytes(std::data(req2), std::size(req2));
 
-    auto const req3 = tr_sha1::digest("req3"sv, handshake->dh.secret());
+    auto const req3 = tr_sha1::digest("req3"sv, dh_.secret());
     for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
     {
         obfuscated_hash[i] = req2[i] ^ req3[i];
     }
 
-    if (auto const info = handshake->torrent_info_from_obfuscated(obfuscated_hash); info)
+    if (auto const info = torrent_info_from_obfuscated(obfuscated_hash); info)
     {
         bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = handshake->is_peer_known_seed(info->id, peer_io->address());
-        tr_logAddTraceHand(handshake, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
+        bool const peer_is_seed = is_peer_known_seed(info->id, peer_io->address());
+        tr_logAddTraceHand(this, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->setTorrentHash(info->info_hash);
 
         if (client_is_seed && peer_is_seed)
         {
-            tr_logAddTraceHand(handshake, "another seed tried to reconnect to us!");
-            return handshake->done(false);
+            tr_logAddTraceHand(this, "another seed tried to reconnect to us!");
+            return done(false);
         }
     }
     else
     {
-        tr_logAddTraceHand(handshake, "can't find that torrent...");
-        return handshake->done(false);
+        tr_logAddTraceHand(this, "can't find that torrent...");
+        return done(false);
     }
 
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
 
     auto const& info_hash = peer_io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readCryptoProvide requires an info_hash");
-    peer_io->decryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
+    peer_io->decryptInit(peer_io->isIncoming(), dh_, info_hash);
 
     auto vc_in = vc_t{};
     peer_io->readBytes(std::data(vc_in), std::size(vc_in));
 
     peer_io->readUint32(&crypto_provide);
-    handshake->crypto_provide = crypto_provide;
-    tr_logAddTraceHand(handshake, fmt::format("crypto_provide is {}", crypto_provide));
+    crypto_provide_ = crypto_provide;
+    tr_logAddTraceHand(this, fmt::format("crypto_provide is {}", crypto_provide));
 
     peer_io->readUint16(&padc_len);
-    tr_logAddTraceHand(handshake, fmt::format("padc is {}", padc_len));
+    tr_logAddTraceHand(this, fmt::format("padc is {}", padc_len));
     if (padc_len > PadcMaxlen)
     {
-        tr_logAddTraceHand(handshake, "peer's PadC is too big");
-        return handshake->done(false);
+        tr_logAddTraceHand(this, "peer's PadC is too big");
+        return done(false);
     }
 
-    handshake->pad_c_len = padc_len;
-    handshake->set_state(tr_handshake::State::AwaitingPadC);
+    pad_c_len_ = padc_len;
+    set_state(tr_handshake::State::AwaitingPadC);
     return READ_NOW;
 }
 
-static ReadState readPadC(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readPadC(tr_peerIo* peer_io)
 {
-    if (auto const needlen = handshake->pad_c_len + sizeof(uint16_t); peer_io->readBufferSize() < needlen)
+    if (auto const needlen = pad_c_len_ + sizeof(uint16_t); peer_io->readBufferSize() < needlen)
     {
         return READ_LATER;
     }
 
     // read the throwaway padc
     auto pad_c = std::array<char, PadcMaxlen>{};
-    peer_io->readBytes(std::data(pad_c), handshake->pad_c_len);
+    peer_io->readBytes(std::data(pad_c), pad_c_len_);
 
     /* read ia_len */
     uint16_t ia_len = 0;
     peer_io->readUint16(&ia_len);
-    tr_logAddTraceHand(handshake, fmt::format("ia_len is {}", ia_len));
-    handshake->ia_len = ia_len;
-    handshake->set_state(tr_handshake::State::AwaitingIa);
+    tr_logAddTraceHand(this, fmt::format("ia_len is {}", ia_len));
+    ia_len_ = ia_len;
+    set_state(tr_handshake::State::AwaitingIa);
     return READ_NOW;
 }
 
-static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
+ReadState tr_handshake::readIA(tr_peerIo* peer_io)
 {
-    size_t const needlen = handshake->ia_len;
+    size_t const needlen = ia_len_;
 
-    tr_logAddTraceHand(handshake, fmt::format("reading IA... have {}, need {}", peer_io->readBufferSize(), needlen));
+    tr_logAddTraceHand(this, fmt::format("reading IA... have {}, need {}", peer_io->readBufferSize(), needlen));
 
     if (peer_io->readBufferSize() < needlen)
     {
@@ -716,28 +714,28 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
 
     auto const& info_hash = peer_io->torrentHash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
-    peer_io->encryptInit(peer_io->isIncoming(), handshake->dh, info_hash);
+    peer_io->encryptInit(peer_io->isIncoming(), dh_, info_hash);
     auto outbuf = libtransmission::Buffer{};
 
     // send VC
-    tr_logAddTraceHand(handshake, "sending vc");
+    tr_logAddTraceHand(this, "sending vc");
     outbuf.add(VC);
 
     /* send crypto_select */
-    uint32_t const crypto_select = getCryptoSelect(handshake->encryption_mode, handshake->crypto_provide);
+    uint32_t const crypto_select = getCryptoSelect(encryption_mode_, crypto_provide_);
 
     if (crypto_select != 0)
     {
-        tr_logAddTraceHand(handshake, fmt::format("selecting crypto mode '{}'", crypto_select));
+        tr_logAddTraceHand(this, fmt::format("selecting crypto mode '{}'", crypto_select));
         outbuf.addUint32(crypto_select);
     }
     else
     {
-        tr_logAddTraceHand(handshake, "peer didn't offer an encryption mode we like.");
-        return handshake->done(false);
+        tr_logAddTraceHand(this, "peer didn't offer an encryption mode we like.");
+        return done(false);
     }
 
-    tr_logAddTraceHand(handshake, "sending pad d");
+    tr_logAddTraceHand(this, "sending pad d");
 
     /* ENCRYPT(VC, crypto_provide, len(PadD), PadD
      * PadD is reserved for future extensions to the handshake...
@@ -751,24 +749,24 @@ static ReadState readIA(tr_handshake* handshake, tr_peerIo* peer_io)
         TR_ASSERT(std::empty(outbuf));
     }
 
-    tr_logAddTraceHand(handshake, "sending handshake");
+    tr_logAddTraceHand(this, "sending handshake");
 
     /* send our handshake */
-    if (auto msg = std::array<uint8_t, HandshakeSize>{}; handshake->build_handshake_message(peer_io, std::data(msg)))
+    if (auto msg = std::array<uint8_t, HandshakeSize>{}; build_handshake_message(peer_io, std::data(msg)))
     {
         outbuf.add(msg);
-        handshake->have_sent_bittorrent_handshake = true;
+        have_sent_bittorrent_handshake_ = true;
     }
     else
     {
-        return handshake->done(false);
+        return done(false);
     }
 
     /* send it out */
     peer_io->write(outbuf, false);
 
     /* now await the handshake */
-    handshake->set_state(tr_handshake::State::AwaitingPayloadStream);
+    set_state(tr_handshake::State::AwaitingPayloadStream);
     return READ_NOW;
 }
 
@@ -827,27 +825,27 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
             break;
 
         case tr_handshake::State::AwaitingPeerId:
-            ret = readPeerId(handshake, peer_io);
+            ret = handshake->readPeerId(peer_io);
             break;
 
         case tr_handshake::State::AwaitingYa:
-            ret = readYa(handshake, peer_io);
+            ret = handshake->readYa(peer_io);
             break;
 
         case tr_handshake::State::AwaitingPadA:
-            ret = readPadA(handshake, peer_io);
+            ret = handshake->readPadA(peer_io);
             break;
 
         case tr_handshake::State::AwaitingCryptoProvide:
-            ret = readCryptoProvide(handshake, peer_io);
+            ret = handshake->readCryptoProvide(peer_io);
             break;
 
         case tr_handshake::State::AwaitingPadC:
-            ret = readPadC(handshake, peer_io);
+            ret = handshake->readPadC(peer_io);
             break;
 
         case tr_handshake::State::AwaitingIa:
-            ret = readIA(handshake, peer_io);
+            ret = handshake->readIA(peer_io);
             break;
 
         case tr_handshake::State::AwaitingPayloadStream:
@@ -855,11 +853,11 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
             break;
 
         case tr_handshake::State::AwaitingYb:
-            ret = readYb(handshake, peer_io);
+            ret = handshake->readYb(peer_io);
             break;
 
         case tr_handshake::State::AwaitingVc:
-            ret = readVC(handshake, peer_io);
+            ret = handshake->readVC(peer_io);
             break;
 
         case tr_handshake::State::AwaitingCryptoSelect:
@@ -887,15 +885,15 @@ static ReadState canRead(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
         }
         else if (handshake->is_state(tr_handshake::State::AwaitingPadC))
         {
-            ready_for_more = peer_io->readBufferSize() >= handshake->pad_c_len;
+            ready_for_more = peer_io->readBufferSize() >= handshake->pad_c_len_;
         }
         else if (handshake->is_state(tr_handshake::State::AwaitingPadD))
         {
-            ready_for_more = peer_io->readBufferSize() >= handshake->pad_d_len;
+            ready_for_more = peer_io->readBufferSize() >= handshake->pad_d_len_;
         }
         else if (handshake->is_state(tr_handshake::State::AwaitingIa))
         {
-            ready_for_more = peer_io->readBufferSize() >= handshake->ia_len;
+            ready_for_more = peer_io->readBufferSize() >= handshake->ia_len_;
         }
     }
 
@@ -924,7 +922,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
         {
             auto msg = std::array<uint8_t, HandshakeSize>{};
             handshake->build_handshake_message(io, std::data(msg));
-            handshake->have_sent_bittorrent_handshake = true;
+            handshake->have_sent_bittorrent_handshake_ = true;
             setReadState(handshake, tr_handshake::State::AwaitingHandshake);
             io->writeBytes(std::data(msg), std::size(msg), false);
         }
@@ -934,12 +932,12 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
     if ((handshake->is_state(tr_handshake::State::AwaitingYb) || handshake->is_state(tr_handshake::State::AwaitingVc)) &&
-        handshake->encryption_mode != TR_ENCRYPTION_REQUIRED && handshake->allows_tcp() && io->reconnect() == 0)
+        handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->allows_tcp() && io->reconnect() == 0)
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
         handshake->build_handshake_message(io, std::data(msg));
-        handshake->have_sent_bittorrent_handshake = true;
+        handshake->have_sent_bittorrent_handshake_ = true;
         setReadState(handshake, tr_handshake::State::AwaitingHandshake);
         io->writeBytes(std::data(msg), std::size(msg), false);
     }
@@ -961,8 +959,8 @@ tr_handshake::tr_handshake(
     std::shared_ptr<tr_peerIo> peer_io,
     tr_encryption_mode mode_in,
     DoneFunc done_func)
-    : dh{ mediator->private_key() }
-    , encryption_mode{ mode_in }
+    : dh_{ mediator->private_key() }
+    , encryption_mode_{ mode_in }
     , mediator_{ mediator }
     , peer_io_{ std::move(peer_io) }
     , done_func_{ std::move(done_func) }
@@ -976,7 +974,7 @@ tr_handshake::tr_handshake(
     {
         setReadState(this, tr_handshake::State::AwaitingHandshake);
     }
-    else if (encryption_mode != TR_CLEAR_PREFERRED)
+    else if (encryption_mode_ != TR_CLEAR_PREFERRED)
     {
         sendYa(this, peer_io_.get());
     }
@@ -985,7 +983,7 @@ tr_handshake::tr_handshake(
         auto msg = std::array<uint8_t, HandshakeSize>{};
         build_handshake_message(peer_io_.get(), std::data(msg));
 
-        have_sent_bittorrent_handshake = true;
+        have_sent_bittorrent_handshake_ = true;
         setReadState(this, tr_handshake::State::AwaitingHandshake);
         peer_io_->writeBytes(std::data(msg), std::size(msg), false);
     }

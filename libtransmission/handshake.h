@@ -100,6 +100,14 @@ public:
     virtual ~tr_handshake() = default;
 
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
+    ReadState readCryptoProvide(tr_peerIo* peer_io);
+    ReadState readPadA(tr_peerIo* peer_io);
+    ReadState readVC(tr_peerIo* peer_io);
+    ReadState readYb(tr_peerIo* peer_io);
+    ReadState readYa(tr_peerIo* peer_io);
+    ReadState readIA(tr_peerIo* peer_io);
+    ReadState readPadC(tr_peerIo* peer_io);
+    ReadState readPeerId(tr_peerIo* peer_io);
 
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
@@ -201,7 +209,7 @@ public:
     {
         uint32_t provide = 0;
 
-        switch (encryption_mode)
+        switch (encryption_mode_)
         {
         case TR_ENCRYPTION_REQUIRED:
         case TR_ENCRYPTION_PREFERRED:
@@ -219,14 +227,14 @@ public:
     static auto constexpr CryptoProvidePlaintext = int{ 1 };
     static auto constexpr CryptoProvideCrypto = int{ 2 };
 
-    bool have_sent_bittorrent_handshake = false;
-    DH dh = {};
-    tr_encryption_mode encryption_mode;
-    uint16_t pad_c_len = {};
-    uint16_t pad_d_len = {};
-    uint16_t ia_len = {};
-    uint32_t crypto_select = {};
-    uint32_t crypto_provide = {};
+    bool have_sent_bittorrent_handshake_ = false;
+    DH dh_ = {};
+    tr_encryption_mode encryption_mode_;
+    uint16_t pad_c_len_ = {};
+    uint16_t pad_d_len_ = {};
+    uint16_t ia_len_ = {};
+    uint32_t crypto_select_ = {};
+    uint32_t crypto_provide_ = {};
 
 protected:
     bool fire_done(bool is_connected)
