@@ -75,10 +75,6 @@ auto constexpr HandshakeFlagsLen = int{ 8 };
 auto constexpr HandshakeSize = int{ 68 };
 auto constexpr IncomingHandshakeLen = int{ 48 };
 
-// encryption constants
-auto constexpr CryptoProvidePlaintext = int{ 1 };
-auto constexpr CryptoProvideCrypto = int{ 2 };
-
 // "VC is a verification constant that is used to verify whether the
 // other side knows S and SKEY and thus defeats replay attacks of the
 // SKEY hash. As of this version VC is a String of 8 bytes set to 0x00."
@@ -191,7 +187,7 @@ void tr_handshake::send_ya(tr_peerIo* io)
     set_state(tr_handshake::State::AwaitingYb);
 }
 
-static constexpr uint32_t getCryptoSelect(tr_encryption_mode encryption_mode, uint32_t crypto_provide)
+[[nodiscard]] uint32_t tr_handshake::get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept
 {
     auto choices = std::array<uint32_t, 2>{};
     int n_choices = 0;
@@ -683,7 +679,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     outbuf.add(VC);
 
     /* send crypto_select */
-    uint32_t const crypto_select = getCryptoSelect(encryption_mode_, crypto_provide_);
+    uint32_t const crypto_select = get_crypto_select(encryption_mode_, crypto_provide_);
 
     if (crypto_select != 0)
     {

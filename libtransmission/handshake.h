@@ -170,6 +170,8 @@ private:
 
     [[nodiscard]] uint32_t crypto_provide() const noexcept;
 
+    [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
+
     bool fire_done(bool is_connected);
 
     template<size_t PadMax>
@@ -188,8 +190,13 @@ private:
 
     static auto constexpr HandshakeTimeoutSec = std::chrono::seconds{ 30 };
 
-    static auto constexpr CryptoProvidePlaintext = int{ 1 };
-    static auto constexpr CryptoProvideCrypto = int{ 2 };
+    // MSE constatnts.
+    // http://wiki.vuze.com/w/Message_Stream_Encryption
+    // crypto_provide and crypto_select are a 32bit bitfields.
+    // As of now 0x01 means plaintext, 0x02 means RC4. (see Functions)
+    // The remaining bits are reserved for future use.
+    static auto constexpr CryptoProvidePlaintext = size_t{ 1U };
+    static auto constexpr CryptoProvideCrypto = size_t{ 2U };
 
     // MSE constatnts.
     // http://wiki.vuze.com/w/Message_Stream_Encryption
