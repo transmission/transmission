@@ -326,7 +326,7 @@ static size_t utp_get_rb_size(tr_peerIo* const io)
     return UtpReadBufferSize - bytes;
 }
 
-static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
+static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t max);
 
 static void utp_on_writable(tr_peerIo* io)
 {
@@ -858,69 +858,40 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
     return n_read;
 }
 
-static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
+static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t max)
 {
-    auto n_written = size_t{ 0U };
-
-    auto const old_len = std::size(io->outbuf);
-
-    howmuch = std::min(howmuch, old_len);
-    howmuch = io->bandwidth().clamp(TR_UP, howmuch);
-    if (howmuch == 0)
+    max = std::min(max, std::size(io->outbuf));
+    max = io->bandwidth().clamp(TR_UP, max);
+    if (max == 0)
     {
-        return n_written;
+        return {};
     }
 
-    if (io->socket.is_tcp())
+    tr_error* error = nullptr;
+    auto const n_written = io->socket.try_write(io->outbuf, max, &error);
+    if (n_written > 0U)
     {
-        tr_error* error = nullptr;
-        n_written = io->outbuf.toSocket(io->socket.handle.tcp, howmuch, &error);
-
-        if (n_written > 0)
-        {
-            didWriteWrapper(io, n_written);
-        }
-
-        if (error != nullptr)
-        {
-            if (!canRetryFromError(error->code))
-            {
-                short constexpr What = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
-                tr_logAddTraceIo(
-                    io,
-                    fmt::format(
-                        "tr_peerIoTryWrite err: res:{}, what:{}, errno:{} ({})",
-                        n_written,
-                        What,
-                        error->code,
-                        error->message));
-
-                io->call_error_callback(What);
-            }
-
-            tr_error_clear(&error);
-        }
+        didWriteWrapper(io, n_written);
     }
-#ifdef WITH_UTP
-    else if (io->socket.is_utp())
+    if (error != nullptr)
     {
-        auto iov = io->outbuf.vecs(howmuch);
-        errno = 0;
-        auto const n = utp_writev(io->socket.handle.utp, reinterpret_cast<struct utp_iovec*>(std::data(iov)), std::size(iov));
-        auto const error_code = errno;
-        if (n > 0)
+        if (!canRetryFromError(error->code))
         {
-            n_written = static_cast<size_t>(n);
-            io->outbuf.drain(n);
-            didWriteWrapper(io, n);
+            short constexpr What = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
+            tr_logAddTraceIo(
+                io,
+                fmt::format(
+                    "tr_peerIoTryWrite err: res:{}, what:{}, errno:{} ({})",
+                    n_written,
+                    What,
+                    error->code,
+                    error->message));
+
+            io->call_error_callback(What);
         }
-        else if (n < 0 && !canRetryFromError(error_code))
-        {
-            // FIXME(ckerr)
-            // tr_error_set(error, error_code, tr_strerror(error_code));
-        }
+
+        tr_error_clear(&error);
     }
-#endif
 
     return n_written;
 }
