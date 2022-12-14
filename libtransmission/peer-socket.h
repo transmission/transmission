@@ -15,8 +15,10 @@
 
 #include "transmission.h"
 
+#include "error.h"
 #include "net.h"
 #include "tr-assert.h"
+#include "tr-buffer.h"
 
 struct UTPSocket;
 struct tr_session;
@@ -24,6 +26,8 @@ struct tr_session;
 class tr_peer_socket
 {
 public:
+    using Buffer = libtransmission::Buffer;
+
     tr_peer_socket() = default;
     tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock);
     tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock);
@@ -34,6 +38,8 @@ public:
     ~tr_peer_socket() = default;
 
     void close(tr_session* session);
+
+    size_t try_write(Buffer& buf, size_t max, tr_error** error);
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
     {

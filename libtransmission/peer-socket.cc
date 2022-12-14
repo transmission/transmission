@@ -64,3 +64,39 @@ void tr_peer_socket::close(tr_session* session)
     type_ = Type::None;
     handle = {};
 }
+
+size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error)
+{
+    if (max == 0)
+    {
+        return {};
+    }
+
+    if (is_tcp())
+    {
+        return buf.toSocket(handle.tcp, max, error);
+    }
+#ifdef WITH_UTP
+    else if (is_utp())
+    {
+        auto iov = buf.vecs(max);
+
+        errno = 0;
+        auto const n = utp_writev(handle.utp, reinterpret_cast<struct utp_iovec*>(std::data(iov)), std::size(iov));
+        auto const error_code = errno;
+
+        if (n > 0)
+        {
+            buf.drain(n);
+            return static_cast<size_t>(n);
+        }
+
+        if (n < 0 && error_code != 0)
+        {
+            tr_error_set(error, error_code, tr_strerror(error_code));
+        }
+    }
+#endif
+
+    return {};
+}
