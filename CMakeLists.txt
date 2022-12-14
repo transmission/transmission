@@ -4,17 +4,14 @@ if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
 
-function(tr_set_apple_deployment_targets OSX_DEPLOYMENT_TARGET)
-    # The value of this variable should be set prior to the first project() command invocation.
-    # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
-    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET ${OSX_DEPLOYMENT_TARGET} CACHE STRING "Minimum OS X version to target for deployment" FORCE)
-    endif()
-    if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS OSX_DEPLOYMENT_TARGET)
-        message(FATAL_ERROR "Targeting macOS versions before ${OSX_DEPLOYMENT_TARGET} is not supported, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
-    endif()
-endfunction()
-tr_set_apple_deployment_targets("10.13")
+# Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
+set(MACOS_SUPPORT_MINIMUM 10.13)
+
+# The value of this variable should be set prior to the first project() command invocation.
+# See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
+if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_SUPPORT_MINIMUM} CACHE STRING "Minimum macOS version to target for deployment" FORCE)
+endif()
 
 project(transmission)
 
