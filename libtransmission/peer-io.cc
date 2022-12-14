@@ -47,29 +47,6 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
-static constexpr size_t guessPacketOverhead(size_t d)
-{
-    /**
-     * https://web.archive.org/web/20140912230020/http://sd.wareonearth.com:80/~phil/net/overhead/
-     *
-     * TCP over Ethernet:
-     * Assuming no header compression (e.g. not PPP)
-     * Add 20 IPv4 header or 40 IPv6 header (no options)
-     * Add 20 TCP header
-     * Add 12 bytes optional TCP timestamps
-     * Max TCP Payload data rates over ethernet are thus:
-     * (1500-40)/ (38+1500) = 94.9285 %  IPv4, minimal headers
-     * (1500-52)/ (38+1500) = 94.1482 %  IPv4, TCP timestamps
-     * (1500-52)/ (42+1500) = 93.9040 %  802.1q, IPv4, TCP timestamps
-     * (1500-60)/ (38+1500) = 93.6281 %  IPv6, minimal headers
-     * (1500-72)/ (38+1500) = 92.8479 %  IPv6, TCP timestamps
-     * (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, TCP timestamps
-     */
-    double const assumed_payload_data_rate = 94.0;
-
-    return (size_t)(d * (100.0 / assumed_payload_data_rate) - d);
-}
-
 /***
 ****
 ***/
@@ -82,7 +59,7 @@ static void didWriteWrapper(tr_peerIo* io, size_t bytes_transferred)
 
         size_t const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
         /* For µTP sockets, the overhead is computed in utp_on_overhead. */
-        size_t const overhead = io->socket.is_tcp() ? guessPacketOverhead(payload) : 0;
+        size_t const overhead = io->socket.guess_packet_overhead(payload);
         uint64_t const now = tr_time_msec();
 
         io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);
@@ -136,7 +113,7 @@ static void canReadWrapper(tr_peerIo* io_in)
         auto const old_len = io->readBufferSize();
         auto const read_state = io->canRead == nullptr ? READ_ERR : io->canRead(io.get(), io->userData, &piece);
         auto const used = old_len - io->readBufferSize();
-        auto const overhead = guessPacketOverhead(used);
+        auto const overhead = io->socket.guess_packet_overhead(used);
 
         if (piece != 0 || piece != used)
         {
