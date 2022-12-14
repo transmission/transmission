@@ -2775,7 +2775,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else if ([sortType isEqualToString:SortTypeSize])
     {
-        NSSortDescriptor* sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"size" ascending:asc];
+        NSSortDescriptor* sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"totalSizeSelected" ascending:asc];
 
         descriptors = @[ sizeDescriptor, nameDescriptor ];
     }
