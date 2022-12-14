@@ -70,7 +70,7 @@ static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr);
 class HandshakeMediator final : public tr_handshake::Mediator
 {
 private:
-    [[nodiscard]] static std::optional<TorrentInfo> torrent_info(tr_torrent* tor)
+    [[nodiscard]] static std::optional<TorrentInfo> torrent(tr_torrent* tor)
     {
         if (tor == nullptr)
         {
@@ -91,15 +91,14 @@ public:
     {
     }
 
-    [[nodiscard]] std::optional<TorrentInfo> torrent_info(tr_sha1_digest_t const& info_hash) const override
+    [[nodiscard]] std::optional<TorrentInfo> torrent(tr_sha1_digest_t const& info_hash) const override
     {
-        return torrent_info(session_.torrents().get(info_hash));
+        return torrent(session_.torrents().get(info_hash));
     }
 
-    [[nodiscard]] std::optional<TorrentInfo> torrent_info_from_obfuscated(
-        tr_sha1_digest_t const& obfuscated_info_hash) const override
+    [[nodiscard]] std::optional<TorrentInfo> torrent_from_obfuscated(tr_sha1_digest_t const& info_hash) const override
     {
-        return torrent_info(tr_torrentFindFromObfuscatedHash(&session_, obfuscated_info_hash));
+        return torrent(tr_torrentFindFromObfuscatedHash(&session_, info_hash));
     }
 
     [[nodiscard]] bool allows_dht() const override

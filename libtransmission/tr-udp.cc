@@ -214,7 +214,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         }
         else
         {
-            if (session->allowsUTP() && session->utp_context)
+            if (session->allowsUTP() && (session->utp_context != nullptr))
             {
                 if (!tr_utpPacket(std::data(buf), rc, (struct sockaddr*)&from, fromlen, session))
                 {
