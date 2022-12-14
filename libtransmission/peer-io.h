@@ -121,8 +121,8 @@ public:
 
     void readBufferAdd(void const* data, size_t n_bytes);
 
-    size_t flushOutgoingProtocolMsgs(tr_error** error = nullptr);
-    size_t flush(tr_direction dir, size_t byte_limit, tr_error** error = nullptr);
+    size_t flushOutgoingProtocolMsgs();
+    size_t flush(tr_direction dir, size_t byte_limit);
 
     void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
