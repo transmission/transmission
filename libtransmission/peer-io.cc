@@ -326,7 +326,7 @@ static size_t utp_get_rb_size(tr_peerIo* const io)
     return UtpReadBufferSize - bytes;
 }
 
-static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error = nullptr);
+static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
 
 static void utp_on_writable(tr_peerIo* io)
 {
@@ -803,7 +803,7 @@ void tr_peerIo::readBufferDrain(size_t byte_count)
 ****
 ***/
 
-static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
+static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 {
     auto n_read = size_t{ 0U };
 
@@ -825,11 +825,7 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
 
         if (my_error != nullptr)
         {
-            if (canRetryFromError(my_error->code))
-            {
-                tr_error_clear(&my_error);
-            }
-            else
+            if (!canRetryFromError(my_error->code))
             {
                 short const what = BEV_EVENT_READING | BEV_EVENT_ERROR | (n_read == 0 ? BEV_EVENT_EOF : 0);
                 auto const msg = fmt::format(
@@ -841,9 +837,9 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
                 tr_logAddTraceIo(io, msg);
 
                 io->call_error_callback(what);
-
-                tr_error_propagate(error, &my_error);
             }
+
+            tr_error_clear(&my_error);
         }
     }
 #ifdef WITH_UTP
@@ -862,7 +858,7 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
     return n_read;
 }
 
-static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
+static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 {
     auto n_written = size_t{ 0U };
 
@@ -877,21 +873,17 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
 
     if (io->socket.is_tcp())
     {
-        tr_error* my_error = nullptr;
-        n_written = io->outbuf.toSocket(io->socket.handle.tcp, howmuch, &my_error);
+        tr_error* error = nullptr;
+        n_written = io->outbuf.toSocket(io->socket.handle.tcp, howmuch, &error);
 
         if (n_written > 0)
         {
             didWriteWrapper(io, n_written);
         }
 
-        if (my_error != nullptr)
+        if (error != nullptr)
         {
-            if (canRetryFromError(my_error->code))
-            {
-                tr_error_clear(&my_error);
-            }
-            else
+            if (!canRetryFromError(error->code))
             {
                 short constexpr What = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
                 tr_logAddTraceIo(
@@ -900,13 +892,13 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
                         "tr_peerIoTryWrite err: res:{}, what:{}, errno:{} ({})",
                         n_written,
                         What,
-                        my_error->code,
-                        my_error->message));
+                        error->code,
+                        error->message));
 
                 io->call_error_callback(What);
-
-                tr_error_propagate(error, &my_error);
             }
+
+            tr_error_clear(&error);
         }
     }
 #ifdef WITH_UTP
@@ -924,7 +916,8 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
         }
         else if (n < 0 && !canRetryFromError(error_code))
         {
-            tr_error_set(error, error_code, tr_strerror(error_code));
+            // FIXME(ckerr)
+            // tr_error_set(error, error_code, tr_strerror(error_code));
         }
     }
 #endif
@@ -932,18 +925,18 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
     return n_written;
 }
 
-size_t tr_peerIo::flush(tr_direction dir, size_t limit, tr_error** error)
+size_t tr_peerIo::flush(tr_direction dir, size_t limit)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit, error) : tr_peerIoTryWrite(this, limit, error);
+    auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
     tr_logAddTraceIo(
         this,
         fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", static_cast<int>(dir), limit, bytes_used));
     return bytes_used;
 }
 
-size_t tr_peerIo::flushOutgoingProtocolMsgs(tr_error** error)
+size_t tr_peerIo::flushOutgoingProtocolMsgs()
 {
     size_t byte_count = 0;
 
@@ -959,5 +952,5 @@ size_t tr_peerIo::flushOutgoingProtocolMsgs(tr_error** error)
         byte_count += n_bytes;
     }
 
-    return flush(TR_UP, byte_count, error);
+    return flush(TR_UP, byte_count);
 }
