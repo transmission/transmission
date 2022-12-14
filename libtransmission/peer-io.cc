@@ -160,7 +160,6 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->socket.is_tcp());
 
     /* Limit the input buffer to 256K, so it doesn't grow too large */
     tr_direction const dir = TR_DOWN;
@@ -220,7 +219,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
 // Helps us to ignore errors that say "try again later"
 // since that's what peer-io does by default anyway.
-[[nodiscard]] static auto constexpr canRetryFromError(int error_code)
+[[nodiscard]] static auto constexpr canRetryFromError(int error_code) noexcept
 {
     return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
 }
@@ -230,7 +229,6 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->socket.is_tcp());
 
     io->pendingEvents &= ~EV_WRITE;
 
@@ -801,16 +799,8 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t max)
     {
         if (!canRetryFromError(error->code))
         {
-            short const what = BEV_EVENT_READING | BEV_EVENT_ERROR | (n_read == 0 ? BEV_EVENT_EOF : 0);
-            auto const msg = fmt::format(
-                "tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})",
-                n_read,
-                what,
-                error->code,
-                error->message);
-            tr_logAddTraceIo(io, msg);
-
-            io->call_error_callback(what);
+            tr_logAddTraceIo(io, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error->code, error->message));
+            io->call_error_callback(BEV_EVENT_READING | BEV_EVENT_ERROR | (n_read == 0 ? BEV_EVENT_EOF : 0));
         }
 
         tr_error_clear(&error);
@@ -838,17 +828,8 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t max)
     {
         if (!canRetryFromError(error->code))
         {
-            short constexpr What = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
-            tr_logAddTraceIo(
-                io,
-                fmt::format(
-                    "tr_peerIoTryWrite err: res:{}, what:{}, errno:{} ({})",
-                    n_written,
-                    What,
-                    error->code,
-                    error->message));
-
-            io->call_error_callback(What);
+            tr_logAddTraceIo(io, fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error->code, error->message));
+            io->call_error_callback(BEV_EVENT_WRITING | BEV_EVENT_ERROR);
         }
 
         tr_error_clear(&error);
