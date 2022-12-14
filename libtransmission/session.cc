@@ -666,6 +666,11 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         addr_changed = true;
     }
 
+    if (auto const& val = new_settings.port_forwarding_enabled; force || val != old_settings.port_forwarding_enabled)
+    {
+        tr_sessionSetPortForwardingEnabled(this, val);
+    }
+
     if (port_changed)
     {
         port_forwarding_->localPortChanged();
