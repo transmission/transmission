@@ -204,7 +204,7 @@ public:
 
         // Being slightly late is fine,
         // and has the added benefit of adding some jitter.
-        auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int_weak(1000) };
+        auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int(1000) };
         periodic_timer_->startSingleShot(interval);
     }
 
@@ -323,8 +323,8 @@ private:
     {
         auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(info_hash));
         auto const rc = mediator_.api().search(dht_hash, port.host(), af, callback, this);
-        auto const announce_again_in_n_secs = rc < 0 ? 5s + std::chrono::seconds{ tr_rand_int_weak(5) } :
-                                                       25min + std::chrono::seconds{ tr_rand_int_weak(3 * 60) };
+        auto const announce_again_in_n_secs = rc < 0 ? 5s + std::chrono::seconds{ tr_rand_int(5) } :
+                                                       25min + std::chrono::seconds{ tr_rand_int(3 * 60) };
         return announce_again_in_n_secs;
     }
 
@@ -363,7 +363,7 @@ private:
 
         // Being slightly late is fine,
         // and has the added benefit of adding some jitter.
-        auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int_weak(1000) };
+        auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int(1000) };
         periodic_timer_->startSingleShot(interval);
     }
 

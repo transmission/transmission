@@ -95,6 +95,7 @@ static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
 {
     for (size_t i = 0; i < buffer_size; ++i)
     {
+        // my_rand is used to initialize tr_rand_buffer itself used by tr_rand_int, so we can only use tr_rand_int_weak here
         buffer[i] = tr_rand_int_weak(256);
     }
 

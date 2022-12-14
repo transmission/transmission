@@ -37,7 +37,7 @@ protected:
 
     auto makeRandomFiles(
         std::string_view top,
-        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int_weak(DefaultMaxFileCount))),
+        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int(DefaultMaxFileCount))),
         size_t max_size = DefaultMaxFileSize)
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
@@ -50,7 +50,7 @@ protected:
             // builder-to-metainfo comparisons here. tr_torrent_metainfo
             // will behave when BEP52 support is added in Transmission 5.
             static auto constexpr MinFileSize = size_t{ 1U };
-            payload.resize(std::max(MinFileSize, static_cast<size_t>(tr_rand_int_weak(max_size))));
+            payload.resize(std::max(MinFileSize, static_cast<size_t>(tr_rand_int(max_size))));
             tr_rand_buffer(std::data(payload), std::size(payload));
 
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };

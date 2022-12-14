@@ -12,7 +12,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // tr_rand_int_weak()
+#include "crypto-utils.h" // tr_rand_int()
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
@@ -153,7 +153,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
 static void reset_timer(tr_session* session)
 {
     auto interval = std::chrono::milliseconds{};
-    auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
+    auto const random_percent = tr_rand_int(1000) / 1000.0;
 
     if (session->allowsUTP())
     {

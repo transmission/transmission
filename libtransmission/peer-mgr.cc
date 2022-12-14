@@ -2176,7 +2176,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 
         if (auto const n = std::size(rand_pool); n != 0)
         {
-            auto* c = rand_pool[tr_rand_int_weak(n)];
+            auto* c = rand_pool[tr_rand_int(n)];
             c->is_choked = false;
             s->optimistic = c->msgs;
             s->optimistic_unchoke_time_scaler = OptimisticUnchokeMultiplier;
