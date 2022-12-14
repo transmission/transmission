@@ -155,6 +155,13 @@ static void canReadWrapper(tr_peerIo* io_in)
     }
 }
 
+// Helps us to ignore errors that say "try again later"
+// since that's what peer-io does by default anyway.
+[[nodiscard]] static auto constexpr canRetryFromError(int error_code) noexcept
+{
+    return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
+}
+
 static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
     auto* io = static_cast<tr_peerIo*>(vio);
@@ -198,30 +205,20 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
         }
         if (error != nullptr)
         {
-            if (error->code == EAGAIN || error->code == EINTR)
+            if (canRetryFromError(error->code))
             {
                 io->setEnabled(dir, true);
                 return;
             }
 
             what |= BEV_EVENT_ERROR;
-
-            tr_logAddDebugIo(
-                io,
-                fmt::format("event_read_cb err: res:{}, what:{}, errno:{} ({})", res, what, error->code, error->message));
+            tr_logAddDebugIo(io, fmt::format("event_read_cb err: res:{}, errno:{} ({})", res, error->code, error->message));
         }
 
         io->call_error_callback(what);
     }
 
     tr_error_clear(&error);
-}
-
-// Helps us to ignore errors that say "try again later"
-// since that's what peer-io does by default anyway.
-[[nodiscard]] static auto constexpr canRetryFromError(int error_code) noexcept
-{
-    return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
 }
 
 static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
@@ -371,30 +368,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
 {
     auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket));
 
-    if (io == nullptr)
-    {
-#ifdef TR_UTP_TRACE
-
-        if (args->callback_type != UTP_ON_STATE_CHANGE || args->u1.state != UTP_STATE_DESTROYING)
-        {
-            fmt::print(
-                stderr,
-                FMT_STRING("[µTP] [{}:{}] [{}] io is null! buf={}, len={}, flags={}, send/error_code/state={}, type={}\n"),
-                fmt::ptr(args->context),
-                fmt::ptr(args->socket),
-                utp_callback_names[args->callback_type],
-                fmt::ptr(args->buf),
-                args->len,
-                args->flags,
-                args->u1.send,
-                args->u2.type);
-        }
-
-#endif
-
-        return 0;
-    }
-
+    TR_ASSERT(io != nullptr);
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.handle.utp == args->socket);
 
@@ -842,11 +816,9 @@ size_t tr_peerIo::flush(tr_direction dir, size_t limit)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    auto const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
-    tr_logAddTraceIo(
-        this,
-        fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", static_cast<int>(dir), limit, bytes_used));
-    return bytes_used;
+    auto const n_used = dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
+    tr_logAddTraceIo(this, fmt::format("flush dir:{}, limit:{}, n_used:{}", static_cast<int>(dir), limit, n_used));
+    return n_used;
 }
 
 size_t tr_peerIo::flushOutgoingProtocolMsgs()
