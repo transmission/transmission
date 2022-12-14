@@ -227,7 +227,7 @@
                                         </subviews>
                                     </clipView>
                                     <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="280" id="Rsh-Sr-mv6"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="247" id="Rsh-Sr-mv6"/>
                                         <constraint firstAttribute="height" constant="58" id="WCB-XG-J3d"/>
                                     </constraints>
                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" controlSize="small" horizontal="YES" id="59">
@@ -447,7 +447,7 @@
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="trailing" secondItem="WMr-Dh-mdg" secondAttribute="trailing" priority="250" constant="218" id="BL5-hI-Rcy"/>
-                        <constraint firstAttribute="width" priority="250" constant="360" id="zSb-K0-Tyg"/>
+                        <constraint firstAttribute="width" priority="250" constant="330" id="zSb-K0-Tyg"/>
                     </constraints>
                     <visibilityPriorities>
                         <integer value="1000"/>

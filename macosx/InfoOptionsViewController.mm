@@ -62,7 +62,9 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 @property(nonatomic) IBOutlet NSStackView* fOptionsStackView;
 @property(nonatomic) IBOutlet NSView* fSeedingView;
-@property(nonatomic, readonly) CGFloat currentHeight;
+@property(nonatomic, readwrite) CGFloat oldHeight;
+@property(nonatomic, readwrite) CGFloat heightChange;
+@property(nonatomic, readwrite) CGFloat currentHeight;
 @property(nonatomic, readonly) CGFloat horizLayoutHeight;
 @property(nonatomic, readonly) CGFloat horizLayoutWidth;
 @property(nonatomic, readonly) CGFloat vertLayoutHeight;
@@ -83,6 +85,8 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 - (void)awakeFromNib
 {
+    [self checkWindowSize];
+
     [self setGlobalLabels];
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setGlobalLabels) name:@"UpdateGlobalOptions" object:nil];
@@ -94,11 +98,6 @@ static CGFloat const kStackViewSpacing = 8.0;
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
-- (CGFloat)currentHeight
-{
-    return NSHeight(self.view.frame);
 }
 
 - (CGFloat)horizLayoutHeight
@@ -116,27 +115,19 @@ static CGFloat const kStackViewSpacing = 8.0;
     return NSHeight(self.fPriorityView.frame) + NSHeight(self.fSeedingView.frame) + (2 * kStackViewInset) + kStackViewSpacing;
 }
 
-- (CGFloat)changeInWindowHeight
+- (void)updateOldHeight:(CGFloat)height
 {
-    CGFloat difference = 0;
+    self.oldHeight = height;
+}
 
-    if (NSWidth(self.view.window.frame) >= self.horizLayoutWidth + 1)
-    {
-        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
-        difference = NSHeight(self.view.frame) - self.horizLayoutHeight;
-    }
-    else
-    {
-        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
-        difference = NSHeight(self.view.frame) - self.vertLayoutHeight;
-    }
-
-    return difference;
+- (CGFloat)heightChange
+{
+    return self.oldHeight - self.currentHeight;
 }
 
 - (NSRect)viewRect
 {
-    CGFloat difference = self.changeInWindowHeight;
+    CGFloat difference = self.heightChange;
 
     NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
     if (difference != 0)
@@ -148,12 +139,40 @@ static CGFloat const kStackViewSpacing = 8.0;
     return viewRect;
 }
 
+- (void)checkLayout
+{
+    if (NSWidth(self.view.window.frame) >= self.horizLayoutWidth + 1)
+    {
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+        self.currentHeight = self.horizLayoutHeight;
+    }
+    else
+    {
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+        self.currentHeight = self.vertLayoutHeight;
+    }
+}
+
+- (void)checkWindowSize
+{
+    self.oldHeight = self.currentHeight;
+
+    [self checkLayout];
+
+    if (self.oldHeight != self.currentHeight)
+    {
+        [self updateWindowLayout];
+    }
+}
+
 - (void)updateWindowLayout
 {
-    CGFloat difference = self.changeInWindowHeight;
-
-    if (difference != 0)
+    if (self.currentHeight != 0)
     {
+        [self checkLayout];
+
+        CGFloat difference = self.heightChange;
+
         NSRect windowRect = self.view.window.frame;
         windowRect.origin.y += difference;
         windowRect.size.height -= difference;

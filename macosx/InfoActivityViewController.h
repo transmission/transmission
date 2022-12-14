@@ -8,7 +8,10 @@
 
 @interface InfoActivityViewController : NSViewController<InfoViewController>
 
+- (void)updateOldHeight:(CGFloat)height;
 - (NSRect)viewRect;
+- (void)checkLayout;
+- (void)checkWindowSize;
 - (void)updateWindowLayout;
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
