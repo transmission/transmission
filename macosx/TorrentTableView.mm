@@ -156,7 +156,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)saveCollapsedGroups
 {
-    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups] forKey:@"CollapsedGroupIndexes"];
+    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups requiringSecureCoding:YES error:nil]
+                       forKey:@"CollapsedGroupIndexes"];
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item

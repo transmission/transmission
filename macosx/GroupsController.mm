@@ -356,7 +356,9 @@ GroupsController* fGroupsInstance = nil;
         [groups addObject:tempDict];
     }
 
-    [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups] forKey:@"GroupDicts"];
+    [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups requiringSecureCoding:YES
+                                                                                         error:nil]
+                                            forKey:@"GroupDicts"];
 }
 
 - (NSImage*)imageForGroupNone
