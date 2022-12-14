@@ -887,6 +887,8 @@ std::string_view tr_handshake::state_string(State state) noexcept
     case State::AwaitingPadD:
         return "awaiting pad d";
     }
+
+    return "unknown state";
 }
 
 uint32_t tr_handshake::crypto_provide() const noexcept

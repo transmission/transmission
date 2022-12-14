@@ -129,7 +129,7 @@ private:
 
     ParseResult parse_handshake(tr_peerIo* peer_io);
 
-    constexpr void set_peer_id(tr_peer_id_t const& id) noexcept
+    void set_peer_id(tr_peer_id_t const& id) noexcept
     {
         peer_id_ = id;
     }
