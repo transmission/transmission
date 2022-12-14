@@ -121,23 +121,30 @@ $ sudo make install
 
 ## On Windows ##
 
-### Building transmission-daemon
+### Prerequisites
 You need the following installed:
 
-* Visual Studio 2019 or greater (the Community Edition is sufficient - just make sure its C++ compiler, MSVC, is installed)
+* [Visual Studio 2019 or greater](https://visualstudio.microsoft.com/downloads/) (the Community Edition is sufficient)
+    * install the "Desktop Development with C++" workload
+    * install the ATL and MFC components (only needed by the Qt client)
 * [CMake](https://cmake.org/download/) (choose to add CMake to your path)
 * [Git for Windows](https://git-scm.com/download/win)
 * [Vcpkg](https://github.com/microsoft/vcpkg#quick-start-windows)
 * [Python](https://python.org/downloads)
 
 
-### Install all dependencies through vcpkg
+### Install dependencies through vcpkg
 
+Vcpkg will install x86 libraries by default. To install x64 add the `--triplet=x64-windows` flag at the end of the commands below.
+
+Common dependencies:
 ```
-vcpkg integrate install
-vcpkg install curl
-vcpkg install zlib
-vcpkg install openssl
+vcpkg install curl zlib openssl
+```
+
+Additional dependencies for the Qt client:
+```
+vcpkg install qt5-tools qt5-winextras
 ```
 
 ### Get Transmission source and build it
