@@ -803,57 +803,41 @@ void tr_peerIo::readBufferDrain(size_t byte_count)
 ****
 ***/
 
-static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
+static size_t tr_peerIoTryRead(tr_peerIo* io, size_t max)
 {
-    auto n_read = size_t{ 0U };
-
-    howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
-    if (howmuch == 0)
+    max = io->bandwidth().clamp(TR_DOWN, max);
+    if (max == 0)
     {
-        return n_read;
+        return {};
     }
 
-    TR_ASSERT(io->socket.is_valid());
-    if (io->socket.is_tcp())
+    auto& buf = io->inbuf;
+    tr_error* error = nullptr;
+    auto const n_read = io->socket.try_read(buf, max, &error);
+
+    if (!std::empty(buf))
     {
-        tr_error* my_error = nullptr;
-        n_read = io->inbuf.addSocket(io->socket.handle.tcp, howmuch, &my_error);
-        if (io->readBufferSize() != 0)
-        {
-            canReadWrapper(io);
-        }
-
-        if (my_error != nullptr)
-        {
-            if (!canRetryFromError(my_error->code))
-            {
-                short const what = BEV_EVENT_READING | BEV_EVENT_ERROR | (n_read == 0 ? BEV_EVENT_EOF : 0);
-                auto const msg = fmt::format(
-                    "tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})",
-                    n_read,
-                    what,
-                    my_error->code,
-                    my_error->message);
-                tr_logAddTraceIo(io, msg);
-
-                io->call_error_callback(what);
-            }
-
-            tr_error_clear(&my_error);
-        }
+        canReadWrapper(io);
     }
-#ifdef WITH_UTP
-    else if (io->socket.is_utp())
+
+    if (error != nullptr)
     {
-        // UTP_RBDrained notifies libutp that your read buffer is empty.
-        // It opens up the congestion window by sending an ACK (soonish)
-        // if one was not going to be sent.
-        if (io->readBufferSize() == 0)
+        if (!canRetryFromError(error->code))
         {
-            utp_read_drained(io->socket.handle.utp);
+            short const what = BEV_EVENT_READING | BEV_EVENT_ERROR | (n_read == 0 ? BEV_EVENT_EOF : 0);
+            auto const msg = fmt::format(
+                "tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})",
+                n_read,
+                what,
+                error->code,
+                error->message);
+            tr_logAddTraceIo(io, msg);
+
+            io->call_error_callback(what);
         }
+
+        tr_error_clear(&error);
     }
-#endif
 
     return n_read;
 }
