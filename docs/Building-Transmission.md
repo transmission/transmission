@@ -128,6 +128,7 @@ You need the following installed:
 * [CMake](https://cmake.org/download/) (choose to add CMake to your path)
 * [Git for Windows](https://git-scm.com/download/win)
 * [Vcpkg](https://github.com/microsoft/vcpkg#quick-start-windows)
+* [Python](https://python.org/downloads)
 
 
 ### Install all dependencies through vcpkg
