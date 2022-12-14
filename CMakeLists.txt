@@ -4,10 +4,13 @@ if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
 
+# Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
+set(MACOS_SUPPORT_MINIMUM 10.13)
+
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X version to target for deployment" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_SUPPORT_MINIMUM} CACHE STRING "Minimum macOS version to target for deployment" FORCE)
 endif()
 
 project(transmission)

@@ -266,14 +266,14 @@ TEST(Crypto, base64)
         auto buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += static_cast<char>(tr_rand_int_weak(256));
+            buf += static_cast<char>(tr_rand_int(256));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
 
         buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += static_cast<char>(1 + tr_rand_int_weak(255));
+            buf += static_cast<char>(1 + tr_rand_int(255));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
     }

@@ -27,7 +27,7 @@
 #include "announce-list.h"
 #include "announcer-common.h"
 #include "announcer.h"
-#include "crypto-utils.h" /* tr_rand_int(), tr_rand_int_weak() */
+#include "crypto-utils.h" /* tr_rand_int() */
 #include "log.h"
 #include "session.h"
 #include "timer.h"
@@ -303,19 +303,19 @@ struct tr_tracker
             return 20;
 
         case 2:
-            return tr_rand_int_weak(60) + 60 * 5;
+            return tr_rand_int(60) + 60 * 5;
 
         case 3:
-            return tr_rand_int_weak(60) + 60 * 15;
+            return tr_rand_int(60) + 60 * 15;
 
         case 4:
-            return tr_rand_int_weak(60) + 60 * 30;
+            return tr_rand_int(60) + 60 * 30;
 
         case 5:
-            return tr_rand_int_weak(60) + 60 * 60;
+            return tr_rand_int(60) + 60 * 60;
 
         default:
-            return tr_rand_int_weak(60) + 60 * 120;
+            return tr_rand_int(60) + 60 * 120;
         }
     }
 
