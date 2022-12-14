@@ -67,7 +67,7 @@ void tr_peer_socket::close(tr_session* session)
 
 size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error)
 {
-    if (max == 0)
+    if (max == size_t{})
     {
         return {};
     }
@@ -94,6 +94,33 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error)
         if (n < 0 && error_code != 0)
         {
             tr_error_set(error, error_code, tr_strerror(error_code));
+        }
+    }
+#endif
+
+    return {};
+}
+
+size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error)
+{
+    if (max == size_t{})
+    {
+        return {};
+    }
+
+    if (is_tcp())
+    {
+        return buf.addSocket(handle.tcp, max, error);
+    }
+#ifdef WITH_UTP
+    else if (is_utp())
+    {
+        // utp_read_drained() notifies libutp that this read buffer is
+        // empty.  It opens up the congestion window by sending an ACK
+        // (soonish) if one was not going to be sent.
+        if (std::empty(buf))
+        {
+            utp_read_drained(handle.utp);
         }
     }
 #endif
