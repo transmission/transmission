@@ -7,6 +7,7 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
+#include <climits>
 #include <string_view>
 #include <utility>
 
@@ -14,6 +15,7 @@
 
 #include "transmission.h"
 
+#include "bitfield.h"
 #include "clients.h"
 #include "crypto-utils.h"
 #include "handshake.h"
@@ -23,42 +25,6 @@
 #include "tr-assert.h"
 #include "tr-buffer.h"
 #include "utils.h"
-
-// https://www.bittorrent.org/beps/bep_0004.html
-// reserved[5] 0x10  LTEP (Libtorrent Extension Protocol)
-// reserved[7] 0x01  BitTorrent DHT
-// reserved[7] 0x04  suggest, haveall, havenone, reject request, and allow fast extensions
-
-/* enable LibTransmission extension protocol */
-#define ENABLE_LTEP
-/* fast extensions */
-#define ENABLE_FAST
-/* DHT */
-#define ENABLE_DHT
-
-#ifdef ENABLE_LTEP
-#define HANDSHAKE_HAS_LTEP(bits) (((bits)[5] & 0x10) != 0)
-#define HANDSHAKE_SET_LTEP(bits) ((bits)[5] |= 0x10)
-#else
-#define HANDSHAKE_HAS_LTEP(bits) (false)
-#define HANDSHAKE_SET_LTEP(bits) ((void)0)
-#endif
-
-#ifdef ENABLE_FAST
-#define HANDSHAKE_HAS_FASTEXT(bits) (((bits)[7] & 0x04) != 0)
-#define HANDSHAKE_SET_FASTEXT(bits) ((bits)[7] |= 0x04)
-#else
-#define HANDSHAKE_HAS_FASTEXT(bits) (false)
-#define HANDSHAKE_SET_FASTEXT(bits) ((void)0)
-#endif
-
-#ifdef ENABLE_DHT
-#define HANDSHAKE_HAS_DHT(bits) (((bits)[7] & 0x01) != 0)
-#define HANDSHAKE_SET_DHT(bits) ((bits)[7] |= 0x01)
-#else
-#define HANDSHAKE_HAS_DHT(bits) (false)
-#define HANDSHAKE_SET_DHT(bits) ((void)0)
-#endif
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
@@ -76,29 +42,22 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
         return false;
     }
 
-    uint8_t* walk = buf;
-
-    walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(HandshakeName)), std::size(HandshakeName), walk);
-
-    std::fill_n(walk, HandshakeFlagsLen, 0);
-    HANDSHAKE_SET_LTEP(walk);
-    HANDSHAKE_SET_FASTEXT(walk);
-    /* Note that this doesn't depend on whether the torrent is private.
-     * We don't accept DHT peers for a private torrent,
-     * but we participate in the DHT regardless. */
+    auto flags = tr_bitfield{ HandshakeFlagsBits };
+    flags.set(LtepFlag);
+    flags.set(FextFlag);
     if (mediator_->allows_dht())
     {
-        HANDSHAKE_SET_DHT(walk);
+        flags.set(DhtFlag);
     }
-    walk += HandshakeFlagsLen;
+    auto const flag_bytes = flags.raw();
 
+    auto* walk = buf;
+    walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(HandshakeName)), std::size(HandshakeName), walk);
+    walk = std::copy(std::begin(flag_bytes), std::end(flag_bytes), walk);
     walk = std::copy_n(reinterpret_cast<char const*>(std::data(info_hash)), std::size(info_hash), walk);
-    [[maybe_unused]] auto const* const walk_end = std::copy(
-        std::begin(info->client_peer_id),
-        std::end(info->client_peer_id),
-        walk);
+    walk = std::copy(std::begin(info->client_peer_id), std::end(info->client_peer_id), walk);
+    TR_ASSERT(walk - buf == HandshakeSize);
 
-    TR_ASSERT(walk_end - buf == HandshakeSize);
     return true;
 }
 
@@ -120,8 +79,13 @@ tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
     }
 
     /* read the reserved bytes */
-    auto reserved = std::array<uint8_t, HandshakeFlagsLen>{};
+    auto flags = tr_bitfield{ HandshakeFlagsBits };
+    auto reserved = std::array<uint8_t, HandshakeFlagsBytes>{};
     peer_io->readBytes(std::data(reserved), std::size(reserved));
+    flags.setRaw(std::data(reserved), std::size(reserved));
+    peer_io->enableDHT(flags.test(DhtFlag));
+    peer_io->enableLTEP(flags.test(LtepFlag));
+    peer_io->enableFEXT(flags.test(FextFlag));
 
     // torrent hash
     auto info_hash = tr_sha1_digest_t{};
@@ -146,11 +110,6 @@ tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
         tr_logAddTraceHand(this, "streuth!  we've connected to ourselves.");
         return ParseResult::PeerIsSelf;
     }
-
-    // extensions
-    peer_io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
-    peer_io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
-    peer_io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
 
     return ParseResult::Ok;
 }
@@ -409,17 +368,14 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
         return done(false);
     }
 
-    /* reserved bytes */
-    auto reserved = std::array<uint8_t, HandshakeFlagsLen>{};
+    // reserved bytes / flags
+    auto reserved = std::array<uint8_t, HandshakeFlagsBytes>{};
+    auto flags = tr_bitfield{ HandshakeFlagsBits };
     peer_io->readBytes(std::data(reserved), std::size(reserved));
-
-    /**
-    *** Extensions
-    **/
-
-    peer_io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
-    peer_io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
-    peer_io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
+    flags.setRaw(std::data(reserved), std::size(reserved));
+    peer_io->enableDHT(flags.test(DhtFlag));
+    peer_io->enableLTEP(flags.test(LtepFlag));
+    peer_io->enableFEXT(flags.test(FextFlag));
 
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};

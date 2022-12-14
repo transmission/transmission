@@ -202,10 +202,18 @@ private:
         std::byte{ 't' }, std::byte{ ' ' }, std::byte{ 'p' }, std::byte{ 'r' }, std::byte{ 'o' },
         std::byte{ 't' }, std::byte{ 'o' }, std::byte{ 'c' }, std::byte{ 'o' }, std::byte{ 'l' }
     };
+
     // [Next comes] eight reserved bytes [used for enabling ltep, dht, fext]
-    static auto constexpr HandshakeFlagsLen = size_t{ 8 };
+    static auto constexpr HandshakeFlagsBytes = size_t{ 8 };
+    static auto constexpr HandshakeFlagsBits = size_t{ 64 };
+    // https://www.bittorrent.org/beps/bep_0004.html
+    // https://wiki.theory.org/BitTorrentSpecification#Reserved_Bytes
+    static auto constexpr LtepFlag = size_t{ 43U };
+    static auto constexpr FextFlag = size_t{ 61U };
+    static auto constexpr DhtFlag = size_t{ 63U };
+
     // Next comes the 20 byte sha1 info_hash and the 20-byte peer_id
-    static auto constexpr HandshakeSize = sizeof(HandshakeName) + HandshakeFlagsLen + sizeof(tr_sha1_digest_t) +
+    static auto constexpr HandshakeSize = sizeof(HandshakeName) + HandshakeFlagsBytes + sizeof(tr_sha1_digest_t) +
         sizeof(tr_peer_id_t);
     static_assert(HandshakeSize == 68);
 
@@ -214,7 +222,7 @@ private:
     // > the recipient must respond as soon as it sees the info_hash part
     // > of the handshake (the peer id will presumably be sent after the
     // > recipient sends its own handshake).
-    static auto constexpr IncomingHandshakeLen = sizeof(HandshakeName) + HandshakeFlagsLen + sizeof(tr_sha1_digest_t);
+    static auto constexpr IncomingHandshakeLen = sizeof(HandshakeName) + HandshakeFlagsBytes + sizeof(tr_sha1_digest_t);
     static_assert(IncomingHandshakeLen == 48);
 
     // MSE constants.
