@@ -803,7 +803,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             handshake->mediator_->set_utp_failed(info_hash, io->address());
         }
 
-        if (handshake->mediator_->allows_tcp() && io->reconnect() == 0)
+        if (handshake->mediator_->allows_tcp() && io->reconnect())
         {
             auto msg = std::array<uint8_t, HandshakeSize>{};
             handshake->build_handshake_message(io, std::data(msg));

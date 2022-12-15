@@ -577,7 +577,7 @@ void tr_peerIo::clear()
     io_close_socket(this);
 }
 
-int tr_peerIo::reconnect()
+bool tr_peerIo::reconnect()
 {
     TR_ASSERT(tr_isPeerIo(this));
     TR_ASSERT(!this->isIncoming());
@@ -593,7 +593,7 @@ int tr_peerIo::reconnect()
 
     if (!this->socket.is_tcp())
     {
-        return -1;
+        return false;
     }
 
     this->event_read.reset(event_new(session->eventBase(), this->socket.handle.tcp, EV_READ, event_read_cb, this));
@@ -601,7 +601,7 @@ int tr_peerIo::reconnect()
 
     event_enable(this, pending_events);
 
-    return 0;
+    return true;
 }
 
 /**
