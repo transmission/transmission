@@ -47,8 +47,6 @@ enum ReadState
     READ_ERR
 };
 
-auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
-
 namespace libtransmission::test
 {
 
