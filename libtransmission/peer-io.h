@@ -98,7 +98,7 @@ public:
     void readUint16(uint16_t* setme);
     void readUint32(uint32_t* setme);
 
-    int reconnect();
+    [[nodiscard]] bool reconnect();
 
     void setEnabled(tr_direction dir, bool is_enabled);
 
