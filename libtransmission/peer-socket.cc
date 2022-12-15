@@ -65,7 +65,7 @@ void tr_peer_socket::close(tr_session* session)
     handle = {};
 }
 
-size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error)
+size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) const
 {
     if (max == size_t{})
     {
@@ -76,8 +76,9 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error)
     {
         return buf.toSocket(handle.tcp, max, error);
     }
+
 #ifdef WITH_UTP
-    else if (is_utp())
+    if (is_utp())
     {
         auto iov = buf.vecs(max);
 
@@ -101,7 +102,7 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error)
     return {};
 }
 
-size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error)
+size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error) const
 {
     if (max == size_t{})
     {
@@ -112,8 +113,9 @@ size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error)
     {
         return buf.addSocket(handle.tcp, max, error);
     }
+
 #ifdef WITH_UTP
-    else if (is_utp())
+    if (is_utp())
     {
         // utp_read_drained() notifies libutp that this read buffer is
         // empty.  It opens up the congestion window by sending an ACK

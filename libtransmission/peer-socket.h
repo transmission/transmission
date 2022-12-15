@@ -39,8 +39,8 @@ public:
 
     void close(tr_session* session);
 
-    size_t try_write(Buffer& buf, size_t max, tr_error** error);
-    size_t try_read(Buffer& buf, size_t max, tr_error** error);
+    size_t try_write(Buffer& buf, size_t max, tr_error** error) const;
+    size_t try_read(Buffer& buf, size_t max, tr_error** error) const;
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
     {
