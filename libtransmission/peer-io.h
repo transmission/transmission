@@ -31,7 +31,6 @@
 #include "tr-buffer.h"
 #include "utils-ev.h"
 
-class tr_peerIo;
 struct tr_bandwidth;
 struct struct_utp_context;
 
