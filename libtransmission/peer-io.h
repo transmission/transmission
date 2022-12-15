@@ -237,17 +237,14 @@ public:
         return priority_;
     }
 
+    [[nodiscard]] constexpr auto is_encrypted() const noexcept
+    {
+        return filter_.is_active();
+    }
+
     constexpr void set_priority(tr_priority_t priority)
     {
         priority_ = priority;
-    }
-
-    void call_error_callback(tr_error const& error)
-    {
-        if (got_error_ != nullptr)
-        {
-            got_error_(this, error, user_data_);
-        }
     }
 
     void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
@@ -265,28 +262,30 @@ public:
         filter_.encryptInit(is_incoming, dh, info_hash);
     }
 
+    static void utp_init(struct_utp_context* ctx);
+
+private:
+    static constexpr auto RcvBuf = size_t{ 256 * 1024 };
+
+    friend class libtransmission::test::HandshakeTest;
+
+    void call_error_callback(tr_error const& error)
+    {
+        if (got_error_ != nullptr)
+        {
+            got_error_(this, error, user_data_);
+        }
+    }
+
     void encrypt(size_t buflen, void* buf)
     {
         filter_.encrypt(buflen, buf);
     }
 
-    [[nodiscard]] bool isEncrypted() const noexcept
-    {
-        return filter_.is_active();
-    }
-
-    static void utpInit(struct_utp_context* ctx);
-
     void on_utp_state_change(int new_state);
     void on_utp_error(int errcode);
-    void can_read_wrapper();
-
-private:
-    static constexpr auto RcvBuf = size_t{ 256 * 1024 };
 
     void close();
-
-    friend class libtransmission::test::HandshakeTest;
 
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
     static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
@@ -294,6 +293,7 @@ private:
     void event_enable(short event);
     void event_disable(short event);
 
+    void can_read_wrapper();
     void did_write_wrapper(size_t bytes_transferred);
 
     size_t try_read(size_t max);

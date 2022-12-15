@@ -296,7 +296,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     return io;
 }
 
-void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
+void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
 {
 #ifdef WITH_UTP
     utp_context_set_option(ctx, UTP_RCVBUF, RcvBuf);
@@ -638,7 +638,7 @@ void tr_peerIo::readBytes(void* bytes, size_t byte_count)
 
     inbuf_.toBuf(bytes, byte_count);
 
-    if (isEncrypted())
+    if (is_encrypted())
     {
         decrypt(byte_count, bytes);
     }
