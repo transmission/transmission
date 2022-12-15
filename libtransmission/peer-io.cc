@@ -246,9 +246,9 @@ tr_peerIo::tr_peerIo(
     bool is_incoming,
     bool is_seed,
     tr_bandwidth* parent_bandwidth)
-    : session_{ session }
-    , bandwidth_{ parent_bandwidth }
+    : bandwidth_{ parent_bandwidth }
     , info_hash_{ info_hash != nullptr ? *info_hash : tr_sha1_digest_t{} }
+    , session_{ session }
     , is_seed_{ is_seed }
     , is_incoming_{ is_incoming }
 {
