@@ -788,7 +788,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 {
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    if (io->socket.is_utp() && !io->isIncoming() && handshake->is_state(State::AwaitingYb))
+    if (io->is_utp() && !io->isIncoming() && handshake->is_state(State::AwaitingYb))
     {
         // the peer probably doesn't speak µTP.
 
@@ -815,7 +815,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
     if ((handshake->is_state(State::AwaitingYb) || handshake->is_state(State::AwaitingVc)) &&
-        handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect() == 0)
+        handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect())
     {
         auto msg = std::array<uint8_t, HandshakeSize>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");

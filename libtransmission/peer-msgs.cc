@@ -374,7 +374,7 @@ public:
 
     [[nodiscard]] bool is_utp_connection() const noexcept override
     {
-        return io->socket.is_utp();
+        return io->is_utp();
     }
 
     [[nodiscard]] bool is_encrypted() const override
@@ -872,7 +872,7 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
     auto& out = msgs->outMessages;
-    auto const ipv6 = tr_globalIPv6(msgs->io->session);
+    auto const ipv6 = tr_globalIPv6(msgs->session);
     static tr_quark version_quark = 0;
 
     if (msgs->clientSentLtepHandshake)
@@ -1808,7 +1808,7 @@ static int clientGotBlock(
     return 0;
 }
 
-static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs)
+static void didWrite(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
     auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 

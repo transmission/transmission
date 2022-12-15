@@ -1143,7 +1143,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
 
         /* In principle, this flag specifies whether the peer groks µTP,
            not whether it's currently connected over µTP. */
-        if (result.io->socket.is_utp())
+        if (result.io->is_utp())
         {
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
