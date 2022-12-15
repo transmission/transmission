@@ -239,50 +239,6 @@ void tr_peerIo::on_utp_error(int errcode)
     }
 }
 
-static uint64 utp_callback(utp_callback_arguments* args)
-{
-    auto const type = args->callback_type;
-
-    // utp_close() code comment: "Data will keep to try being delivered after the close."
-    // That comes through this callback, so it's possible for `io` to be nullptr here.
-    auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket));
-    if (io == nullptr)
-    {
-        return {};
-    }
-
-    switch (type)
-    {
-    case UTP_ON_READ:
-        io->inbuf.add(args->buf, args->len);
-        io->setEnabled(TR_DOWN, true);
-        io->can_read_wrapper();
-        break;
-
-    case UTP_GET_READ_BUFFER_SIZE:
-        return std::size(io->inbuf);
-
-    case UTP_ON_STATE_CHANGE:
-        io->on_utp_state_change(args->u1.state);
-        break;
-
-    case UTP_ON_ERROR:
-        io->on_utp_error(args->u1.error_code);
-        break;
-
-    case UTP_ON_OVERHEAD_STATISTICS:
-        tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
-        io->bandwidth().notifyBandwidthConsumed(args->u1.send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
-        break;
-
-    default:
-        TR_ASSERT_MSG(false, utp_callback_names[type]);
-        break;
-    }
-
-    return {};
-}
-
 #endif /* #ifdef WITH_UTP */
 
 tr_peerIo::tr_peerIo(
@@ -344,13 +300,73 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 {
 #ifdef WITH_UTP
-    utp_set_callback(ctx, UTP_GET_READ_BUFFER_SIZE, &utp_callback);
-    utp_set_callback(ctx, UTP_ON_ERROR, &utp_callback);
-    utp_set_callback(ctx, UTP_ON_OVERHEAD_STATISTICS, &utp_callback);
-    utp_set_callback(ctx, UTP_ON_READ, &utp_callback);
-    utp_set_callback(ctx, UTP_ON_STATE_CHANGE, &utp_callback);
-
     utp_context_set_option(ctx, UTP_RCVBUF, RcvBuf);
+
+    // note: all the callback handlers here need to check `userdata` for nullptr
+    // because libutp can fire callbacks on a socket after utp_close() is called
+
+    utp_set_callback(
+        ctx,
+        UTP_ON_READ,
+        [](utp_callback_arguments* args) -> uint64
+        {
+            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            {
+                io->inbuf.add(args->buf, args->len);
+                io->setEnabled(TR_DOWN, true);
+                io->can_read_wrapper();
+            }
+            return {};
+        });
+
+    utp_set_callback(
+        ctx,
+        UTP_GET_READ_BUFFER_SIZE,
+        [](utp_callback_arguments* args) -> uint64
+        {
+            if (auto const* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            {
+                return std::size(io->inbuf);
+            }
+            return {};
+        });
+
+    utp_set_callback(
+        ctx,
+        UTP_ON_ERROR,
+        [](utp_callback_arguments* args) -> uint64
+        {
+            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            {
+                io->on_utp_error(args->u1.error_code);
+            }
+            return {};
+        });
+
+    utp_set_callback(
+        ctx,
+        UTP_ON_OVERHEAD_STATISTICS,
+        [](utp_callback_arguments* args) -> uint64
+        {
+            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            {
+                tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
+                io->bandwidth().notifyBandwidthConsumed(args->u1.send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
+            }
+            return {};
+        });
+
+    utp_set_callback(
+        ctx,
+        UTP_ON_STATE_CHANGE,
+        [](utp_callback_arguments* args) -> uint64
+        {
+            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            {
+                io->on_utp_state_change(args->u1.state);
+            }
+            return {};
+        });
 #endif
 }
 
