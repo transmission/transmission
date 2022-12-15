@@ -8,7 +8,6 @@
 
 @interface InfoActivityViewController : NSViewController<InfoViewController>
 
-- (void)updateOldHeight:(CGFloat)height;
 - (NSRect)viewRect;
 - (void)checkLayout;
 - (void)checkWindowSize;
@@ -22,5 +21,6 @@
 - (void)clearView;
 
 @property(nonatomic) IBOutlet NSView* fTransferView;
+@property(nonatomic) CGFloat oldHeight;
 
 @end

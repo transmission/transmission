@@ -8,7 +8,6 @@
 
 @interface InfoOptionsViewController : NSViewController<InfoViewController>
 
-- (void)updateOldHeight:(CGFloat)height;
 - (NSRect)viewRect;
 - (void)checkLayout;
 - (void)checkWindowSize;
@@ -35,5 +34,6 @@
 - (IBAction)setPeersConnectLimit:(id)sender;
 
 @property(nonatomic) IBOutlet NSView* fPriorityView;
+@property(nonatomic) CGFloat oldHeight;
 
 @end
