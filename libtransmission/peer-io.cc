@@ -51,52 +51,50 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 ****
 ***/
 
-static void didWriteWrapper(tr_peerIo* io, size_t bytes_transferred)
+void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 {
-    while (bytes_transferred != 0 && !std::empty(io->outbuf_info))
+    auto const keep_alive = shared_from_this();
+
+    while (bytes_transferred != 0 && !std::empty(outbuf_info))
     {
-        auto& [n_bytes_left, is_piece_data] = io->outbuf_info.front();
+        auto& [n_bytes_left, is_piece_data] = outbuf_info.front();
 
         size_t const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
         /* For µTP sockets, the overhead is computed in utp_on_overhead. */
-        size_t const overhead = io->socket.guess_packet_overhead(payload);
+        size_t const overhead = socket.guess_packet_overhead(payload);
         uint64_t const now = tr_time_msec();
 
-        io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);
+        bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);
 
         if (overhead > 0)
         {
-            io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
+            bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
         }
 
-        if (io->didWrite != nullptr)
+        if (didWrite != nullptr)
         {
-            io->didWrite(io, payload, is_piece_data, io->userData);
+            didWrite(this, payload, is_piece_data, userData);
         }
 
         bytes_transferred -= payload;
         n_bytes_left -= payload;
         if (n_bytes_left == 0)
         {
-            io->outbuf_info.pop_front();
+            outbuf_info.pop_front();
         }
     }
 }
 
-static void canReadWrapper(tr_peerIo* io_in)
+void tr_peerIo::can_read_wrapper()
 {
-    auto const io = io_in->shared_from_this();
-    tr_logAddTraceIo(io, "canRead");
-
-    tr_session const* const session = io->session;
-
     /* try to consume the input buffer */
-    if (io->canRead == nullptr)
+    if (!canRead)
     {
         return;
     }
 
     auto const lock = session->unique_lock();
+    auto const keep_alive = shared_from_this();
 
     auto const now = tr_time_msec();
     auto done = bool{ false };
@@ -105,33 +103,33 @@ static void canReadWrapper(tr_peerIo* io_in)
     while (!done && !err)
     {
         size_t piece = 0;
-        auto const old_len = io->readBufferSize();
-        auto const read_state = io->canRead == nullptr ? READ_ERR : io->canRead(io.get(), io->userData, &piece);
-        auto const used = old_len - io->readBufferSize();
-        auto const overhead = io->socket.guess_packet_overhead(used);
+        auto const old_len = readBufferSize();
+        auto const read_state = canRead ? canRead(this, userData, &piece) : READ_ERR;
+        auto const used = old_len - readBufferSize();
+        auto const overhead = socket.guess_packet_overhead(used);
 
         if (piece != 0 || piece != used)
         {
             if (piece != 0)
             {
-                io->bandwidth().notifyBandwidthConsumed(TR_DOWN, piece, true, now);
+                bandwidth().notifyBandwidthConsumed(TR_DOWN, piece, true, now);
             }
 
             if (used != piece)
             {
-                io->bandwidth().notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
+                bandwidth().notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
             }
         }
 
         if (overhead > 0)
         {
-            io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
+            bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
         }
 
         switch (read_state)
         {
         case READ_NOW:
-            if (io->readBufferSize() != 0)
+            if (readBufferSize() != 0)
             {
                 continue;
             }
@@ -201,7 +199,7 @@ void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
 {
     inbuf.add(data, n_bytes);
     setEnabled(TR_DOWN, true);
-    canReadWrapper(this);
+    can_read_wrapper();
 }
 
 static size_t utp_get_rb_size(tr_peerIo* const io)
@@ -728,7 +726,7 @@ size_t tr_peerIo::try_read(size_t max)
     }
     else if (!std::empty(buf))
     {
-        canReadWrapper(this);
+        can_read_wrapper();
     }
 
     return n_read;
@@ -771,7 +769,7 @@ size_t tr_peerIo::try_write(size_t max)
     }
     else if (n_written > 0U)
     {
-        didWriteWrapper(this, n_written);
+        did_write_wrapper(n_written);
     }
 
     return n_written;

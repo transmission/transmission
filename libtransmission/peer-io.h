@@ -295,6 +295,9 @@ private:
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
     static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
 
+    void can_read_wrapper();
+    void did_write_wrapper(size_t bytes_transferred);
+
     size_t try_read(size_t max);
     size_t try_write(size_t max);
 
