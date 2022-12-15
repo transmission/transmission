@@ -690,8 +690,6 @@ ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
 
 ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
 {
-    TR_ASSERT(tr_isPeerIo(peer_io));
-
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
     bool ready_for_more = true;
