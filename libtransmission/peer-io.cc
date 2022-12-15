@@ -435,67 +435,67 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
 ****
 ***/
 
-static void event_enable(tr_peerIo* io, short event)
+void tr_peerIo::event_enable(short event)
 {
-    TR_ASSERT(io->session != nullptr);
+    TR_ASSERT(session != nullptr);
 
-    bool const need_events = io->socket.is_tcp();
-    TR_ASSERT(!need_events || io->event_read);
-    TR_ASSERT(!need_events || io->event_write);
+    bool const need_events = socket.is_tcp();
+    TR_ASSERT(!need_events || event_read);
+    TR_ASSERT(!need_events || event_write);
 
-    if ((event & EV_READ) != 0 && (io->pendingEvents & EV_READ) == 0)
+    if ((event & EV_READ) != 0 && (pendingEvents & EV_READ) == 0)
     {
-        tr_logAddTraceIo(io, "enabling ready-to-read polling");
+        tr_logAddTraceIo(this, "enabling ready-to-read polling");
 
         if (need_events)
         {
-            event_add(io->event_read.get(), nullptr);
+            event_add(event_read.get(), nullptr);
         }
 
-        io->pendingEvents |= EV_READ;
+        pendingEvents |= EV_READ;
     }
 
-    if ((event & EV_WRITE) != 0 && (io->pendingEvents & EV_WRITE) == 0)
+    if ((event & EV_WRITE) != 0 && (pendingEvents & EV_WRITE) == 0)
     {
-        tr_logAddTraceIo(io, "enabling ready-to-write polling");
+        tr_logAddTraceIo(this, "enabling ready-to-write polling");
 
         if (need_events)
         {
-            event_add(io->event_write.get(), nullptr);
+            event_add(event_write.get(), nullptr);
         }
 
-        io->pendingEvents |= EV_WRITE;
+        pendingEvents |= EV_WRITE;
     }
 }
 
-static void event_disable(tr_peerIo* io, short event)
+void tr_peerIo::event_disable(short event)
 {
-    bool const need_events = io->socket.is_tcp();
-    TR_ASSERT(!need_events || io->event_read);
-    TR_ASSERT(!need_events || io->event_write);
+    bool const need_events = socket.is_tcp();
+    TR_ASSERT(!need_events || event_read);
+    TR_ASSERT(!need_events || event_write);
 
-    if ((event & EV_READ) != 0 && (io->pendingEvents & EV_READ) != 0)
+    if ((event & EV_READ) != 0 && (pendingEvents & EV_READ) != 0)
     {
-        tr_logAddTraceIo(io, "disabling ready-to-read polling");
+        tr_logAddTraceIo(this, "disabling ready-to-read polling");
 
         if (need_events)
         {
-            event_del(io->event_read.get());
+            event_del(event_read.get());
         }
 
-        io->pendingEvents &= ~EV_READ;
+        pendingEvents &= ~EV_READ;
     }
 
-    if ((event & EV_WRITE) != 0 && (io->pendingEvents & EV_WRITE) != 0)
+    if ((event & EV_WRITE) != 0 && (pendingEvents & EV_WRITE) != 0)
     {
-        tr_logAddTraceIo(io, "disabling ready-to-write polling");
+        tr_logAddTraceIo(this, "disabling ready-to-write polling");
 
         if (need_events)
         {
-            event_del(io->event_write.get());
+            event_del(event_write.get());
         }
 
-        io->pendingEvents &= ~EV_WRITE;
+        pendingEvents &= ~EV_WRITE;
     }
 }
 
@@ -507,11 +507,11 @@ void tr_peerIo::setEnabled(tr_direction dir, bool is_enabled)
 
     if (is_enabled)
     {
-        event_enable(this, event);
+        event_enable(event);
     }
     else
     {
-        event_disable(this, event);
+        event_disable(event);
     }
 }
 
@@ -532,7 +532,7 @@ tr_peerIo::~tr_peerIo()
 
     clearCallbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
-    event_disable(this, EV_READ | EV_WRITE);
+    event_disable(EV_READ | EV_WRITE);
     close();
 }
 
@@ -558,7 +558,7 @@ bool tr_peerIo::reconnect()
     TR_ASSERT(this->session->allowsTCP());
 
     short int const pending_events = this->pendingEvents;
-    event_disable(this, EV_READ | EV_WRITE);
+    event_disable(EV_READ | EV_WRITE);
 
     close();
 
@@ -573,7 +573,7 @@ bool tr_peerIo::reconnect()
     this->event_read.reset(event_new(session->eventBase(), this->socket.handle.tcp, EV_READ, event_read_cb, this));
     this->event_write.reset(event_new(session->eventBase(), this->socket.handle.tcp, EV_WRITE, event_write_cb, this));
 
-    event_enable(this, pending_events);
+    event_enable(pending_events);
 
     return true;
 }
