@@ -203,7 +203,7 @@ class tr_peerMsgsImpl;
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
 static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
 static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs);
-static void gotError(tr_peerIo* io, short what, void* vmsgs);
+static void gotError(tr_peerIo* io, tr_error const& err, void* vmsgs);
 static void peerPulse(void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
@@ -2133,31 +2133,9 @@ static void peerPulse(void* vmsgs)
     }
 }
 
-static void gotError(tr_peerIo* io, short what, void* vmsgs)
+static void gotError(tr_peerIo* /*io*/, tr_error const& /*error*/, void* vmsgs)
 {
-    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-
-    if ((what & BEV_EVENT_TIMEOUT) != 0)
-    {
-        logdbg(msgs, fmt::format(FMT_STRING("libevent got a timeout, what={:d}"), what));
-    }
-
-    if ((what & BEV_EVENT_EOF) != 0)
-    {
-        logdbg(msgs, fmt::format("peer closed connection. {:s}", io->display_name()));
-    }
-    else if (what == BEV_EVENT_ERROR)
-    {
-        // exact BEV_EVENT_ERROR are high frequency errors from utp_on_error which were already logged appropriately
-        logtrace(msgs, fmt::format("libevent got an error! what={:d}, errno={:d} ({:s})", what, errno, tr_strerror(errno)));
-    }
-    else if ((what & BEV_EVENT_ERROR) != 0)
-    {
-        // read or write error
-        logdbg(msgs, fmt::format("libevent got an error! what={:d}, errno={:d} ({:s})", what, errno, tr_strerror(errno)));
-    }
-
-    msgs->publish(tr_peer_event::GotError(ENOTCONN));
+    static_cast<tr_peerMsgsImpl*>(vmsgs)->publish(tr_peer_event::GotError(ENOTCONN));
 }
 
 static void sendBitfield(tr_peerMsgsImpl* msgs)
