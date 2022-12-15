@@ -60,6 +60,17 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
     using Filter = tr_message_stream_encryption::Filter;
 
 public:
+    using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+    using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+    using tr_net_error_cb = void (*)(tr_peerIo* io, tr_error const& error, void* userData);
+
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        bool is_seed,
+        tr_bandwidth* parent_bandwidth);
+
     ~tr_peerIo();
 
     static std::shared_ptr<tr_peerIo> newOutgoing(
@@ -72,6 +83,8 @@ public:
         bool utp);
 
     static std::shared_ptr<tr_peerIo> newIncoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
+
+    void set_socket(tr_peer_socket);
 
     void clear();
 
@@ -210,24 +223,12 @@ public:
         return torrent_hash_;
     }
 
-    using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
-    using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
-    using tr_net_error_cb = void (*)(tr_peerIo* io, tr_error const& error, void* userData);
     void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
     void clearCallbacks()
     {
         setCallbacks(nullptr, nullptr, nullptr, nullptr);
     }
-
-    tr_peer_socket socket = {};
-
-    tr_session* const session;
-
-    tr_can_read_cb canRead = nullptr;
-    tr_did_write_cb didWrite = nullptr;
-    tr_net_error_cb gotError = nullptr;
-    void* userData = nullptr;
 
     void call_error_callback(tr_error const& error)
     {
@@ -236,20 +237,6 @@ public:
             gotError(this, error, userData);
         }
     }
-
-    libtransmission::Buffer inbuf;
-    libtransmission::Buffer outbuf;
-
-    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
-
-    libtransmission::evhelpers::event_unique_ptr event_read;
-    libtransmission::evhelpers::event_unique_ptr event_write;
-
-    short int pendingEvents = 0;
-
-    tr_priority_t priority = TR_PRI_NORMAL;
-
-    bool utp_supported_ = false;
 
     void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
@@ -278,14 +265,28 @@ public:
 
     static void utpInit(struct_utp_context* ctx);
 
-    tr_peerIo(
-        tr_session* session_in,
-        tr_sha1_digest_t const* torrent_hash,
-        bool is_incoming,
-        bool is_seed,
-        tr_bandwidth* parent_bandwidth);
+    tr_peer_socket socket = {};
 
-    void set_socket(tr_peer_socket);
+    tr_session* const session;
+
+    tr_can_read_cb canRead = nullptr;
+    tr_did_write_cb didWrite = nullptr;
+    tr_net_error_cb gotError = nullptr;
+    void* userData = nullptr;
+
+    libtransmission::Buffer inbuf;
+    libtransmission::Buffer outbuf;
+
+    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
+
+    libtransmission::evhelpers::event_unique_ptr event_read;
+    libtransmission::evhelpers::event_unique_ptr event_write;
+
+    short int pendingEvents = 0;
+
+    tr_priority_t priority = TR_PRI_NORMAL;
+
+    bool utp_supported_ = false;
 
 private:
     friend class libtransmission::test::HandshakeTest;
