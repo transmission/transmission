@@ -786,9 +786,8 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
     return ret;
 }
 
-void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
+void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandshake)
 {
-    auto const errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
     if (io->socket.is_utp() && !io->isIncoming() && handshake->is_state(State::AwaitingYb))
@@ -799,7 +798,7 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
         auto const info = handshake->mediator_->torrent(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
-        if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && info)
+        if ((error.code == ETIMEDOUT || error.code == ECONNREFUSED) && info)
         {
             handshake->mediator_->set_utp_failed(info_hash, io->address());
         }
@@ -829,9 +828,7 @@ void tr_handshake::on_error(tr_peerIo* io, short what, void* vhandshake)
     }
     else
     {
-        tr_logAddTraceHand(
-            handshake,
-            fmt::format("libevent got an error: what={:d}, errno={:d} ({:s})", what, errcode, tr_strerror(errcode)));
+        tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
         handshake->done(false);
     }
 }

@@ -214,7 +214,7 @@ public:
 
     using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
     using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
-    using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
+    using tr_net_error_cb = void (*)(tr_peerIo* io, tr_error const& error, void* userData);
     void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
 
     void clearCallbacks()
@@ -231,11 +231,11 @@ public:
     tr_net_error_cb gotError = nullptr;
     void* userData = nullptr;
 
-    void call_error_callback(short what)
+    void call_error_callback(tr_error const& error)
     {
         if (gotError != nullptr)
         {
-            gotError(this, what, userData);
+            gotError(this, error, userData);
         }
     }
 
@@ -285,8 +285,9 @@ public:
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
         bool is_seed,
-        tr_bandwidth* parent_bandwidth,
-        tr_peer_socket sock);
+        tr_bandwidth* parent_bandwidth);
+
+    void set_socket(tr_peer_socket);
 
 private:
     friend class libtransmission::test::HandshakeTest;
@@ -298,8 +299,7 @@ private:
         tr_bandwidth* parent,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
-        bool is_seed,
-        tr_peer_socket socket);
+        bool is_seed);
 
     tr_bandwidth bandwidth_;
 

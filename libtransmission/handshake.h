@@ -108,7 +108,7 @@ private:
 
     static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
 
-    static void on_error(tr_peerIo* io, short what, void* vhandshake);
+    static void on_error(tr_peerIo* io, tr_error const&, void* vhandshake);
 
     bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
 
