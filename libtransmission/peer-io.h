@@ -72,7 +72,7 @@ public:
 
     ~tr_peerIo();
 
-    static std::shared_ptr<tr_peerIo> newOutgoing(
+    static std::shared_ptr<tr_peerIo> new_outgoing(
         tr_session* session,
         tr_bandwidth* parent,
         tr_address const& addr,
@@ -81,7 +81,7 @@ public:
         bool is_seed,
         bool utp);
 
-    static std::shared_ptr<tr_peerIo> newIncoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
+    static std::shared_ptr<tr_peerIo> new_incoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
 
     void set_socket(tr_peer_socket);
 
@@ -92,26 +92,26 @@ public:
 
     void clear();
 
-    void readBytes(void* bytes, size_t byte_count);
+    void read_bytes(void* bytes, size_t byte_count);
 
-    void readUint8(uint8_t* setme)
+    void read_uint8(uint8_t* setme)
     {
-        readBytes(setme, sizeof(uint8_t));
+        read_bytes(setme, sizeof(uint8_t));
     }
 
-    void readUint16(uint16_t* setme);
-    void readUint32(uint32_t* setme);
+    void read_uint16(uint16_t* setme);
+    void read_uint32(uint32_t* setme);
 
     [[nodiscard]] bool reconnect();
 
-    void setEnabled(tr_direction dir, bool is_enabled);
+    void set_enabled(tr_direction dir, bool is_enabled);
 
     [[nodiscard]] constexpr auto const& address() const noexcept
     {
         return socket_.address();
     }
 
-    [[nodiscard]] constexpr auto socketAddress() const noexcept
+    [[nodiscard]] constexpr auto socket_address() const noexcept
     {
         return socket_.socketAddress();
     }
@@ -121,76 +121,76 @@ public:
         return socket_.display_name();
     }
 
-    void readBufferDrain(size_t byte_count);
+    void read_buffer_drain(size_t byte_count);
 
-    [[nodiscard]] auto readBufferSize() const noexcept
+    [[nodiscard]] auto read_buffer_size() const noexcept
     {
         return std::size(inbuf_);
     }
 
     template<typename T>
-    [[nodiscard]] auto readBufferStartsWith(T const& t) const noexcept
+    [[nodiscard]] auto read_buffer_starts_with(T const& t) const noexcept
     {
         return inbuf_.startsWith(t);
     }
 
-    size_t flushOutgoingProtocolMsgs();
+    size_t flush_outgoing_protocol_msgs();
     size_t flush(tr_direction dir, size_t byte_limit);
 
-    void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
+    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
     void write(libtransmission::Buffer& buf, bool is_piece_data);
 
-    [[nodiscard]] size_t getWriteBufferSpace(uint64_t now) const noexcept;
+    [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
 
-    [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
+    [[nodiscard]] auto has_bandwidth_left(tr_direction dir) noexcept
     {
         return bandwidth_.clamp(dir, 1024) > 0;
     }
 
-    [[nodiscard]] auto getPieceSpeedBytesPerSecond(uint64_t now, tr_direction dir) noexcept
+    [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t now, tr_direction dir) noexcept
     {
         return bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
     }
 
-    constexpr void enableFEXT(bool flag) noexcept
+    constexpr void set_supports_fext(bool flag) noexcept
     {
         fast_extension_supported_ = flag;
     }
 
-    [[nodiscard]] constexpr auto supportsFEXT() const noexcept
+    [[nodiscard]] constexpr auto supports_fext() const noexcept
     {
         return fast_extension_supported_;
     }
 
-    constexpr void enableLTEP(bool flag) noexcept
+    constexpr void set_supports_ltep(bool flag) noexcept
     {
         extended_protocol_supported_ = flag;
     }
 
-    [[nodiscard]] constexpr auto supportsLTEP() const noexcept
+    [[nodiscard]] constexpr auto supports_ltep() const noexcept
     {
         return extended_protocol_supported_;
     }
 
-    constexpr void enableDHT(bool flag) noexcept
+    constexpr void set_supports_dht(bool flag) noexcept
     {
         dht_supported_ = flag;
     }
 
-    [[nodiscard]] constexpr auto supportsDHT() const noexcept
+    [[nodiscard]] constexpr auto supports_dht() const noexcept
     {
         return dht_supported_;
     }
 
-    [[nodiscard]] constexpr auto supportsUTP() const noexcept
+    [[nodiscard]] constexpr auto supports_utp() const noexcept
     {
         return utp_supported_;
     }
 
-    [[nodiscard]] constexpr auto isSeed() const noexcept
+    [[nodiscard]] constexpr auto is_seed() const noexcept
     {
         return is_seed_;
     }
@@ -205,31 +205,31 @@ public:
         return bandwidth_;
     }
 
-    void setParent(tr_bandwidth* parent)
+    void set_parent(tr_bandwidth* parent)
     {
         bandwidth_.setParent(parent);
     }
 
-    [[nodiscard]] constexpr auto isIncoming() const noexcept
+    [[nodiscard]] constexpr auto is_incoming() const noexcept
     {
         return is_incoming_;
     }
 
-    void setTorrentHash(tr_sha1_digest_t hash) noexcept
+    void set_torrent_hash(tr_sha1_digest_t hash) noexcept
     {
         info_hash_ = hash;
     }
 
-    [[nodiscard]] constexpr auto const& torrentHash() const noexcept
+    [[nodiscard]] constexpr auto const& torrent_hash() const noexcept
     {
         return info_hash_;
     }
 
-    void setCallbacks(CanRead can_read, DidWrite did_write, GotError got_error, void* user_data);
+    void set_callbacks(CanRead can_read, DidWrite did_write, GotError got_error, void* user_data);
 
-    void clearCallbacks()
+    void clear_callbacks()
     {
-        setCallbacks(nullptr, nullptr, nullptr, nullptr);
+        set_callbacks(nullptr, nullptr, nullptr, nullptr);
     }
 
     [[nodiscard]] constexpr auto priority() const noexcept
@@ -247,7 +247,7 @@ public:
         priority_ = priority;
     }
 
-    void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+    void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
         filter_.decryptInit(is_incoming, dh, info_hash);
     }
@@ -257,7 +257,7 @@ public:
         filter_.decrypt(buflen, buf);
     }
 
-    void encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+    void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
         filter_.encryptInit(is_incoming, dh, info_hash);
     }
@@ -300,7 +300,7 @@ private:
     size_t try_write(size_t max);
 
     // this is only public for testing purposes.
-    // production code should use newOutgoing() or newIncoming()
+    // production code should use new_outgoing() or new_incoming()
     static std::shared_ptr<tr_peerIo> create(
         tr_session* session,
         tr_bandwidth* parent,
