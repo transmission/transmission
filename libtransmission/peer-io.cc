@@ -162,8 +162,6 @@ static void canReadWrapper(tr_peerIo* io_in)
     return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
 }
 
-static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t max);
-
 void tr_peerIo::event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
     static auto constexpr MaxLen = size_t{ 256 * 1024 }; // don't let inbuf get too big
@@ -183,7 +181,7 @@ void tr_peerIo::event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     io->try_read(n_left);
 }
 
-static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
+void tr_peerIo::event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
     auto* const io = static_cast<tr_peerIo*>(vio);
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for writing");
@@ -196,7 +194,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     // Write as much as possible. Since the socket is non-blocking,
     // write() will return if it can't write any more without blocking
-    tr_peerIoTryWrite(io, SIZE_MAX);
+    io->try_write(SIZE_MAX);
 }
 
 /**
@@ -221,43 +219,36 @@ static size_t utp_get_rb_size(tr_peerIo* const io)
     return UtpReadBufferSize - bytes;
 }
 
-static void utp_on_writable(tr_peerIo* io)
-{
-    tr_logAddTraceIo(io, "libutp says this peer is ready to write");
-
-    tr_peerIoTryWrite(io, SIZE_MAX);
-}
-
-static void utp_on_state_change(tr_peerIo* const io, int const state)
+void tr_peerIo::on_utp_state_change(int state)
 {
     if (state == UTP_STATE_CONNECT)
     {
-        tr_logAddTraceIo(io, "utp_on_state_change -- changed to connected");
-        io->utp_supported_ = true;
+        tr_logAddTraceIo(this, "utp_on_state_change -- changed to connected");
+        utp_supported_ = true;
     }
     else if (state == UTP_STATE_WRITABLE)
     {
-        tr_logAddTraceIo(io, "utp_on_state_change -- changed to writable");
+        tr_logAddTraceIo(this, "utp_on_state_change -- changed to writable");
 
-        if ((io->pendingEvents & EV_WRITE) != 0)
+        if ((pendingEvents & EV_WRITE) != 0)
         {
-            utp_on_writable(io);
+            try_write(SIZE_MAX);
         }
     }
     else if (state == UTP_STATE_EOF)
     {
         tr_error* error = nullptr;
         tr_error_set(&error, ENOTCONN, tr_strerror(ENOTCONN));
-        io->call_error_callback(*error);
+        call_error_callback(*error);
         tr_error_clear(&error);
     }
     else if (state == UTP_STATE_DESTROYING)
     {
-        tr_logAddErrorIo(io, "Impossible state UTP_STATE_DESTROYING");
+        tr_logAddErrorIo(this, "Impossible state UTP_STATE_DESTROYING");
     }
     else
     {
-        tr_logAddErrorIo(io, fmt::format(_("Unknown state: {state}"), fmt::arg("state", state)));
+        tr_logAddErrorIo(this, fmt::format(_("Unknown state: {state}"), fmt::arg("state", state)));
     }
 }
 
@@ -311,7 +302,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
         return io == nullptr ? 0U : utp_get_rb_size(io);
 
     case UTP_ON_STATE_CHANGE:
-        utp_on_state_change(io, args->u1.state);
+        io->on_utp_state_change(args->u1.state);
         break;
 
     case UTP_ON_ERROR:
@@ -751,7 +742,7 @@ size_t tr_peerIo::try_read(size_t max)
     return n_read;
 }
 
-static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t max)
+size_t tr_peerIo::try_write(size_t max)
 {
     static auto constexpr Dir = TR_UP;
 
@@ -760,33 +751,35 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t max)
         return {};
     }
 
-    auto& buf = io->outbuf;
+    auto& buf = outbuf;
     max = std::min(max, std::size(buf));
-    max = io->bandwidth().clamp(Dir, max);
+    max = bandwidth().clamp(Dir, max);
     if (max == 0)
     {
-        io->setEnabled(Dir, false);
+        setEnabled(Dir, false);
         return {};
     }
 
     tr_error* error = nullptr;
-    auto const n_written = io->socket.try_write(buf, max, &error);
+    auto const n_written = socket.try_write(buf, max, &error);
     // enable further writes if there's more data to write
-    io->setEnabled(Dir, !std::empty(buf) && (error == nullptr || canRetryFromError(error->code)));
+    setEnabled(Dir, !std::empty(buf) && (error == nullptr || canRetryFromError(error->code)));
 
     if (error != nullptr)
     {
         if (!canRetryFromError(error->code))
         {
-            tr_logAddTraceIo(io, fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error->code, error->message));
-            io->call_error_callback(*error);
+            tr_logAddTraceIo(
+                this,
+                fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error->code, error->message));
+            call_error_callback(*error);
         }
 
         tr_error_clear(&error);
     }
     else if (n_written > 0U)
     {
-        didWriteWrapper(io, n_written);
+        didWriteWrapper(this, n_written);
     }
 
     return n_written;
@@ -796,7 +789,7 @@ size_t tr_peerIo::flush(tr_direction dir, size_t limit)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    return dir == TR_DOWN ? try_read(limit) : tr_peerIoTryWrite(this, limit);
+    return dir == TR_DOWN ? try_read(limit) : try_write(limit);
 }
 
 size_t tr_peerIo::flushOutgoingProtocolMsgs()
