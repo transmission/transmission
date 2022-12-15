@@ -1810,17 +1810,14 @@ static int clientGotBlock(
 
 static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
-    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
+    auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
     if (was_piece_data)
     {
         msgs->publish(tr_peer_event::SentPieceData(bytes_written));
     }
 
-    if (tr_isPeerIo(io) && io->userData != nullptr)
-    {
-        peerPulse(msgs);
-    }
+    peerPulse(msgs);
 }
 
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)

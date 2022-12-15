@@ -53,7 +53,7 @@ static constexpr auto UtpReadBufferSize = 256 * 1024;
 
 static void didWriteWrapper(tr_peerIo* io, size_t bytes_transferred)
 {
-    while (bytes_transferred != 0 && tr_isPeerIo(io) && !std::empty(io->outbuf_info))
+    while (bytes_transferred != 0 && !std::empty(io->outbuf_info))
     {
         auto& [n_bytes_left, is_piece_data] = io->outbuf_info.front();
 
@@ -72,11 +72,6 @@ static void didWriteWrapper(tr_peerIo* io, size_t bytes_transferred)
         if (io->didWrite != nullptr)
         {
             io->didWrite(io, payload, is_piece_data, io->userData);
-        }
-
-        if (!tr_isPeerIo(io))
-        {
-            break;
         }
 
         bytes_transferred -= payload;
@@ -169,7 +164,6 @@ void tr_peerIo::event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     auto* const io = static_cast<tr_peerIo*>(vio);
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for reading");
 
-    TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.is_tcp());
     TR_ASSERT(io->socket.handle.tcp == fd);
 
@@ -186,7 +180,6 @@ void tr_peerIo::event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
     auto* const io = static_cast<tr_peerIo*>(vio);
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for writing");
 
-    TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.is_tcp());
     TR_ASSERT(io->socket.handle.tcp == fd);
 
@@ -579,7 +572,6 @@ void tr_peerIo::clear()
 
 bool tr_peerIo::reconnect()
 {
-    TR_ASSERT(tr_isPeerIo(this));
     TR_ASSERT(!this->isIncoming());
     TR_ASSERT(this->session->allowsTCP());
 
