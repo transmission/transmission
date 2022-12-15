@@ -40,8 +40,6 @@
 
 /* The amount of read bufferring that we allow for µTP sockets. */
 
-static constexpr auto UtpReadBufferSize = 256 * 1024;
-
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
@@ -129,7 +127,7 @@ void tr_peerIo::can_read_wrapper()
         switch (read_state)
         {
         case READ_NOW:
-            if (readBufferSize() != 0)
+            if (!std::empty(inbuf))
             {
                 continue;
             }
@@ -157,7 +155,7 @@ void tr_peerIo::can_read_wrapper()
 
 void tr_peerIo::event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
-    static auto constexpr MaxLen = size_t{ 256 * 1024 }; // don't let inbuf get too big
+    static auto constexpr MaxLen = RcvBuf;
 
     auto* const io = static_cast<tr_peerIo*>(vio);
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for reading");
@@ -200,14 +198,6 @@ void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
     inbuf.add(data, n_bytes);
     setEnabled(TR_DOWN, true);
     can_read_wrapper();
-}
-
-static size_t utp_get_rb_size(tr_peerIo* const io)
-{
-    auto const bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
-
-    tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
-    return UtpReadBufferSize - bytes;
 }
 
 void tr_peerIo::on_utp_state_change(int state)
@@ -290,7 +280,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
         break;
 
     case UTP_GET_READ_BUFFER_SIZE:
-        return io == nullptr ? 0U : utp_get_rb_size(io);
+        return std::size(io->inbuf);
 
     case UTP_ON_STATE_CHANGE:
         io->on_utp_state_change(args->u1.state);
@@ -373,15 +363,13 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 {
 #ifdef WITH_UTP
-
     utp_set_callback(ctx, UTP_GET_READ_BUFFER_SIZE, &utp_callback);
     utp_set_callback(ctx, UTP_ON_ERROR, &utp_callback);
     utp_set_callback(ctx, UTP_ON_OVERHEAD_STATISTICS, &utp_callback);
     utp_set_callback(ctx, UTP_ON_READ, &utp_callback);
     utp_set_callback(ctx, UTP_ON_STATE_CHANGE, &utp_callback);
 
-    utp_context_set_option(ctx, UTP_RCVBUF, UtpReadBufferSize);
-
+    utp_context_set_option(ctx, UTP_RCVBUF, RcvBuf);
 #endif
 }
 

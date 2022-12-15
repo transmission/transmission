@@ -290,6 +290,8 @@ public:
     bool utp_supported_ = false;
 
 private:
+    static constexpr auto RcvBuf = size_t{ 256 * 1024 };
+
     friend class libtransmission::test::HandshakeTest;
 
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
