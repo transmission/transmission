@@ -503,12 +503,11 @@ void tr_peerIo::setEnabled(tr_direction dir, bool is_enabled)
 ****
 ***/
 
-static void io_close_socket(tr_peerIo* io)
+void tr_peerIo::close()
 {
-    io->socket.close(io->session);
-    io->event_write.reset();
-    io->event_read.reset();
-    io->socket = {};
+    socket.close(session);
+    event_write.reset();
+    event_read.reset();
 }
 
 tr_peerIo::~tr_peerIo()
@@ -518,7 +517,7 @@ tr_peerIo::~tr_peerIo()
     clearCallbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
     event_disable(this, EV_READ | EV_WRITE);
-    io_close_socket(this);
+    close();
 }
 
 void tr_peerIo::setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data)
@@ -534,7 +533,7 @@ void tr_peerIo::clear()
     clearCallbacks();
     setEnabled(TR_UP, false);
     setEnabled(TR_DOWN, false);
-    io_close_socket(this);
+    close();
 }
 
 bool tr_peerIo::reconnect()
@@ -545,7 +544,7 @@ bool tr_peerIo::reconnect()
     short int const pending_events = this->pendingEvents;
     event_disable(this, EV_READ | EV_WRITE);
 
-    io_close_socket(this);
+    close();
 
     auto const [addr, port] = socketAddress();
     this->socket = tr_netOpenPeerSocket(session, addr, port, this->isSeed());
