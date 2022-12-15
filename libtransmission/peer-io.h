@@ -291,6 +291,10 @@ public:
 private:
     friend class libtransmission::test::HandshakeTest;
 
+    static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
+
+    size_t try_read(size_t max);
+
     // this is only public for testing purposes.
     // production code should use newOutgoing() or newIncoming()
     static std::shared_ptr<tr_peerIo> create(

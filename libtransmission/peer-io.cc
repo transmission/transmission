@@ -162,10 +162,9 @@ static void canReadWrapper(tr_peerIo* io_in)
     return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
 }
 
-static size_t tr_peerIoTryRead(tr_peerIo* io, size_t max);
 static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t max);
 
-static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
+void tr_peerIo::event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 {
     static auto constexpr MaxLen = size_t{ 256 * 1024 }; // don't let inbuf get too big
 
@@ -181,7 +180,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
     // if we don't have any bandwidth left, stop reading
     auto const n_used = std::size(io->inbuf);
     auto const n_left = n_used >= MaxLen ? 0 : MaxLen - n_used;
-    tr_peerIoTryRead(io, n_left);
+    io->try_read(n_left);
 }
 
 static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
@@ -358,7 +357,7 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket.is_tcp())
     {
-        event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, event_read_cb, this));
+        event_read.reset(event_new(session->eventBase(), socket.handle.tcp, EV_READ, &tr_peerIo::event_read_cb, this));
         event_write.reset(event_new(session->eventBase(), socket.handle.tcp, EV_WRITE, event_write_cb, this));
     }
 #ifdef WITH_UTP
@@ -711,7 +710,7 @@ void tr_peerIo::readBufferDrain(size_t byte_count)
 ****
 ***/
 
-static size_t tr_peerIoTryRead(tr_peerIo* io, size_t max)
+size_t tr_peerIo::try_read(size_t max)
 {
     static auto constexpr Dir = TR_DOWN;
 
@@ -722,31 +721,31 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t max)
 
     // Do not write more than the bandwidth allows.
     // If there is no bandwidth left available, disable writes.
-    max = io->bandwidth().clamp(TR_DOWN, max);
+    max = bandwidth().clamp(TR_DOWN, max);
     if (max == 0)
     {
-        io->setEnabled(Dir, false);
+        setEnabled(Dir, false);
         return {};
     }
 
-    auto& buf = io->inbuf;
+    auto& buf = inbuf;
     tr_error* error = nullptr;
-    auto const n_read = io->socket.try_read(buf, max, &error);
-    io->setEnabled(Dir, error == nullptr || canRetryFromError(error->code));
+    auto const n_read = socket.try_read(buf, max, &error);
+    setEnabled(Dir, error == nullptr || canRetryFromError(error->code));
 
     if (error != nullptr)
     {
         if (!canRetryFromError(error->code))
         {
-            tr_logAddTraceIo(io, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error->code, error->message));
-            io->call_error_callback(*error);
+            tr_logAddTraceIo(this, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error->code, error->message));
+            call_error_callback(*error);
         }
 
         tr_error_clear(&error);
     }
     else if (!std::empty(buf))
     {
-        canReadWrapper(io);
+        canReadWrapper(this);
     }
 
     return n_read;
@@ -797,7 +796,7 @@ size_t tr_peerIo::flush(tr_direction dir, size_t limit)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    return dir == TR_DOWN ? tr_peerIoTryRead(this, limit) : tr_peerIoTryWrite(this, limit);
+    return dir == TR_DOWN ? try_read(limit) : tr_peerIoTryWrite(this, limit);
 }
 
 size_t tr_peerIo::flushOutgoingProtocolMsgs()
