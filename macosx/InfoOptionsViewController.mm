@@ -48,16 +48,6 @@ static CGFloat const kStackViewSpacing = 8.0;
 @property(nonatomic) IBOutlet NSTextField* fPeersConnectLabel;
 @property(nonatomic) IBOutlet NSTextField* fPeersConnectField;
 
-//remove when we switch to auto layout
-@property(nonatomic) IBOutlet NSTextField* fTransferBandwidthSectionLabel;
-@property(nonatomic) IBOutlet NSTextField* fPrioritySectionLabel;
-@property(nonatomic) IBOutlet NSTextField* fPriorityLabel;
-@property(nonatomic) IBOutlet NSTextField* fSeedingLimitsSectionLabel;
-@property(nonatomic) IBOutlet NSTextField* fRatioLabel;
-@property(nonatomic) IBOutlet NSTextField* fInactivityLabel;
-@property(nonatomic) IBOutlet NSTextField* fAdvancedSectionLabel;
-@property(nonatomic) IBOutlet NSTextField* fMaxConnectionsLabel;
-
 @property(nonatomic, copy) NSString* fInitialString;
 
 @property(nonatomic) IBOutlet NSStackView* fOptionsStackView;
@@ -112,11 +102,6 @@ static CGFloat const kStackViewSpacing = 8.0;
 - (CGFloat)fVertLayoutHeight
 {
     return NSHeight(self.fPriorityView.frame) + NSHeight(self.fSeedingView.frame) + (2 * kStackViewInset) + kStackViewSpacing;
-}
-
-- (void)updateOldHeight:(CGFloat)height
-{
-    self.oldHeight = height;
 }
 
 - (CGFloat)fHeightChange
