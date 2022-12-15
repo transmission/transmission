@@ -129,8 +129,6 @@ public:
         return inbuf.startsWith(t);
     }
 
-    void readBufferAdd(void const* data, size_t n_bytes);
-
     size_t flushOutgoingProtocolMsgs();
     size_t flush(tr_direction dir, size_t byte_limit);
 
@@ -265,6 +263,8 @@ public:
     static void utpInit(struct_utp_context* ctx);
 
     void on_utp_state_change(int new_state);
+    void on_utp_error(int errcode);
+    void can_read_wrapper();
 
     tr_peer_socket socket = {};
 
@@ -297,7 +297,6 @@ private:
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
     static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
 
-    void can_read_wrapper();
     void did_write_wrapper(size_t bytes_transferred);
 
     size_t try_read(size_t max);
