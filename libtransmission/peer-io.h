@@ -292,6 +292,8 @@ public:
 private:
     static constexpr auto RcvBuf = size_t{ 256 * 1024 };
 
+    void close();
+
     friend class libtransmission::test::HandshakeTest;
 
     static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
