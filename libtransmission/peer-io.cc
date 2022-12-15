@@ -193,13 +193,6 @@ void tr_peerIo::event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 #ifdef WITH_UTP
 /* µTP callbacks */
 
-void tr_peerIo::readBufferAdd(void const* data, size_t n_bytes)
-{
-    inbuf.add(data, n_bytes);
-    setEnabled(TR_DOWN, true);
-    can_read_wrapper();
-}
-
 void tr_peerIo::on_utp_state_change(int state)
 {
     if (state == UTP_STATE_CONNECT)
@@ -233,32 +226,17 @@ void tr_peerIo::on_utp_state_change(int state)
     }
 }
 
-static void utp_on_error(tr_peerIo* const io, int const errcode)
+void tr_peerIo::on_utp_error(int errcode)
 {
-    if (errcode == UTP_ETIMEDOUT)
-    {
-        // high frequency error: we log as trace
-        tr_logAddTraceIo(io, fmt::format("utp_on_error -- UTP_ETIMEDOUT"));
-    }
-    else
-    {
-        tr_logAddDebugIo(io, fmt::format("utp_on_error -- {}", utp_error_code_names[errcode]));
-    }
+    tr_logAddTraceIo(this, fmt::format("utp_on_error -- {}", utp_error_code_names[errcode]));
 
-    if (io->gotError != nullptr)
+    if (gotError != nullptr)
     {
         tr_error* error = nullptr;
         tr_error_set(&error, errcode, utp_error_code_names[errcode]);
-        io->call_error_callback(*error);
+        call_error_callback(*error);
         tr_error_clear(&error);
     }
-}
-
-static void utp_on_overhead(tr_peerIo* const io, bool const send, size_t const count, int /*type*/)
-{
-    tr_logAddTraceIo(io, fmt::format("utp_on_overhead -- count is {}", count));
-
-    io->bandwidth().notifyBandwidthConsumed(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
 }
 
 static uint64 utp_callback(utp_callback_arguments* args)
@@ -276,7 +254,9 @@ static uint64 utp_callback(utp_callback_arguments* args)
     switch (type)
     {
     case UTP_ON_READ:
-        io->readBufferAdd(args->buf, args->len);
+        io->inbuf.add(args->buf, args->len);
+        io->setEnabled(TR_DOWN, true);
+        io->can_read_wrapper();
         break;
 
     case UTP_GET_READ_BUFFER_SIZE:
@@ -287,11 +267,12 @@ static uint64 utp_callback(utp_callback_arguments* args)
         break;
 
     case UTP_ON_ERROR:
-        utp_on_error(io, args->u1.error_code);
+        io->on_utp_error(args->u1.error_code);
         break;
 
     case UTP_ON_OVERHEAD_STATISTICS:
-        utp_on_overhead(io, args->u1.send != 0, args->len, args->u2.type);
+        tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
+        io->bandwidth().notifyBandwidthConsumed(args->u1.send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
         break;
 
     default:
