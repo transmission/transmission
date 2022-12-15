@@ -195,7 +195,7 @@ void tr_utpInit(tr_session* session)
     utp_context_set_userdata(ctx, session);
     utp_set_callback(ctx, UTP_ON_ACCEPT, &utp_callback);
     utp_set_callback(ctx, UTP_SENDTO, &utp_callback);
-    tr_peerIo::utpInit(ctx);
+    tr_peerIo::utp_init(ctx);
 
 #ifdef TR_UTP_TRACE
     utp_set_callback(ctx, UTP_LOG, &utp_callback);

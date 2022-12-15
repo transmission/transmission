@@ -379,7 +379,7 @@ public:
 
     [[nodiscard]] bool is_encrypted() const override
     {
-        return io->isEncrypted();
+        return io->is_encrypted();
     }
 
     [[nodiscard]] bool is_incoming_connection() const override
