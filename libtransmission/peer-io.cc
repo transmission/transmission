@@ -393,7 +393,6 @@ void tr_peerIo::utpInit([[maybe_unused]] struct_utp_context* ctx)
 {
 #ifdef WITH_UTP
 
-    fmt::print("setting peer-io utp callbacks\n");
     utp_set_callback(ctx, UTP_GET_READ_BUFFER_SIZE, &utp_callback);
     utp_set_callback(ctx, UTP_ON_ERROR, &utp_callback);
     utp_set_callback(ctx, UTP_ON_OVERHEAD_STATISTICS, &utp_callback);
