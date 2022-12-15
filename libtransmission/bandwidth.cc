@@ -213,7 +213,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 
     for (auto const& io : refs)
     {
-        io->flushOutgoingProtocolMsgs();
+        io->flush_outgoing_protocol_msgs();
 
         switch (io->priority())
         {
@@ -244,7 +244,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
     for (auto const& io : refs)
     {
-        io->setEnabled(dir, io->hasBandwidthLeft(dir));
+        io->set_enabled(dir, io->has_bandwidth_left(dir));
     }
 }
 
