@@ -170,6 +170,9 @@
                 <constraint firstAttribute="bottom" secondItem="5" secondAttribute="bottom" constant="5" id="fKx-Ct-3z1"/>
                 <constraint firstAttribute="trailing" secondItem="10" secondAttribute="trailing" constant="5" id="s5c-0G-9tM"/>
             </constraints>
+            <connections>
+                <outlet property="searchFieldVerticalConstraint" destination="ecz-eJ-l9b" id="hzc-vg-t2p"/>
+            </connections>
             <point key="canvasLocation" x="139" y="150"/>
         </customView>
         <menu title="Menu" id="22" userLabel="SearchFilterMenu">
