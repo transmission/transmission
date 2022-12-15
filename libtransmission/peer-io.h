@@ -34,6 +34,11 @@
 struct tr_bandwidth;
 struct struct_utp_context;
 
+namespace libtransmission::test
+{
+class HandshakeTest;
+} // namespace libtransmission::test
+
 /**
  * @addtogroup networked_io Networked IO
  * @{
@@ -45,13 +50,6 @@ enum ReadState
     READ_LATER,
     READ_ERR
 };
-
-namespace libtransmission::test
-{
-
-class HandshakeTest;
-
-} // namespace libtransmission::test
 
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {
@@ -308,7 +306,18 @@ private:
         bool is_incoming,
         bool is_seed);
 
+    Filter filter_;
+
+    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
+
     tr_peer_socket socket_ = {};
+
+    tr_bandwidth bandwidth_;
+
+    tr_sha1_digest_t info_hash_;
+
+    libtransmission::Buffer inbuf_;
+    libtransmission::Buffer outbuf_;
 
     tr_session* const session_;
 
@@ -317,11 +326,6 @@ private:
     GotError got_error_ = nullptr;
     void* user_data_ = nullptr;
 
-    libtransmission::Buffer inbuf_;
-    libtransmission::Buffer outbuf_;
-
-    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
-
     libtransmission::evhelpers::event_unique_ptr event_read_;
     libtransmission::evhelpers::event_unique_ptr event_write_;
 
@@ -329,17 +333,10 @@ private:
 
     tr_priority_t priority_ = TR_PRI_NORMAL;
 
-    bool utp_supported_ = false;
-
-    tr_bandwidth bandwidth_;
-
-    Filter filter_;
-
-    tr_sha1_digest_t info_hash_;
-
     bool const is_seed_;
     bool const is_incoming_;
 
+    bool utp_supported_ = false;
     bool dht_supported_ = false;
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;
