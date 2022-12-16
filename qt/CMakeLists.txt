@@ -146,7 +146,7 @@ source_group("Generated Files" FILES ${${PROJECT_NAME}_UI_SOURCES})
 
 set(${PROJECT_NAME}_QRC_FILES application.qrc)
 if(WIN32 OR APPLE)
-    list(APPEND ${PROJECT_NAME}_QRC_FILES icons/Faenza/Faenza.qrc)
+    list(APPEND ${PROJECT_NAME}_QRC_FILES icons/Win11/Win11.qrc)
 endif()
 source_group(Resources FILES ${${PROJECT_NAME}_QRC_FILES})
 

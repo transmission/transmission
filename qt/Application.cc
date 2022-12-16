@@ -105,7 +105,7 @@ Application::Application(int& argc, char** argv)
 
     if (QIcon::themeName().isEmpty())
     {
-        QIcon::setThemeName(QStringLiteral("Faenza"));
+        QIcon::setThemeName(QStringLiteral("Win11"));
     }
 
 #endif
