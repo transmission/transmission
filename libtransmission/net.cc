@@ -268,30 +268,6 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     return ret;
 }
 
-tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& addr, tr_port port, bool /*client_is_seed*/)
-{
-    auto ret = tr_peer_socket{};
-
-    if (session->utp_context != nullptr && addr.is_valid_for_peers(port))
-    {
-        auto const [ss, sslen] = addr.to_sockaddr(port);
-
-        if (auto* const sock = utp_create_socket(session->utp_context); sock != nullptr)
-        {
-            if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
-            {
-                ret = tr_peer_socket{ addr, port, sock };
-            }
-            else
-            {
-                utp_close(sock);
-            }
-        }
-    }
-
-    return ret;
-}
-
 static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppress_msgs, int* err_out)
 {
     TR_ASSERT(addr.is_valid());
