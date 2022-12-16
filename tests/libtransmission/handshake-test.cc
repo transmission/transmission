@@ -171,7 +171,7 @@ public:
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
         auto peer_io = tr_peerIo::create(session, &session->top_bandwidth_, &info_hash, false /*incoming*/, false /*seed*/);
-        peer_io->set_socket(tr_peer_socket{ session, DefaultPeerAddr, DefaultPeerPort, sockpair[0] });
+        peer_io->set_socket(tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0]));
         return std::make_pair(std::move(peer_io), sockpair[1]);
     }
 
