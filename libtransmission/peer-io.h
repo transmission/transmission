@@ -234,11 +234,6 @@ public:
         return utp_supported_;
     }
 
-    [[nodiscard]] constexpr auto is_seed() const noexcept
-    {
-        return is_seed_;
-    }
-
     [[nodiscard]] constexpr auto is_incoming() const noexcept
     {
         return is_incoming_;
@@ -284,6 +279,11 @@ private:
     static constexpr auto RcvBuf = size_t{ 256 * 1024 };
 
     friend class libtransmission::test::HandshakeTest;
+
+    [[nodiscard]] constexpr auto is_seed() const noexcept
+    {
+        return is_seed_;
+    }
 
     void call_error_callback(tr_error const& error)
     {
