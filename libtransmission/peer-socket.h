@@ -15,8 +15,10 @@
 
 #include "transmission.h"
 
+#include "error.h"
 #include "net.h"
 #include "tr-assert.h"
+#include "tr-buffer.h"
 
 struct UTPSocket;
 struct tr_session;
@@ -24,6 +26,8 @@ struct tr_session;
 class tr_peer_socket
 {
 public:
+    using Buffer = libtransmission::Buffer;
+
     tr_peer_socket() = default;
     tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock);
     tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock);
@@ -34,6 +38,9 @@ public:
     ~tr_peer_socket() = default;
 
     void close(tr_session* session);
+
+    size_t try_write(Buffer& buf, size_t max, tr_error** error) const;
+    size_t try_read(Buffer& buf, size_t max, tr_error** error) const;
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
     {
@@ -85,6 +92,32 @@ public:
 #endif
     }
 
+    [[nodiscard]] constexpr size_t guess_packet_overhead(size_t n_bytes) const noexcept
+    {
+        if (is_tcp())
+        {
+            // https://web.archive.org/web/20140912230020/http://sd.wareonearth.com:80/~phil/net/overhead/
+            // TCP over Ethernet:
+            // Assuming no header compression (e.g. not PPP)
+            // Add 20 IPv4 header or 40 IPv6 header (no options)
+            // Add 20 TCP header
+            // Add 12 bytes optional TCP timestamps
+            // Max TCP Payload data rates over ethernet are thus:
+            // (1500-40)/ (38+1500) = 94.9285 %  IPv4, minimal headers
+            // (1500-52)/ (38+1500) = 94.1482 %  IPv4, TCP timestamps
+            // (1500-52)/ (42+1500) = 93.9040 %  802.1q, IPv4, TCP timestamps
+            // (1500-60)/ (38+1500) = 93.6281 %  IPv6, minimal headers
+            // (1500-72)/ (38+1500) = 92.8479 %  IPv6, TCP timestamps
+            // (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, TCP timestamps
+
+            // So, let's guess around 7% overhead
+            return n_bytes / 14U;
+        }
+
+        // We only guess for TCP; uTP tracks its overhead via UTP_ON_OVERHEAD_STATISTICS
+        return {};
+    }
+
     union
     {
         tr_socket_t tcp;
@@ -106,4 +139,9 @@ private:
 };
 
 tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
-tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
+tr_peer_socket tr_netOpenPeerUTPSocket(
+    tr_session* session,
+    tr_address const& addr,
+    tr_port port,
+    bool client_is_seed,
+    void* userdata);

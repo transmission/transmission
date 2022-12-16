@@ -150,10 +150,10 @@ void tr_bandwidth::allocateBandwidth(
         bandwidth.bytes_left_ = next_pulse_speed * period_msec / 1000U;
     }
 
-    /* add this bandwidth's peer, if any, to the peer pool */
+    // add this bandwidth's peer, if any, to the peer pool
     if (auto shared = this->peer_.lock(); shared)
     {
-        shared->priority = priority;
+        shared->set_priority(priority);
         peer_pool.push_back(std::move(shared));
     }
 
@@ -213,9 +213,9 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 
     for (auto const& io : refs)
     {
-        io->flushOutgoingProtocolMsgs();
+        io->flush_outgoing_protocol_msgs();
 
-        switch (io->priority)
+        switch (io->priority())
         {
         case TR_PRI_HIGH:
             high.push_back(io.get());
@@ -244,7 +244,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
     for (auto const& io : refs)
     {
-        io->setEnabled(dir, io->hasBandwidthLeft(dir));
+        io->set_enabled(dir, io->has_bandwidth_left(dir));
     }
 }
 

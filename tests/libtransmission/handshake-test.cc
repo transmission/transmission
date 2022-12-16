@@ -159,7 +159,7 @@ public:
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
         return std::make_pair(
-            tr_peerIo::newIncoming(
+            tr_peerIo::new_incoming(
                 session,
                 &session->top_bandwidth_,
                 tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0])),
@@ -170,15 +170,9 @@ public:
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
-        return std::make_pair(
-            tr_peerIo::create(
-                session,
-                &session->top_bandwidth_,
-                &info_hash,
-                false /*is_incoming*/,
-                false /*is_seed*/,
-                tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0])),
-            sockpair[1]);
+        auto peer_io = tr_peerIo::create(session, &session->top_bandwidth_, &info_hash, false /*incoming*/, false /*seed*/);
+        peer_io->set_socket(tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0]));
+        return std::make_pair(std::move(peer_io), sockpair[1]);
     }
 
     static constexpr auto makePeerId(std::string_view sv)
@@ -250,7 +244,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(peer_id, res->peer_id);
-    EXPECT_EQ(TorrentWeAreSeeding.info_hash, io->torrentHash());
+    EXPECT_EQ(TorrentWeAreSeeding.info_hash, io->torrent_hash());
 
     evutil_closesocket(sock);
 }
@@ -276,7 +270,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
     EXPECT_FALSE(res->peer_id);
-    EXPECT_EQ(tr_sha1_digest_t{}, io->torrentHash());
+    EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
 
     evutil_closesocket(sock);
 }
@@ -302,8 +296,8 @@ TEST_F(HandshakeTest, outgoingPlaintext)
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(peer_id, res->peer_id);
-    EXPECT_EQ(UbuntuTorrent.info_hash, io->torrentHash());
-    EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrentHash()));
+    EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
+    EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
     evutil_closesocket(sock);
 }
@@ -340,8 +334,8 @@ TEST_F(HandshakeTest, incomingEncrypted)
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(ExpectedPeerId, res->peer_id);
-    EXPECT_EQ(UbuntuTorrent.info_hash, io->torrentHash());
-    EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrentHash()));
+    EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
+    EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
     evutil_closesocket(sock);
 }
@@ -374,7 +368,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
     EXPECT_TRUE(res);
     EXPECT_FALSE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
-    EXPECT_EQ(tr_sha1_digest_t{}, io->torrentHash());
+    EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
 
     evutil_closesocket(sock);
 }
@@ -416,8 +410,8 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     EXPECT_EQ(io, res->io);
     EXPECT_TRUE(res->peer_id);
     EXPECT_EQ(ExpectedPeerId, res->peer_id);
-    EXPECT_EQ(UbuntuTorrent.info_hash, io->torrentHash());
-    EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrentHash()));
+    EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
+    EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
     evutil_closesocket(sock);
 }

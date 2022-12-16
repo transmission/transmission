@@ -964,11 +964,9 @@ void Application::Impl::on_app_exit()
 
     is_closing_ = true;
 
-    /* stop the update timer */
-    timer_.disconnect();
-
-    /* stop the refresh-actions timer */
     refresh_actions_tag_.disconnect();
+    update_model_soon_tag_.disconnect();
+    timer_.disconnect();
 
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
     wind_->remove();
