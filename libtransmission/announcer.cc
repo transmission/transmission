@@ -245,7 +245,7 @@ private:
     {
         for (auto& stop : stops_)
         {
-            announce(stop, [](tr_announce_response const&) {});
+            announce(stop, [](tr_announce_response const& /*response*/) {});
         }
 
         stops_.clear();
