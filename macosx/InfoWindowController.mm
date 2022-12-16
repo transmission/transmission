@@ -183,11 +183,11 @@ typedef NS_ENUM(unsigned int, tabTag) {
 {
     if (self.fViewController == self.fOptionsViewController)
     {
-        [self.fOptionsViewController updateWindowLayout];
+        [self.fOptionsViewController checkWindowSize];
     }
     else if (self.fViewController == self.fActivityViewController)
     {
-        [self.fActivityViewController updateWindowLayout];
+        [self.fActivityViewController checkWindowSize];
     }
 }
 
@@ -337,11 +337,17 @@ typedef NS_ENUM(unsigned int, tabTag) {
     //special case for Activity and Options views
     if (self.fViewController == self.fActivityViewController)
     {
+        [self.fActivityViewController setOldHeight:oldHeight];
+        [self.fActivityViewController checkLayout];
+
         minWindowWidth = MAX(self.fMinWindowWidth, self.fActivityViewController.fTransferView.frame.size.width);
         viewRect = [self.fActivityViewController viewRect];
     }
     else if (self.fViewController == self.fOptionsViewController)
     {
+        [self.fOptionsViewController setOldHeight:oldHeight];
+        [self.fOptionsViewController checkLayout];
+
         minWindowWidth = MAX(self.fMinWindowWidth, self.fOptionsViewController.fPriorityView.frame.size.width);
         viewRect = [self.fOptionsViewController viewRect];
     }

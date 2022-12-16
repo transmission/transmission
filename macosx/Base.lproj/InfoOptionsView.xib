@@ -8,7 +8,6 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="InfoOptionsViewController">
             <connections>
-                <outlet property="fAdvancedSectionLabel" destination="14" id="126"/>
                 <outlet property="fDownloadLimitCheck" destination="7" id="66"/>
                 <outlet property="fDownloadLimitField" destination="17" id="69"/>
                 <outlet property="fDownloadLimitLabel" destination="16" id="70"/>
@@ -17,23 +16,16 @@
                 <outlet property="fIdleLimitGlobalLabel" destination="107" id="111"/>
                 <outlet property="fIdleLimitLabel" destination="97" id="103"/>
                 <outlet property="fIdlePopUp" destination="80" id="104"/>
-                <outlet property="fInactivityLabel" destination="79" id="124"/>
-                <outlet property="fMaxConnectionsLabel" destination="13" id="127"/>
                 <outlet property="fOptionsStackView" destination="KYq-Jm-g2s" id="VcL-x0-Jdk"/>
                 <outlet property="fPeersConnectField" destination="12" id="78"/>
                 <outlet property="fPeersConnectLabel" destination="11" id="77"/>
-                <outlet property="fPriorityLabel" destination="4" id="121"/>
                 <outlet property="fPriorityPopUp" destination="3" id="76"/>
-                <outlet property="fPrioritySectionLabel" destination="5" id="120"/>
                 <outlet property="fPriorityView" destination="2Ow-Hq-XLB" id="mIQ-bG-tAo"/>
-                <outlet property="fRatioLabel" destination="15" id="123"/>
                 <outlet property="fRatioLimitField" destination="10" id="75"/>
                 <outlet property="fRatioLimitGlobalLabel" destination="109" id="112"/>
                 <outlet property="fRatioPopUp" destination="9" id="74"/>
                 <outlet property="fRemoveSeedingCompleteCheck" destination="113" id="118"/>
-                <outlet property="fSeedingLimitsSectionLabel" destination="21" id="122"/>
                 <outlet property="fSeedingView" destination="wfz-WZ-zVG" id="zLN-y6-kI2"/>
-                <outlet property="fTransferBandwidthSectionLabel" destination="20" id="125"/>
                 <outlet property="fUploadLimitCheck" destination="8" id="67"/>
                 <outlet property="fUploadLimitField" destination="19" id="71"/>
                 <outlet property="fUploadLimitLabel" destination="18" id="72"/>
@@ -111,7 +103,7 @@
                                     </connections>
                                 </button>
                                 <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                                    <rect key="frame" x="96" y="99" width="74" height="17"/>
+                                    <rect key="frame" x="96" y="100" width="74" height="17"/>
                                     <popUpButtonCell key="cell" type="roundRect" title="Normal" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="51" id="48">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -230,7 +222,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="80">
-                                    <rect key="frame" x="60" y="79" width="122" height="20"/>
+                                    <rect key="frame" x="60" y="80" width="122" height="20"/>
                                     <popUpButtonCell key="cell" type="roundRect" title="Global Setting" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="87" id="84">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -273,7 +265,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="9">
-                                    <rect key="frame" x="60" y="101" width="122" height="20"/>
+                                    <rect key="frame" x="60" y="102" width="122" height="20"/>
                                     <popUpButtonCell key="cell" type="roundRect" title="Global Setting" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="41" id="38">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>

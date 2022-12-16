@@ -23,18 +23,6 @@
 
 @property(nonatomic) IBOutlet NSButton* fRevealDataButton;
 
-//remove when we switch to auto layout
-@property(nonatomic) IBOutlet NSTextField* fPiecesLabel;
-@property(nonatomic) IBOutlet NSTextField* fHashLabel;
-@property(nonatomic) IBOutlet NSTextField* fSecureLabel;
-@property(nonatomic) IBOutlet NSTextField* fCreatorLabel;
-@property(nonatomic) IBOutlet NSTextField* fDateCreatedLabel;
-@property(nonatomic) IBOutlet NSTextField* fCommentLabel;
-@property(nonatomic) IBOutlet NSTextField* fDataLocationLabel;
-@property(nonatomic) IBOutlet NSTextField* fInfoSectionLabel;
-@property(nonatomic) IBOutlet NSTextField* fWhereSectionLabel;
-@property(nonatomic) IBOutlet NSScrollView* fCommentScrollView;
-
 @end
 
 @implementation InfoGeneralViewController
@@ -47,67 +35,6 @@
     }
 
     return self;
-}
-
-- (void)awakeFromNib
-{
-#warning remove when switching to auto layout
-    [self.fInfoSectionLabel sizeToFit];
-    [self.fWhereSectionLabel sizeToFit];
-
-    NSArray* labels = @[
-        self.fPiecesLabel,
-        self.fHashLabel,
-        self.fSecureLabel,
-        self.fCreatorLabel,
-        self.fDateCreatedLabel,
-        self.fCommentLabel,
-        self.fDataLocationLabel,
-    ];
-
-    CGFloat oldMaxWidth = 0.0, originX = 0.0, newMaxWidth = 0.0;
-    for (NSTextField* label in labels)
-    {
-        NSRect const oldFrame = label.frame;
-        if (oldFrame.size.width > oldMaxWidth)
-        {
-            oldMaxWidth = oldFrame.size.width;
-            originX = oldFrame.origin.x;
-        }
-
-        [label sizeToFit];
-        CGFloat const newWidth = label.bounds.size.width;
-        if (newWidth > newMaxWidth)
-        {
-            newMaxWidth = newWidth;
-        }
-    }
-
-    for (NSTextField* label in labels)
-    {
-        NSRect frame = label.frame;
-        frame.origin.x = originX + (newMaxWidth - frame.size.width);
-        label.frame = frame;
-    }
-
-    NSArray* fields = @[
-        self.fPiecesField,
-        self.fHashField,
-        self.fSecureField,
-        self.fCreatorField,
-        self.fDateCreatedField,
-        self.fCommentScrollView,
-        self.fDataLocationField,
-    ];
-
-    CGFloat const widthIncrease = newMaxWidth - oldMaxWidth;
-    for (NSView* field in fields)
-    {
-        NSRect frame = field.frame;
-        frame.origin.x += widthIncrease;
-        frame.size.width -= widthIncrease;
-        field.frame = frame;
-    }
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
