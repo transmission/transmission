@@ -233,7 +233,7 @@ static void removeKeRangerRansomware()
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
 
-@interface Controller ()<UNUserNotificationCenterDelegate>
+@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet NSStackView* fStackView;
@@ -292,7 +292,7 @@ static void removeKeRangerRansomware()
 @property(nonatomic) NSMutableArray<NSString*>* fAutoImportedNames;
 @property(nonatomic) NSTimer* fAutoImportTimer;
 
-@property(nonatomic) NSMutableDictionary<NSURL*, id>* fPendingTorrentDownloads;
+@property(nonatomic) NSURLSession* fSession;
 
 @property(nonatomic) NSMutableSet<Torrent*>* fAddingTransfers;
 
@@ -590,6 +590,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         _fTorrents = [[NSMutableArray alloc] init];
         _fDisplayedTorrents = [[NSMutableArray alloc] init];
         _fTorrentHashes = [[NSMutableDictionary alloc] init];
+
+        NSURLSessionConfiguration* configuration = NSURLSessionConfiguration.defaultSessionConfiguration;
+        configuration.requestCachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
+        _fSession = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
 
         _fInfoController = [[InfoWindowController alloc] init];
 
@@ -1049,14 +1053,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     //remove all torrent downloads
-    if (self.fPendingTorrentDownloads)
-    {
-        for (NSDictionary* downloadDict in self.fPendingTorrentDownloads)
-        {
-            NSURLDownload* download = downloadDict[@"Download"];
-            [download cancel];
-        }
-    }
+    [self.fSession invalidateAndCancel];
 
     //remember window states and close all windows
     [self.fDefaults setBool:self.fInfoController.window.visible forKey:@"InfoVisible"];
@@ -1112,77 +1109,87 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
-- (void)download:(NSURLDownload*)download decideDestinationWithSuggestedFilename:(NSString*)suggestedName
+#pragma mark - NSURLSessionDelegate
+
+- (void)URLSession:(nonnull NSURLSession*)session
+              dataTask:(nonnull NSURLSessionDataTask*)dataTask
+    didReceiveResponse:(nonnull NSURLResponse*)response
+     completionHandler:(nonnull void (^)(NSURLSessionResponseDisposition))completionHandler
 {
-    if ([suggestedName.pathExtension caseInsensitiveCompare:@"torrent"] != NSOrderedSame)
+    NSString* suggestedName = response.suggestedFilename;
+    if ([suggestedName.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
     {
-        [download cancel];
+        completionHandler(NSURLSessionResponseBecomeDownload);
+        return;
+    }
+    completionHandler(NSURLSessionResponseCancel);
 
-        [self.fPendingTorrentDownloads removeObjectForKey:download.request.URL];
-        if (self.fPendingTorrentDownloads.count == 0)
-        {
-            self.fPendingTorrentDownloads = nil;
-        }
-
-        NSString* message = [NSString
-            stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
-                             suggestedName,
-                             download.request.URL.absoluteString.stringByRemovingPercentEncoding];
-
+    NSString* message = [NSString
+        stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
+                         suggestedName,
+                         dataTask.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding];
+    dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
         alert.messageText = NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title");
         alert.informativeText = message;
         [alert runModal];
-    }
-    else
+    });
+}
+
+- (void)URLSession:(nonnull NSURLSession*)session
+                 dataTask:(nonnull NSURLSessionDataTask*)dataTask
+    didBecomeDownloadTask:(nonnull NSURLSessionDownloadTask*)downloadTask
+{
+    // Required delegate method to proceed with  NSURLSessionResponseBecomeDownload.
+    // nothing to do
+}
+
+- (void)URLSession:(nonnull NSURLSession*)session
+                 downloadTask:(nonnull NSURLSessionDownloadTask*)downloadTask
+    didFinishDownloadingToURL:(nonnull NSURL*)location
+{
+    NSString* path = [NSTemporaryDirectory() stringByAppendingPathComponent:downloadTask.response.suggestedFilename.lastPathComponent];
+    NSError* error;
+    [NSFileManager.defaultManager moveItemAtPath:location.path toPath:path error:&error];
+    if (error)
     {
-        [download setDestination:[NSTemporaryDirectory() stringByAppendingPathComponent:suggestedName.lastPathComponent]
-                  allowOverwrite:NO];
+        [self URLSession:session task:downloadTask didCompleteWithError:error];
+        return;
     }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self openFiles:@[ path ] addType:ADD_URL forcePath:nil];
+
+        //delete the torrent file after opening
+        [NSFileManager.defaultManager removeItemAtPath:path error:NULL];
+    });
 }
 
-- (void)download:(NSURLDownload*)download didCreateDestination:(NSString*)path
+- (void)URLSession:(nonnull NSURLSession*)session
+                    task:(nonnull NSURLSessionTask*)task
+    didCompleteWithError:(nullable NSError*)error
 {
-    NSMutableDictionary* dict = self.fPendingTorrentDownloads[download.request.URL];
-    dict[@"Path"] = path;
-}
+    if (!error || error.code == NSURLErrorCancelled)
+    {
+        // no errors or we already displayed an alert
+        return;
+    }
 
-- (void)download:(NSURLDownload*)download didFailWithError:(NSError*)error
-{
     NSString* message = [NSString
         stringWithFormat:NSLocalizedString(@"The torrent could not be downloaded from %@: %@.", "Torrent download failed -> message"),
-                         download.request.URL.absoluteString.stringByRemovingPercentEncoding,
+                         task.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding,
                          error.localizedDescription];
-
-    NSAlert* alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:NSLocalizedString(@"OK", "Torrent download failed -> button")];
-    alert.messageText = NSLocalizedString(@"Torrent download failed", "Torrent download error -> title");
-    alert.informativeText = message;
-    [alert runModal];
-
-    [self.fPendingTorrentDownloads removeObjectForKey:download.request.URL];
-    if (self.fPendingTorrentDownloads.count == 0)
-    {
-        self.fPendingTorrentDownloads = nil;
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert* alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle:NSLocalizedString(@"OK", "Torrent download failed -> button")];
+        alert.messageText = NSLocalizedString(@"Torrent download failed", "Torrent download error -> title");
+        alert.informativeText = message;
+        [alert runModal];
+    });
 }
 
-- (void)downloadDidFinish:(NSURLDownload*)download
-{
-    NSString* path = self.fPendingTorrentDownloads[download.request.URL][@"Path"];
-
-    [self openFiles:@[ path ] addType:ADD_URL forcePath:nil];
-
-    //delete the torrent file after opening
-    [NSFileManager.defaultManager removeItemAtPath:path error:NULL];
-
-    [self.fPendingTorrentDownloads removeObjectForKey:download.request.URL];
-    if (self.fPendingTorrentDownloads.count == 0)
-    {
-        self.fPendingTorrentDownloads = nil;
-    }
-}
+#pragma mark -
 
 - (void)application:(NSApplication*)app openFiles:(NSArray<NSString*>*)filenames
 {
@@ -1630,23 +1637,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             return;
         }
 
-        NSURLRequest* request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-                                             timeoutInterval:60];
-
-        if (self.fPendingTorrentDownloads[request.URL])
-        {
-            NSLog(@"Already downloading %@", request.URL);
-            return;
-        }
-
-        NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
-
-        if (!self.fPendingTorrentDownloads)
-        {
-            self.fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
-        }
-        NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithObject:download forKey:@"Download"];
-        self.fPendingTorrentDownloads[request.URL] = dict;
+        [self.fSession getAllTasksWithCompletionHandler:^(NSArray<__kindof NSURLSessionTask*>* _Nonnull tasks) {
+            for (NSURLSessionTask* task in tasks)
+            {
+                if ([task.originalRequest.URL isEqual:url])
+                {
+                    NSLog(@"Already downloading %@", url);
+                    return;
+                }
+            }
+            NSURLSessionDataTask* download = [self.fSession dataTaskWithURL:url];
+            [download resume];
+        }];
     }
 }
 
@@ -2366,6 +2368,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     self.fTotalTorrentsField.stringValue = totalTorrentsString;
 }
 
+#pragma mark - UNUserNotificationCenterDelegate
+
 - (void)userNotificationCenter:(UNUserNotificationCenter*)center
        willPresentNotification:(UNNotification*)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler API_AVAILABLE(macos(10.14))
@@ -2492,6 +2496,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self showMainWindow:nil];
     [self.fTableView selectAndScrollToRow:row];
 }
+
+#pragma mark -
 
 - (Torrent*)torrentForHash:(NSString*)hash
 {
