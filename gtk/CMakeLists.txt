@@ -1,6 +1,9 @@
 project(trgtk)
 
 add_compile_options(${C_WARNING_FLAGS})
+if(ENABLE_WERROR)
+    add_compile_options($<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>)
+endif()
 
 execute_process(
     COMMAND
