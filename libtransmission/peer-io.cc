@@ -256,10 +256,7 @@ tr_peerIo::tr_peerIo(
 
 void tr_peerIo::set_socket(tr_peer_socket socket_in)
 {
-    // tear down the previous socket, if any
-    event_read_.reset();
-    event_write_.reset();
-    socket_.close(session_);
+    close(); // tear down the previous socket, if any
 
     socket_ = std::move(socket_in);
 
@@ -397,10 +394,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     }
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
-    if (!peer_io)
-    {
-        return {};
-    }
 
 #ifdef WITH_UTP
     if (utp)
@@ -410,21 +403,20 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         peer_io->set_socket(tr_peer_socket{ addr, port, sock });
 
         auto const [ss, sslen] = addr.to_sockaddr(port);
-        if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == -1)
+        if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
         {
-            peer_io->socket_.close(session);
+            return peer_io;
         }
     }
 #endif
 
     if (!peer_io->socket_.is_valid())
     {
-        peer_io->set_socket(tr_netOpenPeerSocket(session, addr, port, is_seed));
-    }
-
-    if (peer_io->socket_.is_valid())
-    {
-        return peer_io;
+        if (auto sock = tr_netOpenPeerSocket(session, addr, port, is_seed); sock.is_valid())
+        {
+            peer_io->set_socket(std::move(sock));
+            return peer_io;
+        }
     }
 
     return {};
