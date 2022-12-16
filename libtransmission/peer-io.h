@@ -271,11 +271,6 @@ public:
         filter_.decryptInit(is_incoming, dh, info_hash);
     }
 
-    void decrypt(size_t buflen, void* buf)
-    {
-        filter_.decrypt(buflen, buf);
-    }
-
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
         filter_.encryptInit(is_incoming, dh, info_hash);
@@ -296,6 +291,11 @@ private:
         {
             got_error_(this, error, user_data_);
         }
+    }
+
+    void decrypt(size_t buflen, void* buf)
+    {
+        filter_.decrypt(buflen, buf);
     }
 
     void encrypt(size_t buflen, void* buf)
