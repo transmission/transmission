@@ -41,9 +41,9 @@ private:
 #endif
 
 private:
+#if GTKMM_CHECK_VERSION(4, 0, 0)
     PathButton& widget_;
 
-#if GTKMM_CHECK_VERSION(4, 0, 0)
     Glib::Property<Gtk::FileChooser::Action> action_;
     Glib::Property<Glib::ustring> title_;
 
@@ -59,9 +59,9 @@ private:
 #endif
 };
 
-PathButton::Impl::Impl(PathButton& widget)
-    : widget_(widget)
+PathButton::Impl::Impl([[maybe_unused]] PathButton& widget)
 #if GTKMM_CHECK_VERSION(4, 0, 0)
+    : widget_(widget)
     , action_(widget, "action", Gtk::FileChooser::Action::OPEN)
     , title_(widget, "title", {})
     , image_(Gtk::make_managed<Gtk::Image>())

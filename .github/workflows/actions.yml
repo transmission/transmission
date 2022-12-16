@@ -210,6 +210,7 @@ jobs:
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WEB=OFF \
+            -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
@@ -284,6 +285,7 @@ jobs:
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WEB=OFF \
+            -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
@@ -375,6 +377,7 @@ jobs:
             -DENABLE_TESTS=ON `
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WEB=OFF `
+            -DENABLE_WERROR=ON `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: |
@@ -478,6 +481,7 @@ jobs:
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WEB=OFF \
+            -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
@@ -553,6 +557,7 @@ jobs:
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WEB=OFF \
+            -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
@@ -625,6 +630,7 @@ jobs:
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WEB=OFF \
+            -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
