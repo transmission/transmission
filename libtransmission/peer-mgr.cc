@@ -1089,11 +1089,11 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
     bool const ok = result.is_connected;
     bool success = false;
 
-    tr_swarm* const s = getExistingSwarm(manager, result.io->torrentHash());
+    tr_swarm* const s = getExistingSwarm(manager, result.io->torrent_hash());
 
-    auto const [addr, port] = result.io->socketAddress();
+    auto const [addr, port] = result.io->socket_address();
 
-    if (result.io->isIncoming())
+    if (result.io->is_incoming())
     {
         manager->incoming_handshakes.erase(addr);
     }
@@ -1135,7 +1135,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
         atom->piece_data_time = 0;
         atom->lastConnectionAt = tr_time();
 
-        if (!result.io->isIncoming())
+        if (!result.io->is_incoming())
         {
             atom->flags |= ADDED_F_CONNECTABLE;
             atom->flags2 &= ~MyflagUnreachable;
@@ -1143,7 +1143,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
 
         /* In principle, this flag specifies whether the peer groks µTP,
            not whether it's currently connected over µTP. */
-        if (result.io->socket.is_utp())
+        if (result.io->is_utp())
         {
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
@@ -1152,7 +1152,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", atom->display_name()));
         }
-        else if (result.io->isIncoming() && s->peerCount() >= s->tor->peerLimit())
+        else if (result.io->is_incoming() && s->peerCount() >= s->tor->peerLimit())
         {
             /* too many peers already */
         }
@@ -1170,7 +1170,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
                 client = tr_quark_new(std::data(buf));
             }
 
-            result.io->setParent(&s->tor->bandwidth_);
+            result.io->set_parent(&s->tor->bandwidth_);
             createBitTorrentPeer(s->tor, result.io, atom, client);
 
             success = true;
@@ -1202,7 +1202,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         manager->incoming_handshakes.try_emplace(
             address,
             &manager->handshake_mediator_,
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
+            tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),
             [manager](tr_handshake::Result const& result) { return on_handshake_done(manager, result); });
     }
@@ -2759,7 +2759,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
         s,
         fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", atom.display_name()));
 
-    auto peer_io = tr_peerIo::newOutgoing(
+    auto peer_io = tr_peerIo::new_outgoing(
         mgr->session,
         &mgr->session->top_bandwidth_,
         atom.addr,
