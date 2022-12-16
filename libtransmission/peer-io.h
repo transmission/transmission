@@ -31,11 +31,6 @@ namespace libtransmission::test
 class HandshakeTest;
 } // namespace libtransmission::test
 
-/**
- * @addtogroup networked_io Networked IO
- * @{
- */
-
 enum ReadState
 {
     READ_NOW,
@@ -364,8 +359,3 @@ private:
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;
 };
-
-constexpr bool tr_isPeerIo(tr_peerIo const* io)
-{
-    return io != nullptr && io->address().is_valid();
-}
