@@ -124,7 +124,7 @@ public:
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)>& signal_add_error();
     sigc::signal<void(tr_ctor*)>& signal_add_prompt();
-    sigc::signal<void(int)>& signal_blocklist_updated();
+    sigc::signal<void(bool)>& signal_blocklist_updated();
     sigc::signal<void(bool)>& signal_busy();
     sigc::signal<void(tr_quark)>& signal_prefs_changed();
     sigc::signal<void(bool)>& signal_port_tested();
