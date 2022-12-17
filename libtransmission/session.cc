@@ -508,24 +508,6 @@ void tr_session::onNowTimer()
     tr_timeUpdate(time(nullptr));
     alt_speeds_.checkScheduler();
 
-    // TODO: this seems a little silly. Why do we increment this
-    // every second instead of computing the value as needed by
-    // subtracting the current time from a start time?
-    for (auto* const tor : torrents())
-    {
-        if (tor->isRunning)
-        {
-            if (tor->isDone())
-            {
-                ++tor->seconds_seeding_;
-            }
-            else
-            {
-                ++tor->seconds_downloading_;
-            }
-        }
-    }
-
     // set the timer to kick again right after (10ms after) the next second
     auto const now = std::chrono::system_clock::now();
     auto const target_time = std::chrono::time_point_cast<std::chrono::seconds>(now) + 1s + 10ms;
