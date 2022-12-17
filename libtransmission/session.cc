@@ -1248,7 +1248,6 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
         tr_torrentFreeInSessionThread(tor);
     }
     torrents.clear();
-    tr_utpClose(this);
     // ...now that all the torrents have been closed, any remaining
     // `&event=stopped` announce messages are queued in the announcer.
     // Tell the announcer to start shutdown, which sends out the stop
@@ -1284,6 +1283,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 
     stats().saveIfDirty();
     peer_mgr_.reset();
+    tr_utpClose(this);
     openFiles().closeAll();
 
     // tada we are done!
