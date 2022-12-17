@@ -185,7 +185,7 @@ private:
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error_;
     sigc::signal<void(tr_ctor*)> signal_add_prompt_;
-    sigc::signal<void(int)> signal_blocklist_updated_;
+    sigc::signal<void(bool)> signal_blocklist_updated_;
     sigc::signal<void(bool)> signal_busy_;
     sigc::signal<void(tr_quark)> signal_prefs_changed_;
     sigc::signal<void(bool)> signal_port_tested_;
@@ -1715,7 +1715,7 @@ void Session::blocklist_update()
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated().emit(ruleCount);
+            impl_->signal_blocklist_updated().emit(ruleCount >= 0);
         });
     tr_variantClear(&request);
 }
@@ -1803,7 +1803,7 @@ sigc::signal<void(tr_ctor*)>& Session::signal_add_prompt()
     return impl_->signal_add_prompt();
 }
 
-sigc::signal<void(int)>& Session::signal_blocklist_updated()
+sigc::signal<void(bool)>& Session::signal_blocklist_updated()
 {
     return impl_->signal_blocklist_updated();
 }
