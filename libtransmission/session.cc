@@ -517,11 +517,11 @@ void tr_session::onNowTimer()
         {
             if (tor->isDone())
             {
-                ++tor->secondsSeeding;
+                ++tor->seconds_seeding_;
             }
             else
             {
-                ++tor->secondsDownloading;
+                ++tor->seconds_downloading_;
             }
         }
     }

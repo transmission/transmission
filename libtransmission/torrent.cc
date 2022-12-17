@@ -974,8 +974,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->doneDate = tor->doneDate;
     s->editDate = tor->editDate;
     s->startDate = tor->startDate;
-    s->secondsSeeding = tor->secondsSeeding;
-    s->secondsDownloading = tor->secondsDownloading;
+    s->secondsSeeding = tor->seconds_seeding_;
+    s->secondsDownloading = tor->seconds_downloading_;
 
     s->corruptEver = tor->corruptCur + tor->corruptPrev;
     s->downloadedEver = tor->downloadedCur + tor->downloadedPrev;

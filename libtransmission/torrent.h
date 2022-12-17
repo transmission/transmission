@@ -792,6 +792,9 @@ public:
 
     time_t lastStatTime = 0;
 
+    time_t seconds_downloading_ = 0;
+    time_t seconds_seeding_ = 0;
+
     uint64_t downloadedCur = 0;
     uint64_t downloadedPrev = 0;
     uint64_t uploadedCur = 0;
@@ -817,9 +820,6 @@ public:
     tr_stat_errtype error = TR_STAT_OK;
 
     tr_bytes_per_second_t etaSpeed_Bps = 0;
-
-    time_t secondsDownloading = 0;
-    time_t secondsSeeding = 0;
 
     size_t queuePosition = 0;
 

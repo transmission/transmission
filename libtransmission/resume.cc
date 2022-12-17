@@ -752,13 +752,13 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bo
 
     if ((fields_to_load & tr_resume::TimeSeeding) != 0 && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
     {
-        tor->secondsSeeding = i;
+        tor->seconds_seeding_ = i;
         fields_loaded |= tr_resume::TimeSeeding;
     }
 
     if ((fields_to_load & tr_resume::TimeDownloading) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
     {
-        tor->secondsDownloading = i;
+        tor->seconds_downloading_ = i;
         fields_loaded |= tr_resume::TimeDownloading;
     }
 
@@ -907,8 +907,8 @@ void save(tr_torrent* tor)
 
     auto top = tr_variant{};
     tr_variantInitDict(&top, 50); /* arbitrary "big enough" number */
-    tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, tor->secondsSeeding);
-    tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, tor->secondsDownloading);
+    tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, tor->seconds_seeding_);
+    tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, tor->seconds_downloading_);
     tr_variantDictAddInt(&top, TR_KEY_activity_date, tor->activityDate);
     tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
