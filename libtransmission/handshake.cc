@@ -50,7 +50,7 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     }
     auto const flag_bytes = flags.raw();
 
-    auto* walk = buf;
+    [[maybe_unused]] auto* walk = buf;
     walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(HandshakeName)), std::size(HandshakeName), walk);
     walk = std::copy(std::begin(flag_bytes), std::end(flag_bytes), walk);
     walk = std::copy_n(reinterpret_cast<char const*>(std::data(info_hash)), std::size(info_hash), walk);
