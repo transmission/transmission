@@ -4,8 +4,6 @@ if(WITH_SYSTEMD)
     add_definitions(-DUSE_SYSTEMD)
 endif()
 
-add_compile_options(${CXX_WARNING_FLAGS})
-
 include_directories(
     ${CMAKE_SOURCE_DIR}
 )

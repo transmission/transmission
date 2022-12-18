@@ -57,11 +57,6 @@ set(${PROJECT_NAME}_SOURCES
     WatchDir.cc
 )
 
-string(REPLACE ";" " " CXX_WARNING_FLAGS_STR "${CXX_WARNING_FLAGS}")
-foreach(FILE ${${PROJECT_NAME}_SOURCES})
-    set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${CXX_WARNING_FLAGS_STR}")
-endforeach()
-
 if (NOT ENABLE_QT_COM_INTEROP)
     set_source_files_properties(ComInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
 endif()

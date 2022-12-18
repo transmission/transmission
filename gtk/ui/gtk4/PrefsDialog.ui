@@ -3,7 +3,7 @@
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="PrefsDialog">
     <property name="title" translatable="1">Transmission Preferences</property>
-    <property name="modal">1</property>
+    <property name="modal">0</property>
     <child internal-child="content_area">
       <object class="GtkBox" id="dialog_layout">
         <property name="orientation">vertical</property>
