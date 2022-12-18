@@ -73,7 +73,6 @@ target_include_directories(libtransmission-test SYSTEM
 
 target_compile_options(libtransmission-test
     PRIVATE
-        ${CXX_WARNING_FLAGS}
         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
 
 target_link_libraries(libtransmission-test
