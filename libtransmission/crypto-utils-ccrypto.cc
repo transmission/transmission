@@ -63,7 +63,7 @@ char const* ccrypto_error_to_str(CCCryptorStatus error_code)
     return "Unknown error";
 }
 
-void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
+void log_ccrypto_error(CCCryptorStatus error_code, char const* file, long line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
@@ -79,7 +79,7 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
     }
 }
 
-bool check_ccrypto_result(CCCryptorStatus result, char const* file, int line)
+bool check_ccrypto_result(CCCryptorStatus result, char const* file, long line)
 {
     bool const ret = result == kCCSuccess;
 
