@@ -603,6 +603,12 @@ else()
     unset(CMAKE_REQUIRED_FLAGS)
 endif()
 
+string(REPLACE ";" "$<SEMICOLON>" C_WARNING_FLAGS_GENEX "${C_WARNING_FLAGS}")
+string(REPLACE ";" "$<SEMICOLON>" CXX_WARNING_FLAGS_GENEX "${CXX_WARNING_FLAGS}")
+add_compile_options(
+    $<$<COMPILE_LANGUAGE:C>:${C_WARNING_FLAGS_GENEX}>
+    $<$<COMPILE_LANGUAGE:CXX>:${CXX_WARNING_FLAGS_GENEX}>)
+
 ###
 
 include(LargeFileSupport)

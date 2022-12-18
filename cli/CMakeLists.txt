@@ -1,7 +1,5 @@
 project(trcli)
 
-add_compile_options(${CXX_WARNING_FLAGS})
-
 include_directories(${CMAKE_SOURCE_DIR})
 
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
