@@ -42,6 +42,7 @@
 #include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
+#include <wildmat.h>
 
 #include "transmission.h"
 
@@ -191,11 +192,6 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
     }
 
     return len;
-}
-
-extern "C"
-{
-    int DoMatch(char const* text, char const* p);
 }
 
 /* User-level routine. returns whether or not 'text' and 'p' matched */

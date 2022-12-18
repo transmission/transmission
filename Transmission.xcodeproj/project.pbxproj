@@ -46,7 +46,6 @@
 		4D80185910BBC0B0008A4AF2 /* magnet-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */; };
 		4D80185A10BBC0B0008A4AF2 /* magnet-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */; };
 		4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DB74F070E8CD75100AEB1A8 /* wildmat.c */; };
 		4DCCBB3E09C3D71100D3CABF /* TorrentCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */; };
 		4DE5CC9D0980656F00BE280E /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		4DE5CCA70980735700BE280E /* Badger.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA60980735700BE280E /* Badger.mm */; };
@@ -211,8 +210,6 @@
 		A2A4E9210DE0F7E9000CE197 /* web.h in Headers */ = {isa = PBXBuildFile; fileRef = A29EBE530DC01FC9006CEE80 /* web.h */; };
 		A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */ = {isa = PBXBuildFile; fileRef = A29EBE520DC01FC9006CEE80 /* web.cc */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.mm */; };
-		A2A7B32A164F87D400B98C65 /* jsonsl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A7B328164F87D400B98C65 /* jsonsl.c */; };
-		A2A7B32B164F87D400B98C65 /* jsonsl.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A7B329164F87D400B98C65 /* jsonsl.h */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.mm */; };
 		A2AA9BE1132CAC8E00FA131E /* announcer-udp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.cc */; };
 		A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE2132CAE2000FA131E /* evdns.c */; };
@@ -352,6 +349,12 @@
 		C1639A7D1A55F57200E42033 /* cencode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7B1A55F57200E42033 /* cencode.h */; };
 		C17740D5273A002C00E455D2 /* web-utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = C17740D3273A002C00E455D2 /* web-utils.cc */; };
 		C17740D6273A002C00E455D2 /* web-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C17740D4273A002C00E455D2 /* web-utils.h */; };
+		C1846BA0294F7A6300A98F30 /* jsonsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C1846B86294F780700A98F30 /* jsonsl.h */; };
+		C1846BA1294F7A6300A98F30 /* jsonsl.c in Sources */ = {isa = PBXBuildFile; fileRef = C1846B85294F780700A98F30 /* jsonsl.c */; };
+		C1846BA2294F7A6800A98F30 /* wildmat.c in Sources */ = {isa = PBXBuildFile; fileRef = C1846B88294F781800A98F30 /* wildmat.c */; };
+		C1846BA3294F7A6800A98F30 /* wildmat.h in Headers */ = {isa = PBXBuildFile; fileRef = C1846B87294F781800A98F30 /* wildmat.h */; };
+		C1846BA8294F7B5700A98F30 /* libjsonsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1846B91294F796A00A98F30 /* libjsonsl.a */; };
+		C1846BA9294F7B5A00A98F30 /* libwildmat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1846B9E294F7A3400A98F30 /* libwildmat.a */; };
 		C1BF7BA81F2A3CB7008E88A7 /* upnpdev.c in Sources */ = {isa = PBXBuildFile; fileRef = C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */; };
 		C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */ = {isa = PBXBuildFile; fileRef = C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */; };
 		C1F690FD1AD0627500D95CF0 /* daemon-posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1F690FC1AD0627500D95CF0 /* daemon-posix.cc */; };
@@ -538,6 +541,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = C1639A6E1A55F4D600E42033;
 			remoteInfo = b64;
+		};
+		C1846BA4294F7B1100A98F30 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1846B90294F796A00A98F30;
+			remoteInfo = jsonsl;
+		};
+		C1846BA6294F7B1400A98F30 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1846B96294F7A3400A98F30;
+			remoteInfo = wildmat;
 		};
 		C33E46A12794B3CC0090F2AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -751,7 +768,6 @@
 		4D8017E910BBC073008A4AF2 /* torrent-magnet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-magnet.h"; sourceTree = "<group>"; };
 		4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "magnet-metainfo.cc"; sourceTree = "<group>"; };
 		4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "magnet-metainfo.h"; sourceTree = "<group>"; };
-		4DB74F070E8CD75100AEB1A8 /* wildmat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = wildmat.c; sourceTree = "<group>"; };
 		4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCell.mm; sourceTree = "<group>"; };
 		4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentCell.h; sourceTree = "<group>"; };
 		4DDBB71909E16BAE00284745 /* transmissioncli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = transmissioncli; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -967,8 +983,6 @@
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PeerProgressIndicatorCell.mm; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BadgeView.h; sourceTree = "<group>"; };
 		A2A6321A0CD9751700E3DA60 /* BadgeView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BadgeView.mm; sourceTree = "<group>"; };
-		A2A7B328164F87D400B98C65 /* jsonsl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = jsonsl.c; sourceTree = "<group>"; };
-		A2A7B329164F87D400B98C65 /* jsonsl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jsonsl.h; sourceTree = "<group>"; };
 		A2A90DC115F3C3D900FB7115 /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2A9D119187DD75100C52A1F /* tr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2A9D11A187DD75200C52A1F /* tr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1136,6 +1150,12 @@
 		C1639A7B1A55F57200E42033 /* cencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cencode.h; path = include/b64/cencode.h; sourceTree = "<group>"; };
 		C17740D3273A002C00E455D2 /* web-utils.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "web-utils.cc"; sourceTree = "<group>"; };
 		C17740D4273A002C00E455D2 /* web-utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "web-utils.h"; sourceTree = "<group>"; };
+		C1846B85294F780700A98F30 /* jsonsl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = jsonsl.c; sourceTree = "<group>"; };
+		C1846B86294F780700A98F30 /* jsonsl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jsonsl.h; sourceTree = "<group>"; };
+		C1846B87294F781800A98F30 /* wildmat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wildmat.h; sourceTree = "<group>"; };
+		C1846B88294F781800A98F30 /* wildmat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = wildmat.c; sourceTree = "<group>"; };
+		C1846B91294F796A00A98F30 /* libjsonsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libjsonsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1846B9E294F7A3400A98F30 /* libwildmat.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwildmat.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = upnpdev.c; sourceTree = "<group>"; };
 		C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = upnpdev.h; sourceTree = "<group>"; };
 		C1F690FC1AD0627500D95CF0 /* daemon-posix.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "daemon-posix.cc"; sourceTree = "<group>"; };
@@ -1307,6 +1327,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1846BA9294F7B5A00A98F30 /* libwildmat.a in Frameworks */,
+				C1846BA8294F7B5700A98F30 /* libjsonsl.a in Frameworks */,
 				C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */,
 				C3CEBBFC2794A12200683BE0 /* libdeflate.a in Frameworks */,
 				C1639A741A55F4E000E42033 /* libb64.a in Frameworks */,
@@ -1343,6 +1365,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C1639A6C1A55F4D600E42033 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1846B8F294F796A00A98F30 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1846B99294F7A3400A98F30 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1522,6 +1558,8 @@
 				C1639A6F1A55F4D600E42033 /* libb64.a */,
 				C3CEBBA927949CA000683BE0 /* libdeflate.a */,
 				C3D9062127B7E3C900EF2386 /* libpsl.a */,
+				C1846B91294F796A00A98F30 /* libjsonsl.a */,
+				C1846B9E294F7A3400A98F30 /* libwildmat.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1544,6 +1582,8 @@
 				3C7A11880D0B2E6700B5701F /* libnatpmp */,
 				C3D9061627B7E12F00EF2386 /* libpsl */,
 				C1639A751A55F52800E42033 /* b64 */,
+				C1846B81294F774D00A98F30 /* jsonsl */,
+				C1846B82294F777000A98F30 /* wildmat */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				A2F35BBA15C5A0A100EBF632 /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -1662,8 +1702,6 @@
 				BEFC1E160C07861A00B0BB3C /* inout.cc */,
 				BEFC1E150C07861A00B0BB3C /* inout.h */,
 				E23B55A5FC3B557F7746D511 /* interned-string.h */,
-				A2A7B328164F87D400B98C65 /* jsonsl.c */,
-				A2A7B329164F87D400B98C65 /* jsonsl.h */,
 				A2AF23C616B44FA0003BC59E /* log.cc */,
 				A2AF23C716B44FA0003BC59E /* log.h */,
 				4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */,
@@ -1774,7 +1812,6 @@
 				A29EBE530DC01FC9006CEE80 /* web.h */,
 				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
 				A292A6E60DFB45EC004B9C0A /* webseed.h */,
-				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
 			);
 			path = libtransmission;
 			sourceTree = "<group>";
@@ -2021,6 +2058,26 @@
 			path = "third-party/libb64";
 			sourceTree = "<group>";
 		};
+		C1846B81294F774D00A98F30 /* jsonsl */ = {
+			isa = PBXGroup;
+			children = (
+				C1846B85294F780700A98F30 /* jsonsl.c */,
+				C1846B86294F780700A98F30 /* jsonsl.h */,
+			);
+			name = jsonsl;
+			path = "third-party/jsonsl";
+			sourceTree = "<group>";
+		};
+		C1846B82294F777000A98F30 /* wildmat */ = {
+			isa = PBXGroup;
+			children = (
+				C1846B88294F781800A98F30 /* wildmat.c */,
+				C1846B87294F781800A98F30 /* wildmat.h */,
+			);
+			name = wildmat;
+			path = "third-party/wildmat";
+			sourceTree = "<group>";
+		};
 		C3CEBB9E27949A3900683BE0 /* libdeflate */ = {
 			isa = PBXGroup;
 			children = (
@@ -2246,7 +2303,6 @@
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
 				A2EE726F14DCCC950093C99A /* port-forwarding-natpmp.h in Headers */,
 				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,
-				A2A7B32B164F87D400B98C65 /* jsonsl.h in Headers */,
 				A25BFD6A167BED3B0039D1AA /* variant-common.h in Headers */,
 				A25BFD6E167BED3B0039D1AA /* variant.h in Headers */,
 				A2EA52321686AC0D00180493 /* quark.h in Headers */,
@@ -2317,6 +2373,22 @@
 			files = (
 				C1639A7D1A55F57200E42033 /* cencode.h in Headers */,
 				C1639A7C1A55F57200E42033 /* cdecode.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1846B8D294F796A00A98F30 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1846BA0294F7A6300A98F30 /* jsonsl.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1846B97294F7A3400A98F30 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1846BA3294F7A6800A98F30 /* wildmat.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2393,6 +2465,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				C1846BA7294F7B1400A98F30 /* PBXTargetDependency */,
+				C1846BA5294F7B1100A98F30 /* PBXTargetDependency */,
 				C33E46A22794B3CC0090F2AA /* PBXTargetDependency */,
 				A226FDB10D0CDF6E005A7F71 /* PBXTargetDependency */,
 				BE1183760CE161040002D0F3 /* PBXTargetDependency */,
@@ -2587,6 +2661,40 @@
 			productReference = C1639A6F1A55F4D600E42033 /* libb64.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		C1846B90294F796A00A98F30 /* jsonsl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1846B92294F796C00A98F30 /* Build configuration list for PBXNativeTarget "jsonsl" */;
+			buildPhases = (
+				C1846B8D294F796A00A98F30 /* Headers */,
+				C1846B8E294F796A00A98F30 /* Sources */,
+				C1846B8F294F796A00A98F30 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = jsonsl;
+			productName = jsonsl;
+			productReference = C1846B91294F796A00A98F30 /* libjsonsl.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		C1846B96294F7A3400A98F30 /* wildmat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1846B9A294F7A3400A98F30 /* Build configuration list for PBXNativeTarget "wildmat" */;
+			buildPhases = (
+				C1846B97294F7A3400A98F30 /* Headers */,
+				C1846B98294F7A3400A98F30 /* Sources */,
+				C1846B99294F7A3400A98F30 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = wildmat;
+			productName = jsonsl;
+			productReference = C1846B9E294F7A3400A98F30 /* libwildmat.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		C3CEBB9F27949CA000683BE0 /* deflate */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C3CEBBA527949CA000683BE0 /* Build configuration list for PBXNativeTarget "deflate" */;
@@ -2692,6 +2800,9 @@
 					C1639A6E1A55F4D600E42033 = {
 						CreatedOnToolsVersion = 6.1.1;
 					};
+					C1846B90294F796A00A98F30 = {
+						CreatedOnToolsVersion = 14.1;
+					};
 					C3D9062027B7E3C900EF2386 = {
 						CreatedOnToolsVersion = 13.0;
 					};
@@ -2736,6 +2847,8 @@
 				C1639A6E1A55F4D600E42033 /* b64 */,
 				C3CEBB9F27949CA000683BE0 /* deflate */,
 				C3D9062027B7E3C900EF2386 /* psl */,
+				C1846B90294F796A00A98F30 /* jsonsl */,
+				C1846B96294F7A3400A98F30 /* wildmat */,
 			);
 		};
 /* End PBXProject section */
@@ -2952,7 +3065,6 @@
 				A25E03E30E4015380086C225 /* tr-getopt.cc in Sources */,
 				E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */,
 				C1305EBE186A13B100F03351 /* file.cc in Sources */,
-				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.cc in Sources */,
 				C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */,
@@ -2973,7 +3085,6 @@
 				C1FEE5791C3223CC00D62832 /* watchdir-kqueue.cc in Sources */,
 				A2AA9BE1132CAC8E00FA131E /* announcer-udp.cc in Sources */,
 				A2D77452154CC25700A62B93 /* WebSeedTableView.mm in Sources */,
-				A2A7B32A164F87D400B98C65 /* jsonsl.c in Sources */,
 				A25BFD69167BED3B0039D1AA /* variant-benc.cc in Sources */,
 				A25BFD6B167BED3B0039D1AA /* variant-json.cc in Sources */,
 				A25BFD6D167BED3B0039D1AA /* variant.cc in Sources */,
@@ -3180,6 +3291,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1846B8E294F796A00A98F30 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1846BA1294F7A6300A98F30 /* jsonsl.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1846B98294F7A3400A98F30 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1846BA2294F7A6800A98F30 /* wildmat.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C3CEBBA227949CA000683BE0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3293,6 +3420,16 @@
 			isa = PBXTargetDependency;
 			target = C1639A6E1A55F4D600E42033 /* b64 */;
 			targetProxy = C165AB8C1A55FAA900D37711 /* PBXContainerItemProxy */;
+		};
+		C1846BA5294F7B1100A98F30 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1846B90294F796A00A98F30 /* jsonsl */;
+			targetProxy = C1846BA4294F7B1100A98F30 /* PBXContainerItemProxy */;
+		};
+		C1846BA7294F7B1400A98F30 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1846B96294F7A3400A98F30 /* wildmat */;
+			targetProxy = C1846BA6294F7B1400A98F30 /* PBXContainerItemProxy */;
 		};
 		C33E46A22794B3CC0090F2AA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3584,6 +3721,8 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/utfcpp/source",
+					"third-party/jsonsl",
+					"third-party/wildmat",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3834,6 +3973,8 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/utfcpp/source",
+					"third-party/jsonsl",
+					"third-party/wildmat",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4162,6 +4303,8 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/utfcpp/source",
+					"third-party/jsonsl",
+					"third-party/wildmat",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4497,6 +4640,66 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		C1846B93294F796C00A98F30 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				PRODUCT_NAME = jsonsl;
+			};
+			name = Debug;
+		};
+		C1846B94294F796C00A98F30 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				PRODUCT_NAME = jsonsl;
+			};
+			name = "Release - Debug";
+		};
+		C1846B95294F796C00A98F30 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				PRODUCT_NAME = jsonsl;
+			};
+			name = Release;
+		};
+		C1846B9B294F7A3400A98F30 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				PRODUCT_NAME = wildmat;
+			};
+			name = Debug;
+		};
+		C1846B9C294F7A3400A98F30 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				PRODUCT_NAME = wildmat;
+			};
+			name = "Release - Debug";
+		};
+		C1846B9D294F7A3400A98F30 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				PRODUCT_NAME = wildmat;
 			};
 			name = Release;
 		};
@@ -4905,6 +5108,26 @@
 				C1639A701A55F4D600E42033 /* Debug */,
 				C1639A711A55F4D600E42033 /* Release - Debug */,
 				C1639A721A55F4D600E42033 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C1846B92294F796C00A98F30 /* Build configuration list for PBXNativeTarget "jsonsl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1846B93294F796C00A98F30 /* Debug */,
+				C1846B94294F796C00A98F30 /* Release - Debug */,
+				C1846B95294F796C00A98F30 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C1846B9A294F7A3400A98F30 /* Build configuration list for PBXNativeTarget "wildmat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1846B9B294F7A3400A98F30 /* Debug */,
+				C1846B9C294F7A3400A98F30 /* Release - Debug */,
+				C1846B9D294F7A3400A98F30 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
