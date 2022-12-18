@@ -171,7 +171,8 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction di
     tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peer_array.size(), dir == TR_UP ? "upload" : "download"));
 
     // Shuffle the peers so they all have equal chance to be first in line.
-    std::shuffle(std::begin(peer_array), std::end(peer_array), std::mt19937{});
+    thread_local auto random_engine = std::mt19937{ std::random_device{}() };
+    std::shuffle(std::begin(peer_array), std::end(peer_array), random_engine);
 
     // Give each peer `Increment` bandwidth bytes to use. Repeat this
     // process until we run out of bandwidth and/or peers that can use it.
