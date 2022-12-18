@@ -429,6 +429,7 @@ if(NOT USE_SYSTEM_MINIUPNPC)
 endif()
 
 add_subdirectory(third-party/jsonsl)
+add_subdirectory(third-party/wildmat)
 
 tr_add_external_auto_library(DHT dht dht)
 
