@@ -314,7 +314,7 @@ static void printMessage(
     std::string_view name,
     std::string_view message,
     std::string_view filename,
-    int line)
+    long line)
 {
     auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
                                         fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
