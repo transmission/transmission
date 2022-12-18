@@ -725,7 +725,7 @@
   </action>
   <action name="action_AddURL">
    <property name="text">
-    <string>Open &amp;URL…</string>
+    <string>Open &amp;Magnet &amp;or &amp;URL…</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+U</string>
