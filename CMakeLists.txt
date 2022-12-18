@@ -428,6 +428,8 @@ if(NOT USE_SYSTEM_MINIUPNPC)
     set(MINIUPNPC_API_VERSION 12)
 endif()
 
+add_subdirectory(third-party/jsonsl)
+
 tr_add_external_auto_library(DHT dht dht)
 
 tr_add_external_auto_library(PSL libpsl psl)

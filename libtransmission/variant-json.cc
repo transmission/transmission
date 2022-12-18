@@ -19,13 +19,13 @@
 
 #include <fmt/compile.h>
 #include <fmt/format.h>
+#include <jsonsl.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 
 #include "error.h"
-#include "jsonsl.h"
 #include "log.h"
 #include "quark.h"
 #include "tr-assert.h"

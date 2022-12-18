@@ -90,7 +90,6 @@ set(PROJECT_FILES
 )
 
 set(THIRD_PARTY_FILES
-  jsonsl.c
   wildmat.c
 )
 
@@ -317,6 +316,7 @@ target_link_libraries(${TR_NAME}
     ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
     ${TR_NETWORK_LIBRARIES}
+    jsonsl
 )
 
 if(ICONV_FOUND)
