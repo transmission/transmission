@@ -158,18 +158,6 @@ public:
         return evbuffer_get_length(buf_.get()) == 0;
     }
 
-    [[nodiscard]] auto vecs(size_t n_bytes) const
-    {
-        auto chains = std::vector<Iovec>(evbuffer_peek(buf_.get(), n_bytes, nullptr, nullptr, 0));
-        evbuffer_peek(buf_.get(), n_bytes, nullptr, std::data(chains), std::size(chains));
-        return chains;
-    }
-
-    [[nodiscard]] auto vecs() const
-    {
-        return vecs(size());
-    }
-
     [[nodiscard]] auto begin() noexcept
     {
         return Iterator{ buf_.get(), 0U };
