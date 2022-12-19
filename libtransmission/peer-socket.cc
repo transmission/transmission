@@ -80,19 +80,19 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) cons
 #ifdef WITH_UTP
     if (is_utp())
     {
-        auto iov = buf.vecs(max);
+        auto [data, datalen] = buf.pullup();
 
         errno = 0;
-        auto const n = utp_writev(handle.utp, reinterpret_cast<struct utp_iovec*>(std::data(iov)), std::size(iov));
+        auto const n_written = utp_write(handle.utp, data, std::min(datalen, max));
         auto const error_code = errno;
 
-        if (n > 0)
+        if (n_written > 0)
         {
-            buf.drain(n);
-            return static_cast<size_t>(n);
+            buf.drain(n_written);
+            return static_cast<size_t>(n_written);
         }
 
-        if (n < 0 && error_code != 0)
+        if (n_written < 0 && error_code != 0)
         {
             tr_error_set(error, error_code, tr_strerror(error_code));
         }
