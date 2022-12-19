@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <random> // for std::mt19937
 #include <utility> // for std::swap()
 #include <vector>
 
@@ -13,6 +12,7 @@
 #include "transmission.h"
 
 #include "bandwidth.h"
+#include "crypto-utils.h"
 #include "log.h"
 #include "peer-io.h"
 #include "tr-assert.h"
@@ -164,19 +164,19 @@ void tr_bandwidth::allocateBandwidth(
     }
 }
 
-void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction dir)
+void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peers, tr_direction dir)
 {
     // First phase of IO. Tries to distribute bandwidth fairly to keep faster
     // peers from starving the others.
-    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peer_array.size(), dir == TR_UP ? "upload" : "download"));
+    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peers.size(), dir == TR_UP ? "upload" : "download"));
 
     // Shuffle the peers so they all have equal chance to be first in line.
-    thread_local auto random_engine = std::mt19937{ std::random_device{}() };
-    std::shuffle(std::begin(peer_array), std::end(peer_array), random_engine);
+    thread_local auto urbg = tr_urbg<size_t>{};
+    std::shuffle(std::begin(peers), std::end(peers), urbg);
 
     // Give each peer `Increment` bandwidth bytes to use. Repeat this
     // process until we run out of bandwidth and/or peers that can use it.
-    for (size_t n_unfinished = std::size(peer_array); n_unfinished > 0U;)
+    for (size_t n_unfinished = std::size(peers); n_unfinished > 0U;)
     {
         for (size_t i = 0; i < n_unfinished;)
         {
@@ -185,13 +185,13 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction di
             // out in a timely manner.
             static auto constexpr Increment = size_t{ 3000 };
 
-            auto const bytes_used = peer_array[i]->flush(dir, Increment);
+            auto const bytes_used = peers[i]->flush(dir, Increment);
             tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n_unfinished, bytes_used));
 
             if (bytes_used != Increment)
             {
                 // peer is done writing for now; move it to the end of the list
-                std::swap(peer_array[i], peer_array[n_unfinished - 1]);
+                std::swap(peers[i], peers[n_unfinished - 1]);
                 --n_unfinished;
             }
             else

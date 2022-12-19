@@ -9,6 +9,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -185,6 +186,34 @@ public:
 private:
     size_t pos = 0;
     std::array<T, N> buf;
+};
+
+// UniformRandomBitGenerator impl that uses `tr_rand_buffer()`.
+// See https://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator
+template<typename T, size_t N = 1024U>
+class tr_urbg
+{
+public:
+    using result_type = T;
+    static_assert(!std::numeric_limits<T>::is_signed);
+
+    [[nodiscard]] static constexpr T min() noexcept
+    {
+        return std::numeric_limits<T>::min();
+    }
+
+    [[nodiscard]] static constexpr T max() noexcept
+    {
+        return std::numeric_limits<T>::max();
+    }
+
+    [[nodiscard]] T operator()() noexcept
+    {
+        return buf_();
+    }
+
+private:
+    tr_salt_shaker<T, N> buf_;
 };
 
 /** @} */

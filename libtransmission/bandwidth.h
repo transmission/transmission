@@ -252,7 +252,7 @@ private:
 
     [[nodiscard]] size_t clamp(uint64_t now, tr_direction dir, size_t byte_count) const;
 
-    static void phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction dir);
+    static void phaseOne(std::vector<tr_peerIo*>& peers, tr_direction dir);
 
     void allocateBandwidth(
         tr_priority_t parent_priority,
