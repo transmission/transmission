@@ -16,8 +16,12 @@
 #include <cstddef> // for std::byte, size_t
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string_view>
+
+#warning the fmt::print tracers are for testing the new code; remove before merging to main
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -247,6 +251,52 @@ private:
     // https://wiki.vuze.com/w/Message_Stream_Encryption
     using vc_t = std::array<std::byte, 8>;
     static auto constexpr VC = vc_t{};
+
+    /// DH pool. Keys are expensive, so we recycle them iff the peer was unreachable
+
+    static constexpr auto DhPoolMaxSize = size_t{ 32 };
+    static inline auto dh_pool_size_ = size_t{};
+    static inline auto dh_pool_ = std::array<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
+    static inline auto dh_pool_mutex_ = std::mutex{};
+
+    static DH get_dh(Mediator* mediator)
+    {
+        auto lock = std::unique_lock(dh_pool_mutex_);
+
+        if (dh_pool_size_ > 0)
+        {
+            auto ret = dh_pool_[dh_pool_size_ - 1];
+            --dh_pool_size_;
+            return ret;
+        }
+
+        return DH{ mediator->private_key() };
+    }
+
+    static void add_dh(DH&& dh)
+    {
+        auto lock = std::unique_lock(dh_pool_mutex_);
+
+        if (dh_pool_size_ < std::size(dh_pool_))
+        {
+            dh_pool_[dh_pool_size_] = std::move(dh);
+            ++dh_pool_size_;
+            fmt::print("recycling dh; new size is {:d}\n", dh_pool_size_);
+        }
+    }
+
+    void maybe_recycle_dh()
+    {
+        if (have_read_anything_from_peer_)
+        {
+            fmt::print("not recycling dh\n");
+            return;
+        }
+
+        auto dh = DH{};
+        std::swap(dh_, dh);
+        add_dh(std::move(dh));
+    }
 
     ///
 
