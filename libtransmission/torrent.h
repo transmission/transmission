@@ -731,6 +731,44 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto secondsDownloading(time_t now) const noexcept
+    {
+        auto n_secs = seconds_downloading_before_current_start_;
+
+        if (isRunning)
+        {
+            if (doneDate > startDate)
+            {
+                n_secs += doneDate - startDate;
+            }
+            else if (doneDate == 0)
+            {
+                n_secs += now - startDate;
+            }
+        }
+
+        return n_secs;
+    }
+
+    [[nodiscard]] constexpr auto secondsSeeding(time_t now) const noexcept
+    {
+        auto n_secs = seconds_seeding_before_current_start_;
+
+        if (isRunning)
+        {
+            if (doneDate > startDate)
+            {
+                n_secs += now - doneDate;
+            }
+            else if (doneDate != 0)
+            {
+                n_secs += now - startDate;
+            }
+        }
+
+        return n_secs;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -792,6 +830,9 @@ public:
 
     time_t lastStatTime = 0;
 
+    time_t seconds_downloading_before_current_start_ = 0;
+    time_t seconds_seeding_before_current_start_ = 0;
+
     uint64_t downloadedCur = 0;
     uint64_t downloadedPrev = 0;
     uint64_t uploadedCur = 0;
@@ -817,9 +858,6 @@ public:
     tr_stat_errtype error = TR_STAT_OK;
 
     tr_bytes_per_second_t etaSpeed_Bps = 0;
-
-    time_t secondsDownloading = 0;
-    time_t secondsSeeding = 0;
 
     size_t queuePosition = 0;
 
