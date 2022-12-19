@@ -263,7 +263,7 @@ private:
         if (dh_pool_size_ > 0U)
         {
             auto dh = DH{};
-            std::swap(dh, dh_pool_[dh_pool_size_]);
+            std::swap(dh, dh_pool_[dh_pool_size_ - 1U]);
             --dh_pool_size_;
             return dh;
         }
