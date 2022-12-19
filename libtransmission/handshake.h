@@ -20,9 +20,6 @@
 #include <optional>
 #include <string_view>
 
-#warning the fmt::print tracers are for testing the new code; remove before merging to main
-#include <fmt/format.h>
-
 #include "transmission.h"
 
 #include "net.h"
@@ -259,15 +256,16 @@ private:
     static inline auto dh_pool_ = std::array<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
     static inline auto dh_pool_mutex_ = std::mutex{};
 
-    static DH get_dh(Mediator* mediator)
+    [[nodiscard]] static DH get_dh(Mediator* mediator)
     {
         auto lock = std::unique_lock(dh_pool_mutex_);
 
-        if (dh_pool_size_ > 0)
+        if (dh_pool_size_ > 0U)
         {
-            auto ret = dh_pool_[dh_pool_size_ - 1];
+            auto dh = DH{};
+            std::swap(dh, dh_pool_[dh_pool_size_]);
             --dh_pool_size_;
-            return ret;
+            return dh;
         }
 
         return DH{ mediator->private_key() };
@@ -281,7 +279,6 @@ private:
         {
             dh_pool_[dh_pool_size_] = std::move(dh);
             ++dh_pool_size_;
-            fmt::print("recycling dh; new size is {:d}\n", dh_pool_size_);
         }
     }
 
@@ -289,7 +286,6 @@ private:
     {
         if (have_read_anything_from_peer_)
         {
-            fmt::print("not recycling dh\n");
             return;
         }
 
