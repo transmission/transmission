@@ -170,11 +170,6 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peers, tr_direction dir)
     // peers from starving the others.
     tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peers.size(), dir == TR_UP ? "upload" : "download"));
 
-    if (std::none_of(std::begin(peers), std::end(peers), [dir](auto const* peer) { return peer->has_bandwidth_left(dir); }))
-    {
-        return;
-    }
-
     // Shuffle the peers so they all have equal chance to be first in line.
     thread_local auto urbg = tr_urbg<size_t>{};
     std::shuffle(std::begin(peers), std::end(peers), urbg);
