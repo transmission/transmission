@@ -249,7 +249,7 @@ private:
     using vc_t = std::array<std::byte, 8>;
     static auto constexpr VC = vc_t{};
 
-    /// DH pool. Keys are expensive, so we recycle them iff the peer was unreachable
+    ///
 
     static constexpr auto DhPoolMaxSize = size_t{ 32 };
     static inline auto dh_pool_size_ = size_t{};
@@ -284,6 +284,8 @@ private:
 
     void maybe_recycle_dh()
     {
+        // keys are expensive to make, so recycle iff the peer was unreachable
+
         if (have_read_anything_from_peer_)
         {
             return;
