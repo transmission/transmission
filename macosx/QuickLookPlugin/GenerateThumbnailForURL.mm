@@ -14,7 +14,7 @@ QL_EXTERN_C_END
 
 OSStatus GenerateThumbnailForURL(void* thisInterface, QLThumbnailRequestRef thumbnail, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options, CGSize maxSize)
 {
-    // To complete your generator please implement the function GenerateThumbnailForURL in GenerateThumbnailForURL.c
+    // To complete the generator, please implement the function GenerateThumbnailForURL here
     return noErr;
 }
 

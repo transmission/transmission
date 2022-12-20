@@ -48,9 +48,9 @@
     }
     else
     {
-        unsigned int const magnitudePartial = log(partialSize) / log(1000);
+        auto const magnitudePartial = static_cast<unsigned int>(log(partialSize) / log(1000));
         // we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
-        unsigned int const magnitudeFull = fullSize < 1000 ? 0 : log(fullSize) / log(1000);
+        auto const magnitudeFull = static_cast<unsigned int>(fullSize < 1000 ? 0 : log(fullSize) / log(1000));
         partialUnitsSame = magnitudePartial == magnitudeFull;
     }
 
@@ -76,12 +76,12 @@
 {
     //N/A is different than libtransmission's
 
-    if ((int)ratio == TR_RATIO_NA)
+    if (static_cast<int>(ratio) == TR_RATIO_NA)
     {
         return NSLocalizedString(@"N/A", "No Ratio");
     }
 
-    if ((int)ratio == TR_RATIO_INF)
+    if (static_cast<int>(ratio) == TR_RATIO_INF)
     {
         return @"\xE2\x88\x9E";
     }

@@ -209,9 +209,15 @@ NSMutableSet* fTrackerIconLoading;
 
     NSURLSessionDataTask* task = [NSURLSession.sharedSession
         dataTaskWithRequest:request completionHandler:^(NSData* iconData, NSURLResponse* response, NSError* error) {
+            if (error)
+            {
+                NSLog(@"Unable to get tracker icon: task failed (%@)", error.localizedDescription);
+                return;
+            }
             BOOL ok = ((NSHTTPURLResponse*)response).statusCode == 200 ? YES : NO;
             if (!ok)
             {
+                NSLog(@"Unable to get tracker icon: status code not OK (%ld)", (long)((NSHTTPURLResponse*)response).statusCode);
                 return;
             }
 

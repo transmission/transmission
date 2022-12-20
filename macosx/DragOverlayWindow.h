@@ -4,11 +4,9 @@
 
 #import <AppKit/AppKit.h>
 
-#include <libtransmission/transmission.h>
-
 @interface DragOverlayWindow : NSWindow
 
-- (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window;
+- (instancetype)initForWindow:(NSWindow*)window;
 
 - (void)setTorrents:(NSArray<NSString*>*)files;
 - (void)setFile:(NSString*)file;

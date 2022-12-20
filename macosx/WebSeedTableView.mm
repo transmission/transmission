@@ -16,9 +16,10 @@
 {
     NSIndexSet* indexes = self.selectedRowIndexes;
     NSMutableArray* addresses = [NSMutableArray arrayWithCapacity:indexes.count];
-    [self.webSeeds enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(NSDictionary* webSeed, NSUInteger idx, BOOL* stop) {
-        [addresses addObject:webSeed[@"Address"]];
-    }];
+    [self.webSeeds enumerateObjectsAtIndexes:indexes options:0
+                                  usingBlock:^(NSDictionary* webSeed, NSUInteger /*idx*/, BOOL* /*stop*/) {
+                                      [addresses addObject:webSeed[@"Address"]];
+                                  }];
 
     NSString* text = [addresses componentsJoinedByString:@"\n"];
 

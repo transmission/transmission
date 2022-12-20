@@ -193,7 +193,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
-    if (self.fTorrents && [self.fTorrents isEqualToArray:torrents])
+    if ([self.fTorrents isEqualToArray:torrents])
     {
         return;
     }
