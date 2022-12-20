@@ -560,13 +560,6 @@ int gtr_combo_box_get_active_enum(Gtk::ComboBox const& combo_box)
     return value;
 }
 
-Gtk::ComboBox* gtr_priority_combo_new()
-{
-    auto* w = Gtk::make_managed<Gtk::ComboBox>();
-    gtr_priority_combo_init(*w);
-    return w;
-}
-
 void gtr_priority_combo_init(Gtk::ComboBox& combo)
 {
     gtr_combo_box_set_enum(
