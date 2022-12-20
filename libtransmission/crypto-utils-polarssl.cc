@@ -91,21 +91,17 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 ****
 ***/
 
-static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
-{
-    for (size_t i = 0; i < buffer_size; ++i)
-    {
-        // my_rand is used to initialize tr_rand_buffer itself used by tr_rand_int, so we can only use tr_rand_int_weak here
-        buffer[i] = tr_rand_int_weak(256);
-    }
-
-    return 0;
-}
-
 static api_ctr_drbg_context* get_rng()
 {
     static api_ctr_drbg_context rng;
     static bool rng_initialized = false;
+
+    static int my_rand = [](void* /*context*/, unsigned char* buffer, size_t buffer_size)
+    {
+        // since we're initializing tr_rand_buffer()'s rng, we cant use tr_rand_buffer() here
+        tr_rand_buffer_fallback(buffer, buffer_size);
+        return 0;
+    };
 
     if (!rng_initialized)
     {
