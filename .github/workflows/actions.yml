@@ -375,7 +375,7 @@ jobs:
             -DENABLE_MAC=OFF `
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_TESTS=ON `
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_UTILS=ON `
             -DENABLE_WEB=OFF `
             -DENABLE_WERROR=ON `
             -DRUN_CLANG_TIDY=OFF
