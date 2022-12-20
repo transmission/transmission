@@ -91,27 +91,27 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 ****
 ***/
 
+static int my_rand(void* /*context*/, unsigned char* buffer, size_ buffer_size)
+{
+    // since we're initializing tr_rand_buffer()'s rng, we cant use tr_rand_buffer() here
+    tr_rand_buffer_std(buffer, buffer_size);
+    return 0;
+};
+
 static api_ctr_drbg_context* get_rng()
 {
     static api_ctr_drbg_context rng;
     static bool rng_initialized = false;
-
-    static auto my_rand = [](void* /*context*/, unsigned char* buffer, size_t buffer_size)
-    {
-        // since we're initializing tr_rand_buffer()'s rng, we cant use tr_rand_buffer() here
-        tr_rand_buffer_std(buffer, buffer_size);
-        return 0;
-    };
 
     if (!rng_initialized)
     {
 #if API_VERSION_NUMBER >= 0x02000000
         API(ctr_drbg_init)(&rng);
 
-        if (!check_result(API(ctr_drbg_seed)(&rng, &my_rand, nullptr, nullptr, 0)))
+        if (!check_result(API(ctr_drbg_seed)(&rng, my_rand, nullptr, nullptr, 0)))
 #else
 
-        if (!check_result(API(ctr_drbg_init)(&rng, &my_rand, nullptr, nullptr, 0)))
+        if (!check_result(API(ctr_drbg_init)(&rng, my_rand, nullptr, nullptr, 0)))
 #endif
         {
             return nullptr;
