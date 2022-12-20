@@ -93,21 +93,15 @@ void tr_x509_cert_free(tr_x509_cert_t handle);
 template<class IntType>
 [[nodiscard]] IntType tr_rand_int(IntType upper_bound);
 
+/**
+ * @brief Fill a buffer with random bytes.
+ */
+void tr_rand_buffer(void* buffer, size_t length);
+
 // Client code should use `tr_rand_buffer()`.
 // These helpers are only exposed here to permit open-box tests.
 bool tr_rand_buffer_crypto(void* buffer, size_t length);
 void tr_rand_buffer_std(void* buffer, size_t length);
-
-/**
- * @brief Fill a buffer with random bytes.
- */
-void tr_rand_buffer(void* buffer, size_t length)
-{
-    if (!tr_rand_buffer_crypto(buffer, length))
-    {
-        tr_rand_buffer_std(buffer, length);
-    }
-}
 
 template<typename T>
 T tr_rand_obj()

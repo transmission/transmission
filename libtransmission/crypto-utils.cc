@@ -275,3 +275,11 @@ void tr_rand_buffer_std(void* buffer, size_t length)
             return dist(engine);
         });
 }
+
+void tr_rand_buffer(void* buffer, size_t length)
+{
+    if (!tr_rand_buffer_crypto(buffer, length))
+    {
+        tr_rand_buffer_std(buffer, length);
+    }
+}
