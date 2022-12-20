@@ -44,7 +44,6 @@ template<class T>
 }
 
 template size_t tr_rand_int(size_t upper_bound);
-template unsigned char tr_rand_int(unsigned char upper_bound);
 template unsigned int tr_rand_int(unsigned int upper_bound);
 
 ///
