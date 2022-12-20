@@ -96,7 +96,7 @@ static api_ctr_drbg_context* get_rng()
     static api_ctr_drbg_context rng;
     static bool rng_initialized = false;
 
-    static int my_rand = [](void* /*context*/, unsigned char* buffer, size_t buffer_size)
+    static auto my_rand = [](void* /*context*/, unsigned char* buffer, size_t buffer_size)
     {
         // since we're initializing tr_rand_buffer()'s rng, we cant use tr_rand_buffer() here
         tr_rand_buffer_std(buffer, buffer_size);
