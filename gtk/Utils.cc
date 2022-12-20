@@ -529,13 +529,6 @@ void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo_box, int value)
     }
 }
 
-Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>> const& items)
-{
-    auto* w = Gtk::make_managed<Gtk::ComboBox>();
-    gtr_combo_box_set_enum(*w, items);
-    return w;
-}
-
 void gtr_combo_box_set_enum(Gtk::ComboBox& combo, std::vector<std::pair<Glib::ustring, int>> const& items)
 {
     auto store = Gtk::ListStore::create(enum_combo_cols);
