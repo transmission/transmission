@@ -58,6 +58,7 @@ set(${PROJECT_NAME}_SOURCES
     GlobalOptionsPopoverViewController.mm
     GroupTextCell.mm
     GroupToolbarItem.mm
+    GroupPopUpButtonCell.mm
     GroupsController.mm
     GroupsPrefsController.mm
     InfoActivityViewController.mm
@@ -83,9 +84,11 @@ set(${PROJECT_NAME}_SOURCES
     PredicateEditorRowTemplateAny.mm
     PrefsController.mm
     PrefsWindow.mm
+    PriorityPopUpButtonCell.mm
     ProgressGradients.mm
     ShareToolbarItem.mm
     ShareTorrentFileHelper.mm
+    SparkleProxy.mm
     StatsWindowController.mm
     StatusBarController.mm
     StatusBarView.mm
@@ -112,6 +115,7 @@ set(${PROJECT_NAME}_HEADERS
     BlocklistScheduler.h
     BonjourController.h
     ButtonToolbarItem.h
+    CocoaCompatibility.h
     ColorTextField.h
     Controller.h
     CreatorWindowController.h
@@ -129,6 +133,7 @@ set(${PROJECT_NAME}_HEADERS
     FilterBarView.h
     FilterButton.h
     GlobalOptionsPopoverViewController.h
+    GroupPopUpButtonCell.h
     GroupToolbarItem.h
     GroupsController.h
     GroupsPrefsController.h
@@ -155,6 +160,7 @@ set(${PROJECT_NAME}_HEADERS
     PredicateEditorRowTemplateAny.h
     PrefsController.h
     PrefsWindow.h
+    PriorityPopUpButtonCell.h
     ProgressGradients.h
     ShareToolbarItem.h
     ShareTorrentFileHelper.h
