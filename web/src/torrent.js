@@ -370,6 +370,10 @@ export class Torrent extends EventTarget {
         return this.isStopped();
       case Prefs.FilterFinished:
         return this.isFinished();
+      case Prefs.FilterPublic:
+        return !Torrent.isPrivate();
+      case Prefs.FilterPrivate:
+        return Torrent.isPrivate();
       default:
         return true;
     }
