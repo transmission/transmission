@@ -90,6 +90,7 @@ target_sources(${TR_NAME}-mac
         FilterBarView.mm
         FilterButton.h
         FilterButton.mm
+        FloatEqual.h
         GlobalOptionsPopoverViewController.h
         GlobalOptionsPopoverViewController.mm
         GroupCell.h

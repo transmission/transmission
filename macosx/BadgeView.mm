@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #import "BadgeView.h"
+#import "FloatEqual.h"
 #import "NSStringAdditions.h"
 #import "NSImageAdditions.h"
 
@@ -61,7 +62,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
-    if (self.fDownloadRate == downloadRate && self.fUploadRate == uploadRate)
+    if (FloatEqual(self.fDownloadRate, downloadRate) && FloatEqual(self.fUploadRate, uploadRate))
     {
         return NO;
     }

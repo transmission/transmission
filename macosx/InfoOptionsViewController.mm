@@ -5,6 +5,7 @@
 #import "InfoOptionsViewController.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
+#import "FloatEqual.h"
 
 typedef NS_ENUM(NSInteger, OptionPopupType) {
     OptionPopupTypeGlobal = 0,
@@ -295,7 +296,7 @@ static CGFloat const kStackViewSpacing = 8.0;
             checkRatio = kInvalidValue;
         }
 
-        if (!multipleRatioLimits && ratioLimit != torrent.ratioLimit)
+        if (!multipleRatioLimits && !FloatEqual(ratioLimit, torrent.ratioLimit))
         {
             multipleRatioLimits = YES;
         }

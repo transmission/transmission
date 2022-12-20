@@ -1336,6 +1336,7 @@
 		C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSKeyedUnarchiverAdditions.mm; sourceTree = "<group>"; };
 		C843FC8329C51B9400491854 /* utils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = utils.mm; sourceTree = "<group>"; };
 		C86BCD9828228A9600F45599 /* SparkleProxy.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SparkleProxy.mm; sourceTree = "<group>"; };
+		C8732606294F122F009BD6E5 /* FloatEqual.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FloatEqual.h; sourceTree = "<group>"; };
 		C87369642809984200573C90 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		C8748D8929891EA100D9E979 /* suffixes_dafsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = suffixes_dafsa.h; path = "third-party/suffixes_dafsa.h"; sourceTree = SOURCE_ROOT; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -1984,6 +1985,7 @@
 		A234D0D40C79FB6000A82373 /* Additions */ = {
 			isa = PBXGroup;
 			children = (
+				C8732606294F122F009BD6E5 /* FloatEqual.h */,
 				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
 				A29D84031049C25600D1987A /* NSApplicationAdditions.mm */,
 				C809AEE5291ECFD000BFDBE1 /* NSDataAdditions.h */,
