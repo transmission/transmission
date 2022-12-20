@@ -99,9 +99,9 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
 {
     auto buf = std::vector<char>{};
 
-    for (size_t i = 0; i < 100000; ++i)
+    for (size_t i = 0; i < 100000U; ++i)
     {
-        buf.resize(tr_rand_int(1024));
+        buf.resize(tr_rand_int(1024U));
         tr_rand_buffer(std::data(buf), std::size(buf));
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 

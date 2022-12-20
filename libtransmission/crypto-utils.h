@@ -94,15 +94,6 @@ template<class IntType>
 [[nodiscard]] IntType tr_rand_int(IntType upper_bound);
 
 /**
- * @brief Returns a pseudorandom number in the range of [0...upper_bound).
- *
- * This is faster, BUT WEAKER, than tr_rand_int() and never be used in sensitive cases.
- * @see tr_rand_int()
- */
-template<class IntType>
-[[nodiscard]] IntType tr_rand_int_weak(IntType upper_bound);
-
-/**
  * @brief Fill a buffer with random bytes.
  */
 void tr_rand_buffer(void* buffer, size_t length);
