@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <functional>
 #include <iterator>
 #include <random>
 #include <string>
@@ -78,18 +79,13 @@ template<class IntType>
     UIntType noise = 0;
     for (;;)
     {
-        if (!tr_rand_buffer(&noise, sizeof(noise)))
-        {
-            break;
-        }
+        tr_rand_buffer(&noise, sizeof(noise));
+
         if (noise >= min)
         {
             return noise % upper_bound;
         }
     }
-
-    // rare fall back to a weaker implementation when CCRandomGenerateBytes is failing
-    return tr_rand_integer_weak(upper_bound);
 }
 
 template<class IntType>
@@ -320,4 +316,28 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
     auto digest = tr_sha256_digest_t{};
     tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));
     return digest;
+}
+
+// fallback implementation in case the system crypto library's RNG fails
+void tr_rand_buffer_fallback(void* buffer, size_t length)
+{
+    std::generate_n(
+        static_cast<uint8_t*>(buffer),
+        length,
+        []()
+        {
+            thread_local auto engine = std::mt19937{ std::random_device{}() };
+            thread_local auto dist = std::uniform_int_distribution<uint8_t>(uint8_t{});
+            return dist(engine);
+        });
+}
+
+void tr_rand_buffer(void* buffer, size_t length)
+{
+    extern bool tr_rand_buffer_impl(void* buffer, size_t length);
+
+    if (!tr_rand_buffer_impl(buffer, length))
+    {
+        tr_rand_buffer_fallback(buffer, length);
+    }
 }

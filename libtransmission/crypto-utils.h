@@ -105,7 +105,11 @@ template<class IntType>
 /**
  * @brief Fill a buffer with random bytes.
  */
-bool tr_rand_buffer(void* buffer, size_t length);
+void tr_rand_buffer(void* buffer, size_t length);
+
+// don't use this in client code.
+// it's only exposed here for unit tests.
+void tr_rand_buffer_fallback(void* buffer, size_t length);
 
 template<typename T>
 T tr_rand_obj()

@@ -84,10 +84,7 @@ extern "C"
 
     int dht_random_bytes(void* buf, size_t size)
     {
-        if (!tr_rand_buffer(buf, size))
-        {
-            return -1;
-        }
+        tr_rand_buffer(buf, size);
         return static_cast<int>(size);
     }
 
