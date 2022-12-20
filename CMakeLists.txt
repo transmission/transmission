@@ -318,7 +318,7 @@ if(ENABLE_QT)
     set(ENABLE_QT_COM_INTEROP OFF)
     set(ENABLE_QT_DBUS_INTEROP OFF)
 
-    set(QT_REQUIRED_MODULES Core Gui Widgets Network LinguistTools)
+    set(QT_REQUIRED_MODULES Core Gui Widgets Network Svg LinguistTools)
     set(QT_OPTIONAL_MODULES DBus AxContainer AxServer)
     set(MISSING_QT_MODULE)
 
@@ -427,6 +427,9 @@ if(NOT USE_SYSTEM_MINIUPNPC)
     set(MINIUPNPC_VERSION 1.9)
     set(MINIUPNPC_API_VERSION 12)
 endif()
+
+add_subdirectory(third-party/jsonsl)
+add_subdirectory(third-party/wildmat)
 
 tr_add_external_auto_library(DHT dht dht)
 
