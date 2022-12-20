@@ -11,7 +11,7 @@
 
 #include "tr-macros.h"
 
-[[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message);
+[[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message);
 
 #define TR_ASSERT(x) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, #x)))
 #define TR_ASSERT_MSG(x, message) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, message)))

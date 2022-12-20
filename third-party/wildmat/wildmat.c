@@ -37,6 +37,7 @@
 **  on.
 */
 
+#include "wildmat.h"
 #include <stdbool.h>
 
 #define ABORT -1

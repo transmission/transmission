@@ -50,7 +50,7 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     }
     auto const flag_bytes = flags.raw();
 
-    auto* walk = buf;
+    [[maybe_unused]] auto* walk = buf;
     walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(HandshakeName)), std::size(HandshakeName), walk);
     walk = std::copy(std::begin(flag_bytes), std::end(flag_bytes), walk);
     walk = std::copy_n(reinterpret_cast<char const*>(std::data(info_hash)), std::size(info_hash), walk);
@@ -833,6 +833,8 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 
 bool tr_handshake::fire_done(bool is_connected)
 {
+    maybe_recycle_dh();
+
     if (!on_done_)
     {
         return false;
@@ -910,7 +912,7 @@ uint32_t tr_handshake::crypto_provide() const noexcept
 **/
 
 tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode, DoneFunc on_done)
-    : dh_{ mediator->private_key() }
+    : dh_{ tr_handshake::get_dh(mediator) }
     , on_done_{ std::move(on_done) }
     , peer_io_{ std::move(peer_io) }
     , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }

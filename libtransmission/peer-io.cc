@@ -293,7 +293,7 @@ size_t tr_peerIo::try_write(size_t max)
     return n_written;
 }
 
-void tr_peerIo::event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
+void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*event*/, void* vio)
 {
     auto* const io = static_cast<tr_peerIo*>(vio);
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for writing");
@@ -415,7 +415,7 @@ size_t tr_peerIo::try_read(size_t max)
     return n_read;
 }
 
-void tr_peerIo::event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
+void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event*/, void* vio)
 {
     static auto constexpr MaxLen = RcvBuf;
 

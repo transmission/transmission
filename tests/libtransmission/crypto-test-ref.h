@@ -30,6 +30,7 @@
 #define tr_ssha1_test tr_ssha1_test_
 #define tr_ssl_ctx_t tr_ssl_ctx_t_
 #define tr_ssl_get_x509_store tr_ssl_get_x509_store_
+#define tr_urbg tr_urbg_
 #define tr_x509_cert_free tr_x509_cert_free_
 #define tr_x509_cert_new tr_x509_cert_new_
 #define tr_x509_cert_t tr_x509_cert_t_
@@ -63,6 +64,7 @@
 #undef tr_ssha1_test
 #undef tr_ssl_ctx_t
 #undef tr_ssl_get_x509_store
+#undef tr_urbg
 #undef tr_x509_cert_free
 #undef tr_x509_cert_new
 #undef tr_x509_cert_t
@@ -99,6 +101,7 @@
 #define tr_ssha1_test_ tr_ssha1_test
 #define tr_ssl_ctx_t_ tr_ssl_ctx_t
 #define tr_ssl_get_x509_store_ tr_ssl_get_x509_store
+#define tr_urbg_ tr_urbg
 #define tr_x509_cert_free_ tr_x509_cert_free
 #define tr_x509_cert_new_ tr_x509_cert_new
 #define tr_x509_cert_t_ tr_x509_cert_t
