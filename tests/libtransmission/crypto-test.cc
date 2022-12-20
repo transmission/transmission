@@ -270,7 +270,7 @@ TEST(Crypto, randBuf)
     for (size_t i = 0; i < Iterations; ++i)
     {
         auto tmp = buf;
-        tr_rand_buffer_fallback(std::data(tmp), std::size(tmp));
+        tr_rand_buffer_std(std::data(tmp), std::size(tmp));
         EXPECT_NE(tmp, Empty);
         EXPECT_NE(tmp, buf);
         buf = tmp;

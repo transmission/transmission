@@ -99,7 +99,7 @@ static api_ctr_drbg_context* get_rng()
     static int my_rand = [](void* /*context*/, unsigned char* buffer, size_t buffer_size)
     {
         // since we're initializing tr_rand_buffer()'s rng, we cant use tr_rand_buffer() here
-        tr_rand_buffer_fallback(buffer, buffer_size);
+        tr_rand_buffer_std(buffer, buffer_size);
         return 0;
     };
 
@@ -260,7 +260,7 @@ std::unique_ptr<tr_sha256> tr_sha256::create()
 ****
 ***/
 
-bool tr_rand_buffer_impl(void* buffer, size_t length)
+bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {
     if (length == 0)
     {

@@ -263,7 +263,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
 }
 
 // fallback implementation in case the system crypto library's RNG fails
-void tr_rand_buffer_fallback(void* buffer, size_t length)
+void tr_rand_buffer_std(void* buffer, size_t length)
 {
     std::generate_n(
         static_cast<uint8_t*>(buffer),
@@ -278,10 +278,8 @@ void tr_rand_buffer_fallback(void* buffer, size_t length)
 
 void tr_rand_buffer(void* buffer, size_t length)
 {
-    extern bool tr_rand_buffer_impl(void* buffer, size_t length);
-
-    if (!tr_rand_buffer_impl(buffer, length))
+    if (!tr_rand_buffer_crypto(buffer, length))
     {
-        tr_rand_buffer_fallback(buffer, length);
+        tr_rand_buffer_std(buffer, length);
     }
 }

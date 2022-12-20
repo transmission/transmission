@@ -98,9 +98,10 @@ template<class IntType>
  */
 void tr_rand_buffer(void* buffer, size_t length);
 
-// don't use this in client code.
-// it's only exposed here for unit tests.
-void tr_rand_buffer_fallback(void* buffer, size_t length);
+// Client code should use `tr_rand_buffer()`.
+// These helpers are only exposed here to permit open-box tests.
+bool tr_rand_buffer_crypto(void* buffer, size_t length);
+void tr_rand_buffer_std(void* buffer, size_t length);
 
 template<typename T>
 T tr_rand_obj()
