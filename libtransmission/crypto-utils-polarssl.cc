@@ -91,7 +91,7 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 ****
 ***/
 
-static int my_rand(void* /*context*/, unsigned char* buffer, size_ buffer_size)
+static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
 {
     // since we're initializing tr_rand_buffer()'s rng, we cant use tr_rand_buffer() here
     tr_rand_buffer_std(buffer, buffer_size);
