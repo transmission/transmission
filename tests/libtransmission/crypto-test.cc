@@ -253,7 +253,7 @@ TEST(Crypto, random)
 TEST(Crypto, randBuf)
 {
     static auto constexpr Width = 32U;
-    static auto constexpr Iterations = 1000U;
+    static auto constexpr Iterations = 100000U;
     static auto constexpr Empty = std::array<uint8_t, Width>{};
 
     auto buf = Empty;
