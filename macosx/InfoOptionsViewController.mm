@@ -120,6 +120,11 @@ static CGFloat const kStackViewSpacing = 8.0;
         viewRect.size.width = NSWidth(windowRect);
     }
 
+    if (self.isPopover)
+    {
+        viewRect.size.height = self.fVertLayoutHeight;
+    }
+
     return viewRect;
 }
 

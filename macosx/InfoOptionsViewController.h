@@ -35,5 +35,6 @@
 
 @property(nonatomic) IBOutlet NSView* fPriorityView;
 @property(nonatomic) CGFloat oldHeight;
+@property(nonatomic) BOOL isPopover;
 
 @end

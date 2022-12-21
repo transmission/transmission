@@ -817,6 +817,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     popover.behavior = NSPopoverBehaviorTransient;
     InfoOptionsViewController* infoViewController = [[InfoOptionsViewController alloc] init];
     popover.contentViewController = infoViewController;
+
+    //ignore custom height calculations in infoViewController and force height size
+    infoViewController.isPopover = YES;
     popover.delegate = self;
 
     [popover showRelativeToRect:rect ofView:self preferredEdge:NSMaxYEdge];
