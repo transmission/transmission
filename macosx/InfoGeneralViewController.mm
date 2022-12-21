@@ -16,6 +16,8 @@
 @property(nonatomic) IBOutlet NSTextField* fHashField;
 @property(nonatomic) IBOutlet NSTextField* fSecureField;
 @property(nonatomic) IBOutlet NSTextField* fDataLocationField;
+@property(nonatomic) IBOutlet NSTextField* fLastDataLocationField;
+@property(nonatomic) IBOutlet NSTextField* fLastDataLabel;
 @property(nonatomic) IBOutlet NSTextField* fCreatorField;
 @property(nonatomic) IBOutlet NSTextField* fDateCreatedField;
 
@@ -60,8 +62,15 @@
     Torrent* torrent = self.fTorrents[0];
 
     NSString* location = torrent.dataLocation;
+    NSString* lastKnownDataLocation = torrent.lastKnownDataLocation;
+
     self.fDataLocationField.stringValue = location ? location.stringByAbbreviatingWithTildeInPath : @"";
     self.fDataLocationField.toolTip = location ? location : @"";
+
+    self.fLastDataLabel.hidden = !!location;
+    self.fLastDataLocationField.hidden = !!location;
+    self.fLastDataLocationField.stringValue = !location ? lastKnownDataLocation.stringByAbbreviatingWithTildeInPath : @"";
+    self.fLastDataLocationField.toolTip = !location ? lastKnownDataLocation : @"";
 
     self.fRevealDataButton.hidden = !location;
 }
@@ -83,6 +92,9 @@
 
 - (void)setupInfo
 {
+    self.fLastDataLabel.hidden = YES;
+    self.fLastDataLocationField.hidden = YES;
+
     if (self.fTorrents.count == 1)
     {
         Torrent* torrent = self.fTorrents[0];
