@@ -81,13 +81,13 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 [[nodiscard]] auto makeWindowIcon()
 {
     // first, try to load it from the system theme
-    if (auto icon = QIcon::fromTheme(QStringLiteral("transmission")); !icon.isNull())
+    if (auto icon = QIcon::fromTheme(QStringLiteral(":/icons/transmission.ico")); !icon.isNull())
     {
         return icon;
     }
 
     // if that fails, use our own as the fallback
-    return QIcon{ QStringLiteral(":/icons/transmission.svg") };
+    return QIcon{ QStringLiteral(":/icons/transmission-tray.svg") };
 }
 
 } // namespace
@@ -105,7 +105,7 @@ Application::Application(int& argc, char** argv)
 
     if (QIcon::themeName().isEmpty())
     {
-        QIcon::setThemeName(QStringLiteral("Faenza"));
+        QIcon::setThemeName(QStringLiteral("Win11"));
     }
 
 #endif

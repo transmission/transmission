@@ -6,5 +6,7 @@
       <file alias="hamburger-menu.svg">icons/hamburger-menu.svg</file>
       <file alias="ratio.svg">icons/yin-yang.svg</file>
       <file alias="transmission.svg">icons/transmission.svg</file>
+      <file alias="transmission-tray.svg">icons/transmission-tray.svg</file>
+      <file alias="transmission.ico">icons/transmission.ico</file>
   </qresource>
 </RCC>
