@@ -15,6 +15,8 @@
 #define tr_base64_encode tr_base64_encode_
 #define tr_base64_encode_impl tr_base64_encode_impl_
 #define tr_rand_buffer tr_rand_buffer_
+#define tr_rand_buffer_crypto tr_rand_buffer_crypto_
+#define tr_rand_buffer_std tr_rand_buffer_std_
 #define tr_rand_int tr_rand_int_
 #define tr_rand_int_weak tr_rand_int_weak_
 #define tr_rand_obj tr_rand_obj_
@@ -49,6 +51,8 @@
 #undef tr_base64_encode
 #undef tr_base64_encode_impl
 #undef tr_rand_buffer
+#undef tr_rand_buffer_crypto
+#undef tr_rand_buffer_std
 #undef tr_rand_int
 #undef tr_rand_int_weak
 #undef tr_rand_obj
@@ -78,6 +82,8 @@
 #define tr_base64_encode_ tr_base64_encode
 #define tr_base64_encode_impl_ tr_base64_encode_impl
 #define tr_rand_buffer_ tr_rand_buffer
+#define tr_rand_buffer_crypto_ tr_rand_buffer_crypto
+#define tr_rand_buffer_std_ tr_rand_buffer_std
 #define tr_rand_int_ tr_rand_int
 #define tr_rand_int_weak_ tr_rand_int_weak
 #define tr_rand_obj_ tr_rand_obj
