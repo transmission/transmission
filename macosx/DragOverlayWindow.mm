@@ -82,7 +82,7 @@
                 {
                     if (n_files == 1)
                     {
-                        name = @(metainfo.fileSubpath(0).c_str());
+                        name = [NSString convertedStringFromCString:metainfo.fileSubpath(0).c_str()];
                     }
                     else
                     {
@@ -118,7 +118,7 @@
     if (count == 1)
     {
         icon = [NSWorkspace.sharedWorkspace
-            iconForFileType:fileCount == 1 ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
+            iconForFileType:fileCount <= 1 ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
     }
     else
     {
