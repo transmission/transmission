@@ -90,7 +90,6 @@ set(${PROJECT_NAME}_SOURCES
     StatusBarController.mm
     StatusBarView.mm
     Toolbar.mm
-    ToolbarSegmentedCell.mm
     Torrent.mm
     TorrentCell.mm
     TorrentGroup.mm
@@ -163,7 +162,6 @@ set(${PROJECT_NAME}_HEADERS
     StatusBarController.h
     StatusBarView.h
     Toolbar.h
-    ToolbarSegmentedCell.h
     Torrent.h
     TorrentCell.h
     TorrentGroup.h
