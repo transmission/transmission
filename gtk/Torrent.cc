@@ -562,10 +562,11 @@ Torrent::Torrent()
 {
 }
 
-Torrent::Torrent(tr_torrent& torrent)
+Torrent::Torrent(tr_torrent* torrent)
     : Glib::ObjectBase(typeid(Torrent))
-    , impl_(std::make_unique<Impl>(*this, &torrent))
+    , impl_(std::make_unique<Impl>(*this, torrent))
 {
+    g_assert(torrent != nullptr);
 }
 
 Glib::ustring const& Torrent::get_name_collated() const
@@ -725,7 +726,7 @@ Torrent::ChangeFlags Torrent::update()
     return result;
 }
 
-Glib::RefPtr<Torrent> Torrent::create(tr_torrent& torrent)
+Glib::RefPtr<Torrent> Torrent::create(tr_torrent* torrent)
 {
     return Glib::make_refptr_for_instance(new Torrent(torrent));
 }
@@ -752,4 +753,14 @@ void Torrent::get_item_value(Glib::RefPtr<Glib::ObjectBase const> const& item, i
     {
         torrent->impl_->get_value(column, value);
     }
+}
+
+int Torrent::compare_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs)
+{
+    return gtr_compare_generic(lhs->get_id(), rhs->get_id());
+}
+
+bool Torrent::less_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs)
+{
+    return lhs->get_id() < rhs->get_id();
 }

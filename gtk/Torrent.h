@@ -98,16 +98,19 @@ public:
 
     ChangeFlags update();
 
-    static Glib::RefPtr<Torrent> create(tr_torrent& torrent);
+    static Glib::RefPtr<Torrent> create(tr_torrent* torrent);
 
     static Columns const& get_columns();
 
     static int get_item_id(Glib::RefPtr<Glib::ObjectBase const> const& item);
     static void get_item_value(Glib::RefPtr<Glib::ObjectBase const> const& item, int column, Glib::ValueBase& value);
 
+    static int compare_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs);
+    static bool less_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs);
+
 private:
     Torrent();
-    explicit Torrent(tr_torrent& torrent);
+    explicit Torrent(tr_torrent* torrent);
 
 private:
     class Impl;

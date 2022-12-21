@@ -204,9 +204,9 @@ std::optional<guint> ListModelAdapter::find_item_position_by_id(int item_id) con
 
 void ListModelAdapter::adjust_item_positions(guint min_position, int delta)
 {
-    for (auto item_position_it = item_positions_.begin(); item_position_it != item_positions_.end(); ++item_position_it)
+    for (auto item_it = std::next(items_.begin(), min_position); item_it != items_.end(); ++item_it)
     {
-        if (item_position_it->second >= min_position)
+        if (auto const item_position_it = item_positions_.find(item_it->id); item_position_it != item_positions_.end())
         {
             item_position_it->second += delta;
         }

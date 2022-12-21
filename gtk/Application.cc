@@ -425,7 +425,7 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
     case TR_RPC_TORRENT_ADDED:
         if (auto* tor = core_->find_torrent(torrent_id); tor != nullptr)
         {
-            core_->add_torrent(Torrent::create(*tor), true);
+            core_->add_torrent(Torrent::create(tor), true);
         }
 
         break;

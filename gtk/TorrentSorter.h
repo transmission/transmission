@@ -39,8 +39,6 @@ public:
 
     static Glib::RefPtr<TorrentSorter> create();
 
-    static int compare_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs);
-
 protected:
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     Gtk::Ordering compare_vfunc(gpointer lhs, gpointer rhs) override;

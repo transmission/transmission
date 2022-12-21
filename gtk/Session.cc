@@ -667,7 +667,7 @@ void Session::Impl::add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_no
 {
     if (torrent != nullptr)
     {
-        raw_model_->insert_sorted(torrent, &TorrentSorter::compare_by_id);
+        raw_model_->insert_sorted(torrent, &Torrent::compare_by_id);
 
         if (do_notify)
         {
@@ -703,7 +703,7 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
         }
     }
 
-    return Torrent::create(*tor);
+    return Torrent::create(tor);
 }
 
 int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
@@ -952,12 +952,13 @@ void Session::load(bool force_paused)
     raw_torrents.resize(n_torrents);
     tr_sessionGetAllTorrents(session, std::data(raw_torrents), std::size(raw_torrents));
 
-    // TODO: Speed up by subclassing/implementing the model
+    auto torrents = std::vector<Glib::RefPtr<Torrent>>();
+    torrents.reserve(raw_torrents.size());
+    std::transform(raw_torrents.begin(), raw_torrents.end(), std::back_inserter(torrents), &Torrent::create);
+    std::sort(torrents.begin(), torrents.end(), &Torrent::less_by_id);
+
     auto const model = impl_->get_raw_model();
-    for (auto* const raw_torrent : raw_torrents)
-    {
-        model->insert_sorted(Torrent::create(*raw_torrent), &TorrentSorter::compare_by_id);
-    }
+    model->splice(0, model->get_n_items(), torrents);
 }
 
 void Session::clear()

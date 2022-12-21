@@ -246,6 +246,23 @@ inline T gtr_str_strip(T const& text)
     return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin + 1);
 }
 
+template<typename T>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+constexpr int gtr_compare_generic(T const& lhs, T const& rhs)
+{
+    if (lhs < rhs)
+    {
+        return -1;
+    }
+
+    if (lhs > rhs)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 std::string gtr_get_full_resource_path(std::string const& rel_path);
 
 /***

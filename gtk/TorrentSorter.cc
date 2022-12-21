@@ -20,23 +20,6 @@ constexpr bool is_valid_eta(time_t value)
     return value != TR_ETA_NOT_AVAIL && value != TR_ETA_UNKNOWN;
 }
 
-template<typename T>
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-constexpr int compare_generic(T const& lhs, T const& rhs)
-{
-    if (lhs < rhs)
-    {
-        return -1;
-    }
-
-    if (lhs > rhs)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr int compare_eta(time_t lhs, time_t rhs)
 {
@@ -58,7 +41,7 @@ constexpr int compare_eta(time_t lhs, time_t rhs)
         return 1;
     }
 
-    return -compare_generic(lhs, rhs);
+    return -gtr_compare_generic(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -79,7 +62,7 @@ constexpr int compare_ratio(double lhs, double rhs)
         return -1;
     }
 
-    return compare_generic(lhs, rhs);
+    return gtr_compare_generic(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -91,7 +74,7 @@ int compare_by_name(Torrent const& lhs, Torrent const& rhs)
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_queue(Torrent const& lhs, Torrent const& rhs)
 {
-    return compare_generic(lhs.get_queue_position(), rhs.get_queue_position());
+    return gtr_compare_generic(lhs.get_queue_position(), rhs.get_queue_position());
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -110,13 +93,13 @@ int compare_by_ratio(Torrent const& lhs, Torrent const& rhs)
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_activity(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -compare_generic(
+    auto result = -gtr_compare_generic(
         lhs.get_speed_up() + lhs.get_speed_down(),
         rhs.get_speed_up() + rhs.get_speed_down()); // default descending
 
     if (result == 0)
     {
-        result = -compare_generic(lhs.get_active_peer_count(), rhs.get_active_peer_count()); // default descending
+        result = -gtr_compare_generic(lhs.get_active_peer_count(), rhs.get_active_peer_count()); // default descending
     }
 
     if (result == 0)
@@ -130,7 +113,7 @@ int compare_by_activity(Torrent const& lhs, Torrent const& rhs)
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_age(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -compare_generic(lhs.get_added_date(), rhs.get_added_date()); // default descending
+    auto result = -gtr_compare_generic(lhs.get_added_date(), rhs.get_added_date()); // default descending
 
     if (result == 0)
     {
@@ -143,7 +126,7 @@ int compare_by_age(Torrent const& lhs, Torrent const& rhs)
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_size(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -compare_generic(lhs.get_total_size(), rhs.get_total_size()); // default descending
+    auto result = -gtr_compare_generic(lhs.get_total_size(), rhs.get_total_size()); // default descending
 
     if (result == 0)
     {
@@ -156,11 +139,13 @@ int compare_by_size(Torrent const& lhs, Torrent const& rhs)
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_progress(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -compare_generic(lhs.get_percent_complete(), rhs.get_percent_complete()); // default descending
+    auto result = -gtr_compare_generic(lhs.get_percent_complete(), rhs.get_percent_complete()); // default descending
 
     if (result == 0)
     {
-        result = -compare_generic(lhs.get_seed_ratio_percent_done(), rhs.get_seed_ratio_percent_done()); // default descending
+        result = -gtr_compare_generic(
+            lhs.get_seed_ratio_percent_done(),
+            rhs.get_seed_ratio_percent_done()); // default descending
     }
 
     if (result == 0)
@@ -187,7 +172,7 @@ int compare_by_eta(Torrent const& lhs, Torrent const& rhs)
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_state(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -compare_generic(lhs.get_activity(), rhs.get_activity());
+    auto result = -gtr_compare_generic(lhs.get_activity(), rhs.get_activity());
 
     if (result == 0)
     {
@@ -279,11 +264,6 @@ sigc::signal<void()>& TorrentSorter::signal_changed()
 Glib::RefPtr<TorrentSorter> TorrentSorter::create()
 {
     return Glib::make_refptr_for_instance(new TorrentSorter());
-}
-
-int TorrentSorter::compare_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs)
-{
-    return compare_generic(lhs->get_id(), rhs->get_id());
 }
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
