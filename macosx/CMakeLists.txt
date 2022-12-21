@@ -391,9 +391,11 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/VDKQueue
 )
 
-add_definitions(
-    -Wno-unused-parameter
+add_compile_options(
+    # #warnings are good practice in development
     "-Wno-#warnings"
+    # GNU extensions are good practice in Objective-C
+    -Wno-gnu
 )
 
 add_library(vdkqueue STATIC

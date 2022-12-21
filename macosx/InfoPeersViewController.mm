@@ -545,13 +545,14 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     }
     else
     {
-        [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* torrent, NSUInteger idx, BOOL* stop) {
-            if (torrent.webSeedCount > 0)
-            {
-                hasWebSeeds = YES;
-                *stop = YES;
-            }
-        }];
+        [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                         usingBlock:^(Torrent* torrent, NSUInteger /*idx*/, BOOL* stop) {
+                                             if (torrent.webSeedCount > 0)
+                                             {
+                                                 hasWebSeeds = YES;
+                                                 *stop = YES;
+                                             }
+                                         }];
     }
 
     if (!hasWebSeeds)
