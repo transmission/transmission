@@ -161,13 +161,6 @@ struct peer_atom
     {
     }
 
-#ifdef TR_ENABLE_ASSERTS
-    [[nodiscard]] bool isValid() const noexcept
-    {
-        return fromFirst < TR_PEER_FROM__MAX && fromBest < TR_PEER_FROM__MAX && addr.is_valid();
-    }
-#endif
-
     [[nodiscard]] constexpr auto isSeed() const noexcept
     {
         return (flags & ADDED_F_SEED_FLAG) != 0;

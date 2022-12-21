@@ -189,12 +189,10 @@ void gtr_window_raise(Gtk::Window& window);
 ****
 ***/
 
-Gtk::ComboBox* gtr_priority_combo_new();
 void gtr_priority_combo_init(Gtk::ComboBox& combo);
 #define gtr_priority_combo_get_value(w) gtr_combo_box_get_active_enum(w)
 #define gtr_priority_combo_set_value(w, val) gtr_combo_box_set_active_enum(w, val)
 
-Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>> const& items);
 void gtr_combo_box_set_enum(Gtk::ComboBox& combo, std::vector<std::pair<Glib::ustring, int>> const& items);
 int gtr_combo_box_get_active_enum(Gtk::ComboBox const&);
 void gtr_combo_box_set_active_enum(Gtk::ComboBox&, int value);
