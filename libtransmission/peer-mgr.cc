@@ -472,7 +472,6 @@ public:
     uint8_t optimistic_unchoke_time_scaler = 0;
 
     bool is_running = false;
-    bool needs_completeness_check = true;
 
     tr_peerMgr* const manager;
 
@@ -927,8 +926,8 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
         tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->pieceSize(p));
     }
 
-    /* bookkeeping */
-    s->needs_completeness_check = true;
+    // bookkeeping
+    tor->set_needs_completeness_check();
 }
 
 static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs)
@@ -2501,23 +2500,9 @@ void tr_peerMgr::bandwidthPulse()
     static auto constexpr Msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
     session->top_bandwidth_.allocate(Msec);
 
-    /* torrent upkeep */
-    for (auto* const tor : session->torrents())
-    {
-        // run the completeness check for any torrents that need it
-        if (auto& needs_check = tor->swarm->needs_completeness_check; needs_check)
-        {
-            needs_check = false;
-            tor->recheckCompleteness();
-        }
-
-        /* stop torrents that are ready to stop, but couldn't be stopped
-           earlier during the peer-io callback call chain */
-        if (tor->isStopping)
-        {
-            tr_torrentStop(tor);
-        }
-    }
+    // torrent upkeep
+    auto& torrents = session->torrents();
+    std::for_each(std::begin(torrents), std::end(torrents), [](auto* tor) { tor->do_idle_work(); });
 
     /* pump the queues */
     queuePulse(session, TR_UP);
