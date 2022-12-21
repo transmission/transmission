@@ -25,8 +25,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
-#include "Session.h"
-
 /***
 ****
 ***/
@@ -78,6 +76,7 @@
 #define TR_GTK_SELECTION_MODE(Code) IF_GTKMM4(Gtk::SelectionMode::Code, Gtk::SELECTION_##Code)
 #define TR_GTK_SORT_TYPE(Code) IF_GTKMM4(Gtk::SortType::Code, Gtk::SORT_##Code)
 #define TR_GTK_STATE_FLAGS(Code) IF_GTKMM4(Gtk::StateFlags::Code, Gtk::STATE_FLAG_##Code)
+#define TR_GTK_TREE_MODEL_FLAGS(Code) IF_GTKMM4(Gtk::TreeModel::Flags::Code, Gtk::TREE_MODEL_##Code)
 #define TR_GTK_TREE_VIEW_COLUMN_SIZING(Code) IF_GTKMM4(Gtk::TreeViewColumn::Sizing::Code, Gtk::TREE_VIEW_COLUMN_##Code)
 
 #define TR_GTK_TREE_MODEL_CHILD_ITER(Obj) IF_GTKMM4((Obj).get_iter(), (Obj))
@@ -166,6 +165,11 @@ std::string tr_format_time(time_t timestamp);
 ****
 ***/
 
+using TrObjectSignalNotifyCallback = void(Glib::RefPtr<Glib::ObjectBase const> const&);
+
+Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::ObjectBase& object);
+void gtr_object_notify_emit(Glib::ObjectBase& object);
+
 void gtr_open_uri(Glib::ustring const& uri);
 
 void gtr_open_file(std::string const& path);
@@ -242,11 +246,30 @@ inline T gtr_str_strip(T const& text)
     return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin + 1);
 }
 
+template<typename T>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+constexpr int gtr_compare_generic(T const& lhs, T const& rhs)
+{
+    if (lhs < rhs)
+    {
+        return -1;
+    }
+
+    if (lhs > rhs)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 std::string gtr_get_full_resource_path(std::string const& rel_path);
 
 /***
 ****
 ***/
+
+class Session;
 
 extern size_t const max_recent_dirs;
 std::list<std::string> gtr_get_recent_dirs(std::string const& pref);

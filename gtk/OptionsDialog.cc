@@ -120,7 +120,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
                 tr_torrentStart(tor_);
             }
 
-            core_->add_torrent(tor_, false);
+            core_->add_torrent(Torrent::create(tor_), false);
 
             if (trash_check_->get_active())
             {
