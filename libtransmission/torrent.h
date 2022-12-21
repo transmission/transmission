@@ -919,8 +919,6 @@ private:
         }
     }
 
-    void recheckCompleteness();
-
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
     float verify_progress_ = -1;
     tr_interned_string bandwidth_group_;
