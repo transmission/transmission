@@ -773,6 +773,25 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     }
 }
 
+- (NSString*)lastKnownDataLocation
+{
+    if (self.magnet)
+    {
+        return nil;
+    }
+
+    if (self.folder)
+    {
+        NSString* lastDataLocation = [self.currentDirectory stringByAppendingPathComponent:self.name];
+        return lastDataLocation;
+    }
+    else
+    {
+        auto const lastfileName = @(tr_torrentFile(self.fHandle, 0).name);
+        return [self.currentDirectory stringByAppendingPathComponent:lastfileName];
+    }
+}
+
 - (NSString*)fileLocation:(FileListNode*)node
 {
     if (node.isFolder)
