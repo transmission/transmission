@@ -231,6 +231,12 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 #define logdbg(msgs, text) myLogMacro(msgs, TR_LOG_DEBUG, text)
 #define logtrace(msgs, text) myLogMacro(msgs, TR_LOG_TRACE, text)
 
+tr_peerMsgs::~tr_peerMsgs()
+{
+    [[maybe_unused]] auto const n_prev = n_peers_--;
+    TR_ASSERT(n_prev > 0U);
+}
+
 /**
  * Low-level communication state information about a connected peer.
  *
