@@ -75,7 +75,7 @@ tr_port tr_session::randomPort() const
     auto const lower = std::min(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const upper = std::max(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const range = upper - lower;
-    return tr_port::fromHost(lower + tr_rand_int(range + 1));
+    return tr_port::fromHost(lower + tr_rand_int(range + 1U));
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -1172,13 +1172,6 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
     TR_ASSERT(session != nullptr);
 
     session->settings_.should_delete_source_torrents = delete_source;
-}
-
-bool tr_sessionGetDeleteSource(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->shouldDeleteSource();
 }
 
 /***

@@ -20,12 +20,12 @@ TEST(Bitfield, count)
 
     for (auto i = 0; i < IterCount; ++i)
     {
-        int const bit_count = 100 + tr_rand_int(1000);
+        auto const bit_count = 100U + tr_rand_int(1000U);
 
         // generate a random bitfield
         tr_bitfield bf(bit_count);
 
-        for (int j = 0, n = tr_rand_int(bit_count); j < n; ++j)
+        for (size_t j = 0, n = tr_rand_int(bit_count); j < n; ++j)
         {
             bf.set(tr_rand_int(bit_count));
         }

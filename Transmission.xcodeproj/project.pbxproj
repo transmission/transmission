@@ -103,7 +103,6 @@
 		A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EC11114301C6002B02D1 /* InfoOptionsView.xib */; };
 		A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209ECA1114319C3002B02D1 /* InfoWindow.xib */; };
 		A209EE5D1144B51E002B02D1 /* history.h in Headers */ = {isa = PBXBuildFile; fileRef = A209EE5B1144B51E002B02D1 /* history.h */; };
-		A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */; };
 		A21282A80CA6C66800EAEE0F /* StatusBarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A21282A60CA6C66800EAEE0F /* StatusBarView.mm */; };
 		A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */ = {isa = PBXBuildFile; fileRef = A215BF5B0F02EBB800350CDB /* GroupRules.xib */; };
 		A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = A219798A0D07B78400438EA7 /* GroupToolbarItem.mm */; };
@@ -833,8 +832,6 @@
 		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoOptionsViewController.mm; sourceTree = "<group>"; };
 		A209ECA1114319C3002B02D1 /* InfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InfoWindow.xib; sourceTree = "<group>"; };
 		A209EE5B1144B51E002B02D1 /* history.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = history.h; sourceTree = "<group>"; };
-		A20BFFB50D091CC700CE5D2B /* ToolbarSegmentedCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolbarSegmentedCell.h; sourceTree = "<group>"; };
-		A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolbarSegmentedCell.mm; sourceTree = "<group>"; };
 		A21282A50CA6C66800EAEE0F /* StatusBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusBarView.h; sourceTree = "<group>"; };
 		A21282A60CA6C66800EAEE0F /* StatusBarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = StatusBarView.mm; sourceTree = "<group>"; };
 		A21979890D07B78400438EA7 /* GroupToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupToolbarItem.h; sourceTree = "<group>"; };
@@ -1513,8 +1510,6 @@
 				A219798A0D07B78400438EA7 /* GroupToolbarItem.mm */,
 				457AF8E928604AFC00BCF74F /* Toolbar.h */,
 				457AF8EA28604AFC00BCF74F /* Toolbar.mm */,
-				A20BFFB50D091CC700CE5D2B /* ToolbarSegmentedCell.h */,
-				A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */,
 				A22180960D148A71007D09ED /* GroupsPrefsController.h */,
 				A22180970D148A71007D09ED /* GroupsPrefsController.mm */,
 				45A7D3272843B54D00F0C32A /* GroupPopUpButtonCell.h */,
@@ -3144,7 +3139,6 @@
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.mm in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
-				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.mm in Sources */,
 				C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */,
 				A22180980D148A71007D09ED /* GroupsPrefsController.mm in Sources */,
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */,
@@ -3734,7 +3728,6 @@
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ICONV",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3765,9 +3758,8 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
+					"$(inherited)",
 					"-fmodules",
 					"-fcxx-modules",
 				);
@@ -3792,8 +3784,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -3819,7 +3809,6 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -3841,8 +3830,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -3986,7 +3973,6 @@
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ICONV",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4012,8 +3998,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4040,9 +4024,8 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
+					"$(inherited)",
 					"-fmodules",
 					"-fcxx-modules",
 				);
@@ -4131,8 +4114,6 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
 			};
 			name = Debug;
@@ -4143,8 +4124,6 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
 			};
 			name = "Release - Debug";
@@ -4155,8 +4134,6 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
 			};
 			name = Release;
@@ -4248,9 +4225,8 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
+					"$(inherited)",
 					"-fmodules",
 					"-fcxx-modules",
 				);
@@ -4275,8 +4251,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4316,7 +4290,6 @@
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ICONV",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4346,7 +4319,6 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4368,8 +4340,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4443,11 +4413,10 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-fcxx-modules",
+					"$(inherited)",
 					"-fmodules",
+					"-fcxx-modules",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
@@ -4473,11 +4442,10 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-fcxx-modules",
+					"$(inherited)",
 					"-fmodules",
+					"-fcxx-modules",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
@@ -4503,11 +4471,10 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-fcxx-modules",
+					"$(inherited)",
 					"-fmodules",
+					"-fcxx-modules",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
@@ -4579,7 +4546,6 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4601,8 +4567,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4783,8 +4747,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4806,8 +4768,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4829,8 +4789,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4852,8 +4810,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4875,8 +4831,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4898,8 +4852,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4921,8 +4873,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4944,8 +4894,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4967,8 +4915,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (

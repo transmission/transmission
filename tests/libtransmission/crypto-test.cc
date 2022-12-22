@@ -244,9 +244,36 @@ TEST(Crypto, random)
     /* test that tr_rand_int() stays in-bounds */
     for (int i = 0; i < 100000; ++i)
     {
-        int const val = tr_rand_int(100);
-        EXPECT_LE(0, val);
-        EXPECT_LT(val, 100);
+        auto const val = tr_rand_int(100U);
+        EXPECT_LE(0U, val);
+        EXPECT_LT(val, 100U);
+    }
+}
+
+TEST(Crypto, randBuf)
+{
+    static auto constexpr Width = 32U;
+    static auto constexpr Iterations = 100000U;
+    static auto constexpr Empty = std::array<uint8_t, Width>{};
+
+    auto buf = Empty;
+
+    for (size_t i = 0; i < Iterations; ++i)
+    {
+        auto tmp = buf;
+        tr_rand_buffer(std::data(tmp), std::size(tmp));
+        EXPECT_NE(tmp, Empty);
+        EXPECT_NE(tmp, buf);
+        buf = tmp;
+    }
+
+    for (size_t i = 0; i < Iterations; ++i)
+    {
+        auto tmp = buf;
+        tr_rand_buffer_std(std::data(tmp), std::size(tmp));
+        EXPECT_NE(tmp, Empty);
+        EXPECT_NE(tmp, buf);
+        buf = tmp;
     }
 }
 
@@ -266,14 +293,14 @@ TEST(Crypto, base64)
         auto buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += static_cast<char>(tr_rand_int(256));
+            buf += static_cast<char>(tr_rand_int(256U));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
 
         buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += static_cast<char>(1 + tr_rand_int(255));
+            buf += static_cast<char>(1U + tr_rand_int(255U));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
     }

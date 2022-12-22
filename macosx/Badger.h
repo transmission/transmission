@@ -4,13 +4,9 @@
 
 #import <Foundation/Foundation.h>
 
-#include <libtransmission/transmission.h>
-
 @class Torrent;
 
 @interface Badger : NSObject
-
-- (instancetype)initWithLib:(tr_session*)lib;
 
 - (void)updateBadgeWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate;
 - (void)addCompletedTorrent:(Torrent*)torrent;

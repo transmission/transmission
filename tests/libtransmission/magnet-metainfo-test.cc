@@ -110,7 +110,7 @@ TEST(WebUtilsTest, parseMagnetFuzz)
 
     for (size_t i = 0; i < 100000; ++i)
     {
-        auto const len = static_cast<size_t>(tr_rand_int(1024));
+        auto const len = static_cast<size_t>(tr_rand_int(1024U));
         tr_rand_buffer(std::data(buf), len);
         auto mm = tr_magnet_metainfo{};
         EXPECT_FALSE(mm.parseMagnet({ std::data(buf), len }));

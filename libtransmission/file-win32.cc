@@ -320,8 +320,8 @@ static void create_temp_path(
 
         while (i > 0 && path_template[i - 1] == 'X')
         {
-            int const c = tr_rand_int(26 + 26 + 10);
-            path[i - 1] = c < 26 ? c + 'A' : (c < 26 + 26 ? (c - 26) + 'a' : (c - 26 - 26) + '0');
+            static auto constexpr Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"sv;
+            path[i - 1] = Chars[tr_rand_int(std::size(Chars))];
             --i;
         }
 

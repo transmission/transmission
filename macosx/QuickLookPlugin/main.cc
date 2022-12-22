@@ -3,7 +3,7 @@
 //	DO NO MODIFY THE CONTENT OF THIS FILE
 //
 //	This file contains the generic CFPlug-in code necessary for your generator
-//	To complete your generator implement the function in GenerateThumbnailForURL/GeneratePreviewForURL.c
+//	To complete the generator implement the function in GenerateThumbnailForURL/GeneratePreviewForURL.*
 //
 //==============================================================================
 
@@ -30,7 +30,7 @@
 // -----------------------------------------------------------------------------
 
 QL_EXTERN_C_BEGIN
-// The thumbnail generation function to be implemented in GenerateThumbnailForURL.c
+// The thumbnail generation function to be implemented in GenerateThumbnailForURL.*
 OSStatus GenerateThumbnailForURL(
     void* thisInterface,
     QLThumbnailRequestRef thumbnail,
@@ -40,7 +40,7 @@ OSStatus GenerateThumbnailForURL(
     CGSize maxSize);
 void CancelThumbnailGeneration(void* thisInterface, QLThumbnailRequestRef thumbnail);
 
-// The preview generation function to be implemented in GeneratePreviewForURL.c
+// The preview generation function to be implemented in GeneratePreviewForURL.*
 OSStatus GeneratePreviewForURL(
     void* thisInterface,
     QLPreviewRequestRef preview,

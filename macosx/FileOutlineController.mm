@@ -94,7 +94,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         __block BOOL filter = NO;
         if (components)
         {
-            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* obj, NSUInteger idx, BOOL* stop) {
+            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* obj, NSUInteger /*idx*/, BOOL* stop) {
                 if ([item.name rangeOfString:obj options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                 {
                     filter = YES;
@@ -691,7 +691,10 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
     using FindFileNode = void (^)(FileListNode*, NSArray<FileListNode*>*, NSIndexSet*, FileListNode*);
     __weak __block FindFileNode weakFindFileNode;
     FindFileNode findFileNode;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshadow"
     weakFindFileNode = findFileNode = ^(FileListNode* node, NSArray<FileListNode*>* list, NSIndexSet* indexes, FileListNode* currentParent) {
+#pragma clang diagnostic pop
         [list enumerateObjectsAtIndexes:indexes options:NSEnumerationConcurrent
                              usingBlock:^(FileListNode* checkNode, NSUInteger index, BOOL* stop) {
                                  if ([checkNode.indexes containsIndex:node.indexes.firstIndex])

@@ -31,10 +31,13 @@
 #include <libtransmission/variant.h>
 
 #include "Actions.h"
+#include "ListModelAdapter.h"
 #include "Notify.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
+#include "Torrent.h"
+#include "TorrentSorter.h"
 #include "Utils.h"
 
 using namespace std::literals;
@@ -61,43 +64,23 @@ TrVariantPtr create_variant(tr_variant& other)
     return result;
 }
 
-class ScopedModelSortBlocker
-{
-public:
-    explicit ScopedModelSortBlocker(Gtk::TreeSortable& model)
-        : model_(model)
-    {
-        model_.get_sort_column_id(sort_column_id_, sort_type_);
-        model_.set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, TR_GTK_SORT_TYPE(ASCENDING));
-    }
-
-    ~ScopedModelSortBlocker()
-    {
-        model_.set_sort_column(sort_column_id_, sort_type_);
-    }
-
-    TR_DISABLE_COPY_MOVE(ScopedModelSortBlocker)
-
-private:
-    Gtk::TreeSortable& model_;
-    int sort_column_id_ = -1;
-    Gtk::SortType sort_type_ = TR_GTK_SORT_TYPE(ASCENDING);
-};
-
 } // namespace
 
 class Session::Impl
 {
+    using SortModel = IF_GTKMM4(Gtk::SortListModel, Gtk::TreeModelSort);
+
 public:
     Impl(Session& core, tr_session* session);
     ~Impl();
 
     tr_session* close();
 
-    Glib::RefPtr<Gtk::ListStore> get_raw_model() const;
-    Glib::RefPtr<Gtk::TreeModelSort> get_model();
-    Glib::RefPtr<Gtk::TreeModelSort const> get_model() const;
+    Glib::RefPtr<Gio::ListStore<Torrent>> get_raw_model() const;
+    Glib::RefPtr<SortModel> get_model();
     tr_session* get_session() const;
+
+    std::pair<Glib::RefPtr<Torrent>, guint> find_torrent_by_id(tr_torrent_id_t torrent_id) const;
 
     size_t get_active_torrent_count() const;
 
@@ -106,7 +89,7 @@ public:
 
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
     int add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
-    void add_torrent(tr_torrent* tor, bool do_notify);
+    void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
 
     void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
@@ -143,6 +126,11 @@ public:
         return signal_port_tested_;
     }
 
+    auto& signal_torrents_changed()
+    {
+        return signal_torrents_changed_;
+    }
+
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
 
@@ -159,9 +147,7 @@ private:
         bool do_prompt,
         bool do_notify);
 
-    tr_torrent* create_new_torrent(tr_ctor* ctor);
-
-    void set_sort_mode(std::string_view mode, bool is_reversed);
+    Glib::RefPtr<Torrent> create_new_torrent(tr_ctor* ctor);
 
     void maybe_inhibit_hibernation();
     void set_hibernation_allowed(bool allowed);
@@ -178,7 +164,7 @@ private:
     void on_pref_changed(tr_quark key);
 
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
-    void on_torrent_metadata_changed(tr_torrent* tor);
+    void on_torrent_metadata_changed(tr_torrent* raw_torrent);
 
 private:
     Session& core_;
@@ -189,6 +175,7 @@ private:
     sigc::signal<void(bool)> signal_busy_;
     sigc::signal<void(tr_quark)> signal_prefs_changed_;
     sigc::signal<void(bool)> signal_port_tested_;
+    sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)> signal_torrents_changed_;
 
     Glib::RefPtr<Gio::FileMonitor> monitor_;
     sigc::connection monitor_tag_;
@@ -202,32 +189,11 @@ private:
     bool dbus_error_ = false;
     guint inhibit_cookie_ = 0;
     gint busy_count_ = 0;
-    Glib::RefPtr<Gtk::ListStore> raw_model_;
-    Glib::RefPtr<Gtk::TreeModelSort> sorted_model_;
+    Glib::RefPtr<Gio::ListStore<Torrent>> raw_model_;
+    Glib::RefPtr<SortModel> sorted_model_;
+    Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
 };
-
-TorrentModelColumns::TorrentModelColumns() noexcept
-{
-    add(name_collated);
-    add(torrent);
-    add(torrent_id);
-    add(speed_up);
-    add(speed_down);
-    add(active_peers_up);
-    add(active_peers_down);
-    add(recheck_progress);
-    add(active);
-    add(activity);
-    add(finished);
-    add(priority);
-    add(queue_position);
-    add(trackers);
-    add(error);
-    add(active_peer_count);
-}
-
-TorrentModelColumns const torrent_cols;
 
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
 {
@@ -239,22 +205,22 @@ Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
 ****
 ***/
 
-Glib::RefPtr<Gtk::ListStore> Session::Impl::get_raw_model() const
+Glib::RefPtr<Gio::ListStore<Torrent>> Session::Impl::get_raw_model() const
 {
     return raw_model_;
 }
 
-Glib::RefPtr<Gtk::TreeModel> Session::get_model() const
+Glib::RefPtr<Gio::ListModel> Session::get_model() const
+{
+    return impl_->get_raw_model();
+}
+
+Glib::RefPtr<Session::Model> Session::get_sorted_model() const
 {
     return impl_->get_model();
 }
 
-Glib::RefPtr<Gtk::TreeModelSort> Session::Impl::get_model()
-{
-    return sorted_model_;
-}
-
-Glib::RefPtr<Gtk::TreeModelSort const> Session::Impl::get_model() const
+Glib::RefPtr<Session::Impl::SortModel> Session::Impl::get_model()
 {
     return sorted_model_;
 }
@@ -298,278 +264,6 @@ void Session::Impl::inc_busy()
 void Session::Impl::dec_busy()
 {
     add_to_busy(-1);
-}
-
-/***
-****
-****  SORTING THE MODEL
-****
-***/
-
-namespace
-{
-
-template<typename T>
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-constexpr int compare_generic(T const& a, T const& b)
-{
-    if (a < b)
-    {
-        return -1;
-    }
-
-    if (a > b)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-constexpr bool is_valid_eta(time_t t)
-{
-    return t != TR_ETA_NOT_AVAIL && t != TR_ETA_UNKNOWN;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-constexpr int compare_eta(time_t a, time_t b)
-{
-    bool const a_valid = is_valid_eta(a);
-    bool const b_valid = is_valid_eta(b);
-
-    if (!a_valid && !b_valid)
-    {
-        return 0;
-    }
-
-    if (!a_valid)
-    {
-        return -1;
-    }
-
-    if (!b_valid)
-    {
-        return 1;
-    }
-
-    return -compare_generic(a, b);
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-constexpr int compare_ratio(double a, double b)
-{
-    if (static_cast<int>(a) == TR_RATIO_INF && static_cast<int>(b) == TR_RATIO_INF)
-    {
-        return 0;
-    }
-
-    if (static_cast<int>(a) == TR_RATIO_INF)
-    {
-        return 1;
-    }
-
-    if (static_cast<int>(b) == TR_RATIO_INF)
-    {
-        return -1;
-    }
-
-    return compare_generic(a, b);
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_name(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    return a->get_value(torrent_cols.name_collated).compare(b->get_value(torrent_cols.name_collated));
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_queue(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
-    auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-
-    return sb->queuePosition - sa->queuePosition;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_ratio(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    int ret = 0;
-
-    auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
-    auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-
-    if (ret == 0)
-    {
-        ret = compare_ratio(sa->ratio, sb->ratio);
-    }
-
-    if (ret == 0)
-    {
-        ret = compare_by_queue(a, b);
-    }
-
-    return ret;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_activity(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    int ret = 0;
-
-    auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
-    auto* const tb = static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent));
-    auto const aUp = a->get_value(torrent_cols.speed_up);
-    auto const aDown = a->get_value(torrent_cols.speed_down);
-    auto const bUp = b->get_value(torrent_cols.speed_up);
-    auto const bDown = b->get_value(torrent_cols.speed_down);
-
-    ret = compare_generic(aUp + aDown, bUp + bDown);
-
-    if (ret == 0)
-    {
-        auto const* const sa = tr_torrentStatCached(ta);
-        auto const* const sb = tr_torrentStatCached(tb);
-        ret = compare_generic(sa->peersSendingToUs + sa->peersGettingFromUs, sb->peersSendingToUs + sb->peersGettingFromUs);
-    }
-
-    if (ret == 0)
-    {
-        ret = compare_by_queue(a, b);
-    }
-
-    return ret;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_age(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
-    auto* const tb = static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent));
-    int ret = compare_generic(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
-
-    if (ret == 0)
-    {
-        ret = compare_by_name(a, b);
-    }
-
-    return ret;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_size(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
-    auto const size_b = tr_torrentTotalSize(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-    int ret = compare_generic(size_a, size_b);
-
-    if (ret == 0)
-    {
-        ret = compare_by_name(a, b);
-    }
-
-    return ret;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_progress(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
-    auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-    int ret = compare_generic(sa->percentComplete, sb->percentComplete);
-
-    if (ret == 0)
-    {
-        ret = compare_generic(sa->seedRatioPercentDone, sb->seedRatioPercentDone);
-    }
-
-    if (ret == 0)
-    {
-        ret = compare_by_ratio(a, b);
-    }
-
-    return ret;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_eta(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
-    auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-    int ret = compare_eta(sa->eta, sb->eta);
-
-    if (ret == 0)
-    {
-        ret = compare_by_name(a, b);
-    }
-
-    return ret;
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int compare_by_state(Gtk::TreeModel::const_iterator const& a, Gtk::TreeModel::const_iterator const& b)
-{
-    auto const sa = a->get_value(torrent_cols.activity);
-    auto const sb = b->get_value(torrent_cols.activity);
-    int ret = compare_generic(sa, sb);
-
-    if (ret == 0)
-    {
-        ret = compare_by_queue(a, b);
-    }
-
-    return ret;
-}
-
-} // namespace
-
-void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
-{
-    auto const& col = torrent_cols.torrent;
-    Gtk::TreeSortable::SlotCompare sort_func;
-    auto type = is_reversed ? TR_GTK_SORT_TYPE(ASCENDING) : TR_GTK_SORT_TYPE(DESCENDING);
-    auto const sortable = get_model();
-
-    if (mode == "sort-by-activity")
-    {
-        sort_func = &compare_by_activity;
-    }
-    else if (mode == "sort-by-age")
-    {
-        sort_func = &compare_by_age;
-    }
-    else if (mode == "sort-by-progress")
-    {
-        sort_func = &compare_by_progress;
-    }
-    else if (mode == "sort-by-queue")
-    {
-        sort_func = &compare_by_queue;
-    }
-    else if (mode == "sort-by-time-left")
-    {
-        sort_func = &compare_by_eta;
-    }
-    else if (mode == "sort-by-ratio")
-    {
-        sort_func = &compare_by_ratio;
-    }
-    else if (mode == "sort-by-state")
-    {
-        sort_func = &compare_by_state;
-    }
-    else if (mode == "sort-by-size")
-    {
-        sort_func = &compare_by_size;
-    }
-    else
-    {
-        sort_func = &compare_by_name;
-        type = is_reversed ? TR_GTK_SORT_TYPE(DESCENDING) : TR_GTK_SORT_TYPE(ASCENDING);
-    }
-
-    sortable->set_sort_func(col, sort_func);
-    sortable->set_sort_column(col, type);
 }
 
 /***
@@ -773,13 +467,12 @@ void Session::Impl::on_pref_changed(tr_quark const key)
     switch (key)
     {
     case TR_KEY_sort_mode:
+        sorter_->set_mode(gtr_pref_string_get(TR_KEY_sort_mode));
+        break;
+
     case TR_KEY_sort_reversed:
-        {
-            auto const mode = gtr_pref_string_get(TR_KEY_sort_mode);
-            bool const is_reversed = gtr_pref_flag_get(TR_KEY_sort_reversed);
-            set_sort_mode(mode, is_reversed);
-            break;
-        }
+        sorter_->set_reversed(gtr_pref_flag_get(TR_KEY_sort_reversed));
+        break;
 
     case TR_KEY_peer_limit_global:
         tr_sessionSetPeerLimit(session_, gtr_pref_int_get(key));
@@ -825,10 +518,22 @@ Session::Impl::Impl(Session& core, tr_session* session)
     : core_(core)
     , session_(session)
 {
-    raw_model_ = Gtk::ListStore::create(torrent_cols);
-    sorted_model_ = Gtk::TreeModelSort::create(raw_model_);
-    sorted_model_->set_default_sort_func(
-        [](Gtk::TreeModel::const_iterator const& /*a*/, Gtk::TreeModel::const_iterator const& /*b*/) { return 0; });
+    raw_model_ = Gio::ListStore<Torrent>::create();
+    signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_.get(), &TorrentSorter::update)));
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    sorted_model_ = Gtk::SortListModel::create(raw_model_, sorter_);
+#else
+    static auto const& self_col = Torrent::get_columns().self;
+
+    auto const sort_func = [this](SortModel::const_iterator const& lhs, SortModel::const_iterator const& rhs)
+    {
+        return sorter_->compare(*lhs->get_value(self_col), *rhs->get_value(self_col));
+    };
+
+    sorted_model_ = Gtk::TreeModelSort::create(ListModelAdapter::create<Torrent>(raw_model_));
+    sorted_model_->set_default_sort_func(sort_func);
+    sorter_->signal_changed().connect([this, sort_func]() { sorted_model_->set_default_sort_func(sort_func); });
+#endif
 
     /* init from prefs & listen to pref changes */
     on_pref_changed(TR_KEY_sort_mode);
@@ -899,46 +604,48 @@ void Session::Impl::on_torrent_completeness_changed(tr_torrent* tor, tr_complete
 namespace
 {
 
-Glib::ustring get_collated_name(tr_torrent const* tor)
-{
-    return fmt::format("{}\t{}", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentView(tor).hash_string);
-}
-
 struct metadata_callback_data
 {
     Session* core;
     tr_torrent_id_t torrent_id;
 };
 
-Gtk::TreeModel::iterator find_row_from_torrent_id(Glib::RefPtr<Gtk::TreeModel> const& model, tr_torrent_id_t id)
+} // namespace
+
+std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_torrent_id_t torrent_id) const
 {
-    for (auto& row : model->children())
+    auto begin_position = 0U;
+    auto end_position = raw_model_->get_n_items();
+
+    while (begin_position < end_position)
     {
-        if (id == row.get_value(torrent_cols.torrent_id))
+        auto const position = begin_position + (end_position - begin_position) / 2;
+        auto const torrent = raw_model_->get_item(position);
+
+        if (auto const current_torrent_id = torrent->get_id(); current_torrent_id == torrent_id)
         {
-            return TR_GTK_TREE_MODEL_CHILD_ITER(row);
+            return { torrent, position };
+        }
+        else
+        {
+            (current_torrent_id < torrent_id ? begin_position : end_position) = position;
         }
     }
 
     return {};
 }
 
-} // namespace
-
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
    so delegate to the GTK+ thread before changing our list store... */
-void Session::Impl::on_torrent_metadata_changed(tr_torrent* tor)
+void Session::Impl::on_torrent_metadata_changed(tr_torrent* raw_torrent)
 {
     Glib::signal_idle().connect(
-        [this, core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
+        [this, core = get_core_ptr(), torrent_id = tr_torrentId(raw_torrent)]()
         {
             /* update the torrent's collated name */
-            if (auto const* const tor2 = tr_torrentFindFromId(session_, torrent_id); tor2 != nullptr)
+            if (auto const [torrent, position] = find_torrent_by_id(torrent_id); torrent != nullptr)
             {
-                if (auto const iter = find_row_from_torrent_id(raw_model_, torrent_id); iter)
-                {
-                    (*iter)[torrent_cols.name_collated] = get_collated_name(tor2);
-                }
+                torrent->update();
             }
 
             return false;
@@ -951,70 +658,25 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent* tor)
 ****
 ***/
 
-namespace
+void Session::add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify)
 {
+    impl_->add_torrent(torrent, do_notify);
+}
 
-unsigned int build_torrent_trackers_hash(tr_torrent* tor)
+void Session::Impl::add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify)
 {
-    auto hash = uint64_t{};
-
-    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
+    if (torrent != nullptr)
     {
-        for (auto const ch : std::string_view{ tr_torrentTracker(tor, i).announce })
-        {
-            hash = (hash << 4) ^ (hash >> 28) ^ ch;
-        }
-    }
-
-    return hash;
-}
-
-bool is_torrent_active(tr_stat const* st)
-{
-    return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0 || st->activity == TR_STATUS_CHECK;
-}
-
-} // namespace
-
-void Session::add_torrent(tr_torrent* tor, bool do_notify)
-{
-    ScopedModelSortBlocker const disable_sort(*impl_->get_model().get());
-    impl_->add_torrent(tor, do_notify);
-}
-
-void Session::Impl::add_torrent(tr_torrent* tor, bool do_notify)
-{
-    if (tor != nullptr)
-    {
-        tr_stat const* st = tr_torrentStat(tor);
-        auto const collated = get_collated_name(tor);
-        auto const trackers_hash = build_torrent_trackers_hash(tor);
-        auto const store = get_raw_model();
-
-        auto const iter = store->append();
-        (*iter)[torrent_cols.name_collated] = collated;
-        (*iter)[torrent_cols.torrent] = tor;
-        (*iter)[torrent_cols.torrent_id] = tr_torrentId(tor);
-        (*iter)[torrent_cols.speed_up] = st->pieceUploadSpeed_KBps;
-        (*iter)[torrent_cols.speed_down] = st->pieceDownloadSpeed_KBps;
-        (*iter)[torrent_cols.active_peers_up] = st->peersGettingFromUs;
-        (*iter)[torrent_cols.active_peers_down] = st->peersSendingToUs + st->webseedsSendingToUs;
-        (*iter)[torrent_cols.recheck_progress] = st->recheckProgress;
-        (*iter)[torrent_cols.active] = is_torrent_active(st);
-        (*iter)[torrent_cols.activity] = st->activity;
-        (*iter)[torrent_cols.finished] = st->finished;
-        (*iter)[torrent_cols.priority] = tr_torrentGetPriority(tor);
-        (*iter)[torrent_cols.queue_position] = st->queuePosition;
-        (*iter)[torrent_cols.trackers] = trackers_hash;
+        raw_model_->insert_sorted(torrent, &Torrent::compare_by_id);
 
         if (do_notify)
         {
-            gtr_notify_torrent_added(get_core_ptr(), tr_torrentId(tor));
+            gtr_notify_torrent_added(get_core_ptr(), torrent->get_id());
         }
     }
 }
 
-tr_torrent* Session::Impl::create_new_torrent(tr_ctor* ctor)
+Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
 {
     bool do_trash = false;
 
@@ -1041,7 +703,7 @@ tr_torrent* Session::Impl::create_new_torrent(tr_ctor* ctor)
         }
     }
 
-    return tor;
+    return Torrent::create(tor);
 }
 
 int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
@@ -1068,7 +730,6 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 
     if (!do_prompt)
     {
-        ScopedModelSortBlocker const disable_sort(*sorted_model_.get());
         add_torrent(create_new_torrent(ctor), do_notify);
         tr_ctorFree(ctor);
         return 0;
@@ -1249,31 +910,22 @@ void Session::Impl::torrents_added()
 
 void Session::torrent_changed(tr_torrent_id_t id)
 {
-    auto const model = impl_->get_raw_model();
-
-    if (auto const iter = find_row_from_torrent_id(model, id); iter)
+    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
     {
-        model->row_changed(model->get_path(iter), iter);
+        torrent->update();
     }
 }
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
-    auto* tor = find_torrent(id);
-
-    if (tor != nullptr)
+    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
     {
         /* remove from the gui */
-        auto const model = impl_->get_raw_model();
-
-        if (auto const iter = find_row_from_torrent_id(model, id); iter)
-        {
-            model->erase(iter);
-        }
+        impl_->get_raw_model()->remove(position);
 
         /* remove the torrent */
         tr_torrentRemove(
-            tor,
+            &torrent->get_underlying(),
             delete_files,
             [](char const* filename, void* /*user_data*/, tr_error** error)
             { return gtr_file_trash_or_remove(filename, error); },
@@ -1296,108 +948,27 @@ void Session::load(bool force_paused)
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
     tr_ctorFree(ctor);
 
-    ScopedModelSortBlocker const disable_sort(*impl_->get_model().get());
+    auto raw_torrents = std::vector<tr_torrent*>{};
+    raw_torrents.resize(n_torrents);
+    tr_sessionGetAllTorrents(session, std::data(raw_torrents), std::size(raw_torrents));
 
-    auto torrents = std::vector<tr_torrent*>{};
-    torrents.resize(n_torrents);
-    tr_sessionGetAllTorrents(session, std::data(torrents), std::size(torrents));
-    for (auto* tor : torrents)
-    {
-        impl_->add_torrent(tor, false);
-    }
+    auto torrents = std::vector<Glib::RefPtr<Torrent>>();
+    torrents.reserve(raw_torrents.size());
+    std::transform(raw_torrents.begin(), raw_torrents.end(), std::back_inserter(torrents), &Torrent::create);
+    std::sort(torrents.begin(), torrents.end(), &Torrent::less_by_id);
+
+    auto const model = impl_->get_raw_model();
+    model->splice(0, model->get_n_items(), torrents);
 }
 
 void Session::clear()
 {
-    impl_->get_raw_model()->clear();
+    impl_->get_raw_model()->remove_all();
 }
 
 /***
 ****
 ***/
-
-namespace
-{
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-int gtr_compare_double(double const a, double const b, int decimal_places)
-{
-    auto const ia = int64_t(a * pow(10, decimal_places));
-    auto const ib = int64_t(b * pow(10, decimal_places));
-
-    if (ia < ib)
-    {
-        return -1;
-    }
-
-    if (ia > ib)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-void update_foreach(Gtk::TreeModel::Row& row)
-{
-    /* get the old states */
-    auto* const tor = static_cast<tr_torrent*>(row.get_value(torrent_cols.torrent));
-    auto const oldActive = row.get_value(torrent_cols.active);
-    auto const oldActivePeerCount = row.get_value(torrent_cols.active_peer_count);
-    auto const oldUploadPeerCount = row.get_value(torrent_cols.active_peers_up);
-    auto const oldDownloadPeerCount = row.get_value(torrent_cols.active_peers_down);
-    auto const oldError = row.get_value(torrent_cols.error);
-    auto const oldActivity = row.get_value(torrent_cols.activity);
-    auto const oldFinished = row.get_value(torrent_cols.finished);
-    auto const oldPriority = row.get_value(torrent_cols.priority);
-    auto const oldQueuePosition = row.get_value(torrent_cols.queue_position);
-    auto const oldTrackers = row.get_value(torrent_cols.trackers);
-    auto const oldUpSpeed = row.get_value(torrent_cols.speed_up);
-    auto const oldRecheckProgress = row.get_value(torrent_cols.recheck_progress);
-    auto const oldDownSpeed = row.get_value(torrent_cols.speed_down);
-
-    /* get the new states */
-    auto const* const st = tr_torrentStat(tor);
-    auto const newActive = is_torrent_active(st);
-    auto const newActivity = st->activity;
-    auto const newFinished = st->finished;
-    auto const newPriority = tr_torrentGetPriority(tor);
-    auto const newQueuePosition = st->queuePosition;
-    auto const newTrackers = build_torrent_trackers_hash(tor);
-    auto const newUpSpeed = st->pieceUploadSpeed_KBps;
-    auto const newDownSpeed = st->pieceDownloadSpeed_KBps;
-    auto const newRecheckProgress = st->recheckProgress;
-    auto const newActivePeerCount = st->peersSendingToUs + st->peersGettingFromUs + st->webseedsSendingToUs;
-    auto const newDownloadPeerCount = st->peersSendingToUs;
-    auto const newUploadPeerCount = st->peersGettingFromUs + st->webseedsSendingToUs;
-    auto const newError = st->error;
-
-    /* updating the model triggers off resort/refresh,
-       so don't do it unless something's actually changed... */
-    if (newActive != oldActive || newActivity != oldActivity || newFinished != oldFinished || newPriority != oldPriority ||
-        newQueuePosition != oldQueuePosition || newError != oldError || newActivePeerCount != oldActivePeerCount ||
-        newDownloadPeerCount != oldDownloadPeerCount || newUploadPeerCount != oldUploadPeerCount ||
-        newTrackers != oldTrackers || gtr_compare_double(newUpSpeed, oldUpSpeed, 2) != 0 ||
-        gtr_compare_double(newDownSpeed, oldDownSpeed, 2) != 0 ||
-        gtr_compare_double(newRecheckProgress, oldRecheckProgress, 2) != 0)
-    {
-        row[torrent_cols.active] = newActive;
-        row[torrent_cols.active_peer_count] = newActivePeerCount;
-        row[torrent_cols.active_peers_up] = newUploadPeerCount;
-        row[torrent_cols.active_peers_down] = newDownloadPeerCount;
-        row[torrent_cols.error] = newError;
-        row[torrent_cols.activity] = newActivity;
-        row[torrent_cols.finished] = newFinished;
-        row[torrent_cols.priority] = newPriority;
-        row[torrent_cols.queue_position] = newQueuePosition;
-        row[torrent_cols.trackers] = newTrackers;
-        row[torrent_cols.speed_up] = newUpSpeed;
-        row[torrent_cols.speed_down] = newDownSpeed;
-        row[torrent_cols.recheck_progress] = newRecheckProgress;
-    }
-}
-
-} // namespace
 
 void Session::update()
 {
@@ -1419,14 +990,27 @@ void Session::start_now(tr_torrent_id_t id)
 
 void Session::Impl::update()
 {
+    auto torrent_ids = std::unordered_set<tr_torrent_id_t>();
+    auto changes = Torrent::ChangeFlags();
+
     /* update the model */
-    for (auto row : raw_model_->children())
+    for (auto i = 0U, count = raw_model_->get_n_items(); i < count; ++i)
     {
-        update_foreach(row);
+        auto const torrent = raw_model_->get_item(i);
+        if (auto const torrent_changes = torrent->update(); torrent_changes.any())
+        {
+            torrent_ids.insert(torrent->get_id());
+            changes |= torrent_changes;
+        }
     }
 
     /* update hibernation */
     maybe_inhibit_hibernation();
+
+    if (changes.any())
+    {
+        signal_torrents_changed_.emit(torrent_ids, changes);
+    }
 }
 
 /**
@@ -1576,7 +1160,7 @@ void Session::set_pref(tr_quark const key, int newval)
 
 void Session::set_pref(tr_quark const key, double newval)
 {
-    if (gtr_compare_double(newval, gtr_pref_double_get(key), 4) != 0)
+    if (std::fabs(newval - gtr_pref_double_get(key)) >= 0.0001)
     {
         gtr_pref_double_set(key, newval);
         impl_->commit_prefs_change(key);
@@ -1738,7 +1322,7 @@ void Session::exec(tr_variant const* request)
 
 size_t Session::get_torrent_count() const
 {
-    return impl_->get_raw_model()->children().size();
+    return impl_->get_raw_model()->get_n_items();
 }
 
 size_t Session::get_active_torrent_count() const
@@ -1750,9 +1334,9 @@ size_t Session::Impl::get_active_torrent_count() const
 {
     size_t activeCount = 0;
 
-    for (auto const& row : raw_model_->children())
+    for (auto i = 0U, count = raw_model_->get_n_items(); i < count; ++i)
     {
-        if (row.get_value(torrent_cols.activity) != TR_STATUS_STOPPED)
+        if (raw_model_->get_item(i)->get_activity() != TR_STATUS_STOPPED)
         {
             ++activeCount;
         }
@@ -1821,4 +1405,9 @@ sigc::signal<void(tr_quark)>& Session::signal_prefs_changed()
 sigc::signal<void(bool)>& Session::signal_port_tested()
 {
     return impl_->signal_port_tested();
+}
+
+sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)>& Session::signal_torrents_changed()
+{
+    return impl_->signal_torrents_changed();
 }
