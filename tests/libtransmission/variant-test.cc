@@ -543,7 +543,7 @@ TEST_F(VariantTest, variantFromBufFuzz)
 
     for (size_t i = 0; i < 100000; ++i)
     {
-        buf.resize(tr_rand_int(4096));
+        buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 

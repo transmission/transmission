@@ -129,34 +129,3 @@ size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error) const
 
     return {};
 }
-
-tr_peer_socket tr_netOpenPeerUTPSocket(
-    tr_session* session,
-    tr_address const& addr,
-    tr_port port,
-    bool /*client_is_seed*/,
-    void* userdata)
-{
-    auto ret = tr_peer_socket{};
-
-    if (session->utp_context != nullptr && addr.is_valid_for_peers(port))
-    {
-        auto const [ss, sslen] = addr.to_sockaddr(port);
-
-        if (auto* const sock = utp_create_socket(session->utp_context); sock != nullptr)
-        {
-            utp_set_userdata(sock, userdata);
-
-            if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != -1)
-            {
-                ret = tr_peer_socket{ addr, port, sock };
-            }
-            else
-            {
-                utp_close(sock);
-            }
-        }
-    }
-
-    return ret;
-}

@@ -196,7 +196,7 @@ tr_session* fLib = NULL;
 
     self.fRatioField.stringValue = [NSString stringForRatio:statsSession.ratio];
 
-    NSString* totalRatioString = statsAll.ratio != TR_RATIO_NA ?
+    NSString* totalRatioString = static_cast<int>(statsAll.ratio) != TR_RATIO_NA ?
         [NSString stringWithFormat:NSLocalizedString(@"%@ total", "stats total"), [NSString stringForRatio:statsAll.ratio]] :
         NSLocalizedString(@"Total N/A", "stats total");
     self.fRatioAllField.stringValue = totalRatioString;

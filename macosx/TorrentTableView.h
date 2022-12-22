@@ -4,8 +4,6 @@
 
 #import <AppKit/AppKit.h>
 
-#include <libtransmission/transmission.h>
-
 @class Torrent;
 
 extern const CGFloat kGroupSeparatorHeight;

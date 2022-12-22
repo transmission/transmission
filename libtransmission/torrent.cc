@@ -1672,6 +1672,8 @@ void tr_torrent::recheckCompleteness()
 {
     auto const lock = unique_lock();
 
+    needs_completeness_check_ = false;
+
     auto const new_completeness = completion.status();
 
     if (new_completeness != completeness)

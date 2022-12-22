@@ -14,7 +14,7 @@
 
 #include "Utils.h"
 
-struct tr_torrent;
+class Torrent;
 
 class TorrentCellRenderer : public Gtk::CellRenderer
 {
@@ -26,16 +26,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(TorrentCellRenderer)
 
-    Glib::PropertyProxy<gpointer> property_torrent();
-
-    /* Use this instead of tr_stat.pieceUploadSpeed so that the model can
-       control when the speed displays get updated. This is done to keep
-       the individual torrents' speeds and the status bar's overall speed
-       in sync even if they refresh at slightly different times */
-    Glib::PropertyProxy<double> property_piece_upload_speed();
-
-    /* @see property_piece_upload_speed */
-    Glib::PropertyProxy<double> property_piece_download_speed();
+    Glib::PropertyProxy<Torrent*> property_torrent();
 
     Glib::PropertyProxy<int> property_bar_height();
     Glib::PropertyProxy<bool> property_compact();

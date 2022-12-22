@@ -339,8 +339,3 @@ std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key_in)
 
     return std::nullopt;
 }
-
-std::string_view tr_logLevelToKey(tr_log_level key)
-{
-    return LogKeys[key].first;
-}
