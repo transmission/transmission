@@ -261,6 +261,11 @@ void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchRes
     session_->runInSessionThread(std::move(func), std::move(response));
 }
 
+time_t tr_session::WebMediator::now() const
+{
+    return tr_time();
+}
+
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
 {
     session->fetch(std::move(options));
