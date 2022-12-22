@@ -5,11 +5,10 @@
 #import <CoreFoundation/CoreFoundation.h>
 
 /**
- * @brief YES if a value has stayed the same over time.
+ * @brief YES if a value hasn't changed at all.
  */
-template <class FloatType> [[nodiscard]] static inline BOOL FloatEqual(FloatType a, FloatType b);
-
-template <> [[nodiscard]] inline BOOL FloatEqual<CGFloat>(CGFloat a, CGFloat b)
+template<class FloatType>
+[[nodiscard]] static inline BOOL FloatEqualNoWarnings(FloatType a, FloatType b)
 {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"

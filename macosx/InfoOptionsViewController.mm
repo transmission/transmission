@@ -296,7 +296,7 @@ static CGFloat const kStackViewSpacing = 8.0;
             checkRatio = kInvalidValue;
         }
 
-        if (!multipleRatioLimits && !FloatEqual(ratioLimit, torrent.ratioLimit))
+        if (!multipleRatioLimits && !FloatEqualNoWarnings(ratioLimit, torrent.ratioLimit))
         {
             multipleRatioLimits = YES;
         }

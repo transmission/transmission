@@ -62,7 +62,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
-    if (FloatEqual(self.fDownloadRate, downloadRate) && FloatEqual(self.fUploadRate, uploadRate))
+    if (FloatEqualNoWarnings(self.fDownloadRate, downloadRate) && FloatEqualNoWarnings(self.fUploadRate, uploadRate))
     {
         return NO;
     }

@@ -78,13 +78,13 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
 - (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate
 {
     //set rates
-    if (!FloatEqual(dlRate, self.fPreviousDownloadRate))
+    if (!FloatEqualNoWarnings(dlRate, self.fPreviousDownloadRate))
     {
         self.fTotalDLField.stringValue = [NSString stringForSpeed:dlRate];
         self.fPreviousDownloadRate = dlRate;
     }
 
-    if (!FloatEqual(ulRate, self.fPreviousUploadRate))
+    if (!FloatEqualNoWarnings(ulRate, self.fPreviousUploadRate))
     {
         self.fTotalULField.stringValue = [NSString stringForSpeed:ulRate];
         self.fPreviousUploadRate = ulRate;
