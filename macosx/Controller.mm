@@ -256,8 +256,6 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic) IBOutlet NSMenu* fShareMenu;
 @property(nonatomic) IBOutlet NSMenu* fShareContextMenu;
-@property(nonatomic) IBOutlet NSMenuItem* fShareMenuItem; // remove when dropping 10.6
-@property(nonatomic) IBOutlet NSMenuItem* fShareContextMenuItem; // remove when dropping 10.6
 
 @property(nonatomic, readonly) tr_session* fLib;
 
