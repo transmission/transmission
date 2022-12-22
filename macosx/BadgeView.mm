@@ -9,8 +9,6 @@ static CGFloat const kBetweenPadding = 2.0;
 
 @interface BadgeView ()
 
-@property(nonatomic, readonly) tr_session* fLib;
-
 @property(nonatomic) NSMutableDictionary* fAttributes;
 
 @property(nonatomic) CGFloat fDownloadRate;
@@ -20,12 +18,10 @@ static CGFloat const kBetweenPadding = 2.0;
 
 @implementation BadgeView
 
-- (instancetype)initWithLib:(tr_session*)lib
+- (instancetype)init
 {
     if ((self = [super init]))
     {
-        _fLib = lib;
-
         _fDownloadRate = 0.0;
         _fUploadRate = 0.0;
     }

@@ -103,7 +103,7 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
     alert.informativeText = error;
 
-    [alert beginSheetModalForWindow:self.fPrefsController.window completionHandler:^(NSModalResponse returnCode) {
+    [alert beginSheetModalForWindow:self.fPrefsController.window completionHandler:^(NSModalResponse /*returnCode*/) {
         fBLViewController = nil;
     }];
 }

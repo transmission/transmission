@@ -769,6 +769,25 @@ public:
         return n_secs;
     }
 
+    constexpr void set_needs_completeness_check() noexcept
+    {
+        needs_completeness_check_ = true;
+    }
+
+    void do_idle_work()
+    {
+        if (needs_completeness_check_)
+        {
+            needs_completeness_check_ = false;
+            recheckCompleteness();
+        }
+
+        if (isStopping)
+        {
+            tr_torrentStop(this);
+        }
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -886,10 +905,6 @@ public:
     bool magnetVerify = false;
 
 private:
-    tr_verify_state verify_state_ = TR_VERIFY_NONE;
-    float verify_progress_ = -1;
-    tr_interned_string bandwidth_group_;
-
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
         auto const lock = unique_lock();
@@ -903,6 +918,12 @@ private:
             recheckCompleteness();
         }
     }
+
+    tr_verify_state verify_state_ = TR_VERIFY_NONE;
+    float verify_progress_ = -1;
+    tr_interned_string bandwidth_group_;
+
+    bool needs_completeness_check_ = true;
 };
 
 /***

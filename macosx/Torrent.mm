@@ -59,7 +59,7 @@ static int const kETAIdleDisplaySec = 2 * 60;
 
 @end
 
-void renameCallback(tr_torrent* torrent, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
+void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
 {
     @autoreleasepool
     {
@@ -1852,7 +1852,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     if (isFolder)
     {
         [parent.children enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                          usingBlock:^(FileListNode* searchNode, NSUInteger idx, BOOL* stop) {
+                                          usingBlock:^(FileListNode* searchNode, NSUInteger /*idx*/, BOOL* stop) {
                                               if ([searchNode.name isEqualToString:name] && searchNode.isFolder)
                                               {
                                                   node = searchNode;
@@ -1897,9 +1897,11 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
                                                                   selector:@selector(localizedStandardCompare:)];
     [fileNodes sortUsingDescriptors:@[ descriptor ]];
 
-    [fileNodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger idx, BOOL* stop) {
+    [fileNodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger /*idx*/, BOOL* /*stop*/) {
         if (node.isFolder)
+        {
             [self sortFileList:node.children];
+        }
     }];
 }
 
@@ -2006,7 +2008,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
             if (node.isFolder)
             {
                 [node.children enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                usingBlock:^(FileListNode* childNode, NSUInteger idx, BOOL* stop) {
+                                                usingBlock:^(FileListNode* childNode, NSUInteger /*idx*/, BOOL* /*stop*/) {
                                                     weakUpdateNodeAndChildrenForRename(childNode);
                                                 }];
             }
@@ -2016,7 +2018,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         {
             nodes = self.flatFileList;
         }
-        [nodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger idx, BOOL* stop) {
+        [nodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger /*idx*/, BOOL* /*stop*/) {
             updateNodeAndChildrenForRename(node);
         }];
 

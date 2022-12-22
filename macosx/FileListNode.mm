@@ -112,7 +112,7 @@
         lookupPathComponents = [lookupPathComponents arrayByAddingObject:oldName];
         BOOL const allSame = NSNotFound ==
             [lookupPathComponents indexOfObjectWithOptions:NSEnumerationConcurrent
-                                               passingTest:^BOOL(NSString* name, NSUInteger idx, BOOL* stop) {
+                                               passingTest:^BOOL(NSString* name, NSUInteger idx, BOOL* /*stop*/) {
                                                    return ![name isEqualToString:thesePathComponents[idx]];
                                                }];
 

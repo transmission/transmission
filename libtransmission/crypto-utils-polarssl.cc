@@ -93,12 +93,8 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 
 static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
 {
-    for (size_t i = 0; i < buffer_size; ++i)
-    {
-        // my_rand is used to initialize tr_rand_buffer itself used by tr_rand_int, so we can only use tr_rand_int_weak here
-        buffer[i] = tr_rand_int_weak(256);
-    }
-
+    // since we're initializing tr_rand_buffer()'s rng, we can't use tr_rand_buffer() here
+    tr_rand_buffer_std(buffer, buffer_size);
     return 0;
 }
 
@@ -112,10 +108,10 @@ static api_ctr_drbg_context* get_rng()
 #if API_VERSION_NUMBER >= 0x02000000
         API(ctr_drbg_init)(&rng);
 
-        if (!check_result(API(ctr_drbg_seed)(&rng, &my_rand, nullptr, nullptr, 0)))
+        if (!check_result(API(ctr_drbg_seed)(&rng, my_rand, nullptr, nullptr, 0)))
 #else
 
-        if (!check_result(API(ctr_drbg_init)(&rng, &my_rand, nullptr, nullptr, 0)))
+        if (!check_result(API(ctr_drbg_init)(&rng, my_rand, nullptr, nullptr, 0)))
 #endif
         {
             return nullptr;
@@ -264,7 +260,7 @@ std::unique_ptr<tr_sha256> tr_sha256::create()
 ****
 ***/
 
-bool tr_rand_buffer(void* buffer, size_t length)
+bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {
     if (length == 0)
     {

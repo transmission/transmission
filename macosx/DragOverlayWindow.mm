@@ -10,8 +10,6 @@
 
 @interface DragOverlayWindow ()
 
-@property(nonatomic, readonly) tr_session* fLib;
-
 @property(nonatomic, readonly) NSViewAnimation* fFadeInAnimation;
 @property(nonatomic, readonly) NSViewAnimation* fFadeOutAnimation;
 
@@ -19,13 +17,11 @@
 
 @implementation DragOverlayWindow
 
-- (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window
+- (instancetype)initForWindow:(NSWindow*)window
 {
     if ((self = ([super initWithContentRect:window.frame styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered
                                       defer:NO])))
     {
-        _fLib = lib;
-
         self.backgroundColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.5];
         self.alphaValue = 0.0;
         self.opaque = NO;

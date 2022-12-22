@@ -70,11 +70,11 @@ enum
     {
         //determine relevant values
         _fNumPieces = MIN(_torrent.pieceCount, kMaxAcross * kMaxAcross);
-        _fAcross = ceil(sqrt(_fNumPieces));
+        _fAcross = static_cast<NSInteger>(ceil(sqrt(_fNumPieces)));
 
         CGFloat const width = self.bounds.size.width;
-        _fWidth = (width - (_fAcross + 1) * kBetweenPadding) / _fAcross;
-        _fExtraBorder = (width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2;
+        _fWidth = static_cast<NSInteger>((width - (_fAcross + 1) * kBetweenPadding) / _fAcross);
+        _fExtraBorder = static_cast<NSInteger>((width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2);
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];

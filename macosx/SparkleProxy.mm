@@ -7,7 +7,7 @@
 #import "NSStringAdditions.h"
 
 // Development-only proxy when app is not signed for running Sparkle
-void SUUpdater_checkForUpdates(id self, SEL _cmd, ...)
+void SUUpdater_checkForUpdates(id /*self*/, SEL /*_cmd*/, ...)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert* alert = [[NSAlert alloc] init];
