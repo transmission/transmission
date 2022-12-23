@@ -26,20 +26,20 @@ struct tr_error;
  * @{
  */
 
-enum tr_string_type
-{
-    TR_STRING_TYPE_QUARK,
-    TR_STRING_TYPE_HEAP,
-    TR_STRING_TYPE_BUF,
-    TR_STRING_TYPE_VIEW
-};
-
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
 struct tr_variant_string
 {
-    tr_string_type type;
+    enum class StringType
+    {
+        Quark,
+        Heap,
+        Buf,
+        View
+    };
+
+    StringType type;
     size_t len;
     union
     {
@@ -184,7 +184,7 @@ constexpr void tr_variantInit(tr_variant* initme, char type)
 constexpr void tr_variantInitStrView(tr_variant* initme, std::string_view in)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    initme->val.s.type = TR_STRING_TYPE_VIEW;
+    initme->val.s.type = tr_variant_string::StringType::View;
     initme->val.s.len = std::size(in);
     initme->val.s.str.str = std::data(in);
 }

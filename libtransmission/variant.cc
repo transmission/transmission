@@ -46,14 +46,14 @@ static constexpr bool tr_variantIsContainer(tr_variant const* v)
 ***/
 
 static auto constexpr StringInit = tr_variant_string{
-    TR_STRING_TYPE_QUARK,
+    tr_variant_string::StringType::Quark,
     0,
     {},
 };
 
 static void tr_variant_string_clear(struct tr_variant_string* str)
 {
-    if (str->type == TR_STRING_TYPE_HEAP)
+    if (str->type == tr_variant_string::StringType::Heap)
     {
         delete[] ((char*)(str->str.str));
     }
@@ -66,12 +66,12 @@ static constexpr char const* tr_variant_string_get_string(struct tr_variant_stri
 {
     switch (str->type)
     {
-    case TR_STRING_TYPE_BUF:
+    case tr_variant_string::StringType::Buf:
         return str->str.buf;
 
-    case TR_STRING_TYPE_HEAP:
-    case TR_STRING_TYPE_QUARK:
-    case TR_STRING_TYPE_VIEW:
+    case tr_variant_string::StringType::Heap:
+    case tr_variant_string::StringType::Quark:
+    case tr_variant_string::StringType::View:
         return str->str.str;
 
     default:
@@ -83,7 +83,7 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
 {
     tr_variant_string_clear(str);
 
-    str->type = TR_STRING_TYPE_QUARK;
+    str->type = tr_variant_string::StringType::Quark;
     auto const sv = tr_quark_get_string_view(quark);
     str->str.str = std::data(sv);
     str->len = std::size(sv);
@@ -98,7 +98,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, std::str
 
     if (len < sizeof(str->str.buf))
     {
-        str->type = TR_STRING_TYPE_BUF;
+        str->type = tr_variant_string::StringType::Buf;
         if (len > 0)
         {
             std::copy_n(bytes, len, str->str.buf);
@@ -112,7 +112,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, std::str
         auto* tmp = new char[len + 1];
         std::copy_n(bytes, len, tmp);
         tmp[len] = '\0';
-        str->type = TR_STRING_TYPE_HEAP;
+        str->type = tr_variant_string::StringType::Heap;
         str->str.str = tmp;
         str->len = len;
     }
