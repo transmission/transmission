@@ -26,12 +26,12 @@ public:
 public:
     constexpr Flags() noexcept = default;
 
-    constexpr Flags(FlagType flag) noexcept
+    explicit constexpr Flags(FlagType flag) noexcept
     {
         set(flag);
     }
 
-    constexpr Flags(std::initializer_list<FlagType> flags) noexcept
+    explicit constexpr Flags(std::initializer_list<FlagType> flags) noexcept
     {
         for (auto const flag : flags)
         {
