@@ -56,9 +56,9 @@ set(${PROJECT_NAME}_SOURCES
     FilterBarView.mm
     FilterButton.mm
     GlobalOptionsPopoverViewController.mm
+    GroupPopUpButtonCell.mm
     GroupTextCell.mm
     GroupToolbarItem.mm
-    GroupPopUpButtonCell.mm
     GroupsController.mm
     GroupsPrefsController.mm
     InfoActivityViewController.mm
@@ -134,6 +134,7 @@ set(${PROJECT_NAME}_HEADERS
     FilterButton.h
     GlobalOptionsPopoverViewController.h
     GroupPopUpButtonCell.h
+    GroupTextCell.h
     GroupToolbarItem.h
     GroupsController.h
     GroupsPrefsController.h
