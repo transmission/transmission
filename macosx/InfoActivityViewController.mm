@@ -126,12 +126,7 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 {
     self.oldHeight = self.fCurrentHeight;
 
-    [self checkLayout];
-
-    if (self.fHeightChange)
-    {
-        [self updateWindowLayout];
-    }
+    [self updateWindowLayout];
 }
 
 - (void)updateWindowLayout
