@@ -99,16 +99,15 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
     NSRect viewRect = self.view.frame;
 
     CGFloat difference = self.fHeightChange;
-    if (difference)
-    {
-        viewRect.size.height -= difference;
-    }
+    viewRect.size.height -= difference;
 
     return viewRect;
 }
 
-- (void)checkLayout
+- (bool)checkLayout
 {
+    BOOL isVertLayout = NO;
+
     if (NSWidth(self.view.window.frame) >= self.fHorizLayoutWidth + 1)
     {
         self.fActivityStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
@@ -122,16 +121,18 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
         self.fActivityStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
         self.fActivityStackView.spacing = kStackViewVerticalSpacing;
         self.fCurrentHeight = self.fVertLayoutHeight;
+        isVertLayout = YES;
     }
+    
+
+    return isVertLayout;
 }
 
 - (void)checkWindowSize
 {
     self.oldHeight = self.fCurrentHeight;
 
-    [self checkLayout];
-
-    if (self.fHeightChange)
+    if ([self checkLayout])
     {
         [self updateWindowLayout];
     }
@@ -139,22 +140,17 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 
 - (void)updateWindowLayout
 {
-    if (self.fCurrentHeight != 0)
-    {
-        [self checkLayout];
+    CGFloat difference = self.fHeightChange;
 
-        CGFloat difference = self.fHeightChange;
+    NSRect windowRect = self.view.window.frame;
+    windowRect.origin.y += difference;
+    windowRect.size.height -= difference;
 
-        NSRect windowRect = self.view.window.frame;
-        windowRect.origin.y += difference;
-        windowRect.size.height -= difference;
+    self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
+    self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
 
-        self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
-        self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
-
-        self.view.frame = [self viewRect];
-        [self.view.window setFrame:windowRect display:YES animate:YES];
-    }
+    self.view.frame = [self viewRect];
+    [self.view.window setFrame:windowRect display:YES animate:YES];
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents

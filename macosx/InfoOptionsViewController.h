@@ -9,7 +9,7 @@
 @interface InfoOptionsViewController : NSViewController<InfoViewController>
 
 - (NSRect)viewRect;
-- (void)checkLayout;
+- (bool)checkLayout;
 - (void)checkWindowSize;
 - (void)updateWindowLayout;
 
