@@ -29,7 +29,7 @@ public:
     using Buffer = libtransmission::Buffer;
 
     tr_peer_socket() = default;
-    tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock);
+    tr_peer_socket(tr_session const* session, tr_address const& address, tr_port port, tr_socket_t sock);
     tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock);
     tr_peer_socket(tr_peer_socket&&) = default;
     tr_peer_socket(tr_peer_socket const&) = delete;

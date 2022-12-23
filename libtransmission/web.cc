@@ -66,7 +66,7 @@ using shared_unique_ptr = std::unique_ptr<CURLSH, ShareDeleter>;
 
 struct MultiDeleter
 {
-    void operator()(CURLM* multi)
+    void operator()(CURLM* multi) const
     {
         if (multi == nullptr)
         {
@@ -585,7 +585,7 @@ public:
         return std::empty(queued_tasks_) && std::empty(running_tasks_);
     }
 
-    void remove_task(Task& task)
+    void remove_task(Task const& task)
     {
         auto const lock = std::unique_lock{ tasks_mutex_ };
 
