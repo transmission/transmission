@@ -99,10 +99,9 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
     NSRect viewRect = self.view.frame;
 
     CGFloat difference = self.fHeightChange;
-    if (difference != 0)
+    if (difference)
     {
         viewRect.size.height -= difference;
-        viewRect.size.width = NSWidth(self.view.window.frame);
     }
 
     return viewRect;
@@ -132,7 +131,7 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 
     [self checkLayout];
 
-    if (self.fHeightChange != 0)
+    if (self.fHeightChange)
     {
         [self updateWindowLayout];
     }
