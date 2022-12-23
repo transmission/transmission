@@ -115,15 +115,12 @@ size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error) const
     }
 
 #ifdef WITH_UTP
-    if (is_utp())
+    // utp_read_drained() notifies libutp that this read buffer is empty.
+    // It opens up the congestion window by sending an ACK (soonish) if
+    // one was not going to be sent.
+    if (is_utp() && std::empty(buf))
     {
-        // utp_read_drained() notifies libutp that this read buffer is
-        // empty.  It opens up the congestion window by sending an ACK
-        // (soonish) if one was not going to be sent.
-        if (std::empty(buf))
-        {
-            utp_read_drained(handle.utp);
-        }
+        utp_read_drained(handle.utp);
     }
 #endif
 
