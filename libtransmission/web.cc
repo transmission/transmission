@@ -66,7 +66,7 @@ using shared_unique_ptr = std::unique_ptr<CURLSH, ShareDeleter>;
 
 struct MultiDeleter
 {
-    void operator()(CURLM* multi)
+    void operator()(CURLM* multi) const
     {
         if (multi == nullptr)
         {
