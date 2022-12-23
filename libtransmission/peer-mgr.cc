@@ -903,10 +903,8 @@ static void peerSuggestedPiece(
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 {
     bool piece_came_from_peers = false;
-    tr_swarm* const s = tor->swarm;
 
-    /* walk through our peers */
-    for (auto* const peer : s->peers)
+    for (auto* const peer : tor->swarm->peers)
     {
         // notify the peer that we now have this piece
         peer->on_piece_completed(p);
