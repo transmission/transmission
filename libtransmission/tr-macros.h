@@ -8,6 +8,27 @@
 #include <array>
 #include <cstddef> // size_t
 
+///
+
+#ifdef _MSVC_LANG
+#define TR_CPLUSPLUS _MSVC_LANG
+#else
+#define TR_CPLUSPLUS __cplusplus
+#endif
+
+#if ((TR_CPLUSPLUS >= 202002L) && (!defined(_GLIBCXX_RELEASE) || _GLIBCXX_RELEASE > 9)) || \
+    (TR_CPLUSPLUS >= 201709L && TR_GCC_VERSION >= 1002)
+#define TR_CONSTEXPR20 constexpr
+#else
+#define TR_CONSTEXPR20
+#endif
+
+// Placeholder for future use.
+// Can't implement right now because __cplusplus version for C++23 is currently TBD
+#define TR_CONSTEXPR23
+
+///
+
 /***
 ****
 ***/
