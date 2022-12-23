@@ -428,9 +428,8 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
         {
             portString = NSLocalizedString(@"N/A", "Inspector -> Peers tab -> table row tooltip");
         }
-        [components addObject:[NSString stringWithFormat:@"%@: %@",
-                                                         NSLocalizedString(@"Port", "Inspector -> Peers tab -> table row tooltip"),
-                                                         portString]];
+        [components
+            addObject:[NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"Port:", "Inspector -> Peers tab -> table row tooltip"), portString]];
 
         NSInteger const peerFrom = [peer[@"From"] integerValue];
         switch (peerFrom)
