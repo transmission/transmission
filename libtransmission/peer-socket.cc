@@ -18,7 +18,7 @@
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
-tr_peer_socket::tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock)
+tr_peer_socket::tr_peer_socket(tr_session const* session, tr_address const& address, tr_port port, tr_socket_t sock)
     : handle{ sock }
     , address_{ address }
     , port_{ port }
