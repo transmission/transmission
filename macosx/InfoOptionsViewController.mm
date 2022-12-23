@@ -117,7 +117,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
     // we check for existance of self.view.window
     // as when view is shown from TorrentTableView.mm popover we dont want to cutomize the view height
-    if (difference && self.view.window)
+    if (self.view.window)
     {
         viewRect.size.height -= difference;
     }
@@ -125,8 +125,10 @@ static CGFloat const kStackViewSpacing = 8.0;
     return viewRect;
 }
 
-- (void)checkLayout
+- (bool)checkLayout
 {
+    BOOL isVertLayout = NO;
+
     if (NSWidth(self.view.window.frame) >= self.fHorizLayoutWidth + 1)
     {
         self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
@@ -136,16 +138,17 @@ static CGFloat const kStackViewSpacing = 8.0;
     {
         self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
         self.fCurrentHeight = self.fVertLayoutHeight;
+        isVertLayout = YES;
     }
+
+    return isVertLayout;
 }
 
 - (void)checkWindowSize
 {
     self.oldHeight = self.fCurrentHeight;
 
-    [self checkLayout];
-
-    if (self.fHeightChange)
+    if ([self checkLayout])
     {
         [self updateWindowLayout];
     }
@@ -155,7 +158,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 {
     // we check for existance of self.view.window
     // as when view is shown from TorrentTableView.mm popover we dont want to cutomize the view height
-    if (self.fCurrentHeight != 0 && self.view.window)
+    if (self.view.window)
     {
         [self checkLayout];
 
