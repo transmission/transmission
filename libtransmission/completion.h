@@ -150,7 +150,7 @@ struct tr_completion
 
     [[nodiscard]] uint64_t countHasBytesInSpan(tr_byte_span_t) const;
 
-    [[nodiscard]] constexpr bool hasMetainfo() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 bool hasMetainfo() const noexcept
     {
         return !std::empty(blocks_);
     }

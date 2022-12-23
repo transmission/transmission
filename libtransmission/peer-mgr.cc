@@ -413,7 +413,7 @@ public:
         is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->leftUntilDone();
     }
 
-    [[nodiscard]] auto constexpr isEndgame() const noexcept
+    [[nodiscard]] constexpr auto isEndgame() const noexcept
     {
         return is_endgame_;
     }
@@ -447,7 +447,7 @@ public:
         stats.active_webseed_count = 0;
     }
 
-    [[nodiscard]] auto isAllSeeds() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto isAllSeeds() const noexcept
     {
         if (!pool_is_all_seeds_)
         {
