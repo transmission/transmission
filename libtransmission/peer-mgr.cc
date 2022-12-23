@@ -2648,10 +2648,7 @@ struct peer_candidate
     auto const now_msec = tr_time_msec();
 
     // leave 5% of connection slots for incoming connections -- ticket #2609
-    auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95);
-
-    // don't start any new handshakes if we're full up
-    if (max_candidates <= tr_peerMsgs::size())
+    if (auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95); max_candidates <= tr_peerMsgs::size())
     {
         return {};
     }
