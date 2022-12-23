@@ -1154,7 +1154,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.n_pieces = tor->pieceCount();
     ret.is_private = tor->isPrivate();
     ret.is_folder = tor->fileCount() > 1 ||
-        (tor->fileCount() == 1 && tor->fileSubpath(0).find_first_of('/') != std::string_view::npos);
+        (tor->fileCount() == 1 && tr_strvContains(tor->fileSubpath(0), '/');
 
     return ret;
 }
