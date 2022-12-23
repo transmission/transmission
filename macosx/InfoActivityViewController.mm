@@ -136,22 +136,19 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 
 - (void)updateWindowLayout
 {
-    if (self.fCurrentHeight)
-    {
-        [self checkLayout];
+    [self checkLayout];
 
-        CGFloat difference = self.fHeightChange;
+    CGFloat difference = self.fHeightChange;
 
-        NSRect windowRect = self.view.window.frame;
-        windowRect.origin.y += difference;
-        windowRect.size.height -= difference;
+    NSRect windowRect = self.view.window.frame;
+    windowRect.origin.y += difference;
+    windowRect.size.height -= difference;
 
-        self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
-        self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
+    self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
+    self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
 
-        self.view.frame = [self viewRect];
-        [self.view.window setFrame:windowRect display:YES animate:YES];
-    }
+    self.view.frame = [self viewRect];
+    [self.view.window setFrame:windowRect display:YES animate:YES];
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents

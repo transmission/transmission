@@ -155,7 +155,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 {
     // we check for existance of self.view.window
     // as when view is shown from TorrentTableView.mm popover we don't want to cutomize the view height
-    if (self.fCurrentHeight && self.view.window)
+    if (self.view.window)
     {
         [self checkLayout];
 
