@@ -1153,7 +1153,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.piece_size = tor->pieceSize();
     ret.n_pieces = tor->pieceCount();
     ret.is_private = tor->isPrivate();
-    ret.is_folder = tor->fileCount() > 1;
+    ret.is_folder = tor->fileCount() > 1 || (tor->fileCount() == 1 && tr_strvContains(tor->fileSubpath(0), '/'));
 
     return ret;
 }

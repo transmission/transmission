@@ -6,6 +6,7 @@
 #include <libtransmission/utils.h>
 
 #import "NSStringAdditions.h"
+#import "NSDataAdditions.h"
 
 @interface NSString (Private)
 
@@ -132,6 +133,25 @@
         }
     }
     return components;
+}
+
++ (NSString*)convertedStringFromCString:(nonnull char const*)bytes
+{
+    // UTF-8 encoding
+    NSString* fullPath = @(bytes);
+    if (fullPath)
+    {
+        return fullPath;
+    }
+    // autodetection of the encoding (#3434)
+    NSData* data = [NSData dataWithBytes:(void const*)bytes length:sizeof(unsigned char) * strlen(bytes)];
+    [NSString stringEncodingForData:data encodingOptions:nil convertedString:&fullPath usedLossyConversion:nil];
+    if (fullPath)
+    {
+        return fullPath;
+    }
+    // hexa encoding
+    return data.hexString;
 }
 
 @end
