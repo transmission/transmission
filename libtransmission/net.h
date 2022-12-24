@@ -247,6 +247,8 @@ struct tr_address
 
     [[nodiscard]] std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_port port) const noexcept;
 
+    [[nodiscard]] bool is_global_unicast_address() const noexcept;
+
     tr_address_type type;
     union
     {
