@@ -28,12 +28,12 @@ NSString* urlString = nil;
 {
     self.fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
 
-    if (self.urlString)
+    if (urlString)
     {
-        self.fTextField.stringValue = self.urlString;
+        self.fTextField.stringValue = urlString;
         [self.fTextField selectText:self];
 
-        [self updateOpenButtonForURL:self.urlString];
+        [self updateOpenButtonForURL:urlString];
     }
 
     self.fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
@@ -76,7 +76,8 @@ NSString* urlString = nil;
 
 - (NSString*)urlString
 {
-    return self.fTextField.stringValue;
+    urlString = self.fTextField.stringValue;
+    return urlString;
 }
 
 - (void)controlTextDidChange:(NSNotification*)notification
