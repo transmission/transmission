@@ -66,7 +66,7 @@ using shared_unique_ptr = std::unique_ptr<CURLSH, ShareDeleter>;
 
 struct MultiDeleter
 {
-    void operator()(CURLM* multi)
+    void operator()(CURLM* multi) const
     {
         if (multi == nullptr)
         {
@@ -199,14 +199,14 @@ public:
 
     ~Impl()
     {
-        deadline_ = tr_time();
+        deadline_ = mediator.now();
         queued_tasks_cv_.notify_one();
         curl_thread->join();
     }
 
     void startShutdown(std::chrono::milliseconds deadline)
     {
-        deadline_ = tr_time() + std::chrono::duration_cast<std::chrono::seconds>(deadline).count();
+        deadline_ = mediator.now() + std::chrono::duration_cast<std::chrono::seconds>(deadline).count();
         queued_tasks_cv_.notify_one();
     }
 
@@ -402,7 +402,7 @@ public:
 
     [[nodiscard]] bool deadline_reached() const
     {
-        return deadline_exists() && deadline() <= tr_time();
+        return deadline_exists() && deadline() <= mediator.now();
     }
 
     [[nodiscard]] CURL* get_easy(std::string_view host)
@@ -585,7 +585,7 @@ public:
         return std::empty(queued_tasks_) && std::empty(running_tasks_);
     }
 
-    void remove_task(Task& task)
+    void remove_task(Task const& task)
     {
         auto const lock = std::unique_lock{ tasks_mutex_ };
 
@@ -764,7 +764,10 @@ tr_web::tr_web(Mediator& mediator)
 {
 }
 
-tr_web::~tr_web() = default;
+tr_web::~tr_web()
+{
+    impl_->startShutdown(0ms);
+}
 
 std::unique_ptr<tr_web> tr_web::create(Mediator& mediator)
 {

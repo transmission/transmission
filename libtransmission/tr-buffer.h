@@ -189,7 +189,7 @@ public:
     }
 
     template<typename T>
-    [[nodiscard]] bool startsWith(T const& needle) const
+    [[nodiscard]] TR_CONSTEXPR20 bool startsWith(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
         auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));

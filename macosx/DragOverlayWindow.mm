@@ -77,9 +77,17 @@
 
                 auto const n_files = metainfo.fileCount();
                 fileCount += n_files;
-                if (n_files == 1)
+                // only useful when one torrent
+                if (count == 1)
                 {
-                    name = @(metainfo.name().c_str());
+                    if (n_files == 1)
+                    {
+                        name = [NSString convertedStringFromCString:metainfo.fileSubpath(0).c_str()];
+                    }
+                    else
+                    {
+                        name = @(metainfo.name().c_str());
+                    }
                 }
             }
         }
@@ -109,7 +117,8 @@
     NSImage* icon;
     if (count == 1)
     {
-        icon = [NSWorkspace.sharedWorkspace iconForFileType:name ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
+        icon = [NSWorkspace.sharedWorkspace
+            iconForFileType:fileCount <= 1 ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
     }
     else
     {
