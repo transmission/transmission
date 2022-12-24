@@ -154,7 +154,6 @@
 		A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */; };
 		A24621410C769D0900088E81 /* session-thread.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* session-thread.h */; };
 		A24621420C769D0900088E81 /* session-thread.cc in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* session-thread.cc */; };
-		A247A443114C701800547DFC /* InfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A247A442114C701800547DFC /* InfoViewController.h */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A254853C0EB66CD4004539DA /* codelength.h in Headers */ = {isa = PBXBuildFile; fileRef = A25485390EB66CBB004539DA /* codelength.h */; };
@@ -233,7 +232,6 @@
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.mm */; };
 		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
 		A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D7744F154CC25700A62B93 /* WebSeedTableView.h */; };
-		A2D77452154CC25700A62B93 /* WebSeedTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.mm */; };
 		A2D77453154CC72B00A62B93 /* WebSeedTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.mm */; };
 		A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.mm */; };
@@ -401,6 +399,7 @@
 		C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3D9061B27B7E31100EF2386 /* libpsl.h */; };
 		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
 		C809AEE7291ECFD000BFDBE1 /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
+		C82B30312953337B0001BD6E /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
 		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
 		C87369652809984200573C90 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87369642809984200573C90 /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -2285,7 +2284,6 @@
 				4D80185A10BBC0B0008A4AF2 /* magnet-metainfo.h in Headers */,
 				0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */,
 				A209EE5D1144B51E002B02D1 /* history.h in Headers */,
-				A247A443114C701800547DFC /* InfoViewController.h in Headers */,
 				A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */,
 				A23547E311CD0B090046EAE6 /* cache.h in Headers */,
 				CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */,
@@ -3079,7 +3077,6 @@
 				A23F29A2132A447400E9A83B /* announcer-http.cc in Sources */,
 				C1FEE5791C3223CC00D62832 /* watchdir-kqueue.cc in Sources */,
 				A2AA9BE1132CAC8E00FA131E /* announcer-udp.cc in Sources */,
-				A2D77452154CC25700A62B93 /* WebSeedTableView.mm in Sources */,
 				A25BFD69167BED3B0039D1AA /* variant-benc.cc in Sources */,
 				A25BFD6B167BED3B0039D1AA /* variant-json.cc in Sources */,
 				A25BFD6D167BED3B0039D1AA /* variant.cc in Sources */,
@@ -3205,6 +3202,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C82B30312953337B0001BD6E /* NSDataAdditions.mm in Sources */,
 				A29304EE15D7497C00B1F726 /* main.cc in Sources */,
 				A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */,
 				A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.mm in Sources */,
