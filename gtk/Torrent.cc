@@ -25,7 +25,7 @@ namespace
 {
 
 template<typename T>
-Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T> const&)
+Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T> const& /*column*/)
 {
     return static_cast<Glib::Value<T>&>(value);
 }
