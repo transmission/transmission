@@ -487,6 +487,7 @@ Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::O
 
 void gtr_object_notify_emit(Glib::ObjectBase& object)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
     g_signal_emit_by_name(object.gobj(), "notify", nullptr);
 }
 
