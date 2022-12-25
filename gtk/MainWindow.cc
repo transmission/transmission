@@ -107,7 +107,7 @@ private:
 
     Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
-    void on_popup_menu(double view_x, double view_y);
+    void on_popup_menu(double event_x, double event_y);
 
     void onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled);
     void onSpeedSet(tr_direction dir, int KBps);
