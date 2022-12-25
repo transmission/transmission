@@ -89,6 +89,8 @@ public:
     Impl(Session& core, tr_session* session);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     tr_session* close();
 
     Glib::RefPtr<Gio::ListStore<Torrent>> get_raw_model() const;
