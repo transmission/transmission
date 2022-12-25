@@ -476,7 +476,9 @@ Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::O
 {
     static auto const object_signal_notify_info = Glib::SignalProxyInfo{
         .signal_name = "notify",
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         .callback = reinterpret_cast<GCallback>(&object_signal_notify_callback),
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         .notify_callback = reinterpret_cast<GCallback>(&object_signal_notify_callback),
     };
 
