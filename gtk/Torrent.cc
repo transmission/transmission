@@ -732,6 +732,7 @@ Torrent::ChangeFlags Torrent::update()
 
 Glib::RefPtr<Torrent> Torrent::create(tr_torrent* torrent)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new Torrent(torrent));
 }
 
