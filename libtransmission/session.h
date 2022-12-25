@@ -308,7 +308,7 @@ private:
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
         libtransmission::evhelpers::event_unique_ptr udp4_event_;
         libtransmission::evhelpers::event_unique_ptr udp6_event_;
-        std::optional<in6_addr> udp6_bound_;
+        std::optional<tr_address> udp6_bound_;
 
         void rebind_ipv6(bool);
     };

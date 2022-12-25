@@ -176,3 +176,10 @@ TEST_F(NetTest, isGlobalUnicastAddress)
         EXPECT_EQ(expected, address->is_global_unicast_address()) << presentation;
     }
 }
+
+TEST_F(NetTest, globalIPv6)
+{
+    auto addr = tr_globalIPv6();
+    ASSERT_TRUE(addr.has_value());
+    EXPECT_TRUE(addr->is_global_unicast_address());
+}
