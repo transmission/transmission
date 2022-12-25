@@ -465,6 +465,7 @@ void object_signal_notify_callback(GObject* object, GParamSpec* /*param_spec*/, 
     {
         if (auto const* const slot = Glib::SignalProxyBase::data_to_slot(data); slot != nullptr)
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
             (*static_cast<sigc::slot<TrObjectSignalNotifyCallback> const*>(slot))(Glib::wrap(object, true));
         }
     }
