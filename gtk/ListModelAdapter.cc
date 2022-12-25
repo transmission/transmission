@@ -72,6 +72,7 @@ GType ListModelAdapter::get_column_type_vfunc(int index) const
     g_return_val_if_fail(index >= 0, G_TYPE_INVALID);
     g_return_val_if_fail(index < get_n_columns_vfunc(), G_TYPE_INVALID);
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     return columns_.types()[index];
 }
 
