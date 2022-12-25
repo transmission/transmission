@@ -755,12 +755,12 @@ Glib::RefPtr<Gtk::TreeSelection> MainWindow::Impl::get_selection() const
     return view_->get_selection();
 }
 
-void MainWindow::for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> callback) const
+void MainWindow::for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> const& callback) const
 {
     for_each_selected_torrent_until(sigc::bind_return(callback, false));
 }
 
-bool MainWindow::for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> callback) const
+bool MainWindow::for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> const& callback) const
 {
     static auto const& self_col = Torrent::get_columns().self;
 
