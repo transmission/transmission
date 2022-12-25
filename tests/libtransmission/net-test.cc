@@ -179,7 +179,6 @@ TEST_F(NetTest, isGlobalUnicastAddress)
 
 TEST_F(NetTest, globalIPv6)
 {
-    auto addr = tr_globalIPv6();
-    ASSERT_TRUE(addr.has_value());
-    EXPECT_TRUE(addr->is_global_unicast_address());
+    auto const addr = tr_globalIPv6();
+    EXPECT_TRUE(!addr || addr->is_global_unicast_address());
 }

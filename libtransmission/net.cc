@@ -448,34 +448,23 @@ namespace global_ipv6_helpers
     auto const save = errno;
 
     auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0);
-    if (sock == TR_BAD_SOCKET)
+    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        errno = save;
-        return {};
-    }
+        if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
+        {
+            auto src_ss = sockaddr_storage{};
+            auto src_sslen = socklen_t{ sizeof(src_ss) };
+            if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
+            {
+                if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
+                {
+                    errno = save;
+                    return addrport->first;
+                }
+            }
+        }
 
-    if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) != 0)
-    {
         evutil_closesocket(sock);
-        errno = save;
-        return {};
-    }
-
-    auto src_ss = sockaddr_storage{};
-    auto src_sslen = socklen_t{ sizeof(src_ss) };
-    auto const ok = getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0;
-    evutil_closesocket(sock);
-    if (!ok)
-    {
-        errno = save;
-        return {};
-    }
-
-    if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
-    {
-        errno = save;
-        return addrport->first;
     }
 
     errno = save;
