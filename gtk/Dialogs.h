@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include <vector>
+#include <libtransmission/transmission.h>
 
 #include <gtkmm.h>
+
+#include <vector>
 
 class Session;
 

@@ -2,25 +2,26 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <array>
-#include <memory>
-#include <string>
-
-#include <glibmm/i18n.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter_speed_KBps()
+#include "MainWindow.h"
 
 #include "Actions.h"
 #include "FilterBar.h"
 #include "ListModelAdapter.h"
-#include "MainWindow.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Torrent.h"
 #include "TorrentCellRenderer.h"
 #include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> // tr_formatter_speed_KBps()
+
+#include <glibmm/i18n.h>
+
+#include <array>
+#include <memory>
+#include <string>
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;

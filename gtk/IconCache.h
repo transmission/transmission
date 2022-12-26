@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <string_view>
-
 #include <gtkmm.h>
+
+#include <string_view>
 
 extern std::string_view const DirectoryMimeType;
 extern std::string_view const UnknownMimeType;

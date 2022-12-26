@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <memory>
+#include <libtransmission/tr-macros.h>
 
 #include <glibmm.h>
 #include <gtkmm.h>
 
-#include <libtransmission/tr-macros.h>
+#include <memory>
 
 class Session;
 class Torrent;

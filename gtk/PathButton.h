@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <string>
-
-#include <gtkmm.h>
+#include "Utils.h"
 
 #include <libtransmission/tr-macros.h>
 
-#include "Utils.h"
+#include <gtkmm.h>
+
+#include <list>
+#include <memory>
+#include <string>
 
 class PathButton : public IF_GTKMM4(Gtk::Button, Gtk::FileChooserButton)
 {

@@ -320,7 +320,7 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
         tr_logAddWarnTor(
             tor,
             fmt::format(
-                ngettext(
+                tr_ngettext(
                     "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece",
                     "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces",
                     n),

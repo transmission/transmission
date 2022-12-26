@@ -4,22 +4,22 @@
 
 #pragma once
 
-#include <cstddef>
-#include <memory>
-#include <string>
-#include <unordered_set>
-#include <vector>
-
-#include <giomm.h>
-#include <glibmm.h>
-#include <gtkmm.h>
+#include "Torrent.h"
+#include "Utils.h"
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
 
-#include "Torrent.h"
-#include "Utils.h"
+#include <giomm.h>
+#include <glibmm.h>
+#include <gtkmm.h>
+
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
 class Session : public Glib::Object
 {

@@ -2,10 +2,34 @@
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
+#include "Session.h"
+
+#include "Actions.h"
+#include "ListModelAdapter.h"
+#include "Notify.h"
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Torrent.h"
+#include "TorrentSorter.h"
+#include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
+#include <libtransmission/rpcimpl.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-assert.h>
+#include <libtransmission/utils.h> // tr_time()
+#include <libtransmission/variant.h>
+#include <libtransmission/web-utils.h> // tr_urlIsValid()
+
+#include <glibmm/i18n.h>
+
+#include <fmt/core.h>
+
 #include <algorithm>
+#include <cinttypes> // PRId64
 #include <cmath> // pow()
 #include <cstring> // strstr
-#include <cinttypes> // PRId64
 #include <functional>
 #include <iostream>
 #include <map>
@@ -13,32 +37,6 @@
 #include <string>
 #include <string_view>
 #include <utility>
-
-#include <glibmm/i18n.h>
-
-#include <event2/buffer.h>
-
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h>
-
-#include <libtransmission/log.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/tr-assert.h>
-#include <libtransmission/utils.h> // tr_time()
-#include <libtransmission/web-utils.h> // tr_urlIsValid()
-#include <libtransmission/variant.h>
-
-#include "Actions.h"
-#include "ListModelAdapter.h"
-#include "Notify.h"
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Torrent.h"
-#include "TorrentSorter.h"
-#include "Utils.h"
 
 using namespace std::literals;
 

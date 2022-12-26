@@ -3,20 +3,21 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <map>
-#include <utility>
-#include <vector>
+#include "Notify.h"
+
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
 
 #include <giomm.h>
 #include <glibmm/i18n.h>
 
 #include <fmt/core.h>
 
-#include "Notify.h"
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
+#include <map>
+#include <utility>
+#include <vector>
 
 using namespace std::literals;
 

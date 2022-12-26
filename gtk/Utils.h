@@ -5,6 +5,15 @@
 
 #pragma once
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
+
+#include <glibmm.h>
+#include <gtkmm.h>
+
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <cstddef>
 #include <ctime>
 #include <functional>
@@ -15,15 +24,6 @@
 #include <vector>
 
 #include <sys/types.h>
-
-#include <glibmm.h>
-#include <gtkmm.h>
-
-#include <fmt/core.h>
-#include <fmt/format.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 
 /***
 ****
