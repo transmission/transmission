@@ -11,7 +11,6 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include <glibmm.h>

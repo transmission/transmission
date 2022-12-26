@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <libtransmission/transmission.h>
+
 #include <gtkmm.h>
 
 #include <vector>

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
 #include <gtkmm.h>

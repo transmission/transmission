@@ -5,11 +5,10 @@
 
 #pragma once
 
+#include "Torrent.h"
 #include "Utils.h"
 
 #include <gtkmm.h>
-
-class Torrent;
 
 class TorrentFilter : public IF_GTKMM4(Gtk::Filter, Glib::Object)
 {

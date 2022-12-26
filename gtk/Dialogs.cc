@@ -7,8 +7,6 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
-
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
