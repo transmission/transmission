@@ -5,17 +5,18 @@
  *
  */
 
+#include "IconCache.h"
+
+#include "Utils.h"
+
+#include <giomm.h>
+#include <glibmm.h>
+
 #include <algorithm>
 #include <map>
 #include <string>
 #include <string_view>
 #include <utility>
-
-#include <glibmm.h>
-#include <giomm.h>
-
-#include "IconCache.h"
-#include "Utils.h"
 
 using namespace std::literals;
 

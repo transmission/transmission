@@ -3,13 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
-#include <string_view>
+#include <libtransmission/tr-macros.h>
 
 #include <glibmm.h>
 #include <gtkmm.h>
 
-#include <libtransmission/tr-macros.h>
+#include <memory>
+#include <string_view>
 
 class Session;
 

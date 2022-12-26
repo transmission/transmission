@@ -3,9 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <fstream>
-#include <map>
-#include <memory>
+#include "MessageLogWindow.h"
+
+#include "Actions.h"
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -13,15 +20,9 @@
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/log.h>
-
-#include "Actions.h"
-#include "MessageLogWindow.h"
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
+#include <fstream>
+#include <map>
+#include <memory>
 
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {

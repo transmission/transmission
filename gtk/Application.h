@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <libtransmission/tr-macros.h>
 
 #include <glibmm.h>
 #include <gtkmm.h>
 
-#include <libtransmission/tr-macros.h>
+#include <memory>
+#include <string>
+#include <vector>
 
 class Application : public Gtk::Application
 {

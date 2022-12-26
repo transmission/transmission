@@ -4,13 +4,13 @@
 
 #pragma once
 
+#include <libtransmission/transmission.h> /* tr_variant, tr_session */
+#include <libtransmission/quark.h>
+
 #include <cstdint> // int64_t
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <libtransmission/transmission.h> /* tr_variant, tr_session */
-#include <libtransmission/quark.h>
 
 void gtr_pref_init(std::string_view config_dir);
 

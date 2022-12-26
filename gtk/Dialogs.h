@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <vector>
-
 #include <gtkmm.h>
+
+#include <vector>
 
 class Session;
 

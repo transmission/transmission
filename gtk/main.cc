@@ -2,10 +2,14 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <clocale>
-#include <cstdio>
-#include <string>
-#include <tuple>
+#include "Application.h"
+#include "Notify.h"
+#include "Prefs.h"
+#include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/version.h>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -13,14 +17,10 @@
 
 #include <fmt/core.h>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/version.h>
-
-#include "Application.h"
-#include "Notify.h"
-#include "Prefs.h"
-#include "Utils.h"
+#include <clocale>
+#include <cstdio>
+#include <string>
+#include <tuple>
 
 namespace
 {

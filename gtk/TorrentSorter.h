@@ -5,10 +5,10 @@
 
 #pragma once
 
+#include "Utils.h"
+
 #include <glibmm.h>
 #include <gtkmm.h>
-
-#include "Utils.h"
 
 class Torrent;
 

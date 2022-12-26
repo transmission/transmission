@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <gtkmm.h>
-
 #include "Utils.h"
+
+#include <gtkmm.h>
 
 class Session;
 
