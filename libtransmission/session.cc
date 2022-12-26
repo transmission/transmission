@@ -1324,7 +1324,7 @@ static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise
     if (n_torrents != 0U)
     {
         tr_logAddInfo(fmt::format(
-            ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents),
+            tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents),
             fmt::arg("count", n_torrents)));
     }
 

@@ -11,6 +11,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
+#include <glibmm/i18n.h>
+
 #include <fmt/core.h>
 
 #include <array>
