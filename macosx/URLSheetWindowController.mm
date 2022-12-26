@@ -16,8 +16,6 @@
 
 @implementation URLSheetWindowController
 
-NSString* urlString = nil;
-
 - (instancetype)init
 {
     self = [self initWithWindowNibName:@"URLSheetWindow"];
@@ -27,15 +25,6 @@ NSString* urlString = nil;
 - (void)awakeFromNib
 {
     self.fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
-
-    if (urlString)
-    {
-        self.fTextField.stringValue = urlString;
-        [self.fTextField selectText:self];
-
-        [self updateOpenButtonForURL:urlString];
-    }
-
     self.fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
     self.fCancelButton.title = NSLocalizedString(@"Cancel", "URL sheet button");
 
@@ -76,8 +65,7 @@ NSString* urlString = nil;
 
 - (NSString*)urlString
 {
-    urlString = self.fTextField.stringValue;
-    return urlString;
+    return self.fTextField.stringValue;
 }
 
 - (void)controlTextDidChange:(NSNotification*)notification
