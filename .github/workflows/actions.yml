@@ -262,7 +262,7 @@ jobs:
         run: apk add --upgrade glibmm-dev gtkmm3-dev
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apk add --upgrade qt5-qtbase-dev qt5-qttools-dev
+        run: apk add --upgrade qt5-qtbase-dev qt5-qtsvg-dev qt5-qttools-dev
       - name: Get Source
         uses: actions/checkout@v3
         with:
@@ -534,7 +534,7 @@ jobs:
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apt-get install -y --no-install-recommends qtbase5-dev qttools5-dev
+        run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v3
         with:
@@ -607,7 +607,7 @@ jobs:
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: dnf install -y qt6-qtbase-devel qt6-qttools-devel
+        run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel
       - name: Get Source
         uses: actions/download-artifact@v3
         with:
