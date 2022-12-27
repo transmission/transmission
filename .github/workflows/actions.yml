@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'main'
+      - build/alpine-x86
   pull_request:
     branches:
       - 'main'
@@ -32,7 +33,7 @@ jobs:
           if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
             echo is-main-push=1 >> "$GITHUB_OUTPUT"
           else
-            echo is-main-push=0 >> "$GITHUB_OUTPUT"
+            echo is-main-push=1 >> "$GITHUB_OUTPUT"
           fi
       - name: Get Source
         id: get-source
