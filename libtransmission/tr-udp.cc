@@ -150,7 +150,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
 
     if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        auto const [addr, is_default] = session_.publicAddress(TR_AF_INET);
+        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET);
         auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
@@ -175,20 +175,17 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
     }
 
-    if (auto const addr = tr_globalIPv6(&session); !addr.has_value())
+    if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        tr_logAddWarn("Unable to find global IPv6 address");
-    }
-    else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
-    {
-        auto const [ss, sslen] = addr->to_sockaddr(udp_port_);
+        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET6);
+        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv6 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", addr->display_name()),
+                fmt::arg("address", addr.display_name()),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
@@ -196,7 +193,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo("Bound UDP IPv6 address {:s}", addr->display_name(udp_port_));
+            tr_logAddInfo("Bound UDP IPv6 address {:s}", addr.display_name(udp_port_));
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;

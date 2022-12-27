@@ -799,7 +799,7 @@ public:
     struct PublicAddressResult
     {
         tr_address address;
-        bool is_default_value;
+        bool is_any_addr;
     };
 
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
