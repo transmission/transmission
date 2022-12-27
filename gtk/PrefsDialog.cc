@@ -3,28 +3,50 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <limits>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
+#include "PrefsDialog.h"
 
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
+#include "FreeSpaceLabel.h"
+#include "PathButton.h"
+#include "Prefs.h"
+#include "Session.h"
+#include "SystemTrayIcon.h"
+#include "Utils.h"
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 
-#include "FreeSpaceLabel.h"
-#include "PathButton.h"
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "SystemTrayIcon.h"
-#include "Utils.h"
+#include <glibmm/date.h>
+#include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/timer.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/adjustment.h>
+#include <gtkmm/box.h>
+#include <gtkmm/button.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/editable.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/label.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/textview.h>
+#include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/widget.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/eventcontrollerfocus.h>
+#endif
+
+#include <fmt/core.h>
+
+#include <limits>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
 
 /**
 ***

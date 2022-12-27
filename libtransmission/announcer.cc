@@ -1008,7 +1008,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
         tr_logAddWarnTier(
             tier,
             fmt::format(
-                ngettext(
+                tr_ngettext(
                     "Announce error: {error} (Retrying in {count} second)",
                     "Announce error: {error} (Retrying in {count} seconds)",
                     interval),

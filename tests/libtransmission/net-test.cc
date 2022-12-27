@@ -3,6 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <string_view>
+#include <utility>
+
 #include "transmission.h"
 
 #include "net.h"
@@ -141,4 +145,40 @@ TEST_F(NetTest, compact6)
     out = tr_pex::to_compact_ipv6(out, std::data(pex), std::size(pex));
     EXPECT_EQ(std::data(compact6) + std::size(compact6), out);
     EXPECT_EQ(Compact6, compact6);
+}
+
+TEST_F(NetTest, isGlobalUnicastAddress)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 17>{ {
+        { "0.0.0.0"sv, false },
+        { "1.0.0.0"sv, true },
+        { "10.0.0.0"sv, false },
+        { "10.255.0.0"sv, false },
+        { "10.255.0.255"sv, false },
+        { "100.64.0.0"sv, false },
+        { "100.128.0.0"sv, true },
+        { "126.0.0.0"sv, true },
+        { "127.0.0.0"sv, true },
+        { "169.253.255.255"sv, true },
+        { "169.254.0.0"sv, false },
+        { "169.254.255.255"sv, false },
+        { "169.255.0.0"sv, true },
+        { "223.0.0.0"sv, true },
+        { "224.0.0.0"sv, false },
+        { "0:0:0:0:0:0:0:1", false },
+        { "2001:0:0eab:dead::a0:abcd:4e", true },
+    } };
+
+    for (auto const& [presentation, expected] : Tests)
+    {
+        auto const address = tr_address::from_string(presentation);
+        EXPECT_TRUE(address);
+        EXPECT_EQ(expected, address->is_global_unicast_address()) << presentation;
+    }
+}
+
+TEST_F(NetTest, globalIPv6)
+{
+    auto const addr = tr_globalIPv6();
+    EXPECT_TRUE(!addr || addr->is_global_unicast_address());
 }

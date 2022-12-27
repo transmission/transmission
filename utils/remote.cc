@@ -137,13 +137,13 @@ static std::string tr_strltime(time_t seconds)
 
     auto tmpstr = std::string{};
 
-    auto const hstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, ngettext("hour", "hours", hours));
-    auto const mstr = fmt::format(FMT_STRING("{:d} {:s}"), minutes, ngettext("minute", "minutes", minutes));
-    auto const sstr = fmt::format(FMT_STRING("{:d} {:s}"), seconds, ngettext("seconds", "seconds", seconds));
+    auto const hstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, tr_ngettext("hour", "hours", hours));
+    auto const mstr = fmt::format(FMT_STRING("{:d} {:s}"), minutes, tr_ngettext("minute", "minutes", minutes));
+    auto const sstr = fmt::format(FMT_STRING("{:d} {:s}"), seconds, tr_ngettext("seconds", "seconds", seconds));
 
     if (days > 0)
     {
-        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, ngettext("day", "days", days));
+        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, tr_ngettext("day", "days", days));
         tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format(FMT_STRING("{:s}, {:s}"), dstr, hstr);
     }
     else if (hours > 0)
@@ -159,7 +159,7 @@ static std::string tr_strltime(time_t seconds)
         tmpstr = sstr;
     }
 
-    auto const totstr = fmt::format(FMT_STRING("{:d} {:s}"), total_seconds, ngettext("seconds", "seconds", total_seconds));
+    auto const totstr = fmt::format(FMT_STRING("{:d} {:s}"), total_seconds, tr_ngettext("seconds", "seconds", total_seconds));
     return fmt::format(FMT_STRING("{:s} ({:s})"), tmpstr, totstr);
 }
 
