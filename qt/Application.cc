@@ -81,13 +81,13 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 [[nodiscard]] auto makeWindowIcon()
 {
     // first, try to load it from the system theme
-    if (auto icon = QIcon::fromTheme(QStringLiteral("transmission.svg")); !icon.isNull())
+    if (auto icon = QIcon::fromTheme(QStringLiteral(":/icons/transmission.svg")); !icon.isNull())
     {
         return icon;
     }
 
     // if that fails, use our own as the fallback
-    return QIcon{ QStringLiteral("transmission.ico") };
+    return QIcon{ QStringLiteral(":/icons/transmission.ico") };
 }
 
 } // namespace
