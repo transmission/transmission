@@ -8,10 +8,29 @@
 // We're using deprecated Gtk::StatusItem ourselves as well
 #undef GTKMM_DISABLE_DEPRECATED
 
-#include <string>
+#include "SystemTrayIcon.h"
 
-#include <glibmm.h>
+#include "Actions.h"
+#include "Session.h"
+#include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
 #include <glibmm/i18n.h>
+#include <glibmm/ustring.h>
+
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
+#include <giomm/menu.h>
+#include <glibmm/miscutils.h>
+#include <gtkmm/icontheme.h>
+#include <gtkmm/menu.h>
+#if !defined(HAVE_APPINDICATOR)
+#include <gtkmm/statusicon.h>
+#endif
+#endif
+
+#include <string>
 
 #ifdef HAVE_APPINDICATOR
 #ifdef APPINDICATOR_IS_AYATANA
@@ -20,14 +39,6 @@
 #include <libappindicator/app-indicator.h>
 #endif
 #endif
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-
-#include "Actions.h"
-#include "Session.h"
-#include "SystemTrayIcon.h"
-#include "Utils.h"
 
 #ifdef HAVE_APPINDICATOR
 #define TR_SYS_TRAY_IMPL_APPINDICATOR

@@ -3,12 +3,52 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <arpa/inet.h>
-#endif
+#include "DetailsDialog.h"
+
+#include "Actions.h"
+#include "FaviconCache.h" // gtr_get_favicon()
+#include "FileList.h"
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
+
+#include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h>
+
+#include <gdkmm/pixbuf.h>
+#include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/markup.h>
+#include <glibmm/quark.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/adjustment.h>
+#include <gtkmm/button.h>
+#include <gtkmm/cellrendererpixbuf.h>
+#include <gtkmm/cellrendererprogress.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/label.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/notebook.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/textbuffer.h>
+#include <gtkmm/textview.h>
+#include <gtkmm/tooltip.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelfilter.h>
+#include <gtkmm/treemodelsort.h>
+#include <gtkmm/treerowreference.h>
+#include <gtkmm/treeview.h>
+
+#include <fmt/chrono.h>
+#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <array>
@@ -22,25 +62,12 @@
 #include <string_view>
 #include <unordered_map>
 
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-#include <fmt/chrono.h>
-#include <fmt/format.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/web-utils.h>
-
-#include "Actions.h"
-#include "DetailsDialog.h"
-#include "FaviconCache.h" // gtr_get_favicon()
-#include "FileList.h"
-#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#endif
 
 using namespace std::literals;
 

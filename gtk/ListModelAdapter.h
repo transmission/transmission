@@ -5,14 +5,18 @@
 
 #pragma once
 
+#include "Utils.h"
+
+#include <giomm/listmodel.h>
+#include <glibmm/object.h>
+#include <glibmm/refptr.h>
+#include <glibmm/value.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelcolumn.h>
+
 #include <optional>
 #include <unordered_map>
 #include <vector>
-
-#include <glibmm.h>
-#include <gtkmm.h>
-
-#include "Utils.h"
 
 class ListModelAdapter
     : public Gtk::TreeModel

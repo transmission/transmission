@@ -3,25 +3,42 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <fstream>
-#include <map>
-#include <memory>
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-#include <fmt/ostream.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/log.h>
+#include "MessageLogWindow.h"
 
 #include "Actions.h"
-#include "MessageLogWindow.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
+
+#include <giomm/simpleaction.h>
+#include <glibmm/convert.h>
+#include <glibmm/datetime.h>
+#include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/ustring.h>
+#include <glibmm/variant.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/treemodelfilter.h>
+#include <gtkmm/treemodelsort.h>
+#include <gtkmm/treeview.h>
+
+#include <fmt/core.h>
+#include <fmt/ostream.h>
+
+#include <fstream>
+#include <map>
+#include <memory>
 
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {

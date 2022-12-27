@@ -2,38 +2,9 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
-#include <csignal>
-#include <cstdlib> // exit()
-#include <ctime>
-#include <iterator> // std::back_inserter
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <thread>
-#include <tuple>
-#include <utility>
-#include <vector>
-
-#include <fmt/core.h>
-
-#include <giomm.h>
-#include <glib/gmessages.h>
-#ifdef G_OS_UNIX
-#include <glib-unix.h>
-#endif
-#include <glibmm/i18n.h>
-
-#include <libtransmission/transmission.h>
-
-#include <libtransmission/log.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/version.h>
+#include "Application.h"
 
 #include "Actions.h"
-#include "Application.h"
 #include "DetailsDialog.h"
 #include "Dialogs.h"
 #include "FilterBar.h"
@@ -51,6 +22,64 @@
 #include "SystemTrayIcon.h"
 #include "Torrent.h"
 #include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
+#include <libtransmission/rpcimpl.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/version.h>
+
+#include <gdkmm/display.h>
+#include <giomm/appinfo.h>
+#include <giomm/error.h>
+#include <giomm/menu.h>
+#include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/value.h>
+#include <glibmm/vectorutils.h>
+#include <gtkmm/aboutdialog.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/button.h>
+#include <gtkmm/cssprovider.h>
+#include <gtkmm/grid.h>
+#include <gtkmm/icontheme.h>
+#include <gtkmm/image.h>
+#include <gtkmm/label.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/stylecontext.h>
+#include <gtkmm/window.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/droptarget.h>
+#include <gtkmm/eventcontrollerfocus.h>
+#include <gtkmm/shortcutcontroller.h>
+#else
+#include <gdkmm/dragcontext.h>
+#include <gtkmm/selectiondata.h>
+#endif
+
+#include <fmt/core.h>
+
+#include <algorithm>
+#include <csignal>
+#include <cstdlib> // exit()
+#include <ctime>
+#include <iterator> // std::back_inserter
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#include <glib/gmessages.h>
+
+#ifdef G_OS_UNIX
+#include <glib-unix.h>
+#endif
 
 using namespace std::literals;
 

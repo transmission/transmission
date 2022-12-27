@@ -5,11 +5,17 @@
 
 #pragma once
 
-#include <gtkmm.h>
-
+#include "Torrent.h"
 #include "Utils.h"
 
-class Torrent;
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/filter.h>
+#else
+#include <glibmm/object.h>
+#endif
 
 class TorrentFilter : public IF_GTKMM4(Gtk::Filter, Glib::Object)
 {

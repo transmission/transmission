@@ -3,6 +3,21 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "FaviconCache.h"
+
+#include "Utils.h" /* gtr_get_host_from_url() */
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/web-utils.h>
+#include <libtransmission/web.h> // tr_sessionFetch()
+
+#include <glibmm/error.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+
+#include <fmt/core.h>
+
 #include <array>
 #include <functional>
 #include <memory>
@@ -10,15 +25,6 @@
 #include <string_view>
 
 #include <glib/gstdio.h> /* g_remove() */
-
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/web.h> // tr_sessionFetch()
-#include <libtransmission/web-utils.h>
-
-#include "FaviconCache.h"
-#include "Utils.h" /* gtr_get_host_from_url() */
 
 using namespace std::literals;
 

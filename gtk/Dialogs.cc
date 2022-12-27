@@ -2,19 +2,19 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
-#include <vector>
+#include "Dialogs.h"
 
-#include <glibmm.h>
+#include "Session.h"
+#include "Utils.h"
+
 #include <glibmm/i18n.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/messagedialog.h>
 
 #include <fmt/core.h>
 
-#include <libtransmission/transmission.h>
-
-#include "Dialogs.h"
-#include "Session.h"
-#include "Utils.h"
+#include <memory>
+#include <vector>
 
 /***
 ****

@@ -3,6 +3,45 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "Utils.h"
+
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+
+#include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
+#include <libtransmission/error.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/utils.h> /* tr_strratio() */
+#include <libtransmission/version.h> /* SHORT_VERSION_STRING */
+#include <libtransmission/web-utils.h>
+
+#include <gdkmm/display.h>
+#include <giomm/appinfo.h>
+#include <giomm/asyncresult.h>
+#include <giomm/file.h>
+#include <glibmm/error.h>
+#include <glibmm/i18n.h>
+#include <glibmm/quark.h>
+#include <glibmm/spawn.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/eventcontroller.h>
+#include <gtkmm/gesture.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelcolumn.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gdkmm/clipboard.h>
+#include <gtkmm/gestureclick.h>
+#else
+#include <gdkmm/window.h>
+#include <gtkmm/clipboard.h>
+#endif
+
+#include <fmt/core.h>
+
 #include <array>
 #include <functional>
 #include <memory>
@@ -10,29 +49,12 @@
 #include <stdexcept>
 #include <utility>
 
-#include <giomm.h> /* g_file_trash() */
-#include <glibmm/i18n.h>
-
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
+
 #if GTK_CHECK_VERSION(4, 0, 0) && defined(GDK_WINDOWING_X11)
 #include <gdk/x11/gdkx.h>
 #endif
-
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
-
-#include <libtransmission/error.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/utils.h> /* tr_strratio() */
-#include <libtransmission/version.h> /* SHORT_VERSION_STRING */
-#include <libtransmission/web-utils.h>
-
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
 
 using namespace std::literals;
 

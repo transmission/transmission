@@ -211,6 +211,14 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             torrentCell.hoverControl = (row == self.controlButtonHoverRow);
             torrentCell.hoverReveal = (row == self.revealButtonHoverRow);
             torrentCell.hoverAction = (row == self.actionButtonHoverRow);
+
+            // if cell is selected, set backgroundStyle
+            // then can provide alternate font color in TorrentCell - drawInteriorWithFrame
+            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
+            if ([selectedRowIndexes containsIndex:row])
+            {
+                torrentCell.backgroundStyle = NSBackgroundStyleEmphasized;
+            }
         }
     }
 }
