@@ -30,7 +30,7 @@
 #include "crypto-utils.h"
 #include "error.h"
 #include "log.h"
-#include "net.h" /* tr_globalIPv6() */
+#include "net.h" // for tr_globalIPv6()
 #include "peer-mgr.h" /* pex */
 #include "quark.h"
 #include "torrent.h"
@@ -42,9 +42,7 @@
 using namespace std::literals;
 
 /****
-*****
 *****  ANNOUNCE
-*****
 ****/
 
 [[nodiscard]] static constexpr std::string_view get_event_string(tr_announce_request const& req)
@@ -381,21 +379,17 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
     }
 }
 
-[[nodiscard]] std::string format_ipv4_url_arg(tr_address const& addr)
+[[nodiscard]] auto format_ipv4_url_arg(tr_address const& addr)
 {
     auto buf = std::array<char, TR_ADDRSTRLEN>{};
     auto display_name = addr.display_name(std::data(buf), std::size(buf));
     return fmt::format("&ipv4={:s}", display_name);
 }
 
-[[nodiscard]] std::string format_ipv6_url_arg(in6_addr const addr)
+[[nodiscard]] auto format_ipv6_url_arg(tr_address const& addr)
 {
-    auto readable = std::array<char, INET6_ADDRSTRLEN>{};
-    evutil_inet_ntop(AF_INET6, &addr, std::data(readable), std::size(readable));
-
     auto arg = "&ipv6="s;
-    tr_urlPercentEncode(std::back_inserter(arg), readable.data());
-
+    tr_urlPercentEncode(std::back_inserter(arg), addr.display_name());
     return arg;
 }
 

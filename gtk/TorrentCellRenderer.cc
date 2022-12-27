@@ -3,25 +3,41 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "TorrentCellRenderer.h"
+
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_SMALL
+#include "Torrent.h"
+#include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> /* tr_truncd() */
+
+#include <cairomm/context.h>
+#include <cairomm/refptr.h>
+#include <cairomm/surface.h>
+#include <gdkmm/rectangle.h>
+#include <gdkmm/rgba.h>
+#include <giomm/icon.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+#include <glibmm/property.h>
+#include <gtkmm/cellrendererpixbuf.h>
+#include <gtkmm/cellrendererprogress.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/requisition.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/snapshot.h>
+#endif
+
+#include <fmt/core.h>
+
 #include <algorithm> // std::max()
 #include <cstring> // strchr()
 #include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_truncd() */
-
-#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_SMALL
-#include "Torrent.h"
-#include "TorrentCellRenderer.h"
-#include "Utils.h"
 
 /* #define TEST_RTL */
 

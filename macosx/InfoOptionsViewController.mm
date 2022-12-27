@@ -114,10 +114,12 @@ static CGFloat const kStackViewSpacing = 8.0;
     NSRect viewRect = self.view.frame;
 
     CGFloat difference = self.fHeightChange;
-    if (difference != 0)
+
+    // we check for existence of self.view.window
+    // as when view is shown from TorrentTableView.mm popover we don't want to customize the view height
+    if (self.view.window)
     {
         viewRect.size.height -= difference;
-        viewRect.size.width = NSWidth(self.view.window.frame);
     }
 
     return viewRect;
@@ -141,17 +143,14 @@ static CGFloat const kStackViewSpacing = 8.0;
 {
     self.oldHeight = self.fCurrentHeight;
 
-    [self checkLayout];
-
-    if (self.fHeightChange != 0)
-    {
-        [self updateWindowLayout];
-    }
+    [self updateWindowLayout];
 }
 
 - (void)updateWindowLayout
 {
-    if (self.fCurrentHeight != 0)
+    // we check for existence of self.view.window
+    // as when view is shown from TorrentTableView.mm popover we don't want to customize the view height
+    if (self.view.window)
     {
         [self checkLayout];
 
@@ -166,6 +165,13 @@ static CGFloat const kStackViewSpacing = 8.0;
 
         self.view.frame = [self viewRect];
         [self.view.window setFrame:windowRect display:YES animate:YES];
+    }
+    else
+    {
+        // set popover width
+        NSRect rect = self.view.frame;
+        rect.size.width = NSWidth(self.fOptionsStackView.frame) + (2 * kStackViewInset);
+        self.view.frame = rect;
     }
 }
 

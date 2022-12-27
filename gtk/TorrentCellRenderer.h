@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include <memory>
-
-#include <glibmm.h>
-#include <gtkmm.h>
+#include "Utils.h"
 
 #include <libtransmission/tr-macros.h>
 
-#include "Utils.h"
+#include <glibmm/propertyproxy.h>
+#include <gtkmm/cellrenderer.h>
+
+#include <memory>
 
 class Torrent;
 

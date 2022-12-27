@@ -3,11 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-
-#include "Torrent.h"
 #include "TorrentFilter.h"
-#include "Utils.h"
+
+#include <libtransmission/transmission.h>
 
 void TorrentFilter::set_activity(Activity type)
 {

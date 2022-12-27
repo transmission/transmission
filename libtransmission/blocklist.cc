@@ -63,7 +63,7 @@ void save(std::string_view filename, address_range_t const* ranges, size_t n_ran
     else
     {
         tr_logAddInfo(fmt::format(
-            ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", n_ranges),
+            tr_ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", n_ranges),
             fmt::arg("path", tr_sys_path_basename(filename)),
             fmt::arg("count", n_ranges)));
     }
@@ -397,7 +397,7 @@ void Blocklist::ensureLoaded() const
     }
 
     tr_logAddInfo(fmt::format(
-        ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", std::size(rules_)),
+        tr_ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", std::size(rules_)),
         fmt::arg("path", tr_sys_path_basename(bin_file_)),
         fmt::arg("count", std::size(rules_))));
 }

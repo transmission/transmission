@@ -97,7 +97,7 @@ void tr_session::tr_udp_core::set_socket_buffers()
     }
 }
 
-static tr_socket_t rebind_ipv6_impl(in6_addr sin6_addr, tr_port port)
+static tr_socket_t rebind_ipv6_impl(tr_address const& addr, tr_port port)
 {
     auto const sock = socket(PF_INET6, SOCK_DGRAM, 0);
     if (sock == TR_BAD_SOCKET)
@@ -112,16 +112,15 @@ static tr_socket_t rebind_ipv6_impl(in6_addr sin6_addr, tr_port port)
     (void)setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
 #endif
 
-    auto sin6 = sockaddr_in6{};
-    sin6.sin6_family = AF_INET6;
-    sin6.sin6_addr = sin6_addr;
-    sin6.sin6_port = port.network();
-    if (::bind(sock, reinterpret_cast<struct sockaddr*>(&sin6), sizeof(sin6)) == -1)
+    TR_ASSERT(addr.is_ipv6());
+    auto const [ss, sslen] = addr.to_sockaddr(port);
+    if (::bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == -1)
     {
         tr_netCloseSocket(sock);
         return TR_BAD_SOCKET;
     }
 
+    tr_logAddInfo("Bound UDP IPv6 address {:s}", addr.display_name(port));
     return sock;
 }
 
@@ -139,7 +138,7 @@ void tr_session::tr_udp_core::rebind_ipv6(bool force)
         return;
     }
 
-    if (udp6_bound_ && memcmp(&*udp6_bound_, &*ipv6, sizeof(*ipv6)) == 0)
+    if (udp6_bound_ && *udp6_bound_ == *ipv6) // unchanged
     {
         return;
     }
@@ -154,7 +153,7 @@ void tr_session::tr_udp_core::rebind_ipv6(bool force)
         evutil_inet_ntop(AF_INET6, &*ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
         tr_logAddWarn(fmt::format(
             _("Couldn't rebind IPv6 socket {address}: {error} ({error_code})"),
-            fmt::arg("address", std::data(ipv6_readable)),
+            fmt::arg("address", ipv6->display_name()),
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code)));
 
