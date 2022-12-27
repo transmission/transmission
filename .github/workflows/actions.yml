@@ -269,7 +269,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: apk add --upgrade qt5-qtbase-dev qt5-qtsvg-dev qt5-qttools-dev
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v1
         with:
           path: src
           submodules: recursive
