@@ -11,8 +11,17 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include <glibmm.h>
+#include <giomm/file.h>
+#include <giomm/init.h>
 #include <glibmm/i18n.h>
+#include <glibmm/init.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/objectbase.h>
+#include <glibmm/optioncontext.h>
+#include <glibmm/optionentry.h>
+#include <glibmm/optiongroup.h>
+#include <glibmm/ustring.h>
+#include <glibmm/wrap.h>
 #include <gtkmm.h>
 
 #include <fmt/core.h>

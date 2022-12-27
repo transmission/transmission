@@ -11,6 +11,11 @@
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
 
+#include <glibmm/error.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+
 #include <fmt/core.h>
 
 #include <array>

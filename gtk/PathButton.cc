@@ -5,8 +5,15 @@
 
 #include "PathButton.h"
 
-#include <glibmm.h>
+#include <giomm/file.h>
+#include <glibmm/error.h>
 #include <glibmm/i18n.h>
+#include <glibmm/property.h>
+#include <gtkmm/box.h>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/image.h>
+#include <gtkmm/label.h>
+#include <gtkmm/separator.h>
 
 #include <vector>
 

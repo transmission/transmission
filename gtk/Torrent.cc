@@ -12,6 +12,7 @@
 #include <libtransmission/utils.h>
 
 #include <glibmm/i18n.h>
+#include <glibmm/value.h>
 
 #include <fmt/core.h>
 

@@ -17,7 +17,37 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter_speed_KBps()
 
+#include <gdkmm/cursor.h>
+#include <gdkmm/rectangle.h>
+#include <giomm/menu.h>
+#include <giomm/menuitem.h>
+#include <giomm/menumodel.h>
+#include <giomm/simpleaction.h>
+#include <giomm/simpleactiongroup.h>
 #include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/ustring.h>
+#include <glibmm/variant.h>
+#include <gtkmm/image.h>
+#include <gtkmm/label.h>
+#include <gtkmm/menubutton.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/togglebutton.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treeselection.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/widget.h>
+#include <gtkmm/window.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/popovermenu.h>
+#else
+#include <gdkmm/display.h>
+#include <gdkmm/window.h>
+#include <gtkmm/menu.h>
+#endif
 
 #include <array>
 #include <memory>
