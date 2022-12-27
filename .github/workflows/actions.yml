@@ -229,8 +229,12 @@ jobs:
   alpine-musl:
     needs: [ what-to-make ]
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, i386]
     container:
-      image: radupopescu/musl-builder
+      image: ${{ matrix.arch }}/alpine
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
       - name: Show Configuration
@@ -242,7 +246,7 @@ jobs:
         run: |
           set -ex
           apk update
-          apk add \
+          apk add --no-cache \
             ca-certificates \
             cmake \
             curl-dev \
