@@ -7,7 +7,9 @@
 
 #include <libtransmission/tr-macros.h>
 
-#include <gtkmm.h>
+#include <glibmm/refptr.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/window.h>
 
 #include <memory>
 

@@ -16,8 +16,29 @@
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 #include <libtransmission/web-utils.h>
 
-#include <giomm.h> /* g_file_trash() */
+#include <gdkmm/display.h>
+#include <giomm/appinfo.h>
+#include <giomm/asyncresult.h>
+#include <giomm/file.h>
+#include <glibmm/error.h>
 #include <glibmm/i18n.h>
+#include <glibmm/quark.h>
+#include <glibmm/spawn.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/eventcontroller.h>
+#include <gtkmm/gesture.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelcolumn.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gdkmm/clipboard.h>
+#include <gtkmm/gestureclick.h>
+#else
+#include <gdkmm/window.h>
+#include <gtkmm/clipboard.h>
+#endif
 
 #include <fmt/core.h>
 

@@ -8,8 +8,13 @@
 #include "Torrent.h"
 #include "Utils.h"
 
-#include <glibmm.h>
-#include <gtkmm.h>
+#include <glibmm/refptr.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/sorter.h>
+#else
+#include <glibmm/object.h>
+#endif
 
 class TorrentSorter : public IF_GTKMM4(Gtk::Sorter, Glib::Object)
 {

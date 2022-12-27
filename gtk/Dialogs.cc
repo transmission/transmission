@@ -7,8 +7,9 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <glibmm.h>
 #include <glibmm/i18n.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/messagedialog.h>
 
 #include <fmt/core.h>
 

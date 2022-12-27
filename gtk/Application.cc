@@ -29,8 +29,35 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include <giomm.h>
+#include <gdkmm/display.h>
+#include <giomm/appinfo.h>
+#include <giomm/error.h>
+#include <giomm/menu.h>
 #include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/value.h>
+#include <glibmm/vectorutils.h>
+#include <gtkmm/aboutdialog.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/button.h>
+#include <gtkmm/cssprovider.h>
+#include <gtkmm/grid.h>
+#include <gtkmm/icontheme.h>
+#include <gtkmm/image.h>
+#include <gtkmm/label.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/stylecontext.h>
+#include <gtkmm/window.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/droptarget.h>
+#include <gtkmm/eventcontrollerfocus.h>
+#include <gtkmm/shortcutcontroller.h>
+#else
+#include <gdkmm/dragcontext.h>
+#include <gtkmm/selectiondata.h>
+#endif
 
 #include <fmt/core.h>
 

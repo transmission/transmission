@@ -9,8 +9,12 @@
 
 #include <libtransmission/tr-macros.h>
 
+#include <giomm/listmodel.h>
 #include <glibmm/extraclassinit.h>
-#include <gtkmm.h>
+#include <glibmm/refptr.h>
+#include <gtkmm/box.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/treemodel.h>
 
 #include <memory>
 

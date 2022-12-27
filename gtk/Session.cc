@@ -22,7 +22,24 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValid()
 
+#include <giomm/asyncresult.h>
+#include <giomm/dbusconnection.h>
+#include <giomm/fileinfo.h>
+#include <giomm/filemonitor.h>
+#include <giomm/liststore.h>
+#include <glibmm/error.h>
+#include <glibmm/fileutils.h>
 #include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/stringutils.h>
+#include <glibmm/variant.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/sortlistmodel.h>
+#else
+#include <gtkmm/treemodelsort.h>
+#endif
 
 #include <fmt/core.h>
 
