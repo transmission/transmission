@@ -318,7 +318,7 @@ if(ENABLE_QT)
     set(ENABLE_QT_COM_INTEROP OFF)
     set(ENABLE_QT_DBUS_INTEROP OFF)
 
-    set(QT_REQUIRED_MODULES Core Gui Widgets Network LinguistTools)
+    set(QT_REQUIRED_MODULES Core Gui Widgets Network Svg LinguistTools)
     set(QT_OPTIONAL_MODULES DBus AxContainer AxServer)
     set(MISSING_QT_MODULE)
 
