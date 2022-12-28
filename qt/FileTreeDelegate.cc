@@ -8,6 +8,7 @@
 
 #include "FileTreeDelegate.h"
 #include "FileTreeModel.h"
+#include "StyleHelper.h"
 
 QSize FileTreeDelegate::sizeHint(QStyleOptionViewItem const& item, QModelIndex const& index) const
 {
@@ -58,7 +59,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         p.textVisible = true;
         p.progress = static_cast<int>(100.0 * index.data().toDouble());
         p.text = QStringLiteral("%1%").arg(p.progress);
-        style->drawControl(QStyle::CE_ProgressBar, &p, painter);
+        StyleHelper::drawProgressBar(*style, *painter, p);
     }
     else if (column == FileTreeModel::COL_WANTED)
     {
