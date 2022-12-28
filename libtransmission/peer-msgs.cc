@@ -290,7 +290,7 @@ public:
         if (session->allowsDHT() && io->supports_dht())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
-            if (io->address().is_ipv4() || tr_globalIPv6().has_value())
+            if (auto const [addr, is_any] = session->publicAddress(TR_AF_INET6); !is_any)
             {
                 protocolSendPort(this, session->udpPort());
             }
@@ -915,10 +915,10 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantInitDict(&val, 8);
     tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode() != TR_CLEAR_PREFERRED);
 
-    if (auto const ipv6 = tr_globalIPv6(msgs->session); ipv6.has_value())
+    if (auto const [addr, is_any] = msgs->session->publicAddress(TR_AF_INET6); !is_any)
     {
-        TR_ASSERT(ipv6->is_ipv6());
-        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &ipv6->addr.addr6, sizeof(ipv6->addr.addr6));
+        TR_ASSERT(addr.is_ipv6());
+        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &addr.addr.addr6, sizeof(addr.addr.addr6));
     }
 
     // http://bittorrent.org/beps/bep_0009.html
