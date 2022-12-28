@@ -83,93 +83,6 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     }
 }
 
-void tr_session::tr_udp_core::set_socket_buffers()
-{
-    bool const utp = session_.allowsUTP();
-
-    if (udp_socket_ != TR_BAD_SOCKET)
-    {
-        ::set_socket_buffers(udp_socket_, utp);
-    }
-    if (udp6_socket_ != TR_BAD_SOCKET)
-    {
-        ::set_socket_buffers(udp6_socket_, utp);
-    }
-}
-
-static tr_socket_t rebind_ipv6_impl(tr_address const& addr, tr_port port)
-{
-    auto const sock = socket(PF_INET6, SOCK_DGRAM, 0);
-    if (sock == TR_BAD_SOCKET)
-    {
-        return TR_BAD_SOCKET;
-    }
-
-#ifdef IPV6_V6ONLY
-    /* Since we always open an IPv4 socket on the same port,
-     * this shouldn't matter.  But I'm superstitious. */
-    int one = 1;
-    (void)setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
-#endif
-
-    TR_ASSERT(addr.is_ipv6());
-    auto const [ss, sslen] = addr.to_sockaddr(port);
-    if (::bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == -1)
-    {
-        tr_netCloseSocket(sock);
-        return TR_BAD_SOCKET;
-    }
-
-    tr_logAddInfo("Bound UDP IPv6 address {:s}", addr.display_name(port));
-    return sock;
-}
-
-/* BEP-32 has a rather nice explanation of why we need to bind to one
-   IPv6 address, if I may say so myself. */
-void tr_session::tr_udp_core::rebind_ipv6(bool force)
-{
-    auto const ipv6 = tr_globalIPv6(&session_);
-
-    /* We currently have no way to enable or disable IPv6 after initialisation.
-       No way to fix that without some surgery to the DHT code itself. */
-    if (!ipv6 || (!force && udp6_socket_ == TR_BAD_SOCKET))
-    {
-        udp6_bound_.reset();
-        return;
-    }
-
-    if (udp6_bound_ && *udp6_bound_ == *ipv6) // unchanged
-    {
-        return;
-    }
-
-    auto const sock = rebind_ipv6_impl(*ipv6, udp_port_);
-    if (sock == TR_BAD_SOCKET)
-    {
-        /* Something went wrong.  It's difficult to recover, so let's
-         * simply set things up so that we try again next time. */
-        auto const error_code = errno;
-        auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
-        evutil_inet_ntop(AF_INET6, &*ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
-        tr_logAddWarn(fmt::format(
-            _("Couldn't rebind IPv6 socket {address}: {error} ({error_code})"),
-            fmt::arg("address", ipv6->display_name()),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
-
-        udp6_bound_.reset();
-        return;
-    }
-
-    if (udp6_socket_ != TR_BAD_SOCKET)
-    {
-        tr_netCloseSocket(udp6_socket_);
-    }
-
-    udp6_socket_ = sock;
-    udp6_bound_ = ipv6;
-}
-
 static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
 {
     TR_ASSERT(vsession != nullptr);
@@ -224,6 +137,8 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     }
 }
 
+// BEP-32 explains why we need to bind to one IPv6 address
+
 tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     : udp_port_{ udp_port }
     , session_{ session }
@@ -233,65 +148,65 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         return;
     }
 
-    udp_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
-
-    if (udp_socket_ == TR_BAD_SOCKET)
+    if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        tr_logAddWarn(_("Couldn't create IPv4 socket"));
-    }
-    else
-    {
-        auto const [public_addr, is_default] = session_.publicAddress(TR_AF_INET);
+        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET);
+        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
 
-        auto sin = sockaddr_in{};
-        sin.sin_family = AF_INET;
-        if (!is_default)
-        {
-            sin.sin_addr = public_addr.addr.addr4;
-        }
-
-        sin.sin_port = udp_port_.network();
-        int const rc = bind(udp_socket_, (struct sockaddr*)&sin, sizeof(sin));
-
-        if (rc == -1)
+        if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", public_addr.display_name(udp_port_)),
+                fmt::arg("address", addr.display_name(udp_port_)),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
-            tr_netCloseSocket(udp_socket_);
-            udp_socket_ = TR_BAD_SOCKET;
+
+            tr_netCloseSocket(sock);
         }
         else
         {
-            udp4_event_.reset(event_new(session_.eventBase(), udp_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            tr_logAddInfo("Bound UDP IPv4 address {:s}", addr.display_name(udp_port_));
+            session_.setSocketTOS(sock, TR_AF_INET);
+            set_socket_buffers(sock, session_.allowsUTP());
+            udp4_socket_ = sock;
+            udp4_event_.reset(event_new(session_.eventBase(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            event_add(udp4_event_.get(), nullptr);
         }
     }
 
-    // IPV6
-
-    if (tr_globalIPv6(nullptr).has_value())
+    if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        rebind_ipv6(true);
-    }
+        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET6);
+        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
 
-    if (udp6_socket_ != TR_BAD_SOCKET)
-    {
-        udp6_event_.reset(event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
-    }
+        if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
+        {
+            auto const error_code = errno;
+            tr_logAddWarn(fmt::format(
+                _("Couldn't bind IPv6 socket {address}: {error} ({error_code})"),
+                fmt::arg("address", addr.display_name()),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
 
-    set_socket_buffers();
-    set_socket_tos();
+            tr_netCloseSocket(sock);
+        }
+        else
+        {
+            tr_logAddInfo("Bound UDP IPv6 address {:s}", addr.display_name(udp_port_));
+            session_.setSocketTOS(sock, TR_AF_INET6);
+            set_socket_buffers(sock, session_.allowsUTP());
+            udp6_socket_ = sock;
+            udp6_event_.reset(event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            event_add(udp6_event_.get(), nullptr);
 
-    if (udp4_event_ != nullptr)
-    {
-        event_add(udp4_event_.get(), nullptr);
-    }
-    if (udp6_event_)
-    {
-        event_add(udp6_event_.get(), nullptr);
+#ifdef IPV6_V6ONLY
+            // Since we always open an IPv4 socket on the same port,
+            // this shouldn't matter.  But I'm superstitious.
+            int one = 1;
+            (void)setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
+#endif
+        }
     }
 }
 
@@ -307,13 +222,11 @@ tr_session::tr_udp_core::~tr_udp_core()
 
     udp4_event_.reset();
 
-    if (udp_socket_ != TR_BAD_SOCKET)
+    if (udp4_socket_ != TR_BAD_SOCKET)
     {
-        tr_netCloseSocket(udp_socket_);
-        udp_socket_ = TR_BAD_SOCKET;
+        tr_netCloseSocket(udp4_socket_);
+        udp4_socket_ = TR_BAD_SOCKET;
     }
-
-    udp6_bound_.reset();
 }
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
@@ -323,9 +236,9 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
 
     if (to->sa_family == AF_INET)
     {
-        if (udp_socket_ != TR_BAD_SOCKET)
+        if (udp4_socket_ != TR_BAD_SOCKET)
         {
-            if (::sendto(udp_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
+            if (::sendto(udp4_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
             {
                 error = -1;
             }

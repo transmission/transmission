@@ -75,22 +75,24 @@ private:
     void update_filter_tracker();
     void update_filter_text();
 
-    Glib::RefPtr<Gtk::ListStore> activity_filter_model_new();
     bool activity_filter_model_update();
-    void status_model_update_count(Gtk::TreeModel::iterator const& iter, int n);
-    bool activity_is_it_a_separator(Gtk::TreeModel::const_iterator const& iter);
 
-    Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new();
     bool tracker_filter_model_update();
-    void tracker_model_update_count(Gtk::TreeModel::iterator const& iter, int n);
-    bool is_it_a_separator(Gtk::TreeModel::const_iterator const& iter);
-    void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeRowReference& reference);
+    void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeModel::Path const& path);
 
     void update_filter_models(Torrent::ChangeFlags changes);
     void update_filter_models_idle(Torrent::ChangeFlags changes);
 
     void update_count_label_idle();
     bool update_count_label();
+
+    static Glib::RefPtr<Gtk::ListStore> activity_filter_model_new();
+    static void status_model_update_count(Gtk::TreeModel::iterator const& iter, int n);
+    static bool activity_is_it_a_separator(Gtk::TreeModel::const_iterator const& iter);
+
+    static Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new();
+    static void tracker_model_update_count(Gtk::TreeModel::iterator const& iter, int n);
+    static bool is_it_a_separator(Gtk::TreeModel::const_iterator const& iter);
 
     static Glib::ustring get_name_from_host(std::string const& host);
 
@@ -172,14 +174,11 @@ void FilterBar::Impl::tracker_model_update_count(Gtk::TreeModel::iterator const&
     }
 }
 
-void FilterBar::Impl::favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeRowReference& reference)
+void FilterBar::Impl::favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeModel::Path const& path)
 {
     if (pixbuf != nullptr)
     {
-        auto const path = reference.get_path();
-        auto const model = reference.get_model();
-
-        if (auto const iter = model->get_iter(path); iter)
+        if (auto const iter = tracker_model_->get_iter(path); iter)
         {
             iter->set_value(tracker_filter_cols.pixbuf, pixbuf);
         }
@@ -305,9 +304,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
             gtr_get_favicon(
                 core_->get_session(),
                 site.host,
-                [this, ref = Gtk::TreeRowReference(tracker_model_, path)](auto const& pixbuf) mutable
-                { favicon_ready_cb(pixbuf, ref); });
-            // ++iter;
+                [this, path](auto const& pixbuf) { favicon_ready_cb(pixbuf, path); });
             ++i;
         }
         else // update row
@@ -366,7 +363,7 @@ Gtk::CellRendererText* FilterBar::Impl::number_renderer_new()
 void FilterBar::Impl::tracker_combo_box_init(Gtk::ComboBox& combo)
 {
     combo.set_model(tracker_model_);
-    combo.set_row_separator_func(sigc::hide<0>(sigc::mem_fun(*this, &Impl::is_it_a_separator)));
+    combo.set_row_separator_func(sigc::hide<0>(&Impl::is_it_a_separator));
     combo.set_active(0);
 
     {
@@ -511,7 +508,7 @@ void FilterBar::Impl::render_activity_pixbuf_func(
 void FilterBar::Impl::activity_combo_box_init(Gtk::ComboBox& combo)
 {
     combo.set_model(activity_model_);
-    combo.set_row_separator_func(sigc::hide<0>(sigc::mem_fun(*this, &Impl::activity_is_it_a_separator)));
+    combo.set_row_separator_func(sigc::hide<0>(&Impl::activity_is_it_a_separator));
     combo.set_active(0);
 
     {

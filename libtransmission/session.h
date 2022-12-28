@@ -285,7 +285,7 @@ private:
 
         [[nodiscard]] constexpr auto socket4() const noexcept
         {
-            return udp_socket_;
+            return udp4_socket_;
         }
 
         [[nodiscard]] constexpr auto socket6() const noexcept
@@ -294,23 +294,12 @@ private:
         }
 
     private:
-        void set_socket_buffers();
-
-        void set_socket_tos()
-        {
-            session_.setSocketTOS(udp_socket_, TR_AF_INET);
-            session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
-        }
-
         tr_port const udp_port_;
         tr_session& session_;
-        tr_socket_t udp_socket_ = TR_BAD_SOCKET;
+        tr_socket_t udp4_socket_ = TR_BAD_SOCKET;
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
         libtransmission::evhelpers::event_unique_ptr udp4_event_;
         libtransmission::evhelpers::event_unique_ptr udp6_event_;
-        std::optional<tr_address> udp6_bound_;
-
-        void rebind_ipv6(bool);
     };
 
 public:
@@ -810,7 +799,7 @@ public:
     struct PublicAddressResult
     {
         tr_address address;
-        bool is_default_value;
+        bool is_any_addr;
     };
 
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;

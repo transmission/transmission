@@ -72,6 +72,7 @@ GType ListModelAdapter::get_column_type_vfunc(int index) const
     g_return_val_if_fail(index >= 0, G_TYPE_INVALID);
     g_return_val_if_fail(index < get_n_columns_vfunc(), G_TYPE_INVALID);
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     return columns_.types()[index];
 }
 
@@ -202,17 +203,18 @@ std::optional<guint> ListModelAdapter::find_item_position_by_id(int item_id) con
     return item_position_it != item_positions_.end() ? std::make_optional(item_position_it->second) : std::nullopt;
 }
 
-void ListModelAdapter::adjust_item_positions(guint min_position, int delta)
+void ListModelAdapter::adjust_item_positions(guint min_position, PositionAdjustment adjustment)
 {
     for (auto item_it = std::next(items_.begin(), min_position); item_it != items_.end(); ++item_it)
     {
         if (auto const item_position_it = item_positions_.find(item_it->id); item_position_it != item_positions_.end())
         {
-            item_position_it->second += delta;
+            item_position_it->second += static_cast<int>(adjustment);
         }
     }
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void ListModelAdapter::on_adaptee_items_changed(guint position, guint removed, guint added)
 {
     g_assert(position + removed <= items_.size());
@@ -227,7 +229,7 @@ void ListModelAdapter::on_adaptee_items_changed(guint position, guint removed, g
         info.notify_tag.disconnect();
 
         item_positions_.erase(info.id);
-        adjust_item_positions(removed_position, -1);
+        adjust_item_positions(removed_position, PositionAdjustment::DECREMENT);
 
         auto path = Path();
         path.push_back(removed_position);
@@ -247,7 +249,7 @@ void ListModelAdapter::on_adaptee_items_changed(guint position, guint removed, g
 
         items_.insert(std::next(items_.begin(), added_position), info);
 
-        adjust_item_positions(added_position, 1);
+        adjust_item_positions(added_position, PositionAdjustment::INCREMENT);
         item_positions_.emplace(info.id, added_position);
 
         auto path = Path();

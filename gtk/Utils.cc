@@ -465,6 +465,7 @@ void object_signal_notify_callback(GObject* object, GParamSpec* /*param_spec*/, 
     {
         if (auto const* const slot = Glib::SignalProxyBase::data_to_slot(data); slot != nullptr)
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
             (*static_cast<sigc::slot<TrObjectSignalNotifyCallback> const*>(slot))(Glib::wrap(object, true));
         }
     }
@@ -476,7 +477,9 @@ Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::O
 {
     static auto const object_signal_notify_info = Glib::SignalProxyInfo{
         .signal_name = "notify",
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         .callback = reinterpret_cast<GCallback>(&object_signal_notify_callback),
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         .notify_callback = reinterpret_cast<GCallback>(&object_signal_notify_callback),
     };
 
@@ -485,6 +488,7 @@ Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::O
 
 void gtr_object_notify_emit(Glib::ObjectBase& object)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
     g_signal_emit_by_name(object.gobj(), "notify", nullptr);
 }
 

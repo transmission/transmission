@@ -89,6 +89,8 @@ public:
     Impl(Session& core, tr_session* session);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     tr_session* close();
 
     Glib::RefPtr<Gio::ListStore<Torrent>> get_raw_model() const;
@@ -636,15 +638,14 @@ std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_tor
     {
         auto const position = begin_position + (end_position - begin_position) / 2;
         auto const torrent = raw_model_->get_item(position);
+        auto const current_torrent_id = torrent->get_id();
 
-        if (auto const current_torrent_id = torrent->get_id(); current_torrent_id == torrent_id)
+        if (current_torrent_id == torrent_id)
         {
             return { torrent, position };
         }
-        else
-        {
-            (current_torrent_id < torrent_id ? begin_position : end_position) = position;
-        }
+
+        (current_torrent_id < torrent_id ? begin_position : end_position) = position;
     }
 
     return {};
