@@ -43,8 +43,8 @@ template<class T>
     return dist(rng, typename dist_type::param_type(0, upper_bound - 1));
 }
 
-template size_t tr_rand_int(size_t upper_bound);
-template unsigned int tr_rand_int(unsigned int upper_bound);
+template uint32_t tr_rand_int(uint32_t upper_bound);
+template uint64_t tr_rand_int(uint64_t upper_bound);
 
 ///
 
