@@ -312,7 +312,7 @@ BlocklistDownloader* fBLDownloader = nil;
     zipinfo.launchPath = @"/usr/bin/zipinfo";
     zipinfo.arguments = @[
         @"-1", /* just the filename */
-        file /* source zip file */
+        file.path /* source zip file */
     ];
     NSPipe* pipe = [[NSPipe alloc] init];
     zipinfo.standardOutput = pipe;
