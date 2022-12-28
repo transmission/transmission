@@ -75,48 +75,7 @@ tr_session* fLib = NULL;
     self.fTimeLabelField.stringValue = [NSLocalizedString(@"Running Time", "Stats window -> label") stringByAppendingString:@":"];
     self.fNumOpenedLabelField.stringValue = [NSLocalizedString(@"Program Started", "Stats window -> label") stringByAppendingString:@":"];
 
-    //size of all labels
-    CGFloat const oldWidth = self.fUploadedLabelField.frame.size.width;
-
-    NSArray* labels = @[
-        self.fUploadedLabelField,
-        self.fDownloadedLabelField,
-        self.fRatioLabelField,
-        self.fTimeLabelField,
-        self.fNumOpenedLabelField
-    ];
-
-    CGFloat maxWidth = CGFLOAT_MIN;
-    for (NSTextField* label in labels)
-    {
-        [label sizeToFit];
-
-        CGFloat const width = label.frame.size.width;
-        maxWidth = MAX(maxWidth, width);
-    }
-
-    for (NSTextField* label in labels)
-    {
-        NSRect frame = label.frame;
-        frame.size.width = maxWidth;
-        label.frame = frame;
-    }
-
-    //resize window for new label width - fields are set in nib to adjust correctly
-    NSRect windowRect = self.window.frame;
-    windowRect.size.width += maxWidth - oldWidth;
-    [self.window setFrame:windowRect display:YES];
-
-    //resize reset button
-    CGFloat const oldButtonWidth = self.fResetButton.frame.size.width;
-
     self.fResetButton.title = NSLocalizedString(@"Reset", "Stats window -> reset button");
-    [self.fResetButton sizeToFit];
-
-    NSRect buttonFrame = self.fResetButton.frame;
-    buttonFrame.size.width += 10.0;
-    buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
-    self.fResetButton.frame = buttonFrame;
 }
 
 - (void)windowWillClose:(id)sender
@@ -196,7 +155,7 @@ tr_session* fLib = NULL;
 
     self.fRatioField.stringValue = [NSString stringForRatio:statsSession.ratio];
 
-    NSString* totalRatioString = statsAll.ratio != TR_RATIO_NA ?
+    NSString* totalRatioString = static_cast<int>(statsAll.ratio) != TR_RATIO_NA ?
         [NSString stringWithFormat:NSLocalizedString(@"%@ total", "stats total"), [NSString stringForRatio:statsAll.ratio]] :
         NSLocalizedString(@"Total N/A", "stats total");
     self.fRatioAllField.stringValue = totalRatioString;

@@ -4,7 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <utility> // std::swap()
+#include <utility> // for std::swap()
 #include <vector>
 
 #include <fmt/core.h>
@@ -12,7 +12,7 @@
 #include "transmission.h"
 
 #include "bandwidth.h"
-#include "crypto-utils.h" // tr_rand_int_weak()
+#include "crypto-utils.h"
 #include "log.h"
 #include "peer-io.h"
 #include "tr-assert.h"
@@ -137,85 +137,93 @@ void tr_bandwidth::setParent(tr_bandwidth* new_parent)
 
 void tr_bandwidth::allocateBandwidth(
     tr_priority_t parent_priority,
-    tr_direction dir,
     unsigned int period_msec,
     std::vector<std::shared_ptr<tr_peerIo>>& peer_pool)
 {
-    tr_priority_t const priority = std::max(parent_priority, this->priority_);
+    auto const priority = std::max(parent_priority, this->priority_);
 
-    /* set the available bandwidth */
-    if (auto& bandwidth = band_[dir]; bandwidth.is_limited_)
+    // set the available bandwidth
+    for (auto const dir : { TR_UP, TR_DOWN })
     {
-        auto const next_pulse_speed = bandwidth.desired_speed_bps_;
-        bandwidth.bytes_left_ = next_pulse_speed * period_msec / 1000U;
+        if (auto& bandwidth = band_[dir]; bandwidth.is_limited_)
+        {
+            auto const next_pulse_speed = bandwidth.desired_speed_bps_;
+            bandwidth.bytes_left_ = next_pulse_speed * period_msec / 1000U;
+        }
     }
 
-    /* add this bandwidth's peer, if any, to the peer pool */
+    // add this bandwidth's peer, if any, to the peer pool
     if (auto shared = this->peer_.lock(); shared)
     {
-        shared->priority = priority;
+        shared->set_priority(priority);
         peer_pool.push_back(std::move(shared));
     }
 
     // traverse & repeat for the subtree
     for (auto* child : this->children_)
     {
-        child->allocateBandwidth(priority, dir, period_msec, peer_pool);
+        child->allocateBandwidth(priority, period_msec, peer_pool);
     }
 }
 
-void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction dir)
+void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peers, tr_direction dir)
 {
-    /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
-     * peers from starving the others. Loop through the peers, giving each a
-     * small chunk of bandwidth. Keep looping until we run out of bandwidth
-     * and/or peers that can use it */
-    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peer_array.size(), dir == TR_UP ? "upload" : "download"));
+    // First phase of IO. Tries to distribute bandwidth fairly to keep faster
+    // peers from starving the others.
+    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peers.size(), dir == TR_UP ? "upload" : "download"));
 
-    auto n = peer_array.size();
-    while (n > 0)
+    // Shuffle the peers so they all have equal chance to be first in line.
+    thread_local auto urbg = tr_urbg<size_t>{};
+    std::shuffle(std::begin(peers), std::end(peers), urbg);
+
+    // Give each peer `Increment` bandwidth bytes to use. Repeat this
+    // process until we run out of bandwidth and/or peers that can use it.
+    for (size_t n_unfinished = std::size(peers); n_unfinished > 0U;)
     {
-        auto const i = tr_rand_int_weak(n); /* pick a peer at random */
-
-        // value of 3000 bytes chosen so that when using µTP we'll send a full-size
-        // frame right away and leave enough buffered data for the next frame to go
-        // out in a timely manner.
-        static auto constexpr Increment = size_t{ 3000 };
-
-        auto const bytes_used = peer_array[i]->flush(dir, Increment);
-
-        tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
-
-        if (bytes_used != Increment)
+        for (size_t i = 0; i < n_unfinished;)
         {
-            // peer is done writing for now; move it to the end of the list
-            std::swap(peer_array[i], peer_array[n - 1]);
-            --n;
+            // Value of 3000 bytes chosen so that when using µTP we'll send a full-size
+            // frame right away and leave enough buffered data for the next frame to go
+            // out in a timely manner.
+            static auto constexpr Increment = size_t{ 3000 };
+
+            auto const bytes_used = peers[i]->flush(dir, Increment);
+            tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n_unfinished, bytes_used));
+
+            if (bytes_used != Increment)
+            {
+                // peer is done writing for now; move it to the end of the list
+                std::swap(peers[i], peers[n_unfinished - 1]);
+                --n_unfinished;
+            }
+            else
+            {
+                ++i;
+            }
         }
     }
 }
 
-void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
+void tr_bandwidth::allocate(unsigned int period_msec)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
     // keep these peers alive for the scope of this function
     auto refs = std::vector<std::shared_ptr<tr_peerIo>>{};
 
-    auto high = std::vector<tr_peerIo*>{};
-    auto low = std::vector<tr_peerIo*>{};
-    auto normal = std::vector<tr_peerIo*>{};
+    auto peer_arrays = std::array<std::vector<tr_peerIo*>, 3>{};
+    auto& high = peer_arrays[0];
+    auto& normal = peer_arrays[1];
+    auto& low = peer_arrays[2];
 
-    /* allocateBandwidth () is a helper function with two purposes:
-     * 1. allocate bandwidth to b and its subtree
-     * 2. accumulate an array of all the peerIos from b and its subtree. */
-    this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, refs);
+    // allocateBandwidth () is a helper function with two purposes:
+    // 1. allocate bandwidth to b and its subtree
+    // 2. accumulate an array of all the peerIos from b and its subtree.
+    this->allocateBandwidth(TR_PRI_LOW, period_msec, refs);
 
     for (auto const& io : refs)
     {
-        io->flushOutgoingProtocolMsgs();
+        io->flush_outgoing_protocol_msgs();
 
-        switch (io->priority)
+        switch (io->priority())
         {
         case TR_PRI_HIGH:
             high.push_back(io.get());
@@ -230,21 +238,24 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
         }
     }
 
-    /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
-     * peers from starving the others. Loop through the peers, giving each a
-     * small chunk of bandwidth. Keep looping until we run out of bandwidth
-     * and/or peers that can use it */
-    phaseOne(high, dir);
-    phaseOne(normal, dir);
-    phaseOne(low, dir);
+    // First phase of IO. Tries to distribute bandwidth fairly to keep faster
+    // peers from starving the others. Loop through the peers, giving each a
+    // small chunk of bandwidth. Keep looping until we run out of bandwidth
+    // and/or peers that can use it
+    for (auto& peers : peer_arrays)
+    {
+        phaseOne(peers, TR_UP);
+        phaseOne(peers, TR_DOWN);
+    }
 
-    /* Second phase of IO. To help us scale in high bandwidth situations,
-     * enable on-demand IO for peers with bandwidth left to burn.
-     * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
-     * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
+    // Second phase of IO. To help us scale in high bandwidth situations,
+    // enable on-demand IO for peers with bandwidth left to burn.
+    // This on-demand IO is enabled until (1) the peer runs out of bandwidth,
+    // or (2) the next tr_bandwidth::allocate () call, when we start over again.
     for (auto const& io : refs)
     {
-        io->setEnabled(dir, io->hasBandwidthLeft(dir));
+        io->set_enabled(TR_UP, io->has_bandwidth_left(TR_UP));
+        io->set_enabled(TR_DOWN, io->has_bandwidth_left(TR_DOWN));
     }
 }
 

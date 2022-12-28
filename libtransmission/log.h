@@ -42,8 +42,6 @@ enum tr_log_level
 
 std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key);
 
-std::string_view tr_logLevelToKey(tr_log_level);
-
 ///
 
 struct tr_log_message
@@ -52,7 +50,7 @@ struct tr_log_message
 
     // location in the source code
     std::string_view file;
-    size_t line;
+    long line;
 
     // when the message was generated
     time_t when;
@@ -91,7 +89,7 @@ void tr_logSetLevel(tr_log_level);
 
 void tr_logAddMessage(
     char const* source_file,
-    int source_line,
+    long source_line,
     tr_log_level level,
     std::string_view msg,
     std::string_view module_name = {});

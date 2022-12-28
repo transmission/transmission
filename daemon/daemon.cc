@@ -314,7 +314,7 @@ static void printMessage(
     std::string_view name,
     std::string_view message,
     std::string_view filename,
-    int line)
+    long line)
 {
     auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
                                         fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
@@ -418,7 +418,7 @@ static tr_rpc_callback_status on_rpc_callback(
     return TR_RPC_OK;
 }
 
-bool tr_daemon::parse_args(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code)
+bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
 {
     int c;
     char const* optstr;
@@ -877,9 +877,9 @@ CLEANUP:
     return 0;
 }
 
-bool tr_daemon::init(int argc, char* argv[], bool* foreground, int* ret)
+bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* ret)
 {
-    config_dir_ = getConfigDir(argc, (char const* const*)argv);
+    config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
     tr_variantInitDict(&settings_, 0);
@@ -891,7 +891,7 @@ bool tr_daemon::init(int argc, char* argv[], bool* foreground, int* ret)
     *ret = 0;
 
     /* overwrite settings from the command line */
-    if (!parse_args(argc, (char const**)argv, &dumpSettings, foreground, ret))
+    if (!parse_args(argc, argv, &dumpSettings, foreground, ret))
     {
         goto EXIT_EARLY;
     }

@@ -3,23 +3,27 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
-#include <utility>
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/file.h> /* tr_sys_path_is_same() */
+#include "OptionsDialog.h"
 
 #include "FileList.h"
 #include "FreeSpaceLabel.h"
-#include "OptionsDialog.h"
 #include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h" /* gtr_priority_combo_get_value() */
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/file.h> /* tr_sys_path_is_same() */
+
+#include <giomm/file.h>
+#include <glibmm/i18n.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/filefilter.h>
+
+#include <memory>
+#include <utility>
 
 using namespace std::string_view_literals;
 
@@ -120,7 +124,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
                 tr_torrentStart(tor_);
             }
 
-            core_->add_torrent(tor_, false);
+            core_->add_torrent(Torrent::create(tor_), false);
 
             if (trash_check_->get_active())
             {

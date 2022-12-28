@@ -232,6 +232,7 @@ private:
         [[nodiscard]] std::optional<std::string> publicAddressV6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
+        [[nodiscard]] time_t now() const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
@@ -307,7 +308,7 @@ private:
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
         libtransmission::evhelpers::event_unique_ptr udp4_event_;
         libtransmission::evhelpers::event_unique_ptr udp6_event_;
-        std::optional<in6_addr> udp6_bound_;
+        std::optional<tr_address> udp6_bound_;
 
         void rebind_ipv6(bool);
     };
@@ -877,7 +878,7 @@ public:
         web_->fetch(std::move(options));
     }
 
-    [[nodiscard]] auto const& bandwidthGroups() const noexcept
+    [[nodiscard]] constexpr auto const& bandwidthGroups() const noexcept
     {
         return bandwidth_groups_;
     }
@@ -1126,6 +1127,7 @@ private:
     tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
 
 public:
+    // depends-on: udp_core_
     struct struct_utp_context* utp_context = nullptr;
 
 private:
@@ -1141,7 +1143,7 @@ public:
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
-    // depends-on: timer_maker_, top_bandwidth_, torrents_, web_
+    // depends-on: timer_maker_, top_bandwidth_, utp_context, torrents_, web_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
     // depends-on: peer_mgr_, advertised_peer_port_, torrents_

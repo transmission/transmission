@@ -42,6 +42,7 @@
 #include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
+#include <wildmat.h>
 
 #include "transmission.h"
 
@@ -193,17 +194,12 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
     return len;
 }
 
-extern "C"
-{
-    int DoMatch(char const* text, char const* p);
-}
-
 /* User-level routine. returns whether or not 'text' and 'p' matched */
 bool tr_wildmat(std::string_view text, std::string_view pattern)
 {
     // TODO(ckerr): replace wildmat with base/strings/pattern.cc
     // wildmat wants these to be zero-terminated.
-    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) != 0;
+    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) > 0;
 }
 
 char const* tr_strerror(int errnum)

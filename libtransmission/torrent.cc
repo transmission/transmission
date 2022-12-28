@@ -925,11 +925,12 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    uint64_t const now = tr_time_msec();
+    auto const now = tr_time_msec();
+    auto const now_sec = tr_time();
 
     auto swarm_stats = tr_swarm_stats{};
 
-    tor->lastStatTime = tr_time();
+    tor->lastStatTime = now_sec;
 
     if (tor->swarm != nullptr)
     {
@@ -974,8 +975,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->doneDate = tor->doneDate;
     s->editDate = tor->editDate;
     s->startDate = tor->startDate;
-    s->secondsSeeding = tor->secondsSeeding;
-    s->secondsDownloading = tor->secondsDownloading;
+    s->secondsSeeding = tor->secondsSeeding(now_sec);
+    s->secondsDownloading = tor->secondsDownloading(now_sec);
 
     s->corruptEver = tor->corruptCur + tor->corruptPrev;
     s->downloadedEver = tor->downloadedCur + tor->downloadedPrev;
@@ -1152,7 +1153,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.piece_size = tor->pieceSize();
     ret.n_pieces = tor->pieceCount();
     ret.is_private = tor->isPrivate();
-    ret.is_folder = tor->fileCount() > 1;
+    ret.is_folder = tor->fileCount() > 1 || (tor->fileCount() == 1 && tr_strvContains(tor->fileSubpath(0), '/'));
 
     return ret;
 }
@@ -1670,6 +1671,8 @@ static void torrentCallScript(tr_torrent const* tor, std::string const& script)
 void tr_torrent::recheckCompleteness()
 {
     auto const lock = unique_lock();
+
+    needs_completeness_check_ = false;
 
     auto const new_completeness = completion.status();
 

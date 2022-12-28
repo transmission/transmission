@@ -115,7 +115,7 @@ public:
     /**
      * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
      */
-    void allocate(tr_direction dir, unsigned int period_msec);
+    void allocate(unsigned int period_msec);
 
     void setParent(tr_bandwidth* new_parent);
 
@@ -252,11 +252,10 @@ private:
 
     [[nodiscard]] size_t clamp(uint64_t now, tr_direction dir, size_t byte_count) const;
 
-    static void phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction dir);
+    static void phaseOne(std::vector<tr_peerIo*>& peers, tr_direction dir);
 
     void allocateBandwidth(
         tr_priority_t parent_priority,
-        tr_direction dir,
         unsigned int period_msec,
         std::vector<std::shared_ptr<tr_peerIo>>& peer_pool);
 

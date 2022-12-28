@@ -6,10 +6,12 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <functional>
 #include <iterator>
 #include <random>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 extern "C"
@@ -27,87 +29,24 @@ extern "C"
 
 using namespace std::literals;
 
-template<class IntType>
-[[nodiscard]] IntType tr_rand_integer(IntType upper_bound);
-template<class IntType>
-[[nodiscard]] IntType tr_rand_integer_weak(IntType upper_bound);
+///
 
-/***
-****
-***/
-
-template<>
-[[nodiscard]] int tr_rand_int<int>(int upper_bound)
+template<class T>
+[[nodiscard]] T tr_rand_int(T upper_bound)
 {
-    return tr_rand_integer<int>(upper_bound);
+    static_assert(!std::is_signed<T>());
+    TR_ASSERT(upper_bound > std::numeric_limits<T>::min());
+
+    using dist_type = std::uniform_int_distribution<T>;
+    thread_local auto rng = tr_urbg<T>{};
+    thread_local auto dist = dist_type{};
+    return dist(rng, typename dist_type::param_type(0, upper_bound - 1));
 }
 
-template<>
-[[nodiscard]] size_t tr_rand_int<size_t>(size_t upper_bound)
-{
-    return tr_rand_integer<size_t>(upper_bound);
-}
+template size_t tr_rand_int(size_t upper_bound);
+template unsigned int tr_rand_int(unsigned int upper_bound);
 
-template<>
-[[nodiscard]] int tr_rand_int_weak<int>(int upper_bound)
-{
-    return tr_rand_integer_weak<int>(upper_bound);
-}
-
-template<>
-[[nodiscard]] size_t tr_rand_int_weak<size_t>(size_t upper_bound)
-{
-    return tr_rand_integer_weak<size_t>(upper_bound);
-}
-
-template<class IntType>
-[[nodiscard]] IntType tr_rand_integer(IntType upper_bound_integer)
-{
-    TR_ASSERT(upper_bound_integer > 0);
-
-    using UIntType = std::make_unsigned_t<IntType>;
-    auto upper_bound = static_cast<UIntType>(upper_bound_integer);
-
-    // random uniform algorithm for unsigned type
-    // (https://github.com/openbsd/src/blob/master/lib/libc/crypt/arc4random_uniform.c)
-    if (upper_bound < 2)
-    {
-        return 0;
-    }
-    UIntType min = -upper_bound % upper_bound;
-    UIntType noise = 0;
-    for (;;)
-    {
-        if (!tr_rand_buffer(&noise, sizeof(noise)))
-        {
-            break;
-        }
-        if (noise >= min)
-        {
-            return noise % upper_bound;
-        }
-    }
-
-    // rare fall back to a weaker implementation when CCRandomGenerateBytes is failing
-    return tr_rand_integer_weak(upper_bound);
-}
-
-template<class IntType>
-[[nodiscard]] IntType tr_rand_integer_weak(IntType upper_bound)
-{
-    TR_ASSERT(upper_bound > 0);
-
-    thread_local auto random_engine = std::mt19937{ std::random_device{}() };
-    using distribution_type = std::uniform_int_distribution<IntType>;
-    thread_local distribution_type distribution;
-
-    // Upper bound is inclusive in std::uniform_int_distribution.
-    return distribution(random_engine, typename distribution_type::param_type{ 0, upper_bound - 1 });
-}
-
-/***
-****
-***/
+///
 
 namespace
 {
@@ -320,4 +259,26 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
     auto digest = tr_sha256_digest_t{};
     tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));
     return digest;
+}
+
+// fallback implementation in case the system crypto library's RNG fails
+void tr_rand_buffer_std(void* buffer, size_t length)
+{
+    thread_local auto gen = std::mt19937{ std::random_device{}() };
+    thread_local auto dist = std::uniform_int_distribution<unsigned long long>{};
+
+    for (auto *walk = static_cast<uint8_t*>(buffer), *end = walk + length; walk < end;)
+    {
+        auto const tmp = dist(gen);
+        auto const step = std::min(sizeof(tmp), static_cast<size_t>(end - walk));
+        walk = std::copy_n(reinterpret_cast<uint8_t const*>(&tmp), step, walk);
+    }
+}
+
+void tr_rand_buffer(void* buffer, size_t length)
+{
+    if (!tr_rand_buffer_crypto(buffer, length))
+    {
+        tr_rand_buffer_std(buffer, length);
+    }
 }

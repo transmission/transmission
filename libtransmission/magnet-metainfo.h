@@ -37,14 +37,14 @@ public:
         return name_;
     }
 
-    [[nodiscard]] constexpr auto webseedCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
     {
         return std::size(webseed_urls_);
     }
 
-    [[nodiscard]] auto const& webseed(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
     {
-        return webseed_urls_[i];
+        return webseed_urls_.at(i);
     }
 
     [[nodiscard]] constexpr auto& announceList() noexcept

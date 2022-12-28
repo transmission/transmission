@@ -87,7 +87,7 @@ tr_sys_file_t tr_logGetFile()
 
 void logAddImpl(
     [[maybe_unused]] char const* file,
-    [[maybe_unused]] int line,
+    [[maybe_unused]] long line,
     [[maybe_unused]] tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
@@ -243,7 +243,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     return buf;
 }
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view msg, std::string_view name)
+void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string_view msg, std::string_view name)
 {
     TR_ASSERT(!std::empty(msg));
 
@@ -338,9 +338,4 @@ std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key_in)
     }
 
     return std::nullopt;
-}
-
-std::string_view tr_logLevelToKey(tr_log_level key)
-{
-    return LogKeys[key].first;
 }

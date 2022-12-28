@@ -56,7 +56,6 @@ else()
     set(TR_OPENSSL_SSL_NAME "ssleay32.dll")
 endif()
 
-set(ICONS_DIR "${CMAKE_SOURCE_DIR}/qt/icons/hicolor")
 file(COPY "${CMAKE_SOURCE_DIR}/qt/icons/transmission.ico" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")

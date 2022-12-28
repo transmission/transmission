@@ -70,11 +70,11 @@ enum
     {
         //determine relevant values
         _fNumPieces = MIN(_torrent.pieceCount, kMaxAcross * kMaxAcross);
-        _fAcross = ceil(sqrt(_fNumPieces));
+        _fAcross = static_cast<NSInteger>(ceil(sqrt(_fNumPieces)));
 
         CGFloat const width = self.bounds.size.width;
-        _fWidth = (width - (_fAcross + 1) * kBetweenPadding) / _fAcross;
-        _fExtraBorder = (width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2;
+        _fWidth = static_cast<NSInteger>((width - (_fAcross + 1) * kBetweenPadding) / _fAcross);
+        _fExtraBorder = static_cast<NSInteger>((width - ((_fWidth + kBetweenPadding) * _fAcross + kBetweenPadding)) / 2);
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
@@ -95,11 +95,13 @@ enum
         return;
     }
 
+    NSInteger numPieces = self.fNumPieces;
+
     //determine if first time
     BOOL const first = std::empty(self.fPieces);
     if (first)
     {
-        _fPieces.resize(self.fNumPieces);
+        _fPieces.resize(numPieces);
     }
 
     auto pieces = std::vector<int8_t>{};
@@ -108,25 +110,23 @@ enum
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     if (showAvailability)
     {
-        pieces.resize(self.fNumPieces);
+        pieces.resize(numPieces);
         [self.torrent getAvailability:std::data(pieces) size:std::size(pieces)];
     }
     else
     {
-        piecesPercent.resize(self.fNumPieces);
+        piecesPercent.resize(numPieces);
         [self.torrent getAmountFinished:std::data(piecesPercent) size:std::size(piecesPercent)];
     }
 
-    NSImage* image = self.image;
-
-    NSRect fillRects[self.fNumPieces];
-    NSColor* fillColors[self.fNumPieces];
+    NSMutableArray<NSValue*>* fillRects = [NSMutableArray arrayWithCapacity:numPieces];
+    NSMutableArray<NSColor*>* fillColors = [NSMutableArray arrayWithCapacity:numPieces];
 
     NSColor* defaultColor = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
 
     NSInteger usedCount = 0;
 
-    for (NSInteger index = 0; index < self.fNumPieces; index++)
+    for (NSInteger index = 0; index < numPieces; index++)
     {
         NSColor* pieceColor = nil;
 
@@ -175,11 +175,12 @@ enum
         {
             NSInteger const across = index % self.fAcross;
             NSInteger const down = index / self.fAcross;
-            fillRects[usedCount] = NSMakeRect(
-                across * (self.fWidth + kBetweenPadding) + kBetweenPadding + self.fExtraBorder,
-                image.size.width - (down + 1) * (self.fWidth + kBetweenPadding) - self.fExtraBorder,
-                self.fWidth,
-                self.fWidth);
+            fillRects[usedCount] = [NSValue
+                valueWithRect:NSMakeRect(
+                                  across * (self.fWidth + kBetweenPadding) + kBetweenPadding + self.fExtraBorder,
+                                  self.bounds.size.width - (down + 1) * (self.fWidth + kBetweenPadding) - self.fExtraBorder,
+                                  self.fWidth,
+                                  self.fWidth)];
             fillColors[usedCount] = pieceColor;
 
             usedCount++;
@@ -188,9 +189,20 @@ enum
 
     if (usedCount > 0)
     {
-        [image lockFocus];
-        NSRectFillListWithColors(fillRects, fillColors, usedCount);
-        [image unlockFocus];
+        self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect dstRect) {
+            NSRect cFillRects[usedCount];
+            for (NSInteger i = 0; i < usedCount; ++i)
+            {
+                cFillRects[i] = fillRects[i].rectValue;
+            }
+            NSColor* cFillColors[usedCount];
+            for (NSInteger i = 0; i < usedCount; ++i)
+            {
+                cFillColors[i] = fillColors[i];
+            }
+            NSRectFillListWithColors(cFillRects, cFillColors, usedCount);
+            return YES;
+        }];
         [self setNeedsDisplay];
     }
 }

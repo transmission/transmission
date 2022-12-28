@@ -5,14 +5,20 @@
 
 #pragma once
 
-#include <memory>
-
-#include <glibmm/extraclassinit.h>
-#include <gtkmm.h>
+#include "Utils.h"
 
 #include <libtransmission/tr-macros.h>
 
-typedef struct tr_session tr_session;
+#include <giomm/listmodel.h>
+#include <glibmm/extraclassinit.h>
+#include <glibmm/refptr.h>
+#include <gtkmm/box.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/treemodel.h>
+
+#include <memory>
+
+class Session;
 
 class FilterBarExtraInit : public Glib::ExtraClassInit
 {
@@ -29,17 +35,16 @@ class FilterBar
     , public Gtk::Box
 {
 public:
+    using Model = IF_GTKMM4(Gio::ListModel, Gtk::TreeModel);
+
+public:
     FilterBar();
-    FilterBar(
-        BaseObjectType* cast_item,
-        Glib::RefPtr<Gtk::Builder> const& builder,
-        tr_session* session,
-        Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
+    FilterBar(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
     ~FilterBar() override;
 
     TR_DISABLE_COPY_MOVE(FilterBar)
 
-    Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
+    Glib::RefPtr<Model> get_filter_model() const;
 
 private:
     class Impl;

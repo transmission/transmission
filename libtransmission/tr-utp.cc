@@ -12,7 +12,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // tr_rand_int_weak()
+#include "crypto-utils.h" // tr_rand_int()
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
@@ -112,15 +112,6 @@ static void utp_send_to(
     ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
-#ifdef TR_UTP_TRACE
-
-static void utp_log(tr_session* const /*session*/, char const* const msg)
-{
-    fmt::print(stderr, FMT_STRING("[µTP] {}\n"), msg);
-}
-
-#endif
-
 static uint64 utp_callback(utp_callback_arguments* args)
 {
     auto* const session = static_cast<tr_session*>(utp_context_get_userdata(args->context));
@@ -131,11 +122,9 @@ static uint64 utp_callback(utp_callback_arguments* args)
     switch (args->callback_type)
     {
 #ifdef TR_UTP_TRACE
-
     case UTP_LOG:
-        utp_log(session, args->buf);
+        fmt::print(stderr, FMT_STRING("[µTP] {}\n"), args->buf);
         break;
-
 #endif
 
     case UTP_ON_ACCEPT:
@@ -153,7 +142,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
 static void reset_timer(tr_session* session)
 {
     auto interval = std::chrono::milliseconds{};
-    auto const random_percent = tr_rand_int_weak(1000) / 1000.0;
+    auto const random_percent = tr_rand_int(1000U) / 1000.0;
 
     if (session->allowsUTP())
     {
@@ -204,20 +193,15 @@ void tr_utpInit(tr_session* session)
     }
 
     utp_context_set_userdata(ctx, session);
-
     utp_set_callback(ctx, UTP_ON_ACCEPT, &utp_callback);
     utp_set_callback(ctx, UTP_SENDTO, &utp_callback);
-
-    tr_peerIo::utpInit(ctx);
+    tr_peerIo::utp_init(ctx);
 
 #ifdef TR_UTP_TRACE
-
     utp_set_callback(ctx, UTP_LOG, &utp_callback);
-
     utp_context_set_option(ctx, UTP_LOG_NORMAL, 1);
     utp_context_set_option(ctx, UTP_LOG_MTU, 1);
     utp_context_set_option(ctx, UTP_LOG_DEBUG, 1);
-
 #endif
 
     session->utp_context = ctx;

@@ -12,9 +12,3 @@ third-party/*
 
 # maintained at https://github.com/sparkle-project/Sparkle
 macosx/Sparkle.framework/*
-
-# maintained at https://github.com/mnunberg/jsonsl
-libtransmission/jsonsl.*
-
-# missing official maintainer (XConsortium: wildmat.c,v 1.2 94/04/13); TODO: clang-format it
-libtransmission/wildmat.*

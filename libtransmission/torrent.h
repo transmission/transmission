@@ -386,17 +386,17 @@ public:
 
     /// METAINFO - FILES
 
-    [[nodiscard]] tr_file_index_t fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
     {
         return metainfo_.fileCount();
     }
 
-    [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& fileSubpath(tr_file_index_t i) const
     {
         return metainfo_.fileSubpath(i);
     }
 
-    [[nodiscard]] auto fileSize(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const
     {
         return metainfo_.fileSize(i);
     }
@@ -412,22 +412,22 @@ public:
 
     /// METAINFO - TRACKERS
 
-    [[nodiscard]] auto const& announceList() const noexcept
+    [[nodiscard]] constexpr auto const& announceList() const noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto& announceList() noexcept
+    [[nodiscard]] constexpr auto& announceList() noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto trackerCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto trackerCount() const noexcept
     {
         return std::size(this->announceList());
     }
 
-    [[nodiscard]] auto const& tracker(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& tracker(size_t i) const
     {
         return this->announceList().at(i);
     }
@@ -441,12 +441,12 @@ public:
 
     /// METAINFO - WEBSEEDS
 
-    [[nodiscard]] auto webseedCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
     {
         return metainfo_.webseedCount();
     }
 
-    [[nodiscard]] auto const& webseed(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
     {
         return metainfo_.webseed(i);
     }
@@ -731,6 +731,63 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto secondsDownloading(time_t now) const noexcept
+    {
+        auto n_secs = seconds_downloading_before_current_start_;
+
+        if (isRunning)
+        {
+            if (doneDate > startDate)
+            {
+                n_secs += doneDate - startDate;
+            }
+            else if (doneDate == 0)
+            {
+                n_secs += now - startDate;
+            }
+        }
+
+        return n_secs;
+    }
+
+    [[nodiscard]] constexpr auto secondsSeeding(time_t now) const noexcept
+    {
+        auto n_secs = seconds_seeding_before_current_start_;
+
+        if (isRunning)
+        {
+            if (doneDate > startDate)
+            {
+                n_secs += now - doneDate;
+            }
+            else if (doneDate != 0)
+            {
+                n_secs += now - startDate;
+            }
+        }
+
+        return n_secs;
+    }
+
+    constexpr void set_needs_completeness_check() noexcept
+    {
+        needs_completeness_check_ = true;
+    }
+
+    void do_idle_work()
+    {
+        if (needs_completeness_check_)
+        {
+            needs_completeness_check_ = false;
+            recheckCompleteness();
+        }
+
+        if (isStopping)
+        {
+            tr_torrentStop(this);
+        }
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -792,6 +849,9 @@ public:
 
     time_t lastStatTime = 0;
 
+    time_t seconds_downloading_before_current_start_ = 0;
+    time_t seconds_seeding_before_current_start_ = 0;
+
     uint64_t downloadedCur = 0;
     uint64_t downloadedPrev = 0;
     uint64_t uploadedCur = 0;
@@ -817,9 +877,6 @@ public:
     tr_stat_errtype error = TR_STAT_OK;
 
     tr_bytes_per_second_t etaSpeed_Bps = 0;
-
-    time_t secondsDownloading = 0;
-    time_t secondsSeeding = 0;
 
     size_t queuePosition = 0;
 
@@ -848,10 +905,6 @@ public:
     bool magnetVerify = false;
 
 private:
-    tr_verify_state verify_state_ = TR_VERIFY_NONE;
-    float verify_progress_ = -1;
-    tr_interned_string bandwidth_group_;
-
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
         auto const lock = unique_lock();
@@ -865,6 +918,12 @@ private:
             recheckCompleteness();
         }
     }
+
+    tr_verify_state verify_state_ = TR_VERIFY_NONE;
+    float verify_progress_ = -1;
+    tr_interned_string bandwidth_group_;
+
+    bool needs_completeness_check_ = true;
 };
 
 /***

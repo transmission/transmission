@@ -29,17 +29,17 @@ struct tr_error;
 struct tr_torrent_files
 {
 public:
-    [[nodiscard]] bool empty() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
     {
         return std::empty(files_);
     }
 
-    [[nodiscard]] size_t fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 size_t fileCount() const noexcept
     {
         return std::size(files_);
     }
 
-    [[nodiscard]] uint64_t fileSize(tr_file_index_t file_index) const
+    [[nodiscard]] TR_CONSTEXPR20 uint64_t fileSize(tr_file_index_t file_index) const
     {
         return files_.at(file_index).size_;
     }
@@ -49,7 +49,7 @@ public:
         return total_size_;
     }
 
-    [[nodiscard]] std::string const& path(tr_file_index_t file_index) const
+    [[nodiscard]] TR_CONSTEXPR20 std::string const& path(tr_file_index_t file_index) const
     {
         return files_.at(file_index).path_;
     }

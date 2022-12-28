@@ -3,12 +3,19 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <vector>
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
 #include "PathButton.h"
+
+#include <giomm/file.h>
+#include <glibmm/error.h>
+#include <glibmm/i18n.h>
+#include <glibmm/property.h>
+#include <gtkmm/box.h>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/image.h>
+#include <gtkmm/label.h>
+#include <gtkmm/separator.h>
+
+#include <vector>
 
 class PathButton::Impl
 {
@@ -41,9 +48,9 @@ private:
 #endif
 
 private:
+#if GTKMM_CHECK_VERSION(4, 0, 0)
     PathButton& widget_;
 
-#if GTKMM_CHECK_VERSION(4, 0, 0)
     Glib::Property<Gtk::FileChooser::Action> action_;
     Glib::Property<Glib::ustring> title_;
 
@@ -59,9 +66,9 @@ private:
 #endif
 };
 
-PathButton::Impl::Impl(PathButton& widget)
-    : widget_(widget)
+PathButton::Impl::Impl([[maybe_unused]] PathButton& widget)
 #if GTKMM_CHECK_VERSION(4, 0, 0)
+    : widget_(widget)
     , action_(widget, "action", Gtk::FileChooser::Action::OPEN)
     , title_(widget, "title", {})
     , image_(Gtk::make_managed<Gtk::Image>())

@@ -18,7 +18,7 @@
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
-tr_peer_socket::tr_peer_socket(tr_session* session, tr_address const& address, tr_port port, tr_socket_t sock)
+tr_peer_socket::tr_peer_socket(tr_session const* session, tr_address const& address, tr_port port, tr_socket_t sock)
     : handle{ sock }
     , address_{ address }
     , port_{ port }
@@ -49,7 +49,7 @@ tr_peer_socket::tr_peer_socket(tr_address const& address, tr_port port, struct U
 
 void tr_peer_socket::close(tr_session* session)
 {
-    if (is_tcp())
+    if (is_tcp() && (handle.tcp != TR_BAD_SOCKET))
     {
         tr_netClose(session, handle.tcp);
     }
@@ -63,4 +63,66 @@ void tr_peer_socket::close(tr_session* session)
 
     type_ = Type::None;
     handle = {};
+}
+
+size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) const
+{
+    if (max == size_t{})
+    {
+        return {};
+    }
+
+    if (is_tcp())
+    {
+        return buf.toSocket(handle.tcp, max, error);
+    }
+
+#ifdef WITH_UTP
+    if (is_utp())
+    {
+        auto [data, datalen] = buf.pullup();
+
+        errno = 0;
+        auto const n_written = utp_write(handle.utp, data, std::min(datalen, max));
+        auto const error_code = errno;
+
+        if (n_written > 0)
+        {
+            buf.drain(n_written);
+            return static_cast<size_t>(n_written);
+        }
+
+        if (n_written < 0 && error_code != 0)
+        {
+            tr_error_set(error, error_code, tr_strerror(error_code));
+        }
+    }
+#endif
+
+    return {};
+}
+
+size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error) const
+{
+    if (max == size_t{})
+    {
+        return {};
+    }
+
+    if (is_tcp())
+    {
+        return buf.addSocket(handle.tcp, max, error);
+    }
+
+#ifdef WITH_UTP
+    // utp_read_drained() notifies libutp that this read buffer is empty.
+    // It opens up the congestion window by sending an ACK (soonish) if
+    // one was not going to be sent.
+    if (is_utp() && std::empty(buf))
+    {
+        utp_read_drained(handle.utp);
+    }
+#endif
+
+    return {};
 }

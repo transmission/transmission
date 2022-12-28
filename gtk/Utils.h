@@ -5,6 +5,24 @@
 
 #pragma once
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
+
+#include <glibmm/objectbase.h>
+#include <glibmm/refptr.h>
+#include <glibmm/signalproxy.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/label.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/widget.h>
+#include <gtkmm/window.h>
+
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <cstddef>
 #include <ctime>
 #include <functional>
@@ -15,17 +33,6 @@
 #include <vector>
 
 #include <sys/types.h>
-
-#include <glibmm.h>
-#include <gtkmm.h>
-
-#include <fmt/core.h>
-#include <fmt/format.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
-
-#include "Session.h"
 
 /***
 ****
@@ -78,6 +85,7 @@
 #define TR_GTK_SELECTION_MODE(Code) IF_GTKMM4(Gtk::SelectionMode::Code, Gtk::SELECTION_##Code)
 #define TR_GTK_SORT_TYPE(Code) IF_GTKMM4(Gtk::SortType::Code, Gtk::SORT_##Code)
 #define TR_GTK_STATE_FLAGS(Code) IF_GTKMM4(Gtk::StateFlags::Code, Gtk::STATE_FLAG_##Code)
+#define TR_GTK_TREE_MODEL_FLAGS(Code) IF_GTKMM4(Gtk::TreeModel::Flags::Code, Gtk::TREE_MODEL_##Code)
 #define TR_GTK_TREE_VIEW_COLUMN_SIZING(Code) IF_GTKMM4(Gtk::TreeViewColumn::Sizing::Code, Gtk::TREE_VIEW_COLUMN_##Code)
 
 #define TR_GTK_TREE_MODEL_CHILD_ITER(Obj) IF_GTKMM4((Obj).get_iter(), (Obj))
@@ -166,6 +174,11 @@ std::string tr_format_time(time_t timestamp);
 ****
 ***/
 
+using TrObjectSignalNotifyCallback = void(Glib::RefPtr<Glib::ObjectBase const> const&);
+
+Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::ObjectBase& object);
+void gtr_object_notify_emit(Glib::ObjectBase& object);
+
 void gtr_open_uri(Glib::ustring const& uri);
 
 void gtr_open_file(std::string const& path);
@@ -189,12 +202,10 @@ void gtr_window_raise(Gtk::Window& window);
 ****
 ***/
 
-Gtk::ComboBox* gtr_priority_combo_new();
 void gtr_priority_combo_init(Gtk::ComboBox& combo);
 #define gtr_priority_combo_get_value(w) gtr_combo_box_get_active_enum(w)
 #define gtr_priority_combo_set_value(w, val) gtr_combo_box_set_active_enum(w, val)
 
-Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>> const& items);
 void gtr_combo_box_set_enum(Gtk::ComboBox& combo, std::vector<std::pair<Glib::ustring, int>> const& items);
 int gtr_combo_box_get_active_enum(Gtk::ComboBox const&);
 void gtr_combo_box_set_active_enum(Gtk::ComboBox&, int value);
@@ -244,11 +255,30 @@ inline T gtr_str_strip(T const& text)
     return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin + 1);
 }
 
+template<typename T>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+constexpr int gtr_compare_generic(T const& lhs, T const& rhs)
+{
+    if (lhs < rhs)
+    {
+        return -1;
+    }
+
+    if (lhs > rhs)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 std::string gtr_get_full_resource_path(std::string const& rel_path);
 
 /***
 ****
 ***/
+
+class Session;
 
 extern size_t const max_recent_dirs;
 std::list<std::string> gtr_get_recent_dirs(std::string const& pref);

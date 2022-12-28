@@ -156,7 +156,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)saveCollapsedGroups
 {
-    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups] forKey:@"CollapsedGroupIndexes"];
+    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups requiringSecureCoding:YES error:nil]
+                       forKey:@"CollapsedGroupIndexes"];
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
@@ -210,6 +211,14 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             torrentCell.hoverControl = (row == self.controlButtonHoverRow);
             torrentCell.hoverReveal = (row == self.revealButtonHoverRow);
             torrentCell.hoverAction = (row == self.actionButtonHoverRow);
+
+            // if cell is selected, set backgroundStyle
+            // then can provide alternate font color in TorrentCell - drawInteriorWithFrame
+            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
+            if ([selectedRowIndexes containsIndex:row])
+            {
+                torrentCell.backgroundStyle = NSBackgroundStyleEmphasized;
+            }
         }
     }
 }

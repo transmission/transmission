@@ -4,10 +4,13 @@ if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
 
+# Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
+set(MACOS_SUPPORT_MINIMUM 10.13)
+
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X version to target for deployment" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_SUPPORT_MINIMUM} CACHE STRING "Minimum macOS version to target for deployment" FORCE)
 endif()
 
 project(transmission)
@@ -47,6 +50,7 @@ tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_TESTS         "Build unit tests" ON)
         option(ENABLE_LIGHTWEIGHT   "Optimize libtransmission for low-resource systems: smaller cache size, prefer unencrypted peer connections, etc." OFF)
         option(ENABLE_UTP           "Build µTP support" ON)
+        option(ENABLE_WERROR        "Treat warnings as errors" OFF)
         option(ENABLE_NLS           "Enable native language support" ON)
         option(INSTALL_DOC          "Build/install documentation" ON)
         option(INSTALL_LIB          "Install the library" OFF)
@@ -314,7 +318,7 @@ if(ENABLE_QT)
     set(ENABLE_QT_COM_INTEROP OFF)
     set(ENABLE_QT_DBUS_INTEROP OFF)
 
-    set(QT_REQUIRED_MODULES Core Gui Widgets Network LinguistTools)
+    set(QT_REQUIRED_MODULES Core Gui Widgets Network Svg LinguistTools)
     set(QT_OPTIONAL_MODULES DBus AxContainer AxServer)
     set(MISSING_QT_MODULE)
 
@@ -423,6 +427,9 @@ if(NOT USE_SYSTEM_MINIUPNPC)
     set(MINIUPNPC_VERSION 1.9)
     set(MINIUPNPC_API_VERSION 12)
 endif()
+
+add_subdirectory(third-party/jsonsl)
+add_subdirectory(third-party/wildmat)
 
 tr_add_external_auto_library(DHT dht dht)
 
@@ -598,6 +605,12 @@ else()
 
     unset(CMAKE_REQUIRED_FLAGS)
 endif()
+
+string(REPLACE ";" "$<SEMICOLON>" C_WARNING_FLAGS_GENEX "${C_WARNING_FLAGS}")
+string(REPLACE ";" "$<SEMICOLON>" CXX_WARNING_FLAGS_GENEX "${CXX_WARNING_FLAGS}")
+add_compile_options(
+    $<$<COMPILE_LANGUAGE:C>:${C_WARNING_FLAGS_GENEX}>
+    $<$<COMPILE_LANGUAGE:CXX>:${CXX_WARNING_FLAGS_GENEX}>)
 
 ###
 

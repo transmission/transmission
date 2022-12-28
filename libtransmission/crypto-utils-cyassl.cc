@@ -204,7 +204,7 @@ std::unique_ptr<tr_sha256> tr_sha256::create()
 ****
 ***/
 
-bool tr_rand_buffer(void* buffer, size_t length)
+bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {
     if (length == 0)
     {

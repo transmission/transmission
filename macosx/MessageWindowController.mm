@@ -509,7 +509,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     NSString* filterString = self.fFilterField.stringValue;
 
     NSIndexSet* indexes = [self.fMessages
-        indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(NSDictionary* message, NSUInteger idx, BOOL* stop) {
+        indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(NSDictionary* message, NSUInteger /*idx*/, BOOL* /*stop*/) {
             return [message[@"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter:filterString message:message];
         }];
 

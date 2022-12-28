@@ -121,29 +121,54 @@ $ sudo make install
 
 ## On Windows ##
 
-### Building transmission-daemon
+### Prerequisites
 You need the following installed:
 
-* Visual Studio 2019 or greater (the Community Edition is sufficient - just make sure its C++ compiler, MSVC, is installed)
+* [Visual Studio 2019 or greater](https://visualstudio.microsoft.com/downloads/) (the Community Edition is sufficient)
+    * install the "Desktop Development with C++" workload
+    * install the ATL and MFC components (only needed by the Qt client)
 * [CMake](https://cmake.org/download/) (choose to add CMake to your path)
 * [Git for Windows](https://git-scm.com/download/win)
 * [Vcpkg](https://github.com/microsoft/vcpkg#quick-start-windows)
+* [Python](https://python.org/downloads)
 
 
-### Install all dependencies through vcpkg
+### Install dependencies through vcpkg
 
+Vcpkg will install x86 libraries by default. To install x64 add the `--triplet=x64-windows` flag at the end of the commands below.
+
+Common dependencies:
 ```
-vcpkg integrate install
-vcpkg install curl
-vcpkg install zlib
-vcpkg install openssl
+vcpkg install curl zlib openssl
 ```
 
-### Get Transmission source and build it
+Additional dependencies for the Qt client:
+```
+vcpkg install qt5-tools qt5-winextras
+```
+
+### Get Transmission source
 ```
 git clone https://github.com/transmission/transmission
 cd transmission
 git submodule update --init --recursive
-cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE="$($VCPKG_ROOT)\scripts\buildsystems\vcpkg.cmake"
-cmake --build build --config RelWithDebInfo
+```
+
+### Configure CMake and build the project
+
+To configure which components are built use the flags below.
+Each option can be set to `ON` or `OFF`, values shown below are the defaults.
+* `-DENABLE_DAEMON=ON` - build transmission daemon
+* `-DENABLE_QT=AUTO` - build the Qt client
+* `-DENABLE_WEB=OFF` - build the Web client
+* `-DENABLE_UTILS=ON` - build transmission-remote, transmission-create, transmission-edit and transmission-show cli tools
+* `-DENABLE_CLI=OFF` - build the cli client
+
+```
+cmake -B build -DCMAKE_TOOLCHAIN_FILE="<path-to-vcpkg>\scripts\buildsystems\vcpkg.cmake" <flags-from-above> <other-cmake-configurations>
+```
+
+To build the project run:
+```
+cmake --build build
 ```

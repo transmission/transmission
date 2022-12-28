@@ -298,7 +298,7 @@ void tr_x509_cert_free(tr_x509_cert_t handle)
 ****
 ***/
 
-bool tr_rand_buffer(void* buffer, size_t length)
+bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {
     if (length == 0)
     {

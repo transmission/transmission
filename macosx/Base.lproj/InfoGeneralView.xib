@@ -8,24 +8,14 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="InfoGeneralViewController">
             <connections>
-                <outlet property="fCommentLabel" destination="7" id="59"/>
-                <outlet property="fCommentScrollView" destination="4" id="61"/>
                 <outlet property="fCommentView" destination="38" id="51"/>
                 <outlet property="fCreatorField" destination="10" id="46"/>
-                <outlet property="fCreatorLabel" destination="11" id="57"/>
                 <outlet property="fDataLocationField" destination="14" id="48"/>
-                <outlet property="fDataLocationLabel" destination="15" id="60"/>
                 <outlet property="fDateCreatedField" destination="8" id="47"/>
-                <outlet property="fDateCreatedLabel" destination="9" id="58"/>
                 <outlet property="fHashField" destination="5" id="43"/>
-                <outlet property="fHashLabel" destination="6" id="55"/>
-                <outlet property="fInfoSectionLabel" destination="3" id="52"/>
                 <outlet property="fPiecesField" destination="19" id="42"/>
-                <outlet property="fPiecesLabel" destination="20" id="54"/>
                 <outlet property="fRevealDataButton" destination="12" id="49"/>
                 <outlet property="fSecureField" destination="16" id="44"/>
-                <outlet property="fSecureLabel" destination="17" id="56"/>
-                <outlet property="fWhereSectionLabel" destination="13" id="53"/>
                 <outlet property="view" destination="2" id="45"/>
             </connections>
         </customObject>

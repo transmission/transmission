@@ -1,6 +1,8 @@
 project(trgtk)
 
-add_compile_options(${C_WARNING_FLAGS})
+if(ENABLE_WERROR)
+    add_compile_options($<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>)
+endif()
 
 execute_process(
     COMMAND
@@ -108,6 +110,7 @@ set(${PROJECT_NAME}_SOURCES
     FilterBar.cc
     FreeSpaceLabel.cc
     IconCache.cc
+    ListModelAdapter.cc
     main.cc
     MainWindow.cc
     MakeDialog.cc
@@ -121,7 +124,10 @@ set(${PROJECT_NAME}_SOURCES
     Session.cc
     StatsDialog.cc
     SystemTrayIcon.cc
+    Torrent.cc
     TorrentCellRenderer.cc
+    TorrentFilter.cc
+    TorrentSorter.cc
     Utils.cc
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.c
@@ -135,9 +141,11 @@ set(${PROJECT_NAME}_HEADERS
     FaviconCache.h
     FileList.h
     FilterBar.h
+    Flags.h
     FreeSpaceLabel.h
     HigWorkarea.h
     IconCache.h
+    ListModelAdapter.h
     MainWindow.h
     MakeDialog.h
     MessageLogWindow.h
@@ -150,7 +158,10 @@ set(${PROJECT_NAME}_HEADERS
     Session.h
     StatsDialog.h
     SystemTrayIcon.h
+    Torrent.h
     TorrentCellRenderer.h
+    TorrentFilter.h
+    TorrentSorter.h
     Utils.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.h

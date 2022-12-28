@@ -16,7 +16,7 @@
 // macOS implementation of tr_assert_report() that provides the message in the crash report
 // This replaces the generic implementation of the function in tr-assert.cc
 
-[[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message)
+[[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message)
 {
     auto const full_text = fmt::format(FMT_STRING("assertion failed: {:s} ({:s}:{:d})"), message, file, line);
     [NSException raise:NSInternalInconsistencyException format:@"%s", full_text.c_str()];

@@ -75,7 +75,7 @@ tr_port tr_session::randomPort() const
     auto const lower = std::min(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const upper = std::max(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const range = upper - lower;
-    return tr_port::fromHost(lower + tr_rand_int_weak(range + 1));
+    return tr_port::fromHost(lower + tr_rand_int(range + 1U));
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -259,6 +259,11 @@ void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byt
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
 {
     session_->runInSessionThread(std::move(func), std::move(response));
+}
+
+time_t tr_session::WebMediator::now() const
+{
+    return tr_time();
 }
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
@@ -508,24 +513,6 @@ void tr_session::onNowTimer()
     tr_timeUpdate(time(nullptr));
     alt_speeds_.checkScheduler();
 
-    // TODO: this seems a little silly. Why do we increment this
-    // every second instead of computing the value as needed by
-    // subtracting the current time from a start time?
-    for (auto* const tor : torrents())
-    {
-        if (tor->isRunning)
-        {
-            if (tor->isDone())
-            {
-                ++tor->secondsSeeding;
-            }
-            else
-            {
-                ++tor->secondsDownloading;
-            }
-        }
-    }
-
     // set the timer to kick again right after (10ms after) the next second
     auto const now = std::chrono::system_clock::now();
     auto const target_time = std::chrono::time_point_cast<std::chrono::seconds>(now) + 1s + 10ms;
@@ -664,6 +651,11 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         bound_ipv4_.reset();
         bound_ipv6_.reset();
         addr_changed = true;
+    }
+
+    if (auto const& val = new_settings.port_forwarding_enabled; force || val != old_settings.port_forwarding_enabled)
+    {
+        tr_sessionSetPortForwardingEnabled(this, val);
     }
 
     if (port_changed)
@@ -1187,13 +1179,6 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
     session->settings_.should_delete_source_torrents = delete_source;
 }
 
-bool tr_sessionGetDeleteSource(tr_session const* session)
-{
-    TR_ASSERT(session != nullptr);
-
-    return session->shouldDeleteSource();
-}
-
 /***
 ****
 ***/
@@ -1243,7 +1228,6 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
         tr_torrentFreeInSessionThread(tor);
     }
     torrents.clear();
-    tr_utpClose(this);
     // ...now that all the torrents have been closed, any remaining
     // `&event=stopped` announce messages are queued in the announcer.
     // Tell the announcer to start shutdown, which sends out the stop
@@ -1275,11 +1259,12 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 
     this->announcer_.reset();
     this->announcer_udp_.reset();
-    this->udp_core_.reset();
 
     stats().saveIfDirty();
     peer_mgr_.reset();
     openFiles().closeAll();
+    tr_utpClose(this);
+    this->udp_core_.reset();
 
     // tada we are done!
     closed_promise->set_value();
@@ -1339,7 +1324,7 @@ static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise
     if (n_torrents != 0U)
     {
         tr_logAddInfo(fmt::format(
-            ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents),
+            tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents),
             fmt::arg("count", n_torrents)));
     }
 

@@ -9,6 +9,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -93,18 +94,14 @@ template<class IntType>
 [[nodiscard]] IntType tr_rand_int(IntType upper_bound);
 
 /**
- * @brief Returns a pseudorandom number in the range of [0...upper_bound).
- *
- * This is faster, BUT WEAKER, than tr_rand_int() and never be used in sensitive cases.
- * @see tr_rand_int()
- */
-template<class IntType>
-[[nodiscard]] IntType tr_rand_int_weak(IntType upper_bound);
-
-/**
  * @brief Fill a buffer with random bytes.
  */
-bool tr_rand_buffer(void* buffer, size_t length);
+void tr_rand_buffer(void* buffer, size_t length);
+
+// Client code should use `tr_rand_buffer()`.
+// These helpers are only exposed here to permit open-box tests.
+bool tr_rand_buffer_crypto(void* buffer, size_t length);
+void tr_rand_buffer_std(void* buffer, size_t length);
 
 template<typename T>
 T tr_rand_obj()
@@ -185,6 +182,34 @@ public:
 private:
     size_t pos = 0;
     std::array<T, N> buf;
+};
+
+// UniformRandomBitGenerator impl that uses `tr_rand_buffer()`.
+// See https://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator
+template<typename T, size_t N = 1024U>
+class tr_urbg
+{
+public:
+    using result_type = T;
+    static_assert(!std::numeric_limits<T>::is_signed);
+
+    [[nodiscard]] static constexpr T min() noexcept
+    {
+        return std::numeric_limits<T>::min();
+    }
+
+    [[nodiscard]] static constexpr T max() noexcept
+    {
+        return std::numeric_limits<T>::max();
+    }
+
+    [[nodiscard]] T operator()() noexcept
+    {
+        return buf_();
+    }
+
+private:
+    tr_salt_shaker<T, N> buf_;
 };
 
 /** @} */

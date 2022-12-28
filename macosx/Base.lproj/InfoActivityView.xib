@@ -10,38 +10,21 @@
             <connections>
                 <outlet property="fActivityStackView" destination="2aX-cc-oXC" id="fln-Xs-VS8"/>
                 <outlet property="fDateActivityField" destination="9" id="71"/>
-                <outlet property="fDateActivityLabel" destination="10" id="110"/>
                 <outlet property="fDateAddedField" destination="15" id="69"/>
-                <outlet property="fDateAddedLabel" destination="16" id="108"/>
                 <outlet property="fDateCompletedField" destination="13" id="70"/>
-                <outlet property="fDateCompletedLabel" destination="14" id="109"/>
-                <outlet property="fDatesSectionLabel" destination="17" id="114"/>
                 <outlet property="fDatesView" destination="WMr-Dh-mdg" id="v6r-qK-AG5"/>
                 <outlet property="fDownloadTimeField" destination="82" id="99"/>
-                <outlet property="fDownloadTimeLabel" destination="83" id="112"/>
-                <outlet property="fDownloadedLabel" destination="29" id="103"/>
                 <outlet property="fDownloadedTotalField" destination="28" id="65"/>
-                <outlet property="fErrorLabel" destination="18" id="107"/>
                 <outlet property="fErrorMessageView" destination="61" id="72"/>
-                <outlet property="fErrorScrollView" destination="3" id="118"/>
-                <outlet property="fFailedDLLabel" destination="5" id="105"/>
                 <outlet property="fFailedHashField" destination="4" id="67"/>
                 <outlet property="fHaveField" destination="22" id="64"/>
-                <outlet property="fHaveLabel" destination="23" id="102"/>
                 <outlet property="fPiecesControl" destination="8" id="73"/>
                 <outlet property="fPiecesView" destination="19" id="74"/>
                 <outlet property="fProgressField" destination="6" id="63"/>
-                <outlet property="fProgressLabel" destination="7" id="101"/>
                 <outlet property="fRatioField" destination="24" id="68"/>
-                <outlet property="fRatioLabel" destination="25" id="106"/>
                 <outlet property="fSeedTimeField" destination="80" id="98"/>
-                <outlet property="fSeedTimeLabel" destination="81" id="111"/>
                 <outlet property="fStateField" destination="20" id="62"/>
-                <outlet property="fStateLabel" destination="21" id="100"/>
-                <outlet property="fTimeSectionLabel" destination="84" id="116"/>
-                <outlet property="fTransferSectionLabel" destination="11" id="113"/>
                 <outlet property="fTransferView" destination="Vhd-qH-kFK" id="6Rm-4u-qEm"/>
-                <outlet property="fUploadedLabel" destination="27" id="104"/>
                 <outlet property="fUploadedTotalField" destination="26" id="66"/>
                 <outlet property="view" destination="2" id="75"/>
             </connections>
@@ -227,7 +210,7 @@
                                         </subviews>
                                     </clipView>
                                     <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="280" id="Rsh-Sr-mv6"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="247" id="Rsh-Sr-mv6"/>
                                         <constraint firstAttribute="height" constant="58" id="WCB-XG-J3d"/>
                                     </constraints>
                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" controlSize="small" horizontal="YES" id="59">
@@ -447,7 +430,7 @@
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="trailing" secondItem="WMr-Dh-mdg" secondAttribute="trailing" priority="250" constant="218" id="BL5-hI-Rcy"/>
-                        <constraint firstAttribute="width" priority="250" constant="360" id="zSb-K0-Tyg"/>
+                        <constraint firstAttribute="width" priority="250" constant="330" id="zSb-K0-Tyg"/>
                     </constraints>
                     <visibilityPriorities>
                         <integer value="1000"/>

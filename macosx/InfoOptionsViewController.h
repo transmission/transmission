@@ -9,6 +9,8 @@
 @interface InfoOptionsViewController : NSViewController<InfoViewController>
 
 - (NSRect)viewRect;
+- (void)checkLayout;
+- (void)checkWindowSize;
 - (void)updateWindowLayout;
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
@@ -32,5 +34,6 @@
 - (IBAction)setPeersConnectLimit:(id)sender;
 
 @property(nonatomic) IBOutlet NSView* fPriorityView;
+@property(nonatomic) CGFloat oldHeight;
 
 @end
