@@ -5,6 +5,7 @@
 
 #include "MakeDialog.h"
 
+#include "GtkCompat.h"
 #include "PathButton.h"
 #include "PrefsDialog.h"
 #include "Session.h"

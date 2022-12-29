@@ -5,6 +5,8 @@
 
 #include "ListModelAdapter.h"
 
+#include "Utils.h"
+
 namespace
 {
 
