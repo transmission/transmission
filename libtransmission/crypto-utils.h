@@ -12,6 +12,7 @@
 #include <limits>
 #include <memory>
 #include <optional>
+#include <random> // for std::uniform_int_distribution<T>
 #include <string>
 #include <string_view>
 
@@ -86,12 +87,6 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length);
  * @brief Free X509 certificate returned by @ref tr_x509_cert_new.
  */
 void tr_x509_cert_free(tr_x509_cert_t handle);
-
-/**
- * @brief Returns a random number in the range of [0...upper_bound).
- */
-template<class IntType>
-[[nodiscard]] IntType tr_rand_int(IntType upper_bound);
 
 /**
  * @brief Fill a buffer with random bytes.
@@ -211,6 +206,20 @@ public:
 private:
     tr_salt_shaker<T, N> buf_;
 };
+
+/**
+ * @brief Returns a random number in the range of [0...upper_bound).
+ */
+template<class T>
+[[nodiscard]] T tr_rand_int(T upper_bound)
+{
+    static_assert(!std::is_signed<T>());
+    using dist_type = std::uniform_int_distribution<T>;
+
+    thread_local auto rng = tr_urbg<T>{};
+    thread_local auto dist = dist_type{};
+    return dist(rng, typename dist_type::param_type(0, upper_bound - 1));
+}
 
 /** @} */
 
