@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cairommconfig.h>
 #include <glibmmconfig.h>
 #include <gtkmmconfig.h>
 #include <pangommconfig.h>
@@ -19,6 +20,12 @@
 #define GLIBMM_CHECK_VERSION(major, minor, micro) \
     (GLIBMM_MAJOR_VERSION > (major) || (GLIBMM_MAJOR_VERSION == (major) && GLIBMM_MINOR_VERSION > (minor)) || \
      (GLIBMM_MAJOR_VERSION == (major) && GLIBMM_MINOR_VERSION == (minor) && GLIBMM_MICRO_VERSION >= (micro)))
+#endif
+
+#ifndef CAIROMM_CHECK_VERSION
+#define CAIROMM_CHECK_VERSION(major, minor, micro) \
+    (CAIROMM_MAJOR_VERSION > (major) || (CAIROMM_MAJOR_VERSION == (major) && CAIROMM_MINOR_VERSION > (minor)) || \
+     (CAIROMM_MAJOR_VERSION == (major) && CAIROMM_MINOR_VERSION == (minor) && CAIROMM_MICRO_VERSION >= (micro)))
 #endif
 
 #ifndef PANGOMM_CHECK_VERSION
@@ -37,6 +44,12 @@
 #define IF_GLIBMM2_68(ThenValue, ElseValue) ThenValue
 #else
 #define IF_GLIBMM2_68(ThenValue, ElseValue) ElseValue
+#endif
+
+#if CAIROMM_CHECK_VERSION(1, 16, 0)
+#define IF_CAIROMM1_16(ThenValue, ElseValue) ThenValue
+#else
+#define IF_CAIROMM1_16(ThenValue, ElseValue) ElseValue
 #endif
 
 #if PANGOMM_CHECK_VERSION(2, 48, 0)
@@ -81,8 +94,8 @@
 #define TR_GIO_DBUS_PROXY_FLAGS(Code) IF_GLIBMM2_68(Gio::DBus::ProxyFlags::Code, Gio::DBus::PROXY_FLAGS_##Code)
 #define TR_GIO_FILE_MONITOR_EVENT(Code) IF_GLIBMM2_68(Gio::FileMonitor::Event::Code, Gio::FILE_MONITOR_EVENT_##Code)
 
-#define TR_CAIRO_SURFACE_FORMAT(Code) IF_GTKMM4(Cairo::Surface::Format::Code, Cairo::FORMAT_##Code)
-#define TR_CAIRO_CONTEXT_OPERATOR(Code) IF_GTKMM4(Cairo::Context::Operator::Code, Cairo::OPERATOR_##Code)
+#define TR_CAIRO_SURFACE_FORMAT(Code) IF_CAIROMM1_16(Cairo::Surface::Format::Code, Cairo::FORMAT_##Code)
+#define TR_CAIRO_CONTEXT_OPERATOR(Code) IF_CAIROMM1_16(Cairo::Context::Operator::Code, Cairo::OPERATOR_##Code)
 
 #define TR_PANGO_ALIGNMENT(Code) IF_PANGOMM2_48(Pango::Alignment::Code, Pango::ALIGN_##Code)
 #define TR_PANGO_ELLIPSIZE_MODE(Code) IF_PANGOMM2_48(Pango::EllipsizeMode::Code, Pango::ELLIPSIZE_##Code)
