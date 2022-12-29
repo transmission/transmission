@@ -5,6 +5,7 @@
 
 #include "StatsDialog.h"
 
+#include "GtkCompat.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
