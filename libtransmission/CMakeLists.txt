@@ -19,8 +19,8 @@ set(${PROJECT_NAME}_SOURCES
   completion.cc
   crypto-utils-ccrypto.cc
   crypto-utils-fallback.cc
+  crypto-utils-mbedtls.cc
   crypto-utils-openssl.cc
-  crypto-utils-polarssl.cc
   crypto-utils-wolfssl.cc
   crypto-utils.cc
   error.cc
@@ -90,7 +90,7 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set_source_files_properties(crypto-utils-fallback.cc PROPERTIES HEADER_FILE_ONLY ON)
-foreach(CP ccrypto openssl polarssl wolfssl)
+foreach(CP ccrypto mbedtls openssl wolfssl)
     if(NOT CP STREQUAL CRYPTO_PKG)
         set_source_files_properties(crypto-utils-${CP}.cc PROPERTIES HEADER_FILE_ONLY ON)
     endif()
@@ -235,10 +235,6 @@ endif()
 
 if(USE_SYSTEM_B64)
     add_definitions(-DUSE_SYSTEM_B64)
-endif()
-
-if(POLARSSL_IS_MBEDTLS)
-    add_definitions(-DPOLARSSL_IS_MBEDTLS)
 endif()
 
 if(HAVE_SO_REUSEPORT)
