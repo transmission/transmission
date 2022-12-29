@@ -10,6 +10,8 @@
 #include <gtkmmconfig.h>
 #include <pangommconfig.h>
 
+#include <cstddef>
+
 #ifndef GTKMM_CHECK_VERSION
 #define GTKMM_CHECK_VERSION(major, minor, micro) \
     (GTKMM_MAJOR_VERSION > (major) || (GTKMM_MAJOR_VERSION == (major) && GTKMM_MINOR_VERSION > (minor)) || \
@@ -100,3 +102,33 @@
 #define TR_PANGO_ALIGNMENT(Code) IF_PANGOMM2_48(Pango::Alignment::Code, Pango::ALIGN_##Code)
 #define TR_PANGO_ELLIPSIZE_MODE(Code) IF_PANGOMM2_48(Pango::EllipsizeMode::Code, Pango::ELLIPSIZE_##Code)
 #define TR_PANGO_WEIGHT(Code) IF_PANGOMM2_48(Pango::Weight::Code, Pango::WEIGHT_##Code)
+
+namespace Glib
+{
+
+#if !GLIBMM_CHECK_VERSION(2, 68, 0)
+
+template<typename T>
+class RefPtr;
+
+template<typename T>
+inline bool operator==(RefPtr<T> const& lhs, std::nullptr_t /*rhs*/)
+{
+    return !lhs;
+}
+
+template<typename T>
+inline bool operator!=(RefPtr<T> const& lhs, std::nullptr_t /*rhs*/)
+{
+    return !(lhs == nullptr);
+}
+
+template<typename T>
+inline RefPtr<T> make_refptr_for_instance(T* object)
+{
+    return RefPtr<T>(object);
+}
+
+#endif
+
+} // namespace Glib

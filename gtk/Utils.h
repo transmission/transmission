@@ -314,30 +314,3 @@ void gtr_window_on_close(Gtk::Window& widget, F&& callback)
     widget.signal_delete_event().connect(sigc::hide<0>(bool_callback), false);
 #endif
 }
-
-namespace Glib
-{
-
-#if !GLIBMM_CHECK_VERSION(2, 68, 0)
-
-template<typename T>
-inline bool operator==(RefPtr<T> const& lhs, std::nullptr_t /*rhs*/)
-{
-    return !lhs;
-}
-
-template<typename T>
-inline bool operator!=(RefPtr<T> const& lhs, std::nullptr_t /*rhs*/)
-{
-    return !(lhs == nullptr);
-}
-
-template<typename T>
-inline RefPtr<T> make_refptr_for_instance(T* object)
-{
-    return RefPtr<T>(object);
-}
-
-#endif
-
-} // namespace Glib
