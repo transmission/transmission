@@ -204,31 +204,6 @@ extern size_t const max_recent_dirs;
 std::list<std::string> gtr_get_recent_dirs(std::string const& pref);
 void gtr_save_recent_dir(std::string const& pref, Glib::RefPtr<Session> const& core, std::string const& dir);
 
-namespace gtr_detail
-{
-
-#if !GLIBMM_CHECK_VERSION(2, 62, 0)
-
-template<typename T>
-inline T const& sprintify(T const& arg)
-{
-    return arg;
-}
-
-inline char const* sprintify(Glib::ustring const& arg)
-{
-    return arg.c_str();
-}
-
-inline char const* sprintify(std::string const& arg)
-{
-    return arg.c_str();
-}
-
-#endif
-
-} // namespace gtr_detail
-
 template<typename T, typename U>
 inline Glib::RefPtr<T> gtr_ptr_static_cast(Glib::RefPtr<U> const& ptr)
 {
