@@ -13,16 +13,23 @@
 
 extern "C"
 {
-    struct evbuffer;
+#ifndef EVENT2_EVENT_H_INCLUDED_
     struct event;
     struct event_base;
-    struct evhttp;
-
-    void evbuffer_free(struct evbuffer*);
-    void event_base_free(struct event_base*);
     int event_del(struct event*);
     void event_free(struct event*);
+    void event_base_free(struct event_base*);
+#endif
+
+#ifndef EVENT2_BUFFER_H_INCLUDED_
+    struct evbuffer;
+    void evbuffer_free(struct evbuffer*);
+#endif
+
+#ifndef EVENT2_HTTP_H_INCLUDED_
+    struct evhttp;
     void evhttp_free(struct evhttp*);
+#endif
 }
 
 namespace libtransmission::evhelpers
