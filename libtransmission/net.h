@@ -14,7 +14,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility> // std::pair
 
 #ifdef _WIN32
@@ -197,7 +196,6 @@ struct tr_address
         out = tr_address::to_compact_ipv4(out, addr4);
 
         auto const nport = port.network();
-        static_assert(std::is_same_v<uint16_t const, typeof(nport)>);
         return std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
     }
 
@@ -207,7 +205,6 @@ struct tr_address
         out = tr_address::to_compact_ipv6(out, addr6);
 
         auto const nport = port.network();
-        static_assert(std::is_same_v<uint16_t const, typeof(nport)>);
         return std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
     }
 
