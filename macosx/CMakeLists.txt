@@ -15,20 +15,6 @@ add_compile_options(
 
 find_program(ACTOOL_EXECUTABLE actool REQUIRED)
 find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
-find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
-
-macro(tr_wrap_xib IFILE OFILE)
-    get_filename_component(twx_nib_dir "${OFILE}" DIRECTORY)
-    add_custom_command(
-        OUTPUT ${OFILE}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${twx_nib_dir}
-        COMMAND ${IBTOOL_EXECUTABLE} --compile ${OFILE} ${IFILE}
-        DEPENDS ${IFILE}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        VERBATIM)
-    source_group("Generated Files"
-        FILES ${OFILE})
-endmacro()
 
 add_subdirectory(QuickLookPlugin)
 add_subdirectory(VDKQueue)
@@ -196,8 +182,6 @@ set(${PROJECT_NAME}_XIB_FILES
     StatsWindow.xib
     StatusBar.xib
     URLSheetWindow.xib)
-source_group(Resources
-    FILES ${${PROJECT_NAME}_XIB_FILES})
 
 set(${PROJECT_NAME}_RESOURCES
     Defaults.plist
@@ -345,7 +329,7 @@ else()
     set(${PROJECT_NAME}_ENABLED_LINGUAS en)
 endif()
 
-set(${PROJECT_NAME}_LANG_XIB_FILES
+set(${PROJECT_NAME}_BASE_XIB_FILES
     AddMagnetWindow.xib
     AddWindow.xib
     Creator.xib
@@ -356,41 +340,17 @@ set(${PROJECT_NAME}_LANG_XIB_FILES
     InfoOptionsView.xib
     MainMenu.xib
     PrefsWindow.xib)
+list(TRANSFORM ${PROJECT_NAME}_BASE_XIB_FILES
+    PREPEND Base.lproj/)
 
 set(${PROJECT_NAME}_LANG_STRINGS_FILES
     InfoPlist.strings
     Localizable.strings)
 
-set(${PROJECT_NAME}_NIB_FILES)
-foreach(F ${${PROJECT_NAME}_XIB_FILES})
-    get_filename_component(F_BASE "${F}" NAME_WE)
-    set(F_NIB "${PROJECT_BINARY_DIR}/${F_BASE}.nib")
-    tr_wrap_xib("${F}" "${F_NIB}")
-    list(APPEND ${PROJECT_NAME}_NIB_FILES "${F_NIB}")
-endforeach()
-
-set_source_files_properties(
-    ${${PROJECT_NAME}_NIB_FILES}
-    PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources)
-
-set(${PROJECT_NAME}_BASE_XIB_FILES)
-set(${PROJECT_NAME}_BASE_NIB_FILES)
-foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
-    set(F_XIB "Base.lproj/${F}")
-    get_filename_component(F_BASE "${F}" NAME_WE)
-    set(F_NIB "${PROJECT_BINARY_DIR}/Base.lproj/${F_BASE}.nib")
-    tr_wrap_xib("${F_XIB}" "${F_NIB}")
-    list(APPEND ${PROJECT_NAME}_BASE_XIB_FILES "${F_XIB}")
-    list(APPEND ${PROJECT_NAME}_BASE_NIB_FILES "${F_NIB}")
-    source_group(Resources/Base.lproj
-        FILES ${F_XIB})
-endforeach()
-
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
     if(NOT LANG STREQUAL "en")
-        foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
+        foreach(F ${${PROJECT_NAME}_BASE_XIB_FILES})
             get_filename_component(F_BASE "${F}" NAME_WE)
             list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F_BASE}.strings)
         endforeach()
@@ -401,15 +361,6 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     source_group(Resources/${LANG}.lproj
         FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
-
-set(BASE_NIB_FILES_RESOURCES_DIR Resources)
-if(NOT CMAKE_GENERATOR STREQUAL Xcode)
-    string(APPEND BASE_NIB_FILES_RESOURCES_DIR /Base.lproj)
-endif()
-set_source_files_properties(
-    ${${PROJECT_NAME}_BASE_NIB_FILES}
-    PROPERTIES
-        MACOSX_PACKAGE_LOCATION ${BASE_NIB_FILES_RESOURCES_DIR})
 
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
@@ -429,11 +380,11 @@ target_sources(${TR_NAME}-mac
     PRIVATE
         ${${PROJECT_NAME}_SOURCES}
         ${${PROJECT_NAME}_HEADERS}
-        ${${PROJECT_NAME}_XIB_FILES}
-        ${${PROJECT_NAME}_NIB_FILES}
-        ${${PROJECT_NAME}_BASE_XIB_FILES}
-        ${${PROJECT_NAME}_BASE_NIB_FILES}
         ${${PROJECT_NAME}_RESOURCES})
+
+tr_target_xib_files(${TR_NAME}-mac
+    ${${PROJECT_NAME}_XIB_FILES}
+    ${${PROJECT_NAME}_BASE_XIB_FILES})
 
 target_include_directories(${TR_NAME}-mac
     PRIVATE

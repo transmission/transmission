@@ -408,3 +408,55 @@ function(tr_target_idl_files TGT)
             "${ARG_ID}-${ARG_HASH}")
     endforeach()
 endfunction()
+
+function(tr_wrap_xib TGT INPUT_FILE OUTPUT_FILE OUTPUT_FOLDER)
+    if(NOT IBTOOL_EXECUTABLE)
+        find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
+    endif()
+
+    if(OUTPUT_FOLDER)
+        string(PREPEND OUTPUT_FOLDER "/")
+    endif()
+
+    get_filename_component(OUTPUT_FILE_DIR "${OUTPUT_FILE}" DIRECTORY)
+
+    add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_FILE_DIR}
+        COMMAND ${IBTOOL_EXECUTABLE} --compile ${OUTPUT_FILE} ${INPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        VERBATIM)
+
+    target_sources(${TGT}
+        PRIVATE
+            ${INPUT_FILE}
+            ${OUTPUT_FILE})
+
+    set(RESOURCES_DIR Resources)
+    if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+        string(APPEND RESOURCES_DIR "${OUTPUT_FOLDER}")
+    endif()
+    set_source_files_properties(
+        ${OUTPUT_FILE}
+        PROPERTIES
+            MACOSX_PACKAGE_LOCATION "${RESOURCES_DIR}")
+
+    source_group("Resources${OUTPUT_FOLDER}"
+        FILES ${INPUT_FILE})
+
+    source_group("Generated Files${OUTPUT_FOLDER}"
+        FILES ${OUTPUT_FILE})
+endfunction()
+
+function(tr_target_xib_files TGT)
+    foreach(ARG IN LISTS ARGN)
+        get_filename_component(ARG_DIR "${ARG}" DIRECTORY)
+        get_filename_component(ARG_NAME_WLE "${ARG}" NAME_WLE)
+
+        tr_wrap_xib(${TGT}
+            "${ARG}"
+            "${CMAKE_CURRENT_BINARY_DIR}/${ARG_DIR}/${ARG_NAME_WLE}.nib"
+            "${ARG_DIR}")
+    endforeach()
+endfunction()
