@@ -1,9 +1,6 @@
 project(trqt)
 
 set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
-set_property(GLOBAL PROPERTY AUTOMOC_SOURCE_GROUP "Generated Files")
-set_property(GLOBAL PROPERTY AUTORCC_SOURCE_GROUP "Generated Files")
-set_property(GLOBAL PROPERTY AUTOUIC_SOURCE_GROUP "Generated Files")
 
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc
