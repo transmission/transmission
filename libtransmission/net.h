@@ -189,7 +189,7 @@ struct tr_address
         return is_ipv4() ? to_compact_ipv4(out, &this->addr.addr4) : to_compact_ipv6(out, &this->addr.addr6);
     }
 
-    // compact addr + port -- used for peer exchange
+    // compact addr + port -- very common format used for peer exchange, dht, tracker announce responses
 
     template<typename OutputIt>
     static OutputIt to_compact_ipv4(OutputIt out, in_addr const* addr4, tr_port port)
