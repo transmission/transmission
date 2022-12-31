@@ -23,37 +23,6 @@ set(${PROJECT_NAME}_UI_FILES
     ${UI_SUBDIR}/StatsDialog.ui
     ${UI_SUBDIR}/TorrentUrlChooserDialog.ui)
 
-if(ENABLE_NLS)
-    set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
-    add_custom_command(
-        OUTPUT ${${PROJECT_NAME}_DESKTOP_FILE}
-        COMMAND
-            ${GETTEXT_MSGFMT_EXECUTABLE}
-            --desktop
-            -d ${CMAKE_SOURCE_DIR}/po
-            --template ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
-            -o ${${PROJECT_NAME}_DESKTOP_FILE}
-        DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
-        VERBATIM)
-
-    set(${PROJECT_NAME}_METAINFO_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
-    add_custom_command(
-        OUTPUT ${${PROJECT_NAME}_METAINFO_FILE}
-        COMMAND
-            ${GETTEXT_MSGFMT_EXECUTABLE}
-            --xml
-            -d ${CMAKE_SOURCE_DIR}/po
-            --template ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in
-            -o ${${PROJECT_NAME}_METAINFO_FILE}
-        DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in
-        VERBATIM)
-
-    source_group("Generated Files"
-        FILES
-            ${${PROJECT_NAME}_DESKTOP_FILE}
-            ${${PROJECT_NAME}_METAINFO_FILE})
-endif()
-
 set(${PROJECT_NAME}_SOURCES
     Actions.cc
     Application.cc
@@ -146,6 +115,18 @@ target_sources(${TR_NAME}-gtk
 tr_target_glib_resources(${TR_NAME}-gtk
     transmission.gresource.xml
     ${UI_SUBDIR}/transmission-ui.gresource.xml)
+
+if(ENABLE_NLS)
+    set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
+    tr_gettext_msgfmt(${TR_NAME}-gtk
+        ${${PROJECT_NAME}_DESKTOP_FILE}
+        ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in)
+
+    set(${PROJECT_NAME}_METAINFO_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
+    tr_gettext_msgfmt(${TR_NAME}-gtk
+        ${${PROJECT_NAME}_METAINFO_FILE}
+        ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in)
+endif()
 
 target_compile_definitions(${TR_NAME}-gtk
     PRIVATE

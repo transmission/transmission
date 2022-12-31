@@ -330,6 +330,32 @@ function(tr_target_glib_resources TGT)
     endforeach()
 endfunction()
 
+function(tr_gettext_msgfmt TGT OUTPUT_FILE INPUT_FILE)
+    get_filename_component(OUTPUT_FILE_EXT "${OUTPUT_FILE}" LAST_EXT)
+    if(OUTPUT_FILE_EXT STREQUAL ".desktop")
+        set(MODE_ARG "--desktop")
+    elseif(OUTPUT_FILE_EXT STREQUAL ".xml")
+        set(MODE_ARG "--xml")
+    else()
+        message(FATAL_ERROR "Unsupported output file extension: '${OUTPUT_FILE_EXT}'")
+    endif()
+
+    add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} ${MODE_ARG} -d ${CMAKE_SOURCE_DIR}/po --template ${INPUT_FILE} -o ${OUTPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        VERBATIM)
+
+    target_sources(${TGT}
+        PRIVATE
+            "${INPUT_FILE}"
+            "${OUTPUT_FILE}")
+
+    source_group("Generated Files"
+        FILES
+            "${OUTPUT_FILE}")
+endfunction()
+
 macro(tr_qt_wrap_ui)
     if(Qt_VERSION_MAJOR EQUAL 6)
         qt6_wrap_ui(${ARGN})
