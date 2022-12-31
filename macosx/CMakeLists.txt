@@ -7,7 +7,11 @@ endif()
 add_compile_options(
     -fcxx-modules
     -fmodules
-    -fobjc-arc)
+    -fobjc-arc
+    # #warnings are good practice in development
+    "-Wno-#warnings"
+    # GNU extensions are good practice in Objective-C
+    -Wno-gnu)
 
 find_program(ACTOOL_EXECUTABLE actool REQUIRED)
 find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
@@ -394,12 +398,6 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     source_group(Resources/${LANG}.lproj
         FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
-
-add_compile_options(
-    # #warnings are good practice in development
-    "-Wno-#warnings"
-    # GNU extensions are good practice in Objective-C
-    -Wno-gnu)
 
 add_library(vdkqueue STATIC)
 

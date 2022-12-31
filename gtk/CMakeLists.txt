@@ -1,9 +1,5 @@
 project(trgtk)
 
-if(ENABLE_WERROR)
-    add_compile_options($<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>)
-endif()
-
 execute_process(
     COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
     OUTPUT_VARIABLE GLIB_COMPILE_RESOURCES_EXECUTABLE
@@ -218,7 +214,8 @@ target_compile_definitions(${TR_NAME}-gtk
 
 target_compile_options(${TR_NAME}-gtk
     PRIVATE
-        ${GTK${GTK_VERSION}_CFLAGS_OTHER})
+        ${GTK${GTK_VERSION}_CFLAGS_OTHER}
+        $<$<BOOL:${ENABLE_WERROR}>:$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>>)
 
 target_include_directories(${TR_NAME}-gtk
     PRIVATE
