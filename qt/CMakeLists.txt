@@ -188,21 +188,6 @@ if(${PROJECT_NAME}_TS_FILES)
         FILES ${${PROJECT_NAME}_QM_FILES})
 endif()
 
-if(ENABLE_QT_COM_INTEROP)
-    add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb
-        COMMAND ${MIDL_EXECUTABLE} /tlb ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb transmission-qt.idl
-        DEPENDS transmission-qt.idl
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    list(APPEND ${PROJECT_NAME}_WIN32_RC_FILE
-        transmission-qt.tlb.rc
-        transmission-qt.idl
-        ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb)
-    tr_disable_source_files_compile(
-        transmission-qt.idl
-        ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb)
-endif()
-
 add_executable(${TR_NAME}-qt WIN32)
 
 target_sources(${TR_NAME}-qt
@@ -212,6 +197,11 @@ target_sources(${TR_NAME}-qt
         ${${PROJECT_NAME}_QRC_FILES}
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_QM_FILES})
+
+if(ENABLE_QT_COM_INTEROP)
+    tr_target_idl_files(${TR_NAME}-qt
+        transmission-qt.idl)
+endif()
 
 target_include_directories(${TR_NAME}-qt
     PRIVATE

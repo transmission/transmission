@@ -365,3 +365,43 @@ macro(tr_qt_add_translation)
         qt5_add_translation(${ARGN})
     endif()
 endmacro()
+
+function(tr_wrap_idl TGT INPUT_FILE OUTPUT_FILE_BASE)
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb
+        COMMAND ${MIDL_EXECUTABLE} /tlb ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb ${INPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+    configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.tlb.rc.in" ${OUTPUT_FILE_BASE}.tlb.rc)
+
+    target_sources(${TGT}
+        PRIVATE
+            ${INPUT_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb.rc)
+
+    source_group("Generated Files"
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb.rc)
+
+    tr_disable_source_files_compile(
+        ${INPUT_FILE}
+        ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb)
+endfunction()
+
+function(tr_target_idl_files TGT)
+    foreach(ARG IN LISTS ARGN)
+        get_filename_component(ARG_PATH "${ARG}" ABSOLUTE)
+        string(SHA1 ARG_HASH "${ARG_PATH}")
+        string(SUBSTRING "${ARG_HASH}" 0 10 ARG_HASH)
+
+        get_filename_component(ARG_NAME_WE "${ARG}" NAME_WE)
+        string(MAKE_C_IDENTIFIER "${ARG_NAME_WE}" ARG_ID)
+
+        tr_wrap_idl(${TGT}
+            "${ARG}"
+            "${ARG_ID}-${ARG_HASH}")
+    endforeach()
+endfunction()
