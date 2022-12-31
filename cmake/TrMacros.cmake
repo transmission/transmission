@@ -1,3 +1,6 @@
+include(CheckFunctionExists)
+include(CheckIncludeFile)
+
 macro(tr_auto_option_changed NAME ACC VAL FIL STK)
     if(NOT ("${VAL}" STREQUAL "AUTO" OR "${VAL}" STREQUAL "ON" OR "${VAL}" STREQUAL "OFF"))
         if("${VAL}" STREQUAL "0" OR "${VAL}" STREQUAL "NO" OR "${VAL}" STREQUAL "FALSE" OR "${VAL}" STREQUAL "N")
@@ -129,6 +132,33 @@ function(tr_append_target_property TGT PROP VAL)
         set(VAL "${OVAL} ${VAL}")
     endif()
     set_target_properties(${TGT} PROPERTIES ${PROP} "${VAL}")
+endfunction()
+
+function(tr_target_compile_definitions_for_headers TGT)
+    cmake_parse_arguments(ARG "" "" "PRIVATE;PUBLIC" ${ARGN})
+    foreach(VISIBILITY IN ITEMS PRIVATE PUBLIC)
+        foreach(H IN LISTS ARG_${VISIBILITY})
+            tr_make_id("HAVE_${H}" H_ID)
+            check_include_file(${H} ${H_ID})
+            target_compile_definitions(${TGT}
+                ${VISIBILITY}
+                    $<$<BOOL:${${H_ID}}>:${H_ID}>)
+        endforeach()
+    endforeach()
+endfunction()
+
+function(tr_target_compile_definitions_for_functions TGT)
+    cmake_parse_arguments(ARG "" "" "PRIVATE;PUBLIC;REQUIRED_LIBS" ${ARGN})
+    set(CMAKE_REQUIRED_LIBRARIES "${ARG_REQUIRED_LIBS}")
+    foreach(VISIBILITY IN ITEMS PRIVATE PUBLIC)
+        foreach(F IN LISTS ARG_${VISIBILITY})
+            tr_make_id("HAVE_${F}" F_ID)
+            check_function_exists(${F} ${F_ID})
+            target_compile_definitions(${TGT}
+                ${VISIBILITY}
+                    $<$<BOOL:${${F_ID}}>:${F_ID}>)
+        endforeach()
+    endforeach()
 endfunction()
 
 function(tr_win32_app_info TGT DESCR INTNAME ORIGFNAME)

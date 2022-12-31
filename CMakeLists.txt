@@ -25,7 +25,6 @@ include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckLibraryExists)
-include(CheckSymbolExists)
 include(ExternalProject)
 include(GNUInstallDirs)
 include(TrMacros)
@@ -423,7 +422,7 @@ tr_add_external_auto_library(EVENT2 libevent event
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)
-    set(NATPMP_DEFINITIONS -DNATPMP_STATICLIB)
+    set(NATPMP_DEFINITIONS NATPMP_STATICLIB)
 endif()
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
@@ -431,9 +430,9 @@ tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
         -DUPNPC_BUILD_TESTS=OFF)
-set(MINIUPNPC_DEFINITIONS -DSYSTEM_MINIUPNP)
+set(MINIUPNPC_DEFINITIONS SYSTEM_MINIUPNP)
 if(NOT USE_SYSTEM_MINIUPNPC)
-    list(APPEND MINIUPNPC_DEFINITIONS -DMINIUPNP_STATICLIB)
+    list(APPEND MINIUPNPC_DEFINITIONS MINIUPNP_STATICLIB)
     set(MINIUPNPC_VERSION 1.9)
     set(MINIUPNPC_API_VERSION 12)
 endif()
@@ -626,82 +625,10 @@ add_compile_options(
 
 include(LargeFileSupport)
 
-set(NEEDED_HEADERS
-    sys/signalfd.h
-    sys/statvfs.h
-    xfs/xfs.h
-    xlocale.h)
-
-if(ENABLE_NLS)
-    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
-    if(HAVE_LIBINTL)
-        set(LIBINTL_LIBRARY intl)
-        # check_function_exists() below may need this
-        # when looking for gettext() and ngettext()
-        list(APPEND CMAKE_REQUIRED_LIBRARIES intl)
-    endif()
-
-    list(APPEND NEEDED_HEADERS libintl.h)
-endif()
-
-foreach(H ${NEEDED_HEADERS})
-    tr_make_id("${H}" H_ID)
-    check_include_file(${H} HAVE_${H_ID})
-    if(HAVE_${H_ID})
-        add_definitions(-DHAVE_${H_ID})
-    endif()
-endforeach()
-
-set(NEEDED_FUNCTIONS
-    _configthreadlocale
-    copy_file_range
-    copyfile
-    daemon
-    fallocate64
-    flock
-    getmntent
-    gettext
-    htonll
-    mkdtemp
-    ngettext
-    ntohll
-    posix_fadvise
-    posix_fallocate
-    pread
-    pwrite
-    sendfile64
-    statvfs
-    strlcpy
-    syslog)
-
-foreach(F ${NEEDED_FUNCTIONS})
-    tr_make_id("${F}" F_ID)
-    check_function_exists(${F} HAVE_${F_ID})
-    if(HAVE_${F_ID})
-        add_definitions(-DHAVE_${F_ID})
-    endif()
-endforeach()
-
-if(ICONV_FOUND)
-    add_definitions(-DHAVE_ICONV)
-    if(ICONV_SECOND_ARGUMENT_IS_CONST)
-        add_definitions(-DICONV_SECOND_ARGUMENT_IS_CONST)
-    endif()
-endif()
-
-# if(MINGW)
-#     check_function_exists(__mingw_printf HAVE_MINGW_PRINTF)
-#     if(HAVE_MINGW_PRINTF)
-#         add_definitions(-D__USE_MINGW_ANSI_STDIO=1 -D__STDC_FORMAT_MACROS=1)
-#     endif()
-# endif()
-
 check_library_exists(m sqrt "" HAVE_LIBM)
 if(HAVE_LIBM)
     set(LIBM_LIBRARY m)
 endif()
-
-check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
 set(TR_NETWORK_LIBRARIES)
 if(WIN32)

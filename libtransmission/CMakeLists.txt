@@ -1,5 +1,17 @@
 project(libtr)
 
+include(CheckLibraryExists)
+include(CheckSymbolExists)
+
+if(ENABLE_NLS)
+    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
+    if(HAVE_LIBINTL)
+        set(LIBINTL_LIBRARY intl)
+    endif()
+endif()
+
+check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
+
 configure_file(version.h.in version.h)
 
 set(${PROJECT_NAME}_SOURCES
@@ -98,20 +110,14 @@ foreach(CP ccrypto mbedtls openssl wolfssl)
     endif()
 endforeach()
 
-if(WITH_INOTIFY)
-    add_definitions(
-        -DWITH_INOTIFY)
-else()
+if(NOT WITH_INOTIFY)
     set_source_files_properties(
         watchdir-inotify.cc
         PROPERTIES
             HEADER_FILE_ONLY ON)
 endif()
 
-if(WITH_KQUEUE)
-    add_definitions(
-        -DWITH_KQUEUE)
-else()
+if(NOT WITH_KQUEUE)
     set_source_files_properties(
         watchdir-kqueue.cc
         PROPERTIES
@@ -233,45 +239,6 @@ if(NOT ENABLE_UTP)
             HEADER_FILE_ONLY ON)
 endif()
 
-add_definitions(
-    -D__TRANSMISSION__
-    -DWIDE_INTEGER_DISABLE_FLOAT_INTEROP
-    -DWIDE_INTEGER_DISABLE_IOSTREAM
-    "-DPACKAGE_DATA_DIR=\"${CMAKE_INSTALL_FULL_DATAROOTDIR}\""
-    ${NATPMP_DEFINITIONS}
-    ${MINIUPNPC_DEFINITIONS})
-
-if(ENABLE_LIGHTWEIGHT)
-    add_definitions(
-        -DTR_LIGHTWEIGHT)
-endif()
-
-if(NOT ENABLE_NLS)
-    add_definitions(
-        -DDISABLE_GETTEXT)
-endif()
-
-if(ENABLE_UTP)
-    add_definitions(
-        -DWITH_UTP)
-endif()
-
-if(MINIUPNPC_VERSION VERSION_LESS 1.7)
-    # API version macro was only added in 1.7
-    add_definitions(
-        -DMINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION})
-endif()
-
-if(USE_SYSTEM_B64)
-    add_definitions(
-        -DUSE_SYSTEM_B64)
-endif()
-
-if(HAVE_SO_REUSEPORT)
-    add_definitions(
-        -DHAVE_SO_REUSEPORT=1)
-endif()
-
 add_library(${TR_NAME} STATIC)
 
 target_sources(${TR_NAME}
@@ -291,6 +258,60 @@ foreach(UT
         ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
 endforeach()
+
+target_compile_definitions(${TR_NAME}
+    PRIVATE
+        __TRANSMISSION__
+        WIDE_INTEGER_DISABLE_FLOAT_INTEROP
+        WIDE_INTEGER_DISABLE_IOSTREAM
+        PACKAGE_DATA_DIR="${CMAKE_INSTALL_FULL_DATAROOTDIR}"
+        $<$<BOOL:${WITH_INOTIFY}>:WITH_INOTIFY>
+        $<$<BOOL:${WITH_KQUEUE}>:WITH_KQUEUE>
+        $<$<BOOL:${ENABLE_LIGHTWEIGHT}>:TR_LIGHTWEIGHT>
+        $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>
+        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}> # API version macro was only added in 1.7
+        $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
+        $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
+        $<$<BOOL:${ICONV_FOUND}>:HAVE_ICONV>
+        $<$<BOOL:${ICONV_SECOND_ARGUMENT_IS_CONST}>:ICONV_SECOND_ARGUMENT_IS_CONST>
+        ${NATPMP_DEFINITIONS}
+        ${MINIUPNPC_DEFINITIONS}
+    PUBLIC
+        $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
+
+tr_target_compile_definitions_for_headers(${TR_NAME}
+    PRIVATE
+        sys/statvfs.h
+        xfs/xfs.h
+        xlocale.h)
+
+if(ENABLE_NLS)
+    tr_target_compile_definitions_for_headers(${TR_NAME}
+        PRIVATE
+            libintl.h)
+endif()
+
+tr_target_compile_definitions_for_functions(${TR_NAME}
+    PRIVATE
+        copyfile
+        copy_file_range
+        fallocate64
+        flock
+        getmntent
+        htonll
+        mkdtemp
+        ntohll
+        posix_fadvise
+        posix_fallocate
+        pread
+        pwrite
+        sendfile64
+        statvfs
+    PUBLIC
+        gettext
+        ngettext
+    REQUIRED_LIBS
+        $<$<BOOL:${HAVE_LIBINTL}>:${LIBINTL_LIBRARY}>) # gettext, ngettext
 
 target_include_directories(${TR_NAME}
     PRIVATE

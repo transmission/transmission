@@ -1,9 +1,5 @@
 project(trdaemon)
 
-if(WITH_SYSTEMD)
-    add_definitions(-DUSE_SYSTEMD)
-endif()
-
 set(${PROJECT_NAME}_SOURCES
     daemon.cc
     daemon-posix.cc
@@ -30,6 +26,19 @@ target_sources(${TR_NAME}-daemon
     PRIVATE
         ${${PROJECT_NAME}_SOURCES}
         ${${PROJECT_NAME}_HEADERS})
+
+target_compile_definitions(${TR_NAME}-daemon
+    PRIVATE
+        $<$<BOOL:${WITH_SYSTEMD}>:USE_SYSTEMD>)
+
+tr_target_compile_definitions_for_headers(${TR_NAME}-daemon
+    PRIVATE
+        sys/signalfd.h)
+
+tr_target_compile_definitions_for_functions(${TR_NAME}-daemon
+    PRIVATE
+        daemon
+        syslog)
 
 target_include_directories(${TR_NAME}-daemon
     PRIVATE
