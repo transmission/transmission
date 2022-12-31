@@ -142,10 +142,6 @@ endif()
 source_group(Resources
     FILES ${${PROJECT_NAME}_QRC_FILES})
 
-tr_qt_add_resources(${PROJECT_NAME}_QRC_SOURCES ${${PROJECT_NAME}_QRC_FILES})
-source_group("Generated Files"
-    FILES ${${PROJECT_NAME}_QRC_SOURCES})
-
 set(${PROJECT_NAME}_LINGUAS
     af
     ca
@@ -216,7 +212,7 @@ target_sources(${TR_NAME}-qt
     PRIVATE
         ${${PROJECT_NAME}_SOURCES}
         ${${PROJECT_NAME}_UI_FILES}
-        ${${PROJECT_NAME}_QRC_SOURCES}
+        ${${PROJECT_NAME}_QRC_FILES}
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_QM_FILES})
 
@@ -251,6 +247,7 @@ set_target_properties(
     ${TR_NAME}-qt
     PROPERTIES
         AUTOMOC ON
+        AUTORCC ON
         AUTOUIC ON)
 
 tr_win32_app_info(${TR_NAME}-qt
