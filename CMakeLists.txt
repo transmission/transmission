@@ -198,8 +198,6 @@ find_package(Fmt)
 add_definitions(
     -DFMT_HEADER_ONLY
     -DFMT_EXCEPTIONS=0)
-include_directories(SYSTEM
-    ${LIBFMT_INCLUDE_DIRS})
 
 find_package(WideInteger)
 find_package(FastFloat)
@@ -498,8 +496,6 @@ if(WITH_SYSTEMD)
     find_package(SYSTEMD)
     tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_FOUND SYSTEMD_IS_REQUIRED)
 endif()
-
-include_directories(${CMAKE_BINARY_DIR})
 
 if(WIN32)
     foreach(L C CXX)

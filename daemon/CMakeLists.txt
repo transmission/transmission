@@ -4,12 +4,6 @@ if(WITH_SYSTEMD)
     add_definitions(-DUSE_SYSTEMD)
 endif()
 
-include_directories(
-    ${CMAKE_SOURCE_DIR})
-include_directories(SYSTEM
-    ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS})
-
 set(${PROJECT_NAME}_SOURCES
     daemon.cc
     daemon-posix.cc
@@ -36,6 +30,16 @@ target_sources(${TR_NAME}-daemon
     PRIVATE
         ${${PROJECT_NAME}_SOURCES}
         ${${PROJECT_NAME}_HEADERS})
+
+target_include_directories(${TR_NAME}-daemon
+    PRIVATE
+        ${CMAKE_SOURCE_DIR})
+
+target_include_directories(${TR_NAME}-daemon SYSTEM
+    PRIVATE
+        ${LIBFMT_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-daemon
     ${TR_NAME}

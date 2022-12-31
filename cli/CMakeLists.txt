@@ -1,14 +1,20 @@
 project(trcli)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR})
-
 add_executable(${TR_NAME}-cli)
+
 target_sources(${TR_NAME}-cli
     PRIVATE
         cli.cc)
-include_directories(${TR_NAME}-cli
-    ${CURL_INCLUDE_DIRS})
+
+target_include_directories(${TR_NAME}-cli
+    PRIVATE
+        ${CMAKE_SOURCE_DIR})
+
+target_include_directories(${TR_NAME}-cli SYSTEM
+    PRIVATE
+        ${LIBFMT_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS})
+
 target_link_libraries(${TR_NAME}-cli
     ${TR_NAME})
 

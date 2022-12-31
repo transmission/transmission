@@ -8,3 +8,8 @@ target_sources(gtestall
 set_property(
     TARGET gtestall
     PROPERTY FOLDER "third-party")
+
+target_include_directories(gtestall SYSTEM
+    PRIVATE
+        ${THIRD_PARTY_DIR}/googletest/googletest
+        ${THIRD_PARTY_DIR}/googletest/googletest/include)

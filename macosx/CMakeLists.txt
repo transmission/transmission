@@ -4,9 +4,6 @@ if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS MACOS_SUPPORT_MINIMUM)
     message(FATAL_ERROR "Targeting macOS versions before ${MACOS_SUPPORT_MINIMUM} is not supported for the macOS project, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
 endif()
 
-include_directories(
-    ${CMAKE_SOURCE_DIR})
-
 add_compile_options(
     -fcxx-modules
     -fmodules
@@ -398,11 +395,6 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}/libtransmission
-    ${CMAKE_BINARY_DIR}/libtransmission
-    ${PROJECT_SOURCE_DIR}/VDKQueue)
-
 add_compile_options(
     # #warnings are good practice in development
     "-Wno-#warnings"
@@ -452,6 +444,15 @@ target_sources(${TR_NAME}-mac
         ${${PROJECT_NAME}_BASE_XIB_FILES}
         ${${PROJECT_NAME}_BASE_NIB_FILES}
         ${${PROJECT_NAME}_RESOURCES})
+
+target_include_directories(${TR_NAME}-mac
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/VDKQueue)
+
+target_include_directories(${TR_NAME}-mac SYSTEM
+    PRIVATE
+        ${LIBFMT_INCLUDE_DIRS})
 
 find_library(SPARKLE_FRAMEWORK Sparkle
     PATHS ${PROJECT_SOURCE_DIR}

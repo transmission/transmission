@@ -272,30 +272,6 @@ if(HAVE_SO_REUSEPORT)
         -DHAVE_SO_REUSEPORT=1)
 endif()
 
-include_directories(
-    ${PROJECT_SOURCE_DIR}
-    ${PROJECT_BINARY_DIR})
-
-include_directories(SYSTEM
-    ${WIDE_INTEGER_INCLUDE_DIRS}
-    ${UTFCPP_INCLUDE_DIRS}
-    ${DEFLATE_INCLUDE_DIRS}
-    ${FAST_FLOAT_INCLUDE_DIRS}
-    ${CRYPTO_INCLUDE_DIRS}
-    ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS}
-    ${PSL_INCLUDE_DIRS}
-    ${NATPMP_INCLUDE_DIRS}
-    ${MINIUPNPC_INCLUDE_DIRS}
-    ${DHT_INCLUDE_DIRS}
-    ${UTP_INCLUDE_DIRS}
-    ${B64_INCLUDE_DIRS})
-
-if(ICONV_FOUND)
-    include_directories(SYSTEM
-        ${ICONV_INCLUDE_DIRS})
-endif()
-
 add_library(${TR_NAME} STATIC)
 
 target_sources(${TR_NAME}
@@ -315,6 +291,32 @@ foreach(UT
         ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
 endforeach()
+
+target_include_directories(${TR_NAME}
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}
+        ${PROJECT_BINARY_DIR}
+    INTERFACE
+        ${CMAKE_BINARY_DIR})
+
+target_include_directories(${TR_NAME} SYSTEM
+    PRIVATE
+        ${WIDE_INTEGER_INCLUDE_DIRS}
+        ${UTFCPP_INCLUDE_DIRS}
+        ${DEFLATE_INCLUDE_DIRS}
+        ${FAST_FLOAT_INCLUDE_DIRS}
+        ${CRYPTO_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS}
+        ${PSL_INCLUDE_DIRS}
+        ${NATPMP_INCLUDE_DIRS}
+        ${MINIUPNPC_INCLUDE_DIRS}
+        ${DHT_INCLUDE_DIRS}
+        ${UTP_INCLUDE_DIRS}
+        ${B64_INCLUDE_DIRS}
+        $<$<BOOL:${ICONV_FOUND}>:${ICONV_INCLUDE_DIRS}>
+    PUBLIC
+        ${LIBFMT_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}
     ${CMAKE_THREAD_LIBS_INIT}

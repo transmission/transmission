@@ -204,15 +204,6 @@ if(${PROJECT_NAME}_TS_FILES)
         FILES ${${PROJECT_NAME}_QM_FILES})
 endif()
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR})
-
-include_directories(SYSTEM
-    ${PROJECT_BINARY_DIR}
-    ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS})
-
 if(ENABLE_QT_COM_INTEROP)
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb
@@ -239,6 +230,17 @@ target_sources(${TR_NAME}-qt
         ${${PROJECT_NAME}_QRC_SOURCES}
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_QM_FILES})
+
+target_include_directories(${TR_NAME}-qt
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR})
+
+target_include_directories(${TR_NAME}-qt SYSTEM
+    PRIVATE
+        ${PROJECT_BINARY_DIR}
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-qt
     ${TR_NAME}

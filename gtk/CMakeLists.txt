@@ -169,20 +169,6 @@ set(${PROJECT_NAME}_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.h)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}
-    ${PROJECT_BINARY_DIR})
-
-include_directories(SYSTEM
-    ${GTK${GTK_VERSION}_INCLUDE_DIRS}
-    ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS})
-
-if(WITH_APPINDICATOR)
-    include_directories(SYSTEM
-        ${APPINDICATOR_INCLUDE_DIRS})
-endif()
-
 link_directories(
     ${GTK${GTK_VERSION}_LIBRARY_DIRS})
 
@@ -232,6 +218,19 @@ target_sources(${TR_NAME}-gtk
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_DESKTOP_FILE}
         ${${PROJECT_NAME}_METAINFO_FILE})
+
+target_include_directories(${TR_NAME}-gtk
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}
+        ${PROJECT_BINARY_DIR})
+
+target_include_directories(${TR_NAME}-gtk SYSTEM
+    PRIVATE
+        ${LIBFMT_INCLUDE_DIRS}
+        ${GTK${GTK_VERSION}_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS}
+        $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_INCLUDE_DIRS}>)
 
 target_link_libraries(${TR_NAME}-gtk
     ${TR_NAME}

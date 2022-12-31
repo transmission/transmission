@@ -1,16 +1,22 @@
 project(trutils)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR})
-include_directories(SYSTEM
-    ${EVENT2_INCLUDE_DIRS}
-    ${CURL_INCLUDE_DIRS})
-
 foreach(P create edit remote show)
     add_executable(${TR_NAME}-${P})
+
     target_sources(${TR_NAME}-${P}
         PRIVATE
             ${P}.cc)
+
+    target_include_directories(${TR_NAME}-${P}
+        PRIVATE
+            ${CMAKE_SOURCE_DIR})
+
+    target_include_directories(${TR_NAME}-${P} SYSTEM
+        PRIVATE
+            ${LIBFMT_INCLUDE_DIRS}
+            ${EVENT2_INCLUDE_DIRS}
+            ${CURL_INCLUDE_DIRS})
+
     target_link_libraries(${TR_NAME}-${P}
         ${TR_NAME})
 
