@@ -184,8 +184,6 @@ endforeach()
 
 if(${PROJECT_NAME}_TS_FILES)
     tr_qt_add_translation(${PROJECT_NAME}_QM_FILES ${${PROJECT_NAME}_TS_FILES})
-    source_group("Generated Files"
-        FILES ${${PROJECT_NAME}_QM_FILES})
 endif()
 
 add_executable(${TR_NAME}-qt WIN32)

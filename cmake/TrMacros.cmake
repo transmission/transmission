@@ -356,14 +356,17 @@ function(tr_gettext_msgfmt TGT OUTPUT_FILE INPUT_FILE)
             "${OUTPUT_FILE}")
 endfunction()
 
-macro(tr_qt_add_translation)
+macro(tr_qt_add_translation OUTPUT_FILES_VAR)
     if(Qt_VERSION_MAJOR EQUAL 6)
-        qt6_add_translation(${ARGN} OPTIONS -silent)
+        qt6_add_translation(${OUTPUT_FILES_VAR} ${ARGN} OPTIONS -silent)
     elseif(Qt_VERSION GREATER_EQUAL 5.11)
-        qt5_add_translation(${ARGN} OPTIONS -silent)
+        qt5_add_translation(${OUTPUT_FILES_VAR} ${ARGN} OPTIONS -silent)
     else()
-        qt5_add_translation(${ARGN})
+        qt5_add_translation(${OUTPUT_FILES_VAR} ${ARGN})
     endif()
+
+    source_group("Generated Files"
+        FILES ${${OUTPUT_FILES_VAR}})
 endmacro()
 
 function(tr_wrap_idl TGT INPUT_FILE OUTPUT_FILE_BASE)
