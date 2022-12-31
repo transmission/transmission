@@ -1,14 +1,5 @@
 project(trgtk)
 
-execute_process(
-    COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
-    OUTPUT_VARIABLE GLIB_COMPILE_RESOURCES_EXECUTABLE
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
-    message(SEND_ERROR "Unable to find glib-compile-resources executable")
-endif()
-
 find_program(APPSTREAM appstreamcli)
 
 if(GTK_VERSION EQUAL 4)
@@ -31,42 +22,6 @@ set(${PROJECT_NAME}_UI_FILES
     ${UI_SUBDIR}/RelocateDialog.ui
     ${UI_SUBDIR}/StatsDialog.ui
     ${UI_SUBDIR}/TorrentUrlChooserDialog.ui)
-
-macro(gtr_compile_resources NAME INPUT_DIR INPUT_FILE OUTPUT_FILE_BASE)
-    add_custom_command(
-        OUTPUT
-            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
-            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
-        COMMAND
-            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
-            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
-            "--sourcedir=${INPUT_DIR}"
-            --generate-source
-            --c-name "${NAME}"
-            "${INPUT_DIR}/${INPUT_FILE}"
-        COMMAND
-            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
-            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
-            "--sourcedir=${INPUT_DIR}"
-            --generate-header
-            --c-name "${NAME}"
-            "${INPUT_DIR}/${INPUT_FILE}"
-        DEPENDS
-            "${INPUT_DIR}/${INPUT_FILE}"
-            ${ARGN}
-        WORKING_DIRECTORY "${INPUT_DIR}")
-endmacro()
-
-gtr_compile_resources(transmission ${CMAKE_CURRENT_SOURCE_DIR} transmission.gresource.xml transmission-resources
-    icons/hicolor_apps_scalable_transmission.svg
-    icons/lock.svg
-    icons/options-symbolic.svg
-    icons/ratio-symbolic.svg
-    icons/turtle-symbolic.svg
-    transmission-ui.css
-    transmission-ui.xml)
-gtr_compile_resources(transmission_ui ${CMAKE_CURRENT_SOURCE_DIR}/${UI_SUBDIR} transmission-ui.gresource.xml transmission-ui-resources
-    ${${PROJECT_NAME}_UI_FILES})
 
 if(ENABLE_NLS)
     set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
@@ -127,9 +82,7 @@ set(${PROJECT_NAME}_SOURCES
     TorrentCellRenderer.cc
     TorrentFilter.cc
     TorrentSorter.cc
-    Utils.cc
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.c)
+    Utils.cc)
 
 set(${PROJECT_NAME}_HEADERS
     Actions.h
@@ -161,9 +114,7 @@ set(${PROJECT_NAME}_HEADERS
     TorrentCellRenderer.h
     TorrentFilter.h
     TorrentSorter.h
-    Utils.h
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.h)
+    Utils.h)
 
 link_directories(
     ${GTK${GTK_VERSION}_LIBRARY_DIRS})
@@ -191,6 +142,10 @@ target_sources(${TR_NAME}-gtk
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_DESKTOP_FILE}
         ${${PROJECT_NAME}_METAINFO_FILE})
+
+tr_target_glib_resources(${TR_NAME}-gtk
+    transmission.gresource.xml
+    ${UI_SUBDIR}/transmission-ui.gresource.xml)
 
 target_compile_definitions(${TR_NAME}-gtk
     PRIVATE

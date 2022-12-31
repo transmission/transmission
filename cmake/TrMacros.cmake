@@ -242,6 +242,94 @@ function(tr_fixup_bundle_item BUNDLE_DIR BUNDLE_ITEMS DEP_DIRS)
     endwhile()
 endfunction()
 
+function(tr_glib_compile_resources TGT NAME INPUT_DIR INPUT_FILE OUTPUT_FILE_BASE)
+    if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
+        execute_process(
+            COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
+            OUTPUT_VARIABLE GLIB_COMPILE_RESOURCES_EXECUTABLE
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+        if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
+            message(SEND_ERROR "Unable to find glib-compile-resources executable")
+        endif()
+
+        set(GLIB_COMPILE_RESOURCES_EXECUTABLE "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            CACHE STRING "glib-compile-resources executable")
+    endif()
+
+    set_property(
+        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+            "${INPUT_DIR}/${INPUT_FILE}")
+
+    file(STRINGS "${INPUT_DIR}/${INPUT_FILE}" INPUT_LINES)
+    set(OUTPUT_DEPENDS)
+    foreach(INPUT_LINE IN LISTS INPUT_LINES)
+        if(INPUT_LINE MATCHES ">([^<]+)</file>")
+            list(APPEND OUTPUT_DEPENDS "${INPUT_DIR}/${CMAKE_MATCH_1}")
+        endif()
+    endforeach()
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+        COMMAND
+            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "--sourcedir=${INPUT_DIR}"
+            --generate-source
+            --c-name "${NAME}"
+            "${INPUT_DIR}/${INPUT_FILE}"
+        DEPENDS
+            "${INPUT_DIR}/${INPUT_FILE}"
+            ${OUTPUT_DEPENDS}
+        WORKING_DIRECTORY "${INPUT_DIR}")
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
+        COMMAND
+            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
+            "--sourcedir=${INPUT_DIR}"
+            --generate-header
+            --c-name "${NAME}"
+            "${INPUT_DIR}/${INPUT_FILE}"
+        DEPENDS
+            "${INPUT_DIR}/${INPUT_FILE}"
+            ${OUTPUT_DEPENDS}
+        WORKING_DIRECTORY "${INPUT_DIR}")
+
+    target_sources(${TGT}
+        PRIVATE
+            "${INPUT_DIR}/${INPUT_FILE}"
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h")
+
+    source_group("Generated Files"
+        FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h")
+endfunction()
+
+function(tr_target_glib_resources TGT)
+    foreach(ARG IN LISTS ARGN)
+        get_filename_component(ARG_PATH "${ARG}" ABSOLUTE)
+        string(SHA1 ARG_HASH "${ARG_PATH}")
+        string(SUBSTRING "${ARG_HASH}" 0 10 ARG_HASH)
+
+        get_filename_component(ARG_NAME_WE "${ARG}" NAME_WE)
+        string(MAKE_C_IDENTIFIER "${ARG_NAME_WE}" ARG_ID)
+
+        get_filename_component(ARG_DIR "${ARG_PATH}" DIRECTORY)
+        get_filename_component(ARG_NAME "${ARG}" NAME)
+
+        tr_glib_compile_resources(${TGT}
+            "${ARG_ID}_${ARG_HASH}"
+            "${ARG_DIR}"
+            "${ARG_NAME}"
+            "${ARG_ID}-${ARG_HASH}")
+    endforeach()
+endfunction()
+
 macro(tr_qt_wrap_ui)
     if(Qt_VERSION_MAJOR EQUAL 6)
         qt6_wrap_ui(${ARGN})
