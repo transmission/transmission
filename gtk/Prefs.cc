@@ -4,8 +4,8 @@
 
 #include "Prefs.h"
 
+#include "GtkCompat.h"
 #include "PrefsDialog.h"
-#include "Utils.h"
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>

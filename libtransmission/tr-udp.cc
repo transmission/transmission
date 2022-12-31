@@ -166,7 +166,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo("Bound UDP IPv4 address {:s}", addr.display_name(udp_port_));
+            tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", addr.display_name(udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
@@ -193,7 +193,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo("Bound UDP IPv6 address {:s}", addr.display_name(udp_port_));
+            tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", addr.display_name(udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;

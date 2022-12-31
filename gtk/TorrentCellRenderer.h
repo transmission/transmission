@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Utils.h"
+#include "GtkCompat.h"
 
 #include <libtransmission/tr-macros.h>
 

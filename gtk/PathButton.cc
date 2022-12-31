@@ -5,6 +5,8 @@
 
 #include "PathButton.h"
 
+#include "Utils.h"
+
 #include <giomm/file.h>
 #include <glibmm/error.h>
 #include <glibmm/i18n.h>

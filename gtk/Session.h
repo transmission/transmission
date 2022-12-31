@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "GtkCompat.h"
 #include "Torrent.h"
-#include "Utils.h"
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
