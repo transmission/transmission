@@ -6,15 +6,9 @@ set(${PROJECT_NAME}_SOURCES
     daemon-win32.cc)
 
 if(WIN32)
-    set_source_files_properties(
-        daemon-posix.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(daemon-posix.cc)
 else()
-    set_source_files_properties(
-        daemon-win32.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(daemon-win32.cc)
 endif()
 
 set(${PROJECT_NAME}_HEADERS

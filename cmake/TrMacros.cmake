@@ -161,6 +161,13 @@ function(tr_target_compile_definitions_for_functions TGT)
     endforeach()
 endfunction()
 
+function(tr_disable_source_files_compile)
+    set_source_files_properties(
+        ${ARGN}
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
+endfunction()
+
 function(tr_win32_app_info TGT DESCR INTNAME ORIGFNAME)
     if(NOT WIN32)
         return()

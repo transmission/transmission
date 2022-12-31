@@ -57,16 +57,11 @@ set(${PROJECT_NAME}_SOURCES
     WatchDir.cc)
 
 if(NOT ENABLE_QT_COM_INTEROP)
-    set_source_files_properties(
-        ComInteropHelper.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(ComInteropHelper.cc)
 endif()
+
 if(NOT ENABLE_QT_DBUS_INTEROP)
-    set_source_files_properties(
-        DBusInteropHelper.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(DBusInteropHelper.cc)
 endif()
 
 set(${PROJECT_NAME}_HEADERS
@@ -214,11 +209,9 @@ if(ENABLE_QT_COM_INTEROP)
         transmission-qt.tlb.rc
         transmission-qt.idl
         ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb)
-    set_source_files_properties(
+    tr_disable_source_files_compile(
         transmission-qt.idl
-        ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+        ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb)
 endif()
 
 add_executable(${TR_NAME}-qt WIN32)

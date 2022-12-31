@@ -97,58 +97,37 @@ set(${PROJECT_NAME}_SOURCES
     web.cc
     webseed.cc)
 
-set_source_files_properties(
-    crypto-utils-fallback.cc
-    PROPERTIES
-        HEADER_FILE_ONLY ON)
+tr_disable_source_files_compile(crypto-utils-fallback.cc)
+
 foreach(CP ccrypto mbedtls openssl wolfssl)
     if(NOT CP STREQUAL CRYPTO_PKG)
-        set_source_files_properties(
-            crypto-utils-${CP}.cc
-            PROPERTIES
-                HEADER_FILE_ONLY ON)
+        tr_disable_source_files_compile(crypto-utils-${CP}.cc)
     endif()
 endforeach()
 
 if(NOT WITH_INOTIFY)
-    set_source_files_properties(
-        watchdir-inotify.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(watchdir-inotify.cc)
 endif()
 
 if(NOT WITH_KQUEUE)
-    set_source_files_properties(
-        watchdir-kqueue.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(watchdir-kqueue.cc)
 endif()
 
 if(WIN32)
-    set_source_files_properties(
+    tr_disable_source_files_compile(
         file-posix.cc
-        subprocess-posix.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+        subprocess-posix.cc)
 else()
-    set_source_files_properties(
+    tr_disable_source_files_compile(
         file-win32.cc
         subprocess-win32.cc
-        watchdir-win32.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+        watchdir-win32.cc)
 endif()
 
 if(APPLE)
-    set_source_files_properties(
-        tr-assert.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(tr-assert.cc)
 else()
-    set_source_files_properties(
-        tr-assert.mm
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(tr-assert.mm)
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
@@ -233,10 +212,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     webseed.h)
 
 if(NOT ENABLE_UTP)
-    set_source_files_properties(
-        tr-utp.cc
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    tr_disable_source_files_compile(tr-utp.cc)
 endif()
 
 add_library(${TR_NAME} STATIC)
