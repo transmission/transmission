@@ -5,12 +5,9 @@ if(ENABLE_WERROR)
 endif()
 
 execute_process(
-    COMMAND
-        ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
-    OUTPUT_VARIABLE
-        GLIB_COMPILE_RESOURCES_EXECUTABLE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+    COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
+    OUTPUT_VARIABLE GLIB_COMPILE_RESOURCES_EXECUTABLE
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
     message(SEND_ERROR "Unable to find glib-compile-resources executable")
@@ -37,8 +34,7 @@ set(${PROJECT_NAME}_UI_FILES
     ${UI_SUBDIR}/PrefsDialog.ui
     ${UI_SUBDIR}/RelocateDialog.ui
     ${UI_SUBDIR}/StatsDialog.ui
-    ${UI_SUBDIR}/TorrentUrlChooserDialog.ui
-)
+    ${UI_SUBDIR}/TorrentUrlChooserDialog.ui)
 
 macro(gtr_compile_resources NAME INPUT_DIR INPUT_FILE OUTPUT_FILE_BASE)
     add_custom_command(
@@ -62,9 +58,7 @@ macro(gtr_compile_resources NAME INPUT_DIR INPUT_FILE OUTPUT_FILE_BASE)
         DEPENDS
             "${INPUT_DIR}/${INPUT_FILE}"
             ${ARGN}
-        WORKING_DIRECTORY
-            "${INPUT_DIR}"
-    )
+        WORKING_DIRECTORY "${INPUT_DIR}")
 endmacro()
 
 gtr_compile_resources(transmission ${CMAKE_CURRENT_SOURCE_DIR} transmission.gresource.xml transmission-resources
@@ -74,30 +68,39 @@ gtr_compile_resources(transmission ${CMAKE_CURRENT_SOURCE_DIR} transmission.gres
     icons/ratio-symbolic.svg
     icons/turtle-symbolic.svg
     transmission-ui.css
-    transmission-ui.xml
-)
+    transmission-ui.xml)
 gtr_compile_resources(transmission_ui ${CMAKE_CURRENT_SOURCE_DIR}/${UI_SUBDIR} transmission-ui.gresource.xml transmission-ui-resources
-    ${${PROJECT_NAME}_UI_FILES}
-)
+    ${${PROJECT_NAME}_UI_FILES})
 
 if(ENABLE_NLS)
     set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
     add_custom_command(
         OUTPUT ${${PROJECT_NAME}_DESKTOP_FILE}
-        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --desktop -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in -o ${${PROJECT_NAME}_DESKTOP_FILE}
+        COMMAND
+            ${GETTEXT_MSGFMT_EXECUTABLE}
+            --desktop
+            -d ${CMAKE_SOURCE_DIR}/po
+            --template ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
+            -o ${${PROJECT_NAME}_DESKTOP_FILE}
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
-        VERBATIM
-    )
+        VERBATIM)
 
     set(${PROJECT_NAME}_METAINFO_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
     add_custom_command(
         OUTPUT ${${PROJECT_NAME}_METAINFO_FILE}
-        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --xml -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in -o ${${PROJECT_NAME}_METAINFO_FILE}
+        COMMAND
+            ${GETTEXT_MSGFMT_EXECUTABLE}
+            --xml
+            -d ${CMAKE_SOURCE_DIR}/po
+            --template ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in
+            -o ${${PROJECT_NAME}_METAINFO_FILE}
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in
-        VERBATIM
-    )
+        VERBATIM)
 
-    source_group("Generated Files" FILES ${${PROJECT_NAME}_DESKTOP_FILE} ${${PROJECT_NAME}_METAINFO_FILE})
+    source_group("Generated Files"
+        FILES
+            ${${PROJECT_NAME}_DESKTOP_FILE}
+            ${${PROJECT_NAME}_METAINFO_FILE})
 endif()
 
 set(${PROJECT_NAME}_SOURCES
@@ -130,8 +133,7 @@ set(${PROJECT_NAME}_SOURCES
     TorrentSorter.cc
     Utils.cc
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.c
-)
+    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.c)
 
 set(${PROJECT_NAME}_HEADERS
     Actions.h
@@ -165,28 +167,24 @@ set(${PROJECT_NAME}_HEADERS
     TorrentSorter.h
     Utils.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.h
-)
+    ${CMAKE_CURRENT_BINARY_DIR}/transmission-ui-resources.h)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
-    ${PROJECT_BINARY_DIR}
-)
+    ${PROJECT_BINARY_DIR})
 
-include_directories(
-    SYSTEM
+include_directories(SYSTEM
     ${GTK${GTK_VERSION}_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS}
-)
+    ${EVENT2_INCLUDE_DIRS})
 
 if(WITH_APPINDICATOR)
-    include_directories(SYSTEM ${APPINDICATOR_INCLUDE_DIRS})
+    include_directories(SYSTEM
+        ${APPINDICATOR_INCLUDE_DIRS})
 endif()
 
 link_directories(
-    ${GTK${GTK_VERSION}_LIBRARY_DIRS}
-)
+    ${GTK${GTK_VERSION}_LIBRARY_DIRS})
 
 add_definitions(
     "-DTRANSMISSIONLOCALEDIR=\"${CMAKE_INSTALL_FULL_LOCALEDIR}\""
@@ -205,17 +203,24 @@ add_definitions(
     -DGTKMM_DISABLE_DEPRECATED
     -DPANGOMM_DISABLE_DEPRECATED
     -DSIGCXX_DISABLE_DEPRECATED
-    ${GTK${GTK_VERSION}_CFLAGS_OTHER}
-)
+    ${GTK${GTK_VERSION}_CFLAGS_OTHER})
 
 if(ENABLE_UTP)
     add_definitions(-DWITH_UTP)
 endif()
 
 if(WITH_APPINDICATOR)
-    set_property(SOURCE SystemTrayIcon.cc APPEND PROPERTY COMPILE_DEFINITIONS HAVE_APPINDICATOR)
+    set_property(
+        SOURCE SystemTrayIcon.cc
+        APPEND
+        PROPERTY COMPILE_DEFINITIONS
+            HAVE_APPINDICATOR)
     if(APPINDICATOR_IS_AYATANA)
-        set_property(SOURCE SystemTrayIcon.cc APPEND PROPERTY COMPILE_DEFINITIONS APPINDICATOR_IS_AYATANA)
+        set_property(
+            SOURCE SystemTrayIcon.cc
+            APPEND
+            PROPERTY COMPILE_DEFINITIONS
+                APPINDICATOR_IS_AYATANA)
     endif()
 endif()
 
@@ -230,50 +235,64 @@ add_executable(${TR_NAME}-gtk WIN32
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_DESKTOP_FILE}
     ${${PROJECT_NAME}_METAINFO_FILE}
-    ${${PROJECT_NAME}_WIN32_RC_FILE}
-)
+    ${${PROJECT_NAME}_WIN32_RC_FILE})
 
 target_link_libraries(${TR_NAME}-gtk
     ${TR_NAME}
     ${GTK${GTK_VERSION}_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${EVENT2_LIBRARIES}
-)
+    ${EVENT2_LIBRARIES})
 
 if(WITH_APPINDICATOR)
-    target_link_libraries(${TR_NAME}-gtk ${APPINDICATOR_LIBRARIES})
+    target_link_libraries(${TR_NAME}-gtk
+        ${APPINDICATOR_LIBRARIES})
 endif()
 
 if(NOT MSVC)
-    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-exit-time-destructors)
+    target_compile_options(${TR_NAME}-gtk
+        PRIVATE
+            -Wno-exit-time-destructors)
 endif()
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
-install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(
+    TARGETS ${TR_NAME}-gtk
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 set(${PROJECT_NAME}_PUBLIC_ICONS
     hicolor_apps_scalable_transmission.svg
     hicolor_apps_scalable_transmission-devel.svg
-    hicolor_apps_symbolic_transmission-symbolic.svg
-)
+    hicolor_apps_symbolic_transmission-symbolic.svg)
 
 set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
 foreach(ICON ${${PROJECT_NAME}_PUBLIC_ICONS})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
-    install(FILES icons/${ICON} DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/ RENAME ${ICON_NAME})
+    install(
+        FILES icons/${ICON}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/
+        RENAME ${ICON_NAME})
 endforeach()
 
 if(INSTALL_DOC)
-    install(FILES ${TR_NAME}-gtk.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+    install(
+        FILES ${TR_NAME}-gtk.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
 
 if(ENABLE_NLS)
-    install(FILES ${${PROJECT_NAME}_DESKTOP_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-    install(FILES ${${PROJECT_NAME}_METAINFO_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+    install(
+        FILES ${${PROJECT_NAME}_DESKTOP_FILE}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(
+        FILES ${${PROJECT_NAME}_METAINFO_FILE}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 else()
-    install(FILES transmission-gtk.desktop.in DESTINATION ${CMAKE_INSTALL_DATADIR}/applications RENAME ${TR_NAME}-gtk.desktop)
+    install(
+        FILES transmission-gtk.desktop.in
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+        RENAME ${TR_NAME}-gtk.desktop)
 endif()

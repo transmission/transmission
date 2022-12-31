@@ -11,7 +11,8 @@ macro(tr_auto_option_changed NAME ACC VAL FIL STK)
 endmacro()
 
 macro(tr_auto_option NAME DESC VAL)
-    set(${NAME} "${VAL}" CACHE STRING "${DESC}")
+    set(${NAME} "${VAL}"
+        CACHE STRING "${DESC}")
     set_property(CACHE ${NAME} PROPERTY STRINGS "AUTO;ON;OFF")
     variable_watch(${NAME} tr_auto_option_changed)
 endmacro()
@@ -57,7 +58,7 @@ endmacro()
 
 macro(tr_get_required_flag IVAR OVAR)
     set(${OVAR})
-    if (${IVAR} AND NOT ${IVAR} STREQUAL "AUTO")
+    if(${IVAR} AND NOT ${IVAR} STREQUAL "AUTO")
         set(${OVAR} REQUIRED)
     endif()
 endmacro()
@@ -82,8 +83,10 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         set(${ID}_UPSTREAM_TARGET ${LIBNAME})
         set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${${ID}_UPSTREAM_TARGET}")
 
-        set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include" CACHE INTERNAL "")
-        set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}" CACHE INTERNAL "")
+        set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include"
+            CACHE INTERNAL "")
+        set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+            CACHE INTERNAL "")
 
         set(${ID}_INCLUDE_DIRS ${${ID}_INCLUDE_DIR})
         set(${ID}_LIBRARIES ${${ID}_LIBRARY})
@@ -114,8 +117,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
                 "-DCMAKE_INSTALL_LIBDIR:STRING=lib"
                 ${${ID}_EXT_PROJ_CMAKE_ARGS}
-            BUILD_BYPRODUCTS "${${ID}_LIBRARY}"
-        )
+            BUILD_BYPRODUCTS "${${ID}_LIBRARY}")
 
         set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "third-party")
     endif()
@@ -180,7 +182,10 @@ function(tr_fixup_bundle_item BUNDLE_DIR BUNDLE_ITEMS DEP_DIRS)
                 set(DEP_BUNDLE_PATH "Contents/MacOS/${DEP_NAME}")
             elseif(DEP_FULL_PATH MATCHES "^(.+)/(([^/]+[.]framework)/.+)$")
                 set(DEP_NAME "${CMAKE_MATCH_2}")
-                file(COPY "${CMAKE_MATCH_1}/${CMAKE_MATCH_3}" DESTINATION "${BUNDLE_DIR}/Contents/Frameworks/" PATTERN "Headers" EXCLUDE)
+                file(
+                    COPY "${CMAKE_MATCH_1}/${CMAKE_MATCH_3}"
+                    DESTINATION "${BUNDLE_DIR}/Contents/Frameworks/"
+                    PATTERN "Headers" EXCLUDE)
                 set(DEP_BUNDLE_PATH "Contents/Frameworks/${DEP_NAME}")
             else()
                 message(FATAL_ERROR "Don't know how to fixup '${DEP_FULL_PATH}'")

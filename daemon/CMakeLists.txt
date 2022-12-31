@@ -5,29 +5,30 @@ if(WITH_SYSTEMD)
 endif()
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}
-)
-include_directories(
-    SYSTEM
+    ${CMAKE_SOURCE_DIR})
+include_directories(SYSTEM
     ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS}
-)
+    ${EVENT2_INCLUDE_DIRS})
 
 set(${PROJECT_NAME}_SOURCES
     daemon.cc
     daemon-posix.cc
-    daemon-win32.cc
-)
+    daemon-win32.cc)
 
 if(WIN32)
-    set_source_files_properties(daemon-posix.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        daemon-posix.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 else()
-    set_source_files_properties(daemon-win32.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        daemon-win32.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_HEADERS
-    daemon.h
-)
+    daemon.h)
 
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
     "Transmission Daemon"
@@ -41,18 +42,24 @@ add_executable(${TR_NAME}-daemon
 
 target_link_libraries(${TR_NAME}-daemon
     ${TR_NAME}
-    ${EVENT2_LIBRARIES}
-)
+    ${EVENT2_LIBRARIES})
 
 if(WITH_SYSTEMD)
-    target_include_directories(${TR_NAME}-daemon PRIVATE ${SYSTEMD_INCLUDE_DIRS})
-    target_link_libraries(${TR_NAME}-daemon ${SYSTEMD_LIBRARIES})
+    target_include_directories(${TR_NAME}-daemon
+        PRIVATE
+            ${SYSTEMD_INCLUDE_DIRS})
+    target_link_libraries(${TR_NAME}-daemon
+        ${SYSTEMD_LIBRARIES})
 endif()
 
 foreach(P daemon)
-    install(TARGETS ${TR_NAME}-${P} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(
+        TARGETS ${TR_NAME}-${P}
+        DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     if(INSTALL_DOC)
-        install(FILES ${TR_NAME}-${P}.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+        install(
+            FILES ${TR_NAME}-${P}.1
+            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
     endif()
 endforeach()

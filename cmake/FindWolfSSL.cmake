@@ -12,13 +12,18 @@ if(UNIX)
     pkg_check_modules(_WOLFSSL QUIET wolfssl)
 endif()
 
-find_path(WOLFSSL_INCLUDE_DIR NAMES wolfssl/version.h HINTS ${_WOLFSSL_INCLUDEDIR})
-find_library(WOLFSSL_LIBRARY NAMES wolfssl HINTS ${_WOLFSSL_LIBDIR})
+find_path(WOLFSSL_INCLUDE_DIR
+    NAMES wolfssl/version.h
+    HINTS ${_WOLFSSL_INCLUDEDIR})
+find_library(WOLFSSL_LIBRARY
+    NAMES wolfssl
+    HINTS ${_WOLFSSL_LIBDIR})
 
 if(_WOLFSSL_VERSION)
     set(WOLFSSL_VERSION ${_WOLFSSL_VERSION})
 elseif(WOLFSSL_INCLUDE_DIR)
-    file(STRINGS "${WOLFSSL_INCLUDE_DIR}/wolfssl/version.h" WOLFSSL_VERSION_STR REGEX "^#define[\t ]+LIBWOLFSSL_VERSION_STRING[\t ]+\"[^\"]+\"")
+    file(STRINGS "${WOLFSSL_INCLUDE_DIR}/wolfssl/version.h" WOLFSSL_VERSION_STR
+        REGEX "^#define[\t ]+LIBWOLFSSL_VERSION_STRING[\t ]+\"[^\"]+\"")
     if(WOLFSSL_VERSION_STR MATCHES "\"([^\"]+)\"")
         set(WOLFSSL_VERSION "${CMAKE_MATCH_1}")
     endif()
@@ -33,9 +38,7 @@ find_package_handle_standard_args(WolfSSL
     REQUIRED_VARS
         WOLFSSL_LIBRARY
         WOLFSSL_INCLUDE_DIR
-    VERSION_VAR
-        WOLFSSL_VERSION
-)
+    VERSION_VAR WOLFSSL_VERSION)
 
 mark_as_advanced(WOLFSSL_INCLUDE_DIR WOLFSSL_LIBRARY)
 

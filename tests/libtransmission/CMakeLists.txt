@@ -51,7 +51,9 @@ add_executable(libtransmission-test
     watchdir-test.cc
     web-utils-test.cc)
 
-set_property(TARGET libtransmission-test PROPERTY FOLDER "tests")
+set_property(
+    TARGET libtransmission-test
+    PROPERTY FOLDER "tests")
 
 target_compile_definitions(libtransmission-test
     PRIVATE
@@ -72,8 +74,7 @@ target_include_directories(libtransmission-test SYSTEM
         ${EVENT2_INCLUDE_DIRS})
 
 target_compile_options(libtransmission-test
-    PRIVATE
-        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
+    PRIVATE $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
 
 target_link_libraries(libtransmission-test
     PRIVATE
@@ -88,14 +89,17 @@ add_custom_command(
     TARGET libtransmission-test
     PRE_BUILD
     COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_CURRENT_SOURCE_DIR}/subprocess-test-script.cmd
-            $<TARGET_FILE_DIR:libtransmission-test>/subprocess-test.cmd)
+        ${CMAKE_COMMAND}
+        -E copy_if_different
+        ${CMAKE_CURRENT_SOURCE_DIR}/subprocess-test-script.cmd
+        $<TARGET_FILE_DIR:libtransmission-test>/subprocess-test.cmd)
 
 add_executable(subprocess-test
     subprocess-test-program.cc)
 
-set_property(TARGET subprocess-test PROPERTY FOLDER "tests")
+set_property(
+    TARGET subprocess-test
+    PROPERTY FOLDER "tests")
 
 target_include_directories(subprocess-test
     PRIVATE

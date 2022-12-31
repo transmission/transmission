@@ -1,123 +1,148 @@
 project(libtr)
 
-configure_file(
-  version.h.in
-  version.h
-)
+configure_file(version.h.in version.h)
 
 set(${PROJECT_NAME}_SOURCES
-  announce-list.cc
-  announcer-http.cc
-  announcer-udp.cc
-  announcer.cc
-  bandwidth.cc
-  bitfield.cc
-  block-info.cc
-  blocklist.cc
-  cache.cc
-  clients.cc
-  completion.cc
-  crypto-utils-ccrypto.cc
-  crypto-utils-fallback.cc
-  crypto-utils-mbedtls.cc
-  crypto-utils-openssl.cc
-  crypto-utils-wolfssl.cc
-  crypto-utils.cc
-  error.cc
-  file-piece-map.cc
-  file-posix.cc
-  file-win32.cc
-  file.cc
-  handshake.cc
-  inout.cc
-  log.cc
-  magnet-metainfo.cc
-  makemeta.cc
-  net.cc
-  open-files.cc
-  peer-io.cc
-  peer-mgr-active-requests.cc
-  peer-mgr-wishlist.cc
-  peer-mgr.cc
-  peer-mse.cc
-  peer-msgs.cc
-  peer-socket.cc
-  platform-quota.cc
-  platform.cc
-  port-forwarding-natpmp.cc
-  port-forwarding-upnp.cc
-  port-forwarding.cc
-  quark.cc
-  resume.cc
-  rpc-server.cc
-  rpcimpl.cc
-  session-id.cc
-  session-alt-speeds.cc
-  session-settings.cc
-  session-thread.cc
-  session.cc
-  stats.cc
-  subprocess-posix.cc
-  subprocess-win32.cc
-  timer-ev.cc
-  torrent-ctor.cc
-  torrent-files.cc
-  torrent-magnet.cc
-  torrent-metainfo.cc
-  torrent.cc
-  torrents.cc
-  tr-assert.cc
-  tr-assert.mm
-  tr-dht.cc
-  tr-getopt.cc
-  tr-lpd.cc
-  tr-udp.cc
-  tr-utp.cc
-  utils.cc
-  variant-benc.cc
-  variant-json.cc
-  variant.cc
-  variant-converters.cc
-  verify.cc
-  watchdir-generic.cc
-  watchdir-inotify.cc
-  watchdir-kqueue.cc
-  watchdir-win32.cc
-  watchdir.cc
-  web-utils.cc
-  web.cc
-  webseed.cc
-)
+    announce-list.cc
+    announcer-http.cc
+    announcer-udp.cc
+    announcer.cc
+    bandwidth.cc
+    bitfield.cc
+    block-info.cc
+    blocklist.cc
+    cache.cc
+    clients.cc
+    completion.cc
+    crypto-utils-ccrypto.cc
+    crypto-utils-fallback.cc
+    crypto-utils-mbedtls.cc
+    crypto-utils-openssl.cc
+    crypto-utils-wolfssl.cc
+    crypto-utils.cc
+    error.cc
+    file-piece-map.cc
+    file-posix.cc
+    file-win32.cc
+    file.cc
+    handshake.cc
+    inout.cc
+    log.cc
+    magnet-metainfo.cc
+    makemeta.cc
+    net.cc
+    open-files.cc
+    peer-io.cc
+    peer-mgr-active-requests.cc
+    peer-mgr-wishlist.cc
+    peer-mgr.cc
+    peer-mse.cc
+    peer-msgs.cc
+    peer-socket.cc
+    platform-quota.cc
+    platform.cc
+    port-forwarding-natpmp.cc
+    port-forwarding-upnp.cc
+    port-forwarding.cc
+    quark.cc
+    resume.cc
+    rpc-server.cc
+    rpcimpl.cc
+    session-id.cc
+    session-alt-speeds.cc
+    session-settings.cc
+    session-thread.cc
+    session.cc
+    stats.cc
+    subprocess-posix.cc
+    subprocess-win32.cc
+    timer-ev.cc
+    torrent-ctor.cc
+    torrent-files.cc
+    torrent-magnet.cc
+    torrent-metainfo.cc
+    torrent.cc
+    torrents.cc
+    tr-assert.cc
+    tr-assert.mm
+    tr-dht.cc
+    tr-getopt.cc
+    tr-lpd.cc
+    tr-udp.cc
+    tr-utp.cc
+    utils.cc
+    variant-benc.cc
+    variant-json.cc
+    variant.cc
+    variant-converters.cc
+    verify.cc
+    watchdir-generic.cc
+    watchdir-inotify.cc
+    watchdir-kqueue.cc
+    watchdir-win32.cc
+    watchdir.cc
+    web-utils.cc
+    web.cc
+    webseed.cc)
 
-set_source_files_properties(crypto-utils-fallback.cc PROPERTIES HEADER_FILE_ONLY ON)
+set_source_files_properties(
+    crypto-utils-fallback.cc
+    PROPERTIES
+        HEADER_FILE_ONLY ON)
 foreach(CP ccrypto mbedtls openssl wolfssl)
     if(NOT CP STREQUAL CRYPTO_PKG)
-        set_source_files_properties(crypto-utils-${CP}.cc PROPERTIES HEADER_FILE_ONLY ON)
+        set_source_files_properties(
+            crypto-utils-${CP}.cc
+            PROPERTIES
+                HEADER_FILE_ONLY ON)
     endif()
 endforeach()
 
 if(WITH_INOTIFY)
-    add_definitions(-DWITH_INOTIFY)
+    add_definitions(
+        -DWITH_INOTIFY)
 else()
-    set_source_files_properties(watchdir-inotify.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        watchdir-inotify.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 endif()
 
 if(WITH_KQUEUE)
-    add_definitions(-DWITH_KQUEUE)
+    add_definitions(
+        -DWITH_KQUEUE)
 else()
-    set_source_files_properties(watchdir-kqueue.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        watchdir-kqueue.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 endif()
 
 if(WIN32)
-    set_source_files_properties(file-posix.cc subprocess-posix.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        file-posix.cc
+        subprocess-posix.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 else()
-    set_source_files_properties(file-win32.cc subprocess-win32.cc watchdir-win32.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        file-win32.cc
+        subprocess-win32.cc
+        watchdir-win32.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 endif()
 
 if(APPLE)
-    set_source_files_properties(tr-assert.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        tr-assert.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 else()
-    set_source_files_properties(tr-assert.mm PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        tr-assert.mm
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
@@ -142,8 +167,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     variant.h
     watchdir.h
     web-utils.h
-    web.h
-)
+    web.h)
 
 set(${PROJECT_NAME}_PRIVATE_HEADERS
     announce-list.h
@@ -200,11 +224,13 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     verify.h
     version.h
     watchdir-base.h
-    webseed.h
-)
+    webseed.h)
 
 if(NOT ENABLE_UTP)
-    set_source_files_properties(tr-utp.cc PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(
+        tr-utp.cc
+        PROPERTIES
+            HEADER_FILE_ONLY ON)
 endif()
 
 add_definitions(
@@ -213,41 +239,44 @@ add_definitions(
     -DWIDE_INTEGER_DISABLE_IOSTREAM
     "-DPACKAGE_DATA_DIR=\"${CMAKE_INSTALL_FULL_DATAROOTDIR}\""
     ${NATPMP_DEFINITIONS}
-    ${MINIUPNPC_DEFINITIONS}
-)
+    ${MINIUPNPC_DEFINITIONS})
 
 if(ENABLE_LIGHTWEIGHT)
-    add_definitions(-DTR_LIGHTWEIGHT)
+    add_definitions(
+        -DTR_LIGHTWEIGHT)
 endif()
 
 if(NOT ENABLE_NLS)
-    add_definitions(-DDISABLE_GETTEXT)
+    add_definitions(
+        -DDISABLE_GETTEXT)
 endif()
 
 if(ENABLE_UTP)
-    add_definitions(-DWITH_UTP)
+    add_definitions(
+        -DWITH_UTP)
 endif()
 
 if(MINIUPNPC_VERSION VERSION_LESS 1.7)
     # API version macro was only added in 1.7
-    add_definitions(-DMINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION})
+    add_definitions(
+        -DMINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION})
 endif()
 
 if(USE_SYSTEM_B64)
-    add_definitions(-DUSE_SYSTEM_B64)
+    add_definitions(
+        -DUSE_SYSTEM_B64)
 endif()
 
 if(HAVE_SO_REUSEPORT)
-    add_definitions(-DHAVE_SO_REUSEPORT=1)
+    add_definitions(
+        -DHAVE_SO_REUSEPORT=1)
 endif()
 
 include_directories(
     ${PROJECT_SOURCE_DIR}
-    ${PROJECT_BINARY_DIR}
-)
+    ${PROJECT_BINARY_DIR})
 
-include_directories(
-    SYSTEM
+include_directories(SYSTEM
     ${WIDE_INTEGER_INCLUDE_DIRS}
     ${UTFCPP_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
@@ -260,27 +289,27 @@ include_directories(
     ${MINIUPNPC_INCLUDE_DIRS}
     ${DHT_INCLUDE_DIRS}
     ${UTP_INCLUDE_DIRS}
-    ${B64_INCLUDE_DIRS}
-)
+    ${B64_INCLUDE_DIRS})
 
 if(ICONV_FOUND)
-    include_directories(SYSTEM ${ICONV_INCLUDE_DIRS})
+    include_directories(SYSTEM
+        ${ICONV_INCLUDE_DIRS})
 endif()
 
 add_library(${TR_NAME} STATIC
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_PUBLIC_HEADERS}
-    ${${PROJECT_NAME}_PRIVATE_HEADERS}
-)
+    ${${PROJECT_NAME}_PRIVATE_HEADERS})
 
-foreach(UT ${EVENT2_UPSTREAM_TARGET}
-           ${NATPMP_UPSTREAM_TARGET}
-           ${MINIUPNPC_UPSTREAM_TARGET}
-           ${DHT_UPSTREAM_TARGET}
-           ${DEFLATE_UPSTREAM_TARGET}
-           ${UTP_UPSTREAM_TARGET}
-           ${PSL_UPSTREAM_TARGET}
-           ${B64_UPSTREAM_TARGET})
+foreach(UT
+        ${EVENT2_UPSTREAM_TARGET}
+        ${NATPMP_UPSTREAM_TARGET}
+        ${MINIUPNPC_UPSTREAM_TARGET}
+        ${DHT_UPSTREAM_TARGET}
+        ${DEFLATE_UPSTREAM_TARGET}
+        ${UTP_UPSTREAM_TARGET}
+        ${PSL_UPSTREAM_TARGET}
+        ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
 endforeach()
 
@@ -300,22 +329,29 @@ target_link_libraries(${TR_NAME}
     ${LIBM_LIBRARY}
     ${TR_NETWORK_LIBRARIES}
     jsonsl
-    wildmat
-)
+    wildmat)
 
 if(ICONV_FOUND)
-    target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
+    target_link_libraries(${TR_NAME}
+        ${ICONV_LIBRARIES})
 endif()
 
 if(WIN32)
-    target_link_libraries(${TR_NAME} crypt32 shlwapi)
+    target_link_libraries(${TR_NAME}
+        crypt32
+        shlwapi)
 endif()
 
 if(APPLE)
-    target_link_libraries(${TR_NAME} "-framework Foundation")
+    target_link_libraries(${TR_NAME}
+        "-framework Foundation")
 endif()
 
 if(INSTALL_LIB)
-    install(TARGETS ${TR_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(FILES ${${PROJECT_NAME}_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TR_NAME})
+    install(
+        TARGETS ${TR_NAME}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(
+        FILES ${${PROJECT_NAME}_PUBLIC_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TR_NAME})
 endif()
