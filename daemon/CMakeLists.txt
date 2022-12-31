@@ -35,10 +35,13 @@ tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
     "${TR_NAME}-daemon"
     "${TR_NAME}-daemon.exe")
 
-add_executable(${TR_NAME}-daemon
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_WIN32_RC_FILE})
+add_executable(${TR_NAME}-daemon)
+
+target_sources(${TR_NAME}-daemon
+    PRIVATE
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_HEADERS}
+        ${${PROJECT_NAME}_WIN32_RC_FILE})
 
 target_link_libraries(${TR_NAME}-daemon
     ${TR_NAME}

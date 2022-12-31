@@ -12,9 +12,11 @@ foreach(P create edit remote show)
         "${TR_NAME}-${P}"
         "${TR_NAME}-${P}.exe")
 
-    add_executable(${TR_NAME}-${P}
-        ${P}.cc
-        ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
+    add_executable(${TR_NAME}-${P})
+    target_sources(${TR_NAME}-${P}
+        PRIVATE
+            ${P}.cc
+            ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
     target_link_libraries(${TR_NAME}-${P}
         ${TR_NAME})
 

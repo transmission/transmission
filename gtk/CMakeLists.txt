@@ -230,12 +230,15 @@ tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
     "${TR_NAME}-gtk.exe"
     "${TR_NAME}.ico")
 
-add_executable(${TR_NAME}-gtk WIN32
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_DESKTOP_FILE}
-    ${${PROJECT_NAME}_METAINFO_FILE}
-    ${${PROJECT_NAME}_WIN32_RC_FILE})
+add_executable(${TR_NAME}-gtk WIN32)
+
+target_sources(${TR_NAME}-gtk
+    PRIVATE
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_HEADERS}
+        ${${PROJECT_NAME}_DESKTOP_FILE}
+        ${${PROJECT_NAME}_METAINFO_FILE}
+        ${${PROJECT_NAME}_WIN32_RC_FILE})
 
 target_link_libraries(${TR_NAME}-gtk
     ${TR_NAME}

@@ -296,10 +296,13 @@ if(ICONV_FOUND)
         ${ICONV_INCLUDE_DIRS})
 endif()
 
-add_library(${TR_NAME} STATIC
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_PUBLIC_HEADERS}
-    ${${PROJECT_NAME}_PRIVATE_HEADERS})
+add_library(${TR_NAME} STATIC)
+
+target_sources(${TR_NAME}
+    PRIVATE
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_PUBLIC_HEADERS}
+        ${${PROJECT_NAME}_PRIVATE_HEADERS})
 
 foreach(UT
         ${EVENT2_UPSTREAM_TARGET}

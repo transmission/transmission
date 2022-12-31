@@ -236,13 +236,16 @@ if(ENABLE_QT_COM_INTEROP)
             HEADER_FILE_ONLY ON)
 endif()
 
-add_executable(${TR_NAME}-qt WIN32
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_UI_SOURCES}
-    ${${PROJECT_NAME}_QRC_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_QM_FILES}
-    ${${PROJECT_NAME}_WIN32_RC_FILE})
+add_executable(${TR_NAME}-qt WIN32)
+
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_UI_SOURCES}
+        ${${PROJECT_NAME}_QRC_SOURCES}
+        ${${PROJECT_NAME}_HEADERS}
+        ${${PROJECT_NAME}_QM_FILES}
+        ${${PROJECT_NAME}_WIN32_RC_FILE})
 
 target_link_libraries(${TR_NAME}-qt
     ${TR_NAME}

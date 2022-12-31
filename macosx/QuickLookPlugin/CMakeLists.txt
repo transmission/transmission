@@ -58,10 +58,13 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
-add_library(${TR_NAME}-mac-ql MODULE
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_RESOURCES})
+add_library(${TR_NAME}-mac-ql MODULE)
+
+target_sources(${TR_NAME}-mac-ql
+    PRIVATE
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_HEADERS}
+        ${${PROJECT_NAME}_RESOURCES})
 
 set(MAC_QL_BUNDLE_NAME QuickLookPlugin)
 

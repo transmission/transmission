@@ -409,9 +409,12 @@ add_compile_options(
     # GNU extensions are good practice in Objective-C
     -Wno-gnu)
 
-add_library(vdkqueue STATIC
-    VDKQueue/VDKQueue.mm
-    VDKQueue/VDKQueue.h)
+add_library(vdkqueue STATIC)
+
+target_sources(vdkqueue
+    PRIVATE
+        VDKQueue/VDKQueue.mm
+        VDKQueue/VDKQueue.h)
 
 set_property(
     TARGET vdkqueue
@@ -438,14 +441,17 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
             MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
 endforeach()
 
-add_executable(${TR_NAME}-mac MACOSX_BUNDLE
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_XIB_FILES}
-    ${${PROJECT_NAME}_NIB_FILES}
-    ${${PROJECT_NAME}_BASE_XIB_FILES}
-    ${${PROJECT_NAME}_BASE_NIB_FILES}
-    ${${PROJECT_NAME}_RESOURCES})
+add_executable(${TR_NAME}-mac MACOSX_BUNDLE)
+
+target_sources(${TR_NAME}-mac
+    PRIVATE
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_HEADERS}
+        ${${PROJECT_NAME}_XIB_FILES}
+        ${${PROJECT_NAME}_NIB_FILES}
+        ${${PROJECT_NAME}_BASE_XIB_FILES}
+        ${${PROJECT_NAME}_BASE_NIB_FILES}
+        ${${PROJECT_NAME}_RESOURCES})
 
 find_library(SPARKLE_FRAMEWORK Sparkle
     PATHS ${PROJECT_SOURCE_DIR}
