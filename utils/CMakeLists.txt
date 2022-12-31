@@ -7,18 +7,17 @@ include_directories(SYSTEM
     ${CURL_INCLUDE_DIRS})
 
 foreach(P create edit remote show)
-    tr_win32_app_info(${PROJECT_NAME}_${P}_WIN32_RC_FILE
-        "Transmission Utility ('${P}')"
-        "${TR_NAME}-${P}"
-        "${TR_NAME}-${P}.exe")
-
     add_executable(${TR_NAME}-${P})
     target_sources(${TR_NAME}-${P}
         PRIVATE
-            ${P}.cc
-            ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
+            ${P}.cc)
     target_link_libraries(${TR_NAME}-${P}
         ${TR_NAME})
+
+    tr_win32_app_info(${TR_NAME}-${P}
+        "Transmission Utility ('${P}')"
+        "${TR_NAME}-${P}"
+        "${TR_NAME}-${P}.exe")
 
     install(
         TARGETS ${TR_NAME}-${P}

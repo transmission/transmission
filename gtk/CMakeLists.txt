@@ -224,12 +224,6 @@ if(WITH_APPINDICATOR)
     endif()
 endif()
 
-tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
-    "Transmission GTK+ Client"
-    "${TR_NAME}-gtk"
-    "${TR_NAME}-gtk.exe"
-    "${TR_NAME}.ico")
-
 add_executable(${TR_NAME}-gtk WIN32)
 
 target_sources(${TR_NAME}-gtk
@@ -237,8 +231,7 @@ target_sources(${TR_NAME}-gtk
         ${${PROJECT_NAME}_SOURCES}
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_DESKTOP_FILE}
-        ${${PROJECT_NAME}_METAINFO_FILE}
-        ${${PROJECT_NAME}_WIN32_RC_FILE})
+        ${${PROJECT_NAME}_METAINFO_FILE})
 
 target_link_libraries(${TR_NAME}-gtk
     ${TR_NAME}
@@ -260,6 +253,12 @@ endif()
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
+
+tr_win32_app_info(${TR_NAME}-gtk
+    "Transmission GTK+ Client"
+    "${TR_NAME}-gtk"
+    "${TR_NAME}-gtk.exe"
+    "${TR_NAME}.ico")
 
 install(
     TARGETS ${TR_NAME}-gtk

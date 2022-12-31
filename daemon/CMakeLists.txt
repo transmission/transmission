@@ -30,18 +30,12 @@ endif()
 set(${PROJECT_NAME}_HEADERS
     daemon.h)
 
-tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
-    "Transmission Daemon"
-    "${TR_NAME}-daemon"
-    "${TR_NAME}-daemon.exe")
-
 add_executable(${TR_NAME}-daemon)
 
 target_sources(${TR_NAME}-daemon
     PRIVATE
         ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_HEADERS}
-        ${${PROJECT_NAME}_WIN32_RC_FILE})
+        ${${PROJECT_NAME}_HEADERS})
 
 target_link_libraries(${TR_NAME}-daemon
     ${TR_NAME}
@@ -54,6 +48,11 @@ if(WITH_SYSTEMD)
     target_link_libraries(${TR_NAME}-daemon
         ${SYSTEMD_LIBRARIES})
 endif()
+
+tr_win32_app_info(${TR_NAME}-daemon
+    "Transmission Daemon"
+    "${TR_NAME}-daemon"
+    "${TR_NAME}-daemon.exe")
 
 foreach(P daemon)
     install(

@@ -213,12 +213,6 @@ include_directories(SYSTEM
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS})
 
-tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
-    "Transmission Qt Client"
-    "transmission-qt"
-    "transmission-qt.exe"
-    "qtr.ico")
-
 if(ENABLE_QT_COM_INTEROP)
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb
@@ -244,8 +238,7 @@ target_sources(${TR_NAME}-qt
         ${${PROJECT_NAME}_UI_SOURCES}
         ${${PROJECT_NAME}_QRC_SOURCES}
         ${${PROJECT_NAME}_HEADERS}
-        ${${PROJECT_NAME}_QM_FILES}
-        ${${PROJECT_NAME}_WIN32_RC_FILE})
+        ${${PROJECT_NAME}_QM_FILES})
 
 target_link_libraries(${TR_NAME}-qt
     ${TR_NAME}
@@ -268,6 +261,12 @@ set_target_properties(
     ${TR_NAME}-qt
     PROPERTIES
         AUTOMOC TRUE)
+
+tr_win32_app_info(${TR_NAME}-qt
+    "Transmission Qt Client"
+    "transmission-qt"
+    "transmission-qt.exe"
+    "qtr.ico")
 
 install(
     TARGETS ${TR_NAME}-qt

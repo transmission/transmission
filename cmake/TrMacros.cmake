@@ -131,7 +131,7 @@ function(tr_append_target_property TGT PROP VAL)
     set_target_properties(${TGT} PROPERTIES ${PROP} "${VAL}")
 endfunction()
 
-function(tr_win32_app_info OVAR DESCR INTNAME ORIGFNAME)
+function(tr_win32_app_info TGT DESCR INTNAME ORIGFNAME)
     if(NOT WIN32)
         return()
     endif()
@@ -145,7 +145,9 @@ function(tr_win32_app_info OVAR DESCR INTNAME ORIGFNAME)
 
     configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.rc.in" "${INTNAME}-app-info.rc")
 
-    set(${OVAR} "${CMAKE_CURRENT_BINARY_DIR}/${INTNAME}-app-info.rc" PARENT_SCOPE)
+    target_sources(${TGT}
+        PRIVATE
+            "${CMAKE_CURRENT_BINARY_DIR}/${INTNAME}-app-info.rc")
 endfunction()
 
 function(tr_select_library LIBNAMES FUNCNAME DIRS OVAR)
