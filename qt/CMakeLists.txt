@@ -135,10 +135,6 @@ set(${PROJECT_NAME}_UI_FILES
 source_group(Ui
     FILES ${${PROJECT_NAME}_UI_FILES})
 
-tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES ${${PROJECT_NAME}_UI_FILES})
-source_group("Generated Files"
-    FILES ${${PROJECT_NAME}_UI_SOURCES})
-
 set(${PROJECT_NAME}_QRC_FILES application.qrc)
 if(WIN32 OR APPLE)
     list(APPEND ${PROJECT_NAME}_QRC_FILES icons/Faenza/Faenza.qrc)
@@ -219,7 +215,7 @@ add_executable(${TR_NAME}-qt WIN32)
 target_sources(${TR_NAME}-qt
     PRIVATE
         ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_UI_SOURCES}
+        ${${PROJECT_NAME}_UI_FILES}
         ${${PROJECT_NAME}_QRC_SOURCES}
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_QM_FILES})
@@ -231,7 +227,6 @@ target_include_directories(${TR_NAME}-qt
 
 target_include_directories(${TR_NAME}-qt SYSTEM
     PRIVATE
-        ${PROJECT_BINARY_DIR}
         ${CURL_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS})
 
@@ -255,7 +250,8 @@ endif()
 set_target_properties(
     ${TR_NAME}-qt
     PROPERTIES
-        AUTOMOC TRUE)
+        AUTOMOC ON
+        AUTOUIC ON)
 
 tr_win32_app_info(${TR_NAME}-qt
     "Transmission Qt Client"
