@@ -30,6 +30,9 @@ macro(tr_wrap_xib IFILE OFILE)
         FILES ${OFILE})
 endmacro()
 
+add_subdirectory(QuickLookPlugin)
+add_subdirectory(VDKQueue)
+
 set(${PROJECT_NAME}_SOURCES
     AboutWindowController.mm
     AddMagnetWindowController.mm
@@ -399,17 +402,6 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
-add_library(vdkqueue STATIC)
-
-target_sources(vdkqueue
-    PRIVATE
-        VDKQueue/VDKQueue.mm
-        VDKQueue/VDKQueue.h)
-
-set_property(
-    TARGET vdkqueue
-    PROPERTY FOLDER "third-party")
-
 set(BASE_NIB_FILES_RESOURCES_DIR Resources)
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)
     string(APPEND BASE_NIB_FILES_RESOURCES_DIR /Base.lproj)
@@ -445,8 +437,7 @@ target_sources(${TR_NAME}-mac
 
 target_include_directories(${TR_NAME}-mac
     PRIVATE
-        ${CMAKE_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/VDKQueue)
+        ${CMAKE_SOURCE_DIR})
 
 target_include_directories(${TR_NAME}-mac SYSTEM
     PRIVATE
@@ -484,8 +475,6 @@ set_target_properties(
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
         MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/Info.plist.in
         INSTALL_RPATH "@executable_path;@executable_path/../Frameworks")
-
-add_subdirectory(QuickLookPlugin)
 
 install(
     TARGETS ${TR_NAME}-mac
