@@ -2,56 +2,112 @@ project(trqt)
 
 set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 
-set(${PROJECT_NAME}_SOURCES
-    AboutDialog.cc
-    AddData.cc
-    Application.cc
-    ColumnResizer.cc
-    ComInteropHelper.cc
-    DBusInteropHelper.cc
-    DetailsDialog.cc
-    FaviconCache.cc
-    FileTreeDelegate.cc
-    FileTreeItem.cc
-    FileTreeModel.cc
-    FileTreeView.cc
-    FilterBar.cc
-    FilterBarComboBox.cc
-    FilterBarComboBoxDelegate.cc
-    Filters.cc
-    Formatter.cc
-    FreeSpaceLabel.cc
-    IconCache.cc
-    IconToolButton.cc
-    InteropHelper.cc
-    InteropObject.cc
-    LicenseDialog.cc
-    MainWindow.cc
-    MakeDialog.cc
-    OptionsDialog.cc
-    PathButton.cc
-    Prefs.cc
-    PrefsDialog.cc
-    RelocateDialog.cc
-    RpcClient.cc
-    RpcQueue.cc
-    Session.cc
-    SessionDialog.cc
-    SqueezeLabel.cc
-    StatsDialog.cc
-    StyleHelper.cc
-    Torrent.cc
-    TorrentDelegate.cc
-    TorrentDelegateMin.cc
-    TorrentFilter.cc
-    TorrentModel.cc
-    TorrentView.cc
-    TrackerDelegate.cc
-    TrackerModel.cc
-    TrackerModelFilter.cc
-    Utils.cc
-    VariantHelpers.cc
-    WatchDir.cc)
+add_executable(${TR_NAME}-qt WIN32)
+
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        AboutDialog.cc
+        AboutDialog.h
+        AddData.cc
+        AddData.h
+        Application.cc
+        Application.h
+        BaseDialog.h
+        ColumnResizer.cc
+        ColumnResizer.h
+        ComInteropHelper.cc
+        ComInteropHelper.h
+        CustomVariantType.h
+        DBusInteropHelper.cc
+        DBusInteropHelper.h
+        DetailsDialog.cc
+        DetailsDialog.h
+        FaviconCache.cc
+        FaviconCache.h
+        FileTreeDelegate.cc
+        FileTreeDelegate.h
+        FileTreeItem.cc
+        FileTreeItem.h
+        FileTreeModel.cc
+        FileTreeModel.h
+        FileTreeView.cc
+        FileTreeView.h
+        FilterBar.cc
+        FilterBar.h
+        FilterBarComboBox.cc
+        FilterBarComboBox.h
+        FilterBarComboBoxDelegate.cc
+        FilterBarComboBoxDelegate.h
+        Filters.cc
+        Filters.h
+        Formatter.cc
+        Formatter.h
+        FreeSpaceLabel.cc
+        FreeSpaceLabel.h
+        IconCache.cc
+        IconCache.h
+        IconToolButton.cc
+        IconToolButton.h
+        InteropHelper.cc
+        InteropHelper.h
+        InteropObject.cc
+        InteropObject.h
+        LicenseDialog.cc
+        LicenseDialog.h
+        MainWindow.cc
+        MainWindow.h
+        MakeDialog.cc
+        MakeDialog.h
+        OptionsDialog.cc
+        OptionsDialog.h
+        PathButton.cc
+        PathButton.h
+        Prefs.cc
+        Prefs.h
+        PrefsDialog.cc
+        PrefsDialog.h
+        RelocateDialog.cc
+        RelocateDialog.h
+        RpcClient.cc
+        RpcClient.h
+        RpcQueue.cc
+        RpcQueue.h
+        Session.cc
+        Session.h
+        SessionDialog.cc
+        SessionDialog.h
+        Speed.h
+        SqueezeLabel.cc
+        SqueezeLabel.h
+        StatsDialog.cc
+        StatsDialog.h
+        StyleHelper.cc
+        StyleHelper.h
+        Torrent.cc
+        Torrent.h
+        TorrentDelegate.cc
+        TorrentDelegate.h
+        TorrentDelegateMin.cc
+        TorrentDelegateMin.h
+        TorrentFilter.cc
+        TorrentFilter.h
+        TorrentModel.cc
+        TorrentModel.h
+        TorrentView.cc
+        TorrentView.h
+        TrackerDelegate.cc
+        TrackerDelegate.h
+        TrackerModel.cc
+        TrackerModel.h
+        TrackerModelFilter.cc
+        TrackerModelFilter.h
+        Typedefs.h
+        Utils.cc
+        Utils.h
+        VariantHelpers.cc
+        VariantHelpers.h
+        WatchDir.cc
+        WatchDir.h)
 
 if(NOT ENABLE_QT_COM_INTEROP)
     tr_disable_source_files_compile(ComInteropHelper.cc)
@@ -61,83 +117,36 @@ if(NOT ENABLE_QT_DBUS_INTEROP)
     tr_disable_source_files_compile(DBusInteropHelper.cc)
 endif()
 
-set(${PROJECT_NAME}_HEADERS
-    AboutDialog.h
-    AddData.h
-    Application.h
-    BaseDialog.h
-    ColumnResizer.h
-    ComInteropHelper.h
-    CustomVariantType.h
-    DBusInteropHelper.h
-    DetailsDialog.h
-    FaviconCache.h
-    FileTreeDelegate.h
-    FileTreeItem.h
-    FileTreeModel.h
-    FileTreeView.h
-    FilterBar.h
-    FilterBarComboBox.h
-    FilterBarComboBoxDelegate.h
-    Filters.h
-    Formatter.h
-    FreeSpaceLabel.h
-    IconCache.h
-    IconToolButton.h
-    InteropHelper.h
-    InteropObject.h
-    LicenseDialog.h
-    MainWindow.h
-    MakeDialog.h
-    OptionsDialog.h
-    PathButton.h
-    Prefs.h
-    PrefsDialog.h
-    RelocateDialog.h
-    RpcClient.h
-    RpcQueue.h
-    Session.h
-    SessionDialog.h
-    Speed.h
-    SqueezeLabel.h
-    StatsDialog.h
-    StyleHelper.h
-    Torrent.h
-    TorrentDelegate.h
-    TorrentDelegateMin.h
-    TorrentFilter.h
-    TorrentModel.h
-    TorrentView.h
-    TrackerDelegate.h
-    TrackerModel.h
-    TrackerModelFilter.h
-    Typedefs.h
-    Utils.h
-    VariantHelpers.h
-    WatchDir.h)
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        AboutDialog.ui
+        DetailsDialog.ui
+        LicenseDialog.ui
+        MainWindow.ui
+        MakeDialog.ui
+        MakeProgressDialog.ui
+        OptionsDialog.ui
+        PrefsDialog.ui
+        RelocateDialog.ui
+        SessionDialog.ui
+        StatsDialog.ui
+        TrackersDialog.ui)
 
-set(${PROJECT_NAME}_UI_FILES
-    AboutDialog.ui
-    DetailsDialog.ui
-    LicenseDialog.ui
-    MainWindow.ui
-    MakeDialog.ui
-    MakeProgressDialog.ui
-    OptionsDialog.ui
-    PrefsDialog.ui
-    RelocateDialog.ui
-    SessionDialog.ui
-    StatsDialog.ui
-    TrackersDialog.ui)
 source_group(Ui
-    FILES ${${PROJECT_NAME}_UI_FILES})
+    REGULAR_EXPRESSION [[.*\.ui$]])
 
-set(${PROJECT_NAME}_QRC_FILES application.qrc)
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        application.qrc)
+
 if(WIN32 OR APPLE)
-    list(APPEND ${PROJECT_NAME}_QRC_FILES icons/Faenza/Faenza.qrc)
+    target_sources(${TR_NAME}-qt
+        PRIVATE
+            icons/Faenza/Faenza.qrc)
 endif()
+
 source_group(Resources
-    FILES ${${PROJECT_NAME}_QRC_FILES})
+    REGULAR_EXPRESSION [[.*\.qrc$]])
 
 set(${PROJECT_NAME}_LINGUAS
     af
@@ -186,14 +195,8 @@ if(${PROJECT_NAME}_TS_FILES)
     tr_qt_add_translation(${PROJECT_NAME}_QM_FILES ${${PROJECT_NAME}_TS_FILES})
 endif()
 
-add_executable(${TR_NAME}-qt WIN32)
-
 target_sources(${TR_NAME}-qt
     PRIVATE
-        ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_UI_FILES}
-        ${${PROJECT_NAME}_QRC_FILES}
-        ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_QM_FILES})
 
 if(ENABLE_QT_COM_INTEROP)

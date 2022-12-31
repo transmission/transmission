@@ -2,91 +2,104 @@ project(trgtk)
 
 find_program(APPSTREAM appstreamcli)
 
-if(GTK_VERSION EQUAL 4)
-    set(UI_SUBDIR ui/gtk4)
-else()
-    set(UI_SUBDIR ui/gtk3)
-endif()
+add_executable(${TR_NAME}-gtk WIN32)
 
-set(${PROJECT_NAME}_UI_FILES
-    ${UI_SUBDIR}/AddTrackerDialog.ui
-    ${UI_SUBDIR}/DetailsDialog.ui
-    ${UI_SUBDIR}/EditTrackersDialog.ui
-    ${UI_SUBDIR}/FilterBar.ui
-    ${UI_SUBDIR}/MainWindow.ui
-    ${UI_SUBDIR}/MakeDialog.ui
-    ${UI_SUBDIR}/MakeProgressDialog.ui
-    ${UI_SUBDIR}/MessageLogWindow.ui
-    ${UI_SUBDIR}/OptionsDialog.ui
-    ${UI_SUBDIR}/PrefsDialog.ui
-    ${UI_SUBDIR}/RelocateDialog.ui
-    ${UI_SUBDIR}/StatsDialog.ui
-    ${UI_SUBDIR}/TorrentUrlChooserDialog.ui)
+target_sources(${TR_NAME}-gtk
+    PRIVATE
+        Actions.cc
+        Actions.h
+        Application.cc
+        Application.h
+        DetailsDialog.cc
+        DetailsDialog.h
+        Dialogs.cc
+        Dialogs.h
+        FaviconCache.cc
+        FaviconCache.h
+        FileList.cc
+        FileList.h
+        FilterBar.cc
+        FilterBar.h
+        Flags.h
+        FreeSpaceLabel.cc
+        FreeSpaceLabel.h
+        GtkCompat.h
+        HigWorkarea.h
+        IconCache.cc
+        IconCache.h
+        ListModelAdapter.cc
+        ListModelAdapter.h
+        main.cc
+        MainWindow.cc
+        MainWindow.h
+        MakeDialog.cc
+        MakeDialog.h
+        MessageLogWindow.cc
+        MessageLogWindow.h
+        Notify.cc
+        Notify.h
+        OptionsDialog.cc
+        OptionsDialog.h
+        PathButton.cc
+        PathButton.h
+        Prefs.cc
+        Prefs.h
+        PrefsDialog.cc
+        PrefsDialog.h
+        RelocateDialog.cc
+        RelocateDialog.h
+        Session.cc
+        Session.h
+        StatsDialog.cc
+        StatsDialog.h
+        SystemTrayIcon.cc
+        SystemTrayIcon.h
+        Torrent.cc
+        Torrent.h
+        TorrentCellRenderer.cc
+        TorrentCellRenderer.h
+        TorrentFilter.cc
+        TorrentFilter.h
+        TorrentSorter.cc
+        TorrentSorter.h
+        Utils.cc
+        Utils.h)
 
-set(${PROJECT_NAME}_SOURCES
-    Actions.cc
-    Application.cc
-    DetailsDialog.cc
-    Dialogs.cc
-    FaviconCache.cc
-    FileList.cc
-    FilterBar.cc
-    FreeSpaceLabel.cc
-    IconCache.cc
-    ListModelAdapter.cc
-    main.cc
-    MainWindow.cc
-    MakeDialog.cc
-    MessageLogWindow.cc
-    Notify.cc
-    OptionsDialog.cc
-    PathButton.cc
-    Prefs.cc
-    PrefsDialog.cc
-    RelocateDialog.cc
-    Session.cc
-    StatsDialog.cc
-    SystemTrayIcon.cc
-    Torrent.cc
-    TorrentCellRenderer.cc
-    TorrentFilter.cc
-    TorrentSorter.cc
-    Utils.cc)
+target_sources(${TR_NAME}-gtk
+    PRIVATE
+        ui/gtk3/AddTrackerDialog.ui
+        ui/gtk3/DetailsDialog.ui
+        ui/gtk3/EditTrackersDialog.ui
+        ui/gtk3/FilterBar.ui
+        ui/gtk3/MainWindow.ui
+        ui/gtk3/MakeDialog.ui
+        ui/gtk3/MakeProgressDialog.ui
+        ui/gtk3/MessageLogWindow.ui
+        ui/gtk3/OptionsDialog.ui
+        ui/gtk3/PrefsDialog.ui
+        ui/gtk3/RelocateDialog.ui
+        ui/gtk3/StatsDialog.ui
+        ui/gtk3/TorrentUrlChooserDialog.ui)
 
-set(${PROJECT_NAME}_HEADERS
-    Actions.h
-    Application.h
-    DetailsDialog.h
-    Dialogs.h
-    FaviconCache.h
-    FileList.h
-    FilterBar.h
-    Flags.h
-    FreeSpaceLabel.h
-    GtkCompat.h
-    HigWorkarea.h
-    IconCache.h
-    ListModelAdapter.h
-    MainWindow.h
-    MakeDialog.h
-    MessageLogWindow.h
-    Notify.h
-    OptionsDialog.h
-    PathButton.h
-    Prefs.h
-    PrefsDialog.h
-    RelocateDialog.h
-    Session.h
-    StatsDialog.h
-    SystemTrayIcon.h
-    Torrent.h
-    TorrentCellRenderer.h
-    TorrentFilter.h
-    TorrentSorter.h
-    Utils.h)
+target_sources(${TR_NAME}-gtk
+    PRIVATE
+        ui/gtk4/AddTrackerDialog.ui
+        ui/gtk4/DetailsDialog.ui
+        ui/gtk4/EditTrackersDialog.ui
+        ui/gtk4/FilterBar.ui
+        ui/gtk4/MainWindow.ui
+        ui/gtk4/MakeDialog.ui
+        ui/gtk4/MakeProgressDialog.ui
+        ui/gtk4/MessageLogWindow.ui
+        ui/gtk4/OptionsDialog.ui
+        ui/gtk4/PrefsDialog.ui
+        ui/gtk4/RelocateDialog.ui
+        ui/gtk4/StatsDialog.ui
+        ui/gtk4/TorrentUrlChooserDialog.ui)
 
-link_directories(
-    ${GTK${GTK_VERSION}_LIBRARY_DIRS})
+target_link_directories(${TR_NAME}-gtk
+    PRIVATE
+        ${GTK${GTK_VERSION}_LIBRARY_DIRS})
 
 if(WITH_APPINDICATOR)
     set_property(
@@ -103,14 +116,11 @@ if(WITH_APPINDICATOR)
     endif()
 endif()
 
-add_executable(${TR_NAME}-gtk WIN32)
-
-target_sources(${TR_NAME}-gtk
-    PRIVATE
-        ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_HEADERS}
-        ${${PROJECT_NAME}_DESKTOP_FILE}
-        ${${PROJECT_NAME}_METAINFO_FILE})
+if(GTK_VERSION EQUAL 4)
+    set(UI_SUBDIR ui/gtk4)
+else()
+    set(UI_SUBDIR ui/gtk3)
+endif()
 
 tr_target_glib_resources(${TR_NAME}-gtk
     transmission.gresource.xml
@@ -121,11 +131,17 @@ if(ENABLE_NLS)
     tr_gettext_msgfmt(${TR_NAME}-gtk
         ${${PROJECT_NAME}_DESKTOP_FILE}
         ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in)
+    target_sources(${TR_NAME}-gtk
+        PRIVATE
+            ${${PROJECT_NAME}_DESKTOP_FILE})
 
     set(${PROJECT_NAME}_METAINFO_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
     tr_gettext_msgfmt(${TR_NAME}-gtk
         ${${PROJECT_NAME}_METAINFO_FILE}
         ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in)
+    target_sources(${TR_NAME}-gtk
+        PRIVATE
+            ${${PROJECT_NAME}_METAINFO_FILE})
 endif()
 
 target_compile_definitions(${TR_NAME}-gtk

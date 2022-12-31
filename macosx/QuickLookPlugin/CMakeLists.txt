@@ -1,13 +1,14 @@
 project(trmacql)
 
-set(${PROJECT_NAME}_SOURCES
-    ../NSDataAdditions.mm
-    ../NSStringAdditions.mm
-    GeneratePreviewForURL.mm
-    GenerateThumbnailForURL.mm
-    main.cc)
+add_library(${TR_NAME}-mac-ql MODULE)
 
-set(${PROJECT_NAME}_HEADERS)
+target_sources(${TR_NAME}-mac-ql
+    PRIVATE
+        ../NSDataAdditions.mm
+        ../NSStringAdditions.mm
+        GeneratePreviewForURL.mm
+        GenerateThumbnailForURL.mm
+        main.cc)
 
 set(${PROJECT_NAME}_LINGUAS
     da
@@ -58,12 +59,8 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
-add_library(${TR_NAME}-mac-ql MODULE)
-
 target_sources(${TR_NAME}-mac-ql
     PRIVATE
-        ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_RESOURCES})
 
 set(MAC_QL_BUNDLE_NAME QuickLookPlugin)

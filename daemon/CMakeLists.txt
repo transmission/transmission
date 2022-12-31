@@ -1,25 +1,19 @@
 project(trdaemon)
 
-set(${PROJECT_NAME}_SOURCES
-    daemon.cc
-    daemon-posix.cc
-    daemon-win32.cc)
+add_executable(${TR_NAME}-daemon)
+
+target_sources(${TR_NAME}-daemon
+    PRIVATE
+        daemon.cc
+        daemon.h
+        daemon-posix.cc
+        daemon-win32.cc)
 
 if(WIN32)
     tr_disable_source_files_compile(daemon-posix.cc)
 else()
     tr_disable_source_files_compile(daemon-win32.cc)
 endif()
-
-set(${PROJECT_NAME}_HEADERS
-    daemon.h)
-
-add_executable(${TR_NAME}-daemon)
-
-target_sources(${TR_NAME}-daemon
-    PRIVATE
-        ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_HEADERS})
 
 target_compile_definitions(${TR_NAME}-daemon
     PRIVATE
