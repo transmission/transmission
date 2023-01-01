@@ -5,11 +5,16 @@
 
 #pragma once
 
-#include <memory>
-
-#include <gtkmm.h>
-
 #include <libtransmission/tr-macros.h>
+
+#include <glibmm/refptr.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/window.h>
+
+#include <memory>
 
 class Session;
 typedef struct tr_ctor tr_ctor;

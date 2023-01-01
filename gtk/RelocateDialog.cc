@@ -3,21 +3,24 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
-#include <string>
+#include "RelocateDialog.h"
 
-#include <glibmm.h>
+#include "GtkCompat.h"
+#include "PathButton.h"
+#include "Prefs.h" /* gtr_pref_string_get */
+#include "Session.h"
+#include "Utils.h"
+
 #include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/messagedialog.h>
 
 #include <fmt/core.h>
 
-#include <libtransmission/transmission.h>
-
-#include "PathButton.h"
-#include "Prefs.h" /* gtr_pref_string_get */
-#include "RelocateDialog.h"
-#include "Session.h"
-#include "Utils.h"
+#include <memory>
+#include <string>
 
 namespace
 {

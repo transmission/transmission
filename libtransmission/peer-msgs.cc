@@ -290,7 +290,7 @@ public:
         if (session->allowsDHT() && io->supports_dht())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
-            if (io->address().is_ipv4() || tr_globalIPv6(nullptr).has_value())
+            if (auto const [addr, is_any] = session->publicAddress(TR_AF_INET6); !is_any)
             {
                 protocolSendPort(this, session->udpPort());
             }
@@ -878,7 +878,6 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
     auto& out = msgs->outMessages;
-    auto const ipv6 = tr_globalIPv6(msgs->session);
     static tr_quark version_quark = 0;
 
     if (msgs->clientSentLtepHandshake)
@@ -916,9 +915,10 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantInitDict(&val, 8);
     tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode() != TR_CLEAR_PREFERRED);
 
-    if (ipv6.has_value())
+    if (auto const [addr, is_any] = msgs->session->publicAddress(TR_AF_INET6); !is_any)
     {
-        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &*ipv6, sizeof(*ipv6));
+        TR_ASSERT(addr.is_ipv6());
+        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &addr.addr.addr6, sizeof(addr.addr.addr6));
     }
 
     // http://bittorrent.org/beps/bep_0009.html
@@ -943,6 +943,19 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // client supports without dropping any. The default in in
     // libtorrent is 250.
     tr_variantDictAddInt(&val, TR_KEY_reqq, ReqQ);
+
+    // https://www.bittorrent.org/beps/bep_0010.html
+    // A string containing the compact representation of the ip address this peer sees
+    // you as. i.e. this is the receiver's external ip address (no port is included).
+    // This may be either an IPv4 (4 bytes) or an IPv6 (16 bytes) address.
+    {
+        auto buf = std::array<std::byte, TR_ADDRSTRLEN>{};
+        auto const begin = std::data(buf);
+        auto const end = msgs->io->address().to_compact(begin);
+        auto const len = end - begin;
+        TR_ASSERT(len == 4 || len == 16);
+        tr_variantDictAddRaw(&val, TR_KEY_yourip, begin, len);
+    }
 
     // http://bittorrent.org/beps/bep_0010.html
     // Client name and version (as a utf-8 string). This is a much more

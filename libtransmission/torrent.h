@@ -24,6 +24,7 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "completion.h"
+#include "crypto-utils.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
 #include "log.h"
@@ -386,17 +387,17 @@ public:
 
     /// METAINFO - FILES
 
-    [[nodiscard]] tr_file_index_t fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
     {
         return metainfo_.fileCount();
     }
 
-    [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& fileSubpath(tr_file_index_t i) const
     {
         return metainfo_.fileSubpath(i);
     }
 
-    [[nodiscard]] auto fileSize(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const
     {
         return metainfo_.fileSize(i);
     }
@@ -412,22 +413,22 @@ public:
 
     /// METAINFO - TRACKERS
 
-    [[nodiscard]] auto const& announceList() const noexcept
+    [[nodiscard]] constexpr auto const& announceList() const noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto& announceList() noexcept
+    [[nodiscard]] constexpr auto& announceList() noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto trackerCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto trackerCount() const noexcept
     {
         return std::size(this->announceList());
     }
 
-    [[nodiscard]] auto const& tracker(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& tracker(size_t i) const
     {
         return this->announceList().at(i);
     }
@@ -441,12 +442,12 @@ public:
 
     /// METAINFO - WEBSEEDS
 
-    [[nodiscard]] auto webseedCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
     {
         return metainfo_.webseedCount();
     }
 
-    [[nodiscard]] auto const& webseed(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
     {
         return metainfo_.webseed(i);
     }
@@ -788,6 +789,11 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto announce_key() const noexcept
+    {
+        return announce_key_;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -920,7 +926,11 @@ private:
     }
 
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
+
     float verify_progress_ = -1;
+
+    tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
+
     tr_interned_string bandwidth_group_;
 
     bool needs_completeness_check_ = true;

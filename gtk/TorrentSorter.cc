@@ -3,12 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
+#include "TorrentSorter.h"
+
+#include "Utils.h"
 
 #include <libtransmission/transmission.h>
 
-#include "Torrent.h"
-#include "TorrentSorter.h"
+#include <algorithm>
 
 using namespace std::string_view_literals;
 
@@ -263,6 +264,7 @@ sigc::signal<void()>& TorrentSorter::signal_changed()
 
 Glib::RefPtr<TorrentSorter> TorrentSorter::create()
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new TorrentSorter());
 }
 

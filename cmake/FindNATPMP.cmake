@@ -8,12 +8,16 @@ if(NATPMP_PREFER_STATIC_LIB)
 endif()
 
 if(UNIX)
-  find_package(PkgConfig QUIET)
-  pkg_check_modules(_NATPMP QUIET libnatpmp)
+    find_package(PkgConfig QUIET)
+    pkg_check_modules(_NATPMP QUIET libnatpmp)
 endif()
 
-find_path(NATPMP_INCLUDE_DIR NAMES natpmp.h HINTS ${_NATPMP_INCLUDEDIR})
-find_library(NATPMP_LIBRARY NAMES natpmp HINTS ${_NATPMP_LIBDIR})
+find_path(NATPMP_INCLUDE_DIR
+    NAMES natpmp.h
+    HINTS ${_NATPMP_INCLUDEDIR})
+find_library(NATPMP_LIBRARY
+    NAMES natpmp
+    HINTS ${_NATPMP_LIBDIR})
 
 set(NATPMP_INCLUDE_DIRS ${NATPMP_INCLUDE_DIR})
 set(NATPMP_LIBRARIES ${NATPMP_LIBRARY})
@@ -23,8 +27,7 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(NATPMP
     REQUIRED_VARS
         NATPMP_LIBRARY
-        NATPMP_INCLUDE_DIR
-)
+        NATPMP_INCLUDE_DIR)
 
 mark_as_advanced(NATPMP_INCLUDE_DIR NATPMP_LIBRARY)
 

@@ -5,14 +5,18 @@
 
 #pragma once
 
+#include "GtkCompat.h"
+
+#include <giomm/listmodel.h>
+#include <glibmm/object.h>
+#include <glibmm/refptr.h>
+#include <glibmm/value.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelcolumn.h>
+
 #include <optional>
 #include <unordered_map>
 #include <vector>
-
-#include <glibmm.h>
-#include <gtkmm.h>
-
-#include "Utils.h"
 
 class ListModelAdapter
     : public Gtk::TreeModel
@@ -20,6 +24,12 @@ class ListModelAdapter
 {
     using IdGetter = std::function<int(Glib::RefPtr<Glib::ObjectBase const> const&)>;
     using ValueGetter = std::function<void(Glib::RefPtr<Glib::ObjectBase const> const&, int, Glib::ValueBase&)>;
+
+    enum class PositionAdjustment
+    {
+        DECREMENT = -1,
+        INCREMENT = 1,
+    };
 
     struct ItemInfo
     {
@@ -60,7 +70,7 @@ private:
         ValueGetter value_getter);
 
     std::optional<guint> find_item_position_by_id(int item_id) const;
-    void adjust_item_positions(guint min_position, int delta);
+    void adjust_item_positions(guint min_position, PositionAdjustment adjustment);
 
     void on_adaptee_items_changed(guint position, guint removed, guint added);
     void on_adaptee_item_changed(Glib::RefPtr<Glib::ObjectBase const> const& item);

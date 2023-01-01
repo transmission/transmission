@@ -223,12 +223,15 @@ int tr_main(int argc, char* argv[])
     }
 
     fmt::print(
-        ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.fileCount()),
+        tr_ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.fileCount()),
         fmt::arg("file_count", builder.fileCount()),
         fmt::arg("total_size", tr_formatter_size_B(builder.totalSize())));
 
     fmt::print(
-        ngettext("{piece_count:L} piece, {piece_size}\n", "{piece_count:L} pieces, {piece_size} each\n", builder.pieceCount()),
+        tr_ngettext(
+            "{piece_count:L} piece, {piece_size}\n",
+            "{piece_count:L} pieces, {piece_size} each\n",
+            builder.pieceCount()),
         fmt::arg("piece_count", builder.pieceCount()),
         fmt::arg("piece_size", tr_formatter_size_B(builder.pieceSize())));
 

@@ -3,6 +3,37 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "FileList.h"
+
+#include "GtkCompat.h"
+#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
+#include "IconCache.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
+
+#include <libtransmission/utils.h>
+
+#include <giomm/icon.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/markup.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/nodetree.h>
+#include <gtkmm/cellrendererpixbuf.h>
+#include <gtkmm/cellrendererprogress.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/cellrenderertoggle.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/treeselection.h>
+#include <gtkmm/treestore.h>
+#include <gtkmm/treeview.h>
+
+#include <fmt/core.h>
+
 #include <algorithm>
 #include <cstddef>
 #include <list>
@@ -13,21 +44,6 @@
 #include <string_view>
 #include <unordered_map>
 #include <utility>
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-
-#include "FileList.h"
-#include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
-#include "IconCache.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
 
 using namespace std::literals;
 

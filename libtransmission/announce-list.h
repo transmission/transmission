@@ -61,34 +61,34 @@ private:
     using trackers_t = std::vector<tracker_info>;
 
 public:
-    [[nodiscard]] auto begin() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
     {
         return std::begin(trackers_);
     }
 
-    [[nodiscard]] auto end() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
     {
         return std::end(trackers_);
     }
 
-    [[nodiscard]] bool empty() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
     {
         return std::empty(trackers_);
     }
 
-    [[nodiscard]] size_t size() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 size_t size() const noexcept
     {
         return std::size(trackers_);
     }
 
-    [[nodiscard]] tracker_info const& at(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 tracker_info const& at(size_t i) const
     {
         return trackers_.at(i);
     }
 
     [[nodiscard]] tr_tracker_tier_t nextTier() const;
 
-    [[nodiscard]] bool operator==(tr_announce_list const& that) const
+    [[nodiscard]] TR_CONSTEXPR20 bool operator==(tr_announce_list const& that) const
     {
         return trackers_ == that.trackers_;
     }

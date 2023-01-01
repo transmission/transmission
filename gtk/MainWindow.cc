@@ -2,25 +2,57 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <array>
-#include <memory>
-#include <string>
-
-#include <glibmm/i18n.h>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter_speed_KBps()
+#include "MainWindow.h"
 
 #include "Actions.h"
 #include "FilterBar.h"
+#include "GtkCompat.h"
 #include "ListModelAdapter.h"
-#include "MainWindow.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Torrent.h"
 #include "TorrentCellRenderer.h"
 #include "Utils.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> // tr_formatter_speed_KBps()
+
+#include <gdkmm/cursor.h>
+#include <gdkmm/rectangle.h>
+#include <giomm/menu.h>
+#include <giomm/menuitem.h>
+#include <giomm/menumodel.h>
+#include <giomm/simpleaction.h>
+#include <giomm/simpleactiongroup.h>
+#include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/ustring.h>
+#include <glibmm/variant.h>
+#include <gtkmm/image.h>
+#include <gtkmm/label.h>
+#include <gtkmm/menubutton.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/togglebutton.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treeselection.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/widget.h>
+#include <gtkmm/window.h>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/popovermenu.h>
+#else
+#include <gdkmm/display.h>
+#include <gdkmm/window.h>
+#include <gtkmm/menu.h>
+#endif
+
+#include <array>
+#include <memory>
+#include <string>
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;
@@ -76,7 +108,7 @@ private:
 
     Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
-    void on_popup_menu(double view_x, double view_y);
+    void on_popup_menu(double event_x, double event_y);
 
     void onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled);
     void onSpeedSet(tr_direction dir, int KBps);
@@ -724,12 +756,12 @@ Glib::RefPtr<Gtk::TreeSelection> MainWindow::Impl::get_selection() const
     return view_->get_selection();
 }
 
-void MainWindow::for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> callback) const
+void MainWindow::for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> const& callback) const
 {
     for_each_selected_torrent_until(sigc::bind_return(callback, false));
 }
 
-bool MainWindow::for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> callback) const
+bool MainWindow::for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> const& callback) const
 {
     static auto const& self_col = Torrent::get_columns().self;
 

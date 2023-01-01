@@ -5,17 +5,17 @@
  *
  */
 
+#include "IconCache.h"
+
+#include "GtkCompat.h"
+
+#include <giomm/contenttype.h>
+
 #include <algorithm>
 #include <map>
 #include <string>
 #include <string_view>
 #include <utility>
-
-#include <glibmm.h>
-#include <giomm.h>
-
-#include "IconCache.h"
-#include "Utils.h"
 
 using namespace std::literals;
 

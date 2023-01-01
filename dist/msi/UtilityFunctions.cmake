@@ -22,8 +22,12 @@ function(find_msvc_crt_msm OUTPUT_VAR)
     set(CMN_PF_DIR "CommonProgramFiles(x86)")
     find_file(${OUTPUT_VAR}
         NAMES "${MSM_FILE}"
-        PATHS ${VC_VER_DIRS} $ENV{${CMN_PF_DIR}}
-        PATH_SUFFIXES "MergeModules" "Merge Modules")
+        PATHS
+            ${VC_VER_DIRS}
+            $ENV{${CMN_PF_DIR}}
+        PATH_SUFFIXES
+            "MergeModules"
+            "Merge Modules")
     message(STATUS "  * Result: ${${OUTPUT_VAR}}")
 
     set(${OUTPUT_VAR} "${${OUTPUT_VAR}}" PARENT_SCOPE)
@@ -76,7 +80,9 @@ function(wix_candle OUTPUT_VAR)
         add_custom_command(
             OUTPUT "${CANDLE_OUTPUT}"
             COMMAND candle ${OPTIONS} "${F}" -out "${CANDLE_OUTPUT}"
-            DEPENDS "${F}" ${CANDLE_EXTRA_DEPENDS})
+            DEPENDS
+                "${F}"
+                ${CANDLE_EXTRA_DEPENDS})
         list(APPEND ${OUTPUT_VAR} "${CANDLE_OUTPUT}")
     endforeach()
 
@@ -96,7 +102,9 @@ function(wix_light OUTPUT_VAR)
         OUTPUT ${LIGHT_OUTPUT}
         BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/${LIGHT_NAME}.wixpdb"
         COMMAND light ${OPTIONS} -out "${CMAKE_CURRENT_BINARY_DIR}/${LIGHT_NAME}.msi" ${LIGHT_OBJECTS}
-        DEPENDS ${LIGHT_OBJECTS} ${LIGHT_EXTRA_DEPENDS})
+        DEPENDS
+            ${LIGHT_OBJECTS}
+            ${LIGHT_EXTRA_DEPENDS})
 
     list(APPEND ${OUTPUT_VAR} ${LIGHT_OUTPUT})
     set(${OUTPUT_VAR} "${${OUTPUT_VAR}}" PARENT_SCOPE)

@@ -4,14 +4,16 @@
 
 #pragma once
 
+#include <libtransmission/tr-macros.h>
+
+#include <giomm/file.h>
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/application.h>
+
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <glibmm.h>
-#include <gtkmm.h>
-
-#include <libtransmission/tr-macros.h>
 
 class Application : public Gtk::Application
 {

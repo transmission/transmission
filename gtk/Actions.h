@@ -5,9 +5,16 @@
 
 #pragma once
 
-#include <gtkmm.h>
-
+#include "GtkCompat.h"
 #include "Utils.h"
+
+#include <giomm/listmodel.h>
+#include <giomm/menumodel.h>
+#include <giomm/simpleactiongroup.h>
+#include <glibmm/object.h>
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/builder.h>
 
 class Session;
 

@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include <memory>
-
-#include <gtkmm.h>
-
 #include <libtransmission/tr-macros.h>
+
+#include <glibmm/refptr.h>
+#include <gtkmm/window.h>
+
+#include <memory>
 
 class Session;
 

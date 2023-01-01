@@ -2,20 +2,19 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <string>
-#include <string_view>
+#include "Prefs.h"
 
-#include <glibmm.h>
-#include <glibmm/i18n.h>
+#include "GtkCompat.h"
+#include "PrefsDialog.h"
 
 #include <libtransmission/transmission.h>
-
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Utils.h"
+#include <glibmm/miscutils.h>
+
+#include <string>
+#include <string_view>
 
 using namespace std::literals;
 

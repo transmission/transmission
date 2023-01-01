@@ -39,6 +39,8 @@
 #include "utils.h"
 #include "variant.h"
 
+using namespace std::literals;
+
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
@@ -223,7 +225,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
-    auto const [source_addr, is_default_addr] = session->publicAddress(addr.type);
+    auto const [source_addr, is_any] = session->publicAddress(addr.type);
     auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
@@ -435,178 +437,78 @@ void tr_netClose(tr_session* session, tr_socket_t sockfd)
 namespace global_ipv6_helpers
 {
 
-/* Get the source address used for a given destination address. Since
-   there is no official interface to get this information, we create
-   a connected UDP socket (connected UDP... hmm...) and check its source
-   address. */
-[[nodiscard]] int get_source_address(struct sockaddr const* dst, socklen_t dst_len, struct sockaddr* src, socklen_t* src_len)
+// Get the source address used for a given destination address.
+// Since there is no official interface to get this information,
+// we create a connected UDP socket (connected UDP... hmm...)
+// and check its source address.
+//
+// Since it's a UDP socket, this doesn't actually send any packets
+[[nodiscard]] std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port)
 {
-    tr_socket_t const s = socket(dst->sa_family, SOCK_DGRAM, 0);
-    if (s == TR_BAD_SOCKET)
-    {
-        return -1;
-    }
-
-    // since it's a UDP socket, this doesn't actually send any packets
-    if (connect(s, dst, dst_len) == 0 && getsockname(s, src, src_len) == 0)
-    {
-        evutil_closesocket(s);
-        return 0;
-    }
-
     auto const save = errno;
-    evutil_closesocket(s);
+
+    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
+    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    {
+        if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
+        {
+            auto src_ss = sockaddr_storage{};
+            auto src_sslen = socklen_t{ sizeof(src_ss) };
+            if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
+            {
+                if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
+                {
+                    errno = save;
+                    return addrport->first;
+                }
+            }
+        }
+
+        evutil_closesocket(sock);
+    }
+
     errno = save;
-    return -1;
+    return {};
 }
 
-/* We all hate NATs. */
-[[nodiscard]] int global_unicast_address(struct sockaddr_storage* ss)
+[[nodiscard]] auto global_address(int af)
 {
-    if (ss->ss_family == AF_INET)
-    {
-        unsigned char const* a = (unsigned char*)&((struct sockaddr_in*)ss)->sin_addr;
+    // Pick some destination address to pretend to send a packet to
+    static auto constexpr DstIPv4 = "91.121.74.28"sv;
+    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
+    auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6);
+    auto const dst_port = tr_port::fromHost(6969);
 
-        if (a[0] == 0 || a[0] == 127 || a[0] >= 224 || a[0] == 10 || (a[0] == 172 && a[1] >= 16 && a[1] <= 31) ||
-            (a[0] == 192 && a[1] == 168))
-        {
-            return 0;
-        }
+    // In order for address selection to work right,
+    // this should be a native IPv6 address, not Teredo or 6to4
+    TR_ASSERT(dst_addr.has_value());
+    TR_ASSERT(dst_addr->is_global_unicast_address());
 
-        return 1;
-    }
-
-    if (ss->ss_family == AF_INET6)
-    {
-        unsigned char const* a = (unsigned char*)&((struct sockaddr_in6*)ss)->sin6_addr;
-        /* 2000::/3 */
-        return (a[0] & 0xE0) == 0x20 ? 1 : 0;
-    }
-
-    errno = EAFNOSUPPORT;
-    return -1;
-}
-
-[[nodiscard]] int global_address(int af, void* addr, int* addr_len)
-{
-    auto ss = sockaddr_storage{};
-    socklen_t sslen = sizeof(ss);
-    auto sin = sockaddr_in{};
-    auto sin6 = sockaddr_in6{};
-    struct sockaddr const* sa = nullptr;
-    socklen_t salen = 0;
-
-    switch (af)
-    {
-    case AF_INET:
-        memset(&sin, 0, sizeof(sin));
-        sin.sin_family = AF_INET;
-        evutil_inet_pton(AF_INET, "91.121.74.28", &sin.sin_addr);
-        sin.sin_port = htons(6969);
-        sa = (struct sockaddr const*)&sin;
-        salen = sizeof(sin);
-        break;
-
-    case AF_INET6:
-        memset(&sin6, 0, sizeof(sin6));
-        sin6.sin6_family = AF_INET6;
-        /* In order for address selection to work right, this should be
-           a native IPv6 address, not Teredo or 6to4. */
-        evutil_inet_pton(AF_INET6, "2001:1890:1112:1::20", &sin6.sin6_addr);
-        sin6.sin6_port = htons(6969);
-        sa = (struct sockaddr const*)&sin6;
-        salen = sizeof(sin6);
-        break;
-
-    default:
-        return -1;
-    }
-
-    if (int const rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen); rc < 0)
-    {
-        return -1;
-    }
-
-    if (global_unicast_address(&ss) == 0)
-    {
-        return -1;
-    }
-
-    switch (af)
-    {
-    case AF_INET:
-        if (*addr_len < 4)
-        {
-            return -1;
-        }
-
-        memcpy(addr, &((struct sockaddr_in*)&ss)->sin_addr, 4);
-        *addr_len = 4;
-        return 1;
-
-    case AF_INET6:
-        if (*addr_len < 16)
-        {
-            return -1;
-        }
-
-        memcpy(addr, &((struct sockaddr_in6*)&ss)->sin6_addr, 16);
-        *addr_len = 16;
-        return 1;
-
-    default:
-        return -1;
-    }
+    auto src_addr = get_source_address(*dst_addr, dst_port);
+    return src_addr && src_addr->is_global_unicast_address() ? *src_addr : std::optional<tr_address>{};
 }
 
 } // namespace global_ipv6_helpers
 
 /* Return our global IPv6 address, with caching. */
-std::optional<in6_addr> tr_globalIPv6(tr_session const* session)
+std::optional<tr_address> tr_globalIPv6()
 {
     using namespace global_ipv6_helpers;
 
-    static auto ipv6 = in6_addr{};
-    static time_t last_time = 0;
-    static bool have_ipv6 = false;
-
-    /* Re-check every half hour */
-    if (auto const now = tr_time(); last_time < now - 1800)
+    // recheck our cached value every half hour
+    static auto constexpr CacheSecs = 1800;
+    static auto cache_val = std::optional<tr_address>{};
+    static auto cache_expires_at = time_t{};
+    if (auto const now = tr_time(); cache_expires_at <= now)
     {
-        int addrlen = sizeof(ipv6);
-        int const rc = global_address(AF_INET6, &ipv6, &addrlen);
-        have_ipv6 = rc >= 0 && addrlen == sizeof(ipv6);
-        last_time = now;
+        cache_expires_at = now + CacheSecs;
+        cache_val = global_address(AF_INET6);
     }
 
-    if (!have_ipv6)
-    {
-        return {}; // no IPv6 address at all
-    }
-
-    // Return the default address.
-    // This is useful for checking for connectivity in general.
-    if (session == nullptr)
-    {
-        return ipv6;
-    }
-
-    // We have some sort of address.
-    // Now make sure that we return our bound address if non-default.
-    auto const [ipv6_bindaddr, is_default] = session->publicAddress(TR_AF_INET6);
-    if (!is_default)
-    {
-        // return this explicitly-bound address
-        ipv6 = ipv6_bindaddr.addr.addr6;
-    }
-
-    return ipv6;
+    return cache_val;
 }
 
-/***
-****
-****
-***/
+///
 
 namespace is_valid_for_peers_helpers
 {
@@ -814,4 +716,139 @@ static int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
     return tr_address_compare(this, &that);
+}
+
+// https://en.wikipedia.org/wiki/Reserved_IP_addresses
+[[nodiscard]] bool tr_address::is_global_unicast_address() const noexcept
+{
+    if (is_ipv4())
+    {
+        auto const* const a = reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr);
+
+        // [0.0.0.0–0.255.255.255]
+        // Current network.
+        if (a[0] == 0)
+        {
+            return false;
+        }
+
+        // [10.0.0.0 – 10.255.255.255]
+        // Used for local communications within a private network.
+        if (a[0] == 10)
+        {
+            return false;
+        }
+
+        // [100.64.0.0–100.127.255.255]
+        // Shared address space for communications between a service provider
+        // and its subscribers when using a carrier-grade NAT.
+        if ((a[0] == 100) && (64 <= a[1] && a[1] <= 127))
+        {
+            return false;
+        }
+
+        // [169.254.0.0–169.254.255.255]
+        // Used for link-local addresses[5] between two hosts on a single link
+        // when no IP address is otherwise specified, such as would have
+        // normally been retrieved from a DHCP server.
+        if (a[0] == 169 && a[1] == 254)
+        {
+            return false;
+        }
+
+        // [172.16.0.0–172.31.255.255]
+        // Used for local communications within a private network.
+        if ((a[0] == 172) && (16 <= a[1] && a[1] <= 31))
+        {
+            return false;
+        }
+
+        // [192.0.0.0–192.0.0.255]
+        // IETF Protocol Assignments.
+        if (a[0] == 192 && a[1] == 0 && a[2] == 0)
+        {
+            return false;
+        }
+
+        // [192.0.2.0–192.0.2.255]
+        // Assigned as TEST-NET-1, documentation and examples.
+        if (a[0] == 192 && a[1] == 0 && a[2] == 2)
+        {
+            return false;
+        }
+
+        // [192.88.99.0–192.88.99.255]
+        // Reserved. Formerly used for IPv6 to IPv4 relay.
+        if (a[0] == 192 && a[1] == 88 && a[2] == 99)
+        {
+            return false;
+        }
+
+        // [192.168.0.0–192.168.255.255]
+        // Used for local communications within a private network.
+        if (a[0] == 192 && a[1] == 168)
+        {
+            return false;
+        }
+
+        // [198.18.0.0–198.19.255.255]
+        // Used for benchmark testing of inter-network communications
+        // between two separate subnets.
+        if (a[0] == 198 && (18 <= a[1] && a[1] <= 19))
+        {
+            return false;
+        }
+
+        // [198.51.100.0–198.51.100.255]
+        // Assigned as TEST-NET-2, documentation and examples.
+        if (a[0] == 198 && a[1] == 51 && a[2] == 100)
+        {
+            return false;
+        }
+
+        // [203.0.113.0–203.0.113.255]
+        // Assigned as TEST-NET-3, documentation and examples.
+        if (a[0] == 203 && a[1] == 0 && a[2] == 113)
+        {
+            return false;
+        }
+
+        // [224.0.0.0–239.255.255.255]
+        // In use for IP multicast. (Former Class D network.)
+        if (224 <= a[0] && a[0] <= 230)
+        {
+            return false;
+        }
+
+        // [233.252.0.0-233.252.0.255]
+        // Assigned as MCAST-TEST-NET, documentation and examples.
+        if (a[0] == 233 && a[1] == 252 && a[2] == 0)
+        {
+            return false;
+        }
+
+        // [240.0.0.0–255.255.255.254]
+        // Reserved for future use. (Former Class E network.)
+        // [255.255.255.255]
+        // Reserved for the "limited broadcast" destination address.
+        if (240 <= a[0])
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    if (is_ipv6())
+    {
+        auto const* const a = addr.addr6.s6_addr;
+
+        // TODO: 2000::/3 is commonly used for global unicast but technically
+        // other spaces would be allowable too, so we should test those here.
+        // See RFC 4291 in the Section 2.4 lising global unicast as everything
+        // that's not link-local, multicast, loopback, or unspecified.
+        return (a[0] & 0xE0) == 0x20;
+    }
+
+    return false;
 }
