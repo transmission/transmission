@@ -12,14 +12,21 @@ if(UNIX)
     pkg_check_modules(_MBEDTLS QUIET mbedtls)
 endif()
 
-find_path(MBEDTLS_INCLUDE_DIR NAMES mbedtls/version.h HINTS ${_MBEDTLS_INCLUDEDIR})
-find_library(MBEDTLS_LIBRARY NAMES mbedtls HINTS ${_MBEDTLS_LIBDIR})
-find_library(MBEDCRYPTO_LIBRARY NAMES mbedcrypto HINTS ${_MBEDTLS_LIBDIR})
+find_path(MBEDTLS_INCLUDE_DIR
+    NAMES mbedtls/version.h
+    HINTS ${_MBEDTLS_INCLUDEDIR})
+find_library(MBEDTLS_LIBRARY
+    NAMES mbedtls
+    HINTS ${_MBEDTLS_LIBDIR})
+find_library(MBEDCRYPTO_LIBRARY
+    NAMES mbedcrypto
+    HINTS ${_MBEDTLS_LIBDIR})
 
 if(_MBEDTLS_VERSION)
     set(MBEDTLS_VERSION ${_MBEDTLS_VERSION})
 elseif(MBEDTLS_INCLUDE_DIR)
-    file(STRINGS "${MBEDTLS_INCLUDE_DIR}/mbedtls/version.h" MBEDTLS_VERSION_STR REGEX "^#define[\t ]+MBEDTLS_VERSION_STRING[\t ]+\"[^\"]+\"")
+    file(STRINGS "${MBEDTLS_INCLUDE_DIR}/mbedtls/version.h" MBEDTLS_VERSION_STR
+        REGEX "^#define[\t ]+MBEDTLS_VERSION_STRING[\t ]+\"[^\"]+\"")
     if(MBEDTLS_VERSION_STR MATCHES "\"([^\"]+)\"")
         set(MBEDTLS_VERSION "${CMAKE_MATCH_1}")
     endif()
@@ -34,9 +41,7 @@ find_package_handle_standard_args(MbedTLS
     REQUIRED_VARS
         MBEDTLS_LIBRARY
         MBEDTLS_INCLUDE_DIR
-    VERSION_VAR
-        MBEDTLS_VERSION
-)
+    VERSION_VAR MBEDTLS_VERSION)
 
 mark_as_advanced(MBEDTLS_INCLUDE_DIR MBEDTLS_LIBRARY MBEDCRYPTO_LIBRARY)
 

@@ -1,154 +1,150 @@
-project(trqt)
-
 set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
-set_property(GLOBAL PROPERTY AUTOMOC_SOURCE_GROUP "Generated Files")
-set_property(GLOBAL PROPERTY AUTORCC_SOURCE_GROUP "Generated Files")
-set_property(GLOBAL PROPERTY AUTOUIC_SOURCE_GROUP "Generated Files")
 
-set(${PROJECT_NAME}_SOURCES
-    AboutDialog.cc
-    AddData.cc
-    Application.cc
-    ColumnResizer.cc
-    ComInteropHelper.cc
-    DBusInteropHelper.cc
-    DetailsDialog.cc
-    FaviconCache.cc
-    FileTreeDelegate.cc
-    FileTreeItem.cc
-    FileTreeModel.cc
-    FileTreeView.cc
-    FilterBar.cc
-    FilterBarComboBox.cc
-    FilterBarComboBoxDelegate.cc
-    Filters.cc
-    Formatter.cc
-    FreeSpaceLabel.cc
-    IconCache.cc
-    IconToolButton.cc
-    InteropHelper.cc
-    InteropObject.cc
-    LicenseDialog.cc
-    MainWindow.cc
-    MakeDialog.cc
-    OptionsDialog.cc
-    PathButton.cc
-    Prefs.cc
-    PrefsDialog.cc
-    RelocateDialog.cc
-    RpcClient.cc
-    RpcQueue.cc
-    Session.cc
-    SessionDialog.cc
-    SqueezeLabel.cc
-    StatsDialog.cc
-    StyleHelper.cc
-    Torrent.cc
-    TorrentDelegate.cc
-    TorrentDelegateMin.cc
-    TorrentFilter.cc
-    TorrentModel.cc
-    TorrentView.cc
-    TrackerDelegate.cc
-    TrackerModel.cc
-    TrackerModelFilter.cc
-    Utils.cc
-    VariantHelpers.cc
-    WatchDir.cc
-)
+add_executable(${TR_NAME}-qt WIN32)
 
-if (NOT ENABLE_QT_COM_INTEROP)
-    set_source_files_properties(ComInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
-endif()
-if (NOT ENABLE_QT_DBUS_INTEROP)
-    set_source_files_properties(DBusInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
-endif()
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        AboutDialog.cc
+        AboutDialog.h
+        AddData.cc
+        AddData.h
+        Application.cc
+        Application.h
+        BaseDialog.h
+        ColumnResizer.cc
+        ColumnResizer.h
+        ComInteropHelper.cc
+        ComInteropHelper.h
+        CustomVariantType.h
+        DBusInteropHelper.cc
+        DBusInteropHelper.h
+        DetailsDialog.cc
+        DetailsDialog.h
+        FaviconCache.cc
+        FaviconCache.h
+        FileTreeDelegate.cc
+        FileTreeDelegate.h
+        FileTreeItem.cc
+        FileTreeItem.h
+        FileTreeModel.cc
+        FileTreeModel.h
+        FileTreeView.cc
+        FileTreeView.h
+        FilterBar.cc
+        FilterBar.h
+        FilterBarComboBox.cc
+        FilterBarComboBox.h
+        FilterBarComboBoxDelegate.cc
+        FilterBarComboBoxDelegate.h
+        Filters.cc
+        Filters.h
+        Formatter.cc
+        Formatter.h
+        FreeSpaceLabel.cc
+        FreeSpaceLabel.h
+        IconCache.cc
+        IconCache.h
+        IconToolButton.cc
+        IconToolButton.h
+        InteropHelper.cc
+        InteropHelper.h
+        InteropObject.cc
+        InteropObject.h
+        LicenseDialog.cc
+        LicenseDialog.h
+        MainWindow.cc
+        MainWindow.h
+        MakeDialog.cc
+        MakeDialog.h
+        OptionsDialog.cc
+        OptionsDialog.h
+        PathButton.cc
+        PathButton.h
+        Prefs.cc
+        Prefs.h
+        PrefsDialog.cc
+        PrefsDialog.h
+        RelocateDialog.cc
+        RelocateDialog.h
+        RpcClient.cc
+        RpcClient.h
+        RpcQueue.cc
+        RpcQueue.h
+        Session.cc
+        Session.h
+        SessionDialog.cc
+        SessionDialog.h
+        Speed.h
+        SqueezeLabel.cc
+        SqueezeLabel.h
+        StatsDialog.cc
+        StatsDialog.h
+        StyleHelper.cc
+        StyleHelper.h
+        Torrent.cc
+        Torrent.h
+        TorrentDelegate.cc
+        TorrentDelegate.h
+        TorrentDelegateMin.cc
+        TorrentDelegateMin.h
+        TorrentFilter.cc
+        TorrentFilter.h
+        TorrentModel.cc
+        TorrentModel.h
+        TorrentView.cc
+        TorrentView.h
+        TrackerDelegate.cc
+        TrackerDelegate.h
+        TrackerModel.cc
+        TrackerModel.h
+        TrackerModelFilter.cc
+        TrackerModelFilter.h
+        Typedefs.h
+        Utils.cc
+        Utils.h
+        VariantHelpers.cc
+        VariantHelpers.h
+        WatchDir.cc
+        WatchDir.h)
 
-set(${PROJECT_NAME}_HEADERS
-    AboutDialog.h
-    AddData.h
-    Application.h
-    BaseDialog.h
-    ColumnResizer.h
-    ComInteropHelper.h
-    CustomVariantType.h
-    DBusInteropHelper.h
-    DetailsDialog.h
-    FaviconCache.h
-    FileTreeDelegate.h
-    FileTreeItem.h
-    FileTreeModel.h
-    FileTreeView.h
-    FilterBar.h
-    FilterBarComboBox.h
-    FilterBarComboBoxDelegate.h
-    Filters.h
-    Formatter.h
-    FreeSpaceLabel.h
-    IconCache.h
-    IconToolButton.h
-    InteropHelper.h
-    InteropObject.h
-    LicenseDialog.h
-    MainWindow.h
-    MakeDialog.h
-    OptionsDialog.h
-    PathButton.h
-    Prefs.h
-    PrefsDialog.h
-    RelocateDialog.h
-    RpcClient.h
-    RpcQueue.h
-    Session.h
-    SessionDialog.h
-    Speed.h
-    SqueezeLabel.h
-    StatsDialog.h
-    StyleHelper.h
-    Torrent.h
-    TorrentDelegate.h
-    TorrentDelegateMin.h
-    TorrentFilter.h
-    TorrentModel.h
-    TorrentView.h
-    TrackerDelegate.h
-    TrackerModel.h
-    TrackerModelFilter.h
-    Typedefs.h
-    Utils.h
-    VariantHelpers.h
-    WatchDir.h
-)
+tr_allow_compile_if(
+    [=[[ENABLE_QT_COM_INTEROP]]=]
+        ComInteropHelper.cc
+    [=[[ENABLE_QT_DBUS_INTEROP]]=]
+        DBusInteropHelper.cc)
 
-set(${PROJECT_NAME}_UI_FILES
-    AboutDialog.ui
-    DetailsDialog.ui
-    LicenseDialog.ui
-    MainWindow.ui
-    MakeDialog.ui
-    MakeProgressDialog.ui
-    OptionsDialog.ui
-    PrefsDialog.ui
-    RelocateDialog.ui
-    SessionDialog.ui
-    StatsDialog.ui
-    TrackersDialog.ui
-)
-source_group(Ui FILES ${${PROJECT_NAME}_UI_FILES})
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        AboutDialog.ui
+        DetailsDialog.ui
+        LicenseDialog.ui
+        MainWindow.ui
+        MakeDialog.ui
+        MakeProgressDialog.ui
+        OptionsDialog.ui
+        PrefsDialog.ui
+        RelocateDialog.ui
+        SessionDialog.ui
+        StatsDialog.ui
+        TrackersDialog.ui)
 
-tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES ${${PROJECT_NAME}_UI_FILES})
-source_group("Generated Files" FILES ${${PROJECT_NAME}_UI_SOURCES})
+source_group(Ui
+    REGULAR_EXPRESSION [[.*\.ui$]])
 
-set(${PROJECT_NAME}_QRC_FILES application.qrc)
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        application.qrc)
+
 if(WIN32 OR APPLE)
-    list(APPEND ${PROJECT_NAME}_QRC_FILES icons/Faenza/Faenza.qrc)
+    target_sources(${TR_NAME}-qt
+        PRIVATE
+            icons/Faenza/Faenza.qrc)
 endif()
-source_group(Resources FILES ${${PROJECT_NAME}_QRC_FILES})
 
-tr_qt_add_resources(${PROJECT_NAME}_QRC_SOURCES ${${PROJECT_NAME}_QRC_FILES})
-source_group("Generated Files" FILES ${${PROJECT_NAME}_QRC_SOURCES})
+source_group(Resources
+    REGULAR_EXPRESSION [[.*\.qrc$]])
 
-set(${PROJECT_NAME}_LINGUAS
+set(LINGUAS
     af
     ca
     da
@@ -178,99 +174,99 @@ set(${PROJECT_NAME}_LINGUAS
     sv
     tr
     uk
-    zh_CN
-)
+    zh_CN)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_ENABLED_LINGUAS ${${PROJECT_NAME}_LINGUAS})
+    set(ENABLED_LINGUAS ${LINGUAS})
 else()
-    set(${PROJECT_NAME}_ENABLED_LINGUAS)
+    set(ENABLED_LINGUAS)
 endif()
 
-set(${PROJECT_NAME}_TS_FILES)
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    list(APPEND ${PROJECT_NAME}_TS_FILES translations/transmission_${LANG}.ts)
+set(TS_FILES)
+foreach(LANG ${ENABLED_LINGUAS})
+    list(APPEND TS_FILES translations/transmission_${LANG}.ts)
 endforeach()
 
-if(${PROJECT_NAME}_TS_FILES)
-    tr_qt_add_translation(${PROJECT_NAME}_QM_FILES ${${PROJECT_NAME}_TS_FILES})
-    source_group("Generated Files" FILES ${${PROJECT_NAME}_QM_FILES})
+if(TS_FILES)
+    tr_qt_add_translation(QM_FILES ${TS_FILES})
 endif()
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR}
-)
-
-include_directories(
-    SYSTEM
-    ${PROJECT_BINARY_DIR}
-    ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS}
-)
-
-tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
-    "Transmission Qt Client"
-    "transmission-qt"
-    "transmission-qt.exe"
-    "qtr.ico")
+target_sources(${TR_NAME}-qt
+    PRIVATE
+        ${QM_FILES})
 
 if(ENABLE_QT_COM_INTEROP)
-    add_custom_command(
-        OUTPUT
-            ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb
-        COMMAND
-            ${MIDL_EXECUTABLE} /tlb ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb transmission-qt.idl
-        DEPENDS
-            transmission-qt.idl
-        WORKING_DIRECTORY
-            ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-    list(APPEND ${PROJECT_NAME}_WIN32_RC_FILE transmission-qt.tlb.rc transmission-qt.idl ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb)
-    set_source_files_properties(transmission-qt.idl ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb PROPERTIES HEADER_FILE_ONLY ON)
+    tr_target_idl_files(${TR_NAME}-qt
+        transmission-qt.idl)
 endif()
 
-add_executable(${TR_NAME}-qt WIN32
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_UI_SOURCES}
-    ${${PROJECT_NAME}_QRC_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_QM_FILES}
-    ${${PROJECT_NAME}_WIN32_RC_FILE}
-)
+target_include_directories(${TR_NAME}-qt
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(${TR_NAME}-qt SYSTEM
+    PRIVATE
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-qt
-    ${TR_NAME}
-    ${QT_TARGETS}
-    ${CURL_LIBRARIES}
-    ${EVENT2_LIBRARIES}
-)
+    PRIVATE
+        ${TR_NAME}
+        ${QT_TARGETS}
+        ${CURL_LIBRARIES}
+        ${EVENT2_LIBRARIES})
 
-target_compile_definitions(${TR_NAME}-qt PRIVATE
-    "TRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
-    QT_NO_CAST_FROM_ASCII
-    $<$<BOOL:${ENABLE_QT_COM_INTEROP}>:ENABLE_COM_INTEROP>
-    $<$<BOOL:${ENABLE_QT_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
+target_compile_definitions(${TR_NAME}-qt
+    PRIVATE
+        "TRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
+        QT_NO_CAST_FROM_ASCII
+        $<$<BOOL:${ENABLE_QT_COM_INTEROP}>:ENABLE_COM_INTEROP>
+        $<$<BOOL:${ENABLE_QT_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
-set_target_properties(${TR_NAME}-qt PROPERTIES AUTOMOC TRUE)
+set_target_properties(
+    ${TR_NAME}-qt
+    PROPERTIES
+        AUTOMOC ON
+        AUTORCC ON
+        AUTOUIC ON)
 
-install(TARGETS ${TR_NAME}-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
+tr_win32_app_info(${TR_NAME}-qt
+    "Transmission Qt Client"
+    "transmission-qt"
+    "transmission-qt.exe"
+    "qtr.ico")
+
+install(
+    TARGETS ${TR_NAME}-qt
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(INSTALL_DOC)
-    install(FILES ${TR_NAME}-qt.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+    install(
+        FILES ${TR_NAME}-qt.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
 
-install(FILES transmission-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(
+    FILES transmission-qt.desktop
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 
 if(ENABLE_NLS)
-    install(FILES ${${PROJECT_NAME}_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/${TR_NAME}/translations)
+    install(
+        FILES ${QM_FILES}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/${TR_NAME}/translations)
 endif()
 
 if(WIN32)
-    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/dist-qt.conf" CONTENT "")
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dist-qt.conf" DESTINATION ${CMAKE_INSTALL_SYSCONFDIR} RENAME qt.conf)
+    file(GENERATE
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/dist-qt.conf"
+        CONTENT "")
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/dist-qt.conf"
+        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
+        RENAME qt.conf)
 endif()

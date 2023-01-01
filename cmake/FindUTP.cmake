@@ -8,12 +8,16 @@ if(UTP_PREFER_STATIC_LIB)
 endif()
 
 if(UNIX)
-  find_package(PkgConfig QUIET)
-  pkg_check_modules(_UTP QUIET libutp)
+    find_package(PkgConfig QUIET)
+    pkg_check_modules(_UTP QUIET libutp)
 endif()
 
-find_path(UTP_INCLUDE_DIR NAMES libutp/utp.h HINTS ${_UTP_INCLUDEDIR})
-find_library(UTP_LIBRARY NAMES utp HINTS ${_UTP_LIBDIR})
+find_path(UTP_INCLUDE_DIR
+    NAMES libutp/utp.h
+    HINTS ${_UTP_INCLUDEDIR})
+find_library(UTP_LIBRARY
+    NAMES utp
+    HINTS ${_UTP_LIBDIR})
 
 if(UTP_INCLUDE_DIR AND UTP_LIBRARY)
     include(CheckSymbolExists)
@@ -36,8 +40,7 @@ if(UTP_INCLUDE_DIR AND UTP_LIBRARY)
         utp_set_callback
         utp_set_userdata
         utp_write
-        utp_writev
-    )
+        utp_writev)
 
     set(_UTP_OLD_CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES}")
     set(_UTP_OLD_CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}")
@@ -71,8 +74,7 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(UTP
     REQUIRED_VARS
         UTP_LIBRARY
-        UTP_INCLUDE_DIR
-)
+        UTP_INCLUDE_DIR)
 
 mark_as_advanced(UTP_INCLUDE_DIR UTP_LIBRARY)
 

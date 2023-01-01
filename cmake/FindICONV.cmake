@@ -1,7 +1,13 @@
 # Grabbed from http://public.kitware.com/Bug/view.php?id=13517 and slightly modified.
 
-find_path(ICONV_INCLUDE_DIR iconv.h)
-find_library(ICONV_LIBRARY NAMES iconv libiconv libiconv-2 c)
+find_path(ICONV_INCLUDE_DIR
+    NAMES iconv.h)
+find_library(ICONV_LIBRARY
+    NAMES
+        iconv
+        libiconv
+        libiconv-2
+        c)
 
 set(ICONV_INCLUDE_DIRS ${ICONV_INCLUDE_DIR})
 set(ICONV_LIBRARIES ${ICONV_LIBRARY})
@@ -12,9 +18,7 @@ find_package_handle_standard_args(ICONV
     REQUIRED_VARS
         ICONV_LIBRARY
         ICONV_INCLUDE_DIR
-    VERSION_VAR
-        ICONV_VERSION
-)
+    VERSION_VAR ICONV_VERSION)
 
 if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
     include(CheckCXXSourceCompiles)
@@ -38,8 +42,7 @@ if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
         FAIL_REGEX "discards qualifiers in nested pointer types"
         FAIL_REGEX "incompatible pointer type"
         FAIL_REGEX "invalid conversion"
-        FAIL_REGEX "no matching function"
-    )
+        FAIL_REGEX "no matching function")
 
     set(CMAKE_REQUIRED_INCLUDES)
     set(CMAKE_REQUIRED_LIBRARIES)
