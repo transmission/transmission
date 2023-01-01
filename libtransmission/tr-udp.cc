@@ -231,66 +231,52 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
-    int error = 0;
-    std::array<char, std::max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN) + 1> peer = {};
+    auto error = int{ 0 };
 
-    if (to->sa_family == AF_INET)
+    switch (to->sa_family)
     {
-        if (udp4_socket_ != TR_BAD_SOCKET)
-        {
-            if (::sendto(udp4_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
-            {
-                error = -1;
-            }
-        }
-        else
+    case AF_INET:
+        if (udp4_socket_ == TR_BAD_SOCKET)
         {
             error = -1;
             errno = EBADF;
         }
-        if (error == -1)
+        else if (::sendto(udp4_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
         {
-            evutil_inet_ntop(
-                AF_INET,
-                &((reinterpret_cast<struct sockaddr_in const*>(to))->sin_addr),
-                std::data(peer),
-                std::size(peer));
+            error = -1;
         }
-    }
-    else if (to->sa_family == AF_INET6)
-    {
-        if (udp6_socket_ != TR_BAD_SOCKET)
-        {
-            if (::sendto(udp6_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
-            {
-                error = -1;
-            }
-        }
-        else
+        break;
+
+    case AF_INET6:
+        if (udp6_socket_ == TR_BAD_SOCKET)
         {
             error = -1;
             errno = EBADF;
         }
-        if (error == -1)
+        else if (::sendto(udp6_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
         {
-            evutil_inet_ntop(
-                AF_INET6,
-                &((reinterpret_cast<struct sockaddr_in6 const*>(to))->sin6_addr),
-                std::data(peer),
-                std::size(peer));
+            error = -1;
         }
-    }
-    else
-    {
+        break;
+
+    default:
         error = -1;
         errno = EAFNOSUPPORT;
+        break;
     }
 
     if (error == -1)
     {
+        auto display_name = std::string{};
+        if (auto const addrport = tr_address::from_sockaddr(to); addrport)
+        {
+            auto const& [addr, port] = *addrport;
+            display_name = addr.display_name(port);
+        }
+
         tr_logAddWarn(fmt::format(
             "Couldn't send to {address}: {errno} ({error})",
-            fmt::arg("address", std::data(peer)),
+            fmt::arg("address", display_name),
             fmt::arg("errno", errno),
             fmt::arg("error", tr_strerror(errno))));
     }
