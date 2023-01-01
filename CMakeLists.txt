@@ -193,10 +193,6 @@ endif()
 set(CMAKE_FOLDER "third-party")
 
 find_package(Fmt)
-add_definitions(
-    -DFMT_HEADER_ONLY
-    -DFMT_EXCEPTIONS=0)
-
 find_package(WideInteger)
 find_package(FastFloat)
 find_package(UtfCpp)

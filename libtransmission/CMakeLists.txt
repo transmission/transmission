@@ -294,8 +294,7 @@ target_include_directories(${TR_NAME} SYSTEM
         ${B64_INCLUDE_DIRS}
         $<$<BOOL:${ICONV_FOUND}>:${ICONV_INCLUDE_DIRS}>
     PUBLIC
-        ${EVENT2_INCLUDE_DIRS}
-        ${LIBFMT_INCLUDE_DIRS})
+        ${EVENT2_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}
     PRIVATE
@@ -318,7 +317,9 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${ICONV_FOUND}>:${ICONV_LIBRARIES}>
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
-        "$<$<BOOL:${APPLE}>:-framework Foundation>")
+        "$<$<BOOL:${APPLE}>:-framework Foundation>"
+    PUBLIC
+        fmt::fmt-header-only)
 
 if(INSTALL_LIB)
     install(

@@ -387,10 +387,6 @@ target_include_directories(${TR_NAME}-mac
     PRIVATE
         ${CMAKE_SOURCE_DIR})
 
-target_include_directories(${TR_NAME}-mac SYSTEM
-    PRIVATE
-        ${LIBFMT_INCLUDE_DIRS})
-
 find_library(SPARKLE_FRAMEWORK Sparkle
     PATHS ${CMAKE_CURRENT_SOURCE_DIR}
     NO_DEFAULT_PATHS)
@@ -398,6 +394,7 @@ find_library(SPARKLE_FRAMEWORK Sparkle
 target_link_libraries(${TR_NAME}-mac
     PRIVATE
         ${TR_NAME}
+        fmt::fmt-header-only
         vdkqueue
         ${SPARKLE_FRAMEWORK}
         "-framework AppKit"

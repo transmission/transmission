@@ -8,13 +8,10 @@ target_include_directories(${TR_NAME}-cli
     PRIVATE
         ${CMAKE_SOURCE_DIR})
 
-target_include_directories(${TR_NAME}-cli SYSTEM
-    PRIVATE
-        ${LIBFMT_INCLUDE_DIRS})
-
 target_link_libraries(${TR_NAME}-cli
     PRIVATE
-        ${TR_NAME})
+        ${TR_NAME}
+        fmt::fmt-header-only)
 
 tr_win32_app_info(${TR_NAME}-cli
     "Transmission Utility ('cli', obsolete)"

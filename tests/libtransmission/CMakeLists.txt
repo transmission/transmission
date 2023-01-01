@@ -70,7 +70,6 @@ target_include_directories(libtransmission-test
 
 target_include_directories(libtransmission-test SYSTEM
     PRIVATE
-        ${LIBFMT_INCLUDE_DIRS}
         ${WIDE_INTEGER_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS}
         ${DHT_INCLUDE_DIRS}
@@ -82,7 +81,8 @@ target_compile_options(libtransmission-test
 target_link_libraries(libtransmission-test
     PRIVATE
         ${TR_NAME}
-        gtestall)
+        gtestall
+        fmt::fmt-header-only)
 
 add_test(
     NAME libtransmission-test
