@@ -71,6 +71,8 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 
 ### Contributions to `macOS Client`:
 
+* [@nevack (Dzmitry Neviadomski)](https://github.com/nevack):
+  * Code review for [#4308](https://github.com/transmission/transmission/pull/4308), [#4309](https://github.com/transmission/transmission/pull/4309), [#4333](https://github.com/transmission/transmission/pull/4333), [#4366](https://github.com/transmission/transmission/pull/4366), [#4428](https://github.com/transmission/transmission/pull/4428), [#4440](https://github.com/transmission/transmission/pull/4440), [#4473](https://github.com/transmission/transmission/pull/4473)
 * [@sweetppro (SweetPPro)](https://github.com/sweetppro):
   * Code review for [#4308](https://github.com/transmission/transmission/pull/4308), [#4310](https://github.com/transmission/transmission/pull/4310), [#4367](https://github.com/transmission/transmission/pull/4367), [#4417](https://github.com/transmission/transmission/pull/4417), [#4418](https://github.com/transmission/transmission/pull/4418), [#4428](https://github.com/transmission/transmission/pull/4428), [#4461](https://github.com/transmission/transmission/pull/4461)
   * Fixed UI issues in the main window when using Groups. ([#4333](https://github.com/transmission/transmission/pull/4333))
