@@ -298,7 +298,6 @@ target_include_directories(${TR_NAME} SYSTEM
         ${FAST_FLOAT_INCLUDE_DIRS}
         ${CRYPTO_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
-        ${EVENT2_INCLUDE_DIRS}
         ${PSL_INCLUDE_DIRS}
         ${NATPMP_INCLUDE_DIRS}
         ${MINIUPNPC_INCLUDE_DIRS}
@@ -307,40 +306,45 @@ target_include_directories(${TR_NAME} SYSTEM
         ${B64_INCLUDE_DIRS}
         $<$<BOOL:${ICONV_FOUND}>:${ICONV_INCLUDE_DIRS}>
     PUBLIC
+        ${EVENT2_INCLUDE_DIRS}
         ${LIBFMT_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${DEFLATE_LIBRARIES}
-    ${CRYPTO_LIBRARIES}
-    ${CURL_LIBRARIES}
-    ${EVENT2_LIBRARIES}
-    ${PSL_LIBRARIES}
-    ${NATPMP_LIBRARIES}
-    ${MINIUPNPC_LIBRARIES}
-    ${DHT_LIBRARIES}
-    ${UTP_LIBRARIES}
-    ${B64_LIBRARIES}
-    ${LIBINTL_LIBRARY}
-    ${LIBM_LIBRARY}
-    ${TR_NETWORK_LIBRARIES}
-    jsonsl
-    wildmat)
+    PRIVATE
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${DEFLATE_LIBRARIES}
+        ${CRYPTO_LIBRARIES}
+        ${CURL_LIBRARIES}
+        ${EVENT2_LIBRARIES}
+        ${PSL_LIBRARIES}
+        ${NATPMP_LIBRARIES}
+        ${MINIUPNPC_LIBRARIES}
+        ${DHT_LIBRARIES}
+        ${UTP_LIBRARIES}
+        ${B64_LIBRARIES}
+        ${LIBINTL_LIBRARY}
+        ${LIBM_LIBRARY}
+        ${TR_NETWORK_LIBRARIES}
+        jsonsl
+        wildmat)
 
 if(ICONV_FOUND)
     target_link_libraries(${TR_NAME}
-        ${ICONV_LIBRARIES})
+        PRIVATE
+            ${ICONV_LIBRARIES})
 endif()
 
 if(WIN32)
     target_link_libraries(${TR_NAME}
-        crypt32
-        shlwapi)
+        PRIVATE
+            crypt32
+            shlwapi)
 endif()
 
 if(APPLE)
     target_link_libraries(${TR_NAME}
-        "-framework Foundation")
+        PRIVATE
+            "-framework Foundation")
 endif()
 
 if(INSTALL_LIB)

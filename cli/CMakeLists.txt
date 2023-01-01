@@ -16,7 +16,8 @@ target_include_directories(${TR_NAME}-cli SYSTEM
         ${CURL_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-cli
-    ${TR_NAME})
+    PRIVATE
+        ${TR_NAME})
 
 tr_win32_app_info(${TR_NAME}-cli
     "Transmission Utility ('cli', obsolete)"

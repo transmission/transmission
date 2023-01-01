@@ -396,16 +396,17 @@ find_library(SPARKLE_FRAMEWORK Sparkle
     NO_DEFAULT_PATHS)
 
 target_link_libraries(${TR_NAME}-mac
-    ${TR_NAME}
-    vdkqueue
-    ${SPARKLE_FRAMEWORK}
-    "-framework AppKit"
-    "-framework Carbon"
-    "-framework Foundation"
-    "-framework IOKit"
-    "-framework Quartz"
-    "-framework Security"
-    "-weak_framework UserNotifications")
+    PRIVATE
+        ${TR_NAME}
+        vdkqueue
+        ${SPARKLE_FRAMEWORK}
+        "-framework AppKit"
+        "-framework Carbon"
+        "-framework Foundation"
+        "-framework IOKit"
+        "-framework Quartz"
+        "-framework Security"
+        "-weak_framework UserNotifications")
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)
     add_custom_command(

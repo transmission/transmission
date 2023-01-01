@@ -81,12 +81,13 @@ target_include_directories(${TR_NAME}-mac-ql
         ..)
 
 target_link_libraries(${TR_NAME}-mac-ql
-    ${TR_NAME}
-    "-framework Foundation"
-    "-framework CoreFoundation"
-    "-framework CoreServices"
-    "-framework AppKit"
-    "-framework QuickLook")
+    PRIVATE
+        ${TR_NAME}
+        "-framework Foundation"
+        "-framework CoreFoundation"
+        "-framework CoreServices"
+        "-framework AppKit"
+        "-framework QuickLook")
 
 install(
     TARGETS ${TR_NAME}-mac-ql

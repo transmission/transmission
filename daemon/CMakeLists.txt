@@ -39,15 +39,17 @@ target_include_directories(${TR_NAME}-daemon SYSTEM
         ${EVENT2_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-daemon
-    ${TR_NAME}
-    ${EVENT2_LIBRARIES})
+    PRIVATE
+        ${TR_NAME}
+        ${EVENT2_LIBRARIES})
 
 if(WITH_SYSTEMD)
     target_include_directories(${TR_NAME}-daemon
         PRIVATE
             ${SYSTEMD_INCLUDE_DIRS})
     target_link_libraries(${TR_NAME}-daemon
-        ${SYSTEMD_LIBRARIES})
+        PRIVATE
+            ${SYSTEMD_LIBRARIES})
 endif()
 
 tr_win32_app_info(${TR_NAME}-daemon

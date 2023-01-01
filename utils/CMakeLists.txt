@@ -18,7 +18,9 @@ foreach(P create edit remote show)
             ${CURL_INCLUDE_DIRS})
 
     target_link_libraries(${TR_NAME}-${P}
-        ${TR_NAME})
+        PRIVATE
+            ${TR_NAME}
+            ${CURL_LIBRARIES})
 
     tr_win32_app_info(${TR_NAME}-${P}
         "Transmission Utility ('${P}')"

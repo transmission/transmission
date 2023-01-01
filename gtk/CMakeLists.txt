@@ -183,14 +183,16 @@ target_include_directories(${TR_NAME}-gtk SYSTEM
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_INCLUDE_DIRS}>)
 
 target_link_libraries(${TR_NAME}-gtk
-    ${TR_NAME}
-    ${GTK${GTK_VERSION}_LIBRARIES}
-    ${CURL_LIBRARIES}
-    ${EVENT2_LIBRARIES})
+    PRIVATE
+        ${TR_NAME}
+        ${GTK${GTK_VERSION}_LIBRARIES}
+        ${CURL_LIBRARIES}
+        ${EVENT2_LIBRARIES})
 
 if(WITH_APPINDICATOR)
     target_link_libraries(${TR_NAME}-gtk
-        ${APPINDICATOR_LIBRARIES})
+        PRIVATE
+            ${APPINDICATOR_LIBRARIES})
 endif()
 
 if(NOT MSVC)
