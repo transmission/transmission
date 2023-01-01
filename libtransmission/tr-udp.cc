@@ -91,13 +91,13 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     auto buf = std::array<unsigned char, 8192>{};
     auto from = sockaddr_storage{};
     auto fromlen = socklen_t{ sizeof(from) };
-    auto const rc = recvfrom(
-        s,
-        reinterpret_cast<char*>(std::data(buf)),
-        std::size(buf) - 1,
-        0,
-        reinterpret_cast<sockaddr*>(&from),
-        &fromlen);
+    auto* const from_sa = reinterpret_cast<sockaddr*>(&from);
+
+    auto const rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, from_sa, &fromlen);
+    if (rc <= 0)
+    {
+        return;
+    }
 
     /* Since most packets we receive here are µTP, make quick inline
        checks for the other protocols. The logic is as follows:
@@ -106,33 +106,27 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
          is between 0 and 3
        - the above cannot be µTP packets, since these start with a 4-bit
          version number (1). */
-    auto* session = static_cast<tr_session*>(vsession);
-    if (rc > 0)
+    auto* const session = static_cast<tr_session*>(vsession);
+    if (buf[0] == 'd')
     {
-        if (buf[0] == 'd')
+        if (session->dht_)
         {
-            if (session->dht_)
-            {
-                buf[rc] = '\0'; // libdht requires zero-terminated messages
-                session->dht_->handleMessage(std::data(buf), rc, reinterpret_cast<sockaddr*>(&from), fromlen);
-            }
+            buf[rc] = '\0'; // libdht requires zero-terminated messages
+            session->dht_->handleMessage(std::data(buf), rc, from_sa, fromlen);
         }
-        else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
+    }
+    else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
+    {
+        if (!session->announcer_udp_->handleMessage(std::data(buf), rc))
         {
-            if (!session->announcer_udp_->handleMessage(std::data(buf), rc))
-            {
-                tr_logAddTrace("Couldn't parse UDP tracker packet.");
-            }
+            tr_logAddTrace("Couldn't parse UDP tracker packet.");
         }
-        else
+    }
+    else if (session->allowsUTP() && (session->utp_context != nullptr))
+    {
+        if (!tr_utpPacket(std::data(buf), rc, from_sa, fromlen, session))
         {
-            if (session->allowsUTP() && (session->utp_context != nullptr))
-            {
-                if (!tr_utpPacket(std::data(buf), rc, (struct sockaddr*)&from, fromlen, session))
-                {
-                    tr_logAddTrace("Unexpected UDP packet");
-                }
-            }
+            tr_logAddTrace("Unexpected UDP packet");
         }
     }
 }
