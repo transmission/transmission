@@ -115,7 +115,7 @@ public:
     /**
      * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
      */
-    void allocate(tr_direction dir, unsigned int period_msec);
+    void allocate(unsigned int period_msec);
 
     void setParent(tr_bandwidth* new_parent);
 
@@ -256,7 +256,6 @@ private:
 
     void allocateBandwidth(
         tr_priority_t parent_priority,
-        tr_direction dir,
         unsigned int period_msec,
         std::vector<std::shared_ptr<tr_peerIo>>& peer_pool);
 

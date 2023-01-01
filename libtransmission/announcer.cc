@@ -45,10 +45,7 @@ using namespace std::literals;
 
 /* unless the tracker says otherwise, rescrape this frequently */
 static auto constexpr DefaultScrapeIntervalSec = int{ 60 * 30 };
-/* unless the tracker says otherwise, this is the announce interval */
-static auto constexpr DefaultAnnounceIntervalSec = int{ 60 * 10 };
-/* unless the tracker says otherwise, this is the announce min_interval */
-static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
+
 /* the value of the 'numwant' argument passed in tracker requests. */
 static auto constexpr Numwant = int{ 80 };
 
@@ -292,30 +289,30 @@ struct tr_tracker
     {
     }
 
-    [[nodiscard]] int getRetryInterval() const
+    [[nodiscard]] time_t getRetryInterval() const
     {
         switch (consecutive_failures)
         {
         case 0:
-            return 0;
+            return 0U;
 
         case 1:
-            return 20;
+            return 20U;
 
         case 2:
-            return tr_rand_int(60) + 60 * 5;
+            return tr_rand_int(60U) + 60U * 5U;
 
         case 3:
-            return tr_rand_int(60) + 60 * 15;
+            return tr_rand_int(60U) + 60U * 15U;
 
         case 4:
-            return tr_rand_int(60) + 60 * 30;
+            return tr_rand_int(60U) + 60U * 30U;
 
         case 5:
-            return tr_rand_int(60) + 60 * 60;
+            return tr_rand_int(60U) + 60U * 60U;
 
         default:
-            return tr_rand_int(60) + 60 * 120;
+            return tr_rand_int(60U) + 60U * 120U;
         }
     }
 
@@ -528,6 +525,12 @@ struct tr_tier
     bool isScraping = false;
 
 private:
+    // unless the tracker says otherwise, this is the announce interval
+    static auto constexpr DefaultAnnounceIntervalSec = int{ 60 * 10 };
+
+    // unless the tracker says otherwise, this is the announce min_interval
+    static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
+
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
     {
         // Maybe don't scrape paused torrents

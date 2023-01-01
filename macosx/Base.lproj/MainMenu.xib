@@ -745,9 +745,7 @@ CA
                 <outlet property="fOpenIgnoreDownloadFolder" destination="1680" id="1682"/>
                 <outlet property="fPrevInfoTabItem" destination="1694" id="1704"/>
                 <outlet property="fShareContextMenu" destination="lvU-Va-GzM" id="TN5-xV-ApO"/>
-                <outlet property="fShareContextMenuItem" destination="8t6-wh-5UW" id="f1v-KF-xYb"/>
                 <outlet property="fShareMenu" destination="Cay-iU-bH4" id="nHs-6t-KFn"/>
-                <outlet property="fShareMenuItem" destination="s5v-VO-G2y" id="NnB-Cl-bNp"/>
                 <outlet property="fSortMenu" destination="1895" id="3440"/>
                 <outlet property="fSpeedLimitButton" destination="2690" id="2703"/>
                 <outlet property="fStackView" destination="Msk-Iv-kCJ" id="UBA-Uw-iSC"/>

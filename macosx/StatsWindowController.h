@@ -4,8 +4,6 @@
 
 #import <AppKit/AppKit.h>
 
-#include <libtransmission/transmission.h>
-
 @interface StatsWindowController : NSWindowController
 
 @property(nonatomic, class, readonly) StatsWindowController* statsWindow;

@@ -32,7 +32,7 @@ public:
     }
 
     bool spawn(bool foreground, int* exit_code, tr_error** error);
-    bool init(int argc, char* argv[], bool* foreground, int* ret);
+    bool init(int argc, char const* const argv[], bool* foreground, int* ret);
     void handle_error(tr_error*) const;
     int start(bool foreground);
     void periodic_update();
@@ -54,7 +54,7 @@ private:
     tr_quark key_pidfile_ = tr_quark_new("pidfile");
     tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic");
 
-    bool parse_args(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code);
+    bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);
     bool setup_signals();
     void report_status();

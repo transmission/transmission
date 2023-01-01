@@ -6,6 +6,7 @@
 #include <libtransmission/utils.h>
 
 #import "NSStringAdditions.h"
+#import "NSDataAdditions.h"
 
 @interface NSString (Private)
 
@@ -48,9 +49,9 @@
     }
     else
     {
-        unsigned int const magnitudePartial = log(partialSize) / log(1000);
+        auto const magnitudePartial = static_cast<unsigned int>(log(partialSize) / log(1000));
         // we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
-        unsigned int const magnitudeFull = fullSize < 1000 ? 0 : log(fullSize) / log(1000);
+        auto const magnitudeFull = static_cast<unsigned int>(fullSize < 1000 ? 0 : log(fullSize) / log(1000));
         partialUnitsSame = magnitudePartial == magnitudeFull;
     }
 
@@ -76,12 +77,12 @@
 {
     //N/A is different than libtransmission's
 
-    if ((int)ratio == TR_RATIO_NA)
+    if (static_cast<int>(ratio) == TR_RATIO_NA)
     {
         return NSLocalizedString(@"N/A", "No Ratio");
     }
 
-    if ((int)ratio == TR_RATIO_INF)
+    if (static_cast<int>(ratio) == TR_RATIO_INF)
     {
         return @"\xE2\x88\x9E";
     }
@@ -132,6 +133,25 @@
         }
     }
     return components;
+}
+
++ (NSString*)convertedStringFromCString:(nonnull char const*)bytes
+{
+    // UTF-8 encoding
+    NSString* fullPath = @(bytes);
+    if (fullPath)
+    {
+        return fullPath;
+    }
+    // autodetection of the encoding (#3434)
+    NSData* data = [NSData dataWithBytes:(void const*)bytes length:sizeof(unsigned char) * strlen(bytes)];
+    [NSString stringEncodingForData:data encodingOptions:nil convertedString:&fullPath usedLossyConversion:nil];
+    if (fullPath)
+    {
+        return fullPath;
+    }
+    // hexa encoding
+    return data.hexString;
 }
 
 @end

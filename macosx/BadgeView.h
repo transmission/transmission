@@ -4,11 +4,7 @@
 
 #import <AppKit/AppKit.h>
 
-#include <libtransmission/transmission.h>
-
 @interface BadgeView : NSView
-
-- (instancetype)initWithLib:(tr_session*)lib;
 
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate;
 

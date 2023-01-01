@@ -10,8 +10,6 @@
 
 @interface DragOverlayWindow ()
 
-@property(nonatomic, readonly) tr_session* fLib;
-
 @property(nonatomic, readonly) NSViewAnimation* fFadeInAnimation;
 @property(nonatomic, readonly) NSViewAnimation* fFadeOutAnimation;
 
@@ -19,13 +17,11 @@
 
 @implementation DragOverlayWindow
 
-- (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window
+- (instancetype)initForWindow:(NSWindow*)window
 {
     if ((self = ([super initWithContentRect:window.frame styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered
                                       defer:NO])))
     {
-        _fLib = lib;
-
         self.backgroundColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.5];
         self.alphaValue = 0.0;
         self.opaque = NO;
@@ -81,9 +77,17 @@
 
                 auto const n_files = metainfo.fileCount();
                 fileCount += n_files;
-                if (n_files == 1)
+                // only useful when one torrent
+                if (count == 1)
                 {
-                    name = @(metainfo.name().c_str());
+                    if (n_files == 1)
+                    {
+                        name = [NSString convertedStringFromCString:metainfo.fileSubpath(0).c_str()];
+                    }
+                    else
+                    {
+                        name = @(metainfo.name().c_str());
+                    }
                 }
             }
         }
@@ -113,7 +117,8 @@
     NSImage* icon;
     if (count == 1)
     {
-        icon = [NSWorkspace.sharedWorkspace iconForFileType:name ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
+        icon = [NSWorkspace.sharedWorkspace
+            iconForFileType:fileCount <= 1 ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
     }
     else
     {
