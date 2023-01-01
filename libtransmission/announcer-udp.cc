@@ -5,6 +5,7 @@
 
 #include <algorithm> // for std::find_if()
 #include <cerrno> // for errno, EAFNOSUPPORT
+#include <climits> // for CHAR_BIT
 #include <cstring> // for memset()
 #include <ctime>
 #include <future>
@@ -170,6 +171,9 @@ struct tau_announce_request
     tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
         : on_response_{ std::move(on_response) }
     {
+        // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
+        static_assert(sizeof(tr_announce_request::key) * CHAR_BIT == 32);
+
         response.seeders = -1;
         response.leechers = -1;
         response.downloads = -1;
