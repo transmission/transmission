@@ -180,42 +180,34 @@ target_sources(${TR_NAME}
     PRIVATE
         ${PROJECT_BINARY_DIR}/version.h)
 
-tr_disable_source_files_compile(crypto-utils-fallback.cc)
-
-foreach(CP ccrypto mbedtls openssl wolfssl)
-    if(NOT CP STREQUAL CRYPTO_PKG)
-        tr_disable_source_files_compile(crypto-utils-${CP}.cc)
-    endif()
-endforeach()
-
-if(NOT WITH_INOTIFY)
-    tr_disable_source_files_compile(watchdir-inotify.cc)
-endif()
-
-if(NOT WITH_KQUEUE)
-    tr_disable_source_files_compile(watchdir-kqueue.cc)
-endif()
-
-if(WIN32)
-    tr_disable_source_files_compile(
-        file-posix.cc
-        subprocess-posix.cc)
-else()
-    tr_disable_source_files_compile(
+tr_allow_compile_if(
+    [=[[TRUE]]=]
+        crypto-utils-fallback.cc
+    [=[[CRYPTO_PKG STREQUAL "ccrypto"]]=]
+        crypto-utils-ccrypto.cc
+    [=[[CRYPTO_PKG STREQUAL "mbedtls"]]=]
+        crypto-utils-mbedtls.cc
+    [=[[CRYPTO_PKG STREQUAL "openssl"]]=]
+        crypto-utils-openssl.cc
+    [=[[CRYPTO_PKG STREQUAL "wolfssl"]]=]
+        crypto-utils-wolfssl.cc
+    [=[[ENABLE_UTP]]=]
+        tr-utp.cc
+    [=[[WITH_INOTIFY]]=]
+        watchdir-inotify.cc
+    [=[[WITH_KQUEUE]]=]
+        watchdir-kqueue.cc
+    [=[[APPLE]]=]
+        tr-assert.mm
+    [=[[NOT APPLE]]=]
+        tr-assert.cc
+    [=[[WIN32]]=]
         file-win32.cc
         subprocess-win32.cc
-        watchdir-win32.cc)
-endif()
-
-if(APPLE)
-    tr_disable_source_files_compile(tr-assert.cc)
-else()
-    tr_disable_source_files_compile(tr-assert.mm)
-endif()
-
-if(NOT ENABLE_UTP)
-    tr_disable_source_files_compile(tr-utp.cc)
-endif()
+        watchdir-win32.cc
+    [=[[NOT WIN32]]=]
+        file-posix.cc
+        subprocess-posix.cc)
 
 foreach(UT
         ${EVENT2_UPSTREAM_TARGET}

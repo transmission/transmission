@@ -9,11 +9,11 @@ target_sources(${TR_NAME}-daemon
         daemon-posix.cc
         daemon-win32.cc)
 
-if(WIN32)
-    tr_disable_source_files_compile(daemon-posix.cc)
-else()
-    tr_disable_source_files_compile(daemon-win32.cc)
-endif()
+tr_allow_compile_if(
+    [=[[WIN32]]=]
+        daemon-win32.cc
+    [=[[NOT WIN32]]=]
+        daemon-posix.cc)
 
 target_compile_definitions(${TR_NAME}-daemon
     PRIVATE

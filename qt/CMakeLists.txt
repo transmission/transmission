@@ -109,13 +109,11 @@ target_sources(${TR_NAME}-qt
         WatchDir.cc
         WatchDir.h)
 
-if(NOT ENABLE_QT_COM_INTEROP)
-    tr_disable_source_files_compile(ComInteropHelper.cc)
-endif()
-
-if(NOT ENABLE_QT_DBUS_INTEROP)
-    tr_disable_source_files_compile(DBusInteropHelper.cc)
-endif()
+tr_allow_compile_if(
+    [=[[ENABLE_QT_COM_INTEROP]]=]
+        ComInteropHelper.cc
+    [=[[ENABLE_QT_DBUS_INTEROP]]=]
+        DBusInteropHelper.cc)
 
 target_sources(${TR_NAME}-qt
     PRIVATE

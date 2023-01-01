@@ -73,6 +73,61 @@ function(tr_make_id INPUT OVAR)
     set(${OVAR} "${ID}" PARENT_SCOPE)
 endfunction()
 
+function(tr_string_unindent RESULT_VAR TEXT)
+    if(TEXT MATCHES [==[^([ ]+)]==])
+        string(REGEX REPLACE "(^|\n)${CMAKE_MATCH_1}($|.)" "\\1\\2" TEXT "${TEXT}")
+    endif()
+    set(${RESULT_VAR} "${TEXT}" PARENT_SCOPE)
+endfunction()
+
+macro(tr_eval SCRIPT)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+        cmake_language(EVAL CODE "${SCRIPT}")
+    else()
+        tr_string_unindent(_TR_EVAL_SCRIPT "${SCRIPT}")
+
+        string(SHA1 _TR_EVAL_TMP_FILE "${_TR_EVAL_SCRIPT}")
+        string(SUBSTRING "${_TR_EVAL_TMP_FILE}" 0 10 _TR_EVAL_TMP_FILE)
+        set(_TR_EVAL_TMP_FILE "${CMAKE_BINARY_DIR}/.tr-cache/tr_eval.${_TR_EVAL_TMP_FILE}.cmake")
+
+        if(NOT EXISTS "${_TR_EVAL_TMP_FILE}")
+            file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/.tr-cache")
+            file(WRITE "${_TR_EVAL_TMP_FILE}" "${_TR_EVAL_SCRIPT}")
+        endif()
+
+        include("${_TR_EVAL_TMP_FILE}")
+
+        unset(_TR_EVAL_TMP_FILE)
+        unset(_TR_EVAL_SCRIPT)
+    endif()
+endmacro()
+
+function(tr_process_list_conditions VAR_PREFIX)
+    set(ALLOWED_ITEMS)
+    set(DISALLOWED_ITEMS)
+
+    set(ALLOW TRUE)
+    foreach(ARG IN LISTS ARGN)
+        if(ARG MATCHES [==[^\[(.+)\]$]==])
+            set(COND "${CMAKE_MATCH_1}")
+            string(STRIP "${COND}" COND)
+            tr_eval("\
+                if(${COND})
+                    set(ALLOW TRUE)
+                else()
+                    set(ALLOW FALSE)
+                endif()")
+        elseif(ALLOW)
+            list(APPEND ALLOWED_ITEMS "${ARG}")
+        else()
+            list(APPEND DISALLOWED_ITEMS "${ARG}")
+        endif()
+    endforeach()
+
+    set(${VAR_PREFIX}_ALLOWED "${ALLOWED_ITEMS}" PARENT_SCOPE)
+    set(${VAR_PREFIX}_DISALLOWED "${DISALLOWED_ITEMS}" PARENT_SCOPE)
+endfunction()
+
 macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
     if(USE_SYSTEM_${ID})
         tr_get_required_flag(USE_SYSTEM_${ID} SYSTEM_${ID}_IS_REQUIRED)
@@ -162,10 +217,16 @@ function(tr_target_compile_definitions_for_functions TGT)
 endfunction()
 
 function(tr_disable_source_files_compile)
-    set_source_files_properties(
-        ${ARGN}
-        PROPERTIES
-            HEADER_FILE_ONLY ON)
+    if(ARGN)
+        set_property(
+            SOURCE ${ARGN}
+            PROPERTY HEADER_FILE_ONLY ON)
+    endif()
+endfunction()
+
+function(tr_allow_compile_if)
+    tr_process_list_conditions(FILES ${ARGN})
+    tr_disable_source_files_compile(${FILES_DISALLOWED})
 endfunction()
 
 function(tr_win32_app_info TGT DESCR INTNAME ORIGFNAME)
