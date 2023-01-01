@@ -283,7 +283,6 @@ target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
         ${UTFCPP_INCLUDE_DIRS}
         ${DEFLATE_INCLUDE_DIRS}
-        ${FAST_FLOAT_INCLUDE_DIRS}
         ${CRYPTO_INCLUDE_DIRS}
         ${PSL_INCLUDE_DIRS}
         ${NATPMP_INCLUDE_DIRS}
@@ -301,6 +300,7 @@ target_link_libraries(${TR_NAME}
         ${DEFLATE_LIBRARIES}
         ${CRYPTO_LIBRARIES}
         CURL::libcurl
+        FastFloat::fast_float
         ${EVENT2_LIBRARIES}
         ${PSL_LIBRARIES}
         ${NATPMP_LIBRARIES}
