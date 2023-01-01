@@ -281,7 +281,6 @@ target_include_directories(${TR_NAME}
 
 target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
-        ${WIDE_INTEGER_INCLUDE_DIRS}
         ${UTFCPP_INCLUDE_DIRS}
         ${DEFLATE_INCLUDE_DIRS}
         ${FAST_FLOAT_INCLUDE_DIRS}
@@ -314,6 +313,7 @@ target_link_libraries(${TR_NAME}
         ${TR_NETWORK_LIBRARIES}
         jsonsl
         wildmat
+        WideInteger::WideInteger
         $<$<BOOL:${ICONV_FOUND}>:${ICONV_LIBRARIES}>
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
