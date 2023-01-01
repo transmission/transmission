@@ -79,6 +79,9 @@ target_sources(${TR_NAME}-gtk
         ui/gtk3/StatsDialog.ui
         ui/gtk3/TorrentUrlChooserDialog.ui)
 
+source_group(Ui/GTK3
+    REGULAR_EXPRESSION [[ui/gtk3/.*\.ui$]])
+
 target_sources(${TR_NAME}-gtk
     PRIVATE
         ui/gtk4/AddTrackerDialog.ui
@@ -94,6 +97,9 @@ target_sources(${TR_NAME}-gtk
         ui/gtk4/RelocateDialog.ui
         ui/gtk4/StatsDialog.ui
         ui/gtk4/TorrentUrlChooserDialog.ui)
+
+source_group(Ui/GTK4
+    REGULAR_EXPRESSION [[ui/gtk4/.*\.ui$]])
 
 target_link_directories(${TR_NAME}-gtk
     PRIVATE

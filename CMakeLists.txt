@@ -193,6 +193,8 @@ if(WIN32)
     endforeach()
 endif()
 
+set(CMAKE_FOLDER "third-party")
+
 find_package(Fmt)
 add_definitions(
     -DFMT_HEADER_ONLY
@@ -502,6 +504,8 @@ if(WIN32)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
     endforeach()
 endif()
+
+unset(CMAKE_FOLDER)
 
 ## Compiler standard version
 
