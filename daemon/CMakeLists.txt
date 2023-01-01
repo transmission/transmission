@@ -33,7 +33,6 @@ target_include_directories(${TR_NAME}-daemon
 target_include_directories(${TR_NAME}-daemon SYSTEM
     PRIVATE
         ${LIBFMT_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS}
         $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_INCLUDE_DIRS}>)
 

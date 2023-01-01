@@ -207,14 +207,12 @@ target_include_directories(${TR_NAME}-qt
 
 target_include_directories(${TR_NAME}-qt SYSTEM
     PRIVATE
-        ${CURL_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-qt
     PRIVATE
         ${TR_NAME}
         ${QT_TARGETS}
-        ${CURL_LIBRARIES}
         ${EVENT2_LIBRARIES})
 
 target_compile_definitions(${TR_NAME}-qt

@@ -286,7 +286,6 @@ target_include_directories(${TR_NAME} SYSTEM
         ${DEFLATE_INCLUDE_DIRS}
         ${FAST_FLOAT_INCLUDE_DIRS}
         ${CRYPTO_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
         ${PSL_INCLUDE_DIRS}
         ${NATPMP_INCLUDE_DIRS}
         ${MINIUPNPC_INCLUDE_DIRS}
@@ -303,7 +302,7 @@ target_link_libraries(${TR_NAME}
         ${CMAKE_THREAD_LIBS_INIT}
         ${DEFLATE_LIBRARIES}
         ${CRYPTO_LIBRARIES}
-        ${CURL_LIBRARIES}
+        CURL::libcurl
         ${EVENT2_LIBRARIES}
         ${PSL_LIBRARIES}
         ${NATPMP_LIBRARIES}

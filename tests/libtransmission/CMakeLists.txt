@@ -73,7 +73,6 @@ target_include_directories(libtransmission-test SYSTEM
         ${LIBFMT_INCLUDE_DIRS}
         ${WIDE_INTEGER_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
         ${DHT_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS})
 

@@ -183,7 +183,6 @@ target_include_directories(${TR_NAME}-gtk SYSTEM
     PRIVATE
         ${LIBFMT_INCLUDE_DIRS}
         ${GTK${GTK_VERSION}_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS}
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_INCLUDE_DIRS}>)
 
@@ -191,7 +190,6 @@ target_link_libraries(${TR_NAME}-gtk
     PRIVATE
         ${TR_NAME}
         ${GTK${GTK_VERSION}_LIBRARIES}
-        ${CURL_LIBRARIES}
         ${EVENT2_LIBRARIES}
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 

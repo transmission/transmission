@@ -10,8 +10,7 @@ target_include_directories(${TR_NAME}-cli
 
 target_include_directories(${TR_NAME}-cli SYSTEM
     PRIVATE
-        ${LIBFMT_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS})
+        ${LIBFMT_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-cli
     PRIVATE

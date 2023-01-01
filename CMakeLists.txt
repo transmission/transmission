@@ -204,9 +204,10 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-if(TARGET CURL::libcurl)
-    set(CURL_LIBRARIES CURL::libcurl)
-    set(CURL_INCLUDE_DIRS)
+if(NOT TARGET CURL::libcurl)
+    add_library(CURL::libcurl INTERFACE IMPORTED)
+    target_link_libraries(CURL::libcurl INTERFACE ${CURL_LIBRARIES})
+    target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
 endif()
 
 if(NOT WIN32)
