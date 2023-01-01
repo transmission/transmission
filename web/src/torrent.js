@@ -403,9 +403,9 @@ export class Torrent extends EventTarget {
     // maybe filter by tracker...
     if (pass && tracker && tracker.length > 0) {
       if ('public' === tracker) {
-        pass = !this.isPrivate()
+        pass = !this.isPrivate();
       } else if ('private' == tracker) {
-        pass = this.isPrivate()
+        pass = this.isPrivate();
       } else {
         pass = this.getCollatedTrackers().includes(tracker);
       }
