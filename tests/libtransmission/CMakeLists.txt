@@ -75,8 +75,7 @@ target_include_directories(libtransmission-test SYSTEM
         ${B64_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
         ${DHT_INCLUDE_DIRS}
-        ${EVENT2_INCLUDE_DIRS}
-        ${THIRD_PARTY_DIR}/googletest/googletest/include)
+        ${EVENT2_INCLUDE_DIRS})
 
 target_compile_options(libtransmission-test
     PRIVATE $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed

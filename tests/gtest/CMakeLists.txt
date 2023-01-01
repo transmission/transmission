@@ -12,4 +12,5 @@ set_property(
 target_include_directories(gtestall SYSTEM
     PRIVATE
         ${THIRD_PARTY_DIR}/googletest/googletest
+    PUBLIC
         ${THIRD_PARTY_DIR}/googletest/googletest/include)

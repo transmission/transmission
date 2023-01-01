@@ -23,8 +23,7 @@ else()
 
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E compare_files --ignore-eol ${reference_file} ${output_file}
-        RESULT_VARIABLE
-        STATUS)
+        RESULT_VARIABLE STATUS)
 
     if(STATUS AND NOT STATUS EQUAL 0)
         file(READ ${reference_file} CONTENTS)
