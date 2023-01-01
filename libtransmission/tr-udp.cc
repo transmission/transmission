@@ -233,36 +233,19 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
 {
     auto error = int{ 0 };
 
-    switch (to->sa_family)
+    if (to->sa_family != AF_INET && to->sa_family != AF_INET6)
     {
-    case AF_INET:
-        if (udp4_socket_ == TR_BAD_SOCKET)
-        {
-            error = -1;
-            errno = EBADF;
-        }
-        else if (::sendto(udp4_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
-        {
-            error = -1;
-        }
-        break;
-
-    case AF_INET6:
-        if (udp6_socket_ == TR_BAD_SOCKET)
-        {
-            error = -1;
-            errno = EBADF;
-        }
-        else if (::sendto(udp6_socket_, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
-        {
-            error = -1;
-        }
-        break;
-
-    default:
         error = -1;
         errno = EAFNOSUPPORT;
-        break;
+    }
+    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
+    {
+        error = -1;
+        errno = EBADF;
+    }
+    else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
+    {
+        error = -1;
     }
 
     if (error == -1)
