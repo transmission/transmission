@@ -2,6 +2,8 @@ if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS MACOS_SUPPORT_MINIMUM)
     message(FATAL_ERROR "Targeting macOS versions before ${MACOS_SUPPORT_MINIMUM} is not supported for the macOS project, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
 endif()
 
+set(MAC_BUNDLE_NAME Transmission)
+
 add_compile_options(
     -fcxx-modules
     -fmodules
@@ -412,8 +414,6 @@ if(NOT CMAKE_GENERATOR STREQUAL Xcode)
         POST_BUILD
         COMMAND ${CODESIGN_EXECUTABLE} -s - $<TARGET_BUNDLE_DIR:${TR_NAME}-mac>)
 endif()
-
-set(MAC_BUNDLE_NAME Transmission)
 
 set_target_properties(
     ${TR_NAME}-mac
