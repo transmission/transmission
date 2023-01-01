@@ -897,9 +897,23 @@ TODO: fix this when notifications get fixed
 
     // build the new html
     let string = '';
+
+    // All trackers option
     string += !this.filterTracker
       ? '<option value="all" selected="selected">All</option>'
       : '<option value="all">All</option>';
+    string += '<option style="font-size: 1pt; background-color: #000000;" disabled>&nbsp;</option>';
+
+    // Public/private trackers options
+    string += 'public' === this.filterTracker
+      ? '<option value="public">Public</option>'
+      : '<option value="public" selected="selected">Public</option>';
+    string += 'private' === this.filterTracker
+      ? '<option value="private">Private</option>'
+      : '<option value="private" selected="selected">Private</option>';
+
+    // Single tracker options
+    string += '<option style="font-size: 1pt; background-color: #000000;" disabled>&nbsp;</option>';
     for (const sitename of sitenames) {
       string += `<option value="${sitename}"`;
       if (sitename === this.filterTracker) {

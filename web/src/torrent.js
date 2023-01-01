@@ -370,10 +370,6 @@ export class Torrent extends EventTarget {
         return this.isStopped();
       case Prefs.FilterFinished:
         return this.isFinished();
-      case Prefs.FilterPublic:
-        return !Torrent.isPrivate();
-      case Prefs.FilterPrivate:
-        return Torrent.isPrivate();
       default:
         return true;
     }
@@ -406,7 +402,13 @@ export class Torrent extends EventTarget {
 
     // maybe filter by tracker...
     if (pass && tracker && tracker.length > 0) {
-      pass = this.getCollatedTrackers().includes(tracker);
+      if ('public' === tracker) {
+        pass = !this.isPrivate()
+      } else if ('private' == tracker) {
+        pass = this.isPrivate()
+      } else {
+        pass = this.getCollatedTrackers().includes(tracker);
+      }
     }
 
     return pass;
