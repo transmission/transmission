@@ -225,36 +225,29 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
-    auto error = int{ 0 };
-
     if (to->sa_family != AF_INET && to->sa_family != AF_INET6)
     {
-        error = -1;
         errno = EAFNOSUPPORT;
     }
     else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
     {
-        error = -1;
         errno = EBADF;
     }
-    else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) == -1)
+    else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {
-        error = -1;
+        return;
     }
 
-    if (error == -1)
+    auto display_name = std::string{};
+    if (auto const addrport = tr_address::from_sockaddr(to); addrport)
     {
-        auto display_name = std::string{};
-        if (auto const addrport = tr_address::from_sockaddr(to); addrport)
-        {
-            auto const& [addr, port] = *addrport;
-            display_name = addr.display_name(port);
-        }
-
-        tr_logAddWarn(fmt::format(
-            "Couldn't send to {address}: {errno} ({error})",
-            fmt::arg("address", display_name),
-            fmt::arg("errno", errno),
-            fmt::arg("error", tr_strerror(errno))));
+        auto const& [addr, port] = *addrport;
+        display_name = addr.display_name(port);
     }
+
+    tr_logAddWarn(fmt::format(
+        "Couldn't send to {address}: {errno} ({error})",
+        fmt::arg("address", display_name),
+        fmt::arg("errno", errno),
+        fmt::arg("error", tr_strerror(errno))));
 }
