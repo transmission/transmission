@@ -167,7 +167,8 @@ target_compile_definitions(${TR_NAME}-gtk
 target_compile_options(${TR_NAME}-gtk
     PRIVATE
         ${GTK${GTK_VERSION}_CFLAGS_OTHER}
-        $<$<BOOL:${ENABLE_WERROR}>:$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>>)
+        $<$<BOOL:${ENABLE_WERROR}>:$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-exit-time-destructors>)
 
 target_include_directories(${TR_NAME}-gtk
     PRIVATE
@@ -187,19 +188,8 @@ target_link_libraries(${TR_NAME}-gtk
         ${TR_NAME}
         ${GTK${GTK_VERSION}_LIBRARIES}
         ${CURL_LIBRARIES}
-        ${EVENT2_LIBRARIES})
-
-if(WITH_APPINDICATOR)
-    target_link_libraries(${TR_NAME}-gtk
-        PRIVATE
-            ${APPINDICATOR_LIBRARIES})
-endif()
-
-if(NOT MSVC)
-    target_compile_options(${TR_NAME}-gtk
-        PRIVATE
-            -Wno-exit-time-destructors)
-endif()
+        ${EVENT2_LIBRARIES}
+        $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")

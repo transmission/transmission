@@ -36,21 +36,14 @@ target_include_directories(${TR_NAME}-daemon SYSTEM
     PRIVATE
         ${LIBFMT_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
-        ${EVENT2_INCLUDE_DIRS})
+        ${EVENT2_INCLUDE_DIRS}
+        $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_INCLUDE_DIRS}>)
 
 target_link_libraries(${TR_NAME}-daemon
     PRIVATE
         ${TR_NAME}
-        ${EVENT2_LIBRARIES})
-
-if(WITH_SYSTEMD)
-    target_include_directories(${TR_NAME}-daemon
-        PRIVATE
-            ${SYSTEMD_INCLUDE_DIRS})
-    target_link_libraries(${TR_NAME}-daemon
-        PRIVATE
-            ${SYSTEMD_LIBRARIES})
-endif()
+        ${EVENT2_LIBRARIES}
+        $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_LIBRARIES}>)
 
 tr_win32_app_info(${TR_NAME}-daemon
     "Transmission Daemon"

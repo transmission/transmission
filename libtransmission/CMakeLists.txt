@@ -326,26 +326,11 @@ target_link_libraries(${TR_NAME}
         ${LIBM_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
         jsonsl
-        wildmat)
-
-if(ICONV_FOUND)
-    target_link_libraries(${TR_NAME}
-        PRIVATE
-            ${ICONV_LIBRARIES})
-endif()
-
-if(WIN32)
-    target_link_libraries(${TR_NAME}
-        PRIVATE
-            crypt32
-            shlwapi)
-endif()
-
-if(APPLE)
-    target_link_libraries(${TR_NAME}
-        PRIVATE
-            "-framework Foundation")
-endif()
+        wildmat
+        $<$<BOOL:${ICONV_FOUND}>:${ICONV_LIBRARIES}>
+        $<$<BOOL:${WIN32}>:crypt32>
+        $<$<BOOL:${WIN32}>:shlwapi>
+        "$<$<BOOL:${APPLE}>:-framework Foundation>")
 
 if(INSTALL_LIB)
     install(
