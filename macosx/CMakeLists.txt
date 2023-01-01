@@ -1,5 +1,3 @@
-project(trmac)
-
 if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS MACOS_SUPPORT_MINIMUM)
     message(FATAL_ERROR "Targeting macOS versions before ${MACOS_SUPPORT_MINIMUM} is not supported for the macOS project, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
 endif()
@@ -170,7 +168,7 @@ target_sources(${TR_NAME}-mac
         WebSeedTableView.h
         WebSeedTableView.mm)
 
-set(${PROJECT_NAME}_XIB_FILES
+set(XIB_FILES
     AboutWindow.xib
     BlocklistStatusWindow.xib
     FileRenameSheetController.xib
@@ -184,21 +182,21 @@ set(${PROJECT_NAME}_XIB_FILES
     StatusBar.xib
     URLSheetWindow.xib)
 
-set(${PROJECT_NAME}_RESOURCES
+set(RESOURCES
     Defaults.plist
     Credits.rtf
     sparkle_dsa_pub.pem
     ../COPYING
     Images/TransmissionDocument.icns)
 source_group(Resources
-    FILES ${${PROJECT_NAME}_RESOURCES})
+    FILES ${RESOURCES})
 
 set_source_files_properties(
-    ${${PROJECT_NAME}_RESOURCES}
+    ${RESOURCES}
     PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources)
 
-set(${PROJECT_NAME}_IMAGESETS
+set(IMAGESETS
     ActionHover
     Bandwidth
     CleanupTemplate
@@ -267,7 +265,7 @@ set(IMAGE_ASSETS
     ${IMAGE_ASSETS_DIR}/Contents.json
     ${APPICONSET_DIR}/Contents.json)
 
-foreach(IMG IN LISTS ${PROJECT_NAME}_IMAGESETS)
+foreach(IMG IN LISTS IMAGESETS)
     set(IMG_DIR "${IMAGE_ASSETS_DIR}/${IMG}.imageset")
     list(APPEND IMAGE_ASSETS
         ${IMG_DIR}/${IMG}.png
@@ -304,7 +302,7 @@ source_group("Generated Files"
         ${COMPILED_IMAGE_ASSETS}
         ${APPICON_NAME}.Info.plist)
 
-list(APPEND ${PROJECT_NAME}_RESOURCES
+list(APPEND RESOURCES
     ${COMPILED_IMAGE_ASSETS})
 
 set_source_files_properties(
@@ -312,7 +310,7 @@ set_source_files_properties(
     PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources)
 
-set(${PROJECT_NAME}_LINGUAS
+set(LINGUAS
     da
     de
     en
@@ -325,12 +323,12 @@ set(${PROJECT_NAME}_LINGUAS
     tr)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_ENABLED_LINGUAS ${${PROJECT_NAME}_LINGUAS})
+    set(ENABLED_LINGUAS ${LINGUAS})
 else()
-    set(${PROJECT_NAME}_ENABLED_LINGUAS en)
+    set(ENABLED_LINGUAS en)
 endif()
 
-set(${PROJECT_NAME}_BASE_XIB_FILES
+set(BASE_XIB_FILES
     AddMagnetWindow.xib
     AddWindow.xib
     Creator.xib
@@ -341,47 +339,47 @@ set(${PROJECT_NAME}_BASE_XIB_FILES
     InfoOptionsView.xib
     MainMenu.xib
     PrefsWindow.xib)
-list(TRANSFORM ${PROJECT_NAME}_BASE_XIB_FILES
+list(TRANSFORM BASE_XIB_FILES
     PREPEND Base.lproj/)
 
-set(${PROJECT_NAME}_LANG_STRINGS_FILES
+set(LANG_STRINGS_FILES
     InfoPlist.strings
     Localizable.strings)
 
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
+foreach(LANG ${ENABLED_LINGUAS})
+    set(${LANG}_STRINGS_FILES)
     if(NOT LANG STREQUAL "en")
-        foreach(F ${${PROJECT_NAME}_BASE_XIB_FILES})
+        foreach(F ${BASE_XIB_FILES})
             get_filename_component(F_BASE "${F}" NAME_WE)
-            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F_BASE}.strings)
+            list(APPEND ${LANG}_STRINGS_FILES ${LANG}.lproj/${F_BASE}.strings)
         endforeach()
     endif()
-    foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
-        list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+    foreach(F ${LANG_STRINGS_FILES})
+        list(APPEND ${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
     endforeach()
     source_group(Resources/${LANG}.lproj
-        FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+        FILES ${${LANG}_STRINGS_FILES})
 endforeach()
 
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+foreach(LANG ${ENABLED_LINGUAS})
+    list(APPEND RESOURCES ${${LANG}_STRINGS_FILES})
     set(STRINGS_FILES_RESOURCES_DIR Resources)
     if(NOT CMAKE_GENERATOR STREQUAL Xcode)
         string(APPEND STRINGS_FILES_RESOURCES_DIR /${LANG}.lproj)
     endif()
     set_source_files_properties(
-        ${${PROJECT_NAME}_${LANG}_STRINGS_FILES}
+        ${${LANG}_STRINGS_FILES}
         PROPERTIES
             MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
 endforeach()
 
 target_sources(${TR_NAME}-mac
     PRIVATE
-        ${${PROJECT_NAME}_RESOURCES})
+        ${RESOURCES})
 
 tr_target_xib_files(${TR_NAME}-mac
-    ${${PROJECT_NAME}_XIB_FILES}
-    ${${PROJECT_NAME}_BASE_XIB_FILES})
+    ${XIB_FILES}
+    ${BASE_XIB_FILES})
 
 target_include_directories(${TR_NAME}-mac
     PRIVATE
@@ -392,7 +390,7 @@ target_include_directories(${TR_NAME}-mac SYSTEM
         ${LIBFMT_INCLUDE_DIRS})
 
 find_library(SPARKLE_FRAMEWORK Sparkle
-    PATHS ${PROJECT_SOURCE_DIR}
+    PATHS ${CMAKE_CURRENT_SOURCE_DIR}
     NO_DEFAULT_PATHS)
 
 target_link_libraries(${TR_NAME}-mac
@@ -422,7 +420,7 @@ set_target_properties(
     PROPERTIES
         OUTPUT_NAME ${MAC_BUNDLE_NAME}
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
-        MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/Info.plist.in
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
         INSTALL_RPATH "@executable_path;@executable_path/../Frameworks")
 
 install(
@@ -440,4 +438,4 @@ install(CODE
     include(GetPrerequisites)
     tr_fixup_bundle_item(
         \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/Applications/${MAC_BUNDLE_NAME}.app\"
-        \"Contents/MacOS/${MAC_BUNDLE_NAME}\" \"${PROJECT_SOURCE_DIR}\")")
+        \"Contents/MacOS/${MAC_BUNDLE_NAME}\" \"${CMAKE_CURRENT_SOURCE_DIR}\")")

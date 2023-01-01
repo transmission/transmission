@@ -1,5 +1,3 @@
-project(libtr)
-
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 
@@ -178,7 +176,7 @@ configure_file(version.h.in version.h)
 
 target_sources(${TR_NAME}
     PRIVATE
-        ${PROJECT_BINARY_DIR}/version.h)
+        ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 tr_allow_compile_if(
     [=[[TRUE]]=]
@@ -277,8 +275,8 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
 
 target_include_directories(${TR_NAME}
     PRIVATE
-        ${PROJECT_SOURCE_DIR}
-        ${PROJECT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}
     INTERFACE
         ${CMAKE_BINARY_DIR})
 
@@ -351,6 +349,6 @@ if(INSTALL_LIB)
             watchdir.h
             web-utils.h
             web.h
-            ${PROJECT_BINARY_DIR}/version.h
+            ${CMAKE_CURRENT_BINARY_DIR}/version.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TR_NAME})
 endif()

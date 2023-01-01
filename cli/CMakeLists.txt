@@ -1,5 +1,3 @@
-project(trcli)
-
 add_executable(${TR_NAME}-cli)
 
 target_sources(${TR_NAME}-cli

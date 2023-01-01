@@ -1,5 +1,3 @@
-project(trutils)
-
 foreach(P create edit remote show)
     add_executable(${TR_NAME}-${P})
 

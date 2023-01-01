@@ -1,5 +1,3 @@
-project(trgtk)
-
 find_program(APPSTREAM appstreamcli)
 
 add_executable(${TR_NAME}-gtk WIN32)
@@ -127,21 +125,21 @@ tr_target_glib_resources(${TR_NAME}-gtk
     ${UI_SUBDIR}/transmission-ui.gresource.xml)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
+    set(DESKTOP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
     tr_gettext_msgfmt(${TR_NAME}-gtk
-        ${${PROJECT_NAME}_DESKTOP_FILE}
-        ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in)
+        ${DESKTOP_FILE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/transmission-gtk.desktop.in)
     target_sources(${TR_NAME}-gtk
         PRIVATE
-            ${${PROJECT_NAME}_DESKTOP_FILE})
+            ${DESKTOP_FILE})
 
-    set(${PROJECT_NAME}_METAINFO_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
+    set(METAINFO_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
     tr_gettext_msgfmt(${TR_NAME}-gtk
-        ${${PROJECT_NAME}_METAINFO_FILE}
-        ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in)
+        ${METAINFO_FILE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in)
     target_sources(${TR_NAME}-gtk
         PRIVATE
-            ${${PROJECT_NAME}_METAINFO_FILE})
+            ${METAINFO_FILE})
 endif()
 
 target_compile_definitions(${TR_NAME}-gtk
@@ -173,7 +171,7 @@ target_compile_options(${TR_NAME}-gtk
 target_include_directories(${TR_NAME}-gtk
     PRIVATE
         ${CMAKE_SOURCE_DIR}
-        ${PROJECT_BINARY_DIR})
+        ${CMAKE_CURRENT_BINARY_DIR})
 
 target_include_directories(${TR_NAME}-gtk SYSTEM
     PRIVATE
@@ -205,13 +203,13 @@ install(
     TARGETS ${TR_NAME}-gtk
     DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-set(${PROJECT_NAME}_PUBLIC_ICONS
+set(PUBLIC_ICONS
     hicolor_apps_scalable_transmission.svg
     hicolor_apps_scalable_transmission-devel.svg
     hicolor_apps_symbolic_transmission-symbolic.svg)
 
 set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
-foreach(ICON ${${PROJECT_NAME}_PUBLIC_ICONS})
+foreach(ICON ${PUBLIC_ICONS})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
     install(
@@ -228,10 +226,10 @@ endif()
 
 if(ENABLE_NLS)
     install(
-        FILES ${${PROJECT_NAME}_DESKTOP_FILE}
+        FILES ${DESKTOP_FILE}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
     install(
-        FILES ${${PROJECT_NAME}_METAINFO_FILE}
+        FILES ${METAINFO_FILE}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 else()
     install(

@@ -1,5 +1,3 @@
-project(tr-dist-msi)
-
 include(UtilityFunctions.cmake)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -71,7 +69,7 @@ wix_heat(QtClientTranslations.wxs "${TRQMSRCDIR}" QtClientTranslationsComponents
 wix_heat(QtTranslations.wxs "${QTQMSRCDIR}" QtTranslationsComponents QMINSTALLDIR var.QtQmSrcDir
     XSL_TRANSFORM QtTranslations.xsl)
 
-wix_candle(${PROJECT_NAME}_OBJS
+wix_candle(WIX_OBJS
     ARCHITECTURE ${ARCH}
     SOURCES
         components/CliTools.wxs
@@ -99,9 +97,9 @@ wix_candle(${PROJECT_NAME}_OBJS
         "OpenSslSslName=${TR_OPENSSL_SSL_NAME}"
     EXTRA_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")
 
-wix_light(${PROJECT_NAME}_OUTPUT
+wix_light(WIX_OUTPUT
     NAME transmission-${MSI_FILENAME_VERSION}-${ARCH}
-    OBJECTS ${${PROJECT_NAME}_OBJS}
+    OBJECTS ${WIX_OBJS}
     EXTENSIONS
         WixUIExtension
         WixUtilExtension
@@ -118,4 +116,4 @@ add_custom_target(pack-msi
         QtTranslations.xsl
         Transmission.wxs
         TransmissionConfig.wxi.in
-    DEPENDS "${${PROJECT_NAME}_OUTPUT}")
+    DEPENDS "${WIX_OUTPUT}")

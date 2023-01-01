@@ -1,6 +1,4 @@
-project(trpo)
-
-set(${PROJECT_NAME}_LINGUAS
+set(LINGUAS
     an
     ar
     ast
@@ -91,13 +89,13 @@ set(${PROJECT_NAME}_LINGUAS
 set(GETTEXT_PACKAGE ${TR_NAME}-gtk)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_ENABLED_LINGUAS ${${PROJECT_NAME}_LINGUAS})
+    set(ENABLED_LINGUAS ${LINGUAS})
 else()
-    set(${PROJECT_NAME}_ENABLED_LINGUAS)
+    set(ENABLED_LINGUAS)
 endif()
 
-set(${PROJECT_NAME}_MO_FILES)
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
+set(MO_FILES)
+foreach(LANG ${ENABLED_LINGUAS})
     set(msgfmt_INPUT_FILE ${LANG}.po)
     set(msgfmt_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${GETTEXT_PACKAGE}-${LANG}.mo)
 
@@ -107,7 +105,7 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         DEPENDS ${msgfmt_INPUT_FILE})
 
-    list(APPEND ${PROJECT_NAME}_MO_FILES ${msgfmt_OUTPUT_FILE})
+    list(APPEND MO_FILES ${msgfmt_OUTPUT_FILE})
 
     install(
         FILES ${msgfmt_OUTPUT_FILE}
@@ -115,8 +113,8 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         RENAME ${GETTEXT_PACKAGE}.mo)
 endforeach()
 
-if(${PROJECT_NAME}_MO_FILES)
+if(MO_FILES)
     add_custom_target(${GETTEXT_PACKAGE}-po
         ALL
-        DEPENDS ${${PROJECT_NAME}_MO_FILES})
+        DEPENDS ${MO_FILES})
 endif()

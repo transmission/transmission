@@ -1,5 +1,3 @@
-project(trmacql)
-
 add_library(${TR_NAME}-mac-ql MODULE)
 
 target_sources(${TR_NAME}-mac-ql
@@ -10,7 +8,7 @@ target_sources(${TR_NAME}-mac-ql
         GenerateThumbnailForURL.mm
         main.cc)
 
-set(${PROJECT_NAME}_LINGUAS
+set(LINGUAS
     da
     de
     en
@@ -23,45 +21,45 @@ set(${PROJECT_NAME}_LINGUAS
     tr)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_ENABLED_LINGUAS ${${PROJECT_NAME}_LINGUAS})
+    set(ENABLED_LINGUAS ${LINGUAS})
 else()
-    set(${PROJECT_NAME}_ENABLED_LINGUAS en)
+    set(ENABLED_LINGUAS en)
 endif()
 
-set(${PROJECT_NAME}_LANG_STRINGS_FILES
+set(LANG_STRINGS_FILES
     Localizable.strings)
 
-set(${PROJECT_NAME}_RESOURCES
+set(RESOURCES
     style.css)
 source_group(Resources
-    FILES ${${PROJECT_NAME}_RESOURCES})
+    FILES ${RESOURCES})
 
 set_source_files_properties(
-    ${${PROJECT_NAME}_RESOURCES}
+    ${RESOURCES}
     PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources)
 
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
+foreach(LANG ${ENABLED_LINGUAS})
+    set(${LANG}_STRINGS_FILES)
     set(STRINGS_FILES_RESOURCES_DIR Resources)
     if(NOT CMAKE_GENERATOR STREQUAL Xcode)
         string(APPEND STRINGS_FILES_RESOURCES_DIR /${LANG}.lproj)
     endif()
-    foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
-        list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
-        list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+    foreach(F ${LANG_STRINGS_FILES})
+        list(APPEND ${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+        list(APPEND RESOURCES ${${LANG}_STRINGS_FILES})
         set_source_files_properties(
-            ${${PROJECT_NAME}_${LANG}_STRINGS_FILES}
+            ${${LANG}_STRINGS_FILES}
             PROPERTIES
                 MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
     endforeach()
     source_group(Resources/${LANG}.lproj
-        FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+        FILES ${${LANG}_STRINGS_FILES})
 endforeach()
 
 target_sources(${TR_NAME}-mac-ql
     PRIVATE
-        ${${PROJECT_NAME}_RESOURCES})
+        ${RESOURCES})
 
 set(MAC_QL_BUNDLE_NAME QuickLookPlugin)
 
@@ -72,7 +70,7 @@ set_target_properties(
         MACOSX_BUNDLE ON
         BUNDLE ON
         BUNDLE_EXTENSION qlgenerator
-        MACOSX_BUNDLE_INFO_PLIST "${PROJECT_SOURCE_DIR}/Info.plist.in"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
         INSTALL_RPATH "@loader_path/../../../../../MacOS;@loader_path/../../../../../Frameworks")
 
 target_include_directories(${TR_NAME}-mac-ql

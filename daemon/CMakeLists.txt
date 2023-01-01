@@ -1,5 +1,3 @@
-project(trdaemon)
-
 add_executable(${TR_NAME}-daemon)
 
 target_sources(${TR_NAME}-daemon

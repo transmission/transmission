@@ -1,5 +1,3 @@
-project(trqt)
-
 set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 
 add_executable(${TR_NAME}-qt WIN32)
@@ -146,7 +144,7 @@ endif()
 source_group(Resources
     REGULAR_EXPRESSION [[.*\.qrc$]])
 
-set(${PROJECT_NAME}_LINGUAS
+set(LINGUAS
     af
     ca
     da
@@ -179,23 +177,23 @@ set(${PROJECT_NAME}_LINGUAS
     zh_CN)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_ENABLED_LINGUAS ${${PROJECT_NAME}_LINGUAS})
+    set(ENABLED_LINGUAS ${LINGUAS})
 else()
-    set(${PROJECT_NAME}_ENABLED_LINGUAS)
+    set(ENABLED_LINGUAS)
 endif()
 
-set(${PROJECT_NAME}_TS_FILES)
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    list(APPEND ${PROJECT_NAME}_TS_FILES translations/transmission_${LANG}.ts)
+set(TS_FILES)
+foreach(LANG ${ENABLED_LINGUAS})
+    list(APPEND TS_FILES translations/transmission_${LANG}.ts)
 endforeach()
 
-if(${PROJECT_NAME}_TS_FILES)
-    tr_qt_add_translation(${PROJECT_NAME}_QM_FILES ${${PROJECT_NAME}_TS_FILES})
+if(TS_FILES)
+    tr_qt_add_translation(QM_FILES ${TS_FILES})
 endif()
 
 target_sources(${TR_NAME}-qt
     PRIVATE
-        ${${PROJECT_NAME}_QM_FILES})
+        ${QM_FILES})
 
 if(ENABLE_QT_COM_INTEROP)
     tr_target_idl_files(${TR_NAME}-qt
@@ -205,7 +203,7 @@ endif()
 target_include_directories(${TR_NAME}-qt
     PRIVATE
         ${CMAKE_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR})
+        ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_include_directories(${TR_NAME}-qt SYSTEM
     PRIVATE
@@ -259,7 +257,7 @@ install(
 
 if(ENABLE_NLS)
     install(
-        FILES ${${PROJECT_NAME}_QM_FILES}
+        FILES ${QM_FILES}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/${TR_NAME}/translations)
 endif()
 

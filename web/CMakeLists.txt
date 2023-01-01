@@ -1,5 +1,3 @@
-project(trweb)
-
 set(TRWEB_SRCS
     src/about-dialog.js
     src/action-manager.js
