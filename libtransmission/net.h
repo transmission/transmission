@@ -154,34 +154,58 @@ struct tr_address
     std::string_view display_name(char* out, size_t outlen, tr_port port = {}) const;
     [[nodiscard]] std::string display_name(tr_port port = {}) const;
 
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, in_addr const* addr4, tr_port port)
+    ///
+
+    [[nodiscard]] constexpr auto is_ipv4() const noexcept
     {
-        auto const nport = port.network();
-        out = std::copy_n(reinterpret_cast<std::byte const*>(addr4), sizeof(*addr4), out);
-        out = std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
-        return out;
+        return type == TR_AF_INET;
+    }
+
+    [[nodiscard]] constexpr auto is_ipv6() const noexcept
+    {
+        return type == TR_AF_INET6;
+    }
+
+    /// bt protocol compact form
+
+    // compact addr only -- used e.g. as `yourip` value in extension protocol handshake
+
+    template<typename OutputIt>
+    static OutputIt to_compact_ipv4(OutputIt out, in_addr const* addr4)
+    {
+        return std::copy_n(reinterpret_cast<std::byte const*>(addr4), sizeof(*addr4), out);
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, sockaddr_in const* sa4)
+    static OutputIt to_compact_ipv6(OutputIt out, in6_addr const* addr6)
     {
-        return to_compact_ipv4(out, &sa4->sin_addr, tr_port::fromNetwork(sa4->sin_port));
+        return std::copy_n(reinterpret_cast<std::byte const*>(addr6), sizeof(*addr6), out);
+    }
+
+    template<typename OutputIt>
+    OutputIt to_compact(OutputIt out) const
+    {
+        return is_ipv4() ? to_compact_ipv4(out, &this->addr.addr4) : to_compact_ipv6(out, &this->addr.addr6);
+    }
+
+    // compact addr + port -- very common format used for peer exchange, dht, tracker announce responses
+
+    template<typename OutputIt>
+    static OutputIt to_compact_ipv4(OutputIt out, in_addr const* addr4, tr_port port)
+    {
+        out = tr_address::to_compact_ipv4(out, addr4);
+
+        auto const nport = port.network();
+        return std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
     }
 
     template<typename OutputIt>
     static OutputIt to_compact_ipv6(OutputIt out, in6_addr const* addr6, tr_port port)
     {
-        auto const nport = port.network();
-        out = std::copy_n(reinterpret_cast<std::byte const*>(addr6), sizeof(*addr6), out);
-        out = std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
-        return out;
-    }
+        out = tr_address::to_compact_ipv6(out, addr6);
 
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, sockaddr_in6 const* sa6)
-    {
-        return to_compact_ipv6(out, &sa6->sin6_addr, tr_port::fromNetwork(sa6->sin6_port));
+        auto const nport = port.network();
+        return std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
     }
 
     template<typename OutputIt>
@@ -197,6 +221,26 @@ struct tr_address
     }
 
     template<typename OutputIt>
+    OutputIt to_compact(OutputIt out, tr_port port)
+    {
+        return is_ipv4() ? to_compact_4(out, &this->addr.addr4, port) : to_compact_ipv6(out, &this->addr.addr6, port);
+    }
+
+    // compact sockaddr helpers
+
+    template<typename OutputIt>
+    static OutputIt to_compact_ipv4(OutputIt out, sockaddr_in const* sa4)
+    {
+        return to_compact_ipv4(out, &sa4->sin_addr, tr_port::fromNetwork(sa4->sin_port));
+    }
+
+    template<typename OutputIt>
+    static OutputIt to_compact_ipv6(OutputIt out, sockaddr_in6 const* sa6)
+    {
+        return to_compact_ipv6(out, &sa6->sin6_addr, tr_port::fromNetwork(sa6->sin6_port));
+    }
+
+    template<typename OutputIt>
     static OutputIt to_compact(OutputIt out, sockaddr const* saddr)
     {
         return saddr->sa_family == AF_INET ? to_compact_ipv4(out, reinterpret_cast<sockaddr_in const*>(saddr)) :
@@ -207,16 +251,6 @@ struct tr_address
     static OutputIt to_compact(OutputIt out, struct sockaddr_storage* ss)
     {
         return to_compact(out, reinterpret_cast<struct sockaddr*>(ss));
-    }
-
-    [[nodiscard]] constexpr auto is_ipv4() const noexcept
-    {
-        return type == TR_AF_INET;
-    }
-
-    [[nodiscard]] constexpr auto is_ipv6() const noexcept
-    {
-        return type == TR_AF_INET6;
     }
 
     // comparisons

@@ -944,6 +944,19 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // libtorrent is 250.
     tr_variantDictAddInt(&val, TR_KEY_reqq, ReqQ);
 
+    // https://www.bittorrent.org/beps/bep_0010.html
+    // A string containing the compact representation of the ip address this peer sees
+    // you as. i.e. this is the receiver's external ip address (no port is included).
+    // This may be either an IPv4 (4 bytes) or an IPv6 (16 bytes) address.
+    {
+        auto buf = std::array<std::byte, TR_ADDRSTRLEN>{};
+        auto const begin = std::data(buf);
+        auto const end = msgs->io->address().to_compact(begin);
+        auto const len = end - begin;
+        TR_ASSERT(len == 4 || len == 16);
+        tr_variantDictAddRaw(&val, TR_KEY_yourip, begin, len);
+    }
+
     // http://bittorrent.org/beps/bep_0010.html
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
