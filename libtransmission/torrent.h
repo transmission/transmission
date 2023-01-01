@@ -24,6 +24,7 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "completion.h"
+#include "crypto-utils.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
 #include "log.h"
@@ -788,6 +789,11 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto announce_key() const noexcept
+    {
+        return announce_key_;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -920,7 +926,11 @@ private:
     }
 
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
+
     float verify_progress_ = -1;
+
+    tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
+
     tr_interned_string bandwidth_group_;
 
     bool needs_completeness_check_ = true;
