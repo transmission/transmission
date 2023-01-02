@@ -68,10 +68,6 @@ target_include_directories(libtransmission-test
         ${CMAKE_SOURCE_DIR}/libtransmission
         ${CMAKE_BINARY_DIR}/libtransmission)
 
-target_include_directories(libtransmission-test SYSTEM
-    PRIVATE
-        ${B64_INCLUDE_DIRS})
-
 target_compile_options(libtransmission-test
     PRIVATE $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
 

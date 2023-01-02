@@ -207,11 +207,6 @@ tr_allow_compile_if(
         file-posix.cc
         subprocess-posix.cc)
 
-foreach(UT
-        ${B64_UPSTREAM_TARGET})
-    add_dependencies(${TR_NAME} ${UT})
-endforeach()
-
 target_compile_definitions(${TR_NAME}
     PRIVATE
         __TRANSMISSION__
@@ -269,10 +264,6 @@ target_include_directories(${TR_NAME}
     INTERFACE
         ${CMAKE_BINARY_DIR})
 
-target_include_directories(${TR_NAME} SYSTEM
-    PRIVATE
-        ${B64_INCLUDE_DIRS})
-
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
@@ -285,7 +276,7 @@ target_link_libraries(${TR_NAME}
         miniupnpc::libminiupnpc
         dht::dht
         libutp::libutp
-        ${B64_LIBRARIES}
+        libb64::libb64
         ${LIBINTL_LIBRARY}
         ${LIBM_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
