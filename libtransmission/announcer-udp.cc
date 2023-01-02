@@ -94,7 +94,7 @@ struct tau_scrape_request
         this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] constexpr auto has_callback() const noexcept
+    [[nodiscard]] auto has_callback() const noexcept
     {
         return !!on_response_;
     }
@@ -196,7 +196,7 @@ struct tau_announce_request
         payload.insert(std::end(payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] constexpr auto has_callback() const noexcept
+    [[nodiscard]] auto has_callback() const noexcept
     {
         return !!on_response_;
     }
