@@ -205,15 +205,10 @@ target_include_directories(${TR_NAME}-qt
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_include_directories(${TR_NAME}-qt SYSTEM
-    PRIVATE
-        ${EVENT2_INCLUDE_DIRS})
-
 target_link_libraries(${TR_NAME}-qt
     PRIVATE
         ${TR_NAME}
-        transmission::qt_impl
-        ${EVENT2_LIBRARIES})
+        transmission::qt_impl)
 
 target_compile_definitions(${TR_NAME}-qt
     PRIVATE

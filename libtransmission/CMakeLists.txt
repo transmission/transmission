@@ -208,7 +208,6 @@ tr_allow_compile_if(
         subprocess-posix.cc)
 
 foreach(UT
-        ${EVENT2_UPSTREAM_TARGET}
         ${NATPMP_UPSTREAM_TARGET}
         ${MINIUPNPC_UPSTREAM_TARGET}
         ${DHT_UPSTREAM_TARGET}
@@ -284,9 +283,7 @@ target_include_directories(${TR_NAME} SYSTEM
         ${MINIUPNPC_INCLUDE_DIRS}
         ${DHT_INCLUDE_DIRS}
         ${UTP_INCLUDE_DIRS}
-        ${B64_INCLUDE_DIRS}
-    PUBLIC
-        ${EVENT2_INCLUDE_DIRS})
+        ${B64_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}
     PRIVATE
@@ -295,7 +292,6 @@ target_link_libraries(${TR_NAME}
         transmission::crypto_impl
         CURL::libcurl
         FastFloat::fast_float
-        ${EVENT2_LIBRARIES}
         ${PSL_LIBRARIES}
         ${NATPMP_LIBRARIES}
         ${MINIUPNPC_LIBRARIES}
@@ -314,7 +310,8 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
-        fmt::fmt-header-only)
+        fmt::fmt-header-only
+        libevent::event)
 
 if(INSTALL_LIB)
     install(

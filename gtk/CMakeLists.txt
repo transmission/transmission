@@ -176,7 +176,6 @@ target_include_directories(${TR_NAME}-gtk
 
 target_include_directories(${TR_NAME}-gtk SYSTEM
     PRIVATE
-        ${EVENT2_INCLUDE_DIRS}
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_INCLUDE_DIRS}>)
 
 target_link_libraries(${TR_NAME}-gtk
@@ -184,7 +183,6 @@ target_link_libraries(${TR_NAME}-gtk
         ${TR_NAME}
         transmission::gtk_impl
         fmt::fmt-header-only
-        ${EVENT2_LIBRARIES}
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)

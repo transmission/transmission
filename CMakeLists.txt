@@ -448,6 +448,7 @@ if(NOT USE_SYSTEM_DEFLATE)
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
+    TARGET libevent::event
     CMAKE_ARGS
         -DEVENT__DISABLE_OPENSSL:BOOL=ON
         -DEVENT__DISABLE_BENCHMARK:BOOL=ON
