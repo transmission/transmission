@@ -256,6 +256,7 @@ if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "mbedtls")
         set(CRYPTO_LIBRARIES ${MBEDTLS_LIBRARIES})
     endif()
 endif()
+
 # We should have found the library by now
 if(CRYPTO_PKG STREQUAL "")
     if(WITH_CRYPTO STREQUAL "AUTO")
@@ -263,6 +264,16 @@ if(CRYPTO_PKG STREQUAL "")
     else()
         message(FATAL_ERROR "Requested crypto library '${WITH_CRYPTO}' is not supported.")
     endif()
+else()
+    add_library(transmission::crypto_impl INTERFACE IMPORTED)
+
+    target_include_directories(transmission::crypto_impl
+        INTERFACE
+            ${CRYPTO_INCLUDE_DIRS})
+
+    target_link_libraries(transmission::crypto_impl
+        INTERFACE
+            ${CRYPTO_LIBRARIES})
 endif()
 
 if(ENABLE_GTK)

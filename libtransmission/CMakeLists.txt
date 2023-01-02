@@ -281,7 +281,6 @@ target_include_directories(${TR_NAME}
 target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
         ${DEFLATE_INCLUDE_DIRS}
-        ${CRYPTO_INCLUDE_DIRS}
         ${PSL_INCLUDE_DIRS}
         ${NATPMP_INCLUDE_DIRS}
         ${MINIUPNPC_INCLUDE_DIRS}
@@ -295,7 +294,7 @@ target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
         ${DEFLATE_LIBRARIES}
-        ${CRYPTO_LIBRARIES}
+        transmission::crypto_impl
         CURL::libcurl
         FastFloat::fast_float
         ${EVENT2_LIBRARIES}
