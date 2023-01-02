@@ -101,10 +101,6 @@ target_sources(${TR_NAME}-gtk
 source_group(Ui/GTK4
     REGULAR_EXPRESSION [[ui/gtk4/.*\.ui$]])
 
-target_link_directories(${TR_NAME}-gtk
-    PRIVATE
-        ${GTK${GTK_VERSION}_LIBRARY_DIRS})
-
 if(WITH_APPINDICATOR)
     set_property(
         SOURCE SystemTrayIcon.cc
@@ -170,7 +166,6 @@ target_compile_definitions(${TR_NAME}-gtk
 
 target_compile_options(${TR_NAME}-gtk
     PRIVATE
-        ${GTK${GTK_VERSION}_CFLAGS_OTHER}
         $<$<BOOL:${ENABLE_WERROR}>:$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-exit-time-destructors>)
 
@@ -181,14 +176,13 @@ target_include_directories(${TR_NAME}-gtk
 
 target_include_directories(${TR_NAME}-gtk SYSTEM
     PRIVATE
-        ${GTK${GTK_VERSION}_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS}
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_INCLUDE_DIRS}>)
 
 target_link_libraries(${TR_NAME}-gtk
     PRIVATE
         ${TR_NAME}
-        ${GTK${GTK_VERSION}_LIBRARIES}
+        transmission::gtk_impl
         fmt::fmt-header-only
         ${EVENT2_LIBRARIES}
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)

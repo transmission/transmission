@@ -314,6 +314,26 @@ else()
     set(WITH_APPINDICATOR OFF)
 endif()
 
+if(GTK_FOUND)
+    add_library(transmission::gtk_impl INTERFACE IMPORTED)
+
+    target_compile_options(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_CFLAGS_OTHER})
+
+    target_include_directories(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_INCLUDE_DIRS})
+
+    target_link_directories(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_LIBRARY_DIRS})
+
+    target_link_libraries(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_LIBRARIES})
+endif()
+
 if(ENABLE_QT)
     tr_get_required_flag(ENABLE_QT QT_IS_REQUIRED)
 
