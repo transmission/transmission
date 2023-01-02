@@ -153,24 +153,6 @@ public:
         return bandwidth_.isLimited(dir);
     }
 
-    [[nodiscard]] constexpr auto isPieceTransferAllowed(tr_direction direction) const noexcept
-    {
-        if (usesSpeedLimit(direction) && speedLimitBps(direction) <= 0)
-        {
-            return false;
-        }
-
-        if (usesSessionLimits())
-        {
-            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     /// BLOCK INFO
 
     [[nodiscard]] constexpr auto const& blockInfo() const noexcept
@@ -251,7 +233,7 @@ public:
         return completion.hasPiece(piece);
     }
 
-    [[nodiscard]] auto hasBlock(tr_block_index_t block) const
+    [[nodiscard]] TR_CONSTEXPR20 auto hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
@@ -332,7 +314,7 @@ public:
         return files_wanted_.pieceWanted(piece);
     }
 
-    [[nodiscard]] bool fileIsWanted(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 bool fileIsWanted(tr_file_index_t file) const
     {
         return files_wanted_.fileWanted(file);
     }
@@ -536,7 +518,7 @@ public:
 
     /// METAINFO - PIECE CHECKSUMS
 
-    [[nodiscard]] bool isPieceChecked(tr_piece_index_t piece) const
+    [[nodiscard]] TR_CONSTEXPR20 bool isPieceChecked(tr_piece_index_t piece) const
     {
         return checked_pieces_.test(piece);
     }
@@ -574,12 +556,12 @@ public:
         return this->isPublic() && this->session->allowsLPD();
     }
 
-    [[nodiscard]] bool clientCanDownload() const
+    [[nodiscard]] constexpr bool clientCanDownload() const
     {
         return this->isPieceTransferAllowed(TR_PEER_TO_CLIENT);
     }
 
-    [[nodiscard]] bool clientCanUpload() const
+    [[nodiscard]] constexpr bool clientCanUpload() const
     {
         return this->isPieceTransferAllowed(TR_CLIENT_TO_PEER);
     }
@@ -911,6 +893,24 @@ public:
     bool magnetVerify = false;
 
 private:
+    [[nodiscard]] constexpr bool isPieceTransferAllowed(tr_direction direction) const noexcept
+    {
+        if (usesSpeedLimit(direction) && speedLimitBps(direction) <= 0)
+        {
+            return false;
+        }
+
+        if (usesSessionLimits())
+        {
+            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
         auto const lock = unique_lock();
