@@ -488,7 +488,8 @@ target_compile_definitions(miniupnpc::libminiupnpc
 add_subdirectory(third-party/jsonsl)
 add_subdirectory(third-party/wildmat)
 
-tr_add_external_auto_library(DHT dht dht)
+tr_add_external_auto_library(DHT dht dht
+    TARGET dht::dht)
 
 tr_add_external_auto_library(PSL libpsl psl)
 

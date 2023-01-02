@@ -208,7 +208,6 @@ tr_allow_compile_if(
         subprocess-posix.cc)
 
 foreach(UT
-        ${DHT_UPSTREAM_TARGET}
         ${UTP_UPSTREAM_TARGET}
         ${PSL_UPSTREAM_TARGET}
         ${B64_UPSTREAM_TARGET})
@@ -275,7 +274,6 @@ target_include_directories(${TR_NAME}
 target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
         ${PSL_INCLUDE_DIRS}
-        ${DHT_INCLUDE_DIRS}
         ${UTP_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS})
 
@@ -289,7 +287,7 @@ target_link_libraries(${TR_NAME}
         ${PSL_LIBRARIES}
         natpmp::natpmp
         miniupnpc::libminiupnpc
-        ${DHT_LIBRARIES}
+        dht::dht
         ${UTP_LIBRARIES}
         ${B64_LIBRARIES}
         ${LIBINTL_LIBRARY}

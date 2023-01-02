@@ -70,8 +70,7 @@ target_include_directories(libtransmission-test
 
 target_include_directories(libtransmission-test SYSTEM
     PRIVATE
-        ${B64_INCLUDE_DIRS}
-        ${DHT_INCLUDE_DIRS})
+        ${B64_INCLUDE_DIRS})
 
 target_compile_options(libtransmission-test
     PRIVATE $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
@@ -80,6 +79,7 @@ target_link_libraries(libtransmission-test
     PRIVATE
         ${TR_NAME}
         gtestall
+        dht::dht
         fmt::fmt-header-only
         libevent::event
         WideInteger::WideInteger)
