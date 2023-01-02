@@ -94,7 +94,7 @@ struct tau_scrape_request
         this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] auto has_callback() const noexcept
+    [[nodiscard]] constexpr auto has_callback() const noexcept
     {
         return !!on_response_;
     }
@@ -144,7 +144,7 @@ struct tau_scrape_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_SCRAPE_TIMEOUT_SEC.count();
     }
@@ -196,7 +196,7 @@ struct tau_announce_request
         payload.insert(std::end(payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] auto has_callback() const noexcept
+    [[nodiscard]] constexpr auto has_callback() const noexcept
     {
         return !!on_response_;
     }
@@ -241,7 +241,7 @@ struct tau_announce_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_ANNOUNCE_TIMEOUT_SEC.count();
     }
