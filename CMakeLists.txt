@@ -207,9 +207,9 @@ if(NOT TARGET CURL::libcurl)
 endif()
 
 if(NOT WIN32)
-    find_package(ICONV)
+    find_package(Iconv)
 else()
-    set(ICONV_FOUND OFF)
+    set(Iconv_FOUND OFF)
 endif()
 
 set(CRYPTO_PKG "")

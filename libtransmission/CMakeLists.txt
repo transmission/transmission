@@ -231,8 +231,7 @@ target_compile_definitions(${TR_NAME}
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}> # API version macro was only added in 1.7
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
-        $<$<BOOL:${ICONV_FOUND}>:HAVE_ICONV>
-        $<$<BOOL:${ICONV_SECOND_ARGUMENT_IS_CONST}>:ICONV_SECOND_ARGUMENT_IS_CONST>
+        $<$<BOOL:${Iconv_FOUND}>:HAVE_ICONV>
         ${NATPMP_DEFINITIONS}
         ${MINIUPNPC_DEFINITIONS}
     PUBLIC
@@ -289,7 +288,6 @@ target_include_directories(${TR_NAME} SYSTEM
         ${DHT_INCLUDE_DIRS}
         ${UTP_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS}
-        $<$<BOOL:${ICONV_FOUND}>:${ICONV_INCLUDE_DIRS}>
     PUBLIC
         ${EVENT2_INCLUDE_DIRS})
 
@@ -314,7 +312,7 @@ target_link_libraries(${TR_NAME}
         utf8::cpp
         wildmat
         WideInteger::WideInteger
-        $<$<BOOL:${ICONV_FOUND}>:${ICONV_LIBRARIES}>
+        $<$<BOOL:${ICONV_FOUND}>:Iconv::Iconv>
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
