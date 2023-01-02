@@ -457,9 +457,12 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-tr_add_external_auto_library(NATPMP libnatpmp natpmp)
+tr_add_external_auto_library(NATPMP libnatpmp natpmp
+    TARGET natpmp::natpmp)
 if(NOT USE_SYSTEM_NATPMP)
-    set(NATPMP_DEFINITIONS NATPMP_STATICLIB)
+    target_compile_definitions(natpmp::natpmp
+        INTERFACE
+            NATPMP_STATICLIB)
 endif()
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
