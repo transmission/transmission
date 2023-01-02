@@ -209,7 +209,6 @@ tr_allow_compile_if(
 
 foreach(UT
         ${UTP_UPSTREAM_TARGET}
-        ${PSL_UPSTREAM_TARGET}
         ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
 endforeach()
@@ -273,7 +272,6 @@ target_include_directories(${TR_NAME}
 
 target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
-        ${PSL_INCLUDE_DIRS}
         ${UTP_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS})
 
@@ -284,7 +282,7 @@ target_link_libraries(${TR_NAME}
         transmission::crypto_impl
         CURL::libcurl
         FastFloat::fast_float
-        ${PSL_LIBRARIES}
+        psl::psl
         natpmp::natpmp
         miniupnpc::libminiupnpc
         dht::dht
