@@ -15,12 +15,12 @@
 * Fixed `4.0.0-beta.2` IPv6 μTP socket binding regression. ([#4469](https://github.com/transmission/transmission/pull/4469))
 * Followed [BEP 7](https://www.bittorrent.org/beps/bep_0007.html) suggestion to remove `&ipv4=` and `&ipv6=` query parameters from tracker announcements. ([#4502](https://github.com/transmission/transmission/pull/4502))
 * Followed [BEP 7](https://www.bittorrent.org/beps/bep_0007.html) suggestion to make the tracker announce `&key=`  query parameter unique per-torrent. ([#4508](https://github.com/transmission/transmission/pull/4508))
-* Made small performance improvements in libtransmission. ([#4393](https://github.com/transmission/transmission/pull/4393), [#4401](https://github.com/transmission/transmission/pull/4401), [#4404](https://github.com/transmission/transmission/pull/4404), [#4412](https://github.com/transmission/transmission/pull/4412), [#4424](https://github.com/transmission/transmission/pull/4424), [#4425](https://github.com/transmission/transmission/pull/4425), [#4431](https://github.com/transmission/transmission/pull/4431))
+* Made small performance improvements in libtransmission. ([#4393](https://github.com/transmission/transmission/pull/4393), [#4401](https://github.com/transmission/transmission/pull/4401), [#4404](https://github.com/transmission/transmission/pull/4404), [#4412](https://github.com/transmission/transmission/pull/4412), [#4424](https://github.com/transmission/transmission/pull/4424), [#4425](https://github.com/transmission/transmission/pull/4425), [#4431](https://github.com/transmission/transmission/pull/4431), [#4519](https://github.com/transmission/transmission/pull/4519))
 * Improved test coverage in the code that checks for reserved IP address use. ([#4462](https://github.com/transmission/transmission/pull/4462))
 
 ### macOS Client
 
-* Updated sort-by-size to ignore the size of files that the user doesn't want to download. ([#4365](https://github.com/transmission/transmission/pull/4365))
+* Sorting by size now only uses the sizes of files that are wanted. ([#4365](https://github.com/transmission/transmission/pull/4365))
 * Fixed memory leak in the blocklist downloader. ([#4309](https://github.com/transmission/transmission/pull/4309))
 * Fixed UI issues in the main window when using Groups. ([#4333](https://github.com/transmission/transmission/pull/4333))
 * Improved layout of macOS UI elements. ([#4366](https://github.com/transmission/transmission/pull/4366), [#4367](https://github.com/transmission/transmission/pull/4367), [#4460](https://github.com/transmission/transmission/pull/4460))
@@ -74,7 +74,7 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 * [@nevack (Dzmitry Neviadomski)](https://github.com/nevack):
   * Code review for [#4308](https://github.com/transmission/transmission/pull/4308), [#4309](https://github.com/transmission/transmission/pull/4309), [#4333](https://github.com/transmission/transmission/pull/4333), [#4366](https://github.com/transmission/transmission/pull/4366), [#4428](https://github.com/transmission/transmission/pull/4428), [#4440](https://github.com/transmission/transmission/pull/4440), [#4473](https://github.com/transmission/transmission/pull/4473)
 * [@sweetppro (SweetPPro)](https://github.com/sweetppro):
-  * Code review for [#4308](https://github.com/transmission/transmission/pull/4308), [#4310](https://github.com/transmission/transmission/pull/4310), [#4367](https://github.com/transmission/transmission/pull/4367), [#4417](https://github.com/transmission/transmission/pull/4417), [#4418](https://github.com/transmission/transmission/pull/4418), [#4428](https://github.com/transmission/transmission/pull/4428), [#4461](https://github.com/transmission/transmission/pull/4461)
+  * Code review for [#4308](https://github.com/transmission/transmission/pull/4308), [#4310](https://github.com/transmission/transmission/pull/4310), [#4367](https://github.com/transmission/transmission/pull/4367), [#4414](https://github.com/transmission/transmission/pull/4414), [#4417](https://github.com/transmission/transmission/pull/4417), [#4418](https://github.com/transmission/transmission/pull/4418), [#4428](https://github.com/transmission/transmission/pull/4428), [#4461](https://github.com/transmission/transmission/pull/4461)
   * Fixed UI issues in the main window when using Groups. ([#4333](https://github.com/transmission/transmission/pull/4333))
   * Improved layout of macOS UI elements. ([#4366](https://github.com/transmission/transmission/pull/4366))
   * Removed unused or unnecessary code. ([#4374](https://github.com/transmission/transmission/pull/4374))
@@ -105,6 +105,4 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
   * Code review for [#4291](https://github.com/transmission/transmission/pull/4291)
 * [@Petrprogs (Peter)](https://github.com/Petrprogs):
   * Added windows build manual. ([#4291](https://github.com/transmission/transmission/pull/4291))
-* [@sweetppro (SweetPPro)](https://github.com/sweetppro):
-  * Code review for [#4414](https://github.com/transmission/transmission/pull/4414)
 
