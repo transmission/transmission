@@ -441,7 +441,8 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-tr_add_external_auto_library(DEFLATE libdeflate deflate)
+tr_add_external_auto_library(DEFLATE libdeflate deflate
+    TARGET deflate::deflate)
 if(NOT USE_SYSTEM_DEFLATE)
     set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
 endif()

@@ -212,7 +212,6 @@ foreach(UT
         ${NATPMP_UPSTREAM_TARGET}
         ${MINIUPNPC_UPSTREAM_TARGET}
         ${DHT_UPSTREAM_TARGET}
-        ${DEFLATE_UPSTREAM_TARGET}
         ${UTP_UPSTREAM_TARGET}
         ${PSL_UPSTREAM_TARGET}
         ${B64_UPSTREAM_TARGET})
@@ -280,7 +279,6 @@ target_include_directories(${TR_NAME}
 
 target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
-        ${DEFLATE_INCLUDE_DIRS}
         ${PSL_INCLUDE_DIRS}
         ${NATPMP_INCLUDE_DIRS}
         ${MINIUPNPC_INCLUDE_DIRS}
@@ -293,7 +291,7 @@ target_include_directories(${TR_NAME} SYSTEM
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
-        ${DEFLATE_LIBRARIES}
+        deflate::deflate
         transmission::crypto_impl
         CURL::libcurl
         FastFloat::fast_float
