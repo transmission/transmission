@@ -295,7 +295,7 @@ target_include_directories(${TR_NAME} SYSTEM
 
 target_link_libraries(${TR_NAME}
     PRIVATE
-        ${CMAKE_THREAD_LIBS_INIT}
+        Threads::Threads
         ${DEFLATE_LIBRARIES}
         ${CRYPTO_LIBRARIES}
         CURL::libcurl
