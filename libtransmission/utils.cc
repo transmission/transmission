@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 #ifdef _WIN32
@@ -307,27 +308,16 @@ namespace
 namespace tr_strvUtf8Clean_impl
 {
 
-class SecondIconvArg
+template<std::size_t N, typename F>
+struct ArgTypeImpl;
+
+template<std::size_t N, typename R, typename... ArgTs>
+struct ArgTypeImpl<N, R (*)(ArgTs...)> : std::tuple_element<1, std::tuple<ArgTs...>>
 {
-public:
-    explicit SecondIconvArg(char const* arg)
-        : arg_(arg)
-    {
-    }
-
-    operator char**() &&
-    {
-        return const_cast<char**>(&arg_);
-    }
-
-    operator char const**() &&
-    {
-        return &arg_;
-    }
-
-private:
-    char const* arg_;
 };
+
+template<std::size_t N, typename F>
+using ArgType = typename ArgTypeImpl<N, F>::type;
 
 bool validateUtf8(std::string_view sv, char const** good_end)
 {
@@ -381,10 +371,11 @@ std::string to_utf8(std::string_view sv)
             continue;
         }
 
+        auto const* inbuf = std::data(sv);
         size_t inbytesleft = std::size(sv);
         char* out = std::data(buf);
         size_t outbytesleft = std::size(buf);
-        auto const rv = iconv(cd, SecondIconvArg(std::data(sv)), &inbytesleft, &out, &outbytesleft);
+        auto const rv = iconv(cd, const_cast<ArgType<1, decltype(&iconv)>>(&inbuf), &inbytesleft, &out, &outbytesleft);
         iconv_close(cd);
         if (rv != size_t(-1))
         {
