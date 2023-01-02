@@ -496,20 +496,8 @@ tr_add_external_auto_library(PSL libpsl psl
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp
+        TARGET libutp::libutp
         CMAKE_ARGS -DLIBUTP_BUILD_PROGRAMS=OFF)
-
-    if(UTP_UPSTREAM_TARGET)
-        # Use C++ linker for anything that depends on static libutp
-        # TODO: switch to imported targets for all the dependencies
-        add_library(UTP::UTP STATIC IMPORTED)
-        set_property(
-            TARGET UTP::UTP
-            PROPERTY IMPORTED_LOCATION "${UTP_LIBRARIES}")
-        set_property(
-            TARGET UTP::UTP
-            PROPERTY IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
-        set(UTP_LIBRARIES UTP::UTP)
-    endif()
 endif()
 
 tr_add_external_auto_library(B64 libb64 b64)
