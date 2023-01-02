@@ -1,3 +1,7 @@
+
+> transmission-release-notes@0.0.1 render
+> node lib/render.js
+
 # Transmission 4.0.0-beta.3
 
 ## What's New in 4.0.0-beta.3
@@ -39,9 +43,8 @@
 ### GTK Client
 
 * Fixed `4.0.0-beta.1` regression leading to potential crash on startup upon watch directory setup. ([#4355](https://github.com/transmission/transmission/pull/4355))
-* Fixed `4.0.0-beta.1` regression causing preferences dialog to be modal and making it impossble to close the blocklist update status dialog. ([#4391](https://github.com/transmission/transmission/pull/4391))
-* Fixed an issue with "Enable µTP for peer communication" checkbox in preferences dialog being always hidden for CMake-based builds. ([#4349](https://github.com/transmission/transmission/pull/4349))
-* Don't use message dialog to display blocklist update status. ([#4392](https://github.com/transmission/transmission/pull/4392))
+* Fixed `4.0.0-beta.1` regression that prevented closing the "update blocklist" dialog. ([#4391](https://github.com/transmission/transmission/pull/4391), [#4392](https://github.com/transmission/transmission/pull/4392))
+* Fixed a bug that hid the "Enable µTP for peer communication" checkbox. ([#4349](https://github.com/transmission/transmission/pull/4349))
 * Removed unused or unnecessary code. ([#4416](https://github.com/transmission/transmission/pull/4416))
 
 ### transmission-remote
@@ -62,14 +65,14 @@
 
 Last but certainly not least, a big ***Thank You*** to these people who contributed to this release:
 
-### Contributions to `libtransmission (All Platforms)`:
+### Contributions to libtransmission (All Platforms):
 
 * [@stefantalpalaru (Ștefan Talpalaru)](https://github.com/stefantalpalaru):
   * Fixed `4.0.0-beta.2` regression that broke port forwarding in some settings. ([#4343](https://github.com/transmission/transmission/pull/4343))
 * [@tinselcity (Reed Morrison)](https://github.com/tinselcity):
   * Removed unused UTP Socket code. ([#4409](https://github.com/transmission/transmission/pull/4409))
 
-### Contributions to `macOS Client`:
+### Contributions to macOS Client:
 
 * [@nevack (Dzmitry Neviadomski)](https://github.com/nevack):
   * Code review for [#4308](https://github.com/transmission/transmission/pull/4308), [#4309](https://github.com/transmission/transmission/pull/4309), [#4333](https://github.com/transmission/transmission/pull/4333), [#4366](https://github.com/transmission/transmission/pull/4366), [#4428](https://github.com/transmission/transmission/pull/4428), [#4440](https://github.com/transmission/transmission/pull/4440), [#4473](https://github.com/transmission/transmission/pull/4473)
@@ -83,19 +86,19 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
   * Fixed the background style of torrents selected in the main window. ([#4458](https://github.com/transmission/transmission/pull/4458))
   * Improved layout of macOS UI elements. ([#4460](https://github.com/transmission/transmission/pull/4460))
 
-### Contributions to `Qt Client`:
+### Contributions to Qt Client:
 
 * [@GaryElshaw (Gary Elshaw)](https://github.com/GaryElshaw):
   * Updated Qt CMakeLists.txt to include support for building svg. ([#4437](https://github.com/transmission/transmission/pull/4437))
 * [@smrtrfszm (Szepesi Tibor)](https://github.com/smrtrfszm):
   * Added Qt dependencies for Windows build instructions and minor fixes. ([#4363](https://github.com/transmission/transmission/pull/4363))
 
-### Contributions to `transmission-remote`:
+### Contributions to transmission-remote:
 
 * [@lajp (Luukas Pörtfors)](https://github.com/lajp):
   * Fixed `4.0.0-beta.1` bug that showed the wrong ETA for some torrents. ([#4506](https://github.com/transmission/transmission/pull/4506))
 
-### Contributions to `Everything Else`:
+### Contributions to Everything Else:
 
 * [@dmantipov (Dmitry Antipov)](https://github.com/dmantipov):
   * Refactor, ci: switch clang-format to LLVM 15. ([#4297](https://github.com/transmission/transmission/pull/4297))
