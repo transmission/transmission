@@ -466,16 +466,24 @@ if(NOT USE_SYSTEM_NATPMP)
 endif()
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+    TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
         -DUPNPC_BUILD_TESTS=OFF)
-set(MINIUPNPC_DEFINITIONS SYSTEM_MINIUPNP)
 if(NOT USE_SYSTEM_MINIUPNPC)
-    list(APPEND MINIUPNPC_DEFINITIONS MINIUPNP_STATICLIB)
+    target_compile_definitions(miniupnpc::libminiupnpc
+        INTERFACE
+            MINIUPNP_STATICLIB)
+
     set(MINIUPNPC_VERSION 1.9)
     set(MINIUPNPC_API_VERSION 12)
 endif()
+
+target_compile_definitions(miniupnpc::libminiupnpc
+    INTERFACE
+        SYSTEM_MINIUPNP
+        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
 
 add_subdirectory(third-party/jsonsl)
 add_subdirectory(third-party/wildmat)

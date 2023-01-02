@@ -208,7 +208,6 @@ tr_allow_compile_if(
         subprocess-posix.cc)
 
 foreach(UT
-        ${MINIUPNPC_UPSTREAM_TARGET}
         ${DHT_UPSTREAM_TARGET}
         ${UTP_UPSTREAM_TARGET}
         ${PSL_UPSTREAM_TARGET}
@@ -229,7 +228,6 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
         $<$<BOOL:${Iconv_FOUND}>:HAVE_ICONV>
-        ${MINIUPNPC_DEFINITIONS}
     PUBLIC
         $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
 
@@ -277,7 +275,6 @@ target_include_directories(${TR_NAME}
 target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
         ${PSL_INCLUDE_DIRS}
-        ${MINIUPNPC_INCLUDE_DIRS}
         ${DHT_INCLUDE_DIRS}
         ${UTP_INCLUDE_DIRS}
         ${B64_INCLUDE_DIRS})
@@ -291,7 +288,7 @@ target_link_libraries(${TR_NAME}
         FastFloat::fast_float
         ${PSL_LIBRARIES}
         natpmp::natpmp
-        ${MINIUPNPC_LIBRARIES}
+        miniupnpc::libminiupnpc
         ${DHT_LIBRARIES}
         ${UTP_LIBRARIES}
         ${B64_LIBRARIES}
