@@ -281,7 +281,6 @@ target_include_directories(${TR_NAME}
 
 target_include_directories(${TR_NAME} SYSTEM
     PRIVATE
-        ${UTFCPP_INCLUDE_DIRS}
         ${DEFLATE_INCLUDE_DIRS}
         ${CRYPTO_INCLUDE_DIRS}
         ${PSL_INCLUDE_DIRS}
@@ -312,6 +311,7 @@ target_link_libraries(${TR_NAME}
         ${LIBM_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
         jsonsl
+        utf8::cpp
         wildmat
         WideInteger::WideInteger
         $<$<BOOL:${ICONV_FOUND}>:${ICONV_LIBRARIES}>
