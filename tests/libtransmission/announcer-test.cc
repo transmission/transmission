@@ -9,10 +9,10 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "announcer-common.h"
-#include "net.h"
+#include <libtransmission/announcer-common.h>
+#include <libtransmission/net.h>
 
 #include "test-fixtures.h"
 

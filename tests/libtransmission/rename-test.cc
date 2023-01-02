@@ -3,14 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "file.h"
-#include "resume.h"
-#include "torrent.h" // tr_isTorrent()
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "variant.h"
+#include <libtransmission/file.h>
+#include <libtransmission/resume.h>
+#include <libtransmission/torrent.h> // tr_isTorrent()
+#include <libtransmission/tr-assert.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
 

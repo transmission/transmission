@@ -10,12 +10,12 @@
 
 #include <event2/util.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "handshake.h"
-#include "peer-io.h"
-#include "session.h" // tr_peerIdInit()
-#include "timer.h"
+#include <libtransmission/handshake.h>
+#include <libtransmission/peer-io.h>
+#include <libtransmission/session.h> // tr_peerIdInit()
+#include <libtransmission/timer.h>
 
 #include "test-fixtures.h"
 

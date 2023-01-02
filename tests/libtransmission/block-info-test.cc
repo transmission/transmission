@@ -5,9 +5,9 @@
 
 #include <cstdint>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "block-info.h"
+#include <libtransmission/block-info.h>
 
 #include "gtest/gtest.h"
 

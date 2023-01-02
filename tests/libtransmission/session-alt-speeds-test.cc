@@ -8,10 +8,10 @@
 
 #include <fmt/chrono.h>
 
-#include "transmission.h"
-#include "session.h"
-#include "session-id.h"
-#include "version.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/session.h>
+#include <libtransmission/session-id.h>
+#include <libtransmission/version.h>
 
 #include "test-fixtures.h"
 

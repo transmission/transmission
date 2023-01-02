@@ -9,11 +9,11 @@
 #include <string_view>
 #include <utility>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "file.h"
-#include "torrent-files.h"
-#include "tr-strbuf.h"
+#include <libtransmission/file.h>
+#include <libtransmission/torrent-files.h>
+#include <libtransmission/tr-strbuf.h>
 
 #include "test-fixtures.h"
 

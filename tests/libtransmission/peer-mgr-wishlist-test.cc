@@ -9,9 +9,9 @@
 
 #define LIBTRANSMISSION_PEER_MODULE
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "peer-mgr-wishlist.h"
+#include <libtransmission/peer-mgr-wishlist.h>
 
 #include "gtest/gtest.h"
 

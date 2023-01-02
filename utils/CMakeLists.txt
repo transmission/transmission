@@ -5,20 +5,12 @@ foreach(P create edit remote show)
         PRIVATE
             ${P}.cc)
 
-    target_include_directories(${TR_NAME}-${P}
-        PRIVATE
-            ${CMAKE_SOURCE_DIR})
-
-    target_include_directories(${TR_NAME}-${P} SYSTEM
-        PRIVATE
-            ${LIBFMT_INCLUDE_DIRS}
-            ${EVENT2_INCLUDE_DIRS}
-            ${CURL_INCLUDE_DIRS})
-
     target_link_libraries(${TR_NAME}-${P}
         PRIVATE
             ${TR_NAME}
-            ${CURL_LIBRARIES})
+            CURL::libcurl
+            fmt::fmt-header-only
+            libevent::event)
 
     tr_win32_app_info(${TR_NAME}-${P}
         "Transmission Utility ('${P}')"

@@ -8,9 +8,9 @@
 #include <algorithm>
 #include <type_traits>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "peer-mgr-active-requests.h"
+#include <libtransmission/peer-mgr-active-requests.h>
 
 #include "gtest/gtest.h"
 
