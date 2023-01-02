@@ -166,7 +166,7 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
 void tr_peerIo::close()
 {
-    socket_.close(session_);
+    socket_.close();
     event_write_.reset();
     event_read_.reset();
 }

@@ -322,9 +322,7 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
-void tr_netClose(tr_session* session, tr_socket_t s);
-
-void tr_netCloseSocket(tr_socket_t fd);
+void tr_net_close_socket(tr_socket_t fd);
 
 bool tr_net_hasIPv6(tr_port);
 
