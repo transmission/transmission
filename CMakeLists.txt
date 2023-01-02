@@ -416,6 +416,14 @@ if(ENABLE_QT)
     tr_fixup_auto_option(ENABLE_QT QT_FOUND QT_IS_REQUIRED)
 endif()
 
+if(QT_FOUND)
+    add_library(transmission::qt_impl INTERFACE IMPORTED)
+
+    target_link_libraries(transmission::qt_impl
+        INTERFACE
+            ${QT_TARGETS})
+endif()
+
 if(ENABLE_MAC)
     tr_get_required_flag(ENABLE_MAC MAC_IS_REQUIRED)
 

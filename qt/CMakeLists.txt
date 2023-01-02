@@ -212,7 +212,7 @@ target_include_directories(${TR_NAME}-qt SYSTEM
 target_link_libraries(${TR_NAME}-qt
     PRIVATE
         ${TR_NAME}
-        ${QT_TARGETS}
+        transmission::qt_impl
         ${EVENT2_LIBRARIES})
 
 target_compile_definitions(${TR_NAME}-qt
