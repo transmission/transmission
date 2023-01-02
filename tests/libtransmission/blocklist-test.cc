@@ -6,14 +6,14 @@
 #include <cstring> // strlen()
 // #include <unistd.h> // sync()
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "blocklist.h"
-#include "file.h"
-#include "net.h"
-#include "peer-socket.h"
-#include "session.h" // tr_session.tr_session.addressIsBlocked()
-#include "tr-strbuf.h"
+#include <libtransmission/blocklist.h>
+#include <libtransmission/file.h>
+#include <libtransmission/net.h>
+#include <libtransmission/peer-socket.h>
+#include <libtransmission/session.h> // tr_session.tr_session.addressIsBlocked()
+#include <libtransmission/tr-strbuf.h>
 
 #include "test-fixtures.h"
 

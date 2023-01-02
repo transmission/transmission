@@ -26,10 +26,6 @@ tr_target_compile_definitions_for_functions(${TR_NAME}-daemon
         daemon
         syslog)
 
-target_include_directories(${TR_NAME}-daemon
-    PRIVATE
-        ${CMAKE_SOURCE_DIR})
-
 target_include_directories(${TR_NAME}-daemon SYSTEM
     PRIVATE
         $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_INCLUDE_DIRS}>)

@@ -3,12 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "session-alt-speeds.h"
-#include "session-id.h"
-#include "session.h"
-#include "version.h"
+#include <libtransmission/session-alt-speeds.h>
+#include <libtransmission/session-id.h>
+#include <libtransmission/session.h>
+#include <libtransmission/version.h>
 
 #include "test-fixtures.h"
 

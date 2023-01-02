@@ -11,11 +11,11 @@
 
 #include <event2/event.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "file.h"
-#include "timer-ev.h"
-#include "session-thread.h" // for tr_evthread_init();
+#include <libtransmission/file.h>
+#include <libtransmission/timer-ev.h>
+#include <libtransmission/session-thread.h> // for tr_evthread_init();
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"

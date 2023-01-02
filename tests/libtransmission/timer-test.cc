@@ -3,10 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "timer-ev.h"
-#include "utils-ev.h"
+#include <libtransmission/timer-ev.h>
+#include <libtransmission/utils-ev.h>
 
 #include "test-fixtures.h"
 

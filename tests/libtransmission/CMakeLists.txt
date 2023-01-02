@@ -63,11 +63,6 @@ target_compile_definitions(libtransmission-test
         -DLIBTRANSMISSION_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
         __TRANSMISSION__)
 
-target_include_directories(libtransmission-test
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/libtransmission
-        ${CMAKE_BINARY_DIR}/libtransmission)
-
 target_compile_options(libtransmission-test
     PRIVATE $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
 

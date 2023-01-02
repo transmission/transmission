@@ -9,11 +9,11 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h" // tr_rand_obj()
-#include "session.h"
-#include "tr-lpd.h"
+#include <libtransmission/crypto-utils.h> // tr_rand_obj()
+#include <libtransmission/session.h>
+#include <libtransmission/tr-lpd.h>
 
 #include "test-fixtures.h"
 

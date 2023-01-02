@@ -202,7 +202,6 @@ endif()
 
 target_include_directories(${TR_NAME}-qt
     PRIVATE
-        ${CMAKE_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${TR_NAME}-qt

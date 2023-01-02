@@ -4,10 +4,6 @@ target_sources(${TR_NAME}-cli
     PRIVATE
         cli.cc)
 
-target_include_directories(${TR_NAME}-cli
-    PRIVATE
-        ${CMAKE_SOURCE_DIR})
-
 target_link_libraries(${TR_NAME}-cli
     PRIVATE
         ${TR_NAME}

@@ -5,10 +5,6 @@ foreach(P create edit remote show)
         PRIVATE
             ${P}.cc)
 
-    target_include_directories(${TR_NAME}-${P}
-        PRIVATE
-            ${CMAKE_SOURCE_DIR})
-
     target_link_libraries(${TR_NAME}-${P}
         PRIVATE
             ${TR_NAME}

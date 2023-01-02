@@ -171,7 +171,6 @@ target_compile_options(${TR_NAME}-gtk
 
 target_include_directories(${TR_NAME}-gtk
     PRIVATE
-        ${CMAKE_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR})
 
 target_include_directories(${TR_NAME}-gtk SYSTEM
