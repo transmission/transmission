@@ -145,7 +145,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         auto optval = int{ 1 };
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
         auto const [addr, is_any] = session_.publicAddress(TR_AF_INET);
         auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
@@ -175,7 +175,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         auto optval = int{ 1 };
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
         auto const [addr, is_any] = session_.publicAddress(TR_AF_INET6);
         auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
