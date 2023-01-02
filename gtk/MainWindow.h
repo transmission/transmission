@@ -35,8 +35,8 @@ public:
         Glib::RefPtr<Gio::ActionGroup> const& actions,
         Glib::RefPtr<Session> const& core);
 
-    void for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> callback) const;
-    bool for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> callback) const;
+    void for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> const& callback) const;
+    bool for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> const& callback) const;
 
     void select_all();
     void unselect_all();

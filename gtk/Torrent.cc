@@ -25,7 +25,7 @@ namespace
 {
 
 template<typename T>
-Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T> const&)
+Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T> const& /*column*/)
 {
     return static_cast<Glib::Value<T>&>(value);
 }
@@ -167,15 +167,15 @@ public:
 
     void get_value(int column, Glib::ValueBase& value) const;
 
-    Glib::RefPtr<Gio::Icon> get_icon() const;
-    Glib::ustring get_short_status_text() const;
-    Glib::ustring get_long_progress_text() const;
-    Glib::ustring get_long_status_text() const;
+    [[nodiscard]] Glib::RefPtr<Gio::Icon> get_icon() const;
+    [[nodiscard]] Glib::ustring get_short_status_text() const;
+    [[nodiscard]] Glib::ustring get_long_progress_text() const;
+    [[nodiscard]] Glib::ustring get_long_status_text() const;
 
 private:
-    Glib::ustring get_short_transfer_text() const;
-    Glib::ustring get_error_text() const;
-    Glib::ustring get_activity_text() const;
+    [[nodiscard]] Glib::ustring get_short_transfer_text() const;
+    [[nodiscard]] Glib::ustring get_error_text() const;
+    [[nodiscard]] Glib::ustring get_activity_text() const;
 
 private:
     Torrent& torrent_;
@@ -732,6 +732,7 @@ Torrent::ChangeFlags Torrent::update()
 
 Glib::RefPtr<Torrent> Torrent::create(tr_torrent* torrent)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new Torrent(torrent));
 }
 

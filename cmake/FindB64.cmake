@@ -12,8 +12,14 @@ if(UNIX)
     pkg_check_modules(_B64 QUIET libb64)
 endif()
 
-find_path(B64_INCLUDE_DIR NAMES b64/cdecode.h b64/cencode.h HINTS ${_B64_INCLUDEDIR})
-find_library(B64_LIBRARY NAMES b64 HINTS ${_B64_LIBDIR})
+find_path(B64_INCLUDE_DIR
+    NAMES
+        b64/cdecode.h
+        b64/cencode.h
+    HINTS ${_B64_INCLUDEDIR})
+find_library(B64_LIBRARY
+    NAMES b64
+    HINTS ${_B64_LIBDIR})
 
 set(B64_INCLUDE_DIRS ${B64_INCLUDE_DIR})
 set(B64_LIBRARIES ${B64_LIBRARY})
@@ -23,8 +29,7 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(B64
     REQUIRED_VARS
         B64_LIBRARY
-        B64_INCLUDE_DIR
-)
+        B64_INCLUDE_DIR)
 
 mark_as_advanced(B64_INCLUDE_DIR B64_LIBRARY)
 

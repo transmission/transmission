@@ -8,8 +8,13 @@
 #include <QIcon>
 #include <QStyle>
 
+class QPainter;
+class QStyleOptionProgressBar;
+
 class StyleHelper
 {
 public:
     static QIcon::Mode getIconMode(QStyle::State const& state);
+
+    static void drawProgressBar(QStyle const& style, QPainter& painter, QStyleOptionProgressBar const& option);
 };

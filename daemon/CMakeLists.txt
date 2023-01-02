@@ -1,58 +1,61 @@
-project(trdaemon)
+add_executable(${TR_NAME}-daemon)
 
-if(WITH_SYSTEMD)
-    add_definitions(-DUSE_SYSTEMD)
-endif()
+target_sources(${TR_NAME}-daemon
+    PRIVATE
+        daemon.cc
+        daemon.h
+        daemon-posix.cc
+        daemon-win32.cc)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}
-)
-include_directories(
-    SYSTEM
-    ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS}
-)
+tr_allow_compile_if(
+    [=[[WIN32]]=]
+        daemon-win32.cc
+    [=[[NOT WIN32]]=]
+        daemon-posix.cc)
 
-set(${PROJECT_NAME}_SOURCES
-    daemon.cc
-    daemon-posix.cc
-    daemon-win32.cc
-)
+target_compile_definitions(${TR_NAME}-daemon
+    PRIVATE
+        $<$<BOOL:${WITH_SYSTEMD}>:USE_SYSTEMD>)
 
-if(WIN32)
-    set_source_files_properties(daemon-posix.cc PROPERTIES HEADER_FILE_ONLY ON)
-else()
-    set_source_files_properties(daemon-win32.cc PROPERTIES HEADER_FILE_ONLY ON)
-endif()
+tr_target_compile_definitions_for_headers(${TR_NAME}-daemon
+    PRIVATE
+        sys/signalfd.h)
 
-set(${PROJECT_NAME}_HEADERS
-    daemon.h
-)
+tr_target_compile_definitions_for_functions(${TR_NAME}-daemon
+    PRIVATE
+        daemon
+        syslog)
 
-tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
+target_include_directories(${TR_NAME}-daemon
+    PRIVATE
+        ${CMAKE_SOURCE_DIR})
+
+target_include_directories(${TR_NAME}-daemon SYSTEM
+    PRIVATE
+        ${LIBFMT_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS}
+        $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_INCLUDE_DIRS}>)
+
+target_link_libraries(${TR_NAME}-daemon
+    PRIVATE
+        ${TR_NAME}
+        ${EVENT2_LIBRARIES}
+        $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_LIBRARIES}>)
+
+tr_win32_app_info(${TR_NAME}-daemon
     "Transmission Daemon"
     "${TR_NAME}-daemon"
     "${TR_NAME}-daemon.exe")
 
-add_executable(${TR_NAME}-daemon
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_WIN32_RC_FILE})
-
-target_link_libraries(${TR_NAME}-daemon
-    ${TR_NAME}
-    ${EVENT2_LIBRARIES}
-)
-
-if(WITH_SYSTEMD)
-    target_include_directories(${TR_NAME}-daemon PRIVATE ${SYSTEMD_INCLUDE_DIRS})
-    target_link_libraries(${TR_NAME}-daemon ${SYSTEMD_LIBRARIES})
-endif()
-
 foreach(P daemon)
-    install(TARGETS ${TR_NAME}-${P} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(
+        TARGETS ${TR_NAME}-${P}
+        DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     if(INSTALL_DOC)
-        install(FILES ${TR_NAME}-${P}.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+        install(
+            FILES ${TR_NAME}-${P}.1
+            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
     endif()
 endforeach()

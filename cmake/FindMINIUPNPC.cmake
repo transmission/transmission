@@ -8,18 +8,25 @@ if(MINIUPNPC_PREFER_STATIC_LIB)
 endif()
 
 if(UNIX)
-  find_package(PkgConfig QUIET)
-  pkg_check_modules(_MINIUPNPC QUIET libminiupnpc)
+    find_package(PkgConfig QUIET)
+    pkg_check_modules(_MINIUPNPC QUIET libminiupnpc)
 endif()
 
-find_path(MINIUPNPC_INCLUDE_DIR NAMES miniupnpc/miniupnpc.h HINTS ${_MINIUPNPC_INCLUDEDIR})
-find_library(MINIUPNPC_LIBRARY NAMES miniupnpc libminiupnpc HINTS ${_MINIUPNPC_LIBDIR})
+find_path(MINIUPNPC_INCLUDE_DIR
+    NAMES miniupnpc/miniupnpc.h
+    HINTS ${_MINIUPNPC_INCLUDEDIR})
+find_library(MINIUPNPC_LIBRARY
+    NAMES
+        miniupnpc
+        libminiupnpc
+    HINTS ${_MINIUPNPC_LIBDIR})
 
 if(MINIUPNPC_INCLUDE_DIR)
     if(_MINIUPNPC_VERSION)
         set(MINIUPNPC_VERSION ${_MINIUPNPC_VERSION})
     else()
-        file(STRINGS "${MINIUPNPC_INCLUDE_DIR}/miniupnpc/miniupnpc.h" MINIUPNPC_VERSION_STR REGEX "^#define[\t ]+MINIUPNPC_VERSION[\t ]+\"[^\"]+\"")
+        file(STRINGS "${MINIUPNPC_INCLUDE_DIR}/miniupnpc/miniupnpc.h" MINIUPNPC_VERSION_STR
+            REGEX "^#define[\t ]+MINIUPNPC_VERSION[\t ]+\"[^\"]+\"")
         if(MINIUPNPC_VERSION_STR MATCHES "\"([^\"]+)\"")
             set(MINIUPNPC_VERSION "${CMAKE_MATCH_1}")
         endif()
@@ -27,7 +34,8 @@ if(MINIUPNPC_INCLUDE_DIR)
         # Let's hope it's 1.7 or higher, since it provides
         # MINIUPNPC_API_VERSION and we won't have to figure
         # it out on our own
-        file(STRINGS "${MINIUPNPC_INCLUDE_DIR}/miniupnpc/miniupnpc.h" MINIUPNPC_API_VERSION_STR REGEX "^#define[\t ]+MINIUPNPC_API_VERSION[\t ]+[0-9]+")
+        file(STRINGS "${MINIUPNPC_INCLUDE_DIR}/miniupnpc/miniupnpc.h" MINIUPNPC_API_VERSION_STR
+            REGEX "^#define[\t ]+MINIUPNPC_API_VERSION[\t ]+[0-9]+")
         if(MINIUPNPC_API_VERSION_STR MATCHES "^#define[\t ]+MINIUPNPC_API_VERSION[\t ]+([0-9]+)")
             set(MINIUPNPC_API_VERSION "${CMAKE_MATCH_1}")
         endif()
@@ -37,8 +45,7 @@ if(MINIUPNPC_INCLUDE_DIR)
         # Or maybe it's miniupnp 1.6
         if(NOT DEFINED MINIUPNPC_API_VERSION)
             file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/CheckMiniUPnPC_1.6.c
-                "
-                #include <stdlib.h>
+                "#include <stdlib.h>
                 #include <errno.h>
                 #include <miniupnpc/miniupnpc.h>
                 #include <miniupnpc/upnpcommands.h>
@@ -52,12 +59,11 @@ if(MINIUPNPC_INCLUDE_DIR)
                     char intPort[8];
                     char intClient[16];
                     upnpDiscover( 2000, NULL, NULL, 0, 0, &errno );
-                    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) ); 
+                    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) );
                     UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
                                         portStr, \"TCP\", intClient, intPort, NULL, NULL, NULL );
                     return 0;
-                }
-                ")
+                }")
             try_compile(_MINIUPNPC_HAVE_VERSION_1_6
                 ${CMAKE_BINARY_DIR}
                 ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/CheckMiniUPnPC_1.6.c
@@ -75,8 +81,7 @@ if(MINIUPNPC_INCLUDE_DIR)
         # Or maybe it's miniupnp 1.5
         if(NOT DEFINED MINIUPNPC_API_VERSION)
             file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/CheckMiniUPnPC_1.5.c
-                "
-                #include <stdlib.h>
+                "#include <stdlib.h>
                 #include <miniupnpc/miniupnpc.h>
                 #include <miniupnpc/upnpcommands.h>
                 int main()
@@ -89,12 +94,11 @@ if(MINIUPNPC_INCLUDE_DIR)
                     char intPort[8];
                     char intClient[16];
                     upnpDiscover( 2000, NULL, NULL, 0 );
-                    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) ); 
+                    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) );
                     UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
                                         portStr, \"TCP\", intClient, intPort );
                     return 0;
-                }
-                ")
+                }")
             try_compile(_MINIUPNPC_HAVE_VERSION_1_5
                 ${CMAKE_BINARY_DIR}
                 ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/CheckMiniUPnPC_1.5.c
@@ -121,9 +125,7 @@ find_package_handle_standard_args(MINIUPNPC
         MINIUPNPC_LIBRARY
         MINIUPNPC_INCLUDE_DIR
         MINIUPNPC_API_VERSION
-    VERSION_VAR
-        MINIUPNPC_VERSION
-)
+    VERSION_VAR MINIUPNPC_VERSION)
 
 mark_as_advanced(MINIUPNPC_INCLUDE_DIR MINIUPNPC_LIBRARY)
 

@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include "GtkCompat.h"
 #include "Torrent.h"
-#include "Utils.h"
 
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>

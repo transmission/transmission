@@ -4,6 +4,7 @@
 
 #include "Dialogs.h"
 
+#include "GtkCompat.h"
 #include "Session.h"
 #include "Utils.h"
 

@@ -8,6 +8,7 @@
 #include "DetailsDialog.h"
 #include "Dialogs.h"
 #include "FilterBar.h"
+#include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
 #include "MainWindow.h"
 #include "MakeDialog.h"

@@ -5,6 +5,7 @@
 
 #include "RelocateDialog.h"
 
+#include "GtkCompat.h"
 #include "PathButton.h"
 #include "Prefs.h" /* gtr_pref_string_get */
 #include "Session.h"

@@ -225,7 +225,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
-    auto const [source_addr, is_default_addr] = session->publicAddress(addr.type);
+    auto const [source_addr, is_any] = session->publicAddress(addr.type);
     auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
@@ -491,7 +491,7 @@ namespace global_ipv6_helpers
 } // namespace global_ipv6_helpers
 
 /* Return our global IPv6 address, with caching. */
-std::optional<tr_address> tr_globalIPv6(tr_session const* session)
+std::optional<tr_address> tr_globalIPv6()
 {
     using namespace global_ipv6_helpers;
 
@@ -505,18 +505,7 @@ std::optional<tr_address> tr_globalIPv6(tr_session const* session)
         cache_val = global_address(AF_INET6);
     }
 
-    auto ret = cache_val;
-
-    // check to see if the session is overriding this address
-    if (session != nullptr)
-    {
-        if (auto const [ipv6_bindaddr, is_default] = session->publicAddress(TR_AF_INET6); !is_default)
-        {
-            ret = ipv6_bindaddr;
-        }
-    }
-
-    return ret;
+    return cache_val;
 }
 
 ///

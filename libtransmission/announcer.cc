@@ -235,8 +235,6 @@ public:
 
     tr_session* const session;
 
-    uint32_t const key = tr_rand_obj<uint32_t>();
-
 private:
     void flushCloseMessages()
     {
@@ -946,7 +944,7 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
     req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
     req.event = event;
     req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
-    req.key = announcer->key;
+    req.key = tor->announce_key();
     req.partial_seed = tor->isPartialSeed();
     tier->buildLogName(req.log_name, sizeof(req.log_name));
     return req;
