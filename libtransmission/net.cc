@@ -471,7 +471,7 @@ namespace global_ipv6_helpers
     return {};
 }
 
-[[nodiscard]] auto global_address(int af)
+[[nodiscard]] std::optional<tr_address> global_address(int af)
 {
     // Pick some destination address to pretend to send a packet to
     static auto constexpr DstIPv4 = "91.121.74.28"sv;
@@ -481,11 +481,17 @@ namespace global_ipv6_helpers
 
     // In order for address selection to work right,
     // this should be a native IPv6 address, not Teredo or 6to4
-    TR_ASSERT(dst_addr.has_value());
-    TR_ASSERT(dst_addr->is_global_unicast_address());
+    TR_ASSERT(dst_addr.has_value() && dst_addr->is_global_unicast_address());
 
-    auto src_addr = get_source_address(*dst_addr, dst_port);
-    return src_addr && src_addr->is_global_unicast_address() ? *src_addr : std::optional<tr_address>{};
+    if (dst_addr)
+    {
+        if (auto addr = get_source_address(*dst_addr, dst_port); addr && addr->is_global_unicast_address())
+        {
+            return addr;
+        }
+    }
+
+    return {};
 }
 
 } // namespace global_ipv6_helpers
