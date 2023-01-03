@@ -1081,7 +1081,7 @@
 		BE1183680CE160D50002D0F3 /* miniupnpc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = miniupnpc.c; sourceTree = "<group>"; };
 		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE7AA337F6752914B0C416B1 /* utils-ev.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "utils-ev.h"; sourceTree = "<group>"; };
-		BE7AA337F6752914B0C416B3 /* utils-ev.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "utils-ev.cpp"; sourceTree = "<group>"; };
+		BE7AA337F6752914B0C416B3 /* utils-ev.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "utils-ev.cc"; sourceTree = "<group>"; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0E0C07756200B0BB3C /* daemon.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = daemon.cc; sourceTree = "<group>"; };
 		BEFC1C140C07756200B0BB3C /* remote.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = remote.cc; sourceTree = "<group>"; };
