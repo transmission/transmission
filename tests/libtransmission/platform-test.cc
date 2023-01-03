@@ -6,11 +6,11 @@
 #include <cstdlib>
 #include <string_view>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "file.h"
-#include "platform.h"
-#include "tr-strbuf.h"
+#include <libtransmission/file.h>
+#include <libtransmission/platform.h>
+#include <libtransmission/tr-strbuf.h>
 
 #include "test-fixtures.h"
 

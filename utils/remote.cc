@@ -143,7 +143,7 @@ static std::string tr_strltime(time_t seconds)
 
     if (days > 0)
     {
-        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, tr_ngettext("day", "days", days));
+        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), days, tr_ngettext("day", "days", days));
         tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format(FMT_STRING("{:s}, {:s}"), dstr, hstr);
     }
     else if (hours > 0)

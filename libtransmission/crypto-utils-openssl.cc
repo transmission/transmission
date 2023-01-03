@@ -37,11 +37,7 @@ static void log_openssl_error(char const* file, int line)
 
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
-#ifndef TR_LIGHTWEIGHT
-
-        static bool strings_loaded = false;
-
-        if (!strings_loaded)
+        if (static bool strings_loaded = false; !strings_loaded)
         {
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
             ERR_load_crypto_strings();
@@ -51,8 +47,6 @@ static void log_openssl_error(char const* file, int line)
 
             strings_loaded = true;
         }
-
-#endif
 
         auto buf = std::array<char, 512>{};
         ERR_error_string_n(error_code, std::data(buf), std::size(buf));

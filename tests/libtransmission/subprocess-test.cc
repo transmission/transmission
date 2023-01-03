@@ -3,11 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "error.h"
-#include "file.h"
-#include "platform.h"
-#include "subprocess.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/platform.h>
+#include <libtransmission/subprocess.h>
 
 #include "gtest/internal/gtest-port.h" // GetArgvs()
 

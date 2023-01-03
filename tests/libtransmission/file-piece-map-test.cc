@@ -7,10 +7,10 @@
 #include <numeric>
 #include <cstdint>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "block-info.h"
-#include "file-piece-map.h"
+#include <libtransmission/block-info.h>
+#include <libtransmission/file-piece-map.h>
 
 #include "gtest/gtest.h"
 

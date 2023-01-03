@@ -30,7 +30,7 @@
 #include "crypto-utils.h"
 #include "error.h"
 #include "log.h"
-#include "net.h" // for tr_globalIPv6()
+#include "net.h"
 #include "peer-mgr.h" /* pex */
 #include "quark.h"
 #include "torrent.h"
@@ -379,25 +379,9 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
     }
 }
 
-[[nodiscard]] auto format_ipv4_url_arg(tr_address const& addr)
-{
-    auto buf = std::array<char, TR_ADDRSTRLEN>{};
-    auto display_name = addr.display_name(std::data(buf), std::size(buf));
-    return fmt::format("&ipv4={:s}", display_name);
-}
-
-[[nodiscard]] auto format_ipv6_url_arg(tr_address const& addr)
-{
-    auto arg = "&ipv6="s;
-    tr_urlPercentEncode(std::back_inserter(arg), addr.display_name());
-    return arg;
-}
-
 [[nodiscard]] std::string format_ip_arg(std::string_view ip)
 {
-    auto arg = std::string{ "&ip="sv };
-    arg += ip;
-    return arg;
+    return fmt::format("&ip={:s}", ip);
 }
 
 } // namespace tr_tracker_announce_helpers
@@ -437,7 +421,7 @@ void tr_tracker_http_announce(
         session->fetch(std::move(opt));
     };
 
-    auto const ipv6 = tr_globalIPv6(session);
+    auto const [ipv6, ipv6_is_any] = session->publicAddress(TR_AF_INET6);
 
     /*
      * Before Curl 7.77.0, if we explicitly choose the IP version we want
@@ -452,21 +436,13 @@ void tr_tracker_http_announce(
         {
             options.url += format_ip_arg(session->announceIP());
         }
-        else if (ipv6)
-        {
-            if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
-            {
-                options.url += format_ipv4_url_arg(*public_ipv4);
-            }
-            options.url += format_ipv6_url_arg(*ipv6);
-        }
 
         d->requests_sent_count = 1;
         do_make_request(""sv, std::move(options));
     }
     else
     {
-        if (session->useAnnounceIP() || !ipv6)
+        if (session->useAnnounceIP() || ipv6_is_any)
         {
             if (session->useAnnounceIP())
             {
@@ -481,17 +457,10 @@ void tr_tracker_http_announce(
 
             // First try to send the announce via IPv4:
             auto ipv4_options = options;
-            // Set the "&ipv6=" argument
-            ipv4_options.url += format_ipv6_url_arg(*ipv6);
-            // Set protocol to IPv4
             ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
             do_make_request("IPv4"sv, std::move(ipv4_options));
 
-            // Then maybe set the "&ipv4=..." part and try to send via IPv6:
-            if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
-            {
-                options.url += format_ipv4_url_arg(*public_ipv4);
-            }
+            // Then try to send via IPv6:
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
             do_make_request("IPv6"sv, std::move(options));
         }

@@ -12,14 +12,14 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "announcer.h"
-#include "announcer-common.h"
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "peer-mgr.h" // for tr_pex
-#include "timer-ev.h"
-#include "tr-buffer.h"
+#include <libtransmission/announcer.h>
+#include <libtransmission/announcer-common.h>
+#include <libtransmission/crypto-utils.h> // for tr_rand_obj()
+#include <libtransmission/peer-mgr.h> // for tr_pex
+#include <libtransmission/timer-ev.h>
+#include <libtransmission/tr-buffer.h>
 
 #include "test-fixtures.h"
 

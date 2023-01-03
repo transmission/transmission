@@ -3,9 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "rpcimpl.h"
-#include "variant.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/rpcimpl.h>
+#include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
 

@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 #ifdef _WIN32
@@ -307,6 +308,17 @@ namespace
 namespace tr_strvUtf8Clean_impl
 {
 
+template<std::size_t N, typename F>
+struct ArgTypeImpl;
+
+template<std::size_t N, typename R, typename... ArgTs>
+struct ArgTypeImpl<N, R (*)(ArgTs...)> : std::tuple_element<1, std::tuple<ArgTs...>>
+{
+};
+
+template<std::size_t N, typename F>
+using ArgType = typename ArgTypeImpl<N, F>::type;
+
 bool validateUtf8(std::string_view sv, char const** good_end)
 {
     auto const* begin = std::data(sv);
@@ -359,15 +371,11 @@ std::string to_utf8(std::string_view sv)
             continue;
         }
 
-#ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         auto const* inbuf = std::data(sv);
-#else
-        auto* inbuf = const_cast<char*>(std::data(sv));
-#endif
         size_t inbytesleft = std::size(sv);
         char* out = std::data(buf);
         size_t outbytesleft = std::size(buf);
-        auto const rv = iconv(cd, &inbuf, &inbytesleft, &out, &outbytesleft);
+        auto const rv = iconv(cd, const_cast<ArgType<1, decltype(&iconv)>>(&inbuf), &inbytesleft, &out, &outbytesleft);
         iconv_close(cd);
         if (rv != size_t(-1))
         {

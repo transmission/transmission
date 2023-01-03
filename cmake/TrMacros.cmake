@@ -1,3 +1,6 @@
+include(CheckFunctionExists)
+include(CheckIncludeFile)
+
 macro(tr_auto_option_changed NAME ACC VAL FIL STK)
     if(NOT ("${VAL}" STREQUAL "AUTO" OR "${VAL}" STREQUAL "ON" OR "${VAL}" STREQUAL "OFF"))
         if("${VAL}" STREQUAL "0" OR "${VAL}" STREQUAL "NO" OR "${VAL}" STREQUAL "FALSE" OR "${VAL}" STREQUAL "N")
@@ -11,7 +14,8 @@ macro(tr_auto_option_changed NAME ACC VAL FIL STK)
 endmacro()
 
 macro(tr_auto_option NAME DESC VAL)
-    set(${NAME} "${VAL}" CACHE STRING "${DESC}")
+    set(${NAME} "${VAL}"
+        CACHE STRING "${DESC}")
     set_property(CACHE ${NAME} PROPERTY STRINGS "AUTO;ON;OFF")
     variable_watch(${NAME} tr_auto_option_changed)
 endmacro()
@@ -57,7 +61,7 @@ endmacro()
 
 macro(tr_get_required_flag IVAR OVAR)
     set(${OVAR})
-    if (${IVAR} AND NOT ${IVAR} STREQUAL "AUTO")
+    if(${IVAR} AND NOT ${IVAR} STREQUAL "AUTO")
         set(${OVAR} REQUIRED)
     endif()
 endmacro()
@@ -69,7 +73,64 @@ function(tr_make_id INPUT OVAR)
     set(${OVAR} "${ID}" PARENT_SCOPE)
 endfunction()
 
+function(tr_string_unindent RESULT_VAR TEXT)
+    if(TEXT MATCHES [==[^([ ]+)]==])
+        string(REGEX REPLACE "(^|\n)${CMAKE_MATCH_1}($|.)" "\\1\\2" TEXT "${TEXT}")
+    endif()
+    set(${RESULT_VAR} "${TEXT}" PARENT_SCOPE)
+endfunction()
+
+macro(tr_eval SCRIPT)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+        cmake_language(EVAL CODE "${SCRIPT}")
+    else()
+        tr_string_unindent(_TR_EVAL_SCRIPT "${SCRIPT}")
+
+        string(SHA1 _TR_EVAL_TMP_FILE "${_TR_EVAL_SCRIPT}")
+        string(SUBSTRING "${_TR_EVAL_TMP_FILE}" 0 10 _TR_EVAL_TMP_FILE)
+        set(_TR_EVAL_TMP_FILE "${CMAKE_BINARY_DIR}/.tr-cache/tr_eval.${_TR_EVAL_TMP_FILE}.cmake")
+
+        if(NOT EXISTS "${_TR_EVAL_TMP_FILE}")
+            file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/.tr-cache")
+            file(WRITE "${_TR_EVAL_TMP_FILE}" "${_TR_EVAL_SCRIPT}")
+        endif()
+
+        include("${_TR_EVAL_TMP_FILE}")
+
+        unset(_TR_EVAL_TMP_FILE)
+        unset(_TR_EVAL_SCRIPT)
+    endif()
+endmacro()
+
+function(tr_process_list_conditions VAR_PREFIX)
+    set(ALLOWED_ITEMS)
+    set(DISALLOWED_ITEMS)
+
+    set(ALLOW TRUE)
+    foreach(ARG IN LISTS ARGN)
+        if(ARG MATCHES [==[^\[(.+)\]$]==])
+            set(COND "${CMAKE_MATCH_1}")
+            string(STRIP "${COND}" COND)
+            tr_eval("\
+                if(${COND})
+                    set(ALLOW TRUE)
+                else()
+                    set(ALLOW FALSE)
+                endif()")
+        elseif(ALLOW)
+            list(APPEND ALLOWED_ITEMS "${ARG}")
+        else()
+            list(APPEND DISALLOWED_ITEMS "${ARG}")
+        endif()
+    endforeach()
+
+    set(${VAR_PREFIX}_ALLOWED "${ALLOWED_ITEMS}" PARENT_SCOPE)
+    set(${VAR_PREFIX}_DISALLOWED "${DISALLOWED_ITEMS}" PARENT_SCOPE)
+endfunction()
+
 macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
+    cmake_parse_arguments(_TAEAL_ARG "" "TARGET" "CMAKE_ARGS" ${ARGN})
+
     if(USE_SYSTEM_${ID})
         tr_get_required_flag(USE_SYSTEM_${ID} SYSTEM_${ID}_IS_REQUIRED)
         find_package(${ID} ${${ID}_MINIMUM} ${SYSTEM_${ID}_IS_REQUIRED})
@@ -82,8 +143,10 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         set(${ID}_UPSTREAM_TARGET ${LIBNAME})
         set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${${ID}_UPSTREAM_TARGET}")
 
-        set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include" CACHE INTERNAL "")
-        set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}" CACHE INTERNAL "")
+        set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include"
+            CACHE INTERNAL "")
+        set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+            CACHE INTERNAL "")
 
         set(${ID}_INCLUDE_DIRS ${${ID}_INCLUDE_DIR})
         set(${ID}_LIBRARIES ${${ID}_LIBRARY})
@@ -100,7 +163,6 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
             URL "${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}"
-            ${ARGN}
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
@@ -114,10 +176,29 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
                 "-DCMAKE_INSTALL_LIBDIR:STRING=lib"
                 ${${ID}_EXT_PROJ_CMAKE_ARGS}
-            BUILD_BYPRODUCTS "${${ID}_LIBRARY}"
-        )
+                ${_TAEAL_ARG_CMAKE_ARGS}
+            BUILD_BYPRODUCTS "${${ID}_LIBRARY}")
 
         set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "third-party")
+
+        # Imported target (below) requires include directories to be present at configuration time
+        file(MAKE_DIRECTORY ${${ID}_INCLUDE_DIRS})
+    endif()
+
+    if(_TAEAL_ARG_TARGET)
+        add_library(${_TAEAL_ARG_TARGET} INTERFACE IMPORTED)
+
+        target_include_directories(${_TAEAL_ARG_TARGET}
+            INTERFACE
+                ${${ID}_INCLUDE_DIRS})
+
+        target_link_libraries(${_TAEAL_ARG_TARGET}
+            INTERFACE
+                ${${ID}_LIBRARIES})
+
+        if(${ID}_UPSTREAM_TARGET)
+            add_dependencies(${_TAEAL_ARG_TARGET} ${${ID}_UPSTREAM_TARGET})
+        endif()
     endif()
 endmacro()
 
@@ -129,7 +210,47 @@ function(tr_append_target_property TGT PROP VAL)
     set_target_properties(${TGT} PROPERTIES ${PROP} "${VAL}")
 endfunction()
 
-function(tr_win32_app_info OVAR DESCR INTNAME ORIGFNAME)
+function(tr_target_compile_definitions_for_headers TGT)
+    cmake_parse_arguments(ARG "" "" "PRIVATE;PUBLIC" ${ARGN})
+    foreach(VISIBILITY IN ITEMS PRIVATE PUBLIC)
+        foreach(H IN LISTS ARG_${VISIBILITY})
+            tr_make_id("HAVE_${H}" H_ID)
+            check_include_file(${H} ${H_ID})
+            target_compile_definitions(${TGT}
+                ${VISIBILITY}
+                    $<$<BOOL:${${H_ID}}>:${H_ID}>)
+        endforeach()
+    endforeach()
+endfunction()
+
+function(tr_target_compile_definitions_for_functions TGT)
+    cmake_parse_arguments(ARG "" "" "PRIVATE;PUBLIC;REQUIRED_LIBS" ${ARGN})
+    set(CMAKE_REQUIRED_LIBRARIES "${ARG_REQUIRED_LIBS}")
+    foreach(VISIBILITY IN ITEMS PRIVATE PUBLIC)
+        foreach(F IN LISTS ARG_${VISIBILITY})
+            tr_make_id("HAVE_${F}" F_ID)
+            check_function_exists(${F} ${F_ID})
+            target_compile_definitions(${TGT}
+                ${VISIBILITY}
+                    $<$<BOOL:${${F_ID}}>:${F_ID}>)
+        endforeach()
+    endforeach()
+endfunction()
+
+function(tr_disable_source_files_compile)
+    if(ARGN)
+        set_property(
+            SOURCE ${ARGN}
+            PROPERTY HEADER_FILE_ONLY ON)
+    endif()
+endfunction()
+
+function(tr_allow_compile_if)
+    tr_process_list_conditions(FILES ${ARGN})
+    tr_disable_source_files_compile(${FILES_DISALLOWED})
+endfunction()
+
+function(tr_win32_app_info TGT DESCR INTNAME ORIGFNAME)
     if(NOT WIN32)
         return()
     endif()
@@ -143,7 +264,9 @@ function(tr_win32_app_info OVAR DESCR INTNAME ORIGFNAME)
 
     configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.rc.in" "${INTNAME}-app-info.rc")
 
-    set(${OVAR} "${CMAKE_CURRENT_BINARY_DIR}/${INTNAME}-app-info.rc" PARENT_SCOPE)
+    target_sources(${TGT}
+        PRIVATE
+            "${CMAKE_CURRENT_BINARY_DIR}/${INTNAME}-app-info.rc")
 endfunction()
 
 function(tr_select_library LIBNAMES FUNCNAME DIRS OVAR)
@@ -180,7 +303,10 @@ function(tr_fixup_bundle_item BUNDLE_DIR BUNDLE_ITEMS DEP_DIRS)
                 set(DEP_BUNDLE_PATH "Contents/MacOS/${DEP_NAME}")
             elseif(DEP_FULL_PATH MATCHES "^(.+)/(([^/]+[.]framework)/.+)$")
                 set(DEP_NAME "${CMAKE_MATCH_2}")
-                file(COPY "${CMAKE_MATCH_1}/${CMAKE_MATCH_3}" DESTINATION "${BUNDLE_DIR}/Contents/Frameworks/" PATTERN "Headers" EXCLUDE)
+                file(
+                    COPY "${CMAKE_MATCH_1}/${CMAKE_MATCH_3}"
+                    DESTINATION "${BUNDLE_DIR}/Contents/Frameworks/"
+                    PATTERN "Headers" EXCLUDE)
                 set(DEP_BUNDLE_PATH "Contents/Frameworks/${DEP_NAME}")
             else()
                 message(FATAL_ERROR "Don't know how to fixup '${DEP_FULL_PATH}'")
@@ -198,28 +324,221 @@ function(tr_fixup_bundle_item BUNDLE_DIR BUNDLE_ITEMS DEP_DIRS)
     endwhile()
 endfunction()
 
-macro(tr_qt_wrap_ui)
-    if(Qt_VERSION_MAJOR EQUAL 6)
-        qt6_wrap_ui(${ARGN})
-    else()
-        qt5_wrap_ui(${ARGN})
-    endif()
-endmacro()
+function(tr_glib_compile_resources TGT NAME INPUT_DIR INPUT_FILE OUTPUT_FILE_BASE)
+    if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
+        execute_process(
+            COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
+            OUTPUT_VARIABLE GLIB_COMPILE_RESOURCES_EXECUTABLE
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-macro(tr_qt_add_resources)
-    if(Qt_VERSION_MAJOR EQUAL 6)
-        qt6_add_resources(${ARGN})
-    else()
-        qt5_add_resources(${ARGN})
-    endif()
-endmacro()
+        if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
+            message(SEND_ERROR "Unable to find glib-compile-resources executable")
+        endif()
 
-macro(tr_qt_add_translation)
+        set(GLIB_COMPILE_RESOURCES_EXECUTABLE "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            CACHE STRING "glib-compile-resources executable")
+    endif()
+
+    set_property(
+        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+            "${INPUT_DIR}/${INPUT_FILE}")
+
+    file(STRINGS "${INPUT_DIR}/${INPUT_FILE}" INPUT_LINES)
+    set(OUTPUT_DEPENDS)
+    foreach(INPUT_LINE IN LISTS INPUT_LINES)
+        if(INPUT_LINE MATCHES ">([^<]+)</file>")
+            list(APPEND OUTPUT_DEPENDS "${INPUT_DIR}/${CMAKE_MATCH_1}")
+        endif()
+    endforeach()
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+        COMMAND
+            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "--sourcedir=${INPUT_DIR}"
+            --generate-source
+            --c-name "${NAME}"
+            "${INPUT_DIR}/${INPUT_FILE}"
+        DEPENDS
+            "${INPUT_DIR}/${INPUT_FILE}"
+            ${OUTPUT_DEPENDS}
+        WORKING_DIRECTORY "${INPUT_DIR}")
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
+        COMMAND
+            "${GLIB_COMPILE_RESOURCES_EXECUTABLE}"
+            "--target=${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h"
+            "--sourcedir=${INPUT_DIR}"
+            --generate-header
+            --c-name "${NAME}"
+            "${INPUT_DIR}/${INPUT_FILE}"
+        DEPENDS
+            "${INPUT_DIR}/${INPUT_FILE}"
+            ${OUTPUT_DEPENDS}
+        WORKING_DIRECTORY "${INPUT_DIR}")
+
+    target_sources(${TGT}
+        PRIVATE
+            "${INPUT_DIR}/${INPUT_FILE}"
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h")
+
+    source_group("Generated Files"
+        FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.c"
+            "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.h")
+endfunction()
+
+function(tr_target_glib_resources TGT)
+    foreach(ARG IN LISTS ARGN)
+        get_filename_component(ARG_PATH "${ARG}" ABSOLUTE)
+        string(SHA1 ARG_HASH "${ARG_PATH}")
+        string(SUBSTRING "${ARG_HASH}" 0 10 ARG_HASH)
+
+        get_filename_component(ARG_NAME_WE "${ARG}" NAME_WE)
+        string(MAKE_C_IDENTIFIER "${ARG_NAME_WE}" ARG_ID)
+
+        get_filename_component(ARG_DIR "${ARG_PATH}" DIRECTORY)
+        get_filename_component(ARG_NAME "${ARG}" NAME)
+
+        tr_glib_compile_resources(${TGT}
+            "${ARG_ID}_${ARG_HASH}"
+            "${ARG_DIR}"
+            "${ARG_NAME}"
+            "${ARG_ID}-${ARG_HASH}")
+    endforeach()
+endfunction()
+
+function(tr_gettext_msgfmt TGT OUTPUT_FILE INPUT_FILE)
+    get_filename_component(OUTPUT_FILE_EXT "${OUTPUT_FILE}" LAST_EXT)
+    if(OUTPUT_FILE_EXT STREQUAL ".desktop")
+        set(MODE_ARG "--desktop")
+    elseif(OUTPUT_FILE_EXT STREQUAL ".xml")
+        set(MODE_ARG "--xml")
+    else()
+        message(FATAL_ERROR "Unsupported output file extension: '${OUTPUT_FILE_EXT}'")
+    endif()
+
+    add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} ${MODE_ARG} -d ${CMAKE_SOURCE_DIR}/po --template ${INPUT_FILE} -o ${OUTPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        VERBATIM)
+
+    target_sources(${TGT}
+        PRIVATE
+            "${INPUT_FILE}"
+            "${OUTPUT_FILE}")
+
+    source_group("Generated Files"
+        FILES
+            "${OUTPUT_FILE}")
+endfunction()
+
+macro(tr_qt_add_translation OUTPUT_FILES_VAR)
     if(Qt_VERSION_MAJOR EQUAL 6)
-        qt6_add_translation(${ARGN} OPTIONS -silent)
+        qt6_add_translation(${OUTPUT_FILES_VAR} ${ARGN} OPTIONS -silent)
     elseif(Qt_VERSION GREATER_EQUAL 5.11)
-        qt5_add_translation(${ARGN} OPTIONS -silent)
+        qt5_add_translation(${OUTPUT_FILES_VAR} ${ARGN} OPTIONS -silent)
     else()
-        qt5_add_translation(${ARGN})
+        qt5_add_translation(${OUTPUT_FILES_VAR} ${ARGN})
     endif()
+
+    source_group("Generated Files"
+        FILES ${${OUTPUT_FILES_VAR}})
 endmacro()
+
+function(tr_wrap_idl TGT INPUT_FILE OUTPUT_FILE_BASE)
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb
+        COMMAND ${MIDL_EXECUTABLE} /tlb ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb ${INPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+    configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.tlb.rc.in" ${OUTPUT_FILE_BASE}.tlb.rc)
+
+    target_sources(${TGT}
+        PRIVATE
+            ${INPUT_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb.rc)
+
+    source_group("Generated Files"
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb
+            ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb.rc)
+
+    tr_disable_source_files_compile(
+        ${INPUT_FILE}
+        ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE_BASE}.tlb)
+endfunction()
+
+function(tr_target_idl_files TGT)
+    foreach(ARG IN LISTS ARGN)
+        get_filename_component(ARG_PATH "${ARG}" ABSOLUTE)
+        string(SHA1 ARG_HASH "${ARG_PATH}")
+        string(SUBSTRING "${ARG_HASH}" 0 10 ARG_HASH)
+
+        get_filename_component(ARG_NAME_WE "${ARG}" NAME_WE)
+        string(MAKE_C_IDENTIFIER "${ARG_NAME_WE}" ARG_ID)
+
+        tr_wrap_idl(${TGT}
+            "${ARG}"
+            "${ARG_ID}-${ARG_HASH}")
+    endforeach()
+endfunction()
+
+function(tr_wrap_xib TGT INPUT_FILE OUTPUT_FILE OUTPUT_FOLDER)
+    if(NOT IBTOOL_EXECUTABLE)
+        find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
+    endif()
+
+    if(OUTPUT_FOLDER)
+        string(PREPEND OUTPUT_FOLDER "/")
+    endif()
+
+    get_filename_component(OUTPUT_FILE_DIR "${OUTPUT_FILE}" DIRECTORY)
+
+    add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_FILE_DIR}
+        COMMAND ${IBTOOL_EXECUTABLE} --compile ${OUTPUT_FILE} ${INPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        VERBATIM)
+
+    target_sources(${TGT}
+        PRIVATE
+            ${INPUT_FILE}
+            ${OUTPUT_FILE})
+
+    set(RESOURCES_DIR Resources)
+    if(NOT CMAKE_GENERATOR STREQUAL Xcode)
+        string(APPEND RESOURCES_DIR "${OUTPUT_FOLDER}")
+    endif()
+    set_source_files_properties(
+        ${OUTPUT_FILE}
+        PROPERTIES
+            MACOSX_PACKAGE_LOCATION "${RESOURCES_DIR}")
+
+    source_group("Resources${OUTPUT_FOLDER}"
+        FILES ${INPUT_FILE})
+
+    source_group("Generated Files${OUTPUT_FOLDER}"
+        FILES ${OUTPUT_FILE})
+endfunction()
+
+function(tr_target_xib_files TGT)
+    foreach(ARG IN LISTS ARGN)
+        get_filename_component(ARG_DIR "${ARG}" DIRECTORY)
+        get_filename_component(ARG_NAME_WLE "${ARG}" NAME_WLE)
+
+        tr_wrap_xib(${TGT}
+            "${ARG}"
+            "${CMAKE_CURRENT_BINARY_DIR}/${ARG_DIR}/${ARG_NAME_WLE}.nib"
+            "${ARG_DIR}")
+    endforeach()
+endfunction()

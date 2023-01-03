@@ -80,7 +80,7 @@ public:
         files_.shrink_to_fit();
     }
 
-    void clear() noexcept
+    TR_CONSTEXPR20 void clear() noexcept
     {
         files_.clear();
         total_size_ = uint64_t{};

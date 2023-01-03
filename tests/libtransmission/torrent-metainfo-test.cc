@@ -6,14 +6,14 @@
 #include <array>
 #include <string_view>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h"
-#include "error.h"
-#include "torrent-metainfo.h"
-#include "torrent.h"
-#include "tr-strbuf.h"
-#include "utils.h"
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/error.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/torrent.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 

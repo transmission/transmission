@@ -14,13 +14,13 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h"
-#include "file.h"
-#include "makemeta.h"
-#include "session.h" // TR_NAME
-#include "torrent-metainfo.h"
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/file.h>
+#include <libtransmission/makemeta.h>
+#include <libtransmission/session.h> // TR_NAME
+#include <libtransmission/torrent-metainfo.h>
 
 #include "test-fixtures.h"
 

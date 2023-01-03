@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include "Application.h"
+#include "GtkCompat.h"
 #include "Notify.h"
 #include "Prefs.h"
 #include "Utils.h"

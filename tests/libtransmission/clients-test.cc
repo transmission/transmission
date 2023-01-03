@@ -7,10 +7,10 @@
 #include <array>
 #include <string_view>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h" // tr_rand_obj()
-#include "clients.h"
+#include <libtransmission/crypto-utils.h> // tr_rand_obj()
+#include <libtransmission/clients.h>
 
 #include "gtest/gtest.h"
 

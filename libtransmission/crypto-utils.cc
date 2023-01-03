@@ -31,23 +31,6 @@ using namespace std::literals;
 
 ///
 
-template<class T>
-[[nodiscard]] T tr_rand_int(T upper_bound)
-{
-    static_assert(!std::is_signed<T>());
-    TR_ASSERT(upper_bound > std::numeric_limits<T>::min());
-
-    using dist_type = std::uniform_int_distribution<T>;
-    thread_local auto rng = tr_urbg<T>{};
-    thread_local auto dist = dist_type{};
-    return dist(rng, typename dist_type::param_type(0, upper_bound - 1));
-}
-
-template size_t tr_rand_int(size_t upper_bound);
-template unsigned int tr_rand_int(unsigned int upper_bound);
-
-///
-
 namespace
 {
 namespace ssha1_impl

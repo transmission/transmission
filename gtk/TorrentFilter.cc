@@ -5,6 +5,8 @@
 
 #include "TorrentFilter.h"
 
+#include "Utils.h"
+
 #include <libtransmission/transmission.h>
 
 void TorrentFilter::set_activity(Activity type)
@@ -155,6 +157,7 @@ sigc::signal<void()>& TorrentFilter::signal_changed()
 
 Glib::RefPtr<TorrentFilter> TorrentFilter::create()
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new TorrentFilter());
 }
 

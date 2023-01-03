@@ -6,6 +6,7 @@
 
 #include "Actions.h"
 #include "FilterBar.h"
+#include "GtkCompat.h"
 #include "ListModelAdapter.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -107,7 +108,7 @@ private:
 
     Glib::RefPtr<Gio::MenuModel> createStatsMenu();
 
-    void on_popup_menu(double view_x, double view_y);
+    void on_popup_menu(double event_x, double event_y);
 
     void onSpeedToggled(std::string const& action_name, tr_direction dir, bool enabled);
     void onSpeedSet(tr_direction dir, int KBps);
@@ -755,12 +756,12 @@ Glib::RefPtr<Gtk::TreeSelection> MainWindow::Impl::get_selection() const
     return view_->get_selection();
 }
 
-void MainWindow::for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> callback) const
+void MainWindow::for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> const& callback) const
 {
     for_each_selected_torrent_until(sigc::bind_return(callback, false));
 }
 
-bool MainWindow::for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> callback) const
+bool MainWindow::for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> const& callback) const
 {
     static auto const& self_col = Torrent::get_columns().self;
 

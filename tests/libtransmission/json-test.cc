@@ -9,9 +9,9 @@
 #include <string>
 #include <string_view>
 
-#include "transmission.h"
-#include "variant.h"
-#include "variant-common.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/variant.h>
+#include <libtransmission/variant-common.h>
 
 #include "gtest/gtest.h"
 
